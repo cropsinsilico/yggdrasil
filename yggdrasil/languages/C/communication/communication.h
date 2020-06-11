@@ -482,6 +482,7 @@ int comm_send_multipart(const comm_t *x, const char *data, const size_t len) {
   size_t headbuf_len = YGG_MSG_BUF;
   int headlen = 0, ret = -1;
   comm_t* xmulti = NULL;
+  int no_type = is_eof(data);
   if ((x == NULL) || (x->valid == 0)) {
     ygglog_error("comm_send_multipart: Invalid comm");
     return ret;
@@ -499,7 +500,9 @@ int comm_send_multipart(const comm_t *x, const char *data, const size_t len) {
   }
   // Try to send body in header
   if (len < (x->maxMsgSize - x->msgBufSize)) {
-    headlen = format_comm_header(head, &headbuf, headbuf_len);
+    headlen = format_comm_header(&head, &headbuf, headbuf_len,
+				 x->maxMsgSize - x->msgBufSize,
+				 no_type);
     if (headlen < 0) {
       ygglog_error("comm_send_multipart: Failed to format header.");
       free(headbuf);
@@ -545,7 +548,9 @@ int comm_send_multipart(const comm_t *x, const char *data, const size_t len) {
       ygglog_debug("comm_send_multipart: zmq worker reply address is '%s'",
 		   head.zmq_reply_worker);
     }
-    headlen = format_comm_header(head, &headbuf, headbuf_len);
+    headlen = format_comm_header(&head, &headbuf, headbuf_len,
+				 x->maxMsgSize - x->msgBufSize,
+				 no_type);
     if (headlen < 0) {
       ygglog_error("comm_send_multipart: Failed to format header.");
       free(headbuf);
@@ -556,7 +561,13 @@ int comm_send_multipart(const comm_t *x, const char *data, const size_t len) {
     }
   }
   // Send header
-  ret = comm_send_single(x, headbuf, headlen);
+  size_t data_in_header = 0;
+  if ((head.type_in_data) && (headlen > (x->maxMsgSize - x->msgBufSize))) {
+    ret = comm_send_single(x, headbuf, x->maxMsgSize - x->msgBufSize);
+    data_in_header = headlen - (x->maxMsgSize - x->msgBufSize);
+  } else {
+    ret = comm_send_single(x, headbuf, headlen);
+  }
   if (ret < 0) {
     ygglog_error("comm_send_multipart: Failed to send header.");
     if (xmulti != NULL) {
@@ -570,14 +581,42 @@ int comm_send_multipart(const comm_t *x, const char *data, const size_t len) {
     free(headbuf);
     return ret;
   }
-  // Send multipart
+  // Send data stored in header
   size_t msgsiz;
-  size_t prev = 0;
-  while (prev < head.size) {
-    if ((head.size - prev) > (xmulti->maxMsgSize - xmulti->msgBufSize))
+  size_t prev = headlen - data_in_header;
+  while (prev < headlen) {
+    if ((headlen - prev) > (xmulti->maxMsgSize - xmulti->msgBufSize)) {
       msgsiz = xmulti->maxMsgSize - xmulti->msgBufSize;
-    else
+    } else {
+      msgsiz = headlen - prev;
+    }
+    ret = comm_send_single(xmulti, headbuf + prev, msgsiz);
+    if (ret < 0) {
+      ygglog_debug("comm_send_multipart(%s): send of data in header interupted at %d of %d bytes.",
+		   x->name, prev - (headlen - data_in_header), data_in_header);
+      break;
+    }
+    prev += msgsiz;
+    ygglog_debug("comm_send_multipart(%s): %d of %d bytes sent from data in header",
+		 x->name, prev - (headlen - data_in_header), data_in_header);
+  }
+  head.size = head.size - data_in_header;
+  if (ret < 0) {
+    ygglog_error("comm_send_multipart: Failed to send data from header.");
+    if (xmulti != NULL) {
+      free_comm(xmulti);
+    }
+    free(headbuf);
+    return -1;
+  }
+  // Send multipart
+  prev = 0;
+  while (prev < head.size) {
+    if ((head.size - prev) > (xmulti->maxMsgSize - xmulti->msgBufSize)) {
+      msgsiz = xmulti->maxMsgSize - xmulti->msgBufSize;
+    } else {
       msgsiz = head.size - prev;
+    }
     ret = comm_send_single(xmulti, data + prev, msgsiz);
     if (ret < 0) {
       ygglog_debug("comm_send_multipart(%s): send interupted at %d of %d bytes.",
@@ -746,7 +785,7 @@ int comm_recv_multipart(comm_t *x, char **data, const size_t len,
     } else {
       updtype = x->datatype;
     }
-    if ((x->used[0] == 0) && (x->is_file == 0) && (updtype->obj == NULL)) {
+    if ((x->used[0] == 0) && (x->is_file == 0) && (updtype->obj == NULL) && (head.type_in_data == 0)) {
       ygglog_debug("comm_recv_multipart(%s): Updating datatype to '%s'",
 		   x->name, head.dtype->type);
       ret = update_dtype(updtype, head.dtype);
@@ -819,6 +858,20 @@ int comm_recv_multipart(comm_t *x, char **data, const size_t len,
 	pos += ret;
 	ygglog_debug("comm_recv_multipart(%s): %d of %d bytes received",
 		     x->name, prev, head.size);
+      }
+      if ((ret > 0) && (head.type_in_data)) {
+	ygglog_debug("comm_recv_multipart(%s): Extracting type from data.");
+	ret = parse_type_in_data(data, prev, &head);
+	if (ret > 0) {
+	  prev = ret;
+	  ret = update_dtype(updtype, head.dtype);
+	  if (ret != 0) {
+	    ygglog_error("comm_recv_multipart(%s): Error updating existing datatype.", x->name);
+	    return -1;
+	  } else {
+	    ret = (int)prev;
+	  }
+	}
       }
       if (ret > 0) {
 	ygglog_debug("comm_recv_multipart(%s): %d bytes completed", x->name, prev);

@@ -48,10 +48,13 @@ int init_client_comm(comm_t *comm) {
     return init_default_comm(comm);
   }
   // Called to initialize/create client comm
-  dtype_t *dtype_out = create_dtype_format(comm->direction, 0, false);
-  if (dtype_out == NULL) {
-    ygglog_error("init_client_comm: Failed to create output datatype.");
-    return -1;
+  dtype_t *dtype_out = NULL;
+  if (strlen(comm->direction) > 0) {
+    dtype_out = create_dtype_format(comm->direction, 0, false);
+    if (dtype_out == NULL) {
+      ygglog_error("init_client_comm: Failed to create output datatype.");
+      return -1;
+    }
   }
   comm_t *handle;
   if (strlen(comm->name) == 0) {

@@ -113,6 +113,13 @@ class ModelDriver(Driver):
             There will be one channel created for each server the model is a
             client of. Defaults to empty list. Use of `client_of` with `function`
             is not currently supported.
+        timesync (bool, str, optional): If set, the model is assumed to
+            call a send then receive of the state at each timestep
+            for syncronization with other models that are also
+            integrating in time. If a string is provided, it is assumed
+            to be the name of the server that will handle timestep
+            synchronization. If a boolean is provided, the name of the
+            server will be assumed to be 'timestep'. Defaults to False.
         overwrite (bool, optional): If True, any existing model products
             (compilation products, wrapper scripts, etc.) are removed prior to
             the run. If False, the products are not removed. Defaults to True.
@@ -221,6 +228,8 @@ class ModelDriver(Driver):
             started.
         client_of (list): The names of server models that this model is a
             client of.
+        timesync (str): If set, the name of the server performing
+            timestep synchronization for the model.
         with_strace (bool): If True, the command is run with strace or dtrace.
         strace_flags (list): Flags to pass to strace/dtrace.
         with_valgrind (bool): If True, the command is run with valgrind.
@@ -280,6 +289,9 @@ class ModelDriver(Driver):
         'is_server': {'type': 'boolean', 'default': False},
         'client_of': {'type': 'array', 'items': {'type': 'string'},
                       'default': []},
+        'timesync': {'anyOf': [{'type': 'boolean'},
+                               {'type': 'string'}],
+                     'default': False},
         'with_strace': {'type': 'boolean', 'default': False},
         'strace_flags': {'type': 'array',
                          'default': ['-e', 'trace=memory'],
@@ -332,7 +344,8 @@ class ModelDriver(Driver):
                            'event_process_kill_called',
                            'event_process_kill_complete'])
 
-    def __init__(self, name, args, model_index=0, **kwargs):
+    def __init__(self, name, args, model_index=0, clients=[],
+                 **kwargs):
         self.model_outputs_in_inputs = kwargs.pop('outputs_in_inputs', None)
         super(ModelDriver, self).__init__(name, **kwargs)
         # Setup process things
@@ -348,6 +361,7 @@ class ModelDriver(Driver):
              and platform._is_win)):  # pragma: windows
             raise RuntimeError("strace/valgrind options invalid on windows.")
         self.model_index = model_index
+        self.clients = clients
         self.env_copy = ['LANG', 'PATH', 'USER']
         self._exit_line = b'EXIT'
         for k in self.env_copy:
@@ -1056,6 +1070,7 @@ class ModelDriver(Driver):
         env['YGG_MODEL_NAME'] = self.name
         env['YGG_PYTHON_EXEC'] = sys.executable
         env['YGG_DEFAULT_COMM'] = tools.get_default_comm()
+        env['YGG_NCLIENTS'] = str(len(self.clients))
         return env
 
     def before_start(self, no_queue_thread=False, **kwargs):
@@ -1221,8 +1236,8 @@ class ModelDriver(Driver):
         self.wait_process(self.timeout, key_suffix='.graceful_stop')
         super(ModelDriver, self).graceful_stop()
 
-    def cleanup(self):
-        r"""Remove compile executable."""
+    def cleanup_products(self):
+        r"""Remove products created in order to run the model."""
         if self.overwrite:
             self.remove_products()
         if ((self.function and isinstance(self.model_src, str)
@@ -1230,6 +1245,10 @@ class ModelDriver(Driver):
             assert(os.path.basename(self.model_src).startswith('ygg_'))
             os.remove(self.model_src)
         self.restore_files()
+
+    def cleanup(self):
+        r"""Remove compile executable."""
+        self.cleanup_products()
         super(ModelDriver, self).cleanup()
 
     def restore_files(self):

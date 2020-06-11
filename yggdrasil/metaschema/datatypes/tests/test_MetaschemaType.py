@@ -253,10 +253,6 @@ class TestMetaschemaType(YggTestClassInfo):
                                     jsonschema.exceptions.ValidationError),
                                    self.import_cls.encode,
                                    self._invalid_validate[0], self.typedef)
-            if self._valid_decoded:
-                self.assert_raises(RuntimeError, self.import_cls.encode,
-                                   self._valid_decoded[0], self.typedef,
-                                   type='invalid')
 
     def test_decode_errors(self):
         r"""Test error on decode."""

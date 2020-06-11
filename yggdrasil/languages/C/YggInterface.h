@@ -379,6 +379,30 @@ comm_t* yggRpcServer(const char *name, const char *inFormat, const char *outForm
 };
 
 /*!
+  @brief Constructor for client side timestep synchronization calls.
+  Creates an instance of comm_t with provided information.  
+  @param[in] name constant character pointer to name for queues.
+  @param[in] t_units const char* Units that should be used for the
+  timestep. "" indicates no units.
+  @return comm_t structure with provided info.
+ */
+static inline
+comm_t* yggTimesync(const char *name, const char *t_units) {
+  dtype_t* dtypes_out[2];
+  dtypes_out[0] = create_dtype_scalar("float", 64, t_units, false);
+  dtypes_out[1] = create_dtype_json_object(0, NULL, NULL, true);
+  dtype_t* dtype_out = create_dtype_json_array(2, dtypes_out, false);
+  dtype_t* dtypes_in[1];
+  dtypes_in[0] = create_dtype_json_object(0, NULL, NULL, true);
+  dtype_t* dtype_in = create_dtype_json_array(1, dtypes_in, false);
+  comm_t* out = init_comm(name, "%s", CLIENT_COMM, dtype_in);
+  comm_t* handle = (comm_t*)(out->handle);
+  destroy_dtype(&(handle->datatype));
+  handle->datatype = dtype_out;
+  return out;
+};
+
+/*!
   @brief Format and send a message to an RPC output queue.
   Format provided arguments list using the output queue format string and
   then sends it to the output queue under the assumption that it is larger

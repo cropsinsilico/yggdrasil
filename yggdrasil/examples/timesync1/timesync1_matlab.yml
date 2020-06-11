@@ -1,0 +1,31 @@
+---
+
+models:
+  - name: modelA
+    language: matlab
+    args:
+      - ./src/timesync.m
+      - {{TIMESYNC_TSTEP_A}}  # Pass the timestep in hours
+      - hr
+    timesync: True
+    use_symunit: True
+    outputs:
+      name: output
+      default_file:
+        name: modelA_output.txt
+        in_temp: True
+        filetype: table
+  - name: modelB
+    language: matlab
+    args:
+      - ./src/timesync.m
+      - {{TIMESYNC_TSTEP_B}}  # Pass the timestep in days
+      - day
+    timesync: True
+    use_symunit: True
+    outputs:
+      name: output
+      default_file:
+        name: modelB_output.txt
+        in_temp: True
+        filetype: table

@@ -2,7 +2,8 @@ import os
 import copy
 from yggdrasil import platform
 from yggdrasil.drivers.CModelDriver import (
-    CCompilerBase, CModelDriver, GCCCompiler, ClangCompiler)
+    CCompilerBase, CModelDriver, GCCCompiler, ClangCompiler,
+    ClangLinker)
 
 
 class CPPCompilerBase(CCompilerBase):
@@ -45,8 +46,20 @@ class GPPCompiler(CPPCompilerBase, GCCCompiler):
 
 
 class ClangPPCompiler(CPPCompilerBase, ClangCompiler):
-    r"""clang++ compiler on Apple Mac OS."""
+    r"""Interface class for clang++ compiler."""
     toolname = 'clang++'
+    default_linker = 'clang++'
+    # Set to False since ClangLinker has its own class to handle
+    # conflict between versions of clang and ld.
+    is_linker = False
+
+
+class ClangPPLinker(ClangLinker):
+    r"""Interface class for clang++ linker (calls to ld)."""
+    toolname = ClangPPCompiler.toolname
+    languages = ClangPPCompiler.languages
+    default_executable = ClangPPCompiler.default_executable
+    default_executable_env = ClangPPCompiler.default_executable_env
 
 
 class CPPModelDriver(CModelDriver):

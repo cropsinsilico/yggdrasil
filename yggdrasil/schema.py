@@ -1261,24 +1261,6 @@ def standardize(instance, keys, is_singular=False, suffixes=None, altkeys=None):
                 instance[k][i] = {'name': instance[k][i]}
 
 
-def normalize_function_file(cond, working_dir):
-    r"""Normalize functions which use relative paths.
-
-    Args:
-        cond (str): Function expression.
-        working_dir (str): Full path to working directory that
-            should be used to normalized the function path.
-
-    Returns:
-        str: Normalized function expression.
-
-    """
-    mod_file, func_name = cond.split(':', 1)
-    if mod_file.endswith('.py') and (not os.path.isabs(mod_file)):
-        mod_file = os.path.normpath(os.path.join(working_dir, mod_file))
-    return ':'.join([mod_file, func_name])
-
-
 @SchemaRegistry.register_normalizer(tuple())
 def _normalize_root(normalizer, value, instance, schema):
     r"""Decorate normalizer."""
@@ -1300,6 +1282,8 @@ def _normalize_modelio_first(normalizer, value, instance, schema):
     iodict = getattr(normalizer, 'iodict', None)
     if isinstance(instance, dict):
         standardize(instance, ['inputs', 'outputs'])
+        if instance.get('language', None) == 'timesync':
+            instance.setdefault('args', [])
         prefix = '%s:' % instance['name']
         for io in ['inputs', 'outputs']:
             if len(instance[io]) == 0:
@@ -1319,11 +1303,6 @@ def _normalize_modelio_first(normalizer, value, instance, schema):
                         x['default_file'] = {'name': x['default_file']}
                     x['default_file'].setdefault('working_dir',
                                                  instance['working_dir'])
-                for k in ['filter', 'transform']:
-                    x_k = x.get(k, None)
-                    if isinstance(x_k, dict) and ('function' in x_k):
-                        x[k]['function'] = normalize_function_file(
-                            x[k]['function'], instance['working_dir'])
     return instance
 
 
@@ -1428,14 +1407,6 @@ def _normalize_connio_first(normalizer, value, instance, schema):
     if isinstance(instance, dict):
         standardize(instance, ['inputs', 'outputs'], suffixes=['_file', '_files'],
                     altkeys=[['from', 'to']])
-        if instance.get('working_dir', False):
-            for io in ['inputs', 'outputs']:
-                for x in instance[io]:
-                    for k in ['filter', 'transform']:
-                        x_k = x.get(k, None)
-                        if isinstance(x_k, dict) and ('function' in x_k):
-                            x[k]['function'] = normalize_function_file(
-                                x[k]['function'], instance['working_dir'])
         # Handle indexed inputs/outputs
         for io in ['inputs', 'outputs']:
             pruned = []

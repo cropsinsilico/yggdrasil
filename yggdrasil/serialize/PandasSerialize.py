@@ -379,7 +379,10 @@ class PandasSerialize(AsciiTableSerialize):
                 field_names = ['f0', 'f1', 'f2']
             out['objects'] = [serialize.list2pandas(x, names=field_names)
                               for x in out['objects']]
-        out['kwargs'].update(out['typedef'])
+        out['kwargs']['datatype'] = copy.deepcopy(out['typedef'])
+        if no_names:
+            for x in out['kwargs']['datatype']['items']:
+                x.pop('title', None)
         out['empty'] = pandas.DataFrame(np.zeros(0, out['dtype']))
         return out
 

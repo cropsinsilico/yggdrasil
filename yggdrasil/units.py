@@ -1,5 +1,6 @@
 import re
 import numpy as np
+import pandas as pd
 import unyt
 from yggdrasil import tools
 _unit_quantity = unyt.array.unyt_quantity
@@ -28,6 +29,67 @@ def get_ureg():
         unyt._unit_lookup_table.inv_name_alternatives["are"] = "a"
         unyt._unit_lookup_table.inv_name_alternatives["hectare"] = "ha"
     return _ureg_unyt
+
+
+def convert_to_pandas_timedelta(x):
+    r"""Convert variable with time units to a pandas.Timedelta instance.
+
+    Args:
+        x (object): Scalar/array with units to convert to a pandas.Timedelta
+            instance.
+
+    Returns:
+        pandas.Timedelta: Equivalent Timedelta variable.
+
+    """
+    assert(has_units(x))
+    t_data = get_data(x)
+    t_unit = get_units(x)
+    unit_map = {'ns': 'ns',
+                (tools.bytes2str(b'\xc2\xb5') + 's'): 'us',
+                'ms': 'ms',
+                's': 's',
+                'min': 'm',
+                'hr': 'h',
+                'day': 'D'}
+    return pd.Timedelta(t_data, unit=unit_map[t_unit])
+
+
+def convert_from_pandas_timedelta(x):
+    r"""Covert a pandas.Timedelta instance to a scalar/array with
+    time units.
+
+    Args:
+        x (pandas.Timedelta): Timedelta variable to convert.
+
+    Returns:
+        object: Equivalent scalar/array with units.
+
+    """
+    return add_units(x.total_seconds(), 's')
+
+
+def convert_matlab_unit_string(m_str):  # pragma: matlab
+    r"""Convert Matlab unit string to string that the Python package
+    can understand.
+
+    Args:
+        m_str (str): Matlab units string to convert.
+
+    Returns:
+        str: Converted string.
+
+    """
+    out = m_str
+    replacements = {'h': 'hr'}
+    regex_mu = tools.bytes2str(b'\xc2\xb5')
+    regex = r'(?P<name>[A-Za-z%s]+)' % regex_mu
+    for x in re.finditer(regex, m_str):
+        xdict = x.groupdict()
+        if xdict['name'] in replacements:
+            xdict['name'] = replacements[xdict['name']]
+            out = out[:(x.start())] + xdict['name'] + out[(x.end()):]
+    return out
 
 
 def convert_R_unit_string(r_str):
@@ -222,7 +284,7 @@ def is_unit(ustr):
 
 
 def convert_to(arr, new_units):
-    r"""Convert qunatity with units to new units. Objects without units
+    r"""Convert quantity with units to new units. Objects without units
     will be returned with the new units.
 
     Args:
@@ -243,3 +305,22 @@ def convert_to(arr, new_units):
     except unyt.exceptions.UnitConversionError as e:
         raise ValueError(str(e))
     return out
+
+
+def get_conversion_function(old_units, new_units):
+    r"""Get a function that will convert a scalar/array from one unit
+    to another.
+
+    Args:
+        old_units (str): Units to convert from.
+        new_units (str): Units to convert to.
+
+    Returns:
+        function: Conversion function that takes scalar/array as input
+            and returns converted scalar/array.
+
+    """
+    def fconvert(x):
+        ux = add_units(x, old_units)
+        return get_data(convert_to(ux, new_units))
+    return fconvert

@@ -949,18 +949,6 @@ class ZMQComm(AsyncComm.AsyncComm):
         c = super(ZMQComm, self).header2workcomm(header, **kwargs)
         return c
     
-    def on_send_eof(self):
-        r"""Actions to perform when EOF being sent.
-
-        Returns:
-            bool: True if EOF message should be sent, False otherwise.
-
-        """
-        flag, msg_s = super(ZMQComm, self).on_send_eof()
-        header_kwargs = dict(zmq_reply=self.set_reply_socket_send())
-        out = self.serialize(msg_s, header_kwargs=header_kwargs)
-        return flag, out
-        
     def on_send(self, msg, header_kwargs=None):
         r"""Process message to be sent including handling serializing
         message and handling EOF.

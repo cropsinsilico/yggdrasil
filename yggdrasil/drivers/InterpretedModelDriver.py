@@ -108,8 +108,11 @@ class InterpretedModelDriver(ModelDriver):
             if cls.default_interpreter is None:
                 cls.default_interpreter = cls.language
             # Add directory containing the interface
-            cls.paths_to_add.append(cls.get_language_dir())
-                    
+            try:
+                cls.paths_to_add.append(cls.get_language_dir())
+            except ValueError:
+                pass
+                
     def parse_arguments(self, *args, **kwargs):
         r"""Sort model arguments to determine which one is the executable
         and which ones are arguments.

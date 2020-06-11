@@ -80,4 +80,8 @@ class TypeMetaschemaProperty(MetaschemaProperty):
             type_cls = get_type_class(v0)
         else:
             type_cls = get_type_class(value)
-        return type_cls.normalize(instance)
+        kws = {}
+        if (((type_cls.name in ['class', 'function'])
+             and normalizer._working_dir_stack)):
+            kws['working_dir'] = normalizer._working_dir_stack[-1]
+        return type_cls.normalize(instance, **kws)

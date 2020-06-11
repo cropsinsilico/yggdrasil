@@ -1,0 +1,56 @@
+---
+
+models:
+  - name: statesync
+    language: timesync
+    synonyms:
+      modelB:
+        x:
+          alt: xvar
+          alt2base: ./src/timesync.py:xvar2x
+          base2alt: ./src/timesync.py:x2xvar
+        y: yvar
+      modelA:
+        z:
+          alt: [z1, z2]
+          alt2base: ./src/timesync.py:merge_z
+          base2alt: ./src/timesync.py:split_z
+    interpolation:
+      modelA: krogh
+      modelB:
+        method: spline
+        order: 5
+    aggregation:
+      x: ./src/timesync.py:xagg
+      y: sum
+    additional_variables:
+      modelA: [b]
+      modelB: [a]
+  - name: modelA
+    language: c
+    args:
+      - ./src/timesync.c
+      - {{TIMESYNC_TSTEP_A}}  # Pass the timestep in hours
+      - hr
+      - A
+    timesync: statesync
+    outputs:
+      name: output
+      default_file:
+        name: modelA_output.txt
+        in_temp: True
+        filetype: table
+  - name: modelB
+    language: c
+    args:
+      - ./src/timesync.c
+      - {{TIMESYNC_TSTEP_B}}  # Pass the timestep in days
+      - day
+      - B
+    timesync: statesync
+    outputs:
+      name: output
+      default_file:
+        name: modelB_output.txt
+        in_temp: True
+        filetype: table

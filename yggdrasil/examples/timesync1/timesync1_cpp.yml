@@ -1,0 +1,29 @@
+---
+
+models:
+  - name: modelA
+    language: c++
+    args:
+      - ./src/timesync.cpp
+      - {{TIMESYNC_TSTEP_A}}  # Pass the timestep in hours
+      - hr
+    timesync: True
+    outputs:
+      name: output
+      default_file:
+        name: modelA_output.txt
+        in_temp: True
+        filetype: table
+  - name: modelB
+    language: c++
+    args:
+      - ./src/timesync.cpp
+      - {{TIMESYNC_TSTEP_B}}  # Pass the timestep in days
+      - day
+    timesync: True
+    outputs:
+      name: output
+      default_file:
+        name: modelB_output.txt
+        in_temp: True
+        filetype: table

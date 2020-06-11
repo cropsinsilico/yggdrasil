@@ -1,5 +1,9 @@
+import os
+import uuid
+from collections import OrderedDict
 from yggdrasil.components import import_component
 from yggdrasil.communication import CommBase, get_comm
+from yggdrasil.drivers.ClientRequestDriver import YGG_CLIENT_EOF
 
 
 class ServerComm(CommBase.CommBase):
@@ -17,7 +21,7 @@ class ServerComm(CommBase.CommBase):
     Attributes:
         response_kwargs (dict): Keyword arguments for the response comm.
         icomm (Comm): Request comm.
-        ocomm (Comm): Response comm for last request.
+        ocomm (OrderedDict): Response comms for each request.
 
     """
 
@@ -34,11 +38,14 @@ class ServerComm(CommBase.CommBase):
         icomm_kwargs['comm'] = request_comm
         self.response_kwargs = response_kwargs
         self.icomm = get_comm(icomm_name, **icomm_kwargs)
-        self.ocomm = None
+        self.ocomm = OrderedDict()
         self.response_kwargs.setdefault('comm', self.icomm.comm_class)
         self.response_kwargs.setdefault('recv_timeout', self.icomm.recv_timeout)
         self.response_kwargs.setdefault('language', self.icomm.language)
         self._used_response_comms = dict()
+        self.clients = []
+        self.closed_clients = []
+        self.nclients_expected = int(os.environ.get('YGG_NCLIENTS', 0))
         super(ServerComm, self).__init__(self.icomm.name, dont_open=dont_open,
                                          recv_timeout=self.icomm.recv_timeout,
                                          is_interface=self.icomm.is_interface,
@@ -123,8 +130,8 @@ class ServerComm(CommBase.CommBase):
     def close(self, *args, **kwargs):
         r"""Close the connection."""
         self.icomm.close(*args, **kwargs)
-        if self.ocomm is not None:
-            self.ocomm.close()
+        for ocomm in self.ocomm.values():
+            ocomm.close()
         for ocomm in self._used_response_comms.values():
             ocomm.close()
         super(ServerComm, self).close(*args, **kwargs)
@@ -149,6 +156,18 @@ class ServerComm(CommBase.CommBase):
         r"""int: The number of messages in the connection to drain."""
         return self.icomm.n_msg_recv_drain
 
+    @property
+    def open_clients(self):
+        r"""list: Available open clients."""
+        return list(set(self.clients) - set(self.closed_clients))
+
+    @property
+    def all_clients_connected(self):
+        r"""bool: True if all expected clients have connected.
+        False otherwise."""
+        return ((self.nclients_expected > 0)
+                and (len(self.clients) >= self.nclients_expected))
+
     # RESPONSE COMM
     def create_response_comm(self):
         r"""Create a response comm based on information from the last header."""
@@ -159,17 +178,51 @@ class ServerComm(CommBase.CommBase):
         comm_kwargs = dict(address=self.icomm._last_header['response_address'],
                            direction='send', is_response_server=True,
                            single_use=True, **self.response_kwargs)
-        self.ocomm = get_comm(self.name + '.server_response_comm',
-                              **comm_kwargs)
+        request_id = self.icomm._last_header['request_id']
+        while request_id in self.ocomm:  # pragma: debug
+            request_id += str(uuid.uuid4())
+        self.ocomm[request_id] = get_comm(
+            self.name + '.server_response_comm.' + request_id,
+            **comm_kwargs)
+        client_model = self.icomm._last_header.get('client_model', '')
+        self.ocomm[request_id].client_model = client_model
+        if client_model and (client_model not in self.clients):
+            self.clients.append(client_model)
 
-    def remove_response_comm(self):
-        r"""Remove response comm."""
-        self.icomm._last_header = None
-        # self.ocomm.close_on_empty(no_wait=True)
-        self._used_response_comms[self.ocomm.name] = self.ocomm
-        self.ocomm = None
+    def remove_response_comm(self, request_id):
+        r"""Remove response comm.
+
+        Args:
+            request_id (str): The ID used to register the response
+                comm that should be removed.
+
+        """
+        # self.icomm._last_header = None
+        ocomm = self.ocomm.pop(request_id, None)
+        if ocomm is not None:
+            ocomm.close_in_thread(no_wait=True)
+            self._used_response_comms[ocomm.name] = ocomm
 
     # SEND METHODS
+    def send_to(self, request_id, *args, **kwargs):
+        r"""Send a message to a specific response comm.
+
+        Args:
+            request_id (str): ID used to register the response comm.
+            *args: Arguments are passed to output comm send method.
+            **kwargs: Keyword arguments are passed to output comm send method.
+    
+        Returns:
+            obj: Output from output comm send method.
+
+        """
+        # if self.is_closed:
+        #     self.debug("send(): Connection closed.")
+        #     return False
+        out = self.ocomm[request_id].send(*args, **kwargs)
+        self.remove_response_comm(request_id)
+        return out
+        
     def send(self, *args, **kwargs):
         r"""Send a message to the output comm.
 
@@ -181,16 +234,33 @@ class ServerComm(CommBase.CommBase):
             obj: Output from output comm send method.
 
         """
-        # if self.is_closed:
-        #     self.debug("send(): Connection closed.")
-        #     return False
-        if self.ocomm is None:  # pragma: debug
+        if len(self.ocomm) == 0:  # pragma: debug
             raise RuntimeError("There is no registered response comm.")
-        out = self.ocomm.send(*args, **kwargs)
-        self.remove_response_comm()
-        return out
+        return self.send_to(next(iter(self.ocomm.keys())),
+                            *args, **kwargs)
 
     # RECV METHODS
+    def recv_from(self, *args, **kwargs):
+        r"""Receive a message from the input comm and open a new response comm
+        for output using address from the header, returning the request_id.
+
+        Args:
+            *args: Arguments are passed to input comm recv method.
+            **kwargs: Keyword arguments are passed to input comm recv method.
+
+        Returns:
+            tuple(bool, obj, str): Success or failure of recv call,
+                output from input comm recv method, and request_id that
+                response should be sent to.
+
+        """
+        request_id = None
+        flag, msg = self.recv(*args, **kwargs)
+        if ((flag and (not self.icomm.is_eof(msg))
+             and (not self.icomm.is_empty_recv(msg)))):
+            request_id = next(reversed(self.ocomm.keys()))
+        return flag, msg, request_id
+    
     def recv(self, *args, **kwargs):
         r"""Receive a message from the input comm and open a new response comm
         for output using address from the header.
@@ -207,8 +277,13 @@ class ServerComm(CommBase.CommBase):
         #     self.debug("recv(): Connection closed.")
         #     return (False, None)
         flag, msg = self.icomm.recv(*args, **kwargs)
-        if flag and msg and (msg != self.eof_msg):
-            self.create_response_comm()
+        if flag:
+            if isinstance(msg, bytes) and (msg == YGG_CLIENT_EOF):
+                self.closed_clients.append(
+                    self.icomm._last_header['client_model'])
+                return self.recv(*args, **kwargs)
+            elif not (self.icomm.is_eof(msg) or self.icomm.is_empty_recv(msg)):
+                self.create_response_comm()
         return flag, msg
 
     # OLD STYLE ALIASES
@@ -229,6 +304,6 @@ class ServerComm(CommBase.CommBase):
         r"""Purge input and output comms."""
         self.icomm.purge()
         # Not sure if server should purge the response queue...
-        # if self.ocomm is not None:
-        #     self.ocomm.purge()
+        # for ocomm in self.ocomm.values():
+        #     ocomm.purge()
         super(ServerComm, self).purge()
