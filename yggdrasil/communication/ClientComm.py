@@ -155,10 +155,11 @@ class ClientComm(CommBase.CommBase):
         comm_kwargs = dict(direction='recv', is_response_client=True,
                            single_use=True, **self.response_kwargs)
         header = dict(request_id=str(uuid.uuid4()))
-        if header['request_id'] in self.icomm:  # pragma: debug
-            raise ValueError("Request ID %s already in use." % header['request_id'])
+        while header['request_id'] in self.icomm:  # pragma: debug
+            header['request_id'] += str(uuid.uuid4())
         c = new_comm('client_response_comm.' + header['request_id'], **comm_kwargs)
         header['response_address'] = c.address
+        header['client_model'] = self.model_name
         self.icomm[header['request_id']] = c
         self.icomm_order.append(header['request_id'])
         return header
@@ -182,13 +183,17 @@ class ClientComm(CommBase.CommBase):
             obj: Output from output comm send method.
 
         """
-        msg = args[0]
+        msg = args
+        if len(args) == 1:
+            msg = args[0]
         # if self.is_closed:
         #     self.debug("send(): Connection closed.")
         #     return False
         created_response = False
+        kwargs.setdefault('header_kwargs', {})
+        kwargs['header_kwargs'].update(client_model=self.model_name)
         if (not self.is_eof(msg)) and self.ocomm.evaluate_filter(msg):
-            kwargs['header_kwargs'] = self.create_response_comm()
+            kwargs['header_kwargs'].update(self.create_response_comm())
             created_response = True
         out = self.ocomm.send(*args, **kwargs)
         if (not out) and created_response:

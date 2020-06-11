@@ -112,8 +112,8 @@ class TestSerializeBase(YggTestClassInfo):
             msg = self.instance.serialize(iobj, header_kwargs=self._header_info,
                                           add_serializer_info=True)
             hout.update(self.instance.serializer_info)
-            hout.update(self.instance.datatype.encode_type(
-                iobj, typedef=self.instance.typedef))
+            hout['datatype'] = self.instance.datatype.encode_type(
+                iobj, typedef=self.instance.typedef)
             iout, ihead = self.instance.deserialize(msg)
             hout.update(size=ihead['size'], id=ihead['id'],
                         incomplete=False)

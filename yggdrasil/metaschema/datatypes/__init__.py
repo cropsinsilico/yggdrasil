@@ -304,7 +304,7 @@ def guess_type_from_msg(msg):
         if YGG_MSG_HEAD in msg:
             _, metadata, data = msg.split(YGG_MSG_HEAD, 2)
             metadata = decode_json(metadata)
-            cls = _type_registry[metadata['type']]
+            cls = _type_registry[metadata['datatype']['type']]
         else:
             raise Exception
         return cls
@@ -456,7 +456,7 @@ def decode(msg):
     """
     cls = guess_type_from_msg(msg)
     metadata = decode_json(msg.split(YGG_MSG_HEAD, 2)[1])
-    typedef = cls.extract_typedef(metadata)
+    typedef = cls.extract_typedef(metadata.get('datatype', {}))
     cls_inst = cls(**typedef)
     obj = cls_inst.deserialize(msg)[0]
     return obj

@@ -164,7 +164,9 @@ def deploy_package_on_ci(method):
     install_req = os.path.join("utils", "install_from_requirements.py")
     if method == 'conda':
         cmds += [
-            "%s install -q conda-build conda-verify scipy %s %s %s" % (
+            "%s install -q -n base conda-build conda-verify" % (
+                conda_cmd),
+            "%s install -q scipy %s %s %s" % (
                 conda_cmd,
                 os.environ.get('NUMPY', 'numpy'),
                 os.environ.get('MATPLOTLIB', 'matplotlib'),
@@ -199,13 +201,14 @@ def deploy_package_on_ci(method):
         if PY2:
             cmds.append(("%s install contextlib2 pathlib2 "
                          "\"configparser >=3.5\"") % conda_cmd)
-        index_dir = os.path.join("${CONDA_PREFIX}", "conda-bld")
+        # Assumes that an environment is active
+        prefix_dir = os.path.dirname(os.path.dirname(os.environ['CONDA_PREFIX']))
+        index_dir = os.path.join(prefix_dir, "conda-bld")
         cmds += [
             # Install from conda build
-            "%s build %s --python %s" % (
-                conda_cmd, os.path.join('recipe', 'meta.yaml'), PYVER),
+            "%s build %s --python %s" % (conda_cmd, 'recipe', PYVER),
             "%s index %s" % (conda_cmd, index_dir),
-            "%s install -c file:/${CONDA_PREFIX}/conda-bld yggdrasil" % conda_cmd,
+            "%s install -c file:/%s/conda-bld yggdrasil" % (conda_cmd, prefix_dir),
             "%s list" % conda_cmd
         ]
     elif method == 'pip':

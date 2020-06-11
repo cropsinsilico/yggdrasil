@@ -186,9 +186,10 @@ class GCCCompiler(CCompilerBase):
 
 
 class ClangCompiler(CCompilerBase):
-    r"""clang compiler on Apple Mac OS."""
+    r"""Interface class for clang compiler/linker."""
     toolname = 'clang'
-    platforms = ['MacOS']
+    platforms = ['MacOS', 'Linux', 'Windows']
+    default_linker = 'clang'
     default_archiver = 'libtool'
     flag_options = OrderedDict(list(CCompilerBase.flag_options.items())
                                + [('sysroot', '--sysroot'),
@@ -196,12 +197,9 @@ class ClangCompiler(CCompilerBase):
                                                 'prepend': True}),
                                   ('mmacosx-version-min',
                                    '-mmacosx-version-min=%s')])
-    linker_attributes = dict(
-        CCompilerBase.linker_attributes,
-        flag_options=OrderedDict(
-            list(LinkerBase.flag_options.items())
-            + list(CCompilerBase.linker_attributes.get('flag_options', {}).items())
-            + [('library_rpath', '-rpath')]))
+    # Set to False since ClangLinker has its own class to handle
+    # conflict between versions of clang and ld.
+    is_linker = False
     toolset = 'llvm'
 
 
@@ -249,14 +247,14 @@ class MSVCCompiler(CCompilerBase):
     toolset = 'msvc'
     
     @classmethod
-    def language_version(cls, **kwargs):  # pragma: windows
-        r"""Determine the version of this language.
+    def tool_version(cls, **kwargs):  # pragma: windows
+        r"""Determine the version of this tool.
 
         Args:
             **kwargs: Keyword arguments are passed to cls.call.
 
         Returns:
-            str: Version of compiler/interpreter for this language.
+            str: Version of the tool.
 
         """
         out = cls.call(cls.version_flags, skip_flags=True,
@@ -265,7 +263,82 @@ class MSVCCompiler(CCompilerBase):
             raise RuntimeError("Version call failed: %s" % out)
         return out.split('Copyright')[0]
 
-    
+
+# C Linkers
+class LDLinker(LinkerBase):
+    r"""Linker class for ld tool."""
+    toolname = 'ld'
+    # Languages disabled for ld by default to prevent it being
+    # selected instead of the default which seems to be happening
+    # on the CI
+    languages = ['c']  # ['c', 'c++', 'fortran']
+    default_executable_env = 'LD'
+    default_flags_env = 'LDFLAGS'
+    version_flags = ['-v']
+    search_path_envvar = ['LIBRARY_PATH', 'LD_LIBRARY_PATH']
+
+    @classmethod
+    def tool_version(cls, **kwargs):
+        r"""Determine the version of this tool.
+
+        Args:
+            **kwargs: Keyword arguments are passed to cls.call.
+
+        Returns:
+            str: Version of the tool.
+
+        """
+        out = cls.call(cls.version_flags, skip_flags=True,
+                       allow_error=True, **kwargs)
+        if platform._is_mac:
+            regex = r'PROJECT:ld64-(?P<version>\d+(?:\.\d+)?)'
+        else:
+            regex = (r'GNU ld \(GNU Binutils for (?P<os>.+)\) '
+                     r'(?P<version>\d+(?:\.\d+){0,2})')
+        match = re.search(regex, out)
+        if match is None:  # pragma: debug
+            raise RuntimeError("Could not locate version in string: %s" % out)
+        return match.group('version')
+
+
+class ClangLinker(LDLinker):
+    r"""Interface class for clang linker (calls to ld)."""
+    toolname = ClangCompiler.toolname
+    aliases = ClangCompiler.aliases
+    languages = ClangCompiler.languages
+    platforms = ClangCompiler.platforms
+    default_executable = ClangCompiler.default_executable
+    default_executable_env = ClangCompiler.default_executable_env
+    toolset = ClangCompiler.toolset
+    search_path_flags = ['-Xlinker', '-v']
+    search_regex = [r'\t([^\t\n]+)\n']
+    search_regex_begin = 'Library search paths:'
+    flag_options = OrderedDict(LDLinker.flag_options,
+                               **{'linker-version': '-mlinker-version=%s',
+                                  'library_rpath': '-rpath'})
+
+    @classmethod
+    def get_flags(cls, *args, **kwargs):
+        r"""Get a list of linker flags."""
+        # Handle case where clang (10.0.0) is trying to pass
+        # -platform_version to a version of ld64 that dosn't support
+        # it (<520).
+        # https://bugs.llvm.org/show_bug.cgi?id=44813
+        # https://reviews.llvm.org/D71579
+        # https://reviews.llvm.org/D74784
+        out = cls.call(cls.version_flags, skip_flags=True, allow_error=True)
+        regex = r'clang version (?P<version>\d+)\.\d+\.\d+'
+        match = re.search(regex, out)
+        if (match is not None) and (int(match.group('version')) >= 10):
+            ld_version = LDLinker.tool_version()
+            if float(ld_version) < 520:
+                kwargs['linker-version'] = ld_version
+        out = super(ClangLinker, cls).get_flags(*args, **kwargs)
+        if '-lstdc++' not in out:
+            out.append('-lstdc++')
+        return out
+
+
 # C Archivers
 class ARArchiver(ArchiverBase):
     r"""Archiver class for ar tool."""

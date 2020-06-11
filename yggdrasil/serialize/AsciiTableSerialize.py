@@ -1,7 +1,6 @@
 from yggdrasil import units, serialize, tools
 from yggdrasil.serialize import _default_delimiter_str
 from yggdrasil.serialize.DefaultSerialize import DefaultSerialize
-from yggdrasil.metaschema import get_metaschema
 from yggdrasil.metaschema.properties.ScalarMetaschemaProperties import (
     definition2dtype, data2dtype)
 
@@ -61,12 +60,9 @@ class AsciiTableSerialize(DefaultSerialize):
 
     def update_serializer(self, *args, **kwargs):
         # Transform scalar into array for table
-        if kwargs.get('type', 'array') != 'array':
-            old_typedef = {}
-            _metaschema = get_metaschema()
-            for k in _metaschema['properties'].keys():
-                if k in kwargs:
-                    old_typedef[k] = kwargs.pop(k)
+        old_typedef = kwargs.get('datatype', {})
+        if old_typedef.get('type', 'array') != 'array':
+            old_typedef = kwargs.pop('datatype')
             if old_typedef['type'] == 'object':
                 names = self.get_field_names()
                 if not names:
@@ -78,7 +74,7 @@ class AsciiTableSerialize(DefaultSerialize):
                         old_typedef['properties'][n], title=n))
             else:
                 new_typedef = {'type': 'array', 'items': [old_typedef]}
-            kwargs.update(new_typedef)
+            kwargs['datatype'] = new_typedef
         out = super(AsciiTableSerialize, self).update_serializer(*args, **kwargs)
         self.initialized = (self.typedef != self.default_datatype)
         self.update_format_str()

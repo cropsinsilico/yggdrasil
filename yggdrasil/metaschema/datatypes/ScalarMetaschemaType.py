@@ -40,6 +40,8 @@ class ScalarMetaschemaType(MetaschemaType):
             bool: True if the object could be of this type, False otherwise.
 
         """
+        if isinstance(obj, np.ndarray) and (obj.ndim == 0):
+            obj = obj.reshape((1, ))[0]
         if super(ScalarMetaschemaType, cls).validate(units.get_data(obj),
                                                      raise_errors=raise_errors):
             dtype = ScalarMetaschemaProperties.data2dtype(obj)

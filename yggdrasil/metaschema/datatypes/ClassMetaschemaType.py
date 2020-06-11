@@ -15,11 +15,13 @@ class ClassMetaschemaType(MetaschemaType):
     cross_language_support = False
 
     @classmethod
-    def normalize(cls, obj):
+    def normalize(cls, obj, working_dir=None):
         r"""Normalize an object, if possible, to conform to this type.
 
         Args:
             obj (object): Object to normalize.
+            working_dir (str, optional): Working directory that should
+                be used to make relative paths absolute. Defaults to None.
 
         Returns:
             object: Normalized object.
@@ -28,7 +30,8 @@ class ClassMetaschemaType(MetaschemaType):
         if isinstance(obj, (str, bytes)):
             try:
                 obj_str = tools.bytes2str(obj)
-                obj = cls.decode_data(obj_str, {'type': cls.name})
+                obj = cls.decode_data(obj_str, {'type': cls.name},
+                                      working_dir=working_dir)
             except (ValueError, AttributeError):
                 pass
         return obj
@@ -52,13 +55,15 @@ class ClassMetaschemaType(MetaschemaType):
         return out
 
     @classmethod
-    def decode_data(cls, obj, typedef):
+    def decode_data(cls, obj, typedef, working_dir=None):
         r"""Decode an object.
 
         Args:
             obj (string): Encoded object to decode.
             typedef (dict): Type definition that should be used to decode the
                 object.
+            working_dir (str, optional): Working directory that should
+                be used to make relative paths absolute. Defaults to None.
 
         Returns:
             object: Decoded object.
@@ -74,6 +79,8 @@ class ClassMetaschemaType(MetaschemaType):
                              % (cls.name, obj))
         mod, fun = pkg_mod[:]
         moddir, mod = os.path.split(mod)
+        if working_dir is not None:
+            moddir = os.path.normpath(os.path.join(working_dir, moddir))
         if mod.endswith('.py'):
             mod = os.path.splitext(mod)[0]
         try:

@@ -378,6 +378,29 @@ public:
     return out;
   }
   /*!
+    @brief Set the type associated with a property.
+    An error will be raised if the property identified by key is
+    already present and the provided type does not match the existing
+    type.
+    @param[in] key const char* Property key to set type for.
+    @param[in] proptype const MetaschemaType* Pointer to property type
+    that should be associated with the provided key.
+   */
+  void set_property_type(const char* key, const MetaschemaType* proptype) override {
+    MetaschemaTypeMap::const_iterator it = properties_.find(key);
+    if (it != properties_.end()) {
+      if ((*(it->second)) != (*proptype)) {
+	printf("New type:\n");
+	proptype->display();
+	printf("Existing type:\n");
+	it->second->display();
+	ygglog_throw_error("JSONObjectMetaschemaType::set_property_type: New type dosn't match existing type for property '%s'", key);
+      }
+    } else {
+      properties_[key] = proptype->copy();
+    }
+  }
+  /*!
     @brief Update the type object with info from provided variable arguments for serialization.
     @param[in,out] nargs size_t Number of arguments contained in ap. On output
     the number of unused arguments will be assigned to this address.

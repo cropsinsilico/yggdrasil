@@ -1975,12 +1975,8 @@ class CompiledModelDriver(ModelDriver):
         super(CompiledModelDriver, self).__init__(name, args, **kwargs)
         # Compile
         if not skip_compile:
-            try:
-                self.compile_model()
-                self.products.append(self.model_file)
-            except BaseException:
-                self.remove_products()
-                raise
+            self.compile_model()
+            self.products.append(self.model_file)
             assert(os.path.isfile(self.model_file))
             self.debug("Compiled %s", self.model_file)
 
@@ -2948,8 +2944,8 @@ class CompiledModelDriver(ModelDriver):
 
         """
         compiler = cls.get_tool('compiler', toolname=toolname)
-        if hasattr(compiler, 'language_version'):  # pragma: windows
-            return compiler.language_version(**kwargs).strip()
+        if hasattr(compiler, 'tool_version'):  # pragma: windows
+            return compiler.tool_version(**kwargs).strip()
         kwargs['version_flags'] = compiler.version_flags
         kwargs['skip_flags'] = True
         return super(CompiledModelDriver, cls).language_version(**kwargs)
@@ -3366,9 +3362,13 @@ class CompiledModelDriver(ModelDriver):
             default_kwargs.update(linker_flags=self.linker_flags)
         for k, v in default_kwargs.items():
             kwargs.setdefault(k, v)
-        if not kwargs.get('dry_run', False):
-            self.compile_dependencies(toolname=kwargs['toolname'])
-        return self.call_compiler(source_files, **kwargs)
+        try:
+            if not kwargs.get('dry_run', False):
+                self.compile_dependencies(toolname=kwargs['toolname'])
+            return self.call_compiler(source_files, **kwargs)
+        except BaseException:
+            self.cleanup_products()
+            raise
 
     @classmethod
     def get_internal_suffix(cls, commtype=None):

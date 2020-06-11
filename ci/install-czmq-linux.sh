@@ -8,6 +8,9 @@ sudo apt-get install -y \
 # Install Libsodium
 git clone git://github.com/jedisct1/libsodium.git
 cd libsodium
+git fetch --tags
+latestTag=$(git describe --tags `git rev-list --tags --max-count=1`)
+git checkout $latestTag
 ./autogen.sh
 ./configure # && make check
 sudo make install
@@ -17,6 +20,9 @@ cd ..
 # Install libzmq
 git clone git://github.com/zeromq/libzmq.git
 cd libzmq
+git fetch --tags
+latestTag=$(git describe --tags `git rev-list --tags --max-count=1`)
+git checkout $latestTag
 ./autogen.sh
 # do not specify "--with-libsodium" if you prefer to use internal tweetnacl
 # security implementation (recommended for development)
@@ -28,6 +34,9 @@ cd ..
 # Install czmq
 git clone git://github.com/zeromq/czmq.git
 cd czmq
+git fetch --tags
+latestTag=$(git describe --tags `git rev-list --tags --max-count=1`)
+git checkout $latestTag
 ./autogen.sh
 ./configure # && make check
 sudo make install
