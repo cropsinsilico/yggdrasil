@@ -13,6 +13,8 @@ module fygg
   integer, parameter :: ucs4  = selected_char_kind ('ISO_10646')
 #endif
   integer(kind=c_int), bind(c, name="YGG_MSG_MAX_F") :: YGG_MSG_MAX
+  real(8),  parameter :: PI_8  = 4 * atan (1.0_8)
+  real(16), parameter :: PI_16 = 4 * atan (1.0_16)
 
   interface yggarg
      module procedure yggarg_scalar_unsigned1
@@ -150,6 +152,114 @@ module fygg
      module procedure yggarg_2darray_character
      module procedure yggarg_2darray_yggchar_r
   end interface yggarg
+  interface generic_array_set
+     module procedure generic_array_set_boolean
+     ! module procedure generic_array_set_integer
+     module procedure generic_array_set_null
+     ! module procedure generic_array_set_number
+     module procedure generic_array_set_array
+     module procedure generic_array_set_map
+     module procedure generic_array_set_ply
+     module procedure generic_array_set_obj
+     module procedure generic_array_set_python_class
+     ! module procedure generic_array_set_python_function
+     module procedure generic_array_set_schema
+     module procedure generic_array_set_any
+     module procedure generic_array_set_integer2
+     module procedure generic_array_set_integer4
+     module procedure generic_array_set_integer8
+     module procedure generic_array_set_unsigned1
+     module procedure generic_array_set_unsigned2
+     module procedure generic_array_set_unsigned4
+     module procedure generic_array_set_unsigned8
+     module procedure generic_array_set_real4
+     module procedure generic_array_set_real8
+     module procedure generic_array_set_complex4
+     module procedure generic_array_set_complex8
+     module procedure generic_array_set_bytes
+     module procedure generic_array_set_unicode
+     module procedure generic_array_set_1darray_integer2
+     module procedure generic_array_set_1darray_integer4
+     module procedure generic_array_set_1darray_integer8
+     module procedure generic_array_set_1darray_unsigned1
+     module procedure generic_array_set_1darray_unsigned2
+     module procedure generic_array_set_1darray_unsigned4
+     module procedure generic_array_set_1darray_unsigned8
+     module procedure generic_array_set_1darray_real4
+     module procedure generic_array_set_1darray_real8
+     module procedure generic_array_set_1darray_complex4
+     module procedure generic_array_set_1darray_complex8
+     module procedure generic_array_set_1darray_bytes
+     module procedure generic_array_set_1darray_unicode
+     module procedure generic_array_set_ndarray_integer2
+     module procedure generic_array_set_ndarray_integer4
+     module procedure generic_array_set_ndarray_integer8
+     module procedure generic_array_set_ndarray_unsigned1
+     module procedure generic_array_set_ndarray_unsigned2
+     module procedure generic_array_set_ndarray_unsigned4
+     module procedure generic_array_set_ndarray_unsigned8
+     module procedure generic_array_set_ndarray_real4
+     module procedure generic_array_set_ndarray_real8
+     module procedure generic_array_set_ndarray_complex4
+     module procedure generic_array_set_ndarray_complex8
+     module procedure generic_array_set_ndarray_character
+     module procedure generic_array_set_ndarray_bytes
+     module procedure generic_array_set_ndarray_unicode
+  end interface generic_array_set
+  interface generic_map_set
+     module procedure generic_map_set_boolean
+     ! module procedure generic_map_set_integer
+     module procedure generic_map_set_null
+     ! module procedure generic_map_set_number
+     module procedure generic_map_set_array
+     module procedure generic_map_set_map
+     module procedure generic_map_set_ply
+     module procedure generic_map_set_obj
+     module procedure generic_map_set_python_class
+     ! module procedure generic_map_set_python_function
+     module procedure generic_map_set_schema
+     module procedure generic_map_set_any
+     module procedure generic_map_set_integer2
+     module procedure generic_map_set_integer4
+     module procedure generic_map_set_integer8
+     module procedure generic_map_set_unsigned1
+     module procedure generic_map_set_unsigned2
+     module procedure generic_map_set_unsigned4
+     module procedure generic_map_set_unsigned8
+     module procedure generic_map_set_real4
+     module procedure generic_map_set_real8
+     module procedure generic_map_set_complex4
+     module procedure generic_map_set_complex8
+     module procedure generic_map_set_bytes
+     module procedure generic_map_set_unicode
+     module procedure generic_map_set_1darray_integer2
+     module procedure generic_map_set_1darray_integer4
+     module procedure generic_map_set_1darray_integer8
+     module procedure generic_map_set_1darray_unsigned1
+     module procedure generic_map_set_1darray_unsigned2
+     module procedure generic_map_set_1darray_unsigned4
+     module procedure generic_map_set_1darray_unsigned8
+     module procedure generic_map_set_1darray_real4
+     module procedure generic_map_set_1darray_real8
+     module procedure generic_map_set_1darray_complex4
+     module procedure generic_map_set_1darray_complex8
+     module procedure generic_map_set_1darray_bytes
+     module procedure generic_map_set_1darray_unicode
+     module procedure generic_map_set_ndarray_integer2
+     module procedure generic_map_set_ndarray_integer4
+     module procedure generic_map_set_ndarray_integer8
+     module procedure generic_map_set_ndarray_unsigned1
+     module procedure generic_map_set_ndarray_unsigned2
+     module procedure generic_map_set_ndarray_unsigned4
+     module procedure generic_map_set_ndarray_unsigned8
+     module procedure generic_map_set_ndarray_real4
+     module procedure generic_map_set_ndarray_real8
+     module procedure generic_map_set_ndarray_complex4
+     module procedure generic_map_set_ndarray_complex8
+     module procedure generic_map_set_ndarray_character
+     module procedure generic_map_set_ndarray_bytes
+     module procedure generic_map_set_ndarray_unicode
+  end interface generic_map_set
   interface yggassign
      module procedure yggassign_yggchar2character
      ! module procedure yggassign_character2yggchar
@@ -401,6 +511,14 @@ module fygg
      logical(kind=8), dimension(:), pointer :: x => null()
      integer(kind=c_size_t), dimension(:), pointer :: shape => null()
   end type logical8_nd
+  type :: bytes_nd
+     character(len=:), dimension(:), pointer :: x => null()
+     integer(kind=c_size_t), dimension(:), pointer :: shape => null()
+  end type bytes_nd
+  type :: unicode_nd
+     character(kind=ucs4, len=:), dimension(:), pointer :: x => null()
+     integer(kind=c_size_t), dimension(:), pointer :: shape => null()
+  end type unicode_nd
   type :: character_nd
      type(yggchar_r), dimension(:), pointer :: x => null()
      integer(kind=c_size_t), dimension(:), pointer :: shape => null()
@@ -668,27 +786,28 @@ contains
   include "YggInterface_arg.f90"
   include "YggInterface_conv.f90"
   include "YggInterface_assign.f90"
-
+  include "YggInterface_array.f90"
+  include "YggInterface_map.f90"
 
   subroutine ygguint1_assign(self, other)
     type(ygguint1), intent(inout) :: self
     integer, intent(in) :: other
-    self%x = other
+    self%x = int(other, kind=1)
   end subroutine ygguint1_assign
   subroutine ygguint2_assign(self, other)
     type(ygguint2), intent(inout) :: self
     integer, intent(in) :: other
-    self%x = other
+    self%x = int(other, kind=2)
   end subroutine ygguint2_assign
   subroutine ygguint4_assign(self, other)
     type(ygguint4), intent(inout) :: self
     integer, intent(in) :: other
-    self%x = other
+    self%x = int(other, kind=4)
   end subroutine ygguint4_assign
   subroutine ygguint8_assign(self, other)
     type(ygguint8), intent(inout) :: self
     integer, intent(in) :: other
-    self%x = other
+    self%x = int(other, kind=8)
   end subroutine ygguint8_assign
 
 
@@ -1147,6 +1266,18 @@ contains
     call fix_format_str(c_out_fmt)
     channel%comm = ygg_rpc_server_c(c_name, c_in_fmt, c_out_fmt)
   end function ygg_rpc_server
+
+  function ygg_timesync(name, units) result(channel)
+    implicit none
+    character(len=*), intent(in) :: name
+    character(len=*), intent(in) :: units
+    character(len=len_trim(name)+1) :: c_name
+    character(len=len_trim(units)+1) :: c_units
+    type(yggcomm) :: channel
+    c_name = trim(name)//c_null_char
+    c_units = trim(units)//c_null_char
+    channel%comm = ygg_timesync_c(c_name, c_units)
+  end function ygg_timesync
 
   ! Method for constructing data types
   function is_dtype_format_array(type_struct) result(out)
@@ -2140,6 +2271,16 @@ contains
     type(ygggeneric) :: out
     out = init_generic_c()
   end function init_generic
+  function init_generic_array() result(out)
+    implicit none
+    type(ygggeneric) :: out
+    out = init_generic_array_c()
+  end function init_generic_array
+  function init_generic_map() result(out)
+    implicit none
+    type(ygggeneric) :: out
+    out = init_generic_map_c()
+  end function init_generic_map
   function create_generic(type_class, data) result(out)
     implicit none
     type(yggdtype) :: type_class
@@ -2155,9 +2296,9 @@ contains
   end function create_generic
   subroutine free_generic(x)
     implicit none
-    type(ygggeneric) :: x
+    type(ygggeneric), target :: x
     integer(kind=c_int) :: out
-    out = free_generic_c(x)
+    out = free_generic_c(c_loc(x))
     if (out.ne.0) then
        stop "Error freeing generic object."
     end if
@@ -2259,5 +2400,383 @@ contains
     type(yggpython) :: x
     call display_python_c(x)
   end subroutine display_python
+
+  ! Interface for getting/setting generic array elements
+  ! Get
+  function generic_array_get_size(x) result(out)
+    implicit none
+    type(ygggeneric) :: x
+    integer(kind=c_size_t) :: out
+    out = generic_array_get_size_c(x)
+  end function generic_array_get_size
+  function generic_array_get_item(x, index, typename) result(out)
+    implicit none
+    type(ygggeneric) :: x
+    integer, intent(in) :: index
+    character(len=*), intent(in) :: typename
+    type(c_ptr) :: out
+    character(len=len_trim(typename)+1) :: c_typename
+    c_typename = trim(typename)//c_null_char
+    out = generic_array_get_item_c(x, int(index-1, c_size_t), c_typename)
+  end function generic_array_get_item
+  function generic_array_get_item_nbytes(x, index) result(out)
+    implicit none
+    type(ygggeneric) :: x
+    integer, intent(in) :: index
+    integer(kind=c_int) :: out
+    out = generic_array_get_item_nbytes_c(x, int(index-1, c_size_t))
+    if (out.lt.0) then
+       stop "Error getting number of bytes in array item."
+    end if
+  end function generic_array_get_item_nbytes
+  function generic_array_get_scalar(x, index, subtype, precision) result(out)
+    implicit none
+    type(ygggeneric) :: x
+    integer, intent(in) :: index
+    character(len=*), intent(in) :: subtype
+    integer, intent(in) :: precision
+    type(c_ptr) :: out
+    character(len=len_trim(subtype)+1) :: c_subtype
+    c_subtype = trim(subtype)//c_null_char
+    out = generic_array_get_scalar_c(x, int(index-1, c_size_t), &
+         c_subtype, int(precision, c_size_t))
+  end function generic_array_get_scalar
+  function generic_array_get_1darray(x, index, subtype, precision, data) &
+       result(out)
+    implicit none
+    type(ygggeneric) :: x
+    integer, intent(in) :: index
+    character(len=*), intent(in) :: subtype
+    integer, intent(in) :: precision
+    type(c_ptr), value :: data
+    integer(kind=c_size_t) :: out
+    character(len=len_trim(subtype)+1) :: c_subtype
+    c_subtype = trim(subtype)//c_null_char
+    out = generic_array_get_1darray_c(x, int(index-1, c_size_t), &
+         c_subtype, int(precision, c_size_t), data)
+  end function generic_array_get_1darray
+  function generic_array_get_ndarray(x, index, subtype, precision, &
+       data) result(shape)
+    implicit none
+    type(ygggeneric) :: x
+    integer, intent(in) :: index
+    character(len=*), intent(in) :: subtype
+    integer, intent(in) :: precision
+    type(c_ptr), value :: data
+    integer(kind=c_size_t), dimension(:), pointer :: shape
+    integer(kind=c_size_t) :: ndim
+    character(len=len_trim(subtype)+1) :: c_subtype
+    type(c_ptr), target :: c_shape
+    c_subtype = trim(subtype)//c_null_char
+    ndim = generic_array_get_ndarray_c(x, int(index-1, c_size_t), &
+         subtype, int(precision, c_size_t), data, c_loc(c_shape))
+    call c_f_pointer(c_shape, shape, [ndim])
+  end function generic_array_get_ndarray
+  ! Set
+  subroutine generic_array_set_item(x, index, typename, val)
+    implicit none
+    type(ygggeneric) :: x
+    integer, intent(in) :: index
+    character(len=*), intent(in) :: typename
+    type(c_ptr) :: val
+    integer(kind=c_int) :: c_out
+    character(len=len_trim(typename)+1) :: c_typename
+    c_typename = trim(typename)//c_null_char
+    c_out = generic_array_set_item_c(x, int(index-1, c_size_t), &
+         c_typename, val)
+    if (c_out.lt.0) then
+       stop "Error setting element in array."
+    end if
+  end subroutine generic_array_set_item
+  subroutine generic_array_set_scalar(x, index, val, subtype, &
+       precision, units_in)
+    implicit none
+    type(ygggeneric) :: x
+    integer, intent(in) :: index
+    type(c_ptr) :: val
+    character(len=*), intent(in) :: subtype
+    integer, intent(in) :: precision
+    character(len=*), intent(in), optional, target :: units_in
+    character(len=:), pointer :: units
+    integer(kind=c_int) :: c_out
+    character(len=len_trim(subtype)+1) :: c_subtype
+    character(len=:), pointer :: c_units
+    if (present(units_in)) then
+       units => units_in
+    else
+       units = ""
+    end if
+    c_subtype = trim(subtype)//c_null_char
+    c_units = trim(units)//c_null_char
+    c_out = generic_array_set_scalar_c(x, int(index-1, c_size_t), &
+         val, c_subtype, int(precision, c_size_t), c_units)
+    if (c_out.lt.0) then
+       stop "Error setting scalar element in array."
+    end if
+  end subroutine generic_array_set_scalar
+  subroutine generic_array_set_1darray(x, index, val, subtype, &
+       precision, length, units_in)
+    implicit none
+    type(ygggeneric) :: x
+    integer, intent(in) :: index
+    type(c_ptr) :: val
+    character(len=*), intent(in) :: subtype
+    integer, intent(in) :: precision
+    integer, intent(in) :: length
+    character(len=*), intent(in), optional, target :: units_in
+    character(len=:), pointer :: units
+    integer(kind=c_int) :: c_out
+    character(len=len_trim(subtype)+1) :: c_subtype
+    character(len=:), pointer :: c_units
+    if (present(units_in)) then
+       units => units_in
+    else
+       units = ""
+    end if
+    c_subtype = trim(subtype)//c_null_char
+    c_units = trim(units)//c_null_char
+    c_out = generic_array_set_1darray_c(x, int(index-1, c_size_t), &
+         val, c_subtype, int(precision, c_size_t), &
+         int(length, c_size_t), c_units)
+    if (c_out.lt.0) then
+       stop "Error setting 1darray element in array."
+    end if
+  end subroutine generic_array_set_1darray
+  subroutine generic_array_set_ndarray(x, index, data, subtype, &
+       precision, shape, units_in)
+    implicit none
+    type(ygggeneric) :: x
+    integer, intent(in) :: index
+    type(c_ptr) :: data
+    character(len=*), intent(in) :: subtype
+    integer, intent(in) :: precision
+    integer(kind=c_size_t), dimension(:), intent(in), target :: shape
+    character(len=*), intent(in), optional, target :: units_in
+    character(len=:), pointer :: units
+    integer(kind=c_int) :: c_out
+    character(len=len_trim(subtype)+1) :: c_subtype
+    character(len=:), pointer :: c_units
+    if (present(units_in)) then
+       units => units_in
+    else
+       units = ""
+    end if
+    c_subtype = trim(subtype)//c_null_char
+    c_units = trim(units)//c_null_char
+    c_out = generic_array_set_ndarray_c(x, int(index-1, c_size_t), &
+         data, c_subtype, int(precision, c_size_t), &
+         int(size(shape), c_size_t), c_loc(shape), c_units)
+    if (c_out.lt.0) then
+       stop "Error setting ndarray element in array."
+    end if
+  end subroutine generic_array_set_ndarray
+
+  ! Interface for getting/setting generic map elements
+  ! Get
+  function generic_map_get_size(x) result(out)
+    implicit none
+    type(ygggeneric) :: x
+    integer(kind=c_size_t) :: out
+    out = generic_map_get_size_c(x)
+  end function generic_map_get_size
+  subroutine generic_map_get_keys(x, keys)
+    implicit none
+    type(ygggeneric) :: x
+    character(len=:), dimension(:), allocatable, intent(out) :: keys
+    integer(kind=c_size_t), target :: n_keys
+    integer(kind=c_size_t), target :: key_size
+    integer(kind=c_size_t) :: i, j
+    type(c_ptr) :: c_keys
+    character, dimension(:), pointer :: f_keys
+    c_keys = generic_map_get_keys_c(x, c_loc(n_keys), c_loc(key_size))
+    call c_f_pointer(c_keys, f_keys, [n_keys * key_size])
+    allocate(character(len=key_size) :: keys(n_keys))
+    do i = 1, n_keys
+       do j = 1, key_size
+          keys(i)(j:j) = f_keys(((i-1)*key_size)+j)
+       end do
+    end do
+    deallocate(f_keys)
+  end subroutine generic_map_get_keys
+  function generic_map_get_item(x, key, typename) result(out)
+    implicit none
+    type(ygggeneric) :: x
+    character(len=*) :: key
+    character(len=*) :: typename
+    type(c_ptr) :: out
+    character(len=len_trim(key)+1) :: c_key
+    character(len=len_trim(typename)+1) :: c_typename
+    c_key = trim(key)//c_null_char
+    c_typename = trim(typename)//c_null_char
+    out = generic_map_get_item_c(x, c_key, c_typename)
+  end function generic_map_get_item
+  function generic_map_get_item_nbytes(x, key) result(out)
+    implicit none
+    type(ygggeneric) :: x
+    character(len=*) :: key
+    integer(kind=c_int) :: out
+    character(len=len_trim(key)+1) :: c_key
+    c_key = trim(key)//c_null_char
+    out = generic_map_get_item_nbytes_c(x, c_key)
+    if (out.lt.0) then
+       stop "Error getting number of bytes in map item."
+    end if
+  end function generic_map_get_item_nbytes
+  function generic_map_get_scalar(x, key, subtype, precision) result(out)
+    implicit none
+    type(ygggeneric) :: x
+    character(len=*) :: key
+    character(len=*) :: subtype
+    integer, intent(in) :: precision
+    type(c_ptr) :: out
+    character(len=len_trim(key)+1) :: c_key
+    character(len=len_trim(subtype)+1) :: c_subtype
+    c_key = trim(key)//c_null_char
+    c_subtype = trim(subtype)//c_null_char
+    out = generic_map_get_scalar_c(x, c_key, c_subtype, &
+         int(precision, c_size_t))
+  end function generic_map_get_scalar
+  function generic_map_get_1darray(x, key, subtype, precision, data) &
+       result(out)
+    implicit none
+    type(ygggeneric) :: x
+    character(len=*) :: key
+    character(len=*) :: subtype
+    integer, intent(in) :: precision
+    type(c_ptr) :: data
+    integer(kind=c_size_t) :: out
+    character(len=len_trim(key)+1) :: c_key
+    character(len=len_trim(subtype)+1) :: c_subtype
+    c_key = trim(key)//c_null_char
+    c_subtype = trim(subtype)//c_null_char
+    out = generic_map_get_1darray_c(x, c_key, c_subtype, &
+         int(precision, c_size_t), data)
+  end function generic_map_get_1darray
+  function generic_map_get_ndarray(x, key, subtype, precision, data) &
+       result(shape)
+    implicit none
+    type(ygggeneric) :: x
+    character(len=*) :: key
+    character(len=*) :: subtype
+    integer, intent(in) :: precision
+    type(c_ptr) :: data
+    integer(kind=c_size_t), dimension(:), pointer :: shape
+    integer(kind=c_size_t) :: ndim
+    character(len=len_trim(key)+1) :: c_key
+    character(len=len_trim(subtype)+1) :: c_subtype
+    type(c_ptr), target :: c_shape
+    c_key = trim(key)//c_null_char
+    c_subtype = trim(subtype)//c_null_char
+    ndim = generic_map_get_ndarray_c(x, c_key, c_subtype, &
+         int(precision, c_size_t), data, c_loc(c_shape))
+    call c_f_pointer(c_shape, shape, [ndim])
+  end function generic_map_get_ndarray
+  ! Set
+  subroutine generic_map_set_item(x, key, typename, val)
+    implicit none
+    type(ygggeneric) :: x
+    character(len=*) :: key
+    character(len=*) :: typename
+    type(c_ptr) :: val
+    integer(kind=c_int) :: c_out
+    character(len=len_trim(key)+1) :: c_key
+    character(len=len_trim(typename)+1) :: c_typename
+    c_key = trim(key)//c_null_char
+    c_typename = trim(typename)//c_null_char
+    c_out = generic_map_set_item_c(x, c_key, c_typename, val)
+    if (c_out.lt.0) then
+       stop "Error setting element in map."
+    end if
+  end subroutine generic_map_set_item
+  subroutine generic_map_set_scalar(x, key, val, subtype, precision, &
+       units_in)
+    implicit none
+    type(ygggeneric) :: x
+    character(len=*) :: key
+    type(c_ptr) :: val
+    character(len=*) :: subtype
+    integer, intent(in) :: precision
+    character(len=*), intent(in), optional, target :: units_in
+    character(len=:), pointer :: units
+    integer(kind=c_int) :: c_out
+    character(len=len_trim(key)+1) :: c_key
+    character(len=len_trim(subtype)+1) :: c_subtype
+    character(len=:), pointer :: c_units
+    if (present(units_in)) then
+       units => units_in
+    else
+       allocate(character(len=0) :: units)
+       units = ""
+    end if
+    allocate(character(len=len_trim(units)+1) :: c_units)
+    c_key = trim(key)//c_null_char
+    c_subtype = trim(subtype)//c_null_char
+    c_units = trim(units)//c_null_char
+    c_out = generic_map_set_scalar_c(x, c_key, val, c_subtype, &
+         int(precision, c_size_t), c_units)
+    if (c_out.lt.0) then
+       stop "Error setting scalar element in map."
+    end if
+    deallocate(c_units)
+  end subroutine generic_map_set_scalar
+  subroutine generic_map_set_1darray(x, key, val, subtype, &
+       precision, length, units_in)
+    implicit none
+    type(ygggeneric) :: x
+    character(len=*) :: key
+    type(c_ptr) :: val
+    character(len=*) :: subtype
+    integer, intent(in) :: precision
+    integer, intent(in) :: length
+    character(len=*), intent(in), optional, target :: units_in
+    character(len=:), pointer :: units
+    integer(kind=c_int) :: c_out
+    character(len=len_trim(key)+1) :: c_key
+    character(len=len_trim(subtype)+1) :: c_subtype
+    character(len=:), pointer :: c_units
+    if (present(units_in)) then
+       units => units_in
+    else
+       units = ""
+    end if
+    c_key = trim(key)//c_null_char
+    c_subtype = trim(subtype)//c_null_char
+    c_units = trim(units)//c_null_char
+    c_out = generic_map_set_1darray_c(x, c_key, val, c_subtype, &
+         int(precision, c_size_t), int(length, c_size_t), c_units)
+    if (c_out.lt.0) then
+       stop "Error setting 1darray element in map."
+    end if
+  end subroutine generic_map_set_1darray
+  subroutine generic_map_set_ndarray(x, key, data, subtype, &
+       precision, shape, units_in)
+    implicit none
+    type(ygggeneric) :: x
+    character(len=*) :: key
+    type(c_ptr) :: data
+    character(len=*) :: subtype
+    integer, intent(in) :: precision
+    integer(kind=c_size_t), dimension(:), intent(in), target :: shape
+    character(len=*), intent(in), optional, target :: units_in
+    character(len=:), pointer :: units
+    integer(kind=c_int) :: c_out
+    character(len=len_trim(key)+1) :: c_key
+    character(len=len_trim(subtype)+1) :: c_subtype
+    character(len=:), pointer :: c_units
+    if (present(units_in)) then
+       units => units_in
+    else
+       units = ""
+    end if
+    c_key = trim(key)//c_null_char
+    c_subtype = trim(subtype)//c_null_char
+    c_units = trim(units)//c_null_char
+    c_out = generic_map_set_ndarray_c(x, c_key, data, c_subtype, &
+         int(precision, c_size_t), int(size(shape), c_size_t), &
+         c_loc(shape), c_units)
+    if (c_out.lt.0) then
+       stop "Error setting ndarray element in map."
+    end if
+  end subroutine generic_map_set_ndarray
   
 end module fygg

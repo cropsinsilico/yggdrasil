@@ -44,6 +44,7 @@ void *yggRpcClient_f(const char *name, const char *out_fmt,
 		     const char *in_fmt);
 void *yggRpcServer_f(const char *name, const char *in_fmt,
 		     const char *out_fmt);
+void *yggTimesync_f(const char *name, const char *t_units);
 // Method for constructing data types
 int is_dtype_format_array_f(void* type_struct);
 void *create_dtype_empty_f(const bool use_generic);
@@ -94,8 +95,10 @@ void display_obj_indent_f(obj_t p, const char *indent);
 void display_obj_f(obj_t p);
 // Generic interface
 generic_t init_generic_f();
+generic_t init_generic_array_f();
+generic_t init_generic_map_f();
 generic_t create_generic_f(void* type_class, void* data, size_t nbytes);
-int free_generic_f(generic_t* x);
+int free_generic_f(void* x);
 generic_t copy_generic_f(generic_t src);
 int is_generic_init_f(generic_t x);
 void display_generic_f(generic_t x);
@@ -109,6 +112,65 @@ python_t init_python_f();
 void free_python_f(void *x);
 python_t copy_python_f(python_t x);
 void display_python_f(python_t x);
+// Interface for getting generic array elements
+size_t generic_array_get_size_f(generic_t x);
+void* generic_array_get_item_f(generic_t x, const size_t index, const char *type);
+int generic_array_get_item_nbytes_f(generic_t x, const size_t index);
+void* generic_array_get_scalar_f(generic_t x, const size_t index,
+				 const char *subtype, const size_t precision);
+size_t generic_array_get_1darray_f(generic_t x, const size_t index,
+				   const char *subtype, const size_t precision,
+				   void* data);
+size_t generic_array_get_ndarray_f(generic_t x, const size_t index,
+				   const char *subtype, const size_t precision,
+				   void* data, void* shape);
+size_t generic_map_get_size_f(generic_t x);
+void* generic_map_get_keys_f(generic_t x, void* n_keys_f, void* key_size_f);
+void* generic_map_get_item_f(generic_t x, const char* key,
+			   const char *type);
+int generic_map_get_item_nbytes_f(generic_t x, const char* key);
+void* generic_map_get_scalar_f(generic_t x, const char* key,
+			     const char *subtype, const size_t precision);
+size_t generic_map_get_1darray_f(generic_t x, const char* key,
+				 const char *subtype, const size_t precision,
+				 void* data);
+size_t generic_map_get_ndarray_f(generic_t x, const char* key,
+				 const char *subtype, const size_t precision,
+				 void* data, void* shape);
+// Interface for setting generic array elements
+int generic_array_set_item_f(generic_t x, const size_t index,
+			     const char *type, void* value);
+int generic_array_set_scalar_f(generic_t x, const size_t index,
+			       void* value, const char *subtype,
+			       const size_t precision,
+			       const char* units);
+int generic_array_set_1darray_f(generic_t x, const size_t index,
+				void* value, const char *subtype,
+				const size_t precision,
+				const size_t length,
+				const char* units);
+int generic_array_set_ndarray_f(generic_t x, const size_t index,
+				void* data, const char *subtype,
+				const size_t precision,
+				const size_t ndim, const void* shape,
+				const char* units);
+// Interface for setting generic map elements
+int generic_map_set_item_f(generic_t x, const char* key,
+			   const char* type, void* value);
+int generic_map_set_scalar_f(generic_t x, const char* key,
+			     void* value, const char *subtype,
+			     const size_t precision,
+			     const char* units);
+int generic_map_set_1darray_f(generic_t x, const char* key,
+			      void* value, const char *subtype,
+			      const size_t precision,
+			      const size_t length,
+			      const char* units);
+int generic_map_set_ndarray_f(generic_t x, const char* key,
+			      void* data, const char *subtype,
+			      const size_t precision,
+			      const size_t ndim, const void* shape,
+			      const char* units);
 
 #ifdef __cplusplus /* If this is a C++ compiler, end C linkage */
 }

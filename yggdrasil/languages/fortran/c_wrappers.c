@@ -129,6 +129,10 @@ void *yggRpcServer_f(const char *name, const char *in_fmt,
   return (void*)yggRpcServer(name, in_fmt, out_fmt);
 }
 
+void *yggTimesync_f(const char *name, const char *t_units) {
+  return (void*)yggTimesync(name, t_units);
+}
+
 // Method for constructing data types
 int is_dtype_format_array_f(void* type_struct) {
   return is_dtype_format_array((dtype_t*)type_struct);
@@ -330,12 +334,20 @@ generic_t init_generic_f() {
   return init_generic();
 }
 
+generic_t init_generic_array_f() {
+  return init_generic_array();
+}
+
+generic_t init_generic_map_f() {
+  return init_generic_map();
+}
+
 generic_t create_generic_f(void* type_class, void* data, size_t nbytes) {
   return create_generic((dtype_t*)type_class, data, nbytes);
 }
 
-int free_generic_f(generic_t* x) {
-  return destroy_generic(x);
+int free_generic_f(void* x) {
+  return destroy_generic((generic_t*)x);
 }
 
 generic_t copy_generic_f(generic_t src) {
@@ -388,4 +400,151 @@ python_t copy_python_f(python_t x) {
 void display_python_f(python_t x) {
   display_python(x);
 }
-  
+
+// Interface for getting/setting generic array elements
+size_t generic_array_get_size_f(generic_t x) {
+  return generic_array_get_size(x);
+}
+
+void* generic_array_get_item_f(generic_t x, const size_t index, const char *type) {
+  return generic_array_get_item(x, index, type);
+}
+
+int generic_array_get_item_nbytes_f(generic_t x, const size_t index) {
+  return generic_array_get_item_nbytes(x, index);
+}
+
+void* generic_array_get_scalar_f(generic_t x, const size_t index,
+				 const char *subtype, const size_t precision) {
+  return generic_array_get_scalar(x, index, subtype, precision);
+}
+
+size_t generic_array_get_1darray_f(generic_t x, const size_t index,
+				   const char *subtype, const size_t precision,
+				   void* data) {
+  return generic_array_get_1darray(x, index, subtype, precision, (void**)data);
+}
+
+size_t generic_array_get_ndarray_f(generic_t x, const size_t index,
+				   const char *subtype, const size_t precision,
+				   void* data, void* shape) {
+  return generic_array_get_ndarray(x, index, subtype, precision, (void**)data, (size_t**)shape);
+}
+
+int generic_array_set_item_f(generic_t x, const size_t index,
+			     const char *type, void* value) {
+  return generic_array_set_item(x, index, type, value);
+}
+
+int generic_array_set_scalar_f(generic_t x, const size_t index,
+			       void* value, const char *subtype,
+			       const size_t precision,
+			       const char* units) {
+  return generic_array_set_scalar(x, index, value, subtype, precision, units);
+}
+
+int generic_array_set_1darray_f(generic_t x, const size_t index,
+				void* value, const char *subtype,
+				const size_t precision,
+				const size_t length,
+				const char* units) {
+  return generic_array_set_1darray(x, index, value, subtype, precision, length, units);
+}
+
+int generic_array_set_ndarray_f(generic_t x, const size_t index,
+				void* data, const char *subtype,
+				const size_t precision,
+				const size_t ndim, const void* shape,
+				const char* units) {
+  return generic_array_set_ndarray(x, index, data, subtype, precision,
+				   ndim, (const size_t*)shape, units);
+}
+
+
+// Interface for getting/setting generic map elements
+size_t generic_map_get_size_f(generic_t x) {
+  return generic_map_get_size(x);
+}
+
+void* generic_map_get_keys_f(generic_t x, void* n_keys_f, void* key_size_f) {
+  char** keys_c = NULL;
+  char* keys_f = NULL;
+  size_t n_keys = generic_map_get_keys(x, &keys_c);
+  size_t i, i_key_size, max_key_size = 0;
+  for (i = 0; i < n_keys; i++) {
+    i_key_size = strlen(keys_c[i]);
+    if (i_key_size > max_key_size) {
+      max_key_size = i_key_size;
+    }
+  }
+  max_key_size++;
+  keys_f = (char*)malloc(max_key_size * n_keys);
+  for (i = 0; i < (n_keys * max_key_size); i++) {
+    keys_f[i] = ' ';
+  }
+  for (i = 0; i < n_keys; i++) {
+    memcpy(keys_f + (i * max_key_size), keys_c[i],
+	   strlen(keys_c[i])+1);
+    free(keys_c[i]);
+  }
+  free(keys_c);
+  ((size_t*)n_keys_f)[0] = n_keys;
+  ((size_t*)key_size_f)[0] = max_key_size;
+  return (void*)keys_f;
+}
+
+void* generic_map_get_item_f(generic_t x, const char* key,
+			     const char *type) {
+  return generic_map_get_item(x, key, type);
+}
+
+int generic_map_get_item_nbytes_f(generic_t x, const char* key) {
+  return generic_map_get_item_nbytes(x, key);
+}
+
+void* generic_map_get_scalar_f(generic_t x, const char* key,
+			       const char *subtype, const size_t precision) {
+  return generic_map_get_scalar(x, key, subtype, precision);
+}
+
+size_t generic_map_get_1darray_f(generic_t x, const char* key,
+				 const char *subtype, const size_t precision,
+				 void* data) {
+  return generic_map_get_1darray(x, key, subtype, precision, (void**)data);
+}
+
+size_t generic_map_get_ndarray_f(generic_t x, const char* key,
+				 const char *subtype, const size_t precision,
+				 void* data, void* shape) {
+  return generic_map_get_ndarray(x, key, subtype, precision, (void**)data, (size_t**)shape);
+}
+
+int generic_map_set_item_f(generic_t x, const char* key,
+			   const char* type, void* value) {
+  return generic_map_set_item(x, key, type, value);
+}
+
+int generic_map_set_scalar_f(generic_t x, const char* key,
+			     void* value, const char *subtype,
+			     const size_t precision,
+			     const char* units) {
+  return generic_map_set_scalar(x, key, value, subtype, precision, units);
+}
+
+int generic_map_set_1darray_f(generic_t x, const char* key,
+			      void* value, const char *subtype,
+			      const size_t precision,
+			      const size_t length,
+			      const char* units) {
+  return generic_map_set_1darray(x, key, value, subtype, precision,
+				 length, units);
+}
+
+int generic_map_set_ndarray_f(generic_t x, const char* key,
+			      void* data, const char *subtype,
+			      const size_t precision,
+			      const size_t ndim, const void* shape,
+			      const char* units) {
+  return generic_map_set_ndarray(x, key, data, subtype, precision,
+				 ndim, (const size_t*)shape, units);
+}

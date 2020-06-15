@@ -661,15 +661,17 @@ extern "C" {
   int destroy_generic(generic_t* x) {
     int ret = 0;
     if (x != NULL) {
-      x->prefix = ' ';
-      if (x->obj != NULL) {
-	try {
-	  YggGeneric* obj = (YggGeneric*)(x->obj);
-	  delete obj;
-	  x->obj = NULL;
-	} catch (...) {
-	  ygglog_error("destroy_generic: C++ exception thrown in destructor for YggGeneric.");
-	  ret = -1;
+      if (is_generic_init(*x)) {
+	x->prefix = ' ';
+	if (x->obj != NULL) {
+	  try {
+	    YggGeneric* obj = (YggGeneric*)(x->obj);
+	    delete obj;
+	    x->obj = NULL;
+	  } catch (...) {
+	    ygglog_error("destroy_generic: C++ exception thrown in destructor for YggGeneric.");
+	    ret = -1;
+	  }
 	}
       }
     }
@@ -992,6 +994,23 @@ extern "C" {
       delete item_type;
     } catch (...) {
       ygglog_error("generic_array_get_item: C++ exception thrown.");
+    }
+    return out;
+  }
+  int generic_array_get_item_nbytes(generic_t x, const size_t index) {
+    int out = 0;
+    try {
+      if (!(is_generic_init(x))) {
+	ygglog_throw_error("generic_array_get_item_nbytes: Object not initialized.");
+      }
+      YggGeneric* x_obj = (YggGeneric*)(x.obj);
+      if (x_obj == NULL) {
+	ygglog_throw_error("generic_array_get_item_nbytes: Object is NULL.");
+      }
+      out = x_obj->get_nbytes_array_item(index);
+    } catch (...) {
+      ygglog_error("generic_array_get_item_nbytes: C++ exception thrown.");
+      out = -1;
     }
     return out;
   }
@@ -1439,6 +1458,23 @@ extern "C" {
     }
     return out;
   }
+  int generic_map_get_item_nbytes(generic_t x, const char* key) {
+    int out = 0;
+    try {
+      if (!(is_generic_init(x))) {
+	ygglog_throw_error("generic_map_get_item_nbytes: Object not initialized.");
+      }
+      YggGeneric* x_obj = (YggGeneric*)(x.obj);
+      if (x_obj == NULL) {
+	ygglog_throw_error("generic_map_get_item_nbytes: Object is NULL.");
+      }
+      out = (int)(x_obj->get_nbytes_map_item(key));
+    } catch (...) {
+      ygglog_error("generic_map_get_item_nbytes: C++ exception thrown.");
+      out = -1;
+    }
+    return out;
+  }
   bool generic_map_get_bool(generic_t x, const char* key) {
     return ((bool*)generic_map_get_item(x, key, "boolean"))[0];
   }
@@ -1860,6 +1896,10 @@ extern "C" {
 			       generic_t value) {
     return generic_array_set_item(x, index, "object", (void*)(&value));
   }
+  int generic_array_set_map(generic_t x, const size_t index,
+			    generic_t value) {
+    return generic_array_set_item(x, index, "object", (void*)(&value));
+  }
   int generic_array_set_array(generic_t x, const size_t index,
 			      generic_t value) {
     return generic_array_set_item(x, index, "array", (void*)(&value));
@@ -2278,6 +2318,10 @@ extern "C" {
   }
   int generic_map_set_object(generic_t x, const char* key,
 			     generic_t value) {
+    return generic_map_set_item(x, key, "object", (void*)(&value));
+  }
+  int generic_map_set_map(generic_t x, const char* key,
+			  generic_t value) {
     return generic_map_set_item(x, key, "object", (void*)(&value));
   }
   int generic_map_set_array(generic_t x, const char* key,

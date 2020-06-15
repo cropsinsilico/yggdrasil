@@ -253,6 +253,15 @@
        type(c_ptr) :: channel
      end function ygg_rpc_server_c
 
+     function ygg_timesync_c(name, t_units) result(channel) &
+          bind(c, name="yggTimesync_f")
+       use, intrinsic :: iso_c_binding, only: c_ptr, c_char
+       implicit none
+       character(kind=c_char), dimension(*), intent(in) :: name
+       character(kind=c_char), dimension(*), intent(in) :: t_units
+       type(c_ptr) :: channel
+     end function ygg_timesync_c
+
      ! Method for constructing data types
      function is_dtype_format_array_c(type_struct) result(out) &
           bind(c, name="is_dtype_format_array_f")
@@ -548,6 +557,18 @@
        implicit none
        type(ygggeneric) :: out
      end function init_generic_c
+     function init_generic_array_c() result(out) &
+          bind(c, name="init_generic_array_f")
+       import :: ygggeneric
+       implicit none
+       type(ygggeneric) :: out
+     end function init_generic_array_c
+     function init_generic_map_c() result(out) &
+          bind(c, name="init_generic_map_f")
+       import :: ygggeneric
+       implicit none
+       type(ygggeneric) :: out
+     end function init_generic_map_c
      function create_generic_c(type_class, data, nbytes) result(out) &
           bind(c, name="create_generic_f")
        use, intrinsic :: iso_c_binding, only: c_size_t, c_ptr
@@ -560,10 +581,10 @@
      end function create_generic_c
      function free_generic_c(x) result(out) &
           bind(c, name="free_generic_f")
-       use, intrinsic :: iso_c_binding, only: c_int
+       use, intrinsic :: iso_c_binding, only: c_int, c_ptr
        import :: ygggeneric
        implicit none
-       type(ygggeneric) :: x
+       type(c_ptr), value :: x
        integer(kind=c_int) :: out
      end function free_generic_c
      function is_generic_init_c(x) result(out) &
@@ -661,5 +682,269 @@
        implicit none
        type(yggpython), value :: x
      end subroutine display_python_c
+
+     ! Interface for getting/setting generic array elements
+     function generic_array_get_size_c(x) result(out) &
+          bind(c, name="generic_array_get_size_f")
+       use, intrinsic :: iso_c_binding, only: c_size_t
+       import :: ygggeneric
+       implicit none
+       type(ygggeneric), value :: x
+       integer(kind=c_size_t) :: out
+     end function generic_array_get_size_c
+     function generic_array_get_item_c(x, index, type) result(out) &
+          bind(c, name="generic_array_get_item_f")
+       use, intrinsic :: iso_c_binding, only: c_size_t, c_ptr, c_char
+       import :: ygggeneric
+       implicit none
+       type(ygggeneric), value :: x
+       integer(kind=c_size_t), value, intent(in) :: index
+       character(kind=c_char), dimension(*), intent(in) :: type
+       type(c_ptr) :: out
+     end function generic_array_get_item_c
+     function generic_array_get_item_nbytes_c(x, index) result(out) &
+          bind(c, name="generic_array_get_item_nbytes_f")
+       use, intrinsic :: iso_c_binding, only: c_size_t, c_int
+       import :: ygggeneric
+       implicit none
+       type(ygggeneric), value :: x
+       integer(kind=c_size_t), value, intent(in) :: index
+       integer(kind=c_int) :: out
+     end function generic_array_get_item_nbytes_c
+     function generic_array_get_scalar_c(x, index, subtype, precision) &
+          result(out) bind(c, name="generic_array_get_scalar_f")
+       use, intrinsic :: iso_c_binding, only: c_size_t, c_ptr, c_char
+       import :: ygggeneric
+       implicit none
+       type(ygggeneric), value :: x
+       integer(kind=c_size_t), value, intent(in) :: index
+       character(kind=c_char), dimension(*), intent(in) :: subtype
+       integer(kind=c_size_t), value, intent(in) :: precision
+       type(c_ptr) :: out
+     end function generic_array_get_scalar_c
+     function generic_array_get_1darray_c(x, index, subtype, &
+          precision, data) result(out) &
+          bind(c, name="generic_array_get_1darray_f")
+       use, intrinsic :: iso_c_binding, only: c_size_t, c_ptr, c_char
+       import :: ygggeneric
+       implicit none
+       type(ygggeneric), value :: x
+       integer(kind=c_size_t), value, intent(in) :: index
+       character(kind=c_char), dimension(*), intent(in) :: subtype
+       integer(kind=c_size_t), value, intent(in) :: precision
+       type(c_ptr), value :: data
+       integer(kind=c_size_t) :: out
+     end function generic_array_get_1darray_c
+     function generic_array_get_ndarray_c(x, index, subtype, &
+          precision, data, shape) result(out) &
+          bind(c, name="generic_array_get_ndarray_f")
+       use, intrinsic :: iso_c_binding, only: c_size_t, c_ptr, c_char
+       import :: ygggeneric
+       implicit none
+       type(ygggeneric), value :: x
+       integer(kind=c_size_t), value, intent(in) :: index
+       character(kind=c_char), dimension(*), intent(in) :: subtype
+       integer(kind=c_size_t), value, intent(in) :: precision
+       type(c_ptr), value :: data
+       type(c_ptr), value :: shape
+       integer(kind=c_size_t) :: out
+     end function generic_array_get_ndarray_c
+     ! Set
+     function generic_array_set_item_c(x, index, type, value) &
+          result(out) bind(c, name="generic_array_set_item_f")
+       use, intrinsic :: iso_c_binding, only: c_size_t, c_ptr, &
+            c_char, c_int
+       import :: ygggeneric
+       implicit none
+       type(ygggeneric), value :: x
+       integer(kind=c_size_t), value, intent(in) :: index
+       character(kind=c_char), dimension(*), intent(in) :: type
+       type(c_ptr), value :: value
+       integer(kind=c_int) :: out
+     end function generic_array_set_item_c
+     function generic_array_set_scalar_c(x, index, value, subtype, &
+          precision, units) result(out) &
+          bind(c, name="generic_array_set_scalar_f")
+       use, intrinsic :: iso_c_binding, only: c_int, c_char, c_ptr, &
+            c_size_t
+       import :: ygggeneric
+       implicit none
+       type(ygggeneric), value :: x
+       integer(kind=c_size_t), value, intent(in) :: index
+       type(c_ptr), value :: value
+       character(kind=c_char), dimension(*), intent(in) :: subtype
+       integer(kind=c_size_t), value, intent(in) :: precision
+       character(kind=c_char), dimension(*), intent(in) :: units
+       integer(kind=c_int) :: out
+     end function generic_array_set_scalar_c
+     function generic_array_set_1darray_c(x, index, value, subtype, &
+          precision, length, units) result(out) &
+          bind(c, name="generic_array_set_1darray_f")
+       use, intrinsic :: iso_c_binding, only: c_int, c_char, c_ptr, &
+            c_size_t
+       import :: ygggeneric
+       implicit none
+       type(ygggeneric), value :: x
+       integer(kind=c_size_t), value, intent(in) :: index
+       type(c_ptr), value :: value
+       character(kind=c_char), dimension(*), intent(in) :: subtype
+       integer(kind=c_size_t), value, intent(in) :: precision
+       integer(kind=c_size_t), value, intent(in) :: length
+       character(kind=c_char), dimension(*), intent(in) :: units
+       integer(kind=c_int) :: out
+     end function generic_array_set_1darray_c
+     function generic_array_set_ndarray_c(x, index, data, subtype, &
+          precision, ndim, shape, units) result(out) &
+          bind(c, name="generic_array_set_ndarray_f")
+       use, intrinsic :: iso_c_binding, only: c_int, c_char, c_ptr, &
+            c_size_t
+       import :: ygggeneric
+       implicit none
+       type(ygggeneric), value :: x
+       integer(kind=c_size_t), value, intent(in) :: index
+       type(c_ptr), value :: data
+       character(kind=c_char), dimension(*), intent(in) :: subtype
+       integer(kind=c_size_t), value, intent(in) :: precision
+       integer(kind=c_size_t), value, intent(in) :: ndim
+       type(c_ptr), value, intent(in) :: shape
+       character(kind=c_char), dimension(*), intent(in) :: units
+       integer(kind=c_int) :: out
+     end function generic_array_set_ndarray_c
+
+     ! Interface for getting/setting generic map elements
+     ! Get
+     function generic_map_get_size_c(x) result(out) &
+          bind(c, name="generic_map_get_size_f")
+       use, intrinsic :: iso_c_binding, only: c_size_t
+       import :: ygggeneric
+       implicit none
+       type(ygggeneric), value :: x
+       integer(kind=c_size_t) :: out
+     end function generic_map_get_size_c
+     function generic_map_get_keys_c(x, n_keys_f, key_size_f) &
+          result(out) bind(c, name="generic_map_get_keys_f")
+       use, intrinsic :: iso_c_binding, only: c_size_t, c_ptr
+       import :: ygggeneric
+       implicit none
+       type(ygggeneric), value :: x
+       type(c_ptr), value :: n_keys_f
+       type(c_ptr), value :: key_size_f
+       type(c_ptr) :: out
+     end function generic_map_get_keys_c
+     function generic_map_get_item_c(x, key, type) result(out) &
+          bind(c, name="generic_map_get_item_f")
+       use, intrinsic :: iso_c_binding, only: c_char, c_ptr
+       import :: ygggeneric
+       implicit none
+       type(ygggeneric), value :: x
+       character(kind=c_char), dimension(*), intent(in) :: key
+       character(kind=c_char), dimension(*), intent(in) :: type
+       type(c_ptr) :: out
+     end function generic_map_get_item_c
+     function generic_map_get_item_nbytes_c(x, key) result(out) &
+          bind(c, name="generic_map_get_item_nbytes_f")
+       use, intrinsic :: iso_c_binding, only: c_char, c_int
+       import :: ygggeneric
+       implicit none
+       type(ygggeneric), value :: x
+       character(kind=c_char), dimension(*), intent(in) :: key
+       integer(kind=c_int) :: out
+     end function generic_map_get_item_nbytes_c
+     function generic_map_get_scalar_c(x, key, subtype, precision) &
+          result(out) bind(c, name="generic_map_get_scalar_f")
+       use, intrinsic :: iso_c_binding, only: c_char, c_ptr, c_size_t
+       import :: ygggeneric
+       implicit none
+       type(ygggeneric), value :: x
+       character(kind=c_char), dimension(*), intent(in) :: key
+       character(kind=c_char), dimension(*), intent(in) :: subtype
+       integer(kind=c_size_t), value, intent(in) :: precision
+       type(c_ptr) :: out
+     end function generic_map_get_scalar_c
+     function generic_map_get_1darray_c(x, key, subtype, precision, &
+          data) result(out) bind(c, name="generic_map_get_1darray_f")
+       use, intrinsic :: iso_c_binding, only: c_char, c_ptr, c_size_t
+       import :: ygggeneric
+       implicit none
+       type(ygggeneric), value :: x
+       character(kind=c_char), dimension(*), intent(in) :: key
+       character(kind=c_char), dimension(*), intent(in) :: subtype
+       integer(kind=c_size_t), value, intent(in) :: precision
+       type(c_ptr), value :: data
+       integer(kind=c_size_t) :: out
+     end function generic_map_get_1darray_c
+     function generic_map_get_ndarray_c(x, key, subtype, precision, &
+          data, shape) result(out) bind(c, name="generic_map_get_ndarray_f")
+       use, intrinsic :: iso_c_binding, only: c_char, c_ptr, c_size_t
+       import :: ygggeneric
+       implicit none
+       type(ygggeneric), value :: x
+       character(kind=c_char), dimension(*), intent(in) :: key
+       character(kind=c_char), dimension(*), intent(in) :: subtype
+       integer(kind=c_size_t), value, intent(in) :: precision
+       type(c_ptr), value :: data
+       type(c_ptr), value :: shape
+       integer(kind=c_size_t) :: out
+     end function generic_map_get_ndarray_c
+     ! Set
+     function generic_map_set_item_c(x, key, type, value) result(out) &
+          bind(c, name="generic_map_set_item_f")
+       use, intrinsic :: iso_c_binding, only: c_int, c_char, c_ptr
+       import :: ygggeneric
+       implicit none
+       type(ygggeneric), value :: x
+       character(kind=c_char), dimension(*), intent(in) :: key
+       character(kind=c_char), dimension(*), intent(in) :: type
+       type(c_ptr), value :: value
+       integer(kind=c_int) :: out
+     end function generic_map_set_item_c
+     function generic_map_set_scalar_c(x, key, value, subtype, &
+          precision, units) result(out) &
+          bind(c, name="generic_map_set_scalar_f")
+       use, intrinsic :: iso_c_binding, only: c_int, c_char, c_ptr, &
+            c_size_t
+       import :: ygggeneric
+       implicit none
+       type(ygggeneric), value :: x
+       character(kind=c_char), dimension(*), intent(in) :: key
+       type(c_ptr), value :: value
+       character(kind=c_char), dimension(*), intent(in) :: subtype
+       integer(kind=c_size_t), value, intent(in) :: precision
+       character(kind=c_char), dimension(*), intent(in) :: units
+       integer(kind=c_int) :: out
+     end function generic_map_set_scalar_c
+     function generic_map_set_1darray_c(x, key, value, subtype, &
+          precision, length, units) result(out) &
+          bind(c, name="generic_map_set_1darray_f")
+       use, intrinsic :: iso_c_binding, only: c_int, c_char, c_ptr, &
+            c_size_t
+       import :: ygggeneric
+       implicit none
+       type(ygggeneric), value :: x
+       character(kind=c_char), dimension(*), intent(in) :: key
+       type(c_ptr), value :: value
+       character(kind=c_char), dimension(*), intent(in) :: subtype
+       integer(kind=c_size_t), value, intent(in) :: precision
+       integer(kind=c_size_t), value, intent(in) :: length
+       character(kind=c_char), dimension(*), intent(in) :: units
+       integer(kind=c_int) :: out
+     end function generic_map_set_1darray_c
+     function generic_map_set_ndarray_c(x, key, data, subtype, &
+          precision, ndim, shape, units) result(out) &
+          bind(c, name="generic_map_set_ndarray_f")
+       use, intrinsic :: iso_c_binding, only: c_int, c_char, c_ptr, &
+            c_size_t
+       import :: ygggeneric
+       implicit none
+       type(ygggeneric), value :: x
+       character(kind=c_char), dimension(*), intent(in) :: key
+       type(c_ptr), value :: data
+       character(kind=c_char), dimension(*), intent(in) :: subtype
+       integer(kind=c_size_t), value, intent(in) :: precision
+       integer(kind=c_size_t), value, intent(in) :: ndim
+       type(c_ptr), value, intent(in) :: shape
+       character(kind=c_char), dimension(*), intent(in) :: units
+       integer(kind=c_int) :: out
+     end function generic_map_set_ndarray_c
 
   end interface

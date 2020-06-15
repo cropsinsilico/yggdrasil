@@ -27,6 +27,10 @@ case $1 in
 	echo "Running R"
 	yaml='wofost_r.yml'
 	;;
+    -f | --fortran )
+	echo "Running Fortran"
+	yaml='wofost_fortran.yml'
+	;;
 esac
 
 yggrun $yaml

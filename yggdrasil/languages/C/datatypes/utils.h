@@ -412,6 +412,13 @@ public:
 			    const MetaschemaType* item_type,
 			    bool return_generic=false) const;
   /*!
+    @brief Get the size of an array item in bytes.
+    @param[in] i const size_t Index of array element that should be
+    returned.
+    @returns size_t Size of the item in bytes.
+   */
+  size_t get_nbytes_array_item(const size_t i) const;
+  /*!
     @brief Set an array item.
     @param[in] index const size_t Index of array element that should
     be set. If larger than the current size of the array, the element
@@ -433,6 +440,13 @@ public:
   void* get_data_map_item(const char *key,
 			  const MetaschemaType* item_type,
 			  bool return_generic=false) const;
+  /*!
+    @brief Get the size of a map item in bytes.
+    @param[in] key const char* String key for item that should be
+    returned.
+    @returns size_t Size of the item in bytes.
+   */
+  size_t get_nbytes_map_item(const char *key) const;
   /*!
     @brief Set a map item.
     @param[in] key const char* String key for item that should be set.

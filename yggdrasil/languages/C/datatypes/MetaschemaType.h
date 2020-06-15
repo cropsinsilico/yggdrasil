@@ -1629,11 +1629,11 @@ void* YggGeneric::get_data(const MetaschemaType* exp_type) const {
 
 size_t YggGeneric::get_data_array_size() const {
   if (type->type_code() != T_ARRAY) {
-    ygglog_throw_error("YggGeneric::get_data_array_item: Object is not an array.");
+    ygglog_throw_error("YggGeneric::get_data_array_size: Object is not an array.");
   }
   YggGenericVector* arr = (YggGenericVector*)get_data();
   if (arr == NULL) {
-    ygglog_throw_error("YggGeneric::get_data_array_item: Array is NULL.");
+    ygglog_throw_error("YggGeneric::get_data_array_size: Array is NULL.");
   }
   return arr->size();
 };
@@ -1689,6 +1689,21 @@ void* YggGeneric::get_data_array_item(const size_t i,
   }
 };
 
+size_t YggGeneric::get_nbytes_array_item(const size_t i) const {
+  if (type->type_code() != T_ARRAY) {
+    ygglog_throw_error("YggGeneric::get_nbytes_array_item: Object is not an array.");
+  }
+  YggGenericVector* arr = (YggGenericVector*)get_data();
+  if (arr == NULL) {
+    ygglog_throw_error("YggGeneric::get_nbytes_array_item: Array is NULL.");
+  }
+  if (i > arr->size()) {
+    ygglog_throw_error("YggGeneric::get_nbytes_array_item: Array has %lu elements, but %lu were requested.", arr->size(), i);
+  }
+  YggGeneric* out = (*arr)[i];
+  return out->nbytes;
+};
+
 void YggGeneric::set_data_array_item(const size_t index,
 				     const YggGeneric* value) {
   if (type->type_code() != T_ARRAY) {
@@ -1726,6 +1741,22 @@ void* YggGeneric::get_data_map_item(const char *key,
   } else {
     return out->get_data(item_type);
   }
+};
+
+size_t YggGeneric::get_nbytes_map_item(const char *key) const {
+  if (type->type_code() != T_OBJECT) {
+    ygglog_throw_error("YggGeneric::get_nbytes_map_item: Object is not a map.");
+  }
+  YggGenericMap* map = (YggGenericMap*)get_data();
+  if (map == NULL) {
+    ygglog_throw_error("YggGeneric::get_nbytes_map_item: Map is NULL.");
+  }
+  YggGenericMap::iterator map_it = map->find(key);
+  if (map_it == map->end()) {
+    ygglog_throw_error("YggGeneric::get_nbytes_map_item: Could not located item for key '%s'.", key);
+  }
+  YggGeneric* out = map_it->second;
+  return out->nbytes;
 };
 
 void YggGeneric::set_data_map_item(const char *key,

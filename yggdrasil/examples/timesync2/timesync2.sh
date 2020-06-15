@@ -29,6 +29,10 @@ case $1 in
 	echo "Running R"
 	yaml='timesync2_r.yml'
 	;;
+    -f | --fortran )
+	echo "Running Fortran"
+	yaml='timesync2_fortran.yml'
+	;;
 esac
 
 yggrun $yaml

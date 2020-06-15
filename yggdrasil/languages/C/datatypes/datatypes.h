@@ -285,6 +285,7 @@ size_t generic_array_get_size(generic_t x);
  */
 void* generic_array_get_item(generic_t x, const size_t index,
 			   const char *type);
+int generic_array_get_item_nbytes(generic_t x, const size_t index);
 bool generic_array_get_bool(generic_t x, const size_t index);
 int generic_array_get_integer(generic_t x, const size_t index);
 void* generic_array_get_null(generic_t x, const size_t index);
@@ -409,6 +410,7 @@ size_t generic_map_get_keys(generic_t x, char*** keys);
  */
 void* generic_map_get_item(generic_t x, const char* key,
 			   const char *type);
+int generic_map_get_item_nbytes(generic_t x, const char* key);
 bool generic_map_get_bool(generic_t x, const char* key);
 int generic_map_get_integer(generic_t x, const char* key);
 void* generic_map_get_null(generic_t x, const char* key);
@@ -532,6 +534,8 @@ int generic_array_set_string(generic_t x, const size_t index,
 			     char* value);
 int generic_array_set_object(generic_t x, const size_t index,
 			     generic_t value);
+int generic_array_set_map(generic_t x, const size_t index,
+			  generic_t value);
 int generic_array_set_array(generic_t x, const size_t index,
 			    generic_t value);
 int generic_array_set_direct(generic_t x, const size_t index,
@@ -730,6 +734,8 @@ int generic_map_set_string(generic_t x, const char* key,
 			   char* value);
 int generic_map_set_object(generic_t x, const char* key,
 			   generic_t value);
+int generic_map_set_map(generic_t x, const char* key,
+			generic_t value);
 int generic_map_set_array(generic_t x, const char* key,
 			  generic_t value);
 int generic_map_set_direct(generic_t x, const char* key,
