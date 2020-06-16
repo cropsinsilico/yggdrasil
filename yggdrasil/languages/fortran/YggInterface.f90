@@ -153,6 +153,7 @@ module fygg
      module procedure yggarg_2darray_yggchar_r
   end interface yggarg
   interface generic_array_set
+     module procedure generic_array_set_generic
      module procedure generic_array_set_boolean
      ! module procedure generic_array_set_integer
      module procedure generic_array_set_null
@@ -164,7 +165,7 @@ module fygg
      module procedure generic_array_set_python_class
      ! module procedure generic_array_set_python_function
      module procedure generic_array_set_schema
-     module procedure generic_array_set_any
+     ! module procedure generic_array_set_any
      module procedure generic_array_set_integer2
      module procedure generic_array_set_integer4
      module procedure generic_array_set_integer8
@@ -207,6 +208,7 @@ module fygg
      module procedure generic_array_set_ndarray_unicode
   end interface generic_array_set
   interface generic_map_set
+     module procedure generic_map_get_generic
      module procedure generic_map_set_boolean
      ! module procedure generic_map_set_integer
      module procedure generic_map_set_null
@@ -218,7 +220,7 @@ module fygg
      module procedure generic_map_set_python_class
      ! module procedure generic_map_set_python_function
      module procedure generic_map_set_schema
-     module procedure generic_map_set_any
+     ! module procedure generic_map_set_any
      module procedure generic_map_set_integer2
      module procedure generic_map_set_integer4
      module procedure generic_map_set_integer8
@@ -260,6 +262,116 @@ module fygg
      module procedure generic_map_set_ndarray_bytes
      module procedure generic_map_set_ndarray_unicode
   end interface generic_map_set
+  interface generic_array_get
+     module procedure generic_array_get_generic
+     module procedure generic_array_get_boolean
+     ! module procedure generic_array_get_integer
+     module procedure generic_array_get_null
+     ! module procedure generic_array_get_number
+     module procedure generic_array_get_array
+     module procedure generic_array_get_map
+     module procedure generic_array_get_ply
+     module procedure generic_array_get_obj
+     module procedure generic_array_get_python_class
+     ! module procedure generic_array_get_python_function
+     module procedure generic_array_get_schema
+     ! module procedure generic_array_get_any
+     module procedure generic_array_get_integer2
+     module procedure generic_array_get_integer4
+     module procedure generic_array_get_integer8
+     module procedure generic_array_get_unsigned1
+     module procedure generic_array_get_unsigned2
+     module procedure generic_array_get_unsigned4
+     module procedure generic_array_get_unsigned8
+     module procedure generic_array_get_real4
+     module procedure generic_array_get_real8
+     module procedure generic_array_get_complex4
+     module procedure generic_array_get_complex8
+     module procedure generic_array_get_bytes
+     module procedure generic_array_get_unicode
+     module procedure generic_array_get_1darray_integer2
+     module procedure generic_array_get_1darray_integer4
+     module procedure generic_array_get_1darray_integer8
+     module procedure generic_array_get_1darray_unsigned1
+     module procedure generic_array_get_1darray_unsigned2
+     module procedure generic_array_get_1darray_unsigned4
+     module procedure generic_array_get_1darray_unsigned8
+     module procedure generic_array_get_1darray_real4
+     module procedure generic_array_get_1darray_real8
+     module procedure generic_array_get_1darray_complex4
+     module procedure generic_array_get_1darray_complex8
+     module procedure generic_array_get_1darray_bytes
+     module procedure generic_array_get_1darray_unicode
+     module procedure generic_array_get_ndarray_integer2
+     module procedure generic_array_get_ndarray_integer4
+     module procedure generic_array_get_ndarray_integer8
+     module procedure generic_array_get_ndarray_unsigned1
+     module procedure generic_array_get_ndarray_unsigned2
+     module procedure generic_array_get_ndarray_unsigned4
+     module procedure generic_array_get_ndarray_unsigned8
+     module procedure generic_array_get_ndarray_real4
+     module procedure generic_array_get_ndarray_real8
+     module procedure generic_array_get_ndarray_complex4
+     module procedure generic_array_get_ndarray_complex8
+     module procedure generic_array_get_ndarray_character
+     module procedure generic_array_get_ndarray_bytes
+     module procedure generic_array_get_ndarray_unicode
+  end interface generic_array_get
+  interface generic_map_get
+     module procedure generic_map_get_generic
+     module procedure generic_map_get_boolean
+     ! module procedure generic_map_get_integer
+     module procedure generic_map_get_null
+     ! module procedure generic_map_get_number
+     module procedure generic_map_get_array
+     module procedure generic_map_get_map
+     module procedure generic_map_get_ply
+     module procedure generic_map_get_obj
+     module procedure generic_map_get_python_class
+     ! module procedure generic_map_get_python_function
+     module procedure generic_map_get_schema
+     ! module procedure generic_map_get_any
+     module procedure generic_map_get_integer2
+     module procedure generic_map_get_integer4
+     module procedure generic_map_get_integer8
+     module procedure generic_map_get_unsigned1
+     module procedure generic_map_get_unsigned2
+     module procedure generic_map_get_unsigned4
+     module procedure generic_map_get_unsigned8
+     module procedure generic_map_get_real4
+     module procedure generic_map_get_real8
+     module procedure generic_map_get_complex4
+     module procedure generic_map_get_complex8
+     module procedure generic_map_get_bytes
+     module procedure generic_map_get_unicode
+     module procedure generic_map_get_1darray_integer2
+     module procedure generic_map_get_1darray_integer4
+     module procedure generic_map_get_1darray_integer8
+     module procedure generic_map_get_1darray_unsigned1
+     module procedure generic_map_get_1darray_unsigned2
+     module procedure generic_map_get_1darray_unsigned4
+     module procedure generic_map_get_1darray_unsigned8
+     module procedure generic_map_get_1darray_real4
+     module procedure generic_map_get_1darray_real8
+     module procedure generic_map_get_1darray_complex4
+     module procedure generic_map_get_1darray_complex8
+     module procedure generic_map_get_1darray_bytes
+     module procedure generic_map_get_1darray_unicode
+     module procedure generic_map_get_ndarray_integer2
+     module procedure generic_map_get_ndarray_integer4
+     module procedure generic_map_get_ndarray_integer8
+     module procedure generic_map_get_ndarray_unsigned1
+     module procedure generic_map_get_ndarray_unsigned2
+     module procedure generic_map_get_ndarray_unsigned4
+     module procedure generic_map_get_ndarray_unsigned8
+     module procedure generic_map_get_ndarray_real4
+     module procedure generic_map_get_ndarray_real8
+     module procedure generic_map_get_ndarray_complex4
+     module procedure generic_map_get_ndarray_complex8
+     module procedure generic_map_get_ndarray_character
+     module procedure generic_map_get_ndarray_bytes
+     module procedure generic_map_get_ndarray_unicode
+  end interface generic_map_get
   interface yggassign
      module procedure yggassign_yggchar2character
      ! module procedure yggassign_character2yggchar
@@ -2338,7 +2450,7 @@ contains
     integer(kind=c_size_t), intent(in) :: i
     type(ygggeneric), intent(in) :: x
     integer(kind=c_int) :: out
-    out = set_generic_array_c(arr, i, x)
+    out = set_generic_array_c(arr, i-1, x)
   end function set_generic_array
   function get_generic_array(arr, i, x) result(out)
     implicit none
@@ -2347,8 +2459,9 @@ contains
     type(ygggeneric), pointer :: x
     integer(kind=c_int) :: out
     type(c_ptr) :: c_x
+    allocate(x);
     c_x = c_loc(x) ! Maybe use first element in type
-    out = get_generic_array_c(arr, i, c_x)
+    out = get_generic_array_c(arr, i-1, c_x)
   end function get_generic_array
   function set_generic_object(arr, k, x) result(out)
     implicit none
@@ -2362,12 +2475,13 @@ contains
   end function set_generic_object
   function get_generic_object(arr, k, x) result(out)
     implicit none
-    type(ygggeneric) :: arr
+    type(ygggeneric), intent(in) :: arr
     character(len=*), intent(in) :: k
-    type(ygggeneric), pointer :: x
+    type(ygggeneric), pointer, intent(out) :: x
     integer(kind=c_int) :: out
     character(len=len_trim(k)+1) :: c_k
     type(c_ptr) :: c_x
+    allocate(x);
     c_k = trim(k)//c_null_char
     c_x = c_loc(x) ! Maybe use first element in type
     out = get_generic_object_c(arr, c_k, c_x)

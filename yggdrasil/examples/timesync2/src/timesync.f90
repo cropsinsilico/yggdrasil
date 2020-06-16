@@ -13,7 +13,7 @@ program main
   character(len=32) :: t_units, model
   character(len=:), dimension(:), allocatable :: keys
   type(ygggeneric) :: state_send, state_recv, msg
-  real(kind=8) :: x
+  real(kind=8), pointer :: x
   integer :: i
 
   call get_command_argument(1, arg)
@@ -22,7 +22,7 @@ program main
   read(arg, *) t_units
   call get_command_argument(3, arg)
   read(arg, *) model
-  write (*, '("Hello from Fortran timesync: timestep ",F10.5," ",A,&
+  write (*, '("Hello from Fortran timesync: timestep ",F10.5," ",A3,&
        &" (model = ",A,")")') t_step, trim(t_units), trim(model)
   t_start = 0.0
   t_end = 5.0
@@ -55,7 +55,7 @@ program main
        t, adjustl(t_units)
   call generic_map_get_keys(state_recv, keys)
   do i = 1, size(keys)
-     x = generic_map_get_real8(state_recv, trim(keys(i)))
+     call generic_map_get(state_recv, trim(keys(i)), x)
      write (*, '(SP,", ",A," = ",F5.2)', advance="no") &
           trim(keys(i)), x
   end do
@@ -63,7 +63,7 @@ program main
 
   ! Send initial state to output
   msg = copy_generic(state_recv)
-  call generic_map_set_real8(msg, "time", t, t_units)
+  call generic_map_set(msg, "time", t, t_units)
   ret = ygg_send_var(out, yggarg(msg))
   if (.not.ret) then
      write (*, '("timesync(Fortran): Failed to send initial output &
@@ -96,7 +96,7 @@ program main
           t, adjustl(t_units)
      call generic_map_get_keys(state_recv, keys)
      do i = 1, size(keys)
-        x = generic_map_get_real8(state_recv, keys(i))
+        call generic_map_get(state_recv, keys(i), x)
         write (*, '(SP,", ",A," = ",F5.2)', advance="no") &
              trim(keys(i)), x
      end do
@@ -104,7 +104,7 @@ program main
 
      ! Send output
      msg = copy_generic(state_recv)
-     call generic_map_set_real8(msg, "time", t, t_units)
+     call generic_map_set(msg, "time", t, t_units)
      ret = ygg_send_var(out, yggarg(msg))
      if (.not.ret) then
         write (*, '("timesync(Fortran): Failed to send output for &
@@ -148,24 +148,24 @@ function timestep_calc(t, t_units, state, model) result (ret)
   end if
   if (ret) then
      if (model.eq."A") then
-        call generic_map_set_real8(state, "x", &
+        call generic_map_set(state, "x", &
              sin(2.0 * PI_8 * t / x_period))
-        call generic_map_set_real8(state, "y", &
+        call generic_map_set(state, "y", &
              cos(2.0 * PI_8 * t / y_period))
-        call generic_map_set_real8(state, "z1", &
+        call generic_map_set(state, "z1", &
              -cos(2.0 * PI_8 * t / z_period))
-        call generic_map_set_real8(state, "z2", &
+        call generic_map_set(state, "z2", &
              -cos(2.0 * PI_8 * t / z_period))
-        call generic_map_set_real8(state, "a", &
+        call generic_map_set(state, "a", &
              sin(2.0 * PI_8 * t / o_period))
      else
-        call generic_map_set_real8(state, "xvar", &
+        call generic_map_set(state, "xvar", &
              sin(2.0 * PI_8 * t / x_period))
-        call generic_map_set_real8(state, "yvar", &
+        call generic_map_set(state, "yvar", &
              cos(2.0 * PI_8 * t / y_period))
-        call generic_map_set_real8(state, "z", &
+        call generic_map_set(state, "z", &
              -2.0 * cos(2.0 * PI_8 * t / z_period))
-        call generic_map_set_real8(state, "b", &
+        call generic_map_set(state, "b", &
              cos(2.0 * PI_8 * t / o_period))
      end if
   end if

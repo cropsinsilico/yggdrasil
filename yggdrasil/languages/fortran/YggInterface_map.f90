@@ -1,243 +1,258 @@
 ! Interface for getting/setting generic map elements
 ! Get methods
-function generic_map_get_boolean(x, key) result(out)
+subroutine generic_map_get_generic(x, key, out)
+  implicit none
+  type(ygggeneric), intent(in) :: x
+  character(len=*), intent(in) :: key
+  type(ygggeneric), pointer, intent(out) :: out
+  integer(kind=c_int) :: flag
+  flag = get_generic_object(x, key, out)
+  if (flag.ne.0) then
+     stop "generic_map_get_generic: Error extracting generic object."
+  end if
+end subroutine generic_map_get_generic
+subroutine generic_map_get_boolean(x, key, out)
   implicit none
   type(ygggeneric) :: x
   character(len=*) :: key
-  logical(kind=1), pointer :: out
+  logical(kind=1), pointer, intent(out) :: out
   type(c_ptr) :: c_out
   c_out = generic_map_get_item(x, key, "boolean")
   call c_f_pointer(c_out, out)
-end function generic_map_get_boolean
-function generic_map_get_integer(x, key) result(out)
+end subroutine generic_map_get_boolean
+subroutine generic_map_get_integer(x, key, out)
   implicit none
   type(ygggeneric) :: x
   character(len=*) :: key
-  integer(kind=c_int), pointer :: out
+  integer(kind=c_int), pointer, intent(out) :: out
   type(c_ptr) :: c_out
   c_out = generic_map_get_item(x, key, "integer")
   call c_f_pointer(c_out, out)
-end function generic_map_get_integer
-function generic_map_get_null(x, key) result(out)
+end subroutine generic_map_get_integer
+subroutine generic_map_get_null(x, key, out)
   implicit none
   type(ygggeneric) :: x
   character(len=*) :: key
-  type(yggnull) :: out
+  type(yggnull), intent(out) :: out
   type(c_ptr) :: c_out
   c_out = generic_map_get_item(x, key, "null")
   ! call c_f_pointer(c_out%ptr, out)
-end function generic_map_get_null
-function generic_map_get_number(x, key) result(out)
+end subroutine generic_map_get_null
+subroutine generic_map_get_number(x, key, out)
   implicit none
   type(ygggeneric) :: x
   character(len=*) :: key
-  real(kind=8), pointer :: out
+  real(kind=8), pointer, intent(out) :: out
   type(c_ptr) :: c_out
   c_out = generic_map_get_item(x, key, "number")
   call c_f_pointer(c_out, out)
-end function generic_map_get_number
-function generic_map_get_string(x, key) result(out)
+end subroutine generic_map_get_number
+subroutine generic_map_get_string(x, key, out)
   implicit none
   type(ygggeneric) :: x
   character(len=*) :: key
-  character(len=:, kind=c_char), pointer :: out
+  character(len=:, kind=c_char), pointer, intent(out) :: out
   type(c_ptr) :: c_out
   c_out = generic_map_get_item(x, key, "string")
   call c_f_pointer(c_out, out)
-end function generic_map_get_string
-function generic_map_get_map(x, key) result(out)
+end subroutine generic_map_get_string
+subroutine generic_map_get_map(x, key, out)
   implicit none
   type(ygggeneric) :: x
   character(len=*) :: key
-  type(ygggeneric) :: out
-  out = init_generic()
+  type(yggmap), pointer, intent(out) :: out
+  allocate(out)
+  out = yggmap(init_generic())
   out%obj = generic_map_get_item(x, key, "object")
-end function generic_map_get_map
-function generic_map_get_array(x, key) result(out)
+end subroutine generic_map_get_map
+subroutine generic_map_get_array(x, key, out)
   implicit none
   type(ygggeneric) :: x
   character(len=*) :: key
-  type(ygggeneric) :: out
-  out = init_generic()
+  type(yggarr), pointer, intent(out) :: out
+  allocate(out)
+  out = yggarr(init_generic())
   out%obj = generic_map_get_item(x, key, "array")
-end function generic_map_get_array
-function generic_map_get_ply(x, key) result(out)
+end subroutine generic_map_get_array
+subroutine generic_map_get_ply(x, key, out)
   implicit none
   type(ygggeneric) :: x
   character(len=*) :: key
   type(c_ptr) :: c_out
-  type(yggply), pointer :: out
+  type(yggply), pointer, intent(out) :: out
   c_out = generic_map_get_item(x, key, "ply")
   ! Copy?
   call c_f_pointer(c_out, out)
-end function generic_map_get_ply
-function generic_map_get_obj(x, key) result(out)
+end subroutine generic_map_get_ply
+subroutine generic_map_get_obj(x, key, out)
   implicit none
   type(ygggeneric) :: x
   character(len=*) :: key
   type(c_ptr) :: c_out
-  type(yggobj), pointer :: out
+  type(yggobj), pointer, intent(out) :: out
   c_out = generic_map_get_item(x, key, "obj")
   ! Copy?
   call c_f_pointer(c_out, out)
-end function generic_map_get_obj
-function generic_map_get_python_class(x, key) result(out)
+end subroutine generic_map_get_obj
+subroutine generic_map_get_python_class(x, key, out)
   implicit none
   type(ygggeneric) :: x
   character(len=*) :: key
   type(c_ptr) :: c_out
-  type(yggpython), pointer :: out
+  type(yggpython), pointer, intent(out) :: out
   c_out = generic_map_get_item(x, key, "class")
   ! Copy?
   call c_f_pointer(c_out, out)
-end function generic_map_get_python_class
-function generic_map_get_python_function(x, key) result(out)
+end subroutine generic_map_get_python_class
+subroutine generic_map_get_python_function(x, key, out)
   implicit none
   type(ygggeneric) :: x
   character(len=*) :: key
   type(c_ptr) :: c_out
-  type(yggpython), pointer :: out
+  type(yggpython), pointer, intent(out) :: out
   c_out = generic_map_get_item(x, key, "function")
   ! Copy?
   call c_f_pointer(c_out, out)
-end function generic_map_get_python_function
-function generic_map_get_schema(x, key) result(out)
+end subroutine generic_map_get_python_function
+subroutine generic_map_get_schema(x, key, out)
   implicit none
   type(ygggeneric) :: x
   character(len=*) :: key
-  type(ygggeneric) :: out
-  out = init_generic()
+  type(yggschema), pointer, intent(out) :: out
+  allocate(out)
+  out = yggschema(init_generic())
   out%obj = generic_map_get_item(x, key, "schema")
-end function generic_map_get_schema
-function generic_map_get_any(x, key) result(out)
+end subroutine generic_map_get_schema
+subroutine generic_map_get_any(x, key, out)
   implicit none
   type(ygggeneric) :: x
   character(len=*) :: key
-  type(ygggeneric) :: out
+  type(ygggeneric), pointer, intent(out) :: out
+  allocate(out)
   out = init_generic()
   out%obj = generic_map_get_item(x, key, "any")
-end function generic_map_get_any
+end subroutine generic_map_get_any
 ! Get scalar int
-function generic_map_get_integer2(x, key) result(out)
+subroutine generic_map_get_integer2(x, key, out)
   implicit none
   type(ygggeneric) :: x
   character(len=*) :: key
-  integer(kind=2), pointer :: out
+  integer(kind=2), pointer, intent(out) :: out
   type(c_ptr) :: c_out
   c_out = generic_map_get_scalar(x, key, "int", 8 * 2)
   call c_f_pointer(c_out, out)
-end function generic_map_get_integer2
-function generic_map_get_integer4(x, key) result(out)
+end subroutine generic_map_get_integer2
+subroutine generic_map_get_integer4(x, key, out)
   implicit none
   type(ygggeneric) :: x
   character(len=*) :: key
-  integer(kind=4), pointer :: out
+  integer(kind=4), pointer, intent(out) :: out
   type(c_ptr) :: c_out
   c_out = generic_map_get_scalar(x, key, "int", 8 * 4)
   call c_f_pointer(c_out, out)
-end function generic_map_get_integer4
-function generic_map_get_integer8(x, key) result(out)
+end subroutine generic_map_get_integer4
+subroutine generic_map_get_integer8(x, key, out)
   implicit none
   type(ygggeneric) :: x
   character(len=*) :: key
-  integer(kind=8), pointer :: out
+  integer(kind=8), pointer, intent(out) :: out
   type(c_ptr) :: c_out
   c_out = generic_map_get_scalar(x, key, "int", 8 * 8)
   call c_f_pointer(c_out, out)
-end function generic_map_get_integer8
+end subroutine generic_map_get_integer8
 ! Get scalar uint
-function generic_map_get_unsigned1(x, key) result(out)
+subroutine generic_map_get_unsigned1(x, key, out)
   implicit none
   type(ygggeneric) :: x
   character(len=*) :: key
-  type(ygguint1) :: out
+  type(ygguint1), intent(out) :: out
   integer(kind=1), pointer :: temp
   type(c_ptr) :: c_out
   c_out = generic_map_get_scalar(x, key, "uint", 8 * 1)
   call c_f_pointer(c_out, temp)
   out%x = temp
   deallocate(temp)
-end function generic_map_get_unsigned1
-function generic_map_get_unsigned2(x, key) result(out)
+end subroutine generic_map_get_unsigned1
+subroutine generic_map_get_unsigned2(x, key, out)
   implicit none
   type(ygggeneric) :: x
   character(len=*) :: key
-  type(ygguint2) :: out
+  type(ygguint2), intent(out) :: out
   integer(kind=2), pointer :: temp
   type(c_ptr) :: c_out
   c_out = generic_map_get_scalar(x, key, "uint", 8 * 2)
   call c_f_pointer(c_out, temp)
   out%x = temp
   deallocate(temp)
-end function generic_map_get_unsigned2
-function generic_map_get_unsigned4(x, key) result(out)
+end subroutine generic_map_get_unsigned2
+subroutine generic_map_get_unsigned4(x, key, out)
   implicit none
   type(ygggeneric) :: x
   character(len=*) :: key
-  type(ygguint4) :: out
+  type(ygguint4), intent(out) :: out
   integer(kind=4), pointer :: temp
   type(c_ptr) :: c_out
   c_out = generic_map_get_scalar(x, key, "uint", 8 * 4)
   call c_f_pointer(c_out, temp)
   out%x = temp
   deallocate(temp)
-end function generic_map_get_unsigned4
-function generic_map_get_unsigned8(x, key) result(out)
+end subroutine generic_map_get_unsigned4
+subroutine generic_map_get_unsigned8(x, key, out)
   implicit none
   type(ygggeneric) :: x
   character(len=*) :: key
-  type(ygguint8) :: out
+  type(ygguint8), intent(out) :: out
   integer(kind=8), pointer :: temp
   type(c_ptr) :: c_out
   c_out = generic_map_get_scalar(x, key, "uint", 8 * 8)
   call c_f_pointer(c_out, temp)
   out%x = temp
   deallocate(temp)
-end function generic_map_get_unsigned8
+end subroutine generic_map_get_unsigned8
 ! Get scalar real
-function generic_map_get_real4(x, key) result(out)
+subroutine generic_map_get_real4(x, key, out)
   implicit none
   type(ygggeneric) :: x
   character(len=*) :: key
-  real(kind=4), pointer :: out
+  real(kind=4), pointer, intent(out) :: out
   type(c_ptr) :: c_out
   c_out = generic_map_get_scalar(x, key, "float", 8 * 4)
   call c_f_pointer(c_out, out)
-end function generic_map_get_real4
-function generic_map_get_real8(x, key) result(out)
+end subroutine generic_map_get_real4
+subroutine generic_map_get_real8(x, key, out)
   implicit none
   type(ygggeneric) :: x
   character(len=*) :: key
-  real(kind=8), pointer :: out
+  real(kind=8), pointer, intent(out) :: out
   type(c_ptr) :: c_out
   c_out = generic_map_get_scalar(x, key, "float", 8 * 8)
   call c_f_pointer(c_out, out)
-end function generic_map_get_real8
+end subroutine generic_map_get_real8
 ! Get scalar complex
-function generic_map_get_complex4(x, key) result(out)
+subroutine generic_map_get_complex4(x, key, out)
   implicit none
   type(ygggeneric) :: x
   character(len=*) :: key
-  complex(kind=4), pointer :: out
+  complex(kind=4), pointer, intent(out) :: out
   type(c_ptr) :: c_out
   c_out = generic_map_get_scalar(x, key, "complex", 8 * 4)
   call c_f_pointer(c_out, out)
-end function generic_map_get_complex4
-function generic_map_get_complex8(x, key) result(out)
+end subroutine generic_map_get_complex4
+subroutine generic_map_get_complex8(x, key, out)
   implicit none
   type(ygggeneric) :: x
   character(len=*) :: key
-  complex(kind=8), pointer :: out
+  complex(kind=8), pointer, intent(out) :: out
   type(c_ptr) :: c_out
   c_out = generic_map_get_scalar(x, key, "complex", 8 * 8)
   call c_f_pointer(c_out, out)
-end function generic_map_get_complex8
+end subroutine generic_map_get_complex8
 ! Get scalar string
-function generic_map_get_bytes(x, key) result(out)
+subroutine generic_map_get_bytes(x, key, out)
   implicit none
   type(ygggeneric) :: x
   character(len=*) :: key
-  character(len=:), pointer :: out
+  character(len=:), pointer, intent(out) :: out
   character, dimension(:), pointer :: temp
   type(c_ptr) :: c_out
   integer :: length, i
@@ -249,12 +264,12 @@ function generic_map_get_bytes(x, key) result(out)
      out(i:i) = temp(i)
   end do
   deallocate(temp)
-end function generic_map_get_bytes
-function generic_map_get_unicode(x, key) result(out)
+end subroutine generic_map_get_bytes
+subroutine generic_map_get_unicode(x, key, out)
   implicit none
   type(ygggeneric) :: x
   character(len=*) :: key
-  character(kind=ucs4, len=:), pointer :: out
+  character(kind=ucs4, len=:), pointer, intent(out) :: out
   character(kind=ucs4), dimension(:), pointer :: temp
   type(c_ptr) :: c_out
   integer :: length, i
@@ -266,128 +281,128 @@ function generic_map_get_unicode(x, key) result(out)
      out(i:i) = temp(i)
   end do
   deallocate(temp)
-end function generic_map_get_unicode
+end subroutine generic_map_get_unicode
 
 ! Get 1darray int
-function generic_map_get_1darray_integer2(x, key) result(out)
+subroutine generic_map_get_1darray_integer2(x, key, out)
   implicit none
   type(ygggeneric) :: x
   character(len=*) :: key
-  integer(kind=2), dimension(:), pointer :: out
+  integer(kind=2), dimension(:), pointer, intent(out) :: out
   integer(kind=c_size_t) :: c_length
   type(c_ptr), target :: c_out
   c_length = generic_map_get_1darray(x, key, "int", 8 * 2, c_loc(c_out))
   call c_f_pointer(c_out, out, [c_length])
-end function generic_map_get_1darray_integer2
-function generic_map_get_1darray_integer4(x, key) result(out)
+end subroutine generic_map_get_1darray_integer2
+subroutine generic_map_get_1darray_integer4(x, key, out)
   implicit none
   type(ygggeneric) :: x
   character(len=*) :: key
-  integer(kind=4), dimension(:), pointer :: out
+  integer(kind=4), dimension(:), pointer, intent(out) :: out
   integer(kind=c_size_t) :: c_length
   type(c_ptr), target :: c_out
   c_length = generic_map_get_1darray(x, key, "int", 8 * 4, c_loc(c_out))
   call c_f_pointer(c_out, out, [c_length])
-end function generic_map_get_1darray_integer4
-function generic_map_get_1darray_integer8(x, key) result(out)
+end subroutine generic_map_get_1darray_integer4
+subroutine generic_map_get_1darray_integer8(x, key, out)
   implicit none
   type(ygggeneric) :: x
   character(len=*) :: key
-  integer(kind=8), dimension(:), pointer :: out
+  integer(kind=8), dimension(:), pointer, intent(out) :: out
   integer(kind=c_size_t) :: c_length
   type(c_ptr), target :: c_out
   c_length = generic_map_get_1darray(x, key, "int", 8 * 8, c_loc(c_out))
   call c_f_pointer(c_out, out, [c_length])
-end function generic_map_get_1darray_integer8
+end subroutine generic_map_get_1darray_integer8
 ! Get 1darray uint
-function generic_map_get_1darray_unsigned1(x, key) result(out)
+subroutine generic_map_get_1darray_unsigned1(x, key, out)
   implicit none
   type(ygggeneric) :: x
   character(len=*) :: key
-  type(ygguint1), dimension(:), pointer :: out
+  type(ygguint1), dimension(:), pointer, intent(out) :: out
   integer(kind=c_size_t) :: c_length
   type(c_ptr), target :: c_out
   c_length = generic_map_get_1darray(x, key, "uint", 8 * 1, c_loc(c_out))
   call c_f_pointer(c_out, out, [c_length])
-end function generic_map_get_1darray_unsigned1
-function generic_map_get_1darray_unsigned2(x, key) result(out)
+end subroutine generic_map_get_1darray_unsigned1
+subroutine generic_map_get_1darray_unsigned2(x, key, out)
   implicit none
   type(ygggeneric) :: x
   character(len=*) :: key
-  type(ygguint2), dimension(:), pointer :: out
+  type(ygguint2), dimension(:), pointer, intent(out) :: out
   integer(kind=c_size_t) :: c_length
   type(c_ptr), target :: c_out
   c_length = generic_map_get_1darray(x, key, "uint", 8 * 2, c_loc(c_out))
   call c_f_pointer(c_out, out, [c_length])
-end function generic_map_get_1darray_unsigned2
-function generic_map_get_1darray_unsigned4(x, key) result(out)
+end subroutine generic_map_get_1darray_unsigned2
+subroutine generic_map_get_1darray_unsigned4(x, key, out)
   implicit none
   type(ygggeneric) :: x
   character(len=*) :: key
-  type(ygguint4), dimension(:), pointer :: out
+  type(ygguint4), dimension(:), pointer, intent(out) :: out
   integer(kind=c_size_t) :: c_length
   type(c_ptr), target :: c_out
   c_length = generic_map_get_1darray(x, key, "uint", 8 * 4, c_loc(c_out))
   call c_f_pointer(c_out, out, [c_length])
-end function generic_map_get_1darray_unsigned4
-function generic_map_get_1darray_unsigned8(x, key) result(out)
+end subroutine generic_map_get_1darray_unsigned4
+subroutine generic_map_get_1darray_unsigned8(x, key, out)
   implicit none
   type(ygggeneric) :: x
   character(len=*) :: key
-  type(ygguint8), dimension(:), pointer :: out
+  type(ygguint8), dimension(:), pointer, intent(out) :: out
   integer(kind=c_size_t) :: c_length
   type(c_ptr), target :: c_out
   c_length = generic_map_get_1darray(x, key, "uint", 8 * 8, c_loc(c_out))
   call c_f_pointer(c_out, out, [c_length])
-end function generic_map_get_1darray_unsigned8
+end subroutine generic_map_get_1darray_unsigned8
 ! Get 1darray real
-function generic_map_get_1darray_real4(x, key) result(out)
+subroutine generic_map_get_1darray_real4(x, key, out)
   implicit none
   type(ygggeneric) :: x
   character(len=*) :: key
-  real(kind=4), dimension(:), pointer :: out
+  real(kind=4), dimension(:), pointer, intent(out) :: out
   integer(kind=c_size_t) :: c_length
   type(c_ptr), target :: c_out
   c_length = generic_map_get_1darray(x, key, "float", 8 * 4, c_loc(c_out))
   call c_f_pointer(c_out, out, [c_length])
-end function generic_map_get_1darray_real4
-function generic_map_get_1darray_real8(x, key) result(out)
+end subroutine generic_map_get_1darray_real4
+subroutine generic_map_get_1darray_real8(x, key, out)
   implicit none
   type(ygggeneric) :: x
   character(len=*) :: key
-  real(kind=8), dimension(:), pointer :: out
+  real(kind=8), dimension(:), pointer, intent(out) :: out
   integer(kind=c_size_t) :: c_length
   type(c_ptr), target :: c_out
   c_length = generic_map_get_1darray(x, key, "float", 8 * 8, c_loc(c_out))
   call c_f_pointer(c_out, out, [c_length])
-end function generic_map_get_1darray_real8
+end subroutine generic_map_get_1darray_real8
 ! Get 1darray complex
-function generic_map_get_1darray_complex4(x, key) result(out)
+subroutine generic_map_get_1darray_complex4(x, key, out)
   implicit none
   type(ygggeneric) :: x
   character(len=*) :: key
-  complex(kind=4), dimension(:), pointer :: out
+  complex(kind=4), dimension(:), pointer, intent(out) :: out
   integer(kind=c_size_t) :: c_length
   type(c_ptr), target :: c_out
   c_length = generic_map_get_1darray(x, key, "complex", 8 * 4, c_loc(c_out))
   call c_f_pointer(c_out, out, [c_length])
-end function generic_map_get_1darray_complex4
-function generic_map_get_1darray_complex8(x, key) result(out)
+end subroutine generic_map_get_1darray_complex4
+subroutine generic_map_get_1darray_complex8(x, key, out)
   implicit none
   type(ygggeneric) :: x
   character(len=*) :: key
-  complex(kind=8), dimension(:), pointer :: out
+  complex(kind=8), dimension(:), pointer, intent(out) :: out
   integer(kind=c_size_t) :: c_length
   type(c_ptr), target :: c_out
   c_length = generic_map_get_1darray(x, key, "complex", 8 * 8, c_loc(c_out))
   call c_f_pointer(c_out, out, [c_length])
-end function generic_map_get_1darray_complex8
+end subroutine generic_map_get_1darray_complex8
 ! Get 1darray string
-function generic_map_get_1darray_bytes(x, key) result(out)
+subroutine generic_map_get_1darray_bytes(x, key, out)
   implicit none
   type(ygggeneric) :: x
   character(len=*) :: key
-  character(len=:), dimension(:), pointer :: out
+  character(len=:), dimension(:), pointer, intent(out) :: out
   character, dimension(:), pointer :: temp
   type(c_ptr), target :: c_out
   integer(kind=c_size_t) :: c_length, i
@@ -403,12 +418,12 @@ function generic_map_get_1darray_bytes(x, key) result(out)
      end do
   end do
   deallocate(temp)
-end function generic_map_get_1darray_bytes
-function generic_map_get_1darray_unicode(x, key) result(out)
+end subroutine generic_map_get_1darray_bytes
+subroutine generic_map_get_1darray_unicode(x, key, out)
   implicit none
   type(ygggeneric) :: x
   character(len=*) :: key
-  character(kind=ucs4, len=:), dimension(:), pointer :: out
+  character(kind=ucs4, len=:), dimension(:), pointer, intent(out) :: out
   character(kind=ucs4), dimension(:), pointer :: temp
   type(c_ptr), target :: c_out
   integer(kind=c_size_t) :: c_length, i
@@ -424,128 +439,128 @@ function generic_map_get_1darray_unicode(x, key) result(out)
      end do
   end do
   deallocate(temp)
-end function generic_map_get_1darray_unicode
+end subroutine generic_map_get_1darray_unicode
 
 ! Get ndarray int
-function generic_map_get_ndarray_integer2(x, key) result(out)
+subroutine generic_map_get_ndarray_integer2(x, key, out)
   implicit none
   type(ygggeneric) :: x
   character(len=*) :: key
-  type(integer2_nd) :: out
+  type(integer2_nd), intent(out) :: out
   type(c_ptr), target :: c_out
   out%shape => generic_map_get_ndarray(x, key, "int", 8 * 2, &
        c_loc(c_out))
   call c_f_pointer(c_out, out%x, out%shape)
-end function generic_map_get_ndarray_integer2
-function generic_map_get_ndarray_integer4(x, key) result(out)
+end subroutine generic_map_get_ndarray_integer2
+subroutine generic_map_get_ndarray_integer4(x, key, out)
   implicit none
   type(ygggeneric) :: x
   character(len=*) :: key
-  type(integer4_nd) :: out
+  type(integer4_nd), intent(out) :: out
   type(c_ptr), target :: c_out
   out%shape => generic_map_get_ndarray(x, key, "int", 8 * 4, &
        c_loc(c_out))
   call c_f_pointer(c_out, out%x, out%shape)
-end function generic_map_get_ndarray_integer4
-function generic_map_get_ndarray_integer8(x, key) result(out)
+end subroutine generic_map_get_ndarray_integer4
+subroutine generic_map_get_ndarray_integer8(x, key, out)
   implicit none
   type(ygggeneric) :: x
   character(len=*) :: key
-  type(integer8_nd) :: out
+  type(integer8_nd), intent(out) :: out
   type(c_ptr), target :: c_out
   out%shape => generic_map_get_ndarray(x, key, "int", 8 * 8, &
        c_loc(c_out))
   call c_f_pointer(c_out, out%x, out%shape)
-end function generic_map_get_ndarray_integer8
+end subroutine generic_map_get_ndarray_integer8
 ! Get ndarray uint
-function generic_map_get_ndarray_unsigned1(x, key) result(out)
+subroutine generic_map_get_ndarray_unsigned1(x, key, out)
   implicit none
   type(ygggeneric) :: x
   character(len=*) :: key
-  type(unsigned1_nd) :: out
+  type(unsigned1_nd), intent(out) :: out
   type(c_ptr), target :: c_out
   out%shape => generic_map_get_ndarray(x, key, "uint", 8 * 1, &
        c_loc(c_out))
   call c_f_pointer(c_out, out%x, out%shape)
-end function generic_map_get_ndarray_unsigned1
-function generic_map_get_ndarray_unsigned2(x, key) result(out)
+end subroutine generic_map_get_ndarray_unsigned1
+subroutine generic_map_get_ndarray_unsigned2(x, key, out)
   implicit none
   type(ygggeneric) :: x
   character(len=*) :: key
-  type(unsigned2_nd) :: out
+  type(unsigned2_nd), intent(out) :: out
   type(c_ptr), target :: c_out
   out%shape => generic_map_get_ndarray(x, key, "uint", 8 * 2, &
        c_loc(c_out))
   call c_f_pointer(c_out, out%x, out%shape)
-end function generic_map_get_ndarray_unsigned2
-function generic_map_get_ndarray_unsigned4(x, key) result(out)
+end subroutine generic_map_get_ndarray_unsigned2
+subroutine generic_map_get_ndarray_unsigned4(x, key, out)
   implicit none
   type(ygggeneric) :: x
   character(len=*) :: key
-  type(unsigned4_nd) :: out
+  type(unsigned4_nd), intent(out) :: out
   type(c_ptr), target :: c_out
   out%shape => generic_map_get_ndarray(x, key, "uint", 8 * 4, &
        c_loc(c_out))
   call c_f_pointer(c_out, out%x, out%shape)
-end function generic_map_get_ndarray_unsigned4
-function generic_map_get_ndarray_unsigned8(x, key) result(out)
+end subroutine generic_map_get_ndarray_unsigned4
+subroutine generic_map_get_ndarray_unsigned8(x, key, out)
   implicit none
   type(ygggeneric) :: x
   character(len=*) :: key
-  type(unsigned8_nd) :: out
+  type(unsigned8_nd), intent(out) :: out
   type(c_ptr), target :: c_out
   out%shape => generic_map_get_ndarray(x, key, "uint", 8 * 8, &
        c_loc(c_out))
   call c_f_pointer(c_out, out%x, out%shape)
-end function generic_map_get_ndarray_unsigned8
+end subroutine generic_map_get_ndarray_unsigned8
 ! Get ndarray real
-function generic_map_get_ndarray_real4(x, key) result(out)
+subroutine generic_map_get_ndarray_real4(x, key, out)
   implicit none
   type(ygggeneric) :: x
   character(len=*) :: key
-  type(real4_nd) :: out
+  type(real4_nd), intent(out) :: out
   type(c_ptr), target :: c_out
   out%shape => generic_map_get_ndarray(x, key, "float", 8 * 4, &
        c_loc(c_out))
   call c_f_pointer(c_out, out%x, out%shape)
-end function generic_map_get_ndarray_real4
-function generic_map_get_ndarray_real8(x, key) result(out)
+end subroutine generic_map_get_ndarray_real4
+subroutine generic_map_get_ndarray_real8(x, key, out)
   implicit none
   type(ygggeneric) :: x
   character(len=*) :: key
-  type(real8_nd) :: out
+  type(real8_nd), intent(out) :: out
   type(c_ptr), target :: c_out
   out%shape => generic_map_get_ndarray(x, key, "float", 8 * 8, &
        c_loc(c_out))
   call c_f_pointer(c_out, out%x, out%shape)
-end function generic_map_get_ndarray_real8
+end subroutine generic_map_get_ndarray_real8
 ! Get ndarray complex
-function generic_map_get_ndarray_complex4(x, key) result(out)
+subroutine generic_map_get_ndarray_complex4(x, key, out)
   implicit none
   type(ygggeneric) :: x
   character(len=*) :: key
-  type(complex4_nd) :: out
+  type(complex4_nd), intent(out) :: out
   type(c_ptr), target :: c_out
   out%shape => generic_map_get_ndarray(x, key, "complex", 8 * 4, &
        c_loc(c_out))
   call c_f_pointer(c_out, out%x, out%shape)
-end function generic_map_get_ndarray_complex4
-function generic_map_get_ndarray_complex8(x, key) result(out)
+end subroutine generic_map_get_ndarray_complex4
+subroutine generic_map_get_ndarray_complex8(x, key, out)
   implicit none
   type(ygggeneric) :: x
   character(len=*) :: key
-  type(complex8_nd) :: out
+  type(complex8_nd), intent(out) :: out
   type(c_ptr), target :: c_out
   out%shape => generic_map_get_ndarray(x, key, "complex", 8 * 8, &
        c_loc(c_out))
   call c_f_pointer(c_out, out%x, out%shape)
-end function generic_map_get_ndarray_complex8
+end subroutine generic_map_get_ndarray_complex8
 ! Get ndarray string
-function generic_map_get_ndarray_character(x, key) result(out)
+subroutine generic_map_get_ndarray_character(x, key, out)
   implicit none
   type(ygggeneric) :: x
   character(len=*) :: key
-  type(character_nd) :: out
+  type(character_nd), intent(out) :: out
   character, dimension(:), pointer :: temp
   type(c_ptr), target :: c_out
   integer(kind=c_size_t) :: precision, nelements, i, j
@@ -567,12 +582,12 @@ function generic_map_get_ndarray_character(x, key) result(out)
      end do
   end do
   deallocate(temp)
-end function generic_map_get_ndarray_character
-function generic_map_get_ndarray_bytes(x, key) result(out)
+end subroutine generic_map_get_ndarray_character
+subroutine generic_map_get_ndarray_bytes(x, key, out)
   implicit none
   type(ygggeneric) :: x
   character(len=*) :: key
-  type(bytes_nd) :: out
+  type(bytes_nd), intent(out) :: out
   character, dimension(:), pointer :: temp
   type(c_ptr), target :: c_out
   integer(kind=c_size_t) :: precision, nelements, i, j
@@ -593,12 +608,12 @@ function generic_map_get_ndarray_bytes(x, key) result(out)
      end do
   end do
   deallocate(temp)
-end function generic_map_get_ndarray_bytes
-function generic_map_get_ndarray_unicode(x, key) result(out)
+end subroutine generic_map_get_ndarray_bytes
+subroutine generic_map_get_ndarray_unicode(x, key, out)
   implicit none
   type(ygggeneric) :: x
   character(len=*) :: key
-  type(unicode_nd) :: out
+  type(unicode_nd), intent(out) :: out
   character(kind=ucs4), dimension(:), pointer :: temp
   type(c_ptr), target :: c_out
   integer(kind=c_size_t) :: precision, nelements, i, j
@@ -618,10 +633,21 @@ function generic_map_get_ndarray_unicode(x, key) result(out)
         out%x(i)(j:j) = temp(((i-1)*precision) + j)
      end do
   end do
-end function generic_map_get_ndarray_unicode
+end subroutine generic_map_get_ndarray_unicode
 
 
 ! Set methods
+subroutine generic_map_set_generic(x, key, val)
+  implicit none
+  type(ygggeneric) :: x
+  character(len=*) :: key
+  type(ygggeneric), intent(in) :: val
+  integer(kind=c_int) :: flag
+  flag = set_generic_object(x, key, val)
+  if (flag.ne.0) then
+     stop "generic_map_set_generic: Error setting generic object."
+  end if
+end subroutine generic_map_set_generic
 subroutine generic_map_set_boolean(x, key, val)
   implicit none
   type(ygggeneric) :: x

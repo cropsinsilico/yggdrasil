@@ -1,24 +1,35 @@
 ! Interface for getting/setting generic array elements
 ! Get methods
-function generic_array_get_boolean(x, index) result(out)
+subroutine generic_array_get_generic(x, index, out)
   implicit none
   type(ygggeneric) :: x
   integer, intent(in) :: index
-  logical(kind=1), pointer :: out
+  type(ygggeneric), pointer, intent(out) :: out
+  integer(kind=c_int) :: flag
+  flag = get_generic_array(x, int(index, c_size_t), out)
+  if (flag.ne.0) then
+     stop "generic_array_get_generic: Error extracting generic object."
+  end if
+end subroutine generic_array_get_generic
+subroutine generic_array_get_boolean(x, index, out)
+  implicit none
+  type(ygggeneric) :: x
+  integer, intent(in) :: index
+  logical(kind=1), pointer, intent(out) :: out
   type(c_ptr) :: c_out
   c_out = generic_array_get_item(x, index, "boolean")
   call c_f_pointer(c_out, out)
-end function generic_array_get_boolean
-function generic_array_get_integer(x, index) result(out)
+end subroutine generic_array_get_boolean
+subroutine generic_array_get_integer(x, index, out)
   implicit none
   type(ygggeneric) :: x
   integer, intent(in) :: index
-  integer(kind=c_int), pointer :: out
+  integer(kind=c_int), pointer, intent(out) :: out
   type(c_ptr) :: c_out
   c_out = generic_array_get_item(x, index, "integer")
   call c_f_pointer(c_out, out)
-end function generic_array_get_integer
-function generic_array_get_null(x, index) result(out)
+end subroutine generic_array_get_integer
+subroutine generic_array_get_null(x, index, out)
   implicit none
   type(ygggeneric) :: x
   integer, intent(in) :: index
@@ -26,128 +37,132 @@ function generic_array_get_null(x, index) result(out)
   type(c_ptr) :: c_out
   c_out = generic_array_get_item(x, index, "null")
   ! call c_f_pointer(c_out%ptr, out)
-end function generic_array_get_null
-function generic_array_get_number(x, index) result(out)
+end subroutine generic_array_get_null
+subroutine generic_array_get_number(x, index, out)
   implicit none
   type(ygggeneric) :: x
   integer, intent(in) :: index
-  real(kind=8), pointer :: out
+  real(kind=8), pointer, intent(out) :: out
   type(c_ptr) :: c_out
   c_out = generic_array_get_item(x, index, "number")
   call c_f_pointer(c_out, out)
-end function generic_array_get_number
-function generic_array_get_string(x, index) result(out)
+end subroutine generic_array_get_number
+subroutine generic_array_get_string(x, index, out)
   implicit none
   type(ygggeneric) :: x
   integer, intent(in) :: index
-  character(len=:, kind=c_char), pointer :: out
+  character(len=:, kind=c_char), pointer, intent(out) :: out
   type(c_ptr) :: c_out
   integer :: nbytes
   c_out = generic_array_get_item(x, index, "string")
   call c_f_pointer(c_out, out)
-end function generic_array_get_string
-function generic_array_get_map(x, index) result(out)
+end subroutine generic_array_get_string
+subroutine generic_array_get_map(x, index, out)
   implicit none
   type(ygggeneric) :: x
   integer, intent(in) :: index
-  type(ygggeneric) :: out
-  out = init_generic()
+  type(yggmap), pointer, intent(out) :: out
+  allocate(out)
+  out = yggmap(init_generic())
   out%obj = generic_array_get_item(x, index, "object")
-end function generic_array_get_map
-function generic_array_get_array(x, index) result(out)
+end subroutine generic_array_get_map
+subroutine generic_array_get_array(x, index, out)
   implicit none
   type(ygggeneric) :: x
   integer, intent(in) :: index
-  type(ygggeneric) :: out
-  out = init_generic()
+  type(yggarr), pointer, intent(out) :: out
+  allocate(out)
+  out = yggarr(init_generic())
   out%obj = generic_array_get_item(x, index, "array")
-end function generic_array_get_array
-function generic_array_get_ply(x, index) result(out)
+end subroutine generic_array_get_array
+subroutine generic_array_get_ply(x, index, out)
   implicit none
   type(ygggeneric) :: x
   integer, intent(in) :: index
   type(c_ptr) :: c_out
-  type(yggply), pointer :: out
+  type(yggply), pointer, intent(out) :: out
   c_out = generic_array_get_item(x, index, "ply")
   ! Copy?
   call c_f_pointer(c_out, out)
-end function generic_array_get_ply
-function generic_array_get_obj(x, index) result(out)
+end subroutine generic_array_get_ply
+subroutine generic_array_get_obj(x, index, out)
   implicit none
   type(ygggeneric) :: x
   integer, intent(in) :: index
   type(c_ptr) :: c_out
-  type(yggobj), pointer :: out
+  type(yggobj), pointer, intent(out) :: out
   c_out = generic_array_get_item(x, index, "obj")
   ! Copy?
   call c_f_pointer(c_out, out)
-end function generic_array_get_obj
-function generic_array_get_python_class(x, index) result(out)
+end subroutine generic_array_get_obj
+subroutine generic_array_get_python_class(x, index, out)
   implicit none
   type(ygggeneric) :: x
   integer, intent(in) :: index
   type(c_ptr) :: c_out
-  type(yggpython), pointer :: out
+  type(yggpython), pointer, intent(out) :: out
   c_out = generic_array_get_item(x, index, "class")
   ! Copy?
   call c_f_pointer(c_out, out)
-end function generic_array_get_python_class
-function generic_array_get_python_function(x, index) result(out)
+end subroutine generic_array_get_python_class
+subroutine generic_array_get_python_function(x, index, out)
   implicit none
   type(ygggeneric) :: x
   integer, intent(in) :: index
   type(c_ptr) :: c_out
-  type(yggpython), pointer :: out
+  type(yggpython), pointer, intent(out) :: out
   c_out = generic_array_get_item(x, index, "function")
   ! Copy?
   call c_f_pointer(c_out, out)
-end function generic_array_get_python_function
-function generic_array_get_schema(x, index) result(out)
+end subroutine generic_array_get_python_function
+subroutine generic_array_get_schema(x, index, out)
   implicit none
   type(ygggeneric) :: x
   integer, intent(in) :: index
-  type(ygggeneric), pointer :: out
-  out = init_generic()
+  type(yggschema), pointer, intent(out) :: out
+  allocate(out)
+  out = yggschema(init_generic())
   out%obj = generic_array_get_item(x, index, "schema")
-end function generic_array_get_schema
-function generic_array_get_any(x, index) result(out)
+end subroutine generic_array_get_schema
+subroutine generic_array_get_any(x, index, out)
   implicit none
   type(ygggeneric) :: x
   integer, intent(in) :: index
-  type(ygggeneric), pointer :: out
+  type(ygggeneric), pointer, intent(out) :: out
+  allocate(out)
   out = init_generic()
   out%obj = generic_array_get_item(x, index, "any")
-end function generic_array_get_any
+end subroutine generic_array_get_any
 ! Get scalar int
-function generic_array_get_integer2(x, index) result(out)
+subroutine generic_array_get_integer2(x, index, out)
   implicit none
   type(ygggeneric) :: x
   integer, intent(in) :: index
-  integer(kind=2), pointer :: out
+  integer(kind=2), pointer, intent(out) :: out
   type(c_ptr) :: c_out
   c_out = generic_array_get_scalar(x, index, "int", 8 * 2)
   call c_f_pointer(c_out, out)
-end function generic_array_get_integer2
-function generic_array_get_integer4(x, index) result(out)
+end subroutine generic_array_get_integer2
+subroutine generic_array_get_integer4(x, index, out)
   implicit none
   type(ygggeneric) :: x
   integer, intent(in) :: index
-  integer(kind=4), pointer :: out
+  integer(kind=4), pointer, intent(out) :: out
   type(c_ptr) :: c_out
   c_out = generic_array_get_scalar(x, index, "int", 8 * 4)
   call c_f_pointer(c_out, out)
-end function generic_array_get_integer4
-function generic_array_get_integer8(x, index) result(out)
+end subroutine generic_array_get_integer4
+subroutine generic_array_get_integer8(x, index, out)
   implicit none
   type(ygggeneric) :: x
   integer, intent(in) :: index
-  integer(kind=8), pointer :: out
+  integer(kind=8), pointer, intent(out) :: out
   type(c_ptr) :: c_out
   c_out = generic_array_get_scalar(x, index, "int", 8 * 8)
   call c_f_pointer(c_out, out)
-end function generic_array_get_integer8
+end subroutine generic_array_get_integer8
 ! Get scalar uint
-function generic_array_get_unsigned1(x, index) result(out)
+subroutine generic_array_get_unsigned1(x, index, out)
   implicit none
   type(ygggeneric) :: x
   integer, intent(in) :: index
@@ -158,8 +173,8 @@ function generic_array_get_unsigned1(x, index) result(out)
   call c_f_pointer(c_out, temp)
   out%x = temp
   deallocate(temp)
-end function generic_array_get_unsigned1
-function generic_array_get_unsigned2(x, index) result(out)
+end subroutine generic_array_get_unsigned1
+subroutine generic_array_get_unsigned2(x, index, out)
   implicit none
   type(ygggeneric) :: x
   integer, intent(in) :: index
@@ -170,8 +185,8 @@ function generic_array_get_unsigned2(x, index) result(out)
   call c_f_pointer(c_out, temp)
   out%x = temp
   deallocate(temp)
-end function generic_array_get_unsigned2
-function generic_array_get_unsigned4(x, index) result(out)
+end subroutine generic_array_get_unsigned2
+subroutine generic_array_get_unsigned4(x, index, out)
   implicit none
   type(ygggeneric) :: x
   integer, intent(in) :: index
@@ -182,8 +197,8 @@ function generic_array_get_unsigned4(x, index) result(out)
   call c_f_pointer(c_out, temp)
   out%x = temp
   deallocate(temp)
-end function generic_array_get_unsigned4
-function generic_array_get_unsigned8(x, index) result(out)
+end subroutine generic_array_get_unsigned4
+subroutine generic_array_get_unsigned8(x, index, out)
   implicit none
   type(ygggeneric) :: x
   integer, intent(in) :: index
@@ -194,51 +209,51 @@ function generic_array_get_unsigned8(x, index) result(out)
   call c_f_pointer(c_out, temp)
   out%x = temp
   deallocate(temp)
-end function generic_array_get_unsigned8
+end subroutine generic_array_get_unsigned8
 ! Get scalar real
-function generic_array_get_real4(x, index) result(out)
+subroutine generic_array_get_real4(x, index, out)
   implicit none
   type(ygggeneric) :: x
   integer, intent(in) :: index
-  real(kind=4), pointer :: out
+  real(kind=4), pointer, intent(out) :: out
   type(c_ptr) :: c_out
   c_out = generic_array_get_scalar(x, index, "float", 8 * 4)
   call c_f_pointer(c_out, out)
-end function generic_array_get_real4
-function generic_array_get_real8(x, index) result(out)
+end subroutine generic_array_get_real4
+subroutine generic_array_get_real8(x, index, out)
   implicit none
   type(ygggeneric) :: x
   integer, intent(in) :: index
-  real(kind=8), pointer :: out
+  real(kind=8), pointer, intent(out) :: out
   type(c_ptr) :: c_out
   c_out = generic_array_get_scalar(x, index, "float", 8 * 8)
   call c_f_pointer(c_out, out)
-end function generic_array_get_real8
+end subroutine generic_array_get_real8
 ! Get scalar complex
-function generic_array_get_complex4(x, index) result(out)
+subroutine generic_array_get_complex4(x, index, out)
   implicit none
   type(ygggeneric) :: x
   integer, intent(in) :: index
-  complex(kind=4), pointer :: out
+  complex(kind=4), pointer, intent(out) :: out
   type(c_ptr) :: c_out
   c_out = generic_array_get_scalar(x, index, "complex", 8 * 4)
   call c_f_pointer(c_out, out)
-end function generic_array_get_complex4
-function generic_array_get_complex8(x, index) result(out)
+end subroutine generic_array_get_complex4
+subroutine generic_array_get_complex8(x, index, out)
   implicit none
   type(ygggeneric) :: x
   integer, intent(in) :: index
-  complex(kind=8), pointer :: out
+  complex(kind=8), pointer, intent(out) :: out
   type(c_ptr) :: c_out
   c_out = generic_array_get_scalar(x, index, "complex", 8 * 8)
   call c_f_pointer(c_out, out)
-end function generic_array_get_complex8
+end subroutine generic_array_get_complex8
 ! Get scalar string
-function generic_array_get_bytes(x, index) result(out)
+subroutine generic_array_get_bytes(x, index, out)
   implicit none
   type(ygggeneric) :: x
   integer, intent(in) :: index
-  character(len=:), pointer :: out
+  character(len=:), pointer, intent(out) :: out
   character, dimension(:), pointer :: temp
   type(c_ptr) :: c_out
   integer :: length, i
@@ -250,12 +265,12 @@ function generic_array_get_bytes(x, index) result(out)
      out(i:i) = temp(i)
   end do
   deallocate(temp)
-end function generic_array_get_bytes
-function generic_array_get_unicode(x, index) result(out)
+end subroutine generic_array_get_bytes
+subroutine generic_array_get_unicode(x, index, out)
   implicit none
   type(ygggeneric) :: x
   integer, intent(in) :: index
-  character(kind=ucs4, len=:), pointer :: out
+  character(kind=ucs4, len=:), pointer, intent(out) :: out
   character(kind=ucs4), dimension(:), pointer :: temp
   type(c_ptr) :: c_out
   integer :: length, i
@@ -267,128 +282,128 @@ function generic_array_get_unicode(x, index) result(out)
      out(i:i) = temp(i)
   end do
   deallocate(temp)
-end function generic_array_get_unicode
+end subroutine generic_array_get_unicode
 
 ! Get 1darray int
-function generic_array_get_1darray_integer2(x, index) result(out)
+subroutine generic_array_get_1darray_integer2(x, index, out)
   implicit none
   type(ygggeneric) :: x
   integer, intent(in) :: index
-  integer(kind=2), dimension(:), pointer :: out
+  integer(kind=2), dimension(:), intent(out), pointer :: out
   integer(kind=c_size_t) :: c_length
   type(c_ptr), target :: c_out
   c_length = generic_array_get_1darray(x, index, "int", 8 * 2, c_loc(c_out))
   call c_f_pointer(c_out, out, [c_length])
-end function generic_array_get_1darray_integer2
-function generic_array_get_1darray_integer4(x, index) result(out)
+end subroutine generic_array_get_1darray_integer2
+subroutine generic_array_get_1darray_integer4(x, index, out)
   implicit none
   type(ygggeneric) :: x
   integer, intent(in) :: index
-  integer(kind=4), dimension(:), pointer :: out
+  integer(kind=4), dimension(:), pointer, intent(out) :: out
   integer(kind=c_size_t) :: c_length
   type(c_ptr), target :: c_out
   c_length = generic_array_get_1darray(x, index, "int", 8 * 4, c_loc(c_out))
   call c_f_pointer(c_out, out, [c_length])
-end function generic_array_get_1darray_integer4
-function generic_array_get_1darray_integer8(x, index) result(out)
+end subroutine generic_array_get_1darray_integer4
+subroutine generic_array_get_1darray_integer8(x, index, out)
   implicit none
   type(ygggeneric) :: x
   integer, intent(in) :: index
-  integer(kind=8), dimension(:), pointer :: out
+  integer(kind=8), dimension(:), pointer, intent(out) :: out
   integer(kind=c_size_t) :: c_length
   type(c_ptr), target :: c_out
   c_length = generic_array_get_1darray(x, index, "int", 8 * 8, c_loc(c_out))
   call c_f_pointer(c_out, out, [c_length])
-end function generic_array_get_1darray_integer8
+end subroutine generic_array_get_1darray_integer8
 ! Get 1darray uint
-function generic_array_get_1darray_unsigned1(x, index) result(out)
+subroutine generic_array_get_1darray_unsigned1(x, index, out)
   implicit none
   type(ygggeneric) :: x
   integer, intent(in) :: index
-  type(ygguint1), dimension(:), pointer :: out
+  type(ygguint1), dimension(:), pointer, intent(out) :: out
   integer(kind=c_size_t) :: c_length
   type(c_ptr), target :: c_out
   c_length = generic_array_get_1darray(x, index, "uint", 8 * 1, c_loc(c_out))
   call c_f_pointer(c_out, out, [c_length])
-end function generic_array_get_1darray_unsigned1
-function generic_array_get_1darray_unsigned2(x, index) result(out)
+end subroutine generic_array_get_1darray_unsigned1
+subroutine generic_array_get_1darray_unsigned2(x, index, out)
   implicit none
   type(ygggeneric) :: x
   integer, intent(in) :: index
-  type(ygguint2), dimension(:), pointer :: out
+  type(ygguint2), dimension(:), pointer, intent(out) :: out
   integer(kind=c_size_t) :: c_length
   type(c_ptr), target :: c_out
   c_length = generic_array_get_1darray(x, index, "uint", 8 * 2, c_loc(c_out))
   call c_f_pointer(c_out, out, [c_length])
-end function generic_array_get_1darray_unsigned2
-function generic_array_get_1darray_unsigned4(x, index) result(out)
+end subroutine generic_array_get_1darray_unsigned2
+subroutine generic_array_get_1darray_unsigned4(x, index, out)
   implicit none
   type(ygggeneric) :: x
   integer, intent(in) :: index
-  type(ygguint4), dimension(:), pointer :: out
+  type(ygguint4), dimension(:), pointer, intent(out) :: out
   integer(kind=c_size_t) :: c_length
   type(c_ptr), target :: c_out
   c_length = generic_array_get_1darray(x, index, "uint", 8 * 4, c_loc(c_out))
   call c_f_pointer(c_out, out, [c_length])
-end function generic_array_get_1darray_unsigned4
-function generic_array_get_1darray_unsigned8(x, index) result(out)
+end subroutine generic_array_get_1darray_unsigned4
+subroutine generic_array_get_1darray_unsigned8(x, index, out)
   implicit none
   type(ygggeneric) :: x
   integer, intent(in) :: index
-  type(ygguint8), dimension(:), pointer :: out
+  type(ygguint8), dimension(:), pointer, intent(out) :: out
   integer(kind=c_size_t) :: c_length
   type(c_ptr), target :: c_out
   c_length = generic_array_get_1darray(x, index, "uint", 8 * 8, c_loc(c_out))
   call c_f_pointer(c_out, out, [c_length])
-end function generic_array_get_1darray_unsigned8
+end subroutine generic_array_get_1darray_unsigned8
 ! Get 1darray real
-function generic_array_get_1darray_real4(x, index) result(out)
+subroutine generic_array_get_1darray_real4(x, index, out)
   implicit none
   type(ygggeneric) :: x
   integer, intent(in) :: index
-  real(kind=4), dimension(:), pointer :: out
+  real(kind=4), dimension(:), pointer, intent(out) :: out
   integer(kind=c_size_t) :: c_length
   type(c_ptr), target :: c_out
   c_length = generic_array_get_1darray(x, index, "float", 8 * 4, c_loc(c_out))
   call c_f_pointer(c_out, out, [c_length])
-end function generic_array_get_1darray_real4
-function generic_array_get_1darray_real8(x, index) result(out)
+end subroutine generic_array_get_1darray_real4
+subroutine generic_array_get_1darray_real8(x, index, out)
   implicit none
   type(ygggeneric) :: x
   integer, intent(in) :: index
-  real(kind=8), dimension(:), pointer :: out
+  real(kind=8), dimension(:), intent(out), pointer :: out
   integer(kind=c_size_t) :: c_length
   type(c_ptr), target :: c_out
   c_length = generic_array_get_1darray(x, index, "float", 8 * 8, c_loc(c_out))
   call c_f_pointer(c_out, out, [c_length])
-end function generic_array_get_1darray_real8
+end subroutine generic_array_get_1darray_real8
 ! Get 1darray complex
-function generic_array_get_1darray_complex4(x, index) result(out)
+subroutine generic_array_get_1darray_complex4(x, index, out)
   implicit none
   type(ygggeneric) :: x
   integer, intent(in) :: index
-  complex(kind=4), dimension(:), pointer :: out
+  complex(kind=4), dimension(:), pointer, intent(out) :: out
   integer(kind=c_size_t) :: c_length
   type(c_ptr), target :: c_out
   c_length = generic_array_get_1darray(x, index, "complex", 8 * 4, c_loc(c_out))
   call c_f_pointer(c_out, out, [c_length])
-end function generic_array_get_1darray_complex4
-function generic_array_get_1darray_complex8(x, index) result(out)
+end subroutine generic_array_get_1darray_complex4
+subroutine generic_array_get_1darray_complex8(x, index, out)
   implicit none
   type(ygggeneric) :: x
   integer, intent(in) :: index
-  complex(kind=8), dimension(:), pointer :: out
+  complex(kind=8), dimension(:), pointer, intent(out) :: out
   integer(kind=c_size_t) :: c_length
   type(c_ptr), target :: c_out
   c_length = generic_array_get_1darray(x, index, "complex", 8 * 8, c_loc(c_out))
   call c_f_pointer(c_out, out, [c_length])
-end function generic_array_get_1darray_complex8
+end subroutine generic_array_get_1darray_complex8
 ! Get 1darray string
-function generic_array_get_1darray_bytes(x, index) result(out)
+subroutine generic_array_get_1darray_bytes(x, index, out)
   implicit none
   type(ygggeneric) :: x
   integer, intent(in) :: index
-  character(len=:), dimension(:), pointer :: out
+  character(len=:), dimension(:), pointer, intent(out) :: out
   character, dimension(:), pointer :: temp
   type(c_ptr), target :: c_out
   integer(kind=c_size_t) :: c_length, i
@@ -404,12 +419,12 @@ function generic_array_get_1darray_bytes(x, index) result(out)
      end do
   end do
   deallocate(temp)
-end function generic_array_get_1darray_bytes
-function generic_array_get_1darray_unicode(x, index) result(out)
+end subroutine generic_array_get_1darray_bytes
+subroutine generic_array_get_1darray_unicode(x, index, out)
   implicit none
   type(ygggeneric) :: x
   integer, intent(in) :: index
-  character(kind=ucs4, len=:), dimension(:), pointer :: out
+  character(kind=ucs4, len=:), dimension(:), pointer, intent(out) :: out
   character(kind=ucs4), dimension(:), pointer :: temp
   type(c_ptr), target :: c_out
   integer(kind=c_size_t) :: c_length, i
@@ -425,128 +440,128 @@ function generic_array_get_1darray_unicode(x, index) result(out)
      end do
   end do
   deallocate(temp)
-end function generic_array_get_1darray_unicode
+end subroutine generic_array_get_1darray_unicode
 
 ! Get ndarray int
-function generic_array_get_ndarray_integer2(x, index) result(out)
+subroutine generic_array_get_ndarray_integer2(x, index, out)
   implicit none
   type(ygggeneric) :: x
   integer, intent(in) :: index
-  type(integer2_nd) :: out
+  type(integer2_nd), intent(out) :: out
   type(c_ptr), target :: c_out
   out%shape => generic_array_get_ndarray(x, index, "int", 8 * 2, &
        c_loc(c_out))
   call c_f_pointer(c_out, out%x, out%shape)
-end function generic_array_get_ndarray_integer2
-function generic_array_get_ndarray_integer4(x, index) result(out)
+end subroutine generic_array_get_ndarray_integer2
+subroutine generic_array_get_ndarray_integer4(x, index, out)
   implicit none
   type(ygggeneric) :: x
   integer, intent(in) :: index
-  type(integer4_nd) :: out
+  type(integer4_nd), intent(out) :: out
   type(c_ptr), target :: c_out
   out%shape => generic_array_get_ndarray(x, index, "int", 8 * 4, &
        c_loc(c_out))
   call c_f_pointer(c_out, out%x, out%shape)
-end function generic_array_get_ndarray_integer4
-function generic_array_get_ndarray_integer8(x, index) result(out)
+end subroutine generic_array_get_ndarray_integer4
+subroutine generic_array_get_ndarray_integer8(x, index, out)
   implicit none
   type(ygggeneric) :: x
   integer, intent(in) :: index
-  type(integer8_nd) :: out
+  type(integer8_nd), intent(out) :: out
   type(c_ptr), target :: c_out
   out%shape => generic_array_get_ndarray(x, index, "int", 8 * 8, &
        c_loc(c_out))
   call c_f_pointer(c_out, out%x, out%shape)
-end function generic_array_get_ndarray_integer8
+end subroutine generic_array_get_ndarray_integer8
 ! Get ndarray uint
-function generic_array_get_ndarray_unsigned1(x, index) result(out)
+subroutine generic_array_get_ndarray_unsigned1(x, index, out)
   implicit none
   type(ygggeneric) :: x
   integer, intent(in) :: index
-  type(unsigned1_nd) :: out
+  type(unsigned1_nd), intent(out) :: out
   type(c_ptr), target :: c_out
   out%shape => generic_array_get_ndarray(x, index, "uint", 8 * 1, &
        c_loc(c_out))
   call c_f_pointer(c_out, out%x, out%shape)
-end function generic_array_get_ndarray_unsigned1
-function generic_array_get_ndarray_unsigned2(x, index) result(out)
+end subroutine generic_array_get_ndarray_unsigned1
+subroutine generic_array_get_ndarray_unsigned2(x, index, out)
   implicit none
   type(ygggeneric) :: x
   integer, intent(in) :: index
-  type(unsigned2_nd) :: out
+  type(unsigned2_nd), intent(out) :: out
   type(c_ptr), target :: c_out
   out%shape => generic_array_get_ndarray(x, index, "uint", 8 * 2, &
        c_loc(c_out))
   call c_f_pointer(c_out, out%x, out%shape)
-end function generic_array_get_ndarray_unsigned2
-function generic_array_get_ndarray_unsigned4(x, index) result(out)
+end subroutine generic_array_get_ndarray_unsigned2
+subroutine generic_array_get_ndarray_unsigned4(x, index, out)
   implicit none
   type(ygggeneric) :: x
   integer, intent(in) :: index
-  type(unsigned4_nd) :: out
+  type(unsigned4_nd), intent(out) :: out
   type(c_ptr), target :: c_out
   out%shape => generic_array_get_ndarray(x, index, "uint", 8 * 4, &
        c_loc(c_out))
   call c_f_pointer(c_out, out%x, out%shape)
-end function generic_array_get_ndarray_unsigned4
-function generic_array_get_ndarray_unsigned8(x, index) result(out)
+end subroutine generic_array_get_ndarray_unsigned4
+subroutine generic_array_get_ndarray_unsigned8(x, index, out)
   implicit none
   type(ygggeneric) :: x
   integer, intent(in) :: index
-  type(unsigned8_nd) :: out
+  type(unsigned8_nd), intent(out) :: out
   type(c_ptr), target :: c_out
   out%shape => generic_array_get_ndarray(x, index, "uint", 8 * 8, &
        c_loc(c_out))
   call c_f_pointer(c_out, out%x, out%shape)
-end function generic_array_get_ndarray_unsigned8
+end subroutine generic_array_get_ndarray_unsigned8
 ! Get ndarray real
-function generic_array_get_ndarray_real4(x, index) result(out)
+subroutine generic_array_get_ndarray_real4(x, index, out)
   implicit none
   type(ygggeneric) :: x
   integer, intent(in) :: index
-  type(real4_nd) :: out
+  type(real4_nd), intent(out) :: out
   type(c_ptr), target :: c_out
   out%shape => generic_array_get_ndarray(x, index, "float", 8 * 4, &
        c_loc(c_out))
   call c_f_pointer(c_out, out%x, out%shape)
-end function generic_array_get_ndarray_real4
-function generic_array_get_ndarray_real8(x, index) result(out)
+end subroutine generic_array_get_ndarray_real4
+subroutine generic_array_get_ndarray_real8(x, index, out)
   implicit none
   type(ygggeneric) :: x
   integer, intent(in) :: index
-  type(real8_nd) :: out
+  type(real8_nd), intent(out) :: out
   type(c_ptr), target :: c_out
   out%shape => generic_array_get_ndarray(x, index, "float", 8 * 8, &
        c_loc(c_out))
   call c_f_pointer(c_out, out%x, out%shape)
-end function generic_array_get_ndarray_real8
+end subroutine generic_array_get_ndarray_real8
 ! Get ndarray complex
-function generic_array_get_ndarray_complex4(x, index) result(out)
+subroutine generic_array_get_ndarray_complex4(x, index, out)
   implicit none
   type(ygggeneric) :: x
   integer, intent(in) :: index
-  type(complex4_nd) :: out
+  type(complex4_nd), intent(out) :: out
   type(c_ptr), target :: c_out
   out%shape => generic_array_get_ndarray(x, index, "complex", 8 * 4, &
        c_loc(c_out))
   call c_f_pointer(c_out, out%x, out%shape)
-end function generic_array_get_ndarray_complex4
-function generic_array_get_ndarray_complex8(x, index) result(out)
+end subroutine generic_array_get_ndarray_complex4
+subroutine generic_array_get_ndarray_complex8(x, index, out)
   implicit none
   type(ygggeneric) :: x
   integer, intent(in) :: index
-  type(complex8_nd) :: out
+  type(complex8_nd), intent(out) :: out
   type(c_ptr), target :: c_out
   out%shape => generic_array_get_ndarray(x, index, "complex", 8 * 8, &
        c_loc(c_out))
   call c_f_pointer(c_out, out%x, out%shape)
-end function generic_array_get_ndarray_complex8
+end subroutine generic_array_get_ndarray_complex8
 ! Get ndarray string
-function generic_array_get_ndarray_character(x, index) result(out)
+subroutine generic_array_get_ndarray_character(x, index, out)
   implicit none
   type(ygggeneric) :: x
   integer, intent(in) :: index
-  type(character_nd) :: out
+  type(character_nd), intent(out) :: out
   character, dimension(:), pointer :: temp
   type(c_ptr), target :: c_out
   integer(kind=c_size_t) :: precision, nelements, i, j
@@ -568,12 +583,12 @@ function generic_array_get_ndarray_character(x, index) result(out)
      end do
   end do
   deallocate(temp)
-end function generic_array_get_ndarray_character
-function generic_array_get_ndarray_bytes(x, index) result(out)
+end subroutine generic_array_get_ndarray_character
+subroutine generic_array_get_ndarray_bytes(x, index, out)
   implicit none
   type(ygggeneric) :: x
   integer, intent(in) :: index
-  type(bytes_nd) :: out
+  type(bytes_nd), intent(out) :: out
   character, dimension(:), pointer :: temp
   type(c_ptr), target :: c_out
   integer(kind=c_size_t) :: precision, nelements, i, j
@@ -594,12 +609,12 @@ function generic_array_get_ndarray_bytes(x, index) result(out)
      end do
   end do
   deallocate(temp)
-end function generic_array_get_ndarray_bytes
-function generic_array_get_ndarray_unicode(x, index) result(out)
+end subroutine generic_array_get_ndarray_bytes
+subroutine generic_array_get_ndarray_unicode(x, index, out)
   implicit none
   type(ygggeneric) :: x
   integer, intent(in) :: index
-  type(unicode_nd) :: out
+  type(unicode_nd), intent(out) :: out
   character(kind=ucs4), dimension(:), pointer :: temp
   type(c_ptr), target :: c_out
   integer(kind=c_size_t) :: precision, nelements, i, j
@@ -619,10 +634,21 @@ function generic_array_get_ndarray_unicode(x, index) result(out)
         out%x(i)(j:j) = temp(((i-1)*precision) + j)
      end do
   end do
-end function generic_array_get_ndarray_unicode
+end subroutine generic_array_get_ndarray_unicode
 
 
 ! Set methods
+subroutine generic_array_set_generic(x, index, val)
+  implicit none
+  type(ygggeneric) :: x
+  integer, intent(in) :: index
+  type(ygggeneric), intent(in) :: val
+  integer(kind=c_int) :: flag
+  flag = set_generic_array(x, int(index, c_size_t), val)
+  if (flag.ne.0) then
+     stop "generic_array_get_generic: Error setting generic object."
+  end if
+end subroutine generic_array_set_generic
 subroutine generic_array_set_boolean(x, index, val)
   implicit none
   type(ygggeneric) :: x

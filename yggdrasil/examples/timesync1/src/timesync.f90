@@ -12,7 +12,7 @@ program main
   real(kind=8) :: t_step, t_start, t_end, t
   character(len=32) :: t_units
   type(ygggeneric) :: state, msg
-  real(kind=8) :: x, y
+  real(kind=8), pointer :: x, y
 
   call get_command_argument(1, arg)
   read(arg, *) t_step
@@ -46,14 +46,14 @@ program main
      write (*, '("timesync(Fortran): Initial sync failed.")')
      stop 1
   end if
-  x = generic_map_get_real8(state, "x")
-  y = generic_map_get_real8(state, "y")
+  call generic_map_get(state, "x", x)
+  call generic_map_get(state, "y", y)
   write (*, '("timesync(Fortran): t = ",F5.1," ",A3,", x = ",&
        &SP,F5.2,", y = ",F5.2)') t, adjustl(t_units), x, y
 
   ! Send initial state to output
   msg = copy_generic(state)
-  call generic_map_set_real8(msg, "time", t, t_units)
+  call generic_map_set(msg, "time", t, t_units)
   ret = ygg_send_var(out, yggarg(msg))
   if (.not.ret) then
      write (*, '("timesync(Fortran): Failed to send initial output &
@@ -82,14 +82,14 @@ program main
              &".")') t
         stop 1
      end if
-     x = generic_map_get_real8(state, "x")
-     y = generic_map_get_real8(state, "y")
+     call generic_map_get(state, "x", x)
+     call generic_map_get(state, "y", y)
      write (*, '("timesync(Fortran): t = ",F5.1," ",A3,", x = ",&
           &SP,F5.2,", y = ",F5.2)') t, adjustl(t_units), x, y
 
      ! Send output
      msg = copy_generic(state)
-     call generic_map_set_real8(msg, "time", t, t_units)
+     call generic_map_set(msg, "time", t, t_units)
      ret = ygg_send_var(out, yggarg(msg))
      if (.not.ret) then
         write (*, '("timesync(Fortran): Failed to send output for &
@@ -129,7 +129,7 @@ function timestep_calc(t, t_units, state) result (ret)
   if (ret) then
      x = sin(2.0 * PI_8 * t / x_period)
      y = cos(2.0 * PI_8 * t / y_period)
-     call generic_map_set_real8(state, "x", x)
-     call generic_map_set_real8(state, "y", y)
+     call generic_map_set(state, "x", x)
+     call generic_map_set(state, "y", y)
   end if
 end function timestep_calc

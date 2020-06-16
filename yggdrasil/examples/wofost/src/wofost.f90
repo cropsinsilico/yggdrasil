@@ -7,9 +7,9 @@ program main
   type(yggcomm) :: in_channel, out_channel
   type(ygggeneric) :: obj
   character(len=:), dimension(:), allocatable :: keys
-  type(ygggeneric) :: amaxtb
+  type(ygggeneric), pointer :: amaxtb
   real(kind=8), dimension(:), pointer :: amaxtb_x, amaxtb_y
-  real(kind=8) :: co2
+  real(kind=8), pointer :: co2
   integer :: i
   obj = init_generic()
 
@@ -42,13 +42,13 @@ program main
      write (*, '("")')
 
      ! Get double precision floating point element
-     co2 = generic_map_get_real8(obj, "CO2")
+     call generic_map_get(obj, "CO2", co2)
      write (*, '("Fortran Model: CO2 = ",F10.5)') co2
 
      ! Get array element
-     amaxtb = generic_map_get_array(obj, "AMAXTB")
-     amaxtb_x => generic_array_get_1darray_real8(amaxtb, 1)
-     amaxtb_y => generic_array_get_1darray_real8(amaxtb, 2)
+     call generic_map_get(obj, "AMAXTB", amaxtb)
+     call generic_array_get(amaxtb, 1, amaxtb_x)
+     call generic_array_get(amaxtb, 2, amaxtb_y)
      write (*, '("Fortran Model: AMAXTB = ")')
      do i = 1, size(amaxtb_x)
         write (*, '(A,F10.5,A,F10.5)') char(11), amaxtb_x(i), &

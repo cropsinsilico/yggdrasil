@@ -875,11 +875,11 @@ extern "C" {
     x[0] = init_generic();
     try {
       if (!(is_generic_init(arr))) {
-  ygglog_throw_error("get_generic_object: Object is not a generic object.");
+	ygglog_throw_error("get_generic_object: Object is not a generic object.");
       }
       YggGeneric* arr_obj = (YggGeneric*)(arr.obj);
       if (arr_obj == NULL) {
-  ygglog_throw_error("get_generic_object: Object is NULL.");
+	ygglog_throw_error("get_generic_object: Object is NULL.");
       }
       x[0].obj = (void*)(arr_obj->get_object_element(k));
     } catch (...) {
