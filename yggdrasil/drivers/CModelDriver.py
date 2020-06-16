@@ -293,7 +293,7 @@ class LDLinker(LinkerBase):
         if platform._is_mac:
             regex = r'PROJECT:ld64-(?P<version>\d+(?:\.\d+)?)'
         else:
-            regex = (r'GNU ld \(GNU Binutils for (?P<os>.+)\) '
+            regex = (r'GNU ld \(GNU Binutils(?: for (?P<os>.+))?\) '
                      r'(?P<version>\d+(?:\.\d+){0,2})')
         match = re.search(regex, out)
         if match is None:  # pragma: debug

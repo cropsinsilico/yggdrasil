@@ -34,6 +34,7 @@ typedef std::complex<long double> complex_long_double;
 typedef _Fcomplex complex_float;
 typedef _Dcomplex complex_double;
 typedef _Lcomplex complex_long_double;
+#define print_complex(x) printf("%lf+%lfj\n", (double)(x._Val[0]), (double)(x._Val[1]))
 #endif
 #else // Unix
 #ifdef __cplusplus
@@ -56,7 +57,9 @@ typedef double _Complex complex_double;
 typedef long double _Complex complex_long_double;
 #endif
 #endif
+#ifndef print_complex
 #define print_complex(x) printf("%lf+%lfj\n", (double)creal(x), (double)cimag(x))
+#endif
 
 
 #ifdef __cplusplus /* If this is a C++ compiler, use C linkage */
