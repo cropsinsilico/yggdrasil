@@ -291,8 +291,13 @@ subroutine generic_map_get_1darray_integer2(x, key, out)
   integer(kind=2), dimension(:), pointer, intent(out) :: out
   integer(kind=c_size_t) :: c_length
   type(c_ptr), target :: c_out
-  c_length = generic_map_get_1darray(x, key, "int", 8 * 2, c_loc(c_out))
-  call c_f_pointer(c_out, out, [c_length])
+  type(c_ptr), pointer :: temp
+  type(c_ptr) :: c_out_ptr
+  c_out = c_null_ptr
+  c_out_ptr = c_loc(c_out)
+  c_length = generic_map_get_1darray(x, key, "int", 8 * 2, c_out_ptr)
+  call c_f_pointer(c_out_ptr, temp)
+  call c_f_pointer(temp, out, [c_length])
 end subroutine generic_map_get_1darray_integer2
 subroutine generic_map_get_1darray_integer4(x, key, out)
   implicit none
@@ -301,8 +306,13 @@ subroutine generic_map_get_1darray_integer4(x, key, out)
   integer(kind=4), dimension(:), pointer, intent(out) :: out
   integer(kind=c_size_t) :: c_length
   type(c_ptr), target :: c_out
-  c_length = generic_map_get_1darray(x, key, "int", 8 * 4, c_loc(c_out))
-  call c_f_pointer(c_out, out, [c_length])
+  type(c_ptr), pointer :: temp
+  type(c_ptr) :: c_out_ptr
+  c_out = c_null_ptr
+  c_out_ptr = c_loc(c_out)
+  c_length = generic_map_get_1darray(x, key, "int", 8 * 4, c_out_ptr)
+  call c_f_pointer(c_out_ptr, temp)
+  call c_f_pointer(temp, out, [c_length])
 end subroutine generic_map_get_1darray_integer4
 subroutine generic_map_get_1darray_integer8(x, key, out)
   implicit none
@@ -311,8 +321,13 @@ subroutine generic_map_get_1darray_integer8(x, key, out)
   integer(kind=8), dimension(:), pointer, intent(out) :: out
   integer(kind=c_size_t) :: c_length
   type(c_ptr), target :: c_out
-  c_length = generic_map_get_1darray(x, key, "int", 8 * 8, c_loc(c_out))
-  call c_f_pointer(c_out, out, [c_length])
+  type(c_ptr), pointer :: temp
+  type(c_ptr) :: c_out_ptr
+  c_out = c_null_ptr
+  c_out_ptr = c_loc(c_out)
+  c_length = generic_map_get_1darray(x, key, "int", 8 * 8, c_out_ptr)
+  call c_f_pointer(c_out_ptr, temp)
+  call c_f_pointer(temp, out, [c_length])
 end subroutine generic_map_get_1darray_integer8
 ! Get 1darray uint
 subroutine generic_map_get_1darray_unsigned1(x, key, out)
@@ -322,8 +337,13 @@ subroutine generic_map_get_1darray_unsigned1(x, key, out)
   type(ygguint1), dimension(:), pointer, intent(out) :: out
   integer(kind=c_size_t) :: c_length
   type(c_ptr), target :: c_out
-  c_length = generic_map_get_1darray(x, key, "uint", 8 * 1, c_loc(c_out))
-  call c_f_pointer(c_out, out, [c_length])
+  type(c_ptr), pointer :: temp
+  type(c_ptr) :: c_out_ptr
+  c_out = c_null_ptr
+  c_out_ptr = c_loc(c_out)
+  c_length = generic_map_get_1darray(x, key, "uint", 8 * 1, c_out_ptr)
+  call c_f_pointer(c_out_ptr, temp)
+  call c_f_pointer(temp, out, [c_length])
 end subroutine generic_map_get_1darray_unsigned1
 subroutine generic_map_get_1darray_unsigned2(x, key, out)
   implicit none
@@ -332,8 +352,13 @@ subroutine generic_map_get_1darray_unsigned2(x, key, out)
   type(ygguint2), dimension(:), pointer, intent(out) :: out
   integer(kind=c_size_t) :: c_length
   type(c_ptr), target :: c_out
-  c_length = generic_map_get_1darray(x, key, "uint", 8 * 2, c_loc(c_out))
-  call c_f_pointer(c_out, out, [c_length])
+  type(c_ptr), pointer :: temp
+  type(c_ptr) :: c_out_ptr
+  c_out = c_null_ptr
+  c_out_ptr = c_loc(c_out)
+  c_length = generic_map_get_1darray(x, key, "uint", 8 * 2, c_out_ptr)
+  call c_f_pointer(c_out_ptr, temp)
+  call c_f_pointer(temp, out, [c_length])
 end subroutine generic_map_get_1darray_unsigned2
 subroutine generic_map_get_1darray_unsigned4(x, key, out)
   implicit none
@@ -342,8 +367,13 @@ subroutine generic_map_get_1darray_unsigned4(x, key, out)
   type(ygguint4), dimension(:), pointer, intent(out) :: out
   integer(kind=c_size_t) :: c_length
   type(c_ptr), target :: c_out
-  c_length = generic_map_get_1darray(x, key, "uint", 8 * 4, c_loc(c_out))
-  call c_f_pointer(c_out, out, [c_length])
+  type(c_ptr), pointer :: temp
+  type(c_ptr) :: c_out_ptr
+  c_out = c_null_ptr
+  c_out_ptr = c_loc(c_out)
+  c_length = generic_map_get_1darray(x, key, "uint", 8 * 4, c_out_ptr)
+  call c_f_pointer(c_out_ptr, temp)
+  call c_f_pointer(temp, out, [c_length])
 end subroutine generic_map_get_1darray_unsigned4
 subroutine generic_map_get_1darray_unsigned8(x, key, out)
   implicit none
@@ -352,8 +382,13 @@ subroutine generic_map_get_1darray_unsigned8(x, key, out)
   type(ygguint8), dimension(:), pointer, intent(out) :: out
   integer(kind=c_size_t) :: c_length
   type(c_ptr), target :: c_out
-  c_length = generic_map_get_1darray(x, key, "uint", 8 * 8, c_loc(c_out))
-  call c_f_pointer(c_out, out, [c_length])
+  type(c_ptr), pointer :: temp
+  type(c_ptr) :: c_out_ptr
+  c_out = c_null_ptr
+  c_out_ptr = c_loc(c_out)
+  c_length = generic_map_get_1darray(x, key, "uint", 8 * 8, c_out_ptr)
+  call c_f_pointer(c_out_ptr, temp)
+  call c_f_pointer(temp, out, [c_length])
 end subroutine generic_map_get_1darray_unsigned8
 ! Get 1darray real
 subroutine generic_map_get_1darray_real4(x, key, out)
@@ -363,8 +398,13 @@ subroutine generic_map_get_1darray_real4(x, key, out)
   real(kind=4), dimension(:), pointer, intent(out) :: out
   integer(kind=c_size_t) :: c_length
   type(c_ptr), target :: c_out
-  c_length = generic_map_get_1darray(x, key, "float", 8 * 4, c_loc(c_out))
-  call c_f_pointer(c_out, out, [c_length])
+  type(c_ptr), pointer :: temp
+  type(c_ptr) :: c_out_ptr
+  c_out = c_null_ptr
+  c_out_ptr = c_loc(c_out)
+  c_length = generic_map_get_1darray(x, key, "float", 8 * 4, c_out_ptr)
+  call c_f_pointer(c_out_ptr, temp)
+  call c_f_pointer(temp, out, [c_length])
 end subroutine generic_map_get_1darray_real4
 subroutine generic_map_get_1darray_real8(x, key, out)
   implicit none
@@ -373,8 +413,13 @@ subroutine generic_map_get_1darray_real8(x, key, out)
   real(kind=8), dimension(:), pointer, intent(out) :: out
   integer(kind=c_size_t) :: c_length
   type(c_ptr), target :: c_out
-  c_length = generic_map_get_1darray(x, key, "float", 8 * 8, c_loc(c_out))
-  call c_f_pointer(c_out, out, [c_length])
+  type(c_ptr), pointer :: temp
+  type(c_ptr) :: c_out_ptr
+  c_out = c_null_ptr
+  c_out_ptr = c_loc(c_out)
+  c_length = generic_map_get_1darray(x, key, "float", 8 * 8, c_out_ptr)
+  call c_f_pointer(c_out_ptr, temp)
+  call c_f_pointer(temp, out, [c_length])
 end subroutine generic_map_get_1darray_real8
 ! Get 1darray complex
 subroutine generic_map_get_1darray_complex4(x, key, out)
@@ -384,8 +429,13 @@ subroutine generic_map_get_1darray_complex4(x, key, out)
   complex(kind=4), dimension(:), pointer, intent(out) :: out
   integer(kind=c_size_t) :: c_length
   type(c_ptr), target :: c_out
-  c_length = generic_map_get_1darray(x, key, "complex", 8 * 4, c_loc(c_out))
-  call c_f_pointer(c_out, out, [c_length])
+  type(c_ptr), pointer :: temp
+  type(c_ptr) :: c_out_ptr
+  c_out = c_null_ptr
+  c_out_ptr = c_loc(c_out)
+  c_length = generic_map_get_1darray(x, key, "complex", 8 * 4, c_out_ptr)
+  call c_f_pointer(c_out_ptr, temp)
+  call c_f_pointer(temp, out, [c_length])
 end subroutine generic_map_get_1darray_complex4
 subroutine generic_map_get_1darray_complex8(x, key, out)
   implicit none
@@ -394,8 +444,13 @@ subroutine generic_map_get_1darray_complex8(x, key, out)
   complex(kind=8), dimension(:), pointer, intent(out) :: out
   integer(kind=c_size_t) :: c_length
   type(c_ptr), target :: c_out
-  c_length = generic_map_get_1darray(x, key, "complex", 8 * 8, c_loc(c_out))
-  call c_f_pointer(c_out, out, [c_length])
+  type(c_ptr), pointer :: temp
+  type(c_ptr) :: c_out_ptr
+  c_out = c_null_ptr
+  c_out_ptr = c_loc(c_out)
+  c_length = generic_map_get_1darray(x, key, "complex", 8 * 8, c_out_ptr)
+  call c_f_pointer(c_out_ptr, temp)
+  call c_f_pointer(temp, out, [c_length])
 end subroutine generic_map_get_1darray_complex8
 ! Get 1darray string
 subroutine generic_map_get_1darray_bytes(x, key, out)
@@ -407,10 +462,15 @@ subroutine generic_map_get_1darray_bytes(x, key, out)
   type(c_ptr), target :: c_out
   integer(kind=c_size_t) :: c_length, i
   integer :: nbytes, precision, j
-  c_length = generic_map_get_1darray(x, key, "bytes", 0, c_loc(c_out))
+  type(c_ptr), pointer :: temp_ptr
+  type(c_ptr) :: c_out_ptr
+  c_out = c_null_ptr
+  c_out_ptr = c_loc(c_out)
+  c_length = generic_map_get_1darray(x, key, "bytes", 0, c_out_ptr)
   nbytes = generic_map_get_item_nbytes(x, key)
   precision = nbytes/int(c_length, kind=4)
-  call c_f_pointer(c_out, temp, [nbytes])
+  call c_f_pointer(c_out_ptr, temp_ptr)
+  call c_f_pointer(temp_ptr, temp, [nbytes])
   allocate(character(len=precision) :: out(c_length))
   do i = 1, c_length
      do j = 1, precision
@@ -428,10 +488,15 @@ subroutine generic_map_get_1darray_unicode(x, key, out)
   type(c_ptr), target :: c_out
   integer(kind=c_size_t) :: c_length, i
   integer :: nbytes, precision, j
-  c_length = generic_map_get_1darray(x, key, "unicode", 0, c_loc(c_out))
+  type(c_ptr), pointer :: temp_ptr
+  type(c_ptr) :: c_out_ptr
+  c_out = c_null_ptr
+  c_out_ptr = c_loc(c_out)
+  c_length = generic_map_get_1darray(x, key, "unicode", 0, c_out_ptr)
   nbytes = generic_map_get_item_nbytes(x, key)
   precision = nbytes/(int(c_length, kind=4)*4)
-  call c_f_pointer(c_out, temp, [nbytes/4])
+  call c_f_pointer(c_out_ptr, temp_ptr)
+  call c_f_pointer(temp_ptr, temp, [nbytes/4])
   allocate(character(kind=ucs4, len=precision) :: out(c_length))
   do i = 1, c_length
      do j = 1, precision
@@ -448,9 +513,14 @@ subroutine generic_map_get_ndarray_integer2(x, key, out)
   character(len=*) :: key
   type(integer2_nd), intent(out) :: out
   type(c_ptr), target :: c_out
+  type(c_ptr), pointer :: temp
+  type(c_ptr) :: c_out_ptr
+  c_out = c_null_ptr
+  c_out_ptr = c_loc(c_out)
   out%shape => generic_map_get_ndarray(x, key, "int", 8 * 2, &
-       c_loc(c_out))
-  call c_f_pointer(c_out, out%x, out%shape)
+       c_out_ptr)
+  call c_f_pointer(c_out_ptr, temp)
+  call c_f_pointer(temp, out%x, out%shape)
 end subroutine generic_map_get_ndarray_integer2
 subroutine generic_map_get_ndarray_integer4(x, key, out)
   implicit none
@@ -458,9 +528,14 @@ subroutine generic_map_get_ndarray_integer4(x, key, out)
   character(len=*) :: key
   type(integer4_nd), intent(out) :: out
   type(c_ptr), target :: c_out
+  type(c_ptr), pointer :: temp
+  type(c_ptr) :: c_out_ptr
+  c_out = c_null_ptr
+  c_out_ptr = c_loc(c_out)
   out%shape => generic_map_get_ndarray(x, key, "int", 8 * 4, &
-       c_loc(c_out))
-  call c_f_pointer(c_out, out%x, out%shape)
+       c_out_ptr)
+  call c_f_pointer(c_out_ptr, temp)
+  call c_f_pointer(temp, out%x, out%shape)
 end subroutine generic_map_get_ndarray_integer4
 subroutine generic_map_get_ndarray_integer8(x, key, out)
   implicit none
@@ -468,9 +543,14 @@ subroutine generic_map_get_ndarray_integer8(x, key, out)
   character(len=*) :: key
   type(integer8_nd), intent(out) :: out
   type(c_ptr), target :: c_out
+  type(c_ptr), pointer :: temp
+  type(c_ptr) :: c_out_ptr
+  c_out = c_null_ptr
+  c_out_ptr = c_loc(c_out)
   out%shape => generic_map_get_ndarray(x, key, "int", 8 * 8, &
-       c_loc(c_out))
-  call c_f_pointer(c_out, out%x, out%shape)
+       c_out_ptr)
+  call c_f_pointer(c_out_ptr, temp)
+  call c_f_pointer(temp, out%x, out%shape)
 end subroutine generic_map_get_ndarray_integer8
 ! Get ndarray uint
 subroutine generic_map_get_ndarray_unsigned1(x, key, out)
@@ -479,9 +559,14 @@ subroutine generic_map_get_ndarray_unsigned1(x, key, out)
   character(len=*) :: key
   type(unsigned1_nd), intent(out) :: out
   type(c_ptr), target :: c_out
+  type(c_ptr), pointer :: temp
+  type(c_ptr) :: c_out_ptr
+  c_out = c_null_ptr
+  c_out_ptr = c_loc(c_out)
   out%shape => generic_map_get_ndarray(x, key, "uint", 8 * 1, &
-       c_loc(c_out))
-  call c_f_pointer(c_out, out%x, out%shape)
+       c_out_ptr)
+  call c_f_pointer(c_out_ptr, temp)
+  call c_f_pointer(temp, out%x, out%shape)
 end subroutine generic_map_get_ndarray_unsigned1
 subroutine generic_map_get_ndarray_unsigned2(x, key, out)
   implicit none
@@ -489,9 +574,14 @@ subroutine generic_map_get_ndarray_unsigned2(x, key, out)
   character(len=*) :: key
   type(unsigned2_nd), intent(out) :: out
   type(c_ptr), target :: c_out
+  type(c_ptr), pointer :: temp
+  type(c_ptr) :: c_out_ptr
+  c_out = c_null_ptr
+  c_out_ptr = c_loc(c_out)
   out%shape => generic_map_get_ndarray(x, key, "uint", 8 * 2, &
-       c_loc(c_out))
-  call c_f_pointer(c_out, out%x, out%shape)
+       c_out_ptr)
+  call c_f_pointer(c_out_ptr, temp)
+  call c_f_pointer(temp, out%x, out%shape)
 end subroutine generic_map_get_ndarray_unsigned2
 subroutine generic_map_get_ndarray_unsigned4(x, key, out)
   implicit none
@@ -499,9 +589,14 @@ subroutine generic_map_get_ndarray_unsigned4(x, key, out)
   character(len=*) :: key
   type(unsigned4_nd), intent(out) :: out
   type(c_ptr), target :: c_out
+  type(c_ptr), pointer :: temp
+  type(c_ptr) :: c_out_ptr
+  c_out = c_null_ptr
+  c_out_ptr = c_loc(c_out)
   out%shape => generic_map_get_ndarray(x, key, "uint", 8 * 4, &
-       c_loc(c_out))
-  call c_f_pointer(c_out, out%x, out%shape)
+       c_out_ptr)
+  call c_f_pointer(c_out_ptr, temp)
+  call c_f_pointer(temp, out%x, out%shape)
 end subroutine generic_map_get_ndarray_unsigned4
 subroutine generic_map_get_ndarray_unsigned8(x, key, out)
   implicit none
@@ -509,9 +604,14 @@ subroutine generic_map_get_ndarray_unsigned8(x, key, out)
   character(len=*) :: key
   type(unsigned8_nd), intent(out) :: out
   type(c_ptr), target :: c_out
+  type(c_ptr), pointer :: temp
+  type(c_ptr) :: c_out_ptr
+  c_out = c_null_ptr
+  c_out_ptr = c_loc(c_out)
   out%shape => generic_map_get_ndarray(x, key, "uint", 8 * 8, &
-       c_loc(c_out))
-  call c_f_pointer(c_out, out%x, out%shape)
+       c_out_ptr)
+  call c_f_pointer(c_out_ptr, temp)
+  call c_f_pointer(temp, out%x, out%shape)
 end subroutine generic_map_get_ndarray_unsigned8
 ! Get ndarray real
 subroutine generic_map_get_ndarray_real4(x, key, out)
@@ -520,9 +620,14 @@ subroutine generic_map_get_ndarray_real4(x, key, out)
   character(len=*) :: key
   type(real4_nd), intent(out) :: out
   type(c_ptr), target :: c_out
+  type(c_ptr), pointer :: temp
+  type(c_ptr) :: c_out_ptr
+  c_out = c_null_ptr
+  c_out_ptr = c_loc(c_out)
   out%shape => generic_map_get_ndarray(x, key, "float", 8 * 4, &
-       c_loc(c_out))
-  call c_f_pointer(c_out, out%x, out%shape)
+       c_out_ptr)
+  call c_f_pointer(c_out_ptr, temp)
+  call c_f_pointer(temp, out%x, out%shape)
 end subroutine generic_map_get_ndarray_real4
 subroutine generic_map_get_ndarray_real8(x, key, out)
   implicit none
@@ -530,9 +635,14 @@ subroutine generic_map_get_ndarray_real8(x, key, out)
   character(len=*) :: key
   type(real8_nd), intent(out) :: out
   type(c_ptr), target :: c_out
+  type(c_ptr), pointer :: temp
+  type(c_ptr) :: c_out_ptr
+  c_out = c_null_ptr
+  c_out_ptr = c_loc(c_out)
   out%shape => generic_map_get_ndarray(x, key, "float", 8 * 8, &
-       c_loc(c_out))
-  call c_f_pointer(c_out, out%x, out%shape)
+       c_out_ptr)
+  call c_f_pointer(c_out_ptr, temp)
+  call c_f_pointer(temp, out%x, out%shape)
 end subroutine generic_map_get_ndarray_real8
 ! Get ndarray complex
 subroutine generic_map_get_ndarray_complex4(x, key, out)
@@ -541,9 +651,14 @@ subroutine generic_map_get_ndarray_complex4(x, key, out)
   character(len=*) :: key
   type(complex4_nd), intent(out) :: out
   type(c_ptr), target :: c_out
+  type(c_ptr), pointer :: temp
+  type(c_ptr) :: c_out_ptr
+  c_out = c_null_ptr
+  c_out_ptr = c_loc(c_out)
   out%shape => generic_map_get_ndarray(x, key, "complex", 8 * 4, &
-       c_loc(c_out))
-  call c_f_pointer(c_out, out%x, out%shape)
+       c_out_ptr)
+  call c_f_pointer(c_out_ptr, temp)
+  call c_f_pointer(temp, out%x, out%shape)
 end subroutine generic_map_get_ndarray_complex4
 subroutine generic_map_get_ndarray_complex8(x, key, out)
   implicit none
@@ -551,9 +666,14 @@ subroutine generic_map_get_ndarray_complex8(x, key, out)
   character(len=*) :: key
   type(complex8_nd), intent(out) :: out
   type(c_ptr), target :: c_out
+  type(c_ptr), pointer :: temp
+  type(c_ptr) :: c_out_ptr
+  c_out = c_null_ptr
+  c_out_ptr = c_loc(c_out)
   out%shape => generic_map_get_ndarray(x, key, "complex", 8 * 8, &
-       c_loc(c_out))
-  call c_f_pointer(c_out, out%x, out%shape)
+       c_out_ptr)
+  call c_f_pointer(c_out_ptr, temp)
+  call c_f_pointer(temp, out%x, out%shape)
 end subroutine generic_map_get_ndarray_complex8
 ! Get ndarray string
 subroutine generic_map_get_ndarray_character(x, key, out)
@@ -565,15 +685,20 @@ subroutine generic_map_get_ndarray_character(x, key, out)
   type(c_ptr), target :: c_out
   integer(kind=c_size_t) :: precision, nelements, i, j
   integer(kind=c_int) :: nbytes
+  type(c_ptr), pointer :: temp_ptr
+  type(c_ptr) :: c_out_ptr
+  c_out = c_null_ptr
+  c_out_ptr = c_loc(c_out)
   out%shape => generic_map_get_ndarray(x, key, "bytes", 0, &
-       c_loc(c_out))
+       c_out_ptr)
   nbytes = generic_map_get_item_nbytes(x, key)
   nelements = 1
   do i = 1, size(out%shape)
      nelements = nelements * out%shape(i)
   end do
   precision = nbytes/nelements
-  call c_f_pointer(c_out, temp, [nbytes])
+  call c_f_pointer(c_out_ptr, temp_ptr)
+  call c_f_pointer(temp_ptr, temp, [nbytes])
   allocate(out%x(nelements))
   do i = 1, nelements
      allocate(out%x(i)%x(precision))
@@ -592,15 +717,20 @@ subroutine generic_map_get_ndarray_bytes(x, key, out)
   type(c_ptr), target :: c_out
   integer(kind=c_size_t) :: precision, nelements, i, j
   integer(kind=c_int) :: nbytes
+  type(c_ptr), pointer :: temp_ptr
+  type(c_ptr) :: c_out_ptr
+  c_out = c_null_ptr
+  c_out_ptr = c_loc(c_out)
   out%shape => generic_map_get_ndarray(x, key, "bytes", 0, &
-       c_loc(c_out))
+       c_out_ptr)
   nbytes = generic_map_get_item_nbytes(x, key)
   nelements = 1
   do i = 1, size(out%shape)
      nelements = nelements * out%shape(i)
   end do
   precision = nbytes/nelements
-  call c_f_pointer(c_out, temp, [nbytes])
+  call c_f_pointer(c_out_ptr, temp_ptr)
+  call c_f_pointer(temp_ptr, temp, [nbytes])
   allocate(character(len=precision) :: out%x(nelements))
   do i = 1, nelements
      do j = 1, precision
@@ -618,15 +748,20 @@ subroutine generic_map_get_ndarray_unicode(x, key, out)
   type(c_ptr), target :: c_out
   integer(kind=c_size_t) :: precision, nelements, i, j
   integer(kind=c_int) :: nbytes
+  type(c_ptr), pointer :: temp_ptr
+  type(c_ptr) :: c_out_ptr
+  c_out = c_null_ptr
+  c_out_ptr = c_loc(c_out)
   out%shape => generic_map_get_ndarray(x, key, "unicode", 0, &
-       c_loc(c_out))
+       c_out_ptr)
   nbytes = generic_map_get_item_nbytes(x, key)
   nelements = 1
   do i = 1, size(out%shape)
      nelements = nelements * out%shape(i)
   end do
   precision = nbytes/(nelements*4)
-  call c_f_pointer(c_out, temp, [nbytes/4])
+  call c_f_pointer(c_out_ptr, temp_ptr)
+  call c_f_pointer(temp_ptr, temp, [nbytes/4])
   allocate(character(len=precision, kind=ucs4) :: out%x(nelements))
   do i = 1, nelements
      do j = 1, precision
