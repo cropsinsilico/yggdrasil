@@ -6,7 +6,7 @@ program main
   logical :: flag = .true.
   type(yggcomm) :: in_channel, out_channel
   type(ygggeneric) :: obj
-  character(len=:), dimension(:), allocatable :: keys
+  character(len=20), dimension(:), pointer :: keys
   type(ygggeneric), pointer :: amaxtb
   real(kind=8), dimension(:), pointer :: amaxtb_x, amaxtb_y
   real(kind=8), pointer :: co2

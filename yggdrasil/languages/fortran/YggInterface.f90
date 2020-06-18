@@ -2696,18 +2696,33 @@ contains
   subroutine generic_map_get_keys(x, keys)
     implicit none
     type(ygggeneric) :: x
-    character(len=:), dimension(:), allocatable, intent(out) :: keys
+    character(len=*), dimension(:), pointer, intent(out) :: keys
     integer(kind=c_size_t), target :: n_keys
     integer(kind=c_size_t), target :: key_size
     integer(kind=c_size_t) :: i, j
     type(c_ptr) :: c_keys
     character, dimension(:), pointer :: f_keys
     c_keys = generic_map_get_keys_c(x, c_loc(n_keys), c_loc(key_size))
+    if (.not.c_associated(c_keys)) then
+      stop "Error getting keys from map."
+    endif
     call c_f_pointer(c_keys, f_keys, [n_keys * key_size])
-    allocate(character(len=key_size) :: keys(n_keys))
+    allocate(keys(n_keys))
+    if (key_size.gt.len(keys(1))) then
+      stop "Key size is greater than size of provided keys."
+    endif
+    ! Allocation of character length and array dimension in gfortran
+    ! has a bug which is fixed in gfortran 9.1 and the version on
+    ! conda-forge as m2w64-gcc-fortran is only 5.3 as of 2020/6/18
+    ! so for now the keys pointer needs to have a defined character
+    ! length.
+    ! allocate(character(len=key_size) :: keys(n_keys))
     do i = 1, n_keys
        do j = 1, key_size
           keys(i)(j:j) = f_keys(((i-1)*key_size)+j)
+       end do
+       do j = key_size+1, len(keys(1))
+          keys(i)(j:j) = ' '
        end do
     end do
     deallocate(f_keys)

@@ -11,7 +11,7 @@ program main
   type(yggdtype) :: out_dtype
   real(kind=8) :: t_step, t_start, t_end, t
   character(len=32) :: t_units, model
-  character(len=:), dimension(:), allocatable :: keys
+  character(len=20), dimension(:), pointer :: keys
   type(ygggeneric) :: state_send, state_recv, msg
   real(kind=8), pointer :: x
   integer :: i
