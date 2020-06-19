@@ -1,3 +1,5 @@
+#include <YggInterface.h>
+
 #ifdef _DEBUG
 #undef _DEBUG
 #include <Python.h>
@@ -31,6 +33,8 @@ int main(int argc,char *argv[]) {
   }
   if (out == 0) {
     printf("Successfully intialized.\n");
+    PyObject *t = PyLong_FromLong(1L);
+    PyObject_Print(t, stdout, 0);
   }
   if (Py_IsInitialized()) {
     Py_Finalize();

@@ -1,0 +1,7 @@
+set PYTHONHOME=C:\Users\meaga\AppData\Local\Continuum\miniconda3\envs\conda36
+set PYTHONPATH=C:\Users\meaga\AppData\Local\Continuum\miniconda3\envs\conda36\Lib;C:\Users\meaga\AppData\Local\Continuum\miniconda3\envs\conda36\Lib\site-packages;C:\Users\meaga\AppData\Local\Continuum\miniconda3\envs\conda36\DLLs
+
+cl.exe -c /Fotest_c_import.obj  /W4 /Zi /EHsc /TP /nologo -D_CRT_SECURE_NO_WARNINGS -MD -GL -DZMQINSTALLED -DZMQDEF -DYGG_DEBUG=20 -IC:\Users\meaga\yggdrasil\yggdrasil\languages\c -IC:\Users\meaga\yggdrasil\yggdrasil\languages\c\communication -IC:\Users\meaga\yggdrasil\yggdrasil\languages\c\serialize -IC:\Users\meaga\yggdrasil\yggdrasil\languages\c\datatypes -IC:\Users\meaga\yggdrasil\yggdrasil\languages\c\regex -Ic:\users\meaga\appdata\local\continuum\miniconda3\envs\conda36\library\include -IC:\Users\meaga\AppData\Local\Continuum\miniconda3\envs\conda36\Include -IC:\Users\meaga\AppData\Local\Continuum\miniconda3\envs\conda36\lib\site-packages\numpy\core\include test_c_import.c
+LINK.exe /OUT:test_c_import.exe /LIBPATH:C:\Users\meaga\yggdrasil\yggdrasil\languages\c /LIBPATH:c:\users\meaga\appdata\local\continuum\miniconda3\envs\conda36\library\lib /LIBPATH:C:\Users\meaga\AppData\Local\Continuum\miniconda3\envs\conda36\libs test_c_import.obj  ygg_conda36_clx_LIBx.lib libzmq.lib czmq.lib python36.lib
+
+test_c_import.exe
