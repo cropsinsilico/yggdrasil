@@ -367,6 +367,7 @@ public:
     strncpy(arg->name, (char*)encoded_bytes, nbytes_expected);
     arg->args = NULL;
     arg->kwargs = NULL;
+    arg->obj = NULL;
     arg->obj = import_python(arg->name);
     return true;
   }

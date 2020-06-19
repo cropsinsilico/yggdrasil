@@ -2198,7 +2198,7 @@ class CompiledModelDriver(ModelDriver):
                                 return_prop=return_prop,
                                 default=default)
         out = getattr(cls, '%s_tool' % tooltype, None)
-        if (out is None) or ((toolname is not None) and (toolname != out.name)):
+        if (out is None) or ((toolname is not None) and (toolname != out.toolname)):
             # Associate linker & archiver with compiler so that it can be
             # used to retrieve them
             if (tooltype == 'compiler') or (return_prop in ['name', 'flags']):
@@ -3272,6 +3272,8 @@ class CompiledModelDriver(ModelDriver):
             dict: Environment variables for the model process.
 
         """
+        if toolname is None:
+            toolname = self.get_tool_instance('compiler', return_prop='name')
         out = super(CompiledModelDriver, self).set_env(**kwargs)
         if for_compile:
             if compile_kwargs is None:
@@ -3351,7 +3353,6 @@ class CompiledModelDriver(ModelDriver):
         default_kwargs = dict(out=self.model_file,
                               compiler_flags=self.compiler_flags,
                               for_model=True,
-                              env=self.set_env(for_compile=True),
                               skip_interface_flags=skip_interface_flags,
                               overwrite=self.overwrite,
                               working_dir=self.working_dir,
@@ -3362,6 +3363,9 @@ class CompiledModelDriver(ModelDriver):
             default_kwargs.update(linker_flags=self.linker_flags)
         for k, v in default_kwargs.items():
             kwargs.setdefault(k, v)
+        if 'env' not in kwargs:
+            kwargs['env'] = self.set_env(for_compile=True,
+                                         toolname=kwargs['toolname'])
         try:
             if not kwargs.get('dry_run', False):
                 self.compile_dependencies(toolname=kwargs['toolname'])

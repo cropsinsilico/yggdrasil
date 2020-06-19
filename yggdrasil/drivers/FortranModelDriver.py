@@ -392,7 +392,7 @@ class FortranModelDriver(CompiledModelDriver):
         """
         out = super(FortranModelDriver, self).set_env(**kwargs)
         out = CModelDriver.CModelDriver.update_ld_library_path(
-            out, add_libpython_dir=True)
+            out, add_libpython_dir=True, toolname=kwargs.get('toolname', None))
         out = CModelDriver.CModelDriver.update_python_path(out)
         out = CModelDriver.CCompilerBase.set_env(existing=out)
         conda_prefix = tools.get_conda_prefix()

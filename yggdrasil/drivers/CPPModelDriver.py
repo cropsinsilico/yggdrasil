@@ -184,7 +184,8 @@ class CPPModelDriver(CModelDriver):
 
         """
         out = super(CPPModelDriver, self).set_env(**kwargs)
-        out = CModelDriver.update_ld_library_path(out)
+        out = CModelDriver.update_ld_library_path(
+            out, toolname=kwargs.get('toolname', None))
         return out
         
     @classmethod
