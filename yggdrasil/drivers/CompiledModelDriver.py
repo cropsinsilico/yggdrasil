@@ -3458,7 +3458,7 @@ class CompiledModelDriver(ModelDriver):
                     kwargs.setdefault('working_dir', v)
                 kwargs[k] = copy.deepcopy(v)
             src = kwargs.pop('source', None)
-            if src is None:
+            if (src is None) or (not os.path.isabs(src)):
                 src = cls.get_dependency_source(dep, toolname=toolname)
             kwargs.setdefault('for_api', True)
             kwargs.setdefault('libtype', _default_libtype)

@@ -730,7 +730,7 @@ class CModelDriver(CompiledModelDriver):
             kwargs['skip_interface_flags'] = True
         return super(CModelDriver, cls).call_linker(obj, language=language,
                                                     **kwargs)
-        
+
     @classmethod
     def update_ld_library_path(cls, env, paths_to_add=None,
                                add_to_front=False, add_libpython_dir=False):
@@ -773,6 +773,25 @@ class CModelDriver(CompiledModelDriver):
                 env['LD_LIBRARY_PATH'] = os.pathsep.join(path_list)
         return env
 
+    @classmethod
+    def update_python_path(cls, env):
+        r"""Update provided dictionary of environment variables so that
+        PYTHONPATH and PYTHONHOME are set as needed (primarily on windows).
+
+        Args:
+            env (dict): Dictionary of enviroment variables to be updated.
+
+        Returns:
+            dict: Updated dictionary of environment variables.
+
+        """
+        if platform._is_win:  # pragma: windows
+            env.setdefault('PYTHONHOME', sysconfig.get_config_var('prefix'))
+            env.setdefault('PYTHONPATH', os.pathsep.join([
+                sysconfig.get_path('stdlib'), sysconfig.get_path('purelib'),
+                os.path.join(sysconfig.get_config_var('prefix'), 'DLLs')]))
+        return env
+
     def set_env(self, **kwargs):
         r"""Get environment variables that should be set for the model process.
 
@@ -786,11 +805,7 @@ class CModelDriver(CompiledModelDriver):
         """
         out = super(CModelDriver, self).set_env(**kwargs)
         out = self.update_ld_library_path(out)
-        if platform._is_win:  # pragma: windows
-            out.setdefault('PYTHONHOME', sysconfig.get_config_var('prefix'))
-            out.setdefault('PYTHONPATH', os.pathsep.join([
-                sysconfig.get_path('stdlib'), sysconfig.get_path('purelib'),
-                os.path.join(sysconfig.get_config_var('prefix'), 'DLLs')]))
+        out = self.update_python_path(out)
         return out
     
     @classmethod

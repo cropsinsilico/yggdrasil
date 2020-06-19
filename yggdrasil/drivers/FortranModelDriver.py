@@ -393,7 +393,8 @@ class FortranModelDriver(CompiledModelDriver):
         out = super(FortranModelDriver, self).set_env(**kwargs)
         out = CModelDriver.CModelDriver.update_ld_library_path(
             out, add_libpython_dir=True)
-        out = CModelDriver.CCompilerBase.set_env(out)
+        out = CModelDriver.CModelDriver.update_python_path(out)
+        out = CModelDriver.CCompilerBase.set_env(existing=out)
         conda_prefix = tools.get_conda_prefix()
         if conda_prefix and platform._is_mac:
             out.setdefault('DYLD_FALLBACK_LIBRARY_PATH',
