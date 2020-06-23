@@ -229,7 +229,8 @@ class MSVCCompiler(CCompilerBase):
     search_path_envvar = 'INCLUDE'
     search_path_flags = None
     version_flags = []
-    product_exts = ['.dir', '.ilk', '.pdb', '.sln', '.vcxproj', '.vcxproj.filters']
+    product_exts = ['.dir', '.ilk', '.pdb', '.sln', '.vcxproj', '.vcxproj.filters',
+                    '.exp', '.lib']
     combine_with_linker = True  # Must be explicit; linker is separate .exe
     linker_attributes = dict(GCCCompiler.linker_attributes,
                              default_executable=None,
@@ -436,7 +437,8 @@ class CModelDriver(CompiledModelDriver):
         'ygg': {'source': os.path.join(_incl_interface, 'YggInterface.c'),
                 'language': 'c',
                 'linker_language': 'c++',  # Some dependencies are C++
-                'internal_dependencies': ['regex', 'datatypes'],
+                'internal_dependencies': ['regex', 'datatypes',
+                                          'python_wrapper'],
                 'external_dependencies': ['rapidjson',
                                           'python', 'numpy'],
                 'include_dirs': [_incl_comm, _incl_seri],
@@ -459,7 +461,14 @@ class CModelDriver(CompiledModelDriver):
                       'internal_dependencies': ['regex'],
                       'external_dependencies': ['rapidjson',
                                                 'python', 'numpy'],
-                      'include_dirs': []}}
+                      'include_dirs': []},
+        'python_wrapper': {'source': 'python_wrapper.c',
+                           'directory': _top_lang_dir,
+                           'language': 'c',
+                           'libtype': 'shared',
+                           'external_dependencies': ['python', 'numpy'],
+                           'linker_language': 'c',
+                           'include_dirs': [_top_lang_dir]}}
     type_map = {
         'comm': 'comm_t*',
         'dtype': 'dtype_t*',
@@ -707,6 +716,36 @@ class CModelDriver(CompiledModelDriver):
         return out
 
     @classmethod
+    def get_dependency_info(cls, dep, toolname=None, default=None):
+        r"""Get the dictionary of information associated with a
+        dependency.
+
+        Args:
+            dep (str): Name of internal or external dependency or full path
+                to the library.
+            toolname (str, optional): Name of compiler tool that should be used.
+                Defaults to None and the default compiler for the language will
+                be used.
+            default (dict, optional): Information dictionary that should
+                be returned if dep cannot be located. Defaults to None
+                and an error will be raised if dep cannot be found.
+
+        Returns:
+            dict: Dependency info.
+
+        """
+        if platform._is_win and (dep == 'python_wrapper'):
+            # The Python library is compiled against MSVC so a wrapper is requried
+            # to reconcile the differences in FILE* between gcc and MSVC.
+            toolname = 'cl'
+        out = super(CModelDriver, cls).get_dependency_info(
+            dep, toolname=toolname, default=default)
+        if platform._is_win and (dep == 'python_wrapper'):
+            out['remove_flags'] = ['/TP']
+            out['toolname'] = toolname
+        return out
+
+    @classmethod
     def call_linker(cls, obj, language=None, **kwargs):
         r"""Link several object files to create an executable or library (shared
         or static), checking for errors.
@@ -762,9 +801,14 @@ class CModelDriver(CompiledModelDriver):
         if add_libpython_dir:
             paths_to_add = paths_to_add + [os.path.dirname(
                 cls.get_dependency_library('python', toolname=toolname))]
+        env_var = None
         if platform._is_linux:
+            env_var = 'LD_LIBRARY_PATH'
+        elif platform._is_win:
+            env_var = 'PATH'
+        if env_var is not None:
             path_list = []
-            prev_path = env.pop('LD_LIBRARY_PATH', '')
+            prev_path = env.pop(env_var, '')
             if prev_path:
                 path_list.append(prev_path)
             for x in paths_to_add:
@@ -774,7 +818,7 @@ class CModelDriver(CompiledModelDriver):
                     else:
                         path_list.append(x)
             if path_list:
-                env['LD_LIBRARY_PATH'] = os.pathsep.join(path_list)
+                env[env_var] = os.pathsep.join(path_list)
         return env
 
     @classmethod

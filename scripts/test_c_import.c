@@ -14,6 +14,8 @@
 #include <numpy/npy_common.h>
 #endif
 
+#include <python_wrapper.h>
+
 int main(int argc,char *argv[]) {
   int out = 0;
   // Py_SetProgramName(L"/private/tmp/venv_20.0.15/bin/python");
@@ -34,7 +36,8 @@ int main(int argc,char *argv[]) {
   if (out == 0) {
     printf("Successfully intialized.\n");
     PyObject *t = PyLong_FromLong(1L);
-    PyObject_Print(t, stdout, 0);
+    PyObject_Print_STDOUT(t);
+    printf("after\n");
   }
   if (Py_IsInitialized()) {
     Py_Finalize();

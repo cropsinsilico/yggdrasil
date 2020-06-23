@@ -2,6 +2,7 @@
 #define PYOBJ_METASCHEMA_TYPE_H_
 
 #include "../tools.h"
+#include "../python_wrapper.h"
 #include "MetaschemaType.h"
 
 #include "rapidjson/document.h"
@@ -106,9 +107,8 @@ public:
     @param[in] x python_t Structure containing Python object to display.
   */
   static void display_python_t(python_t x) {
-    FILE* fout = stdout;
     if (x.obj != NULL) {
-      if (PyObject_Print(x.obj, fout, 0) < 0) {
+      if (PyObject_Print_STDOUT(x.obj) < 0) {
 	ygglog_throw_error("display_python: Failed to print the Python object.");
       }
     }
