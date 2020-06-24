@@ -172,20 +172,20 @@ class CPPModelDriver(CModelDriver):
             cls.get_language_dir())
         cls.internal_libraries = internal_libs
 
-    def set_env(self, **kwargs):
-        r"""Get environment variables that should be set for the model process.
+    @classmethod
+    def set_env_class(cls, **kwargs):
+        r"""Set environment variables that are instance independent.
 
         Args:
             **kwargs: Additional keyword arguments are passed to the parent
-                class's method.
+                class's method and update_ld_library_path.
 
         Returns:
             dict: Environment variables for the model process.
 
         """
-        out = super(CPPModelDriver, self).set_env(**kwargs)
-        out = CModelDriver.update_ld_library_path(
-            out, toolname=kwargs.get('toolname', None))
+        out = super(CPPModelDriver, cls).set_env_class(**kwargs)
+        out = CModelDriver.update_ld_library_path(out, **kwargs)
         return out
         
     @classmethod

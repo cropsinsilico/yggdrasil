@@ -310,6 +310,6 @@ class BuildModelDriver(CompiledModelDriver):
             kwargs['compile_kwargs']['language_compiler'] = self.target_compiler
         out = super(BuildModelDriver, self).set_env(**kwargs)
         if not kwargs.get('for_compile', False):
-            if hasattr(self.target_language_driver, 'update_ld_library_path'):
-                self.target_language_driver.update_ld_library_path(out)
+            kwargs['existing'] = out
+            out = self.target_language_driver.set_env_class(**kwargs)
         return out

@@ -1066,15 +1066,37 @@ class ModelDriver(Driver):
         """
         return []
 
-    def set_env(self):
-        r"""Get environment variables that should be set for the model process.
+    @classmethod
+    def set_env_class(cls, existing=None, **kwargs):
+        r"""Set environment variables that are instance independent.
+
+        Args:
+            existing (dict, optional): Existing dictionary of environment
+                variables that new variables should be added to. Defaults
+                to a copy of os.environ.
+            **kwargs: Additional keyword arguments are ignored.
 
         Returns:
             dict: Environment variables for the model process.
 
         """
-        env = copy.deepcopy(self.env)
-        env.update(os.environ)
+        if existing is None:
+            existing = {}
+            existing.update(os.environ)
+        return existing
+
+    def set_env(self, **kwargs):
+        r"""Get environment variables that should be set for the model process.
+
+        Args:
+            **kwargs: Keyword arguments are passed to set_env_class.
+
+        Returns:
+            dict: Environment variables for the model process.
+
+        """
+        env = self.set_env_class(**kwargs)
+        env.update(copy.deepcopy(self.env))
         env['YGG_SUBPROCESS'] = "True"
         env['YGG_MODEL_INDEX'] = str(self.model_index)
         env['YGG_MODEL_LANGUAGE'] = self.language

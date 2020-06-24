@@ -2892,6 +2892,12 @@ class CompiledModelDriver(ModelDriver):
             if (((cls.interface_library is not None)
                  and (cls.interface_library not in internal_dependencies))):
                 internal_dependencies.append(cls.interface_library)
+                for dep in cls.get_dependency_order([cls.interface_library],
+                                                    toolname=toolname):
+                    if dep not in internal_dependencies:
+                        dep_info = cls.get_dependency_info(dep, toolname=toolname)
+                        if dep_info['libtype'] in ['static', 'shared']:
+                            internal_dependencies.append(dep)
             for k in cls.get_external_libraries(no_comm_libs=True):
                 if (k not in external_dependencies) and cls.is_library_installed(k):
                     external_dependencies.append(k)

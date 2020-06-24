@@ -378,19 +378,20 @@ class FortranModelDriver(CompiledModelDriver):
             if cxx_lib not in cls.external_libraries:
                 cls.external_libraries[cxx_lib] = cxx_orig.copy()
                 cls.internal_libraries['fygg']['external_dependencies'].append(cxx_lib)
-        
-    def set_env(self, **kwargs):
-        r"""Get environment variables that should be set for the model process.
+
+    @classmethod
+    def set_env_class(cls, **kwargs):
+        r"""Set environment variables that are instance independent.
 
         Args:
             **kwargs: Additional keyword arguments are passed to the parent
-                class's method.
+                class's method and update_ld_library_path.
 
         Returns:
             dict: Environment variables for the model process.
 
         """
-        out = super(FortranModelDriver, self).set_env(**kwargs)
+        out = super(FortranModelDriver, cls).set_env_class(**kwargs)
         out = CModelDriver.CModelDriver.update_ld_library_path(
             out, add_libpython_dir=True, toolname=kwargs.get('toolname', None))
         out = CModelDriver.CModelDriver.update_python_path(out)

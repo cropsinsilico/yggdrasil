@@ -773,7 +773,7 @@ class CModelDriver(CompiledModelDriver):
     @classmethod
     def update_ld_library_path(cls, env, paths_to_add=None,
                                add_to_front=False, add_libpython_dir=False,
-                               toolname=None):
+                               toolname=None, **kwargs):
         r"""Update provided dictionary of environment variables so that
         LD_LIBRARY_PATH includes the interface directory containing the interface
         libraries.
@@ -790,6 +790,7 @@ class CModelDriver(CompiledModelDriver):
             toolname (str, optional): Name of compiler tool that should be used.
                 Defaults to None and the default compiler for the language will
                 be used.
+            **kwargs: Additional keyword arguments are ignored.
 
         Returns:
             dict: Updated dictionary of environment variables.
@@ -841,21 +842,21 @@ class CModelDriver(CompiledModelDriver):
                 os.path.join(sysconfig.get_config_var('prefix'), 'DLLs')]))
         return env
 
-    def set_env(self, **kwargs):
-        r"""Get environment variables that should be set for the model process.
+    @classmethod
+    def set_env_class(cls, **kwargs):
+        r"""Set environment variables that are instance independent.
 
         Args:
             **kwargs: Additional keyword arguments are passed to the parent
-                class's method.
+                class's method and update_ld_library_path.
 
         Returns:
             dict: Environment variables for the model process.
 
         """
-        out = super(CModelDriver, self).set_env(**kwargs)
-        out = self.update_ld_library_path(
-            out, toolname=kwargs.get('toolname', None))
-        out = self.update_python_path(out)
+        out = super(CModelDriver, cls).set_env_class(**kwargs)
+        out = cls.update_ld_library_path(out, **kwargs)
+        out = cls.update_python_path(out)
         return out
     
     @classmethod

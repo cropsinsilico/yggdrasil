@@ -516,13 +516,16 @@ class CMakeConfigure(BuildToolBase):
                 # if cls.add_libraries:  # pragma: no cover
                 # Version adding library
                 lines.append('if (NOT TARGET %s)' % xl)
-                if xe.lower() in ['.so', '.dll', '.dylib']:  # pragma: no cover
+                if xe.lower() in ['.so', '.dll', '.dylib']:
                     lines.append('    ADD_LIBRARY(%s SHARED IMPORTED)' % xl)
                 else:
                     lines.append('    ADD_LIBRARY(%s STATIC IMPORTED)' % xl)
                 lines += ['    SET_TARGET_PROPERTIES(',
-                          '        %s PROPERTIES' % xl,
-                          '        IMPORTED_LOCATION %s)' % x,
+                          '        %s PROPERTIES' % xl]
+                if xe.lower() == '.dll':
+                    lines.append('        IMPORTED_IMPLIB %s'
+                                 % x.replace('.dll', '.lib'))
+                lines += ['        IMPORTED_LOCATION %s)' % x,
                           'endif()',
                           'TARGET_LINK_LIBRARIES(%s %s)' % (target, xl)]
             else:
