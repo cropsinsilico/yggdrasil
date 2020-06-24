@@ -2672,7 +2672,7 @@ class CompiledModelDriver(ModelDriver):
                     new_deps.append(sub_d)
             if d in out:
                 dpos = out.index(d)
-                assert(dpos < min_dep)
+                assert(dpos <= min_dep)
                 min_dep = dpos
             elif d not in new_deps:
                 new_deps.insert(0, d)
@@ -2896,7 +2896,7 @@ class CompiledModelDriver(ModelDriver):
                                                     toolname=toolname):
                     if dep not in internal_dependencies:
                         dep_info = cls.get_dependency_info(dep, toolname=toolname)
-                        if dep_info['libtype'] in ['static', 'shared']:
+                        if dep_info.get('libtype', None) in ['static', 'shared']:
                             internal_dependencies.append(dep)
             for k in cls.get_external_libraries(no_comm_libs=True):
                 if (k not in external_dependencies) and cls.is_library_installed(k):
