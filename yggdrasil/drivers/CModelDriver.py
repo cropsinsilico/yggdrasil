@@ -325,7 +325,7 @@ class ClangLinker(LDLinker):
         to registration including things like platform dependent properties and
         checking environment variables for default settings.
         """
-        ClangLinker.before_registration(cls)
+        LDLinker.before_registration(cls)
         if platform._is_win:  # pragma: windows
             # One windows clang calls the MSVC linker LINK.exe which does not
             # accept rpath. Runtime libraries must be in the same directory
