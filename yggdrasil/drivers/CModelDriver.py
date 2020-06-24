@@ -809,10 +809,11 @@ class CModelDriver(CompiledModelDriver):
         if env_var is not None:
             path_list = []
             prev_path = env.pop(env_var, '')
+            prev_path_list = prev_path.split(os.pathsep)
             if prev_path:
                 path_list.append(prev_path)
             for x in paths_to_add:
-                if x not in prev_path:
+                if x not in prev_path_list:
                     if add_to_front:
                         path_list.insert(0, x)
                     else:
