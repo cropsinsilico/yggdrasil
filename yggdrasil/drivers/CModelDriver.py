@@ -9,7 +9,8 @@ import sysconfig
 from collections import OrderedDict
 from yggdrasil import platform, tools
 from yggdrasil.drivers.CompiledModelDriver import (
-    CompiledModelDriver, CompilerBase, LinkerBase, ArchiverBase)
+    CompiledModelDriver, CompilerBase, LinkerBase, ArchiverBase,
+    get_compilation_tool)
 from yggdrasil.metaschema.properties.ScalarMetaschemaProperties import (
     _valid_types)
 from yggdrasil.languages import get_language_dir
@@ -739,13 +740,16 @@ class CModelDriver(CompiledModelDriver):
             dict: Dependency info.
 
         """
+        replaced_toolname = False
         if platform._is_win and (dep == 'python_wrapper'):
             # The Python library is compiled against MSVC so a wrapper is requried
             # to reconcile the differences in FILE* between gcc and MSVC.
-            toolname = 'cl'
+            if get_compilation_tool('compiler', 'cl').is_installed():
+                replaced_toolname = True
+                toolname = 'cl'
         out = super(CModelDriver, cls).get_dependency_info(
             dep, toolname=toolname, default=default)
-        if platform._is_win and (dep == 'python_wrapper'):
+        if replaced_toolname:
             out['remove_flags'] = ['/TP']
             out['toolname'] = toolname
         return out
