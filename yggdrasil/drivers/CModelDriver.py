@@ -315,8 +315,8 @@ class ClangLinker(LDLinker):
     search_regex = [r'\t([^\t\n]+)\n']
     search_regex_begin = 'Library search paths:'
     flag_options = OrderedDict(LDLinker.flag_options,
-                               **{'linker-version': '-mlinker-version=%s'})
-    # 'library_rpath': '-rpath'})
+                               **{'linker-version': '-mlinker-version=%s',
+                                  'library_rpath': '-rpath'})
 
     @classmethod
     def get_flags(cls, *args, **kwargs):
@@ -327,6 +327,11 @@ class ClangLinker(LDLinker):
         # https://bugs.llvm.org/show_bug.cgi?id=44813
         # https://reviews.llvm.org/D71579
         # https://reviews.llvm.org/D74784
+        if platform._is_win:  # pragma: windows
+            # One windows clang calls the MSVC linker LINK.exe which does not
+            # accept rpath. Runtime libraries must be in the same directory
+            # as the executable or a directory in the PATH env variable.
+            kwargs.pop('library_rpath', None)
         out = cls.call(cls.version_flags, skip_flags=True, allow_error=True)
         regex = r'clang version (?P<version>\d+)\.\d+\.\d+'
         match = re.search(regex, out)
