@@ -20,7 +20,11 @@ extern "C" {
 #include <stdio.h>
 
 
+#ifdef _MSC_VER
 __declspec(dllexport) int PyObject_Print_STDOUT(PyObject* x);
+#else
+int PyObject_Print_STDOUT(PyObject* x);
+#endif
 
 #ifdef __cplusplus /* If this is a C++ compiler, end C linkage */
 }
