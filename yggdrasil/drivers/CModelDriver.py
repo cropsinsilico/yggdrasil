@@ -315,8 +315,8 @@ class ClangLinker(LDLinker):
     search_regex = [r'\t([^\t\n]+)\n']
     search_regex_begin = 'Library search paths:'
     flag_options = OrderedDict(LDLinker.flag_options,
-                               **{'linker-version': '-mlinker-version=%s',
-                                  'library_rpath': '-rpath'})
+                               **{'linker-version': '-mlinker-version=%s'})
+    # 'library_rpath': '-rpath'})
 
     @classmethod
     def get_flags(cls, *args, **kwargs):
