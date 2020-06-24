@@ -920,6 +920,8 @@ class ModelDriver(Driver):
         # Check for config keys
         for k in cls._config_keys:
             out = (cls.cfg.get(cls.language, k, None) is not None)
+            if not out:
+                break
         return out
 
     @classmethod
@@ -1043,7 +1045,7 @@ class ModelDriver(Driver):
         before the libraries are configured.
 
         Args:
-            cfg (CisConfigParser): Config class that options should be set for.
+            cfg (YggConfigParser): Config class that options should be set for.
         
         Returns:
             list: Section, option, description tuples for options that could not
@@ -1057,7 +1059,7 @@ class ModelDriver(Driver):
         r"""Add configuration options for external libraries in this language.
 
         Args:
-            cfg (CisConfigParser): Config class that options should be set for.
+            cfg (YggConfigParser): Config class that options should be set for.
         
         Returns:
             list: Section, option, description tuples for options that could not
