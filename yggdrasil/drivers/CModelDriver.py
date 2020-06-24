@@ -672,7 +672,7 @@ class CModelDriver(CompiledModelDriver):
             shutil.copy(stdint_win, os.path.join(_top_lang_dir, 'stdint.h'))
             cls.internal_libraries['datatypes']['include_dirs'] += [_top_lang_dir]
         if platform._is_linux:
-            for x in ['ygg', 'datatypes']:
+            for x in ['ygg', 'datatypes', 'python_wrapper']:
                 if 'compiler_flags' not in cls.internal_libraries[x]:
                     cls.internal_libraries[x]['compiler_flags'] = []
                 if '-fPIC' not in cls.internal_libraries[x]['compiler_flags']:
