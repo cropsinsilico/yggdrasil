@@ -319,6 +319,19 @@ class ClangLinker(LDLinker):
                                **{'linker-version': '-mlinker-version=%s',
                                   'library_rpath': '-rpath'})
 
+    @staticmethod
+    def before_registration(cls):
+        r"""Operations that should be performed to modify class attributes prior
+        to registration including things like platform dependent properties and
+        checking environment variables for default settings.
+        """
+        ClangLinker.before_registration(cls)
+        if platform._is_win:  # pragma: windows
+            # One windows clang calls the MSVC linker LINK.exe which does not
+            # accept rpath. Runtime libraries must be in the same directory
+            # as the executable or a directory in the PATH env variable.
+            cls.flag_options.pop('library_rpath', None)
+
     @classmethod
     def get_flags(cls, *args, **kwargs):
         r"""Get a list of linker flags."""
@@ -328,11 +341,6 @@ class ClangLinker(LDLinker):
         # https://bugs.llvm.org/show_bug.cgi?id=44813
         # https://reviews.llvm.org/D71579
         # https://reviews.llvm.org/D74784
-        if platform._is_win:  # pragma: windows
-            # One windows clang calls the MSVC linker LINK.exe which does not
-            # accept rpath. Runtime libraries must be in the same directory
-            # as the executable or a directory in the PATH env variable.
-            kwargs.pop('library_rpath', None)
         out = cls.call(cls.version_flags, skip_flags=True, allow_error=True)
         regex = r'clang version (?P<version>\d+)\.\d+\.\d+'
         match = re.search(regex, out)
