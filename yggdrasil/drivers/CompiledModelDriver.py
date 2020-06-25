@@ -3334,10 +3334,15 @@ class CompiledModelDriver(ModelDriver):
     @classmethod
     def cleanup_dependencies(cls, products=None, **kwargs):
         r"""Cleanup dependencies."""
+        if not cls.is_installed():
+            return
         if products is None:
             products = []
         kwargs['dry_run'] = True
-        compiler = cls.get_tool('compiler', toolname=kwargs.get('toolname', None))
+        compiler = cls.get_tool('compiler', toolname=kwargs.get('toolname', None),
+                                default=None)
+        if compiler is None:
+            return
         suffix = cls.get_internal_suffix(commtype=kwargs.get('commtype', None))
         suffix += compiler.get_tool_suffix()
         cls.compile_dependencies(products=products, **kwargs)
