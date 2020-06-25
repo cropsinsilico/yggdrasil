@@ -41,7 +41,8 @@ script_list = [
     ('lpy', 'lpy_model.lpy'),
     ('r', 'r_model.R'),
     ('fortran', ['hellofunc.f90', 'fortran_model.f90']),
-    ('sbml', 'sbml_model.xml')]
+    ('sbml', 'sbml_model.xml'),
+    ('osr', 'osr_model.xml')]
 scripts = {}
 for k, v in script_list:
     if isinstance(v, list):
@@ -66,7 +67,8 @@ yaml_list = [
     ('error', 'error_model.yml'),
     ('lpy', 'lpy_model.yml'),
     ('fortran', 'fortran_model.yml'),
-    ('sbml', 'sbml_model.yml')]
+    ('sbml', 'sbml_model.yml'),
+    ('osr', 'osr_model.xml')]
 yamls = {k: os.path.join(yaml_dir, v) for k, v in yaml_list}
 
 # Makefile

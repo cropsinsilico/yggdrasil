@@ -125,9 +125,9 @@ definitions:
             type: string
           type: array
       required:
-      - datatype
-      - commtype
       - name
+      - commtype
+      - datatype
       title: comm_base
       type: object
     - anyOf:
@@ -217,7 +217,6 @@ definitions:
           - file_input
           - file_output
           - input
-          - io
           - output
           - rmq_async_client
           - rmq_async_server
@@ -376,16 +375,6 @@ definitions:
             - rmq_server
             type: string
         title: RMQServerDriver
-        type: object
-      - additionalProperties: true
-        description: Schema for connection component ['io'] subtype.
-        properties:
-          connection_type:
-            description: Connection between two models.
-            enum:
-            - io
-            type: string
-        title: IODriver
         type: object
       - additionalProperties: true
         description: Schema for connection component ['rmq_async_client'] subtype.
@@ -640,9 +629,9 @@ definitions:
             is used.
           type: string
       required:
-      - name
-      - filetype
       - working_dir
+      - filetype
+      - name
       title: file_base
       type: object
     - anyOf:
@@ -1250,6 +1239,13 @@ definitions:
           description: Build type/configuration that should be built. Defaults to
             'Release'.
           type: string
+        copy_xml_to_osr:
+          default: false
+          description: If True, the XML file(s) will be copied to the OSR repository
+            InputFiles direcitory before running. This is necessary if the XML file(s)
+            use any of the files located there since OSR always assumes the included
+            file paths are relative. Defaults to False.
+          type: boolean
         driver:
           description: '[DEPRECATED] Name of driver class that should be used.'
           type: string
@@ -1363,6 +1359,7 @@ definitions:
           - lpy
           - make
           - matlab
+          - osr
           - python
           - r
           - sbml
@@ -1513,6 +1510,20 @@ definitions:
           items:
             type: string
           type: array
+        sync_vars_in:
+          default: []
+          description: Variables that should be synchronized from other models. Defaults
+            to [].
+          items:
+            type: string
+          type: array
+        sync_vars_out:
+          default: []
+          description: Variables that should be synchronized to other models. Defaults
+            to [].
+          items:
+            type: string
+          type: array
         synonyms:
           additionalProperties:
             additionalProperties:
@@ -1559,6 +1570,44 @@ definitions:
           anyOf:
           - type: boolean
           - type: string
+          - properties:
+              inputs:
+                anyOf:
+                - type: string
+                - items:
+                    type: string
+                  type: array
+              name:
+                default: timesync
+                type: string
+              outputs:
+                anyOf:
+                - type: string
+                - items:
+                    type: string
+                  type: array
+            type: object
+          - items:
+              anyOf:
+              - type: string
+              - properties:
+                  inputs:
+                    anyOf:
+                    - type: string
+                    - items:
+                        type: string
+                      type: array
+                  name:
+                    default: timesync
+                    type: string
+                  outputs:
+                    anyOf:
+                    - type: string
+                    - items:
+                        type: string
+                      type: array
+                type: object
+            type: array
           default: false
           description: If set, the model is assumed to call a send then receive of
             the state at each timestep for syncronization with other models that are
@@ -1594,9 +1643,9 @@ definitions:
           type: string
       required:
       - language
-      - name
-      - args
       - working_dir
+      - args
+      - name
       title: model_base
       type: object
     - anyOf:
@@ -1756,6 +1805,49 @@ definitions:
               via the command line. Defaults to False.
             type: boolean
         title: LPyModelDriver
+        type: object
+      - additionalProperties: true
+        description: Schema for model component ['executable'] subtype.
+        properties:
+          language:
+            default: executable
+            description: Model is an executable.
+            enum:
+            - executable
+            type: string
+        title: ExecutableModelDriver
+        type: object
+      - additionalProperties: true
+        description: Schema for model component ['osr'] subtype.
+        properties:
+          copy_xml_to_osr:
+            default: false
+            description: If True, the XML file(s) will be copied to the OSR repository
+              InputFiles direcitory before running. This is necessary if the XML file(s)
+              use any of the files located there since OSR always assumes the included
+              file paths are relative. Defaults to False.
+            type: boolean
+          language:
+            default: executable
+            description: Model is an OSR model.
+            enum:
+            - osr
+            type: string
+          sync_vars_in:
+            default: []
+            description: Variables that should be synchronized from other models.
+              Defaults to [].
+            items:
+              type: string
+            type: array
+          sync_vars_out:
+            default: []
+            description: Variables that should be synchronized to other models. Defaults
+              to [].
+            items:
+              type: string
+            type: array
+        title: OSRModelDriver
         type: object
       - additionalProperties: true
         description: Schema for model component ['matlab'] subtype.
@@ -2235,17 +2327,6 @@ definitions:
             - f2008
             type: string
         title: FortranModelDriver
-        type: object
-      - additionalProperties: true
-        description: Schema for model component ['executable'] subtype.
-        properties:
-          language:
-            default: executable
-            description: Model is an executable.
-            enum:
-            - executable
-            type: string
-        title: ExecutableModelDriver
         type: object
     description: Schema for model components.
     title: model

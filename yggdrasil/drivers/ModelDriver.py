@@ -291,9 +291,37 @@ class ModelDriver(Driver):
         'is_server': {'type': 'boolean', 'default': False},
         'client_of': {'type': 'array', 'items': {'type': 'string'},
                       'default': []},
-        'timesync': {'anyOf': [{'type': 'boolean'},
-                               {'type': 'string'}],
-                     'default': False},
+        'timesync': {
+            'anyOf': [
+                {'type': 'boolean'}, {'type': 'string'},
+                {'type': 'object',
+                 'properties': {
+                     'name': {'type': 'string', 'default': 'timesync'},
+                     'inputs': {'anyOf': [
+                         {'type': 'string'},
+                         {'type': 'array',
+                          'items': {'type': 'string'}}]},
+                     'outputs': {'anyOf': [
+                         {'type': 'string'},
+                         {'type': 'array',
+                          'items': {'type': 'string'}}]}}},
+                {'type': 'array',
+                 'items': {
+                     'anyOf': [
+                         {'type': 'string'},
+                         {'type': 'object',
+                          'properties': {
+                              'name': {'type': 'string',
+                                       'default': 'timesync'},
+                              'inputs': {'anyOf': [
+                                  {'type': 'string'},
+                                  {'type': 'array',
+                                   'items': {'type': 'string'}}]},
+                              'outputs': {'anyOf': [
+                                  {'type': 'string'},
+                                  {'type': 'array',
+                                   'items': {'type': 'string'}}]}}}]}}],
+            'default': False},
         'with_strace': {'type': 'boolean', 'default': False},
         'strace_flags': {'type': 'array',
                          'default': ['-e', 'trace=memory'],

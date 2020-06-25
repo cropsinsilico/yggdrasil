@@ -164,10 +164,15 @@ def parse_yaml(files):
         if yml.get('timesync', False):
             if yml['timesync'] is True:
                 yml['timesync'] = 'timesync'
-            tsync = yml['timesync']
-            timesync_names.append(tsync)
+            if not isinstance(yml['timesync'], list):
+                yml['timesync'] = [yml['timesync']]
+            for i, tsync in enumerate(yml['timesync']):
+                if isinstance(tsync, str):
+                    tsync = {'name': tsync}
+                    yml['timesync'][i] = tsync
+            timesync_names.append(tsync['name'])
             yml.setdefault('timesync_client_of', [])
-            yml['timesync_client_of'].append(tsync)
+            yml['timesync_client_of'].append(tsync['name'])
     for tsync in set(timesync_names):
         for m in yml_norm['models']:
             if m['name'] == tsync:

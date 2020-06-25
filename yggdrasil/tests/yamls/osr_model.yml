@@ -1,0 +1,8 @@
+model:
+  name: osr_model
+  language: osr
+  timesync:
+    inputs: specificLeafArea
+    outputs: ovar1, ovar2
+  args:
+    - {{OSR_REPOSITORY}}/OpenSimRoot/InputFiles/runMaizeYgg.xml
