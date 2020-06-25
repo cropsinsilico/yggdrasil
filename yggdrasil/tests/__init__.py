@@ -1050,8 +1050,59 @@ def ErrorClass(base_class, *args, **kwargs):
     return ErrorClass(*args, **kwargs)
 
 
+def generate_component_subtests(comptype, suffix, target_globals,
+                                parent_module_name, new_attr=None,
+                                module_name_format='test_%s',
+                                class_name_format='Test%s',
+                                skip_subtypes=[]):
+    r"""Function that generates tests for all component subtypes that
+    subclass the original test class for the subtype.
+
+    Args:
+        comptype (str): Component type.
+        suffix (str): Suffix to be added to the end of the original
+            test class name to get the name for the new test.
+        target_globals (dict): Globals dictionary that class should be
+            added to.
+        parent_module_name (str): Parent module that contains test
+            classes for the specified component type.
+        new_attr (dict, optional): Attributes to add to the test classes.
+            Defaults to None and will be an empty dict.
+        module_name_format (str, optional): Format string that should
+            be used to locate the original test modules. Defaults to
+            'test_%s'.
+        class_name_format (str, optional): Format string that should
+            be used to both name generated test classes and locate the
+            original test classes. Defaults to 'Test%s'.
+        skip_subtypes (list, optional): List of subtypes to skip.
+            Defaults to empty list.
+
+    """
+    from yggdrasil.schema import get_schema
+    _schema = get_schema()
+    if new_attr is None:
+        new_attr = {}
+    if comptype not in _schema.keys():  # pragma: debug
+        raise NotImplementedError("%s is not a component type." % comptype)
+    for subtype in _schema[comptype].subtypes:
+        if subtype in skip_subtypes:
+            continue
+        subtype_cls = _schema[comptype].subtype2class[subtype]
+        old_mod_name = (parent_module_name + '.'
+                        + (module_name_format % subtype_cls))
+        old_cls_name = class_name_format % subtype_cls
+        new_cls_name = class_name_format % (subtype_cls + suffix.title())
+        base_class = getattr(importlib.import_module(old_mod_name),
+                             old_cls_name)
+        new_cls = type(new_cls_name, (base_class, ), new_attr)
+        target_globals[new_cls.__name__] = new_cls
+        del new_cls
+    
+
 def generate_component_tests(comptype, base_class, target_globals,
-                             directory, class_attr='_cls'):
+                             directory, class_attr='_cls', new_attr=None,
+                             class_name_format='Test%s',
+                             class_file_format='test_%s.py'):
     r"""Function that generates tests for all component subtypes
     based on the registered classes.
 
@@ -1064,23 +1115,33 @@ def generate_component_tests(comptype, base_class, target_globals,
             that should be checked for tests.
         class_attr (str, optional): Attribute that should be set to the
             name of the class being tested.
+        new_attr (dict, optional): Attributes to add to the test classes.
+            Defaults to None and will be an empty dict.
+        class_name_format (str, optional): Format string that should
+            be used to name generated test class's. Defaults to
+            'Test%s'.
+        class_file_format (str, optional): Format string that should
+            be used to name test files that are checked for. Defaults
+            to 'test_%s.py'.
 
     """
     from yggdrasil.schema import get_schema
     _schema = get_schema()
+    if new_attr is None:
+        new_attr = {}
     if os.path.isfile(directory):
         directory = os.path.dirname(directory)
     if comptype not in _schema.keys():  # pragma: debug
         raise NotImplementedError("%s is not a component type." % comptype)
     for subtype in _schema[comptype].subtypes:
         subtype_cls = _schema[comptype].subtype2class[subtype]
-        new_cls_name = 'Test%s' % subtype_cls
+        new_cls_name = class_name_format % subtype_cls
         new_cls_file = os.path.join(directory,
-                                    'test_%s' % subtype_cls) + '.py'
+                                    class_file_format % subtype_cls)
         if os.path.isfile(new_cls_file):
             continue
-        cls_attr = {class_attr: subtype_cls}
-        new_cls = type(new_cls_name, (base_class, ), cls_attr)
+        new_attr.setdefault(class_attr, subtype_cls)
+        new_cls = type(new_cls_name, (base_class, ), new_attr)
         target_globals[new_cls.__name__] = new_cls
         del new_cls
 

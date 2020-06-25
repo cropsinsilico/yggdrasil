@@ -1061,8 +1061,15 @@ class YggTaskLoop(YggTask):
     def __init__(self, *args, **kwargs):
         super(YggTaskLoop, self).__init__(*args, **kwargs)
         self._1st_main_terminated = False
+        self._loop_count = 0
         self.create_flag_attr('break_flag')
         self.create_flag_attr('loop_flag')
+
+    @property
+    def loop_count(self):
+        r"""int: Number of loops performed."""
+        with self.lock:
+            return self._loop_count
 
     def on_main_terminated(self, dont_break=False):  # pragma: debug
         r"""Actions performed when 1st main terminated.
@@ -1094,7 +1101,7 @@ class YggTaskLoop(YggTask):
         r"""bool: True if the thread/process was loop. False otherwise."""
         return self.check_flag_attr('loop_flag')
 
-    def wait_for_loop(self, timeout=None, key=None):
+    def wait_for_loop(self, timeout=None, key=None, nloop=0):
         r"""Wait until thread/process enters loop to return using sleeps rather than
         blocking.
 
@@ -1103,11 +1110,13 @@ class YggTaskLoop(YggTask):
                 the thread/process to enter loop. Defaults to None and is infinite.
             key (str, optional): Key that should be used to register the timeout.
                 Defaults to None and is set based on the stack trace.
+            nloop (int, optional): Number of loops that should be performed
+                before breaking. Defaults to 0.
 
         """
         T = self.start_timeout(timeout, key_level=1, key=key)
-        while (self.is_alive() and (not self.was_loop)
-               and (not T.is_out)):  # pragma: debug
+        while (((not self.was_loop) or (self.loop_count < nloop))
+               and self.is_alive() and (not T.is_out)):  # pragma: debug
             self.verbose_debug('Waiting for thread/process to enter loop...')
             self.sleep()
         self.stop_timeout(key_level=1, key=key)
@@ -1143,6 +1152,8 @@ class YggTaskLoop(YggTask):
             self._ygg_target(*self._ygg_args, **self._ygg_kwargs)
         else:
             self.set_break_flag()
+        with self.lock:
+            self._loop_count += 1
 
     def run_error(self):
         r"""Actions to perform on error in try/except wrapping run."""

@@ -5,7 +5,7 @@ from yggdrasil.tests import assert_raises
 from yggdrasil.config import ygg_cfg
 from yggdrasil.communication import new_comm
 from yggdrasil.communication.RMQComm import RMQComm, check_rmq_server
-from yggdrasil.communication.tests import test_AsyncComm
+from yggdrasil.communication.tests import test_CommBase
 
 
 _rmq_installed = RMQComm.is_installed(language='python')
@@ -13,12 +13,12 @@ _rmq_installed = RMQComm.is_installed(language='python')
 
 @unittest.skipIf(not _rmq_installed, "RMQ Server not running")
 @flaky.flaky
-class TestRMQComm(test_AsyncComm.TestAsyncComm):
+class TestRMQComm(test_CommBase.TestCommBase):
     r"""Test for RMQComm communication class."""
 
     comm = 'RMQComm'
     timeout = 10.0
-    attr_list = (copy.deepcopy(test_AsyncComm.TestAsyncComm.attr_list)
+    attr_list = (copy.deepcopy(test_CommBase.TestCommBase.attr_list)
                  + ['connection', 'channel'])
 
     

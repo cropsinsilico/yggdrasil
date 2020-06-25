@@ -4,7 +4,7 @@ import copy
 from yggdrasil import platform
 from yggdrasil.tests import assert_raises, assert_equal
 from yggdrasil.communication import new_comm
-from yggdrasil.communication.tests import test_AsyncComm
+from yggdrasil.communication.tests import test_CommBase
 from yggdrasil.communication import ZMQComm, IPCComm
 
 
@@ -60,11 +60,11 @@ def test_error_on_send_open_twice():
 
         
 @unittest.skipIf(not _zmq_installed, "ZMQ library not installed")
-class TestZMQComm(test_AsyncComm.TestAsyncComm):
+class TestZMQComm(test_CommBase.TestCommBase):
     r"""Test for ZMQComm communication class."""
 
     comm = 'ZMQComm'
-    attr_list = (copy.deepcopy(test_AsyncComm.TestAsyncComm.attr_list)
+    attr_list = (copy.deepcopy(test_CommBase.TestCommBase.attr_list)
                  + ['context', 'socket', 'socket_type_name',
                     'socket_type', 'protocol', 'host', 'port'])
     protocol = None
@@ -185,6 +185,36 @@ class TestZMQCommREQ(TestZMQComm):
     def test_send_recv_condition(self):
         r"""Test send/recv with conditional."""
         pass
+
+    def test_send_recv_filter_eof(self, **kwargs):
+        r"""Test send/recv of EOF with filter."""
+        self.setup_filters()
+        self.assert_raises(RuntimeError, self.do_send_recv,
+                           send_meth='send_eof')
+
+    def test_send_recv_filter_pass(self, **kwargs):
+        r"""Test send/recv with filter that passes both messages."""
+        self.setup_filters()
+        kwargs.setdefault('msg_send', self.msg_filter_pass)
+        kwargs.setdefault('msg_recv', self.msg_filter_pass)
+        self.assert_raises(RuntimeError, self.do_send_recv, **kwargs)
+        
+    def test_send_recv_filter_send_filter(self, **kwargs):
+        r"""Test send/recv with filter that blocks send."""
+        self.setup_filters()
+        kwargs.setdefault('msg_send', self.msg_filter_send)
+        kwargs.setdefault('msg_recv', self.recv_instance.empty_obj_recv)
+        kwargs.setdefault('recv_timeout', self.sleeptime)
+        kwargs.setdefault('no_recv', True)
+        self.assert_raises(RuntimeError, self.do_send_recv, **kwargs)
+        
+    def test_send_recv_filter_recv_filter(self, **kwargs):
+        r"""Test send/recv with filter that blocks recv."""
+        self.setup_filters()
+        kwargs.setdefault('msg_send', self.msg_filter_recv)
+        kwargs.setdefault('msg_recv', self.recv_instance.empty_obj_recv)
+        kwargs.setdefault('recv_timeout', 10 * self.sleeptime)
+        self.assert_raises(RuntimeError, self.do_send_recv, **kwargs)
     
 
 class TestZMQCommROUTER(TestZMQComm):

@@ -27,10 +27,6 @@ class TestRMQAsyncComm(parent.TestRMQComm):
         while (not T.is_out) and (self.recv_instance.times_connected == 1):
             self.instance.sleep()
         self.instance.stop_timeout()
-
-    # def test_send_recv_direct(self):
-    #     r"""Disabled: Test send/recv direct."""
-    #     pass
         
 
 @unittest.skipIf(_rmq_installed, "RMQ Server running")

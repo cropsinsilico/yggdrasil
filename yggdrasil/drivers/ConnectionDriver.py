@@ -264,6 +264,7 @@ class ConnectionDriver(Driver):
         comm_kws['direction'] = direction
         comm_kws['dont_open'] = True
         comm_kws['reverse_names'] = True
+        comm_kws['use_async'] = True
         comm_kws.setdefault('name', name)
         self.debug('%s comm_kws:\n%s', attr_comm, self.pprint(comm_kws, 1))
         setattr(self, attr_comm, new_comm(**comm_kws))

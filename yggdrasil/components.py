@@ -514,17 +514,24 @@ class ComponentMeta(type):
                 cls.finalize_registration(cls)
         return cls
 
-    # def __getattribute__(cls, key):
-    #     r"""If the class is an alias for another class and has been initialized,
-    #     call getattr on the aliased class."""
-    #     if key not in ['__dict__', '_get_alias']:
-    #         if hasattr(cls, '_get_alias') and (key not in cls.__dict__):
-    #             return getattr(cls._get_alias(), key)
-    #     return super(ComponentMeta, cls).__getattribute__(key)
+
+class ComponentBaseUnregistered(object):
+    r"""Base class for schema components w/o schema and registration."""
+    __slots__ = []
+    _disconnect_attr = []
+
+    def __del__(self):
+        self.disconnect()
+
+    def disconnect(self):
+        r"""Disconnect attributes that are aliases."""
+        for k in self._disconnect_attr:
+            if hasattr(getattr(self, k, None), 'disconnect'):
+                getattr(self, k).disconnect()
 
 
 @six.add_metaclass(ComponentMeta)
-class ComponentBase(object):
+class ComponentBase(ComponentBaseUnregistered):
     r"""Base class for schema components.
 
     Args:
@@ -582,7 +589,6 @@ class ComponentBase(object):
     _schema_excluded_from_class_validation = []
     _schema_inherit = True
     _dont_register = False
-    _disconnect_attr = []
 
     def __new__(cls, *args, **kwargs):
         obj = object.__new__(cls)
@@ -600,6 +606,16 @@ class ComponentBase(object):
                 obj._input_kwargs[k] = v
         return obj
     
+    def __getstate__(self):
+        out = self.__dict__.copy()
+        del out['_input_args'], out['_input_kwargs']
+        return out
+
+    def __setstate__(self, state):
+        state['_input_args'] = []
+        state['_input_kwargs'] = {}
+        self.__dict__.update(state)
+
     def __init__(self, skip_component_schema_normalization=None, **kwargs):
         if skip_component_schema_normalization is None:
             skip_component_schema_normalization = (
@@ -668,25 +684,6 @@ class ComponentBase(object):
             #                    "with the value %s.")
             #                   % (k, v, getattr(self, k)))
         self.extra_kwargs = kwargs
-
-    def __getstate__(self):
-        out = self.__dict__.copy()
-        del out['_input_args'], out['_input_kwargs']
-        return out
-
-    def __setstate__(self, state):
-        state['_input_args'] = []
-        state['_input_kwargs'] = {}
-        self.__dict__.update(state)
-
-    def __del__(self):
-        self.disconnect()
-
-    def disconnect(self):
-        r"""Disconnect attributes that are aliases."""
-        for k in self._disconnect_attr:
-            if hasattr(getattr(self, k, None), 'disconnect'):
-                getattr(self, k).disconnect()
 
     @staticmethod
     def before_registration(cls):

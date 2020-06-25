@@ -879,6 +879,12 @@ class ProxyObject(metaclass=ProxyMeta):
             return
         setattr(object.__getattribute__(self, "_wrapped"), name, value)
 
+    def __getstate__(self):
+        return object.__getattribute__(self, "_wrapped")
+
+    def __setstate__(self, state):
+        object.__setattr__(self, "_wrapped", state)
+
     # Special cases
     def __nonzero__(self):
         return bool(object.__getattribute__(self, "_wrapped"))
@@ -1028,6 +1034,7 @@ class TimeOut(object):
         self.max_time = max_time
         self.start_time = time.perf_counter()
         self.key = key
+        self.checked = False
 
     @property
     def elapsed(self):
@@ -1039,7 +1046,12 @@ class TimeOut(object):
         r"""bool: True if there is not any time remaining. False otherwise."""
         if self.max_time is False:
             return False
-        return (self.elapsed > self.max_time)
+        if (not self.checked) and (self.max_time == 0):
+            out = False
+        else:
+            out = (self.elapsed > self.max_time)
+        self.checked = True
+        return out
 
 
 # def single_use_method(func):

@@ -1,6 +1,16 @@
 from yggdrasil.components import import_component
 
 
+class TemporaryCommunicationError(Exception):
+    r"""Raised when the comm is open, but send/recv is temporarily disabled."""
+    pass
+
+
+class NoMessages(TemporaryCommunicationError):
+    r"""Raised when the comm is open, but there are no messages waiting."""
+    pass
+
+
 def determine_suffix(no_suffix=False, reverse_names=False,
                      direction='send', **kwargs):
     r"""Determine the suffix that should be used for the comm name.
@@ -36,13 +46,16 @@ def determine_suffix(no_suffix=False, reverse_names=False,
     return suffix
 
 
-def new_comm(name, comm=None, **kwargs):
+def new_comm(name, comm=None, use_async=False, **kwargs):
     r"""Return a new communicator, creating necessary components for
     communication (queues, sockets, channels, etc.).
 
     Args:
         name (str): Communicator name.
         comm (str, optional): Name of communicator class.
+        use_async (bool, optional): If True, send/recv operations will
+            be performed asynchronously on new threads. Defaults to
+            False.
         **kwargs: Additional keyword arguments are passed to communicator
             class method new_comm.
 
@@ -54,7 +67,7 @@ def new_comm(name, comm=None, **kwargs):
         if len(comm) == 1:
             kwargs.update(comm[0])
             kwargs.setdefault('name', name)
-            return new_comm(**kwargs)
+            return new_comm(use_async=use_async, **kwargs)
         else:
             kwargs['comm'] = comm
             comm = 'ForkComm'
@@ -67,7 +80,13 @@ def new_comm(name, comm=None, **kwargs):
         commtype = kwargs.pop('commtype', 'default')
         assert(commtype == 'default')
     comm_cls = import_component('comm', comm)
-    return comm_cls.new_comm(name, **kwargs)
+    if use_async:
+        kwargs['is_async'] = True
+    out = comm_cls.new_comm(name, **kwargs)
+    if use_async and (out._commtype is not None):
+        from yggdrasil.communication.AsyncComm import AsyncComm
+        out = AsyncComm(out)
+    return out
 
 
 def get_comm(name, **kwargs):

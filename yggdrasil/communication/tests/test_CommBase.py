@@ -38,6 +38,7 @@ class TestCommBase(YggTestClassInfo):
                  'serializer', 'recv_timeout',
                  'close_on_eof_recv', 'opp_address', 'opp_comms',
                  'maxMsgSize']
+    use_async = False
     
     @property
     def cleanup_comm_classes(self):
@@ -67,7 +68,8 @@ class TestCommBase(YggTestClassInfo):
     @property
     def send_inst_kwargs(self):
         r"""dict: Keyword arguments for send instance."""
-        out = {'comm': self.comm, 'reverse_names': True, 'direction': 'send'}
+        out = {'comm': self.comm, 'reverse_names': True,
+               'direction': 'send', 'use_async': self.use_async}
         out.update(self.testing_options['kwargs'])
         return out
 
@@ -192,7 +194,12 @@ class TestCommBase(YggTestClassInfo):
         send_inst, recv_inst = self.get_fresh_error_instance(recv=True)
         self.fd_count
         recv_inst.error_replace('recv_multipart')
-        flag, msg_recv = recv_inst.recv()
+        if recv_inst.is_async:
+            nloop = max(1, recv_inst.backlog_thread.loop_count + 1)
+            recv_inst.backlog_thread.wait_for_loop(timeout=10.0,
+                                                   key="error_recv",
+                                                   nloop=nloop)
+        flag, msg_recv = recv_inst.recv(timeout=5.0)
         self.fd_count
         assert(not flag)
         recv_inst.restore_all()
@@ -360,6 +367,8 @@ class TestCommBase(YggTestClassInfo):
         if reverse_comms:
             send_instance = self.recv_instance
             recv_instance = self.send_instance
+            send_instance.direction = 'send'
+            recv_instance.direction = 'recv'
         else:
             send_instance = self.send_instance
             recv_instance = self.recv_instance
@@ -438,6 +447,9 @@ class TestCommBase(YggTestClassInfo):
             recv_instance.confirm(noblock=True)
         self.assert_equal(getattr(send_instance, n_msg_send_meth), 0)
         self.assert_equal(getattr(recv_instance, n_msg_recv_meth), 0)
+        if reverse_comms:
+            send_instance.direction = 'recv'
+            recv_instance.direction = 'send'
 
     def test_cleanup_comms(self):
         r"""Test cleanup_comms for comm class."""
@@ -589,6 +601,8 @@ class TestCommBase(YggTestClassInfo):
         kwargs.setdefault('msg_send', self.msg_filter_recv)
         kwargs.setdefault('msg_recv', self.recv_instance.empty_obj_recv)
         kwargs.setdefault('recv_timeout', 10 * self.sleeptime)
+        if self.recv_instance.is_async:
+            kwargs.setdefault('no_recv', True)
         self.do_send_recv(**kwargs)
 
     def test_send_recv(self):

@@ -7,7 +7,8 @@ import types
 import time
 from yggdrasil import tools, multitasking
 from yggdrasil.tools import YGG_MSG_EOF
-from yggdrasil.communication import new_comm, get_comm, determine_suffix
+from yggdrasil.communication import (
+    new_comm, get_comm, determine_suffix, TemporaryCommunicationError)
 from yggdrasil.components import import_component, create_component
 from yggdrasil.metaschema.datatypes import MetaschemaTypeError
 from yggdrasil.metaschema.datatypes.MetaschemaType import MetaschemaType
@@ -412,7 +413,7 @@ class CommBase(tools.YggClass):
                  single_use=False, reverse_names=False, no_suffix=False,
                  is_client=False, is_response_client=False,
                  is_server=False, is_response_server=False,
-                 comm=None, **kwargs):
+                 comm=None, is_async=False, **kwargs):
         self._comm_class = None
         if comm is not None:
             assert(comm == self.comm_class)
@@ -462,6 +463,7 @@ class CommBase(tools.YggClass):
         self.touches_model = (self.partner_model is not None)
         self.is_client = is_client
         self.is_server = is_server
+        self.is_async = is_async
         self.is_response_client = is_response_client
         self.is_response_server = is_response_server
         self._server = None
@@ -553,7 +555,7 @@ class CommBase(tools.YggClass):
                 if k in kwargs:
                     seri_kws.setdefault(k, kwargs[k])
             # Create serializer instance
-            self.debug('seri_kws = %s', str(seri_kws))
+            self.debug('seri_kws = %.100s', str(seri_kws))
             self.serializer = seri_cls(**seri_kws)
         # Set send/recv converter based on the serializer
         dir_conv = '%s_converter' % self.direction
@@ -877,7 +879,7 @@ class CommBase(tools.YggClass):
             dict: Keyword arguments for opposite comm object.
 
         """
-        kwargs = {'comm': self.comm_class}
+        kwargs = {'comm': self.comm_class, 'use_async': self.is_async}
         kwargs['address'] = self.opp_address
         kwargs['serializer'] = self.serializer
         if self.direction == 'send':
@@ -1230,6 +1232,22 @@ class CommBase(tools.YggClass):
             yield msg[prev:next]
             prev = next
 
+    def precheck(self, direction):
+        r"""Check that comm is ready for action in specified direction,
+        raising errors if it is not.
+
+        Args:
+            direction (str): Check that comm is ready to perform this
+                action.
+
+        """
+        if self.direction != direction:
+            raise RuntimeError("This comm is designated to %s and "
+                               "therefore cannot %s."
+                               % (self.direction, direction))
+        if self.single_use and self._used:
+            raise RuntimeError("This comm is single use and it was already used.")
+
     # CLIENT/SERVER METHODS
     def server_exists(self, srv_address):
         r"""Determine if a server exists.
@@ -1434,41 +1452,35 @@ class CommBase(tools.YggClass):
     # SEND METHODS
     def _safe_send(self, *args, **kwargs):
         r"""Send message checking if is 1st message and then waiting."""
-        if (not self._used) and self._multiple_first_send:
-            out = self._send_1st(*args, **kwargs)
-        else:
-            self.debug('is_closed = %s', self.is_closed)
-            with self._closing_thread.lock:
-                self.debug(
-                    "inside safe_send lock, is_closed = %s", self.is_closed)
-                if self.is_closed:  # pragma: debug
-                    return False
-                out = self._send(*args, **kwargs)
+        timeout = kwargs.pop('timeout', self.timeout)
+        send_1st = ((not self._used) and self._multiple_first_send)
+        if send_1st:
+            timeout = max(timeout, self.timeout)
+            self.suppress_special_debug = True
+        Tout = self.start_timeout(timeout, key_suffix='._safe_send')
+        out = False
+        while (not Tout.is_out):
+            try:
+                with self._closing_thread.lock:
+                    if self.is_open:
+                        out = self._send(*args, **kwargs)
+                        if out or (not send_1st):
+                            break
+                    else:
+                        self.debug('Comm closed')
+                        out = False
+                        break
+            except TemporaryCommunicationError as e:
+                self.special_debug("TemporaryCommunicationError: %s" % e)
+            self.sleep()
+        self.stop_timeout(key_suffix='._safe_send')
+        if send_1st:
+            self.suppress_special_debug = False
         if out:
             self._n_sent += 1
             self._last_send = time.perf_counter()
         return out
     
-    def _send_1st(self, *args, **kwargs):
-        r"""Send first message until it succeeds."""
-        with self._closing_thread.lock:
-            if self.is_closed:  # pragma: debug
-                return False
-            flag = self._send(*args, **kwargs)
-        T = self.start_timeout(key_suffix='._send_1st')
-        self.suppress_special_debug = True
-        while (not T.is_out) and (self.is_open) and (not flag):  # pragma: debug
-            with self._closing_thread.lock:
-                if not self.is_open:
-                    break
-                flag = self._send(*args, **kwargs)
-            if flag or (self.is_closed):
-                break
-            self.sleep()
-        self.stop_timeout(key_suffix='._send_1st')
-        self.suppress_special_debug = False
-        return flag
-        
     def _send(self, msg, *args, **kwargs):
         r"""Raw send. Should be overridden by inheriting class."""
         raise NotImplementedError("_send method needs implemented.")
@@ -1515,9 +1527,13 @@ class CommBase(tools.YggClass):
 
         """
         workcomm = self.get_work_comm(info)
-        ret = workcomm._send_multipart(msg, **kwargs)
-        # self.remove_work_comm(workcomm.uuid, in_thread=True)
-        return ret
+        if workcomm.is_async:
+            return workcomm._send_multipart(msg, **kwargs)
+        else:
+            args = [msg]
+            self.sched_task(0, workcomm._send_multipart, args=args,
+                            kwargs=kwargs)
+            return True
             
     def on_send_eof(self, header_kwargs=None):
         r"""Actions to perform when EOF being sent.
@@ -1583,7 +1599,8 @@ class CommBase(tools.YggClass):
             # Serialize
             add_sinfo = (self._send_serializer and (not self.is_file))
             if add_sinfo:
-                self.debug('Sending sinfo: %s', self.serializer.serializer_info)
+                self.debug('Sending sinfo: %.100s',
+                           str(self.serializer.serializer_info))
             msg_s = self.serialize(msg_, header_kwargs=header_kwargs,
                                    add_serializer_info=add_sinfo)
             if self.no_serialization:
@@ -1614,9 +1631,11 @@ class CommBase(tools.YggClass):
             bool: Success or failure of send.
 
         """
-        if self.single_use and self._used:  # pragma: debug
-            raise RuntimeError("This comm is single use and it was already used.")
+        self.precheck('send')
         args = self.language_driver.language2python(args)
+        if self.is_closed:
+            self.debug('Comm closed')
+            return False
         if not self.evaluate_filter(*args):
             # Return True to indicate success because nothing should be done
             self.debug("Sent message skipped based on filter: %.100s", str(args))
@@ -1627,29 +1646,28 @@ class CommBase(tools.YggClass):
                 self._used = True
                 if self.serializer.initialized:
                     self._send_serializer = False
+            if self.single_use and self._used:
+                self.debug('Closing single use send comm [DISABLED]')
+                # self.linger_close()
+                # self.close_in_thread(no_wait=True)
+            elif ret and self._eof_sent.is_set() and self.close_on_eof_send:
+                self.debug('Close on send EOF')
+                self.linger_close()
+                # self.close_in_thread(no_wait=True, timeout=False)
+            return ret
         except MetaschemaTypeError as e:  # pragma: debug
             self._type_errors.append(e)
             try:
                 self.exception('Failed to send: %.100s.', str(args))
             except ValueError:  # pragma: debug
                 self.exception('Failed to send (unyt array in message)')
-            return False
         except BaseException:
             # Handle error caused by calling repr on unyt array that isn't float64
             try:
                 self.exception('Failed to send: %.100s.', str(args))
             except ValueError:  # pragma: debug
                 self.exception('Failed to send (unyt array in message)')
-            return False
-        if self.single_use and self._used:
-            self.debug('Closing single use send comm [DISABLED]')
-            # self.linger_close()
-            # self.close_in_thread(no_wait=True)
-        elif ret and self._eof_sent.is_set() and self.close_on_eof_send:
-            self.debug('Close on send EOF')
-            self.linger_close()
-            # self.close_in_thread(no_wait=True, timeout=False)
-        return ret
+        return False
 
     def send_multipart(self, msg, header_kwargs=None, **kwargs):
         r"""Send a multipart message. If the message is smaller than maxMsgSize,
@@ -1677,7 +1695,7 @@ class CommBase(tools.YggClass):
             msg_len = len(msg_s)
         # Sent first part of message which includes the header describing the
         # work comm
-        self.special_debug('Sending %d bytes', msg_len)
+        self.special_debug('Sending %d bytes to %s', msg_len, self.address)
         if (msg_len < self.maxMsgSize) or (self.maxMsgSize == 0):
             flag = self._safe_send(msg_s, **kwargs)
         else:
@@ -1718,12 +1736,26 @@ class CommBase(tools.YggClass):
         # return False
 
     # RECV METHODS
-    def _safe_recv(self, *args, **kwargs):
+    def _safe_recv(self, timeout=None, **kwargs):
         r"""Safe receive that does things for all comm classes."""
-        with self._closing_thread.lock:
-            if self.is_closed:
-                return (False, self.empty_bytes_msg)
-            out = self._recv(*args, **kwargs)
+        if timeout is None:
+            timeout = self.recv_timeout
+        Tout = self.start_timeout(timeout, key_suffix='._safe_recv')
+        out = (True, self.empty_bytes_msg)
+        while (not Tout.is_out):
+            try:
+                with self._closing_thread.lock:
+                    if self.is_open:
+                        out = self._recv(**kwargs)
+                    else:
+                        self.debug('Comm closed')
+                        out = (False, self.empty_bytes_msg)
+                    break
+            except TemporaryCommunicationError as e:
+                self.periodic_debug("_safe_recv", period=1000)(
+                    "TemporaryCommunicationError: %s" % e)
+            self.sleep()
+        self.stop_timeout(key_suffix='._safe_recv')
         if out[0] and (not self.is_empty(out[1], self.empty_bytes_msg)):
             self._n_recv += 1
             self._last_recv = time.perf_counter()
@@ -1843,26 +1875,25 @@ class CommBase(tools.YggClass):
                 message.
 
         """
-        if self.single_use and self._used:
-            raise RuntimeError("This comm is single use and it was already used.")
+        self.precheck('recv')
         if self.is_closed:
             self.debug('Comm closed')
             return (False, None)
         try:
             flag, msg = self.recv_multipart(*args, **kwargs)
+            if flag and (not self.evaluate_filter(msg)):
+                assert(not self.single_use)
+                self.debug("Received message skipped based on "
+                           "filter: %.100s", str(msg))
+                return self.recv(*args, **kwargs)
+            if self.single_use and self._used:
+                self.debug('Linger close on single use')
+                self.linger_close()
+            return self.language_driver.python2language((flag, msg))
         except BaseException:
             self.exception('Failed to recv.')
+            self.close()
             return (False, None)
-        if flag and (not self.evaluate_filter(msg)):
-            assert(not self.single_use)
-            self.debug("Recieved message skipped based on filter: %.100s", str(msg))
-            return self.recv(*args, **kwargs)
-        if self.single_use and self._used:
-            self.debug('Linger close on single use')
-            self.linger_close()
-        out = (flag, msg)
-        out = self.language_driver.python2language(out)
-        return out
 
     def recv_multipart(self, *args, **kwargs):
         r"""Receive a multipart message. If a message is received without a
@@ -1878,6 +1909,7 @@ class CommBase(tools.YggClass):
                 message.
 
         """
+        self.debug("Receiving message from %s", self.address)
         # Receive first part of message
         flag, s_msg = self._safe_recv(*args, **kwargs)
         if not flag:
@@ -1933,6 +1965,9 @@ class CommBase(tools.YggClass):
 
     def purge(self):
         r"""Purge all messages from the comm."""
+        if self.direction == 'recv':
+            while self.n_msg_recv > 0:  # pragma: debug
+                self.recv()
         self._n_sent = 0
         self._n_recv = 0
         self._last_send = None

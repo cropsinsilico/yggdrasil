@@ -3,7 +3,7 @@ import copy
 from yggdrasil.tests import assert_raises, assert_equal
 from yggdrasil.communication import new_comm
 from yggdrasil.communication import IPCComm, CommBase
-from yggdrasil.communication.tests import test_AsyncComm
+from yggdrasil.communication.tests import test_CommBase
 
 
 _ipc_installed = IPCComm.IPCComm.is_installed(language='python')
@@ -52,11 +52,11 @@ def test_ipcrm_queues():
 
     
 @unittest.skipIf(not _ipc_installed, "IPC library not installed")
-class TestIPCComm(test_AsyncComm.TestAsyncComm):
+class TestIPCComm(test_CommBase.TestCommBase):
     r"""Test for IPCComm communication class."""
 
     comm = 'IPCComm'
-    attr_list = (copy.deepcopy(test_AsyncComm.TestAsyncComm.attr_list)
+    attr_list = (copy.deepcopy(test_CommBase.TestCommBase.attr_list)
                  + ['q'])
 
 

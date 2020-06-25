@@ -28,7 +28,7 @@ class ServerComm(CommBase.CommBase):
     _dont_register = True
     
     def __init__(self, name, request_comm=None, response_kwargs=None,
-                 dont_open=False, **kwargs):
+                 dont_open=False, is_async=False, **kwargs):
         if response_kwargs is None:
             response_kwargs = dict()
         icomm_name = name
@@ -37,12 +37,14 @@ class ServerComm(CommBase.CommBase):
                             dont_open=True,
                             comm=request_comm)
         icomm_kwargs.setdefault('is_server', True)
+        icomm_kwargs.setdefault('use_async', is_async)
         self.response_kwargs = response_kwargs
         self.icomm = get_comm(icomm_name, **icomm_kwargs)
         self.ocomm = OrderedDict()
         self.response_kwargs.setdefault('comm', self.icomm.comm_class)
         self.response_kwargs.setdefault('recv_timeout', self.icomm.recv_timeout)
         self.response_kwargs.setdefault('language', self.icomm.language)
+        self.response_kwargs.setdefault('use_async', self.icomm.is_async)
         self._used_response_comms = dict()
         self.clients = []
         self.closed_clients = []
@@ -51,7 +53,8 @@ class ServerComm(CommBase.CommBase):
                                          recv_timeout=self.icomm.recv_timeout,
                                          is_interface=self.icomm.is_interface,
                                          direction='recv', no_suffix=True,
-                                         address=self.icomm.address)
+                                         address=self.icomm.address,
+                                         is_async=self.icomm.is_async)
 
     @classmethod
     def is_installed(cls, language=None):

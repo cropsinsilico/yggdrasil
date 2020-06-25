@@ -26,7 +26,7 @@ class ClientComm(CommBase.CommBase):
     _dont_register = True
     
     def __init__(self, name, request_comm=None, response_kwargs=None,
-                 dont_open=False, **kwargs):
+                 dont_open=False, is_async=False, **kwargs):
         if response_kwargs is None:
             response_kwargs = dict()
         ocomm_name = name
@@ -34,6 +34,7 @@ class ClientComm(CommBase.CommBase):
         ocomm_kwargs['direction'] = 'send'
         ocomm_kwargs['dont_open'] = True
         ocomm_kwargs['comm'] = request_comm
+        ocomm_kwargs.setdefault('use_async', is_async)
         self.response_kwargs = response_kwargs
         self.ocomm = get_comm(ocomm_name, **ocomm_kwargs)
         self.icomm = dict()
@@ -41,11 +42,13 @@ class ClientComm(CommBase.CommBase):
         self.response_kwargs.setdefault('comm', self.ocomm.comm_class)
         self.response_kwargs.setdefault('recv_timeout', self.ocomm.recv_timeout)
         self.response_kwargs.setdefault('language', self.ocomm.language)
+        self.response_kwargs.setdefault('use_async', self.ocomm.is_async)
         super(ClientComm, self).__init__(self.ocomm.name, dont_open=dont_open,
                                          recv_timeout=self.ocomm.recv_timeout,
                                          is_interface=self.ocomm.is_interface,
                                          direction='send', no_suffix=True,
-                                         address=self.ocomm.address)
+                                         address=self.ocomm.address,
+                                         is_async=self.ocomm.is_async)
 
     @classmethod
     def is_installed(cls, language=None):
