@@ -207,6 +207,18 @@ class OSRModelDriver(ExecutableModelDriver):
         return out
         
     @classmethod
+    def language_executable(cls, **kwargs):
+        r"""Command required to compile/run a model written in this language
+        from the command line.
+
+        Returns:
+            str: Name of (or path to) compiler/interpreter executable required
+                to run the compiler/interpreter from the command line.
+
+        """
+        return cls.executable_path
+        
+    @classmethod
     def executable_command(cls, args, **kwargs):
         r"""Compose a command for running a program using the exectuable for
         this language (compiler/interpreter) with the provided arguments.
