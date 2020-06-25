@@ -63,7 +63,7 @@ environment:
       INSTALLC: 0  # Acts to exclude c and cpp
     - platform: x64
       PYTHON_VERSION: "3.7"
-      YGG_TEST_FLAGS: "--test-suite=types --languages c cpp"
+      YGG_TEST_FLAGS: "--test-suite=types --languages c cpp fortran"
 
 install:
   - "SET PATH=%PYTHON%;%PYTHON%\\Scripts;%PATH%"
