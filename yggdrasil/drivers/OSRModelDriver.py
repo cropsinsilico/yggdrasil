@@ -177,6 +177,7 @@ class OSRModelDriver(ExecutableModelDriver):
                 be set.
 
         """
+        # TODO: Move clone + compile to install
         out = super(OSRModelDriver, cls).configure_executable_type(cfg)
         opt = 'repository'
         desc = 'The full path to the OpenSimRoot repository.'
