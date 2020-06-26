@@ -154,6 +154,17 @@ class OSRModelDriver(ExecutableModelDriver):
         return dst
 
     @classmethod
+    def is_language_installed(cls):
+        r"""Determine if the interpreter/compiler for the associated programming
+        language is installed.
+
+        Returns:
+            bool: True if the language interpreter/compiler is installed.
+
+        """
+        return (cls.repository is not None)
+        
+    @classmethod
     def configure_executable_type(cls, cfg):
         r"""Add configuration options specific in the executable type
         before the libraries are configured.
@@ -179,8 +190,9 @@ class OSRModelDriver(ExecutableModelDriver):
                 logger.info('Could not locate %s, attempting to clone' % fname)
                 try:
                     fpath = os.path.join(tempfile.gettempdir(), fname)
-                    git.Repo.clone_from(cls.repository_url, fpath,
-                                        branch=cls.repository_branch)
+                    if not os.path.isdir(fpath):
+                        git.Repo.clone_from(cls.repository_url, fpath,
+                                            branch=cls.repository_branch)
                     cfg.set(cls.language, opt, fpath)
                 except BaseException as e:  # pragma: debug
                     logger.info('Failed to clone from %s. error = %s'
