@@ -3418,10 +3418,10 @@ class CompiledModelDriver(ModelDriver):
     def get_windows_import_libtype(cls, toolname=None):
         r"""Get the library type that should be used when import library
         requested."""
-        if cls.get_tool('compiler', toolname=toolname).is_gnu:
-            return 'shared'
-        else:
+        if cls.get_tool('compiler', toolname=toolname).toolset == 'msvc':
             return 'static'
+        else:
+            return 'shared'
     
     @classmethod
     def call_compiler(cls, src, language=None, toolname=None, dont_build=None,
