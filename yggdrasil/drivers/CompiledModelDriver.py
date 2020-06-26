@@ -2252,7 +2252,12 @@ class CompiledModelDriver(ModelDriver):
                         raise NotImplementedError("%s not set for language '%s'."
                                                   % (tooltype.title(), cls.language))
                     return default
-                out = getattr(out_tool, tooltype)()
+                try:
+                    out = getattr(out_tool, tooltype)()
+                except BaseException:  # pragma: debug
+                    if default is False:
+                        raise
+                    return default
         # Returns correct property given the tool
         if return_prop == 'tool':
             return out
