@@ -58,7 +58,8 @@ def get_compatible_tool(tool, tooltype, language):
                     return ix
     raise ValueError(("Could not locate %s for %s language "
                       "that is compatible with the %s %s.")
-                     % (tooltype, language, tool.toolname, tooltype))
+                     % (tooltype, language, tool.toolname,
+                        tool.tooltype))
 
 
 def get_compilation_tool_registry(tooltype):
@@ -3073,6 +3074,10 @@ class CompiledModelDriver(ModelDriver):
             if not out:  # pragma: no cover
                 break
             out = cls.is_library_installed(k)
+        for k in ['compiler', 'archiver', 'linker']:
+            if not out:  # pragma: no cover
+                break
+            out = (cls.get_tool(k, default=None) is not None)
         return out
 
     @classmethod

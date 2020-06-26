@@ -919,7 +919,10 @@ class ModelDriver(Driver):
             out = (cls.cfg.get(cls.language, 'commtypes', None) is not None)
         # Check for config keys
         for k in cls._config_keys:
+            if not out:  # pragma: no cover
+                break
             out = (cls.cfg.get(cls.language, k, None) is not None)
+            print(cls.language, k, out)
         return out
 
     @classmethod
