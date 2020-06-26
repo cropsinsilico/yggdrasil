@@ -3079,6 +3079,18 @@ class CompiledModelDriver(ModelDriver):
             if not out:  # pragma: no cover
                 break
             out = cls.is_library_installed(k)
+        return out
+            
+    @classmethod
+    def is_language_installed(cls):
+        r"""Determine if the interpreter/compiler for the associated programming
+        language is installed.
+
+        Returns:
+            bool: True if the language interpreter/compiler is installed.
+
+        """
+        out = super(CompiledModelDriver, cls).is_language_installed()
         for k in ['compiler', 'archiver', 'linker']:
             if not out:  # pragma: no cover
                 break

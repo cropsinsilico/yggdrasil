@@ -922,7 +922,6 @@ class ModelDriver(Driver):
             if not out:  # pragma: no cover
                 break
             out = (cls.cfg.get(cls.language, k, None) is not None)
-            print(cls.language, k, out)
         return out
 
     @classmethod
