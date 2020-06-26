@@ -58,7 +58,8 @@ def get_compatible_tool(tool, tooltype, language):
                     return ix
     raise ValueError(("Could not locate %s for %s language "
                       "that is compatible with the %s %s.")
-                     % (tooltype, language, tool.toolname, tooltype))
+                     % (tooltype, language, tool.toolname,
+                        tool.tooltype))
 
 
 def get_compilation_tool_registry(tooltype):
@@ -2251,7 +2252,12 @@ class CompiledModelDriver(ModelDriver):
                         raise NotImplementedError("%s not set for language '%s'."
                                                   % (tooltype.title(), cls.language))
                     return default
-                out = getattr(out_tool, tooltype)()
+                try:
+                    out = getattr(out_tool, tooltype)()
+                except BaseException:  # pragma: debug
+                    if default is False:
+                        raise
+                    return default
         # Returns correct property given the tool
         if return_prop == 'tool':
             return out
@@ -3074,6 +3080,22 @@ class CompiledModelDriver(ModelDriver):
                 break
             out = cls.is_library_installed(k)
         return out
+            
+    @classmethod
+    def is_language_installed(cls):
+        r"""Determine if the interpreter/compiler for the associated programming
+        language is installed.
+
+        Returns:
+            bool: True if the language interpreter/compiler is installed.
+
+        """
+        out = super(CompiledModelDriver, cls).is_language_installed()
+        for k in ['compiler', 'archiver', 'linker']:
+            if not out:  # pragma: no cover
+                break
+            out = (cls.get_tool(k, default=None) is not None)
+        return out
 
     @classmethod
     def configure_executable_type(cls, cfg):
@@ -3418,10 +3440,10 @@ class CompiledModelDriver(ModelDriver):
     def get_windows_import_libtype(cls, toolname=None):
         r"""Get the library type that should be used when import library
         requested."""
-        if cls.get_tool('compiler', toolname=toolname).is_gnu:
-            return 'shared'
-        else:
+        if cls.get_tool('compiler', toolname=toolname).toolset == 'msvc':
             return 'static'
+        else:
+            return 'shared'
     
     @classmethod
     def call_compiler(cls, src, language=None, toolname=None, dont_build=None,
