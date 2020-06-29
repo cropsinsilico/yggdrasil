@@ -185,7 +185,7 @@ class GCCCompiler(CCompilerBase):
                 out = False  # Disable gcc when it is an alias for clang
         return out
 
-    def dll2a(cls, dll, dst=None, lib=None, overwrite=False):
+    def dll2a(cls, dll, dst=None, overwrite=False):
         r"""Convert a window's .dll library into a static library.
 
         Args:
@@ -194,11 +194,6 @@ class GCCCompiler(CCompilerBase):
                 library should be saved. Defaults to None and will be
                 set based on lib or will be placed in the same directory
                 as dll.
-            lib (str, optional): Full path to location of the windows
-                import library for the provided dll. If provided, the
-                generatic static library will be placed in the same
-                directory as lib, otherwise the directory containing
-                dll will be used.
             overwrite (bool, optional): If True, the static file will
                 be created even if it already exists. Defaults to False.
 
@@ -212,15 +207,16 @@ class GCCCompiler(CCompilerBase):
         if dst is None:
             libbase = base
             if not libbase.startswith('lib'):
-                libbase = 'lib' + base
+                libbase = 'lib' + libbase
             libdir = os.path.dirname(dll)
-            if lib is not None:
-                libdir = os.path.dirname(lib)
-            dst = os.path.join(libdir, libbase + '.a')
+            dst = os.path.join(libdir, libbase + '.dll.a')
         if (not os.path.isfile(dst)) or overwrite:
             gendef = shutil.which("gendef")
             dlltool = shutil.which("dlltool")
-            print(gendef, dlltool)
+            if not (gendef and dlltool):
+                print("Could not locate gendef (%s) and dlltool (%s)."
+                      % (gendef, dlltool))
+                return dll
             subprocess.check_call([gendef, dll])
             subprocess.check_call(
                 [dlltool, '-D', dll, '-d', '%s.def' % base, '-l', dst])
@@ -284,6 +280,7 @@ class MSVCCompiler(CCompilerBase):
                              output_first_library=False,
                              flag_options=OrderedDict(
                                  [('library_libs', ''),
+                                  ('library_libs_nonstd', ''),
                                   ('library_dirs', '/LIBPATH:%s')]),
                              shared_library_flag='/DLL',
                              search_path_envvar='LIB',

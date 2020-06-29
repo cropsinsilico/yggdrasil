@@ -316,7 +316,6 @@ class CompilationToolBase(object):
     compatible_toolsets = []
     is_build_tool = False
     tool_suffix_format = '_%sx'
-
     _language_ext = None  # only update once per class
     
     def __init__(self, **kwargs):
@@ -1516,17 +1515,21 @@ class LinkerBase(CompilationToolBase):
     """
 
     tooltype = 'linker'
-    flag_options = OrderedDict(
-        [('library_libs', {
+    flag_options = OrderedDict([
+        ('library_libs', {
             'key': '-l%s',
             'allow_duplicate_values': True}),
-         ('library_dirs', '-L%s')])
+        ('library_libs_nonstd', {
+            'key': '-l:%s',
+            'allow_duplicate_values': True}),
+        ('library_dirs', '-L%s')])
     shared_library_flag = '-shared'
     library_prefix = 'lib'
     library_ext = None  # depends on the OS
     executable_ext = '.out'
     output_first_library = None
     search_path_env = ['lib']
+    all_library_ext = ['.so', '.a']
 
     @staticmethod
     def before_registration(cls):
@@ -1543,16 +1546,37 @@ class LinkerBase(CompilationToolBase):
             cls.search_path_env += [
                 'DLLs', os.path.join('library', 'bin')]
             if cls.is_gnu:
-                cls.library_ext += '.a'
+                # cls.library_ext += '.a'
                 cls.library_prefix = 'lib'
+            cls.all_library_ext = ['.dll', '.lib', '.dll.a']
         elif platform._is_mac:
             # TODO: Dynamic library by default on windows?
             # cls.shared_library_flag = '-dynamiclib'
             cls.library_ext = '.dylib'
-            # cls.flag_options['library_rpath'] = '-rpath'
         else:
             cls.library_ext = '.so'
-            # cls.flag_options['library_rpath'] = '-Wl,-rpath'
+        if cls.library_ext not in cls.all_library_ext:
+            cls.all_library_ext = cls.all_library_ext + [cls.library_ext]
+
+    @classmethod
+    def is_standard_libname(cls, libname):
+        r"""Determine if the provided file name conforms to the standards
+        expected by this linker.
+
+        Args:
+            libname (str): Library file name to check.
+
+        Returns:
+            bool: True if the name conforms, False otherwise.
+
+        """
+        if cls.toolset == 'msvc':  # pragma: windows
+            return False  # Pass all libraries w/ ext
+        elif platform._is_win:  # pragma: windows
+            if libname.startswith('lib') and libname.endswith(('.lib', '.dll')):
+                return False
+        return (libname.startswith(cls.library_prefix)
+                and libname.endswith(cls.all_library_ext))
 
     @classmethod
     def libpath2libname(cls, libpath):
@@ -1565,24 +1589,26 @@ class LinkerBase(CompilationToolBase):
             str: Library name.
 
         """
-        dont_split = False
-        if platform._is_win:  # pragma: windows
-            # Extension must remain or else the MSVC linker assumes the name
-            # refers to a .obj file
-            if cls.is_gnu:
-                libname = cls.file2base(libpath)
-                if libname.startswith('lib') and libpath.endswith('.lib'):
-                    dont_split = True
-            else:
-                libname = os.path.basename(libpath)
-                if libname.endswith('.dll'):  # Link using import library
-                    libname = libname.replace('.dll', '.lib')
-        else:
-            libname = cls.file2base(libpath)
-        if ((cls.library_prefix and (not dont_split)
-             and libname.startswith(cls.library_prefix))):
-            libname = libname.split(cls.library_prefix, 1)[-1]
-        return libname
+        return cls.file2base(libpath).split(cls.library_prefix, 1)[-1]
+        
+        # dont_split = False
+        # if platform._is_win:  # pragma: windows
+        #     # Extension must remain or else the MSVC linker assumes the name
+        #     # refers to a .obj file
+        #     if cls.toolset == 'gnu':
+        #         libname = cls.file2base(libpath)
+        #         if libname.startswith('lib') and libpath.endswith('.lib'):
+        #             dont_split = True
+        #     else:
+        #         libname = os.path.basename(libpath)
+        #         if libname.endswith('.dll'):  # Link using import library
+        #             libname = libname.replace('.dll', '.lib')
+        # else:
+        #     libname = cls.file2base(libpath)
+        # if ((cls.library_prefix and (not dont_split)
+        #      and libname.startswith(cls.library_prefix))):
+        #     libname = libname.split(cls.library_prefix, 1)[-1]
+        # return libname
 
     @classmethod
     def extract_kwargs(cls, kwargs, compiler=None, add_kws_link=[],
@@ -1610,7 +1636,8 @@ class LinkerBase(CompilationToolBase):
         """
         kws_link = ['build_library', 'skip_library_libs', 'use_library_path',
                     '%s_flags' % cls.tooltype, '%s_language' % cls.tooltype,
-                    'libraries', 'library_dirs', 'library_libs', 'library_flags']
+                    'libraries', 'library_dirs', 'library_libs',
+                    'library_libs_nonstd', 'library_flags']
         kws_both = ['overwrite', 'products', 'allow_error', 'dry_run',
                     'working_dir', 'env']
         kws_link += add_kws_link
@@ -1649,6 +1676,9 @@ class LinkerBase(CompilationToolBase):
                 for libraries. Defaults to an empty list.
             library_libs (list, optional): Names of libraries that should be
                 linked against. Defaults to an empty list.
+            library_libs_nonstd (list, optional): Names of libraries
+                w/ non-standard naming conventions that should be linked
+                against. Defaults to an empty list.
             library_flags (list, optional): Existing list that library flags
                 should be appended to instead of the returned flags if
                 skip_library_libs is True. Defaults to [].
@@ -1679,6 +1709,7 @@ class LinkerBase(CompilationToolBase):
         libraries = kwargs.pop('libraries', [])
         library_dirs = kwargs.pop('library_dirs', [])
         library_libs = kwargs.pop('library_libs', [])
+        library_libs_nonstd = kwargs.pop('library_libs_nonstd', [])
         library_rpath = kwargs.pop('library_rpath', [])
         library_flags = kwargs.pop('library_flags', [])
         flags = copy.deepcopy(kwargs.pop('flags', []))
@@ -1701,23 +1732,34 @@ class LinkerBase(CompilationToolBase):
                 x_d, x_f = os.path.split(x)
                 if x_d and (x_d not in library_dirs):
                     library_dirs.append(x_d)
-                x_l = cls.libpath2libname(x_f)
-                library_libs.append(x_l)
+                if cls.is_standard_libname(x_f):
+                    library_libs.append(cls.libpath2libname(x_f))
+                else:
+                    library_libs_nonstd.append(x_f)
                 if (((cls.tooltype == 'linker') and x_f.endswith(cls.library_ext)
                      and ('library_rpath' in cls.flag_options))):
                     if x_d not in library_rpath:
                         library_rpath.append(x_d)
         # Add libraries to library_flags instead of flags so they can be
         # used elsewhere
-        if skip_library_libs and library_libs:
-            cls.append_flags(library_flags, cls.flag_options['library_libs'],
-                             library_libs)
-            library_libs = []
+        if skip_library_libs:
+            if library_libs:
+                cls.append_flags(library_flags,
+                                 cls.flag_options['library_libs'],
+                                 library_libs)
+                library_libs = []
+            if library_libs_nonstd:
+                cls.append_flags(library_flags,
+                                 cls.flag_options['library_libs_nonstd'],
+                                 library_libs_nonstd)
+                library_libs_nonstd = []
         # Call parent class
         if library_dirs:
             kwargs['library_dirs'] = library_dirs
         if library_libs:
             kwargs['library_libs'] = library_libs
+        if library_libs_nonstd:
+            kwargs['library_libs_nonstd'] = library_libs_nonstd
         if library_rpath:
             kwargs['library_rpath'] = library_rpath
         out = super(LinkerBase, cls).get_flags(flags=flags, **kwargs)
