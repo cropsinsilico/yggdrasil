@@ -218,7 +218,7 @@ class GCCCompiler(CCompilerBase):
                 libdir = os.path.dirname(lib)
             dst = os.path.join(libdir, libbase + '.a')
         if (not os.path.isfile(dst)) or overwrite:
-            gendef = shutil.shich("gendef")
+            gendef = shutil.which("gendef")
             dlltool = shutil.which("dlltool")
             print(gendef, dlltool)
             subprocess.check_call([gendef, dll])
