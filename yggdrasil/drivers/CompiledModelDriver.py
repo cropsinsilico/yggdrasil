@@ -2557,6 +2557,15 @@ class CompiledModelDriver(ModelDriver):
                                       "dependency '%s', but one or more "
                                       "libraries of types %s were found.")
                                      % (libtype, dep, libtype_found))
+            if platform._is_win and out.endswith('.lib'):  # pragma: windows
+                if tool is None:
+                    tool = cls.get_tool('compiler', language=dep_lang,
+                                        toolname=toolname)
+                if tool.is_gnu:
+                    dll = cls.get_dependency_library(dep, libtype='shared',
+                                                     commtype=commtype,
+                                                     toolname=toolname)
+                    out = tool.dll2a(dll, lib=out)
         elif libclass == 'internal':
             src = cls.get_dependency_source(dep, toolname=toolname)
             suffix = cls.get_internal_suffix(commtype=commtype)
@@ -2575,15 +2584,6 @@ class CompiledModelDriver(ModelDriver):
                                  "dependency '%s'" % dep)
             else:
                 out = default
-        if platform._is_win and out.endswith('.lib'):  # pragma: windows
-            if tool is None:
-                tool = cls.get_tool('compiler', language=dep_lang,
-                                    toolname=toolname)
-            if tool.is_gnu:
-                dll = cls.get_dependency_library(dep, libtype='shared',
-                                                 commtype=commtype,
-                                                 toolname=toolname)
-                out = tool.dll2a(dll, lib=out)
         return out
 
     @classmethod
