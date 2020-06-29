@@ -218,11 +218,9 @@ class GCCCompiler(CCompilerBase):
                 libdir = os.path.dirname(lib)
             dst = os.path.join(libdir, libbase + '.a')
         if (not os.path.isfile(dst)) or overwrite:
-            subprocess.check_call(' '.join(['gendef.exe', dll]),
-                                  shell=True)
-            subprocess.check_call(
-                ' '.join(['dlltool.exe', '-D', dll, '-d', '%s.def' % base,
-                          '-l', dst]), shell=True)
+            subprocess.check_call('gendef.exe %s' % dll, shell=True)
+            subprocess.check_call(('dlltool.exe -D %s -d %s.def -l %s'
+                                   % (dll, base, dst)), shell=True)
         assert(os.path.isfile(dst))
         return dst
 
