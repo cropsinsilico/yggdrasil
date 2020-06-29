@@ -185,6 +185,46 @@ class GCCCompiler(CCompilerBase):
                 out = False  # Disable gcc when it is an alias for clang
         return out
 
+    def dll2a(cls, dll, dst=None, lib=None, overwrite=False):
+        r"""Convert a window's .dll library into a static library.
+
+        Args:
+            dll (str): Full path to .dll library to convert.
+            dst (str, optional): Full path to location where the new
+                library should be saved. Defaults to None and will be
+                set based on lib or will be placed in the same directory
+                as dll.
+            lib (str, optional): Full path to location of the windows
+                import library for the provided dll. If provided, the
+                generatic static library will be placed in the same
+                directory as lib, otherwise the directory containing
+                dll will be used.
+            overwrite (bool, optional): If True, the static file will
+                be created even if it already exists. Defaults to False.
+
+        Returns:
+            str: Full path to new .a static library.
+
+        """
+        # https://sourceforge.net/p/mingw-w64/wiki2/
+        # Answer%20generation%20of%20DLL%20import%20library/
+        base = os.path.splitext(os.path.basename(dll))[0]
+        if dst is None:
+            libbase = base
+            if not libbase.startswith('lib'):
+                libbase = 'lib' + base
+            libdir = os.path.dirname(dll)
+            if lib is not None:
+                libdir = os.path.dirname(lib)
+            dst = os.path.join(libdir, libbase + '.a')
+        if (not os.path.isfile(dst)) or overwrite:
+            cmds = [['gendef', dll],
+                    ['dlltool', '-D', dll, '-d', '%s.def' % base, '-l', dst]]
+            for cmd in cmds:
+                subprocess.check_call(cmd)
+        assert(os.path.isfile(dst))
+        return dst
+
 
 class ClangCompiler(CCompilerBase):
     r"""Interface class for clang compiler/linker."""

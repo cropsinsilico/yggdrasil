@@ -2537,6 +2537,7 @@ class CompiledModelDriver(ModelDriver):
             raise ValueError("libtype must be one of %s" % libtype_list)
         # Determine output
         out = None
+        tool = None
         if libclass == 'external':
             dep_lang = libinfo.get('language', cls.language)
             if libtype in libinfo:
@@ -2574,6 +2575,15 @@ class CompiledModelDriver(ModelDriver):
                                  "dependency '%s'" % dep)
             else:
                 out = default
+        if platform._is_win and out.endswith('.lib'):  # pragma: windows
+            if tool is None:
+                tool = cls.get_tool('compiler', language=dep_lang,
+                                    toolname=toolname)
+            if tool.is_gnu:
+                dll = cls.get_dependency_library(dep, libtype='shared',
+                                                 commtype=commtype,
+                                                 toolname=toolname)
+                out = tool.dll2a(dll, lib=out)
         return out
 
     @classmethod
