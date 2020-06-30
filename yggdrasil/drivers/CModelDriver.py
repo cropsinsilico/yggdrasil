@@ -356,7 +356,8 @@ class ClangLinker(LDLinker):
     search_regex_begin = 'Library search paths:'
     flag_options = OrderedDict(LDLinker.flag_options,
                                **{'linker-version': '-mlinker-version=%s',
-                                  'library_rpath': '-rpath'})
+                                  'library_rpath': '-rpath',
+                                  'library_libs_nonstd': ''})
 
     @staticmethod
     def before_registration(cls):

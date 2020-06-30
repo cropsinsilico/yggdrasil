@@ -474,7 +474,10 @@ class CompilationToolBase(object):
             str: File name without extension.
 
         """
-        return os.path.splitext(os.path.basename(fname))[0]
+        out = os.path.splitext(os.path.basename(fname))[0]
+        if out.endswith('.dll'):
+            out = os.path.splitext(out)[0]
+        return out
 
     @classmethod
     def append_flags(cls, out, key, value, **kwargs):
