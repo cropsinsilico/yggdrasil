@@ -2598,10 +2598,18 @@ class CompiledModelDriver(ModelDriver):
             dep_lang = cls.get_dependency_info(dep, toolname=toolname).get(
                 'language', cls.language)
             tool = cls.get_tool('compiler', language=dep_lang, toolname=toolname)
+            import_lib = False
+            if (((libinfo.get('libtype', None) == 'windows_import')
+                 and (libtype == 'static'))):
+                # Name import lib using dll
+                import_lib = True
+                libtype = 'shared'
             out = tool.get_output_file(dep, libtype=libtype, no_src_ext=True,
                                        build_library=True,
                                        suffix=suffix,
                                        working_dir=os.path.dirname(src))
+            if import_lib:
+                out = os.path.splitext(out)[0] + '.lib'
         elif os.path.isfile(dep):
             out = dep
         if out is None:
