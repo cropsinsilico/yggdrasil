@@ -1546,7 +1546,6 @@ class LinkerBase(CompilationToolBase):
             cls.search_path_env += [
                 'DLLs', os.path.join('library', 'bin')]
             if cls.is_gnu:
-                # cls.library_ext += '.a'
                 cls.library_prefix = 'lib'
             cls.all_library_ext = ['.dll', '.lib', '.dll.a']
         elif platform._is_mac:
@@ -1589,26 +1588,10 @@ class LinkerBase(CompilationToolBase):
             str: Library name.
 
         """
-        return cls.file2base(libpath).split(cls.library_prefix, 1)[-1]
-        
-        # dont_split = False
-        # if platform._is_win:  # pragma: windows
-        #     # Extension must remain or else the MSVC linker assumes the name
-        #     # refers to a .obj file
-        #     if cls.toolset == 'gnu':
-        #         libname = cls.file2base(libpath)
-        #         if libname.startswith('lib') and libpath.endswith('.lib'):
-        #             dont_split = True
-        #     else:
-        #         libname = os.path.basename(libpath)
-        #         if libname.endswith('.dll'):  # Link using import library
-        #             libname = libname.replace('.dll', '.lib')
-        # else:
-        #     libname = cls.file2base(libpath)
-        # if ((cls.library_prefix and (not dont_split)
-        #      and libname.startswith(cls.library_prefix))):
-        #     libname = libname.split(cls.library_prefix, 1)[-1]
-        # return libname
+        out = cls.file2base(libpath)
+        if cls.library_prefix:
+            out = out.split(cls.library_prefix, 1)[-1]
+        return out
 
     @classmethod
     def extract_kwargs(cls, kwargs, compiler=None, add_kws_link=[],
@@ -2599,6 +2582,7 @@ class CompiledModelDriver(ModelDriver):
                                       "dependency '%s', but one or more "
                                       "libraries of types %s were found.")
                                      % (libtype, dep, libtype_found))
+            # TODO: CLEANUP
             if platform._is_win and out.endswith('.lib'):  # pragma: windows
                 if tool is None:
                     tool = cls.get_tool('compiler', language=dep_lang,
@@ -2607,8 +2591,6 @@ class CompiledModelDriver(ModelDriver):
                     dll = cls.get_dependency_library(dep, libtype='shared',
                                                      commtype=commtype,
                                                      toolname=toolname)
-                    from yggdrasil.drivers.CModelDriver import MSVCArchiver
-                    print(out, MSVCArchiver.is_import_lib(out))
                     out = tool.dll2a(dll)
         elif libclass == 'internal':
             src = cls.get_dependency_source(dep, toolname=toolname)

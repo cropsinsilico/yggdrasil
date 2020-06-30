@@ -445,8 +445,8 @@ class MSVCArchiver(ArchiverBase):
             return False
         out = subprocess.check_output([cls.get_executable(full_path=True),
                                        '/list', libpath])
-        if out:
-            print(out)
+        files = set(out.splitlines())
+        if any([f.endswith('.obj') for f in files]):
             return False
         return True
 
