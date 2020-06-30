@@ -2555,7 +2555,7 @@ class CompiledModelDriver(ModelDriver):
             return ''
         # Do substitution when windows_import specified
         if libtype == 'windows_import':
-            libtype = cls.get_windows_import_libtype(toolname)
+            libtype = 'static'
         # Check that libtype is valid
         libtype_list = ['static', 'shared']
         if libtype not in libtype_list:
@@ -3473,16 +3473,6 @@ class CompiledModelDriver(ModelDriver):
         return _system_suffix
 
     @classmethod
-    def get_windows_import_libtype(cls, toolname=None):
-        r"""Get the library type that should be used when import library
-        requested."""
-        # if cls.get_tool('compiler', toolname=toolname).toolset == 'msvc':
-        #     return 'static'
-        # else:
-        #     return 'shared'
-        return 'static'
-    
-    @classmethod
     def call_compiler(cls, src, language=None, toolname=None, dont_build=None,
                       **kwargs):
         r"""Compile a source file into an executable or linkable object file,
@@ -3553,7 +3543,8 @@ class CompiledModelDriver(ModelDriver):
             kwargs.setdefault('for_api', True)
             kwargs.setdefault('libtype', _default_libtype)
             if kwargs['libtype'] == 'windows_import':
-                kwargs['libtype'] = cls.get_windows_import_libtype(toolname)
+                # Compile dynamic library
+                kwargs['libtype'] = 'shared'
             if kwargs['libtype'] == 'header_only':
                 return src
             elif kwargs['libtype'] in ['static', 'shared']:

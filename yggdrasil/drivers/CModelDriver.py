@@ -732,6 +732,7 @@ class CModelDriver(CompiledModelDriver):
             for x in ['zmq', 'czmq', 'python']:
                 if x in cls.external_libraries:
                     cls.external_libraries[x]['libtype'] = 'windows_import'
+            cls.internal_libraries['python_wrapper'] = 'windows_import'
         # Platform specific regex internal library
         if platform._is_win:  # pragma: windows
             regex_lib = cls.internal_libraries['regex_win32']
