@@ -1575,7 +1575,7 @@ class LinkerBase(CompilationToolBase):
             if libname.startswith('lib') and libname.endswith(('.lib', '.dll')):
                 return False
         return (libname.startswith(cls.library_prefix)
-                and libname.endswith(cls.all_library_ext))
+                and libname.endswith(tuple(cls.all_library_ext)))
 
     @classmethod
     def libpath2libname(cls, libpath):
