@@ -1,5 +1,7 @@
+.. _conditional_io_rst:
+
 conditional_io Example
-======================
+===============================================
 
 C Version
 ---------
@@ -48,6 +50,32 @@ Model Code:
 Model YAML:
 
 .. literalinclude:: /../../yggdrasil/examples/conditional_io/conditional_io_cpp.yml
+   :language: yaml
+   :linenos:
+
+
+
+Fortran Version
+---------------
+
+Model Code:
+
+.. literalinclude:: /../../yggdrasil/examples/conditional_io/src/conditional_io_modelA.f90
+   :language: python
+   :linenos:
+
+.. literalinclude:: /../../yggdrasil/examples/conditional_io/src/conditional_io_modelB1.f90
+   :language: python
+   :linenos:
+
+.. literalinclude:: /../../yggdrasil/examples/conditional_io/src/conditional_io_modelB2.f90
+   :language: python
+   :linenos:
+
+
+Model YAML:
+
+.. literalinclude:: /../../yggdrasil/examples/conditional_io/conditional_io_fortran.yml
    :language: yaml
    :linenos:
 

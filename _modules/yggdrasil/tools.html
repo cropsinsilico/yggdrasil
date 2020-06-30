@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>yggdrasil.tools &mdash; yggdrasil 1.0.0+154.g684a530e.dirty documentation</title>
+  <title>yggdrasil.tools &mdash; yggdrasil 1.1.1+126.ga2f33bac.dirty documentation</title>
   
 
   
@@ -59,7 +59,7 @@
             
             
               <div class="version">
-                1.0.0
+                1.1.1
               </div>
             
           
@@ -94,6 +94,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../../autowrap.html#notes-on-autowrapping-c-c-model-functions">Notes on Autowrapping C/C++ Model Functions</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../conditional_io.html">Conditional I/O</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../transformed_io.html">Transformed I/O</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../timesync_io.html">Timestep Synchronization</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../yaml.html">YAML Files</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../config.html">Configuration Files</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../units.html">Units</a></li>
@@ -176,7 +177,10 @@
 <span class="kn">import</span> <span class="nn">os</span>
 <span class="kn">import</span> <span class="nn">sys</span>
 <span class="kn">import</span> <span class="nn">sysconfig</span>
-<span class="kn">import</span> <span class="nn">distutils</span>
+<span class="k">try</span><span class="p">:</span>
+    <span class="kn">from</span> <span class="nn">distutils</span> <span class="k">import</span> <span class="n">sysconfig</span> <span class="k">as</span> <span class="n">distutils_sysconfig</span>
+<span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>  <span class="c1"># pragma: debug</span>
+    <span class="n">distutils_sysconfig</span> <span class="o">=</span> <span class="kc">None</span>
 <span class="kn">import</span> <span class="nn">warnings</span>
 <span class="kn">import</span> <span class="nn">copy</span>
 <span class="kn">import</span> <span class="nn">shutil</span>
@@ -365,7 +369,7 @@
             <span class="n">libtype</span> <span class="o">=</span> <span class="s1">&#39;shared&#39;</span>
         <span class="n">libtype2key</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;shared&#39;</span><span class="p">:</span> <span class="s1">&#39;LDLIBRARY&#39;</span><span class="p">,</span> <span class="s1">&#39;static&#39;</span><span class="p">:</span> <span class="s1">&#39;LIBRARY&#39;</span><span class="p">}</span>
         <span class="n">base</span> <span class="o">=</span> <span class="n">cvars</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">libtype2key</span><span class="p">[</span><span class="n">libtype</span><span class="p">],</span> <span class="kc">None</span><span class="p">)</span>
-        <span class="k">if</span> <span class="n">platform</span><span class="o">.</span><span class="n">_is_mac</span> <span class="ow">and</span> <span class="n">base</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s1">&#39;/Python&#39;</span><span class="p">):</span>  <span class="c1"># pragma: osx</span>
+        <span class="k">if</span> <span class="n">platform</span><span class="o">.</span><span class="n">_is_mac</span> <span class="ow">and</span> <span class="n">base</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s1">&#39;/Python&#39;</span><span class="p">):</span>  <span class="c1"># pragma: no cover</span>
             <span class="n">base</span> <span class="o">=</span> <span class="s1">&#39;libpython</span><span class="si">%s</span><span class="s1">.dylib&#39;</span> <span class="o">%</span> <span class="n">cvars</span><span class="p">[</span><span class="s1">&#39;py_version_short&#39;</span><span class="p">]</span>
     <span class="k">if</span> <span class="n">base</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>  <span class="c1"># pragma: debug</span>
         <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">((</span><span class="s2">&quot;Could not determine base name for the Python &quot;</span>
@@ -388,8 +392,9 @@
     <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;stdlib&#39;</span><span class="p">,</span> <span class="s1">&#39;purelib&#39;</span><span class="p">,</span> <span class="s1">&#39;platlib&#39;</span><span class="p">,</span> <span class="s1">&#39;platstdlib&#39;</span><span class="p">,</span> <span class="s1">&#39;data&#39;</span><span class="p">]:</span>
         <span class="n">dir_try</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">paths</span><span class="p">[</span><span class="n">k</span><span class="p">])</span>
     <span class="n">dir_try</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">paths</span><span class="p">[</span><span class="s1">&#39;data&#39;</span><span class="p">],</span> <span class="s1">&#39;lib&#39;</span><span class="p">))</span>
-    <span class="n">dir_try</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span>
-        <span class="n">distutils</span><span class="o">.</span><span class="n">sysconfig</span><span class="o">.</span><span class="n">get_python_lib</span><span class="p">(</span><span class="kc">True</span><span class="p">,</span> <span class="kc">True</span><span class="p">)))</span>
+    <span class="k">if</span> <span class="n">distutils_sysconfig</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">dir_try</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span>
+            <span class="n">distutils_sysconfig</span><span class="o">.</span><span class="n">get_python_lib</span><span class="p">(</span><span class="kc">True</span><span class="p">,</span> <span class="kc">True</span><span class="p">)))</span>
     <span class="n">dir_try</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">dir_try</span><span class="p">)</span>
     <span class="k">for</span> <span class="n">idir</span> <span class="ow">in</span> <span class="n">dir_try</span><span class="p">:</span>
         <span class="n">x</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">idir</span><span class="p">,</span> <span class="n">base</span><span class="p">)</span>
@@ -405,12 +410,48 @@
                           <span class="n">pprint</span><span class="o">.</span><span class="n">pformat</span><span class="p">(</span><span class="n">cvars</span><span class="p">)))</span>  <span class="c1"># pragma: debug</span>
 
 
+<span class="k">def</span> <span class="nf">get_env_prefixes</span><span class="p">():</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Determine the environment path prefix (virtualenv or conda) for</span>
+<span class="sd">    the current environment.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        list: Full path to the directory prefixes used for the current</span>
+<span class="sd">            environments if one (or more) exists. If neither a</span>
+<span class="sd">            virtualenv or conda prefix can be located, None is returned.</span>
+
+<span class="sd">    Raises:</span>
+<span class="sd">        RuntimeError: If both virtualenv and conda environments are</span>
+<span class="sd">            located.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">out</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">venv</span> <span class="o">=</span> <span class="n">get_venv_prefix</span><span class="p">()</span>
+    <span class="n">cenv</span> <span class="o">=</span> <span class="n">get_conda_prefix</span><span class="p">()</span>
+    <span class="k">if</span> <span class="n">venv</span><span class="p">:</span>
+        <span class="n">out</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">venv</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">cenv</span><span class="p">:</span>
+        <span class="n">out</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">cenv</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">out</span>
+
+
+<span class="k">def</span> <span class="nf">get_venv_prefix</span><span class="p">():</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Determine the virtualenv path prefix for the current environment.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        str: Full path to the directory prefix used for the current</span>
+<span class="sd">            virtualenv environment if one exists. If virtualenv cannot</span>
+<span class="sd">            be located, None is returned.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;VIRTUAL_ENV&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+
+
 <span class="k">def</span> <span class="nf">get_conda_prefix</span><span class="p">():</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Determine the conda path prefix for the current environment.</span>
 
 <span class="sd">    Returns:</span>
 <span class="sd">        str: Full path to the directory prefix used for the current conda</span>
-<span class="sd">            environment if one exits. If conda cannot be located, None is</span>
+<span class="sd">            environment if one exists. If conda cannot be located, None is</span>
 <span class="sd">            returned.</span>
 
 <span class="sd">    &quot;&quot;&quot;</span>
@@ -471,7 +512,7 @@
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Things to do at exit.&quot;&quot;&quot;</span>
     <span class="n">check_locks</span><span class="p">()</span>
     <span class="n">check_threads</span><span class="p">()</span>
-    <span class="c1"># This causes a segfault in a C dependency</span>
+    <span class="c1"># # This causes a segfault in a C dependency</span>
     <span class="c1"># if not is_subprocess():</span>
     <span class="c1">#     check_sockets()</span>
     <span class="c1"># Python 3.4 no longer supported if using pip 9.0.0, but this</span>

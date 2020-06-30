@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Installation &mdash; yggdrasil 1.0.0+154.g684a530e.dirty documentation</title>
+  <title>Installation &mdash; yggdrasil 1.1.1+410.g95af39b2 documentation</title>
   
 
   
@@ -61,7 +61,7 @@
             
             
               <div class="version">
-                1.0.0
+                1.1.1
               </div>
             
           
@@ -95,7 +95,16 @@
 <li class="toctree-l2"><a class="reference internal" href="#user-defined-rapidjson">User Defined rapidjson</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#additional-steps-on-windows">Additional Steps on Windows</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#additional-steps-for-matlab-models">Additional Steps for Matlab Models</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#additional-steps-for-r-models">Additional Steps for R Models</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#additional-steps-for-r-models">Additional Steps for R Models</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#r-interpreter">R Interpreter</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#mac">Mac</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#linux">Linux</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#windows">Windows</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#r-dependencies">R Dependencies</a></li>
+</ul>
+</li>
 <li class="toctree-l2"><a class="reference internal" href="#additional-steps-for-rabbitmq-message-passing">Additional Steps for RabbitMQ Message Passing</a></li>
 </ul>
 </li>
@@ -106,6 +115,7 @@
 <li class="toctree-l1"><a class="reference internal" href="autowrap.html#notes-on-autowrapping-c-c-model-functions">Notes on Autowrapping C/C++ Model Functions</a></li>
 <li class="toctree-l1"><a class="reference internal" href="conditional_io.html">Conditional I/O</a></li>
 <li class="toctree-l1"><a class="reference internal" href="transformed_io.html">Transformed I/O</a></li>
+<li class="toctree-l1"><a class="reference internal" href="timesync_io.html">Timestep Synchronization</a></li>
 <li class="toctree-l1"><a class="reference internal" href="yaml.html">YAML Files</a></li>
 <li class="toctree-l1"><a class="reference internal" href="config.html">Configuration Files</a></li>
 <li class="toctree-l1"><a class="reference internal" href="units.html">Units</a></li>
@@ -200,11 +210,7 @@
 </div>
 <div class="section" id="conda-installation-recommended">
 <h2>Conda Installation (recommended)<a class="headerlink" href="#conda-installation-recommended" title="Permalink to this headline">¶</a></h2>
-<p>Download and install Miniconda (or Anaconda) from
-<a class="reference external" href="https://www.anaconda.com/download/">here</a>.
-There are conda distributions available for yggdrasil from
-<a class="reference external" href="https://github.com/conda-forge/yggdrasil-feedstock">conda-forge</a>.
-You can install yggdrasil from conda-forge by calling:</p>
+<p>Download and install Miniconda from <a class="reference external" href="https://docs.conda.io/en/latest/miniconda.html">here</a> (or Anaconda from <a class="reference external" href="https://www.anaconda.com/download/">here</a> if you would like additional Python libraries installed by default). There are conda distributions available for yggdrasil from <a class="reference external" href="https://github.com/conda-forge/yggdrasil-feedstock">conda-forge</a>. You can install yggdrasil from conda-forge by calling:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ conda install -c conda-forge yggdrasil
 </pre></div>
 </div>
@@ -228,6 +234,18 @@ the terminal (or Anaconda Prompt on Windows).:</p>
 </pre></div>
 </div>
 <p>Then run <code class="docutils literal notranslate"><span class="pre">yggconfig</span></code> to finish the installation process for C and C++.</p>
+</div>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>If conda takes a very long time to install yggdrasil (&gt;5 min spent solving the environment) or fails with an error about conflicts and you are using a version of conda older than 4.7.2, try either updating conda and/or adding the conda-forge channel (if you havn’t already):</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">conda</span> <span class="n">config</span> <span class="o">--</span><span class="n">add</span> <span class="n">channels</span> <span class="n">conda</span><span class="o">-</span><span class="n">forge</span>
+</pre></div>
+</div>
+<p>and setting the channel priority to strict:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">conda</span> <span class="n">config</span> <span class="o">--</span><span class="nb">set</span> <span class="n">channel_priority</span> <span class="n">strict</span>
+</pre></div>
+</div>
+<p>See discussion <a class="reference external" href="https://github.com/conda/conda/issues/7690">here</a> for additional ideas on why conda might be hanging.</p>
 </div>
 </div>
 <div class="section" id="development-installation">
@@ -355,12 +373,7 @@ package, you can re-configure yggdrasil by calling <code class="docutils literal
 line.</p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
-<p>The version of Matlab that you are using will determine the versions of
-Python that you can use with yggdrasil. The chart below shows the
-versions of Python that are compatible with several versions of Matlab.
-If you are using an incompatible version, the instructions above for manually
-installing the Matlab engine as a Python package will fail with an error
-message indicating which versions of Python you can use.</p>
+<p>The version of Matlab that you are using will determine the versions of Python that you can use with yggdrasil. The chart below shows the versions of Python that are compatible with several versions of Matlab. If you are using an incompatible version, the instructions above for manually installing the Matlab engine as a Python package will fail with an error message indicating which versions of Python you can use.</p>
 </div>
 <table class="docutils align-default">
 <colgroup>
@@ -384,11 +397,44 @@ message indicating which versions of Python you can use.</p>
 </tr>
 </tbody>
 </table>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>yggdrasil cannot currently run Matlab models if Matlab is installed via a Citrix environment as yggdrasil needs command line access to the Matlab executable and access to the environment in which Matlab models are run.</p>
+</div>
 </div>
 <div class="section" id="additional-steps-for-r-models">
-<h2>Additional Steps for R Models<a class="headerlink" href="#additional-steps-for-r-models" title="Permalink to this headline">¶</a></h2>
+<span id="install-r-rst"></span><h2>Additional Steps for R Models<a class="headerlink" href="#additional-steps-for-r-models" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="r-interpreter">
+<h3>R Interpreter<a class="headerlink" href="#r-interpreter" title="Permalink to this headline">¶</a></h3>
 <p>To run R models, you will need to install the
-<a class="reference external" href="https://www.r-project.org/">R interpreter</a>. If you installed yggdrasil using conda, this will be installed for you, but if you are not using conda, you will need to install this yourself.</p>
+<a class="reference external" href="https://www.r-project.org/">R interpreter</a> (we recommend R &gt;= 3.5). If you installed yggdrasil using conda, this will be installed for you, but if you are not using conda, you will need to install R yourself along with the <a class="reference external" href="https://www.unidata.ucar.edu/software/udunits/">udunits</a> package.</p>
+<div class="section" id="mac">
+<h4>Mac<a class="headerlink" href="#mac" title="Permalink to this headline">¶</a></h4>
+<p>On Mac, this can be done via Homebrew:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ brew install r
+$ brew install udunits
+</pre></div>
+</div>
+</div>
+<div class="section" id="linux">
+<h4>Linux<a class="headerlink" href="#linux" title="Permalink to this headline">¶</a></h4>
+<p>On Linux this can be done via apt. Installing R &gt;= 3.5 (recommended) requires first adding a source entry and key for your OS as shown below for for Xenial distribution of Ubuntu (Details on <a class="reference external" href="https://cloud.r-project.org/bin/linux/ubuntu/README.html">ubuntu</a>, <a class="reference external" href="https://cloud.r-project.org/bin/linux/debian/">debian</a>, <a class="reference external" href="https://cloud.r-project.org/bin/linux/redhat/README">redhat</a> installation):</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ sudo add-apt-repository &#39;deb https://cloud.r-project.org/bin/linux/ubuntu xenial-cran35/&#39;
+$ sudo apt-key adv --keyserver keyserver.ubuntu.com --recv-keys E298A3A825C0D65DFD57CBB651716619E084DAB9
+$ sudo apt update
+$ sudo apt-get install r-base r-base-dev
+$ sudo apt-get install libudunits2-dev
+</pre></div>
+</div>
+<p>If you don’t want the latest version, you can install the default using the last two lines on Ubuntu and Debian.</p>
+</div>
+<div class="section" id="windows">
+<h4>Windows<a class="headerlink" href="#windows" title="Permalink to this headline">¶</a></h4>
+<p>On Windows, you will need to download and run the installer. Links to the R 3.6 installer and additoinal information about the installation process on Windows can be found <a class="reference external" href="https://cran.r-project.org/bin/windows/base/">here</a>.</p>
+</div>
+</div>
+<div class="section" id="r-dependencies">
+<h3>R Dependencies<a class="headerlink" href="#r-dependencies" title="Permalink to this headline">¶</a></h3>
 <p>Even if you install the R interpreter yourself, yggdrasil will attempt to install the R dependencies it needs via <a class="reference external" href="https://cran.r-project.org/">CRAN</a> when it is installed. If this fails, you may need to install these yourself from within the R interpreter. yggdrasil’s R dependencies include <a class="reference external" href="https://blog.rstudio.com/2018/03/26/reticulate-r-interface-to-python/">reticulate</a> for calling Python from R, <a class="reference external" href="https://cran.r-project.org/web/packages/zeallot/index.html">zeallot</a> for allowing assignment of output to multiple variables, <a class="reference external" href="https://cran.r-project.org/web/packages/units/index.html">units</a> for tracking physical units in R, <a class="reference external" href="https://cran.r-project.org/web/packages/bit64/index.html">bit64</a> for 64bit integers, and <a class="reference external" href="https://cran.r-project.org/web/packages/R6/index.html">R6</a> for creating interface classes with teardown methods.</p>
 <p>These packages can by installed from CRAN from the R interpreter.:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">&gt;</span> <span class="n">install</span><span class="o">.</span><span class="n">packages</span><span class="p">(</span><span class="s2">&quot;reticulate&quot;</span><span class="p">)</span>
@@ -400,9 +446,20 @@ message indicating which versions of Python you can use.</p>
 </div>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
-<p>If you have issues installing R packages on MacOS, check to make sure that <code class="docutils literal notranslate"><span class="pre">which</span> <span class="pre">ar</span></code> returns
-the system default (<code class="docutils literal notranslate"><span class="pre">/usr/bin/ar</span></code>). If you have another version of <code class="docutils literal notranslate"><span class="pre">ar</span></code>
-installed (e.g. through homebrew’s binutils), it may cause conflicts.</p>
+<p>[MAC ONLY] If you have compilation issues when installing R packages on MacOS, check to make sure that <code class="docutils literal notranslate"><span class="pre">which</span> <span class="pre">ar</span></code> returns the system default (<code class="docutils literal notranslate"><span class="pre">/usr/bin/ar</span></code>). If you have another version of <code class="docutils literal notranslate"><span class="pre">ar</span></code> installed (e.g. through homebrew’s binutils), it may cause conflicts.</p>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>[MAC ONLY] If <code class="docutils literal notranslate"><span class="pre">install.packages(&quot;units&quot;)</span></code> fails with messages about the <code class="docutils literal notranslate"><span class="pre">udunits</span></code> library being missing and you installed <code class="docutils literal notranslate"><span class="pre">udunits</span></code> using homebrew as described above, then you can install the R <code class="docutils literal notranslate"><span class="pre">units</span></code> and point to the library by running:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">&gt;</span> <span class="n">install</span><span class="o">.</span><span class="n">packages</span><span class="p">(</span><span class="s2">&quot;units&quot;</span><span class="p">,</span> <span class="n">configure</span><span class="o">.</span><span class="n">args</span> <span class="o">=</span> <span class="n">c</span><span class="p">(</span><span class="s2">&quot;--with-udunits2-include=/usr/local/opt/udunits/include/&quot;</span><span class="p">,</span> <span class="s2">&quot;--with-udunits2-lib=/usr/local/opt/udunits/lib/&quot;</span><span class="p">))</span>
+</pre></div>
+</div>
+</div>
+<p>If you install R and/or the R dependencies after installing yggdrasil, you can complete yggdrasil’s R installation by running:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ ygginstall R
+</pre></div>
+</div>
+<p>from your terminal (Linux/Mac) or Anaconda prompt (Windows).</p>
 </div>
 </div>
 <div class="section" id="additional-steps-for-rabbitmq-message-passing">

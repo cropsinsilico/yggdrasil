@@ -28,6 +28,14 @@ yggdrasil.tests.test\_config module
    :undoc-members:
    :show-inheritance:
 
+yggdrasil.tests.test\_multitasking module
+-----------------------------------------
+
+.. automodule:: yggdrasil.tests.test_multitasking
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 yggdrasil.tests.test\_platform module
 -------------------------------------
 

@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Transformed I/O &mdash; yggdrasil 1.0.0+154.g684a530e.dirty documentation</title>
+  <title>Transformed I/O &mdash; yggdrasil 1.1.1+410.g95af39b2 documentation</title>
   
 
   
@@ -36,7 +36,7 @@
   <link rel="stylesheet" href="_static/theme_overrides.css" type="text/css" />
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="YAML Files" href="yaml.html" />
+    <link rel="next" title="Timestep Synchronization" href="timesync_io.html" />
     <link rel="prev" title="Conditional I/O" href="conditional_io.html" /> 
 </head>
 
@@ -61,7 +61,7 @@
             
             
               <div class="version">
-                1.0.0
+                1.1.1
               </div>
             
           
@@ -105,6 +105,7 @@
 </li>
 </ul>
 </li>
+<li class="toctree-l1"><a class="reference internal" href="timesync_io.html">Timestep Synchronization</a></li>
 <li class="toctree-l1"><a class="reference internal" href="yaml.html">YAML Files</a></li>
 <li class="toctree-l1"><a class="reference internal" href="config.html">Configuration Files</a></li>
 <li class="toctree-l1"><a class="reference internal" href="units.html">Units</a></li>
@@ -182,7 +183,7 @@
             
   <div class="section" id="transformed-i-o">
 <span id="transformed-io-rst"></span><h1>Transformed I/O<a class="headerlink" href="#transformed-i-o" title="Permalink to this headline">¶</a></h1>
-<p>In addition to I/O <a class="reference internal" href="conditional_io.html#conditional-io-rst"><span class="std std-ref">filters</span></a>, yggdrasil also provides methods for specifying transformations that should be performed on input/output received/returned by a model. In addition to type specific operations (e.g. mapping field names, selecting columns), yggdrasil also supports generic transformations via arbitrary Python statements and/or Python functions.</p>
+<p>In addition to I/O <a class="reference internal" href="examples/conditional_io.html#conditional-io-rst"><span class="std std-ref">filters</span></a>, yggdrasil also provides methods for specifying transformations that should be performed on input/output received/returned by a model. In addition to type specific operations (e.g. mapping field names, selecting columns), yggdrasil also supports generic transformations via arbitrary Python statements and/or Python functions.</p>
 <div class="section" id="transformed-output">
 <h2>Transformed Output<a class="headerlink" href="#transformed-output" title="Permalink to this headline">¶</a></h2>
 <p>In the example below, the output from model A is passed to both model B and C, however model B and C expect slightly different forms of the varaible, which as output by model A, is a rate with units of g/s. In the case of model B, it expects an input value in the form of a rate multiplied by 10 to account for accumulation across 10 producers. In the case of Model C, it expects an input value in the form of a rate density, requiring the value returned by model A to be normalized by an area.</p>
@@ -457,7 +458,7 @@ more complex relationships are required, use the FunctionTransform class.</p></t
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="yaml.html" class="btn btn-neutral float-right" title="YAML Files" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+        <a href="timesync_io.html" class="btn btn-neutral float-right" title="Timestep Synchronization" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
         <a href="conditional_io.html" class="btn btn-neutral float-left" title="Conditional I/O" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>

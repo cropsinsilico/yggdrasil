@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Debugging &mdash; yggdrasil 1.0.0+154.g684a530e.dirty documentation</title>
+  <title>Debugging &mdash; yggdrasil 1.1.1+410.g95af39b2 documentation</title>
   
 
   
@@ -61,7 +61,7 @@
             
             
               <div class="version">
-                1.0.0
+                1.1.1
               </div>
             
           
@@ -96,6 +96,7 @@
 <li class="toctree-l1"><a class="reference internal" href="autowrap.html#notes-on-autowrapping-c-c-model-functions">Notes on Autowrapping C/C++ Model Functions</a></li>
 <li class="toctree-l1"><a class="reference internal" href="conditional_io.html">Conditional I/O</a></li>
 <li class="toctree-l1"><a class="reference internal" href="transformed_io.html">Transformed I/O</a></li>
+<li class="toctree-l1"><a class="reference internal" href="timesync_io.html">Timestep Synchronization</a></li>
 <li class="toctree-l1"><a class="reference internal" href="yaml.html">YAML Files</a></li>
 <li class="toctree-l1"><a class="reference internal" href="config.html">Configuration Files</a></li>
 <li class="toctree-l1"><a class="reference internal" href="units.html">Units</a></li>
@@ -103,6 +104,7 @@
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Debugging</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#tips-for-debugging">Tips for Debugging</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#possible-errors">Possible Errors</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#linux-errors">Linux Errors</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#macos-errors">MacOS Errors</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#matlab-errors">Matlab Errors</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#c-errors">C++ Errors</a></li>
@@ -186,30 +188,30 @@
 <div class="section" id="tips-for-debugging">
 <h2>Tips for Debugging<a class="headerlink" href="#tips-for-debugging" title="Permalink to this headline">¶</a></h2>
 <ol class="arabic simple">
-<li><p><em>Check for known errors.</em> The list below includes several errors that have
-already been encountered by yggdrasil users and the method used to solve
-the issue.</p></li>
-<li><p><em>Turn on debugging log messages.</em> This will increase the number of log
-messages greatly and help you track down any issues. Debug messages can be
-enabled by setting the <code class="docutils literal notranslate"><span class="pre">ygg</span></code> and <code class="docutils literal notranslate"><span class="pre">client</span></code> debug options in your config
-file to <code class="docutils literal notranslate"><span class="pre">DEBUG</span></code> (see <a class="reference internal" href="config.html#config-rst"><span class="std std-ref">Configuration Options</span></a> for details
-on the location of the user config file and additional logging options).</p></li>
-<li><p><em>Trace the flow of data.</em> Use the debug messages to trace the flow of data
-from one model to the next and determine where the failure is occuring.</p></li>
-<li><p><em>Check |yggdrasil| summary.</em> yggdrasil includes a command line utility,
-<code class="docutils literal notranslate"><span class="pre">ygginfo</span></code> that will print out relevent information about yggdrasil, the
-languages it supports, and the operating system. This information can be
-useful for running down conflicting dependencies or determining why
-yggdrasil thinks a language is or isn’t install. Additional information
-about the system can be display by adding the <code class="docutils literal notranslate"><span class="pre">--verbose</span></code> flag, including
-the current conda environment information (if you are using a conda
-environment) and informaiton about the current R installation (if R is
-installed). This information should be included in any Github issues opened
-related to bugs in order to help us assist you.</p></li>
+<li><p><em>Look at the full output.</em> The final error raised by yggdrasil may not contain all of the informations provided by errors that were raised within a model due to limitations of error forwarding between the different languages. It is important to look at the full output from a failed run. Usually the first error encountered or the error raised within the model’s language will be the most relevant and be the most useful for debugging.</p></li>
+<li><p><em>Check for known errors.</em> The list below includes several errors that have already been encountered by yggdrasil users and the method used to solve the issue.</p></li>
+<li><p><em>Turn on debugging log messages.</em> This will increase the number of log messages greatly and help you track down any issues. Debug messages can be enabled by setting the <code class="docutils literal notranslate"><span class="pre">ygg</span></code> and <code class="docutils literal notranslate"><span class="pre">client</span></code> debug options in your config file to <code class="docutils literal notranslate"><span class="pre">DEBUG</span></code> (see <a class="reference internal" href="config.html#config-rst"><span class="std std-ref">Configuration Options</span></a> for details on the location of the user config file and additional logging options).</p></li>
+<li><p><em>Trace the flow of data.</em> Use the debug messages to trace the flow of data from one model to the next and determine where the failure is occuring.</p></li>
+<li><p><em>Check |yggdrasil| summary.</em> yggdrasil includes a command line utility, <code class="docutils literal notranslate"><span class="pre">ygginfo</span></code> that will print out relevent information about yggdrasil, the languages it supports, and the operating system. This information can be useful for running down conflicting dependencies or determining why yggdrasil thinks a language is or isn’t install. Additional information about the system can be display by adding the <code class="docutils literal notranslate"><span class="pre">--verbose</span></code> flag, including the current conda environment information (if you are using a conda environment) and informaiton about the current R installation (if R is installed). This information should be included in any Github issues opened related to bugs in order to help us assist you.</p></li>
 </ol>
 </div>
 <div class="section" id="possible-errors">
 <h2>Possible Errors<a class="headerlink" href="#possible-errors" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="linux-errors">
+<h3>Linux Errors<a class="headerlink" href="#linux-errors" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li><dl class="simple">
+<dt>Importing yggdrasil installed using conda causes <code class="docutils literal notranslate"><span class="pre">ImportError:</span> <span class="pre">/usr/lib/x86_64-linux-gnu/libstdc++.so.6:</span> <span class="pre">version</span> <span class="pre">'GLIBCXX_3.4.22'</span> <span class="pre">not</span> <span class="pre">found</span> <span class="pre">(required</span> <span class="pre">by</span> <span class="pre">&lt;some</span> <span class="pre">python</span> <span class="pre">package&gt;)</span></code></dt><dd><p><strong>Possible Cause:</strong> For some reason (e.g. path modification), the Python package raising the import error is trying to use the system version of libstdc++ rather than the conda version that the package was compiled against.
+<strong>Solutions:</strong></p>
+<ol class="arabic simple">
+<li><p>Add the conda library path so that libraries installed by conda are found before the system libraries: <code class="docutils literal notranslate"><span class="pre">export</span> <span class="pre">LD_LIBRARY_PATH=$CONDA_PREFIX/lib:$LD_LIBRARY_PATH</span></code>.</p></li>
+<li><p>Preload the conda libstdc++ after verifying the path to your conda install’s libstdc++ shared object library: <code class="docutils literal notranslate"><span class="pre">export</span> <span class="pre">LD_PRELOAD=$CONDA_PREFIX/lib/libstdc++.so.6</span></code></p></li>
+</ol>
+</dd>
+</dl>
+</li>
+</ul>
+</div>
 <div class="section" id="macos-errors">
 <h3>MacOS Errors<a class="headerlink" href="#macos-errors" title="Permalink to this headline">¶</a></h3>
 <ul>
@@ -217,8 +219,9 @@ related to bugs in order to help us assist you.</p></li>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">ld</span><span class="p">:</span> <span class="n">warning</span><span class="p">:</span> <span class="n">ignoring</span> <span class="n">file</span> <span class="o">/</span><span class="n">Library</span><span class="o">/</span><span class="n">Developer</span><span class="o">/</span><span class="n">CommandLineTools</span><span class="o">/</span><span class="n">SDKs</span><span class="o">/</span><span class="n">MacOSX10</span><span class="o">.</span><span class="mf">14.</span><span class="n">sdk</span><span class="o">/</span><span class="n">usr</span><span class="o">/</span><span class="n">lib</span><span class="o">/</span><span class="n">libSystem</span><span class="o">.</span><span class="n">tbd</span><span class="p">,</span> <span class="n">file</span> <span class="n">was</span> <span class="n">built</span> <span class="k">for</span> <span class="n">unsupported</span> <span class="n">file</span> <span class="nb">format</span> <span class="p">(</span> <span class="mh">0x2D</span> <span class="mh">0x2D</span> <span class="mh">0x2D</span> <span class="mh">0x20</span> <span class="mh">0x21</span> <span class="mh">0x74</span> <span class="mh">0x61</span> <span class="mh">0x70</span> <span class="mh">0x69</span> <span class="mh">0x2D</span> <span class="mh">0x74</span> <span class="mh">0x62</span> <span class="mh">0x64</span> <span class="mh">0x2D</span> <span class="mh">0x76</span> <span class="mh">0x33</span> <span class="p">)</span> <span class="n">which</span> <span class="ow">is</span> <span class="ow">not</span> <span class="n">the</span> <span class="n">architecture</span> <span class="n">being</span> <span class="n">linked</span> <span class="p">(</span><span class="n">x86_64</span><span class="p">):</span> <span class="o">/</span><span class="n">Library</span><span class="o">/</span><span class="n">Developer</span><span class="o">/</span><span class="n">CommandLineTools</span><span class="o">/</span><span class="n">SDKs</span><span class="o">/</span><span class="n">MacOSX10</span><span class="o">.</span><span class="mf">14.</span><span class="n">sdk</span><span class="o">/</span><span class="n">usr</span><span class="o">/</span><span class="n">lib</span><span class="o">/</span><span class="n">libSystem</span><span class="o">.</span><span class="n">tbd</span>
 </pre></div>
 </div>
-<ul>
-<li><p><em>Possible Cause:</em> You are trying to use the conda-forge supplied compilers on a newer Mac OS (see discussion <a class="reference external" href="https://github.com/conda-forge/compilers-feedstock/issues/6">here</a>). The newer Mac SDKs cannot be packaged by conda-forge due to licensing issues. As a result, the libraries are not correctly linked and you will get the above warning and <code class="docutils literal notranslate"><span class="pre">Undefined</span> <span class="pre">symbol</span></code> errors. This can be solved by downloading an older SDK (10.9 works well) and pointing the conda compilers to it using the steps below.:</p>
+<blockquote>
+<div><p><strong>Possible Cause:</strong> You are trying to use the conda-forge supplied compilers on a newer Mac OS (see discussion <a class="reference external" href="https://github.com/conda-forge/compilers-feedstock/issues/6">here</a>). The newer Mac SDKs cannot be packaged by conda-forge due to licensing issues. As a result, the libraries are not correctly linked and you will get the above warning and <code class="docutils literal notranslate"><span class="pre">Undefined</span> <span class="pre">symbol</span></code> errors.</p>
+<p><strong>Solution:</strong> Download an older SDK (10.9 works well) and point the conda compilers to it using the steps below.:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ export MACOSX_DEPLOYMENT_TARGET=${MACOSX_DEPLOYMENT_TARGET:-10.9}
 $ export CONDA_BUILD_SYSROOT=&quot;$(xcode-select -p)/SDKs/MacOSX${MACOSX_DEPLOYMENT_TARGET}.sdk&quot;
 $ curl -L -O https://github.com/phracker/MacOSX-SDKs/releases/download/10.13/MacOSX${MACOSX_DEPLOYMENT_TARGET}.sdk.tar.xz
@@ -229,49 +232,35 @@ $ tar -xf MacOSX${MACOSX_DEPLOYMENT_TARGET}.sdk.tar.xz -C &quot;$(dirname &quot;
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ yggconfig --macos-sdkroot &lt;path to sdk&gt;
 </pre></div>
 </div>
-</li>
-</ul>
+</div></blockquote>
 </li>
 </ul>
 </div>
 <div class="section" id="matlab-errors">
 <h3>Matlab Errors<a class="headerlink" href="#matlab-errors" title="Permalink to this headline">¶</a></h3>
 <ul>
-<li><p>The MATLAB model hangs for a long time during startup and then times out.
-- <em>Possible Cause:</em> If MATLAB has trouble accessing the license server, it</p>
-<blockquote>
-<div><p>can hang for a long time during startup. yggdrasil has a config parameter
-that controls how long it will wait for MATLAB to start. If it takes longer
-than that amount of time, it will kill the process and report an error. To
-solve this issue, verify that you have access to the MATLAB license server
-(e.g. an internet connection and, if appropriate, the correct VPN). If you
-do (i.e. you can start the MATLAB application independent of yggdrasil),
-increase the <code class="docutils literal notranslate"><span class="pre">startup_waittime_s</span></code> config parameter described
-<a class="reference internal" href="config.html#config-rst"><span class="std std-ref">here</span></a>.</p>
-</div></blockquote>
+<li><dl>
+<dt>The MATLAB model hangs for a long time during startup and then times out.</dt><dd><p><strong>Possible Cause:</strong> If MATLAB has trouble accessing the license server, it can hang for a long time during startup. yggdrasil has a config parameter that controls how long it will wait for MATLAB to start. If it takes longer than that amount of time, it will kill the process and report an error.</p>
+<p><strong>Solution:</strong> Verify that you have access to the MATLAB license server (e.g. an internet connection and, if appropriate, the correct VPN). If you do (i.e. you can start the MATLAB application independent of yggdrasil), increase the <code class="docutils literal notranslate"><span class="pre">startup_waittime_s</span></code> config parameter described <a class="reference internal" href="config.html#config-rst"><span class="std std-ref">here</span></a>.</p>
+</dd>
+</dl>
 </li>
 </ul>
 </div>
 <div class="section" id="c-errors">
 <h3>C++ Errors<a class="headerlink" href="#c-errors" title="Permalink to this headline">¶</a></h3>
 <ul>
-<li><p>The received message size is always 0, but the message is not empty.
-- <em>Possible Cause:</em> Some C++ compilers will incorrectly pass the <code class="docutils literal notranslate"><span class="pre">size_t</span></code></p>
-<blockquote>
-<div><p>reference such that it is copied and set to zero as it is passed. This can
-be solved by using <code class="docutils literal notranslate"><span class="pre">strlen</span></code> to get the actual size of the received string.</p>
-</div></blockquote>
+<li><dl>
+<dt>The received message size is always 0, but the message is not empty.</dt><dd><p><strong>Possible Cause:</strong> Some C++ compilers will incorrectly pass the <code class="docutils literal notranslate"><span class="pre">size_t</span></code> reference such that it is copied and set to zero as it is passed.</p>
+<p><strong>Solution:</strong> Use <code class="docutils literal notranslate"><span class="pre">strlen</span></code> to get the actual size of the received string rather than relying on the size returned by the yggdrasil receive call.</p>
+</dd>
+</dl>
 </li>
-<li><p>You are sending/receiving from/into a character array (e.g. <code class="docutils literal notranslate"><span class="pre">char</span> <span class="pre">x[100];</span></code>),
-and the received message is always empty even through the received message
-size may or may not be 0.
-- <em>Possible Cause:</em> Some C++ compilers will incorrectly pass the reference to</p>
-<blockquote>
-<div><p>the character array such that is is copied and, therefore, not assigned to
-during the receive call. This can be solved by dynamically allocated a
-variable on heap (e.g. <code class="docutils literal notranslate"><span class="pre">char</span> <span class="pre">\*x</span> <span class="pre">=</span> <span class="pre">(char\*)malloc(100)</span></code>), just be sure to
-free the variable at the end.</p>
-</div></blockquote>
+<li><dl>
+<dt>You are sending/receiving from/into a character array (e.g. <code class="docutils literal notranslate"><span class="pre">char</span> <span class="pre">x[100];</span></code>), and the received message is always empty even through the received message size may or may not be 0.</dt><dd><p><strong>Possible Cause:</strong> Some C++ compilers will incorrectly pass the reference to the character array such that is is copied and, therefore, not assigned to during the receive call.</p>
+<p><strong>Solution:</strong> Dynamically allocate a variable on heap (e.g. <code class="docutils literal notranslate"><span class="pre">char</span> <span class="pre">*x</span> <span class="pre">=</span> <span class="pre">(char*)malloc(100)</span></code>) to use when receiving a character array, just be sure to free the variable at the end.</p>
+</dd>
+</dl>
 </li>
 </ul>
 </div>
@@ -282,28 +271,36 @@ free the variable at the end.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span>ImportError: /usr/lib/x86_64-linux-gnu/libstdc++.so.6: version `GLIBCXX_3.4.20&#39; not found
 </pre></div>
 </div>
-<ul class="simple">
-<li><p><em>Possible Causes:</em> This error usually results from a conflict in the shared libraries
-available during R calls to Python as handled through the
-<a class="reference external" href="https://rstudio.github.io/reticulate/">reticulate</a> package. The <code class="docutils literal notranslate"><span class="pre">reticulate</span></code>
-development team is aware of this (see
-<a class="reference external" href="https://github.com/rstudio/reticulate/issues/428">this</a> issue and the issues it
-references), but has not yet taken steps to address it as of writing this
-(2019/06/20). This error is most likely to occur if you are using a <code class="docutils literal notranslate"><span class="pre">conda</span></code>
-environment to manage yggdrasil, but are using a version of R that was not
-installed via <code class="docutils literal notranslate"><span class="pre">conda</span></code>. One remedy is to install R using <code class="docutils literal notranslate"><span class="pre">conda</span></code> (e.g.
-<code class="docutils literal notranslate"><span class="pre">conda</span> <span class="pre">install</span> <span class="pre">r-base</span></code>). Another solution is to install the missing shared
-library on your local machine (i.e. outside the conda environment) so that it is
-available when using R.</p></li>
-</ul>
-</li>
-<li><p>You get a segfault when calling one of the Python object methods.
-- <em>Possible Cause:</em> The Python and R packages are using different C/C++ libraries.</p>
 <blockquote>
-<div><p>This can result from using conda to manage the Python packages, but using a
-version of R and R packages that were installed outside the conda environment
-using locally installed versions of the libraries. As above, one solution is to
-use <code class="docutils literal notranslate"><span class="pre">conda</span></code> to install R and the R dependencies.</p>
+<div><p><strong>Possible Causes:</strong> This error usually results from a conflict in the shared libraries available during R calls to Python as handled through the <a class="reference external" href="https://rstudio.github.io/reticulate/">reticulate</a> package. The <code class="docutils literal notranslate"><span class="pre">reticulate</span></code> development team is aware of this (see <a class="reference external" href="https://github.com/rstudio/reticulate/issues/428">this</a> issue and the issues it references), but has not yet taken steps to address it as of writing this (2019/06/20). This error is most likely to occur if you are using a <code class="docutils literal notranslate"><span class="pre">conda</span></code> environment to manage yggdrasil, but are using a version of R that was not installed via <code class="docutils literal notranslate"><span class="pre">conda</span></code>.</p>
+<p><strong>Solutions:</strong></p>
+<ol class="arabic simple">
+<li><p>Install R using <code class="docutils literal notranslate"><span class="pre">conda</span></code> (e.g. <code class="docutils literal notranslate"><span class="pre">conda</span> <span class="pre">install</span> <span class="pre">r-base</span></code>).</p></li>
+<li><p>Install the missing shared library on your local machine (i.e. outside the conda environment) so that it is available when using R.</p></li>
+</ol>
+</div></blockquote>
+</li>
+<li><p>You get a segfault when calling one of the Python object methods.</p>
+<blockquote>
+<div><p><strong>Possible Cause:</strong> The Python and R packages are using different C/C++ libraries. This error can result from using conda to manage the Python packages, but using a version of R and R packages that were installed outside the conda environment using locally installed versions of the libraries.</p>
+<p><strong>Solution:</strong> Use <code class="docutils literal notranslate"><span class="pre">conda</span></code> to install R and the R dependencies.</p>
+</div></blockquote>
+</li>
+<li><p>When running an R model, you get an R error message that looks like:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Error</span> <span class="ow">in</span> <span class="o">.</span><span class="n">simplify_units</span><span class="p">(</span><span class="n">NextMethod</span><span class="p">(),</span> <span class="o">.</span><span class="n">symbolic_units</span><span class="p">(</span><span class="n">numerator</span><span class="p">,</span> <span class="n">denominator</span><span class="p">))</span> <span class="p">:</span>
+  <span class="n">could</span> <span class="ow">not</span> <span class="n">find</span> <span class="n">function</span> <span class="s2">&quot;isFALSE&quot;</span>
+<span class="n">Calls</span><span class="p">:</span> <span class="o">%&lt;-%</span> <span class="o">...</span> <span class="n">multi_assign</span> <span class="o">-&gt;</span> <span class="n">modelB_function2</span> <span class="o">-&gt;</span> <span class="n">Ops</span><span class="o">.</span><span class="n">units</span> <span class="o">-&gt;</span> <span class="o">.</span><span class="n">simplify_units</span>
+<span class="n">Execution</span> <span class="n">halted</span>
+</pre></div>
+</div>
+<blockquote>
+<div><p><strong>Possible Causes:</strong> You are using version 0.6-6 of the R units package, but an older version of R (&lt;3.5). This error is more likely if you installed R on Ubuntu Linux using apt as the default version is 3.2.3 (as of 2020/4/14).</p>
+<p><strong>Solutions:</strong></p>
+<ol class="arabic simple">
+<li><p>[RECOMMENDED] Install a newer version of R. See <a class="reference internal" href="install.html#install-r-rst"><span class="std std-ref">Additional Steps for R Models</span></a> for details on installing a more recent version of R on Linux.</p></li>
+<li><p>Install a new version of units (if one is available).</p></li>
+<li><p>Intall units version 0.6-5 (be sure to uninstall the existing version of units first).</p></li>
+</ol>
 </div></blockquote>
 </li>
 </ul>

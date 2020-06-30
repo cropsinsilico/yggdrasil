@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>yggdrasil.metaschema.datatypes.MetaschemaType &mdash; yggdrasil 1.0.0+154.g684a530e.dirty documentation</title>
+  <title>yggdrasil.metaschema.datatypes.MetaschemaType &mdash; yggdrasil 1.1.1+410.g95af39b2 documentation</title>
   
 
   
@@ -59,7 +59,7 @@
             
             
               <div class="version">
-                1.0.0
+                1.1.1
               </div>
             
           
@@ -94,6 +94,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../../autowrap.html#notes-on-autowrapping-c-c-model-functions">Notes on Autowrapping C/C++ Model Functions</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../conditional_io.html">Conditional I/O</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../transformed_io.html">Transformed I/O</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../timesync_io.html">Timestep Synchronization</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../yaml.html">YAML Files</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../config.html">Configuration Files</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../units.html">Units</a></li>
@@ -175,7 +176,6 @@
 <span></span><span class="kn">import</span> <span class="nn">six</span>
 <span class="kn">import</span> <span class="nn">copy</span>
 <span class="kn">import</span> <span class="nn">uuid</span>
-<span class="kn">import</span> <span class="nn">pprint</span>
 <span class="kn">import</span> <span class="nn">importlib</span>
 <span class="kn">import</span> <span class="nn">jsonschema</span>
 <span class="kn">from</span> <span class="nn">yggdrasil</span> <span class="k">import</span> <span class="n">tools</span>
@@ -747,15 +747,6 @@
         <span class="c1"># Encode</span>
         <span class="n">metadata</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">encode_type</span><span class="p">(</span><span class="n">obj_t</span><span class="p">,</span> <span class="n">typedef</span><span class="o">=</span><span class="n">typedef</span><span class="p">)</span>
         <span class="n">data</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">encode_data</span><span class="p">(</span><span class="n">obj_t</span><span class="p">,</span> <span class="n">metadata</span><span class="p">)</span>
-        <span class="c1"># Add extra keyword arguments to metadata, ensuring type not overwritten</span>
-        <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
-            <span class="k">if</span> <span class="p">(</span><span class="n">k</span> <span class="ow">in</span> <span class="n">metadata</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">v</span> <span class="o">!=</span> <span class="n">metadata</span><span class="p">[</span><span class="n">k</span><span class="p">]):</span>
-                <span class="n">error_str</span> <span class="o">=</span> <span class="p">(</span><span class="s2">&quot;Key &#39;</span><span class="si">%s</span><span class="s2">&#39; set by the type encoder.</span><span class="se">\n</span><span class="s2">&quot;</span>
-                             <span class="o">+</span> <span class="s2">&quot; User defined value:</span><span class="se">\n</span><span class="si">%s</span><span class="se">\n</span><span class="s2">&quot;</span>
-                             <span class="o">+</span> <span class="s2">&quot;Type encoder defined value:</span><span class="se">\n</span><span class="si">%s</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span> <span class="o">%</span> <span class="p">(</span>
-                                 <span class="n">k</span><span class="p">,</span> <span class="n">pprint</span><span class="o">.</span><span class="n">pformat</span><span class="p">(</span><span class="n">v</span><span class="p">),</span> <span class="n">pprint</span><span class="o">.</span><span class="n">pformat</span><span class="p">(</span><span class="n">metadata</span><span class="p">[</span><span class="n">k</span><span class="p">]))</span>
-                <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="n">error_str</span><span class="p">)</span>
-            <span class="n">metadata</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">v</span>
         <span class="k">return</span> <span class="n">metadata</span><span class="p">,</span> <span class="n">data</span></div>
 
 <div class="viewcode-block" id="MetaschemaType.decode"><a class="viewcode-back" href="../../../../yggdrasil.metaschema.datatypes.html#yggdrasil.metaschema.datatypes.MetaschemaType.MetaschemaType.decode">[docs]</a>    <span class="nd">@classmethod</span>
@@ -807,7 +798,7 @@
         <span class="k">return</span> <span class="n">out</span></div>
 
 <div class="viewcode-block" id="MetaschemaType.serialize"><a class="viewcode-back" href="../../../../yggdrasil.metaschema.datatypes.html#yggdrasil.metaschema.datatypes.MetaschemaType.MetaschemaType.serialize">[docs]</a>    <span class="k">def</span> <span class="nf">serialize</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">,</span> <span class="n">no_metadata</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">dont_encode</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
-                  <span class="n">dont_check</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+                  <span class="n">dont_check</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">max_header_size</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Serialize a message.</span>
 
 <span class="sd">        Args:</span>
@@ -820,12 +811,19 @@
 <span class="sd">            dont_check (bool, optional): If True, the object being serialized</span>
 <span class="sd">                will not be checked against the type definition. Defaults to</span>
 <span class="sd">                False.</span>
+<span class="sd">            max_header_size (int, optional): Maximum size that header</span>
+<span class="sd">                should occupy in order to be sent in a single message.</span>
+<span class="sd">                A value of 0 indicates that any size header is valid.</span>
+<span class="sd">                Defaults to 0.</span>
 <span class="sd">            **kwargs: Additional keyword arguments are added to the metadata.</span>
 
 <span class="sd">        Returns:</span>
 <span class="sd">            bytes, str: Serialized message.</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;size&#39;</span><span class="p">,</span> <span class="s1">&#39;data&#39;</span><span class="p">,</span> <span class="s1">&#39;datatype&#39;</span><span class="p">]:</span>
+            <span class="k">if</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">&quot;&#39;</span><span class="si">%s</span><span class="s2">&#39; is a reserved keyword in the metadata.&quot;</span> <span class="o">%</span> <span class="n">k</span><span class="p">)</span>
         <span class="k">if</span> <span class="p">((</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="nb">bytes</span><span class="p">)</span>
              <span class="ow">and</span> <span class="p">((</span><span class="n">obj</span> <span class="o">==</span> <span class="n">tools</span><span class="o">.</span><span class="n">YGG_MSG_EOF</span><span class="p">)</span> <span class="ow">or</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;raw&#39;</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>
                   <span class="ow">or</span> <span class="n">dont_encode</span><span class="p">))):</span>
@@ -833,21 +831,37 @@
             <span class="n">data</span> <span class="o">=</span> <span class="n">obj</span>
             <span class="n">is_raw</span> <span class="o">=</span> <span class="kc">True</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="n">metadata</span><span class="p">,</span> <span class="n">data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">typedef</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_typedef</span><span class="p">,</span>
-                                         <span class="n">typedef_validated</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-                                         <span class="n">dont_check</span><span class="o">=</span><span class="n">dont_check</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+            <span class="n">typedef</span><span class="p">,</span> <span class="n">data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">typedef</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_typedef</span><span class="p">,</span>
+                                        <span class="n">typedef_validated</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                                        <span class="n">dont_check</span><span class="o">=</span><span class="n">dont_check</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+            <span class="n">metadata</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;datatype&#39;</span><span class="p">:</span> <span class="n">typedef</span><span class="p">}</span>
+            <span class="n">metadata</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">kwargs</span><span class="p">)</span>
             <span class="n">is_raw</span> <span class="o">=</span> <span class="kc">False</span>
-        <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;size&#39;</span><span class="p">,</span> <span class="s1">&#39;data&#39;</span><span class="p">]:</span>
-            <span class="k">if</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">metadata</span><span class="p">:</span>
-                <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">&quot;&#39;</span><span class="si">%s</span><span class="s2">&#39; is a reserved keyword in the metadata.&quot;</span> <span class="o">%</span> <span class="n">k</span><span class="p">)</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">is_raw</span><span class="p">:</span>
             <span class="n">data</span> <span class="o">=</span> <span class="n">encoder</span><span class="o">.</span><span class="n">encode_json</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">no_metadata</span><span class="p">:</span>
             <span class="k">return</span> <span class="n">data</span>
         <span class="n">metadata</span><span class="p">[</span><span class="s1">&#39;size&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
         <span class="n">metadata</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s1">&#39;id&#39;</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">uuid</span><span class="o">.</span><span class="n">uuid4</span><span class="p">()))</span>
-        <span class="n">metadata</span> <span class="o">=</span> <span class="n">encoder</span><span class="o">.</span><span class="n">encode_json</span><span class="p">(</span><span class="n">metadata</span><span class="p">)</span>
-        <span class="n">msg</span> <span class="o">=</span> <span class="n">YGG_MSG_HEAD</span> <span class="o">+</span> <span class="n">metadata</span> <span class="o">+</span> <span class="n">YGG_MSG_HEAD</span> <span class="o">+</span> <span class="n">data</span>
+        <span class="n">header</span> <span class="o">=</span> <span class="n">YGG_MSG_HEAD</span> <span class="o">+</span> <span class="n">encoder</span><span class="o">.</span><span class="n">encode_json</span><span class="p">(</span><span class="n">metadata</span><span class="p">)</span> <span class="o">+</span> <span class="n">YGG_MSG_HEAD</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">max_header_size</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">header</span><span class="p">)</span> <span class="o">&gt;</span> <span class="n">max_header_size</span><span class="p">):</span>
+            <span class="n">metadata_type</span> <span class="o">=</span> <span class="n">metadata</span>
+            <span class="n">metadata</span> <span class="o">=</span> <span class="p">{}</span>
+            <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;address&#39;</span><span class="p">,</span> <span class="s1">&#39;size&#39;</span><span class="p">,</span> <span class="s1">&#39;id&#39;</span><span class="p">,</span> <span class="s1">&#39;request_id&#39;</span><span class="p">,</span>
+                      <span class="s1">&#39;response_address&#39;</span><span class="p">,</span> <span class="s1">&#39;zmq_reply&#39;</span><span class="p">,</span>
+                      <span class="s1">&#39;zmq_reply_worker&#39;</span><span class="p">,</span> <span class="s1">&#39;model&#39;</span><span class="p">]:</span>
+                <span class="k">if</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">metadata_type</span><span class="p">:</span>
+                    <span class="n">metadata</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">metadata_type</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="n">k</span><span class="p">)</span>
+            <span class="k">assert</span><span class="p">(</span><span class="n">metadata</span><span class="p">)</span>
+            <span class="n">data</span> <span class="o">=</span> <span class="p">(</span><span class="n">encoder</span><span class="o">.</span><span class="n">encode_json</span><span class="p">(</span><span class="n">metadata_type</span><span class="p">)</span> <span class="o">+</span> <span class="n">YGG_MSG_HEAD</span> <span class="o">+</span> <span class="n">data</span><span class="p">)</span>
+            <span class="n">metadata</span><span class="p">[</span><span class="s1">&#39;size&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+            <span class="n">metadata</span><span class="p">[</span><span class="s1">&#39;type_in_data&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
+            <span class="n">header</span> <span class="o">=</span> <span class="n">YGG_MSG_HEAD</span> <span class="o">+</span> <span class="n">encoder</span><span class="o">.</span><span class="n">encode_json</span><span class="p">(</span><span class="n">metadata</span><span class="p">)</span> <span class="o">+</span> <span class="n">YGG_MSG_HEAD</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">header</span><span class="p">)</span> <span class="o">&gt;</span> <span class="n">max_header_size</span><span class="p">:</span>  <span class="c1"># pragma: debug</span>
+                <span class="k">raise</span> <span class="ne">AssertionError</span><span class="p">((</span><span class="s2">&quot;The header is larger (</span><span class="si">%d</span><span class="s2">) than the &quot;</span>
+                                      <span class="s2">&quot;maximum (</span><span class="si">%d</span><span class="s2">): </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">)</span>
+                                     <span class="o">%</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">header</span><span class="p">),</span> <span class="n">max_header_size</span><span class="p">,</span> <span class="n">header</span><span class="p">))</span>
+        <span class="n">msg</span> <span class="o">=</span> <span class="n">header</span> <span class="o">+</span> <span class="n">data</span>
         <span class="k">return</span> <span class="n">msg</span></div>
     
 <div class="viewcode-block" id="MetaschemaType.deserialize"><a class="viewcode-back" href="../../../../yggdrasil.metaschema.datatypes.html#yggdrasil.metaschema.datatypes.MetaschemaType.MetaschemaType.deserialize">[docs]</a>    <span class="k">def</span> <span class="nf">deserialize</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">msg</span><span class="p">,</span> <span class="n">no_data</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">metadata</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">dont_decode</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
@@ -878,7 +892,7 @@
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">msg</span><span class="p">,</span> <span class="nb">bytes</span><span class="p">):</span>
             <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;Message to be deserialized is not bytes type.&quot;</span><span class="p">)</span>
         <span class="c1"># Check for header</span>
-        <span class="k">if</span> <span class="n">YGG_MSG_HEAD</span> <span class="ow">in</span> <span class="n">msg</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">msg</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="n">YGG_MSG_HEAD</span><span class="p">):</span>
             <span class="k">if</span> <span class="n">metadata</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
                 <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Metadata in header and provided by keyword.&quot;</span><span class="p">)</span>
             <span class="n">_</span><span class="p">,</span> <span class="n">metadata</span><span class="p">,</span> <span class="n">data</span> <span class="o">=</span> <span class="n">msg</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">YGG_MSG_HEAD</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
@@ -886,6 +900,13 @@
                 <span class="n">metadata</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">size</span><span class="o">=</span><span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="p">))</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="n">metadata</span> <span class="o">=</span> <span class="n">encoder</span><span class="o">.</span><span class="n">decode_json</span><span class="p">(</span><span class="n">metadata</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">metadata</span><span class="p">,</span> <span class="nb">dict</span><span class="p">)</span> <span class="ow">and</span> <span class="n">metadata</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;type_in_data&#39;</span><span class="p">,</span> <span class="kc">False</span><span class="p">):</span>
+            <span class="k">assert</span><span class="p">(</span><span class="n">msg</span><span class="o">.</span><span class="n">count</span><span class="p">(</span><span class="n">YGG_MSG_HEAD</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">)</span>
+            <span class="n">typedef</span><span class="p">,</span> <span class="n">data</span> <span class="o">=</span> <span class="n">msg</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">YGG_MSG_HEAD</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">typedef</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="n">metadata</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">encoder</span><span class="o">.</span><span class="n">decode_json</span><span class="p">(</span><span class="n">typedef</span><span class="p">))</span>
+            <span class="n">metadata</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;type_in_data&#39;</span><span class="p">)</span>
+            <span class="n">metadata</span><span class="p">[</span><span class="s1">&#39;size&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">data</span> <span class="o">=</span> <span class="n">msg</span>
             <span class="k">if</span> <span class="n">metadata</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
@@ -908,7 +929,7 @@
             <span class="k">return</span> <span class="n">data</span><span class="p">,</span> <span class="n">metadata</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">data</span> <span class="o">=</span> <span class="n">encoder</span><span class="o">.</span><span class="n">decode_json</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
-            <span class="n">obj</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="n">metadata</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_typedef</span><span class="p">,</span>
+            <span class="n">obj</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="n">metadata</span><span class="p">[</span><span class="s1">&#39;datatype&#39;</span><span class="p">],</span> <span class="n">data</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_typedef</span><span class="p">,</span>
                               <span class="n">typedef_validated</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">dont_check</span><span class="o">=</span><span class="n">dont_check</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">obj</span><span class="p">,</span> <span class="n">metadata</span></div>
 

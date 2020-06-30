@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>&lt;no title&gt; &mdash; yggdrasil 1.0.0+154.g684a530e.dirty documentation</title>
+  <title>&lt;no title&gt; &mdash; yggdrasil 1.1.1+410.g95af39b2 documentation</title>
   
 
   
@@ -59,7 +59,7 @@
             
             
               <div class="version">
-                1.0.0
+                1.1.1
               </div>
             
           
@@ -94,6 +94,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../autowrap.html#notes-on-autowrapping-c-c-model-functions">Notes on Autowrapping C/C++ Model Functions</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../conditional_io.html">Conditional I/O</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../transformed_io.html">Transformed I/O</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../timesync_io.html">Timestep Synchronization</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../yaml.html">YAML Files</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../config.html">Configuration Files</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../units.html">Units</a></li>
@@ -171,10 +172,10 @@
             
   <table class="docutils align-default" id="schema-table-file-specific-rst">
 <colgroup>
-<col style="width: 9%" />
-<col style="width: 9%" />
-<col style="width: 41%" />
-<col style="width: 42%" />
+<col style="width: 8%" />
+<col style="width: 8%" />
+<col style="width: 37%" />
+<col style="width: 47%" />
 </colgroup>
 <thead>
 <tr class="row-odd"><th class="head"><p>Option</p></th>
@@ -187,13 +188,13 @@
 <tr class="row-even"><td><p>comment</p></td>
 <td><p>string</p></td>
 <td><p>One or more characters indicating a comment. Defaults to ‘# ‘.</p></td>
-<td><p>[‘ascii’, ‘obj’, ‘mat’, ‘ply’, ‘map’, ‘yaml’, ‘json’, ‘pickle’, ‘table’, ‘pandas’]</p></td>
+<td><p>[‘mat’, ‘pickle’, ‘netcdf’, ‘ascii’, ‘map’, ‘ply’, ‘obj’, ‘table’, ‘yaml’, ‘pandas’, ‘wofost’, ‘json’]</p></td>
 </tr>
 <tr class="row-odd"><td><p>datatype</p></td>
 <td><p>schema</p></td>
 <td><p>JSON schema defining the type of object that the serializer will be used to
 serialize/deserialize. Defaults to default_datatype.</p></td>
-<td><p>[‘ascii’, ‘obj’, ‘mat’, ‘ply’, ‘map’, ‘yaml’, ‘json’, ‘pickle’, ‘table’, ‘pandas’]</p></td>
+<td><p>[‘mat’, ‘pickle’, ‘netcdf’, ‘ascii’, ‘map’, ‘ply’, ‘obj’, ‘table’, ‘yaml’, ‘pandas’, ‘wofost’, ‘json’]</p></td>
 </tr>
 <tr class="row-even"><td><p>default_flow_style</p></td>
 <td><p>boolean</p></td>
@@ -205,7 +206,7 @@ they will always be serialized in the flow style. See <a class="reference extern
 <td><p>string</p></td>
 <td><p>Delimiter that should be used to separate name/value pairs in the map. Defaults
 to t.</p></td>
-<td><p>[‘map’, ‘table’, ‘pandas’]</p></td>
+<td><p>[‘table’, ‘wofost’, ‘pandas’, ‘map’]</p></td>
 </tr>
 <tr class="row-even"><td><p>encoding</p></td>
 <td><p>string</p></td>
@@ -216,12 +217,12 @@ to t.</p></td>
 <td><p>[‘string’, ‘int’]</p></td>
 <td><p>String or number of spaces that should be used to indent each level within the
 seiralized structure. Defaults to ‘t’.</p></td>
-<td><p>[‘json’, ‘yaml’]</p></td>
+<td><p>[‘yaml’, ‘json’]</p></td>
 </tr>
 <tr class="row-even"><td><p>newline</p></td>
 <td><p>string</p></td>
 <td><p>One or more characters indicating a newline. Defaults to ‘n’.</p></td>
-<td><p>[‘ascii’, ‘obj’, ‘mat’, ‘ply’, ‘map’, ‘yaml’, ‘json’, ‘pickle’, ‘table’, ‘pandas’]</p></td>
+<td><p>[‘mat’, ‘pickle’, ‘netcdf’, ‘ascii’, ‘map’, ‘ply’, ‘obj’, ‘table’, ‘yaml’, ‘pandas’, ‘wofost’, ‘json’]</p></td>
 </tr>
 <tr class="row-odd"><td><p>no_header</p></td>
 <td><p>boolean</p></td>
@@ -229,35 +230,51 @@ seiralized structure. Defaults to ‘t’.</p></td>
 False.</p></td>
 <td><p>[‘pandas’]</p></td>
 </tr>
-<tr class="row-even"><td><p>read_meth</p></td>
+<tr class="row-even"><td><p>read_attributes</p></td>
+<td><p>boolean</p></td>
+<td><p>If True, the attributes are read in as well as the variables. Defaults to False.</p></td>
+<td><p>[‘netcdf’]</p></td>
+</tr>
+<tr class="row-odd"><td><p>read_meth</p></td>
 <td><p>string</p></td>
 <td><p>Method that should be used to read data from the file. Defaults to ‘read’.
 Ignored if direction is ‘send’.</p></td>
 <td><p>[‘binary’]</p></td>
 </tr>
-<tr class="row-odd"><td><p>serializer</p></td>
+<tr class="row-even"><td><p>serializer</p></td>
 <td></td>
 <td><p>Class with serialize and deserialize methods that should be used to process sent
 and received messages. Defaults to None and is constructed using provided
 ‘serializer_kwargs’.</p></td>
 <td><p>[‘binary’]</p></td>
 </tr>
-<tr class="row-even"><td><p>sort_keys</p></td>
+<tr class="row-odd"><td><p>sort_keys</p></td>
 <td><p>boolean</p></td>
 <td><p>If True, the serialization of dictionaries will be in key sorted order. Defaults
 to True.</p></td>
 <td><p>[‘json’]</p></td>
 </tr>
-<tr class="row-odd"><td><p>str_as_bytes</p></td>
+<tr class="row-even"><td><p>str_as_bytes</p></td>
 <td><p>boolean</p></td>
 <td><p>If True, strings in columns are read as bytes. Defaults to False.</p></td>
 <td><p>[‘pandas’]</p></td>
 </tr>
-<tr class="row-even"><td><p>use_astropy</p></td>
+<tr class="row-odd"><td><p>use_astropy</p></td>
 <td><p>boolean</p></td>
 <td><p>If True, the astropy package will be used to serialize/deserialize table.
 Defaults to False.</p></td>
 <td><p>[‘table’, ‘pandas’]</p></td>
+</tr>
+<tr class="row-even"><td><p>variables</p></td>
+<td><p>array</p></td>
+<td><p>List of variables to read in. If not provided, all variables will be read.</p></td>
+<td><p>[‘netcdf’]</p></td>
+</tr>
+<tr class="row-odd"><td><p>version</p></td>
+<td><p>integer</p></td>
+<td><p>Version of netCDF format that should be used. Defaults to 1. Options are 1
+(classic format) and 2 (64-bit offset format).</p></td>
+<td><p>[‘netcdf’]</p></td>
 </tr>
 </tbody>
 </table>

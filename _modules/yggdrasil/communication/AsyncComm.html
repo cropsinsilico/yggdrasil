@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>yggdrasil.communication.AsyncComm &mdash; yggdrasil 1.0.0+154.g684a530e.dirty documentation</title>
+  <title>yggdrasil.communication.AsyncComm &mdash; yggdrasil 1.1.1+410.g95af39b2 documentation</title>
   
 
   
@@ -59,7 +59,7 @@
             
             
               <div class="version">
-                1.0.0
+                1.1.1
               </div>
             
           
@@ -94,6 +94,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../autowrap.html#notes-on-autowrapping-c-c-model-functions">Notes on Autowrapping C/C++ Model Functions</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../conditional_io.html">Conditional I/O</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../transformed_io.html">Transformed I/O</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../timesync_io.html">Timestep Synchronization</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../yaml.html">YAML Files</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../config.html">Configuration Files</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../units.html">Units</a></li>
@@ -171,7 +172,7 @@
             
   <h1>Source code for yggdrasil.communication.AsyncComm</h1><div class="highlight"><pre>
 <span></span><span class="kn">import</span> <span class="nn">uuid</span>
-<span class="kn">import</span> <span class="nn">threading</span>
+<span class="kn">from</span> <span class="nn">yggdrasil</span> <span class="k">import</span> <span class="n">multitasking</span>
 <span class="kn">from</span> <span class="nn">yggdrasil.communication</span> <span class="k">import</span> <span class="n">CommBase</span>
 
 
@@ -193,21 +194,24 @@
 <span class="sd">    Attributes:</span>
 <span class="sd">        dont_backlog (bool): If True, the backlog will not be started and all</span>
 <span class="sd">            messages will be sent/received directly to/from the comm.</span>
-<span class="sd">        backlog_send_ready (threading.Event): Event set when there is a</span>
+<span class="sd">        backlog_send_ready (multitasking.Event): Event set when there is a</span>
 <span class="sd">            message in the send backlog.</span>
-<span class="sd">        backlog_recv_ready (threading.Event): Event set when there is a</span>
+<span class="sd">        backlog_recv_ready (multitasking.Event): Event set when there is a</span>
 <span class="sd">            message in the recv backlog.</span>
 <span class="sd">        </span>
 <span class="sd">    &quot;&quot;&quot;</span>
+    
+    <span class="n">_disconnect_attr</span> <span class="o">=</span> <span class="p">(</span><span class="n">CommBase</span><span class="o">.</span><span class="n">CommBase</span><span class="o">.</span><span class="n">_disconnect_attr</span>
+                        <span class="o">+</span> <span class="p">[</span><span class="s1">&#39;backlog_send_ready&#39;</span><span class="p">,</span> <span class="s1">&#39;backlog_recv_ready&#39;</span><span class="p">,</span>
+                           <span class="s1">&#39;_backlog_thread&#39;</span><span class="p">])</span>
+
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">dont_backlog</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="c1"># TODO: Fix the cleanup of Python threads in languages that call the</span>
-        <span class="c1"># Python API underneath</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">dont_backlog</span> <span class="o">=</span> <span class="p">(</span><span class="n">dont_backlog</span> <span class="ow">or</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;is_interface&#39;</span><span class="p">,</span> <span class="kc">False</span><span class="p">))</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_backlog_recv</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_backlog_send</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_backlog_thread</span> <span class="o">=</span> <span class="kc">None</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">backlog_send_ready</span> <span class="o">=</span> <span class="n">threading</span><span class="o">.</span><span class="n">Event</span><span class="p">()</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">backlog_recv_ready</span> <span class="o">=</span> <span class="n">threading</span><span class="o">.</span><span class="n">Event</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">backlog_send_ready</span> <span class="o">=</span> <span class="n">multitasking</span><span class="o">.</span><span class="n">Event</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">backlog_recv_ready</span> <span class="o">=</span> <span class="n">multitasking</span><span class="o">.</span><span class="n">Event</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">backlog_open</span> <span class="o">=</span> <span class="kc">False</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_used_direct</span> <span class="o">=</span> <span class="kc">False</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">AsyncComm</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
@@ -239,14 +243,14 @@
         
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">backlog_thread</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;tools.YggThread: Thread that will handle sinding or receiving</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;tools.YggTask: Task that will handle sinding or receiving</span>
 <span class="sd">        backlogged messages.&quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_backlog_thread</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">direction</span> <span class="o">==</span> <span class="s1">&#39;send&#39;</span><span class="p">:</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">_backlog_thread</span> <span class="o">=</span> <span class="n">CommBase</span><span class="o">.</span><span class="n">CommThreadLoop</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_backlog_thread</span> <span class="o">=</span> <span class="n">CommBase</span><span class="o">.</span><span class="n">CommTaskLoop</span><span class="p">(</span>
                     <span class="bp">self</span><span class="p">,</span> <span class="n">target</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">run_backlog_send</span><span class="p">,</span> <span class="n">suffix</span><span class="o">=</span><span class="s1">&#39;SendBacklog&#39;</span><span class="p">)</span>
             <span class="k">else</span><span class="p">:</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">_backlog_thread</span> <span class="o">=</span> <span class="n">CommBase</span><span class="o">.</span><span class="n">CommThreadLoop</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_backlog_thread</span> <span class="o">=</span> <span class="n">CommBase</span><span class="o">.</span><span class="n">CommTaskLoop</span><span class="p">(</span>
                     <span class="bp">self</span><span class="p">,</span> <span class="n">target</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">run_backlog_recv</span><span class="p">,</span> <span class="n">suffix</span><span class="o">=</span><span class="s1">&#39;RecvBacklog&#39;</span><span class="p">)</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_backlog_thread</span>
 
@@ -276,10 +280,12 @@
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Close the backlog thread.&quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;&#39;</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">backlog_open</span> <span class="o">=</span> <span class="kc">False</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">backlog_thread</span><span class="o">.</span><span class="n">set_break_flag</span><span class="p">()</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_backlog_thread</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">backlog_thread</span><span class="o">.</span><span class="n">set_break_flag</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">backlog_send_ready</span><span class="o">.</span><span class="n">set</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">backlog_recv_ready</span><span class="o">.</span><span class="n">set</span><span class="p">()</span>
-        <span class="k">if</span> <span class="n">wait</span> <span class="ow">and</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">dont_backlog</span><span class="p">:</span>
+        <span class="k">if</span> <span class="p">((</span><span class="n">wait</span> <span class="ow">and</span> <span class="p">(</span><span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">dont_backlog</span><span class="p">)</span>
+             <span class="ow">and</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_backlog_thread</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">))):</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">backlog_thread</span><span class="o">.</span><span class="n">wait</span><span class="p">(</span><span class="n">key</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="n">uuid</span><span class="o">.</span><span class="n">uuid4</span><span class="p">()))</span>
 
     <span class="k">def</span> <span class="nf">_close</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">linger</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
@@ -481,8 +487,8 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">_close_backlog</span><span class="p">()</span>
             <span class="k">return</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">periodic_debug</span><span class="p">(</span><span class="s1">&#39;run_backlog_send&#39;</span><span class="p">,</span> <span class="n">period</span><span class="o">=</span><span class="mi">1000</span><span class="p">)(</span>
-            <span class="s2">&quot;Sleeping (is_confirmed_send=</span><span class="si">%s</span><span class="s2">)&quot;</span><span class="p">,</span>
-            <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">is_confirmed_send</span><span class="p">))</span>
+            <span class="s2">&quot;Sleeping (is_confirmed_send=</span><span class="si">%s</span><span class="s2">, n_msg_send=</span><span class="si">%d</span><span class="s2">)&quot;</span><span class="p">,</span>
+            <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">is_confirmed_send</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_msg_backlog_send</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">sleep</span><span class="p">()</span></div>
 
 <div class="viewcode-block" id="AsyncComm.run_backlog_recv"><a class="viewcode-back" href="../../../yggdrasil.communication.html#yggdrasil.communication.AsyncComm.AsyncComm.run_backlog_recv">[docs]</a>    <span class="k">def</span> <span class="nf">run_backlog_recv</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -619,7 +625,10 @@
                     <span class="k">return</span> <span class="n">out</span>
             <span class="k">except</span> <span class="n">AsyncTryAgain</span><span class="p">:</span>
                 <span class="k">if</span> <span class="n">no_backlog</span><span class="p">:</span>  <span class="c1"># pragma: debug</span>
-                    <span class="k">raise</span>
+                    <span class="k">if</span> <span class="p">(</span><span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_used</span><span class="p">)</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">_multiple_first_send</span><span class="p">:</span>
+                        <span class="k">return</span> <span class="kc">False</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="k">raise</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">add_backlog_send</span><span class="p">(</span><span class="n">payload</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">%d</span><span class="s1"> bytes backlogged&#39;</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">payload</span><span class="p">))</span>
         <span class="k">return</span> <span class="kc">True</span>
@@ -655,7 +664,7 @@
             <span class="k">while</span> <span class="p">((</span><span class="ow">not</span> <span class="n">T</span><span class="o">.</span><span class="n">is_out</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">n_msg_direct_recv</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span>
                    <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_open_direct</span><span class="p">):</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">sleep</span><span class="p">()</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">stop_timeout</span><span class="p">(</span><span class="n">key_suffix</span><span class="o">=</span><span class="s1">&#39;_recv:direct&#39;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">stop_timeout</span><span class="p">(</span><span class="n">key_suffix</span><span class="o">=</span><span class="s1">&#39;_recv:direct&#39;</span><span class="p">,</span> <span class="n">quiet</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
             <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_open_direct</span><span class="p">:</span>  <span class="c1"># pragma: debug</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Comm closed&quot;</span><span class="p">)</span>
                 <span class="k">return</span> <span class="p">(</span><span class="kc">False</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">empty_bytes_msg</span><span class="p">)</span>

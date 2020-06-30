@@ -17,5 +17,7 @@ pandas       Serializes tables using the pandas package.
 pickle       Serialize any Python object using a Python pickle.                              
 ply          Serialize 3D structures using Ply format.                                       
 table        ASCII tab (or otherwise) delimited table.                                       
+wofost       Serialization of mapping between keys and scalar or array values as used in the 
+             WOFOST parameter files.                                                         
 yaml         Serializes Python objects using the YAML standard.                              
 ==========   ================================================================================

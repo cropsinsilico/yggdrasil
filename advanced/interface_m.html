@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Matlab Interface &mdash; yggdrasil 1.0.0+154.g684a530e.dirty documentation</title>
+  <title>Matlab Interface &mdash; yggdrasil 1.1.1+410.g95af39b2 documentation</title>
   
 
   
@@ -61,7 +61,7 @@
             
             
               <div class="version">
-                1.0.0
+                1.1.1
               </div>
             
           
@@ -96,6 +96,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../autowrap.html#notes-on-autowrapping-c-c-model-functions">Notes on Autowrapping C/C++ Model Functions</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../conditional_io.html">Conditional I/O</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../transformed_io.html">Transformed I/O</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../timesync_io.html">Timestep Synchronization</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../yaml.html">YAML Files</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../config.html">Configuration Files</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../units.html">Units</a></li>
@@ -195,30 +196,30 @@
 <h1>Matlab Interface<a class="headerlink" href="#matlab-interface" title="Permalink to this headline">¶</a></h1>
 <div class="breathe-sectiondef docutils container">
 <p class="breathe-sectiondef-title rubric">Functions</p>
-<dl class="function">
+<dl class="cpp function">
 <dt>
-<span class="target" id="_ygg_interface_8m_1a7028523a410a9bca4d61edf8582f8d82"></span><code class="sig-name descname">if(nargin, 1)</code></dt>
+<span class="target" id="_ygg_interface_8m_1a7028523a410a9bca4d61edf8582f8d82"></span><code class="sig-name descname">if (nargin &gt; 1)</code></dt>
 <dd></dd></dl>
 
 </div>
 <div class="breathe-sectiondef docutils container">
 <p class="breathe-sectiondef-title rubric">Variables</p>
-<dl class="member">
+<dl class="cpp var">
 <dt>
-<span class="target" id="_ygg_interface_8m_1ac20f542425d23d5b71774e61a30c7884"></span><code class="sig-name descname">pyobj = YggInterface.YggInit(type, py.list(varargin))</code></dt>
+<span class="target" id="_ygg_interface_8m_1ac20f542425d23d5b71774e61a30c7884"></span><code class="sig-name descname">pyobj   = YggInterface.YggInit(type, py.list(varargin))</code></dt>
 <dd></dd></dl>
 
-<dl class="member">
+<dl class="cpp var">
 <dt>
-<span class="target" id="_ygg_interface_8m_1a2a89187d8e8e8fba509ef9ab5f815d88"></span><code class="sig-name descname">out = YggInterfaceClass(pyobj)</code></dt>
+<span class="target" id="_ygg_interface_8m_1a2a89187d8e8e8fba509ef9ab5f815d88"></span><code class="sig-name descname">out   = YggInterfaceClass(pyobj)</code></dt>
 <dd></dd></dl>
 
-<dl class="member">
+<dl class="cpp var">
 <dt>
 <span class="target" id="_ygg_interface_8m_1a0544c3fe466e421738dae463968b70ba"></span><code class="sig-name descname">else</code></dt>
 <dd></dd></dl>
 
-<dl class="member">
+<dl class="cpp var">
 <dt>
 <span class="target" id="_ygg_interface_8m_1afb358f48b1646c750fb9da6c6585be2b"></span><code class="sig-name descname">end</code></dt>
 <dd></dd></dl>

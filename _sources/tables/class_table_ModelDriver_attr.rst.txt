@@ -26,6 +26,8 @@ source_products       Files created by running the model that are source files. 
                       removed without checking their extension so users should avoid adding files to                                                 
                       this list unless they are sure they should be deleted.                                                                         
 strace_flags          Flags to pass to strace/dtrace.                                                               list                             
+timesync              If set, the name of the server performing timestep synchronization for the                    str                              
+                      model.                                                                                                                         
 valgrind_flags        Flags to pass to valgrind.                                                                    list                             
 with_strace           If True, the command is run with strace or dtrace.                                            bool                             
 with_valgrind         If True, the command is run with valgrind.                                                    bool                             

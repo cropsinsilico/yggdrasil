@@ -1,5 +1,7 @@
+.. _gs_lesson4_rst:
+
 gs_lesson4 Example
-==================
+=======================================
 
 C Version
 ---------
@@ -62,6 +64,28 @@ Model Code:
 Model YAML:
 
 .. literalinclude:: /../../yggdrasil/examples/gs_lesson4/gs_lesson4_cpp.yml
+   :language: yaml
+   :linenos:
+
+
+
+Fortran Version
+---------------
+
+Model Code:
+
+.. literalinclude:: /../../yggdrasil/examples/gs_lesson4/src/gs_lesson4_modelA.f90
+   :language: python
+   :linenos:
+
+.. literalinclude:: /../../yggdrasil/examples/gs_lesson4/src/gs_lesson4_modelB.f90
+   :language: python
+   :linenos:
+
+
+Model YAML:
+
+.. literalinclude:: /../../yggdrasil/examples/gs_lesson4/gs_lesson4_fortran.yml
    :language: yaml
    :linenos:
 

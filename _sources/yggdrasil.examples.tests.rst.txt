@@ -220,10 +220,34 @@ yggdrasil.examples.tests.test\_rpc\_lesson2 module
    :undoc-members:
    :show-inheritance:
 
+yggdrasil.examples.tests.test\_sbml module
+------------------------------------------
+
+.. automodule:: yggdrasil.examples.tests.test_sbml
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 yggdrasil.examples.tests.test\_timed\_pipe module
 -------------------------------------------------
 
 .. automodule:: yggdrasil.examples.tests.test_timed_pipe
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+yggdrasil.examples.tests.test\_timesync1 module
+-----------------------------------------------
+
+.. automodule:: yggdrasil.examples.tests.test_timesync1
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+yggdrasil.examples.tests.test\_timesync2 module
+-----------------------------------------------
+
+.. automodule:: yggdrasil.examples.tests.test_timesync2
    :members:
    :undoc-members:
    :show-inheritance:
@@ -248,6 +272,14 @@ yggdrasil.examples.tests.test\_types module
 -------------------------------------------
 
 .. automodule:: yggdrasil.examples.tests.test_types
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+yggdrasil.examples.tests.test\_wofost module
+--------------------------------------------
+
+.. automodule:: yggdrasil.examples.tests.test_wofost
    :members:
    :undoc-members:
    :show-inheritance:

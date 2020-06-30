@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>yggdrasil.examples.tests.test_SaM &mdash; yggdrasil 1.0.0+154.g684a530e.dirty documentation</title>
+  <title>yggdrasil.examples.tests.test_SaM &mdash; yggdrasil 1.1.1+410.g95af39b2 documentation</title>
   
 
   
@@ -59,7 +59,7 @@
             
             
               <div class="version">
-                1.0.0
+                1.1.1
               </div>
             
           
@@ -94,6 +94,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../../autowrap.html#notes-on-autowrapping-c-c-model-functions">Notes on Autowrapping C/C++ Model Functions</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../conditional_io.html">Conditional I/O</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../transformed_io.html">Transformed I/O</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../timesync_io.html">Timestep Synchronization</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../yaml.html">YAML Files</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../config.html">Configuration Files</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../units.html">Units</a></li>
@@ -186,9 +187,9 @@
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;list: Results that should be found in the output files.&quot;&quot;&quot;</span>
         <span class="c1"># 1 + 2*n_languages</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">language</span> <span class="o">==</span> <span class="s1">&#39;all&#39;</span><span class="p">:</span>  <span class="c1"># pragma: matlab</span>
-            <span class="n">s</span> <span class="o">=</span> <span class="mi">9</span>
+            <span class="n">s</span> <span class="o">=</span> <span class="mi">11</span>
         <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">language</span> <span class="o">==</span> <span class="s1">&#39;all_nomatlab&#39;</span><span class="p">:</span>  <span class="c1"># pragma: no matlab</span>
-            <span class="n">s</span> <span class="o">=</span> <span class="mi">7</span>
+            <span class="n">s</span> <span class="o">=</span> <span class="mi">9</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">s</span> <span class="o">=</span> <span class="mi">3</span>
         <span class="k">return</span> <span class="p">[</span><span class="s1">&#39;</span><span class="si">%d</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">s</span><span class="p">]</span>

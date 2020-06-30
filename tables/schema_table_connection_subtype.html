@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>&lt;no title&gt; &mdash; yggdrasil 1.0.0+154.g684a530e.dirty documentation</title>
+  <title>&lt;no title&gt; &mdash; yggdrasil 1.1.1+410.g95af39b2 documentation</title>
   
 
   
@@ -59,7 +59,7 @@
             
             
               <div class="version">
-                1.0.0
+                1.1.1
               </div>
             
           
@@ -94,6 +94,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../autowrap.html#notes-on-autowrapping-c-c-model-functions">Notes on Autowrapping C/C++ Model Functions</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../conditional_io.html">Conditional I/O</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../transformed_io.html">Transformed I/O</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../timesync_io.html">Timestep Synchronization</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../yaml.html">YAML Files</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../config.html">Configuration Files</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../units.html">Units</a></li>
@@ -195,26 +196,29 @@
 <tr class="row-even"><td><p>input</p></td>
 <td><p>Connection between one or more comms/files and a model.</p></td>
 </tr>
-<tr class="row-odd"><td><p>output</p></td>
+<tr class="row-odd"><td><p>io</p></td>
+<td><p>Connection between two models.</p></td>
+</tr>
+<tr class="row-even"><td><p>output</p></td>
 <td><p>Connection between a model and one or more comms/files.</p></td>
 </tr>
-<tr class="row-even"><td><p>rmq_async_client</p></td>
+<tr class="row-odd"><td><p>rmq_async_client</p></td>
 <td><p>Connection between a model acting as a client and an asynchronous RabbitMQ
 server request comm.</p></td>
 </tr>
-<tr class="row-odd"><td><p>rmq_async_server</p></td>
+<tr class="row-even"><td><p>rmq_async_server</p></td>
 <td><p>Connection between an asynchronous RabbitMQ server request comm and a model
 acting as a server.</p></td>
 </tr>
-<tr class="row-even"><td><p>rmq_client</p></td>
+<tr class="row-odd"><td><p>rmq_client</p></td>
 <td><p>Connection between a model acting as a client and a RabbitMQ server request
 comm.</p></td>
 </tr>
-<tr class="row-odd"><td><p>rmq_server</p></td>
+<tr class="row-even"><td><p>rmq_server</p></td>
 <td><p>Connection between a RabbitMQ server request comm and a model acting as a
 server.</p></td>
 </tr>
-<tr class="row-even"><td><p>server</p></td>
+<tr class="row-odd"><td><p>server</p></td>
 <td><p>Connection between a server request comm and a model acting as a server.</p></td>
 </tr>
 </tbody>

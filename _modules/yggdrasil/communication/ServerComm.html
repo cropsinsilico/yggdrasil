@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>yggdrasil.communication.ServerComm &mdash; yggdrasil 1.0.0+154.g684a530e.dirty documentation</title>
+  <title>yggdrasil.communication.ServerComm &mdash; yggdrasil 1.1.1+410.g95af39b2 documentation</title>
   
 
   
@@ -59,7 +59,7 @@
             
             
               <div class="version">
-                1.0.0
+                1.1.1
               </div>
             
           
@@ -94,6 +94,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../autowrap.html#notes-on-autowrapping-c-c-model-functions">Notes on Autowrapping C/C++ Model Functions</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../conditional_io.html">Conditional I/O</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../transformed_io.html">Transformed I/O</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../timesync_io.html">Timestep Synchronization</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../yaml.html">YAML Files</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../config.html">Configuration Files</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../units.html">Units</a></li>
@@ -170,8 +171,12 @@
            <div itemprop="articleBody">
             
   <h1>Source code for yggdrasil.communication.ServerComm</h1><div class="highlight"><pre>
-<span></span><span class="kn">from</span> <span class="nn">yggdrasil.components</span> <span class="k">import</span> <span class="n">import_component</span>
+<span></span><span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">uuid</span>
+<span class="kn">from</span> <span class="nn">collections</span> <span class="k">import</span> <span class="n">OrderedDict</span>
+<span class="kn">from</span> <span class="nn">yggdrasil.components</span> <span class="k">import</span> <span class="n">import_component</span>
 <span class="kn">from</span> <span class="nn">yggdrasil.communication</span> <span class="k">import</span> <span class="n">CommBase</span><span class="p">,</span> <span class="n">get_comm</span>
+<span class="kn">from</span> <span class="nn">yggdrasil.drivers.ClientRequestDriver</span> <span class="k">import</span> <span class="n">YGG_CLIENT_EOF</span>
 
 
 <div class="viewcode-block" id="ServerComm"><a class="viewcode-back" href="../../../yggdrasil.communication.html#yggdrasil.communication.ServerComm.ServerComm">[docs]</a><span class="k">class</span> <span class="nc">ServerComm</span><span class="p">(</span><span class="n">CommBase</span><span class="o">.</span><span class="n">CommBase</span><span class="p">):</span>
@@ -189,7 +194,7 @@
 <span class="sd">    Attributes:</span>
 <span class="sd">        response_kwargs (dict): Keyword arguments for the response comm.</span>
 <span class="sd">        icomm (Comm): Request comm.</span>
-<span class="sd">        ocomm (Comm): Response comm for last request.</span>
+<span class="sd">        ocomm (OrderedDict): Response comms for each request.</span>
 
 <span class="sd">    &quot;&quot;&quot;</span>
 
@@ -206,11 +211,14 @@
         <span class="n">icomm_kwargs</span><span class="p">[</span><span class="s1">&#39;comm&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">request_comm</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">response_kwargs</span> <span class="o">=</span> <span class="n">response_kwargs</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">icomm</span> <span class="o">=</span> <span class="n">get_comm</span><span class="p">(</span><span class="n">icomm_name</span><span class="p">,</span> <span class="o">**</span><span class="n">icomm_kwargs</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">ocomm</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ocomm</span> <span class="o">=</span> <span class="n">OrderedDict</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">response_kwargs</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s1">&#39;comm&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">icomm</span><span class="o">.</span><span class="n">comm_class</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">response_kwargs</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s1">&#39;recv_timeout&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">icomm</span><span class="o">.</span><span class="n">recv_timeout</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">response_kwargs</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s1">&#39;language&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">icomm</span><span class="o">.</span><span class="n">language</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_used_response_comms</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">clients</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">closed_clients</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">nclients_expected</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;YGG_NCLIENTS&#39;</span><span class="p">,</span> <span class="mi">0</span><span class="p">))</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">ServerComm</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">icomm</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">dont_open</span><span class="o">=</span><span class="n">dont_open</span><span class="p">,</span>
                                          <span class="n">recv_timeout</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">icomm</span><span class="o">.</span><span class="n">recv_timeout</span><span class="p">,</span>
                                          <span class="n">is_interface</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">icomm</span><span class="o">.</span><span class="n">is_interface</span><span class="p">,</span>
@@ -295,8 +303,8 @@
 <div class="viewcode-block" id="ServerComm.close"><a class="viewcode-back" href="../../../yggdrasil.communication.html#yggdrasil.communication.ServerComm.ServerComm.close">[docs]</a>    <span class="k">def</span> <span class="nf">close</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Close the connection.&quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">icomm</span><span class="o">.</span><span class="n">close</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">ocomm</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">ocomm</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">ocomm</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">ocomm</span><span class="o">.</span><span class="n">values</span><span class="p">():</span>
+            <span class="n">ocomm</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
         <span class="k">for</span> <span class="n">ocomm</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_used_response_comms</span><span class="o">.</span><span class="n">values</span><span class="p">():</span>
             <span class="n">ocomm</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">ServerComm</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">close</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
@@ -321,6 +329,18 @@
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;int: The number of messages in the connection to drain.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">icomm</span><span class="o">.</span><span class="n">n_msg_recv_drain</span>
 
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">open_clients</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;list: Available open clients.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="nb">list</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">clients</span><span class="p">)</span> <span class="o">-</span> <span class="nb">set</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">closed_clients</span><span class="p">))</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">all_clients_connected</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;bool: True if all expected clients have connected.</span>
+<span class="sd">        False otherwise.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">nclients_expected</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)</span>
+                <span class="ow">and</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">clients</span><span class="p">)</span> <span class="o">&gt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">nclients_expected</span><span class="p">))</span>
+
     <span class="c1"># RESPONSE COMM</span>
 <div class="viewcode-block" id="ServerComm.create_response_comm"><a class="viewcode-back" href="../../../yggdrasil.communication.html#yggdrasil.communication.ServerComm.ServerComm.create_response_comm">[docs]</a>    <span class="k">def</span> <span class="nf">create_response_comm</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Create a response comm based on information from the last header.&quot;&quot;&quot;</span>
@@ -331,17 +351,51 @@
         <span class="n">comm_kwargs</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">address</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">icomm</span><span class="o">.</span><span class="n">_last_header</span><span class="p">[</span><span class="s1">&#39;response_address&#39;</span><span class="p">],</span>
                            <span class="n">direction</span><span class="o">=</span><span class="s1">&#39;send&#39;</span><span class="p">,</span> <span class="n">is_response_server</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
                            <span class="n">single_use</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">response_kwargs</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">ocomm</span> <span class="o">=</span> <span class="n">get_comm</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">+</span> <span class="s1">&#39;.server_response_comm&#39;</span><span class="p">,</span>
-                              <span class="o">**</span><span class="n">comm_kwargs</span><span class="p">)</span></div>
+        <span class="n">request_id</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">icomm</span><span class="o">.</span><span class="n">_last_header</span><span class="p">[</span><span class="s1">&#39;request_id&#39;</span><span class="p">]</span>
+        <span class="k">while</span> <span class="n">request_id</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">ocomm</span><span class="p">:</span>  <span class="c1"># pragma: debug</span>
+            <span class="n">request_id</span> <span class="o">+=</span> <span class="nb">str</span><span class="p">(</span><span class="n">uuid</span><span class="o">.</span><span class="n">uuid4</span><span class="p">())</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ocomm</span><span class="p">[</span><span class="n">request_id</span><span class="p">]</span> <span class="o">=</span> <span class="n">get_comm</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">+</span> <span class="s1">&#39;.server_response_comm.&#39;</span> <span class="o">+</span> <span class="n">request_id</span><span class="p">,</span>
+            <span class="o">**</span><span class="n">comm_kwargs</span><span class="p">)</span>
+        <span class="n">client_model</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">icomm</span><span class="o">.</span><span class="n">_last_header</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;client_model&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ocomm</span><span class="p">[</span><span class="n">request_id</span><span class="p">]</span><span class="o">.</span><span class="n">client_model</span> <span class="o">=</span> <span class="n">client_model</span>
+        <span class="k">if</span> <span class="n">client_model</span> <span class="ow">and</span> <span class="p">(</span><span class="n">client_model</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">clients</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">clients</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">client_model</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="ServerComm.remove_response_comm"><a class="viewcode-back" href="../../../yggdrasil.communication.html#yggdrasil.communication.ServerComm.ServerComm.remove_response_comm">[docs]</a>    <span class="k">def</span> <span class="nf">remove_response_comm</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Remove response comm.&quot;&quot;&quot;</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">icomm</span><span class="o">.</span><span class="n">_last_header</span> <span class="o">=</span> <span class="kc">None</span>
-        <span class="c1"># self.ocomm.close_on_empty(no_wait=True)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_used_response_comms</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">ocomm</span><span class="o">.</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ocomm</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">ocomm</span> <span class="o">=</span> <span class="kc">None</span></div>
+<div class="viewcode-block" id="ServerComm.remove_response_comm"><a class="viewcode-back" href="../../../yggdrasil.communication.html#yggdrasil.communication.ServerComm.ServerComm.remove_response_comm">[docs]</a>    <span class="k">def</span> <span class="nf">remove_response_comm</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">request_id</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Remove response comm.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            request_id (str): The ID used to register the response</span>
+<span class="sd">                comm that should be removed.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># self.icomm._last_header = None</span>
+        <span class="n">ocomm</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ocomm</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="n">request_id</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">ocomm</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">ocomm</span><span class="o">.</span><span class="n">close_in_thread</span><span class="p">(</span><span class="n">no_wait</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_used_response_comms</span><span class="p">[</span><span class="n">ocomm</span><span class="o">.</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">ocomm</span></div>
 
     <span class="c1"># SEND METHODS</span>
+<div class="viewcode-block" id="ServerComm.send_to"><a class="viewcode-back" href="../../../yggdrasil.communication.html#yggdrasil.communication.ServerComm.ServerComm.send_to">[docs]</a>    <span class="k">def</span> <span class="nf">send_to</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">request_id</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Send a message to a specific response comm.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            request_id (str): ID used to register the response comm.</span>
+<span class="sd">            *args: Arguments are passed to output comm send method.</span>
+<span class="sd">            **kwargs: Keyword arguments are passed to output comm send method.</span>
+<span class="sd">    </span>
+<span class="sd">        Returns:</span>
+<span class="sd">            obj: Output from output comm send method.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># if self.is_closed:</span>
+        <span class="c1">#     self.debug(&quot;send(): Connection closed.&quot;)</span>
+        <span class="c1">#     return False</span>
+        <span class="n">out</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ocomm</span><span class="p">[</span><span class="n">request_id</span><span class="p">]</span><span class="o">.</span><span class="n">send</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">remove_response_comm</span><span class="p">(</span><span class="n">request_id</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">out</span></div>
+        
 <div class="viewcode-block" id="ServerComm.send"><a class="viewcode-back" href="../../../yggdrasil.communication.html#yggdrasil.communication.ServerComm.ServerComm.send">[docs]</a>    <span class="k">def</span> <span class="nf">send</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Send a message to the output comm.</span>
 
@@ -353,16 +407,33 @@
 <span class="sd">            obj: Output from output comm send method.</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="c1"># if self.is_closed:</span>
-        <span class="c1">#     self.debug(&quot;send(): Connection closed.&quot;)</span>
-        <span class="c1">#     return False</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">ocomm</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>  <span class="c1"># pragma: debug</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ocomm</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>  <span class="c1"># pragma: debug</span>
             <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">&quot;There is no registered response comm.&quot;</span><span class="p">)</span>
-        <span class="n">out</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ocomm</span><span class="o">.</span><span class="n">send</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">remove_response_comm</span><span class="p">()</span>
-        <span class="k">return</span> <span class="n">out</span></div>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">send_to</span><span class="p">(</span><span class="nb">next</span><span class="p">(</span><span class="nb">iter</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ocomm</span><span class="o">.</span><span class="n">keys</span><span class="p">())),</span>
+                            <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
 
     <span class="c1"># RECV METHODS</span>
+<div class="viewcode-block" id="ServerComm.recv_from"><a class="viewcode-back" href="../../../yggdrasil.communication.html#yggdrasil.communication.ServerComm.ServerComm.recv_from">[docs]</a>    <span class="k">def</span> <span class="nf">recv_from</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Receive a message from the input comm and open a new response comm</span>
+<span class="sd">        for output using address from the header, returning the request_id.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            *args: Arguments are passed to input comm recv method.</span>
+<span class="sd">            **kwargs: Keyword arguments are passed to input comm recv method.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            tuple(bool, obj, str): Success or failure of recv call,</span>
+<span class="sd">                output from input comm recv method, and request_id that</span>
+<span class="sd">                response should be sent to.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">request_id</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="n">flag</span><span class="p">,</span> <span class="n">msg</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">recv</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="k">if</span> <span class="p">((</span><span class="n">flag</span> <span class="ow">and</span> <span class="p">(</span><span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">icomm</span><span class="o">.</span><span class="n">is_eof</span><span class="p">(</span><span class="n">msg</span><span class="p">))</span>
+             <span class="ow">and</span> <span class="p">(</span><span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">icomm</span><span class="o">.</span><span class="n">is_empty_recv</span><span class="p">(</span><span class="n">msg</span><span class="p">)))):</span>
+            <span class="n">request_id</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span><span class="nb">reversed</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ocomm</span><span class="o">.</span><span class="n">keys</span><span class="p">()))</span>
+        <span class="k">return</span> <span class="n">flag</span><span class="p">,</span> <span class="n">msg</span><span class="p">,</span> <span class="n">request_id</span></div>
+    
 <div class="viewcode-block" id="ServerComm.recv"><a class="viewcode-back" href="../../../yggdrasil.communication.html#yggdrasil.communication.ServerComm.ServerComm.recv">[docs]</a>    <span class="k">def</span> <span class="nf">recv</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Receive a message from the input comm and open a new response comm</span>
 <span class="sd">        for output using address from the header.</span>
@@ -379,8 +450,13 @@
         <span class="c1">#     self.debug(&quot;recv(): Connection closed.&quot;)</span>
         <span class="c1">#     return (False, None)</span>
         <span class="n">flag</span><span class="p">,</span> <span class="n">msg</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">icomm</span><span class="o">.</span><span class="n">recv</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
-        <span class="k">if</span> <span class="n">flag</span> <span class="ow">and</span> <span class="n">msg</span> <span class="ow">and</span> <span class="p">(</span><span class="n">msg</span> <span class="o">!=</span> <span class="bp">self</span><span class="o">.</span><span class="n">eof_msg</span><span class="p">):</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">create_response_comm</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">flag</span><span class="p">:</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">msg</span><span class="p">,</span> <span class="nb">bytes</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">msg</span> <span class="o">==</span> <span class="n">YGG_CLIENT_EOF</span><span class="p">):</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">closed_clients</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">icomm</span><span class="o">.</span><span class="n">_last_header</span><span class="p">[</span><span class="s1">&#39;client_model&#39;</span><span class="p">])</span>
+                <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">recv</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+            <span class="k">elif</span> <span class="ow">not</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">icomm</span><span class="o">.</span><span class="n">is_eof</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">icomm</span><span class="o">.</span><span class="n">is_empty_recv</span><span class="p">(</span><span class="n">msg</span><span class="p">)):</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">create_response_comm</span><span class="p">()</span>
         <span class="k">return</span> <span class="n">flag</span><span class="p">,</span> <span class="n">msg</span></div>
 
     <span class="c1"># OLD STYLE ALIASES</span>
@@ -401,8 +477,8 @@
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Purge input and output comms.&quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">icomm</span><span class="o">.</span><span class="n">purge</span><span class="p">()</span>
         <span class="c1"># Not sure if server should purge the response queue...</span>
-        <span class="c1"># if self.ocomm is not None:</span>
-        <span class="c1">#     self.ocomm.purge()</span>
+        <span class="c1"># for ocomm in self.ocomm.values():</span>
+        <span class="c1">#     ocomm.purge()</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">ServerComm</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">purge</span><span class="p">()</span></div></div>
 </pre></div>
 

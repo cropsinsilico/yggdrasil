@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>yggdrasil.tests &mdash; yggdrasil 1.0.0+154.g684a530e.dirty documentation</title>
+  <title>yggdrasil.tests &mdash; yggdrasil 1.1.1+410.g95af39b2 documentation</title>
   
 
   
@@ -59,7 +59,7 @@
             
             
               <div class="version">
-                1.0.0
+                1.1.1
               </div>
             
           
@@ -94,6 +94,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../../autowrap.html#notes-on-autowrapping-c-c-model-functions">Notes on Autowrapping C/C++ Model Functions</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../conditional_io.html">Conditional I/O</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../transformed_io.html">Transformed I/O</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../timesync_io.html">Timestep Synchronization</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../yaml.html">YAML Files</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../config.html">Configuration Files</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../units.html">Units</a></li>
@@ -209,7 +210,9 @@
     <span class="p">(</span><span class="s1">&#39;python&#39;</span><span class="p">,</span> <span class="s1">&#39;python_model.py&#39;</span><span class="p">),</span>
     <span class="p">(</span><span class="s1">&#39;error&#39;</span><span class="p">,</span> <span class="s1">&#39;error_model.py&#39;</span><span class="p">),</span>
     <span class="p">(</span><span class="s1">&#39;lpy&#39;</span><span class="p">,</span> <span class="s1">&#39;lpy_model.lpy&#39;</span><span class="p">),</span>
-    <span class="p">(</span><span class="s1">&#39;r&#39;</span><span class="p">,</span> <span class="s1">&#39;r_model.R&#39;</span><span class="p">)]</span>
+    <span class="p">(</span><span class="s1">&#39;r&#39;</span><span class="p">,</span> <span class="s1">&#39;r_model.R&#39;</span><span class="p">),</span>
+    <span class="p">(</span><span class="s1">&#39;fortran&#39;</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;hellofunc.f90&#39;</span><span class="p">,</span> <span class="s1">&#39;fortran_model.f90&#39;</span><span class="p">]),</span>
+    <span class="p">(</span><span class="s1">&#39;sbml&#39;</span><span class="p">,</span> <span class="s1">&#39;sbml_model.xml&#39;</span><span class="p">)]</span>
 <span class="n">scripts</span> <span class="o">=</span> <span class="p">{}</span>
 <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">script_list</span><span class="p">:</span>
     <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
@@ -232,7 +235,9 @@
     <span class="p">(</span><span class="s1">&#39;matlab&#39;</span><span class="p">,</span> <span class="s1">&#39;matlab_model.yml&#39;</span><span class="p">),</span>
     <span class="p">(</span><span class="s1">&#39;python&#39;</span><span class="p">,</span> <span class="s1">&#39;python_model.yml&#39;</span><span class="p">),</span>
     <span class="p">(</span><span class="s1">&#39;error&#39;</span><span class="p">,</span> <span class="s1">&#39;error_model.yml&#39;</span><span class="p">),</span>
-    <span class="p">(</span><span class="s1">&#39;lpy&#39;</span><span class="p">,</span> <span class="s1">&#39;lpy_model.yml&#39;</span><span class="p">)]</span>
+    <span class="p">(</span><span class="s1">&#39;lpy&#39;</span><span class="p">,</span> <span class="s1">&#39;lpy_model.yml&#39;</span><span class="p">),</span>
+    <span class="p">(</span><span class="s1">&#39;fortran&#39;</span><span class="p">,</span> <span class="s1">&#39;fortran_model.yml&#39;</span><span class="p">),</span>
+    <span class="p">(</span><span class="s1">&#39;sbml&#39;</span><span class="p">,</span> <span class="s1">&#39;sbml_model.yml&#39;</span><span class="p">)]</span>
 <span class="n">yamls</span> <span class="o">=</span> <span class="p">{</span><span class="n">k</span><span class="p">:</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">yaml_dir</span><span class="p">,</span> <span class="n">v</span><span class="p">)</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">yaml_list</span><span class="p">}</span>
 
 <span class="c1"># Makefile</span>
@@ -1216,6 +1221,41 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">replace_method</span><span class="p">(</span><span class="n">method_name</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">error_method</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
 
     <span class="k">return</span> <span class="n">ErrorClass</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
+
+
+<span class="k">def</span> <span class="nf">generate_component_tests</span><span class="p">(</span><span class="n">comptype</span><span class="p">,</span> <span class="n">base_class</span><span class="p">,</span> <span class="n">target_globals</span><span class="p">,</span>
+                             <span class="n">directory</span><span class="p">,</span> <span class="n">class_attr</span><span class="o">=</span><span class="s1">&#39;_cls&#39;</span><span class="p">):</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Function that generates tests for all component subtypes</span>
+<span class="sd">    based on the registered classes.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        comptype (str): Component type.</span>
+<span class="sd">        base_class (class): Base python test class.</span>
+<span class="sd">        target_globals (dict): Globals dictionary that class should be</span>
+<span class="sd">            added to.</span>
+<span class="sd">        directory (str): Directory to check for tests or file in directory</span>
+<span class="sd">            that should be checked for tests.</span>
+<span class="sd">        class_attr (str, optional): Attribute that should be set to the</span>
+<span class="sd">            name of the class being tested.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="kn">from</span> <span class="nn">yggdrasil.schema</span> <span class="k">import</span> <span class="n">get_schema</span>
+    <span class="n">_schema</span> <span class="o">=</span> <span class="n">get_schema</span><span class="p">()</span>
+    <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">directory</span><span class="p">):</span>
+        <span class="n">directory</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">directory</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">comptype</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">_schema</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>  <span class="c1"># pragma: debug</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">%s</span><span class="s2"> is not a component type.&quot;</span> <span class="o">%</span> <span class="n">comptype</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">subtype</span> <span class="ow">in</span> <span class="n">_schema</span><span class="p">[</span><span class="n">comptype</span><span class="p">]</span><span class="o">.</span><span class="n">subtypes</span><span class="p">:</span>
+        <span class="n">subtype_cls</span> <span class="o">=</span> <span class="n">_schema</span><span class="p">[</span><span class="n">comptype</span><span class="p">]</span><span class="o">.</span><span class="n">subtype2class</span><span class="p">[</span><span class="n">subtype</span><span class="p">]</span>
+        <span class="n">new_cls_name</span> <span class="o">=</span> <span class="s1">&#39;Test</span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">subtype_cls</span>
+        <span class="n">new_cls_file</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">directory</span><span class="p">,</span>
+                                    <span class="s1">&#39;test_</span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">subtype_cls</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39;.py&#39;</span>
+        <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">new_cls_file</span><span class="p">):</span>
+            <span class="k">continue</span>
+        <span class="n">cls_attr</span> <span class="o">=</span> <span class="p">{</span><span class="n">class_attr</span><span class="p">:</span> <span class="n">subtype_cls</span><span class="p">}</span>
+        <span class="n">new_cls</span> <span class="o">=</span> <span class="nb">type</span><span class="p">(</span><span class="n">new_cls_name</span><span class="p">,</span> <span class="p">(</span><span class="n">base_class</span><span class="p">,</span> <span class="p">),</span> <span class="n">cls_attr</span><span class="p">)</span>
+        <span class="n">target_globals</span><span class="p">[</span><span class="n">new_cls</span><span class="o">.</span><span class="vm">__name__</span><span class="p">]</span> <span class="o">=</span> <span class="n">new_cls</span>
+        <span class="k">del</span> <span class="n">new_cls</span>
 
 
 <span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;data&#39;</span><span class="p">,</span> <span class="s1">&#39;scripts&#39;</span><span class="p">,</span> <span class="s1">&#39;yamls&#39;</span><span class="p">,</span> <span class="s1">&#39;IOInfo&#39;</span><span class="p">,</span> <span class="s1">&#39;ErrorClass&#39;</span><span class="p">,</span>

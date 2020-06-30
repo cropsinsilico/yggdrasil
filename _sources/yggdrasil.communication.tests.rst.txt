@@ -12,14 +12,6 @@ yggdrasil.communication.tests.test\_AsciiFileComm module
    :undoc-members:
    :show-inheritance:
 
-yggdrasil.communication.tests.test\_AsciiMapComm module
--------------------------------------------------------
-
-.. automodule:: yggdrasil.communication.tests.test_AsciiMapComm
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
 yggdrasil.communication.tests.test\_AsciiTableComm module
 ---------------------------------------------------------
 
@@ -76,50 +68,10 @@ yggdrasil.communication.tests.test\_IPCComm module
    :undoc-members:
    :show-inheritance:
 
-yggdrasil.communication.tests.test\_JSONFileComm module
--------------------------------------------------------
-
-.. automodule:: yggdrasil.communication.tests.test_JSONFileComm
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
-yggdrasil.communication.tests.test\_MatFileComm module
-------------------------------------------------------
-
-.. automodule:: yggdrasil.communication.tests.test_MatFileComm
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
-yggdrasil.communication.tests.test\_ObjFileComm module
-------------------------------------------------------
-
-.. automodule:: yggdrasil.communication.tests.test_ObjFileComm
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
 yggdrasil.communication.tests.test\_PandasFileComm module
 ---------------------------------------------------------
 
 .. automodule:: yggdrasil.communication.tests.test_PandasFileComm
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
-yggdrasil.communication.tests.test\_PickleFileComm module
----------------------------------------------------------
-
-.. automodule:: yggdrasil.communication.tests.test_PickleFileComm
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
-yggdrasil.communication.tests.test\_PlyFileComm module
-------------------------------------------------------
-
-.. automodule:: yggdrasil.communication.tests.test_PlyFileComm
    :members:
    :undoc-members:
    :show-inheritance:
@@ -144,14 +96,6 @@ yggdrasil.communication.tests.test\_ServerComm module
 -----------------------------------------------------
 
 .. automodule:: yggdrasil.communication.tests.test_ServerComm
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
-yggdrasil.communication.tests.test\_YAMLFileComm module
--------------------------------------------------------
-
-.. automodule:: yggdrasil.communication.tests.test_YAMLFileComm
    :members:
    :undoc-members:
    :show-inheritance:

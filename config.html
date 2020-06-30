@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Configuration Files &mdash; yggdrasil 1.0.0+154.g684a530e.dirty documentation</title>
+  <title>Configuration Files &mdash; yggdrasil 1.1.1+410.g95af39b2 documentation</title>
   
 
   
@@ -61,7 +61,7 @@
             
             
               <div class="version">
-                1.0.0
+                1.1.1
               </div>
             
           
@@ -96,6 +96,7 @@
 <li class="toctree-l1"><a class="reference internal" href="autowrap.html#notes-on-autowrapping-c-c-model-functions">Notes on Autowrapping C/C++ Model Functions</a></li>
 <li class="toctree-l1"><a class="reference internal" href="conditional_io.html">Conditional I/O</a></li>
 <li class="toctree-l1"><a class="reference internal" href="transformed_io.html">Transformed I/O</a></li>
+<li class="toctree-l1"><a class="reference internal" href="timesync_io.html">Timestep Synchronization</a></li>
 <li class="toctree-l1"><a class="reference internal" href="yaml.html">YAML Files</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Configuration Files</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#debug-options">Debug Options</a></li>
@@ -183,23 +184,15 @@
             
   <div class="section" id="configuration-files">
 <span id="config-rst"></span><h1>Configuration Files<a class="headerlink" href="#configuration-files" title="Permalink to this headline">¶</a></h1>
-<p>Many components of the yggdrasil framework’s behavior can be controlled
-by options in the configuration file. When installed yggdrasil creates
-a user config file called ‘.yggdrasil.cfg’ in your home directory. By
-editting the options in the user config file, you can customize the behavior
-of your framework runs.</p>
-<p>Further customization for specific runs can be
-achieved by creating a local config file called ‘.yggdrasil.cfg’ in the
-directory where the interface will be run. Any options not found in the local
-will be filled in with values from the user config file. Any options not
-found in the user config file will be filled in with default package values.</p>
+<p>Many components of the yggdrasil framework’s behavior can be controlled by options in the configuration file. When installed yggdrasil creates a user config file called ‘.yggdrasil.cfg’ in your home directory or the direcotry associated with your conda or virtual environment (if you are using a conda or virtual environment). By editting the options in the user config file, you can customize the behavior of your framework runs. The exact location of your config file can be found by running:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ yggconfig --show-file
+</pre></div>
+</div>
+<p>Further customization for specific runs can be achieved by creating a local config file called ‘.yggdrasil.cfg’ in the directory where the interface will be run. Any options not found in the local will be filled in with values from the user config file. Any options not found in the user config file will be filled in with default package values.</p>
 <div class="section" id="debug-options">
 <h2>Debug Options<a class="headerlink" href="#debug-options" title="Permalink to this headline">¶</a></h2>
-<p>Options for controlling the level of information printed during a run can be
-controlled by options in the ‘[debug]’ section of the config files. Each one
-can have any of the valid
-<a class="reference external" href="https://docs.python.org/2/library/logging.html#levels">logging levels</a>.
-These include:</p>
+<p>Options for controlling the level of information printed during a run can be controlled by options in the ‘[debug]’ section of the config files. Each one can have any of the valid
+<a class="reference external" href="https://docs.python.org/2/library/logging.html#levels">logging levels</a>. These include:</p>
 <ul class="simple">
 <li><p><strong>NOTSET:</strong> Do not print any messages.</p></li>
 <li><p><strong>CRITICAL:</strong> Print only messages logged as critical.</p></li>
@@ -242,9 +235,7 @@ yggdrasil calls from the models.</p></td>
 </div>
 <div class="section" id="language-options">
 <h2>Language Options<a class="headerlink" href="#language-options" title="Permalink to this headline">¶</a></h2>
-<p>Each supported language has a dedicated section in the config file with
-options that control how models of that language will be handled. The
-following options are available to all languages:</p>
+<p>Each supported language has a dedicated section in the config file with options that control how models of that language will be handled. The following options are available to all languages:</p>
 <table class="docutils align-default">
 <colgroup>
 <col style="width: 21%" />
@@ -337,7 +328,7 @@ options related to their treatment of models or dependencies.</p>
 use an alternate version than the one identified by yggdrasil, it may
 be necessary for you to manually specify the location of dependency
 headers and/or libraries. These can be set using the following config
-options.</p>
+options (with are also used to configure C++ model compilations).</p>
 <table class="docutils align-default">
 <colgroup>
 <col style="width: 25%" />
@@ -357,13 +348,45 @@ headers.</p></td>
 <td><p>Full path to the zmq.h header.</p></td>
 </tr>
 <tr class="row-even"><td><p>zmq_static</p></td>
-<td><p>Full path to the zmq.lib static library.</p></td>
+<td><p>Full path to the zmq.lib/libzmq.a static library.</p></td>
 </tr>
-<tr class="row-odd"><td><p>czmq_include</p></td>
+<tr class="row-odd"><td><p>zmq_shared</p></td>
+<td><p>Full path to the zmq.dll/libzmq.so/libzmq.dylib
+dynamic/shared object library.</p></td>
+</tr>
+<tr class="row-even"><td><p>czmq_include</p></td>
 <td><p>Full path to the czmq.h header.</p></td>
 </tr>
-<tr class="row-even"><td><p>czmq_static</p></td>
+<tr class="row-odd"><td><p>czmq_static</p></td>
 <td><p>Full path to the czmq.lib static library.</p></td>
+</tr>
+<tr class="row-even"><td><p>czmq_shared</p></td>
+<td><p>Full path to the czmq.dll/libczmq.so/libczmq.dylib
+dynamic/shared object library.</p></td>
+</tr>
+<tr class="row-odd"><td><p>python_include</p></td>
+<td><p>Full path to the Python.h header.</p></td>
+</tr>
+<tr class="row-even"><td><p>python_static</p></td>
+<td><p>Full path to the pythonX.X.lib/libpythonX.X.a
+static library.</p></td>
+</tr>
+<tr class="row-odd"><td><p>python_shared</p></td>
+<td><p>Full path to the pythonX.X.dll/libpythonX.X.so/
+libpythonX.X.dylib dynamic/shared object library.</p></td>
+</tr>
+<tr class="row-even"><td><p>c++_include</p></td>
+<td><p>Full path to the stdlib.h C++ header.</p></td>
+</tr>
+<tr class="row-odd"><td><p>c++_static</p></td>
+<td><p>Full path to the libc++.a static library.</p></td>
+</tr>
+<tr class="row-even"><td><p>c++_shared</p></td>
+<td><p>Full path to the libc++.so/libc++.dylib C++
+dynamic/shared object library.</p></td>
+</tr>
+<tr class="row-odd"><td><p>macos_sdkroot</p></td>
+<td><p>Full path to the Mac SDK that should be used.</p></td>
 </tr>
 </tbody>
 </table>

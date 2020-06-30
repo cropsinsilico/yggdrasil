@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>yggdrasil.serialize.AsciiTableSerialize &mdash; yggdrasil 1.0.0+154.g684a530e.dirty documentation</title>
+  <title>yggdrasil.serialize.AsciiTableSerialize &mdash; yggdrasil 1.1.1+410.g95af39b2 documentation</title>
   
 
   
@@ -59,7 +59,7 @@
             
             
               <div class="version">
-                1.0.0
+                1.1.1
               </div>
             
           
@@ -94,6 +94,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../autowrap.html#notes-on-autowrapping-c-c-model-functions">Notes on Autowrapping C/C++ Model Functions</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../conditional_io.html">Conditional I/O</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../transformed_io.html">Transformed I/O</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../timesync_io.html">Timestep Synchronization</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../yaml.html">YAML Files</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../config.html">Configuration Files</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../units.html">Units</a></li>
@@ -171,7 +172,6 @@
 <span></span><span class="kn">from</span> <span class="nn">yggdrasil</span> <span class="k">import</span> <span class="n">units</span><span class="p">,</span> <span class="n">serialize</span><span class="p">,</span> <span class="n">tools</span>
 <span class="kn">from</span> <span class="nn">yggdrasil.serialize</span> <span class="k">import</span> <span class="n">_default_delimiter_str</span>
 <span class="kn">from</span> <span class="nn">yggdrasil.serialize.DefaultSerialize</span> <span class="k">import</span> <span class="n">DefaultSerialize</span>
-<span class="kn">from</span> <span class="nn">yggdrasil.metaschema</span> <span class="k">import</span> <span class="n">get_metaschema</span>
 <span class="kn">from</span> <span class="nn">yggdrasil.metaschema.properties.ScalarMetaschemaProperties</span> <span class="k">import</span> <span class="p">(</span>
     <span class="n">definition2dtype</span><span class="p">,</span> <span class="n">data2dtype</span><span class="p">)</span>
 
@@ -231,12 +231,9 @@
 
 <div class="viewcode-block" id="AsciiTableSerialize.update_serializer"><a class="viewcode-back" href="../../../yggdrasil.serialize.html#yggdrasil.serialize.AsciiTableSerialize.AsciiTableSerialize.update_serializer">[docs]</a>    <span class="k">def</span> <span class="nf">update_serializer</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="c1"># Transform scalar into array for table</span>
-        <span class="k">if</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;type&#39;</span><span class="p">,</span> <span class="s1">&#39;array&#39;</span><span class="p">)</span> <span class="o">!=</span> <span class="s1">&#39;array&#39;</span><span class="p">:</span>
-            <span class="n">old_typedef</span> <span class="o">=</span> <span class="p">{}</span>
-            <span class="n">_metaschema</span> <span class="o">=</span> <span class="n">get_metaschema</span><span class="p">()</span>
-            <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">_metaschema</span><span class="p">[</span><span class="s1">&#39;properties&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
-                <span class="k">if</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="p">:</span>
-                    <span class="n">old_typedef</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="n">k</span><span class="p">)</span>
+        <span class="n">old_typedef</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;datatype&#39;</span><span class="p">,</span> <span class="p">{})</span>
+        <span class="k">if</span> <span class="n">old_typedef</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;type&#39;</span><span class="p">,</span> <span class="s1">&#39;array&#39;</span><span class="p">)</span> <span class="o">!=</span> <span class="s1">&#39;array&#39;</span><span class="p">:</span>
+            <span class="n">old_typedef</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;datatype&#39;</span><span class="p">)</span>
             <span class="k">if</span> <span class="n">old_typedef</span><span class="p">[</span><span class="s1">&#39;type&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;object&#39;</span><span class="p">:</span>
                 <span class="n">names</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_field_names</span><span class="p">()</span>
                 <span class="k">if</span> <span class="ow">not</span> <span class="n">names</span><span class="p">:</span>
@@ -248,7 +245,7 @@
                         <span class="n">old_typedef</span><span class="p">[</span><span class="s1">&#39;properties&#39;</span><span class="p">][</span><span class="n">n</span><span class="p">],</span> <span class="n">title</span><span class="o">=</span><span class="n">n</span><span class="p">))</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="n">new_typedef</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;array&#39;</span><span class="p">,</span> <span class="s1">&#39;items&#39;</span><span class="p">:</span> <span class="p">[</span><span class="n">old_typedef</span><span class="p">]}</span>
-            <span class="n">kwargs</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">new_typedef</span><span class="p">)</span>
+            <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;datatype&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">new_typedef</span>
         <span class="n">out</span> <span class="o">=</span> <span class="nb">super</span><span class="p">(</span><span class="n">AsciiTableSerialize</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">update_serializer</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">initialized</span> <span class="o">=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">typedef</span> <span class="o">!=</span> <span class="bp">self</span><span class="o">.</span><span class="n">default_datatype</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">update_format_str</span><span class="p">()</span>

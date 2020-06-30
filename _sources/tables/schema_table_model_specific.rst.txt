@@ -1,59 +1,84 @@
 .. _schema_table_model_specific_rst:
 
-==================   =======   ================================================================================   =====================================
-Option               Type      Description                                                                        Valid For 'Language' Of              
-==================   =======   ================================================================================   =====================================
-builddir             string    Directory where the build should be saved. Defaults to <sourcedir>/build. It can   ['cmake']                            
-                               be relative to working_dir or absolute.                                                                                 
-compiler             string    Command or path to executable that should be used to compile the model. If not     ['make', 'cpp', 'c', 'cmake', 'c++'] 
-                               provided, the compiler will be determined based on configuration options for the                                        
-                               language (if present) and the registered compilers that are available on the                                            
-                               current operating system.                                                                                               
-compiler_flags       array     Flags that should be passed to the compiler during compilation. If nto provided,   ['make', 'cpp', 'c', 'cmake', 'c++'] 
-                               the compiler flags will be determined based on configuration options for the                                            
-                               language (if present), the compiler defaults, and the default_compiler_flags                                            
-                               class attribute.                                                                                                        
-configuration        string    Build type/configuration that should be built. Defaults to 'Release'.              ['cmake']                            
-env_compiler         string    Environment variable where the compiler executable should be stored for use        ['make']                             
-                               within the Makefile. Defaults to 'CC'.                                                                                  
-env_compiler_flags   string    Environment variable where the compiler flags should be stored (including those    ['make']                             
-                               required to compile against the |yggdrasil| interface). Defaults to 'CFLAGS'.                                           
-env_linker           string    Environment variable where the linker executable should be stored for use within   ['make']                             
-                               the Makefile. Defaults to 'CC'.                                                                                         
-env_linker_flags     string    Environment variable where the linker flags should be stored (including those      ['make']                             
-                               required to link against the |yggdrasil| interface). Defaults to 'LDFLAGS'.                                             
-interpreter          string    Name or path of interpreter executable that should be used to run the model. If    ['r', 'R', 'matlab', 'lpy', 'python']
-                               not provided, the interpreter will be determined based on configuration options                                         
-                               for the language (if present) and the default_interpreter class attribute.                                              
-interpreter_flags    array     Flags that should be passed to the interpreter when running the model. If not      ['r', 'R', 'matlab', 'lpy', 'python']
-                               provided, the flags are determined based on configuration options for the                                               
-                               language (if present) and the default_interpreter_flags class attribute.                                                
-linker               string    Command or path to executable that should be used to link the model. If not        ['make', 'cpp', 'c', 'cmake', 'c++'] 
-                               provided, the linker will be determined based on configuration options for the                                          
-                               language (if present) and the registered linkers that are available on the                                              
-                               current operating system                                                                                                
-linker_flags         array     Flags that should be passed to the linker during compilation. If nto provided,     ['make', 'cpp', 'c', 'cmake', 'c++'] 
-                               the linker flags will be determined based on configuration options for the                                              
-                               language (if present), the linker defaults, and the default_linker_flags class                                          
-                               attribute.                                                                                                              
-makedir              string    Directory where make should be invoked from if it is not the same as the           ['make']                             
-                               directory containing the makefile. Defaults to directory containing makefile if                                         
-                               provided, otherwise working_dir.                                                                                        
-makefile             string    Path to make file either absolute, relative to makedir (if provided), or           ['make']                             
-                               relative to working_dir. Defaults to Makefile.                                                                          
-skip_interpreter     boolean   If True, no interpreter will be added to the arguments. This should only be used   ['r', 'R', 'matlab', 'lpy', 'python']
-                               for subclasses that will not be invoking the model via the command line.                                                
-                               Defaults to False.                                                                                                      
-source_files         array     Source files that should be compiled into an executable. Defaults to an empty      ['make', 'cpp', 'c', 'cmake', 'c++'] 
-                               list and the driver will search for a source file based on the model executable                                         
-                               (the first model argument).                                                                                             
-sourcedir            string    Source directory to call cmake on. If not provided it is set to working_dir.       ['cmake']                            
-                               This should be the directory containing the CMakeLists.txt file. It can be                                              
-                               relative to working_dir or absolute.                                                                                    
-target               string    Make target that should be built to create the model executable. Defaults to       ['make', 'cmake']                    
-                               None.                                                                                                                   
-target_language      string    Language that the target is written in. Defaults to None and will be set based     ['make', 'cmake']                    
-                               on the source files provided.                                                                                           
-use_symunit          boolean   If True, input/output variables with units will be represented in Matlab using     ['matlab']                           
-                               symunit. Defaults to False.                                                                                             
-==================   =======   ================================================================================   =====================================
+======================   =======   ================================================================================   =========================================================
+Option                   Type      Description                                                                        Valid For 'Language' Of                                  
+======================   =======   ================================================================================   =========================================================
+additional_variables     object                                                                                       ['timesync']                                             
+aggregation                                                                                                           ['timesync']                                             
+builddir                 string    Directory where the build should be saved. Defaults to <sourcedir>/build. It can   ['cmake']                                                
+                                   be relative to working_dir or absolute.                                                                                                     
+compiler                 string    Command or path to executable that should be used to compile the model. If not     ['cpp', 'c++', 'c', 'make', 'fortran', 'cmake']          
+                                   provided, the compiler will be determined based on configuration options for the                                                            
+                                   language (if present) and the registered compilers that are available on the                                                                
+                                   current operating system.                                                                                                                   
+compiler_flags           array     Flags that should be passed to the compiler during compilation. If nto provided,   ['cpp', 'c++', 'c', 'make', 'fortran', 'cmake']          
+                                   the compiler flags will be determined based on configuration options for the                                                                
+                                   language (if present), the compiler defaults, and the default_compiler_flags                                                                
+                                   class attribute.                                                                                                                            
+configuration            string    Build type/configuration that should be built. Defaults to 'Release'.              ['cmake']                                                
+env_compiler             string    Environment variable where the compiler executable should be stored for use        ['make']                                                 
+                                   within the Makefile. Defaults to 'CC'.                                                                                                      
+env_compiler_flags       string    Environment variable where the compiler flags should be stored (including those    ['make']                                                 
+                                   required to compile against the |yggdrasil| interface). Defaults to 'CFLAGS'.                                                               
+env_linker               string    Environment variable where the linker executable should be stored for use within   ['make']                                                 
+                                   the Makefile. Defaults to 'CC'.                                                                                                             
+env_linker_flags         string    Environment variable where the linker flags should be stored (including those      ['make']                                                 
+                                   required to link against the |yggdrasil| interface). Defaults to 'LDFLAGS'.                                                                 
+integrator               string    Name of integrator that should be used. Valid options include ['cvode',            ['sbml']                                                 
+                                   'gillespie', 'rk4', 'rk45']. Defaults to 'cvode'.                                                                                           
+integrator_settings      object    Settings for the integrator. Defaults to empty dict.                               ['sbml']                                                 
+interpolation                                                                                                         ['timesync']                                             
+interpreter              string    Name or path of interpreter executable that should be used to run the model. If    ['R', 'lpy', 'r', 'sbml', 'timesync', 'matlab', 'python']
+                                   not provided, the interpreter will be determined based on configuration options                                                             
+                                   for the language (if present) and the default_interpreter class attribute.                                                                  
+interpreter_flags        array     Flags that should be passed to the interpreter when running the model. If not      ['R', 'lpy', 'r', 'sbml', 'timesync', 'matlab', 'python']
+                                   provided, the flags are determined based on configuration options for the                                                                   
+                                   language (if present) and the default_interpreter_flags class attribute.                                                                    
+linker                   string    Command or path to executable that should be used to link the model. If not        ['cpp', 'c++', 'c', 'make', 'fortran', 'cmake']          
+                                   provided, the linker will be determined based on configuration options for the                                                              
+                                   language (if present) and the registered linkers that are available on the                                                                  
+                                   current operating system                                                                                                                    
+linker_flags             array     Flags that should be passed to the linker during compilation. If nto provided,     ['cpp', 'c++', 'c', 'make', 'fortran', 'cmake']          
+                                   the linker flags will be determined based on configuration options for the                                                                  
+                                   language (if present), the linker defaults, and the default_linker_flags class                                                              
+                                   attribute.                                                                                                                                  
+makedir                  string    Directory where make should be invoked from if it is not the same as the           ['make']                                                 
+                                   directory containing the makefile. Defaults to directory containing makefile if                                                             
+                                   provided, otherwise working_dir.                                                                                                            
+makefile                 string    Path to make file either absolute, relative to makedir (if provided), or           ['make']                                                 
+                                   relative to working_dir. Defaults to Makefile.                                                                                              
+only_output_final_step   boolean   If True, only the final timestep is output. Defaults to False.                     ['sbml']                                                 
+reset                    boolean   If True, the simulation will be reset to it's initial values before each call      ['sbml']                                                 
+                                   (including the start time). Defaults to False.                                                                                              
+selections               array     Variables to include in the output. Defaults to None and the time/floating         ['sbml']                                                 
+                                   selections will be returned.                                                                                                                
+skip_interpreter         boolean   If True, no interpreter will be added to the arguments. This should only be used   ['R', 'lpy', 'r', 'sbml', 'timesync', 'matlab', 'python']
+                                   for subclasses that will not be invoking the model via the command line.                                                                    
+                                   Defaults to False.                                                                                                                          
+skip_start_time          boolean   If True, the results for the initial time step will not be output. Defaults to     ['sbml']                                                 
+                                   False. This option is ignored if only_output_final_step is True.                                                                            
+source_files             array     Source files that should be compiled into an executable. Defaults to an empty      ['cpp', 'c++', 'c', 'make', 'fortran', 'cmake']          
+                                   list and the driver will search for a source file based on the model executable                                                             
+                                   (the first model argument).                                                                                                                 
+sourcedir                string    Source directory to call cmake on. If not provided it is set to working_dir.       ['cmake']                                                
+                                   This should be the directory containing the CMakeLists.txt file. It can be                                                                  
+                                   relative to working_dir or absolute.                                                                                                        
+standard                 string    Fortran standard that should be used. Defaults to 'f2003'.                         ['fortran']                                              
+start_time               number    Time that simulation should be started from. If 'reset' is True, the start time    ['sbml']                                                 
+                                   will always be the provided value, otherwise, the start time will be the end of                                                             
+                                   the previous call after the first call. Defaults to 0.0.                                                                                    
+steps                    integer   Number of steps that should be output. Defaults to None.                           ['sbml']                                                 
+synonyms                 object    Mapping from model names to mappings from base variables names to information      ['timesync']                                             
+                                   about one or more alternate variable names used by the named model that should                                                              
+                                   be converted to the base variable. Values for providing information about                                                                   
+                                   alternate variables can either be strings (implies equivalence with the base                                                                
+                                   variable in everything but name and units) or mappings with the keys:                                                                       
+target                   string    Make target that should be built to create the model executable. Defaults to       ['make', 'cmake']                                        
+                                   None.                                                                                                                                       
+target_compiler          string    Compilation tool that should be used for the target language. Defaults to None     ['make', 'cmake']                                        
+                                   and will be set based on the selected language driver.                                                                                      
+target_language          string    Language that the target is written in. Defaults to None and will be set based     ['make', 'cmake']                                        
+                                   on the source files provided.                                                                                                               
+use_symunit              boolean   If True, input/output variables with units will be represented in Matlab using     ['matlab']                                               
+                                   symunit. Defaults to False.                                                                                                                 
+======================   =======   ================================================================================   =========================================================

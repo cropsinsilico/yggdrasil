@@ -1,5 +1,7 @@
+.. _transformed_io_rst:
+
 transformed_io Example
-======================
+===============================================
 
 C Version
 ---------

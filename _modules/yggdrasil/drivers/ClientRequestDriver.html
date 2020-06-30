@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>yggdrasil.drivers.ClientRequestDriver &mdash; yggdrasil 1.0.0+154.g684a530e.dirty documentation</title>
+  <title>yggdrasil.drivers.ClientRequestDriver &mdash; yggdrasil 1.1.1+410.g95af39b2 documentation</title>
   
 
   
@@ -59,7 +59,7 @@
             
             
               <div class="version">
-                1.0.0
+                1.1.1
               </div>
             
           
@@ -94,6 +94,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../autowrap.html#notes-on-autowrapping-c-c-model-functions">Notes on Autowrapping C/C++ Model Functions</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../conditional_io.html">Conditional I/O</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../transformed_io.html">Transformed I/O</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../timesync_io.html">Timestep Synchronization</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../yaml.html">YAML Files</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../config.html">Configuration Files</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../units.html">Units</a></li>
@@ -277,6 +278,14 @@
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">last_header</span><span class="p">[</span><span class="s1">&#39;response_address&#39;</span><span class="p">]</span>
 
     <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">client_model</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;str: Name of the client model.&quot;&quot;&quot;</span>
+        <span class="c1"># NOTE: This means that any client_model value in the last</span>
+        <span class="c1"># header will not be propagated to the server. This also assumes</span>
+        <span class="c1"># that there is only one client model serviced by this driver</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;:&#39;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+
+    <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">request_name</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;str: The name of the channel used to send requests to the server</span>
 <span class="sd">        request driver.&quot;&quot;&quot;</span>
@@ -336,7 +345,11 @@
             <span class="k">return</span> <span class="kc">False</span>
         <span class="c1"># Start response driver</span>
         <span class="n">is_eof</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;is_eof&#39;</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="n">is_eof</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">is_eof</span><span class="p">:</span>
+            <span class="n">kwargs</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s1">&#39;header_kwargs&#39;</span><span class="p">,</span> <span class="p">{})</span>
+            <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;header_kwargs&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s1">&#39;client_model&#39;</span><span class="p">,</span>
+                                               <span class="bp">self</span><span class="o">.</span><span class="n">client_model</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
             <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">lock</span><span class="p">:</span>
                 <span class="k">if</span> <span class="p">(</span><span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_comm_open</span><span class="p">)</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">_block_response</span><span class="p">:</span>  <span class="c1"># pragma: debug</span>
                     <span class="k">return</span> <span class="kc">False</span>
@@ -359,7 +372,30 @@
             <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;header_kwargs&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span>
                 <span class="s1">&#39;response_address&#39;</span><span class="p">,</span> <span class="n">response_driver</span><span class="o">.</span><span class="n">response_address</span><span class="p">)</span>
             <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;header_kwargs&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s1">&#39;request_id&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">request_id</span><span class="p">)</span>
-        <span class="k">return</span> <span class="nb">super</span><span class="p">(</span><span class="n">ClientRequestDriver</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">send_message</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div></div>
+            <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;header_kwargs&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s1">&#39;client_model&#39;</span><span class="p">,</span>
+                                               <span class="bp">self</span><span class="o">.</span><span class="n">client_model</span><span class="p">)</span>
+        <span class="k">return</span> <span class="nb">super</span><span class="p">(</span><span class="n">ClientRequestDriver</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">send_message</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="ClientRequestDriver.run_loop"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.ClientRequestDriver.ClientRequestDriver.run_loop">[docs]</a>    <span class="k">def</span> <span class="nf">run_loop</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Run the driver. Continue looping over messages until there are not</span>
+<span class="sd">        any left or the communication channel is closed.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">ClientRequestDriver</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">run_loop</span><span class="p">()</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">was_break</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">prune_response_drivers</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="ClientRequestDriver.prune_response_drivers"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.ClientRequestDriver.ClientRequestDriver.prune_response_drivers">[docs]</a>    <span class="k">def</span> <span class="nf">prune_response_drivers</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Remove response drivers that are no longer being used.&quot;&quot;&quot;</span>
+        <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">lock</span><span class="p">:</span>
+            <span class="n">remove_idx</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">x</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">response_drivers</span><span class="p">):</span>
+                <span class="k">if</span> <span class="p">(((</span><span class="ow">not</span> <span class="n">x</span><span class="o">.</span><span class="n">is_alive</span><span class="p">())</span>
+                     <span class="ow">and</span> <span class="n">x</span><span class="o">.</span><span class="n">icomm</span><span class="o">.</span><span class="n">is_confirmed_recv</span>
+                     <span class="ow">and</span> <span class="n">x</span><span class="o">.</span><span class="n">ocomm</span><span class="o">.</span><span class="n">is_confirmed_send</span><span class="p">)):</span>
+                    <span class="n">x</span><span class="o">.</span><span class="n">cleanup</span><span class="p">()</span>
+                    <span class="n">remove_idx</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">remove_idx</span><span class="p">[::</span><span class="o">-</span><span class="mi">1</span><span class="p">]:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">response_drivers</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="n">i</span><span class="p">)</span></div></div>
 </pre></div>
 
            </div>

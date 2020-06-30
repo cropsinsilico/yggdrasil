@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>yggdrasil.metaschema.properties package &mdash; yggdrasil 1.0.0+154.g684a530e.dirty documentation</title>
+  <title>yggdrasil.metaschema.properties package &mdash; yggdrasil 1.1.1+410.g95af39b2 documentation</title>
   
 
   
@@ -59,7 +59,7 @@
             
             
               <div class="version">
-                1.0.0
+                1.1.1
               </div>
             
           
@@ -94,6 +94,7 @@
 <li class="toctree-l1"><a class="reference internal" href="autowrap.html#notes-on-autowrapping-c-c-model-functions">Notes on Autowrapping C/C++ Model Functions</a></li>
 <li class="toctree-l1"><a class="reference internal" href="conditional_io.html">Conditional I/O</a></li>
 <li class="toctree-l1"><a class="reference internal" href="transformed_io.html">Transformed I/O</a></li>
+<li class="toctree-l1"><a class="reference internal" href="timesync_io.html">Timestep Synchronization</a></li>
 <li class="toctree-l1"><a class="reference internal" href="yaml.html">YAML Files</a></li>
 <li class="toctree-l1"><a class="reference internal" href="config.html">Configuration Files</a></li>
 <li class="toctree-l1"><a class="reference internal" href="units.html">Units</a></li>
@@ -198,46 +199,46 @@
 </div>
 <div class="section" id="module-yggdrasil.metaschema.properties.AnyMetaschemaProperties">
 <span id="yggdrasil-metaschema-properties-anymetaschemaproperties-module"></span><h2>yggdrasil.metaschema.properties.AnyMetaschemaProperties module<a class="headerlink" href="#module-yggdrasil.metaschema.properties.AnyMetaschemaProperties" title="Permalink to this headline">¶</a></h2>
-<dl class="class">
+<dl class="py class">
 <dt id="yggdrasil.metaschema.properties.AnyMetaschemaProperties.TemptypeMetaschemaProperty">
 <em class="property">class </em><code class="sig-prename descclassname">yggdrasil.metaschema.properties.AnyMetaschemaProperties.</code><code class="sig-name descname">TemptypeMetaschemaProperty</code><a class="reference internal" href="_modules/yggdrasil/metaschema/properties/AnyMetaschemaProperties.html#TemptypeMetaschemaProperty"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.metaschema.properties.AnyMetaschemaProperties.TemptypeMetaschemaProperty" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#yggdrasil.metaschema.properties.MetaschemaProperty.MetaschemaProperty" title="yggdrasil.metaschema.properties.MetaschemaProperty.MetaschemaProperty"><code class="xref py py-class docutils literal notranslate"><span class="pre">yggdrasil.metaschema.properties.MetaschemaProperty.MetaschemaProperty</span></code></a></p>
 <p>Property class for ‘temptype’ property.</p>
-<dl class="method">
+<dl class="py method">
 <dt id="yggdrasil.metaschema.properties.AnyMetaschemaProperties.TemptypeMetaschemaProperty.compare">
-<em class="property">classmethod </em><code class="sig-name descname">compare</code><span class="sig-paren">(</span><em class="sig-param">prop1</em>, <em class="sig-param">prop2</em>, <em class="sig-param">root1=None</em>, <em class="sig-param">root2=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/metaschema/properties/AnyMetaschemaProperties.html#TemptypeMetaschemaProperty.compare"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.metaschema.properties.AnyMetaschemaProperties.TemptypeMetaschemaProperty.compare" title="Permalink to this definition">¶</a></dt>
+<em class="property">classmethod </em><code class="sig-name descname">compare</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">prop1</span></em>, <em class="sig-param"><span class="n">prop2</span></em>, <em class="sig-param"><span class="n">root1</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">root2</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/metaschema/properties/AnyMetaschemaProperties.html#TemptypeMetaschemaProperty.compare"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.metaschema.properties.AnyMetaschemaProperties.TemptypeMetaschemaProperty.compare" title="Permalink to this definition">¶</a></dt>
 <dd><p>Comparison for the ‘temptype’ property.</p>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="yggdrasil.metaschema.properties.AnyMetaschemaProperties.TemptypeMetaschemaProperty.encode">
-<em class="property">classmethod </em><code class="sig-name descname">encode</code><span class="sig-paren">(</span><em class="sig-param">instance</em>, <em class="sig-param">typedef=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/metaschema/properties/AnyMetaschemaProperties.html#TemptypeMetaschemaProperty.encode"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.metaschema.properties.AnyMetaschemaProperties.TemptypeMetaschemaProperty.encode" title="Permalink to this definition">¶</a></dt>
+<em class="property">classmethod </em><code class="sig-name descname">encode</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">instance</span></em>, <em class="sig-param"><span class="n">typedef</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/metaschema/properties/AnyMetaschemaProperties.html#TemptypeMetaschemaProperty.encode"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.metaschema.properties.AnyMetaschemaProperties.TemptypeMetaschemaProperty.encode" title="Permalink to this definition">¶</a></dt>
 <dd><p>Encoder for the ‘temptype’ property.</p>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="py attribute">
 <dt id="yggdrasil.metaschema.properties.AnyMetaschemaProperties.TemptypeMetaschemaProperty.name">
 <code class="sig-name descname">name</code><em class="property"> = 'temptype'</em><a class="headerlink" href="#yggdrasil.metaschema.properties.AnyMetaschemaProperties.TemptypeMetaschemaProperty.name" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="attribute">
+<dl class="py attribute">
 <dt id="yggdrasil.metaschema.properties.AnyMetaschemaProperties.TemptypeMetaschemaProperty.python_types">
 <code class="sig-name descname">python_types</code><em class="property"> = (&lt;class 'object'&gt;,)</em><a class="headerlink" href="#yggdrasil.metaschema.properties.AnyMetaschemaProperties.TemptypeMetaschemaProperty.python_types" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="attribute">
+<dl class="py attribute">
 <dt id="yggdrasil.metaschema.properties.AnyMetaschemaProperties.TemptypeMetaschemaProperty.schema">
 <code class="sig-name descname">schema</code><em class="property"> = {'description': 'The type of the data for a single message.', 'type': 'schema'}</em><a class="headerlink" href="#yggdrasil.metaschema.properties.AnyMetaschemaProperties.TemptypeMetaschemaProperty.schema" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="attribute">
+<dl class="py attribute">
 <dt id="yggdrasil.metaschema.properties.AnyMetaschemaProperties.TemptypeMetaschemaProperty.types">
 <code class="sig-name descname">types</code><em class="property"> = ('any',)</em><a class="headerlink" href="#yggdrasil.metaschema.properties.AnyMetaschemaProperties.TemptypeMetaschemaProperty.types" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="yggdrasil.metaschema.properties.AnyMetaschemaProperties.TemptypeMetaschemaProperty.validate">
-<em class="property">classmethod </em><code class="sig-name descname">validate</code><span class="sig-paren">(</span><em class="sig-param">validator</em>, <em class="sig-param">value</em>, <em class="sig-param">instance</em>, <em class="sig-param">schema</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/metaschema/properties/AnyMetaschemaProperties.html#TemptypeMetaschemaProperty.validate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.metaschema.properties.AnyMetaschemaProperties.TemptypeMetaschemaProperty.validate" title="Permalink to this definition">¶</a></dt>
+<em class="property">classmethod </em><code class="sig-name descname">validate</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">validator</span></em>, <em class="sig-param"><span class="n">value</span></em>, <em class="sig-param"><span class="n">instance</span></em>, <em class="sig-param"><span class="n">schema</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/metaschema/properties/AnyMetaschemaProperties.html#TemptypeMetaschemaProperty.validate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.metaschema.properties.AnyMetaschemaProperties.TemptypeMetaschemaProperty.validate" title="Permalink to this definition">¶</a></dt>
 <dd><p>Validator for JSON schema validation of an instance by this property.
 If there is not a user provided validate function, the instance will be
 encoded and then the encoded value will be checked against the provided
@@ -262,26 +263,26 @@ value using cls.compare.</p>
 </div>
 <div class="section" id="module-yggdrasil.metaschema.properties.ArgsMetaschemaProperty">
 <span id="yggdrasil-metaschema-properties-argsmetaschemaproperty-module"></span><h2>yggdrasil.metaschema.properties.ArgsMetaschemaProperty module<a class="headerlink" href="#module-yggdrasil.metaschema.properties.ArgsMetaschemaProperty" title="Permalink to this headline">¶</a></h2>
-<dl class="class">
+<dl class="py class">
 <dt id="yggdrasil.metaschema.properties.ArgsMetaschemaProperty.ArgsMetaschemaProperty">
 <em class="property">class </em><code class="sig-prename descclassname">yggdrasil.metaschema.properties.ArgsMetaschemaProperty.</code><code class="sig-name descname">ArgsMetaschemaProperty</code><a class="reference internal" href="_modules/yggdrasil/metaschema/properties/ArgsMetaschemaProperty.html#ArgsMetaschemaProperty"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.metaschema.properties.ArgsMetaschemaProperty.ArgsMetaschemaProperty" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#yggdrasil.metaschema.properties.MetaschemaProperty.MetaschemaProperty" title="yggdrasil.metaschema.properties.MetaschemaProperty.MetaschemaProperty"><code class="xref py py-class docutils literal notranslate"><span class="pre">yggdrasil.metaschema.properties.MetaschemaProperty.MetaschemaProperty</span></code></a></p>
 <p>Property class for ‘args’ property.</p>
-<dl class="method">
+<dl class="py method">
 <dt id="yggdrasil.metaschema.properties.ArgsMetaschemaProperty.ArgsMetaschemaProperty.compare">
-<em class="property">classmethod </em><code class="sig-name descname">compare</code><span class="sig-paren">(</span><em class="sig-param">*args</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/metaschema/properties/ArgsMetaschemaProperty.html#ArgsMetaschemaProperty.compare"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.metaschema.properties.ArgsMetaschemaProperty.ArgsMetaschemaProperty.compare" title="Permalink to this definition">¶</a></dt>
+<em class="property">classmethod </em><code class="sig-name descname">compare</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">*</span><span class="n">args</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/metaschema/properties/ArgsMetaschemaProperty.html#ArgsMetaschemaProperty.compare"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.metaschema.properties.ArgsMetaschemaProperty.ArgsMetaschemaProperty.compare" title="Permalink to this definition">¶</a></dt>
 <dd><p>Comparison method for ‘args’ container property.</p>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="yggdrasil.metaschema.properties.ArgsMetaschemaProperty.ArgsMetaschemaProperty.encode">
-<em class="property">classmethod </em><code class="sig-name descname">encode</code><span class="sig-paren">(</span><em class="sig-param">instance</em>, <em class="sig-param">typedef=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/metaschema/properties/ArgsMetaschemaProperty.html#ArgsMetaschemaProperty.encode"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.metaschema.properties.ArgsMetaschemaProperty.ArgsMetaschemaProperty.encode" title="Permalink to this definition">¶</a></dt>
+<em class="property">classmethod </em><code class="sig-name descname">encode</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">instance</span></em>, <em class="sig-param"><span class="n">typedef</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/metaschema/properties/ArgsMetaschemaProperty.html#ArgsMetaschemaProperty.encode"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.metaschema.properties.ArgsMetaschemaProperty.ArgsMetaschemaProperty.encode" title="Permalink to this definition">¶</a></dt>
 <dd><p>Encoder for the ‘args’ property.</p>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="yggdrasil.metaschema.properties.ArgsMetaschemaProperty.ArgsMetaschemaProperty.instance2args">
-<em class="property">classmethod </em><code class="sig-name descname">instance2args</code><span class="sig-paren">(</span><em class="sig-param">instance</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/metaschema/properties/ArgsMetaschemaProperty.html#ArgsMetaschemaProperty.instance2args"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.metaschema.properties.ArgsMetaschemaProperty.ArgsMetaschemaProperty.instance2args" title="Permalink to this definition">¶</a></dt>
+<em class="property">classmethod </em><code class="sig-name descname">instance2args</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">instance</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/metaschema/properties/ArgsMetaschemaProperty.html#ArgsMetaschemaProperty.instance2args"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.metaschema.properties.ArgsMetaschemaProperty.ArgsMetaschemaProperty.instance2args" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get input arguments from a class instance.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -296,22 +297,22 @@ value using cls.compare.</p>
 </dl>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="py attribute">
 <dt id="yggdrasil.metaschema.properties.ArgsMetaschemaProperty.ArgsMetaschemaProperty.name">
 <code class="sig-name descname">name</code><em class="property"> = 'args'</em><a class="headerlink" href="#yggdrasil.metaschema.properties.ArgsMetaschemaProperty.ArgsMetaschemaProperty.name" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="attribute">
+<dl class="py attribute">
 <dt id="yggdrasil.metaschema.properties.ArgsMetaschemaProperty.ArgsMetaschemaProperty.python_types">
 <code class="sig-name descname">python_types</code><em class="property"> = (&lt;class 'object'&gt;,)</em><a class="headerlink" href="#yggdrasil.metaschema.properties.ArgsMetaschemaProperty.ArgsMetaschemaProperty.python_types" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="attribute">
+<dl class="py attribute">
 <dt id="yggdrasil.metaschema.properties.ArgsMetaschemaProperty.ArgsMetaschemaProperty.schema">
 <code class="sig-name descname">schema</code><em class="property"> = {'description': 'Arguments required to recreate a class instance.', 'type': 'array'}</em><a class="headerlink" href="#yggdrasil.metaschema.properties.ArgsMetaschemaProperty.ArgsMetaschemaProperty.schema" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="attribute">
+<dl class="py attribute">
 <dt id="yggdrasil.metaschema.properties.ArgsMetaschemaProperty.ArgsMetaschemaProperty.types">
 <code class="sig-name descname">types</code><em class="property"> = ('instance',)</em><a class="headerlink" href="#yggdrasil.metaschema.properties.ArgsMetaschemaProperty.ArgsMetaschemaProperty.types" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
@@ -321,72 +322,72 @@ value using cls.compare.</p>
 </div>
 <div class="section" id="module-yggdrasil.metaschema.properties.ArrayMetaschemaProperties">
 <span id="yggdrasil-metaschema-properties-arraymetaschemaproperties-module"></span><h2>yggdrasil.metaschema.properties.ArrayMetaschemaProperties module<a class="headerlink" href="#module-yggdrasil.metaschema.properties.ArrayMetaschemaProperties" title="Permalink to this headline">¶</a></h2>
-<dl class="class">
+<dl class="py class">
 <dt id="yggdrasil.metaschema.properties.ArrayMetaschemaProperties.LengthMetaschemaProperty">
 <em class="property">class </em><code class="sig-prename descclassname">yggdrasil.metaschema.properties.ArrayMetaschemaProperties.</code><code class="sig-name descname">LengthMetaschemaProperty</code><a class="reference internal" href="_modules/yggdrasil/metaschema/properties/ArrayMetaschemaProperties.html#LengthMetaschemaProperty"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.metaschema.properties.ArrayMetaschemaProperties.LengthMetaschemaProperty" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#yggdrasil.metaschema.properties.MetaschemaProperty.MetaschemaProperty" title="yggdrasil.metaschema.properties.MetaschemaProperty.MetaschemaProperty"><code class="xref py py-class docutils literal notranslate"><span class="pre">yggdrasil.metaschema.properties.MetaschemaProperty.MetaschemaProperty</span></code></a></p>
 <p>Property class for ‘length’ property.</p>
-<dl class="method">
+<dl class="py method">
 <dt id="yggdrasil.metaschema.properties.ArrayMetaschemaProperties.LengthMetaschemaProperty.encode">
-<em class="property">classmethod </em><code class="sig-name descname">encode</code><span class="sig-paren">(</span><em class="sig-param">instance</em>, <em class="sig-param">typedef=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/metaschema/properties/ArrayMetaschemaProperties.html#LengthMetaschemaProperty.encode"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.metaschema.properties.ArrayMetaschemaProperties.LengthMetaschemaProperty.encode" title="Permalink to this definition">¶</a></dt>
+<em class="property">classmethod </em><code class="sig-name descname">encode</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">instance</span></em>, <em class="sig-param"><span class="n">typedef</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/metaschema/properties/ArrayMetaschemaProperties.html#LengthMetaschemaProperty.encode"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.metaschema.properties.ArrayMetaschemaProperties.LengthMetaschemaProperty.encode" title="Permalink to this definition">¶</a></dt>
 <dd><p>Encoder for the ‘length’ 1darray property.</p>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="py attribute">
 <dt id="yggdrasil.metaschema.properties.ArrayMetaschemaProperties.LengthMetaschemaProperty.name">
 <code class="sig-name descname">name</code><em class="property"> = 'length'</em><a class="headerlink" href="#yggdrasil.metaschema.properties.ArrayMetaschemaProperties.LengthMetaschemaProperty.name" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="attribute">
+<dl class="py attribute">
 <dt id="yggdrasil.metaschema.properties.ArrayMetaschemaProperties.LengthMetaschemaProperty.python_types">
 <code class="sig-name descname">python_types</code><em class="property"> = (&lt;class 'numpy.ndarray'&gt;, &lt;class 'unyt.array.unyt_array'&gt;)</em><a class="headerlink" href="#yggdrasil.metaschema.properties.ArrayMetaschemaProperties.LengthMetaschemaProperty.python_types" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="attribute">
+<dl class="py attribute">
 <dt id="yggdrasil.metaschema.properties.ArrayMetaschemaProperties.LengthMetaschemaProperty.schema">
 <code class="sig-name descname">schema</code><em class="property"> = {'description': 'Number of elements in the 1D array.', 'minimum': 1, 'type': 'number'}</em><a class="headerlink" href="#yggdrasil.metaschema.properties.ArrayMetaschemaProperties.LengthMetaschemaProperty.schema" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="attribute">
+<dl class="py attribute">
 <dt id="yggdrasil.metaschema.properties.ArrayMetaschemaProperties.LengthMetaschemaProperty.types">
 <code class="sig-name descname">types</code><em class="property"> = ('1darray',)</em><a class="headerlink" href="#yggdrasil.metaschema.properties.ArrayMetaschemaProperties.LengthMetaschemaProperty.types" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </dd></dl>
 
-<dl class="class">
+<dl class="py class">
 <dt id="yggdrasil.metaschema.properties.ArrayMetaschemaProperties.ShapeMetaschemaProperty">
 <em class="property">class </em><code class="sig-prename descclassname">yggdrasil.metaschema.properties.ArrayMetaschemaProperties.</code><code class="sig-name descname">ShapeMetaschemaProperty</code><a class="reference internal" href="_modules/yggdrasil/metaschema/properties/ArrayMetaschemaProperties.html#ShapeMetaschemaProperty"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.metaschema.properties.ArrayMetaschemaProperties.ShapeMetaschemaProperty" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#yggdrasil.metaschema.properties.MetaschemaProperty.MetaschemaProperty" title="yggdrasil.metaschema.properties.MetaschemaProperty.MetaschemaProperty"><code class="xref py py-class docutils literal notranslate"><span class="pre">yggdrasil.metaschema.properties.MetaschemaProperty.MetaschemaProperty</span></code></a></p>
 <p>Property class for ‘shape’ property.</p>
-<dl class="method">
+<dl class="py method">
 <dt id="yggdrasil.metaschema.properties.ArrayMetaschemaProperties.ShapeMetaschemaProperty.compare">
-<em class="property">classmethod </em><code class="sig-name descname">compare</code><span class="sig-paren">(</span><em class="sig-param">prop1</em>, <em class="sig-param">prop2</em>, <em class="sig-param">root1=None</em>, <em class="sig-param">root2=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/metaschema/properties/ArrayMetaschemaProperties.html#ShapeMetaschemaProperty.compare"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.metaschema.properties.ArrayMetaschemaProperties.ShapeMetaschemaProperty.compare" title="Permalink to this definition">¶</a></dt>
+<em class="property">classmethod </em><code class="sig-name descname">compare</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">prop1</span></em>, <em class="sig-param"><span class="n">prop2</span></em>, <em class="sig-param"><span class="n">root1</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">root2</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/metaschema/properties/ArrayMetaschemaProperties.html#ShapeMetaschemaProperty.compare"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.metaschema.properties.ArrayMetaschemaProperties.ShapeMetaschemaProperty.compare" title="Permalink to this definition">¶</a></dt>
 <dd><p>Comparison method for the ‘shape’ ndarray property.</p>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="yggdrasil.metaschema.properties.ArrayMetaschemaProperties.ShapeMetaschemaProperty.encode">
-<em class="property">classmethod </em><code class="sig-name descname">encode</code><span class="sig-paren">(</span><em class="sig-param">instance</em>, <em class="sig-param">typedef=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/metaschema/properties/ArrayMetaschemaProperties.html#ShapeMetaschemaProperty.encode"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.metaschema.properties.ArrayMetaschemaProperties.ShapeMetaschemaProperty.encode" title="Permalink to this definition">¶</a></dt>
+<em class="property">classmethod </em><code class="sig-name descname">encode</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">instance</span></em>, <em class="sig-param"><span class="n">typedef</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/metaschema/properties/ArrayMetaschemaProperties.html#ShapeMetaschemaProperty.encode"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.metaschema.properties.ArrayMetaschemaProperties.ShapeMetaschemaProperty.encode" title="Permalink to this definition">¶</a></dt>
 <dd><p>Encoder for the ‘shape’ ndarray property.</p>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="py attribute">
 <dt id="yggdrasil.metaschema.properties.ArrayMetaschemaProperties.ShapeMetaschemaProperty.name">
 <code class="sig-name descname">name</code><em class="property"> = 'shape'</em><a class="headerlink" href="#yggdrasil.metaschema.properties.ArrayMetaschemaProperties.ShapeMetaschemaProperty.name" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="attribute">
+<dl class="py attribute">
 <dt id="yggdrasil.metaschema.properties.ArrayMetaschemaProperties.ShapeMetaschemaProperty.python_types">
 <code class="sig-name descname">python_types</code><em class="property"> = (&lt;class 'numpy.ndarray'&gt;, &lt;class 'unyt.array.unyt_array'&gt;)</em><a class="headerlink" href="#yggdrasil.metaschema.properties.ArrayMetaschemaProperties.ShapeMetaschemaProperty.python_types" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="attribute">
+<dl class="py attribute">
 <dt id="yggdrasil.metaschema.properties.ArrayMetaschemaProperties.ShapeMetaschemaProperty.schema">
 <code class="sig-name descname">schema</code><em class="property"> = {'description': 'Shape of the ND array in each dimension.', 'items': {'minimum': 1, 'type': 'integer'}, 'type': 'array'}</em><a class="headerlink" href="#yggdrasil.metaschema.properties.ArrayMetaschemaProperties.ShapeMetaschemaProperty.schema" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="attribute">
+<dl class="py attribute">
 <dt id="yggdrasil.metaschema.properties.ArrayMetaschemaProperties.ShapeMetaschemaProperty.types">
 <code class="sig-name descname">types</code><em class="property"> = ('ndarray',)</em><a class="headerlink" href="#yggdrasil.metaschema.properties.ArrayMetaschemaProperties.ShapeMetaschemaProperty.types" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
@@ -396,14 +397,14 @@ value using cls.compare.</p>
 </div>
 <div class="section" id="module-yggdrasil.metaschema.properties.ClassMetaschemaProperty">
 <span id="yggdrasil-metaschema-properties-classmetaschemaproperty-module"></span><h2>yggdrasil.metaschema.properties.ClassMetaschemaProperty module<a class="headerlink" href="#module-yggdrasil.metaschema.properties.ClassMetaschemaProperty" title="Permalink to this headline">¶</a></h2>
-<dl class="class">
+<dl class="py class">
 <dt id="yggdrasil.metaschema.properties.ClassMetaschemaProperty.ClassMetaschemaProperty">
 <em class="property">class </em><code class="sig-prename descclassname">yggdrasil.metaschema.properties.ClassMetaschemaProperty.</code><code class="sig-name descname">ClassMetaschemaProperty</code><a class="reference internal" href="_modules/yggdrasil/metaschema/properties/ClassMetaschemaProperty.html#ClassMetaschemaProperty"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.metaschema.properties.ClassMetaschemaProperty.ClassMetaschemaProperty" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#yggdrasil.metaschema.properties.MetaschemaProperty.MetaschemaProperty" title="yggdrasil.metaschema.properties.MetaschemaProperty.MetaschemaProperty"><code class="xref py py-class docutils literal notranslate"><span class="pre">yggdrasil.metaschema.properties.MetaschemaProperty.MetaschemaProperty</span></code></a></p>
 <p>Property class for ‘class’ property.</p>
-<dl class="method">
+<dl class="py method">
 <dt id="yggdrasil.metaschema.properties.ClassMetaschemaProperty.ClassMetaschemaProperty.compare">
-<em class="property">classmethod </em><code class="sig-name descname">compare</code><span class="sig-paren">(</span><em class="sig-param">prop1</em>, <em class="sig-param">prop2</em>, <em class="sig-param">root1=None</em>, <em class="sig-param">root2=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/metaschema/properties/ClassMetaschemaProperty.html#ClassMetaschemaProperty.compare"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.metaschema.properties.ClassMetaschemaProperty.ClassMetaschemaProperty.compare" title="Permalink to this definition">¶</a></dt>
+<em class="property">classmethod </em><code class="sig-name descname">compare</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">prop1</span></em>, <em class="sig-param"><span class="n">prop2</span></em>, <em class="sig-param"><span class="n">root1</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">root2</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/metaschema/properties/ClassMetaschemaProperty.html#ClassMetaschemaProperty.compare"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.metaschema.properties.ClassMetaschemaProperty.ClassMetaschemaProperty.compare" title="Permalink to this definition">¶</a></dt>
 <dd><p>Method to determine compatiblity of one property value with another.
 This method is not necessarily symmetric in that the second value may
 not be compatible with the first even if the first is compatible with
@@ -421,28 +422,28 @@ the second.</p>
 </dl>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="yggdrasil.metaschema.properties.ClassMetaschemaProperty.ClassMetaschemaProperty.encode">
-<em class="property">classmethod </em><code class="sig-name descname">encode</code><span class="sig-paren">(</span><em class="sig-param">instance</em>, <em class="sig-param">typedef=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/metaschema/properties/ClassMetaschemaProperty.html#ClassMetaschemaProperty.encode"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.metaschema.properties.ClassMetaschemaProperty.ClassMetaschemaProperty.encode" title="Permalink to this definition">¶</a></dt>
+<em class="property">classmethod </em><code class="sig-name descname">encode</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">instance</span></em>, <em class="sig-param"><span class="n">typedef</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/metaschema/properties/ClassMetaschemaProperty.html#ClassMetaschemaProperty.encode"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.metaschema.properties.ClassMetaschemaProperty.ClassMetaschemaProperty.encode" title="Permalink to this definition">¶</a></dt>
 <dd><p>Encoder for the ‘class’ property.</p>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="py attribute">
 <dt id="yggdrasil.metaschema.properties.ClassMetaschemaProperty.ClassMetaschemaProperty.name">
 <code class="sig-name descname">name</code><em class="property"> = 'class'</em><a class="headerlink" href="#yggdrasil.metaschema.properties.ClassMetaschemaProperty.ClassMetaschemaProperty.name" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="attribute">
+<dl class="py attribute">
 <dt id="yggdrasil.metaschema.properties.ClassMetaschemaProperty.ClassMetaschemaProperty.python_types">
 <code class="sig-name descname">python_types</code><em class="property"> = (&lt;class 'object'&gt;,)</em><a class="headerlink" href="#yggdrasil.metaschema.properties.ClassMetaschemaProperty.ClassMetaschemaProperty.python_types" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="attribute">
+<dl class="py attribute">
 <dt id="yggdrasil.metaschema.properties.ClassMetaschemaProperty.ClassMetaschemaProperty.schema">
 <code class="sig-name descname">schema</code><em class="property"> = {'anyOf': [{'type': 'class'}, {'type': 'array', 'items': {'type': 'class'}, 'minItems': 1}], 'description': 'One or more classes that the object should be an instance of.'}</em><a class="headerlink" href="#yggdrasil.metaschema.properties.ClassMetaschemaProperty.ClassMetaschemaProperty.schema" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="attribute">
+<dl class="py attribute">
 <dt id="yggdrasil.metaschema.properties.ClassMetaschemaProperty.ClassMetaschemaProperty.types">
 <code class="sig-name descname">types</code><em class="property"> = ('instance',)</em><a class="headerlink" href="#yggdrasil.metaschema.properties.ClassMetaschemaProperty.ClassMetaschemaProperty.types" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
@@ -452,19 +453,19 @@ the second.</p>
 </div>
 <div class="section" id="module-yggdrasil.metaschema.properties.DefaultProperty">
 <span id="yggdrasil-metaschema-properties-defaultproperty-module"></span><h2>yggdrasil.metaschema.properties.DefaultProperty module<a class="headerlink" href="#module-yggdrasil.metaschema.properties.DefaultProperty" title="Permalink to this headline">¶</a></h2>
-<dl class="class">
+<dl class="py class">
 <dt id="yggdrasil.metaschema.properties.DefaultProperty.DefaultMetaschemaProperty">
 <em class="property">class </em><code class="sig-prename descclassname">yggdrasil.metaschema.properties.DefaultProperty.</code><code class="sig-name descname">DefaultMetaschemaProperty</code><a class="reference internal" href="_modules/yggdrasil/metaschema/properties/DefaultProperty.html#DefaultMetaschemaProperty"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.metaschema.properties.DefaultProperty.DefaultMetaschemaProperty" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#yggdrasil.metaschema.properties.MetaschemaProperty.MetaschemaProperty" title="yggdrasil.metaschema.properties.MetaschemaProperty.MetaschemaProperty"><code class="xref py py-class docutils literal notranslate"><span class="pre">yggdrasil.metaschema.properties.MetaschemaProperty.MetaschemaProperty</span></code></a></p>
 <p>Property class for ‘default’ property.</p>
-<dl class="attribute">
+<dl class="py attribute">
 <dt id="yggdrasil.metaschema.properties.DefaultProperty.DefaultMetaschemaProperty.name">
 <code class="sig-name descname">name</code><em class="property"> = 'default'</em><a class="headerlink" href="#yggdrasil.metaschema.properties.DefaultProperty.DefaultMetaschemaProperty.name" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="yggdrasil.metaschema.properties.DefaultProperty.DefaultMetaschemaProperty.normalize">
-<em class="property">classmethod </em><code class="sig-name descname">normalize</code><span class="sig-paren">(</span><em class="sig-param">normalizer</em>, <em class="sig-param">value</em>, <em class="sig-param">instance</em>, <em class="sig-param">schema</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/metaschema/properties/DefaultProperty.html#DefaultMetaschemaProperty.normalize"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.metaschema.properties.DefaultProperty.DefaultMetaschemaProperty.normalize" title="Permalink to this definition">¶</a></dt>
+<em class="property">classmethod </em><code class="sig-name descname">normalize</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">normalizer</span></em>, <em class="sig-param"><span class="n">value</span></em>, <em class="sig-param"><span class="n">instance</span></em>, <em class="sig-param"><span class="n">schema</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/metaschema/properties/DefaultProperty.html#DefaultMetaschemaProperty.normalize"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.metaschema.properties.DefaultProperty.DefaultMetaschemaProperty.normalize" title="Permalink to this definition">¶</a></dt>
 <dd><p>Normalization method for ‘default’ property.</p>
 </dd></dl>
 
@@ -473,34 +474,34 @@ the second.</p>
 </div>
 <div class="section" id="module-yggdrasil.metaschema.properties.JSONArrayMetaschemaProperties">
 <span id="yggdrasil-metaschema-properties-jsonarraymetaschemaproperties-module"></span><h2>yggdrasil.metaschema.properties.JSONArrayMetaschemaProperties module<a class="headerlink" href="#module-yggdrasil.metaschema.properties.JSONArrayMetaschemaProperties" title="Permalink to this headline">¶</a></h2>
-<dl class="class">
+<dl class="py class">
 <dt id="yggdrasil.metaschema.properties.JSONArrayMetaschemaProperties.ItemsMetaschemaProperty">
 <em class="property">class </em><code class="sig-prename descclassname">yggdrasil.metaschema.properties.JSONArrayMetaschemaProperties.</code><code class="sig-name descname">ItemsMetaschemaProperty</code><a class="reference internal" href="_modules/yggdrasil/metaschema/properties/JSONArrayMetaschemaProperties.html#ItemsMetaschemaProperty"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.metaschema.properties.JSONArrayMetaschemaProperties.ItemsMetaschemaProperty" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#yggdrasil.metaschema.properties.MetaschemaProperty.MetaschemaProperty" title="yggdrasil.metaschema.properties.MetaschemaProperty.MetaschemaProperty"><code class="xref py py-class docutils literal notranslate"><span class="pre">yggdrasil.metaschema.properties.MetaschemaProperty.MetaschemaProperty</span></code></a></p>
 <p>Property class for ‘items’ property.</p>
-<dl class="method">
+<dl class="py method">
 <dt id="yggdrasil.metaschema.properties.JSONArrayMetaschemaProperties.ItemsMetaschemaProperty.compare">
-<em class="property">classmethod </em><code class="sig-name descname">compare</code><span class="sig-paren">(</span><em class="sig-param">prop1</em>, <em class="sig-param">prop2</em>, <em class="sig-param">root1=None</em>, <em class="sig-param">root2=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/metaschema/properties/JSONArrayMetaschemaProperties.html#ItemsMetaschemaProperty.compare"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.metaschema.properties.JSONArrayMetaschemaProperties.ItemsMetaschemaProperty.compare" title="Permalink to this definition">¶</a></dt>
+<em class="property">classmethod </em><code class="sig-name descname">compare</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">prop1</span></em>, <em class="sig-param"><span class="n">prop2</span></em>, <em class="sig-param"><span class="n">root1</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">root2</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/metaschema/properties/JSONArrayMetaschemaProperties.html#ItemsMetaschemaProperty.compare"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.metaschema.properties.JSONArrayMetaschemaProperties.ItemsMetaschemaProperty.compare" title="Permalink to this definition">¶</a></dt>
 <dd><p>Comparison method for ‘items’ container property.</p>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="yggdrasil.metaschema.properties.JSONArrayMetaschemaProperties.ItemsMetaschemaProperty.encode">
-<em class="property">classmethod </em><code class="sig-name descname">encode</code><span class="sig-paren">(</span><em class="sig-param">instance</em>, <em class="sig-param">typedef=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/metaschema/properties/JSONArrayMetaschemaProperties.html#ItemsMetaschemaProperty.encode"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.metaschema.properties.JSONArrayMetaschemaProperties.ItemsMetaschemaProperty.encode" title="Permalink to this definition">¶</a></dt>
+<em class="property">classmethod </em><code class="sig-name descname">encode</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">instance</span></em>, <em class="sig-param"><span class="n">typedef</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/metaschema/properties/JSONArrayMetaschemaProperties.html#ItemsMetaschemaProperty.encode"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.metaschema.properties.JSONArrayMetaschemaProperties.ItemsMetaschemaProperty.encode" title="Permalink to this definition">¶</a></dt>
 <dd><p>Encoder for the ‘items’ container property.</p>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="py attribute">
 <dt id="yggdrasil.metaschema.properties.JSONArrayMetaschemaProperties.ItemsMetaschemaProperty.name">
 <code class="sig-name descname">name</code><em class="property"> = 'items'</em><a class="headerlink" href="#yggdrasil.metaschema.properties.JSONArrayMetaschemaProperties.ItemsMetaschemaProperty.name" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="attribute">
+<dl class="py attribute">
 <dt id="yggdrasil.metaschema.properties.JSONArrayMetaschemaProperties.ItemsMetaschemaProperty.python_types">
 <code class="sig-name descname">python_types</code><em class="property"> = (&lt;class 'tuple'&gt;, &lt;class 'pandas.core.frame.DataFrame'&gt;, &lt;class 'list'&gt;, &lt;class 'numpy.ndarray'&gt;)</em><a class="headerlink" href="#yggdrasil.metaschema.properties.JSONArrayMetaschemaProperties.ItemsMetaschemaProperty.python_types" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="attribute">
+<dl class="py attribute">
 <dt id="yggdrasil.metaschema.properties.JSONArrayMetaschemaProperties.ItemsMetaschemaProperty.types">
 <code class="sig-name descname">types</code><em class="property"> = ('array',)</em><a class="headerlink" href="#yggdrasil.metaschema.properties.JSONArrayMetaschemaProperties.ItemsMetaschemaProperty.types" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
@@ -510,46 +511,46 @@ the second.</p>
 </div>
 <div class="section" id="module-yggdrasil.metaschema.properties.JSONObjectMetaschemaProperties">
 <span id="yggdrasil-metaschema-properties-jsonobjectmetaschemaproperties-module"></span><h2>yggdrasil.metaschema.properties.JSONObjectMetaschemaProperties module<a class="headerlink" href="#module-yggdrasil.metaschema.properties.JSONObjectMetaschemaProperties" title="Permalink to this headline">¶</a></h2>
-<dl class="class">
+<dl class="py class">
 <dt id="yggdrasil.metaschema.properties.JSONObjectMetaschemaProperties.PropertiesMetaschemaProperty">
 <em class="property">class </em><code class="sig-prename descclassname">yggdrasil.metaschema.properties.JSONObjectMetaschemaProperties.</code><code class="sig-name descname">PropertiesMetaschemaProperty</code><a class="reference internal" href="_modules/yggdrasil/metaschema/properties/JSONObjectMetaschemaProperties.html#PropertiesMetaschemaProperty"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.metaschema.properties.JSONObjectMetaschemaProperties.PropertiesMetaschemaProperty" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#yggdrasil.metaschema.properties.MetaschemaProperty.MetaschemaProperty" title="yggdrasil.metaschema.properties.MetaschemaProperty.MetaschemaProperty"><code class="xref py py-class docutils literal notranslate"><span class="pre">yggdrasil.metaschema.properties.MetaschemaProperty.MetaschemaProperty</span></code></a></p>
 <p>Property class for ‘properties’ property.</p>
-<dl class="method">
+<dl class="py method">
 <dt id="yggdrasil.metaschema.properties.JSONObjectMetaschemaProperties.PropertiesMetaschemaProperty.compare">
-<em class="property">classmethod </em><code class="sig-name descname">compare</code><span class="sig-paren">(</span><em class="sig-param">prop1</em>, <em class="sig-param">prop2</em>, <em class="sig-param">root1=None</em>, <em class="sig-param">root2=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/metaschema/properties/JSONObjectMetaschemaProperties.html#PropertiesMetaschemaProperty.compare"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.metaschema.properties.JSONObjectMetaschemaProperties.PropertiesMetaschemaProperty.compare" title="Permalink to this definition">¶</a></dt>
+<em class="property">classmethod </em><code class="sig-name descname">compare</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">prop1</span></em>, <em class="sig-param"><span class="n">prop2</span></em>, <em class="sig-param"><span class="n">root1</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">root2</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/metaschema/properties/JSONObjectMetaschemaProperties.html#PropertiesMetaschemaProperty.compare"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.metaschema.properties.JSONObjectMetaschemaProperties.PropertiesMetaschemaProperty.compare" title="Permalink to this definition">¶</a></dt>
 <dd><p>Comparison method for ‘properties’ container property.</p>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="yggdrasil.metaschema.properties.JSONObjectMetaschemaProperties.PropertiesMetaschemaProperty.encode">
-<em class="property">classmethod </em><code class="sig-name descname">encode</code><span class="sig-paren">(</span><em class="sig-param">instance</em>, <em class="sig-param">typedef=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/metaschema/properties/JSONObjectMetaschemaProperties.html#PropertiesMetaschemaProperty.encode"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.metaschema.properties.JSONObjectMetaschemaProperties.PropertiesMetaschemaProperty.encode" title="Permalink to this definition">¶</a></dt>
+<em class="property">classmethod </em><code class="sig-name descname">encode</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">instance</span></em>, <em class="sig-param"><span class="n">typedef</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/metaschema/properties/JSONObjectMetaschemaProperties.html#PropertiesMetaschemaProperty.encode"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.metaschema.properties.JSONObjectMetaschemaProperties.PropertiesMetaschemaProperty.encode" title="Permalink to this definition">¶</a></dt>
 <dd><p>Encoder for the ‘properties’ container property.</p>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="py attribute">
 <dt id="yggdrasil.metaschema.properties.JSONObjectMetaschemaProperties.PropertiesMetaschemaProperty.name">
 <code class="sig-name descname">name</code><em class="property"> = 'properties'</em><a class="headerlink" href="#yggdrasil.metaschema.properties.JSONObjectMetaschemaProperties.PropertiesMetaschemaProperty.name" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="yggdrasil.metaschema.properties.JSONObjectMetaschemaProperties.PropertiesMetaschemaProperty.normalize">
-<em class="property">classmethod </em><code class="sig-name descname">normalize</code><span class="sig-paren">(</span><em class="sig-param">validator</em>, <em class="sig-param">value</em>, <em class="sig-param">instance</em>, <em class="sig-param">schema</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/metaschema/properties/JSONObjectMetaschemaProperties.html#PropertiesMetaschemaProperty.normalize"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.metaschema.properties.JSONObjectMetaschemaProperties.PropertiesMetaschemaProperty.normalize" title="Permalink to this definition">¶</a></dt>
+<em class="property">classmethod </em><code class="sig-name descname">normalize</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">validator</span></em>, <em class="sig-param"><span class="n">value</span></em>, <em class="sig-param"><span class="n">instance</span></em>, <em class="sig-param"><span class="n">schema</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/metaschema/properties/JSONObjectMetaschemaProperties.html#PropertiesMetaschemaProperty.normalize"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.metaschema.properties.JSONObjectMetaschemaProperties.PropertiesMetaschemaProperty.normalize" title="Permalink to this definition">¶</a></dt>
 <dd><p>Normalization method for ‘properties’ container property.</p>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="yggdrasil.metaschema.properties.JSONObjectMetaschemaProperties.PropertiesMetaschemaProperty.post_validate">
-<em class="property">classmethod </em><code class="sig-name descname">post_validate</code><span class="sig-paren">(</span><em class="sig-param">validator</em>, <em class="sig-param">value</em>, <em class="sig-param">instance</em>, <em class="sig-param">schema</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/metaschema/properties/JSONObjectMetaschemaProperties.html#PropertiesMetaschemaProperty.post_validate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.metaschema.properties.JSONObjectMetaschemaProperties.PropertiesMetaschemaProperty.post_validate" title="Permalink to this definition">¶</a></dt>
+<em class="property">classmethod </em><code class="sig-name descname">post_validate</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">validator</span></em>, <em class="sig-param"><span class="n">value</span></em>, <em class="sig-param"><span class="n">instance</span></em>, <em class="sig-param"><span class="n">schema</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/metaschema/properties/JSONObjectMetaschemaProperties.html#PropertiesMetaschemaProperty.post_validate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.metaschema.properties.JSONObjectMetaschemaProperties.PropertiesMetaschemaProperty.post_validate" title="Permalink to this definition">¶</a></dt>
 <dd><p>Actions performed after validation if normalizing.</p>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="py attribute">
 <dt id="yggdrasil.metaschema.properties.JSONObjectMetaschemaProperties.PropertiesMetaschemaProperty.python_types">
 <code class="sig-name descname">python_types</code><em class="property"> = (&lt;class 'dict'&gt;,)</em><a class="headerlink" href="#yggdrasil.metaschema.properties.JSONObjectMetaschemaProperties.PropertiesMetaschemaProperty.python_types" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="attribute">
+<dl class="py attribute">
 <dt id="yggdrasil.metaschema.properties.JSONObjectMetaschemaProperties.PropertiesMetaschemaProperty.types">
 <code class="sig-name descname">types</code><em class="property"> = ('object',)</em><a class="headerlink" href="#yggdrasil.metaschema.properties.JSONObjectMetaschemaProperties.PropertiesMetaschemaProperty.types" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
@@ -559,26 +560,26 @@ the second.</p>
 </div>
 <div class="section" id="module-yggdrasil.metaschema.properties.KwargsMetaschemaProperty">
 <span id="yggdrasil-metaschema-properties-kwargsmetaschemaproperty-module"></span><h2>yggdrasil.metaschema.properties.KwargsMetaschemaProperty module<a class="headerlink" href="#module-yggdrasil.metaschema.properties.KwargsMetaschemaProperty" title="Permalink to this headline">¶</a></h2>
-<dl class="class">
+<dl class="py class">
 <dt id="yggdrasil.metaschema.properties.KwargsMetaschemaProperty.KwargsMetaschemaProperty">
 <em class="property">class </em><code class="sig-prename descclassname">yggdrasil.metaschema.properties.KwargsMetaschemaProperty.</code><code class="sig-name descname">KwargsMetaschemaProperty</code><a class="reference internal" href="_modules/yggdrasil/metaschema/properties/KwargsMetaschemaProperty.html#KwargsMetaschemaProperty"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.metaschema.properties.KwargsMetaschemaProperty.KwargsMetaschemaProperty" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#yggdrasil.metaschema.properties.ArgsMetaschemaProperty.ArgsMetaschemaProperty" title="yggdrasil.metaschema.properties.ArgsMetaschemaProperty.ArgsMetaschemaProperty"><code class="xref py py-class docutils literal notranslate"><span class="pre">yggdrasil.metaschema.properties.ArgsMetaschemaProperty.ArgsMetaschemaProperty</span></code></a></p>
 <p>Property class for ‘kwargs’ property.</p>
-<dl class="method">
+<dl class="py method">
 <dt id="yggdrasil.metaschema.properties.KwargsMetaschemaProperty.KwargsMetaschemaProperty.compare">
-<em class="property">classmethod </em><code class="sig-name descname">compare</code><span class="sig-paren">(</span><em class="sig-param">*args</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/metaschema/properties/KwargsMetaschemaProperty.html#KwargsMetaschemaProperty.compare"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.metaschema.properties.KwargsMetaschemaProperty.KwargsMetaschemaProperty.compare" title="Permalink to this definition">¶</a></dt>
+<em class="property">classmethod </em><code class="sig-name descname">compare</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">*</span><span class="n">args</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/metaschema/properties/KwargsMetaschemaProperty.html#KwargsMetaschemaProperty.compare"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.metaschema.properties.KwargsMetaschemaProperty.KwargsMetaschemaProperty.compare" title="Permalink to this definition">¶</a></dt>
 <dd><p>Comparison method for ‘args’ container property.</p>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="yggdrasil.metaschema.properties.KwargsMetaschemaProperty.KwargsMetaschemaProperty.encode">
-<em class="property">classmethod </em><code class="sig-name descname">encode</code><span class="sig-paren">(</span><em class="sig-param">instance</em>, <em class="sig-param">typedef=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/metaschema/properties/KwargsMetaschemaProperty.html#KwargsMetaschemaProperty.encode"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.metaschema.properties.KwargsMetaschemaProperty.KwargsMetaschemaProperty.encode" title="Permalink to this definition">¶</a></dt>
+<em class="property">classmethod </em><code class="sig-name descname">encode</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">instance</span></em>, <em class="sig-param"><span class="n">typedef</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/metaschema/properties/KwargsMetaschemaProperty.html#KwargsMetaschemaProperty.encode"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.metaschema.properties.KwargsMetaschemaProperty.KwargsMetaschemaProperty.encode" title="Permalink to this definition">¶</a></dt>
 <dd><p>Encoder for the ‘kwargs’ property.</p>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="yggdrasil.metaschema.properties.KwargsMetaschemaProperty.KwargsMetaschemaProperty.instance2kwargs">
-<em class="property">classmethod </em><code class="sig-name descname">instance2kwargs</code><span class="sig-paren">(</span><em class="sig-param">instance</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/metaschema/properties/KwargsMetaschemaProperty.html#KwargsMetaschemaProperty.instance2kwargs"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.metaschema.properties.KwargsMetaschemaProperty.KwargsMetaschemaProperty.instance2kwargs" title="Permalink to this definition">¶</a></dt>
+<em class="property">classmethod </em><code class="sig-name descname">instance2kwargs</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">instance</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/metaschema/properties/KwargsMetaschemaProperty.html#KwargsMetaschemaProperty.instance2kwargs"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.metaschema.properties.KwargsMetaschemaProperty.KwargsMetaschemaProperty.instance2kwargs" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get input keyword arguments from a class instance.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -593,22 +594,22 @@ the second.</p>
 </dl>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="py attribute">
 <dt id="yggdrasil.metaschema.properties.KwargsMetaschemaProperty.KwargsMetaschemaProperty.name">
 <code class="sig-name descname">name</code><em class="property"> = 'kwargs'</em><a class="headerlink" href="#yggdrasil.metaschema.properties.KwargsMetaschemaProperty.KwargsMetaschemaProperty.name" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="attribute">
+<dl class="py attribute">
 <dt id="yggdrasil.metaschema.properties.KwargsMetaschemaProperty.KwargsMetaschemaProperty.python_types">
 <code class="sig-name descname">python_types</code><em class="property"> = (&lt;class 'object'&gt;,)</em><a class="headerlink" href="#yggdrasil.metaschema.properties.KwargsMetaschemaProperty.KwargsMetaschemaProperty.python_types" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="attribute">
+<dl class="py attribute">
 <dt id="yggdrasil.metaschema.properties.KwargsMetaschemaProperty.KwargsMetaschemaProperty.schema">
 <code class="sig-name descname">schema</code><em class="property"> = {'description': 'Keyword arguments required to recreate a class instance.', 'type': 'object'}</em><a class="headerlink" href="#yggdrasil.metaschema.properties.KwargsMetaschemaProperty.KwargsMetaschemaProperty.schema" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="attribute">
+<dl class="py attribute">
 <dt id="yggdrasil.metaschema.properties.KwargsMetaschemaProperty.KwargsMetaschemaProperty.types">
 <code class="sig-name descname">types</code><em class="property"> = ('instance',)</em><a class="headerlink" href="#yggdrasil.metaschema.properties.KwargsMetaschemaProperty.KwargsMetaschemaProperty.types" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
@@ -618,7 +619,7 @@ the second.</p>
 </div>
 <div class="section" id="module-yggdrasil.metaschema.properties.MetaschemaProperty">
 <span id="yggdrasil-metaschema-properties-metaschemaproperty-module"></span><h2>yggdrasil.metaschema.properties.MetaschemaProperty module<a class="headerlink" href="#module-yggdrasil.metaschema.properties.MetaschemaProperty" title="Permalink to this headline">¶</a></h2>
-<dl class="class">
+<dl class="py class">
 <dt id="yggdrasil.metaschema.properties.MetaschemaProperty.MetaschemaProperty">
 <em class="property">class </em><code class="sig-prename descclassname">yggdrasil.metaschema.properties.MetaschemaProperty.</code><code class="sig-name descname">MetaschemaProperty</code><a class="reference internal" href="_modules/yggdrasil/metaschema/properties/MetaschemaProperty.html#MetaschemaProperty"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.metaschema.properties.MetaschemaProperty.MetaschemaProperty" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.8)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
@@ -637,9 +638,9 @@ schema (dict): JSON schema describing valid values for the property.</p>
 </dl>
 </dd>
 </dl>
-<dl class="method">
+<dl class="py method">
 <dt id="yggdrasil.metaschema.properties.MetaschemaProperty.MetaschemaProperty.compare">
-<em class="property">classmethod </em><code class="sig-name descname">compare</code><span class="sig-paren">(</span><em class="sig-param">prop1</em>, <em class="sig-param">prop2</em>, <em class="sig-param">root1=None</em>, <em class="sig-param">root2=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/metaschema/properties/MetaschemaProperty.html#MetaschemaProperty.compare"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.metaschema.properties.MetaschemaProperty.MetaschemaProperty.compare" title="Permalink to this definition">¶</a></dt>
+<em class="property">classmethod </em><code class="sig-name descname">compare</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">prop1</span></em>, <em class="sig-param"><span class="n">prop2</span></em>, <em class="sig-param"><span class="n">root1</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">root2</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/metaschema/properties/MetaschemaProperty.html#MetaschemaProperty.compare"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.metaschema.properties.MetaschemaProperty.MetaschemaProperty.compare" title="Permalink to this definition">¶</a></dt>
 <dd><p>Method to determine compatiblity of one property value with another.
 This method is not necessarily symmetric in that the second value may
 not be compatible with the first even if the first is compatible with
@@ -657,9 +658,9 @@ the second.</p>
 </dl>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="yggdrasil.metaschema.properties.MetaschemaProperty.MetaschemaProperty.encode">
-<em class="property">classmethod </em><code class="sig-name descname">encode</code><span class="sig-paren">(</span><em class="sig-param">instance</em>, <em class="sig-param">typedef=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/metaschema/properties/MetaschemaProperty.html#MetaschemaProperty.encode"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.metaschema.properties.MetaschemaProperty.MetaschemaProperty.encode" title="Permalink to this definition">¶</a></dt>
+<em class="property">classmethod </em><code class="sig-name descname">encode</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">instance</span></em>, <em class="sig-param"><span class="n">typedef</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/metaschema/properties/MetaschemaProperty.html#MetaschemaProperty.encode"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.metaschema.properties.MetaschemaProperty.MetaschemaProperty.encode" title="Permalink to this definition">¶</a></dt>
 <dd><p>Method to encode the property given the object.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -679,14 +680,14 @@ is ignored.</p></li>
 </dl>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="py attribute">
 <dt id="yggdrasil.metaschema.properties.MetaschemaProperty.MetaschemaProperty.name">
 <code class="sig-name descname">name</code><em class="property"> = 'base'</em><a class="headerlink" href="#yggdrasil.metaschema.properties.MetaschemaProperty.MetaschemaProperty.name" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="yggdrasil.metaschema.properties.MetaschemaProperty.MetaschemaProperty.normalize">
-<em class="property">classmethod </em><code class="sig-name descname">normalize</code><span class="sig-paren">(</span><em class="sig-param">validator</em>, <em class="sig-param">value</em>, <em class="sig-param">instance</em>, <em class="sig-param">schema</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/metaschema/properties/MetaschemaProperty.html#MetaschemaProperty.normalize"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.metaschema.properties.MetaschemaProperty.MetaschemaProperty.normalize" title="Permalink to this definition">¶</a></dt>
+<em class="property">classmethod </em><code class="sig-name descname">normalize</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">validator</span></em>, <em class="sig-param"><span class="n">value</span></em>, <em class="sig-param"><span class="n">instance</span></em>, <em class="sig-param"><span class="n">schema</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/metaschema/properties/MetaschemaProperty.html#MetaschemaProperty.normalize"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.metaschema.properties.MetaschemaProperty.MetaschemaProperty.normalize" title="Permalink to this definition">¶</a></dt>
 <dd><p>Method to normalize the instance based on the property value.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -706,9 +707,9 @@ is ignored.</p></li>
 </dl>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="yggdrasil.metaschema.properties.MetaschemaProperty.MetaschemaProperty.normalize_in_schema">
-<em class="property">classmethod </em><code class="sig-name descname">normalize_in_schema</code><span class="sig-paren">(</span><em class="sig-param">schema</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/metaschema/properties/MetaschemaProperty.html#MetaschemaProperty.normalize_in_schema"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.metaschema.properties.MetaschemaProperty.MetaschemaProperty.normalize_in_schema" title="Permalink to this definition">¶</a></dt>
+<em class="property">classmethod </em><code class="sig-name descname">normalize_in_schema</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">schema</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/metaschema/properties/MetaschemaProperty.html#MetaschemaProperty.normalize_in_schema"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.metaschema.properties.MetaschemaProperty.MetaschemaProperty.normalize_in_schema" title="Permalink to this definition">¶</a></dt>
 <dd><p>Method to normalize the entry for this property in a schema.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -723,30 +724,30 @@ is ignored.</p></li>
 </dl>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="yggdrasil.metaschema.properties.MetaschemaProperty.MetaschemaProperty.post_validate">
-<em class="property">classmethod </em><code class="sig-name descname">post_validate</code><span class="sig-paren">(</span><em class="sig-param">validator</em>, <em class="sig-param">value</em>, <em class="sig-param">instance</em>, <em class="sig-param">schema</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/metaschema/properties/MetaschemaProperty.html#MetaschemaProperty.post_validate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.metaschema.properties.MetaschemaProperty.MetaschemaProperty.post_validate" title="Permalink to this definition">¶</a></dt>
+<em class="property">classmethod </em><code class="sig-name descname">post_validate</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">validator</span></em>, <em class="sig-param"><span class="n">value</span></em>, <em class="sig-param"><span class="n">instance</span></em>, <em class="sig-param"><span class="n">schema</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/metaschema/properties/MetaschemaProperty.html#MetaschemaProperty.post_validate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.metaschema.properties.MetaschemaProperty.MetaschemaProperty.post_validate" title="Permalink to this definition">¶</a></dt>
 <dd><p>Actions performed after validation if normalizing.</p>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="py attribute">
 <dt id="yggdrasil.metaschema.properties.MetaschemaProperty.MetaschemaProperty.python_types">
 <code class="sig-name descname">python_types</code><em class="property"> = ()</em><a class="headerlink" href="#yggdrasil.metaschema.properties.MetaschemaProperty.MetaschemaProperty.python_types" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="attribute">
+<dl class="py attribute">
 <dt id="yggdrasil.metaschema.properties.MetaschemaProperty.MetaschemaProperty.schema">
 <code class="sig-name descname">schema</code><em class="property"> = None</em><a class="headerlink" href="#yggdrasil.metaschema.properties.MetaschemaProperty.MetaschemaProperty.schema" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="attribute">
+<dl class="py attribute">
 <dt id="yggdrasil.metaschema.properties.MetaschemaProperty.MetaschemaProperty.types">
 <code class="sig-name descname">types</code><em class="property"> = ()</em><a class="headerlink" href="#yggdrasil.metaschema.properties.MetaschemaProperty.MetaschemaProperty.types" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="yggdrasil.metaschema.properties.MetaschemaProperty.MetaschemaProperty.validate">
-<em class="property">classmethod </em><code class="sig-name descname">validate</code><span class="sig-paren">(</span><em class="sig-param">validator</em>, <em class="sig-param">value</em>, <em class="sig-param">instance</em>, <em class="sig-param">schema</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/metaschema/properties/MetaschemaProperty.html#MetaschemaProperty.validate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.metaschema.properties.MetaschemaProperty.MetaschemaProperty.validate" title="Permalink to this definition">¶</a></dt>
+<em class="property">classmethod </em><code class="sig-name descname">validate</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">validator</span></em>, <em class="sig-param"><span class="n">value</span></em>, <em class="sig-param"><span class="n">instance</span></em>, <em class="sig-param"><span class="n">schema</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/metaschema/properties/MetaschemaProperty.html#MetaschemaProperty.validate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.metaschema.properties.MetaschemaProperty.MetaschemaProperty.validate" title="Permalink to this definition">¶</a></dt>
 <dd><p>Validator for JSON schema validation of an instance by this property.
 If there is not a user provided validate function, the instance will be
 encoded and then the encoded value will be checked against the provided
@@ -766,9 +767,9 @@ value using cls.compare.</p>
 </dl>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="yggdrasil.metaschema.properties.MetaschemaProperty.MetaschemaProperty.wrapped_validate">
-<em class="property">classmethod </em><code class="sig-name descname">wrapped_validate</code><span class="sig-paren">(</span><em class="sig-param">validator</em>, <em class="sig-param">value</em>, <em class="sig-param">instance</em>, <em class="sig-param">schema</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/metaschema/properties/MetaschemaProperty.html#MetaschemaProperty.wrapped_validate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.metaschema.properties.MetaschemaProperty.MetaschemaProperty.wrapped_validate" title="Permalink to this definition">¶</a></dt>
+<em class="property">classmethod </em><code class="sig-name descname">wrapped_validate</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">validator</span></em>, <em class="sig-param"><span class="n">value</span></em>, <em class="sig-param"><span class="n">instance</span></em>, <em class="sig-param"><span class="n">schema</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/metaschema/properties/MetaschemaProperty.html#MetaschemaProperty.wrapped_validate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.metaschema.properties.MetaschemaProperty.MetaschemaProperty.wrapped_validate" title="Permalink to this definition">¶</a></dt>
 <dd><p>Wrapped validator that handles errors produced by the native
 validate method and ensures that the property is parsed by the base
 validator and raises the correct error if necessary.</p>
@@ -785,9 +786,9 @@ method.</p></li>
 
 </dd></dl>
 
-<dl class="function">
+<dl class="py function">
 <dt id="yggdrasil.metaschema.properties.MetaschemaProperty.create_property">
-<code class="sig-prename descclassname">yggdrasil.metaschema.properties.MetaschemaProperty.</code><code class="sig-name descname">create_property</code><span class="sig-paren">(</span><em class="sig-param">name</em>, <em class="sig-param">schema</em>, <em class="sig-param">encode</em>, <em class="sig-param">validate=None</em>, <em class="sig-param">compare=None</em>, <em class="sig-param">dont_register=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/metaschema/properties/MetaschemaProperty.html#create_property"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.metaschema.properties.MetaschemaProperty.create_property" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">yggdrasil.metaschema.properties.MetaschemaProperty.</code><code class="sig-name descname">create_property</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">name</span></em>, <em class="sig-param"><span class="n">schema</span></em>, <em class="sig-param"><span class="n">encode</span></em>, <em class="sig-param"><span class="n">validate</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">compare</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">dont_register</span><span class="o">=</span><span class="default_value">False</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/metaschema/properties/MetaschemaProperty.html#create_property"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.metaschema.properties.MetaschemaProperty.create_property" title="Permalink to this definition">¶</a></dt>
 <dd><p>Create a new property class.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -818,132 +819,132 @@ not be registered. Defaults to False.</p></li>
 </div>
 <div class="section" id="module-yggdrasil.metaschema.properties.ScalarMetaschemaProperties">
 <span id="yggdrasil-metaschema-properties-scalarmetaschemaproperties-module"></span><h2>yggdrasil.metaschema.properties.ScalarMetaschemaProperties module<a class="headerlink" href="#module-yggdrasil.metaschema.properties.ScalarMetaschemaProperties" title="Permalink to this headline">¶</a></h2>
-<dl class="class">
+<dl class="py class">
 <dt id="yggdrasil.metaschema.properties.ScalarMetaschemaProperties.PrecisionMetaschemaProperty">
 <em class="property">class </em><code class="sig-prename descclassname">yggdrasil.metaschema.properties.ScalarMetaschemaProperties.</code><code class="sig-name descname">PrecisionMetaschemaProperty</code><a class="reference internal" href="_modules/yggdrasil/metaschema/properties/ScalarMetaschemaProperties.html#PrecisionMetaschemaProperty"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.metaschema.properties.ScalarMetaschemaProperties.PrecisionMetaschemaProperty" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#yggdrasil.metaschema.properties.MetaschemaProperty.MetaschemaProperty" title="yggdrasil.metaschema.properties.MetaschemaProperty.MetaschemaProperty"><code class="xref py py-class docutils literal notranslate"><span class="pre">yggdrasil.metaschema.properties.MetaschemaProperty.MetaschemaProperty</span></code></a></p>
 <p>Property class for ‘precision’ property.</p>
-<dl class="method">
+<dl class="py method">
 <dt id="yggdrasil.metaschema.properties.ScalarMetaschemaProperties.PrecisionMetaschemaProperty.compare">
-<em class="property">classmethod </em><code class="sig-name descname">compare</code><span class="sig-paren">(</span><em class="sig-param">prop1</em>, <em class="sig-param">prop2</em>, <em class="sig-param">root1=None</em>, <em class="sig-param">root2=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/metaschema/properties/ScalarMetaschemaProperties.html#PrecisionMetaschemaProperty.compare"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.metaschema.properties.ScalarMetaschemaProperties.PrecisionMetaschemaProperty.compare" title="Permalink to this definition">¶</a></dt>
+<em class="property">classmethod </em><code class="sig-name descname">compare</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">prop1</span></em>, <em class="sig-param"><span class="n">prop2</span></em>, <em class="sig-param"><span class="n">root1</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">root2</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/metaschema/properties/ScalarMetaschemaProperties.html#PrecisionMetaschemaProperty.compare"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.metaschema.properties.ScalarMetaschemaProperties.PrecisionMetaschemaProperty.compare" title="Permalink to this definition">¶</a></dt>
 <dd><p>Comparison for the ‘precision’ scalar property.</p>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="yggdrasil.metaschema.properties.ScalarMetaschemaProperties.PrecisionMetaschemaProperty.encode">
-<em class="property">classmethod </em><code class="sig-name descname">encode</code><span class="sig-paren">(</span><em class="sig-param">instance</em>, <em class="sig-param">typedef=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/metaschema/properties/ScalarMetaschemaProperties.html#PrecisionMetaschemaProperty.encode"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.metaschema.properties.ScalarMetaschemaProperties.PrecisionMetaschemaProperty.encode" title="Permalink to this definition">¶</a></dt>
+<em class="property">classmethod </em><code class="sig-name descname">encode</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">instance</span></em>, <em class="sig-param"><span class="n">typedef</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/metaschema/properties/ScalarMetaschemaProperties.html#PrecisionMetaschemaProperty.encode"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.metaschema.properties.ScalarMetaschemaProperties.PrecisionMetaschemaProperty.encode" title="Permalink to this definition">¶</a></dt>
 <dd><p>Encoder for the ‘precision’ scalar property.</p>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="py attribute">
 <dt id="yggdrasil.metaschema.properties.ScalarMetaschemaProperties.PrecisionMetaschemaProperty.name">
 <code class="sig-name descname">name</code><em class="property"> = 'precision'</em><a class="headerlink" href="#yggdrasil.metaschema.properties.ScalarMetaschemaProperties.PrecisionMetaschemaProperty.name" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="yggdrasil.metaschema.properties.ScalarMetaschemaProperties.PrecisionMetaschemaProperty.normalize_in_schema">
-<em class="property">classmethod </em><code class="sig-name descname">normalize_in_schema</code><span class="sig-paren">(</span><em class="sig-param">schema</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/metaschema/properties/ScalarMetaschemaProperties.html#PrecisionMetaschemaProperty.normalize_in_schema"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.metaschema.properties.ScalarMetaschemaProperties.PrecisionMetaschemaProperty.normalize_in_schema" title="Permalink to this definition">¶</a></dt>
+<em class="property">classmethod </em><code class="sig-name descname">normalize_in_schema</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">schema</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/metaschema/properties/ScalarMetaschemaProperties.html#PrecisionMetaschemaProperty.normalize_in_schema"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.metaschema.properties.ScalarMetaschemaProperties.PrecisionMetaschemaProperty.normalize_in_schema" title="Permalink to this definition">¶</a></dt>
 <dd><p>Normalization for the ‘precision’ scalar property in a schema.</p>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="py attribute">
 <dt id="yggdrasil.metaschema.properties.ScalarMetaschemaProperties.PrecisionMetaschemaProperty.python_types">
-<code class="sig-name descname">python_types</code><em class="property"> = (&lt;class 'numpy.complex64'&gt;, &lt;class 'numpy.float32'&gt;, &lt;class 'bytes'&gt;, &lt;class 'str'&gt;, &lt;class 'numpy.uint16'&gt;, &lt;class 'float'&gt;, &lt;class 'numpy.int16'&gt;, &lt;class 'numpy.ndarray'&gt;, &lt;class 'numpy.complex128'&gt;, &lt;class 'numpy.float64'&gt;, &lt;class 'numpy.uint32'&gt;, &lt;class 'numpy.int32'&gt;, &lt;class 'numpy.bytes_'&gt;, &lt;class 'int'&gt;, &lt;class 'numpy.signedinteger'&gt;, &lt;class 'unyt.array.unyt_array'&gt;, &lt;class 'numpy.complex256'&gt;, &lt;class 'numpy.float128'&gt;, &lt;class 'numpy.uint64'&gt;, &lt;class 'numpy.int64'&gt;, &lt;class 'numpy.str_'&gt;, &lt;class 'numpy.unsignedinteger'&gt;, &lt;class 'complex'&gt;, &lt;class 'numpy.float16'&gt;, &lt;class 'unyt.array.unyt_quantity'&gt;, &lt;class 'numpy.uint8'&gt;, &lt;class 'numpy.int8'&gt;)</em><a class="headerlink" href="#yggdrasil.metaschema.properties.ScalarMetaschemaProperties.PrecisionMetaschemaProperty.python_types" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">python_types</code><em class="property"> = (&lt;class 'unyt.array.unyt_array'&gt;, &lt;class 'numpy.complex64'&gt;, &lt;class 'numpy.float32'&gt;, &lt;class 'bytes'&gt;, &lt;class 'str'&gt;, &lt;class 'numpy.uint16'&gt;, &lt;class 'float'&gt;, &lt;class 'numpy.int16'&gt;, &lt;class 'numpy.ndarray'&gt;, &lt;class 'numpy.complex128'&gt;, &lt;class 'numpy.float64'&gt;, &lt;class 'numpy.uint32'&gt;, &lt;class 'numpy.int32'&gt;, &lt;class 'numpy.bytes_'&gt;, &lt;class 'int'&gt;, &lt;class 'numpy.signedinteger'&gt;, &lt;class 'numpy.complex256'&gt;, &lt;class 'numpy.float128'&gt;, &lt;class 'unyt.array.unyt_quantity'&gt;, &lt;class 'numpy.uint64'&gt;, &lt;class 'numpy.int64'&gt;, &lt;class 'numpy.str_'&gt;, &lt;class 'numpy.unsignedinteger'&gt;, &lt;class 'complex'&gt;, &lt;class 'numpy.float16'&gt;, &lt;class 'numpy.uint8'&gt;, &lt;class 'numpy.int8'&gt;)</em><a class="headerlink" href="#yggdrasil.metaschema.properties.ScalarMetaschemaProperties.PrecisionMetaschemaProperty.python_types" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="attribute">
+<dl class="py attribute">
 <dt id="yggdrasil.metaschema.properties.ScalarMetaschemaProperties.PrecisionMetaschemaProperty.schema">
 <code class="sig-name descname">schema</code><em class="property"> = {'description': 'The size (in bits) of each item.', 'minimum': 1, 'type': 'number'}</em><a class="headerlink" href="#yggdrasil.metaschema.properties.ScalarMetaschemaProperties.PrecisionMetaschemaProperty.schema" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="attribute">
+<dl class="py attribute">
 <dt id="yggdrasil.metaschema.properties.ScalarMetaschemaProperties.PrecisionMetaschemaProperty.types">
-<code class="sig-name descname">types</code><em class="property"> = ('1darray', 'ndarray', 'unicode', 'float', 'complex', 'uint', 'int', 'bytes', 'scalar')</em><a class="headerlink" href="#yggdrasil.metaschema.properties.ScalarMetaschemaProperties.PrecisionMetaschemaProperty.types" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">types</code><em class="property"> = ('unicode', 'ndarray', 'bytes', 'uint', '1darray', 'scalar', 'float', 'int', 'complex')</em><a class="headerlink" href="#yggdrasil.metaschema.properties.ScalarMetaschemaProperties.PrecisionMetaschemaProperty.types" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </dd></dl>
 
-<dl class="class">
+<dl class="py class">
 <dt id="yggdrasil.metaschema.properties.ScalarMetaschemaProperties.SubtypeMetaschemaProperty">
 <em class="property">class </em><code class="sig-prename descclassname">yggdrasil.metaschema.properties.ScalarMetaschemaProperties.</code><code class="sig-name descname">SubtypeMetaschemaProperty</code><a class="reference internal" href="_modules/yggdrasil/metaschema/properties/ScalarMetaschemaProperties.html#SubtypeMetaschemaProperty"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.metaschema.properties.ScalarMetaschemaProperties.SubtypeMetaschemaProperty" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#yggdrasil.metaschema.properties.MetaschemaProperty.MetaschemaProperty" title="yggdrasil.metaschema.properties.MetaschemaProperty.MetaschemaProperty"><code class="xref py py-class docutils literal notranslate"><span class="pre">yggdrasil.metaschema.properties.MetaschemaProperty.MetaschemaProperty</span></code></a></p>
 <p>Property class for ‘subtype’ property.</p>
-<dl class="method">
+<dl class="py method">
 <dt id="yggdrasil.metaschema.properties.ScalarMetaschemaProperties.SubtypeMetaschemaProperty.encode">
-<em class="property">classmethod </em><code class="sig-name descname">encode</code><span class="sig-paren">(</span><em class="sig-param">instance</em>, <em class="sig-param">typedef=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/metaschema/properties/ScalarMetaschemaProperties.html#SubtypeMetaschemaProperty.encode"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.metaschema.properties.ScalarMetaschemaProperties.SubtypeMetaschemaProperty.encode" title="Permalink to this definition">¶</a></dt>
+<em class="property">classmethod </em><code class="sig-name descname">encode</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">instance</span></em>, <em class="sig-param"><span class="n">typedef</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/metaschema/properties/ScalarMetaschemaProperties.html#SubtypeMetaschemaProperty.encode"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.metaschema.properties.ScalarMetaschemaProperties.SubtypeMetaschemaProperty.encode" title="Permalink to this definition">¶</a></dt>
 <dd><p>Encoder for the ‘subtype’ scalar property.</p>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="py attribute">
 <dt id="yggdrasil.metaschema.properties.ScalarMetaschemaProperties.SubtypeMetaschemaProperty.name">
 <code class="sig-name descname">name</code><em class="property"> = 'subtype'</em><a class="headerlink" href="#yggdrasil.metaschema.properties.ScalarMetaschemaProperties.SubtypeMetaschemaProperty.name" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="yggdrasil.metaschema.properties.ScalarMetaschemaProperties.SubtypeMetaschemaProperty.normalize_in_schema">
-<em class="property">classmethod </em><code class="sig-name descname">normalize_in_schema</code><span class="sig-paren">(</span><em class="sig-param">schema</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/metaschema/properties/ScalarMetaschemaProperties.html#SubtypeMetaschemaProperty.normalize_in_schema"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.metaschema.properties.ScalarMetaschemaProperties.SubtypeMetaschemaProperty.normalize_in_schema" title="Permalink to this definition">¶</a></dt>
+<em class="property">classmethod </em><code class="sig-name descname">normalize_in_schema</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">schema</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/metaschema/properties/ScalarMetaschemaProperties.html#SubtypeMetaschemaProperty.normalize_in_schema"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.metaschema.properties.ScalarMetaschemaProperties.SubtypeMetaschemaProperty.normalize_in_schema" title="Permalink to this definition">¶</a></dt>
 <dd><p>Normalization for the ‘subtype’ scalar property in a schema.</p>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="py attribute">
 <dt id="yggdrasil.metaschema.properties.ScalarMetaschemaProperties.SubtypeMetaschemaProperty.python_types">
-<code class="sig-name descname">python_types</code><em class="property"> = (&lt;class 'numpy.complex64'&gt;, &lt;class 'numpy.float32'&gt;, &lt;class 'bytes'&gt;, &lt;class 'str'&gt;, &lt;class 'numpy.uint16'&gt;, &lt;class 'float'&gt;, &lt;class 'numpy.int16'&gt;, &lt;class 'numpy.ndarray'&gt;, &lt;class 'numpy.complex128'&gt;, &lt;class 'numpy.float64'&gt;, &lt;class 'numpy.uint32'&gt;, &lt;class 'numpy.int32'&gt;, &lt;class 'numpy.bytes_'&gt;, &lt;class 'int'&gt;, &lt;class 'numpy.signedinteger'&gt;, &lt;class 'unyt.array.unyt_array'&gt;, &lt;class 'numpy.complex256'&gt;, &lt;class 'numpy.float128'&gt;, &lt;class 'numpy.uint64'&gt;, &lt;class 'numpy.int64'&gt;, &lt;class 'numpy.str_'&gt;, &lt;class 'numpy.unsignedinteger'&gt;, &lt;class 'complex'&gt;, &lt;class 'numpy.float16'&gt;, &lt;class 'unyt.array.unyt_quantity'&gt;, &lt;class 'numpy.uint8'&gt;, &lt;class 'numpy.int8'&gt;)</em><a class="headerlink" href="#yggdrasil.metaschema.properties.ScalarMetaschemaProperties.SubtypeMetaschemaProperty.python_types" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">python_types</code><em class="property"> = (&lt;class 'unyt.array.unyt_array'&gt;, &lt;class 'numpy.complex64'&gt;, &lt;class 'numpy.float32'&gt;, &lt;class 'bytes'&gt;, &lt;class 'str'&gt;, &lt;class 'numpy.uint16'&gt;, &lt;class 'float'&gt;, &lt;class 'numpy.int16'&gt;, &lt;class 'numpy.ndarray'&gt;, &lt;class 'numpy.complex128'&gt;, &lt;class 'numpy.float64'&gt;, &lt;class 'numpy.uint32'&gt;, &lt;class 'numpy.int32'&gt;, &lt;class 'numpy.bytes_'&gt;, &lt;class 'int'&gt;, &lt;class 'numpy.signedinteger'&gt;, &lt;class 'numpy.complex256'&gt;, &lt;class 'numpy.float128'&gt;, &lt;class 'unyt.array.unyt_quantity'&gt;, &lt;class 'numpy.uint64'&gt;, &lt;class 'numpy.int64'&gt;, &lt;class 'numpy.str_'&gt;, &lt;class 'numpy.unsignedinteger'&gt;, &lt;class 'complex'&gt;, &lt;class 'numpy.float16'&gt;, &lt;class 'numpy.uint8'&gt;, &lt;class 'numpy.int8'&gt;)</em><a class="headerlink" href="#yggdrasil.metaschema.properties.ScalarMetaschemaProperties.SubtypeMetaschemaProperty.python_types" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="attribute">
+<dl class="py attribute">
 <dt id="yggdrasil.metaschema.properties.ScalarMetaschemaProperties.SubtypeMetaschemaProperty.schema">
 <code class="sig-name descname">schema</code><em class="property"> = {'description': 'The base type for each item.', 'enum': ['bytes', 'complex', 'float', 'int', 'uint', 'unicode'], 'type': 'string'}</em><a class="headerlink" href="#yggdrasil.metaschema.properties.ScalarMetaschemaProperties.SubtypeMetaschemaProperty.schema" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="attribute">
+<dl class="py attribute">
 <dt id="yggdrasil.metaschema.properties.ScalarMetaschemaProperties.SubtypeMetaschemaProperty.types">
 <code class="sig-name descname">types</code><em class="property"> = ('ndarray', '1darray', 'scalar')</em><a class="headerlink" href="#yggdrasil.metaschema.properties.ScalarMetaschemaProperties.SubtypeMetaschemaProperty.types" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </dd></dl>
 
-<dl class="class">
+<dl class="py class">
 <dt id="yggdrasil.metaschema.properties.ScalarMetaschemaProperties.UnitsMetaschemaProperty">
 <em class="property">class </em><code class="sig-prename descclassname">yggdrasil.metaschema.properties.ScalarMetaschemaProperties.</code><code class="sig-name descname">UnitsMetaschemaProperty</code><a class="reference internal" href="_modules/yggdrasil/metaschema/properties/ScalarMetaschemaProperties.html#UnitsMetaschemaProperty"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.metaschema.properties.ScalarMetaschemaProperties.UnitsMetaschemaProperty" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#yggdrasil.metaschema.properties.MetaschemaProperty.MetaschemaProperty" title="yggdrasil.metaschema.properties.MetaschemaProperty.MetaschemaProperty"><code class="xref py py-class docutils literal notranslate"><span class="pre">yggdrasil.metaschema.properties.MetaschemaProperty.MetaschemaProperty</span></code></a></p>
 <p>Property class for ‘units’ property.</p>
-<dl class="method">
+<dl class="py method">
 <dt id="yggdrasil.metaschema.properties.ScalarMetaschemaProperties.UnitsMetaschemaProperty.compare">
-<em class="property">classmethod </em><code class="sig-name descname">compare</code><span class="sig-paren">(</span><em class="sig-param">prop1</em>, <em class="sig-param">prop2</em>, <em class="sig-param">root1=None</em>, <em class="sig-param">root2=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/metaschema/properties/ScalarMetaschemaProperties.html#UnitsMetaschemaProperty.compare"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.metaschema.properties.ScalarMetaschemaProperties.UnitsMetaschemaProperty.compare" title="Permalink to this definition">¶</a></dt>
+<em class="property">classmethod </em><code class="sig-name descname">compare</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">prop1</span></em>, <em class="sig-param"><span class="n">prop2</span></em>, <em class="sig-param"><span class="n">root1</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">root2</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/metaschema/properties/ScalarMetaschemaProperties.html#UnitsMetaschemaProperty.compare"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.metaschema.properties.ScalarMetaschemaProperties.UnitsMetaschemaProperty.compare" title="Permalink to this definition">¶</a></dt>
 <dd><p>Comparision for the ‘units’ scalar property.</p>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="yggdrasil.metaschema.properties.ScalarMetaschemaProperties.UnitsMetaschemaProperty.encode">
-<em class="property">classmethod </em><code class="sig-name descname">encode</code><span class="sig-paren">(</span><em class="sig-param">instance</em>, <em class="sig-param">typedef=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/metaschema/properties/ScalarMetaschemaProperties.html#UnitsMetaschemaProperty.encode"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.metaschema.properties.ScalarMetaschemaProperties.UnitsMetaschemaProperty.encode" title="Permalink to this definition">¶</a></dt>
+<em class="property">classmethod </em><code class="sig-name descname">encode</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">instance</span></em>, <em class="sig-param"><span class="n">typedef</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/metaschema/properties/ScalarMetaschemaProperties.html#UnitsMetaschemaProperty.encode"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.metaschema.properties.ScalarMetaschemaProperties.UnitsMetaschemaProperty.encode" title="Permalink to this definition">¶</a></dt>
 <dd><p>Encoder for the ‘units’ scalar property.</p>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="py attribute">
 <dt id="yggdrasil.metaschema.properties.ScalarMetaschemaProperties.UnitsMetaschemaProperty.name">
 <code class="sig-name descname">name</code><em class="property"> = 'units'</em><a class="headerlink" href="#yggdrasil.metaschema.properties.ScalarMetaschemaProperties.UnitsMetaschemaProperty.name" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="attribute">
+<dl class="py attribute">
 <dt id="yggdrasil.metaschema.properties.ScalarMetaschemaProperties.UnitsMetaschemaProperty.python_types">
-<code class="sig-name descname">python_types</code><em class="property"> = (&lt;class 'numpy.complex64'&gt;, &lt;class 'numpy.float32'&gt;, &lt;class 'bytes'&gt;, &lt;class 'str'&gt;, &lt;class 'numpy.uint16'&gt;, &lt;class 'float'&gt;, &lt;class 'numpy.int16'&gt;, &lt;class 'numpy.ndarray'&gt;, &lt;class 'numpy.complex128'&gt;, &lt;class 'numpy.float64'&gt;, &lt;class 'numpy.uint32'&gt;, &lt;class 'numpy.int32'&gt;, &lt;class 'numpy.bytes_'&gt;, &lt;class 'int'&gt;, &lt;class 'numpy.signedinteger'&gt;, &lt;class 'unyt.array.unyt_array'&gt;, &lt;class 'numpy.complex256'&gt;, &lt;class 'numpy.float128'&gt;, &lt;class 'numpy.uint64'&gt;, &lt;class 'numpy.int64'&gt;, &lt;class 'numpy.str_'&gt;, &lt;class 'numpy.unsignedinteger'&gt;, &lt;class 'complex'&gt;, &lt;class 'numpy.float16'&gt;, &lt;class 'unyt.array.unyt_quantity'&gt;, &lt;class 'numpy.uint8'&gt;, &lt;class 'numpy.int8'&gt;)</em><a class="headerlink" href="#yggdrasil.metaschema.properties.ScalarMetaschemaProperties.UnitsMetaschemaProperty.python_types" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">python_types</code><em class="property"> = (&lt;class 'unyt.array.unyt_array'&gt;, &lt;class 'numpy.complex64'&gt;, &lt;class 'numpy.float32'&gt;, &lt;class 'bytes'&gt;, &lt;class 'str'&gt;, &lt;class 'numpy.uint16'&gt;, &lt;class 'float'&gt;, &lt;class 'numpy.int16'&gt;, &lt;class 'numpy.ndarray'&gt;, &lt;class 'numpy.complex128'&gt;, &lt;class 'numpy.float64'&gt;, &lt;class 'numpy.uint32'&gt;, &lt;class 'numpy.int32'&gt;, &lt;class 'numpy.bytes_'&gt;, &lt;class 'int'&gt;, &lt;class 'numpy.signedinteger'&gt;, &lt;class 'numpy.complex256'&gt;, &lt;class 'numpy.float128'&gt;, &lt;class 'unyt.array.unyt_quantity'&gt;, &lt;class 'numpy.uint64'&gt;, &lt;class 'numpy.int64'&gt;, &lt;class 'numpy.str_'&gt;, &lt;class 'numpy.unsignedinteger'&gt;, &lt;class 'complex'&gt;, &lt;class 'numpy.float16'&gt;, &lt;class 'numpy.uint8'&gt;, &lt;class 'numpy.int8'&gt;)</em><a class="headerlink" href="#yggdrasil.metaschema.properties.ScalarMetaschemaProperties.UnitsMetaschemaProperty.python_types" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="attribute">
+<dl class="py attribute">
 <dt id="yggdrasil.metaschema.properties.ScalarMetaschemaProperties.UnitsMetaschemaProperty.schema">
 <code class="sig-name descname">schema</code><em class="property"> = {'description': 'Physical units.', 'type': 'string'}</em><a class="headerlink" href="#yggdrasil.metaschema.properties.ScalarMetaschemaProperties.UnitsMetaschemaProperty.schema" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="attribute">
+<dl class="py attribute">
 <dt id="yggdrasil.metaschema.properties.ScalarMetaschemaProperties.UnitsMetaschemaProperty.types">
-<code class="sig-name descname">types</code><em class="property"> = ('1darray', 'ndarray', 'unicode', 'float', 'complex', 'uint', 'int', 'bytes', 'scalar')</em><a class="headerlink" href="#yggdrasil.metaschema.properties.ScalarMetaschemaProperties.UnitsMetaschemaProperty.types" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">types</code><em class="property"> = ('unicode', 'ndarray', 'bytes', 'uint', '1darray', 'scalar', 'float', 'int', 'complex')</em><a class="headerlink" href="#yggdrasil.metaschema.properties.ScalarMetaschemaProperties.UnitsMetaschemaProperty.types" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </dd></dl>
 
-<dl class="function">
+<dl class="py function">
 <dt id="yggdrasil.metaschema.properties.ScalarMetaschemaProperties.data2dtype">
-<code class="sig-prename descclassname">yggdrasil.metaschema.properties.ScalarMetaschemaProperties.</code><code class="sig-name descname">data2dtype</code><span class="sig-paren">(</span><em class="sig-param">data</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/metaschema/properties/ScalarMetaschemaProperties.html#data2dtype"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.metaschema.properties.ScalarMetaschemaProperties.data2dtype" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">yggdrasil.metaschema.properties.ScalarMetaschemaProperties.</code><code class="sig-name descname">data2dtype</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">data</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/metaschema/properties/ScalarMetaschemaProperties.html#data2dtype"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.metaschema.properties.ScalarMetaschemaProperties.data2dtype" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get numpy data type for an object.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -958,9 +959,9 @@ not be registered. Defaults to False.</p></li>
 </dl>
 </dd></dl>
 
-<dl class="function">
+<dl class="py function">
 <dt id="yggdrasil.metaschema.properties.ScalarMetaschemaProperties.definition2dtype">
-<code class="sig-prename descclassname">yggdrasil.metaschema.properties.ScalarMetaschemaProperties.</code><code class="sig-name descname">definition2dtype</code><span class="sig-paren">(</span><em class="sig-param">props</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/metaschema/properties/ScalarMetaschemaProperties.html#definition2dtype"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.metaschema.properties.ScalarMetaschemaProperties.definition2dtype" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">yggdrasil.metaschema.properties.ScalarMetaschemaProperties.</code><code class="sig-name descname">definition2dtype</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">props</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/metaschema/properties/ScalarMetaschemaProperties.html#definition2dtype"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.metaschema.properties.ScalarMetaschemaProperties.definition2dtype" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get numpy data type for a type definition.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -978,24 +979,24 @@ not be registered. Defaults to False.</p></li>
 </div>
 <div class="section" id="module-yggdrasil.metaschema.properties.TitleMetaschemaProperty">
 <span id="yggdrasil-metaschema-properties-titlemetaschemaproperty-module"></span><h2>yggdrasil.metaschema.properties.TitleMetaschemaProperty module<a class="headerlink" href="#module-yggdrasil.metaschema.properties.TitleMetaschemaProperty" title="Permalink to this headline">¶</a></h2>
-<dl class="class">
+<dl class="py class">
 <dt id="yggdrasil.metaschema.properties.TitleMetaschemaProperty.TitleMetaschemaProperty">
 <em class="property">class </em><code class="sig-prename descclassname">yggdrasil.metaschema.properties.TitleMetaschemaProperty.</code><code class="sig-name descname">TitleMetaschemaProperty</code><a class="reference internal" href="_modules/yggdrasil/metaschema/properties/TitleMetaschemaProperty.html#TitleMetaschemaProperty"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.metaschema.properties.TitleMetaschemaProperty.TitleMetaschemaProperty" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#yggdrasil.metaschema.properties.MetaschemaProperty.MetaschemaProperty" title="yggdrasil.metaschema.properties.MetaschemaProperty.MetaschemaProperty"><code class="xref py py-class docutils literal notranslate"><span class="pre">yggdrasil.metaschema.properties.MetaschemaProperty.MetaschemaProperty</span></code></a></p>
 <p>Title property with validation of new properties.</p>
-<dl class="attribute">
+<dl class="py attribute">
 <dt id="yggdrasil.metaschema.properties.TitleMetaschemaProperty.TitleMetaschemaProperty.name">
 <code class="sig-name descname">name</code><em class="property"> = 'title'</em><a class="headerlink" href="#yggdrasil.metaschema.properties.TitleMetaschemaProperty.TitleMetaschemaProperty.name" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="attribute">
+<dl class="py attribute">
 <dt id="yggdrasil.metaschema.properties.TitleMetaschemaProperty.TitleMetaschemaProperty.python_types">
-<code class="sig-name descname">python_types</code><em class="property"> = (&lt;class 'numpy.complex64'&gt;, &lt;class 'numbers.Number'&gt;, &lt;class 'numpy.float32'&gt;, &lt;class 'bytes'&gt;, &lt;class 'str'&gt;, &lt;class 'numpy.uint16'&gt;, &lt;class 'float'&gt;, &lt;class 'numpy.int16'&gt;, &lt;class 'numpy.ndarray'&gt;, &lt;class 'numpy.complex128'&gt;, &lt;class 'numpy.float64'&gt;, &lt;class 'method'&gt;, &lt;class 'object'&gt;, &lt;class 'numpy.uint32'&gt;, &lt;class 'builtin_function_or_method'&gt;, &lt;class 'numpy.int32'&gt;, &lt;class 'dict'&gt;, &lt;class 'function'&gt;, &lt;class 'numpy.bytes_'&gt;, &lt;class 'int'&gt;, &lt;class 'numpy.signedinteger'&gt;, &lt;class 'unyt.array.unyt_array'&gt;, &lt;class 'numpy.complex256'&gt;, &lt;class 'tuple'&gt;, &lt;class 'numpy.float128'&gt;, &lt;class 'type'&gt;, &lt;class 'numpy.uint64'&gt;, &lt;class 'numpy.int64'&gt;, &lt;class 'numpy.str_'&gt;, &lt;class 'numpy.unsignedinteger'&gt;, &lt;class 'complex'&gt;, &lt;class 'list'&gt;, &lt;class 'NoneType'&gt;, &lt;class 'bool'&gt;, &lt;class 'pandas.core.frame.DataFrame'&gt;, &lt;class 'numpy.float16'&gt;, &lt;class 'unyt.array.unyt_quantity'&gt;, &lt;class 'numpy.uint8'&gt;, &lt;class 'numpy.int8'&gt;)</em><a class="headerlink" href="#yggdrasil.metaschema.properties.TitleMetaschemaProperty.TitleMetaschemaProperty.python_types" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">python_types</code><em class="property"> = (&lt;class 'unyt.array.unyt_array'&gt;, &lt;class 'numpy.complex64'&gt;, &lt;class 'numpy.float32'&gt;, &lt;class 'bytes'&gt;, &lt;class 'str'&gt;, &lt;class 'numpy.uint16'&gt;, &lt;class 'float'&gt;, &lt;class 'numpy.int16'&gt;, &lt;class 'numpy.ndarray'&gt;, &lt;class 'numpy.complex128'&gt;, &lt;class 'numpy.float64'&gt;, &lt;class 'method'&gt;, &lt;class 'numpy.uint32'&gt;, &lt;class 'object'&gt;, &lt;class 'builtin_function_or_method'&gt;, &lt;class 'numpy.int32'&gt;, &lt;class 'dict'&gt;, &lt;class 'function'&gt;, &lt;class 'numpy.bytes_'&gt;, &lt;class 'int'&gt;, &lt;class 'numpy.signedinteger'&gt;, &lt;class 'pandas.core.frame.DataFrame'&gt;, &lt;class 'numpy.complex256'&gt;, &lt;class 'numpy.float128'&gt;, &lt;class 'unyt.array.unyt_quantity'&gt;, &lt;class 'tuple'&gt;, &lt;class 'numpy.uint64'&gt;, &lt;class 'type'&gt;, &lt;class 'numpy.int64'&gt;, &lt;class 'numpy.str_'&gt;, &lt;class 'numpy.unsignedinteger'&gt;, &lt;class 'complex'&gt;, &lt;class 'list'&gt;, &lt;class 'NoneType'&gt;, &lt;class 'bool'&gt;, &lt;class 'numbers.Number'&gt;, &lt;class 'numpy.float16'&gt;, &lt;class 'numpy.uint8'&gt;, &lt;class 'numpy.int8'&gt;)</em><a class="headerlink" href="#yggdrasil.metaschema.properties.TitleMetaschemaProperty.TitleMetaschemaProperty.python_types" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="attribute">
+<dl class="py attribute">
 <dt id="yggdrasil.metaschema.properties.TitleMetaschemaProperty.TitleMetaschemaProperty.types">
-<code class="sig-name descname">types</code><em class="property"> = ('null', 'class', 'string', 'boolean', 'array', '1darray', 'number', 'ndarray', 'instance', 'any', 'unicode', 'float', 'function', 'uint', 'integer', 'complex', 'object', 'int', 'bytes', 'scalar')</em><a class="headerlink" href="#yggdrasil.metaschema.properties.TitleMetaschemaProperty.TitleMetaschemaProperty.types" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">types</code><em class="property"> = ('unicode', 'string', 'integer', 'boolean', 'ndarray', 'bytes', 'any', 'number', 'null', 'class', 'uint', '1darray', 'array', 'scalar', 'object', 'float', 'int', 'instance', 'function', 'complex')</em><a class="headerlink" href="#yggdrasil.metaschema.properties.TitleMetaschemaProperty.TitleMetaschemaProperty.types" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </dd></dl>
@@ -1003,14 +1004,14 @@ not be registered. Defaults to False.</p></li>
 </div>
 <div class="section" id="module-yggdrasil.metaschema.properties.TypeMetaschemaProperty">
 <span id="yggdrasil-metaschema-properties-typemetaschemaproperty-module"></span><h2>yggdrasil.metaschema.properties.TypeMetaschemaProperty module<a class="headerlink" href="#module-yggdrasil.metaschema.properties.TypeMetaschemaProperty" title="Permalink to this headline">¶</a></h2>
-<dl class="class">
+<dl class="py class">
 <dt id="yggdrasil.metaschema.properties.TypeMetaschemaProperty.TypeMetaschemaProperty">
 <em class="property">class </em><code class="sig-prename descclassname">yggdrasil.metaschema.properties.TypeMetaschemaProperty.</code><code class="sig-name descname">TypeMetaschemaProperty</code><a class="reference internal" href="_modules/yggdrasil/metaschema/properties/TypeMetaschemaProperty.html#TypeMetaschemaProperty"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.metaschema.properties.TypeMetaschemaProperty.TypeMetaschemaProperty" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#yggdrasil.metaschema.properties.MetaschemaProperty.MetaschemaProperty" title="yggdrasil.metaschema.properties.MetaschemaProperty.MetaschemaProperty"><code class="xref py py-class docutils literal notranslate"><span class="pre">yggdrasil.metaschema.properties.MetaschemaProperty.MetaschemaProperty</span></code></a></p>
 <p>Type property with validation of new properties.</p>
-<dl class="method">
+<dl class="py method">
 <dt id="yggdrasil.metaschema.properties.TypeMetaschemaProperty.TypeMetaschemaProperty.compare">
-<em class="property">classmethod </em><code class="sig-name descname">compare</code><span class="sig-paren">(</span><em class="sig-param">prop1</em>, <em class="sig-param">prop2</em>, <em class="sig-param">root1=None</em>, <em class="sig-param">root2=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/metaschema/properties/TypeMetaschemaProperty.html#TypeMetaschemaProperty.compare"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.metaschema.properties.TypeMetaschemaProperty.TypeMetaschemaProperty.compare" title="Permalink to this definition">¶</a></dt>
+<em class="property">classmethod </em><code class="sig-name descname">compare</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">prop1</span></em>, <em class="sig-param"><span class="n">prop2</span></em>, <em class="sig-param"><span class="n">root1</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">root2</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/metaschema/properties/TypeMetaschemaProperty.html#TypeMetaschemaProperty.compare"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.metaschema.properties.TypeMetaschemaProperty.TypeMetaschemaProperty.compare" title="Permalink to this definition">¶</a></dt>
 <dd><p>Method to determine compatiblity of one property value with another.
 This method is not necessarily symmetric in that the second value may
 not be compatible with the first even if the first is compatible with
@@ -1028,9 +1029,9 @@ the second.</p>
 </dl>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="yggdrasil.metaschema.properties.TypeMetaschemaProperty.TypeMetaschemaProperty.encode">
-<em class="property">classmethod </em><code class="sig-name descname">encode</code><span class="sig-paren">(</span><em class="sig-param">instance</em>, <em class="sig-param">typedef=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/metaschema/properties/TypeMetaschemaProperty.html#TypeMetaschemaProperty.encode"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.metaschema.properties.TypeMetaschemaProperty.TypeMetaschemaProperty.encode" title="Permalink to this definition">¶</a></dt>
+<em class="property">classmethod </em><code class="sig-name descname">encode</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">instance</span></em>, <em class="sig-param"><span class="n">typedef</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/metaschema/properties/TypeMetaschemaProperty.html#TypeMetaschemaProperty.encode"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.metaschema.properties.TypeMetaschemaProperty.TypeMetaschemaProperty.encode" title="Permalink to this definition">¶</a></dt>
 <dd><p>Method to encode the property given the object.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -1050,14 +1051,14 @@ is ignored.</p></li>
 </dl>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="py attribute">
 <dt id="yggdrasil.metaschema.properties.TypeMetaschemaProperty.TypeMetaschemaProperty.name">
 <code class="sig-name descname">name</code><em class="property"> = 'type'</em><a class="headerlink" href="#yggdrasil.metaschema.properties.TypeMetaschemaProperty.TypeMetaschemaProperty.name" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="yggdrasil.metaschema.properties.TypeMetaschemaProperty.TypeMetaschemaProperty.normalize">
-<em class="property">classmethod </em><code class="sig-name descname">normalize</code><span class="sig-paren">(</span><em class="sig-param">normalizer</em>, <em class="sig-param">value</em>, <em class="sig-param">instance</em>, <em class="sig-param">schema</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/metaschema/properties/TypeMetaschemaProperty.html#TypeMetaschemaProperty.normalize"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.metaschema.properties.TypeMetaschemaProperty.TypeMetaschemaProperty.normalize" title="Permalink to this definition">¶</a></dt>
+<em class="property">classmethod </em><code class="sig-name descname">normalize</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">normalizer</span></em>, <em class="sig-param"><span class="n">value</span></em>, <em class="sig-param"><span class="n">instance</span></em>, <em class="sig-param"><span class="n">schema</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/metaschema/properties/TypeMetaschemaProperty.html#TypeMetaschemaProperty.normalize"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.metaschema.properties.TypeMetaschemaProperty.TypeMetaschemaProperty.normalize" title="Permalink to this definition">¶</a></dt>
 <dd><p>Method to normalize the instance based on the property value.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -1077,14 +1078,14 @@ is ignored.</p></li>
 </dl>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="py attribute">
 <dt id="yggdrasil.metaschema.properties.TypeMetaschemaProperty.TypeMetaschemaProperty.python_types">
-<code class="sig-name descname">python_types</code><em class="property"> = (&lt;class 'numpy.complex64'&gt;, &lt;class 'numbers.Number'&gt;, &lt;class 'numpy.float32'&gt;, &lt;class 'bytes'&gt;, &lt;class 'str'&gt;, &lt;class 'numpy.uint16'&gt;, &lt;class 'float'&gt;, &lt;class 'numpy.int16'&gt;, &lt;class 'numpy.ndarray'&gt;, &lt;class 'yggdrasil.metaschema.datatypes.PlyMetaschemaType.PlyDict'&gt;, &lt;class 'numpy.complex128'&gt;, &lt;class 'numpy.float64'&gt;, &lt;class 'method'&gt;, &lt;class 'object'&gt;, &lt;class 'numpy.uint32'&gt;, &lt;class 'builtin_function_or_method'&gt;, &lt;class 'numpy.int32'&gt;, &lt;class 'dict'&gt;, &lt;class 'function'&gt;, &lt;class 'numpy.bytes_'&gt;, &lt;class 'int'&gt;, &lt;class 'numpy.signedinteger'&gt;, &lt;class 'unyt.array.unyt_array'&gt;, &lt;class 'numpy.complex256'&gt;, &lt;class 'tuple'&gt;, &lt;class 'numpy.float128'&gt;, &lt;class 'type'&gt;, &lt;class 'numpy.uint64'&gt;, &lt;class 'numpy.int64'&gt;, &lt;class 'numpy.str_'&gt;, &lt;class 'yggdrasil.metaschema.datatypes.ObjMetaschemaType.ObjDict'&gt;, &lt;class 'numpy.unsignedinteger'&gt;, &lt;class 'complex'&gt;, &lt;class 'list'&gt;, &lt;class 'NoneType'&gt;, &lt;class 'bool'&gt;, &lt;class 'pandas.core.frame.DataFrame'&gt;, &lt;class 'numpy.float16'&gt;, &lt;class 'unyt.array.unyt_quantity'&gt;, &lt;class 'numpy.uint8'&gt;, &lt;class 'numpy.int8'&gt;)</em><a class="headerlink" href="#yggdrasil.metaschema.properties.TypeMetaschemaProperty.TypeMetaschemaProperty.python_types" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">python_types</code><em class="property"> = (&lt;class 'unyt.array.unyt_array'&gt;, &lt;class 'numpy.complex64'&gt;, &lt;class 'numpy.float32'&gt;, &lt;class 'bytes'&gt;, &lt;class 'str'&gt;, &lt;class 'numpy.uint16'&gt;, &lt;class 'float'&gt;, &lt;class 'numpy.int16'&gt;, &lt;class 'numpy.ndarray'&gt;, &lt;class 'numpy.complex128'&gt;, &lt;class 'numpy.float64'&gt;, &lt;class 'method'&gt;, &lt;class 'numpy.uint32'&gt;, &lt;class 'object'&gt;, &lt;class 'builtin_function_or_method'&gt;, &lt;class 'numpy.int32'&gt;, &lt;class 'dict'&gt;, &lt;class 'function'&gt;, &lt;class 'numpy.bytes_'&gt;, &lt;class 'int'&gt;, &lt;class 'numpy.signedinteger'&gt;, &lt;class 'pandas.core.frame.DataFrame'&gt;, &lt;class 'numpy.complex256'&gt;, &lt;class 'numpy.float128'&gt;, &lt;class 'unyt.array.unyt_quantity'&gt;, &lt;class 'tuple'&gt;, &lt;class 'numpy.uint64'&gt;, &lt;class 'type'&gt;, &lt;class 'numpy.int64'&gt;, &lt;class 'yggdrasil.metaschema.datatypes.PlyMetaschemaType.PlyDict'&gt;, &lt;class 'numpy.str_'&gt;, &lt;class 'numpy.unsignedinteger'&gt;, &lt;class 'complex'&gt;, &lt;class 'yggdrasil.metaschema.datatypes.ObjMetaschemaType.ObjDict'&gt;, &lt;class 'list'&gt;, &lt;class 'NoneType'&gt;, &lt;class 'bool'&gt;, &lt;class 'numbers.Number'&gt;, &lt;class 'numpy.float16'&gt;, &lt;class 'numpy.uint8'&gt;, &lt;class 'numpy.int8'&gt;)</em><a class="headerlink" href="#yggdrasil.metaschema.properties.TypeMetaschemaProperty.TypeMetaschemaProperty.python_types" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="attribute">
+<dl class="py attribute">
 <dt id="yggdrasil.metaschema.properties.TypeMetaschemaProperty.TypeMetaschemaProperty.types">
-<code class="sig-name descname">types</code><em class="property"> = ('boolean', 'array', 'number', 'bytes', 'null', 'unicode', 'float', 'integer', 'uint', 'ply', 'class', 'any', 'function', 'object', 'int', 'scalar', 'string', '1darray', 'schema', 'ndarray', 'instance', 'complex', 'obj')</em><a class="headerlink" href="#yggdrasil.metaschema.properties.TypeMetaschemaProperty.TypeMetaschemaProperty.types" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">types</code><em class="property"> = ('boolean', 'any', '1darray', 'integer', 'complex', 'string', 'bytes', 'instance', 'ply', 'array', 'obj', 'float', 'int', 'unicode', 'ndarray', 'number', 'null', 'class', 'uint', 'object', 'scalar', 'function', 'schema')</em><a class="headerlink" href="#yggdrasil.metaschema.properties.TypeMetaschemaProperty.TypeMetaschemaProperty.types" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </dd></dl>
@@ -1092,16 +1093,16 @@ is ignored.</p></li>
 </div>
 <div class="section" id="module-yggdrasil.metaschema.properties">
 <span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-yggdrasil.metaschema.properties" title="Permalink to this headline">¶</a></h2>
-<dl class="class">
+<dl class="py class">
 <dt id="yggdrasil.metaschema.properties.MetaschemaPropertyMeta">
 <em class="property">class </em><code class="sig-prename descclassname">yggdrasil.metaschema.properties.</code><code class="sig-name descname">MetaschemaPropertyMeta</code><a class="reference internal" href="_modules/yggdrasil/metaschema/properties.html#MetaschemaPropertyMeta"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.metaschema.properties.MetaschemaPropertyMeta" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#type" title="(in Python v3.8)"><code class="xref py py-class docutils literal notranslate"><span class="pre">type</span></code></a></p>
 <p>Meta class for registering properties.</p>
 </dd></dl>
 
-<dl class="function">
+<dl class="py function">
 <dt id="yggdrasil.metaschema.properties.get_metaschema_property">
-<code class="sig-prename descclassname">yggdrasil.metaschema.properties.</code><code class="sig-name descname">get_metaschema_property</code><span class="sig-paren">(</span><em class="sig-param">property_name</em>, <em class="sig-param">skip_generic=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/metaschema/properties.html#get_metaschema_property"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.metaschema.properties.get_metaschema_property" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">yggdrasil.metaschema.properties.</code><code class="sig-name descname">get_metaschema_property</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">property_name</span></em>, <em class="sig-param"><span class="n">skip_generic</span><span class="o">=</span><span class="default_value">False</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/metaschema/properties.html#get_metaschema_property"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.metaschema.properties.get_metaschema_property" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get the property class associated with a metaschema property.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -1120,7 +1121,7 @@ class, None is returned. Defaults to False.</p></li>
 </dl>
 </dd></dl>
 
-<dl class="function">
+<dl class="py function">
 <dt id="yggdrasil.metaschema.properties.get_registered_properties">
 <code class="sig-prename descclassname">yggdrasil.metaschema.properties.</code><code class="sig-name descname">get_registered_properties</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/metaschema/properties.html#get_registered_properties"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.metaschema.properties.get_registered_properties" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return a dictionary of registered properties.</p>
@@ -1134,15 +1135,9 @@ class, None is returned. Defaults to False.</p></li>
 </dl>
 </dd></dl>
 
-<dl class="function">
-<dt id="yggdrasil.metaschema.properties.import_all_properties">
-<code class="sig-prename descclassname">yggdrasil.metaschema.properties.</code><code class="sig-name descname">import_all_properties</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/metaschema/properties.html#import_all_properties"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.metaschema.properties.import_all_properties" title="Permalink to this definition">¶</a></dt>
-<dd><p>Import all types to ensure they are registered.</p>
-</dd></dl>
-
-<dl class="function">
+<dl class="py function">
 <dt id="yggdrasil.metaschema.properties.register_metaschema_property">
-<code class="sig-prename descclassname">yggdrasil.metaschema.properties.</code><code class="sig-name descname">register_metaschema_property</code><span class="sig-paren">(</span><em class="sig-param">prop_class</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/metaschema/properties.html#register_metaschema_property"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.metaschema.properties.register_metaschema_property" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">yggdrasil.metaschema.properties.</code><code class="sig-name descname">register_metaschema_property</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">prop_class</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/metaschema/properties.html#register_metaschema_property"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.metaschema.properties.register_metaschema_property" title="Permalink to this definition">¶</a></dt>
 <dd><p>Register a schema property.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>

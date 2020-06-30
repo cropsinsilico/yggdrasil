@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>yggdrasil.communication.ZMQComm &mdash; yggdrasil 1.0.0+154.g684a530e.dirty documentation</title>
+  <title>yggdrasil.communication.ZMQComm &mdash; yggdrasil 1.1.1+410.g95af39b2 documentation</title>
   
 
   
@@ -59,7 +59,7 @@
             
             
               <div class="version">
-                1.0.0
+                1.1.1
               </div>
             
           
@@ -94,6 +94,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../autowrap.html#notes-on-autowrapping-c-c-model-functions">Notes on Autowrapping C/C++ Model Functions</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../conditional_io.html">Conditional I/O</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../transformed_io.html">Transformed I/O</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../timesync_io.html">Timestep Synchronization</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../yaml.html">YAML Files</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../config.html">Configuration Files</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../units.html">Units</a></li>
@@ -174,9 +175,9 @@
 <span class="kn">import</span> <span class="nn">tempfile</span>
 <span class="kn">import</span> <span class="nn">uuid</span>
 <span class="kn">import</span> <span class="nn">zmq</span>
-<span class="kn">import</span> <span class="nn">threading</span>
 <span class="kn">import</span> <span class="nn">logging</span>
 <span class="kn">from</span> <span class="nn">yggdrasil</span> <span class="k">import</span> <span class="n">tools</span>
+<span class="kn">from</span> <span class="nn">yggdrasil</span> <span class="k">import</span> <span class="n">multitasking</span>
 <span class="kn">from</span> <span class="nn">yggdrasil.communication</span> <span class="k">import</span> <span class="n">CommBase</span><span class="p">,</span> <span class="n">AsyncComm</span>
 
 
@@ -362,19 +363,19 @@
 <span class="sd">        cli_count (int): Number of clients that have connected to this proxy.</span>
 
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">srv_address</span><span class="p">,</span> <span class="n">context</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">retry_timeout</span><span class="o">=-</span><span class="mi">1</span><span class="p">,</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">srv_address</span><span class="p">,</span> <span class="n">zmq_context</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">retry_timeout</span><span class="o">=-</span><span class="mi">1</span><span class="p">,</span>
                  <span class="n">nretry</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="c1"># Get parameters</span>
         <span class="n">srv_param</span> <span class="o">=</span> <span class="n">parse_address</span><span class="p">(</span><span class="n">srv_address</span><span class="p">)</span>
         <span class="n">cli_param</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
         <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;protocol&#39;</span><span class="p">,</span> <span class="s1">&#39;host&#39;</span><span class="p">,</span> <span class="s1">&#39;port&#39;</span><span class="p">]:</span>
             <span class="n">cli_param</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="n">srv_param</span><span class="p">[</span><span class="n">k</span><span class="p">])</span>
-        <span class="n">context</span> <span class="o">=</span> <span class="n">context</span> <span class="ow">or</span> <span class="n">_global_context</span>
+        <span class="n">zmq_context</span> <span class="o">=</span> <span class="n">zmq_context</span> <span class="ow">or</span> <span class="n">_global_context</span>
         <span class="c1"># Create new address for the frontend</span>
         <span class="k">if</span> <span class="n">cli_param</span><span class="p">[</span><span class="s1">&#39;protocol&#39;</span><span class="p">]</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;inproc&#39;</span><span class="p">,</span> <span class="s1">&#39;ipc&#39;</span><span class="p">]:</span>
             <span class="n">cli_param</span><span class="p">[</span><span class="s1">&#39;host&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">get_ipc_host</span><span class="p">()</span>
         <span class="n">cli_address</span> <span class="o">=</span> <span class="n">format_address</span><span class="p">(</span><span class="n">cli_param</span><span class="p">[</span><span class="s1">&#39;protocol&#39;</span><span class="p">],</span> <span class="n">cli_param</span><span class="p">[</span><span class="s1">&#39;host&#39;</span><span class="p">])</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">cli_socket</span> <span class="o">=</span> <span class="n">context</span><span class="o">.</span><span class="n">socket</span><span class="p">(</span><span class="n">zmq</span><span class="o">.</span><span class="n">ROUTER</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cli_socket</span> <span class="o">=</span> <span class="n">zmq_context</span><span class="o">.</span><span class="n">socket</span><span class="p">(</span><span class="n">zmq</span><span class="o">.</span><span class="n">ROUTER</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">cli_address</span> <span class="o">=</span> <span class="n">bind_socket</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cli_socket</span><span class="p">,</span> <span class="n">cli_address</span><span class="p">,</span>
                                        <span class="n">nretry</span><span class="o">=</span><span class="n">nretry</span><span class="p">,</span>
                                        <span class="n">retry_timeout</span><span class="o">=</span><span class="n">retry_timeout</span><span class="p">)</span>
@@ -382,7 +383,7 @@
         <span class="n">CommBase</span><span class="o">.</span><span class="n">register_comm</span><span class="p">(</span><span class="s1">&#39;ZMQComm&#39;</span><span class="p">,</span> <span class="s1">&#39;ROUTER_server_&#39;</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">cli_address</span><span class="p">,</span>
                                <span class="bp">self</span><span class="o">.</span><span class="n">cli_socket</span><span class="p">)</span>
         <span class="c1"># Bind backend</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">srv_socket</span> <span class="o">=</span> <span class="n">context</span><span class="o">.</span><span class="n">socket</span><span class="p">(</span><span class="n">zmq</span><span class="o">.</span><span class="n">DEALER</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">srv_socket</span> <span class="o">=</span> <span class="n">zmq_context</span><span class="o">.</span><span class="n">socket</span><span class="p">(</span><span class="n">zmq</span><span class="o">.</span><span class="n">DEALER</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">srv_socket</span><span class="o">.</span><span class="n">setsockopt</span><span class="p">(</span><span class="n">zmq</span><span class="o">.</span><span class="n">LINGER</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">srv_address</span> <span class="o">=</span> <span class="n">bind_socket</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">srv_socket</span><span class="p">,</span> <span class="n">srv_address</span><span class="p">,</span>
                                        <span class="n">nretry</span><span class="o">=</span><span class="n">nretry</span><span class="p">,</span>
@@ -395,7 +396,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">reply_socket</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="c1"># Set name</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">ZMQProxy</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">srv_address</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">cli_address</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="s1">&#39;ZMQProxy.</span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">srv_address</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_name</span> <span class="o">=</span> <span class="s1">&#39;ZMQProxy.</span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">srv_address</span>
 
 <div class="viewcode-block" id="ZMQProxy.client_recv"><a class="viewcode-back" href="../../../yggdrasil.communication.html#yggdrasil.communication.ZMQComm.ZMQProxy.client_recv">[docs]</a>    <span class="k">def</span> <span class="nf">client_recv</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Receive single message from the client.&quot;&quot;&quot;</span>
@@ -414,7 +415,7 @@
                 <span class="bp">self</span><span class="o">.</span><span class="n">srv_socket</span><span class="o">.</span><span class="n">send</span><span class="p">(</span><span class="n">msg</span><span class="p">,</span> <span class="n">zmq</span><span class="o">.</span><span class="n">NOBLOCK</span><span class="p">)</span>
                 <span class="c1"># self.srv_socket.send_multipart(msg, zmq.NOBLOCK)</span>
                 <span class="k">break</span>
-            <span class="k">except</span> <span class="n">zmq</span><span class="o">.</span><span class="n">ZMQError</span><span class="p">:</span>
+            <span class="k">except</span> <span class="n">zmq</span><span class="o">.</span><span class="n">ZMQError</span><span class="p">:</span>  <span class="c1"># pragma: no cover</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mf">0.0001</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="ZMQProxy.poll"><a class="viewcode-back" href="../../../yggdrasil.communication.html#yggdrasil.communication.ZMQComm.ZMQProxy.poll">[docs]</a>    <span class="k">def</span> <span class="nf">poll</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -442,7 +443,8 @@
 
 <div class="viewcode-block" id="ZMQProxy.cleanup"><a class="viewcode-back" href="../../../yggdrasil.communication.html#yggdrasil.communication.ZMQComm.ZMQProxy.cleanup">[docs]</a>    <span class="k">def</span> <span class="nf">cleanup</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Clean up sockets on exit.&quot;&quot;&quot;</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">close_sockets</span><span class="p">()</span></div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">close_sockets</span><span class="p">()</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">ZMQProxy</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">cleanup</span><span class="p">()</span></div>
 
 <div class="viewcode-block" id="ZMQProxy.close_sockets"><a class="viewcode-back" href="../../../yggdrasil.communication.html#yggdrasil.communication.ZMQComm.ZMQProxy.close_sockets">[docs]</a>    <span class="k">def</span> <span class="nf">close_sockets</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Close the sockets.&quot;&quot;&quot;</span>
@@ -517,14 +519,16 @@
                            <span class="s2">&quot;address depends on the transport. &quot;</span>
                            <span class="s2">&quot;Additional information can be found &quot;</span>
                            <span class="s2">&quot;`here &lt;http://api.zeromq.org/3-2:zmq-bind&gt;`_.&quot;</span><span class="p">)</span>
+    <span class="n">_disconnect_attr</span> <span class="o">=</span> <span class="p">(</span><span class="n">AsyncComm</span><span class="o">.</span><span class="n">AsyncComm</span><span class="o">.</span><span class="n">_disconnect_attr</span>
+                        <span class="o">+</span> <span class="p">[</span><span class="s1">&#39;reply_socket_lock&#39;</span><span class="p">,</span> <span class="s1">&#39;socket_lock&#39;</span><span class="p">])</span>
     
     <span class="k">def</span> <span class="nf">_init_before_open</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">context</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">socket_type</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
                           <span class="n">socket_action</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">topic_filter</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">,</span>
-                          <span class="n">dealer_identity</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                          <span class="n">dealer_identity</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">new_process</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
                           <span class="n">reply_socket_address</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Initialize defaults for socket type/action based on direction.&quot;&quot;&quot;</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">reply_socket_lock</span> <span class="o">=</span> <span class="n">threading</span><span class="o">.</span><span class="n">RLock</span><span class="p">()</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">socket_lock</span> <span class="o">=</span> <span class="n">threading</span><span class="o">.</span><span class="n">RLock</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">reply_socket_lock</span> <span class="o">=</span> <span class="n">multitasking</span><span class="o">.</span><span class="n">RLock</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">socket_lock</span> <span class="o">=</span> <span class="n">multitasking</span><span class="o">.</span><span class="n">RLock</span><span class="p">()</span>
         <span class="c1"># Client/Server things</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_client</span><span class="p">:</span>
             <span class="n">socket_type</span> <span class="o">=</span> <span class="s1">&#39;DEALER&#39;</span>
@@ -560,7 +564,10 @@
                 <span class="n">socket_action</span> <span class="o">=</span> <span class="s1">&#39;bind&#39;</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="n">socket_action</span> <span class="o">=</span> <span class="s1">&#39;connect&#39;</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">context</span> <span class="o">=</span> <span class="n">context</span> <span class="ow">or</span> <span class="n">_global_context</span>
+        <span class="k">if</span> <span class="n">new_process</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">context</span> <span class="o">=</span> <span class="n">zmq</span><span class="o">.</span><span class="n">Context</span><span class="p">()</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">context</span> <span class="o">=</span> <span class="n">context</span> <span class="ow">or</span> <span class="n">_global_context</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">socket_type_name</span> <span class="o">=</span> <span class="n">socket_type</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">socket_type</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">zmq</span><span class="p">,</span> <span class="n">socket_type</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">socket_action</span> <span class="o">=</span> <span class="n">socket_action</span>
@@ -584,10 +591,31 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">_n_reply_sent</span> <span class="o">=</span> <span class="mi">0</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_n_reply_recv</span> <span class="o">=</span> <span class="p">{}</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_server_class</span> <span class="o">=</span> <span class="n">ZMQProxy</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_server_kwargs</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">context</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">context</span><span class="p">,</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_server_kwargs</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">zmq_context</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">context</span><span class="p">,</span>
                                    <span class="n">nretry</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span> <span class="n">retry_timeout</span><span class="o">=</span><span class="mf">2.0</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">sleeptime</span><span class="p">)</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">ZMQComm</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">_init_before_open</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
 
+    <span class="k">def</span> <span class="nf">__getstate__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_bound</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">unbind</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_bound</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="n">state</span> <span class="o">=</span> <span class="nb">super</span><span class="p">(</span><span class="n">ZMQComm</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__getstate__</span><span class="p">()</span>
+        <span class="k">del</span> <span class="n">state</span><span class="p">[</span><span class="s1">&#39;context&#39;</span><span class="p">]</span>
+        <span class="n">state</span><span class="p">[</span><span class="s1">&#39;_server_kwargs&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;zmq_context&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+        <span class="c1"># del state[&#39;_server_kwargs&#39;][&#39;zmq_context&#39;]</span>
+        <span class="k">del</span> <span class="n">state</span><span class="p">[</span><span class="s1">&#39;socket&#39;</span><span class="p">]</span>
+        <span class="k">return</span> <span class="n">state</span>
+
+    <span class="k">def</span> <span class="nf">__setstate__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">state</span><span class="p">):</span>
+        <span class="n">state</span><span class="p">[</span><span class="s1">&#39;context&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">zmq</span><span class="o">.</span><span class="n">Context</span><span class="p">()</span>
+        <span class="n">state</span><span class="p">[</span><span class="s1">&#39;_server_kwargs&#39;</span><span class="p">][</span><span class="s1">&#39;zmq_context&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">state</span><span class="p">[</span><span class="s1">&#39;context&#39;</span><span class="p">]</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">ZMQComm</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__setstate__</span><span class="p">(</span><span class="n">state</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">socket</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">context</span><span class="o">.</span><span class="n">socket</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">socket_type</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">socket</span><span class="o">.</span><span class="n">setsockopt</span><span class="p">(</span><span class="n">zmq</span><span class="o">.</span><span class="n">LINGER</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_bound</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_bound</span> <span class="o">=</span> <span class="kc">False</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">bind</span><span class="p">()</span>
+        
 <div class="viewcode-block" id="ZMQComm.get_status_message"><a class="viewcode-back" href="../../../yggdrasil.communication.html#yggdrasil.communication.ZMQComm.ZMQComm.get_status_message">[docs]</a>    <span class="k">def</span> <span class="nf">get_status_message</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">nindent</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Return lines composing a status message.</span>
 <span class="sd">        </span>
@@ -945,8 +973,8 @@
             <span class="c1"># Ensure socket not still open</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_openned</span> <span class="o">=</span> <span class="kc">False</span>
             <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">socket</span><span class="o">.</span><span class="n">closed</span><span class="p">:</span>
-                <span class="c1"># if self._bound:</span>
-                <span class="c1">#     self.unbind()</span>
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_bound</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">unbind</span><span class="p">()</span>
                 <span class="c1"># elif self._connected:</span>
                 <span class="c1">#     self.disconnect()</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">socket</span><span class="o">.</span><span class="n">close</span><span class="p">(</span><span class="n">linger</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
@@ -1094,18 +1122,6 @@
         <span class="n">c</span> <span class="o">=</span> <span class="nb">super</span><span class="p">(</span><span class="n">ZMQComm</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">header2workcomm</span><span class="p">(</span><span class="n">header</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">c</span></div>
     
-<div class="viewcode-block" id="ZMQComm.on_send_eof"><a class="viewcode-back" href="../../../yggdrasil.communication.html#yggdrasil.communication.ZMQComm.ZMQComm.on_send_eof">[docs]</a>    <span class="k">def</span> <span class="nf">on_send_eof</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Actions to perform when EOF being sent.</span>
-
-<span class="sd">        Returns:</span>
-<span class="sd">            bool: True if EOF message should be sent, False otherwise.</span>
-
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">flag</span><span class="p">,</span> <span class="n">msg_s</span> <span class="o">=</span> <span class="nb">super</span><span class="p">(</span><span class="n">ZMQComm</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">on_send_eof</span><span class="p">()</span>
-        <span class="n">header_kwargs</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">zmq_reply</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">set_reply_socket_send</span><span class="p">())</span>
-        <span class="n">out</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">serialize</span><span class="p">(</span><span class="n">msg_s</span><span class="p">,</span> <span class="n">header_kwargs</span><span class="o">=</span><span class="n">header_kwargs</span><span class="p">)</span>
-        <span class="k">return</span> <span class="n">flag</span><span class="p">,</span> <span class="n">out</span></div>
-        
 <div class="viewcode-block" id="ZMQComm.on_send"><a class="viewcode-back" href="../../../yggdrasil.communication.html#yggdrasil.communication.ZMQComm.ZMQComm.on_send">[docs]</a>    <span class="k">def</span> <span class="nf">on_send</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">msg</span><span class="p">,</span> <span class="n">header_kwargs</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Process message to be sent including handling serializing</span>
 <span class="sd">        message and handling EOF.</span>

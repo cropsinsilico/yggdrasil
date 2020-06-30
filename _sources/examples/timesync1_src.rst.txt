@@ -1,0 +1,8 @@
+Model Code:
+
+.. literalinclude:: /../../yggdrasil/examples/timesync1/src/timesync.py
+   :language: python
+   :linenos:
+
+
+(`Example in other languages <examples/timesync1.html>`__)

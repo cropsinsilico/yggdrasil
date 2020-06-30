@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>yggdrasil.config &mdash; yggdrasil 1.0.0+154.g684a530e.dirty documentation</title>
+  <title>yggdrasil.config &mdash; yggdrasil 1.1.1+410.g95af39b2 documentation</title>
   
 
   
@@ -59,7 +59,7 @@
             
             
               <div class="version">
-                1.0.0
+                1.1.1
               </div>
             
           
@@ -94,6 +94,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../../autowrap.html#notes-on-autowrapping-c-c-model-functions">Notes on Autowrapping C/C++ Model Functions</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../conditional_io.html">Conditional I/O</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../transformed_io.html">Transformed I/O</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../timesync_io.html">Timestep Synchronization</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../yaml.html">YAML Files</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../config.html">Configuration Files</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../units.html">Units</a></li>
@@ -184,13 +185,12 @@
 <span class="kn">import</span> <span class="nn">configparser</span>
 <span class="kn">from</span> <span class="nn">collections</span> <span class="k">import</span> <span class="n">OrderedDict</span>
 <span class="kn">from</span> <span class="nn">yggdrasil</span> <span class="k">import</span> <span class="n">tools</span>
-<span class="n">conda_prefix</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;CONDA_PREFIX&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">)</span>
+<span class="n">env_prefixes</span> <span class="o">=</span> <span class="n">tools</span><span class="o">.</span><span class="n">get_env_prefixes</span><span class="p">()</span>
 <span class="n">config_file</span> <span class="o">=</span> <span class="s1">&#39;.yggdrasil.cfg&#39;</span>
 <span class="n">def_config_file</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="vm">__file__</span><span class="p">),</span> <span class="s1">&#39;defaults.cfg&#39;</span><span class="p">)</span>
-<span class="k">if</span> <span class="n">conda_prefix</span><span class="p">:</span>
-    <span class="n">usr_dir</span> <span class="o">=</span> <span class="n">conda_prefix</span>
-<span class="k">else</span><span class="p">:</span>
-    <span class="n">usr_dir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">expanduser</span><span class="p">(</span><span class="s1">&#39;~&#39;</span><span class="p">)</span>
+<span class="n">usr_dir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">expanduser</span><span class="p">(</span><span class="s1">&#39;~&#39;</span><span class="p">)</span>
+<span class="k">if</span> <span class="n">env_prefixes</span><span class="p">:</span>
+    <span class="n">usr_dir</span> <span class="o">=</span> <span class="n">env_prefixes</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
 <span class="n">usr_config_file</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">usr_dir</span><span class="p">,</span> <span class="n">config_file</span><span class="p">)</span>
 <span class="n">loc_config_file</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">getcwd</span><span class="p">(),</span> <span class="n">config_file</span><span class="p">)</span>
 <span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
@@ -205,6 +205,8 @@
 
     <span class="k">def</span> <span class="nf">reload</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Reload parameters from the original files.&quot;&quot;&quot;</span>
+        <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">sections</span><span class="p">():</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">remove_section</span><span class="p">(</span><span class="n">s</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_sections</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_dict</span><span class="p">()</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">files</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">files</span><span class="p">)</span>
@@ -331,14 +333,10 @@
     <span class="n">out</span> <span class="o">=</span> <span class="n">OrderedDict</span><span class="p">()</span>
     <span class="k">for</span> <span class="n">d</span><span class="p">,</span> <span class="n">drv</span> <span class="ow">in</span> <span class="n">drivers</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
         <span class="k">if</span> <span class="n">d</span> <span class="o">==</span> <span class="s1">&#39;cpp&#39;</span><span class="p">:</span>
-            <span class="k">if</span> <span class="s1">&#39;c++&#39;</span> <span class="ow">in</span> <span class="n">drivers</span><span class="p">:</span>
-                <span class="k">continue</span>
             <span class="n">d</span> <span class="o">=</span> <span class="s1">&#39;c++&#39;</span>
         <span class="n">new_deps</span> <span class="o">=</span> <span class="n">OrderedDict</span><span class="p">()</span>
         <span class="n">sub_deps</span> <span class="o">=</span> <span class="n">OrderedDict</span><span class="p">()</span>
         <span class="k">for</span> <span class="n">sub_d</span> <span class="ow">in</span> <span class="n">drv</span><span class="o">.</span><span class="n">base_languages</span><span class="p">:</span>
-            <span class="k">if</span> <span class="n">sub_d</span> <span class="o">==</span> <span class="s1">&#39;cpp&#39;</span><span class="p">:</span>
-                <span class="n">sub_d</span> <span class="o">=</span> <span class="s1">&#39;c++&#39;</span>
             <span class="k">if</span> <span class="n">sub_d</span> <span class="ow">in</span> <span class="n">drivers</span><span class="p">:</span>
                 <span class="n">sub_deps</span><span class="p">[</span><span class="n">sub_d</span><span class="p">]</span> <span class="o">=</span> <span class="n">drivers</span><span class="p">[</span><span class="n">sub_d</span><span class="p">]</span>
             <span class="k">else</span><span class="p">:</span>
@@ -394,17 +392,14 @@
         <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Updating user configuration file for yggdrasil at:</span><span class="se">\n\t</span><span class="si">%s</span><span class="s2">&quot;</span>
                     <span class="o">%</span> <span class="n">usr_config_file</span><span class="p">)</span>
     <span class="n">miss</span> <span class="o">=</span> <span class="p">[]</span>
-    <span class="k">if</span> <span class="n">languages</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">languages</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">or</span> <span class="n">overwrite</span><span class="p">:</span>
         <span class="n">all_languages</span> <span class="o">=</span> <span class="n">tools</span><span class="o">.</span><span class="n">get_supported_lang</span><span class="p">()</span>
         <span class="n">languages</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;c&#39;</span><span class="p">,</span> <span class="s1">&#39;c++&#39;</span><span class="p">,</span> <span class="s1">&#39;make&#39;</span><span class="p">,</span> <span class="s1">&#39;cmake&#39;</span><span class="p">,</span> <span class="s1">&#39;python&#39;</span><span class="p">,</span> <span class="s1">&#39;lpy&#39;</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">,</span> <span class="s1">&#39;matlab&#39;</span><span class="p">]</span>
-        <span class="k">for</span> <span class="n">l</span> <span class="ow">in</span> <span class="n">all_languages</span><span class="p">:</span>
-            <span class="k">if</span> <span class="n">l</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">languages</span><span class="p">:</span>
-                <span class="n">languages</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">l</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">lang</span> <span class="ow">in</span> <span class="n">all_languages</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">lang</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">languages</span><span class="p">:</span>
+                <span class="n">languages</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">lang</span><span class="p">)</span>
     <span class="k">elif</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">languages</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
         <span class="n">languages</span> <span class="o">=</span> <span class="p">[</span><span class="n">languages</span><span class="p">]</span>
-    <span class="n">drivers</span> <span class="o">=</span> <span class="n">OrderedDict</span><span class="p">([(</span><span class="n">l</span><span class="p">,</span> <span class="n">import_component</span><span class="p">(</span><span class="s1">&#39;model&#39;</span><span class="p">,</span> <span class="n">l</span><span class="p">))</span>
-                           <span class="k">for</span> <span class="n">l</span> <span class="ow">in</span> <span class="n">languages</span><span class="p">])</span>
-    <span class="n">drv</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">get_language_order</span><span class="p">(</span><span class="n">drivers</span><span class="p">)</span><span class="o">.</span><span class="n">values</span><span class="p">())</span>
     <span class="k">if</span> <span class="n">disable_languages</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">disable_languages</span> <span class="o">=</span> <span class="p">[]</span>
     <span class="k">if</span> <span class="n">enable_languages</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
@@ -414,6 +409,9 @@
     <span class="k">if</span> <span class="n">overwrite</span><span class="p">:</span>
         <span class="n">shutil</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="n">def_config_file</span><span class="p">,</span> <span class="n">usr_config_file</span><span class="p">)</span>
         <span class="n">ygg_cfg_usr</span><span class="o">.</span><span class="n">reload</span><span class="p">()</span>
+    <span class="n">drivers</span> <span class="o">=</span> <span class="n">OrderedDict</span><span class="p">([(</span><span class="n">lang</span><span class="p">,</span> <span class="n">import_component</span><span class="p">(</span><span class="s1">&#39;model&#39;</span><span class="p">,</span> <span class="n">lang</span><span class="p">))</span>
+                           <span class="k">for</span> <span class="n">lang</span> <span class="ow">in</span> <span class="n">languages</span><span class="p">])</span>
+    <span class="n">drv</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">get_language_order</span><span class="p">(</span><span class="n">drivers</span><span class="p">)</span><span class="o">.</span><span class="n">values</span><span class="p">())</span>
     <span class="k">for</span> <span class="n">idrv</span> <span class="ow">in</span> <span class="n">drv</span><span class="p">:</span>
         <span class="k">if</span> <span class="p">(((</span><span class="n">idrv</span><span class="o">.</span><span class="n">language</span> <span class="ow">in</span> <span class="n">disable_languages</span><span class="p">)</span>
              <span class="ow">and</span> <span class="p">(</span><span class="n">idrv</span><span class="o">.</span><span class="n">language</span> <span class="ow">in</span> <span class="n">enable_languages</span><span class="p">))):</span>

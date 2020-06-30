@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>yggdrasil.examples.tests &mdash; yggdrasil 1.0.0+154.g684a530e.dirty documentation</title>
+  <title>yggdrasil.examples.tests &mdash; yggdrasil 1.1.1+410.g95af39b2 documentation</title>
   
 
   
@@ -59,7 +59,7 @@
             
             
               <div class="version">
-                1.0.0
+                1.1.1
               </div>
             
           
@@ -94,6 +94,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../autowrap.html#notes-on-autowrapping-c-c-model-functions">Notes on Autowrapping C/C++ Model Functions</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../conditional_io.html">Conditional I/O</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../transformed_io.html">Transformed I/O</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../timesync_io.html">Timestep Synchronization</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../yaml.html">YAML Files</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../config.html">Configuration Files</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../units.html">Units</a></li>
@@ -176,7 +177,7 @@
 <span class="kn">import</span> <span class="nn">shutil</span>
 <span class="kn">import</span> <span class="nn">itertools</span>
 <span class="kn">import</span> <span class="nn">flaky</span>
-<span class="kn">from</span> <span class="nn">yggdrasil.components</span> <span class="k">import</span> <span class="n">ComponentMeta</span>
+<span class="kn">from</span> <span class="nn">yggdrasil.components</span> <span class="k">import</span> <span class="n">ComponentMeta</span><span class="p">,</span> <span class="n">import_component</span>
 <span class="kn">from</span> <span class="nn">yggdrasil</span> <span class="k">import</span> <span class="n">runner</span><span class="p">,</span> <span class="n">tools</span><span class="p">,</span> <span class="n">platform</span>
 <span class="kn">from</span> <span class="nn">yggdrasil.examples</span> <span class="k">import</span> <span class="n">yamls</span><span class="p">,</span> <span class="n">source</span><span class="p">,</span> <span class="n">ext_map</span>
 <span class="kn">from</span> <span class="nn">yggdrasil.tests</span> <span class="k">import</span> <span class="n">YggTestBase</span><span class="p">,</span> <span class="n">check_enabled_languages</span>
@@ -410,18 +411,20 @@
                 <span class="k">raise</span> <span class="n">unittest</span><span class="o">.</span><span class="n">SkipTest</span><span class="p">(</span><span class="s2">&quot;Could not locate example </span><span class="si">%s</span><span class="s2"> in language </span><span class="si">%s</span><span class="s2">.&quot;</span> <span class="o">%</span>
                                         <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">language</span><span class="p">))</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="c1"># Copy platform specific makefile</span>
-            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">language</span> <span class="o">==</span> <span class="s1">&#39;make&#39;</span><span class="p">:</span>
-                <span class="n">makefile</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">yamldir</span><span class="p">,</span> <span class="s1">&#39;src&#39;</span><span class="p">,</span> <span class="s1">&#39;Makefile&#39;</span><span class="p">)</span>
-                <span class="k">if</span> <span class="n">platform</span><span class="o">.</span><span class="n">_is_win</span><span class="p">:</span>  <span class="c1"># pragma: windows</span>
-                    <span class="n">make_ext</span> <span class="o">=</span> <span class="s1">&#39;_windows&#39;</span>
-                <span class="k">else</span><span class="p">:</span>
-                    <span class="n">make_ext</span> <span class="o">=</span> <span class="s1">&#39;_linux&#39;</span>
-                <span class="n">shutil</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="n">makefile</span> <span class="o">+</span> <span class="n">make_ext</span><span class="p">,</span> <span class="n">makefile</span><span class="p">)</span>
             <span class="c1"># Check that language is installed</span>
             <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">languages_tested</span><span class="p">:</span>
                 <span class="k">if</span> <span class="ow">not</span> <span class="n">tools</span><span class="o">.</span><span class="n">is_lang_installed</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
                     <span class="k">raise</span> <span class="n">unittest</span><span class="o">.</span><span class="n">SkipTest</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">%s</span><span class="s2"> not installed.&quot;</span> <span class="o">%</span> <span class="n">x</span><span class="p">)</span>
+            <span class="c1"># Copy platform specific makefile</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">language</span> <span class="o">==</span> <span class="s1">&#39;make&#39;</span><span class="p">:</span>
+                <span class="n">makefile</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">yamldir</span><span class="p">,</span> <span class="s1">&#39;src&#39;</span><span class="p">,</span> <span class="s1">&#39;Makefile&#39;</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">platform</span><span class="o">.</span><span class="n">_is_win</span><span class="p">:</span>  <span class="c1"># pragma: windows</span>
+                    <span class="n">makedrv</span> <span class="o">=</span> <span class="n">import_component</span><span class="p">(</span><span class="s1">&#39;model&#39;</span><span class="p">,</span> <span class="s1">&#39;make&#39;</span><span class="p">)</span>
+                    <span class="k">assert</span><span class="p">(</span><span class="n">makedrv</span><span class="o">.</span><span class="n">get_tool</span><span class="p">(</span><span class="s1">&#39;compiler&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">toolname</span> <span class="o">==</span> <span class="s1">&#39;nmake&#39;</span><span class="p">)</span>
+                    <span class="n">make_ext</span> <span class="o">=</span> <span class="s1">&#39;_windows&#39;</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">make_ext</span> <span class="o">=</span> <span class="s1">&#39;_linux&#39;</span>
+                <span class="n">shutil</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="n">makefile</span> <span class="o">+</span> <span class="n">make_ext</span><span class="p">,</span> <span class="n">makefile</span><span class="p">)</span>
             <span class="c1"># Check that comm is installed</span>
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">comm</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;ipc&#39;</span><span class="p">,</span> <span class="s1">&#39;IPCComm&#39;</span><span class="p">]:</span>
                 <span class="kn">from</span> <span class="nn">yggdrasil.communication.IPCComm</span> <span class="k">import</span> <span class="p">(</span>
@@ -441,14 +444,15 @@
             <span class="k">try</span><span class="p">:</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">check_results</span><span class="p">()</span>
             <span class="k">finally</span><span class="p">:</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">cleanup</span><span class="p">()</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">example_cleanup</span><span class="p">()</span>
                 <span class="c1"># Remove copied makefile</span>
                 <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">language</span> <span class="o">==</span> <span class="s1">&#39;make&#39;</span><span class="p">:</span>
                     <span class="n">makefile</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">yamldir</span><span class="p">,</span> <span class="s1">&#39;src&#39;</span><span class="p">,</span> <span class="s1">&#39;Makefile&#39;</span><span class="p">)</span>
                     <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">makefile</span><span class="p">):</span>
-                        <span class="n">os</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">makefile</span><span class="p">)</span></div>
+                        <span class="n">os</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">makefile</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">runner</span> <span class="o">=</span> <span class="kc">None</span></div>
 
-<div class="viewcode-block" id="ExampleTstBase.cleanup"><a class="viewcode-back" href="../../../yggdrasil.examples.tests.html#yggdrasil.examples.tests.test_SaM.ExampleTstBase.cleanup">[docs]</a>    <span class="k">def</span> <span class="nf">cleanup</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="ExampleTstBase.example_cleanup"><a class="viewcode-back" href="../../../yggdrasil.examples.tests.html#yggdrasil.examples.tests.test_SaM.ExampleTstBase.example_cleanup">[docs]</a>    <span class="k">def</span> <span class="nf">example_cleanup</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Cleanup files created during the test.&quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">yaml</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">output_files</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">):</span>
             <span class="n">timer_class</span> <span class="o">=</span> <span class="n">tools</span><span class="o">.</span><span class="n">YggClass</span><span class="p">()</span>

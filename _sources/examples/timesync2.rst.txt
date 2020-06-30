@@ -1,0 +1,113 @@
+.. _timesync2_rst:
+
+timesync2 Example
+=====================================
+
+C Version
+---------
+
+Model Code:
+
+.. literalinclude:: /../../yggdrasil/examples/timesync2/src/timesync.c
+   :language: c
+   :linenos:
+
+
+Model YAML:
+
+.. literalinclude:: /temp/timesync2_c.yml
+   :language: yaml
+   :linenos:
+
+
+
+C++ Version
+-----------
+
+Model Code:
+
+.. literalinclude:: /../../yggdrasil/examples/timesync2/src/timesync.cpp
+   :language: c++
+   :linenos:
+
+
+Model YAML:
+
+.. literalinclude:: /temp/timesync2_cpp.yml
+   :language: yaml
+   :linenos:
+
+
+
+Fortran Version
+---------------
+
+Model Code:
+
+.. literalinclude:: /../../yggdrasil/examples/timesync2/src/timesync.f90
+   :language: python
+   :linenos:
+
+
+Model YAML:
+
+.. literalinclude:: /temp/timesync2_fortran.yml
+   :language: yaml
+   :linenos:
+
+
+
+Matlab Version
+--------------
+
+Model Code:
+
+.. literalinclude:: /../../yggdrasil/examples/timesync2/src/timesync.m
+   :language: matlab
+   :linenos:
+
+
+Model YAML:
+
+.. literalinclude:: /temp/timesync2_matlab.yml
+   :language: yaml
+   :linenos:
+
+
+
+Python Version
+--------------
+
+Model Code:
+
+.. literalinclude:: /../../yggdrasil/examples/timesync2/src/timesync.py
+   :language: python
+   :linenos:
+
+
+Model YAML:
+
+.. literalinclude:: /temp/timesync2_python.yml
+   :language: yaml
+   :linenos:
+
+
+
+R Version
+---------
+
+Model Code:
+
+.. literalinclude:: /../../yggdrasil/examples/timesync2/src/timesync.R
+   :language: python
+   :linenos:
+
+
+Model YAML:
+
+.. literalinclude:: /temp/timesync2_r.yml
+   :language: yaml
+   :linenos:
+
+
+

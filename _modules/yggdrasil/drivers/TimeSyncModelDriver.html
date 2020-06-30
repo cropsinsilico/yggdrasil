@@ -1,0 +1,640 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>yggdrasil.drivers.TimeSyncModelDriver &mdash; yggdrasil 1.1.1+410.g95af39b2 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="../../../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/underscore.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+        <script src="../../../_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="../../../_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/theme_overrides.css" type="text/css" />
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../../index.html" class="icon icon-home"> yggdrasil
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                1.1.1
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../includeme.html">Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../install.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../getting_started.html">Getting started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../formatted_io.html">Formatted I/O</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../server_client_io.html">Server/Client I/O</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../autowrap.html">Autowrapping Model Functions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../autowrap.html#notes-on-autowrapping-c-c-model-functions">Notes on Autowrapping C/C++ Model Functions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../conditional_io.html">Conditional I/O</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../transformed_io.html">Transformed I/O</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../timesync_io.html">Timestep Synchronization</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../yaml.html">YAML Files</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../config.html">Configuration Files</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../units.html">Units</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../c_format_strings.html">C-Style Format Strings</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../debugging.html">Debugging</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../examples/examples_toc.html">Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../advanced/index.html">Advanced</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../development/index.html">Development</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../publications.html">Publications</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../hackathon2018/index.html">Welcome to the 2018 Crops in Silico Hackathon!</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../hackathon2019/index.html">Welcome to the 2019 Crops in Silico Hackathon!</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">yggdrasil</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../../index.html">Module code</a> &raquo;</li>
+        
+          <li><a href="../drivers.html">yggdrasil.drivers</a> &raquo;</li>
+        
+      <li>yggdrasil.drivers.TimeSyncModelDriver</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for yggdrasil.drivers.TimeSyncModelDriver</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">from</span> <span class="nn">yggdrasil</span> <span class="k">import</span> <span class="n">units</span><span class="p">,</span> <span class="n">tools</span><span class="p">,</span> <span class="n">multitasking</span>
+<span class="kn">from</span> <span class="nn">yggdrasil.drivers.DSLModelDriver</span> <span class="k">import</span> <span class="n">DSLModelDriver</span>
+
+
+<span class="n">_default_agg</span> <span class="o">=</span> <span class="s1">&#39;mean&#39;</span>
+<span class="n">_default_interp</span> <span class="o">=</span> <span class="s1">&#39;index&#39;</span>
+
+
+<div class="viewcode-block" id="TimeSyncModelDriver"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.TimeSyncModelDriver.TimeSyncModelDriver">[docs]</a><span class="k">class</span> <span class="nc">TimeSyncModelDriver</span><span class="p">(</span><span class="n">DSLModelDriver</span><span class="p">):</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Class for synchronizing states for timesteps between two models.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        synonyms (dict, optional): Mapping from model names to mappings</span>
+<span class="sd">            from base variables names to information about one or</span>
+<span class="sd">            more alternate variable names used by the named model</span>
+<span class="sd">            that should be converted to the base variable. Values for</span>
+<span class="sd">            providing information about alternate variables can either</span>
+<span class="sd">            be strings (implies equivalence with the base variable in</span>
+<span class="sd">            everything but name and units) or mappings with the keys:</span>
+
+<span class="sd">              alt (str, list): Name of one or more variables used by</span>
+<span class="sd">                 the model that should be used to calculate the named</span>
+<span class="sd">                 base variable.</span>
+<span class="sd">              alt2base (function): Callable object that takes the</span>
+<span class="sd">                 alternate variables named by the &#39;alt&#39; property as</span>
+<span class="sd">                 input and returns the base variable.</span>
+<span class="sd">              base2alt (function): Callable object that takes the base</span>
+<span class="sd">                 variable as input and returns the alternate variables</span>
+<span class="sd">                 named by the &#39;alt&#39; property.</span>
+
+<span class="sd">            Defaults to an empty dictionary.</span>
+<span class="sd">        aggregation (str, dict, optional): Method(s) that should be used</span>
+<span class="sd">            to aggregate synonymous variables across models. This can</span>
+<span class="sd">            be a single method that should be used for all synonymous</span>
+<span class="sd">            variables or a dictionary mapping between synonymous variables</span>
+<span class="sd">            and the method that should be used by that variable. If a</span>
+<span class="sd">            variable is not present in the dictionary or a values is</span>
+<span class="sd">            not provided, &#39;mean&#39; will be used. See the documentation</span>
+<span class="sd">            for pandas.DataFrame.aggregate for available options.</span>
+<span class="sd">        interpolation (str, dict, optional): Method(s) or keyword</span>
+<span class="sd">            arguments that should be used to interpolate missing</span>
+<span class="sd">            timesteps. This can be a single method or a dictionary</span>
+<span class="sd">            mapping between model name and the interpolation methods</span>
+<span class="sd">            (or keyword arguments) that should be used for variables</span>
+<span class="sd">            from that model. Defaults to &#39;index&#39;. See the documentation</span>
+<span class="sd">            for pandas.DataFrame.interpolate for available options.</span>
+<span class="sd">        additional_variables (dict, optional): Mapping from model</span>
+<span class="sd">            name to a list of variables from other models that are</span>
+<span class="sd">            not provided by the model, but should still be returned</span>
+<span class="sd">            to the model. Defaults to empty dictionary.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">_schema_subtype_description</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;Model is dedicated to synchronizing&#39;</span>
+                                   <span class="s1">&#39;timesteps between other models.&#39;</span><span class="p">)</span>
+    <span class="n">_schema_properties</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s1">&#39;synonyms&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;object&#39;</span><span class="p">,</span>
+                     <span class="s1">&#39;additionalProperties&#39;</span><span class="p">:</span> <span class="p">{</span>
+                         <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;object&#39;</span><span class="p">,</span>
+                         <span class="s1">&#39;additionalProperties&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;anyOf&#39;</span><span class="p">:</span> <span class="p">[</span>
+                             <span class="p">{</span><span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;string&#39;</span><span class="p">},</span>
+                             <span class="p">{</span><span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;object&#39;</span><span class="p">,</span>
+                              <span class="s1">&#39;required&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;alt&#39;</span><span class="p">,</span> <span class="s1">&#39;alt2base&#39;</span><span class="p">,</span> <span class="s1">&#39;base2alt&#39;</span><span class="p">],</span>
+                              <span class="s1">&#39;properties&#39;</span><span class="p">:</span> <span class="p">{</span>
+                                  <span class="s1">&#39;alt&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;anyOf&#39;</span><span class="p">:</span> <span class="p">[</span>
+                                      <span class="p">{</span><span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;string&#39;</span><span class="p">},</span>
+                                      <span class="p">{</span><span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;array&#39;</span><span class="p">,</span>
+                                       <span class="s1">&#39;items&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;string&#39;</span><span class="p">}}]},</span>
+                                  <span class="s1">&#39;alt2base&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;function&#39;</span><span class="p">},</span>
+                                  <span class="s1">&#39;base2alt&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;function&#39;</span><span class="p">}}}]}},</span>
+                     <span class="s1">&#39;default&#39;</span><span class="p">:</span> <span class="p">{}},</span>
+        <span class="s1">&#39;interpolation&#39;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="s1">&#39;anyOf&#39;</span><span class="p">:</span> <span class="p">[{</span><span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;string&#39;</span><span class="p">},</span>
+                      <span class="p">{</span><span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;object&#39;</span><span class="p">,</span>
+                       <span class="s1">&#39;additionalProperties&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;oneOf&#39;</span><span class="p">:</span> <span class="p">[</span>
+                           <span class="p">{</span><span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;string&#39;</span><span class="p">},</span>
+                           <span class="p">{</span><span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;object&#39;</span><span class="p">,</span>
+                            <span class="s1">&#39;required&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;method&#39;</span><span class="p">],</span>
+                            <span class="s1">&#39;properties&#39;</span><span class="p">:</span> <span class="p">{</span>
+                                <span class="s1">&#39;method&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;string&#39;</span><span class="p">}}}]}},</span>
+                      <span class="p">{</span><span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;object&#39;</span><span class="p">,</span>
+                       <span class="s1">&#39;required&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;method&#39;</span><span class="p">],</span>
+                       <span class="s1">&#39;properties&#39;</span><span class="p">:</span> <span class="p">{</span>
+                           <span class="s1">&#39;method&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;string&#39;</span><span class="p">}}}],</span>
+            <span class="s1">&#39;default&#39;</span><span class="p">:</span> <span class="n">_default_interp</span><span class="p">},</span>
+        <span class="s1">&#39;aggregation&#39;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="s1">&#39;anyOf&#39;</span><span class="p">:</span> <span class="p">[{</span><span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;function&#39;</span><span class="p">},</span>
+                      <span class="p">{</span><span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;string&#39;</span><span class="p">},</span>
+                      <span class="p">{</span><span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;object&#39;</span><span class="p">,</span>
+                       <span class="s1">&#39;additionalProperties&#39;</span><span class="p">:</span> <span class="p">{</span>
+                           <span class="s1">&#39;anyOf&#39;</span><span class="p">:</span> <span class="p">[{</span><span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;function&#39;</span><span class="p">},</span>
+                                     <span class="p">{</span><span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;string&#39;</span><span class="p">}]}}],</span>
+            <span class="s1">&#39;default&#39;</span><span class="p">:</span> <span class="n">_default_agg</span><span class="p">},</span>
+        <span class="s1">&#39;additional_variables&#39;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;object&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;additionalProperties&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;array&#39;</span><span class="p">,</span>
+                                     <span class="s1">&#39;items&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;string&#39;</span><span class="p">}},</span>
+            <span class="s1">&#39;default&#39;</span><span class="p">:</span> <span class="p">{}}}</span>
+    <span class="n">language</span> <span class="o">=</span> <span class="s1">&#39;timesync&#39;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">TimeSyncModelDriver</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="c1"># Ensure that options are uniform in their format and check</span>
+        <span class="c1"># that they are valid</span>
+        <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">synonyms</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="k">for</span> <span class="n">s0</span><span class="p">,</span> <span class="n">x</span> <span class="ow">in</span> <span class="nb">list</span><span class="p">(</span><span class="n">v</span><span class="o">.</span><span class="n">items</span><span class="p">()):</span>
+                <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+                    <span class="n">x</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;alt&#39;</span><span class="p">:</span> <span class="n">x</span><span class="p">,</span> <span class="s1">&#39;alt2base&#39;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span> <span class="s1">&#39;base2alt&#39;</span><span class="p">:</span> <span class="kc">None</span><span class="p">}</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">x</span><span class="p">[</span><span class="s1">&#39;alt&#39;</span><span class="p">],</span> <span class="nb">list</span><span class="p">):</span>
+                    <span class="n">x</span><span class="p">[</span><span class="s1">&#39;alt&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">x</span><span class="p">[</span><span class="s1">&#39;alt&#39;</span><span class="p">]]</span>
+                <span class="k">if</span> <span class="p">((((</span><span class="n">x</span><span class="p">[</span><span class="s1">&#39;alt2base&#39;</span><span class="p">]</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">or</span> <span class="p">(</span><span class="n">x</span><span class="p">[</span><span class="s1">&#39;base2alt&#39;</span><span class="p">]</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">))</span>
+                     <span class="ow">and</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">x</span><span class="p">[</span><span class="s1">&#39;alt&#39;</span><span class="p">])</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">))):</span>  <span class="c1"># pragma: debug</span>
+                    <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span>
+                        <span class="p">(</span><span class="s1">&#39;Cannot convert from multiple alternate &#39;</span>
+                         <span class="s1">&#39;variables (</span><span class="si">%s</span><span class="s1">) to single base variable (</span><span class="si">%s</span><span class="s1">) &#39;</span>
+                         <span class="s1">&#39;without transformation functions.&#39;</span><span class="p">)</span>
+                        <span class="o">%</span> <span class="p">(</span><span class="n">x</span><span class="p">[</span><span class="s1">&#39;alt&#39;</span><span class="p">],</span> <span class="n">s0</span><span class="p">))</span>
+                <span class="n">v</span><span class="p">[</span><span class="n">s0</span><span class="p">]</span> <span class="o">=</span> <span class="n">x</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">interpolation</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">interpolation</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;method&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">interpolation</span><span class="p">}</span>
+        <span class="k">if</span> <span class="s1">&#39;method&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">interpolation</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">interpolation</span><span class="o">.</span><span class="n">items</span><span class="p">()):</span>
+                <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+                    <span class="n">v</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;method&#39;</span><span class="p">:</span> <span class="n">v</span><span class="p">}</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">interpolation</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">v</span>
+
+<div class="viewcode-block" id="TimeSyncModelDriver.parse_arguments"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.TimeSyncModelDriver.TimeSyncModelDriver.parse_arguments">[docs]</a>    <span class="k">def</span> <span class="nf">parse_arguments</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Sort model arguments to determine which one is the executable</span>
+<span class="sd">        and which ones are arguments.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            args (list): List of arguments provided.</span>
+<span class="sd">            **kwargs: Additional keyword arguments are ignored.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">assert</span><span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">args</span><span class="p">,</span> <span class="nb">list</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">args</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">model_file</span> <span class="o">=</span> <span class="s1">&#39;dummy&#39;</span></div>
+        
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">model_wrapper_args</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;tuple: Positional arguments for the model wrapper.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">synonyms</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">interpolation</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">aggregation</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">additional_variables</span><span class="p">)</span>
+
+<div class="viewcode-block" id="TimeSyncModelDriver.model_wrapper"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.TimeSyncModelDriver.TimeSyncModelDriver.model_wrapper">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">model_wrapper</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">synonyms</span><span class="p">,</span> <span class="n">interpolation</span><span class="p">,</span>
+                      <span class="n">aggregation</span><span class="p">,</span> <span class="n">additional_variables</span><span class="p">,</span> <span class="n">env</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Model wrapper.&quot;&quot;&quot;</span>
+        <span class="kn">from</span> <span class="nn">yggdrasil.languages.Python.YggInterface</span> <span class="k">import</span> <span class="n">YggRpcServer</span>
+        <span class="k">if</span> <span class="n">env</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">env</span><span class="p">)</span>
+        <span class="n">rpc</span> <span class="o">=</span> <span class="n">YggRpcServer</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
+        <span class="n">threads</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="n">times</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">tables</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="n">table_units</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;base&#39;</span><span class="p">:</span> <span class="p">{}}</span>
+        <span class="n">table_lock</span> <span class="o">=</span> <span class="n">multitasking</span><span class="o">.</span><span class="n">RLock</span><span class="p">()</span>
+        <span class="n">default_agg</span> <span class="o">=</span> <span class="n">_default_agg</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">aggregation</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
+            <span class="n">default_agg</span> <span class="o">=</span> <span class="n">aggregation</span>
+            <span class="n">aggregation</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">while</span> <span class="kc">True</span><span class="p">:</span>
+            <span class="c1"># Check for errors on response threads</span>
+            <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">threads</span><span class="o">.</span><span class="n">values</span><span class="p">():</span>
+                <span class="k">if</span> <span class="n">v</span><span class="o">.</span><span class="n">check_flag_attr</span><span class="p">(</span><span class="s1">&#39;error_flag&#39;</span><span class="p">):</span>  <span class="c1"># pragma: debug</span>
+                    <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">threads</span><span class="o">.</span><span class="n">values</span><span class="p">():</span>
+                        <span class="k">if</span> <span class="n">v</span><span class="o">.</span><span class="n">is_alive</span><span class="p">():</span>
+                            <span class="n">v</span><span class="o">.</span><span class="n">terminate</span><span class="p">()</span>
+                    <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s2">&quot;Error on response thread.&quot;</span><span class="p">)</span>
+            <span class="c1"># Receive values from client models</span>
+            <span class="n">flag</span><span class="p">,</span> <span class="n">values</span><span class="p">,</span> <span class="n">request_id</span> <span class="o">=</span> <span class="n">rpc</span><span class="o">.</span><span class="n">recv_from</span><span class="p">(</span><span class="n">timeout</span><span class="o">=</span><span class="mf">1.0</span><span class="p">)</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">flag</span><span class="p">:</span>
+                <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;timesync server: End of input.&quot;</span><span class="p">)</span>
+                <span class="k">break</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">values</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="n">rpc</span><span class="o">.</span><span class="n">sleep</span><span class="p">()</span>
+                <span class="k">continue</span>
+            <span class="n">t</span><span class="p">,</span> <span class="n">state</span> <span class="o">=</span> <span class="n">values</span><span class="p">[:]</span>
+            <span class="n">t_pd</span> <span class="o">=</span> <span class="n">units</span><span class="o">.</span><span class="n">convert_to_pandas_timedelta</span><span class="p">(</span><span class="n">t</span><span class="p">)</span>
+            <span class="n">client_model</span> <span class="o">=</span> <span class="n">rpc</span><span class="o">.</span><span class="n">ocomm</span><span class="p">[</span><span class="n">request_id</span><span class="p">]</span><span class="o">.</span><span class="n">client_model</span>
+            <span class="c1"># Update record</span>
+            <span class="k">with</span> <span class="n">table_lock</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">client_model</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">tables</span><span class="p">:</span>
+                    <span class="n">tables</span><span class="p">[</span><span class="n">client_model</span><span class="p">]</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">({</span><span class="s1">&#39;time&#39;</span><span class="p">:</span> <span class="n">times</span><span class="p">})</span>
+                <span class="c1"># Update units &amp; aggregation methods</span>
+                <span class="k">if</span> <span class="n">client_model</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">table_units</span><span class="p">:</span>
+                    <span class="c1"># NOTE: this assumes that units will not change</span>
+                    <span class="c1"># between timesteps for a single model. Is there a</span>
+                    <span class="c1"># case where this might not be true?</span>
+                    <span class="n">table_units</span><span class="p">[</span><span class="n">client_model</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
+                        <span class="n">k</span><span class="p">:</span> <span class="n">units</span><span class="o">.</span><span class="n">get_units</span><span class="p">(</span><span class="n">v</span><span class="p">)</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">state</span><span class="o">.</span><span class="n">items</span><span class="p">()}</span>
+                    <span class="n">table_units</span><span class="p">[</span><span class="n">client_model</span><span class="p">][</span><span class="s1">&#39;time&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">units</span><span class="o">.</span><span class="n">get_units</span><span class="p">(</span><span class="n">t</span><span class="p">)</span>
+                    <span class="n">alt_vars</span> <span class="o">=</span> <span class="p">[]</span>
+                    <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">synonyms</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">client_model</span><span class="p">,</span> <span class="p">{})</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                        <span class="n">alt_vars</span> <span class="o">+=</span> <span class="n">v</span><span class="p">[</span><span class="s1">&#39;alt&#39;</span><span class="p">]</span>
+                        <span class="k">if</span> <span class="n">v</span><span class="p">[</span><span class="s1">&#39;alt2base&#39;</span><span class="p">]</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                            <span class="n">table_units</span><span class="p">[</span><span class="n">client_model</span><span class="p">][</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">units</span><span class="o">.</span><span class="n">get_units</span><span class="p">(</span>
+                                <span class="n">v</span><span class="p">[</span><span class="s1">&#39;alt2base&#39;</span><span class="p">](</span><span class="o">*</span><span class="p">[</span><span class="n">state</span><span class="p">[</span><span class="n">a</span><span class="p">]</span> <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="n">v</span><span class="p">[</span><span class="s1">&#39;alt&#39;</span><span class="p">]]))</span>
+                        <span class="k">else</span><span class="p">:</span>
+                            <span class="n">table_units</span><span class="p">[</span><span class="n">client_model</span><span class="p">][</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">table_units</span><span class="p">[</span>
+                                <span class="n">client_model</span><span class="p">][</span><span class="n">v</span><span class="p">[</span><span class="s1">&#39;alt&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">]]</span>
+                    <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">table_units</span><span class="p">[</span><span class="n">client_model</span><span class="p">]</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                        <span class="n">table_units</span><span class="p">[</span><span class="s1">&#39;base&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="n">v</span><span class="p">)</span>
+                    <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">list</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">state</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span> <span class="o">-</span> <span class="nb">set</span><span class="p">(</span><span class="n">alt_vars</span><span class="p">)):</span>
+                        <span class="n">aggregation</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="n">default_agg</span><span class="p">)</span>
+                <span class="c1"># Update the state</span>
+                <span class="k">if</span> <span class="n">t_pd</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">times</span><span class="p">:</span>
+                    <span class="n">times</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">t_pd</span><span class="p">)</span>
+                <span class="k">for</span> <span class="n">model</span><span class="p">,</span> <span class="n">table</span> <span class="ow">in</span> <span class="n">tables</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                    <span class="n">new_data</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;time&#39;</span><span class="p">:</span> <span class="p">[</span><span class="n">t_pd</span><span class="p">]}</span>
+                    <span class="k">if</span> <span class="n">model</span> <span class="o">==</span> <span class="n">client_model</span><span class="p">:</span>
+                        <span class="n">new_data</span><span class="o">.</span><span class="n">update</span><span class="p">({</span><span class="n">k</span><span class="p">:</span> <span class="p">[</span><span class="n">units</span><span class="o">.</span><span class="n">get_data</span><span class="p">(</span><span class="n">v</span><span class="p">)]</span>
+                                         <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">state</span><span class="o">.</span><span class="n">items</span><span class="p">()})</span>
+                    <span class="n">new_data</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">new_data</span><span class="p">)</span>
+                    <span class="n">idx</span> <span class="o">=</span> <span class="n">table</span><span class="p">[</span><span class="s1">&#39;time&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">isin</span><span class="p">([</span><span class="n">t_pd</span><span class="p">])</span>
+                    <span class="k">if</span> <span class="ow">not</span> <span class="n">idx</span><span class="o">.</span><span class="n">any</span><span class="p">():</span>
+                        <span class="n">table</span> <span class="o">=</span> <span class="n">table</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">new_data</span><span class="p">,</span> <span class="n">sort</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+                    <span class="k">elif</span> <span class="n">model</span> <span class="o">==</span> <span class="n">client_model</span><span class="p">:</span>
+                        <span class="n">table</span> <span class="o">=</span> <span class="n">table</span><span class="o">.</span><span class="n">drop</span><span class="p">(</span><span class="n">table</span><span class="o">.</span><span class="n">index</span><span class="p">[</span><span class="n">idx</span><span class="p">])</span>
+                        <span class="n">table</span> <span class="o">=</span> <span class="n">table</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">new_data</span><span class="p">,</span> <span class="n">sort</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+                    <span class="n">tables</span><span class="p">[</span><span class="n">model</span><span class="p">]</span> <span class="o">=</span> <span class="n">table</span><span class="o">.</span><span class="n">sort_values</span><span class="p">(</span><span class="s1">&#39;time&#39;</span><span class="p">)</span>
+            <span class="c1"># Assign thread to handle checking when data is filled in</span>
+            <span class="n">internal_variables</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">state</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
+            <span class="n">external_variables</span> <span class="o">=</span> <span class="n">additional_variables</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">client_model</span><span class="p">,</span> <span class="p">[])</span>
+            <span class="n">threads</span><span class="p">[</span><span class="n">request_id</span><span class="p">]</span> <span class="o">=</span> <span class="n">multitasking</span><span class="o">.</span><span class="n">YggTaskLoop</span><span class="p">(</span>
+                <span class="n">target</span><span class="o">=</span><span class="bp">cls</span><span class="o">.</span><span class="n">response_loop</span><span class="p">,</span>
+                <span class="n">args</span><span class="o">=</span><span class="p">(</span><span class="n">client_model</span><span class="p">,</span> <span class="n">request_id</span><span class="p">,</span> <span class="n">rpc</span><span class="p">,</span> <span class="n">t_pd</span><span class="p">,</span>
+                      <span class="n">internal_variables</span><span class="p">,</span> <span class="n">external_variables</span><span class="p">,</span>
+                      <span class="n">tables</span><span class="p">,</span> <span class="n">table_units</span><span class="p">,</span> <span class="n">table_lock</span><span class="p">,</span>
+                      <span class="n">synonyms</span><span class="p">,</span> <span class="n">interpolation</span><span class="p">,</span> <span class="n">aggregation</span><span class="p">))</span>
+            <span class="n">threads</span><span class="p">[</span><span class="n">request_id</span><span class="p">]</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
+        <span class="c1"># Cleanup threads (only called if there is an error since the</span>
+        <span class="c1"># loop will only be broken when all of the clients have signed</span>
+        <span class="c1"># off, implying that all requests have been responded to).</span>
+        <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">threads</span><span class="o">.</span><span class="n">values</span><span class="p">():</span>
+            <span class="k">if</span> <span class="n">v</span><span class="o">.</span><span class="n">is_alive</span><span class="p">():</span>  <span class="c1"># pragma: debug</span>
+                <span class="n">v</span><span class="o">.</span><span class="n">wait</span><span class="p">(</span><span class="mf">0.5</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">threads</span><span class="o">.</span><span class="n">values</span><span class="p">():</span>
+            <span class="k">if</span> <span class="n">v</span><span class="o">.</span><span class="n">is_alive</span><span class="p">():</span>  <span class="c1"># pragma: debug</span>
+                <span class="n">v</span><span class="o">.</span><span class="n">terminate</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="TimeSyncModelDriver.check_for_data"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.TimeSyncModelDriver.TimeSyncModelDriver.check_for_data">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">check_for_data</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">time</span><span class="p">,</span> <span class="n">tables</span><span class="p">,</span> <span class="n">table_lock</span><span class="p">,</span> <span class="n">open_clients</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Check for a time in the tables to determine if there is</span>
+<span class="sd">        sufficient data available to calculate the state.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            time (pandas.Timedelta): Time that state is requested at.</span>
+<span class="sd">            tables (dict): Mapping from model name to pandas DataFrames</span>
+<span class="sd">                containing variables supplied by the model.</span>
+<span class="sd">            table_lock (RLock): Thread-safe lock for accessing table.</span>
+<span class="sd">            open_clients (list): Clients that are still open.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            bool: True if there is sufficient data, False otherwise.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">with</span> <span class="n">table_lock</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">tables</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                <span class="k">if</span> <span class="p">(</span><span class="n">k</span> <span class="ow">in</span> <span class="n">open_clients</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">time</span> <span class="o">&gt;</span> <span class="nb">max</span><span class="p">(</span><span class="n">v</span><span class="o">.</span><span class="n">dropna</span><span class="p">()[</span><span class="s1">&#39;time&#39;</span><span class="p">])):</span>
+                    <span class="k">return</span> <span class="kc">False</span>
+        <span class="k">return</span> <span class="kc">True</span></div>
+
+<div class="viewcode-block" id="TimeSyncModelDriver.response_loop"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.TimeSyncModelDriver.TimeSyncModelDriver.response_loop">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">response_loop</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">client_model</span><span class="p">,</span> <span class="n">request_id</span><span class="p">,</span> <span class="n">rpc</span><span class="p">,</span> <span class="n">time</span><span class="p">,</span>
+                      <span class="n">internal_variables</span><span class="p">,</span> <span class="n">external_variables</span><span class="p">,</span>
+                      <span class="n">tables</span><span class="p">,</span> <span class="n">table_units</span><span class="p">,</span> <span class="n">table_lock</span><span class="p">,</span>
+                      <span class="n">synonyms</span><span class="p">,</span> <span class="n">interpolation</span><span class="p">,</span> <span class="n">aggregation</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Check for available data and send response if it is</span>
+<span class="sd">        available.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            client_model (str): Name of model that made the request.</span>
+<span class="sd">            request_id (str): ID associated with request that should</span>
+<span class="sd">                be responded to.</span>
+<span class="sd">            rpc (ServerComm): Server RPC comm that should be used to</span>
+<span class="sd">                reply to the request when the data is available.</span>
+<span class="sd">            time (pandas.Timedelta): Time to get variables at.</span>
+<span class="sd">            internal_variables (list): Variables that model is requesting</span>
+<span class="sd">                that it also calculates.</span>
+<span class="sd">            external_variables (list): Variables that model is requesting</span>
+<span class="sd">                that will be provided by other models.</span>
+<span class="sd">            tables (dict): Mapping from model name to pandas DataFrames</span>
+<span class="sd">                containing variables supplied by the model.</span>
+<span class="sd">            table_units (dict): Mapping from model name to dictionaries</span>
+<span class="sd">                mapping from variable names to units.</span>
+<span class="sd">            table_lock (RLock): Thread-safe lock for accessing table.</span>
+<span class="sd">            synonyms (dict): Dictionary mapping from base variables to</span>
+<span class="sd">                alternate variables and mapping functions used to convert</span>
+<span class="sd">                between the variables. Defaults to empty dict and no</span>
+<span class="sd">                conversions are performed.</span>
+<span class="sd">            interpolation (dict): Mapping from model name to the</span>
+<span class="sd">                interpolation kwargs that should be used. Defaults to</span>
+<span class="sd">                empty dictionary.</span>
+<span class="sd">            aggregation (dict): Mapping from variable name to the</span>
+<span class="sd">                aggregation method that should be used. Defaults to</span>
+<span class="sd">                empty dictionary.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span><span class="n">rpc</span><span class="o">.</span><span class="n">all_clients_connected</span>
+                <span class="ow">and</span> <span class="bp">cls</span><span class="o">.</span><span class="n">check_for_data</span><span class="p">(</span><span class="n">time</span><span class="p">,</span> <span class="n">tables</span><span class="p">,</span> <span class="n">table_lock</span><span class="p">,</span>
+                                       <span class="n">rpc</span><span class="o">.</span><span class="n">open_clients</span><span class="p">)):</span>
+            <span class="c1"># Don&#39;t start sampling until all clients have connected</span>
+            <span class="c1"># and there is data available for the requested timestep</span>
+            <span class="n">tools</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mf">1.0</span><span class="p">)</span>
+            <span class="k">return</span>
+        <span class="n">tot</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">merge</span><span class="p">(</span><span class="n">tables</span><span class="p">,</span> <span class="n">table_units</span><span class="p">,</span> <span class="n">table_lock</span><span class="p">,</span> <span class="n">rpc</span><span class="o">.</span><span class="n">open_clients</span><span class="p">,</span>
+                        <span class="n">synonyms</span><span class="p">,</span> <span class="n">interpolation</span><span class="p">,</span> <span class="n">aggregation</span><span class="p">)</span>
+        <span class="c1"># Update external units</span>
+        <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">external_variables</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">k</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">table_units</span><span class="p">[</span><span class="n">client_model</span><span class="p">]:</span>
+                <span class="n">table_units</span><span class="p">[</span><span class="n">client_model</span><span class="p">][</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">table_units</span><span class="p">[</span><span class="s1">&#39;base&#39;</span><span class="p">][</span><span class="n">k</span><span class="p">]</span>
+        <span class="c1"># Check if data is available at the desired timestep?</span>
+        <span class="c1"># Convert units</span>
+        <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">tot</span><span class="o">.</span><span class="n">columns</span><span class="p">:</span>
+            <span class="n">funits</span> <span class="o">=</span> <span class="n">units</span><span class="o">.</span><span class="n">get_conversion_function</span><span class="p">(</span><span class="n">table_units</span><span class="p">[</span><span class="s1">&#39;base&#39;</span><span class="p">][</span><span class="n">k</span><span class="p">],</span>
+                                                   <span class="n">table_units</span><span class="p">[</span><span class="n">client_model</span><span class="p">][</span><span class="n">k</span><span class="p">])</span>
+            <span class="n">tot</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">tot</span><span class="p">[</span><span class="n">k</span><span class="p">]</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="n">funits</span><span class="p">)</span>
+        <span class="c1"># Transform back to variables expected by the model</span>
+        <span class="k">for</span> <span class="n">kbase</span><span class="p">,</span> <span class="n">alt</span> <span class="ow">in</span> <span class="n">synonyms</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">client_model</span><span class="p">,</span> <span class="p">{})</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="k">if</span> <span class="n">alt</span><span class="p">[</span><span class="s1">&#39;base2alt&#39;</span><span class="p">]</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">alt_vars</span> <span class="o">=</span> <span class="n">alt</span><span class="p">[</span><span class="s1">&#39;base2alt&#39;</span><span class="p">](</span><span class="n">tot</span><span class="p">[</span><span class="n">kbase</span><span class="p">])</span>
+                <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">alt_vars</span><span class="p">,</span> <span class="p">(</span><span class="nb">tuple</span><span class="p">,</span> <span class="nb">list</span><span class="p">)):</span>
+                    <span class="k">assert</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">alt_vars</span><span class="p">)</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="n">alt</span><span class="p">[</span><span class="s1">&#39;alt&#39;</span><span class="p">]))</span>
+                    <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">alt</span><span class="p">[</span><span class="s1">&#39;alt&#39;</span><span class="p">],</span> <span class="n">alt_vars</span><span class="p">):</span>
+                        <span class="n">tot</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">v</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="k">assert</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">alt</span><span class="p">[</span><span class="s1">&#39;alt&#39;</span><span class="p">])</span> <span class="o">==</span> <span class="mi">1</span><span class="p">)</span>
+                    <span class="n">tot</span><span class="p">[</span><span class="n">alt</span><span class="p">[</span><span class="s1">&#39;alt&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">]]</span> <span class="o">=</span> <span class="n">alt_vars</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">tot</span><span class="p">[</span><span class="n">alt</span><span class="p">[</span><span class="s1">&#39;alt&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">]]</span> <span class="o">=</span> <span class="n">tot</span><span class="p">[</span><span class="n">kbase</span><span class="p">]</span>
+        <span class="c1"># Get state</span>
+        <span class="n">state</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">internal_variables</span> <span class="o">+</span> <span class="n">external_variables</span><span class="p">:</span>
+            <span class="n">v_res</span> <span class="o">=</span> <span class="n">tot</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">time</span><span class="p">,</span> <span class="n">v</span><span class="p">]</span>
+            <span class="n">state</span><span class="p">[</span><span class="n">v</span><span class="p">]</span> <span class="o">=</span> <span class="n">units</span><span class="o">.</span><span class="n">add_units</span><span class="p">(</span><span class="n">v_res</span><span class="p">,</span> <span class="n">table_units</span><span class="p">[</span><span class="n">client_model</span><span class="p">][</span><span class="n">v</span><span class="p">])</span>
+        <span class="n">time_u</span> <span class="o">=</span> <span class="n">units</span><span class="o">.</span><span class="n">convert_to</span><span class="p">(</span><span class="n">units</span><span class="o">.</span><span class="n">convert_from_pandas_timedelta</span><span class="p">(</span><span class="n">time</span><span class="p">),</span>
+                                  <span class="n">table_units</span><span class="p">[</span><span class="n">client_model</span><span class="p">][</span><span class="s1">&#39;time&#39;</span><span class="p">])</span>
+        <span class="n">flag</span> <span class="o">=</span> <span class="n">rpc</span><span class="o">.</span><span class="n">send_to</span><span class="p">(</span><span class="n">request_id</span><span class="p">,</span> <span class="n">state</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">flag</span><span class="p">:</span>  <span class="c1"># pragma: debug</span>
+            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">((</span><span class="s2">&quot;Failed to send response to &quot;</span>
+                                <span class="s2">&quot;request </span><span class="si">%s</span><span class="s2"> for time </span><span class="si">%s</span><span class="s2"> from &quot;</span>
+                                <span class="s2">&quot;model </span><span class="si">%s</span><span class="s2">.&quot;</span><span class="p">)</span>
+                               <span class="o">%</span> <span class="p">(</span><span class="n">request_id</span><span class="p">,</span> <span class="n">time_u</span><span class="p">,</span> <span class="n">client_model</span><span class="p">))</span>
+        <span class="k">raise</span> <span class="n">multitasking</span><span class="o">.</span><span class="n">BreakLoopException</span></div>
+    
+<div class="viewcode-block" id="TimeSyncModelDriver.merge"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.TimeSyncModelDriver.TimeSyncModelDriver.merge">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">merge</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">tables</span><span class="p">,</span> <span class="n">table_units</span><span class="p">,</span> <span class="n">table_lock</span><span class="p">,</span> <span class="n">open_clients</span><span class="p">,</span>
+              <span class="n">synonyms</span><span class="p">,</span> <span class="n">interpolation</span><span class="p">,</span> <span class="n">aggregation</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Merge tables from models to get data.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            tables (dict): Mapping from model name to pandas DataFrames</span>
+<span class="sd">                containing variables supplied by the model.</span>
+<span class="sd">            table_units (dict): Mapping from model name to dictionaries</span>
+<span class="sd">                mapping from variable names to units.</span>
+<span class="sd">            table_lock (RLock): Thread-safe lock for accessing table.</span>
+<span class="sd">            open_clients (list): Clients that are still open.</span>
+<span class="sd">            synonyms (dict): Dictionary mapping from base variables to</span>
+<span class="sd">                alternate variables and mapping functions used to convert</span>
+<span class="sd">                between the variables. Defaults to empty dict and no</span>
+<span class="sd">                conversions are performed.</span>
+<span class="sd">            interpolation (dict): Mapping from model name to the</span>
+<span class="sd">                interpolation kwargs that should be used. Defaults to</span>
+<span class="sd">                empty dictionary.</span>
+<span class="sd">            aggregation (dict): Mapping from variable name to the</span>
+<span class="sd">                aggregation method that should be used. Defaults to</span>
+<span class="sd">                empty dictionary.</span>
+
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># Adjust input arguments</span>
+        <span class="n">interp_default</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;method&#39;</span><span class="p">:</span> <span class="n">_default_interp</span><span class="p">}</span>
+        <span class="k">if</span> <span class="s1">&#39;method&#39;</span> <span class="ow">in</span> <span class="n">interpolation</span><span class="p">:</span>
+            <span class="n">interp_default</span> <span class="o">=</span> <span class="n">interpolation</span>
+            <span class="n">interpolation</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="c1"># Interpolate</span>
+        <span class="n">table_temp</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">with</span> <span class="n">table_lock</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">tables</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                <span class="n">kws</span> <span class="o">=</span> <span class="n">interpolation</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="n">interp_default</span><span class="p">)</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+                <span class="k">if</span> <span class="n">k</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">open_clients</span><span class="p">:</span>
+                    <span class="c1"># Ensure that clients that have signed of are</span>
+                    <span class="c1"># extrapolated, otherwise they would never produce</span>
+                    <span class="c1"># valid data</span>
+                    <span class="n">kws</span><span class="p">[</span><span class="s1">&#39;limit_area&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+                <span class="k">if</span> <span class="s1">&#39;order&#39;</span> <span class="ow">in</span> <span class="n">kws</span><span class="p">:</span>
+                    <span class="n">kws</span><span class="p">[</span><span class="s1">&#39;order&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">v</span><span class="o">.</span><span class="n">dropna</span><span class="p">()</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="mi">1</span><span class="p">,</span>
+                                       <span class="n">kws</span><span class="p">[</span><span class="s1">&#39;order&#39;</span><span class="p">])</span>
+                    <span class="k">if</span> <span class="n">kws</span><span class="p">[</span><span class="s1">&#39;order&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                        <span class="n">kws</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;order&#39;</span><span class="p">)</span>
+                        <span class="n">kws</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">interp_default</span><span class="p">)</span>
+                <span class="n">v</span> <span class="o">=</span> <span class="n">v</span><span class="o">.</span><span class="n">set_index</span><span class="p">(</span><span class="s1">&#39;time&#39;</span><span class="p">)</span>
+                <span class="c1"># Cannot interpolate on pandas timedelta as of pandas 1.0.1</span>
+                <span class="n">ind</span> <span class="o">=</span> <span class="n">v</span><span class="o">.</span><span class="n">index</span>
+                <span class="n">v</span><span class="o">.</span><span class="n">index</span> <span class="o">=</span> <span class="n">v</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">total_seconds</span><span class="p">()</span>
+                <span class="n">table_temp</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">v</span><span class="o">.</span><span class="n">interpolate</span><span class="p">(</span><span class="o">**</span><span class="n">kws</span><span class="p">)</span>
+                <span class="n">table_temp</span><span class="p">[</span><span class="n">k</span><span class="p">]</span><span class="o">.</span><span class="n">index</span> <span class="o">=</span> <span class="n">ind</span>
+        <span class="c1"># Rename + transformation</span>
+        <span class="k">for</span> <span class="n">model</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">table_temp</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="n">drop</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="k">for</span> <span class="n">kbase</span><span class="p">,</span> <span class="n">alt</span> <span class="ow">in</span> <span class="n">synonyms</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="p">{})</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                <span class="k">if</span> <span class="n">alt</span><span class="p">[</span><span class="s1">&#39;alt2base&#39;</span><span class="p">]</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="n">args</span> <span class="o">=</span> <span class="p">[</span><span class="n">v</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">alt</span><span class="p">[</span><span class="s1">&#39;alt&#39;</span><span class="p">]]</span>
+                    <span class="n">v</span><span class="p">[</span><span class="n">kbase</span><span class="p">]</span> <span class="o">=</span> <span class="n">alt</span><span class="p">[</span><span class="s1">&#39;alt2base&#39;</span><span class="p">](</span><span class="o">*</span><span class="n">args</span><span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">v</span><span class="p">[</span><span class="n">kbase</span><span class="p">]</span> <span class="o">=</span> <span class="n">v</span><span class="p">[</span><span class="n">alt</span><span class="p">[</span><span class="s1">&#39;alt&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">]]</span>
+                <span class="n">drop</span> <span class="o">+=</span> <span class="n">alt</span><span class="p">[</span><span class="s1">&#39;alt&#39;</span><span class="p">]</span>
+            <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">drop</span><span class="p">:</span>
+                <span class="n">v</span> <span class="o">=</span> <span class="n">v</span><span class="o">.</span><span class="n">drop</span><span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+            <span class="c1"># Units</span>
+            <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">v</span><span class="o">.</span><span class="n">columns</span><span class="p">:</span>
+                <span class="n">funits</span> <span class="o">=</span> <span class="n">units</span><span class="o">.</span><span class="n">get_conversion_function</span><span class="p">(</span><span class="n">table_units</span><span class="p">[</span><span class="n">model</span><span class="p">][</span><span class="n">k</span><span class="p">],</span>
+                                                       <span class="n">table_units</span><span class="p">[</span><span class="s1">&#39;base&#39;</span><span class="p">][</span><span class="n">k</span><span class="p">])</span>
+                <span class="n">v</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">v</span><span class="p">[</span><span class="n">k</span><span class="p">]</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="n">funits</span><span class="p">)</span>
+            <span class="n">table_temp</span><span class="p">[</span><span class="n">model</span><span class="p">]</span> <span class="o">=</span> <span class="n">v</span>
+        <span class="c1"># Append</span>
+        <span class="n">out</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">table_temp</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="n">out</span> <span class="o">=</span> <span class="n">out</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="n">sort</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+        <span class="c1"># Groupby + aggregate</span>
+        <span class="n">out</span> <span class="o">=</span> <span class="n">out</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="s1">&#39;time&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">agg</span><span class="p">(</span><span class="n">aggregation</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">out</span></div></div>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2017, Meagan Lang, David Raila
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

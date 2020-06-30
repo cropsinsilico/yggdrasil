@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>YAML Files &mdash; yggdrasil 1.0.0+154.g684a530e.dirty documentation</title>
+  <title>YAML Files &mdash; yggdrasil 1.1.1+410.g95af39b2 documentation</title>
   
 
   
@@ -37,7 +37,7 @@
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="Configuration Files" href="config.html" />
-    <link rel="prev" title="Transformed I/O" href="transformed_io.html" /> 
+    <link rel="prev" title="Timestep Synchronization" href="timesync_io.html" /> 
 </head>
 
 <body class="wy-body-for-nav">
@@ -61,7 +61,7 @@
             
             
               <div class="version">
-                1.0.0
+                1.1.1
               </div>
             
           
@@ -96,6 +96,7 @@
 <li class="toctree-l1"><a class="reference internal" href="autowrap.html#notes-on-autowrapping-c-c-model-functions">Notes on Autowrapping C/C++ Model Functions</a></li>
 <li class="toctree-l1"><a class="reference internal" href="conditional_io.html">Conditional I/O</a></li>
 <li class="toctree-l1"><a class="reference internal" href="transformed_io.html">Transformed I/O</a></li>
+<li class="toctree-l1"><a class="reference internal" href="timesync_io.html">Timestep Synchronization</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">YAML Files</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#models">Models</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#connections">Connections</a></li>
@@ -360,15 +361,16 @@ files without running the integration, this can be done via the <code class="doc
 <tr class="row-even"><td><p>args</p></td>
 <td><p>array</p></td>
 <td><p>X</p></td>
-<td><p>Argument(s) for running the model on the command line. This should be a complete
-command including the necessary executable and command line arguments to that
-executable.</p></td>
+<td><p>The full path to the file containing the model program that will be run by the
+driver or a list starting with the program file and including any arguments that
+should be passed as input to the program.</p></td>
 </tr>
 <tr class="row-odd"><td><p>language</p></td>
 <td><p>string</p></td>
 <td><p>X</p></td>
-<td><p>The programming language that the model is written in. (Options described
-<a class="reference internal" href="#schema-table-model-subtype-rst"><span class="std std-ref">here</span></a>)</p></td>
+<td><p>The programming language that the model is written in. A list of available
+languages can be found <a class="reference internal" href="#schema-table-model-subtype-rst"><span class="std std-ref">here</span></a>. (Options
+described <a class="reference internal" href="#schema-table-model-subtype-rst"><span class="std std-ref">here</span></a>)</p></td>
 </tr>
 <tr class="row-even"><td><p>name</p></td>
 <td><p>string</p></td>
@@ -383,8 +385,13 @@ executable.</p></td>
 <tr class="row-even"><td><p>client_of</p></td>
 <td><p>array</p></td>
 <td></td>
-<td><p>The names of one or more servers that this model is a client of. Defaults to
-empty list. Use of client_of with function is not currently supported.</p></td>
+<td><p>The names of one or more models that this model will call as a server. If there
+are more than one, this should be specified as a sequence collection (list). The
+corresponding channel(s) that should be passed to the yggdrasil API will be the
+name of the server model joined with the name of the client model with an
+underscore <cite>&lt;server_model&gt;_&lt;client_model&gt;</cite>. There will be one channel created
+for each server the model is a client of. Defaults to empty list. Use of
+<cite>client_of</cite> with <cite>function</cite> is not currently supported.</p></td>
 </tr>
 <tr class="row-odd"><td><p>driver</p></td>
 <td><p>string</p></td>
@@ -402,19 +409,27 @@ the yggdrasil interface.</p></td>
 <tr class="row-odd"><td><p>inputs</p></td>
 <td><p>array</p></td>
 <td></td>
-<td><p>Model inputs described as comm objects.</p></td>
+<td><p>A mapping object containing the entry for a model input channel or a list of
+input channel entries. If the model does not get input from another model, this
+may be ommitted. A full description of channel entries and the options available
+for channels can be found <a class="reference internal" href="#yaml-comm-options"><span class="std std-ref">here</span></a>.</p></td>
 </tr>
 <tr class="row-even"><td><p>is_server</p></td>
 <td><p>boolean</p></td>
 <td></td>
-<td><p>If True, the model is assumed to be a server and an instance of
-<a class="reference internal" href="yggdrasil.drivers.html#module-yggdrasil.drivers.ServerDriver" title="yggdrasil.drivers.ServerDriver"><code class="xref py py-class docutils literal notranslate"><span class="pre">yggdrasil.drivers.ServerDriver</span></code></a> is started. Defaults to False. Use of
-is_server with function is not currently supported.</p></td>
+<td><p>If <cite>True</cite>, the model is assumed to be a server for one or more client models and
+an instance of <a class="reference internal" href="yggdrasil.drivers.html#module-yggdrasil.drivers.ServerDriver" title="yggdrasil.drivers.ServerDriver"><code class="xref py py-class docutils literal notranslate"><span class="pre">yggdrasil.drivers.ServerDriver</span></code></a> is started. The
+corresponding channel that should be passed to the yggdrasil API will be the
+name of the model. Defaults to False. Use of <cite>is_server</cite> with <cite>function</cite> is not
+currently supported.</p></td>
 </tr>
 <tr class="row-odd"><td><p>outputs</p></td>
 <td><p>array</p></td>
 <td></td>
-<td><p>Model outputs described as comm objects.</p></td>
+<td><p>A mapping object containing the entry for a model output channel or a list of
+output channel entries. If the model does not output to another model, this may
+be ommitted. A full description of channel entries and the options available for
+channels can be found <a class="reference internal" href="#yaml-comm-options"><span class="std std-ref">here</span></a>.</p></td>
 </tr>
 <tr class="row-even"><td><p>outputs_in_inputs</p></td>
 <td><p>boolean</p></td>
@@ -460,18 +475,27 @@ this list unless they are sure they should be deleted. Defaults to [].</p></td>
 <td></td>
 <td><p>Flags to pass to strace (or dtrace). Defaults to [].</p></td>
 </tr>
-<tr class="row-even"><td><p>valgrind_flags</p></td>
+<tr class="row-even"><td><p>timesync</p></td>
+<td></td>
+<td></td>
+<td><p>If set, the model is assumed to call a send then receive of the state at each
+timestep for syncronization with other models that are also integrating in time.
+If a string is provided, it is assumed to be the name of the server that will
+handle timestep synchronization. If a boolean is provided, the name of the
+server will be assumed to be ‘timestep’. Defaults to False.</p></td>
+</tr>
+<tr class="row-odd"><td><p>valgrind_flags</p></td>
 <td><p>array</p></td>
 <td></td>
 <td><p>Flags to pass to valgrind. Defaults to [].</p></td>
 </tr>
-<tr class="row-odd"><td><p>with_strace</p></td>
+<tr class="row-even"><td><p>with_strace</p></td>
 <td><p>boolean</p></td>
 <td></td>
 <td><p>If True, the command is run with strace (on Linux) or dtrace (on MacOS).
 Defaults to False.</p></td>
 </tr>
-<tr class="row-even"><td><p>with_valgrind</p></td>
+<tr class="row-odd"><td><p>with_valgrind</p></td>
 <td><p>boolean</p></td>
 <td></td>
 <td><p>If True, the command is run with valgrind. Defaults to False.</p></td>
@@ -514,20 +538,32 @@ Defaults to False.</p></td>
 <td><p>[DEFAULT] Model is an executable.</p></td>
 <td></td>
 </tr>
-<tr class="row-odd"><td><p>lpy</p></td>
+<tr class="row-odd"><td><p>fortran</p></td>
+<td><p>Model is written in Fortran.</p></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><p>lpy</p></td>
 <td><p>Model is an LPy system.</p></td>
 <td></td>
 </tr>
-<tr class="row-even"><td><p>make</p></td>
+<tr class="row-odd"><td><p>make</p></td>
 <td><p>Model is written in C/C++ and has a Makefile for compilation.</p></td>
 <td></td>
 </tr>
-<tr class="row-odd"><td><p>matlab</p></td>
+<tr class="row-even"><td><p>matlab</p></td>
 <td><p>Model is written in Matlab.</p></td>
 <td></td>
 </tr>
-<tr class="row-even"><td><p>python</p></td>
+<tr class="row-odd"><td><p>python</p></td>
 <td><p>Model is written in Python.</p></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><p>sbml</p></td>
+<td><p>Model is an SBML model.</p></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><p>timesync</p></td>
+<td><p>Model is dedicated to synchronizingtimesteps between other models.</p></td>
 <td></td>
 </tr>
 </tbody>
@@ -538,9 +574,9 @@ Defaults to False.</p></td>
 <table class="docutils align-default" id="schema-table-model-specific-rst">
 <colgroup>
 <col style="width: 13%" />
-<col style="width: 5%" />
-<col style="width: 56%" />
-<col style="width: 26%" />
+<col style="width: 4%" />
+<col style="width: 48%" />
+<col style="width: 34%" />
 </colgroup>
 <thead>
 <tr class="row-odd"><th class="head"><p>Option</p></th>
@@ -550,6 +586,16 @@ Defaults to False.</p></td>
 </tr>
 </thead>
 <tbody>
+<tr class="row-even"><td><p>additional_variables</p></td>
+<td><p>object</p></td>
+<td></td>
+<td><p>[‘timesync’]</p></td>
+</tr>
+<tr class="row-odd"><td><p>aggregation</p></td>
+<td></td>
+<td></td>
+<td><p>[‘timesync’]</p></td>
+</tr>
 <tr class="row-even"><td><p>builddir</p></td>
 <td><p>string</p></td>
 <td><p>Directory where the build should be saved. Defaults to &lt;sourcedir&gt;/build. It can
@@ -562,7 +608,7 @@ be relative to working_dir or absolute.</p></td>
 provided, the compiler will be determined based on configuration options for the
 language (if present) and the registered compilers that are available on the
 current operating system.</p></td>
-<td><p>[‘make’, ‘cpp’, ‘c’, ‘cmake’, ‘c++’]</p></td>
+<td><p>[‘cpp’, ‘c++’, ‘c’, ‘make’, ‘fortran’, ‘cmake’]</p></td>
 </tr>
 <tr class="row-even"><td><p>compiler_flags</p></td>
 <td><p>array</p></td>
@@ -570,7 +616,7 @@ current operating system.</p></td>
 the compiler flags will be determined based on configuration options for the
 language (if present), the compiler defaults, and the default_compiler_flags
 class attribute.</p></td>
-<td><p>[‘make’, ‘cpp’, ‘c’, ‘cmake’, ‘c++’]</p></td>
+<td><p>[‘cpp’, ‘c++’, ‘c’, ‘make’, ‘fortran’, ‘cmake’]</p></td>
 </tr>
 <tr class="row-odd"><td><p>configuration</p></td>
 <td><p>string</p></td>
@@ -601,74 +647,145 @@ the Makefile. Defaults to ‘CC’.</p></td>
 required to link against the yggdrasil interface). Defaults to ‘LDFLAGS’.</p></td>
 <td><p>[‘make’]</p></td>
 </tr>
-<tr class="row-even"><td><p>interpreter</p></td>
+<tr class="row-even"><td><p>integrator</p></td>
+<td><p>string</p></td>
+<td><p>Name of integrator that should be used. Valid options include [‘cvode’,
+‘gillespie’, ‘rk4’, ‘rk45’]. Defaults to ‘cvode’.</p></td>
+<td><p>[‘sbml’]</p></td>
+</tr>
+<tr class="row-odd"><td><p>integrator_settings</p></td>
+<td><p>object</p></td>
+<td><p>Settings for the integrator. Defaults to empty dict.</p></td>
+<td><p>[‘sbml’]</p></td>
+</tr>
+<tr class="row-even"><td><p>interpolation</p></td>
+<td></td>
+<td></td>
+<td><p>[‘timesync’]</p></td>
+</tr>
+<tr class="row-odd"><td><p>interpreter</p></td>
 <td><p>string</p></td>
 <td><p>Name or path of interpreter executable that should be used to run the model. If
 not provided, the interpreter will be determined based on configuration options
 for the language (if present) and the default_interpreter class attribute.</p></td>
-<td><p>[‘r’, ‘R’, ‘matlab’, ‘lpy’, ‘python’]</p></td>
+<td><p>[‘R’, ‘lpy’, ‘r’, ‘sbml’, ‘timesync’, ‘matlab’, ‘python’]</p></td>
 </tr>
-<tr class="row-odd"><td><p>interpreter_flags</p></td>
+<tr class="row-even"><td><p>interpreter_flags</p></td>
 <td><p>array</p></td>
 <td><p>Flags that should be passed to the interpreter when running the model. If not
 provided, the flags are determined based on configuration options for the
 language (if present) and the default_interpreter_flags class attribute.</p></td>
-<td><p>[‘r’, ‘R’, ‘matlab’, ‘lpy’, ‘python’]</p></td>
+<td><p>[‘R’, ‘lpy’, ‘r’, ‘sbml’, ‘timesync’, ‘matlab’, ‘python’]</p></td>
 </tr>
-<tr class="row-even"><td><p>linker</p></td>
+<tr class="row-odd"><td><p>linker</p></td>
 <td><p>string</p></td>
 <td><p>Command or path to executable that should be used to link the model. If not
 provided, the linker will be determined based on configuration options for the
 language (if present) and the registered linkers that are available on the
 current operating system</p></td>
-<td><p>[‘make’, ‘cpp’, ‘c’, ‘cmake’, ‘c++’]</p></td>
+<td><p>[‘cpp’, ‘c++’, ‘c’, ‘make’, ‘fortran’, ‘cmake’]</p></td>
 </tr>
-<tr class="row-odd"><td><p>linker_flags</p></td>
+<tr class="row-even"><td><p>linker_flags</p></td>
 <td><p>array</p></td>
 <td><p>Flags that should be passed to the linker during compilation. If nto provided,
 the linker flags will be determined based on configuration options for the
 language (if present), the linker defaults, and the default_linker_flags class
 attribute.</p></td>
-<td><p>[‘make’, ‘cpp’, ‘c’, ‘cmake’, ‘c++’]</p></td>
+<td><p>[‘cpp’, ‘c++’, ‘c’, ‘make’, ‘fortran’, ‘cmake’]</p></td>
 </tr>
-<tr class="row-even"><td><p>makedir</p></td>
+<tr class="row-odd"><td><p>makedir</p></td>
 <td><p>string</p></td>
 <td><p>Directory where make should be invoked from if it is not the same as the
 directory containing the makefile. Defaults to directory containing makefile if
 provided, otherwise working_dir.</p></td>
 <td><p>[‘make’]</p></td>
 </tr>
-<tr class="row-odd"><td><p>makefile</p></td>
+<tr class="row-even"><td><p>makefile</p></td>
 <td><p>string</p></td>
 <td><p>Path to make file either absolute, relative to makedir (if provided), or
 relative to working_dir. Defaults to Makefile.</p></td>
 <td><p>[‘make’]</p></td>
+</tr>
+<tr class="row-odd"><td><p>only_output_final_step</p></td>
+<td><p>boolean</p></td>
+<td><p>If True, only the final timestep is output. Defaults to False.</p></td>
+<td><p>[‘sbml’]</p></td>
+</tr>
+<tr class="row-even"><td><p>reset</p></td>
+<td><p>boolean</p></td>
+<td><p>If True, the simulation will be reset to it’s initial values before each call
+(including the start time). Defaults to False.</p></td>
+<td><p>[‘sbml’]</p></td>
+</tr>
+<tr class="row-odd"><td><p>selections</p></td>
+<td><p>array</p></td>
+<td><p>Variables to include in the output. Defaults to None and the time/floating
+selections will be returned.</p></td>
+<td><p>[‘sbml’]</p></td>
 </tr>
 <tr class="row-even"><td><p>skip_interpreter</p></td>
 <td><p>boolean</p></td>
 <td><p>If True, no interpreter will be added to the arguments. This should only be used
 for subclasses that will not be invoking the model via the command line.
 Defaults to False.</p></td>
-<td><p>[‘r’, ‘R’, ‘matlab’, ‘lpy’, ‘python’]</p></td>
+<td><p>[‘R’, ‘lpy’, ‘r’, ‘sbml’, ‘timesync’, ‘matlab’, ‘python’]</p></td>
 </tr>
-<tr class="row-odd"><td><p>source_files</p></td>
+<tr class="row-odd"><td><p>skip_start_time</p></td>
+<td><p>boolean</p></td>
+<td><p>If True, the results for the initial time step will not be output. Defaults to
+False. This option is ignored if only_output_final_step is True.</p></td>
+<td><p>[‘sbml’]</p></td>
+</tr>
+<tr class="row-even"><td><p>source_files</p></td>
 <td><p>array</p></td>
 <td><p>Source files that should be compiled into an executable. Defaults to an empty
 list and the driver will search for a source file based on the model executable
 (the first model argument).</p></td>
-<td><p>[‘make’, ‘cpp’, ‘c’, ‘cmake’, ‘c++’]</p></td>
+<td><p>[‘cpp’, ‘c++’, ‘c’, ‘make’, ‘fortran’, ‘cmake’]</p></td>
 </tr>
-<tr class="row-even"><td><p>sourcedir</p></td>
+<tr class="row-odd"><td><p>sourcedir</p></td>
 <td><p>string</p></td>
 <td><p>Source directory to call cmake on. If not provided it is set to working_dir.
 This should be the directory containing the CMakeLists.txt file. It can be
 relative to working_dir or absolute.</p></td>
 <td><p>[‘cmake’]</p></td>
 </tr>
-<tr class="row-odd"><td><p>target</p></td>
+<tr class="row-even"><td><p>standard</p></td>
+<td><p>string</p></td>
+<td><p>Fortran standard that should be used. Defaults to ‘f2003’.</p></td>
+<td><p>[‘fortran’]</p></td>
+</tr>
+<tr class="row-odd"><td><p>start_time</p></td>
+<td><p>number</p></td>
+<td><p>Time that simulation should be started from. If ‘reset’ is True, the start time
+will always be the provided value, otherwise, the start time will be the end of
+the previous call after the first call. Defaults to 0.0.</p></td>
+<td><p>[‘sbml’]</p></td>
+</tr>
+<tr class="row-even"><td><p>steps</p></td>
+<td><p>integer</p></td>
+<td><p>Number of steps that should be output. Defaults to None.</p></td>
+<td><p>[‘sbml’]</p></td>
+</tr>
+<tr class="row-odd"><td><p>synonyms</p></td>
+<td><p>object</p></td>
+<td><p>Mapping from model names to mappings from base variables names to information
+about one or more alternate variable names used by the named model that should
+be converted to the base variable. Values for providing information about
+alternate variables can either be strings (implies equivalence with the base
+variable in everything but name and units) or mappings with the keys:</p></td>
+<td><p>[‘timesync’]</p></td>
+</tr>
+<tr class="row-even"><td><p>target</p></td>
 <td><p>string</p></td>
 <td><p>Make target that should be built to create the model executable. Defaults to
 None.</p></td>
+<td><p>[‘make’, ‘cmake’]</p></td>
+</tr>
+<tr class="row-odd"><td><p>target_compiler</p></td>
+<td><p>string</p></td>
+<td><p>Compilation tool that should be used for the target language. Defaults to None
+and will be set based on the selected language driver.</p></td>
 <td><p>[‘make’, ‘cmake’]</p></td>
 </tr>
 <tr class="row-even"><td><p>target_language</p></td>
@@ -1003,23 +1120,29 @@ separated by some delimiter.</p></td>
 <td><p>The file is a Matlab .mat file containing one or more serialized Matlab
 variables.</p></td>
 </tr>
-<tr class="row-odd"><td><p>obj</p></td>
+<tr class="row-odd"><td><p>netcdf</p></td>
+<td><p>The file is read/written as netCDF.</p></td>
+</tr>
+<tr class="row-even"><td><p>obj</p></td>
 <td><p>The file is in the <a class="reference external" href="http://paulbourke.net/dataformats/obj/">Obj</a> data format
 for 3D structures.</p></td>
 </tr>
-<tr class="row-even"><td><p>pandas</p></td>
+<tr class="row-odd"><td><p>pandas</p></td>
 <td><p>The file is a Pandas frame output as a table.</p></td>
 </tr>
-<tr class="row-odd"><td><p>pickle</p></td>
+<tr class="row-even"><td><p>pickle</p></td>
 <td><p>The file contains one or more pickled Python objects.</p></td>
 </tr>
-<tr class="row-even"><td><p>ply</p></td>
+<tr class="row-odd"><td><p>ply</p></td>
 <td><p>The file is in the <a class="reference external" href="http://paulbourke.net/dataformats/ply/">Ply</a> data format
 for 3D structures.</p></td>
 </tr>
-<tr class="row-odd"><td><p>table</p></td>
+<tr class="row-even"><td><p>table</p></td>
 <td><p>The file is an ASCII table that will be read/written one row at a time. If
 <code class="docutils literal notranslate"><span class="pre">as_array</span></code> is <code class="docutils literal notranslate"><span class="pre">True</span></code>, the table will be read/written all at once.</p></td>
+</tr>
+<tr class="row-odd"><td><p>wofost</p></td>
+<td><p>The file is a WOFOST parameter file.</p></td>
 </tr>
 <tr class="row-even"><td><p>yaml</p></td>
 <td><p>The file contains a YAML serialized object.</p></td>
@@ -1031,10 +1154,10 @@ for 3D structures.</p></td>
 <h3>File Type Specific Options<a class="headerlink" href="#file-type-specific-options" title="Permalink to this headline">¶</a></h3>
 <table class="docutils align-default" id="schema-table-file-specific-rst">
 <colgroup>
-<col style="width: 9%" />
-<col style="width: 9%" />
-<col style="width: 41%" />
-<col style="width: 42%" />
+<col style="width: 8%" />
+<col style="width: 8%" />
+<col style="width: 37%" />
+<col style="width: 47%" />
 </colgroup>
 <thead>
 <tr class="row-odd"><th class="head"><p>Option</p></th>
@@ -1047,13 +1170,13 @@ for 3D structures.</p></td>
 <tr class="row-even"><td><p>comment</p></td>
 <td><p>string</p></td>
 <td><p>One or more characters indicating a comment. Defaults to ‘# ‘.</p></td>
-<td><p>[‘ascii’, ‘obj’, ‘mat’, ‘ply’, ‘map’, ‘yaml’, ‘json’, ‘pickle’, ‘table’, ‘pandas’]</p></td>
+<td><p>[‘mat’, ‘pickle’, ‘netcdf’, ‘ascii’, ‘map’, ‘ply’, ‘obj’, ‘table’, ‘yaml’, ‘pandas’, ‘wofost’, ‘json’]</p></td>
 </tr>
 <tr class="row-odd"><td><p>datatype</p></td>
 <td><p>schema</p></td>
 <td><p>JSON schema defining the type of object that the serializer will be used to
 serialize/deserialize. Defaults to default_datatype.</p></td>
-<td><p>[‘ascii’, ‘obj’, ‘mat’, ‘ply’, ‘map’, ‘yaml’, ‘json’, ‘pickle’, ‘table’, ‘pandas’]</p></td>
+<td><p>[‘mat’, ‘pickle’, ‘netcdf’, ‘ascii’, ‘map’, ‘ply’, ‘obj’, ‘table’, ‘yaml’, ‘pandas’, ‘wofost’, ‘json’]</p></td>
 </tr>
 <tr class="row-even"><td><p>default_flow_style</p></td>
 <td><p>boolean</p></td>
@@ -1065,7 +1188,7 @@ they will always be serialized in the flow style. See <a class="reference extern
 <td><p>string</p></td>
 <td><p>Delimiter that should be used to separate name/value pairs in the map. Defaults
 to t.</p></td>
-<td><p>[‘map’, ‘table’, ‘pandas’]</p></td>
+<td><p>[‘table’, ‘wofost’, ‘pandas’, ‘map’]</p></td>
 </tr>
 <tr class="row-even"><td><p>encoding</p></td>
 <td><p>string</p></td>
@@ -1076,12 +1199,12 @@ to t.</p></td>
 <td><p>[‘string’, ‘int’]</p></td>
 <td><p>String or number of spaces that should be used to indent each level within the
 seiralized structure. Defaults to ‘t’.</p></td>
-<td><p>[‘json’, ‘yaml’]</p></td>
+<td><p>[‘yaml’, ‘json’]</p></td>
 </tr>
 <tr class="row-even"><td><p>newline</p></td>
 <td><p>string</p></td>
 <td><p>One or more characters indicating a newline. Defaults to ‘n’.</p></td>
-<td><p>[‘ascii’, ‘obj’, ‘mat’, ‘ply’, ‘map’, ‘yaml’, ‘json’, ‘pickle’, ‘table’, ‘pandas’]</p></td>
+<td><p>[‘mat’, ‘pickle’, ‘netcdf’, ‘ascii’, ‘map’, ‘ply’, ‘obj’, ‘table’, ‘yaml’, ‘pandas’, ‘wofost’, ‘json’]</p></td>
 </tr>
 <tr class="row-odd"><td><p>no_header</p></td>
 <td><p>boolean</p></td>
@@ -1089,35 +1212,51 @@ seiralized structure. Defaults to ‘t’.</p></td>
 False.</p></td>
 <td><p>[‘pandas’]</p></td>
 </tr>
-<tr class="row-even"><td><p>read_meth</p></td>
+<tr class="row-even"><td><p>read_attributes</p></td>
+<td><p>boolean</p></td>
+<td><p>If True, the attributes are read in as well as the variables. Defaults to False.</p></td>
+<td><p>[‘netcdf’]</p></td>
+</tr>
+<tr class="row-odd"><td><p>read_meth</p></td>
 <td><p>string</p></td>
 <td><p>Method that should be used to read data from the file. Defaults to ‘read’.
 Ignored if direction is ‘send’.</p></td>
 <td><p>[‘binary’]</p></td>
 </tr>
-<tr class="row-odd"><td><p>serializer</p></td>
+<tr class="row-even"><td><p>serializer</p></td>
 <td></td>
 <td><p>Class with serialize and deserialize methods that should be used to process sent
 and received messages. Defaults to None and is constructed using provided
 ‘serializer_kwargs’.</p></td>
 <td><p>[‘binary’]</p></td>
 </tr>
-<tr class="row-even"><td><p>sort_keys</p></td>
+<tr class="row-odd"><td><p>sort_keys</p></td>
 <td><p>boolean</p></td>
 <td><p>If True, the serialization of dictionaries will be in key sorted order. Defaults
 to True.</p></td>
 <td><p>[‘json’]</p></td>
 </tr>
-<tr class="row-odd"><td><p>str_as_bytes</p></td>
+<tr class="row-even"><td><p>str_as_bytes</p></td>
 <td><p>boolean</p></td>
 <td><p>If True, strings in columns are read as bytes. Defaults to False.</p></td>
 <td><p>[‘pandas’]</p></td>
 </tr>
-<tr class="row-even"><td><p>use_astropy</p></td>
+<tr class="row-odd"><td><p>use_astropy</p></td>
 <td><p>boolean</p></td>
 <td><p>If True, the astropy package will be used to serialize/deserialize table.
 Defaults to False.</p></td>
 <td><p>[‘table’, ‘pandas’]</p></td>
+</tr>
+<tr class="row-even"><td><p>variables</p></td>
+<td><p>array</p></td>
+<td><p>List of variables to read in. If not provided, all variables will be read.</p></td>
+<td><p>[‘netcdf’]</p></td>
+</tr>
+<tr class="row-odd"><td><p>version</p></td>
+<td><p>integer</p></td>
+<td><p>Version of netCDF format that should be used. Defaults to 1. Options are 1
+(classic format) and 2 (64-bit offset format).</p></td>
+<td><p>[‘netcdf’]</p></td>
 </tr>
 </tbody>
 </table>
@@ -1145,14 +1284,16 @@ Defaults to False.</p></td>
 <tr class="row-even"><td><p>inputs</p></td>
 <td><p>array</p></td>
 <td><p>X</p></td>
-<td><p>One or more name(s) of model output(s) and/or new comm/file objects that the
-connection should receive messages from.</p></td>
+<td><p>One or more name(s) of model output channel(s) and/or new channel/file objects
+that the connection should receive messages from. A full description of file
+entries and the available options can be found <a class="reference internal" href="#yaml-file-options"><span class="std std-ref">here</span></a>.</p></td>
 </tr>
 <tr class="row-odd"><td><p>outputs</p></td>
 <td><p>array</p></td>
 <td><p>X</p></td>
-<td><p>One or more name(s) of model input(s) and/or new comm/file objects that the
-connection should send messages to.</p></td>
+<td><p>One or more name(s) of model input channel(s) and/or new channel/file objects
+that the connection should send messages to. A full description of file entries
+and the available options can be found <a class="reference internal" href="#yaml-file-options"><span class="std std-ref">here</span></a>.</p></td>
 </tr>
 <tr class="row-even"><td><p>args</p></td>
 <td><p>string</p></td>
@@ -1178,12 +1319,12 @@ with exits, but before the connection driver is shut down. Defaults to None.</p>
 <tr class="row-even"><td><p>translator</p></td>
 <td><p>array</p></td>
 <td></td>
-<td><p>Function or string specifying function that should be used to translate messages
-from the input communicator before passing them to the output communicator. If a
-string, the format should be “&lt;package.module&gt;:&lt;function&gt;” so that &lt;function&gt;
-can be imported from &lt;package&gt;. Defaults to None and messages are passed
-directly. This can also be a list of functions/strings that will be called on
-the messages in the order they are provided.</p></td>
+<td><p>Function or string specifying a function that should be used to translate
+messages from the input communicator(s) before passing them to the output
+communicator(s). If a string, the format should be “&lt;package.module&gt;:&lt;function&gt;”
+so that &lt;function&gt; can be imported from &lt;package&gt;. Defaults to None and messages
+are passed directly. This can also be a list of functions/strings that will be
+called on the messages in the order they are provided.</p></td>
 </tr>
 </tbody>
 </table>
@@ -1216,26 +1357,29 @@ the messages in the order they are provided.</p></td>
 <tr class="row-even"><td><p>input</p></td>
 <td><p>Connection between one or more comms/files and a model.</p></td>
 </tr>
-<tr class="row-odd"><td><p>output</p></td>
+<tr class="row-odd"><td><p>io</p></td>
+<td><p>Connection between two models.</p></td>
+</tr>
+<tr class="row-even"><td><p>output</p></td>
 <td><p>Connection between a model and one or more comms/files.</p></td>
 </tr>
-<tr class="row-even"><td><p>rmq_async_client</p></td>
+<tr class="row-odd"><td><p>rmq_async_client</p></td>
 <td><p>Connection between a model acting as a client and an asynchronous RabbitMQ
 server request comm.</p></td>
 </tr>
-<tr class="row-odd"><td><p>rmq_async_server</p></td>
+<tr class="row-even"><td><p>rmq_async_server</p></td>
 <td><p>Connection between an asynchronous RabbitMQ server request comm and a model
 acting as a server.</p></td>
 </tr>
-<tr class="row-even"><td><p>rmq_client</p></td>
+<tr class="row-odd"><td><p>rmq_client</p></td>
 <td><p>Connection between a model acting as a client and a RabbitMQ server request
 comm.</p></td>
 </tr>
-<tr class="row-odd"><td><p>rmq_server</p></td>
+<tr class="row-even"><td><p>rmq_server</p></td>
 <td><p>Connection between a RabbitMQ server request comm and a model acting as a
 server.</p></td>
 </tr>
-<tr class="row-even"><td><p>server</p></td>
+<tr class="row-odd"><td><p>server</p></td>
 <td><p>Connection between a server request comm and a model acting as a server.</p></td>
 </tr>
 </tbody>
@@ -1340,7 +1484,7 @@ arguments can be found <a class="reference internal" href="advanced/io_drivers.h
         <a href="config.html" class="btn btn-neutral float-right" title="Configuration Files" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
-        <a href="transformed_io.html" class="btn btn-neutral float-left" title="Transformed I/O" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+        <a href="timesync_io.html" class="btn btn-neutral float-left" title="Timestep Synchronization" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
       
     </div>
   

@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>yggdrasil.interface package &mdash; yggdrasil 1.0.0+154.g684a530e.dirty documentation</title>
+  <title>yggdrasil.interface package &mdash; yggdrasil 1.1.1+410.g95af39b2 documentation</title>
   
 
   
@@ -59,7 +59,7 @@
             
             
               <div class="version">
-                1.0.0
+                1.1.1
               </div>
             
           
@@ -94,6 +94,7 @@
 <li class="toctree-l1"><a class="reference internal" href="autowrap.html#notes-on-autowrapping-c-c-model-functions">Notes on Autowrapping C/C++ Model Functions</a></li>
 <li class="toctree-l1"><a class="reference internal" href="conditional_io.html">Conditional I/O</a></li>
 <li class="toctree-l1"><a class="reference internal" href="transformed_io.html">Transformed I/O</a></li>
+<li class="toctree-l1"><a class="reference internal" href="timesync_io.html">Timestep Synchronization</a></li>
 <li class="toctree-l1"><a class="reference internal" href="yaml.html">YAML Files</a></li>
 <li class="toctree-l1"><a class="reference internal" href="config.html">Configuration Files</a></li>
 <li class="toctree-l1"><a class="reference internal" href="units.html">Units</a></li>
@@ -183,9 +184,9 @@
 <div class="section" id="module-yggdrasil.interface">
 <span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-yggdrasil.interface" title="Permalink to this headline">¶</a></h2>
 <p>Routines for interfacing with framework from Python.</p>
-<dl class="function">
+<dl class="py function">
 <dt id="yggdrasil.interface.YggInput">
-<code class="sig-prename descclassname">yggdrasil.interface.</code><code class="sig-name descname">YggInput</code><span class="sig-paren">(</span><em class="sig-param">name</em>, <em class="sig-param">format_str=None</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/languages/Python/YggInterface.html#YggInput"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.interface.YggInput" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">yggdrasil.interface.</code><code class="sig-name descname">YggInput</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">name</span></em>, <em class="sig-param"><span class="n">format_str</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/languages/Python/YggInterface.html#YggInput"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.interface.YggInput" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get class for handling input from a message queue.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -208,9 +209,9 @@ objects. Defaults to None and raw string messages are returned.</p></li>
 </dl>
 </dd></dl>
 
-<dl class="function">
+<dl class="py function">
 <dt id="yggdrasil.interface.YggOutput">
-<code class="sig-prename descclassname">yggdrasil.interface.</code><code class="sig-name descname">YggOutput</code><span class="sig-paren">(</span><em class="sig-param">name</em>, <em class="sig-param">format_str=None</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/languages/Python/YggInterface.html#YggOutput"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.interface.YggOutput" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">yggdrasil.interface.</code><code class="sig-name descname">YggOutput</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">name</span></em>, <em class="sig-param"><span class="n">format_str</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/languages/Python/YggInterface.html#YggOutput"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.interface.YggOutput" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get class for handling output to a message queue.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>

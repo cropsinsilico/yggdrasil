@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>yggdrasil.serialize.SerializeBase &mdash; yggdrasil 1.0.0+154.g684a530e.dirty documentation</title>
+  <title>yggdrasil.serialize.SerializeBase &mdash; yggdrasil 1.1.1+410.g95af39b2 documentation</title>
   
 
   
@@ -59,7 +59,7 @@
             
             
               <div class="version">
-                1.0.0
+                1.1.1
               </div>
             
           
@@ -94,6 +94,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../autowrap.html#notes-on-autowrapping-c-c-model-functions">Notes on Autowrapping C/C++ Model Functions</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../conditional_io.html">Conditional I/O</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../transformed_io.html">Transformed I/O</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../timesync_io.html">Timestep Synchronization</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../yaml.html">YAML Files</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../config.html">Configuration Files</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../units.html">Units</a></li>
@@ -173,7 +174,6 @@
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="kn">import</span> <span class="nn">warnings</span>
 <span class="kn">from</span> <span class="nn">yggdrasil</span> <span class="k">import</span> <span class="n">tools</span><span class="p">,</span> <span class="n">units</span><span class="p">,</span> <span class="n">serialize</span>
-<span class="kn">from</span> <span class="nn">yggdrasil.metaschema</span> <span class="k">import</span> <span class="n">get_metaschema</span>
 <span class="kn">from</span> <span class="nn">yggdrasil.metaschema.datatypes</span> <span class="k">import</span> <span class="p">(</span>
     <span class="n">guess_type_from_obj</span><span class="p">,</span> <span class="n">get_type_from_def</span><span class="p">,</span> <span class="n">get_type_class</span><span class="p">,</span> <span class="n">compare_schema</span><span class="p">,</span>
     <span class="n">type2numpy</span><span class="p">)</span>
@@ -608,8 +608,7 @@
             <span class="k">return</span>
         <span class="bp">cls</span> <span class="o">=</span> <span class="n">guess_type_from_obj</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
         <span class="n">typedef</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">encode_type</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
-        <span class="n">typedef</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">extract_typedef</span><span class="p">(</span><span class="n">typedef</span><span class="p">)</span>
-        <span class="n">metadata</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">typedef</span><span class="p">)</span>
+        <span class="n">metadata</span><span class="p">[</span><span class="s1">&#39;datatype&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">extract_typedef</span><span class="p">(</span><span class="n">typedef</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">initialize_serializer</span><span class="p">(</span><span class="n">metadata</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="SerializeBase.initialize_serializer"><a class="viewcode-back" href="../../../yggdrasil.serialize.html#yggdrasil.serialize.SerializeBase.SerializeBase.initialize_serializer">[docs]</a>    <span class="k">def</span> <span class="nf">initialize_serializer</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">metadata</span><span class="p">,</span> <span class="n">extract</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
@@ -651,7 +650,6 @@
         <span class="n">old_datatype</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">initialized</span><span class="p">:</span>
             <span class="n">old_datatype</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">datatype</span><span class="p">)</span>
-        <span class="n">_metaschema</span> <span class="o">=</span> <span class="n">get_metaschema</span><span class="p">()</span>
         <span class="c1"># Raise an error if the types are not compatible</span>
         <span class="n">seritype</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;seritype&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">seritype</span><span class="p">)</span>
         <span class="k">if</span> <span class="p">(</span><span class="n">seritype</span> <span class="o">!=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_seritype</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">seritype</span> <span class="o">!=</span> <span class="s1">&#39;default&#39;</span><span class="p">):</span>  <span class="c1"># pragma: debug</span>
@@ -663,7 +661,7 @@
                        <span class="s1">&#39;commtype&#39;</span><span class="p">,</span> <span class="s1">&#39;filetype&#39;</span><span class="p">,</span> <span class="s1">&#39;response_address&#39;</span><span class="p">,</span> <span class="s1">&#39;request_id&#39;</span><span class="p">,</span>
                        <span class="s1">&#39;append&#39;</span><span class="p">,</span> <span class="s1">&#39;in_temp&#39;</span><span class="p">,</span> <span class="s1">&#39;is_series&#39;</span><span class="p">,</span> <span class="s1">&#39;working_dir&#39;</span><span class="p">,</span> <span class="s1">&#39;fmts&#39;</span><span class="p">,</span>
                        <span class="s1">&#39;model_driver&#39;</span><span class="p">,</span> <span class="s1">&#39;env&#39;</span><span class="p">,</span> <span class="s1">&#39;send_converter&#39;</span><span class="p">,</span> <span class="s1">&#39;recv_converter&#39;</span><span class="p">,</span>
-                       <span class="s1">&#39;typedef_base&#39;</span><span class="p">]</span>
+                       <span class="s1">&#39;typedef_base&#39;</span><span class="p">,</span> <span class="s1">&#39;client_model&#39;</span><span class="p">,</span> <span class="s1">&#39;closed_clients&#39;</span><span class="p">]</span>
         <span class="n">kws</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">kwargs</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
         <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">kws</span><span class="p">:</span>
             <span class="k">if</span> <span class="p">(</span><span class="n">k</span> <span class="ow">in</span> <span class="n">_remove_kws</span><span class="p">)</span> <span class="ow">or</span> <span class="n">k</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;zmq&#39;</span><span class="p">):</span>
@@ -674,9 +672,6 @@
                 <span class="nb">setattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">k</span><span class="p">,</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="n">k</span><span class="p">))</span>
         <span class="c1"># Create preliminary typedef</span>
         <span class="n">typedef</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;datatype&#39;</span><span class="p">,</span> <span class="p">{})</span>
-        <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">_metaschema</span><span class="p">[</span><span class="s1">&#39;properties&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
-            <span class="k">if</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="p">:</span>
-                <span class="n">typedef</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="n">k</span><span class="p">)</span>
         <span class="c1"># Update extra keywords</span>
         <span class="k">if</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">):</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">extra_kwargs</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">kwargs</span><span class="p">)</span>
@@ -834,7 +829,7 @@
         <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;func_deserialize not implemented.&quot;</span><span class="p">)</span></div>
     
 <div class="viewcode-block" id="SerializeBase.serialize"><a class="viewcode-back" href="../../../yggdrasil.serialize.html#yggdrasil.serialize.SerializeBase.SerializeBase.serialize">[docs]</a>    <span class="k">def</span> <span class="nf">serialize</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">args</span><span class="p">,</span> <span class="n">header_kwargs</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">add_serializer_info</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
-                  <span class="n">no_metadata</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+                  <span class="n">no_metadata</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">max_header_size</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Serialize a message.</span>
 
 <span class="sd">        Args:</span>
@@ -845,6 +840,10 @@
 <span class="sd">                will be added to the metadata. Defaults to False.</span>
 <span class="sd">            no_metadata (bool, optional): If True, no metadata will be added to</span>
 <span class="sd">                the serialized message. Defaults to False.</span>
+<span class="sd">            max_header_size (int, optional): Maximum size that header</span>
+<span class="sd">                should occupy in order to be sent in a single message.</span>
+<span class="sd">                A value of 0 indicates that any size header is valid.</span>
+<span class="sd">                Defaults to 0.</span>
 
 <span class="sd">        Returns:</span>
 <span class="sd">            bytes, str: Serialized message.</span>
@@ -859,7 +858,8 @@
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">args</span><span class="p">,</span> <span class="nb">bytes</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">args</span> <span class="o">==</span> <span class="n">tools</span><span class="o">.</span><span class="n">YGG_MSG_EOF</span><span class="p">):</span>
             <span class="n">header_kwargs</span><span class="p">[</span><span class="s1">&#39;raw&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">initialize_from_message</span><span class="p">(</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">header_kwargs</span><span class="p">)</span>
-        <span class="n">metadata</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;no_metadata&#39;</span><span class="p">:</span> <span class="n">no_metadata</span><span class="p">}</span>
+        <span class="n">metadata</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;no_metadata&#39;</span><span class="p">:</span> <span class="n">no_metadata</span><span class="p">,</span>
+                    <span class="s1">&#39;max_header_size&#39;</span><span class="p">:</span> <span class="n">max_header_size</span><span class="p">}</span>
         <span class="k">if</span> <span class="n">add_serializer_info</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;serializer_info = </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">serializer_info</span><span class="p">))</span>
             <span class="n">metadata</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">serializer_info</span><span class="p">)</span>
@@ -880,8 +880,9 @@
                                         <span class="o">%</span> <span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">data</span><span class="p">),</span> <span class="nb">bytes</span><span class="p">))</span>
                     <span class="n">metadata</span><span class="p">[</span><span class="s1">&#39;dont_encode&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
                     <span class="k">if</span> <span class="ow">not</span> <span class="n">no_metadata</span><span class="p">:</span>
-                        <span class="n">metadata</span><span class="p">[</span><span class="s1">&#39;metadata&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">datatype</span><span class="o">.</span><span class="n">encode_type</span><span class="p">(</span>
-                            <span class="n">args</span><span class="p">,</span> <span class="n">typedef</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">typedef</span><span class="p">)</span>
+                        <span class="n">metadata</span><span class="p">[</span><span class="s1">&#39;metadata&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
+                            <span class="s1">&#39;datatype&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">datatype</span><span class="o">.</span><span class="n">encode_type</span><span class="p">(</span>
+                                <span class="n">args</span><span class="p">,</span> <span class="n">typedef</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">typedef</span><span class="p">)}</span>
         <span class="k">if</span> <span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">initialized</span>
              <span class="ow">and</span> <span class="p">(</span><span class="ow">not</span> <span class="n">tools</span><span class="o">.</span><span class="n">check_environ_bool</span><span class="p">(</span><span class="s1">&#39;YGG_VALIDATE_ALL_MESSAGES&#39;</span><span class="p">)))):</span>
             <span class="n">metadata</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s1">&#39;dont_check&#39;</span><span class="p">,</span> <span class="kc">True</span><span class="p">)</span>
@@ -917,19 +918,20 @@
                       <span class="ow">or</span> <span class="n">metadata</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;raw&#39;</span><span class="p">,</span> <span class="kc">False</span><span class="p">)):</span>
                 <span class="k">if</span> <span class="s1">&#39;metadata&#39;</span> <span class="ow">in</span> <span class="n">metadata</span><span class="p">:</span>
                     <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">metadata</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
-                        <span class="k">if</span> <span class="n">k</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;type&#39;</span><span class="p">,</span> <span class="s1">&#39;precision&#39;</span><span class="p">,</span> <span class="s1">&#39;units&#39;</span><span class="p">,</span> <span class="s1">&#39;metadata&#39;</span><span class="p">]:</span>
+                        <span class="k">if</span> <span class="n">k</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;datatype&#39;</span><span class="p">,</span> <span class="s1">&#39;metadata&#39;</span><span class="p">]:</span>
                             <span class="n">metadata</span><span class="p">[</span><span class="s1">&#39;metadata&#39;</span><span class="p">][</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">v</span>
                     <span class="n">metadata</span> <span class="o">=</span> <span class="n">metadata</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;metadata&#39;</span><span class="p">)</span>
                 <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">initialized</span><span class="p">:</span>
                     <span class="bp">self</span><span class="o">.</span><span class="n">update_serializer</span><span class="p">(</span><span class="n">extract</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="o">**</span><span class="n">metadata</span><span class="p">)</span>
                 <span class="n">out</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">func_deserialize</span><span class="p">(</span><span class="n">out</span><span class="p">)</span>
         <span class="c1"># Update serializer</span>
-        <span class="n">typedef_base</span> <span class="o">=</span> <span class="n">metadata</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;typedef_base&#39;</span><span class="p">,</span> <span class="p">{})</span>
-        <span class="n">typedef</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">metadata</span><span class="p">)</span>
-        <span class="n">typedef</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">typedef_base</span><span class="p">)</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="p">((</span><span class="n">metadata</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;size&#39;</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span>
                 <span class="ow">or</span> <span class="n">metadata</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;incomplete&#39;</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>
                 <span class="ow">or</span> <span class="n">metadata</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;raw&#39;</span><span class="p">,</span> <span class="kc">False</span><span class="p">)):</span>
+            <span class="n">typedef_base</span> <span class="o">=</span> <span class="n">metadata</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;typedef_base&#39;</span><span class="p">,</span> <span class="p">{})</span>
+            <span class="n">typedef</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">metadata</span><span class="p">)</span>
+            <span class="n">typedef</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s1">&#39;datatype&#39;</span><span class="p">,</span> <span class="p">{})</span>
+            <span class="n">typedef</span><span class="p">[</span><span class="s1">&#39;datatype&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">typedef_base</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">initialize_serializer</span><span class="p">(</span><span class="n">typedef</span><span class="p">,</span> <span class="n">extract</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">out</span><span class="p">,</span> <span class="n">metadata</span></div>
 

@@ -10,6 +10,7 @@ map        The file contains a key/value mapping with one key/value pair per lin
            separated by some delimiter.                                                    
 mat        The file is a Matlab .mat file containing one or more serialized Matlab         
            variables.                                                                      
+netcdf     The file is read/written as netCDF.                                             
 obj        The file is in the `Obj <http://paulbourke.net/dataformats/obj/>`_ data format  
            for 3D structures.                                                              
 pandas     The file is a Pandas frame output as a table.                                   
@@ -18,5 +19,6 @@ ply        The file is in the `Ply <http://paulbourke.net/dataformats/ply/>`_ da
            for 3D structures.                                                              
 table      The file is an ASCII table that will be read/written one row at a time. If      
            ``as_array`` is ``True``, the table will be read/written all at once.           
+wofost     The file is a WOFOST parameter file.                                            
 yaml       The file contains a YAML serialized object.                                     
 ========   ================================================================================

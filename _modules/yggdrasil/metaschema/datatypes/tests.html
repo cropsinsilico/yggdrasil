@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>yggdrasil.metaschema.datatypes.tests &mdash; yggdrasil 1.0.0+154.g684a530e.dirty documentation</title>
+  <title>yggdrasil.metaschema.datatypes.tests &mdash; yggdrasil 1.1.1+410.g95af39b2 documentation</title>
   
 
   
@@ -59,7 +59,7 @@
             
             
               <div class="version">
-                1.0.0
+                1.1.1
               </div>
             
           
@@ -94,6 +94,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../../autowrap.html#notes-on-autowrapping-c-c-model-functions">Notes on Autowrapping C/C++ Model Functions</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../conditional_io.html">Conditional I/O</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../transformed_io.html">Transformed I/O</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../timesync_io.html">Timestep Synchronization</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../yaml.html">YAML Files</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../config.html">Configuration Files</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../units.html">Units</a></li>
@@ -177,6 +178,13 @@
 <span class="kn">from</span> <span class="nn">yggdrasil.metaschema.tests</span> <span class="k">import</span> <span class="n">_valid_objects</span>
 <span class="kn">from</span> <span class="nn">yggdrasil.metaschema.datatypes.ScalarMetaschemaType</span> <span class="k">import</span> <span class="p">(</span>
     <span class="n">ScalarMetaschemaType</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="test_registry_operations"><a class="viewcode-back" href="../../../../yggdrasil.metaschema.datatypes.tests.html#yggdrasil.metaschema.datatypes.tests.test_registry_operations">[docs]</a><span class="k">def</span> <span class="nf">test_registry_operations</span><span class="p">():</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test access to registry dictionary operations.&quot;&quot;&quot;</span>
+    <span class="n">datatypes</span><span class="o">.</span><span class="n">_type_registry</span><span class="o">.</span><span class="n">items</span><span class="p">()</span>
+    <span class="n">datatypes</span><span class="o">.</span><span class="n">_type_registry</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span>
+    <span class="n">datatypes</span><span class="o">.</span><span class="n">_type_registry</span><span class="o">.</span><span class="n">values</span><span class="p">()</span></div>
 
 
 <div class="viewcode-block" id="test_get_type_class"><a class="viewcode-back" href="../../../../yggdrasil.metaschema.datatypes.tests.html#yggdrasil.metaschema.datatypes.tests.test_get_type_class">[docs]</a><span class="k">def</span> <span class="nf">test_get_type_class</span><span class="p">():</span>

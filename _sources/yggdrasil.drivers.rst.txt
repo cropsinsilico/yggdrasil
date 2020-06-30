@@ -5,6 +5,7 @@ Subpackages
 -----------
 
 .. toctree::
+   :maxdepth: 4
 
    yggdrasil.drivers.tests
 
@@ -83,6 +84,14 @@ yggdrasil.drivers.ConnectionDriver module
    :undoc-members:
    :show-inheritance:
 
+yggdrasil.drivers.DSLModelDriver module
+---------------------------------------
+
+.. automodule:: yggdrasil.drivers.DSLModelDriver
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 yggdrasil.drivers.Driver module
 -------------------------------
 
@@ -111,6 +120,14 @@ yggdrasil.drivers.FileOutputDriver module
 -----------------------------------------
 
 .. automodule:: yggdrasil.drivers.FileOutputDriver
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+yggdrasil.drivers.FortranModelDriver module
+-------------------------------------------
+
+.. automodule:: yggdrasil.drivers.FortranModelDriver
    :members:
    :undoc-members:
    :show-inheritance:
@@ -219,6 +236,14 @@ yggdrasil.drivers.RModelDriver module
    :undoc-members:
    :show-inheritance:
 
+yggdrasil.drivers.SBMLModelDriver module
+----------------------------------------
+
+.. automodule:: yggdrasil.drivers.SBMLModelDriver
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 yggdrasil.drivers.ServerDriver module
 -------------------------------------
 
@@ -239,6 +264,14 @@ yggdrasil.drivers.ServerResponseDriver module
 ---------------------------------------------
 
 .. automodule:: yggdrasil.drivers.ServerResponseDriver
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+yggdrasil.drivers.TimeSyncModelDriver module
+--------------------------------------------
+
+.. automodule:: yggdrasil.drivers.TimeSyncModelDriver
    :members:
    :undoc-members:
    :show-inheritance:

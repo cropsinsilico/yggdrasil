@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>yggdrasil.drivers.MatlabModelDriver &mdash; yggdrasil 1.0.0+154.g684a530e.dirty documentation</title>
+  <title>yggdrasil.drivers.MatlabModelDriver &mdash; yggdrasil 1.1.1+410.g95af39b2 documentation</title>
   
 
   
@@ -59,7 +59,7 @@
             
             
               <div class="version">
-                1.0.0
+                1.1.1
               </div>
             
           
@@ -94,6 +94,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../autowrap.html#notes-on-autowrapping-c-c-model-functions">Notes on Autowrapping C/C++ Model Functions</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../conditional_io.html">Conditional I/O</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../transformed_io.html">Transformed I/O</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../timesync_io.html">Timestep Synchronization</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../yaml.html">YAML Files</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../config.html">Configuration Files</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../units.html">Units</a></li>
@@ -684,6 +685,7 @@
             <span class="sa">r</span><span class="s1">&#39;\s*(?P&lt;name&gt;.+?)\s*(?:(?:,(?: *... *\n)?)|$)&#39;</span><span class="p">),</span>
         <span class="s1">&#39;outputs_def_regex&#39;</span><span class="p">:</span> <span class="p">(</span>
             <span class="sa">r</span><span class="s1">&#39;\s*(?P&lt;name&gt;.+?)\s*(?:,|$)&#39;</span><span class="p">)}</span>
+    <span class="n">zero_based</span> <span class="o">=</span> <span class="kc">False</span>
 
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">using_matlab_engine</span> <span class="o">=</span> <span class="n">_matlab_engine_installed</span>
@@ -734,7 +736,8 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">wrapper_products</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">model_wrapper</span><span class="p">)</span></div>
         
 <div class="viewcode-block" id="MatlabModelDriver.write_error_wrapper"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.MatlabModelDriver.MatlabModelDriver.write_error_wrapper">[docs]</a>    <span class="nd">@classmethod</span>
-    <span class="k">def</span> <span class="nf">write_error_wrapper</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">fname</span><span class="p">,</span> <span class="n">try_lines</span><span class="p">,</span> <span class="n">matlab_engine</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">write_error_wrapper</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">fname</span><span class="p">,</span> <span class="n">try_lines</span><span class="p">,</span> <span class="n">env</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                            <span class="n">matlab_engine</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Write a wrapper for the model that encloses it in a try except so</span>
 <span class="sd">        that the error can be propagated appropriately.</span>
 
@@ -742,14 +745,23 @@
 <span class="sd">            fname (str): File where the wrapper should be written.</span>
 <span class="sd">            try_lines (list): List of lines to go in the try block.</span>
 <span class="sd">            model_file (str): Path to model that should be wrapped.</span>
+<span class="sd">            env (dict, optional): Dictionary of environment variables</span>
+<span class="sd">                that should be set before calling the model. Defaults</span>
+<span class="sd">                to None and is ignored.</span>
 <span class="sd">            matlab_engine (MatlabEngine, optional): Matlab engine that will be</span>
-<span class="sd">               used to call the wrapper. If not provided, it is assumed the</span>
-<span class="sd">               error will be called using the Matlab interpreter on the command</span>
-<span class="sd">               line. Defautls to None.</span>
+<span class="sd">                used to call the wrapper. If not provided, it is assumed the</span>
+<span class="sd">                error will be called using the Matlab interpreter on the command</span>
+<span class="sd">                line. Defautls to None.</span>
 
 <span class="sd">        Raises:</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># Add environment variables explicitly</span>
+        <span class="n">lines</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">if</span> <span class="n">env</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">env</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;setenv(</span><span class="se">\&#39;</span><span class="si">%s</span><span class="se">\&#39;</span><span class="s1">, </span><span class="se">\&#39;</span><span class="si">%s</span><span class="se">\&#39;</span><span class="s1">)&#39;</span> <span class="o">%</span> <span class="p">(</span>
+                    <span class="n">k</span><span class="p">,</span> <span class="n">v</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="s2">&quot;unicode_escape&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s1">&#39;utf-8&#39;</span><span class="p">)))</span>
         <span class="c1"># Create lines based on use of engine or not</span>
         <span class="k">if</span> <span class="n">matlab_engine</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">catch_block</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;error(e.message);&quot;</span><span class="p">]</span>
@@ -759,7 +771,7 @@
             <span class="c1">#                &quot;disp(e.identifier);&quot;,</span>
             <span class="c1">#                &quot;disp(e.stack);&quot;,</span>
             <span class="c1">#                &quot;exit(0);&quot;]</span>
-        <span class="n">lines</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">write_try_except</span><span class="p">(</span><span class="n">try_lines</span><span class="p">,</span> <span class="n">catch_block</span><span class="p">)</span>
+        <span class="n">lines</span> <span class="o">+=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">write_try_except</span><span class="p">(</span><span class="n">try_lines</span><span class="p">,</span> <span class="n">catch_block</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">matlab_engine</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;exit(0);&quot;</span><span class="p">)</span>
         <span class="c1"># Write lines</span>
@@ -787,7 +799,7 @@
         <span class="n">kwargs</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s1">&#39;process_kwargs&#39;</span><span class="p">,</span> <span class="p">{})</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;process_kwargs&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;dont_wrap_error&#39;</span><span class="p">,</span> <span class="kc">False</span><span class="p">):</span>
             <span class="n">lines</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">write_error_wrapper</span><span class="p">(</span>
-                <span class="kc">None</span><span class="p">,</span> <span class="n">lines</span><span class="p">,</span>
+                <span class="kc">None</span><span class="p">,</span> <span class="n">lines</span><span class="p">,</span> <span class="n">env</span><span class="o">=</span><span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;env&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">),</span>
                 <span class="n">matlab_engine</span><span class="o">=</span><span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;matlab_engine&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">))</span>
             <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;process_kwargs&#39;</span><span class="p">][</span><span class="s1">&#39;dont_wrap_error&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
         <span class="k">return</span> <span class="nb">super</span><span class="p">(</span><span class="n">MatlabModelDriver</span><span class="p">,</span> <span class="bp">cls</span><span class="p">)</span><span class="o">.</span><span class="n">run_code</span><span class="p">(</span><span class="n">lines</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
@@ -849,6 +861,7 @@
                 <span class="k">if</span> <span class="n">working_dir</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
                     <span class="n">fname_wrapper</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">working_dir</span><span class="p">,</span> <span class="n">fname_wrapper</span><span class="p">)</span>
             <span class="bp">cls</span><span class="o">.</span><span class="n">write_error_wrapper</span><span class="p">(</span><span class="n">fname_wrapper</span><span class="p">,</span> <span class="n">try_block</span><span class="p">,</span>
+                                    <span class="n">env</span><span class="o">=</span><span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;env&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">),</span>
                                     <span class="n">matlab_engine</span><span class="o">=</span><span class="n">matlab_engine</span><span class="p">)</span>
             <span class="k">assert</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">fname_wrapper</span><span class="p">))</span>
             <span class="n">args</span> <span class="o">=</span> <span class="p">[</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">splitext</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">basename</span><span class="p">(</span><span class="n">fname_wrapper</span><span class="p">))[</span><span class="mi">0</span><span class="p">]]</span>

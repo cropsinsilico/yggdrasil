@@ -1,0 +1,491 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>yggdrasil.communication.NetCDFFileComm &mdash; yggdrasil 1.1.1+410.g95af39b2 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="../../../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/underscore.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+        <script src="../../../_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="../../../_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/theme_overrides.css" type="text/css" />
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../../index.html" class="icon icon-home"> yggdrasil
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                1.1.1
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../includeme.html">Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../install.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../getting_started.html">Getting started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../formatted_io.html">Formatted I/O</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../server_client_io.html">Server/Client I/O</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../autowrap.html">Autowrapping Model Functions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../autowrap.html#notes-on-autowrapping-c-c-model-functions">Notes on Autowrapping C/C++ Model Functions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../conditional_io.html">Conditional I/O</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../transformed_io.html">Transformed I/O</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../timesync_io.html">Timestep Synchronization</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../yaml.html">YAML Files</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../config.html">Configuration Files</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../units.html">Units</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../c_format_strings.html">C-Style Format Strings</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../debugging.html">Debugging</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../examples/examples_toc.html">Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../advanced/index.html">Advanced</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../development/index.html">Development</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../publications.html">Publications</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../hackathon2018/index.html">Welcome to the 2018 Crops in Silico Hackathon!</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../hackathon2019/index.html">Welcome to the 2019 Crops in Silico Hackathon!</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">yggdrasil</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../../index.html">Module code</a> &raquo;</li>
+        
+          <li><a href="../communication.html">yggdrasil.communication</a> &raquo;</li>
+        
+      <li>yggdrasil.communication.NetCDFFileComm</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for yggdrasil.communication.NetCDFFileComm</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">sys</span>
+<span class="kn">import</span> <span class="nn">copy</span>
+<span class="kn">import</span> <span class="nn">pprint</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">from</span> <span class="nn">scipy.io</span> <span class="k">import</span> <span class="n">netcdf</span>
+<span class="kn">from</span> <span class="nn">yggdrasil</span> <span class="k">import</span> <span class="n">units</span>
+<span class="kn">from</span> <span class="nn">yggdrasil.communication.FileComm</span> <span class="k">import</span> <span class="n">FileComm</span>
+
+
+<div class="viewcode-block" id="NetCDFFileComm"><a class="viewcode-back" href="../../../yggdrasil.communication.html#yggdrasil.communication.NetCDFFileComm.NetCDFFileComm">[docs]</a><span class="k">class</span> <span class="nc">NetCDFFileComm</span><span class="p">(</span><span class="n">FileComm</span><span class="p">):</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Class for handling I/O from/to an netCDF file.</span>
+
+
+<span class="sd">    Args:</span>
+<span class="sd">        read_attributes (bool, optional): If True, the attributes are read</span>
+<span class="sd">            in as well as the variables. Defaults to False.</span>
+<span class="sd">        variables (list, optional): List of variables to read in. If</span>
+<span class="sd">            not provided, all variables will be read.</span>
+<span class="sd">        version (int, optional): Version of netCDF format that should be</span>
+<span class="sd">            used. Defaults to 1. Options are 1 (classic format) and</span>
+<span class="sd">            2 (64-bit offset format).</span>
+<span class="sd">        **kwargs: Additional keywords arguments are passed to parent class.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">_filetype</span> <span class="o">=</span> <span class="s1">&#39;netcdf&#39;</span>
+    <span class="n">_schema_subtype_description</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;The file is read/written as netCDF.&#39;</span><span class="p">)</span>
+    <span class="n">_schema_properties</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s1">&#39;read_attributes&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;boolean&#39;</span><span class="p">,</span> <span class="s1">&#39;default&#39;</span><span class="p">:</span> <span class="kc">False</span><span class="p">},</span>
+        <span class="s1">&#39;variables&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;array&#39;</span><span class="p">,</span> <span class="s1">&#39;items&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;string&#39;</span><span class="p">}},</span>
+        <span class="s1">&#39;version&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;integer&#39;</span><span class="p">,</span> <span class="s1">&#39;enum&#39;</span><span class="p">:</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">],</span> <span class="s1">&#39;default&#39;</span><span class="p">:</span> <span class="mi">1</span><span class="p">}}</span>
+    <span class="n">_default_extension</span> <span class="o">=</span> <span class="s1">&#39;.nc&#39;</span>
+    <span class="n">_mode_as_bytes</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="n">_synchronous_read</span> <span class="o">=</span> <span class="kc">True</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_fd_netcdf</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;read_meth&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;read&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_last_size</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">return</span> <span class="nb">super</span><span class="p">(</span><span class="n">NetCDFFileComm</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+<div class="viewcode-block" id="NetCDFFileComm.get_testing_options"><a class="viewcode-back" href="../../../yggdrasil.communication.html#yggdrasil.communication.NetCDFFileComm.NetCDFFileComm.get_testing_options">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">get_testing_options</span><span class="p">(</span><span class="bp">cls</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Method to return a dictionary of testing options for this class.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            dict: Dictionary of variables to use for testing. Key/value pairs:</span>
+<span class="sd">                kwargs (dict): Keyword arguments for comms tested with the</span>
+<span class="sd">                    provided content.</span>
+<span class="sd">                send (list): List of objects to send to test file.</span>
+<span class="sd">                recv (list): List of objects that will be received from a test</span>
+<span class="sd">                    file that was sent the messages in &#39;send&#39;.</span>
+<span class="sd">                contents (bytes): Bytes contents of test file created by sending</span>
+<span class="sd">                    the messages in &#39;send&#39;.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s1">&#39;time&#39;</span><span class="p">:</span> <span class="n">units</span><span class="o">.</span><span class="n">add_units</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">10</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="s1">&#39;float32&#39;</span><span class="p">),</span> <span class="s1">&#39;s&#39;</span><span class="p">),</span>
+            <span class="s1">&#39;x&#39;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="s1">&#39;a&#39;</span><span class="p">,</span> <span class="s1">&#39;hello&#39;</span><span class="p">,</span> <span class="s1">&#39;c&#39;</span><span class="p">],</span> <span class="s1">&#39;S5&#39;</span><span class="p">)}</span>
+        <span class="n">data_add</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s1">&#39;space&#39;</span><span class="p">:</span> <span class="n">units</span><span class="o">.</span><span class="n">add_units</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">((</span><span class="mi">5</span><span class="p">,</span> <span class="mi">5</span><span class="p">),</span> <span class="s1">&#39;int64&#39;</span><span class="p">),</span> <span class="s1">&#39;mol&#39;</span><span class="p">)}</span>
+        <span class="n">out</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;kwargs&#39;</span><span class="p">:</span> <span class="p">{},</span>
+               <span class="s1">&#39;exact_contents&#39;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
+               <span class="s1">&#39;msg&#39;</span><span class="p">:</span> <span class="n">data</span><span class="p">,</span>
+               <span class="s1">&#39;dict&#39;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
+               <span class="s1">&#39;objects&#39;</span><span class="p">:</span> <span class="p">[</span><span class="n">data</span><span class="p">,</span> <span class="n">data_add</span><span class="p">],</span>
+               <span class="s1">&#39;send&#39;</span><span class="p">:</span> <span class="p">[</span><span class="n">data</span><span class="p">,</span> <span class="n">data_add</span><span class="p">],</span>
+               <span class="s1">&#39;recv&#39;</span><span class="p">:</span> <span class="p">[</span><span class="nb">dict</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="o">**</span><span class="n">data_add</span><span class="p">)],</span>
+               <span class="s1">&#39;recv_partial&#39;</span><span class="p">:</span> <span class="p">[[</span><span class="n">data</span><span class="p">],</span> <span class="p">[</span><span class="nb">dict</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="o">**</span><span class="n">data_add</span><span class="p">)]],</span>
+               <span class="s1">&#39;contents&#39;</span><span class="p">:</span> <span class="p">(</span>
+                   <span class="sa">b</span><span class="s1">&#39;CDF</span><span class="se">\x01\x00\x00\x00\x00\x00\x00\x00\n\x00\x00</span><span class="s1">&#39;</span>
+                   <span class="sa">b</span><span class="s1">&#39;</span><span class="se">\x00\x05\x00\x00\x00\x04</span><span class="s1">time</span><span class="se">\x00\x00\x00\n\x00</span><span class="s1">&#39;</span>
+                   <span class="sa">b</span><span class="s1">&#39;</span><span class="se">\x00\x00\x01</span><span class="s1">x</span><span class="se">\x00\x00\x00\x00\x00\x00\x05\x00</span><span class="s1">&#39;</span>
+                   <span class="sa">b</span><span class="s1">&#39;</span><span class="se">\x00\x00\x02</span><span class="s1">x1</span><span class="se">\x00\x00\x00\x00\x00\x03\x00\x00</span><span class="s1">&#39;</span>
+                   <span class="sa">b</span><span class="s1">&#39;</span><span class="se">\x00\x05</span><span class="s1">space</span><span class="se">\x00\x00\x00\x00\x00\x00\x05\x00</span><span class="s1">&#39;</span>
+                   <span class="sa">b</span><span class="s1">&#39;</span><span class="se">\x00\x00\x06</span><span class="s1">space1</span><span class="se">\x00\x00\x00\x00\x00\x05\x00</span><span class="s1">&#39;</span>
+                   <span class="sa">b</span><span class="s1">&#39;</span><span class="se">\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x0b\x00</span><span class="s1">&#39;</span>
+                   <span class="sa">b</span><span class="s1">&#39;</span><span class="se">\x00\x00\x03\x00\x00\x00\x04</span><span class="s1">time</span><span class="se">\x00\x00\x00\x01</span><span class="s1">&#39;</span>
+                   <span class="sa">b</span><span class="s1">&#39;</span><span class="se">\x00\x00\x00\x00\x00\x00\x00\x0c\x00\x00\x00\x01</span><span class="s1">&#39;</span>
+                   <span class="sa">b</span><span class="s1">&#39;</span><span class="se">\x00\x00\x00\x05</span><span class="s1">units</span><span class="se">\x00\x00\x00\x00\x00\x00</span><span class="s1">&#39;</span>
+                   <span class="sa">b</span><span class="s1">&#39;</span><span class="se">\x02\x00\x00\x00\x01</span><span class="s1">s</span><span class="se">\x00\x00\x00\x00\x00\x00</span><span class="s1">&#39;</span>
+                   <span class="sa">b</span><span class="s1">&#39;</span><span class="se">\x05\x00\x00\x00</span><span class="s1">(</span><span class="se">\x00\x00\x01\x0c\x00\x00\x00</span><span class="s1">&#39;</span>
+                   <span class="sa">b</span><span class="s1">&#39;</span><span class="se">\x05</span><span class="s1">space</span><span class="se">\x00\x00\x00\x00\x00\x00\x02\x00\x00</span><span class="s1">&#39;</span>
+                   <span class="sa">b</span><span class="s1">&#39;</span><span class="se">\x00\x03\x00\x00\x00\x04\x00\x00\x00\x0c\x00\x00</span><span class="s1">&#39;</span>
+                   <span class="sa">b</span><span class="s1">&#39;</span><span class="se">\x00\x01\x00\x00\x00\x05</span><span class="s1">units</span><span class="se">\x00\x00\x00\x00</span><span class="s1">&#39;</span>
+                   <span class="sa">b</span><span class="s1">&#39;</span><span class="se">\x00\x00\x02\x00\x00\x00\x03</span><span class="s1">mol</span><span class="se">\x00\x00\x00\x00</span><span class="s1">&#39;</span>
+                   <span class="sa">b</span><span class="s1">&#39;</span><span class="se">\x04\x00\x00\x00</span><span class="s1">d</span><span class="se">\x00\x00\x01</span><span class="s1">4</span><span class="se">\x00\x00\x00\x01</span><span class="s1">x&#39;</span>
+                   <span class="sa">b</span><span class="s1">&#39;</span><span class="se">\x00\x00\x00\x00\x00\x00\x02\x00\x00\x00\x01\x00</span><span class="s1">&#39;</span>
+                   <span class="sa">b</span><span class="s1">&#39;</span><span class="se">\x00\x00\x02\x00\x00\x00\x00\x00\x00\x00\x00\x00</span><span class="s1">&#39;</span>
+                   <span class="sa">b</span><span class="s1">&#39;</span><span class="se">\x00\x00\x02\x00\x00\x00\x10\x00\x00\x01\x98\x00</span><span class="s1">&#39;</span>
+                   <span class="sa">b</span><span class="s1">&#39;</span><span class="se">\x00\x00\x00</span><span class="s1">?</span><span class="se">\x80\x00\x00</span><span class="s1">@</span><span class="se">\x00\x00\x00</span><span class="s1">@@</span><span class="se">\x00\x00</span><span class="s1">&#39;</span>
+                   <span class="sa">b</span><span class="s1">&#39;@</span><span class="se">\x80\x00\x00</span><span class="s1">@</span><span class="se">\xa0\x00\x00</span><span class="s1">@</span><span class="se">\xc0\x00\x00</span><span class="s1">@</span><span class="se">\xe0\x00</span><span class="s1">&#39;</span>
+                   <span class="sa">b</span><span class="s1">&#39;</span><span class="se">\x00</span><span class="s1">A</span><span class="se">\x00\x00\x00</span><span class="s1">A</span><span class="se">\x10\x00\x00\x00\x00\x00\x01</span><span class="s1">&#39;</span>
+                   <span class="sa">b</span><span class="s1">&#39;</span><span class="se">\x00\x00\x00\x01\x00\x00\x00\x01\x00\x00\x00\x01</span><span class="s1">&#39;</span>
+                   <span class="sa">b</span><span class="s1">&#39;</span><span class="se">\x00\x00\x00\x01\x00\x00\x00\x01\x00\x00\x00\x01</span><span class="s1">&#39;</span>
+                   <span class="sa">b</span><span class="s1">&#39;</span><span class="se">\x00\x00\x00\x01\x00\x00\x00\x01\x00\x00\x00\x01</span><span class="s1">&#39;</span>
+                   <span class="sa">b</span><span class="s1">&#39;</span><span class="se">\x00\x00\x00\x01\x00\x00\x00\x01\x00\x00\x00\x01</span><span class="s1">&#39;</span>
+                   <span class="sa">b</span><span class="s1">&#39;</span><span class="se">\x00\x00\x00\x01\x00\x00\x00\x01\x00\x00\x00\x01</span><span class="s1">&#39;</span>
+                   <span class="sa">b</span><span class="s1">&#39;</span><span class="se">\x00\x00\x00\x01\x00\x00\x00\x01\x00\x00\x00\x01</span><span class="s1">&#39;</span>
+                   <span class="sa">b</span><span class="s1">&#39;</span><span class="se">\x00\x00\x00\x01\x00\x00\x00\x01\x00\x00\x00\x01</span><span class="s1">&#39;</span>
+                   <span class="sa">b</span><span class="s1">&#39;</span><span class="se">\x00\x00\x00\x01\x00\x00\x00\x01\x00\x00\x00\x01</span><span class="s1">&#39;</span>
+                   <span class="sa">b</span><span class="s1">&#39;ahc</span><span class="se">\x00</span><span class="s1">e</span><span class="se">\x00\x00</span><span class="s1">l</span><span class="se">\x00\x00</span><span class="s1">l</span><span class="se">\x00\x00</span><span class="s1">o</span><span class="se">\x00\x00</span><span class="s1">&#39;</span><span class="p">)}</span>
+        <span class="k">return</span> <span class="n">out</span></div>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">concats_as_str</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;bool: True if concatenating file contents result in a</span>
+<span class="sd">        valid file.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="kc">False</span>
+
+<div class="viewcode-block" id="NetCDFFileComm.serialize"><a class="viewcode-back" href="../../../yggdrasil.communication.html#yggdrasil.communication.NetCDFFileComm.NetCDFFileComm.serialize">[docs]</a>    <span class="k">def</span> <span class="nf">serialize</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Don&#39;t serialize for netCDF since using a serializer</span>
+<span class="sd">        is inefficient.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">obj</span></div>
+
+<div class="viewcode-block" id="NetCDFFileComm.deserialize"><a class="viewcode-back" href="../../../yggdrasil.communication.html#yggdrasil.communication.NetCDFFileComm.NetCDFFileComm.deserialize">[docs]</a>    <span class="k">def</span> <span class="nf">deserialize</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">msg</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Don&#39;t deserialize for netCDF since using a serializer</span>
+<span class="sd">        is inefficient.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">msg</span><span class="p">,</span> <span class="p">{}</span></div>
+
+<div class="viewcode-block" id="NetCDFFileComm.transform_type_recv"><a class="viewcode-back" href="../../../yggdrasil.communication.html#yggdrasil.communication.NetCDFFileComm.NetCDFFileComm.transform_type_recv">[docs]</a>    <span class="k">def</span> <span class="nf">transform_type_recv</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
+        <span class="n">x_dtype</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">dtype</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">dtype</span><span class="p">)</span>
+        <span class="n">typecode</span><span class="p">,</span> <span class="n">size</span> <span class="o">=</span> <span class="n">x_dtype</span><span class="o">.</span><span class="n">char</span><span class="p">,</span> <span class="n">x_dtype</span><span class="o">.</span><span class="n">itemsize</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">typecode</span> <span class="o">==</span> <span class="s1">&#39;c&#39;</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">ndim</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">):</span>
+            <span class="n">size</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="n">new_shape</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span>
+            <span class="n">x_str</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">new_shape</span><span class="p">,</span> <span class="s1">&#39;S</span><span class="si">%d</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">size</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">index</span> <span class="ow">in</span> <span class="n">np</span><span class="o">.</span><span class="n">ndindex</span><span class="p">(</span><span class="o">*</span><span class="n">new_shape</span><span class="p">):</span>
+                <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">size</span><span class="p">):</span>
+                    <span class="n">x_str</span><span class="p">[</span><span class="n">index</span><span class="p">]</span> <span class="o">+=</span> <span class="n">x</span><span class="p">[</span><span class="nb">tuple</span><span class="p">([</span><span class="n">i</span><span class="p">,</span> <span class="o">*</span><span class="n">index</span><span class="p">])]</span>
+            <span class="n">x</span> <span class="o">=</span> <span class="n">x_str</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">x</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+            <span class="k">if</span> <span class="p">((((</span><span class="n">sys</span><span class="o">.</span><span class="n">byteorder</span> <span class="o">==</span> <span class="s1">&#39;little&#39;</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">dtype</span><span class="o">.</span><span class="n">byteorder</span> <span class="o">==</span> <span class="s1">&#39;&gt;&#39;</span><span class="p">))</span>
+                 <span class="ow">or</span> <span class="p">((</span><span class="n">sys</span><span class="o">.</span><span class="n">byteorder</span> <span class="o">==</span> <span class="s1">&#39;big&#39;</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">dtype</span><span class="o">.</span><span class="n">byteorder</span> <span class="o">==</span> <span class="s1">&#39;&lt;&#39;</span><span class="p">)))):</span>
+                <span class="n">x</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">dtype</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">x</span></div>
+
+<div class="viewcode-block" id="NetCDFFileComm.transform_type_send"><a class="viewcode-back" href="../../../yggdrasil.communication.html#yggdrasil.communication.NetCDFFileComm.NetCDFFileComm.transform_type_send">[docs]</a>    <span class="k">def</span> <span class="nf">transform_type_send</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
+        <span class="n">x_dtype</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">dtype</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">dtype</span><span class="p">)</span>
+        <span class="n">typecode</span><span class="p">,</span> <span class="n">size</span> <span class="o">=</span> <span class="n">x_dtype</span><span class="o">.</span><span class="n">char</span><span class="p">,</span> <span class="n">x_dtype</span><span class="o">.</span><span class="n">itemsize</span>
+        <span class="n">typecode_map</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;l&#39;</span><span class="p">:</span> <span class="s1">&#39;i&#39;</span><span class="p">,</span> <span class="s1">&#39;q&#39;</span><span class="p">:</span> <span class="s1">&#39;i&#39;</span><span class="p">}</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">typecode</span><span class="p">,</span> <span class="n">size</span><span class="p">)</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">netcdf</span><span class="o">.</span><span class="n">REVERSE</span><span class="p">:</span>
+            <span class="n">REVERSE_keys</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">netcdf</span><span class="o">.</span><span class="n">REVERSE</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
+            <span class="n">REVERSE_typecode</span> <span class="o">=</span> <span class="p">[</span><span class="n">k</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">REVERSE_keys</span><span class="p">]</span>
+            <span class="n">typecode</span> <span class="o">=</span> <span class="n">typecode_map</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">typecode</span><span class="p">,</span> <span class="n">typecode</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">typecode</span> <span class="o">==</span> <span class="s1">&#39;S&#39;</span><span class="p">:</span>
+                <span class="n">x_str</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="nb">tuple</span><span class="p">([</span><span class="n">size</span><span class="p">]</span> <span class="o">+</span> <span class="nb">list</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">shape</span><span class="p">)),</span> <span class="s1">&#39;S1&#39;</span><span class="p">)</span>
+                <span class="k">for</span> <span class="n">index</span> <span class="ow">in</span> <span class="n">np</span><span class="o">.</span><span class="n">ndindex</span><span class="p">(</span><span class="o">*</span><span class="n">x</span><span class="o">.</span><span class="n">shape</span><span class="p">):</span>
+                    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">size</span><span class="p">):</span>
+                        <span class="k">if</span> <span class="n">i</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="n">x</span><span class="p">[</span><span class="n">index</span><span class="p">]):</span>
+                            <span class="n">x_str</span><span class="p">[</span><span class="nb">tuple</span><span class="p">([</span><span class="n">i</span><span class="p">,</span> <span class="o">*</span><span class="n">index</span><span class="p">])]</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="se">\0</span><span class="s1">&#39;</span>
+                        <span class="k">elif</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="nb">len</span><span class="p">(</span><span class="n">x</span><span class="p">[</span><span class="n">index</span><span class="p">]):</span>
+                            <span class="n">x_str</span><span class="p">[</span><span class="nb">tuple</span><span class="p">([</span><span class="n">i</span><span class="p">,</span> <span class="o">*</span><span class="n">index</span><span class="p">])]</span> <span class="o">=</span> <span class="n">x</span><span class="p">[</span><span class="n">index</span><span class="p">][</span><span class="n">i</span><span class="p">:(</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)]</span>
+                <span class="n">x</span> <span class="o">=</span> <span class="n">x_str</span>
+            <span class="k">elif</span> <span class="n">typecode</span> <span class="ow">in</span> <span class="n">REVERSE_typecode</span><span class="p">:</span>
+                <span class="n">x</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">dtype</span><span class="p">(</span><span class="o">*</span><span class="n">REVERSE_keys</span><span class="p">[</span>
+                    <span class="n">REVERSE_typecode</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">typecode</span><span class="p">)]))</span>
+            <span class="k">else</span><span class="p">:</span>  <span class="c1"># pragma: debug</span>
+                <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span>
+                    <span class="p">(</span><span class="s2">&quot;Type (</span><span class="si">%s</span><span class="s2">, </span><span class="si">%d</span><span class="s2">) is not in set accepted by &quot;</span>
+                     <span class="s2">&quot;netCDF </span><span class="si">%s</span><span class="s2">.&quot;</span><span class="p">)</span>
+                    <span class="o">%</span> <span class="p">(</span><span class="n">typecode</span><span class="p">,</span> <span class="n">size</span><span class="p">,</span> <span class="n">pprint</span><span class="o">.</span><span class="n">pformat</span><span class="p">(</span><span class="n">netcdf</span><span class="o">.</span><span class="n">REVERSE</span><span class="p">)))</span>
+        <span class="k">return</span> <span class="n">x</span></div>
+    
+    <span class="c1"># Methods related to position in the file/series</span>
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">file_size</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;int: Current size of file.&quot;&quot;&quot;</span>
+        <span class="n">out</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">current_address</span><span class="p">):</span>
+            <span class="n">out</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">stat</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">current_address</span><span class="p">)</span><span class="o">.</span><span class="n">st_size</span>
+        <span class="k">return</span> <span class="n">out</span>
+
+<div class="viewcode-block" id="NetCDFFileComm.file_tell"><a class="viewcode-back" href="../../../yggdrasil.communication.html#yggdrasil.communication.NetCDFFileComm.NetCDFFileComm.file_tell">[docs]</a>    <span class="k">def</span> <span class="nf">file_tell</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;int: Current position in the file.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_last_size</span></div>
+    
+<div class="viewcode-block" id="NetCDFFileComm.file_seek"><a class="viewcode-back" href="../../../yggdrasil.communication.html#yggdrasil.communication.NetCDFFileComm.NetCDFFileComm.file_seek">[docs]</a>    <span class="k">def</span> <span class="nf">file_seek</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pos</span><span class="p">,</span> <span class="n">whence</span><span class="o">=</span><span class="n">os</span><span class="o">.</span><span class="n">SEEK_SET</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Move in the file to the specified position.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            pos (int): Position (in bytes) to move file to.</span>
+<span class="sd">            whence (int, optional): Flag indicating position that pos</span>
+<span class="sd">                is relative to. 0 for the beginning of the file, 1 for</span>
+<span class="sd">                from the current location, and 2 from the end of the</span>
+<span class="sd">                file.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">NetCDFFileComm</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">file_seek</span><span class="p">(</span><span class="n">pos</span><span class="p">,</span> <span class="n">whence</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">whence</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_last_size</span> <span class="o">=</span> <span class="n">pos</span>
+        <span class="k">elif</span> <span class="n">whence</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>  <span class="c1"># pragma: no cover</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_last_size</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">file_size</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_last_size</span> <span class="o">+</span> <span class="n">pos</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">whence</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_last_size</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">file_size</span></div>
+        
+<div class="viewcode-block" id="NetCDFFileComm.file_flush"><a class="viewcode-back" href="../../../yggdrasil.communication.html#yggdrasil.communication.NetCDFFileComm.NetCDFFileComm.file_flush">[docs]</a>    <span class="k">def</span> <span class="nf">file_flush</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Flush the file.&quot;&quot;&quot;</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">NetCDFFileComm</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">file_flush</span><span class="p">()</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_fd_netcdf</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_fd_netcdf</span><span class="o">.</span><span class="n">flush</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_fd_netcdf</span><span class="o">.</span><span class="n">sync</span><span class="p">()</span></div>
+        
+    <span class="k">def</span> <span class="nf">_file_open</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">address</span><span class="p">,</span> <span class="n">mode</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_last_size</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">if</span> <span class="p">((((</span><span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">address</span><span class="p">))</span> <span class="ow">or</span> <span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">stat</span><span class="p">(</span><span class="n">address</span><span class="p">)</span><span class="o">.</span><span class="n">st_size</span> <span class="o">==</span> <span class="mi">0</span><span class="p">))</span>
+             <span class="ow">and</span> <span class="p">(</span><span class="n">mode</span> <span class="o">==</span> <span class="s1">&#39;r&#39;</span><span class="p">))):</span>
+            <span class="c1"># NetCDF dosn&#39;t allow opening an empty file for read</span>
+            <span class="c1"># because it will not contain the opening version bytes</span>
+            <span class="k">return</span> <span class="nb">super</span><span class="p">(</span><span class="n">NetCDFFileComm</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">_file_open</span><span class="p">(</span><span class="n">address</span><span class="p">,</span> <span class="n">mode</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_fd_netcdf</span> <span class="o">=</span> <span class="n">netcdf</span><span class="o">.</span><span class="n">netcdf_file</span><span class="p">(</span><span class="n">address</span><span class="p">,</span> <span class="n">mode</span><span class="p">,</span>
+                                             <span class="n">mmap</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                                             <span class="n">version</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">version</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_fd_netcdf</span><span class="o">.</span><span class="n">fp</span>
+
+    <span class="k">def</span> <span class="nf">_file_close</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">NetCDFFileComm</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">_file_close</span><span class="p">()</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_fd_netcdf</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_fd_netcdf</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_fd_netcdf</span> <span class="o">=</span> <span class="kc">None</span>
+
+    <span class="k">def</span> <span class="nf">_file_refresh</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">prev_pos</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">file_tell</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_file_close</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_fd</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_file_open</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">current_address</span><span class="p">,</span>
+                                   <span class="bp">self</span><span class="o">.</span><span class="n">open_mode</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">file_seek</span><span class="p">(</span><span class="n">prev_pos</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_file_send</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">msg</span><span class="p">):</span>
+        <span class="k">assert</span><span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">msg</span><span class="p">,</span> <span class="nb">dict</span><span class="p">))</span>
+        <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">msg</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">):</span>
+                <span class="n">dims</span> <span class="o">=</span> <span class="p">[]</span>
+                <span class="n">v</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">transform_type_send</span><span class="p">(</span><span class="n">v</span><span class="p">)</span>
+                <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">d</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">v</span><span class="o">.</span><span class="n">shape</span><span class="p">):</span>
+                    <span class="k">if</span> <span class="n">i</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                        <span class="n">idim</span> <span class="o">=</span> <span class="n">k</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="n">idim</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="si">%s%d</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="n">i</span><span class="p">)</span>
+                    <span class="n">dims</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">idim</span><span class="p">)</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">_fd_netcdf</span><span class="o">.</span><span class="n">createDimension</span><span class="p">(</span><span class="n">idim</span><span class="p">,</span> <span class="n">d</span><span class="p">)</span>
+                <span class="n">var</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_fd_netcdf</span><span class="o">.</span><span class="n">createVariable</span><span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="n">v</span><span class="o">.</span><span class="n">dtype</span><span class="p">,</span> <span class="n">dims</span><span class="p">)</span>
+                <span class="n">var</span><span class="p">[:]</span> <span class="o">=</span> <span class="n">v</span>
+                <span class="k">if</span> <span class="n">units</span><span class="o">.</span><span class="n">has_units</span><span class="p">(</span><span class="n">v</span><span class="p">):</span>
+                    <span class="n">var</span><span class="o">.</span><span class="n">units</span> <span class="o">=</span> <span class="n">units</span><span class="o">.</span><span class="n">get_units</span><span class="p">(</span><span class="n">v</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>  <span class="c1"># pragma: debug</span>
+                <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;Type &#39;</span><span class="si">%s</span><span class="s2">&#39; no supported.&quot;</span> <span class="o">%</span> <span class="nb">type</span><span class="p">(</span><span class="n">msg</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_last_size</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">file_size</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">fd</span><span class="o">.</span><span class="n">seek</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_last_size</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">remaining_bytes</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;int: Remaining bytes in the file.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_open</span> <span class="ow">and</span> <span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">_fd_netcdf</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">append</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_file_refresh</span><span class="p">()</span>
+        <span class="k">return</span> <span class="nb">super</span><span class="p">(</span><span class="n">NetCDFFileComm</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">remaining_bytes</span>
+        
+    <span class="k">def</span> <span class="nf">_file_recv</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">out</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_open</span> <span class="ow">and</span> <span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">_fd_netcdf</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">append</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_file_refresh</span><span class="p">()</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">file_size</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">_last_size</span><span class="p">:</span>
+            <span class="n">variables</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">variables</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">variables</span><span class="p">:</span>
+                <span class="n">variables</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_fd_netcdf</span><span class="o">.</span><span class="n">variables</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
+            <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">variables</span><span class="p">:</span>
+                <span class="n">out</span><span class="p">[</span><span class="n">v</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">transform_type_recv</span><span class="p">(</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">_fd_netcdf</span><span class="o">.</span><span class="n">variables</span><span class="p">[</span><span class="n">v</span><span class="p">][:])</span>
+                <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_fd_netcdf</span><span class="o">.</span><span class="n">variables</span><span class="p">[</span><span class="n">v</span><span class="p">],</span> <span class="s1">&#39;units&#39;</span><span class="p">):</span>
+                    <span class="n">out</span><span class="p">[</span><span class="n">v</span><span class="p">]</span> <span class="o">=</span> <span class="n">units</span><span class="o">.</span><span class="n">add_units</span><span class="p">(</span>
+                        <span class="n">out</span><span class="p">[</span><span class="n">v</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">_fd_netcdf</span><span class="o">.</span><span class="n">variables</span><span class="p">[</span><span class="n">v</span><span class="p">]</span><span class="o">.</span><span class="n">units</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_last_size</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">file_size</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">fd</span><span class="o">.</span><span class="n">seek</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_last_size</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">out</span><span class="p">)</span></div>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2017, Meagan Lang, David Raila
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

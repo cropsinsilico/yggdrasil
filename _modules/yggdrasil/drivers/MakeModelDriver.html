@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>yggdrasil.drivers.MakeModelDriver &mdash; yggdrasil 1.0.0+154.g684a530e.dirty documentation</title>
+  <title>yggdrasil.drivers.MakeModelDriver &mdash; yggdrasil 1.1.1+410.g95af39b2 documentation</title>
   
 
   
@@ -59,7 +59,7 @@
             
             
               <div class="version">
-                1.0.0
+                1.1.1
               </div>
             
           
@@ -94,6 +94,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../autowrap.html#notes-on-autowrapping-c-c-model-functions">Notes on Autowrapping C/C++ Model Functions</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../conditional_io.html">Conditional I/O</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../transformed_io.html">Transformed I/O</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../timesync_io.html">Timestep Synchronization</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../yaml.html">YAML Files</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../config.html">Configuration Files</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../units.html">Units</a></li>
@@ -192,6 +193,9 @@
 <span class="sd">            model executable. Defaults to None.</span>
 <span class="sd">        target_language (str, optional): Language that the target is written in.</span>
 <span class="sd">            Defaults to None and will be set based on the source files provided.</span>
+<span class="sd">        target_compiler (str, optional): Compilation tool that should be used</span>
+<span class="sd">            for the target language. Defaults to None and will be set based on</span>
+<span class="sd">            the selected language driver.</span>
 <span class="sd">        env_compiler (str, optional): Environment variable where the compiler</span>
 <span class="sd">            executable should be stored for use within the Makefile. Defaults</span>
 <span class="sd">            to &#39;CC&#39;.</span>
@@ -217,6 +221,8 @@
 <span class="sd">        target_language (str): Language that the target is written in.</span>
 <span class="sd">        target_language_driver (ModelDriver): Language driver for the target</span>
 <span class="sd">            language.</span>
+<span class="sd">        target_compiler (str): Compilation tool that should be used</span>
+<span class="sd">            for the target language.</span>
 <span class="sd">        env_compiler (str): Compiler environment variable.</span>
 <span class="sd">        env_compiler_flags (str): Compiler flags environment variable.</span>
 <span class="sd">        env_linker (str): Linker environment variable.</span>
@@ -228,6 +234,7 @@
         <span class="s1">&#39;makedir&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;string&#39;</span><span class="p">},</span>  <span class="c1"># default will depend on makefile</span>
         <span class="s1">&#39;target&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;string&#39;</span><span class="p">},</span>
         <span class="s1">&#39;target_language&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;string&#39;</span><span class="p">},</span>
+        <span class="s1">&#39;target_compiler&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;string&#39;</span><span class="p">},</span>
         <span class="s1">&#39;env_compiler&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;string&#39;</span><span class="p">,</span> <span class="s1">&#39;default&#39;</span><span class="p">:</span> <span class="s1">&#39;CC&#39;</span><span class="p">},</span>
         <span class="s1">&#39;env_compiler_flags&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;string&#39;</span><span class="p">,</span> <span class="s1">&#39;default&#39;</span><span class="p">:</span> <span class="s1">&#39;CFLAGS&#39;</span><span class="p">},</span>
         <span class="s1">&#39;env_linker&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;string&#39;</span><span class="p">,</span> <span class="s1">&#39;default&#39;</span><span class="p">:</span> <span class="s1">&#39;CC&#39;</span><span class="p">},</span>
@@ -240,7 +247,7 @@
     <span class="n">output_key</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
     <span class="n">no_separate_linking</span> <span class="o">=</span> <span class="kc">True</span>
     <span class="n">default_archiver</span> <span class="o">=</span> <span class="kc">False</span>
-    <span class="n">linker_attributes</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;executable_ext&#39;</span><span class="p">:</span> <span class="s1">&#39;&#39;</span><span class="p">}</span>
+    <span class="n">linker_attributes</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;executable_ext&#39;</span><span class="p">:</span> <span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="s1">&#39;tool_suffix_format&#39;</span><span class="p">:</span> <span class="s1">&#39;&#39;</span><span class="p">}</span>
     <span class="n">build_language</span> <span class="o">=</span> <span class="s1">&#39;make&#39;</span>
     
 <div class="viewcode-block" id="MakeCompiler.before_registration"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.MakeModelDriver.MakeCompiler.before_registration">[docs]</a>    <span class="nd">@staticmethod</span>
@@ -253,8 +260,8 @@
         <span class="k">if</span> <span class="n">platform</span><span class="o">.</span><span class="n">_is_win</span><span class="p">:</span>  <span class="c1"># pragma: windows</span>
             <span class="bp">cls</span><span class="o">.</span><span class="n">linker_attributes</span><span class="p">[</span><span class="s1">&#39;executable_ext&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;.exe&#39;</span></div>
 
-<div class="viewcode-block" id="MakeCompiler.language_version"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.MakeModelDriver.MakeCompiler.language_version">[docs]</a>    <span class="nd">@classmethod</span>
-    <span class="k">def</span> <span class="nf">language_version</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<div class="viewcode-block" id="MakeCompiler.tool_version"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.MakeModelDriver.MakeCompiler.tool_version">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">tool_version</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Determine the version of this language.</span>
 
 <span class="sd">        Args:</span>
@@ -317,6 +324,7 @@
         <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">link_kws</span><span class="p">:</span>
             <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
         <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;outfile&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+        <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;target_compiler&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
         <span class="c1"># if (target is None) and (outfile is not None):</span>
         <span class="c1">#     target = cls.file2base(outfile)</span>
         <span class="n">out</span> <span class="o">=</span> <span class="nb">super</span><span class="p">(</span><span class="n">MakeCompiler</span><span class="p">,</span> <span class="bp">cls</span><span class="p">)</span><span class="o">.</span><span class="n">get_flags</span><span class="p">(</span><span class="n">outfile</span><span class="o">=</span><span class="n">target</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
@@ -360,7 +368,7 @@
 
 <div class="viewcode-block" id="MakeCompiler.set_env"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.MakeModelDriver.MakeCompiler.set_env">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">set_env</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">logging_level</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">language</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">language_driver</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-                <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+                <span class="n">language_compiler</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Get environment variables that should be set for the model process.</span>
 
 <span class="sd">        Args:</span>
@@ -371,6 +379,10 @@
 <span class="sd">            language_driver (ModelDriver, optional): Driver for language that</span>
 <span class="sd">                should be used. Defaults to None and will be imported based</span>
 <span class="sd">                on language.</span>
+<span class="sd">            language_compiler (str, optional): name of compilation tool that</span>
+<span class="sd">                should be used to set the environment variables. Defaults to</span>
+<span class="sd">                None and the default compilation tools for the provided</span>
+<span class="sd">                language/language_driver will be used.</span>
 <span class="sd">            **kwargs: Additional keyword arguments are passed to the parent</span>
 <span class="sd">                class&#39;s method.</span>
 
@@ -384,13 +396,14 @@
             <span class="n">language_driver</span> <span class="o">=</span> <span class="n">components</span><span class="o">.</span><span class="n">import_component</span><span class="p">(</span><span class="s1">&#39;model&#39;</span><span class="p">,</span> <span class="n">language</span><span class="p">)</span>
         <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;language_driver&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">language_driver</span>
         <span class="n">out</span> <span class="o">=</span> <span class="nb">super</span><span class="p">(</span><span class="n">MakeCompiler</span><span class="p">,</span> <span class="bp">cls</span><span class="p">)</span><span class="o">.</span><span class="n">set_env</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
-        <span class="n">compiler</span> <span class="o">=</span> <span class="n">language_driver</span><span class="o">.</span><span class="n">get_tool</span><span class="p">(</span><span class="s1">&#39;compiler&#39;</span><span class="p">)</span>
+        <span class="n">compiler</span> <span class="o">=</span> <span class="n">language_driver</span><span class="o">.</span><span class="n">get_tool</span><span class="p">(</span><span class="s1">&#39;compiler&#39;</span><span class="p">,</span> <span class="n">toolname</span><span class="o">=</span><span class="n">language_compiler</span><span class="p">)</span>
         <span class="n">compile_flags</span> <span class="o">=</span> <span class="n">language_driver</span><span class="o">.</span><span class="n">get_compiler_flags</span><span class="p">(</span>
             <span class="n">for_model</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">skip_defaults</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">dont_skip_env_defaults</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-            <span class="n">logging_level</span><span class="o">=</span><span class="n">logging_level</span><span class="p">,</span> <span class="n">dont_link</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-        <span class="n">linker</span> <span class="o">=</span> <span class="n">language_driver</span><span class="o">.</span><span class="n">get_tool</span><span class="p">(</span><span class="s1">&#39;linker&#39;</span><span class="p">)</span>
+            <span class="n">logging_level</span><span class="o">=</span><span class="n">logging_level</span><span class="p">,</span> <span class="n">dont_link</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">toolnane</span><span class="o">=</span><span class="n">language_compiler</span><span class="p">)</span>
+        <span class="n">linker</span> <span class="o">=</span> <span class="n">language_driver</span><span class="o">.</span><span class="n">get_tool</span><span class="p">(</span><span class="s1">&#39;linker&#39;</span><span class="p">,</span> <span class="n">toolname</span><span class="o">=</span><span class="n">language_compiler</span><span class="p">)</span>
         <span class="n">linker_flags</span> <span class="o">=</span> <span class="n">language_driver</span><span class="o">.</span><span class="n">get_linker_flags</span><span class="p">(</span>
-            <span class="n">for_model</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">skip_defaults</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">dont_skip_env_defaults</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+            <span class="n">for_model</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">skip_defaults</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">dont_skip_env_defaults</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+            <span class="n">toolname</span><span class="o">=</span><span class="n">language_compiler</span><span class="p">)</span>
         <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;env_compiler&#39;</span><span class="p">,</span> <span class="s1">&#39;env_compiler_flags&#39;</span><span class="p">,</span>
                   <span class="s1">&#39;env_linker&#39;</span><span class="p">,</span> <span class="s1">&#39;env_linker_flags&#39;</span><span class="p">]:</span>
             <span class="n">kwargs</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="bp">cls</span><span class="o">.</span><span class="n">_schema_properties</span><span class="p">[</span><span class="n">k</span><span class="p">][</span><span class="s1">&#39;default&#39;</span><span class="p">])</span>
@@ -478,6 +491,16 @@
     <span class="n">base_languages</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;c&#39;</span><span class="p">,</span> <span class="s1">&#39;c++&#39;</span><span class="p">]</span>
     <span class="n">built_where_called</span> <span class="o">=</span> <span class="kc">True</span>
 
+<div class="viewcode-block" id="MakeModelDriver.before_registration"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.MakeModelDriver.MakeModelDriver.before_registration">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">before_registration</span><span class="p">(</span><span class="bp">cls</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Operations that should be performed to modify class attributes prior</span>
+<span class="sd">        to registration including things like platform dependent properties and</span>
+<span class="sd">        checking environment variables for default settings.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">BuildModelDriver</span><span class="o">.</span><span class="n">before_registration</span><span class="p">(</span><span class="bp">cls</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">platform</span><span class="o">.</span><span class="n">_is_win</span><span class="p">:</span>  <span class="c1"># pragma: windows</span>
+            <span class="bp">cls</span><span class="o">.</span><span class="n">default_compiler</span> <span class="o">=</span> <span class="s1">&#39;nmake&#39;</span></div>
+        
 <div class="viewcode-block" id="MakeModelDriver.parse_arguments"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.MakeModelDriver.MakeModelDriver.parse_arguments">[docs]</a>    <span class="k">def</span> <span class="nf">parse_arguments</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Sort arguments based on their syntax to determine if an argument</span>
 <span class="sd">        is a source file, compilation flag, or runtime option/flag that should</span>

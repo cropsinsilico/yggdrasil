@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>yggdrasil.serialize.WOFOSTParamSerialize &mdash; yggdrasil 1.0.0+154.g684a530e.dirty documentation</title>
+  <title>yggdrasil.serialize.WOFOSTParamSerialize &mdash; yggdrasil 1.1.1+410.g95af39b2 documentation</title>
   
 
   
@@ -59,7 +59,7 @@
             
             
               <div class="version">
-                1.0.0
+                1.1.1
               </div>
             
           
@@ -94,6 +94,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../autowrap.html#notes-on-autowrapping-c-c-model-functions">Notes on Autowrapping C/C++ Model Functions</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../conditional_io.html">Conditional I/O</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../transformed_io.html">Transformed I/O</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../timesync_io.html">Timestep Synchronization</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../yaml.html">YAML Files</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../config.html">Configuration Files</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../units.html">Units</a></li>
@@ -201,23 +202,47 @@
 <span class="sd">            bytes, str: Serialized message.</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">out</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+        <span class="n">lines</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">args</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
             <span class="n">v</span> <span class="o">=</span> <span class="n">args</span><span class="p">[</span><span class="n">k</span><span class="p">]</span>
-            <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="nb">bytes</span><span class="p">)):</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="nb">bytes</span><span class="p">)):</span>  <span class="c1"># pragma: debug</span>
                 <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Serialization of non-string keys not supported.&quot;</span><span class="p">)</span>
             <span class="n">iline</span> <span class="o">=</span> <span class="n">tools</span><span class="o">.</span><span class="n">bytes2str</span><span class="p">(</span><span class="n">k</span><span class="p">)</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">delimiter</span>
-            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">):</span>
-                <span class="n">indent</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">iline</span><span class="p">)</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
+                <span class="n">indent</span> <span class="o">=</span> <span class="s1">&#39; &#39;</span> <span class="o">*</span> <span class="nb">len</span><span class="p">(</span><span class="n">iline</span><span class="p">)</span>
                 <span class="n">arr_lines</span> <span class="o">=</span> <span class="p">[]</span>
-                <span class="k">assert</span><span class="p">(</span><span class="n">v</span><span class="o">.</span><span class="n">ndim</span> <span class="o">==</span> <span class="mi">2</span><span class="p">)</span>
-                <span class="k">assert</span><span class="p">(</span><span class="n">v</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="mi">2</span><span class="p">)</span>
-                <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">v</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]):</span>
-                    <span class="n">arr_lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_array_fmt</span> <span class="o">%</span> <span class="n">v</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+                <span class="k">assert</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">v</span><span class="p">)</span> <span class="o">==</span> <span class="mi">2</span><span class="p">)</span>
+                <span class="k">assert</span><span class="p">(</span><span class="n">v</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">shape</span> <span class="o">==</span> <span class="n">v</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+                <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">v</span><span class="p">[</span><span class="mi">0</span><span class="p">])):</span>
+                    <span class="n">arr_lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_array_fmt</span> <span class="o">%</span> <span class="p">(</span><span class="n">v</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="n">i</span><span class="p">],</span> <span class="n">v</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="n">i</span><span class="p">]))</span>
                 <span class="n">iline</span> <span class="o">+=</span> <span class="p">(</span><span class="s1">&#39;,</span><span class="se">\n</span><span class="s1">&#39;</span> <span class="o">+</span> <span class="n">indent</span><span class="p">)</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">arr_lines</span><span class="p">)</span>
+            <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+                <span class="n">iline</span> <span class="o">+=</span> <span class="s2">&quot;</span><span class="se">\&#39;</span><span class="si">%s</span><span class="se">\&#39;</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">v</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="n">iline</span> <span class="o">+=</span> <span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="bp">cls</span><span class="o">=</span><span class="n">JSONReadableEncoder</span><span class="p">)</span>
-            <span class="n">out</span> <span class="o">+=</span> <span class="n">iline</span>
+            <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">iline</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">tools</span><span class="o">.</span><span class="n">str2bytes</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">lines</span><span class="p">))</span></div>
+
+<div class="viewcode-block" id="WOFOSTParamSerialize.parse_units"><a class="viewcode-back" href="../../../yggdrasil.serialize.html#yggdrasil.serialize.WOFOSTParamSerialize.WOFOSTParamSerialize.parse_units">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">parse_units</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Parse units.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            x (str): Unit string.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            str: Propertly formatted units.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">replacements</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;kg N&quot;</span><span class="p">:</span> <span class="s2">&quot;kg&quot;</span><span class="p">,</span>
+                        <span class="s2">&quot;kg P&quot;</span><span class="p">:</span> <span class="s2">&quot;kg&quot;</span><span class="p">,</span>
+                        <span class="s2">&quot;kg-1 dry biomass&quot;</span><span class="p">:</span> <span class="s2">&quot;kg-1&quot;</span><span class="p">,</span>
+                        <span class="s2">&quot;kg CH2O&quot;</span><span class="p">:</span> <span class="s2">&quot;kg&quot;</span><span class="p">,</span>
+                        <span class="s2">&quot;days&quot;</span><span class="p">:</span> <span class="s2">&quot;d&quot;</span><span class="p">,</span>
+                        <span class="s2">&quot;cel&quot;</span><span class="p">:</span> <span class="s2">&quot;degC&quot;</span><span class="p">}</span>
+        <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">replacements</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="n">x</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="n">v</span><span class="p">)</span>
+        <span class="n">out</span> <span class="o">=</span> <span class="n">units</span><span class="o">.</span><span class="n">convert_R_unit_string</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">out</span></div>
             
 <div class="viewcode-block" id="WOFOSTParamSerialize.func_deserialize"><a class="viewcode-back" href="../../../yggdrasil.serialize.html#yggdrasil.serialize.WOFOSTParamSerialize.WOFOSTParamSerialize.func_deserialize">[docs]</a>    <span class="k">def</span> <span class="nf">func_deserialize</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">msg</span><span class="p">):</span>
@@ -230,46 +255,80 @@
 <span class="sd">            dict: Deserialized Python dictionary.</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">regex</span> <span class="o">=</span> <span class="p">(</span><span class="sa">r</span><span class="s1">&#39;(?:(?:(?P&lt;name&gt;.*?)\s+=\s+)|(?:\s+))&#39;</span>
-                 <span class="sa">r</span><span class="s1">&#39;(?P&lt;value1&gt;.*?)(?:,\s+(?P&lt;value2&gt;.*?)&#39;</span>
-                 <span class="sa">r</span><span class="s1">&#39;(?:,))?\s*(?:!\s*(?P&lt;description&gt;.*?)&#39;</span>
-                 <span class="sa">r</span><span class="s1">&#39;(?:[(?P&lt;units&gt;)]))?&#39;</span><span class="p">)</span>
+        <span class="n">regex</span> <span class="o">=</span> <span class="p">(</span><span class="sa">r</span><span class="s1">&#39;(?:(?:(?P&lt;name&gt;[^!]*?)\s*=\s*)|(?:\s+))&#39;</span>
+                 <span class="sa">r</span><span class="s1">&#39;(?P&lt;value1&gt;(?:-?[\d.]+(?:.[\d+])?)|(?:</span><span class="se">\&#39;</span><span class="s1">.*?</span><span class="se">\&#39;</span><span class="s1">))?&#39;</span>
+                 <span class="sa">r</span><span class="s1">&#39;\s*(?:(?P&lt;unwrapped_units&gt;[^!,</span><span class="se">\&#39;</span><span class="s1">]*?))?&#39;</span>
+                 <span class="sa">r</span><span class="s1">&#39;(?:,\s+(?P&lt;value2&gt;[^!,]*?)&#39;</span>
+                 <span class="sa">r</span><span class="s1">&#39;(?:,?))?\s*(?:!\s*(?P&lt;description&gt;.*?)?\s*&#39;</span>
+                 <span class="sa">r</span><span class="s1">&#39;(?:\[(?P&lt;units&gt;.*?)\])?)?\s*&#39;</span><span class="p">)</span>
         <span class="n">out</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
         <span class="n">lines</span> <span class="o">=</span> <span class="n">tools</span><span class="o">.</span><span class="n">bytes2str</span><span class="p">(</span><span class="n">msg</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">newline</span><span class="p">),</span> <span class="n">recurse</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
         <span class="n">k</span> <span class="o">=</span> <span class="kc">None</span>
-        <span class="n">desc</span> <span class="o">=</span> <span class="kc">None</span>
-        <span class="n">units</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="n">desc</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+        <span class="n">k_units</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
         <span class="n">is_arr</span> <span class="o">=</span> <span class="kc">False</span>
-        <span class="k">for</span> <span class="n">l</span> <span class="ow">in</span> <span class="n">lines</span><span class="p">:</span>
-            <span class="k">if</span> <span class="p">(</span><span class="ow">not</span> <span class="n">l</span><span class="o">.</span><span class="n">strip</span><span class="p">())</span> <span class="ow">or</span> <span class="n">l</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;**&#39;</span><span class="p">):</span>
-                <span class="k">continue</span>
-            <span class="n">match</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">fullmatch</span><span class="p">(</span><span class="n">regex</span><span class="p">,</span> <span class="n">l</span><span class="p">)</span><span class="o">.</span><span class="n">groupdict</span><span class="p">()</span>
-            <span class="k">if</span> <span class="n">match</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;name&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">):</span>
+
+        <span class="k">def</span> <span class="nf">finalize_element</span><span class="p">():</span>
+            <span class="k">if</span> <span class="n">is_arr</span><span class="p">:</span>
+                <span class="n">out</span><span class="p">[</span><span class="n">k</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">out</span><span class="p">[</span><span class="n">k</span><span class="p">][</span><span class="mi">0</span><span class="p">])</span>
+                <span class="n">out</span><span class="p">[</span><span class="n">k</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">out</span><span class="p">[</span><span class="n">k</span><span class="p">][</span><span class="mi">1</span><span class="p">])</span>
+            <span class="k">if</span> <span class="n">k_units</span><span class="p">:</span>
                 <span class="k">if</span> <span class="n">is_arr</span><span class="p">:</span>
-                    <span class="n">out</span><span class="p">[</span><span class="n">k</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">out</span><span class="p">[</span><span class="n">k</span><span class="p">][</span><span class="mi">0</span><span class="p">])</span>
-                    <span class="n">out</span><span class="p">[</span><span class="n">k</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">out</span><span class="p">[</span><span class="n">k</span><span class="p">][</span><span class="mi">1</span><span class="p">])</span>
-                <span class="k">if</span> <span class="n">units</span><span class="p">:</span>
-                    <span class="k">if</span> <span class="n">is_arr</span><span class="p">:</span>
-                        <span class="n">u1</span><span class="p">,</span> <span class="n">u2</span> <span class="o">=</span> <span class="n">units</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;;&#39;</span><span class="p">)</span>
+                    <span class="k">if</span> <span class="s1">&#39;;&#39;</span> <span class="ow">in</span> <span class="n">k_units</span><span class="p">:</span>
+                        <span class="n">u1</span><span class="p">,</span> <span class="n">u2</span> <span class="o">=</span> <span class="n">k_units</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;;&#39;</span><span class="p">)</span>
+                        <span class="n">u1</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">parse_units</span><span class="p">(</span><span class="n">u1</span><span class="p">)</span>
+                        <span class="n">u2</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">parse_units</span><span class="p">(</span><span class="n">u2</span><span class="p">)</span>
                         <span class="n">out</span><span class="p">[</span><span class="n">k</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">units</span><span class="o">.</span><span class="n">add_units</span><span class="p">(</span><span class="n">out</span><span class="p">[</span><span class="n">k</span><span class="p">][</span><span class="mi">0</span><span class="p">],</span> <span class="n">u1</span><span class="p">)</span>
                         <span class="n">out</span><span class="p">[</span><span class="n">k</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">units</span><span class="o">.</span><span class="n">add_units</span><span class="p">(</span><span class="n">out</span><span class="p">[</span><span class="n">k</span><span class="p">][</span><span class="mi">1</span><span class="p">],</span> <span class="n">u2</span><span class="p">)</span>
                     <span class="k">else</span><span class="p">:</span>
-                        <span class="n">out</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">units</span><span class="o">.</span><span class="n">add_units</span><span class="p">(</span><span class="n">out</span><span class="p">[</span><span class="n">k</span><span class="p">],</span> <span class="n">units</span><span class="p">)</span>
-                <span class="n">is_arr</span> <span class="o">=</span> <span class="nb">bool</span><span class="p">(</span><span class="n">match</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;value2&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">))</span>
+                        <span class="n">out</span><span class="p">[</span><span class="n">k</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">units</span><span class="o">.</span><span class="n">add_units</span><span class="p">(</span>
+                            <span class="n">out</span><span class="p">[</span><span class="n">k</span><span class="p">][</span><span class="mi">1</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">parse_units</span><span class="p">(</span><span class="n">k_units</span><span class="p">))</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">out</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">units</span><span class="o">.</span><span class="n">add_units</span><span class="p">(</span>
+                        <span class="n">out</span><span class="p">[</span><span class="n">k</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">parse_units</span><span class="p">(</span><span class="n">k_units</span><span class="p">))</span>
+        
+        <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">lines</span><span class="p">:</span>
+            <span class="k">if</span> <span class="p">(</span><span class="ow">not</span> <span class="n">line</span><span class="o">.</span><span class="n">strip</span><span class="p">())</span> <span class="ow">or</span> <span class="n">line</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;**&#39;</span><span class="p">):</span>
+                <span class="k">continue</span>
+            <span class="n">match</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">fullmatch</span><span class="p">(</span><span class="n">regex</span><span class="p">,</span> <span class="n">line</span><span class="p">)</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">match</span><span class="p">:</span>  <span class="c1"># pragma: debug</span>
+                <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s2">&quot;Failed to parse line: &#39;</span><span class="si">%s</span><span class="s2">&#39;&quot;</span> <span class="o">%</span> <span class="n">line</span><span class="p">)</span>
+            <span class="n">match</span> <span class="o">=</span> <span class="n">match</span><span class="o">.</span><span class="n">groupdict</span><span class="p">()</span>
+            <span class="k">if</span> <span class="n">match</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;name&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">):</span>
+                <span class="n">finalize_element</span><span class="p">()</span>
                 <span class="n">k</span> <span class="o">=</span> <span class="n">match</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">]</span>
+                <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">match</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;value1&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">),</span> <span class="nb">str</span><span class="p">):</span>
+                    <span class="n">match</span><span class="p">[</span><span class="s1">&#39;value1&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">match</span><span class="p">[</span><span class="s1">&#39;value1&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+                <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">match</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;value2&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">),</span> <span class="nb">str</span><span class="p">):</span>
+                    <span class="n">match</span><span class="p">[</span><span class="s1">&#39;value2&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">match</span><span class="p">[</span><span class="s1">&#39;value2&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+                <span class="n">is_arr</span> <span class="o">=</span> <span class="nb">bool</span><span class="p">(</span><span class="n">match</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;value2&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">))</span>
                 <span class="n">desc</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
-                <span class="n">units</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+                <span class="n">k_units</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
                 <span class="k">if</span> <span class="n">is_arr</span><span class="p">:</span>
                     <span class="n">out</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="p">[[],</span> <span class="p">[]]</span>
-            <span class="n">desc</span> <span class="o">+=</span> <span class="n">match</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;description&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">)</span>
-            <span class="n">units</span> <span class="o">+=</span> <span class="n">match</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;units&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">)</span>
-            <span class="n">v1</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">match</span><span class="p">[</span><span class="s1">&#39;value1&#39;</span><span class="p">])</span>
-            <span class="k">if</span> <span class="n">is_arr</span><span class="p">:</span>
-                <span class="n">v2</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">match</span><span class="p">[</span><span class="s1">&#39;value2&#39;</span><span class="p">])</span>
-                <span class="n">out</span><span class="p">[</span><span class="n">k</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">v1</span><span class="p">)</span>
-                <span class="n">out</span><span class="p">[</span><span class="n">k</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">v2</span><span class="p">)</span>
-            <span class="k">else</span><span class="p">:</span>
-                <span class="n">out</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">v1</span>
+            <span class="k">if</span> <span class="n">match</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;description&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">):</span>
+                <span class="n">desc</span> <span class="o">+=</span> <span class="n">match</span><span class="p">[</span><span class="s1">&#39;description&#39;</span><span class="p">]</span>
+            <span class="k">if</span> <span class="n">match</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;units&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">):</span>
+                <span class="n">k_units</span> <span class="o">+=</span> <span class="n">match</span><span class="p">[</span><span class="s1">&#39;units&#39;</span><span class="p">]</span>
+            <span class="k">if</span> <span class="n">match</span><span class="p">[</span><span class="s1">&#39;value1&#39;</span><span class="p">]:</span>
+                <span class="k">if</span> <span class="n">match</span><span class="p">[</span><span class="s1">&#39;value1&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\&#39;</span><span class="s1">&#39;</span><span class="p">)</span> <span class="ow">and</span> <span class="n">match</span><span class="p">[</span><span class="s1">&#39;value1&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\&#39;</span><span class="s1">&#39;</span><span class="p">):</span>
+                    <span class="n">v1</span> <span class="o">=</span> <span class="n">match</span><span class="p">[</span><span class="s1">&#39;value1&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">strip</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\&#39;</span><span class="s1">&#39;</span><span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="k">try</span><span class="p">:</span>
+                        <span class="n">v1</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">match</span><span class="p">[</span><span class="s1">&#39;value1&#39;</span><span class="p">])</span>
+                    <span class="k">except</span> <span class="n">json</span><span class="o">.</span><span class="n">decoder</span><span class="o">.</span><span class="n">JSONDecodeError</span><span class="p">:</span>
+                        <span class="k">if</span> <span class="n">match</span><span class="p">[</span><span class="s1">&#39;value1&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s1">&#39;.&#39;</span><span class="p">):</span>
+                            <span class="n">v1</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">match</span><span class="p">[</span><span class="s1">&#39;value1&#39;</span><span class="p">]</span> <span class="o">+</span> <span class="s1">&#39;0&#39;</span><span class="p">)</span>
+                        <span class="k">else</span><span class="p">:</span>  <span class="c1"># pragma: debug</span>
+                            <span class="k">raise</span>
+                <span class="k">if</span> <span class="n">is_arr</span><span class="p">:</span>
+                    <span class="n">v2</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">match</span><span class="p">[</span><span class="s1">&#39;value2&#39;</span><span class="p">])</span>
+                    <span class="n">out</span><span class="p">[</span><span class="n">k</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">v1</span><span class="p">)</span>
+                    <span class="n">out</span><span class="p">[</span><span class="n">k</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">v2</span><span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">out</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">v1</span>
+        <span class="k">if</span> <span class="n">out</span><span class="p">:</span>
+            <span class="n">finalize_element</span><span class="p">()</span>
         <span class="k">return</span> <span class="n">out</span></div>
 
 <div class="viewcode-block" id="WOFOSTParamSerialize.concatenate"><a class="viewcode-back" href="../../../yggdrasil.serialize.html#yggdrasil.serialize.WOFOSTParamSerialize.WOFOSTParamSerialize.concatenate">[docs]</a>    <span class="nd">@classmethod</span>
@@ -299,22 +358,28 @@
 
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">out</span> <span class="o">=</span> <span class="nb">super</span><span class="p">(</span><span class="n">WOFOSTParamSerialize</span><span class="p">,</span> <span class="bp">cls</span><span class="p">)</span><span class="o">.</span><span class="n">get_testing_options</span><span class="p">()</span>
+        <span class="n">out</span><span class="p">[</span><span class="s1">&#39;exact_contents&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">False</span>
         <span class="n">out</span><span class="p">[</span><span class="s1">&#39;objects&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[{</span><span class="s1">&#39;CRPNAM&#39;</span><span class="p">:</span> <span class="s1">&#39;Grain maize CSA practicals&#39;</span><span class="p">,</span>
-                           <span class="s1">&#39;TBASEM&#39;</span><span class="p">:</span> <span class="n">units</span><span class="o">.</span><span class="n">add_units</span><span class="p">(</span><span class="mf">4.0</span><span class="p">,</span> <span class="s1">&#39;cel&#39;</span><span class="p">),</span>
-                           <span class="s1">&#39;TEFFMX&#39;</span><span class="p">:</span> <span class="n">units</span><span class="o">.</span><span class="n">add_units</span><span class="p">(</span><span class="mf">30.0</span><span class="p">,</span> <span class="s1">&#39;cel&#39;</span><span class="p">),</span>
-                           <span class="s1">&#39;TSUMEM&#39;</span><span class="p">:</span> <span class="n">units</span><span class="o">.</span><span class="n">add_units</span><span class="p">(</span><span class="mf">110.0</span><span class="p">,</span> <span class="s1">&#39;cel d&#39;</span><span class="p">),</span>
+                           <span class="s1">&#39;TBASEM&#39;</span><span class="p">:</span> <span class="n">units</span><span class="o">.</span><span class="n">add_units</span><span class="p">(</span><span class="mf">4.0</span><span class="p">,</span> <span class="s1">&#39;degC&#39;</span><span class="p">),</span>
+                           <span class="s1">&#39;TEFFMX&#39;</span><span class="p">:</span> <span class="n">units</span><span class="o">.</span><span class="n">add_units</span><span class="p">(</span><span class="mf">30.0</span><span class="p">,</span> <span class="s1">&#39;degC&#39;</span><span class="p">),</span>
+                           <span class="s1">&#39;TSUMEM&#39;</span><span class="p">:</span> <span class="n">units</span><span class="o">.</span><span class="n">add_units</span><span class="p">(</span><span class="mf">110.0</span><span class="p">,</span> <span class="s1">&#39;degC*d&#39;</span><span class="p">),</span>
                            <span class="s1">&#39;IDSL&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
                            <span class="s1">&#39;DLO&#39;</span><span class="p">:</span> <span class="n">units</span><span class="o">.</span><span class="n">add_units</span><span class="p">(</span><span class="o">-</span><span class="mf">99.0</span><span class="p">,</span> <span class="s1">&#39;hr&#39;</span><span class="p">),</span>
                            <span class="s1">&#39;DLC&#39;</span><span class="p">:</span> <span class="n">units</span><span class="o">.</span><span class="n">add_units</span><span class="p">(</span><span class="o">-</span><span class="mf">99.0</span><span class="p">,</span> <span class="s1">&#39;hr&#39;</span><span class="p">),</span>
-                           <span class="s1">&#39;TSUM1&#39;</span><span class="p">:</span> <span class="n">units</span><span class="o">.</span><span class="n">add_units</span><span class="p">(</span><span class="mf">900.0</span><span class="p">,</span> <span class="s1">&#39;cel d&#39;</span><span class="p">),</span>
-                           <span class="s1">&#39;TSUM2&#39;</span><span class="p">:</span> <span class="n">units</span><span class="o">.</span><span class="n">add_units</span><span class="p">(</span><span class="mf">800.0</span><span class="p">,</span> <span class="s1">&#39;cel d&#39;</span><span class="p">),</span>
+                           <span class="s1">&#39;TSUM1&#39;</span><span class="p">:</span> <span class="n">units</span><span class="o">.</span><span class="n">add_units</span><span class="p">(</span><span class="mf">900.0</span><span class="p">,</span> <span class="s1">&#39;degC*d&#39;</span><span class="p">),</span>
+                           <span class="s1">&#39;TSUM2&#39;</span><span class="p">:</span> <span class="n">units</span><span class="o">.</span><span class="n">add_units</span><span class="p">(</span><span class="mf">800.0</span><span class="p">,</span> <span class="s1">&#39;degC*d&#39;</span><span class="p">),</span>
                            <span class="s1">&#39;DTSMTB&#39;</span><span class="p">:</span> <span class="p">[</span>
                                <span class="n">units</span><span class="o">.</span><span class="n">add_units</span><span class="p">(</span>
-                                   <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">10.0</span><span class="p">,</span> <span class="mf">30.0</span><span class="p">,</span> <span class="mf">35.0</span><span class="p">]),</span> <span class="s1">&#39;cel&#39;</span><span class="p">),</span>
+                                   <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">10.0</span><span class="p">,</span> <span class="mf">30.0</span><span class="p">,</span> <span class="mf">35.0</span><span class="p">]),</span> <span class="s1">&#39;degC&#39;</span><span class="p">),</span>
                                <span class="n">units</span><span class="o">.</span><span class="n">add_units</span><span class="p">(</span>
-                                   <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mf">24.0</span><span class="p">,</span> <span class="mf">24.0</span><span class="p">]),</span> <span class="s1">&#39;cell d&#39;</span><span class="p">)],</span>
+                                   <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mf">24.0</span><span class="p">,</span> <span class="mf">24.0</span><span class="p">]),</span> <span class="s1">&#39;degC*d&#39;</span><span class="p">)],</span>
                            <span class="s1">&#39;DVSI&#39;</span><span class="p">:</span> <span class="mf">0.0</span><span class="p">,</span>
-                           <span class="s1">&#39;DVSEND&#39;</span><span class="p">:</span> <span class="mf">2.0</span><span class="p">}]</span>
+                           <span class="s1">&#39;DVSEND&#39;</span><span class="p">:</span> <span class="mf">2.0</span><span class="p">,</span>
+                           <span class="s1">&#39;SSATB&#39;</span><span class="p">:</span> <span class="p">[</span>
+                               <span class="n">units</span><span class="o">.</span><span class="n">add_units</span><span class="p">(</span>
+                                   <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">2.0</span><span class="p">]),</span> <span class="s1">&#39;ha/kg&#39;</span><span class="p">),</span>
+                               <span class="n">units</span><span class="o">.</span><span class="n">add_units</span><span class="p">(</span>
+                                   <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">]),</span> <span class="s1">&#39;ha/kg&#39;</span><span class="p">)]}]</span>
         <span class="n">out</span><span class="p">[</span><span class="s1">&#39;empty&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
         <span class="n">out</span><span class="p">[</span><span class="s1">&#39;contents&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span>
             <span class="sa">b</span><span class="s1">&#39;CRPNAM=</span><span class="se">\&#39;</span><span class="s1">Grain maize CSA practicals</span><span class="se">\&#39;\n\n</span><span class="s1">&#39;</span>
@@ -336,7 +401,9 @@
             <span class="sa">b</span><span class="s1">&#39;            35.00,   24.00</span><span class="se">\n</span><span class="s1">&#39;</span>
             <span class="sa">b</span><span class="s1">&#39;DVSI = 0.           ! initial DVS</span><span class="se">\n</span><span class="s1">&#39;</span>
             <span class="sa">b</span><span class="s1">&#39;DVSEND   =   2.00   ! development stage at harvest (= 2.0 at &#39;</span>
-            <span class="sa">b</span><span class="s1">&#39;maturity [-]))</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+            <span class="sa">b</span><span class="s1">&#39;maturity [-]))</span><span class="se">\n</span><span class="s1">&#39;</span>
+            <span class="sa">b</span><span class="s1">&#39;SSATB =  0.0, 0.0,  ! specific stem area [ha kg-1]</span><span class="se">\n</span><span class="s1">&#39;</span>
+            <span class="sa">b</span><span class="s1">&#39;         2.0, 0.0   ! as function of DVS</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">out</span></div></div>
 </pre></div>
 

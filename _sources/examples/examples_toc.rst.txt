@@ -22,4 +22,6 @@ Examples
    model_function
    conditional_io
    transformed_io
+   timesync1
+   timesync2
 

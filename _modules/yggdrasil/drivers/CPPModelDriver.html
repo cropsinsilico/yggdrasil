@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>yggdrasil.drivers.CPPModelDriver &mdash; yggdrasil 1.0.0+154.g684a530e.dirty documentation</title>
+  <title>yggdrasil.drivers.CPPModelDriver &mdash; yggdrasil 1.1.1+410.g95af39b2 documentation</title>
   
 
   
@@ -59,7 +59,7 @@
             
             
               <div class="version">
-                1.0.0
+                1.1.1
               </div>
             
           
@@ -94,6 +94,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../autowrap.html#notes-on-autowrapping-c-c-model-functions">Notes on Autowrapping C/C++ Model Functions</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../conditional_io.html">Conditional I/O</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../transformed_io.html">Transformed I/O</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../timesync_io.html">Timestep Synchronization</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../yaml.html">YAML Files</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../config.html">Configuration Files</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../units.html">Units</a></li>
@@ -174,7 +175,8 @@
 <span class="kn">import</span> <span class="nn">copy</span>
 <span class="kn">from</span> <span class="nn">yggdrasil</span> <span class="k">import</span> <span class="n">platform</span>
 <span class="kn">from</span> <span class="nn">yggdrasil.drivers.CModelDriver</span> <span class="k">import</span> <span class="p">(</span>
-    <span class="n">CCompilerBase</span><span class="p">,</span> <span class="n">CModelDriver</span><span class="p">,</span> <span class="n">GCCCompiler</span><span class="p">,</span> <span class="n">ClangCompiler</span><span class="p">)</span>
+    <span class="n">CCompilerBase</span><span class="p">,</span> <span class="n">CModelDriver</span><span class="p">,</span> <span class="n">GCCCompiler</span><span class="p">,</span> <span class="n">ClangCompiler</span><span class="p">,</span>
+    <span class="n">ClangLinker</span><span class="p">)</span>
 
 
 <div class="viewcode-block" id="CPPCompilerBase"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.CPPModelDriver.CPPCompilerBase">[docs]</a><span class="k">class</span> <span class="nc">CPPCompilerBase</span><span class="p">(</span><span class="n">CCompilerBase</span><span class="p">):</span>
@@ -182,16 +184,18 @@
     <span class="n">languages</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;c++&#39;</span><span class="p">]</span>
     <span class="n">default_executable_env</span> <span class="o">=</span> <span class="s1">&#39;CXX&#39;</span>
     <span class="n">default_flags_env</span> <span class="o">=</span> <span class="s1">&#39;CXXFLAGS&#39;</span>
-    <span class="n">cpp_std</span> <span class="o">=</span> <span class="s1">&#39;c++11&#39;</span>
+    <span class="n">cpp_std</span> <span class="o">=</span> <span class="s1">&#39;c++14&#39;</span>
     <span class="n">search_path_flags</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;-E&#39;</span><span class="p">,</span> <span class="s1">&#39;-v&#39;</span><span class="p">,</span> <span class="s1">&#39;-xc++&#39;</span><span class="p">,</span> <span class="s1">&#39;/dev/null&#39;</span><span class="p">]</span>
     <span class="n">default_linker</span> <span class="o">=</span> <span class="kc">None</span>
     <span class="n">default_executable</span> <span class="o">=</span> <span class="kc">None</span>
 
 <div class="viewcode-block" id="CPPCompilerBase.get_flags"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.CPPModelDriver.CPPCompilerBase.get_flags">[docs]</a>    <span class="nd">@classmethod</span>
-    <span class="k">def</span> <span class="nf">get_flags</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">get_flags</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">skip_standard_flag</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Get a list of compiler flags.</span>
 
 <span class="sd">        Args:</span>
+<span class="sd">            skip_standard_flag (bool, optional): If True, the C++ standard flag</span>
+<span class="sd">                will not be added. Defaults to False.</span>
 <span class="sd">            **kwargs: Additional keyword arguments are passed to the parent</span>
 <span class="sd">                class&#39;s method.</span>
 
@@ -201,13 +205,14 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">out</span> <span class="o">=</span> <span class="nb">super</span><span class="p">(</span><span class="n">CCompilerBase</span><span class="p">,</span> <span class="bp">cls</span><span class="p">)</span><span class="o">.</span><span class="n">get_flags</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
         <span class="c1"># Add standard library flag</span>
-        <span class="n">std_flag</span> <span class="o">=</span> <span class="kc">None</span>
-        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">a</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">out</span><span class="p">):</span>
-            <span class="k">if</span> <span class="n">a</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;-std=&#39;</span><span class="p">):</span>
-                <span class="n">std_flag</span> <span class="o">=</span> <span class="n">i</span>
-                <span class="k">break</span>
-        <span class="k">if</span> <span class="n">std_flag</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">out</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;-std=</span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="bp">cls</span><span class="o">.</span><span class="n">cpp_std</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">skip_standard_flag</span><span class="p">:</span>
+            <span class="n">std_flag</span> <span class="o">=</span> <span class="kc">None</span>
+            <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">a</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">out</span><span class="p">):</span>
+                <span class="k">if</span> <span class="n">a</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;-std=&#39;</span><span class="p">):</span>
+                    <span class="n">std_flag</span> <span class="o">=</span> <span class="n">i</span>
+                    <span class="k">break</span>
+            <span class="k">if</span> <span class="n">std_flag</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">out</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;-std=</span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="bp">cls</span><span class="o">.</span><span class="n">cpp_std</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">out</span></div></div>
     
 
@@ -217,8 +222,55 @@
 
 
 <div class="viewcode-block" id="ClangPPCompiler"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.CPPModelDriver.ClangPPCompiler">[docs]</a><span class="k">class</span> <span class="nc">ClangPPCompiler</span><span class="p">(</span><span class="n">CPPCompilerBase</span><span class="p">,</span> <span class="n">ClangCompiler</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;clang++ compiler on Apple Mac OS.&quot;&quot;&quot;</span>
-    <span class="n">toolname</span> <span class="o">=</span> <span class="s1">&#39;clang++&#39;</span></div>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Interface class for clang++ compiler.&quot;&quot;&quot;</span>
+    <span class="n">toolname</span> <span class="o">=</span> <span class="s1">&#39;clang++&#39;</span>
+    <span class="n">default_linker</span> <span class="o">=</span> <span class="s1">&#39;clang++&#39;</span>
+    <span class="c1"># Set to False since ClangLinker has its own class to handle</span>
+    <span class="c1"># conflict between versions of clang and ld.</span>
+    <span class="n">is_linker</span> <span class="o">=</span> <span class="kc">False</span>
+
+<div class="viewcode-block" id="ClangPPCompiler.before_registration"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.CPPModelDriver.ClangPPCompiler.before_registration">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">before_registration</span><span class="p">(</span><span class="bp">cls</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Operations that should be performed to modify class attributes prior</span>
+<span class="sd">        to registration including things like platform dependent properties and</span>
+<span class="sd">        checking environment variables for default settings.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">platform</span><span class="o">.</span><span class="n">_is_win</span><span class="p">:</span>  <span class="c1"># pragma: windows</span>
+            <span class="bp">cls</span><span class="o">.</span><span class="n">default_executable</span> <span class="o">=</span> <span class="s1">&#39;clang&#39;</span>
+        <span class="n">CPPCompilerBase</span><span class="o">.</span><span class="n">before_registration</span><span class="p">(</span><span class="bp">cls</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="ClangPPCompiler.get_executable_command"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.CPPModelDriver.ClangPPCompiler.get_executable_command">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">get_executable_command</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">args</span><span class="p">,</span> <span class="n">skip_flags</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">unused_kwargs</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                               <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Determine the command required to run the tool using the specified</span>
+<span class="sd">        arguments and options.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            args (list): The arguments that should be passed to the tool. If</span>
+<span class="sd">                skip_flags is False, these are treated as input files that will</span>
+<span class="sd">                be used by the tool.</span>
+<span class="sd">            **kwargs: Additional keyword arguments will be passed to the parent</span>
+<span class="sd">                class&#39;s method.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            str: Output to stdout from the command execution.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">platform</span><span class="o">.</span><span class="n">_is_win</span><span class="p">:</span>  <span class="c1"># pragma: windows</span>
+            <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="n">args</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">a</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s1">&#39;.c&#39;</span><span class="p">):</span>
+                    <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;skip_standard_flag&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
+                    <span class="k">break</span>
+        <span class="k">return</span> <span class="nb">super</span><span class="p">(</span><span class="n">ClangPPCompiler</span><span class="p">,</span> <span class="bp">cls</span><span class="p">)</span><span class="o">.</span><span class="n">get_executable_command</span><span class="p">(</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div></div>
+
+
+<div class="viewcode-block" id="ClangPPLinker"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.CPPModelDriver.ClangPPLinker">[docs]</a><span class="k">class</span> <span class="nc">ClangPPLinker</span><span class="p">(</span><span class="n">ClangLinker</span><span class="p">):</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Interface class for clang++ linker (calls to ld).&quot;&quot;&quot;</span>
+    <span class="n">toolname</span> <span class="o">=</span> <span class="n">ClangPPCompiler</span><span class="o">.</span><span class="n">toolname</span>
+    <span class="n">languages</span> <span class="o">=</span> <span class="n">ClangPPCompiler</span><span class="o">.</span><span class="n">languages</span>
+    <span class="n">default_executable</span> <span class="o">=</span> <span class="n">ClangPPCompiler</span><span class="o">.</span><span class="n">default_executable</span>
+    <span class="n">default_executable_env</span> <span class="o">=</span> <span class="n">ClangPPCompiler</span><span class="o">.</span><span class="n">default_executable_env</span>
+    <span class="n">toolset</span> <span class="o">=</span> <span class="n">ClangPPCompiler</span><span class="o">.</span><span class="n">toolset</span></div>
 
 
 <div class="viewcode-block" id="CPPModelDriver"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.CPPModelDriver.CPPModelDriver">[docs]</a><span class="k">class</span> <span class="nc">CPPModelDriver</span><span class="p">(</span><span class="n">CModelDriver</span><span class="p">):</span>
@@ -264,6 +316,7 @@
             <span class="sa">r</span><span class="s1">&#39;(?P&lt;name&gt;.+?)(?(2)(?:\)|(?:)))(?P&lt;shape&gt;(?:\[.+?\])+)?\s*(?:,|$)(?:\n)?&#39;</span><span class="p">))</span>
     <span class="n">include_arg_count</span> <span class="o">=</span> <span class="kc">True</span>
     <span class="n">include_channel_obj</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="n">dont_declare_channel</span> <span class="o">=</span> <span class="kc">True</span>
     
 <div class="viewcode-block" id="CPPModelDriver.after_registration"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.CPPModelDriver.CPPModelDriver.after_registration">[docs]</a>    <span class="nd">@staticmethod</span>
     <span class="k">def</span> <span class="nf">after_registration</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
@@ -292,19 +345,20 @@
             <span class="bp">cls</span><span class="o">.</span><span class="n">get_language_dir</span><span class="p">())</span>
         <span class="bp">cls</span><span class="o">.</span><span class="n">internal_libraries</span> <span class="o">=</span> <span class="n">internal_libs</span></div>
 
-<div class="viewcode-block" id="CPPModelDriver.set_env"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.CPPModelDriver.CPPModelDriver.set_env">[docs]</a>    <span class="k">def</span> <span class="nf">set_env</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Get environment variables that should be set for the model process.</span>
+<div class="viewcode-block" id="CPPModelDriver.set_env_class"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.CPPModelDriver.CPPModelDriver.set_env_class">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">set_env_class</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Set environment variables that are instance independent.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            **kwargs: Additional keyword arguments are passed to the parent</span>
-<span class="sd">                class&#39;s method.</span>
+<span class="sd">                class&#39;s method and update_ld_library_path.</span>
 
 <span class="sd">        Returns:</span>
 <span class="sd">            dict: Environment variables for the model process.</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">out</span> <span class="o">=</span> <span class="nb">super</span><span class="p">(</span><span class="n">CPPModelDriver</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">set_env</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
-        <span class="n">out</span> <span class="o">=</span> <span class="n">CModelDriver</span><span class="o">.</span><span class="n">update_ld_library_path</span><span class="p">(</span><span class="n">out</span><span class="p">)</span>
+        <span class="n">out</span> <span class="o">=</span> <span class="nb">super</span><span class="p">(</span><span class="n">CPPModelDriver</span><span class="p">,</span> <span class="bp">cls</span><span class="p">)</span><span class="o">.</span><span class="n">set_env_class</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="n">out</span> <span class="o">=</span> <span class="n">CModelDriver</span><span class="o">.</span><span class="n">update_ld_library_path</span><span class="p">(</span><span class="n">out</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">out</span></div>
         
 <div class="viewcode-block" id="CPPModelDriver.write_try_except"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.CPPModelDriver.CPPModelDriver.write_try_except">[docs]</a>    <span class="nd">@classmethod</span>

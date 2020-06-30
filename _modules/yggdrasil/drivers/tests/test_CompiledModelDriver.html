@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>yggdrasil.drivers.tests.test_CompiledModelDriver &mdash; yggdrasil 1.0.0+154.g684a530e.dirty documentation</title>
+  <title>yggdrasil.drivers.tests.test_CompiledModelDriver &mdash; yggdrasil 1.1.1+410.g95af39b2 documentation</title>
   
 
   
@@ -59,7 +59,7 @@
             
             
               <div class="version">
-                1.0.0
+                1.1.1
               </div>
             
           
@@ -94,6 +94,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../../autowrap.html#notes-on-autowrapping-c-c-model-functions">Notes on Autowrapping C/C++ Model Functions</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../conditional_io.html">Conditional I/O</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../transformed_io.html">Transformed I/O</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../timesync_io.html">Timestep Synchronization</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../yaml.html">YAML Files</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../config.html">Configuration Files</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../units.html">Units</a></li>
@@ -203,10 +204,10 @@
             <span class="n">assert_equal</span><span class="p">(</span><span class="n">CompiledModelDriver</span><span class="o">.</span><span class="n">get_compilation_tool</span><span class="p">(</span><span class="n">tooltype</span><span class="p">,</span> <span class="n">v</span><span class="p">),</span> <span class="n">out</span><span class="p">)</span>
         <span class="n">assert_raises</span><span class="p">(</span><span class="ne">ValueError</span><span class="p">,</span> <span class="n">CompiledModelDriver</span><span class="o">.</span><span class="n">get_compilation_tool</span><span class="p">,</span>
                       <span class="s1">&#39;compiler&#39;</span><span class="p">,</span> <span class="s1">&#39;invalid&#39;</span><span class="p">)</span>
-    <span class="k">else</span><span class="p">:</span>
-        <span class="n">assert_raises</span><span class="p">(</span><span class="ne">NotImplementedError</span><span class="p">,</span> <span class="n">CModelDriver</span><span class="o">.</span><span class="n">get_tool</span><span class="p">,</span> <span class="s1">&#39;compiler&#39;</span><span class="p">)</span>
-        <span class="n">assert_equal</span><span class="p">(</span><span class="n">CModelDriver</span><span class="o">.</span><span class="n">get_tool</span><span class="p">(</span>
-            <span class="s1">&#39;compiler&#39;</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="s1">&#39;invalid&#39;</span><span class="p">),</span> <span class="s1">&#39;invalid&#39;</span><span class="p">)</span>
+    <span class="c1"># else:</span>
+    <span class="c1">#     assert_raises(NotImplementedError, CModelDriver.get_tool, &#39;compiler&#39;)</span>
+    <span class="c1">#     assert_equal(CModelDriver.get_tool(</span>
+    <span class="c1">#         &#39;compiler&#39;, default=&#39;invalid&#39;), &#39;invalid&#39;)</span>
     <span class="n">assert_equal</span><span class="p">(</span><span class="n">CompiledModelDriver</span><span class="o">.</span><span class="n">get_compilation_tool</span><span class="p">(</span><span class="s1">&#39;compiler&#39;</span><span class="p">,</span> <span class="s1">&#39;invalid&#39;</span><span class="p">,</span>
                                                           <span class="n">default</span><span class="o">=</span><span class="s1">&#39;invalid&#39;</span><span class="p">),</span> <span class="s1">&#39;invalid&#39;</span><span class="p">)</span></div>
 
@@ -222,7 +223,7 @@
     <span class="n">_dont_register</span> <span class="o">=</span> <span class="kc">True</span>
     <span class="n">toolname</span> <span class="o">=</span> <span class="s1">&#39;dummy&#39;</span>
     <span class="n">languages</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;dummy&#39;</span><span class="p">]</span>
-    <span class="n">search_path_env</span> <span class="o">=</span> <span class="s1">&#39;PATH&#39;</span>
+    <span class="n">search_path_envvar</span> <span class="o">=</span> <span class="s1">&#39;PATH&#39;</span>
     <span class="n">_language_ext</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;.c&#39;</span><span class="p">]</span>
     <span class="n">default_linker</span> <span class="o">=</span> <span class="kc">False</span>
     <span class="n">default_archiver</span> <span class="o">=</span> <span class="kc">None</span>
@@ -492,7 +493,11 @@
         <span class="c1"># Record old tools</span>
         <span class="n">old_tools</span> <span class="o">=</span> <span class="p">{}</span>
         <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;compiler&#39;</span><span class="p">,</span> <span class="s1">&#39;linker&#39;</span><span class="p">,</span> <span class="s1">&#39;achiver&#39;</span><span class="p">]:</span>
-            <span class="n">old_tools</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="p">,</span> <span class="s1">&#39;</span><span class="si">%s</span><span class="s1">_tool&#39;</span> <span class="o">%</span> <span class="n">k</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+            <span class="n">old_tools</span><span class="p">[</span><span class="s1">&#39;</span><span class="si">%s</span><span class="s1">_tool&#39;</span> <span class="o">%</span> <span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="p">,</span>
+                                               <span class="s1">&#39;</span><span class="si">%s</span><span class="s1">_tool&#39;</span> <span class="o">%</span> <span class="n">k</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;compiler_flags&#39;</span><span class="p">,</span> <span class="s1">&#39;linker_flags&#39;</span><span class="p">]:</span>
+            <span class="n">old_tools</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="p">,</span> <span class="n">k</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+            <span class="nb">setattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="p">,</span> <span class="n">k</span><span class="p">,</span> <span class="p">[])</span>
         <span class="c1"># Compile with each compiler</span>
         <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">import_cls</span><span class="o">.</span><span class="n">get_available_tools</span><span class="p">(</span><span class="s1">&#39;compiler&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
             <span class="k">if</span> <span class="p">(</span><span class="ow">not</span> <span class="n">v</span><span class="o">.</span><span class="n">is_installed</span><span class="p">())</span> <span class="ow">or</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="s1">&#39;is_build_tool&#39;</span><span class="p">,</span> <span class="kc">False</span><span class="p">):</span>
@@ -503,7 +508,7 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="o">.</span><span class="n">compile_model</span><span class="p">()</span>
         <span class="c1"># Restore the old tools</span>
         <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">old_tools</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
-            <span class="nb">setattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="p">,</span> <span class="s1">&#39;</span><span class="si">%s</span><span class="s1">_tool&#39;</span> <span class="o">%</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span><span class="p">)</span></div>
+            <span class="nb">setattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="p">,</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="TestCompiledModelDriverNoStart.test_compile_model"><a class="viewcode-back" href="../../../../yggdrasil.drivers.tests.html#yggdrasil.drivers.tests.test_CompiledModelDriver.TestCompiledModelDriverNoStart.test_compile_model">[docs]</a>    <span class="k">def</span> <span class="nf">test_compile_model</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test compile model with alternate set of input arguments.&quot;&quot;&quot;</span>

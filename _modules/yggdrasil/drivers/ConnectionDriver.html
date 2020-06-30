@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>yggdrasil.drivers.ConnectionDriver &mdash; yggdrasil 1.0.0+154.g684a530e.dirty documentation</title>
+  <title>yggdrasil.drivers.ConnectionDriver &mdash; yggdrasil 1.1.1+410.g95af39b2 documentation</title>
   
 
   
@@ -59,7 +59,7 @@
             
             
               <div class="version">
-                1.0.0
+                1.1.1
               </div>
             
           
@@ -94,6 +94,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../autowrap.html#notes-on-autowrapping-c-c-model-functions">Notes on Autowrapping C/C++ Model Functions</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../conditional_io.html">Conditional I/O</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../transformed_io.html">Transformed I/O</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../timesync_io.html">Timestep Synchronization</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../yaml.html">YAML Files</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../config.html">Configuration Files</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../units.html">Units</a></li>
@@ -174,7 +175,9 @@
 <span class="kn">import</span> <span class="nn">os</span>
 <span class="kn">import</span> <span class="nn">copy</span>
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
-<span class="kn">import</span> <span class="nn">threading</span>
+<span class="kn">import</span> <span class="nn">functools</span>
+<span class="kn">import</span> <span class="nn">queue</span>
+<span class="kn">from</span> <span class="nn">yggdrasil</span> <span class="k">import</span> <span class="n">multitasking</span>
 <span class="kn">from</span> <span class="nn">yggdrasil.communication</span> <span class="k">import</span> <span class="n">new_comm</span>
 <span class="kn">from</span> <span class="nn">yggdrasil.drivers.Driver</span> <span class="k">import</span> <span class="n">Driver</span>
 <span class="kn">from</span> <span class="nn">yggdrasil.components</span> <span class="k">import</span> <span class="p">(</span>
@@ -186,6 +189,107 @@
     <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">arr</span><span class="p">,</span> <span class="p">(</span><span class="nb">list</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">)):</span>
         <span class="n">arr</span> <span class="o">=</span> <span class="n">arr</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
     <span class="k">return</span> <span class="n">arr</span>
+
+
+<div class="viewcode-block" id="TaskThreadError"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.ConnectionDriver.TaskThreadError">[docs]</a><span class="k">class</span> <span class="nc">TaskThreadError</span><span class="p">(</span><span class="ne">RuntimeError</span><span class="p">):</span>
+    <span class="k">pass</span></div>
+
+
+<div class="viewcode-block" id="run_remotely"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.ConnectionDriver.run_remotely">[docs]</a><span class="k">def</span> <span class="nf">run_remotely</span><span class="p">(</span><span class="n">method</span><span class="p">):</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Decorator for methods that should be run remotely.&quot;&quot;&quot;</span>
+    <span class="nd">@functools</span><span class="o">.</span><span class="n">wraps</span><span class="p">(</span><span class="n">method</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">modified_method</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="n">method_name</span> <span class="o">=</span> <span class="n">method</span><span class="o">.</span><span class="vm">__name__</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">can_run_remotely</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">task_thread</span><span class="o">.</span><span class="n">run_task_remote</span><span class="p">(</span><span class="n">method_name</span><span class="p">,</span> <span class="n">args</span><span class="p">,</span> <span class="n">kwargs</span><span class="p">)</span>
+            <span class="k">except</span> <span class="p">(</span><span class="n">TaskThreadError</span><span class="p">,</span>
+                    <span class="n">multitasking</span><span class="o">.</span><span class="n">AliasDisconnectError</span><span class="p">):</span>  <span class="c1"># pragma: debug</span>
+                <span class="k">pass</span>
+        <span class="k">return</span> <span class="n">method</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">modified_method</span></div>
+
+
+<div class="viewcode-block" id="RemoteTaskLoop"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.ConnectionDriver.RemoteTaskLoop">[docs]</a><span class="k">class</span> <span class="nc">RemoteTaskLoop</span><span class="p">(</span><span class="n">multitasking</span><span class="o">.</span><span class="n">YggTaskLoop</span><span class="p">):</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Class to handle running tasks on the connection loop process.&quot;&quot;&quot;</span>
+
+    <span class="n">_disconnect_attr</span> <span class="o">=</span> <span class="p">(</span><span class="n">multitasking</span><span class="o">.</span><span class="n">YggTaskLoop</span><span class="o">.</span><span class="n">_disconnect_attr</span>
+                        <span class="o">+</span> <span class="p">[</span><span class="s1">&#39;q_tasks&#39;</span><span class="p">,</span> <span class="s1">&#39;q_results&#39;</span><span class="p">])</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">connection</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">connection</span> <span class="o">=</span> <span class="n">connection</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">q_tasks</span> <span class="o">=</span> <span class="n">multitasking</span><span class="o">.</span><span class="n">Queue</span><span class="p">(</span>
+            <span class="n">task_method</span><span class="o">=</span><span class="s1">&#39;process&#39;</span><span class="p">,</span>
+            <span class="n">task_context</span><span class="o">=</span><span class="n">connection</span><span class="o">.</span><span class="n">process_instance</span><span class="o">.</span><span class="n">context</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">q_results</span> <span class="o">=</span> <span class="n">multitasking</span><span class="o">.</span><span class="n">Queue</span><span class="p">(</span>
+            <span class="n">task_method</span><span class="o">=</span><span class="s1">&#39;process&#39;</span><span class="p">,</span>
+            <span class="n">task_context</span><span class="o">=</span><span class="n">connection</span><span class="o">.</span><span class="n">process_instance</span><span class="o">.</span><span class="n">context</span><span class="p">)</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">RemoteTaskLoop</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">target</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">target</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="c1"># Overwrite break flag with process safe Event</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">break_flag</span> <span class="o">=</span> <span class="n">multitasking</span><span class="o">.</span><span class="n">Event</span><span class="p">(</span>
+            <span class="n">task_method</span><span class="o">=</span><span class="s1">&#39;process&#39;</span><span class="p">,</span>
+            <span class="n">task_context</span><span class="o">=</span><span class="n">connection</span><span class="o">.</span><span class="n">process_instance</span><span class="o">.</span><span class="n">context</span><span class="p">)</span>
+
+<div class="viewcode-block" id="RemoteTaskLoop.is_open"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.ConnectionDriver.RemoteTaskLoop.is_open">[docs]</a>    <span class="k">def</span> <span class="nf">is_open</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="p">(</span><span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">was_break</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="RemoteTaskLoop.close"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.ConnectionDriver.RemoteTaskLoop.close">[docs]</a>    <span class="k">def</span> <span class="nf">close</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Close the queues.&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">terminate</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">q_tasks</span><span class="o">.</span><span class="n">disconnect</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">q_results</span><span class="o">.</span><span class="n">disconnect</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="RemoteTaskLoop.run_task_local"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.ConnectionDriver.RemoteTaskLoop.run_task_local">[docs]</a>    <span class="k">def</span> <span class="nf">run_task_local</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">task</span><span class="p">,</span> <span class="n">args</span><span class="p">,</span> <span class="n">kwargs</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Run task on the current process.&quot;&quot;&quot;</span>
+        <span class="n">f_task</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">connection</span><span class="p">,</span> <span class="n">task</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">f_task</span><span class="p">,</span> <span class="s1">&#39;__call__&#39;</span><span class="p">):</span>
+            <span class="n">out</span> <span class="o">=</span> <span class="n">f_task</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">out</span> <span class="o">=</span> <span class="n">f_task</span>
+        <span class="k">return</span> <span class="n">out</span></div>
+
+<div class="viewcode-block" id="RemoteTaskLoop.run_task_remote"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.ConnectionDriver.RemoteTaskLoop.run_task_remote">[docs]</a>    <span class="k">def</span> <span class="nf">run_task_remote</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">task</span><span class="p">,</span> <span class="n">args</span><span class="p">,</span> <span class="n">kwargs</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Run task on the connection loop process.&quot;&quot;&quot;</span>
+        <span class="k">assert</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">connection</span><span class="o">.</span><span class="n">as_process</span>
+               <span class="ow">and</span> <span class="p">(</span><span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">connection</span><span class="o">.</span><span class="n">in_process</span><span class="p">)</span>
+               <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">connection</span><span class="o">.</span><span class="n">is_alive</span><span class="p">())</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">break_flag</span><span class="o">.</span><span class="n">is_set</span><span class="p">():</span>  <span class="c1"># pragma: debug</span>
+            <span class="k">raise</span> <span class="n">TaskThreadError</span><span class="p">(</span><span class="s2">&quot;Task thread was stopped.&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">q_tasks</span><span class="o">.</span><span class="n">put_nowait</span><span class="p">((</span><span class="n">task</span><span class="p">,</span> <span class="n">args</span><span class="p">,</span> <span class="n">kwargs</span><span class="p">))</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">out</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">q_results</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">timeout</span><span class="o">=</span><span class="mf">180.0</span><span class="p">)</span>
+        <span class="k">except</span> <span class="n">queue</span><span class="o">.</span><span class="n">Empty</span><span class="p">:</span>  <span class="c1"># pragma: debug</span>
+            <span class="k">raise</span> <span class="n">TaskThreadError</span><span class="p">(</span><span class="s2">&quot;Task thread was stopped.&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">out</span> <span class="o">==</span> <span class="s1">&#39;TERMINATED&#39;</span><span class="p">:</span>  <span class="c1"># pragma: debug</span>
+            <span class="k">raise</span> <span class="n">TaskThreadError</span><span class="p">(</span><span class="s2">&quot;Task thread was stopped.&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">out</span></div>
+
+<div class="viewcode-block" id="RemoteTaskLoop.after_loop"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.ConnectionDriver.RemoteTaskLoop.after_loop">[docs]</a>    <span class="k">def</span> <span class="nf">after_loop</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Actions performed after the loop.&quot;&quot;&quot;</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">RemoteTaskLoop</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">after_loop</span><span class="p">()</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">while</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">q_tasks</span><span class="o">.</span><span class="n">empty</span><span class="p">():</span>  <span class="c1"># pragma: debug</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">q_tasks</span><span class="o">.</span><span class="n">get_nowait</span><span class="p">()</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">q_results</span><span class="o">.</span><span class="n">put</span><span class="p">(</span><span class="s1">&#39;TERMINATED&#39;</span><span class="p">)</span>
+        <span class="k">except</span> <span class="n">multitasking</span><span class="o">.</span><span class="n">AliasDisconnectError</span><span class="p">:</span>  <span class="c1"># pragma: debug</span>
+            <span class="k">pass</span></div>
+
+<div class="viewcode-block" id="RemoteTaskLoop.target"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.ConnectionDriver.RemoteTaskLoop.target">[docs]</a>    <span class="k">def</span> <span class="nf">target</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Complete all pending tasks.&quot;&quot;&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">while</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">q_tasks</span><span class="o">.</span><span class="n">empty</span><span class="p">():</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Task waiting&quot;</span><span class="p">)</span>
+                <span class="n">args</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">q_tasks</span><span class="o">.</span><span class="n">get_nowait</span><span class="p">()</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Task received: </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">args</span><span class="p">)</span>
+                <span class="n">out</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">run_task_local</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Task complete: </span><span class="si">%s</span><span class="s2"> = </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">args</span><span class="p">,</span> <span class="n">out</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">q_results</span><span class="o">.</span><span class="n">put</span><span class="p">(</span><span class="n">out</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Task returned: </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">args</span><span class="p">)</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">was_break</span><span class="p">:</span>
+                <span class="k">return</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">sleep</span><span class="p">()</span>
+        <span class="k">except</span> <span class="n">multitasking</span><span class="o">.</span><span class="n">AliasDisconnectError</span><span class="p">:</span>  <span class="c1"># pragma: debug</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">set_break_flag</span><span class="p">()</span></div></div>
 
 
 <div class="viewcode-block" id="ConnectionDriver"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.ConnectionDriver.ConnectionDriver">[docs]</a><span class="k">class</span> <span class="nc">ConnectionDriver</span><span class="p">(</span><span class="n">Driver</span><span class="p">):</span>
@@ -270,6 +374,8 @@
                            <span class="p">{</span><span class="s1">&#39;$ref&#39;</span><span class="p">:</span> <span class="s1">&#39;#/definitions/transform&#39;</span><span class="p">}]}},</span>
         <span class="s1">&#39;onexit&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;string&#39;</span><span class="p">}}</span>
     <span class="n">_schema_excluded_from_class_validation</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;inputs&#39;</span><span class="p">,</span> <span class="s1">&#39;outputs&#39;</span><span class="p">]</span>
+    <span class="n">_disconnect_attr</span> <span class="o">=</span> <span class="n">Driver</span><span class="o">.</span><span class="n">_disconnect_attr</span> <span class="o">+</span> <span class="p">[</span>
+        <span class="s1">&#39;_comm_closed&#39;</span><span class="p">,</span> <span class="s1">&#39;_skip_after_loop&#39;</span><span class="p">,</span> <span class="s1">&#39;shared&#39;</span><span class="p">,</span> <span class="s1">&#39;task_thread&#39;</span><span class="p">]</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">_is_input</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -283,6 +389,22 @@
 
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">translator</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">single_use</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">onexit</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">ConnectionDriver</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="c1"># Shared attributes (set once or synced using events)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">single_use</span> <span class="o">=</span> <span class="n">single_use</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">shared</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">context</span><span class="o">.</span><span class="n">Dict</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">shared</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">nrecv</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">nproc</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">nsent</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">nskip</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+                           <span class="n">state</span><span class="o">=</span><span class="s1">&#39;started&#39;</span><span class="p">,</span> <span class="n">close_state</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">,</span>
+                           <span class="n">_comm_closed</span><span class="o">=</span><span class="n">multitasking</span><span class="o">.</span><span class="n">DummyEvent</span><span class="p">(),</span>
+                           <span class="n">_skip_after_loop</span><span class="o">=</span><span class="n">multitasking</span><span class="o">.</span><span class="n">DummyEvent</span><span class="p">())</span>
+        <span class="c1"># Attributes used by process</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_eof_sent</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_first_send_done</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_used</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">onexit</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">task_thread</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">as_process</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">task_thread</span> <span class="o">=</span> <span class="n">RemoteTaskLoop</span><span class="p">(</span>
+                <span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">%s</span><span class="s1">.TaskThread&#39;</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">))</span>
         <span class="c1"># Translator</span>
         <span class="k">if</span> <span class="n">translator</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">translator</span> <span class="o">=</span> <span class="p">[]</span>
@@ -298,21 +420,6 @@
         <span class="k">if</span> <span class="p">(</span><span class="n">onexit</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">onexit</span><span class="p">)):</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;onexit &#39;</span><span class="si">%s</span><span class="s2">&#39; is not a class method.&quot;</span> <span class="o">%</span> <span class="n">onexit</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">onexit</span> <span class="o">=</span> <span class="n">onexit</span>
-        <span class="c1"># Attributes</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_eof_sent</span> <span class="o">=</span> <span class="kc">False</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">single_use</span> <span class="o">=</span> <span class="n">single_use</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_first_send_done</span> <span class="o">=</span> <span class="kc">False</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_comm_opened</span> <span class="o">=</span> <span class="n">threading</span><span class="o">.</span><span class="n">Event</span><span class="p">()</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_comm_closed</span> <span class="o">=</span> <span class="kc">False</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_used</span> <span class="o">=</span> <span class="kc">False</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_skip_after_loop</span> <span class="o">=</span> <span class="kc">False</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_model_exited</span> <span class="o">=</span> <span class="kc">False</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">nrecv</span> <span class="o">=</span> <span class="mi">0</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">nproc</span> <span class="o">=</span> <span class="mi">0</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">nsent</span> <span class="o">=</span> <span class="mi">0</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">nskip</span> <span class="o">=</span> <span class="mi">0</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">state</span> <span class="o">=</span> <span class="s1">&#39;started&#39;</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">close_state</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
         <span class="c1"># Add comms and print debug info</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_init_comms</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
         <span class="c1"># self.debug(&#39;    env: %s&#39;, str(self.env))</span>
@@ -370,6 +477,8 @@
                 <span class="k">else</span><span class="p">:</span>
                     <span class="n">all_files</span> <span class="o">=</span> <span class="kc">False</span>
                     <span class="n">ikws</span> <span class="o">+=</span> <span class="n">s</span><span class="p">[</span><span class="s1">&#39;comm&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">get_subtype_properties</span><span class="p">(</span><span class="n">icomm_cls</span><span class="o">.</span><span class="n">_commtype</span><span class="p">)</span>
+                    <span class="k">if</span> <span class="p">(</span><span class="n">icomm_cls</span><span class="o">.</span><span class="n">_commtype</span> <span class="o">==</span> <span class="s1">&#39;buffer&#39;</span><span class="p">)</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">as_process</span><span class="p">:</span>
+                        <span class="n">x</span><span class="p">[</span><span class="s1">&#39;buffer_task_method&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;process&#39;</span>
             <span class="n">ikws</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">ikws</span><span class="p">))</span>
             <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">ikws</span><span class="p">:</span>
                 <span class="k">if</span> <span class="p">(</span><span class="n">k</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">comm_kws</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">k</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="p">):</span>
@@ -379,6 +488,7 @@
         <span class="k">if</span> <span class="n">any_files</span> <span class="ow">and</span> <span class="p">(</span><span class="n">io</span> <span class="o">==</span> <span class="s1">&#39;input&#39;</span><span class="p">):</span>
             <span class="n">kwargs</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s1">&#39;timeout_send_1st&#39;</span><span class="p">,</span> <span class="mi">60</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">%s</span><span class="s1"> comm_kws:</span><span class="se">\n</span><span class="si">%s</span><span class="s1">&#39;</span><span class="p">,</span> <span class="n">attr_comm</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">pprint</span><span class="p">(</span><span class="n">comm_kws</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span>
+        <span class="n">comm_kws</span><span class="p">[</span><span class="s1">&#39;touches_model&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">touches_model</span>
         <span class="nb">setattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">attr_comm</span><span class="p">,</span> <span class="n">new_comm</span><span class="p">(</span><span class="o">**</span><span class="n">comm_kws</span><span class="p">))</span>
         <span class="nb">setattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;</span><span class="si">%s</span><span class="s1">_kws&#39;</span> <span class="o">%</span> <span class="n">attr_comm</span><span class="p">,</span> <span class="n">comm_kws</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">touches_model</span><span class="p">:</span>
@@ -398,8 +508,88 @@
         <span class="c1"># Apply keywords dependent on comms</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">timeout_send_1st</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;timeout_send_1st&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">timeout</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;Final env:</span><span class="se">\n</span><span class="si">%s</span><span class="s1">&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">pprint</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">env</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span>
-        
-<div class="viewcode-block" id="ConnectionDriver.wait_for_route"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.ConnectionDriver.ConnectionDriver.wait_for_route">[docs]</a>    <span class="k">def</span> <span class="nf">wait_for_route</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+
+<div class="viewcode-block" id="ConnectionDriver.get_flag_attr"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.ConnectionDriver.ConnectionDriver.get_flag_attr">[docs]</a>    <span class="k">def</span> <span class="nf">get_flag_attr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">attr</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Return the flag attribute.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">attr</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">shared</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">shared</span><span class="p">[</span><span class="n">attr</span><span class="p">]</span>
+        <span class="k">return</span> <span class="nb">super</span><span class="p">(</span><span class="n">ConnectionDriver</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">get_flag_attr</span><span class="p">(</span><span class="n">attr</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="ConnectionDriver.set_flag_attr"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.ConnectionDriver.ConnectionDriver.set_flag_attr">[docs]</a>    <span class="k">def</span> <span class="nf">set_flag_attr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">attr</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Set a flag.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">attr</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">shared</span><span class="p">:</span>
+            <span class="n">exist</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">shared</span><span class="p">[</span><span class="n">attr</span><span class="p">]</span>
+            <span class="k">if</span> <span class="n">value</span><span class="p">:</span>
+                <span class="n">exist</span><span class="o">.</span><span class="n">set</span><span class="p">()</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">exist</span><span class="o">.</span><span class="n">clear</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">shared</span><span class="p">[</span><span class="n">attr</span><span class="p">]</span> <span class="o">=</span> <span class="n">exist</span>
+            <span class="k">return</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">ConnectionDriver</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">set_flag_attr</span><span class="p">(</span><span class="n">attr</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="n">value</span><span class="p">)</span></div>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">nrecv</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;int: Number of messages received.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">shared</span><span class="p">[</span><span class="s1">&#39;nrecv&#39;</span><span class="p">]</span>
+
+    <span class="nd">@nrecv</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">nrecv</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">shared</span><span class="p">[</span><span class="s1">&#39;nrecv&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">x</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">nsent</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;int: Number of messages sent.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">shared</span><span class="p">[</span><span class="s1">&#39;nsent&#39;</span><span class="p">]</span>
+
+    <span class="nd">@nsent</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">nsent</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">shared</span><span class="p">[</span><span class="s1">&#39;nsent&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">x</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">nskip</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;int: Number of messages skipped.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">shared</span><span class="p">[</span><span class="s1">&#39;nskip&#39;</span><span class="p">]</span>
+
+    <span class="nd">@nskip</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">nskip</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">shared</span><span class="p">[</span><span class="s1">&#39;nskip&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">x</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">nproc</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;int: Number of messages processed.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">shared</span><span class="p">[</span><span class="s1">&#39;nproc&#39;</span><span class="p">]</span>
+
+    <span class="nd">@nproc</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">nproc</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">shared</span><span class="p">[</span><span class="s1">&#39;nproc&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">x</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">state</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;str: Current state of the connection.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">shared</span><span class="p">[</span><span class="s1">&#39;state&#39;</span><span class="p">]</span>
+
+    <span class="nd">@state</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">state</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">shared</span><span class="p">[</span><span class="s1">&#39;state&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">x</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">close_state</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;str: State of the connection at close.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">shared</span><span class="p">[</span><span class="s1">&#39;close_state&#39;</span><span class="p">]</span>
+
+    <span class="nd">@close_state</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">close_state</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">shared</span><span class="p">[</span><span class="s1">&#39;close_state&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">x</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">can_run_remotely</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;bool: True if process should be run remotely.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">as_process</span> <span class="ow">and</span> <span class="p">(</span><span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">in_process</span><span class="p">)</span>
+                <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_alive</span><span class="p">()</span>
+                <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">task_thread</span><span class="o">.</span><span class="n">is_open</span><span class="p">())</span>
+
+<div class="viewcode-block" id="ConnectionDriver.wait_for_route"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.ConnectionDriver.ConnectionDriver.wait_for_route">[docs]</a>    <span class="nd">@run_remotely</span>
+    <span class="k">def</span> <span class="nf">wait_for_route</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Wait until messages have been routed.&quot;&quot;&quot;</span>
         <span class="n">T</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">start_timeout</span><span class="p">(</span><span class="n">timeout</span><span class="p">)</span>
         <span class="k">while</span> <span class="p">((</span><span class="ow">not</span> <span class="n">T</span><span class="o">.</span><span class="n">is_out</span><span class="p">)</span>
@@ -409,6 +599,7 @@
         <span class="k">return</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">nrecv</span> <span class="o">==</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">nsent</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">nskip</span><span class="p">))</span></div>
 
     <span class="nd">@property</span>
+    <span class="nd">@run_remotely</span>
     <span class="k">def</span> <span class="nf">is_valid</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;bool: Returns True if the connection is open and the parent class</span>
 <span class="sd">        is valid.&quot;&quot;&quot;</span>
@@ -417,19 +608,22 @@
                     <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_comm_open</span> <span class="ow">and</span> <span class="ow">not</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">single_use</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">_used</span><span class="p">))</span>
 
     <span class="nd">@property</span>
+    <span class="nd">@run_remotely</span>
     <span class="k">def</span> <span class="nf">is_comm_open</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;bool: Returns True if both communicators are open.&quot;&quot;&quot;</span>
         <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">lock</span><span class="p">:</span>
             <span class="k">return</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">icomm</span><span class="o">.</span><span class="n">is_open</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">ocomm</span><span class="o">.</span><span class="n">is_open</span>
-                    <span class="ow">and</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_comm_closed</span><span class="p">)</span>
+                    <span class="ow">and</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">check_flag_attr</span><span class="p">(</span><span class="s1">&#39;_comm_closed&#39;</span><span class="p">))</span>
 
     <span class="nd">@property</span>
+    <span class="nd">@run_remotely</span>
     <span class="k">def</span> <span class="nf">is_comm_closed</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;bool: Returns True if both communicators are closed.&quot;&quot;&quot;</span>
         <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">lock</span><span class="p">:</span>
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">icomm</span><span class="o">.</span><span class="n">is_closed</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">ocomm</span><span class="o">.</span><span class="n">is_closed</span>
 
     <span class="nd">@property</span>
+    <span class="nd">@run_remotely</span>
     <span class="k">def</span> <span class="nf">n_msg</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;int: Number of messages waiting in input communicator.&quot;&quot;&quot;</span>
         <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">lock</span><span class="p">:</span>
@@ -439,7 +633,7 @@
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Open the communicators.&quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;&#39;</span><span class="p">)</span>
         <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">lock</span><span class="p">:</span>
-            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_comm_closed</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">check_flag_attr</span><span class="p">(</span><span class="s1">&#39;_comm_closed&#39;</span><span class="p">):</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;Aborted as comm closed&#39;</span><span class="p">)</span>
                 <span class="k">return</span>
             <span class="k">try</span><span class="p">:</span>
@@ -448,15 +642,15 @@
             <span class="k">except</span> <span class="ne">BaseException</span><span class="p">:</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">close_comm</span><span class="p">()</span>
                 <span class="k">raise</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_comm_opened</span><span class="o">.</span><span class="n">set</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;Returning&#39;</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="ConnectionDriver.close_comm"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.ConnectionDriver.ConnectionDriver.close_comm">[docs]</a>    <span class="k">def</span> <span class="nf">close_comm</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="ConnectionDriver.close_comm"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.ConnectionDriver.ConnectionDriver.close_comm">[docs]</a>    <span class="nd">@run_remotely</span>
+    <span class="k">def</span> <span class="nf">close_comm</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Close the communicators.&quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;&#39;</span><span class="p">)</span>
         <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">lock</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_comm_closed</span> <span class="o">=</span> <span class="kc">True</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_skip_after_loop</span> <span class="o">=</span> <span class="kc">True</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">set_flag_attr</span><span class="p">(</span><span class="s1">&#39;_comm_closed&#39;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">set_flag_attr</span><span class="p">(</span><span class="s1">&#39;_skip_after_loop&#39;</span><span class="p">)</span>
             <span class="c1"># Capture errors for both comms</span>
             <span class="n">ie</span> <span class="o">=</span> <span class="kc">None</span>
             <span class="n">oe</span> <span class="o">=</span> <span class="kc">None</span>
@@ -478,14 +672,20 @@
 
 <div class="viewcode-block" id="ConnectionDriver.start"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.ConnectionDriver.ConnectionDriver.start">[docs]</a>    <span class="k">def</span> <span class="nf">start</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Open connection before running.&quot;&quot;&quot;</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">open_comm</span><span class="p">()</span>
-        <span class="n">Tout</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">start_timeout</span><span class="p">()</span>
-        <span class="k">while</span> <span class="p">(</span><span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_comm_open</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="ow">not</span> <span class="n">Tout</span><span class="o">.</span><span class="n">is_out</span><span class="p">):</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">sleep</span><span class="p">()</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">stop_timeout</span><span class="p">()</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_comm_open</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s2">&quot;Connection never finished opening.&quot;</span><span class="p">)</span>
-        <span class="nb">super</span><span class="p">(</span><span class="n">ConnectionDriver</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">start</span><span class="p">()</span></div>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">as_process</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">open_comm</span><span class="p">()</span>
+            <span class="n">Tout</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">start_timeout</span><span class="p">()</span>
+            <span class="k">while</span> <span class="p">(</span><span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_comm_open</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="ow">not</span> <span class="n">Tout</span><span class="o">.</span><span class="n">is_out</span><span class="p">):</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">sleep</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">stop_timeout</span><span class="p">()</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_comm_open</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s2">&quot;Connection never finished opening.&quot;</span><span class="p">)</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">ConnectionDriver</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;Started connection process&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">as_process</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">wait_flag_attr</span><span class="p">(</span><span class="s1">&#39;loop_flag&#39;</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="mf">120.0</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">icomm</span><span class="o">.</span><span class="n">disconnect</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">ocomm</span><span class="o">.</span><span class="n">disconnect</span><span class="p">()</span></div>
 
 <div class="viewcode-block" id="ConnectionDriver.graceful_stop"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.ConnectionDriver.ConnectionDriver.graceful_stop">[docs]</a>    <span class="k">def</span> <span class="nf">graceful_stop</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Stop the driver, first waiting for the input comm to be empty.</span>
@@ -500,16 +700,16 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;&#39;</span><span class="p">)</span>
         <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">lock</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">set_close_state</span><span class="p">(</span><span class="s1">&#39;stop&#39;</span><span class="p">)</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_skip_after_loop</span> <span class="o">=</span> <span class="kc">True</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">set_flag_attr</span><span class="p">(</span><span class="s1">&#39;_skip_after_loop&#39;</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">drain_input</span><span class="p">(</span><span class="n">timeout</span><span class="o">=</span><span class="n">timeout</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">wait_for_route</span><span class="p">(</span><span class="n">timeout</span><span class="o">=</span><span class="n">timeout</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">drain_output</span><span class="p">(</span><span class="n">timeout</span><span class="o">=</span><span class="n">timeout</span><span class="p">)</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">ConnectionDriver</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">graceful_stop</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;Returning&#39;</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="ConnectionDriver.on_model_exit"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.ConnectionDriver.ConnectionDriver.on_model_exit">[docs]</a>    <span class="k">def</span> <span class="nf">on_model_exit</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Drain input and then close it.&quot;&quot;&quot;</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;&#39;</span><span class="p">)</span>
+<div class="viewcode-block" id="ConnectionDriver.on_model_exit_remote"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.ConnectionDriver.ConnectionDriver.on_model_exit_remote">[docs]</a>    <span class="nd">@run_remotely</span>
+    <span class="k">def</span> <span class="nf">on_model_exit_remote</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Drain input and then close it (on the remote process).&quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">onexit</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">[</span><span class="kc">None</span><span class="p">,</span> <span class="s1">&#39;on_model_exit&#39;</span><span class="p">,</span> <span class="s1">&#39;pass&#39;</span><span class="p">]):</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Calling onexit = &#39;</span><span class="si">%s</span><span class="s2">&#39;&quot;</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">onexit</span><span class="p">)</span>
             <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">onexit</span><span class="p">)()</span>
@@ -524,7 +724,12 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">wait_for_route</span><span class="p">(</span><span class="n">timeout</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">timeout</span><span class="p">)</span>
             <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">lock</span><span class="p">:</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">icomm</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">set_break_flag</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">set_break_flag</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="ConnectionDriver.on_model_exit"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.ConnectionDriver.ConnectionDriver.on_model_exit">[docs]</a>    <span class="k">def</span> <span class="nf">on_model_exit</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Drain input and then close it.&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">on_model_exit_remote</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">wait</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;Finished&#39;</span><span class="p">)</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">ConnectionDriver</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">on_model_exit</span><span class="p">()</span></div>
@@ -534,15 +739,19 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;&#39;</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">set_close_state</span><span class="p">(</span><span class="s1">&#39;terminate&#39;</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">close_comm</span><span class="p">()</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">as_process</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">task_thread</span><span class="o">.</span><span class="n">terminate</span><span class="p">()</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">ConnectionDriver</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">do_terminate</span><span class="p">()</span></div>
 
 <div class="viewcode-block" id="ConnectionDriver.cleanup"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.ConnectionDriver.ConnectionDriver.cleanup">[docs]</a>    <span class="k">def</span> <span class="nf">cleanup</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Ensure that the communicators are closed.&quot;&quot;&quot;</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;&#39;</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">close_comm</span><span class="p">()</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">as_process</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">task_thread</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">ConnectionDriver</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">cleanup</span><span class="p">()</span></div>
 
-<div class="viewcode-block" id="ConnectionDriver.printStatus"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.ConnectionDriver.ConnectionDriver.printStatus">[docs]</a>    <span class="k">def</span> <span class="nf">printStatus</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">beg_msg</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="n">end_msg</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">):</span>
+<div class="viewcode-block" id="ConnectionDriver.printStatus"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.ConnectionDriver.ConnectionDriver.printStatus">[docs]</a>    <span class="nd">@run_remotely</span>
+    <span class="k">def</span> <span class="nf">printStatus</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">beg_msg</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="n">end_msg</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Print information on the status of the ConnectionDriver.</span>
 
 <span class="sd">        Arguments:</span>
@@ -567,7 +776,8 @@
         <span class="n">msg</span> <span class="o">+=</span> <span class="n">end_msg</span>
         <span class="nb">print</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="ConnectionDriver.confirm_input"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.ConnectionDriver.ConnectionDriver.confirm_input">[docs]</a>    <span class="k">def</span> <span class="nf">confirm_input</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<div class="viewcode-block" id="ConnectionDriver.confirm_input"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.ConnectionDriver.ConnectionDriver.confirm_input">[docs]</a>    <span class="nd">@run_remotely</span>
+    <span class="k">def</span> <span class="nf">confirm_input</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Confirm receipt of messages from input comm.&quot;&quot;&quot;</span>
         <span class="n">T</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">start_timeout</span><span class="p">(</span><span class="n">timeout</span><span class="p">)</span>
         <span class="k">while</span> <span class="ow">not</span> <span class="n">T</span><span class="o">.</span><span class="n">is_out</span><span class="p">:</span>  <span class="c1"># pragma: debug</span>
@@ -579,7 +789,8 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mi">10</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">sleeptime</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">stop_timeout</span><span class="p">()</span></div>
 
-<div class="viewcode-block" id="ConnectionDriver.confirm_output"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.ConnectionDriver.ConnectionDriver.confirm_output">[docs]</a>    <span class="k">def</span> <span class="nf">confirm_output</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<div class="viewcode-block" id="ConnectionDriver.confirm_output"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.ConnectionDriver.ConnectionDriver.confirm_output">[docs]</a>    <span class="nd">@run_remotely</span>
+    <span class="k">def</span> <span class="nf">confirm_output</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Confirm receipt of messages from output comm.&quot;&quot;&quot;</span>
         <span class="n">T</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">start_timeout</span><span class="p">(</span><span class="n">timeout</span><span class="p">)</span>
         <span class="k">while</span> <span class="ow">not</span> <span class="n">T</span><span class="o">.</span><span class="n">is_out</span><span class="p">:</span>  <span class="c1"># pragma: debug</span>
@@ -591,12 +802,14 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mi">10</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">sleeptime</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">stop_timeout</span><span class="p">()</span></div>
 
-<div class="viewcode-block" id="ConnectionDriver.drain_input"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.ConnectionDriver.ConnectionDriver.drain_input">[docs]</a>    <span class="k">def</span> <span class="nf">drain_input</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<div class="viewcode-block" id="ConnectionDriver.drain_input"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.ConnectionDriver.ConnectionDriver.drain_input">[docs]</a>    <span class="nd">@run_remotely</span>
+    <span class="k">def</span> <span class="nf">drain_input</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Drain messages from input comm.&quot;&quot;&quot;</span>
         <span class="n">T</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">start_timeout</span><span class="p">(</span><span class="n">timeout</span><span class="p">)</span>
         <span class="k">while</span> <span class="ow">not</span> <span class="n">T</span><span class="o">.</span><span class="n">is_out</span><span class="p">:</span>
             <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">lock</span><span class="p">:</span>
-                <span class="k">if</span> <span class="p">(</span><span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">icomm</span><span class="o">.</span><span class="n">is_open</span><span class="p">):</span>
+                <span class="k">if</span> <span class="p">(</span><span class="ow">not</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">icomm</span><span class="o">.</span><span class="n">is_open</span>
+                         <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">was_terminated</span><span class="p">)):</span>
                     <span class="k">break</span>
                 <span class="k">elif</span> <span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">icomm</span><span class="o">.</span><span class="n">n_msg_recv_drain</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span>
                       <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">icomm</span><span class="o">.</span><span class="n">is_confirmed_recv</span><span class="p">):</span>
@@ -604,23 +817,30 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">sleep</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">stop_timeout</span><span class="p">()</span></div>
 
-<div class="viewcode-block" id="ConnectionDriver.drain_output"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.ConnectionDriver.ConnectionDriver.drain_output">[docs]</a>    <span class="k">def</span> <span class="nf">drain_output</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<div class="viewcode-block" id="ConnectionDriver.drain_output"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.ConnectionDriver.ConnectionDriver.drain_output">[docs]</a>    <span class="nd">@run_remotely</span>
+    <span class="k">def</span> <span class="nf">drain_output</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">dont_confirm_eof</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Drain messages from output comm.&quot;&quot;&quot;</span>
+        <span class="n">nwait</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">if</span> <span class="n">dont_confirm_eof</span><span class="p">:</span>
+            <span class="n">nwait</span> <span class="o">+=</span> <span class="mi">1</span>
         <span class="n">T</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">start_timeout</span><span class="p">(</span><span class="n">timeout</span><span class="p">)</span>
         <span class="k">while</span> <span class="ow">not</span> <span class="n">T</span><span class="o">.</span><span class="n">is_out</span><span class="p">:</span>
             <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">lock</span><span class="p">:</span>
-                <span class="k">if</span> <span class="p">(</span><span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">ocomm</span><span class="o">.</span><span class="n">is_open</span><span class="p">):</span>  <span class="c1"># pragma: no cover</span>
+                <span class="k">if</span> <span class="p">(</span><span class="ow">not</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ocomm</span><span class="o">.</span><span class="n">is_open</span>
+                         <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">was_terminated</span><span class="p">)):</span>  <span class="c1"># pragma: no cover</span>
                     <span class="k">break</span>
-                <span class="k">elif</span> <span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">ocomm</span><span class="o">.</span><span class="n">n_msg_send_drain</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span>
+                <span class="k">elif</span> <span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">ocomm</span><span class="o">.</span><span class="n">n_msg_send_drain</span> <span class="o">&lt;=</span> <span class="n">nwait</span><span class="p">)</span>
                       <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">ocomm</span><span class="o">.</span><span class="n">is_confirmed_send</span><span class="p">):</span>
                     <span class="k">break</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">sleep</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">sleep</span><span class="p">()</span>  <span class="c1"># pragma: no cover</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">stop_timeout</span><span class="p">()</span></div>
 
 <div class="viewcode-block" id="ConnectionDriver.before_loop"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.ConnectionDriver.ConnectionDriver.before_loop">[docs]</a>    <span class="k">def</span> <span class="nf">before_loop</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Actions to perform prior to sending messages.&quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">state</span> <span class="o">=</span> <span class="s1">&#39;before loop&#39;</span>
         <span class="k">try</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">as_process</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">task_thread</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">open_comm</span><span class="p">()</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">sleep</span><span class="p">()</span>  <span class="c1"># Help ensure senders/receivers connected before messages</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;Running in </span><span class="si">%s</span><span class="s1">, is_valid = </span><span class="si">%s</span><span class="s1">&#39;</span><span class="p">,</span> <span class="n">os</span><span class="o">.</span><span class="n">getcwd</span><span class="p">(),</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">is_valid</span><span class="p">))</span>
@@ -630,7 +850,15 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">exception</span><span class="p">(</span><span class="s1">&#39;Could not prep for loop (is_open = (</span><span class="si">%s</span><span class="s1">, </span><span class="si">%s</span><span class="s1">)).&#39;</span> <span class="o">%</span> <span class="p">(</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">icomm</span><span class="o">.</span><span class="n">is_open</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">ocomm</span><span class="o">.</span><span class="n">is_open</span><span class="p">))</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">close_comm</span><span class="p">()</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">set_break_flag</span><span class="p">()</span></div>
+            <span class="bp">self</span><span class="o">.</span><span class="n">set_break_flag</span><span class="p">()</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">as_process</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">task_thread</span><span class="o">.</span><span class="n">terminate</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="ConnectionDriver.after_loop_process"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.ConnectionDriver.ConnectionDriver.after_loop_process">[docs]</a>    <span class="k">def</span> <span class="nf">after_loop_process</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Actions to preform after loop for process.&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;After loop process&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">task_thread</span><span class="o">.</span><span class="n">set_break_flag</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">task_thread</span><span class="o">.</span><span class="n">wait</span><span class="p">()</span></div>
 
 <div class="viewcode-block" id="ConnectionDriver.after_loop"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.ConnectionDriver.ConnectionDriver.after_loop">[docs]</a>    <span class="k">def</span> <span class="nf">after_loop</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Actions to perform after sending messages.&quot;&quot;&quot;</span>
@@ -639,9 +867,11 @@
         <span class="c1"># Close input comm in case loop did not</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">confirm_input</span><span class="p">(</span><span class="n">timeout</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;Confirmed input&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">check_flag_attr</span><span class="p">(</span><span class="s1">&#39;_skip_after_loop&#39;</span><span class="p">)</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">as_process</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">after_loop_process</span><span class="p">()</span>
         <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">lock</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;Acquired lock&#39;</span><span class="p">)</span>
-            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_skip_after_loop</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">check_flag_attr</span><span class="p">(</span><span class="s1">&#39;_skip_after_loop&#39;</span><span class="p">):</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;After loop skipped.&quot;</span><span class="p">)</span>
                 <span class="k">return</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">icomm</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
@@ -649,7 +879,11 @@
         <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">single_use</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">send_eof</span><span class="p">()</span>
         <span class="c1"># Do not close output comm in case model/connection still receiving</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;Finished&#39;</span><span class="p">)</span></div>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">as_process</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">ocomm</span><span class="o">.</span><span class="n">touches_model</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">drain_output</span><span class="p">(</span><span class="n">timeout</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">dont_confirm_eof</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;Finished&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">as_process</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">after_loop_process</span><span class="p">()</span></div>
 
 <div class="viewcode-block" id="ConnectionDriver.recv_message"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.ConnectionDriver.ConnectionDriver.recv_message">[docs]</a>    <span class="k">def</span> <span class="nf">recv_message</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Get a new message to send.</span>
@@ -662,6 +896,7 @@
 <span class="sd">            str, bool: False if no more messages, message otherwise.</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">assert</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">in_process</span><span class="p">)</span>
         <span class="n">kwargs</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s1">&#39;timeout&#39;</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
         <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">lock</span><span class="p">:</span>
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">icomm</span><span class="o">.</span><span class="n">is_closed</span><span class="p">:</span>
@@ -707,11 +942,15 @@
 
 <div class="viewcode-block" id="ConnectionDriver.update_serializer"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.ConnectionDriver.ConnectionDriver.update_serializer">[docs]</a>    <span class="k">def</span> <span class="nf">update_serializer</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">msg</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Update the serializer for the output comm based on input.&quot;&quot;&quot;</span>
-        <span class="n">sinfo</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">icomm</span><span class="o">.</span><span class="n">serializer</span><span class="o">.</span><span class="n">typedef</span>
-        <span class="n">sinfo</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">icomm</span><span class="o">.</span><span class="n">serializer</span><span class="o">.</span><span class="n">serializer_info</span><span class="p">)</span>
+        <span class="n">sinfo_keys</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;format_str&#39;</span><span class="p">,</span> <span class="s1">&#39;field_names&#39;</span><span class="p">,</span> <span class="s1">&#39;field_units&#39;</span><span class="p">]</span>
+        <span class="n">stype</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">icomm</span><span class="o">.</span><span class="n">serializer</span><span class="o">.</span><span class="n">typedef</span>
+        <span class="n">sinfo</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">icomm</span><span class="o">.</span><span class="n">serializer</span><span class="o">.</span><span class="n">serializer_info</span>
+        <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">sinfo_keys</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">sinfo</span><span class="p">:</span>
+                <span class="n">stype</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">sinfo</span><span class="p">[</span><span class="n">k</span><span class="p">]</span>
         <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">icomm</span><span class="o">.</span><span class="n">transform</span><span class="p">:</span>
-            <span class="n">t</span><span class="o">.</span><span class="n">set_original_datatype</span><span class="p">(</span><span class="n">sinfo</span><span class="p">)</span>
-            <span class="n">sinfo</span> <span class="o">=</span> <span class="n">t</span><span class="o">.</span><span class="n">transformed_datatype</span>
+            <span class="n">t</span><span class="o">.</span><span class="n">set_original_datatype</span><span class="p">(</span><span class="n">stype</span><span class="p">)</span>
+            <span class="n">stype</span> <span class="o">=</span> <span class="n">t</span><span class="o">.</span><span class="n">transformed_datatype</span>
         <span class="n">sinfo</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;seritype&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;Before update:</span><span class="se">\n</span><span class="s1">&#39;</span>
                    <span class="o">+</span> <span class="s1">&#39;  icomm:</span><span class="se">\n</span><span class="s1">    sinfo:</span><span class="se">\n</span><span class="si">%s</span><span class="se">\n</span><span class="s1">    typedef:</span><span class="se">\n</span><span class="si">%s</span><span class="se">\n</span><span class="s1">&#39;</span>
@@ -722,17 +961,21 @@
                    <span class="bp">self</span><span class="o">.</span><span class="n">pprint</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ocomm</span><span class="o">.</span><span class="n">serializer</span><span class="o">.</span><span class="n">typedef</span><span class="p">,</span> <span class="mi">2</span><span class="p">))</span>
         <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">translator</span><span class="p">:</span>
             <span class="k">if</span> <span class="n">isinstance_component</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="s1">&#39;transform&#39;</span><span class="p">):</span>
-                <span class="n">t</span><span class="o">.</span><span class="n">set_original_datatype</span><span class="p">(</span><span class="n">sinfo</span><span class="p">)</span>
-                <span class="n">sinfo</span> <span class="o">=</span> <span class="n">t</span><span class="o">.</span><span class="n">transformed_datatype</span>
+                <span class="n">t</span><span class="o">.</span><span class="n">set_original_datatype</span><span class="p">(</span><span class="n">stype</span><span class="p">)</span>
+                <span class="n">stype</span> <span class="o">=</span> <span class="n">t</span><span class="o">.</span><span class="n">transformed_datatype</span>
         <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">ocomm</span><span class="o">.</span><span class="n">transform</span><span class="p">:</span>
-            <span class="n">t</span><span class="o">.</span><span class="n">set_original_datatype</span><span class="p">(</span><span class="n">sinfo</span><span class="p">)</span>
-            <span class="n">sinfo</span> <span class="o">=</span> <span class="n">t</span><span class="o">.</span><span class="n">transformed_datatype</span>
+            <span class="n">t</span><span class="o">.</span><span class="n">set_original_datatype</span><span class="p">(</span><span class="n">stype</span><span class="p">)</span>
+            <span class="n">stype</span> <span class="o">=</span> <span class="n">t</span><span class="o">.</span><span class="n">transformed_datatype</span>
+        <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">sinfo_keys</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">stype</span><span class="p">:</span>
+                <span class="n">sinfo</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">stype</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="n">k</span><span class="p">)</span>
+        <span class="n">sinfo</span><span class="p">[</span><span class="s1">&#39;datatype&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">stype</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">ocomm</span><span class="o">.</span><span class="n">serializer</span><span class="o">.</span><span class="n">initialize_serializer</span><span class="p">(</span><span class="n">sinfo</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">ocomm</span><span class="o">.</span><span class="n">serializer</span><span class="o">.</span><span class="n">update_serializer</span><span class="p">(</span><span class="n">skip_type</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
                                                 <span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">icomm</span><span class="o">.</span><span class="n">_last_header</span><span class="p">)</span>
-        <span class="k">if</span> <span class="p">(((</span><span class="n">sinfo</span><span class="p">[</span><span class="s1">&#39;type&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;array&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="p">(((</span><span class="n">stype</span><span class="p">[</span><span class="s1">&#39;type&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;array&#39;</span><span class="p">)</span>
              <span class="ow">and</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ocomm</span><span class="o">.</span><span class="n">serializer</span><span class="o">.</span><span class="n">typedef</span><span class="p">[</span><span class="s1">&#39;type&#39;</span><span class="p">]</span> <span class="o">!=</span> <span class="s1">&#39;array&#39;</span><span class="p">)</span>
-             <span class="ow">and</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">sinfo</span><span class="p">[</span><span class="s1">&#39;items&#39;</span><span class="p">])</span> <span class="o">==</span> <span class="mi">1</span><span class="p">))):</span>
+             <span class="ow">and</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">stype</span><span class="p">[</span><span class="s1">&#39;items&#39;</span><span class="p">])</span> <span class="o">==</span> <span class="mi">1</span><span class="p">))):</span>
             <span class="c1"># if (((self.icomm.serializer.typedef[&#39;type&#39;] == &#39;array&#39;)</span>
             <span class="c1">#      and (self.ocomm.serializer.typedef[&#39;type&#39;] != &#39;array&#39;)</span>
             <span class="c1">#      and (len(self.icomm.serializer.typedef[&#39;items&#39;]) == 1))):</span>
@@ -820,6 +1063,7 @@
 <span class="sd">            bool: Success or failure of send.</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">assert</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">in_process</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;&#39;</span><span class="p">)</span>
         <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;is_eof&#39;</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>
         <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">lock</span><span class="p">:</span>

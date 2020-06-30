@@ -36,26 +36,10 @@ yggdrasil.serialize.tests.test\_FunctionalSerialize module
    :undoc-members:
    :show-inheritance:
 
-yggdrasil.serialize.tests.test\_JSONSerialize module
-----------------------------------------------------
-
-.. automodule:: yggdrasil.serialize.tests.test_JSONSerialize
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
 yggdrasil.serialize.tests.test\_MatSerialize module
 ---------------------------------------------------
 
 .. automodule:: yggdrasil.serialize.tests.test_MatSerialize
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
-yggdrasil.serialize.tests.test\_ObjSerialize module
----------------------------------------------------
-
-.. automodule:: yggdrasil.serialize.tests.test_ObjSerialize
    :members:
    :undoc-members:
    :show-inheritance:
@@ -76,26 +60,10 @@ yggdrasil.serialize.tests.test\_PickleSerialize module
    :undoc-members:
    :show-inheritance:
 
-yggdrasil.serialize.tests.test\_PlySerialize module
----------------------------------------------------
-
-.. automodule:: yggdrasil.serialize.tests.test_PlySerialize
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
 yggdrasil.serialize.tests.test\_SerializeBase module
 ----------------------------------------------------
 
 .. automodule:: yggdrasil.serialize.tests.test_SerializeBase
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
-yggdrasil.serialize.tests.test\_YAMLSerialize module
-----------------------------------------------------
-
-.. automodule:: yggdrasil.serialize.tests.test_YAMLSerialize
    :members:
    :undoc-members:
    :show-inheritance:

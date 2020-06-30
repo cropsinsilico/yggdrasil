@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>yggdrasil.drivers.LPyModelDriver &mdash; yggdrasil 1.0.0+154.g684a530e.dirty documentation</title>
+  <title>yggdrasil.drivers.LPyModelDriver &mdash; yggdrasil 1.1.1+410.g95af39b2 documentation</title>
   
 
   
@@ -59,7 +59,7 @@
             
             
               <div class="version">
-                1.0.0
+                1.1.1
               </div>
             
           
@@ -94,6 +94,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../autowrap.html#notes-on-autowrapping-c-c-model-functions">Notes on Autowrapping C/C++ Model Functions</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../conditional_io.html">Conditional I/O</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../transformed_io.html">Transformed I/O</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../timesync_io.html">Timestep Synchronization</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../yaml.html">YAML Files</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../config.html">Configuration Files</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../units.html">Units</a></li>
@@ -189,6 +190,8 @@
     <span class="n">default_interpreter_flags</span> <span class="o">=</span> <span class="p">[</span><span class="n">_model_script</span><span class="p">]</span>
     <span class="n">interface_dependencies</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;openalea.lpy&#39;</span><span class="p">]</span>
     <span class="n">function_param</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">full_language</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="n">is_dsl</span> <span class="o">=</span> <span class="kc">True</span>
 
 <div class="viewcode-block" id="LPyModelDriver.language_version"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.LPyModelDriver.LPyModelDriver.language_version">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">language_version</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>

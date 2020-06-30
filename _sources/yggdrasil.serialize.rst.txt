@@ -5,6 +5,7 @@ Subpackages
 -----------
 
 .. toctree::
+   :maxdepth: 4
 
    yggdrasil.serialize.tests
 
@@ -63,14 +64,6 @@ yggdrasil.serialize.MatSerialize module
 ---------------------------------------
 
 .. automodule:: yggdrasil.serialize.MatSerialize
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
-yggdrasil.serialize.NetCDFSerialize module
-------------------------------------------
-
-.. automodule:: yggdrasil.serialize.NetCDFSerialize
    :members:
    :undoc-members:
    :show-inheritance:

@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>yggdrasil.metaschema.datatypes &mdash; yggdrasil 1.0.0+154.g684a530e.dirty documentation</title>
+  <title>yggdrasil.metaschema.datatypes &mdash; yggdrasil 1.1.1+410.g95af39b2 documentation</title>
   
 
   
@@ -59,7 +59,7 @@
             
             
               <div class="version">
-                1.0.0
+                1.1.1
               </div>
             
           
@@ -94,6 +94,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../autowrap.html#notes-on-autowrapping-c-c-model-functions">Notes on Autowrapping C/C++ Model Functions</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../conditional_io.html">Conditional I/O</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../transformed_io.html">Transformed I/O</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../timesync_io.html">Timestep Synchronization</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../yaml.html">YAML Files</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../config.html">Configuration Files</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../units.html">Units</a></li>
@@ -174,14 +175,12 @@
 <span class="kn">import</span> <span class="nn">glob</span>
 <span class="kn">import</span> <span class="nn">jsonschema</span>
 <span class="kn">import</span> <span class="nn">copy</span>
-<span class="kn">import</span> <span class="nn">importlib</span>
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
-<span class="kn">from</span> <span class="nn">collections</span> <span class="k">import</span> <span class="n">OrderedDict</span>
+<span class="kn">from</span> <span class="nn">yggdrasil.components</span> <span class="k">import</span> <span class="n">ClassRegistry</span>
 <span class="kn">from</span> <span class="nn">yggdrasil.metaschema.encoder</span> <span class="k">import</span> <span class="n">decode_json</span>
 <span class="kn">from</span> <span class="nn">yggdrasil.metaschema.properties</span> <span class="k">import</span> <span class="n">get_metaschema_property</span>
 
 
-<span class="n">_type_registry</span> <span class="o">=</span> <span class="n">OrderedDict</span><span class="p">()</span>
 <span class="n">_schema_dir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="vm">__file__</span><span class="p">),</span> <span class="s1">&#39;schemas&#39;</span><span class="p">)</span>
 <span class="n">_base_validator</span> <span class="o">=</span> <span class="n">jsonschema</span><span class="o">.</span><span class="n">validators</span><span class="o">.</span><span class="n">validator_for</span><span class="p">({</span><span class="s2">&quot;$schema&quot;</span><span class="p">:</span> <span class="s2">&quot;&quot;</span><span class="p">})</span>
 <span class="n">YGG_MSG_HEAD</span> <span class="o">=</span> <span class="sa">b</span><span class="s1">&#39;YGG_MSG_HEAD&#39;</span>
@@ -189,12 +188,36 @@
                         <span class="s1">&#39;metadata_properties&#39;</span><span class="p">,</span> <span class="s1">&#39;extract_properties&#39;</span><span class="p">]</span>
 
 
+<div class="viewcode-block" id="import_schema_types"><a class="viewcode-back" href="../../../yggdrasil.metaschema.datatypes.html#yggdrasil.metaschema.datatypes.import_schema_types">[docs]</a><span class="k">def</span> <span class="nf">import_schema_types</span><span class="p">():</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Import all types to ensure they are registered.&quot;&quot;&quot;</span>
+    <span class="c1"># Load types from schema</span>
+    <span class="n">schema_files</span> <span class="o">=</span> <span class="n">glob</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">_schema_dir</span><span class="p">,</span> <span class="s1">&#39;*.json&#39;</span><span class="p">))</span>
+    <span class="n">names</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">schema_files</span><span class="p">:</span>
+        <span class="n">names</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">add_type_from_schema</span><span class="p">(</span><span class="n">f</span><span class="p">))</span>
+    <span class="c1"># TODO: Need to make sure metaschema updated if it was already loaded</span>
+    <span class="kn">from</span> <span class="nn">yggdrasil.metaschema</span> <span class="k">import</span> <span class="n">_metaschema</span>
+    <span class="k">if</span> <span class="n">_metaschema</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">reload_ygg</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="n">curr</span> <span class="o">=</span> <span class="n">_metaschema</span>
+        <span class="n">new_names</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="n">names</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">n</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">curr</span><span class="p">[</span><span class="s1">&#39;definitions&#39;</span><span class="p">][</span><span class="s1">&#39;simpleTypes&#39;</span><span class="p">][</span><span class="s1">&#39;enum&#39;</span><span class="p">]:</span>  <span class="c1"># pragma: debug</span>
+                <span class="n">reload_ygg</span> <span class="o">=</span> <span class="kc">True</span>
+                <span class="n">new_names</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">n</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">reload_ygg</span><span class="p">:</span>  <span class="c1"># pragma: debug</span>
+            <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s2">&quot;The metaschema needs to be regenerated to include the &quot;</span>
+                            <span class="o">+</span> <span class="s2">&quot;following new schemas found in schema files: </span><span class="si">%s</span><span class="s2">&quot;</span>
+                            <span class="o">%</span> <span class="n">new_names</span><span class="p">)</span></div>
+    
+
 <div class="viewcode-block" id="MetaschemaTypeError"><a class="viewcode-back" href="../../../yggdrasil.metaschema.datatypes.html#yggdrasil.metaschema.datatypes.MetaschemaTypeError">[docs]</a><span class="k">class</span> <span class="nc">MetaschemaTypeError</span><span class="p">(</span><span class="ne">TypeError</span><span class="p">):</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Error that should be raised when a class encounters a type it cannot handle.&quot;&quot;&quot;</span>
     <span class="k">pass</span></div>
 
 
 <span class="n">_default_typedef</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;bytes&#39;</span><span class="p">}</span>
+<span class="n">_type_registry</span> <span class="o">=</span> <span class="n">ClassRegistry</span><span class="p">(</span><span class="n">import_function</span><span class="o">=</span><span class="n">import_schema_types</span><span class="p">)</span>
 
 
 <div class="viewcode-block" id="is_default_typedef"><a class="viewcode-back" href="../../../yggdrasil.metaschema.datatypes.html#yggdrasil.metaschema.datatypes.is_default_typedef">[docs]</a><span class="k">def</span> <span class="nf">is_default_typedef</span><span class="p">(</span><span class="n">typedef</span><span class="p">):</span>
@@ -224,7 +247,7 @@
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">global</span> <span class="n">_type_registry</span>
     <span class="n">type_name</span> <span class="o">=</span> <span class="n">type_class</span><span class="o">.</span><span class="n">name</span>
-    <span class="k">if</span> <span class="n">type_name</span> <span class="ow">in</span> <span class="n">_type_registry</span><span class="p">:</span>
+    <span class="k">if</span> <span class="n">_type_registry</span><span class="o">.</span><span class="n">has_entry</span><span class="p">(</span><span class="n">type_name</span><span class="p">):</span>
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Type &#39;</span><span class="si">%s</span><span class="s2">&#39; already registered.&quot;</span> <span class="o">%</span> <span class="n">type_name</span><span class="p">)</span>
     <span class="k">if</span> <span class="p">(</span><span class="ow">not</span> <span class="n">type_class</span><span class="o">.</span><span class="n">_replaces_existing</span><span class="p">):</span>  <span class="c1"># pragma: debug</span>
         <span class="n">exist_flag</span> <span class="o">=</span> <span class="p">(</span><span class="n">type_name</span> <span class="ow">in</span> <span class="n">_base_validator</span><span class="o">.</span><span class="n">TYPE_CHECKER</span><span class="o">.</span><span class="n">_type_checkers</span><span class="p">)</span>
@@ -331,7 +354,8 @@
     <span class="n">jsonschema</span><span class="o">.</span><span class="n">validate</span><span class="p">(</span><span class="n">out</span><span class="p">,</span> <span class="p">{</span><span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;object&#39;</span><span class="p">,</span>
                               <span class="s1">&#39;required&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;title&#39;</span><span class="p">,</span> <span class="s1">&#39;description&#39;</span><span class="p">,</span> <span class="s1">&#39;type&#39;</span><span class="p">]})</span>
     <span class="n">name</span> <span class="o">=</span> <span class="n">out</span><span class="p">[</span><span class="s1">&#39;title&#39;</span><span class="p">]</span>
-    <span class="k">if</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">_type_registry</span><span class="p">:</span>
+    <span class="k">if</span> <span class="n">_type_registry</span><span class="o">.</span><span class="n">has_entry</span><span class="p">(</span><span class="n">name</span><span class="p">):</span>
+        <span class="k">assert</span><span class="p">(</span><span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;target_globals&#39;</span><span class="p">]</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">name</span>
     <span class="n">description</span> <span class="o">=</span> <span class="n">out</span><span class="p">[</span><span class="s1">&#39;description&#39;</span><span class="p">]</span>
     <span class="n">base</span> <span class="o">=</span> <span class="n">get_type_class</span><span class="p">(</span><span class="n">out</span><span class="p">[</span><span class="s1">&#39;type&#39;</span><span class="p">])</span>
@@ -373,33 +397,6 @@
     <span class="k">return</span> <span class="n">_type_registry</span></div>
 
 
-<div class="viewcode-block" id="import_all_types"><a class="viewcode-back" href="../../../yggdrasil.metaschema.datatypes.html#yggdrasil.metaschema.datatypes.import_all_types">[docs]</a><span class="k">def</span> <span class="nf">import_all_types</span><span class="p">():</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Import all types to ensure they are registered.&quot;&quot;&quot;</span>
-    <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">glob</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="vm">__file__</span><span class="p">),</span> <span class="s1">&#39;*.py&#39;</span><span class="p">)):</span>
-        <span class="n">type_mod</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">basename</span><span class="p">(</span><span class="n">x</span><span class="p">)[:</span><span class="o">-</span><span class="mi">3</span><span class="p">]</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="n">type_mod</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;__&#39;</span><span class="p">):</span>
-            <span class="n">importlib</span><span class="o">.</span><span class="n">import_module</span><span class="p">(</span><span class="s1">&#39;yggdrasil.metaschema.datatypes.</span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">type_mod</span><span class="p">)</span>
-    <span class="c1"># Load types from schema</span>
-    <span class="n">schema_files</span> <span class="o">=</span> <span class="n">glob</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">_schema_dir</span><span class="p">,</span> <span class="s1">&#39;*.json&#39;</span><span class="p">))</span>
-    <span class="n">names</span> <span class="o">=</span> <span class="p">[]</span>
-    <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">schema_files</span><span class="p">:</span>
-        <span class="n">names</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">add_type_from_schema</span><span class="p">(</span><span class="n">f</span><span class="p">))</span>
-    <span class="c1"># TODO: Need to make sure metaschema updated if it was already loaded</span>
-    <span class="kn">from</span> <span class="nn">yggdrasil.metaschema</span> <span class="k">import</span> <span class="n">_metaschema</span>
-    <span class="k">if</span> <span class="n">_metaschema</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="n">reload_ygg</span> <span class="o">=</span> <span class="kc">False</span>
-        <span class="n">curr</span> <span class="o">=</span> <span class="n">_metaschema</span>
-        <span class="n">new_names</span> <span class="o">=</span> <span class="p">[]</span>
-        <span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="n">names</span><span class="p">:</span>
-            <span class="k">if</span> <span class="n">n</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">curr</span><span class="p">[</span><span class="s1">&#39;definitions&#39;</span><span class="p">][</span><span class="s1">&#39;simpleTypes&#39;</span><span class="p">][</span><span class="s1">&#39;enum&#39;</span><span class="p">]:</span>  <span class="c1"># pragma: debug</span>
-                <span class="n">reload_ygg</span> <span class="o">=</span> <span class="kc">True</span>
-                <span class="n">new_names</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">n</span><span class="p">)</span>
-        <span class="k">if</span> <span class="n">reload_ygg</span><span class="p">:</span>  <span class="c1"># pragma: debug</span>
-            <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s2">&quot;The metaschema needs to be regenerated to include the &quot;</span>
-                            <span class="o">+</span> <span class="s2">&quot;following new schemas found in schema files: </span><span class="si">%s</span><span class="s2">&quot;</span>
-                            <span class="o">%</span> <span class="n">new_names</span><span class="p">)</span></div>
-    
-
 <div class="viewcode-block" id="complete_typedef"><a class="viewcode-back" href="../../../yggdrasil.metaschema.datatypes.html#yggdrasil.metaschema.datatypes.complete_typedef">[docs]</a><span class="k">def</span> <span class="nf">complete_typedef</span><span class="p">(</span><span class="n">typedef</span><span class="p">):</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Complete the type definition by converting it into the standard format.</span>
 
@@ -436,9 +433,10 @@
         <span class="n">create_multitype_class</span><span class="p">)</span>
     <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">type_name</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
         <span class="k">return</span> <span class="n">create_multitype_class</span><span class="p">(</span><span class="n">type_name</span><span class="p">)</span>
-    <span class="k">if</span> <span class="n">type_name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">_type_registry</span><span class="p">:</span>
+    <span class="n">out</span> <span class="o">=</span> <span class="n">_type_registry</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">type_name</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">out</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Class for type &#39;</span><span class="si">%s</span><span class="s2">&#39; could not be found.&quot;</span> <span class="o">%</span> <span class="n">type_name</span><span class="p">)</span>
-    <span class="k">return</span> <span class="n">_type_registry</span><span class="p">[</span><span class="n">type_name</span><span class="p">]</span></div>
+    <span class="k">return</span> <span class="n">out</span></div>
 
 
 <div class="viewcode-block" id="get_type_from_def"><a class="viewcode-back" href="../../../yggdrasil.metaschema.datatypes.html#yggdrasil.metaschema.datatypes.get_type_from_def">[docs]</a><span class="k">def</span> <span class="nf">get_type_from_def</span><span class="p">(</span><span class="n">typedef</span><span class="p">,</span> <span class="n">dont_complete</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
@@ -479,7 +477,7 @@
         <span class="k">if</span> <span class="n">YGG_MSG_HEAD</span> <span class="ow">in</span> <span class="n">msg</span><span class="p">:</span>
             <span class="n">_</span><span class="p">,</span> <span class="n">metadata</span><span class="p">,</span> <span class="n">data</span> <span class="o">=</span> <span class="n">msg</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">YGG_MSG_HEAD</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
             <span class="n">metadata</span> <span class="o">=</span> <span class="n">decode_json</span><span class="p">(</span><span class="n">metadata</span><span class="p">)</span>
-            <span class="bp">cls</span> <span class="o">=</span> <span class="n">_type_registry</span><span class="p">[</span><span class="n">metadata</span><span class="p">[</span><span class="s1">&#39;type&#39;</span><span class="p">]]</span>
+            <span class="bp">cls</span> <span class="o">=</span> <span class="n">_type_registry</span><span class="p">[</span><span class="n">metadata</span><span class="p">[</span><span class="s1">&#39;datatype&#39;</span><span class="p">][</span><span class="s1">&#39;type&#39;</span><span class="p">]]</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">Exception</span>
         <span class="k">return</span> <span class="bp">cls</span>
@@ -631,7 +629,7 @@
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="bp">cls</span> <span class="o">=</span> <span class="n">guess_type_from_msg</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
     <span class="n">metadata</span> <span class="o">=</span> <span class="n">decode_json</span><span class="p">(</span><span class="n">msg</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">YGG_MSG_HEAD</span><span class="p">,</span> <span class="mi">2</span><span class="p">)[</span><span class="mi">1</span><span class="p">])</span>
-    <span class="n">typedef</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">extract_typedef</span><span class="p">(</span><span class="n">metadata</span><span class="p">)</span>
+    <span class="n">typedef</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">extract_typedef</span><span class="p">(</span><span class="n">metadata</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;datatype&#39;</span><span class="p">,</span> <span class="p">{}))</span>
     <span class="n">cls_inst</span> <span class="o">=</span> <span class="bp">cls</span><span class="p">(</span><span class="o">**</span><span class="n">typedef</span><span class="p">)</span>
     <span class="n">obj</span> <span class="o">=</span> <span class="n">cls_inst</span><span class="o">.</span><span class="n">deserialize</span><span class="p">(</span><span class="n">msg</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
     <span class="k">return</span> <span class="n">obj</span></div>

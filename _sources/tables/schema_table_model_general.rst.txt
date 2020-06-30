@@ -3,25 +3,39 @@
 =================   =======   ========   ================================================================================
 Option              Type      Required   Description                                                                     
 =================   =======   ========   ================================================================================
-args                array     X          Argument(s) for running the model on the command line. This should be a complete
-                                         command including the necessary executable and command line arguments to that   
-                                         executable.                                                                     
-language            string    X          The programming language that the model is written in. (Options described       
-                                         :ref:`here <schema_table_model_subtype_rst>`)                                   
+args                array     X          The full path to the file containing the model program that will be run by the  
+                                         driver or a list starting with the program file and including any arguments that
+                                         should be passed as input to the program.                                       
+language            string    X          The programming language that the model is written in. A list of available      
+                                         languages can be found :ref:`here <schema_table_model_subtype_rst>`. (Options   
+                                         described :ref:`here <schema_table_model_subtype_rst>`)                         
 name                string    X          Name used for component in log messages.                                        
 working_dir         string    X          Working directory. If not provided, the current working directory is used.      
-client_of           array                The names of one or more servers that this model is a client of. Defaults to    
-                                         empty list. Use of client_of with function is not currently supported.          
+client_of           array                The names of one or more models that this model will call as a server. If there 
+                                         are more than one, this should be specified as a sequence collection (list). The
+                                         corresponding channel(s) that should be passed to the yggdrasil API will be the 
+                                         name of the server model joined with the name of the client model with an       
+                                         underscore `<server_model>_<client_model>`. There will be one channel created   
+                                         for each server the model is a client of. Defaults to empty list. Use of        
+                                         `client_of` with `function` is not currently supported.                         
 driver              string               [DEPRECATED] Name of driver class that should be used.                          
 function            string               If provided, an integrated model is created by wrapping the function named here.
                                          The function must be located within the file specified by the source file listed
                                          in the first argument. If not provided, the model must contain it's own calls to
                                          the |yggdrasil| interface.                                                      
-inputs              array                Model inputs described as comm objects.                                         
-is_server           boolean              If True, the model is assumed to be a server and an instance of                 
-                                         :class:`yggdrasil.drivers.ServerDriver` is started. Defaults to False. Use of   
-                                         is_server with function is not currently supported.                             
-outputs             array                Model outputs described as comm objects.                                        
+inputs              array                A mapping object containing the entry for a model input channel or a list of    
+                                         input channel entries. If the model does not get input from another model, this 
+                                         may be ommitted. A full description of channel entries and the options available
+                                         for channels can be found :ref:`here<yaml_comm_options>`.                       
+is_server           boolean              If `True`, the model is assumed to be a server for one or more client models and
+                                         an instance of :class:`yggdrasil.drivers.ServerDriver` is started. The          
+                                         corresponding channel that should be passed to the yggdrasil API will be the    
+                                         name of the model. Defaults to False. Use of `is_server` with `function` is not 
+                                         currently supported.                                                            
+outputs             array                A mapping object containing the entry for a model output channel or a list of   
+                                         output channel entries. If the model does not output to another model, this may 
+                                         be ommitted. A full description of channel entries and the options available for
+                                         channels can be found :ref:`here<yaml_comm_options>`.                           
 outputs_in_inputs   boolean              If True, outputs from wrapped model functions are passed by pointer as inputs   
                                          for modification and the return value will be a flag. If False, outputs are     
                                          limited to return values. Defaults to the value of the class attribute          
@@ -42,6 +56,11 @@ source_products     array                Files created by running the model that
                                          removed without checking their extension so users should avoid adding files to  
                                          this list unless they are sure they should be deleted. Defaults to [].          
 strace_flags        array                Flags to pass to strace (or dtrace). Defaults to [].                            
+timesync                                 If set, the model is assumed to call a send then receive of the state at each   
+                                         timestep for syncronization with other models that are also integrating in time.
+                                         If a string is provided, it is assumed to be the name of the server that will   
+                                         handle timestep synchronization. If a boolean is provided, the name of the      
+                                         server will be assumed to be 'timestep'. Defaults to False.                     
 valgrind_flags      array                Flags to pass to valgrind. Defaults to [].                                      
 with_strace         boolean              If True, the command is run with strace (on Linux) or dtrace (on MacOS).        
                                          Defaults to False.                                                              

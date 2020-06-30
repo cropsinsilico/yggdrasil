@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>yggdrasil.metaschema.properties &mdash; yggdrasil 1.0.0+154.g684a530e.dirty documentation</title>
+  <title>yggdrasil.metaschema.properties &mdash; yggdrasil 1.1.1+410.g95af39b2 documentation</title>
   
 
   
@@ -59,7 +59,7 @@
             
             
               <div class="version">
-                1.0.0
+                1.1.1
               </div>
             
           
@@ -94,6 +94,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../autowrap.html#notes-on-autowrapping-c-c-model-functions">Notes on Autowrapping C/C++ Model Functions</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../conditional_io.html">Conditional I/O</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../transformed_io.html">Transformed I/O</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../timesync_io.html">Timestep Synchronization</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../yaml.html">YAML Files</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../config.html">Configuration Files</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../units.html">Units</a></li>
@@ -170,13 +171,10 @@
            <div itemprop="articleBody">
             
   <h1>Source code for yggdrasil.metaschema.properties</h1><div class="highlight"><pre>
-<span></span><span class="kn">import</span> <span class="nn">os</span>
-<span class="kn">import</span> <span class="nn">glob</span>
-<span class="kn">import</span> <span class="nn">importlib</span>
-<span class="kn">from</span> <span class="nn">collections</span> <span class="k">import</span> <span class="n">OrderedDict</span>
+<span></span><span class="kn">from</span> <span class="nn">yggdrasil.components</span> <span class="k">import</span> <span class="n">ClassRegistry</span>
 
 
-<span class="n">_metaschema_properties</span> <span class="o">=</span> <span class="n">OrderedDict</span><span class="p">()</span>
+<span class="n">_metaschema_properties</span> <span class="o">=</span> <span class="n">ClassRegistry</span><span class="p">()</span>
 
 
 <div class="viewcode-block" id="register_metaschema_property"><a class="viewcode-back" href="../../../yggdrasil.metaschema.properties.html#yggdrasil.metaschema.properties.register_metaschema_property">[docs]</a><span class="k">def</span> <span class="nf">register_metaschema_property</span><span class="p">(</span><span class="n">prop_class</span><span class="p">):</span>
@@ -200,7 +198,7 @@
     <span class="kn">from</span> <span class="nn">yggdrasil.metaschema</span> <span class="k">import</span> <span class="n">_metaschema</span><span class="p">,</span> <span class="n">_base_validator</span>
     <span class="k">global</span> <span class="n">_metaschema_properties</span>
     <span class="n">prop_name</span> <span class="o">=</span> <span class="n">prop_class</span><span class="o">.</span><span class="n">name</span>
-    <span class="k">if</span> <span class="n">prop_name</span> <span class="ow">in</span> <span class="n">_metaschema_properties</span><span class="p">:</span>
+    <span class="k">if</span> <span class="n">_metaschema_properties</span><span class="o">.</span><span class="n">has_entry</span><span class="p">(</span><span class="n">prop_name</span><span class="p">):</span>
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Property &#39;</span><span class="si">%s</span><span class="s2">&#39; already registered.&quot;</span> <span class="o">%</span> <span class="n">prop_name</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">prop_name</span> <span class="ow">in</span> <span class="n">_base_validator</span><span class="o">.</span><span class="n">VALIDATORS</span><span class="p">:</span>
         <span class="k">if</span> <span class="p">(</span><span class="n">prop_class</span><span class="o">.</span><span class="n">schema</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">):</span>
@@ -255,21 +253,10 @@
 
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="kn">from</span> <span class="nn">yggdrasil.metaschema.properties</span> <span class="k">import</span> <span class="n">MetaschemaProperty</span>
-    <span class="k">if</span> <span class="n">property_name</span> <span class="ow">in</span> <span class="n">_metaschema_properties</span><span class="p">:</span>
-        <span class="k">return</span> <span class="n">_metaschema_properties</span><span class="p">[</span><span class="n">property_name</span><span class="p">]</span>
-    <span class="k">else</span><span class="p">:</span>
-        <span class="k">if</span> <span class="n">skip_generic</span><span class="p">:</span>
-            <span class="k">return</span> <span class="kc">None</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="k">return</span> <span class="n">MetaschemaProperty</span><span class="o">.</span><span class="n">MetaschemaProperty</span></div>
-
-
-<div class="viewcode-block" id="import_all_properties"><a class="viewcode-back" href="../../../yggdrasil.metaschema.properties.html#yggdrasil.metaschema.properties.import_all_properties">[docs]</a><span class="k">def</span> <span class="nf">import_all_properties</span><span class="p">():</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Import all types to ensure they are registered.&quot;&quot;&quot;</span>
-    <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">glob</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="vm">__file__</span><span class="p">),</span> <span class="s1">&#39;*.py&#39;</span><span class="p">)):</span>
-        <span class="n">mod</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">basename</span><span class="p">(</span><span class="n">x</span><span class="p">)[:</span><span class="o">-</span><span class="mi">3</span><span class="p">]</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="n">mod</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;__&#39;</span><span class="p">):</span>
-            <span class="n">importlib</span><span class="o">.</span><span class="n">import_module</span><span class="p">(</span><span class="s1">&#39;yggdrasil.metaschema.properties.</span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">mod</span><span class="p">)</span></div>
+    <span class="n">out</span> <span class="o">=</span> <span class="n">_metaschema_properties</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">property_name</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">out</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="ow">not</span> <span class="n">skip_generic</span><span class="p">):</span>
+        <span class="n">out</span> <span class="o">=</span> <span class="n">MetaschemaProperty</span><span class="o">.</span><span class="n">MetaschemaProperty</span>
+    <span class="k">return</span> <span class="n">out</span></div>
 </pre></div>
 
            </div>

@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>yggdrasil.tests.test_tools &mdash; yggdrasil 1.0.0+154.g684a530e.dirty documentation</title>
+  <title>yggdrasil.tests.test_tools &mdash; yggdrasil 1.1.1+410.g95af39b2 documentation</title>
   
 
   
@@ -59,7 +59,7 @@
             
             
               <div class="version">
-                1.0.0
+                1.1.1
               </div>
             
           
@@ -94,6 +94,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../autowrap.html#notes-on-autowrapping-c-c-model-functions">Notes on Autowrapping C/C++ Model Functions</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../conditional_io.html">Conditional I/O</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../transformed_io.html">Transformed I/O</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../timesync_io.html">Timestep Synchronization</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../yaml.html">YAML Files</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../config.html">Configuration Files</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../units.html">Units</a></li>
@@ -237,6 +238,11 @@
 <div class="viewcode-block" id="test_get_conda_env"><a class="viewcode-back" href="../../../yggdrasil.tests.html#yggdrasil.tests.test_tools.test_get_conda_env">[docs]</a><span class="k">def</span> <span class="nf">test_get_conda_env</span><span class="p">():</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test get_conda_env.&quot;&quot;&quot;</span>
     <span class="n">tools</span><span class="o">.</span><span class="n">get_conda_env</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="test_get_python_c_library"><a class="viewcode-back" href="../../../yggdrasil.tests.html#yggdrasil.tests.test_tools.test_get_python_c_library">[docs]</a><span class="k">def</span> <span class="nf">test_get_python_c_library</span><span class="p">():</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test get_python_c_library.&quot;&quot;&quot;</span>
+    <span class="n">tools</span><span class="o">.</span><span class="n">get_python_c_library</span><span class="p">(</span><span class="n">allow_failure</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span></div>
     
 
 <div class="viewcode-block" id="test_get_supported"><a class="viewcode-back" href="../../../yggdrasil.tests.html#yggdrasil.tests.test_tools.test_get_supported">[docs]</a><span class="k">def</span> <span class="nf">test_get_supported</span><span class="p">():</span>
@@ -250,6 +256,11 @@
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test get_installed_&lt;lang/comm&gt;.&quot;&quot;&quot;</span>
     <span class="n">tools</span><span class="o">.</span><span class="n">get_installed_lang</span><span class="p">()</span>
     <span class="n">tools</span><span class="o">.</span><span class="n">get_installed_comm</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="test_is_comm_installed"><a class="viewcode-back" href="../../../yggdrasil.tests.html#yggdrasil.tests.test_tools.test_is_comm_installed">[docs]</a><span class="k">def</span> <span class="nf">test_is_comm_installed</span><span class="p">():</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test is_comm_installed for any.&quot;&quot;&quot;</span>
+    <span class="k">assert</span><span class="p">(</span><span class="n">tools</span><span class="o">.</span><span class="n">is_comm_installed</span><span class="p">(</span><span class="s1">&#39;zmq&#39;</span><span class="p">,</span> <span class="n">language</span><span class="o">=</span><span class="s1">&#39;any&#39;</span><span class="p">))</span></div>
 
 
 <div class="viewcode-block" id="test_which"><a class="viewcode-back" href="../../../yggdrasil.tests.html#yggdrasil.tests.test_tools.test_which">[docs]</a><span class="k">def</span> <span class="nf">test_which</span><span class="p">():</span>
@@ -372,6 +383,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="o">.</span><span class="n">verbose_debug</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="o">.</span><span class="n">critical</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="o">.</span><span class="n">exception</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
         <span class="k">try</span><span class="p">:</span>

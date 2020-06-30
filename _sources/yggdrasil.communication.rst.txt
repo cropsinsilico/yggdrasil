@@ -5,6 +5,7 @@ Subpackages
 -----------
 
 .. toctree::
+   :maxdepth: 4
 
    yggdrasil.communication.filters
    yggdrasil.communication.tests
@@ -125,6 +126,14 @@ yggdrasil.communication.MatFileComm module
    :undoc-members:
    :show-inheritance:
 
+yggdrasil.communication.NetCDFFileComm module
+---------------------------------------------
+
+.. automodule:: yggdrasil.communication.NetCDFFileComm
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 yggdrasil.communication.ObjFileComm module
 ------------------------------------------
 
@@ -177,6 +186,14 @@ yggdrasil.communication.ServerComm module
 -----------------------------------------
 
 .. automodule:: yggdrasil.communication.ServerComm
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+yggdrasil.communication.WOFOSTParamFileComm module
+--------------------------------------------------
+
+.. automodule:: yggdrasil.communication.WOFOSTParamFileComm
    :members:
    :undoc-members:
    :show-inheritance:

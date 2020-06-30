@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>yggdrasil.communication.RMQAsyncComm &mdash; yggdrasil 1.0.0+154.g684a530e.dirty documentation</title>
+  <title>yggdrasil.communication.RMQAsyncComm &mdash; yggdrasil 1.1.1+410.g95af39b2 documentation</title>
   
 
   
@@ -59,7 +59,7 @@
             
             
               <div class="version">
-                1.0.0
+                1.1.1
               </div>
             
           
@@ -94,6 +94,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../autowrap.html#notes-on-autowrapping-c-c-model-functions">Notes on Autowrapping C/C++ Model Functions</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../conditional_io.html">Conditional I/O</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../transformed_io.html">Transformed I/O</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../timesync_io.html">Timestep Synchronization</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../yaml.html">YAML Files</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../config.html">Configuration Files</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../units.html">Units</a></li>
@@ -170,8 +171,7 @@
            <div itemprop="articleBody">
             
   <h1>Source code for yggdrasil.communication.RMQAsyncComm</h1><div class="highlight"><pre>
-<span></span><span class="kn">import</span> <span class="nn">threading</span>
-<span class="kn">from</span> <span class="nn">yggdrasil</span> <span class="k">import</span> <span class="n">tools</span>
+<span></span><span class="kn">from</span> <span class="nn">yggdrasil</span> <span class="k">import</span> <span class="n">tools</span><span class="p">,</span> <span class="n">multitasking</span>
 <span class="kn">from</span> <span class="nn">yggdrasil.communication</span> <span class="k">import</span> <span class="n">RMQComm</span>
 <span class="k">if</span> <span class="n">RMQComm</span><span class="o">.</span><span class="n">_rmq_installed</span><span class="p">:</span>
     <span class="kn">import</span> <span class="nn">pika</span>
@@ -197,12 +197,14 @@
 <span class="sd">    Attributes:</span>
 <span class="sd">        times_connected (int): Number of times that this connections has been</span>
 <span class="sd">            established.</span>
-<span class="sd">        rmq_thread (tools.YggThread): Thread used to run IO loop.</span>
+<span class="sd">        rmq_thread (multitasking.YggTask): Thread used to run IO loop.</span>
 
 <span class="sd">    &quot;&quot;&quot;</span>
     
     <span class="n">_commtype</span> <span class="o">=</span> <span class="s1">&#39;rmq_async&#39;</span>
     <span class="n">_schema_subtype_description</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;Asynchronous RabbitMQ connection.&#39;</span><span class="p">)</span>
+    <span class="n">_disconnect_attr</span> <span class="o">=</span> <span class="p">(</span><span class="n">RMQComm</span><span class="o">.</span><span class="n">RMQComm</span><span class="o">.</span><span class="n">_disconnect_attr</span>
+                        <span class="o">+</span> <span class="p">[</span><span class="s1">&#39;_qres_lock&#39;</span><span class="p">,</span> <span class="s1">&#39;_qres_event&#39;</span><span class="p">,</span> <span class="s1">&#39;rmq_thread&#39;</span><span class="p">])</span>
     
     <span class="k">def</span> <span class="nf">_init_before_open</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Initialize null variables and RMQ async thread.&quot;&quot;&quot;</span>
@@ -215,8 +217,8 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">_close_called</span> <span class="o">=</span> <span class="kc">False</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_buffered_messages</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_qres</span> <span class="o">=</span> <span class="kc">None</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_qres_lock</span> <span class="o">=</span> <span class="n">threading</span><span class="o">.</span><span class="n">RLock</span><span class="p">()</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_qres_event</span> <span class="o">=</span> <span class="n">threading</span><span class="o">.</span><span class="n">Event</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_qres_lock</span> <span class="o">=</span> <span class="n">multitasking</span><span class="o">.</span><span class="n">RLock</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_qres_event</span> <span class="o">=</span> <span class="n">multitasking</span><span class="o">.</span><span class="n">Event</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_qres_event</span><span class="o">.</span><span class="n">set</span><span class="p">()</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">RMQAsyncComm</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">_init_before_open</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
 
@@ -230,8 +232,9 @@
         <span class="k">if</span> <span class="n">name</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">rmq_thread_count</span> <span class="o">+=</span> <span class="mi">1</span>
-        <span class="k">return</span> <span class="n">tools</span><span class="o">.</span><span class="n">YggThread</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="n">name</span> <span class="o">+</span> <span class="s1">&#39;.RMQThread</span><span class="si">%d</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">rmq_thread_count</span><span class="p">,</span>
-                               <span class="n">target</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">run_thread</span><span class="p">)</span></div>
+        <span class="k">return</span> <span class="n">multitasking</span><span class="o">.</span><span class="n">YggTask</span><span class="p">(</span>
+            <span class="n">name</span><span class="o">=</span><span class="n">name</span> <span class="o">+</span> <span class="s1">&#39;.RMQThread</span><span class="si">%d</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">rmq_thread_count</span><span class="p">,</span>
+            <span class="n">target</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">run_thread</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="RMQAsyncComm.run_thread"><a class="viewcode-back" href="../../../yggdrasil.communication.html#yggdrasil.communication.RMQAsyncComm.RMQAsyncComm.run_thread">[docs]</a>    <span class="k">def</span> <span class="nf">run_thread</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Connect to the connection and begin the IO loop.&quot;&quot;&quot;</span>
