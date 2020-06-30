@@ -44,30 +44,26 @@ environment:
   rabbitmq_installer_path: "C:\\Users\\appveyor\\rabbitmq-server-3.7.3.exe"
 
   matrix:
-    # - platform: x64
-    #   PYTHON_VERSION: "3.6"
-    #   YGG_TEST_FLAGS: "--test-suite=examples_part1"
-    # - platform: x64
-    #   PYTHON_VERSION: "3.6"
-    #   YGG_TEST_FLAGS: "--test-suite=examples_part2"
     - platform: x64
       PYTHON_VERSION: "3.6"
-      YGG_TEST_FLAGS: "drivers/tests/test_CModelDriver.py drivers/tests/test_CPPModelDriver.py drivers/tests/test_FortranModelDriver.py"
+      YGG_TEST_FLAGS: "--test-suite=examples_part1"
+    - platform: x64
+      PYTHON_VERSION: "3.6"
+      YGG_TEST_FLAGS: "--test-suite=examples_part2"
     - platform: x64
       PYTHON_VERSION: "3.6"
       YGG_TEST_FLAGS: "--long-running"
-    # - platform: x64
-    #   PYTHON_VERSION: "3.7"
-    #   INSTALLZMQ: 0
-    #   YGG_TEST_FLAGS: "--long-running"
-    # - platform: x64
-    #   PYTHON_VERSION: "3.6"
-    #   YGG_TEST_FLAGS: "--test-suite=types tests/test_config.py drivers/tests/test_CompiledModelDriver.py"
-    #   INSTALLC: 0  # Acts to exclude c and cpp
     - platform: x64
       PYTHON_VERSION: "3.7"
-      YGG_TEST_FLAGS: "--test-suite=types --languages c fortran"
-      # YGG_TEST_FLAGS: "--test-suite=types --languages c cpp fortran"
+      INSTALLZMQ: 0
+      YGG_TEST_FLAGS: "--long-running"
+    - platform: x64
+      PYTHON_VERSION: "3.6"
+      YGG_TEST_FLAGS: "--test-suite=types tests/test_config.py drivers/tests/test_CompiledModelDriver.py"
+      INSTALLC: 0  # Acts to exclude c and cpp
+    - platform: x64
+      PYTHON_VERSION: "3.7"
+      YGG_TEST_FLAGS: "--test-suite=types --languages c cpp fortran"
 
 install:
   - "SET PATH=%PYTHON%;%PYTHON%\\Scripts;%PATH%"
