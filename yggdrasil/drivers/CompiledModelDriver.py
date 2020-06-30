@@ -1548,8 +1548,6 @@ class LinkerBase(CompilationToolBase):
             cls.executable_ext = '.exe'
             cls.search_path_env += [
                 'DLLs', os.path.join('library', 'bin')]
-            # if cls.is_gnu:
-            #     cls.library_prefix = 'lib'
             cls.all_library_ext = ['.dll', '.lib', '.dll.a']
         elif platform._is_mac:
             # TODO: Dynamic library by default on windows?
@@ -1574,9 +1572,6 @@ class LinkerBase(CompilationToolBase):
         """
         if cls.toolset == 'msvc':  # pragma: windows
             return False  # Pass all libraries w/ ext
-        # elif platform._is_win:  # pragma: windows
-        #     if libname.startswith('lib') and libname.endswith(('.lib', '.dll')):
-        #         return False
         return (libname.startswith(cls.library_prefix)
                 and libname.endswith(tuple(cls.all_library_ext)))
 
