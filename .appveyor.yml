@@ -46,24 +46,27 @@ environment:
   matrix:
     - platform: x64
       PYTHON_VERSION: "3.6"
-      YGG_TEST_FLAGS: "--test-suite=examples_part1"
-    - platform: x64
-      PYTHON_VERSION: "3.6"
-      YGG_TEST_FLAGS: "--test-suite=examples_part2"
-    - platform: x64
-      PYTHON_VERSION: "3.6"
-      YGG_TEST_FLAGS: "--long-running"
-    - platform: x64
-      PYTHON_VERSION: "3.7"
-      INSTALLZMQ: 0
-      YGG_TEST_FLAGS: "--long-running"
-    - platform: x64
-      PYTHON_VERSION: "3.6"
-      YGG_TEST_FLAGS: "--test-suite=types tests/test_config.py drivers/tests/test_CompiledModelDriver.py"
-      INSTALLC: 0  # Acts to exclude c and cpp
-    - platform: x64
-      PYTHON_VERSION: "3.7"
-      YGG_TEST_FLAGS: "--test-suite=types --languages c cpp fortran"
+      YGG_TEST_FLAGS: "--with-examples examples/tests/test_transforms.py::TestExampleTransforms::test_R_array"
+    # - platform: x64
+    #   PYTHON_VERSION: "3.6"
+    #   YGG_TEST_FLAGS: "--test-suite=examples_part1"
+    # - platform: x64
+    #   PYTHON_VERSION: "3.6"
+    #   YGG_TEST_FLAGS: "--test-suite=examples_part2"
+    # - platform: x64
+    #   PYTHON_VERSION: "3.6"
+    #   YGG_TEST_FLAGS: "--long-running"
+    # - platform: x64
+    #   PYTHON_VERSION: "3.7"
+    #   INSTALLZMQ: 0
+    #   YGG_TEST_FLAGS: "--long-running"
+    # - platform: x64
+    #   PYTHON_VERSION: "3.6"
+    #   YGG_TEST_FLAGS: "--test-suite=types tests/test_config.py drivers/tests/test_CompiledModelDriver.py"
+    #   INSTALLC: 0  # Acts to exclude c and cpp
+    # - platform: x64
+    #   PYTHON_VERSION: "3.7"
+    #   YGG_TEST_FLAGS: "--test-suite=types --languages c cpp fortran"
 
 install:
   - "SET PATH=%PYTHON%;%PYTHON%\\Scripts;%PATH%"
@@ -119,6 +122,9 @@ install:
   # - if "%YGG_CONDA%" == "1" "python utils\\ci_setup.py conda deploy"
   # - if "%YGG_CONDA%" == "0" "python utils\\ci_setup.py pip deploy"
   - "echo %PATH%"
+
+  # Change code page to something closer to utf-8
+  - "chcp 65001"
 
 cache:
   - '%LOCALAPPDATA%\pip\Cache -> setup.py'
