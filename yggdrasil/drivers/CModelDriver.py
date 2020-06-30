@@ -429,7 +429,28 @@ class MSVCArchiver(ArchiverBase):
     compatible_toolsets = ['llvm']
     search_path_envvar = 'LIB'
     
+    @classmethod
+    def is_import_lib(cls, libpath):
+        r"""Determine if a library is an import library or a static
+        library.
+        
+        Args:
+            libpath (str): Full path to library.
 
+        Returns:
+            bool: True if the library is an import library, False otherwise.
+
+        """
+        if (not os.path.isfile(libpath)) or (not libpath.endswith('.lib')):
+            return False
+        out = subprocess.check_output([cls.get_executable(full_path=True),
+                                       '/list', libpath])
+        if out:
+            print(out)
+            return False
+        return True
+
+    
 _incl_interface = _top_lang_dir
 _incl_seri = os.path.join(_top_lang_dir, 'serialize')
 _incl_comm = os.path.join(_top_lang_dir, 'communication')

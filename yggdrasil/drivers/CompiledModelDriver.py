@@ -2607,7 +2607,9 @@ class CompiledModelDriver(ModelDriver):
                     dll = cls.get_dependency_library(dep, libtype='shared',
                                                      commtype=commtype,
                                                      toolname=toolname)
-                    out = tool.dll2a(dll, lib=out)
+                    from yggdrasil.drivers.CModelDriver import MSVCArchiver
+                    print(out, MSVCArchiver.is_import_lib(out))
+                    out = tool.dll2a(dll)
         elif libclass == 'internal':
             src = cls.get_dependency_source(dep, toolname=toolname)
             suffix = cls.get_internal_suffix(commtype=commtype)
