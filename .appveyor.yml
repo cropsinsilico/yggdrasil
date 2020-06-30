@@ -52,6 +52,9 @@ environment:
     #   YGG_TEST_FLAGS: "--test-suite=examples_part2"
     - platform: x64
       PYTHON_VERSION: "3.6"
+      YGG_TEST_FLAGS: "drivers/tests/test_CModelDriver.py drivers/tests/test_CPPModelDriver.py drivers/tests/test_FortranModelDriver.py"
+    - platform: x64
+      PYTHON_VERSION: "3.6"
       YGG_TEST_FLAGS: "--long-running"
     # - platform: x64
     #   PYTHON_VERSION: "3.7"
