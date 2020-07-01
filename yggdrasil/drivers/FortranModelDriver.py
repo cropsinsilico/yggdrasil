@@ -748,17 +748,17 @@ class FortranModelDriver(CompiledModelDriver):
                 imports = [imports]
             for kws in imports:
                 if ('filename' in kws) and os.path.isfile(kws['filename']):
-                    with open(kws['filename'], 'r') as fd:
-                        contents = fd.read()
-                    regex_module = (r'(?i)\s*module\s+(?P<module>.*?)'
-                                    r'(?:.*?\n)*?'
-                                    r'\s*end\s+module\s+(?P=module)')
-                    match_module = re.search(regex_module, contents)
-                    if match_module:
-                        module = match_module.groupdict('module')
-                    else:
-                        module = '%s_module' % kws['function']
-                        kws['module'] = module
+                    # with open(kws['filename'], 'r') as fd:
+                    #     contents = fd.read()
+                    # regex_module = (r'(?i)\s*module\s+(?P<module>.*?)'
+                    #                 r'(?:.*?\n)*?'
+                    #                 r'\s*end\s+module\s+(?P=module)')
+                    # match_module = re.search(regex_module, contents)
+                    # if match_module:
+                    #     module = match_module.groupdict('module')
+                    # else:
+                    module = '%s_module' % kws['function']
+                    kws['module'] = module
                     lines.insert(last_use + 1, 'use %s' % module)
                     last_use += 1
         if 'implicit none' not in lines:
