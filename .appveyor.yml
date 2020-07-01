@@ -69,7 +69,10 @@ environment:
     #   YGG_TEST_FLAGS: "--test-suite=types --languages c cpp fortran"
 
 install:
+  # Change code page to something closer to utf-8
   - "chcp 65001"
+  - set PYTHONIOENCODING=utf-8
+  
   - "SET PATH=%PYTHON%;%PYTHON%\\Scripts;%PATH%"
   - "git submodule update --init --recursive"
 
@@ -123,10 +126,6 @@ install:
   # - if "%YGG_CONDA%" == "1" "python utils\\ci_setup.py conda deploy"
   # - if "%YGG_CONDA%" == "0" "python utils\\ci_setup.py pip deploy"
   - "echo %PATH%"
-
-  # Change code page to something closer to utf-8
-  - "chcp 65001"
-  - set PYTHONIOENCODING=utf-8
 
 cache:
   - '%LOCALAPPDATA%\pip\Cache -> setup.py'
