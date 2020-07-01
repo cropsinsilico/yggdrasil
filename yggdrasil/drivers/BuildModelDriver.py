@@ -311,5 +311,6 @@ class BuildModelDriver(CompiledModelDriver):
         out = super(BuildModelDriver, self).set_env(**kwargs)
         if not kwargs.get('for_compile', False):
             kwargs['existing'] = out
-            out = self.target_language_driver.set_env_class(**kwargs)
+            if hasattr(self.target_language_driver, 'set_env_class'):
+                out = self.target_language_driver.set_env_class(**kwargs)
         return out

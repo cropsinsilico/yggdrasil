@@ -448,6 +448,8 @@ class TestModelDriverNoInit(TestModelParam, parent.TestDriverNoInit):
 
     def test_split_line(self, vals=None):
         r"""Test split_line."""
+        if self.import_cls.function_param is None:
+            return
         if vals is None:
             vals = [('abcdef', {'length': 3, 'force_split': True},
                      ['abc', 'def']),

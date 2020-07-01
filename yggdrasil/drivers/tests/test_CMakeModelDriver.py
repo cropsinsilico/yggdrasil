@@ -2,12 +2,14 @@ import os
 import re
 import pprint
 import tempfile
+import unittest
 from yggdrasil import platform
 from yggdrasil.tests import (
     scripts, assert_raises, assert_equal, requires_language)
 import yggdrasil.drivers.tests.test_CompiledModelDriver as parent
 from yggdrasil.drivers.CMakeModelDriver import (
     CMakeModelDriver, CMakeConfigure, CMakeBuilder)
+from yggdrasil.drivers.CModelDriver import GCCCompiler
 
 
 @requires_language('cmake', installed='any')
@@ -159,10 +161,18 @@ class TestCMakeModelParam(parent.TestCompiledModelParam):
 class TestCMakeModelDriverNoInit(TestCMakeModelParam,
                                  parent.TestCompiledModelDriverNoInit):
     r"""Test runner for CMakeModelDriver without init."""
-    
+
+    @unittest.skipIf(True, "Redundant and time intensive")
     def test_sbdir(self):
         r"""Test that source/build directories set correctly."""
         pass
+
+    @unittest.skipIf(not platform._is_win, "Windows only.")
+    @unittest.skipIf(not GCCCompiler.is_installed(),
+                     "GNU compiler not installed.")
+    def test_run_model_gcc(self):
+        r"""Test compiling/running test model with gcc."""
+        self.run_model_instance(target_compiler='clang')
     
     
 class TestCMakeModelDriverNoStart(TestCMakeModelParam,
@@ -177,6 +187,11 @@ class TestCMakeModelDriverNoStart(TestCMakeModelParam,
         self._inst_kwargs.update(sourcedir='.',
                                  builddir='build',
                                  compiler_flags=['-Wdev'])
+
+    @unittest.skipIf(True, "Redundant and time intensive")
+    def test_sbdir(self):
+        r"""Test that source/build directories set correctly."""
+        pass
 
     def test_call_compiler(self):
         r"""Test call_compiler without full path."""
@@ -194,6 +209,11 @@ class TestCMakeModelDriverNoStart(TestCMakeModelParam,
 
 class TestCMakeModelDriver(TestCMakeModelParam, parent.TestCompiledModelDriver):
     r"""Test runner for CMakeModelDriver."""
+
+    @unittest.skipIf(True, "Redundant and time intensive")
+    def test_sbdir(self):
+        r"""Test that source/build directories set correctly."""
+        pass
 
     def test_write_wrappers(self):
         r"""Test write_wrappers method with verbosity and existing

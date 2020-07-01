@@ -2433,7 +2433,7 @@ class CompiledModelDriver(ModelDriver):
         elif dep in cls.external_libraries:
             dep_lang = cls.external_libraries[dep].get('language', cls.language)
             out = cls.cfg.get(dep_lang, '%s_%s' % (dep, 'include'), None)
-        elif os.path.isfile(dep):
+        elif isinstance(dep, str) and os.path.isfile(dep):
             out = dep
         if out is None:
             if default is None:
@@ -2484,7 +2484,7 @@ class CompiledModelDriver(ModelDriver):
             tool = cls.get_tool('compiler', language=dep_lang, toolname=toolname)
             out = tool.get_output_file(
                 src, dont_link=True, suffix=suffix)
-        elif os.path.isfile(dep):
+        elif isinstance(dep, str) and os.path.isfile(dep):
             out = dep
         if out is None:
             if default is None:
@@ -2607,7 +2607,7 @@ class CompiledModelDriver(ModelDriver):
                                        working_dir=os.path.dirname(src))
             if import_lib:
                 out = os.path.splitext(out)[0] + '.lib'
-        elif os.path.isfile(dep):
+        elif isinstance(dep, str) and os.path.isfile(dep):
             out = dep
         if out is None:
             if default is None:
@@ -2665,7 +2665,7 @@ class CompiledModelDriver(ModelDriver):
             out = cls.cfg.get(dep_lang, '%s_include' % dep, None)
             if (out is not None) and os.path.isfile(out):
                 out = os.path.dirname(out)
-        elif os.path.isfile(dep):
+        elif isinstance(dep, str) and os.path.isfile(dep):
             out = os.path.dirname(dep)
         if not out:
             if default is None:
