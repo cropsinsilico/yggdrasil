@@ -126,7 +126,6 @@ install:
 
   # Change code page to something closer to utf-8
   - "chcp 65001"
-  - "chcp"
 
 cache:
   - '%LOCALAPPDATA%\pip\Cache -> setup.py'
