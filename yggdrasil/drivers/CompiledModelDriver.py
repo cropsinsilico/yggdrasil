@@ -347,7 +347,8 @@ class CompilationToolBase(object):
         exec_env = ''
         if cls.default_executable_env is not None:
             exec_env = os.environ.get(cls.default_executable_env, '')
-        if os.path.splitext(os.path.basename(exec_env))[0] == cls.toolname:
+        if ((isinstance(cls.toolname, str)
+             and os.path.splitext(exec_env)[0].endswith(cls.toolname))):
             cls.default_executable = exec_env
             if cls.default_flags_env is not None:
                 flags_env = cls.default_flags_env
@@ -427,7 +428,7 @@ class CompilationToolBase(object):
             cls = lang_drv.get_tool(cls.tooltype, toolname=toolname)
         elif ((toolname is not None) and (toolname != cls.toolname)
               and (toolname not in cls.aliases)):
-            cls = get_compilation_tool(cls.tooltype, toolname=toolname)
+            cls = get_compilation_tool(cls.tooltype, toolname)
         return cls
             
     @classmethod
@@ -1210,8 +1211,9 @@ class CompilerBase(CompilationToolBase):
         if linker:
             out = get_compilation_tool('linker', linker)(flags=linker_flags,
                                                          executable=linker)
-            if not out.is_installed():
-                out = get_compatible_tool(cls, 'linker', language=cls.languages[0])
+            assert(out.is_installed())
+            # if not out.is_installed():
+            #     out = get_compatible_tool(cls, 'linker', language=cls.languages[0])
         else:
             out = linker
         return out
@@ -2350,8 +2352,7 @@ class CompiledModelDriver(ModelDriver):
         dependency.
 
         Args:
-            dep (str): Name of internal or external dependency or full path
-                to the library.
+            dep (str): Name of internal or external dependency.
             toolname (str, optional): Name of compiler tool that should be used.
                 Defaults to None and the default compiler for the language will
                 be used.
@@ -2379,8 +2380,6 @@ class CompiledModelDriver(ModelDriver):
                                    "for compiler specific libraries.")
         elif dep in cls.external_libraries:
             out = cls.external_libraries[dep]
-        elif isinstance(dep, str) and os.path.isfile(dep):
-            out = dep
         if out is None:
             out = default
         if out is None:
@@ -2925,6 +2924,9 @@ class CompiledModelDriver(ModelDriver):
                 archiver flags.
 
         """
+        # Set default toolname
+        if toolname is None:
+            toolname = cls.get_tool("linker", return_prop='name')
         # Copy/Pop so that empty default dosn't get appended to
         libraries = kwargs.pop('libraries', [])
         internal_dependencies = kwargs.pop('internal_dependencies', [])
@@ -3264,8 +3266,7 @@ class CompiledModelDriver(ModelDriver):
                         for exts in ext_sets:
                             if fname.endswith(exts):
                                 base = fname.split('.', 1)[0]
-                                if base.startswith('lib'):
-                                    base = base.split('lib', 1)[-1]
+                                assert(not base.startswith('lib'))
                                 fname = []
                                 for ext in exts:
                                     fname += [base + ext,
@@ -3398,23 +3399,20 @@ class CompiledModelDriver(ModelDriver):
     @classmethod
     def cleanup_dependencies(cls, products=None, **kwargs):
         r"""Cleanup dependencies."""
-        if not cls.is_installed():
-            return
         if products is None:
             products = []
         kwargs['dry_run'] = True
         compiler = cls.get_tool('compiler', toolname=kwargs.get('toolname', None),
                                 default=None)
-        if compiler is None:
-            return
-        suffix = cls.get_internal_suffix(commtype=kwargs.get('commtype', None))
-        suffix += compiler.get_tool_suffix()
-        cls.compile_dependencies(products=products, **kwargs)
-        new_products = []
-        for i in range(len(products)):
-            if suffix in products[i]:
-                new_products += glob.glob(products[i].replace(suffix, '*'))
-        products += new_products
+        if compiler is not None:
+            suffix = cls.get_internal_suffix(commtype=kwargs.get('commtype', None))
+            suffix += compiler.get_tool_suffix()
+            cls.compile_dependencies(products=products, **kwargs)
+            new_products = []
+            for i in range(len(products)):
+                if suffix in products[i]:
+                    new_products += glob.glob(products[i].replace(suffix, '*'))
+            products += new_products
         super(CompiledModelDriver, cls).cleanup_dependencies(products=products)
 
     def compile_model(self, source_files=None, skip_interface_flags=False,

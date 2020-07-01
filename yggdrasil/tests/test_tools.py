@@ -107,7 +107,7 @@ def test_locate_file():
     assert(not tools.locate_file(['missing_file.fake']))
     # Single file
     sdir, spat, sans = make_temp_single()
-    sout = tools.locate_file(spat)
+    sout = tools.locate_file(spat, verification_func=os.path.isfile)
     assert(isinstance(sout, (bytes, str)))
     assert_equal(sout, sans[0])
     # Multiple files

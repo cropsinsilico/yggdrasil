@@ -354,8 +354,6 @@ class FortranModelDriver(CompiledModelDriver):
     is_typed = True
     types_in_funcdef = False
     interface_inside_exec = True
-    import_after_exec = False
-    declare_functions_as_var = False
     zero_based = False
     max_line_width = 72
     
@@ -469,7 +467,7 @@ class FortranModelDriver(CompiledModelDriver):
         type_match = re.search(cls.function_param['type_regex'], out)
         if type_match:
             type_match = type_match.groupdict()
-            if type_match.get('shape_var', None):
+            if type_match.get('shape_var', None):  # pragma: debug
                 if ('pointer' not in out) and ('allocatable' not in out):
                     out += ', allocatable'
                 if type_match['shape_var'][0] == '*':
@@ -487,9 +485,9 @@ class FortranModelDriver(CompiledModelDriver):
             return out
         from yggdrasil.metaschema.datatypes import get_type_class
         json_type = kwargs.get('datatype', kwargs.get('type', 'bytes'))
-        if isinstance(json_type, str):
+        if isinstance(json_type, str):  # pragma: no cover
             json_type = {'type': json_type}
-        if 'type' in kwargs:
+        if 'type' in kwargs:  # pragma: no cover
             json_type.update(kwargs)
         assert(isinstance(json_type, dict))
         json_type = get_type_class(json_type['type']).normalize_definition(
@@ -508,8 +506,9 @@ class FortranModelDriver(CompiledModelDriver):
             out = cls.get_native_type(datatype=json_subtype) + dim_str
             if not dim_str:
                 json_subtype['type'] = out.split('(')[0]
-                if json_subtype['type'] == 'character':
+                if json_subtype['type'] == 'character':  # pragma: debug
                     json_subtype['precision'] = ''
+                    raise RuntimeError("Character array requires precision.")
                 else:
                     json_subtype['precision'] = int(json_subtype['precision'] / 8)
                 json_subtype.setdefault('ndim', 'n')
@@ -682,10 +681,11 @@ class FortranModelDriver(CompiledModelDriver):
         if for_yggdrasil:
             new_vars_list = []
             for v in vars_list:
-                if isinstance(v, dict):
-                    v = dict(v, name=('yggarg(%s)' % v['name']))
-                else:
-                    v = 'yggarg(%s)' % v
+                assert(isinstance(v, dict))
+                # if isinstance(v, dict):
+                v = dict(v, name=('yggarg(%s)' % v['name']))
+                # else:
+                #     v = 'yggarg(%s)' % v
                 new_vars_list.append(v)
         out = super(FortranModelDriver, cls).prepare_variables(
             new_vars_list, for_yggdrasil=for_yggdrasil, **kwargs)

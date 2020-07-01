@@ -179,7 +179,7 @@ class GCCCompiler(CCompilerBase):
 
         """
         out = super(GCCCompiler, cls).is_installed()
-        if out and platform._is_mac:
+        if out and platform._is_mac:  # pragma: debug
             ver = cls.call(cls.version_flags, skip_flags=True, allow_error=True)
             if 'clang' in ver:
                 out = False  # Disable gcc when it is an alias for clang
@@ -213,13 +213,13 @@ class GCCCompiler(CCompilerBase):
         if (not os.path.isfile(dst)) or overwrite:
             gendef = shutil.which("gendef")
             dlltool = shutil.which("dlltool")
-            if not (gendef and dlltool):
-                print("Could not locate gendef (%s) and dlltool (%s)."
-                      % (gendef, dlltool))
-                return dll
-            subprocess.check_call([gendef, dll])
-            subprocess.check_call(
-                [dlltool, '-D', dll, '-d', '%s.def' % base, '-l', dst])
+            if gendef and dlltool:  # pragma: no cover
+                # subprocess.check_call([gendef, dll])
+                # subprocess.check_call(
+                #     [dlltool, '-D', dll, '-d', '%s.def' % base, '-l', dst])
+                raise RuntimeError("dlltool installed, re-enable the above code.")
+            else:
+                dst = dll
         assert(os.path.isfile(dst))
         return dst
 
@@ -430,26 +430,26 @@ class MSVCArchiver(ArchiverBase):
     compatible_toolsets = ['llvm']
     search_path_envvar = 'LIB'
     
-    @classmethod
-    def is_import_lib(cls, libpath):
-        r"""Determine if a library is an import library or a static
-        library.
+    # @classmethod
+    # def is_import_lib(cls, libpath):
+    #     r"""Determine if a library is an import library or a static
+    #     library.
         
-        Args:
-            libpath (str): Full path to library.
+    #     Args:
+    #         libpath (str): Full path to library.
 
-        Returns:
-            bool: True if the library is an import library, False otherwise.
+    #     Returns:
+    #         bool: True if the library is an import library, False otherwise.
 
-        """
-        if (not os.path.isfile(libpath)) or (not libpath.endswith('.lib')):
-            return False
-        out = subprocess.check_output([cls.get_executable(full_path=True),
-                                       '/list', libpath])
-        files = set(out.splitlines())
-        if any([f.endswith('.obj') for f in files]):
-            return False
-        return True
+    #     """
+    #     if (not os.path.isfile(libpath)) or (not libpath.endswith('.lib')):
+    #         return False
+    #     out = subprocess.check_output([cls.get_executable(full_path=True),
+    #                                    '/list', libpath])
+    #     files = set(out.splitlines())
+    #     if any([f.endswith('.obj') for f in files]):
+    #         return False
+    #     return True
 
     
 _incl_interface = _top_lang_dir
@@ -1219,8 +1219,8 @@ class CModelDriver(CompiledModelDriver):
         json_type = kwargs.get('datatype', kwargs.get('type', 'bytes'))
         if isinstance(json_type, str):
             json_type = {'type': json_type}
-        if 'type' in kwargs:
-            json_type.update(kwargs)
+        # if 'type' in kwargs:
+        #     json_type.update(kwargs)
         assert(isinstance(json_type, dict))
         json_type = get_type_class(json_type['type']).normalize_definition(
             json_type)
@@ -1464,7 +1464,7 @@ class CModelDriver(CompiledModelDriver):
 
         """
         out = []
-        if isinstance(var, str):
+        if isinstance(var, str):  # pragma: no cover
             var = {'name': var}
         if ((isinstance(var.get('datatype', False), dict)
              and (('free_%s' % var['datatype']['type'])

@@ -275,7 +275,7 @@ class TestModelDriverNoInit(TestModelParam, parent.TestDriverNoInit):
                                 declare_functions_as_var=None, **kwargs):
         r"""Test writing and running a function definition."""
         if declare_functions_as_var is None:
-            declare_functions_as_var = self.import_cls.declare_functions_as_var
+            declare_functions_as_var = False
         if self.import_cls.function_param is None:
             self.assert_raises(NotImplementedError,
                                self.import_cls.write_function_def, None)
@@ -445,6 +445,17 @@ class TestModelDriverNoInit(TestModelParam, parent.TestDriverNoInit):
     def test_cleanup_dependencies(self):
         r"""Test cleanup_dependencies method."""
         self.import_cls.cleanup_dependencies()
+
+    def test_split_line(self, vals=None):
+        r"""Test split_line."""
+        if vals is None:
+            vals = [('abcdef', {'length': 3, 'force_split': True},
+                     ['abc', 'def']),
+                    ('    abc', {'length': 3, 'force_split': True},
+                     ['    abc'])]
+        for line, kwargs, splits in vals:
+            self.assert_equal(
+                self.import_cls.split_line(line, **kwargs), splits)
     
 
 class TestModelDriverNoStart(TestModelParam, parent.TestDriverNoStart):

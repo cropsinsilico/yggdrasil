@@ -111,7 +111,16 @@ class TestFortranModelDriverNoInit(TestFortranModelParam,
         r"""Test writing a try/except block."""
         pass
 
-    
+    def test_split_line(self, vals=None):
+        r"""Test split_line."""
+        if vals is None:
+            vals = [('abcdef', {'length': 3, 'force_split': True},
+                     ['ab&', '     &cdef']),
+                    ('    abc', {'length': 3, 'force_split': True},
+                     ['    abc'])]
+        super(TestFortranModelDriverNoInit, self).test_split_line(vals=vals)
+
+            
 class TestFortranModelDriverNoStart(TestFortranModelParam,
                                     parent.TestCompiledModelDriverNoStart):
     r"""Test runner for FortranModelDriver without start."""
