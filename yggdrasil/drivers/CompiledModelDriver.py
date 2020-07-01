@@ -2926,7 +2926,7 @@ class CompiledModelDriver(ModelDriver):
         """
         # Set default toolname
         if toolname is None:
-            toolname = cls.get_tool("linker", return_prop='name')
+            toolname = cls.get_tool("compiler", return_prop='name')
         # Copy/Pop so that empty default dosn't get appended to
         libraries = kwargs.pop('libraries', [])
         internal_dependencies = kwargs.pop('internal_dependencies', [])
