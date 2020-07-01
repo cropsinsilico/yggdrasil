@@ -69,6 +69,7 @@ environment:
     #   YGG_TEST_FLAGS: "--test-suite=types --languages c cpp fortran"
 
 install:
+  - "chcp 65001"
   - "SET PATH=%PYTHON%;%PYTHON%\\Scripts;%PATH%"
   - "git submodule update --init --recursive"
 
@@ -125,6 +126,7 @@ install:
 
   # Change code page to something closer to utf-8
   - "chcp 65001"
+  - "chcp"
 
 cache:
   - '%LOCALAPPDATA%\pip\Cache -> setup.py'
