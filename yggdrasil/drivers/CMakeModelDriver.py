@@ -933,8 +933,8 @@ class CMakeModelDriver(BuildModelDriver):
                          "\\Library\\mingw-w64\\bin\\*")
             print(glob.glob(mingw_bin))
             # if tools.which('mingw32-make') is not None:
-            kwargs.setdefault('generator', 'MSYS Makefiles')
-            # kwargs.setdefault('generator', 'MinGW Makefiles')
+            # kwargs.setdefault('generator', 'MSYS Makefiles')
+            kwargs.setdefault('generator', 'MinGW Makefiles')
             # elif kwargs.get('generator', None) is None:  # pragma: debug
             #     # TODO: Unclear what this would be
             #     # kwargs.setdefault('generator', 'Unix Makefiles')

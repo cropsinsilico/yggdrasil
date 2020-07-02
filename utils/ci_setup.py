@@ -267,7 +267,7 @@ def deploy_package_on_ci(method):
             if _in_conda:
                 if _is_win:
                     cmds.append(("%s install -c conda-forge "
-                                 "m2w64-gcc-fortran "  # m2w64-make "
+                                 "m2w64-gcc-fortran m2w64-make "
                                  "m2w64-toolchain_win-64") % conda_cmd)
                 else:
                     cmds.append("%s install -c conda-forge fortran-compiler" % conda_cmd)
