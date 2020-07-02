@@ -923,12 +923,11 @@ class CMakeModelDriver(BuildModelDriver):
         """
         if platform._is_win and (kwargs.get('target_compiler', None)
                                  in ['gcc', 'g++', 'gfortran']):  # pragma: windows
-            if tools.which('sh.exe') is not None:  # pragma: debug
-                # TODO: Determine which generator should be used when sh.exe on path
+            if tools.which('sh.exe') is not None:
                 kwargs.setdefault('generator', 'MSYS Makefiles')
-                raise RuntimeError("Unsure what generator to use for Msys.")
-            elif tools.which('mingw32-make') is not None:
-                kwargs.setdefault('generator', 'MinGW Makefiles')
+            # Untested
+            # elif tools.which('mingw32-make') is not None:
+            #     kwargs.setdefault('generator', 'MinGW Makefiles')
             elif kwargs.get('generator', None) is None:  # pragma: debug
                 # TODO: Unclear what this would be
                 # kwargs.setdefault('generator', 'Unix Makefiles')
