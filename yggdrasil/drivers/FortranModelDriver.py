@@ -52,7 +52,7 @@ class FortranCompilerBase(CompilerBase):
             kwargs.setdefault('module-search-path', _top_lang_dir)
         kwargs.setdefault('include_dirs', cls.get_search_path())
         out = super(FortranCompilerBase, cls).get_flags(**kwargs)
-        for x in ['-O', '-O2', '-O3', 'Os', 'Ofast']:
+        for x in ['-O', '-O2', '-O3', 'Os', 'Ofast']:  # pragma: debug
             if x in out:
                 out.remove(x)
         return out

@@ -150,10 +150,8 @@ class CCompilerBase(CompilerBase):
         out = super(CompilerBase, cls).get_search_path(*args, **kwargs)
         if platform._is_mac and (_osx_sysroot is not None):
             base_path = os.path.join(_osx_sysroot, 'usr')
-            if kwargs.get('libtype', None) == 'include':
-                out.append(os.path.join(base_path, 'include'))
-            else:
-                out.append(os.path.join(base_path, 'lib'))
+            assert(kwargs.get('libtype', None) == 'include')
+            out.append(os.path.join(base_path, 'include'))
         return out
 
 

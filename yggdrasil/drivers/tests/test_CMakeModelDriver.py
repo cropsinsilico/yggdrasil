@@ -75,10 +75,9 @@ def test_create_include():
         testlist += [([], [fname_dll], ['ADD_LIBRARY(test SHARED IMPORTED)']),
                      ([], [fname_lib], ['ADD_LIBRARY(test STATIC IMPORTED)'])]
     else:
+        tempdir_cp = tempdir
         if platform._is_win:  # pragma: windows
             tempdir_cp = tempdir.replace('\\', re.escape('\\'))
-        else:
-            tempdir_cp = tempdir
         testlist += [([], [fname_dll], [('FIND_LIBRARY(TEST_LIBRARY NAMES %s '
                                          'test HINTS %s)')
                                         % (os.path.basename(fname_dll), tempdir_cp)]),
@@ -163,7 +162,7 @@ class TestCMakeModelDriverNoInit(TestCMakeModelParam,
     r"""Test runner for CMakeModelDriver without init."""
 
     @unittest.skipIf(True, "Redundant and time intensive")
-    def test_sbdir(self):
+    def test_sbdir(self):  # pragma: no cover
         r"""Test that source/build directories set correctly."""
         pass
 
@@ -172,7 +171,7 @@ class TestCMakeModelDriverNoInit(TestCMakeModelParam,
                      "GNU compiler not installed.")
     def test_run_model_gcc(self):
         r"""Test compiling/running test model with gcc."""
-        self.run_model_instance(target_compiler='clang')
+        self.run_model_instance(target_compiler='gcc')
     
     
 class TestCMakeModelDriverNoStart(TestCMakeModelParam,
@@ -189,7 +188,7 @@ class TestCMakeModelDriverNoStart(TestCMakeModelParam,
                                  compiler_flags=['-Wdev'])
 
     @unittest.skipIf(True, "Redundant and time intensive")
-    def test_sbdir(self):
+    def test_sbdir(self):  # pragma: no cover
         r"""Test that source/build directories set correctly."""
         pass
 
@@ -211,7 +210,7 @@ class TestCMakeModelDriver(TestCMakeModelParam, parent.TestCompiledModelDriver):
     r"""Test runner for CMakeModelDriver."""
 
     @unittest.skipIf(True, "Redundant and time intensive")
-    def test_sbdir(self):
+    def test_sbdir(self):  # pragma: no cover
         r"""Test that source/build directories set correctly."""
         pass
 

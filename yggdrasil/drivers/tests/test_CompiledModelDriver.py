@@ -193,8 +193,10 @@ class TestCompiledModelDriverNoInit(TestCompiledModelParam,
 
     def test_get_dependency_info(self):
         r"""Test get_dependency_info."""
-        dep_list = self.import_cls.get_dependency_order(
-            self.import_cls.interface_library)
+        dep_list = (
+            self.import_cls.get_dependency_order(
+                self.import_cls.interface_library)
+            + list(self.import_cls.external_libraries.keys()))
         for dep in dep_list:
             self.import_cls.get_dependency_info(dep, default='default')
         self.assert_raises(KeyError, self.import_cls.get_dependency_info,
@@ -204,8 +206,10 @@ class TestCompiledModelDriverNoInit(TestCompiledModelParam,
 
     def test_get_dependency_source(self):
         r"""Test get_dependency_source."""
-        dep_list = self.import_cls.get_dependency_order(
-            self.import_cls.interface_library)
+        dep_list = (
+            self.import_cls.get_dependency_order(
+                self.import_cls.interface_library)
+            + list(self.import_cls.external_libraries.keys()))
         for dep in dep_list:
             self.import_cls.get_dependency_source(dep, default='default')
         self.assert_raises(ValueError, self.import_cls.get_dependency_source,
@@ -217,8 +221,10 @@ class TestCompiledModelDriverNoInit(TestCompiledModelParam,
 
     def test_get_dependency_object(self):
         r"""Test get_dependency_object."""
-        dep_list = self.import_cls.get_dependency_order(
-            self.import_cls.interface_library)
+        dep_list = (
+            self.import_cls.get_dependency_order(
+                self.import_cls.interface_library)
+            + list(self.import_cls.external_libraries.keys()))
         for dep in dep_list:
             self.import_cls.get_dependency_object(dep, default='default')
         self.assert_raises(ValueError, self.import_cls.get_dependency_object,
