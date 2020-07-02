@@ -211,11 +211,11 @@ class GCCCompiler(CCompilerBase):
         if (not os.path.isfile(dst)) or overwrite:
             gendef = shutil.which("gendef")
             dlltool = shutil.which("dlltool")
-            if gendef and dlltool:  # pragma: no cover
-                # subprocess.check_call([gendef, dll])
-                # subprocess.check_call(
-                #     [dlltool, '-D', dll, '-d', '%s.def' % base, '-l', dst])
-                raise RuntimeError("dlltool installed, re-enable the above code.")
+            if gendef and dlltool:
+                subprocess.check_call([gendef, dll])
+                subprocess.check_call(
+                    [dlltool, '-D', dll, '-d', '%s.def' % base, '-l', dst])
+                # raise RuntimeError("dlltool installed, re-enable the above code.")
             else:
                 dst = dll
         assert(os.path.isfile(dst))
