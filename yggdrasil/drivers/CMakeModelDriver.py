@@ -926,12 +926,14 @@ class CMakeModelDriver(BuildModelDriver):
             # if tools.which('sh.exe') is not None:
             #     kwargs.setdefault('generator', 'MSYS Makefiles')
             # Untested
-            if tools.which('mingw32-make') is not None:
-                kwargs.setdefault('generator', 'MinGW Makefiles')
-            elif kwargs.get('generator', None) is None:  # pragma: debug
-                # TODO: Unclear what this would be
-                # kwargs.setdefault('generator', 'Unix Makefiles')
-                raise RuntimeError("Could not determine GNU Makefile generator.")
+            print(tools.which('make'),
+                  tools.which('m2w64-make'))
+            # if tools.which('mingw32-make') is not None:
+            kwargs.setdefault('generator', 'MinGW Makefiles')
+            # elif kwargs.get('generator', None) is None:  # pragma: debug
+            #     # TODO: Unclear what this would be
+            #     # kwargs.setdefault('generator', 'Unix Makefiles')
+            #     raise RuntimeError("Could not determine GNU Makefile generator.")
         out = super(CMakeModelDriver, cls).update_compiler_kwargs(**kwargs)
         if CModelDriver._osx_sysroot is not None:
             out.setdefault('definitions', [])
