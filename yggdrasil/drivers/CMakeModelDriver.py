@@ -929,9 +929,10 @@ class CMakeModelDriver(BuildModelDriver):
             print(tools.which('make'),
                   tools.which('m2w64-make'))
             # if tools.which('mingw32-make') is not None:
-            kwargs.setdefault('generator', 'MSYS Makefiles')
-            # kwargs.setdefault('generator', 'MinGW Makefiles')
-            
+            # kwargs.setdefault('generator', 'MSYS Makefiles')
+            kwargs.setdefault('generator', 'MinGW Makefiles')
+            kwargs.setdefault('definitions', [])
+            kwargs['definitions'].append('CMAKE_SH="CMAKE_SH-NOTFOUND"')
             # -DCMAKE_SH="CMAKE_SH-NOTFOUND"
             # elif kwargs.get('generator', None) is None:  # pragma: debug
             #     # TODO: Unclear what this would be
