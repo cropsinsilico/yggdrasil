@@ -10,5 +10,6 @@ r-units
 zeromq
 c-compiler; platform_system == 'Windows'
 cxx-compiler; platform_system == 'Windows'
+m2w64-make; platform_system == 'Windows'
 m2w64-gcc-fortran; platform_system == 'Windows'
 m2w64-toolchain_win-64; platform_system == 'Windows'
