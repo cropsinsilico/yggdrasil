@@ -23,7 +23,7 @@ _c_internal_libs = copy.deepcopy(CModelDriver.CModelDriver.internal_libraries)
 class FortranCompilerBase(CompilerBase):
     r"""Base class for Fortran compilers."""
     languages = ['fortran']
-    default_executable_env = 'FF'
+    default_executable_env = 'FC'
     default_flags_env = 'FFLAGS'
     default_flags = ['-g', '-Wall', '-cpp', '-pedantic-errors']
     linker_attributes = {'default_flags_env': 'LFLAGS',
