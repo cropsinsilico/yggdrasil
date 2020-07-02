@@ -814,6 +814,10 @@ class CMakeModelDriver(BuildModelDriver):
                 shutil.copy2(self.buildfile, self.buildfile_copy)
             with open(self.buildfile, 'r') as fd:
                 contents = fd.read().splitlines()
+            # Prevent error about sh.exe being on path for windows
+            if platform._is_win and tools.which('sh.exe'):  # pragma: windows
+                newlines_before.append(
+                    'set(DCMAKE_SH="CMAKE_SH-NOTFOUND")')
             # Prevent error when cross compiling by building static lib as test
             newlines_before.append(
                 'set(CMAKE_TRY_COMPILE_TARGET_TYPE "STATIC_LIBRARY")')
@@ -923,21 +927,8 @@ class CMakeModelDriver(BuildModelDriver):
         """
         if platform._is_win and (kwargs.get('target_compiler', None)
                                  in ['gcc', 'g++', 'gfortran']):  # pragma: windows
-            # if tools.which('sh.exe') is not None:
-            #     kwargs.setdefault('generator', 'MSYS Makefiles')
-            # Untested
-            print(tools.which('make'),
-                  tools.which('m2w64-make'))
-            # if tools.which('mingw32-make') is not None:
             # kwargs.setdefault('generator', 'MSYS Makefiles')
             kwargs.setdefault('generator', 'MinGW Makefiles')
-            kwargs.setdefault('definitions', [])
-            kwargs['definitions'].append('CMAKE_SH="CMAKE_SH-NOTFOUND"')
-            # -DCMAKE_SH="CMAKE_SH-NOTFOUND"
-            # elif kwargs.get('generator', None) is None:  # pragma: debug
-            #     # TODO: Unclear what this would be
-            #     # kwargs.setdefault('generator', 'Unix Makefiles')
-            #     raise RuntimeError("Could not determine GNU Makefile generator.")
         out = super(CMakeModelDriver, cls).update_compiler_kwargs(**kwargs)
         if CModelDriver._osx_sysroot is not None:
             out.setdefault('definitions', [])
