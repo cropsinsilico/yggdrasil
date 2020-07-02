@@ -926,15 +926,13 @@ class CMakeModelDriver(BuildModelDriver):
             # if tools.which('sh.exe') is not None:
             #     kwargs.setdefault('generator', 'MSYS Makefiles')
             # Untested
-            import glob
             print(tools.which('make'),
                   tools.which('m2w64-make'))
-            mingw_bin = ("C:\\Miniconda3-x64\\envs\\test-environment"
-                         "\\Library\\mingw-w64\\bin\\*")
-            print(glob.glob(mingw_bin))
             # if tools.which('mingw32-make') is not None:
-            # kwargs.setdefault('generator', 'MSYS Makefiles')
-            kwargs.setdefault('generator', 'MinGW Makefiles')
+            kwargs.setdefault('generator', 'MSYS Makefiles')
+            # kwargs.setdefault('generator', 'MinGW Makefiles')
+            
+            # -DCMAKE_SH="CMAKE_SH-NOTFOUND"
             # elif kwargs.get('generator', None) is None:  # pragma: debug
             #     # TODO: Unclear what this would be
             #     # kwargs.setdefault('generator', 'Unix Makefiles')
