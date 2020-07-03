@@ -923,25 +923,29 @@ class CMakeModelDriver(BuildModelDriver):
         """
         if platform._is_win and (kwargs.get('target_compiler', None)
                                  in ['gcc', 'g++', 'gfortran']):  # pragma: windows
-            gcc = get_compilation_tool('compiler',
-                                       kwargs['target_compiler'],
-                                       None)
-            sh_path = shutil.which('sh.exe')
             # Remove sh from path for compilation when the rtools
             # version of sh is on the path, but the gnu compiler being
             # used is not part of that installation.
+            gcc = get_compilation_tool('compiler',
+                                       kwargs['target_compiler'],
+                                       None)
             if gcc:
-                gcc_path = gcc.get_executable(full_path=True)
                 path = kwargs['env']['PATH']
+                gcc_path = gcc.get_executable(full_path=True)
+                sh_path = shutil.which('sh', path=path)
                 while sh_path:
                     for k in ['rtools', 'git']:
-                        if (k in sh_path.lower()) and (k not in gcc_path.lower()):
-                            paths = path.split(os.pathsep)
-                            paths.remove(os.path.dirname(sh_path))
-                            path = os.pathsep.join(paths)
-                        else:
+                        if k in sh_path.lower():
                             break
-                    sh_path = shutil.which('sh.exe', path=path)
+                    else:  # pragma: debug
+                        break
+                    if k not in gcc_path.lower():
+                        paths = path.split(os.pathsep)
+                        paths.remove(os.path.dirname(sh_path))
+                        path = os.pathsep.join(paths)
+                    else:  # pragma: debug
+                        break
+                    sh_path = shutil.which('sh', path=path)
                 kwargs['env']['PATH'] = path
                 print(sh_path, path)
                 if sh_path:
