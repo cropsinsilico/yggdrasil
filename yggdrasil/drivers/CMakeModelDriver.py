@@ -814,10 +814,6 @@ class CMakeModelDriver(BuildModelDriver):
                 shutil.copy2(self.buildfile, self.buildfile_copy)
             with open(self.buildfile, 'r') as fd:
                 contents = fd.read().splitlines()
-            # Prevent error about sh.exe being on path for windows
-            if platform._is_win and tools.which('sh.exe'):  # pragma: windows
-                newlines_before.append(
-                    'set(DCMAKE_SH="CMAKE_SH-NOTFOUND")')
             # Prevent error when cross compiling by building static lib as test
             newlines_before.append(
                 'set(CMAKE_TRY_COMPILE_TARGET_TYPE "STATIC_LIBRARY")')
@@ -927,8 +923,23 @@ class CMakeModelDriver(BuildModelDriver):
         """
         if platform._is_win and (kwargs.get('target_compiler', None)
                                  in ['gcc', 'g++', 'gfortran']):  # pragma: windows
-            # kwargs.setdefault('generator', 'MSYS Makefiles')
-            kwargs.setdefault('generator', 'MinGW Makefiles')
+            gcc = get_compilation_tool('compiler',
+                                       kwargs['target_compiler'],
+                                       None)
+            sh_path = tools.which('sh.exe')
+            # Remove sh from path for compilation when the rtools
+            # version of sh is on the path, but the gnu compiler being
+            # used is not part of that installation.
+            if gcc and sh_path:
+                gcc_path = gcc.get_executable(full_path=True)
+                if ('rtools' in sh_path.lower()) and ('rtools' not in gcc_path.lower()):
+                    paths = kwargs['env']['PATH'].split(os.pathsep)
+                    paths.remove(os.path.dirname(sh_path))
+                    kwargs['env']['PATH'] = os.pathsep.join(paths)
+                    print(kwargs['env']['PATH'])
+                    kwargs.setdefault('generator', 'MinGW Makefiles')
+                else:
+                    kwargs.setdefault('generator', 'MSYS Makefiles')
         out = super(CMakeModelDriver, cls).update_compiler_kwargs(**kwargs)
         if CModelDriver._osx_sysroot is not None:
             out.setdefault('definitions', [])
