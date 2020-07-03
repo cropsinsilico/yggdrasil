@@ -232,13 +232,25 @@ class ObjDict(PlyDict):
     def mesh(self):
         r"""list: Vertices for each face in the structure."""
         mesh = []
-        for i in range(self.count_elements('faces')):
+        for f in self['faces']:
             imesh = []
-            for f in self['faces']:
-                for v in f:
-                    imesh += [self['vertices'][v['vertex_index']][k]
-                              for k in ['x', 'y', 'z']]
+            for v in f:
+                imesh.append([self['vertices'][v['vertex_index']][k]
+                              for k in ['x', 'y', 'z']])
             mesh.append(imesh)
+        return mesh
+
+    @property
+    def vertex_normals(self):
+        mesh = None
+        if 'normals' in self:
+            mesh = []
+            for f in self['faces']:
+                imesh = []
+                for v in f:
+                    imesh.append([self['normals'][v['normal_index']][k]
+                                  for k in ['i', 'j', 'k']])
+                mesh.append(imesh)
         return mesh
 
     @classmethod
