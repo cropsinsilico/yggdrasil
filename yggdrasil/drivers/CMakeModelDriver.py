@@ -930,16 +930,24 @@ class CMakeModelDriver(BuildModelDriver):
             # Remove sh from path for compilation when the rtools
             # version of sh is on the path, but the gnu compiler being
             # used is not part of that installation.
-            if gcc and sh_path:
+            if gcc:
                 gcc_path = gcc.get_executable(full_path=True)
-                if ('rtools' in sh_path.lower()) and ('rtools' not in gcc_path.lower()):
-                    paths = kwargs['env']['PATH'].split(os.pathsep)
-                    paths.remove(os.path.dirname(sh_path))
-                    kwargs['env']['PATH'] = os.pathsep.join(paths)
-                    print(kwargs['env']['PATH'])
-                    kwargs.setdefault('generator', 'MinGW Makefiles')
-                else:
+                path = kwargs['env']['PATH']
+                while sh_path:
+                    for k in ['rtools', 'git']:
+                        if (k in sh_path.lower()) and (k not in gcc_path.lower()):
+                            paths = path.split(os.pathsep)
+                            paths.remove(os.path.dirname(sh_path))
+                            path = os.pathsep.join(paths)
+                        else:
+                            break
+                    sh_path = shutil.which('sh.exe', path=path)
+                kwargs['env']['PATH'] = path
+                print(sh_path, path)
+                if sh_path:
                     kwargs.setdefault('generator', 'MSYS Makefiles')
+                else:
+                    kwargs.setdefault('generator', 'MinGW Makefiles')
         out = super(CMakeModelDriver, cls).update_compiler_kwargs(**kwargs)
         if CModelDriver._osx_sysroot is not None:
             out.setdefault('definitions', [])
