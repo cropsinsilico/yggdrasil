@@ -6,6 +6,7 @@ import glob
 import logging
 import warnings
 import subprocess
+import shutil
 from collections import OrderedDict
 from yggdrasil import platform, tools, scanf
 from yggdrasil.drivers.ModelDriver import ModelDriver, remove_products
@@ -623,7 +624,7 @@ class CompilationToolBase(object):
             bool: True if the tool is installed, False otherwise.
 
         """
-        exec_path = tools.which(cls.get_executable())
+        exec_path = shutil.which(cls.get_executable())
         return (exec_path is not None)
 
     @classmethod
@@ -731,7 +732,7 @@ class CompilationToolBase(object):
             raise NotImplementedError("Executable not set for %s '%s'."
                                       % (cls.tooltype, cls.toolname))
         if full_path:
-            out = tools.which(out)
+            out = shutil.which(out)
         return out
 
     @classmethod

@@ -261,7 +261,7 @@ def get_conda_prefix():
     # CONDA_PREFIX set. Older version of conda behaved this way so it is
     # possible that a future release will as well.
     # if not conda_prefix:
-    #     conda_prefix = which('conda')
+    #     conda_prefix = shutil.which('conda')
     #     if conda_prefix is not None:
     #         conda_prefix = os.path.dirname(os.path.dirname(conda_prefix))
     return conda_prefix
@@ -307,23 +307,6 @@ def is_subprocess():
 
     """
     return check_environ_bool('YGG_SUBPROCESS')
-
-
-def which(program):
-    r"""Determine the path to an executable if it exists.
-
-    Args:
-        program (str): Name of program to locate or full path to program.
-
-    Returns:
-        str: Path to executable if it can be located. Otherwise, None.
-
-    """
-    if platform._is_win and (not program.endswith('.exe')):  # pragma: windows
-        out = which(program + '.exe')
-        if out is not None:
-            return out
-    return shutil.which(program)
 
 
 def find_all(name, path, verification_func=None):

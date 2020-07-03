@@ -4,7 +4,7 @@ import shutil
 import logging
 import sysconfig
 from collections import OrderedDict
-from yggdrasil import platform, components, tools
+from yggdrasil import platform, components
 from yggdrasil.drivers.CompiledModelDriver import (
     LinkerBase, get_compilation_tool, get_compatible_tool)
 from yggdrasil.drivers.BuildModelDriver import (
@@ -926,7 +926,7 @@ class CMakeModelDriver(BuildModelDriver):
             gcc = get_compilation_tool('compiler',
                                        kwargs['target_compiler'],
                                        None)
-            sh_path = tools.which('sh.exe')
+            sh_path = shutil.which('sh.exe')
             # Remove sh from path for compilation when the rtools
             # version of sh is on the path, but the gnu compiler being
             # used is not part of that installation.

@@ -839,7 +839,7 @@ class ModelDriver(Driver):
         out = False
         if cls.language is not None:
             try:
-                out = (tools.which(cls.language_executable()) is not None)
+                out = (shutil.which(cls.language_executable()) is not None)
             except NotImplementedError:  # pragma: debug
                 out = False
         return out
