@@ -12,6 +12,9 @@ from yggdrasil.metaschema.datatypes.PlyMetaschemaType import (
     _index_type, _color_type, _coord_type,
     _index_conv, _color_conv, _coord_conv,
     _index_fmt, _color_fmt, _coord_fmt)
+
+
+# TODO: Add support for groups
     
 
 _schema_file = os.path.join(_schema_dir, 'obj.json')

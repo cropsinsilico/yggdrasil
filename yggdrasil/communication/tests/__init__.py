@@ -1,4 +1,6 @@
+import os
 import tempfile
+import uuid
 from yggdrasil.tests import generate_component_tests, assert_equal, assert_raises
 from yggdrasil.communication import open_file_comm
 from yggdrasil.communication.tests.test_FileComm import TestFileComm
@@ -10,8 +12,9 @@ generate_component_tests('file', TestFileComm, globals(), __file__,
 
 def test_open_file_comm():
     r"""Test file comm context manager."""
-    with tempfile.NamedTemporaryFile() as fd:
-        fname = fd.name
+    fname = os.path.join(tempfile.gettempdir(),
+                         '%s.txt' % str(uuid.uuid4))
+    try:
         msg = b'Test message'
         with open_file_comm(fname, 'w') as comm:
             flag = comm.send(msg)
@@ -23,6 +26,9 @@ def test_open_file_comm():
             flag, res = comm.recv()
             assert(flag)
         assert_equal(res, 2 * msg)
+    finally:
+        if os.path.isfile(fname):
+            os.remove(fname)
     with assert_raises(ValueError):
         with open_file_comm(fname, 'invalid') as comm:  # pragma: debug
             pass
