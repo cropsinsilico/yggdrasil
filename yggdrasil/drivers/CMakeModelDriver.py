@@ -947,11 +947,11 @@ class CMakeModelDriver(BuildModelDriver):
                         break
                     sh_path = shutil.which('sh', path=path)
                 kwargs['env']['PATH'] = path
-                print(sh_path, path)
-                if sh_path:
-                    kwargs.setdefault('generator', 'MSYS Makefiles')
-                else:
+                if not sh_path:
                     kwargs.setdefault('generator', 'MinGW Makefiles')
+                # This is not currently tested
+                # else:
+                #     kwargs.setdefault('generator', 'MSYS Makefiles')
         out = super(CMakeModelDriver, cls).update_compiler_kwargs(**kwargs)
         if CModelDriver._osx_sysroot is not None:
             out.setdefault('definitions', [])
