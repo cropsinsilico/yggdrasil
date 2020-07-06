@@ -215,7 +215,6 @@ class GCCCompiler(CCompilerBase):
                 subprocess.check_call([gendef, dll])
                 subprocess.check_call(
                     [dlltool, '-D', dll, '-d', '%s.def' % base, '-l', dst])
-                # raise RuntimeError("dlltool installed, re-enable the above code.")
             else:
                 dst = dll
         assert(os.path.isfile(dst))

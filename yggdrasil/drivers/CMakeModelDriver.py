@@ -522,9 +522,11 @@ class CMakeConfigure(BuildToolBase):
                     lines.append('    ADD_LIBRARY(%s STATIC IMPORTED)' % xl)
                 lines += ['    SET_TARGET_PROPERTIES(',
                           '        %s PROPERTIES' % xl]
-                if xe.lower() == '.dll':
-                    lines.append('        IMPORTED_IMPLIB %s'
-                                 % x.replace('.dll', '.lib'))
+                # Untested on appveyor, but required when using dynamic
+                # library directly (if dll2a not used).
+                # if xe.lower() == '.dll':
+                #     lines.append('        IMPORTED_IMPLIB %s'
+                #                  % x.replace('.dll', '.lib'))
                 lines += ['        IMPORTED_LOCATION %s)' % x,
                           'endif()',
                           'TARGET_LINK_LIBRARIES(%s %s)' % (target, xl)]

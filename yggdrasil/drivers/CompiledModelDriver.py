@@ -346,10 +346,17 @@ class CompilationToolBase(object):
             setattr(cls, k, copy.deepcopy(getattr(cls, k, [])))
         # Set attributes based on environment variables
         exec_env = ''
+        exec_env_base = ''
+        tool_base = ''
+        if isinstance(cls.toolname, str):
+            tool_base = cls.toolname
         if cls.default_executable_env is not None:
             exec_env = os.environ.get(cls.default_executable_env, '')
-        if ((isinstance(cls.toolname, str)
-             and os.path.splitext(exec_env)[0].endswith(cls.toolname))):
+            exec_env_base = exec_env
+        if os.environ.get('PATHEXT', ''):
+            exec_env_base = exec_env.split(os.environ['PATHEXT'])[0]
+            tool_base = tool_base.split(os.environ['PATHEXT'])[0]
+        if exec_env_base.endswith(tool_base):
             cls.default_executable = exec_env
             if cls.default_flags_env is not None:
                 flags_env = cls.default_flags_env
@@ -641,7 +648,8 @@ class CompilationToolBase(object):
             if not isinstance(env, list):
                 env = [env]
             for ienv in env:
-                out += os.environ.get(ienv, '').split()
+                new_val = os.environ.get(ienv, '').split()
+                out += [v for v in new_val if v not in out]
         return out
 
     @classmethod

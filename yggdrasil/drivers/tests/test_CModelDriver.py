@@ -119,7 +119,18 @@ class TestCModelDriverNoInit(TestCModelParam,
         self.test_write_function_def(inputs=inputs, outputs=outputs,
                                      dont_add_lengths=True)
         
-    
+    def test_GCCCompiler_dll2a(self):
+        r"""Test the dll2a method of the GCCCompiler class."""
+        gcc = self.import_cls.get_tool('compiler', toolname='gcc',
+                                       default=None)
+        if gcc:
+            kws = {'toolname': 'gcc'}
+            if platform._is_win:
+                kws['libtype'] = 'shared'
+            dll = self.import_cls.get_dependency_library('python', **kws)
+            gcc.dll2a(dll, overwrite=True)
+
+
 class TestCModelDriverNoStart(TestCModelParam,
                               parent.TestCompiledModelDriverNoStart):
     r"""Test runner for CModelDriver without start."""
