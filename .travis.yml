@@ -41,7 +41,8 @@ env:
   matrix:
     - YGG_TEST_FLAGS="--test-suite=examples_part1"
     - YGG_TEST_FLAGS="--test-suite=examples_part2"
-    - YGG_CONDA=yes YGG_TEST_FLAGS="--long-running drivers/tests/test_CModelDriver.py" INSTALLRMQ=1 INSTALLAPY=1 YGG_SECOND_TEST="yggtest --ci --default-comm=IPCComm --long-running" CFLAGS="-Wall -g"
+    - YGG_CONDA=yes YGG_TEST_FLAGS="--long-running drivers/tests/test_CModelDriver.py" CFLAGS="-Wall -g" INSTALLRMQ=1 INSTALLAPY=1
+    # YGG_SECOND_TEST="yggtest --ci --default-comm=IPCComm --long-running"
     # - YGG_CONDA=yes YGG_TEST_FLAGS="--test-suite=types --languages R c"
     # - YGG_TEST_FLAGS="--test-suite=types --languages matlab python cpp"
 
