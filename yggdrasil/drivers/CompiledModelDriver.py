@@ -658,6 +658,8 @@ class CompilationToolBase(object):
             tool_base = tool_base.split(os.environ['PATHEXT'])[0]
             envi_base = envi_base.split(os.environ['PATHEXT'])[0]
         out = False
+        print('here3', cls.toolname, cls.default_executable_env,
+              tool_base, envi_base)
         if tool_base and envi_base:
             out = envi_base.endswith(tool_base)
         return out
