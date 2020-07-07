@@ -37,7 +37,7 @@ class ForkComm(CommBase.CommBase):
 
     _dont_register = True
     
-    def __init__(self, name, comm=None, **kwargs):
+    def __init__(self, name, comm=None, is_async=False, **kwargs):
         self.comm_list = []
         self.curr_comm_index = 0
         self.eof_recv = []
@@ -62,13 +62,14 @@ class ForkComm(CommBase.CommBase):
         for i in range(ncomm):
             ikw = dict(**kwargs)
             ikw.update(**comm[i])
+            ikw.setdefault('use_async', is_async)
             iname = ikw.pop('name')
             self.comm_list.append(get_comm(iname, **ikw))
             self.eof_recv.append(0)
         if ncomm > 0:
             kwargs['address'] = [x.address for x in self.comm_list]
         kwargs['comm'] = 'ForkComm'
-        super(ForkComm, self).__init__(name, **kwargs)
+        super(ForkComm, self).__init__(name, is_async=is_async, **kwargs)
         assert(not self.single_use)
         assert(not self.is_server)
         assert(not self.is_client)

@@ -520,9 +520,16 @@ class Task(ContextObject):
     @property
     def dummy_copy(self):
         r"""Dummy copy of base."""
-        return DummyTask(name=self._base.name,
-                         exitcode=self._base.exitcode,
-                         daemon=self._base.daemon)
+        name = b'dummy'
+        exitcode = 0
+        daemon = False
+        try:
+            name = self._base.name
+            exitcode = self._base.exitcode
+            daemon = self._base.daemon
+        except AttributeError:
+            pass
+        return DummyTask(name=name, exitcode=exitcode, daemon=daemon)
         
     def __getstate__(self):
         state = super(Task, self).__getstate__()
@@ -615,7 +622,7 @@ class Queue(ContextObject):
 
     def __setstate__(self, state):
         if state['_base'] is None:
-            state['_base'] = queue.Queue
+            state['_base'] = queue.Queue()
         super(Queue, self).__setstate__(state)
 
     @property
