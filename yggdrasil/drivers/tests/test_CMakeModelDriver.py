@@ -150,22 +150,26 @@ class TestCMakeModelParam(parent.TestCompiledModelParam):
         self.builddir = os.path.join(self.sourcedir, 'build')
         self.args = [self.target]
         self._inst_kwargs['yml']['working_dir'] = self.sourcedir
-
-    def test_sbdir(self):
-        r"""Test that source/build directories set correctly."""
-        assert_equal(self.instance.sourcedir, self.sourcedir)
-        assert_equal(self.instance.builddir, self.builddir)
         
 
 class TestCMakeModelDriverNoInit(TestCMakeModelParam,
                                  parent.TestCompiledModelDriverNoInit):
     r"""Test runner for CMakeModelDriver without init."""
 
-    @unittest.skipIf(True, "Redundant and time intensive")
-    def test_sbdir(self):  # pragma: no cover
-        r"""Test that source/build directories set correctly."""
-        pass
+    def __init__(self, *args, **kwargs):
+        super(TestCMakeModelDriverNoInit, self).__init__(*args, **kwargs)
+        self._inst_kwargs['skip_compile'] = True
 
+    @unittest.skip("Redundant since called by C driver.")
+    def test_build(self):  # pragma: no cover
+        r"""Test building libraries as a shared/static library or object files."""
+        pass
+    
+    def run_model_instance(self, **kwargs):
+        r"""Create a driver for a model and run it."""
+        kwargs.setdefault('skip_compile', False)
+        return super(TestCMakeModelDriverNoInit, self).run_model_instance(**kwargs)
+        
     @unittest.skipIf(not platform._is_win, "Windows only.")
     @unittest.skipIf(not GCCCompiler.is_installed(),
                      "GNU compiler not installed.")
@@ -185,12 +189,8 @@ class TestCMakeModelDriverNoStart(TestCMakeModelParam,
         # Relative paths
         self._inst_kwargs.update(sourcedir='.',
                                  builddir='build',
-                                 compiler_flags=['-Wdev'])
-
-    @unittest.skipIf(True, "Redundant and time intensive")
-    def test_sbdir(self):  # pragma: no cover
-        r"""Test that source/build directories set correctly."""
-        pass
+                                 compiler_flags=['-Wdev'],
+                                 skip_compiler=True)
 
     def test_call_compiler(self):
         r"""Test call_compiler without full path."""
@@ -209,10 +209,10 @@ class TestCMakeModelDriverNoStart(TestCMakeModelParam,
 class TestCMakeModelDriver(TestCMakeModelParam, parent.TestCompiledModelDriver):
     r"""Test runner for CMakeModelDriver."""
 
-    @unittest.skipIf(True, "Redundant and time intensive")
-    def test_sbdir(self):  # pragma: no cover
+    def test_sbdir(self):
         r"""Test that source/build directories set correctly."""
-        pass
+        assert_equal(self.instance.sourcedir, self.sourcedir)
+        assert_equal(self.instance.builddir, self.builddir)
 
     def test_write_wrappers(self):
         r"""Test write_wrappers method with verbosity and existing

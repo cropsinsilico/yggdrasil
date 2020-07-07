@@ -133,9 +133,9 @@ class TestModelDriverNoInit(TestModelParam, parent.TestDriverNoInit):
         drv.wait(False)
         assert(not drv.errors)
 
-    def test_run_model(self):
+    def test_run_model(self, **kwargs):
         r"""Test running script used without debug."""
-        self.run_model_instance()
+        self.run_model_instance(**kwargs)
 
     @unittest.skipIf(platform._is_win, "No valgrind on windows")
     @unittest.skipIf(shutil.which('valgrind') is None,
