@@ -356,22 +356,23 @@ class CompilationToolBase(object):
         if os.environ.get('PATHEXT', ''):
             exec_env_base = exec_env.split(os.environ['PATHEXT'])[0]
             tool_base = tool_base.split(os.environ['PATHEXT'])[0]
-        if exec_env_base.endswith(tool_base):
-            cls.default_executable = exec_env
-            print('here1', cls.toolname, cls.default_flags_env)
-            if cls.default_flags_env is not None:
-                flags_env = cls.default_flags_env
-                if not isinstance(flags_env, list):
-                    flags_env = [flags_env]
-                for ienv in flags_env:
-                    new_val = os.environ.get(ienv, '').split()
-                    cls.default_flags += [v for v in new_val if v
-                                          not in cls.default_flags]
-        else:
-            # Don't use environment variables if they don't match the tool
-            # associated with this class
-            cls.default_executable_env = None
-            cls.default_flags_env = None
+        if cls.toolname:
+            if exec_env_base.endswith(tool_base):
+                cls.default_executable = exec_env
+                print('here1', cls.toolname, cls.default_flags_env)
+                if cls.default_flags_env is not None:
+                    flags_env = cls.default_flags_env
+                    if not isinstance(flags_env, list):
+                        flags_env = [flags_env]
+                    for ienv in flags_env:
+                        new_val = os.environ.get(ienv, '').split()
+                        cls.default_flags += [v for v in new_val if v
+                                              not in cls.default_flags]
+            else:
+                # Don't use environment variables if they don't match the tool
+                # associated with this class
+                cls.default_executable_env = None
+                cls.default_flags_env = None
         # Set default_executable to name
         if cls.default_executable is None:
             cls.default_executable = cls.toolname
