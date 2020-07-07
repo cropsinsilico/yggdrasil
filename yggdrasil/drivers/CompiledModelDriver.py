@@ -631,7 +631,7 @@ class CompilationToolBase(object):
             envi_base = envi_base.split(os.environ['PATHEXT'])[0]
         out = False
         if tool_base and envi_base:
-            out = envi_base.endswith(tool_base)
+            out = envi_base.endswith(tuple(tool_base))
         return out
 
     @classmethod
