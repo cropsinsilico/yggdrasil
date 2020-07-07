@@ -217,7 +217,7 @@ def run_tsts(**kwargs):  # pragma: no cover
             elif x == 'examples_part1':
                 args.withexamples = True
                 test_paths.append(os.path.join(
-                    'examples', 'tests', 'test_[a-g]*.py'))
+                    'examples', 'tests', 'test_[A-Za-g]*.py'))
             elif x == 'examples_part2':
                 args.withexamples = True
                 test_paths.append(os.path.join(
