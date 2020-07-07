@@ -358,6 +358,7 @@ class CompilationToolBase(object):
             tool_base = tool_base.split(os.environ['PATHEXT'])[0]
         if exec_env_base.endswith(tool_base):
             cls.default_executable = exec_env
+            print('here1', cls.toolname, cls.default_flags_env)
             if cls.default_flags_env is not None:
                 flags_env = cls.default_flags_env
                 if not isinstance(flags_env, list):
