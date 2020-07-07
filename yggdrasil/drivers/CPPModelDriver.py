@@ -46,6 +46,7 @@ class CPPCompilerBase(CCompilerBase):
 class GPPCompiler(CPPCompilerBase, GCCCompiler):
     r"""Interface class for G++ compiler/linker."""
     toolname = 'g++'
+    aliases = ['gnu-c++']
 
 
 class ClangPPCompiler(CPPCompilerBase, ClangCompiler):

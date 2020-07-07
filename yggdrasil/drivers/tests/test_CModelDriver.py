@@ -10,7 +10,7 @@ def test_LDLinker_tool_version():
     if LDLinker.is_installed():
         LDLinker.tool_version()
         LDLinker.get_search_path()
-        print(LDLinker.get_env_flags())
+        LDLinker.get_env_flags()
 
 
 class TestCModelParam(parent.TestCompiledModelParam):

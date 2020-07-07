@@ -345,37 +345,8 @@ class CompilationToolBase(object):
             # Copy so that list modification is not propagated to subclasses
             setattr(cls, k, copy.deepcopy(getattr(cls, k, [])))
         # Set attributes based on environment variables
-        # exec_env = ''
-        # exec_env_base = ''
-        # tool_base = ''
-        # if isinstance(cls.toolname, str):
-        #     tool_base = cls.toolname
-        # if cls.default_executable_env is not None:
-        #     exec_env = os.environ.get(cls.default_executable_env, '')
-        #     exec_env_base = exec_env
-        # if os.environ.get('PATHEXT', ''):
-        #     exec_env_base = exec_env.split(os.environ['PATHEXT'])[0]
-        #     tool_base = tool_base.split(os.environ['PATHEXT'])[0]
         if cls.env_matches_tool():
             cls.default_executable = os.environ[cls.default_executable_env]
-            print('here0', cls.toolname, cls.default_executable)
-        # if cls.toolname:
-        #     if exec_env_base.endswith(tool_base):
-        #         cls.default_executable = exec_env
-        #         print('here1', cls.toolname, cls.default_flags_env)
-        #         if cls.default_flags_env is not None:
-        #             flags_env = cls.default_flags_env
-        #             if not isinstance(flags_env, list):
-        #                 flags_env = [flags_env]
-        #             for ienv in flags_env:
-        #                 new_val = os.environ.get(ienv, '').split()
-        #                 cls.default_flags += [v for v in new_val if v
-        #                                       not in cls.default_flags]
-        #     else:
-        #         # Don't use environment variables if they don't match the tool
-        #         # associated with this class
-        #         cls.default_executable_env = None
-        #         cls.default_flags_env = None
         # Set default_executable to name
         if cls.default_executable is None:
             cls.default_executable = cls.toolname
@@ -648,18 +619,17 @@ class CompilationToolBase(object):
             bool: True if the environment variable matches, False otherwise.
 
         """
-        tool_base = ''
+        tool_base = cls.aliases.copy()
         envi_base = ''
         if isinstance(cls.toolname, str):
-            tool_base = cls.toolname
+            tool_base.append(cls.toolname)
         if isinstance(cls.default_executable_env, str):
             envi_base = os.environ.get(cls.default_executable_env, '')
         if os.environ.get('PATHEXT', ''):
-            tool_base = tool_base.split(os.environ['PATHEXT'])[0]
+            tool_base = [x.split(os.environ['PATHEXT'])[0]
+                         for x in tool_base]
             envi_base = envi_base.split(os.environ['PATHEXT'])[0]
         out = False
-        print('here3', cls.toolname, cls.default_executable_env,
-              tool_base, envi_base)
         if tool_base and envi_base:
             out = envi_base.endswith(tool_base)
         return out
@@ -673,10 +643,8 @@ class CompilationToolBase(object):
 
         """
         out = []
-        print('here1', cls.toolname, cls.env_matches_tool())
         if cls.env_matches_tool():
             env = getattr(cls, 'default_flags_env', None)
-            print('here2', cls.toolname, env)
             if env is not None:
                 if not isinstance(env, list):
                     env = [env]
