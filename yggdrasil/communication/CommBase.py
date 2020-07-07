@@ -973,6 +973,8 @@ class CommBase(tools.YggClass):
                 self.recv(timeout=0)
             self.wait_for_confirm(timeout=self._timeout_drain)
         else:
+            if self.is_response_server and (not self.is_async):
+                self.wait_for_workers(timeout=self._timeout_drain)
             self.drain_messages(variable='n_msg_send')
             self.wait_for_confirm(timeout=self._timeout_drain)
         self.debug("Finished (timeout_drain = %s)", str(self._timeout_drain))
@@ -1026,6 +1028,20 @@ class CommBase(tools.YggClass):
             return self.is_confirmed_recv
         else:
             return self.is_confirmed_send
+
+    def wait_for_workers(self, timeout=None):
+        r"""Sleep until all workers are closed or have been used."""
+        Tout = self.start_timeout(t=timeout,
+                                  key_suffix='.wait_for_workers')
+        flag = False
+        while (not Tout.is_out):
+            flag = all([(x._used or x.is_closed) for x in
+                        self._work_comms.values()])
+            if flag:
+                break
+            self.sleep()
+        self.stop_timeout(key_suffix='.wait_for_workers')
+        return flag
 
     def wait_for_confirm(self, timeout=None, direction=None,
                          active_confirm=False, noblock=False):
@@ -1530,9 +1546,8 @@ class CommBase(tools.YggClass):
         if workcomm.is_async:
             return workcomm._send_multipart(msg, **kwargs)
         else:
-            args = [msg]
-            self.sched_task(0, workcomm._send_multipart, args=args,
-                            kwargs=kwargs)
+            self.sched_task(0, workcomm._send_multipart,
+                            args=[msg], kwargs=kwargs)
             return True
             
     def on_send_eof(self, header_kwargs=None):
