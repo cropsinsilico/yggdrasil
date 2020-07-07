@@ -1,0 +1,7 @@
+---
+
+model:
+  name: maxMsgSrv
+  driver: FortranModelDriver
+  args: ./src/maxMsgSrv.f90
+  is_server: True

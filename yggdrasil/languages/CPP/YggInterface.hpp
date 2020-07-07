@@ -89,7 +89,7 @@ public:
    */
   int recv(const int nargs, ...) {
     size_t nargs_copy = (size_t)nargs;
-    va_list_t va;
+    va_list_t va = init_va_list();
     va_start(va.va, nargs);
     int ret = vcommRecv(_pi, 0, nargs_copy, va);
     va_end(va.va);
@@ -108,7 +108,7 @@ public:
    */
   int recvRealloc(const int nargs, ...) {
     size_t nargs_copy = (size_t)nargs;
-    va_list_t va;
+    va_list_t va = init_va_list();
     va_start(va.va, nargs);
     int ret = vcommRecv(_pi, 1, nargs_copy, va);
     va_end(va.va);
@@ -139,7 +139,7 @@ public:
     indicate success.
    */
   int recv_nolimit(const int nargs, ...) {
-    va_list_t va;
+    va_list_t va = init_va_list();
     va_start(va.va, nargs);
     int ret = vyggRecv(_pi, 0, nargs, va);
     va_end(va.va);
@@ -230,7 +230,7 @@ public:
     success.
   */
   int send(const int nargs, ...) {
-    va_list_t va;
+    va_list_t va = init_va_list();
     va_start(va.va, nargs);
     int ret = vyggSend(_pi, (size_t)nargs, va);
     va_end(va.va);
@@ -257,7 +257,7 @@ public:
     success.
   */
   int send_nolimit(const int nargs, ...) {
-    va_list_t va;
+    va_list_t va = init_va_list();
     va_start(va.va, nargs);
     int ret = vyggSend(_pi, nargs, va);
     va_end(va.va);
@@ -318,7 +318,7 @@ public:
     success.
   */
   int send(const int nargs, ...) {
-    va_list_t va;
+    va_list_t va = init_va_list();
     va_start(va.va, nargs);
     int ret = vrpcSend(_pi, nargs, va);
     va_end(va.va);
@@ -336,7 +336,7 @@ public:
     indicate success.
    */
   int recv(const int nargs, ...) {
-    va_list_t va;
+    va_list_t va = init_va_list();
     va_start(va.va, nargs);
     int ret = vrpcRecv(_pi, nargs, va);
     va_end(va.va);
@@ -356,7 +356,7 @@ public:
     indicate success.
    */
   int recvRealloc(const int nargs, ...) {
-    va_list_t va;
+    va_list_t va = init_va_list();
     va_start(va.va, nargs);
     int ret = vrpcRecvRealloc(_pi, nargs, va);
     va_end(va.va);
@@ -442,7 +442,7 @@ public:
   */
   int call(const int nargs, ...) {
     yggRpc_t _cpi = pi();
-    va_list_t va;
+    va_list_t va = init_va_list();
     va_start(va.va, nargs);
     int ret = vrpcCall(_cpi, nargs, va);
     va_end(va.va);
@@ -466,7 +466,7 @@ public:
   */
   int callRealloc(const int nargs, ...) {
     yggRpc_t _cpi = pi();
-    va_list_t va;
+    va_list_t va = init_va_list();
     va_start(va.va, nargs);
     int ret = vrpcCallRealloc(_cpi, nargs, va);
     va_end(va.va);

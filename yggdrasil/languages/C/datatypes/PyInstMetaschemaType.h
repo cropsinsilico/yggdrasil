@@ -330,7 +330,12 @@ public:
     if (use_generic())
       return out;
     ygglog_throw_error("PyObjMetaschemaType::update_from_serialization_args: Not implemented");
-    python_t arg = va_arg(ap.va, python_t);
+    python_t arg;
+    if (ap.using_ptrs) {
+      arg = ((python_t*)get_va_list_ptr_cpp(&ap))[0];
+    } else {
+      arg = va_arg(ap.va, python_t);
+    }
     out++;
     if (args_type_ == NULL) {
       update_class_name(arg.name);
@@ -469,7 +474,12 @@ public:
    */
   bool encode_data(rapidjson::Writer<rapidjson::StringBuffer> *writer,
 		   size_t *nargs, va_list_t &ap) const override {
-    python_t arg0 = va_arg(ap.va, python_t);
+    python_t arg0;
+    if (ap.using_ptrs) {
+      arg0 = ((python_t*)get_va_list_ptr_cpp(&ap))[0];
+    } else {
+      arg0 = va_arg(ap.va, python_t);
+    }
     writer->StartArray();
     // Args
     YggGeneric* args = (YggGeneric*)(arg0.args);
@@ -543,7 +553,11 @@ public:
     python_t *arg;
     python_t **p;
     if (allow_realloc) {
-      p = va_arg(ap.va, python_t**);
+      if (ap.using_ptrs) {
+	p = (python_t**)get_va_list_ptr_ref_cpp(&ap);
+      } else {
+	p = va_arg(ap.va, python_t**);
+      }
       python_t *temp = (python_t*)realloc(p[0], sizeof(python_t));
       if (temp == NULL) {
 	ygglog_throw_error("PyInstMetaschemaType::decode_data: Failed to realloc variable.");
@@ -551,7 +565,11 @@ public:
       p[0] = temp;
       arg = *p;
     } else {
-      arg = va_arg(ap.va, python_t*);
+      if (ap.using_ptrs) {
+	arg = (python_t*)get_va_list_ptr_cpp(&ap);
+      } else {
+	arg = va_arg(ap.va, python_t*);
+      }
       p = &arg;
     }
     (*nargs)--;

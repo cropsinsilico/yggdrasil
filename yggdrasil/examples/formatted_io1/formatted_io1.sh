@@ -23,9 +23,13 @@ case $1 in
 	echo "Running C++"
 	yaml='formatted_io1_cpp.yml'
 	;;
-    -r | -R)
+    -r | -R )
 	echo "Running R"
 	yaml='formatted_io1_r.yml'
+	;;
+    -f | --fortran )
+	echo "Running Fortran"
+	yaml='formatted_io1_fortran.yml'
 	;;
 esac
 

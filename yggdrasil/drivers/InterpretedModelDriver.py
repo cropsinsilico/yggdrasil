@@ -1,5 +1,5 @@
 import os
-from yggdrasil import tools
+import shutil
 from yggdrasil.drivers.ModelDriver import ModelDriver
 
 
@@ -222,7 +222,7 @@ class InterpretedModelDriver(ModelDriver):
 
         """
         # (cls.language not in cmd)
-        out = ((tools.which(cmd) is not None)
+        out = ((shutil.which(cmd) is not None)
                and (not any([cmd.endswith(e) for e in cls.language_ext])))
         return out
 

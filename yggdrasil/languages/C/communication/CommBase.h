@@ -257,9 +257,7 @@ static inline
 int comm_base_send(const comm_t *x, const char *data, const size_t len) {
   // Prevent C4100 warning on windows by referencing param
 #ifdef _WIN32
-  x;
-  data;
-  len;
+  UNUSED(data);
 #endif
   // Make sure you arn't sending a message that is too big
   if (len > YGG_MSG_MAX) {

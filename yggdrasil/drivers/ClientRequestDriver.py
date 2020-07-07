@@ -212,12 +212,13 @@ class ClientRequestDriver(ConnectionDriver):
 
     def prune_response_drivers(self):
         r"""Remove response drivers that are no longer being used."""
-        remove_idx = []
-        for i, x in enumerate(self.response_drivers):
-            if (((not x.is_alive())
-                 and x.icomm.is_confirmed_recv
-                 and x.ocomm.is_confirmed_send)):
-                x.cleanup()
-                remove_idx.append(i)
-        for i in remove_idx[::-1]:
-            self.response_drivers.pop(i)
+        with self.lock:
+            remove_idx = []
+            for i, x in enumerate(self.response_drivers):
+                if (((not x.is_alive())
+                     and x.icomm.is_confirmed_recv
+                     and x.ocomm.is_confirmed_send)):
+                    x.cleanup()
+                    remove_idx.append(i)
+            for i in remove_idx[::-1]:
+                self.response_drivers.pop(i)

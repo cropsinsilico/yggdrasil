@@ -569,6 +569,27 @@ extern "C" {
     return (void*)out;
   }
 
+  int is_dtype_format_array(dtype_t* type_struct) {
+    int out = 0;
+    try {
+      if (type_struct->obj == NULL) {
+	return -1;
+      }
+      MetaschemaType* type = dtype2class(type_struct);
+      const char* name = type->type();
+      if (strcmp(name, "array") == 0) {
+	JSONArrayMetaschemaType* array_type = static_cast<JSONArrayMetaschemaType*>(type);
+	if ((array_type->all_arrays()) && (strlen(array_type->format_str()) > 0)) {
+	  out = 1;
+	}
+      }
+    } catch(...) {
+      ygglog_error("is_dtype_format_array: C++ exception thrown.");
+      out = -1;
+    }
+    return out;
+  }
+
   generic_t init_generic() {
     generic_t out;
     out.prefix = prefix_char;
@@ -622,18 +643,41 @@ extern "C" {
     return out;
   }
 
+  // generic_t create_generic_array(const size_t nitems,
+  // 				 generic_t* items) {
+  //   generic_t out = init_generic();
+  //   try {
+  //     size_t i;
+  //     MetaschemaTypeVector *types = new MetaschemaTypeVector();
+  //     YggGenericVector *data = new YggGenericVector();
+  //     for (i = 0; i < nitems; i++) {
+  // 	YggGeneric* iobj = (YggGeneric*)(items[i].obj);
+  // 	MetaschemaType* itype = iobj->get_type();
+  // 	data->push_back(iobj);
+  // 	types->push_back(itype);
+  //     }
+  //     JSONArrayMetaschemaType *new_type = new JSONArrayMetaschemaType(types, "", true);
+  //     YggGeneric* obj = new YggGeneric(new_type, (void*)data, new_type->nbytes);
+  //   } catch (...) {
+  //     ygglog_error("create_generic_array: C++ exception thrown.");
+  //   }
+  //   return out;
+  // }
+
   int destroy_generic(generic_t* x) {
     int ret = 0;
     if (x != NULL) {
-      x->prefix = ' ';
-      if (x->obj != NULL) {
-	try {
-	  YggGeneric* obj = (YggGeneric*)(x->obj);
-	  delete obj;
-	  x->obj = NULL;
-	} catch (...) {
-	  ygglog_error("destroy_generic: C++ exception thrown in destructor for YggGeneric.");
-	  ret = -1;
+      if (is_generic_init(*x)) {
+	x->prefix = ' ';
+	if (x->obj != NULL) {
+	  try {
+	    YggGeneric* obj = (YggGeneric*)(x->obj);
+	    delete obj;
+	    x->obj = NULL;
+	  } catch (...) {
+	    ygglog_error("destroy_generic: C++ exception thrown in destructor for YggGeneric.");
+	    ret = -1;
+	  }
 	}
       }
     }
@@ -675,18 +719,25 @@ extern "C" {
     generic_t out;
     if (nargs != 1)
       return out;
-    va_list ap_copy;
-    va_copy(ap_copy, ap.va);
-    out = va_arg(ap_copy, generic_t);
+    va_list_t ap_copy = copy_va_list(ap);
+    if (ap.using_ptrs) {
+      CSafe(out = ((generic_t*)get_va_list_ptr_cpp(&ap_copy))[0])
+    } else {
+      out = va_arg(ap_copy.va, generic_t);
+    }
     return out;
   }
 
   generic_t* get_generic_va_ptr(size_t nargs, va_list_t ap) {
     if (nargs != 1)
       return NULL;
-    va_list ap_copy;
-    va_copy(ap_copy, ap.va);
-    generic_t *out = va_arg(ap_copy, generic_t*);
+    generic_t *out;
+    va_list_t ap_copy = copy_va_list(ap);
+    if (ap.using_ptrs) {
+      CSafe(out = (generic_t*)get_va_list_ptr_cpp(&ap_copy))
+    } else {
+      out = va_arg(ap_copy.va, generic_t*);
+    }
     if ((out != NULL) || (is_generic_init(*out))) {
       return out;
     } else {
@@ -701,7 +752,11 @@ extern "C" {
       return out;
     }
     (*nargs)--;
-    out = va_arg(ap->va, generic_t);
+    if (ap->using_ptrs) {
+      CSafe(out = ((generic_t*)get_va_list_ptr_cpp(ap))[0])
+    } else {
+      out = va_arg(ap->va, generic_t);
+    }
     return out;
   }
 
@@ -711,13 +766,131 @@ extern "C" {
       return NULL;
     }
     (*nargs)--;
-    generic_t *out = va_arg(ap->va, generic_t*);
+    generic_t *out;
+    if (ap->using_ptrs) {
+      CSafe(out = (generic_t*)get_va_list_ptr_cpp(ap))
+    } else {
+      out = va_arg(ap->va, generic_t*);
+    }
     if (out == NULL) {
       ygglog_error("pop_generic_va_ptr: Object is NULL.");
       return NULL;
     } else if (!(is_generic_init(*out))) {
       ygglog_error("pop_generic_va_ptr: Generic object not intialized.");
       return NULL;
+    }
+    return out;
+  }
+
+  int add_generic_array(generic_t arr, generic_t x) {
+    int out = 0;
+    try {
+      if (!(is_generic_init(arr))) {
+	ygglog_throw_error("add_generic_array: Array is not a generic object.");
+      }
+      if (!(is_generic_init(x))) {
+	ygglog_throw_error("add_generic_array: New element is not a generic object.");
+      }
+      YggGeneric* arr_obj = (YggGeneric*)(arr.obj);
+      if (arr_obj == NULL) {
+	ygglog_throw_error("add_generic_array: Array is NULL.");
+      }
+      YggGeneric* x_obj = (YggGeneric*)(x.obj);
+      if (x_obj == NULL) {
+	ygglog_throw_error("add_generic_array: New element is NULL.");
+      }
+      arr_obj->add_array_element(x_obj);
+    } catch (...) {
+      ygglog_error("add_generic_array: C++ exception thrown.");
+      out = 1;
+    }
+    return out;
+  }
+
+  int set_generic_array(generic_t arr, size_t i, generic_t x) {
+    int out = 0;
+    try {
+      if (!(is_generic_init(arr))) {
+	ygglog_throw_error("set_generic_array: Array is not a generic object.");
+      }
+      if (!(is_generic_init(x))) {
+	ygglog_throw_error("set_generic_array: New element is not a generic object.");
+      }
+      YggGeneric* arr_obj = (YggGeneric*)(arr.obj);
+      if (arr_obj == NULL) {
+	ygglog_throw_error("set_generic_array: Array is NULL.");
+      }
+      YggGeneric* x_obj = (YggGeneric*)(x.obj);
+      if (x_obj == NULL) {
+	ygglog_throw_error("set_generic_array: New element is NULL.");
+      }
+      arr_obj->set_array_element(i, x_obj);
+    } catch (...) {
+      ygglog_error("set_generic_array: C++ exception thrown.");
+      out = 1;
+    }
+    return out;
+  }
+
+  int get_generic_array(generic_t arr, size_t i, generic_t *x) {
+    int out = 0;
+    x[0] = init_generic();
+    try {
+      if (!(is_generic_init(arr))) {
+  ygglog_throw_error("get_generic_array: Array is not a generic object.");
+      }
+      YggGeneric* arr_obj = (YggGeneric*)(arr.obj);
+      if (arr_obj == NULL) {
+  ygglog_throw_error("get_generic_array: Array is NULL.");
+      }
+      x[0].obj = (void*)(arr_obj->get_array_element(i));
+    } catch (...) {
+      ygglog_error("get_generic_array: C++ exception thrown.");
+      out = 1;
+    }
+    return out;
+  }
+
+  int set_generic_object(generic_t arr, const char* k, generic_t x) {
+    int out = 0;
+    try {
+      if (!(is_generic_init(arr))) {
+  ygglog_throw_error("set_generic_object: Object is not a generic object.");
+      }
+      if (!(is_generic_init(x))) {
+  ygglog_throw_error("set_generic_object: New element is not a generic object.");
+      }
+      YggGeneric* arr_obj = (YggGeneric*)(arr.obj);
+      if (arr_obj == NULL) {
+  ygglog_throw_error("set_generic_object: Object is NULL.");
+      }
+      YggGeneric* x_obj = (YggGeneric*)(x.obj);
+      if (x_obj == NULL) {
+  ygglog_throw_error("set_generic_object: New element is NULL.");
+      }
+      arr_obj->set_object_element(k, x_obj);
+    } catch (...) {
+      ygglog_error("set_generic_object: C++ exception thrown.");
+      out = 1;
+    }
+    return out;
+  }
+
+  int get_generic_object(generic_t arr, const char* k, generic_t *x) {
+    int out = 0;
+    x[0] = init_generic();
+    try {
+      if (!(is_generic_init(arr))) {
+	ygglog_throw_error("get_generic_object: Object is not a generic object.");
+      }
+      YggGeneric* arr_obj = (YggGeneric*)(arr.obj);
+      if (arr_obj == NULL) {
+	ygglog_throw_error("get_generic_object: Object is NULL.");
+      }
+      x[0].obj = (void*)(arr_obj->get_object_element(k));
+    } catch (...) {
+      ygglog_error("get_generic_object: C++ exception thrown.");
+      out = 1;
     }
     return out;
   }
@@ -830,6 +1003,23 @@ extern "C" {
     }
     return out;
   }
+  int generic_array_get_item_nbytes(generic_t x, const size_t index) {
+    int out = 0;
+    try {
+      if (!(is_generic_init(x))) {
+	ygglog_throw_error("generic_array_get_item_nbytes: Object not initialized.");
+      }
+      YggGeneric* x_obj = (YggGeneric*)(x.obj);
+      if (x_obj == NULL) {
+	ygglog_throw_error("generic_array_get_item_nbytes: Object is NULL.");
+      }
+      out = x_obj->get_nbytes_array_item(index);
+    } catch (...) {
+      ygglog_error("generic_array_get_item_nbytes: C++ exception thrown.");
+      out = -1;
+    }
+    return out;
+  }
   bool generic_array_get_bool(generic_t x, const size_t index) {
     return ((bool*)generic_array_get_item(x, index, "boolean"))[0];
   }
@@ -884,7 +1074,7 @@ extern "C" {
     return out;
   }
   generic_t generic_array_get_any(generic_t x, const size_t index) {
-    YggGeneric* result = (YggGeneric*)generic_array_get_item(x, index, "array");
+    YggGeneric* result = (YggGeneric*)generic_array_get_item(x, index, "any");
     generic_t out = init_generic();
     out.obj = (void*)(result->copy());
     return out;
@@ -1274,6 +1464,23 @@ extern "C" {
     }
     return out;
   }
+  int generic_map_get_item_nbytes(generic_t x, const char* key) {
+    int out = 0;
+    try {
+      if (!(is_generic_init(x))) {
+	ygglog_throw_error("generic_map_get_item_nbytes: Object not initialized.");
+      }
+      YggGeneric* x_obj = (YggGeneric*)(x.obj);
+      if (x_obj == NULL) {
+	ygglog_throw_error("generic_map_get_item_nbytes: Object is NULL.");
+      }
+      out = (int)(x_obj->get_nbytes_map_item(key));
+    } catch (...) {
+      ygglog_error("generic_map_get_item_nbytes: C++ exception thrown.");
+      out = -1;
+    }
+    return out;
+  }
   bool generic_map_get_bool(generic_t x, const char* key) {
     return ((bool*)generic_map_get_item(x, key, "boolean"))[0];
   }
@@ -1328,7 +1535,7 @@ extern "C" {
     return out;
   }
   generic_t generic_map_get_any(generic_t x, const char* key) {
-    YggGeneric* result = (YggGeneric*)generic_map_get_item(x, key, "array");
+    YggGeneric* result = (YggGeneric*)generic_map_get_item(x, key, "any");
     generic_t out = init_generic();
     out.obj = (void*)(result->copy());
     return out;
@@ -1693,6 +1900,10 @@ extern "C" {
   }
   int generic_array_set_object(generic_t x, const size_t index,
 			       generic_t value) {
+    return generic_array_set_item(x, index, "object", (void*)(&value));
+  }
+  int generic_array_set_map(generic_t x, const size_t index,
+			    generic_t value) {
     return generic_array_set_item(x, index, "object", (void*)(&value));
   }
   int generic_array_set_array(generic_t x, const size_t index,
@@ -2113,6 +2324,10 @@ extern "C" {
   }
   int generic_map_set_object(generic_t x, const char* key,
 			     generic_t value) {
+    return generic_map_set_item(x, key, "object", (void*)(&value));
+  }
+  int generic_map_set_map(generic_t x, const char* key,
+			  generic_t value) {
     return generic_map_set_item(x, key, "object", (void*)(&value));
   }
   int generic_map_set_array(generic_t x, const char* key,
@@ -2671,10 +2886,20 @@ extern "C" {
     }
   }
   dtype_t* create_dtype_ndarray_arr(const char* subtype, const size_t precision,
-				    const size_t ndim, const size_t shape[],
+				    const size_t ndim, const int64_t shape[],
 				    const char* units, const bool use_generic=false) {
-    const size_t* shape_ptr = shape;
-    return create_dtype_ndarray(subtype, precision, ndim, shape_ptr, units, use_generic);
+    size_t *shape_ptr = (size_t*)malloc(ndim*sizeof(size_t));
+    // size_t shape_size_t[ndim];
+    size_t i;
+    for (i = 0; i < ndim; i++) {
+      shape_ptr[i] = (size_t)shape[i];
+      // shape_size_t[i] = (size_t)shape[i];
+    }
+    // size_t* shape_ptr = shape_size_t;
+    // const size_t* shape_ptr = shape;
+    dtype_t* out = create_dtype_ndarray(subtype, precision, ndim, shape_ptr, units, use_generic);
+    free(shape_ptr);
+    return out;
   }
   dtype_t* create_dtype_json_array(const size_t nitems, dtype_t** items,
 				   const bool use_generic=true){

@@ -16,6 +16,7 @@ recursive-include yggdrasil *.ply
 recursive-include yggdrasil *.obj
 recursive-include yggdrasil *.txt
 recursive-include yggdrasil *.json
+recursive-include yggdrasil *.f90
 recursive-include yggdrasil *.xml
 recursive-include yggdrasil/examples *.py
 recursive-include yggdrasil/tests/scripts *.py
@@ -29,6 +30,9 @@ include yggdrasil/languages/LPy/lpy_model.py
 include yggdrasil/languages/R/DESCRIPTION
 include yggdrasil/languages/R/NAMESPACE
 include yggdrasil/languages/R/R/*.R
+include yggdrasil/languages/fortran/*.f90
+include yggdrasil/languages/fortran/*.c
+include yggdrasil/languages/fortran/*.h
 include yggdrasil/regex/CMakeLists.txt
 include yggdrasil/tests/scripts/CMakeLists.txt
 include yggdrasil/tests/scripts/Makefile_linux

@@ -36,6 +36,39 @@ models:
         field_names: name,number,value,complex
 
   -
+    name: ascii_io_Fortran
+    driver: FortranModelDriver
+    args: src/ascii_io.f90
+
+    inputs:
+      - name: inputF_file
+        driver: InputDriver
+        args: outputC_file
+
+      - name: inputF_table
+        driver: InputDriver
+        args: outputC_table
+
+      - name: inputF_array
+        driver: InputDriver
+        args: outputC_array
+
+    outputs:
+      - name: outputF_file
+        driver: OutputDriver
+        args: outputF_file
+
+      - name: outputF_table
+        driver: OutputDriver
+        args: outputF_table
+        field_names: name,number,value,complex
+
+      - name: outputF_array
+        driver: OutputDriver
+        args: outputF_array
+        field_names: name,number,value,complex
+
+  -
     name: ascii_io_Python
     driver: PythonModelDriver
     args: src/ascii_io.py
@@ -43,15 +76,15 @@ models:
     inputs:
       - name: inputPy_file
         driver: InputDriver
-        args: outputC_file
+        args: outputF_file
 
       - name: inputPy_table
         driver: InputDriver
-        args: outputC_table
+        args: outputF_table
 
       - name: inputPy_array
         driver: InputDriver
-        args: outputC_array
+        args: outputF_array
 
     outputs:
       - name: outputPy_file

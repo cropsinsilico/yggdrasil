@@ -217,7 +217,7 @@ def run_tsts(**kwargs):  # pragma: no cover
             elif x == 'examples_part1':
                 args.withexamples = True
                 test_paths.append(os.path.join(
-                    'examples', 'tests', 'test_[a-g]*.py'))
+                    'examples', 'tests', 'test_[A-Za-g]*.py'))
             elif x == 'examples_part2':
                 args.withexamples = True
                 test_paths.append(os.path.join(
@@ -333,9 +333,8 @@ def run_tsts(**kwargs):  # pragma: no cover
                                     "\tBuild  version: %s\n")
                                    % (src_ver, dst_ver))
             if os.environ.get("INSTALLR", None) == "1":
-                from yggdrasil import tools
-                print(tools.which("R"))
-                print(tools.which("Rscript"))
+                print(shutil.which("R"))
+                print(shutil.which("Rscript"))
             subprocess.check_call(["flake8", "yggdrasil"])
             if os.environ.get("YGG_CONDA", None):
                 subprocess.check_call(["python", "create_coveragerc.py"])

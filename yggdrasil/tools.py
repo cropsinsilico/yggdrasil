@@ -158,11 +158,13 @@ def get_python_c_library(allow_failure=False, libtype=None):
     paths = sysconfig.get_paths()
     cvars = sysconfig.get_config_vars()
     if platform._is_win:  # pragma: windows
-        if libtype is None:
-            libtype = 'static'
         libtype2ext = {'shared': '.dll', 'static': '.lib'}
-        base = 'python%s%s' % (cvars['py_version_nodot'],
-                               libtype2ext[libtype])
+        prefix = ''
+        if libtype is None:
+            libtype = 'shared'
+        base = '%spython%s%s' % (prefix,
+                                 cvars['py_version_nodot'],
+                                 libtype2ext[libtype])
     else:
         if libtype is None:
             libtype = 'shared'
@@ -259,7 +261,7 @@ def get_conda_prefix():
     # CONDA_PREFIX set. Older version of conda behaved this way so it is
     # possible that a future release will as well.
     # if not conda_prefix:
-    #     conda_prefix = which('conda')
+    #     conda_prefix = shutil.which('conda')
     #     if conda_prefix is not None:
     #         conda_prefix = os.path.dirname(os.path.dirname(conda_prefix))
     return conda_prefix
@@ -307,24 +309,7 @@ def is_subprocess():
     return check_environ_bool('YGG_SUBPROCESS')
 
 
-def which(program):
-    r"""Determine the path to an executable if it exists.
-
-    Args:
-        program (str): Name of program to locate or full path to program.
-
-    Returns:
-        str: Path to executable if it can be located. Otherwise, None.
-
-    """
-    if platform._is_win and (not program.endswith('.exe')):  # pragma: windows
-        out = which(program + '.exe')
-        if out is not None:
-            return out
-    return shutil.which(program)
-
-
-def find_all(name, path):
+def find_all(name, path, verification_func=None):
     r"""Find all instances of a file with a given name within the directory
     tree starting at a given path.
 
@@ -333,6 +318,9 @@ def find_all(name, path):
         path (str, None): Directory where search should start. If set to
             None on Windows, the current directory and PATH variable are
             searched.
+        verification_func (function, optional): Function that returns
+            True when a file is valid and should be returned and False
+            otherwise. Defaults to None and is ignored.
 
     Returns:
         list: All instances of the specified file.
@@ -367,10 +355,13 @@ def find_all(name, path):
         result = sorted(out.splitlines())
     result = [os.path.normcase(os.path.normpath(bytes2str(m)))
               for m in result]
+    if verification_func is not None:
+        result = [x for x in result if verification_func(x)]
     return result
 
 
-def locate_file(fname, environment_variable='PATH', directory_list=None):
+def locate_file(fname, environment_variable='PATH', directory_list=None,
+                show_alternates=False, verification_func=None):
     r"""Locate a file within a set of paths defined by a list or environment
     variable.
 
@@ -388,6 +379,12 @@ def locate_file(fname, environment_variable='PATH', directory_list=None):
             to those specified by environment_variable. Defaults to None and is
             ignored. These directories will be searched be for those in the
             specified environment variables.
+        show_alternates (bool, optional): If True and there is more
+            than one match, the alternate matches will be printed in
+            a warning message. Defaults to False.
+        verification_func (function, optional): Function that returns
+            True when a file is valid and should be returned and False
+            otherwise. Defaults to None and is ignored.
 
     Returns:
         bool, str: Full path to the located file if it was located, False
@@ -398,14 +395,17 @@ def locate_file(fname, environment_variable='PATH', directory_list=None):
         out = False
         for ifname in fname:
             out = locate_file(ifname, environment_variable=environment_variable,
-                              directory_list=directory_list)
+                              directory_list=directory_list,
+                              show_alternates=show_alternates,
+                              verification_func=verification_func)
             if out:
                 break
         return out
     out = []
     if ((platform._is_win and (environment_variable == 'PATH')
          and (directory_list is None))):  # pragma: windows
-        out += find_all(fname, None)
+        out += find_all(fname, None,
+                        verification_func=verification_func)
     else:
         if directory_list is None:
             directory_list = []
@@ -416,17 +416,21 @@ def locate_file(fname, environment_variable='PATH', directory_list=None):
                 directory_list += os.environ.get(x, '').split(os.pathsep)
         for path in directory_list:
             if path:
-                out += find_all(fname, path)
+                out += find_all(fname, path,
+                                verification_func=verification_func)
+            if out and (not show_alternates):
+                break
     if not out:
         return False
     first = out[0]
-    out = set(out)
-    out.remove(first)
-    if len(out) > 0:
-        warnings.warn(("More than one (%d) match to %s:\n%s\n "
-                       + "Using first match (%s)") %
-                      (len(out) + 1, fname, pprint.pformat(out),
-                       first), RuntimeWarning)
+    if show_alternates:  # pragma: debug
+        out = set(out)
+        out.remove(first)
+        if len(out) > 0:
+            warnings.warn(("More than one (%d) match to %s:\n%s\n "
+                           + "Using first match (%s)") %
+                          (len(out) + 1, fname, pprint.pformat(out),
+                           first), RuntimeWarning)
     return first
 
 

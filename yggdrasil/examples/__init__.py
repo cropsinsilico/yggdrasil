@@ -43,7 +43,10 @@ def register_example(example_dir):
         # TODO: Automate test creation
         if not tools.is_subprocess():
             logging.error("Missing test file: %s" % testfile)
-    assert(os.path.isdir(srcdir))
+    if not os.path.isdir(srcdir):  # pragma: no cover
+        if not tools.is_subprocess():
+            logging.error("Missing source directory: %s" % srcdir)
+        return {}
     # Determine which languages are present in the example
     lang_avail = []
     lang_search = None
@@ -195,8 +198,9 @@ def discover_examples(parent_dir=None):
             continue
         match_base = os.path.basename(match)
         iout = register_example(match)
-        for i, k in enumerate(['lang', 'yml', 'src']):
-            out[k][match_base] = iout[i]
+        if iout:
+            for i, k in enumerate(['lang', 'yml', 'src']):
+                out[k][match_base] = iout[i]
     return out['lang'], out['yml'], out['src']
 
 
