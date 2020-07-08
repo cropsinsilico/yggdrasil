@@ -80,7 +80,7 @@ static inline
 int ascii_file_comm_nmsg(const comm_t* x) {
   // Prevent C4100 warning on windows by referencing param
 #ifdef _WIN32
-  x;
+  UNUSED(x);
 #endif
   // TODO: Count lines in file.
   return 0;
@@ -101,7 +101,7 @@ int ascii_file_comm_send(const comm_t* x, const char *data, const size_t len) {
     return 0;
   // Prevent C4100 warning on windows by referencing param
 #ifdef _WIN32
-  len;
+  UNUSED(len);
 #endif
   asciiFile_t *file = (asciiFile_t*)(x->handle);
   return af_writeline_full(file[0], data);

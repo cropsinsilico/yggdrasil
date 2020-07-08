@@ -30,6 +30,18 @@ int comm_nmsg(const comm_t *x);
 
 
 /*!
+  @brief Determine if a channel has a format type associated with it.
+  @param[in] x comm_t * Pointer to communicator to check.
+  @returns int 1 if format type, 0 otherwise.
+ */
+static
+int is_comm_format_array_type(const comm_t *x) {
+  dtype_t *datatype = x->datatype;
+  return is_dtype_format_array(datatype);
+};
+
+  
+/*!
   @brief Perform deallocation for type specific communicator.
   @param[in] x comm_t * Pointer to communicator to deallocate.
   @returns int 1 if there is an error, 0 otherwise.
@@ -111,7 +123,7 @@ void clean_comms(void) {
   }
   ncomms2clean = 0;
 #if defined(ZMQINSTALLED)
-  // #if defined(_WIN32) && defined(ZMQINSTALLED)
+  // #if defined(_MSC_VER) && defined(ZMQINSTALLED)
   zsys_shutdown();
 #endif
   if (Py_IsInitialized()) {
@@ -269,7 +281,7 @@ static
 comm_t* init_comm(const char *name, const char *direction,
 		  const comm_type t, dtype_t *datatype) {
   ygglog_debug("init_comm: Initializing comm.");
-#ifdef _WIN32
+#ifdef _MSC_VER
   SetErrorMode(SEM_FAILCRITICALERRORS | SEM_NOGPFAULTERRORBOX);
   _set_abort_behavior(0,_WRITE_ABORT_MSG);
 #endif
@@ -1058,7 +1070,7 @@ int vcommSend(const comm_t *x, size_t nargs, va_list_t ap) {
 */
 static
 int ncommSend(const comm_t *x, size_t nargs, ...) {
-  va_list_t ap;
+  va_list_t ap = init_va_list();
   va_start(ap.va, nargs);
   ygglog_debug("ncommSend: nargs = %d", nargs);
   int ret = vcommSend(x, nargs, ap);
@@ -1143,7 +1155,7 @@ int vcommRecv(comm_t *x, const int allow_realloc, size_t nargs, va_list_t ap) {
  */
 static
 int ncommRecv(comm_t *x, const int allow_realloc, size_t nargs, ...) {
-  va_list_t ap;
+  va_list_t ap = init_va_list();
   va_start(ap.va, nargs);
   ygglog_debug("ncommRecv: nargs = %d", nargs);
   int ret = vcommRecv(x, allow_realloc, nargs, ap);

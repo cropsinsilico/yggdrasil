@@ -4,6 +4,7 @@ yggdrasil/tests/scripts/gcc_model.out
 yggdrasil/tests/scripts/Makefile
 
 # Library things
+*.exp
 *.a
 *.lib
 *.so
@@ -55,6 +56,7 @@ tmp/
 # Compiled things - not managed
 *.pyc
 *.o
+*.mod
 
 # Tooling things - not managed
 *.vscode

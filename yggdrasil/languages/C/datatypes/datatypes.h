@@ -102,6 +102,15 @@ void* type_from_pyobj_c(PyObject* pyobj, const bool use_generic);
 
 
 /*!
+  @brief Determine if a datatype was created from a format.
+  @params[in] type_struct dtype_t* Datatype structure.
+  @returns int 1 if the datatype was created from a format, 0 if it
+  was not, -1 if there is an error.
+ */
+int is_dtype_format_array(dtype_t* type_struct);
+  
+
+/*!
   @brief Initialize an empty generic object.
   @returns generic_t New generic object structure.
  */
@@ -210,6 +219,57 @@ generic_t pop_generic_va(size_t* nargs, va_list_t* ap);
 generic_t* pop_generic_va_ptr(size_t* nargs, va_list_t* ap);
 
 /*!
+  @brief Add an element to the end of an array of generic elements.
+  @param[in] arr generic_t Array to add element to.
+  @param[in] x generic_t Element to add.
+  @returns int Flag that is 1 if there is an error and 0 otherwise.
+ */
+int add_generic_array(generic_t arr, generic_t x);
+
+
+/*!
+  @brief Set an element in the array at a given index to a new value.
+  @param[in] arr generic_t Array to add element to.
+  @param[in] i size_t Index where element should be added.
+  @param[in] x generic_t Element to add.
+  @returns int Flag that is 1 if there is an error and 0 otherwise.
+ */
+int set_generic_array(generic_t arr, size_t i, generic_t x);
+
+
+/*!
+  @brief Get an element from an array.
+  @param[in] arr generic_t Array to get element from.
+  @param[in] i size_t Index of element to get.
+  @param[out] x generic_t* Pointer to address where element should be
+  stored.
+  @returns int Flag that is 1 if there is an error and 0 otherwise.
+ */
+int get_generic_array(generic_t arr, size_t i, generic_t *x);
+
+
+/*!
+  @brief Set an element in the object at for a given key to a new value.
+  @param[in] arr generic_t Object to add element to.
+  @param[in] k const char* Key where element should be added.
+  @param[in] x generic_t Element to add.
+  @returns int Flag that is 1 if there is an error and 0 otherwise.
+ */
+int set_generic_object(generic_t arr, const char* k, generic_t x);
+
+
+/*!
+  @brief Get an element from an object.
+  @param[in] arr generic_t Object to get element from.
+  @param[in] k const char* Key of element to return.
+  @param[out] x generic_t* Pointer to address where element should be
+  stored.
+  @returns int Flag that is 1 if there is an error and 0 otherwise.
+ */
+int get_generic_object(generic_t arr, const char* k, generic_t *x);
+
+
+/*!
   @brief Get the number of elements in an array object.
   @param[in] x generic_t Generic object that is presumed to contain an array.
   @returns size_t Number of elements in array.
@@ -225,6 +285,7 @@ size_t generic_array_get_size(generic_t x);
  */
 void* generic_array_get_item(generic_t x, const size_t index,
 			   const char *type);
+int generic_array_get_item_nbytes(generic_t x, const size_t index);
 bool generic_array_get_bool(generic_t x, const size_t index);
 int generic_array_get_integer(generic_t x, const size_t index);
 void* generic_array_get_null(generic_t x, const size_t index);
@@ -349,6 +410,7 @@ size_t generic_map_get_keys(generic_t x, char*** keys);
  */
 void* generic_map_get_item(generic_t x, const char* key,
 			   const char *type);
+int generic_map_get_item_nbytes(generic_t x, const char* key);
 bool generic_map_get_bool(generic_t x, const char* key);
 int generic_map_get_integer(generic_t x, const char* key);
 void* generic_map_get_null(generic_t x, const char* key);
@@ -472,6 +534,8 @@ int generic_array_set_string(generic_t x, const size_t index,
 			     char* value);
 int generic_array_set_object(generic_t x, const size_t index,
 			     generic_t value);
+int generic_array_set_map(generic_t x, const size_t index,
+			  generic_t value);
 int generic_array_set_array(generic_t x, const size_t index,
 			    generic_t value);
 int generic_array_set_direct(generic_t x, const size_t index,
@@ -670,6 +734,8 @@ int generic_map_set_string(generic_t x, const char* key,
 			   char* value);
 int generic_map_set_object(generic_t x, const char* key,
 			   generic_t value);
+int generic_map_set_map(generic_t x, const char* key,
+			generic_t value);
 int generic_map_set_array(generic_t x, const char* key,
 			  generic_t value);
 int generic_map_set_direct(generic_t x, const char* key,
@@ -846,6 +912,7 @@ int generic_map_set_ndarray_bytes(generic_t x, const char* key, char** data, con
 int generic_map_set_ndarray_unicode(generic_t x, const char* key, char** data, const size_t ndim, const size_t* shape, const char* units);
   
 /*!
+>>>>>>> topic/timesync
   @brief Destroy a structure containing a Python object.
   @param[in] x python_t* Pointer to Python object structure that should be freed.
 */
@@ -1023,7 +1090,7 @@ dtype_t* create_dtype_ndarray(const char* subtype, const size_t precision,
   @returns dtype_t* Type structure/class.
 */
 dtype_t* create_dtype_ndarray_arr(const char* subtype, const size_t precision,
-				  const size_t ndim, const size_t shape[],
+				  const size_t ndim, const int64_t shape[],
 				  const char* units, const bool use_generic);
 
   

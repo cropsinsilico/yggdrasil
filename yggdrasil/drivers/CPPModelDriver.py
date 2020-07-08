@@ -11,16 +11,18 @@ class CPPCompilerBase(CCompilerBase):
     languages = ['c++']
     default_executable_env = 'CXX'
     default_flags_env = 'CXXFLAGS'
-    cpp_std = 'c++11'
+    cpp_std = 'c++14'
     search_path_flags = ['-E', '-v', '-xc++', '/dev/null']
     default_linker = None
     default_executable = None
 
     @classmethod
-    def get_flags(cls, **kwargs):
+    def get_flags(cls, skip_standard_flag=False, **kwargs):
         r"""Get a list of compiler flags.
 
         Args:
+            skip_standard_flag (bool, optional): If True, the C++ standard flag
+                will not be added. Defaults to False.
             **kwargs: Additional keyword arguments are passed to the parent
                 class's method.
 
@@ -30,19 +32,21 @@ class CPPCompilerBase(CCompilerBase):
         """
         out = super(CCompilerBase, cls).get_flags(**kwargs)
         # Add standard library flag
-        std_flag = None
-        for i, a in enumerate(out):
-            if a.startswith('-std='):
-                std_flag = i
-                break
-        if std_flag is None:
-            out.append('-std=%s' % cls.cpp_std)
+        if not skip_standard_flag:
+            std_flag = None
+            for i, a in enumerate(out):
+                if a.startswith('-std='):
+                    std_flag = i
+                    break
+            if std_flag is None:
+                out.append('-std=%s' % cls.cpp_std)
         return out
     
 
 class GPPCompiler(CPPCompilerBase, GCCCompiler):
     r"""Interface class for G++ compiler/linker."""
     toolname = 'g++'
+    aliases = ['gnu-c++']
 
 
 class ClangPPCompiler(CPPCompilerBase, ClangCompiler):
@@ -53,6 +57,40 @@ class ClangPPCompiler(CPPCompilerBase, ClangCompiler):
     # conflict between versions of clang and ld.
     is_linker = False
 
+    @staticmethod
+    def before_registration(cls):
+        r"""Operations that should be performed to modify class attributes prior
+        to registration including things like platform dependent properties and
+        checking environment variables for default settings.
+        """
+        if platform._is_win:  # pragma: windows
+            cls.default_executable = 'clang'
+        CPPCompilerBase.before_registration(cls)
+
+    @classmethod
+    def get_executable_command(cls, args, skip_flags=False, unused_kwargs=None,
+                               **kwargs):
+        r"""Determine the command required to run the tool using the specified
+        arguments and options.
+
+        Args:
+            args (list): The arguments that should be passed to the tool. If
+                skip_flags is False, these are treated as input files that will
+                be used by the tool.
+            **kwargs: Additional keyword arguments will be passed to the parent
+                class's method.
+
+        Returns:
+            str: Output to stdout from the command execution.
+
+        """
+        if platform._is_win:  # pragma: windows
+            for a in args:
+                if a.endswith('.c'):
+                    kwargs['skip_standard_flag'] = True
+                    break
+        return super(ClangPPCompiler, cls).get_executable_command(args, **kwargs)
+
 
 class ClangPPLinker(ClangLinker):
     r"""Interface class for clang++ linker (calls to ld)."""
@@ -60,6 +98,7 @@ class ClangPPLinker(ClangLinker):
     languages = ClangPPCompiler.languages
     default_executable = ClangPPCompiler.default_executable
     default_executable_env = ClangPPCompiler.default_executable_env
+    toolset = ClangPPCompiler.toolset
 
 
 class CPPModelDriver(CModelDriver):
@@ -105,6 +144,7 @@ class CPPModelDriver(CModelDriver):
             r'(?P<name>.+?)(?(2)(?:\)|(?:)))(?P<shape>(?:\[.+?\])+)?\s*(?:,|$)(?:\n)?'))
     include_arg_count = True
     include_channel_obj = False
+    dont_declare_channel = True
     
     @staticmethod
     def after_registration(cls, **kwargs):
@@ -133,19 +173,20 @@ class CPPModelDriver(CModelDriver):
             cls.get_language_dir())
         cls.internal_libraries = internal_libs
 
-    def set_env(self, **kwargs):
-        r"""Get environment variables that should be set for the model process.
+    @classmethod
+    def set_env_class(cls, **kwargs):
+        r"""Set environment variables that are instance independent.
 
         Args:
             **kwargs: Additional keyword arguments are passed to the parent
-                class's method.
+                class's method and update_ld_library_path.
 
         Returns:
             dict: Environment variables for the model process.
 
         """
-        out = super(CPPModelDriver, self).set_env(**kwargs)
-        out = CModelDriver.update_ld_library_path(out)
+        out = super(CPPModelDriver, cls).set_env_class(**kwargs)
+        out = CModelDriver.update_ld_library_path(out, **kwargs)
         return out
         
     @classmethod

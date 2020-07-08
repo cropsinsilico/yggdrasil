@@ -1,0 +1,22 @@
+models:
+  - name: fortran_modelA
+    language: fortran
+    args: ./src/formatted_io5_modelA.f90
+    inputs: inputA
+    outputs: outputA
+
+  - name: fortran_modelB
+    language: fortran
+    args: ./src/formatted_io5_modelB.f90
+    inputs: inputB
+    outputs: outputB
+
+connections:
+  - input: outputA  # Connection between model A output & model B input
+    output: inputB
+  - input: ./Input/input.ply  # Connection between file and model A input
+    output: inputA
+    filetype: ply
+  - input: outputB  # Connection between model B output and file
+    output: ./output.ply
+    filetype: ply

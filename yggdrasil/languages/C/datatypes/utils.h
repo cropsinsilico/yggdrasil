@@ -32,6 +32,67 @@ void ygglog_throw_error(const char* fmt, ...) {
   throw std::exception();
 };
 
+
+/*! C++ wrapper to get a pointer from the variable argument list and
+  advancing the position.
+  @param[in] ap va_list_t Variable argument list.
+  @param[in] allow_null int If 0, an error will be raised if the
+  selected pointer is null, otherwise the null pointer will be returned.
+  @returns void* Pointer.
+*/
+static inline
+void* get_va_list_ptr_cpp(va_list_t *ap, int allow_null = 0) {
+  void *out = NULL;
+  if (ap->using_ptrs) {
+    if (ap->ptrs == NULL) {
+      ygglog_throw_error("get_va_list_ptr: Pointers is NULL.");
+    } else if (ap->iptr >= ap->nptrs) {
+      ygglog_throw_error("get_va_list_ptr: Current index %d exceeds total number of pointers %d.",
+		   ap->iptr, ap->nptrs);
+    } else {
+      out = ap->ptrs[ap->iptr];
+      ap->iptr++;
+      if ((out == NULL) && (allow_null == 0)) {
+	ygglog_throw_error("get_va_list_ptr: Argument %d is NULL.", ap->iptr - 1);
+      }
+    }
+  } else {
+    ygglog_throw_error("get_va_list_ptr: Variable argument list is not stored in pointers.");
+  }
+  return out;
+};
+
+
+/*! C++ wrapper to get a pointer to a pointer from the variable
+  argument list and advancing the position.
+  @param[in] ap va_list_t Variable argument list.
+  @param[in] allow_null int If 0, an error will be raised if the
+  selected pointer is null, otherwise the null pointer will be returned.
+  @returns void* Pointer.
+*/
+static inline
+void** get_va_list_ptr_ref_cpp(va_list_t *ap, int allow_null = 0) {
+  void **out = NULL;
+  if (ap->using_ptrs) {
+    if (ap->ptrs == NULL) {
+      ygglog_throw_error("get_va_list_ptr_ref: Pointers is NULL.");
+    } else if (ap->iptr >= ap->nptrs) {
+      ygglog_throw_error("get_va_list_ptr_ref: Current index %d exceeds total number of pointers %d.",
+		   ap->iptr, ap->nptrs);
+    } else {
+      out = ap->ptrs + ap->iptr;
+      ap->iptr++;
+      if (((out == NULL) || (*out == NULL)) && (allow_null == 0)) {
+	ygglog_throw_error("get_va_list_ptr_ref: Argument is NULL.");
+      }
+    }
+  } else {
+    ygglog_throw_error("get_va_list_ptr_ref: Variable argument list is not stored in pointers.");
+  }
+  return out;
+};
+
+
 /*!
   @brief Count the number of times a regular expression is matched in a string.
   @param[in] regex_text constant character pointer to string that should be
@@ -286,6 +347,36 @@ public:
    */
   void get_data(char* obj, size_t nelements) const;
   /*!
+    @brief Add an element to the end of the array if this object is an
+    array.
+    @param[in] x YggGeneric* Pointer to new element.
+   */
+  void add_array_element(YggGeneric *x);
+  /*!
+    @brief Set an array element if this object is an array.
+    @param[in] i size_t Index where element should be assigned.
+    @param[in] x YggGeneric* Pointer to new element.
+   */
+  void set_array_element(size_t i, YggGeneric *x);
+  /*!
+    @brief Get an array element if this array is an array.
+    @param[in] i size_t Index of element that should be returned.
+    @returns YggGeneric* Pointer to element at index i.
+   */
+  YggGeneric* get_array_element(size_t i);
+  /*!
+    @brief Set an object element if this object is an object.
+    @param[in] k const char* Key where element should be assigned.
+    @param[in] x YggGeneric* Pointer to new element.
+   */
+  void set_object_element(const char *k, YggGeneric *x);
+  /*!
+    @brief Get an object element if this object is an object.
+    @param[in] k const char* Key of element that should be returned.
+    @returns YggGeneric* Pointer to element at index i.
+   */
+  YggGeneric* get_object_element(const char *k);
+  /*!
     @brief Get data and check against a data type.
     @param[in] exp_type MetaschemaType* Type that is expected to be
     returned.
@@ -321,6 +412,13 @@ public:
 			    const MetaschemaType* item_type,
 			    bool return_generic=false) const;
   /*!
+    @brief Get the size of an array item in bytes.
+    @param[in] i const size_t Index of array element that should be
+    returned.
+    @returns size_t Size of the item in bytes.
+   */
+  size_t get_nbytes_array_item(const size_t i) const;
+  /*!
     @brief Set an array item.
     @param[in] index const size_t Index of array element that should
     be set. If larger than the current size of the array, the element
@@ -342,6 +440,13 @@ public:
   void* get_data_map_item(const char *key,
 			  const MetaschemaType* item_type,
 			  bool return_generic=false) const;
+  /*!
+    @brief Get the size of a map item in bytes.
+    @param[in] key const char* String key for item that should be
+    returned.
+    @returns size_t Size of the item in bytes.
+   */
+  size_t get_nbytes_map_item(const char *key) const;
   /*!
     @brief Set a map item.
     @param[in] key const char* String key for item that should be set.

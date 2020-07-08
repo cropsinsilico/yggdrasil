@@ -1,0 +1,39 @@
+---
+
+model:
+  name: ascii_io_Fortran
+  driver: FortranModelDriver
+  args: src/ascii_io.f90
+
+  inputs:
+    - name: inputF_file
+      driver: AsciiFileInputDriver
+      args: ./Input/input_file.txt
+
+    - name: inputF_table
+      driver: AsciiTableInputDriver
+      args: ./Input/input_table.txt
+
+    - name: inputF_array
+      driver: AsciiTableInputDriver
+      args: ./Input/input_array.txt
+      as_array: True
+
+  outputs:
+    - name: outputF_file
+      driver: AsciiFileOutputDriver
+      args: output_file.txt
+      in_temp: True
+
+    - name: outputF_table
+      driver: AsciiTableOutputDriver
+      args: output_table.txt
+      in_temp: True
+      field_names: name,number,value,complex
+
+    - name: outputF_array
+      driver: AsciiTableOutputDriver
+      args: output_array.txt
+      as_array: True
+      in_temp: True
+      field_names: name,number,value,complex

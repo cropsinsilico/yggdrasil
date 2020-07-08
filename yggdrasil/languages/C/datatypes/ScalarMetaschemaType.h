@@ -45,6 +45,7 @@ public:
       _variable_precision = false;
     update_subtype(subtype, true);
     update_units(units, true);
+    _in_table = false;
   }
   /*!
     @brief Constructor for ScalarMetaschemaType from a JSON type defintion.
@@ -103,6 +104,7 @@ public:
       _variable_precision = true;
     else
       _variable_precision = false;
+    _in_table = false;
   }
   /*!
     @brief Constructor for ScalarMetaschemaType from Python dictionary.
@@ -136,6 +138,7 @@ public:
       _variable_precision = true;
     else
       _variable_precision = false;
+    _in_table = false;
   }
   /*!
     @brief Copy constructor.
@@ -197,7 +200,7 @@ public:
     MetaschemaType::display(indent);
     printf("%s%-15s = %s\n", indent, "subtype", subtype_);
     printf("%s%-15s = %d\n", indent, "subtype_code", subtype_code_);
-    printf("%s%-15s = %zu\n", indent, "precision", precision_);
+    printf("%s%-15s = %ld\n", indent, "precision", precision_);
     printf("%s%-15s = %s\n", indent, "units", units_);
   }
   /*!
@@ -412,6 +415,11 @@ public:
    */
   const size_t precision() const { return precision_; }
   /*!
+    @brief Get the in_table flag.
+    @return bool true if in table, false otherwise.
+   */
+  const bool in_table() const { return _in_table; }
+  /*!
     @brief Get the type units.
     @returns const char* Type units string.
    */
@@ -513,15 +521,27 @@ public:
 	switch (precision_) {
 	case 8:
 	case 16: {
-	  va_arg(ap.va, int);
+	  if (ap.using_ptrs) {
+	    va_list_t_skip(&ap, sizeof(int));
+	  } else {
+	    va_arg(ap.va, int);
+	  }
 	  break;
 	}
 	case 32: {
-	  va_arg(ap.va, int32_t);
+	  if (ap.using_ptrs) {
+	    va_list_t_skip(&ap, sizeof(int32_t));
+	  } else {
+	    va_arg(ap.va, int32_t);
+	  }
 	  break;
 	}
 	case 64: {
-	  va_arg(ap.va, int64_t);
+	  if (ap.using_ptrs) {
+	    va_list_t_skip(&ap, sizeof(int64_t));
+	  } else {
+	    va_arg(ap.va, int64_t);
+	  }
 	  break;
 	}
 	}
@@ -532,15 +552,27 @@ public:
 	switch (precision_) {
 	case 8:
 	case 16: {
-	  va_arg(ap.va, unsigned int);
+	  if (ap.using_ptrs) {
+	    va_list_t_skip(&ap, sizeof(unsigned int));
+	  } else {
+	    va_arg(ap.va, unsigned int);
+	  }
 	  break;
 	}
 	case 32: {
-	  va_arg(ap.va, uint32_t);
+	  if (ap.using_ptrs) {
+	    va_list_t_skip(&ap, sizeof(uint32_t));
+	  } else {
+	    va_arg(ap.va, uint32_t);
+	  }
 	  break;
 	}
 	case 64: {
-	  va_arg(ap.va, uint64_t);
+	  if (ap.using_ptrs) {
+	    va_list_t_skip(&ap, sizeof(uint64_t));
+	  } else {
+	    va_arg(ap.va, uint64_t);
+	  }
 	  break;
 	}
 	}
@@ -549,22 +581,46 @@ public:
       }
       case T_FLOAT: {
 	if (sizeof(float) == bytes_precision) {
-	  va_arg(ap.va, double);
+	  if (ap.using_ptrs) {
+	    va_list_t_skip(&ap, sizeof(double));
+	  } else {
+	    va_arg(ap.va, double);
+	  }
 	} else if (sizeof(double) == bytes_precision) {
-	  va_arg(ap.va, double);
+	  if (ap.using_ptrs) {
+	    va_list_t_skip(&ap, sizeof(double));
+	  } else {
+	    va_arg(ap.va, double);
+	  }
 	} else if (sizeof(long double) == bytes_precision) {
-	  va_arg(ap.va, long double);
+	  if (ap.using_ptrs) {
+	    va_list_t_skip(&ap, sizeof(long double));
+	  } else {
+	    va_arg(ap.va, long double);
+	  }
 	}
 	out = out + 1;
 	break;
       }
       case T_COMPLEX: {
 	if (sizeof(float) == (bytes_precision / 2)) {
-	  va_arg(ap.va, complex_float_t);
+	  if (ap.using_ptrs) {
+	    va_list_t_skip(&ap, sizeof(complex_float_t));
+	  } else {
+	    va_arg(ap.va, complex_float_t);
+	  }
 	} else if (sizeof(double) == (bytes_precision / 2)) {
-	  va_arg(ap.va, complex_double_t);
+	  if (ap.using_ptrs) {
+	    va_list_t_skip(&ap, sizeof(complex_double_t));
+	  } else {
+	    va_arg(ap.va, complex_double_t);
+	  }
 	} else if (sizeof(long double) == (bytes_precision / 2)) {
-	  va_arg(ap.va, complex_long_double_t);
+	  if (ap.using_ptrs) {
+	    va_list_t_skip(&ap, sizeof(complex_long_double_t));
+	  } else {
+	    va_arg(ap.va, complex_long_double_t);
+	  }
 	}
 	out = out + 1;
 	break;
@@ -572,13 +628,23 @@ public:
       case T_BYTES:
       case T_UNICODE: {
 	if (_variable_precision) {
-	  char* arg0 = va_arg(ap.va, char*);
-	  UNUSED(arg0); // Parameter extract to get next
-	  const size_t arg0_siz = va_arg(ap.va, size_t);
-	  set_precision(8 * arg0_siz);
+	  if (ap.using_ptrs) {
+	    va_list_t_skip(&ap, sizeof(char*));
+	    const size_t arg0_siz = ((size_t*)get_va_list_ptr_cpp(&ap))[0];
+	    set_precision(8 * arg0_siz);
+	  } else {
+	    va_arg(ap.va, char*);
+	    const size_t arg0_siz = va_arg(ap.va, size_t);
+	    set_precision(8 * arg0_siz);
+	  }
 	} else {
-	  va_arg(ap.va, char*);
-	  va_arg(ap.va, size_t);
+	  if (ap.using_ptrs) {
+	    va_list_t_skip(&ap, sizeof(char*));
+	    va_list_t_skip(&ap, sizeof(size_t));
+	  } else {
+	    va_arg(ap.va, char*);
+	    va_arg(ap.va, size_t);
+	  }
 	}
 	out = out + 2;
 	break;
@@ -663,6 +729,13 @@ public:
     // }
     // size_t *precision_modifier = const_cast<size_t*>(&precision_);
     // *precision_modifier = new_precision;
+  }
+  /*!
+    @brief Set the _in_table private variable.
+    @param[in] new_in_table bool New value.
+   */
+  void set_in_table(bool new_in_table) override {
+    _in_table = new_in_table;
   }
   /*!
     @brief Get the number of arguments expected to be filled/used by the type.
@@ -870,7 +943,12 @@ public:
     switch (type_code()) {
     case T_1DARRAY:
     case T_NDARRAY: {
-      unsigned char* arg0 = va_arg(ap.va, unsigned char*);
+      unsigned char* arg0;
+      if (ap.using_ptrs) {
+	arg0 = (unsigned char*)get_va_list_ptr_cpp(&ap);
+      } else {
+	arg0 = va_arg(ap.va, unsigned char*);
+      }
       if (nelements() == 0) {
 	ygglog_error("ScalarMetaschemaType::encode_data: Array types require the number of elements be non-zero.");
 	return false;
@@ -883,22 +961,42 @@ public:
       case T_INT: {
 	switch (precision_) {
 	case 8: {
-	  int8_t arg0 = (int8_t)va_arg(ap.va, int);
+	  int8_t arg0;
+	  if (ap.using_ptrs) {
+	    arg0 = ((int8_t*)get_va_list_ptr_cpp(&ap))[0];
+	  } else {
+	    arg0 = (int8_t)va_arg(ap.va, int);
+	  }
 	  memcpy(arg, &arg0, bytes_precision);
 	  break;
 	}
 	case 16: {
-	  int16_t arg0 = (int16_t)va_arg(ap.va, int);
+	  int16_t arg0;
+	  if (ap.using_ptrs) {
+	    arg0 = ((int16_t*)get_va_list_ptr_cpp(&ap))[0];
+	  } else {
+	    arg0 = (int16_t)va_arg(ap.va, int);
+	  }
 	  memcpy(arg, &arg0, bytes_precision);
 	  break;
 	}
 	case 32: {
-	  int32_t arg0 = va_arg(ap.va, int32_t);
+	  int32_t arg0;
+	  if (ap.using_ptrs) {
+	    arg0 = ((int32_t*)get_va_list_ptr_cpp(&ap))[0];
+	  } else {
+	    arg0 = va_arg(ap.va, int32_t);
+	  }
 	  memcpy(arg, &arg0, bytes_precision);
 	  break;
 	}
 	case 64: {
-	  int64_t arg0 = va_arg(ap.va, int64_t);
+	  int64_t arg0;
+	  if (ap.using_ptrs) {
+	    arg0 = ((int64_t*)get_va_list_ptr_cpp(&ap))[0];
+	  } else {
+	    arg0 = va_arg(ap.va, int64_t);
+	  }
 	  memcpy(arg, &arg0, bytes_precision);
 	  break;
 	}
@@ -913,22 +1011,42 @@ public:
       case T_UINT: {
 	switch (precision_) {
 	case 8: {
-	  uint8_t arg0 = (uint8_t)va_arg(ap.va, unsigned int);
+	  uint8_t arg0;
+	  if (ap.using_ptrs) {
+	    arg0 = ((uint8_t*)get_va_list_ptr_cpp(&ap))[0];
+	  } else {
+	    arg0 = (uint8_t)va_arg(ap.va, unsigned int);
+	  }
 	  memcpy(arg, &arg0, bytes_precision);
 	  break;
 	}
 	case 16: {
-	  uint16_t arg0 = (uint16_t)va_arg(ap.va, unsigned int);
+	  uint16_t arg0;
+	  if (ap.using_ptrs) {
+	    arg0 = ((uint16_t*)get_va_list_ptr_cpp(&ap))[0];
+	  } else {
+	    arg0 = (uint16_t)va_arg(ap.va, unsigned int);
+	  }
 	  memcpy(arg, &arg0, bytes_precision);
 	  break;
 	}
 	case 32: {
-	  uint32_t arg0 = va_arg(ap.va, uint32_t);
+	  uint32_t arg0;
+	  if (ap.using_ptrs) {
+	    arg0 = ((uint32_t*)get_va_list_ptr_cpp(&ap))[0];
+	  } else {
+	    arg0 = va_arg(ap.va, uint32_t);
+	  }
 	  memcpy(arg, &arg0, bytes_precision);
 	  break;
 	}
 	case 64: {
-	  uint64_t arg0 = va_arg(ap.va, uint64_t);
+	  uint64_t arg0;
+	  if (ap.using_ptrs) {
+	    arg0 = ((uint64_t*)get_va_list_ptr_cpp(&ap))[0];
+	  } else {
+	    arg0 = va_arg(ap.va, uint64_t);
+	  }
 	  memcpy(arg, &arg0, bytes_precision);
 	  break;
 	}
@@ -942,13 +1060,28 @@ public:
       }
       case T_FLOAT: {
 	if (sizeof(float) == bytes_precision) {
-	  float arg0 = (float)va_arg(ap.va, double);
+	  float arg0;
+	  if (ap.using_ptrs) {
+	    arg0 = ((float*)get_va_list_ptr_cpp(&ap))[0];
+	  } else {
+	    arg0 = (float)va_arg(ap.va, double);
+	  }
 	  memcpy(arg, &arg0, bytes_precision);
 	} else if (sizeof(double) == bytes_precision) {
-	  double arg0 = va_arg(ap.va, double);
+	  double arg0;
+	  if (ap.using_ptrs) {
+	    arg0 = ((double*)get_va_list_ptr_cpp(&ap))[0];
+	  } else {
+	    arg0 = va_arg(ap.va, double);
+	  }
 	  memcpy(arg, &arg0, bytes_precision);
 	} else if (sizeof(long double) == bytes_precision) {
-	  long double arg0 = va_arg(ap.va, long double);
+	  long double arg0;
+	  if (ap.using_ptrs) {
+	    arg0 = ((long double*)get_va_list_ptr_cpp(&ap))[0];
+	  } else {
+	    arg0 = va_arg(ap.va, long double);
+	  }
 	  memcpy(arg, &arg0, bytes_precision);
 	} else {
 	  ygglog_error("ScalarMetaschemaType::encode_data: Unsupported float precision '%lu'.",
@@ -959,13 +1092,28 @@ public:
       }
       case T_COMPLEX: {
 	if (sizeof(float) == (bytes_precision / 2)) {
-    complex_float_t arg0 = (complex_float_t)va_arg(ap.va, complex_float_t);
+	  complex_float_t arg0;
+	  if (ap.using_ptrs) {
+	    arg0 = ((complex_float_t*)get_va_list_ptr_cpp(&ap))[0];
+	  } else {
+	    arg0 = (complex_float_t)va_arg(ap.va, complex_float_t);
+	  }
 	  memcpy(arg, &arg0, bytes_precision);
 	} else if (sizeof(double) == (bytes_precision / 2)) {
-	  complex_double_t arg0 = va_arg(ap.va, complex_double_t);
+	  complex_double_t arg0;
+	  if (ap.using_ptrs) {
+	    arg0 = ((complex_double_t*)get_va_list_ptr_cpp(&ap))[0];
+	  } else {
+	    arg0 = va_arg(ap.va, complex_double_t);
+	  }
 	  memcpy(arg, &arg0, bytes_precision);
 	} else if (sizeof(long double) == (bytes_precision / 2)) {
-	  complex_long_double_t arg0 = va_arg(ap.va, complex_long_double_t);
+	  complex_long_double_t arg0;
+	  if (ap.using_ptrs) {
+	    arg0 = ((complex_long_double_t*)get_va_list_ptr_cpp(&ap))[0];
+	  } else {
+	    arg0 = va_arg(ap.va, complex_long_double_t);
+	  }
 	  memcpy(arg, &arg0, bytes_precision);
 	} else {
 	  ygglog_error("ScalarMetaschemaType::encode_data: Unsupported complex precision '%lu'.",
@@ -976,8 +1124,16 @@ public:
       }
       case T_BYTES:
       case T_UNICODE: {
-	char* arg0 = va_arg(ap.va, char*);
-	const size_t arg0_siz = va_arg(ap.va, size_t);
+	char* arg0;
+	size_t arg0_siz_x;
+	if (ap.using_ptrs) {
+	  arg0 = (char*)get_va_list_ptr_cpp(&ap);
+	  arg0_siz_x = ((size_t*)get_va_list_ptr_cpp(&ap))[0];
+	} else {
+	  arg0 = va_arg(ap.va, char*);
+	  arg0_siz_x = va_arg(ap.va, size_t);
+	}
+	const size_t arg0_siz = arg0_siz_x;
 	int allow_realloc = (int)_variable_precision;
 	(*nargs)--;
 	size_t arg_siz = bytes_precision + 1;
@@ -1186,19 +1342,35 @@ public:
     char *arg;
     char **p;
     if (allow_realloc) {
-      p = va_arg(ap.va, char**);
+      if (ap.using_ptrs) {
+	p = (char**)get_va_list_ptr_ref_cpp(&ap, 1);
+      } else {
+	p = va_arg(ap.va, char**);
+      }
       arg = *p;
     } else {
-      arg = va_arg(ap.va, char*);
+      if (ap.using_ptrs) {
+	arg = (char*)get_va_list_ptr_cpp(&ap);
+      } else {
+	arg = va_arg(ap.va, char*);
+      }
       p = &arg;
     }
     (*nargs)--;
     bool skip_terminal;
     if ((type_code() == T_SCALAR) &&
 	((subtype_code_ == T_BYTES) || (subtype_code_ == T_UNICODE))) {
-      size_t * const arg_siz = va_arg(ap.va, size_t*);
+      size_t * arg_siz_x;
+      if (ap.using_ptrs) {
+      	arg_siz_x = (size_t*)get_va_list_ptr_cpp(&ap);
+      } else {
+      	arg_siz_x = va_arg(ap.va, size_t*);
+      }
+      size_t * const arg_siz = arg_siz_x;
       (*nargs)--;
       skip_terminal = false;
+      if (ap.for_fortran)
+	skip_terminal = true;
       int ret = copy_to_buffer((char*)decoded_bytes, decoded_len,
 			       p, arg_siz[0], allow_realloc, skip_terminal);
       if (ret < 0) {
@@ -1210,7 +1382,7 @@ public:
       arg_siz[0] = (size_t)ret;
     } else {
       size_t *arg_siz = &nbytes_expected;
-      if (allow_realloc) {
+      if ((allow_realloc) && (!((type_code() == T_SCALAR) && ap.for_fortran))) {
 	arg_siz[0] = 0;
       }
       skip_terminal = true;
@@ -1228,9 +1400,8 @@ public:
 	  return false;
 	}
       }
-      // ygglog_info("arg_siz = %ld", *arg_siz);
       int ret = copy_to_buffer((char*)decoded_bytes, decoded_len,
-			       p, *arg_siz, allow_realloc, skip_terminal);
+      			       p, *arg_siz, allow_realloc, skip_terminal);
       if (ret < 0) {
 	ygglog_error("ScalarMetaschemaType::decode_data: Failed to copy buffer for %s.",
 		     subtype());
@@ -1326,6 +1497,7 @@ private:
   const char *units_;
   bool _variable_precision;
   size_t cast_precision_;
+  bool _in_table;
 };
 
 
@@ -1454,6 +1626,20 @@ public:
     @returns bool true if the encoding was successful, false otherwise.
    */
   bool encode_type_prop(rapidjson::Writer<rapidjson::StringBuffer> *writer) const override;
+  /*!
+    @brief Decode variables from a JSON string.
+    @param[in] data rapidjson::Value Reference to entry in JSON string.
+    @param[in] allow_realloc int If 1, the passed variables will be reallocated
+    to contain the deserialized data.
+    @param[in,out] nargs size_t Number of arguments contained in ap. On return,
+    the number of arguments assigned from the deserialized data will be assigned
+    to this address.
+    @param[out] ap va_list_t Reference to variable argument list containing
+    address where deserialized data should be assigned.
+    @returns bool true if the data was successfully decoded, false otherwise.
+   */
+  bool decode_data(rapidjson::Value &data, const int allow_realloc,
+		   size_t *nargs, va_list_t &ap) const override;
   
 private:
   std::vector<size_t> shape_;
@@ -1568,7 +1754,7 @@ class OneDArrayMetaschemaType : public ScalarMetaschemaType {
   */
   void display(const char* indent="") const override {
     ScalarMetaschemaType::display(indent);
-    printf("%s%-15s = %zu\n", indent, "length", length_);
+    printf("%s%-15s = %ld\n", indent, "length", length_);
   }
   /*!
     @brief Get type information as a Python dictionary.
@@ -1637,14 +1823,18 @@ class OneDArrayMetaschemaType : public ScalarMetaschemaType {
     if (use_generic())
       return out;
     if ((_variable_length) && (*nargs >= 2)) {
-      unsigned char* temp = va_arg(ap.va, unsigned char*);
-      UNUSED(temp); // Parameter extract to get next
-      size_t new_length = va_arg(ap.va, size_t);
+      size_t new_length;
+      va_list_t_skip(&ap, sizeof(unsigned char*));
+      if (ap.using_ptrs) {
+	new_length = ((size_t*)get_va_list_ptr_cpp(&ap))[0];
+      } else {
+	new_length = va_arg(ap.va, size_t);
+      }
       skip_after_.push_back(sizeof(size_t));
       set_length(new_length);
       out = out + 2;
     } else {
-      va_arg(ap.va, unsigned char*);
+      va_list_t_skip(&ap, sizeof(unsigned char*));
       out = out + 1;
     }
     return out;
@@ -1661,12 +1851,32 @@ class OneDArrayMetaschemaType : public ScalarMetaschemaType {
     if (use_generic())
       return out;
     if ((_variable_length) && (*nargs >= 2)) {
-      unsigned char** temp = va_arg(ap.va, unsigned char**);
-      UNUSED(temp); // Parameter extracted to get next
-      size_t * const new_length = va_arg(ap.va, size_t*);
-      new_length[0] = length_;
+      va_list_t_skip(&ap, sizeof(unsigned char**));
+      if (ap.using_ptrs) {
+	size_t * const new_length = (size_t* const)get_va_list_ptr_cpp(&ap);
+	new_length[0] = length_;
+      } else {
+	size_t * const new_length = va_arg(ap.va, size_t*);
+	new_length[0] = length_;
+      }
       skip_after_.push_back(sizeof(size_t*));
       out = out + 2;
+    }
+    if ((ap.for_fortran) && (ap.using_ptrs)) {
+      if ((!(_variable_length)) || (*nargs < 2)) {
+	va_list_t_skip(&ap, sizeof(unsigned char**));
+	out = out + 1;
+      }
+      if (!(_variable_length) && (!(in_table()))) {
+	ap.nptrs++;
+	size_t * const new_length = (size_t* const)get_va_list_ptr_cpp(&ap);
+	new_length[0] = length_;
+      }
+      if ((subtype_code() == T_BYTES) || (subtype_code() == T_UNICODE)) {
+	ap.nptrs++;
+	size_t * arg_prec = (size_t*)get_va_list_ptr_cpp(&ap);
+	arg_prec[0] = (size_t)(precision()/8);
+      }
     }
     return out;
   }
@@ -1724,6 +1934,37 @@ class OneDArrayMetaschemaType : public ScalarMetaschemaType {
     writer->Key("length");
     writer->Int((int)length_);
     return true;
+  }
+
+  /*!
+    @brief Decode variables from a JSON string.
+    @param[in] data rapidjson::Value Reference to entry in JSON string.
+    @param[in] allow_realloc int If 1, the passed variables will be reallocated
+    to contain the deserialized data.
+    @param[in,out] nargs size_t Number of arguments contained in ap. On return,
+    the number of arguments assigned from the deserialized data will be assigned
+    to this address.
+    @param[out] ap va_list_t Reference to variable argument list containing
+    address where deserialized data should be assigned.
+    @returns bool true if the data was successfully decoded, false otherwise.
+   */
+  bool decode_data(rapidjson::Value &data, const int allow_realloc,
+		   size_t *nargs, va_list_t &ap) const override {
+    bool out = ScalarMetaschemaType::decode_data(data, allow_realloc,
+						 nargs, ap);
+    if (out) {
+      if ((ap.for_fortran) && (ap.using_ptrs)) {
+	if ((!(_variable_length)) && (!(in_table()))) {
+	  ap.nptrs++;
+	  va_list_t_skip(&ap, sizeof(size_t*));
+	}
+	if ((subtype_code() == T_BYTES) || (subtype_code() == T_UNICODE)) {
+	  ap.nptrs++;
+	  va_list_t_skip(&ap, sizeof(size_t*));
+	}
+      }
+    }
+    return out;
   }
   
 private:
@@ -1810,9 +2051,9 @@ void NDArrayMetaschemaType::display(const char* indent) const {
   printf("%s%-15s = [ ", indent, "shape");
   if (ndim() > 0) {
     size_t i;
-    printf("%zu", shape_[0]);
+    printf("%ld", shape_[0]);
     for (i = 1; i < ndim(); i++) {
-      printf(", %zu", shape_[i]);
+      printf(", %ld", shape_[i]);
     }
   }
   printf(" ]\n");
@@ -1882,17 +2123,23 @@ size_t NDArrayMetaschemaType::update_from_serialization_args(size_t *nargs, va_l
   if (use_generic())
     return out;
   if ((_variable_shape) && (*nargs >= 3)) {
-    unsigned char* temp = va_arg(ap.va, unsigned char*);
-    UNUSED(temp); // Parameter extracted to get next
-    size_t new_ndim = va_arg(ap.va, size_t);
+    size_t new_ndim;
+    size_t* new_shape_ptr;
+    va_list_t_skip(&ap, sizeof(unsigned char*));
+    if (ap.using_ptrs) {
+      new_ndim = ((size_t*)get_va_list_ptr_cpp(&ap))[0];
+      new_shape_ptr = (size_t*)get_va_list_ptr_cpp(&ap);
+    } else {
+      new_ndim = va_arg(ap.va, size_t);
+      new_shape_ptr = va_arg(ap.va, size_t*);
+    }
     skip_after_.push_back(sizeof(size_t));
-    size_t* new_shape_ptr = va_arg(ap.va, size_t*);
     skip_after_.push_back(sizeof(size_t*));
     std::vector<size_t> new_shape(new_shape_ptr, new_shape_ptr + new_ndim);
     set_shape(new_shape);
     out = out + 3;
   } else {
-    va_arg(ap.va, unsigned char*);
+    va_list_t_skip(&ap, sizeof(unsigned char*));
     out = out + 1;
   }
   return out;
@@ -1902,16 +2149,22 @@ size_t NDArrayMetaschemaType::update_from_deserialization_args(size_t *nargs, va
   if (use_generic())
     return out;
   if ((_variable_shape) && (*nargs >= 3)) {
-    unsigned char** temp = va_arg(ap.va, unsigned char**);
-    UNUSED(temp); // Parameter extracted to get next
-    size_t * const new_ndim = va_arg(ap.va, size_t*);
+    va_list_t_skip(&ap, sizeof(unsigned char**));
+    size_t** new_shape;
+    if (ap.using_ptrs) {
+      size_t * const new_ndim = (size_t* const)get_va_list_ptr_cpp(&ap);
+      new_ndim[0] = ndim();
+      new_shape = (size_t**)get_va_list_ptr_ref_cpp(&ap, 1);
+    } else {
+      size_t * const new_ndim = va_arg(ap.va, size_t*);
+      new_ndim[0] = ndim();
+      new_shape = va_arg(ap.va, size_t**);
+    }
     skip_after_.push_back(sizeof(size_t*));
-    size_t** new_shape = va_arg(ap.va, size_t**);
     skip_after_.push_back(sizeof(size_t**));
-    new_ndim[0] = ndim();
     size_t* new_shape_temp = (size_t*)realloc(new_shape[0], ndim()*sizeof(size_t));
     if (new_shape_temp == NULL) {
-      ygglog_throw_error("NDArrayMetaschemaType::decode_data: Failed to realloc memory for the provided shape array.");
+      ygglog_throw_error("NDArrayMetaschemaType::update_from_deseriali: Failed to realloc memory for the provided shape array.");
     }
     new_shape[0] = new_shape_temp;
     size_t i;
@@ -1919,6 +2172,33 @@ size_t NDArrayMetaschemaType::update_from_deserialization_args(size_t *nargs, va
       (*new_shape)[i] = shape_[i];
     }
     out = out + 3;
+  }
+  if ((ap.for_fortran) && (ap.using_ptrs)) {
+    if ((!(_variable_shape)) || (*nargs < 3)) {
+      va_list_t_skip(&ap, sizeof(unsigned char**));
+      out = out + 1;
+    }
+    if (!(_variable_shape)) {
+      ap.nptrs++;
+      size_t * new_ndim = (size_t*)get_va_list_ptr_cpp(&ap);
+      new_ndim[0] = ndim();
+      ap.nptrs++;
+      size_t** new_shape = (size_t**)get_va_list_ptr_ref_cpp(&ap, 1);
+      // size_t* new_shape_temp = (size_t*)realloc(new_shape[0], ndim()*sizeof(size_t));
+      // if (new_shape_temp == NULL) {
+      // 	ygglog_throw_error("NDArrayMetaschemaType::update_from_deseriali: Failed to realloc memory for the provided shape array.");
+      // }
+      // new_shape[0] = new_shape_temp;
+      size_t i;
+      for (i = 0; i < ndim(); i++) {
+	(*new_shape)[i] = shape_[i];
+      }
+    }
+    if ((subtype_code() == T_BYTES) || (subtype_code() == T_UNICODE)) {
+      ap.nptrs++;
+      size_t * arg_prec = (size_t*)get_va_list_ptr_cpp(&ap);
+      arg_prec[0] = (size_t)(precision()/8);
+    }
   }
   return out;
 };
@@ -1960,6 +2240,26 @@ bool NDArrayMetaschemaType::encode_type_prop(rapidjson::Writer<rapidjson::String
   writer->EndArray();
   return true;
 };
+bool NDArrayMetaschemaType::decode_data(rapidjson::Value &data, const int allow_realloc,
+					size_t *nargs, va_list_t &ap) const {
+    bool out = ScalarMetaschemaType::decode_data(data, allow_realloc,
+						 nargs, ap);
+    if (out) {
+      if ((ap.for_fortran) && (ap.using_ptrs)) {
+	if (!(_variable_shape)) {
+	  ap.nptrs++;
+	  va_list_t_skip(&ap, sizeof(size_t*));
+	  ap.nptrs++;
+	  va_list_t_skip(&ap, sizeof(size_t**));
+	}
+	if ((subtype_code() == T_BYTES) || (subtype_code() == T_UNICODE)) {
+	  ap.nptrs++;
+	  va_list_t_skip(&ap, sizeof(size_t*));
+	}
+      }
+    }
+    return out;
+  };
 
 
 #endif /*SCALAR_METASCHEMA_TYPE_H_*/

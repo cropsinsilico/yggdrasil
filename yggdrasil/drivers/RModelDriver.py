@@ -33,7 +33,8 @@ class RModelDriver(InterpretedModelDriver):  # pragma: R
     # it is defined here statically. For dynamic import, use the following:
     #     interface_library = PythonModelDriver.interface_library
     interface_library = 'yggdrasil'
-    interface_dependencies = install.requirements_from_description()
+    interface_dependencies = [x.split()[0] for x in
+                              install.requirements_from_description()]
     # The Batch version causes output to saved to a file rather than directed to
     # stdout so use Rscript instead. For the batch version, use the following:
     #     default_interpreter_flags = ['CMD', 'BATCH' '--vanilla', '--silent']
@@ -110,6 +111,7 @@ class RModelDriver(InterpretedModelDriver):  # pragma: R
         'inputs_def_regex': r'\s*(?P<name>.+?)\s*(?:,|$)',
         'outputs_def_regex': r'\s*(?P<name>.+?)\s*(?:,|$)'}
     brackets = (r'{', r'}')
+    zero_based = False
 
     @classmethod
     def is_library_installed(cls, lib, **kwargs):

@@ -125,9 +125,9 @@ definitions:
             type: string
           type: array
       required:
-      - name
-      - commtype
       - datatype
+      - commtype
+      - name
       title: comm_base
       type: object
     - anyOf:
@@ -640,9 +640,9 @@ definitions:
             is used.
           type: string
       required:
-      - working_dir
       - name
       - filetype
+      - working_dir
       title: file_base
       type: object
     - anyOf:
@@ -1359,6 +1359,7 @@ definitions:
           - cmake
           - cpp
           - executable
+          - fortran
           - lpy
           - make
           - matlab
@@ -1486,6 +1487,13 @@ definitions:
             to working_dir. This should be the directory containing the CMakeLists.txt
             file. It can be relative to working_dir or absolute.
           type: string
+        standard:
+          default: f2003
+          description: Fortran standard that should be used. Defaults to 'f2003'.
+          enum:
+          - f2003
+          - f2008
+          type: string
         start_time:
           default: 0.0
           description: Time that simulation should be started from. If 'reset' is
@@ -1539,6 +1547,10 @@ definitions:
           description: Make target that should be built to create the model executable.
             Defaults to None.
           type: string
+        target_compiler:
+          description: Compilation tool that should be used for the target language.
+            Defaults to None and will be set based on the selected language driver.
+          type: string
         target_language:
           description: Language that the target is written in. Defaults to None and
             will be set based on the source files provided.
@@ -1581,10 +1593,10 @@ definitions:
             is used.
           type: string
       required:
+      - language
+      - name
       - args
       - working_dir
-      - name
-      - language
       title: model_base
       type: object
     - anyOf:
@@ -1670,6 +1682,10 @@ definitions:
           target:
             description: Make target that should be built to create the model executable.
               Defaults to None.
+            type: string
+          target_compiler:
+            description: Compilation tool that should be used for the target language.
+              Defaults to None and will be set based on the selected language driver.
             type: string
           target_language:
             description: Language that the target is written in. Defaults to None
@@ -2154,11 +2170,71 @@ definitions:
             description: Make target that should be built to create the model executable.
               Defaults to None.
             type: string
+          target_compiler:
+            description: Compilation tool that should be used for the target language.
+              Defaults to None and will be set based on the selected language driver.
+            type: string
           target_language:
             description: Language that the target is written in. Defaults to None
               and will be set based on the source files provided.
             type: string
         title: CMakeModelDriver
+        type: object
+      - additionalProperties: true
+        description: Schema for model component ['fortran'] subtype.
+        properties:
+          compiler:
+            description: Command or path to executable that should be used to compile
+              the model. If not provided, the compiler will be determined based on
+              configuration options for the language (if present) and the registered
+              compilers that are available on the current operating system.
+            type: string
+          compiler_flags:
+            default: []
+            description: Flags that should be passed to the compiler during compilation.
+              If nto provided, the compiler flags will be determined based on configuration
+              options for the language (if present), the compiler defaults, and the
+              default_compiler_flags class attribute.
+            items:
+              type: string
+            type: array
+          language:
+            default: executable
+            description: Model is written in Fortran.
+            enum:
+            - fortran
+            type: string
+          linker:
+            description: Command or path to executable that should be used to link
+              the model. If not provided, the linker will be determined based on configuration
+              options for the language (if present) and the registered linkers that
+              are available on the current operating system
+            type: string
+          linker_flags:
+            default: []
+            description: Flags that should be passed to the linker during compilation.
+              If nto provided, the linker flags will be determined based on configuration
+              options for the language (if present), the linker defaults, and the
+              default_linker_flags class attribute.
+            items:
+              type: string
+            type: array
+          source_files:
+            default: []
+            description: Source files that should be compiled into an executable.
+              Defaults to an empty list and the driver will search for a source file
+              based on the model executable (the first model argument).
+            items:
+              type: string
+            type: array
+          standard:
+            default: f2003
+            description: Fortran standard that should be used. Defaults to 'f2003'.
+            enum:
+            - f2003
+            - f2008
+            type: string
+        title: FortranModelDriver
         type: object
       - additionalProperties: true
         description: Schema for model component ['executable'] subtype.

@@ -10,7 +10,14 @@ _is_osx = (sys.platform == 'darwin')
 _is_linux = ('linux' in sys.platform)
 _is_win = (sys.platform in ['win32', 'cygwin'])
 INSTALLLPY = (os.environ.get('INSTALLLPY', '0') == '1')
+if _is_win:
+    INSTALLC = (os.environ.get('INSTALLC', '0') == '1')
+else:
+    INSTALLC = True  # c compiler usually installed by default
 INSTALLR = (os.environ.get('INSTALLR', '0') == '1')
+INSTALLFORTRAN = (os.environ.get('INSTALLFORTRAN', '0') == '1')
+if not INSTALLC:
+    INSTALLFORTRAN = False
 INSTALLSBML = (os.environ.get('INSTALLSBML', '0') == '1')
 INSTALLAPY = (os.environ.get('INSTALLAPY', '0') == '1')
 INSTALLZMQ = (os.environ.get('INSTALLZMQ', '0') == '1')
@@ -255,6 +262,22 @@ def deploy_package_on_ci(method):
             else:
                 raise NotImplementedError("Could not determine "
                                           "R installation method.")
+        if INSTALLFORTRAN:
+            cmds.append("echo Installing Fortran...")
+            if _in_conda:
+                if _is_win:
+                    cmds.append(("%s install -c conda-forge "
+                                 "m2w64-gcc-fortran make "
+                                 "m2w64-toolchain_win-64") % conda_cmd)
+                else:
+                    cmds.append("%s install -c conda-forge fortran-compiler" % conda_cmd)
+            elif _is_linux:
+                cmds += ["sudo apt-get install gfortran"]
+            elif _is_osx:
+                cmds += ["brew install gfortran"]
+            else:
+                raise NotImplementedError("Could not determine "
+                                          "Fortran installation method.")
         if INSTALLSBML:
             cmds += ['pip install libroadrunner']
         if INSTALLAPY:
@@ -280,8 +303,9 @@ def deploy_package_on_ci(method):
             elif _is_osx:
                 cmds.append("bash ci/install-czmq-osx.sh")
             elif _is_win:
-                cmds += ["call ci\\install-czmq-windows.bat",
-                         "echo \"%PATH%\""]
+                cmds.append("%s install czmq zeromq" % conda_cmd)
+                # cmds += ["call ci\\install-czmq-windows.bat",
+                #          "echo \"%PATH%\""]
             else:
                 raise NotImplementedError("Could not determine "
                                           "ZeroMQ installation method.")

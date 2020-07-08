@@ -36,6 +36,10 @@ case $1 in
 	echo "Running R"
 	yaml='timed_pipe_r.yml'
 	;;
+    -f | --fortran )
+	echo "Running Fortran"
+	yaml='timed_pipe_fortran.yml'
+	;;
     * )
 	echo "Running ", $1
 	yaml=$1

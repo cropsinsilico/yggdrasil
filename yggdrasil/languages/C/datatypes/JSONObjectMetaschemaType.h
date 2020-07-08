@@ -285,6 +285,22 @@ public:
     update_properties(new_info_obj->properties());
   }
   /*!
+    @brief Update the type associated with a key.
+    @param[in] k const char* Key where item type should be added.
+    @param[in] x MetaschemaType* Type to insert at key k.
+  */
+  void update_type_element(const char* k, const MetaschemaType* x) override {
+    MetaschemaTypeMap::iterator it;
+    MetaschemaTypeMap::iterator old_it;
+    old_it = properties_.find(k);
+    if (old_it != properties_.end()) {
+      MetaschemaType* old = old_it->second;
+      delete old;
+      old = NULL;
+    }
+    properties_[k] = x->copy();
+  }
+  /*!
     @brief Update the property types.
     @param[in] new_properties MetaschemaTypeMap Map of new types describing properties.
     @param[in] force bool If true, the existing properties are overwritten, otherwise they are only updated.
@@ -437,8 +453,7 @@ public:
       iout = it->second->update_from_deserialization_args(&new_nargs, ap);
       if (iout == 0) {
 	for (iout = 0; iout < it->second->nargs_exp(); iout++) {
-	  // Can use void* here since all variables will be pointers
-	  va_arg(ap.va, void*);
+	  va_list_t_skip(&ap, sizeof(void*));
 	}
       }
       out = out + iout;

@@ -16,12 +16,15 @@ Documentation
 * Add papers section for listing publication using yggdrasil
 * Expand development section into contributing guide
 * Add section on command line utilities
+* Add model API documentation for R & Fortran to Hackathon 2018 docs?
+* Mark hackathon 2019 docs as deprecated since the UI is no longer live
   
 Performance
 -----------
 
 * Streamline normalization to speed it up
 * improve speed of validation
+* Wrap C API for serializing/deserializing obj/ply
   
 Refactor
 --------

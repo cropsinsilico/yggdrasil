@@ -1,7 +1,7 @@
 #ifndef YGGTOOLS_H_
 #define YGGTOOLS_H_
 
-#ifdef _WIN32
+#ifdef _MSC_VER
 #ifndef _CRT_SECURE_NO_WARNINGS
 #define _CRT_SECURE_NO_WARNINGS 1
 #endif
@@ -15,7 +15,7 @@
 #include <time.h>
 
 
-#ifdef _WIN32
+#ifdef _MSC_VER
 #ifdef __cplusplus
 #include <complex>
 typedef std::complex<float> complex_float;
@@ -34,6 +34,7 @@ typedef std::complex<long double> complex_long_double;
 typedef _Fcomplex complex_float;
 typedef _Dcomplex complex_double;
 typedef _Lcomplex complex_long_double;
+#define print_complex(x) printf("%lf+%lfj\n", (double)(x._Val[0]), (double)(x._Val[1]))
 #endif
 #else // Unix
 #ifdef __cplusplus
@@ -56,7 +57,9 @@ typedef double _Complex complex_double;
 typedef long double _Complex complex_long_double;
 #endif
 #endif
+#ifndef print_complex
 #define print_complex(x) printf("%lf+%lfj\n", (double)creal(x), (double)cimag(x))
+#endif
 
 
 #ifdef __cplusplus /* If this is a C++ compiler, use C linkage */
@@ -92,19 +95,22 @@ typedef struct complex_long_double_t {
 // Platform specific
 #ifdef _WIN32
 #include "regex/regex_win32.h"
+#include "getline_win32.h"
+#else
+#include "regex_posix.h"
+#endif
+#ifdef _MSC_VER
 #include "windows_stdint.h"  // Use local copy for MSVC support
 // Prevent windows.h from including winsock.h
 #ifndef WIN32_LEAN_AND_MEAN
 #define WIN32_LEAN_AND_MEAN
 #endif
 #include <windows.h>
-#include "getline_win32.h"
 #include <process.h>
 #define ygg_getpid _getpid
 #define sleep(tsec) Sleep(1000*tsec)
 #define usleep(usec) Sleep(usec/1000)
 #else
-#include "regex_posix.h"
 #include <stdint.h>
 #include <unistd.h>
 #define ygg_getpid getpid
@@ -140,7 +146,7 @@ static int _ygg_error_flag = 0;
 
 /*! @brief Define macros to allow counts of variables. */
 // https://codecraft.co/2014/11/25/variadic-macros-tricks/
-#ifdef _WIN32
+#ifdef _MSC_VER
 // https://stackoverflow.com/questions/48710758/how-to-fix-variadic-macro-related-issues-with-macro-overloading-in-msvc-mic
 #define MSVC_BUG(MACRO, ARGS) MACRO ARGS  // name to remind that bug fix is due to MSVC :-)
 #define _GET_NTH_ARG_2(_1, _2, _3, _4, _5, _6, _7, _8, _9, _10, _11, _12, _13, _14, N, ...) N
@@ -171,6 +177,11 @@ unsigned long ptr2seed(void *ptr) {
 */
 typedef struct va_list_t {
   va_list va;
+  int using_ptrs;
+  void **ptrs;
+  int nptrs;
+  int iptr;
+  int for_fortran;
 } va_list_t;
 
 
@@ -465,20 +476,89 @@ int is_send(const char *buf) {
 };
 
   
+/*!
+  @brief Initialize a variable argument list from an existing va_list.
+  @returns va_list_t New variable argument list structure.
+ */
+static inline
+va_list_t init_va_list() {
+  va_list_t out;
+  out.using_ptrs = 0;
+  out.ptrs = NULL;
+  out.nptrs = 0;
+  out.iptr = 0;
+  out.for_fortran = 0;
+  return out;
+};
+
+
+/*! Initialize a variable argument list from an array of pointers.
+  @param[in] nptrs int Number of pointers.
+  @param[in] ptrs void** Array of pointers. 
+  @returns va_list_t New variable argument list structure.
+*/
+static inline
+va_list_t init_va_ptrs(const int nptrs, void** ptrs) {
+  va_list_t out;
+  out.using_ptrs = 1;
+  out.ptrs = ptrs;
+  out.nptrs = nptrs;
+  out.iptr = 0;
+  out.for_fortran = 0;
+  return out;
+};
+  
+
+/*! Finalize a variable argument list.
+  @param[in] va_list_t Variable argument list.
+*/
+static inline
+void end_va_list(va_list_t *ap) {
+  if (!(ap->using_ptrs)) {
+    va_end(ap->va);
+  }
+};
+
+  
+/*! Copy a variable argument list.
+  @param[in] va_list_t Variable argument list structure to copy.
+  @returns va_list_t New variable argument list structure.
+*/
+static inline
+va_list_t copy_va_list(va_list_t ap) {
+  va_list_t out;
+  if (ap.using_ptrs) {
+    out = init_va_ptrs(ap.nptrs, ap.ptrs);
+    out.iptr = ap.iptr;
+  } else {
+    out = init_va_list();
+    va_copy(out.va, ap.va);
+  }
+  out.for_fortran = ap.for_fortran;
+  return out;
+};
+
+
 /*! @brief Method for skipping a number of bytes in the argument list.
   @param[in] ap va_list_t* Structure containing variable argument list.
   @param[in] nbytes size_t Number of bytes that should be skipped.
  */
 static inline
 void va_list_t_skip(va_list_t *ap, size_t nbytes) {
-  if (nbytes == sizeof(void*)) {
-    va_arg(ap->va, void*);
-  } else if (nbytes == sizeof(size_t)) {
-    va_arg(ap->va, size_t);
+  if (ap->using_ptrs) {
+    ap->iptr++;
   } else {
-    printf("WARNING: Cannot get argument of size %zd.\n", nbytes);
-    va_arg(ap->va, void*);
-    // va_arg(ap->va, char[nbytes]);
+    if (nbytes == sizeof(void*)) {
+      va_arg(ap->va, void*);
+    } else if (nbytes == sizeof(size_t)) {
+      va_arg(ap->va, size_t);
+    } else if (nbytes == sizeof(char*)) {
+      va_arg(ap->va, char*);
+    } else {
+      printf("WARNING: Cannot get argument of size %ld.\n", nbytes);
+      va_arg(ap->va, void*);
+      // va_arg(ap->va, char[nbytes]);
+    }
   }
 };
 

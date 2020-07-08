@@ -1,5 +1,5 @@
 #include <stdio.h>
-#include <hellofunc.h>
+#include "hellofunc.h"
 #include <YggInterface.h>
 
 int main() {

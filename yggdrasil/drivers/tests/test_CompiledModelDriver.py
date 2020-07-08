@@ -3,6 +3,7 @@ from yggdrasil.config import ygg_cfg
 from yggdrasil.tests import assert_equal, assert_raises, YggTestClass
 from yggdrasil.drivers import CompiledModelDriver
 import yggdrasil.drivers.tests.test_ModelDriver as parent
+from yggdrasil.components import import_component
 
 
 def test_get_compilation_tool_registry():
@@ -15,6 +16,13 @@ def test_find_compilation_tool():
     r"""Test errors raised by find_compilation_tool."""
     assert_raises(RuntimeError, CompiledModelDriver.find_compilation_tool,
                   'archiver', 'cmake')
+
+
+def test_get_alternate_class():
+    r"""Test get_alternate_class."""
+    import_component('model', subtype='c')
+    gcc = CompiledModelDriver.get_compilation_tool('compiler', 'gcc')
+    gcc.get_alternate_class(toolname='clang')
     
 
 def test_get_compilation_tool():
@@ -102,7 +110,9 @@ class TestCompilationTool(YggTestClass):
         if self._cls == 'CompilationToolBase':
             self.assert_raises(NotImplementedError, self.import_cls.get_search_path)
         else:
-            self.import_cls.get_search_path()
+            self.import_cls.get_search_path(libtype='include')
+            self.import_cls.get_search_path(libtype='shared')
+            self.import_cls.get_search_path(libtype='static')
             
     def test_get_executable_command(self):
         r"""Test get_executable_command."""
@@ -181,10 +191,25 @@ class TestCompiledModelDriverNoInit(TestCompiledModelParam,
         self.assert_raises(ValueError, self.import_cls.get_tool, 'compiler',
                            return_prop='invalid')
 
+    def test_get_dependency_info(self):
+        r"""Test get_dependency_info."""
+        dep_list = (
+            self.import_cls.get_dependency_order(
+                self.import_cls.interface_library)
+            + list(self.import_cls.external_libraries.keys()))
+        for dep in dep_list:
+            self.import_cls.get_dependency_info(dep, default='default')
+        self.assert_raises(KeyError, self.import_cls.get_dependency_info,
+                           'invalid')
+        self.assert_equal(self.import_cls.get_dependency_info(
+            'invalid', default='default'), 'default')
+
     def test_get_dependency_source(self):
         r"""Test get_dependency_source."""
-        dep_list = (list(self.import_cls.external_libraries.keys())
-                    + list(self.import_cls.internal_libraries.keys()))
+        dep_list = (
+            self.import_cls.get_dependency_order(
+                self.import_cls.interface_library)
+            + list(self.import_cls.external_libraries.keys()))
         for dep in dep_list:
             self.import_cls.get_dependency_source(dep, default='default')
         self.assert_raises(ValueError, self.import_cls.get_dependency_source,
@@ -192,6 +217,21 @@ class TestCompiledModelDriverNoInit(TestCompiledModelParam,
         self.assert_equal(self.import_cls.get_dependency_source(__file__),
                           __file__)
         self.assert_equal(self.import_cls.get_dependency_source(
+            'invalid', default='default'), 'default')
+
+    def test_get_dependency_object(self):
+        r"""Test get_dependency_object."""
+        dep_list = (
+            self.import_cls.get_dependency_order(
+                self.import_cls.interface_library)
+            + list(self.import_cls.external_libraries.keys()))
+        for dep in dep_list:
+            self.import_cls.get_dependency_object(dep, default='default')
+        self.assert_raises(ValueError, self.import_cls.get_dependency_object,
+                           'invalid')
+        self.assert_equal(self.import_cls.get_dependency_object(__file__),
+                          __file__)
+        self.assert_equal(self.import_cls.get_dependency_object(
             'invalid', default='default'), 'default')
 
     def test_get_dependency_library(self):
@@ -320,7 +360,11 @@ class TestCompiledModelDriverNoStart(TestCompiledModelParam,
         # Record old tools
         old_tools = {}
         for k in ['compiler', 'linker', 'achiver']:
-            old_tools[k] = getattr(self.instance, '%s_tool' % k, None)
+            old_tools['%s_tool' % k] = getattr(self.instance,
+                                               '%s_tool' % k, None)
+        for k in ['compiler_flags', 'linker_flags']:
+            old_tools[k] = getattr(self.instance, k, None)
+            setattr(self.instance, k, [])
         # Compile with each compiler
         for k, v in self.import_cls.get_available_tools('compiler').items():
             if (not v.is_installed()) or getattr(v, 'is_build_tool', False):
@@ -331,7 +375,7 @@ class TestCompiledModelDriverNoStart(TestCompiledModelParam,
             self.instance.compile_model()
         # Restore the old tools
         for k, v in old_tools.items():
-            setattr(self.instance, '%s_tool' % k, v)
+            setattr(self.instance, k, v)
 
     def test_compile_model(self):
         r"""Test compile model with alternate set of input arguments."""

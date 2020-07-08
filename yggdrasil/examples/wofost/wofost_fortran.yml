@@ -1,0 +1,12 @@
+models:
+  - name: fortran_model
+    language: fortran
+    args: ./src/wofost.f90
+
+connections:
+  - input: ./Input/input.txt  # Connection between file and model input
+    output: fortran_model:input
+    filetype: wofost
+  - input: fortran_model:output  # Connection between model output and file
+    output: ./output.txt
+    filetype: wofost

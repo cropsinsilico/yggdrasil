@@ -265,7 +265,7 @@ These packages can by installed from CRAN from the R interpreter.::
 .. note::
    [MAC ONLY] If ``install.packages("units")`` fails with messages about the ``udunits`` library being missing and you installed ``udunits`` using homebrew as described above, then you can install the R ``units`` and point to the library by running::
 
-     > install.packages('units', configure.args = c('--with-udunits2-include=/usr/local/opt/udunits/include/', '--with-udunits2-lib=/usr/local/opt/udunits/lib/‘))
+     > install.packages("units", configure.args = c("--with-udunits2-include=/usr/local/opt/udunits/include/", "--with-udunits2-lib=/usr/local/opt/udunits/lib/"))
 
 
 If you install R and/or the R dependencies after installing |yggdrasil|, you can complete |yggdrasil|'s R installation by running::
