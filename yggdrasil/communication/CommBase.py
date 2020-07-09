@@ -517,10 +517,14 @@ class CommBase(tools.YggClass):
     def __getstate__(self):
         if self.is_open and (self._commtype != 'buffer'):  # pragma: debug
             raise RuntimeError("Cannot pickle an open comm.")
-        return super(CommBase, self).__getstate__()
+        out = super(CommBase, self).__getstate__()
+        del out['_closing_thread']
+        return out
 
     def __setstate__(self, state):
         super(CommBase, self).__setstate__(state)
+        self._closing_thread = multitasking.YggTask(
+            target=self.linger_close, name=self.name + '.ClosingTask')
         if self.is_interface:  # pragma: debug
             atexit.register(self.atexit)
 
@@ -1924,7 +1928,7 @@ class CommBase(tools.YggClass):
                 message.
 
         """
-        self.debug("Receiving message from %s", self.address)
+        self.special_debug("Receiving message from %s", self.address)
         # Receive first part of message
         flag, s_msg = self._safe_recv(*args, **kwargs)
         if not flag:

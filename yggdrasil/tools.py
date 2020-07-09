@@ -839,9 +839,10 @@ class ProxyMeta(type):
     def __new__(cls, classname, bases, attrs):
         overrides = attrs.get('__overrides__', [])
         overrides.extend(attrs.get('__slots__', []))
-        overrides.append('wrapped_object')
         overrides.extend(k for k in attrs.keys() if k not in
                          ['__overrides__'])
+        for base in bases:
+            overrides.extend(getattr(base, '__overrides__', []))
         if '_wrapped' not in overrides:
             overrides.append('_wrapped')
         attrs['__overrides__'] = overrides
@@ -851,9 +852,10 @@ class ProxyMeta(type):
                 mtd = getattr(object.__getattribute__(self, "_wrapped"), name)
                 return mtd(*args, **kwargs)
             return method
-        
+
         for name in cls._special_names:
-            attrs[name] = make_method(name)
+            if name not in overrides:
+                attrs[name] = make_method(name)
         return type.__new__(cls, classname, bases, attrs)
 
 
@@ -883,12 +885,13 @@ class ProxyObject(metaclass=ProxyMeta):
             return
         setattr(object.__getattribute__(self, "_wrapped"), name, value)
 
-    def __getstate__(self):
-        return object.__getattribute__(self, "_wrapped")
+    def __reduce__(self):
+        return (object.__getattribute__(self, "__class__"),
+                (object.__getattribute__(self, "_wrapped"), ))
 
-    def __setstate__(self, state):
-        object.__setattr__(self, "_wrapped", state)
-
+    def __reduce_ex__(self, proto):
+        return object.__getattribute__(self, "__reduce__")()
+    
     # Special cases
     def __nonzero__(self):
         return bool(object.__getattribute__(self, "_wrapped"))

@@ -55,6 +55,11 @@ class RemoteTaskLoop(multitasking.YggTaskLoop):
             task_method='process',
             task_context=connection.process_instance.context)
 
+    def __getstate__(self):
+        out = super(RemoteTaskLoop, self).__getstate__()
+        del out['connection']
+        return out
+
     def is_open(self):
         return (not self.was_break)
 
@@ -266,6 +271,8 @@ class ConnectionDriver(Driver):
         comm_kws['reverse_names'] = True
         comm_kws['use_async'] = True
         comm_kws.setdefault('name', name)
+        if self.as_process:
+            comm_kws.setdefault('buffer_task_method', 'process')
         self.debug('%s comm_kws:\n%s', attr_comm, self.pprint(comm_kws, 1))
         setattr(self, attr_comm, new_comm(**comm_kws))
         setattr(self, '%s_kws' % attr_comm, comm_kws)
@@ -283,6 +290,11 @@ class ConnectionDriver(Driver):
             kwargs.setdefault('timeout_send_1st', 60)
         self.timeout_send_1st = kwargs.pop('timeout_send_1st', self.timeout)
         self.debug('Final env:\n%s', self.pprint(self.env, 1))
+
+    def __setstate__(self, state):
+        super(ConnectionDriver, self).__setstate__(state)
+        if self.as_process:
+            self.task_thread.connection = self
 
     @property
     def model_env(self):
@@ -418,6 +430,7 @@ class ConnectionDriver(Driver):
         with self.lock:
             return self.icomm.n_msg_recv
 
+    @run_remotely
     def open_comm(self):
         r"""Open the communicators."""
         self.debug('')

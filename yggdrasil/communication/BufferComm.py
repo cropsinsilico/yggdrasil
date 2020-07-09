@@ -1,5 +1,5 @@
 from yggdrasil import multitasking
-from yggdrasil.communication import CommBase
+from yggdrasil.communication import CommBase, NoMessages
 
 
 class LockedBuffer(multitasking.Queue):
@@ -97,14 +97,21 @@ class BufferComm(CommBase.CommBase):
         return False
         
     def bind(self):
-        r"""Bind to address, getting random port as necessary."""
+        r"""Bind to new buffer."""
         super(BufferComm, self).bind()
         if not isinstance(self.address, LockedBuffer):
             if self.address == 'address':
                 self.address = LockedBuffer(task_method=self.buffer_task_method)
+                self.address._closed.set()
             else:  # pragma: debug
                 raise ValueError("Invalid address for a buffer: %s"
                                  % self.address)
+
+    def open(self):
+        r"""Open the buffer."""
+        super(BufferComm, self).open()
+        if self.address.closed and (self.address._base is not None):
+            self.address._closed.clear()
         
     def serialize(self, args, **kwargs):
         r"""Serialize a message using the associated serializer."""
@@ -153,13 +160,10 @@ class BufferComm(CommBase.CommBase):
             bool: Success or failure of sending the message.
 
         """
-        if self.direction == 'recv':  # pragma: debug
-            self.error("Receiving buffer comm cannot send.")
-            return False
         self.address.append(payload)
         return True
 
-    def _recv(self, timeout=None):
+    def _recv(self):
         r"""Receive a message from the buffer.
 
         Args:
@@ -171,16 +175,8 @@ class BufferComm(CommBase.CommBase):
                 and the message received.
 
         """
-        if timeout is None:  # pragma: no cover
-            timeout = self.recv_timeout
-        if self.direction == 'send':  # pragma: debug
-            self.error("Sending buffer comm cannot receive.")
-            return (False, self.empty_bytes_msg)
-        # Sleep until there is a message
-        T = self.start_timeout(timeout, key_suffix='_recv')
-        while (not T.is_out) and (not len(self.address)):
-            self.sleep()
-        self.stop_timeout(key_suffix='_recv')
+        if not len(self.address):
+            raise NoMessages("No messages in queue.")
         return (True, self.address.pop(0, self.empty_bytes_msg))
 
     def purge(self):

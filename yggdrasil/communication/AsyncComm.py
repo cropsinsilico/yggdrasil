@@ -27,8 +27,7 @@ class AsyncComm(ProxyObject, ComponentBaseUnregistered):
     __slots__ = ['_backlog_buffer', '_backlog_thread',
                  'backlog_ready', '_used_direct', 'close_on_eof_recv']
     __overrides__ = ['_input_args', '_input_kwargs']
-    _disconnect_attr = ['backlog_ready',
-                        '_backlog_thread', '_wrapped']
+    _disconnect_attr = ['backlog_ready', '_backlog_thread', '_wrapped']
 
     def __init__(self, wrapped):
         self._backlog_buffer = []
@@ -43,21 +42,12 @@ class AsyncComm(ProxyObject, ComponentBaseUnregistered):
         if self._wrapped.is_open:
             self.open()
 
-    def __getstate__(self):
-        if self.is_open and (self._commtype != 'buffer'):  # pragma: debug
-            raise RuntimeError("Cannot pickle an open comm.")
-        wrapped = super(AsyncComm, self).__getstate__()
+    def __reduce__(self):
+        rv = list(super(AsyncComm, self).__reduce__())
+        (wrapped, ) = rv[1]
         wrapped.close_on_eof_recv = self.close_on_eof_recv
-        return wrapped
-
-    def __setstate__(self, wrapped):
-        self._backlog_buffer = []
-        self._backlog_thread = None
-        self.backlog_ready = multitasking.Event()
-        self._used_direct = False
-        self.close_on_eof_recv = wrapped.close_on_eof_recv
-        wrapped.close_on_eof_recv = False
-        super(AsyncComm, self).__setstate__(wrapped)
+        rv[1] = (wrapped, )
+        return tuple(rv)
 
     def printStatus(self, *args, **kwargs):
         r"""Print status of the communicator."""
@@ -88,6 +78,7 @@ class AsyncComm(ProxyObject, ComponentBaseUnregistered):
     def open(self):
         r"""Open the connection by connecting to the queue."""
         self._wrapped.open()
+        self._wrapped.suppress_special_debug = True
         if self._wrapped.is_open and (not self.is_open_backlog):
             self.backlog_thread.start()
 
@@ -138,6 +129,11 @@ class AsyncComm(ProxyObject, ComponentBaseUnregistered):
         return ((self.backlog_thread is not None)
                 and (not self.backlog_thread.was_break)
                 and (self.backlog_thread.is_alive()))
+
+    @property
+    def is_closed(self):
+        r"""bool: True if the connection is closed."""
+        return (not self.is_open)
 
     @property
     def n_msg(self):
