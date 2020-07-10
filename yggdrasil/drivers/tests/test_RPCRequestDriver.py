@@ -1,6 +1,9 @@
+import unittest
+from yggdrasil.schema import get_schema
 from yggdrasil.tests import assert_raises, assert_equal
 import yggdrasil.drivers.tests.test_ConnectionDriver as parent
-from yggdrasil import tools
+from yggdrasil.drivers.tests.test_ConnectionDriver import (
+    _default_comm, _zmq_installed, _ipc_installed, _rmq_installed)
 
 
 class TestRPCRequestParam(parent.TestConnectionParam):
@@ -19,14 +22,12 @@ class TestRPCRequestParam(parent.TestConnectionParam):
         # self.debug_flag = True
         # self.sleeptime = 0.5
         # self.timeout = 10.0
-        self.comm_name = tools.get_default_comm()
-        self.icomm_name = self.comm_name
-        self.ocomm_name = self.comm_name
             
     @property
     def send_comm_kwargs(self):
         r"""dict: Keyword arguments for send comm."""
         out = self.instance.icomm.opp_comm_kwargs()
+        out['request_comm'] = out['comm']
         out['comm'] = 'ClientComm'
         return out
 
@@ -34,15 +35,8 @@ class TestRPCRequestParam(parent.TestConnectionParam):
     def recv_comm_kwargs(self):
         r"""dict: Keyword arguments for recv comm."""
         out = self.instance.ocomm.opp_comm_kwargs()
+        out['request_comm'] = out['comm']
         out['comm'] = 'ServerComm'
-        return out
-
-    @property
-    def inst_kwargs(self):
-        r"""dict: Keyword arguments for tested class."""
-        out = super(TestRPCRequestParam, self).inst_kwargs
-        out['icomm_kws']['comm'] = self.icomm_name
-        out['ocomm_kws']['comm'] = self.ocomm_name
         return out
 
     
@@ -100,3 +94,34 @@ class TestRPCRequestDriver(TestRPCRequestParam,
     def test_send_recv_nolimit(self):
         r"""Test routing of a large message between client and server."""
         self.test_send_recv(msg_send=self.msg_long)
+
+
+# Dynamically create tests based on registered comm classes
+s = get_schema()
+comm_types = list(s['comm'].schema_subtypes.keys())
+for k in comm_types:
+    if k == _default_comm:  # pragma: debug
+        continue
+    tcls = type('Test%sRPCRequestDriver' % k,
+                (TestRPCRequestDriver, ), {'ocomm_name': k,
+                                           'icomm_name': k,
+                                           'driver': 'RPCRequestDriver',
+                                           'args': 'test'})
+    # Flags
+    flag_func = None
+    if k in ['RMQComm', 'RMQAsyncComm']:
+        flag_func = unittest.skipIf(not _rmq_installed,
+                                    "RMQ Server not running")
+    elif k in ['ZMQComm']:
+        flag_func = unittest.skipIf(not _zmq_installed,
+                                    "ZMQ library not installed")
+    elif k in ['IPCComm']:
+        flag_func = unittest.skipIf(not _ipc_installed,
+                                    "IPC library not installed")
+    elif k in ['BufferComm']:
+        flag_func = unittest.skip("Buffer cannot be sent via header.")
+    if flag_func is not None:
+        tcls = flag_func(tcls)
+    # Add class to globals
+    globals()[tcls.__name__] = tcls
+    del tcls

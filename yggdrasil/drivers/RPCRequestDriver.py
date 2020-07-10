@@ -197,7 +197,9 @@ class RPCRequestDriver(ConnectionDriver):
                     return False
                 drv_args = [self.response_address]
                 drv_kwargs = dict(msg_id=self.request_id,
-                                  request_name=self.name)
+                                  request_name=self.name,
+                                  icomm_kws={'comm': self.ocomm.comm_class},
+                                  ocomm_kws={'comm': self.icomm.comm_class})
                 self.debug("Creating response comm: address = %s, request_id = %s",
                            self.response_address, self.request_id)
                 try:

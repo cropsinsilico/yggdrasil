@@ -3,7 +3,7 @@ import uuid
 from collections import OrderedDict
 from yggdrasil.components import import_component
 from yggdrasil.communication import CommBase, get_comm
-from yggdrasil.drivers.ClientRequestDriver import YGG_CLIENT_EOF
+from yggdrasil.drivers.RPCRequestDriver import YGG_CLIENT_EOF
 
 
 class ServerComm(CommBase.CommBase):

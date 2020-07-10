@@ -462,7 +462,7 @@ def test_ConnectionDriverTranslate_errors():
                   translator=invalid_translate)
 
     
-# Dynamically create tests based on registered file classes
+# Dynamically create tests based on registered comm classes
 s = get_schema()
 comm_types = list(s['comm'].schema_subtypes.keys())
 for k in comm_types:

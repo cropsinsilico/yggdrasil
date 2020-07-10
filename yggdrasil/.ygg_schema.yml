@@ -212,19 +212,13 @@ definitions:
           type: string
         connection_type:
           enum:
-          - client
           - connection
           - file_input
           - file_output
           - input
           - output
-          - rmq_async_client
-          - rmq_async_server
-          - rmq_client
-          - rmq_server
           - rpc_request
           - rpc_response
-          - server
           type: string
         driver:
           description: '[DEPRECATED] Name of driver class that should be used.'
@@ -267,8 +261,8 @@ definitions:
             - $ref: '#/definitions/transform'
           type: array
       required:
-      - inputs
       - outputs
+      - inputs
       title: connection_base
       type: object
     - anyOf:
@@ -282,28 +276,6 @@ definitions:
             - connection
             type: string
         title: ConnectionDriver
-        type: object
-      - additionalProperties: true
-        description: Schema for connection component ['client'] subtype.
-        properties:
-          connection_type:
-            description: Connection between a model acting as a client and a server
-              request comm.
-            enum:
-            - client
-            type: string
-        title: ClientDriver
-        type: object
-      - additionalProperties: true
-        description: Schema for connection component ['rmq_client'] subtype.
-        properties:
-          connection_type:
-            description: Connection between a model acting as a client and a RabbitMQ
-              server request comm.
-            enum:
-            - rmq_client
-            type: string
-        title: RMQClientDriver
         type: object
       - additionalProperties: true
         description: Schema for connection component ['rpc_response'] subtype.
@@ -348,28 +320,6 @@ definitions:
         title: FileOutputDriver
         type: object
       - additionalProperties: true
-        description: Schema for connection component ['server'] subtype.
-        properties:
-          connection_type:
-            description: Connection between a server request comm and a model acting
-              as a server.
-            enum:
-            - server
-            type: string
-        title: ServerDriver
-        type: object
-      - additionalProperties: true
-        description: Schema for connection component ['rmq_async_server'] subtype.
-        properties:
-          connection_type:
-            description: Connection between an asynchronous RabbitMQ server request
-              comm and a model acting as a server.
-            enum:
-            - rmq_async_server
-            type: string
-        title: RMQAsyncServerDriver
-        type: object
-      - additionalProperties: true
         description: Schema for connection component ['input'] subtype.
         properties:
           connection_type:
@@ -388,28 +338,6 @@ definitions:
             - file_input
             type: string
         title: FileInputDriver
-        type: object
-      - additionalProperties: true
-        description: Schema for connection component ['rmq_server'] subtype.
-        properties:
-          connection_type:
-            description: Connection between a RabbitMQ server request comm and a model
-              acting as a server.
-            enum:
-            - rmq_server
-            type: string
-        title: RMQServerDriver
-        type: object
-      - additionalProperties: true
-        description: Schema for connection component ['rmq_async_client'] subtype.
-        properties:
-          connection_type:
-            description: Connection between a model acting as a client and an asynchronous
-              RabbitMQ server request comm.
-            enum:
-            - rmq_async_client
-            type: string
-        title: RMQAsyncClientDriver
         type: object
     description: Schema for connection components.
     title: connection
@@ -1608,8 +1536,8 @@ definitions:
       required:
       - args
       - working_dir
-      - language
       - name
+      - language
       title: model_base
       type: object
     - anyOf:
