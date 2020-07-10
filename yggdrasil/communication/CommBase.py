@@ -907,17 +907,19 @@ class CommBase(tools.YggClass):
         r"""Close the connection."""
         pass
 
-    def close(self, linger=False):
+    def close(self, linger=False, **kwargs):
         r"""Close the connection.
 
         Args:
             linger (bool, optional): If True, drain messages before closing the
                 comm. Defaults to False.
+            **kwargs: Additional keyword arguments are passed to linger
+                method if linger is True.
 
         """
         self.debug("Closing %s", self.address)
         if linger and self.is_open:
-            self.linger()
+            self.linger(**kwargs)
         else:
             self._closing_thread.set_terminated_flag()
             linger = False
@@ -965,22 +967,24 @@ class CommBase(tools.YggClass):
                 self.debug("Closing thread took too long")
                 self.close()
 
-    def linger_close(self):
+    def linger_close(self, **kwargs):
         r"""Wait for messages to drain, then close."""
-        self.close(linger=True)
+        self.close(linger=True, **kwargs)
 
-    def linger(self):
+    def linger(self, active_confirm=False):
         r"""Wait for messages to drain."""
         self.debug('')
         if self.direction == 'recv':
             while self.is_open and (self.n_msg_recv_drain > 0):  # pragma: debug
                 self.recv(timeout=0)
-            self.wait_for_confirm(timeout=self._timeout_drain)
+            self.wait_for_confirm(timeout=self._timeout_drain,
+                                  active_confirm=active_confirm)
         else:
             if self.is_response_server and (not self.is_async):
                 self.wait_for_workers(timeout=self._timeout_drain)
             self.drain_messages(variable='n_msg_send')
-            self.wait_for_confirm(timeout=self._timeout_drain)
+            self.wait_for_confirm(timeout=self._timeout_drain,
+                                  active_confirm=active_confirm)
         self.debug("Finished (timeout_drain = %s)", str(self._timeout_drain))
 
     def language_atexit(self):  # pragma: debug
@@ -1012,7 +1016,7 @@ class CommBase(tools.YggClass):
     @property
     def is_confirmed_send(self):
         r"""bool: True if all sent messages have been confirmed."""
-        for v in self._work_comms.values():
+        for v in list(self._work_comms.values()):
             if (v.direction == 'send') and not v.is_confirmed_send:  # pragma: debug
                 return False
         return (self.n_msg_send == 0)
@@ -1020,7 +1024,7 @@ class CommBase(tools.YggClass):
     @property
     def is_confirmed_recv(self):
         r"""bool: True if all received messages have been confirmed."""
-        for v in self._work_comms.values():
+        for v in list(self._work_comms.values()):
             if (v.direction == 'recv') and not v.is_confirmed_recv:  # pragma: debug
                 return False
         return (self.n_msg_recv == 0)
@@ -1262,11 +1266,13 @@ class CommBase(tools.YggClass):
 
         """
         if self.direction != direction:
-            raise RuntimeError("This comm is designated to %s and "
+            raise RuntimeError("This comm (%s) is designated to %s and "
                                "therefore cannot %s."
-                               % (self.direction, direction))
+                               % (self.address, self.direction, direction))
         if self.single_use and self._used:
-            raise RuntimeError("This comm is single use and it was already used.")
+            raise RuntimeError("This comm (%s) is single use and it "
+                               "was already used."
+                               % self.address)
 
     # CLIENT/SERVER METHODS
     def server_exists(self, srv_address):
@@ -1875,7 +1881,8 @@ class CommBase(tools.YggClass):
             msg = msg_
         if not second_pass:
             self._last_header = header
-        if not header.get('incomplete', False):
+        if (((not self.is_empty(s_msg, self.empty_bytes_msg))
+             and (not header.get('incomplete', False)))):
             # if not self._used:
             #     self.serializer = serialize.get_serializer(**header)
             #     msg, _ = self.deserialize(s_msg)
@@ -1907,7 +1914,7 @@ class CommBase(tools.YggClass):
                 return self.recv(*args, **kwargs)
             if self.single_use and self._used:
                 self.debug('Linger close on single use')
-                self.linger_close()
+                self.linger_close(active_confirm=self.is_async)
             return self.language_driver.python2language((flag, msg))
         except BaseException:
             self.exception('Failed to recv.')

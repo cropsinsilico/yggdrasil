@@ -25,7 +25,8 @@ class AsyncComm(ProxyObject, ComponentBaseUnregistered):
     """
 
     __slots__ = ['_backlog_buffer', '_backlog_thread',
-                 'backlog_ready', '_used_direct', 'close_on_eof_recv']
+                 'backlog_ready', '_used_direct', 'close_on_eof_recv',
+                 '_used', '_last_header']
     __overrides__ = ['_input_args', '_input_kwargs']
     _disconnect_attr = ['backlog_ready', '_backlog_thread', '_wrapped']
 
@@ -35,6 +36,8 @@ class AsyncComm(ProxyObject, ComponentBaseUnregistered):
         self.backlog_ready = multitasking.Event()
         self._used_direct = False
         self.close_on_eof_recv = wrapped.close_on_eof_recv
+        self._used = False
+        self._last_header = None
         wrapped.close_on_eof_recv = False
         wrapped.is_async = True
         super(AsyncComm, self).__init__(wrapped)
@@ -48,6 +51,9 @@ class AsyncComm(ProxyObject, ComponentBaseUnregistered):
         wrapped.close_on_eof_recv = self.close_on_eof_recv
         rv[1] = (wrapped, )
         return tuple(rv)
+
+    def precheck(self, *args, **kwargs):
+        CommBase.CommBase.precheck(self, *args, **kwargs)
 
     def printStatus(self, *args, **kwargs):
         r"""Print status of the communicator."""
@@ -264,8 +270,9 @@ class AsyncComm(ProxyObject, ComponentBaseUnregistered):
 
     def send_direct(self, *args, **kwargs):
         r"""Send a message directly to the underlying comm."""
-        if not self._used_direct:
-            self.suppress_special_debug = True
+        self.periodic_debug("send_direct", period=1000)(
+            "Sending message to %s", self.address)
+        self.suppress_special_debug = True
         try:
             kwargs.setdefault('timeout', 0)
             if self._wrapped.send(*args, **kwargs):
@@ -280,8 +287,9 @@ class AsyncComm(ProxyObject, ComponentBaseUnregistered):
 
     def recv_direct(self, **kwargs):
         r"""Receive a message directly from the underlying comm."""
-        if not self._used_direct:
-            self.suppress_special_debug = True
+        self.periodic_debug("recv_direct", period=1000)(
+            "Receiving message from %s", self.address)
+        self.suppress_special_debug = True
         data = None
         try:
             kwargs.setdefault('timeout', 0)
@@ -324,7 +332,7 @@ class AsyncComm(ProxyObject, ComponentBaseUnregistered):
             async_flag, data = self.recv_direct()
             flag = bool(async_flag)
             if async_flag == FLAG_SUCCESS:
-                self.add_backlog(data)
+                self.add_backlog((data, self._wrapped._last_header))
         self.confirm_recv()
         return flag
 
@@ -347,6 +355,7 @@ class AsyncComm(ProxyObject, ComponentBaseUnregistered):
             if async_flag != FLAG_TRYAGAIN:
                 return bool(async_flag)
         self.add_backlog((args, kwargs))
+        self._used = True
         return True
 
     def recv(self, timeout=None, **kwargs):
@@ -378,11 +387,12 @@ class AsyncComm(ProxyObject, ComponentBaseUnregistered):
                 return (self.is_open_backlog, self.empty_obj_recv)
         # Return backlogged message
         self.debug('Returning backlogged received message')
-        msg = self.pop_backlog()
+        msg, self._last_header = self.pop_backlog()
         flag = True
         if self.is_eof(msg) and self.close_on_eof_recv:
             flag = False
             self.close()
+        self._used = True
         return (flag, msg)
 
     def purge(self):
