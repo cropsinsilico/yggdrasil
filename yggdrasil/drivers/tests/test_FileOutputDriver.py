@@ -27,7 +27,7 @@ class TestFileOutputParam(parent.TestConnectionParam):
     @property
     def recv_comm_kwargs(self):
         r"""Keyword arguments for receive comm."""
-        return {'comm': 'CommBase'}
+        return {'comm': 'CommBase', 'direction': 'recv'}
         
     def teardown(self):
         r"""Remove the instance, stoppping it."""

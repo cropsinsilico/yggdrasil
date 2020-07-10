@@ -26,7 +26,7 @@ class AsyncComm(ProxyObject, ComponentBaseUnregistered):
 
     __slots__ = ['_backlog_buffer', '_backlog_thread',
                  'backlog_ready', '_used_direct', 'close_on_eof_recv',
-                 '_used', '_last_header']
+                 '_used', '_last_header', '_closed']
     __overrides__ = ['_input_args', '_input_kwargs']
     _disconnect_attr = ['backlog_ready', '_backlog_thread', '_wrapped']
 
@@ -38,6 +38,7 @@ class AsyncComm(ProxyObject, ComponentBaseUnregistered):
         self.close_on_eof_recv = wrapped.close_on_eof_recv
         self._used = False
         self._last_header = None
+        self._closed = False
         wrapped.close_on_eof_recv = False
         wrapped.is_async = True
         super(AsyncComm, self).__init__(wrapped)
@@ -99,6 +100,8 @@ class AsyncComm(ProxyObject, ComponentBaseUnregistered):
         with self._closing_thread.lock:
             self._wrapped.close(linger=linger)
             self._close_backlog(wait=linger)
+        with self.backlog_thread.lock:
+            self._closed = True
 
     def _close_backlog(self, wait=False):
         r"""Close the backlog thread."""
@@ -121,8 +124,8 @@ class AsyncComm(ProxyObject, ComponentBaseUnregistered):
         if self.direction == 'send':
             return self._wrapped.is_open and self.is_open_backlog
         else:
-            return ((self._wrapped.is_open and self.is_open_backlog)
-                    or (self.n_msg_backlog > 0))
+            return (((self._wrapped.is_open and self.is_open_backlog)
+                     or (self.n_msg_backlog > 0)) and (not self._closed))
 
     @property
     def is_open_direct(self):
@@ -224,8 +227,9 @@ class AsyncComm(ProxyObject, ComponentBaseUnregistered):
         """
         with self.backlog_thread.lock:
             self.debug("Added message to recv backlog.")
-            self._backlog_buffer.append(payload)
-            self.backlog_ready.set()
+            if not self._closed:
+                self._backlog_buffer.append(payload)
+                self.backlog_ready.set()
 
     def pop_backlog(self):
         r"""Pop a message from the front of the backlog.
