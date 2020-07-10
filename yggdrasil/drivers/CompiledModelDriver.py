@@ -27,7 +27,7 @@ if _venv_prefix is not None:
     _system_suffix += '_' + os.path.basename(_venv_prefix)
 
 
-def get_compatible_tool(tool, tooltype, language):
+def get_compatible_tool(tool, tooltype, language, default=False):
     r"""Get a compatible compilation tool that can be used in
     conjunction with the one provided based on the registry of
     compilation toolsets.
@@ -38,6 +38,10 @@ def get_compatible_tool(tool, tooltype, language):
         tooltype (str): Type of compilation tool that should be
             returned.
         language (str): Language that compilation tool should handle.
+        default (CompilationToolBase, optional): Default tool that
+            should be returned if not compatible tool can be located.
+            Defaults to False and an error will be raised if a tool
+            cannot be located.
 
     Returns:
         CompilationToolBase: Compatible compilation tool class.
@@ -57,6 +61,8 @@ def get_compatible_tool(tool, tooltype, language):
                 if ix.is_installed():
                     reg[t][language] = [ix]
                     return ix
+    if default is not False:
+        return default
     raise ValueError(("Could not locate %s for %s language "
                       "that is compatible with the %s %s.")
                      % (tooltype, language, tool.toolname,
@@ -2280,7 +2286,12 @@ class CompiledModelDriver(ModelDriver):
                             'archiver', return_prop='name', default=None),
                         archiver_flags=cls.get_tool(
                             'archiver', return_prop='flags', default=None))
-                out = get_compatible_tool(toolname, tooltype, cls.language)(**kwargs)
+                out = get_compatible_tool(toolname, tooltype, cls.language,
+                                          default=default)
+                if isinstance(out, type):
+                    out = out(**kwargs)
+                else:
+                    return out
             else:
                 out_tool = cls.get_tool('compiler', toolname=toolname, default=None)
                 if out_tool is None:  # pragma: debug
