@@ -81,6 +81,8 @@ def new_comm(name, comm=None, use_async=False, **kwargs):
         commtype = kwargs.pop('commtype', 'default')
         assert(commtype == 'default')
     comm_cls = import_component('comm', comm)
+    if kwargs.get('is_interface', False):
+        use_async = False
     if use_async:
         kwargs['is_async'] = True
     out = comm_cls.new_comm(name, **kwargs)

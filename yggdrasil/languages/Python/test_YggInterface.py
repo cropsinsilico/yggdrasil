@@ -213,14 +213,15 @@ class TestBase(YggTestClassInfo):
         self.iodriver.start()
         self.iodriver.wait_for_loop()
         # Test comm
-        if self.direction == 'input':
-            kws = self.iodriver.icomm.opp_comm_kwargs()
-            kws.update(self.test_comm_kwargs)
-            self.test_comm = get_comm('in', **kws)
-        elif self.direction == 'output':
-            kws = self.iodriver.ocomm.opp_comm_kwargs()
-            kws.update(self.test_comm_kwargs)
-            self.test_comm = get_comm('out', **kws)
+        if not self.is_file:
+            if self.direction == 'input':
+                kws = self.iodriver.icomm.opp_comm_kwargs()
+                kws.update(self.test_comm_kwargs)
+                self.test_comm = get_comm('in', **kws)
+            elif self.direction == 'output':
+                kws = self.iodriver.ocomm.opp_comm_kwargs()
+                kws.update(self.test_comm_kwargs)
+                self.test_comm = get_comm('out', **kws)
         # Test class
         super(TestBase, self).setup(nprev_comm=nprev_comm,
                                     nprev_thread=nprev_thread,

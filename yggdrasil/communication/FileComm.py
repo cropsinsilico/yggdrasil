@@ -305,15 +305,18 @@ class FileComm(CommBase.CommBase):
     @property
     def file_size(self):
         r"""int: Current size of file."""
-        prev_pos = self.file_tell()
-        self.file_seek(0, os.SEEK_END)
-        out = self.file_tell() - prev_pos
-        self.file_seek(prev_pos)
+        with self._closing_thread.lock:
+            prev_pos = self.file_tell()
+            self.file_seek(0, os.SEEK_END)
+            out = self.file_tell() - prev_pos
+            self.file_seek(0, 0)
+            self.file_seek(prev_pos)
         return out
 
     def file_tell(self):
         r"""int: Current position in the file."""
-        return self.fd.tell()
+        with self._closing_thread.lock:
+            return self.fd.tell()
 
     def file_seek(self, pos, whence=os.SEEK_SET):
         r"""Move in the file to the specified position.
@@ -326,11 +329,13 @@ class FileComm(CommBase.CommBase):
                 file.
 
         """
-        self.fd.seek(pos, whence)
+        with self._closing_thread.lock:
+            self.fd.seek(pos, whence)
 
     def file_flush(self):
         r"""Flush the file."""
-        self.fd.flush()
+        with self._closing_thread.lock:
+            self.fd.flush()
 
     def record_position(self):
         r"""Record the current position in the file/series."""
@@ -541,24 +546,25 @@ class FileComm(CommBase.CommBase):
         out = 0
         if self.is_closed or self.direction == 'send':
             return out
-        pos = self.record_position()
-        try:
-            curpos = self.file_tell()
-            self.file_seek(0, os.SEEK_END)
-            endpos = self.file_tell()
-            out = endpos - curpos
-        except (ValueError, AttributeError, OSError):  # pragma: debug
-            if self.is_open:
-                raise
-        if self.is_series:
-            i = self._series_index + 1
-            while True:
-                fname = self.get_series_address(i)
-                if not os.path.isfile(fname):
-                    break
-                out += os.path.getsize(fname)
-                i += 1
-        self.change_position(*pos)
+        with self._closing_thread.lock:
+            pos = self.record_position()
+            try:
+                curpos = self.file_tell()
+                self.file_seek(0, os.SEEK_END)
+                endpos = self.file_tell()
+                out = endpos - curpos
+            except (ValueError, AttributeError, OSError):  # pragma: debug
+                if self.is_open:
+                    raise
+            if self.is_series:
+                i = self._series_index + 1
+                while True:
+                    fname = self.get_series_address(i)
+                    if not os.path.isfile(fname):
+                        break
+                    out += os.path.getsize(fname)
+                    i += 1
+            self.change_position(*pos)
         return out
 
     @property
