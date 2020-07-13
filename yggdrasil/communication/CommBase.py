@@ -1881,6 +1881,7 @@ class CommBase(tools.YggClass):
             msg = msg_
         if not second_pass:
             self._last_header = header
+            self._last_header["comm"] = self.comm_class
         if (((not self.is_empty(s_msg, self.empty_bytes_msg))
              and (not header.get('incomplete', False)))):
             # if not self._used:
