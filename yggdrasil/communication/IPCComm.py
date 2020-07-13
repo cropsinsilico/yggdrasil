@@ -313,9 +313,6 @@ class IPCComm(CommBase.CommBase):
             bool: Success or failure of sending the message.
 
         """
-        if not self.is_open:  # pragma: debug
-            self.error("Queue closed")
-            return False
         try:
             self.q.send(payload, block=False)
         except sysv_ipc.BusyError:  # pragma: debug

@@ -284,7 +284,7 @@ class AsyncComm(ProxyObject, ComponentBaseUnregistered):
                 self._used_direct = True
             else:
                 async_flag = FLAG_FAILURE
-        except TemporaryCommunicationError:  # pragma: debug
+        except TemporaryCommunicationError:
             async_flag = FLAG_TRYAGAIN
         self.suppress_special_debug = False
         return async_flag
@@ -309,7 +309,7 @@ class AsyncComm(ProxyObject, ComponentBaseUnregistered):
                     async_flag = FLAG_SUCCESS
                 else:
                     async_flag = FLAG_FAILURE
-        except TemporaryCommunicationError:  # pragma: debug
+        except TemporaryCommunicationError:
             async_flag = FLAG_TRYAGAIN
         self.suppress_special_debug = False
         return async_flag, data
@@ -361,6 +361,19 @@ class AsyncComm(ProxyObject, ComponentBaseUnregistered):
         self.add_backlog((args, kwargs))
         self._used = True
         return True
+
+    def send_eof(self, *args, **kwargs):
+        r"""Send the EOF message as a short message.
+        
+        Args:
+            *args: All arguments are passed to comm send.
+            **kwargs: All keywords arguments are passed to comm send.
+
+        Returns:
+            bool: Success or failure of send.
+
+        """
+        return self.send(self.eof_msg, *args, **kwargs)
 
     def recv(self, timeout=None, **kwargs):
         r"""Receive a message.

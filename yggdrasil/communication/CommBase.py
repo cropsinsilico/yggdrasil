@@ -20,6 +20,10 @@ _registered_servers = multitasking.LockedDict(task_method='thread')
 _registered_comms = multitasking.LockedDict(task_method='thread')
 
 
+class NeverMatch(Exception):
+    'An exception class that is never raised by any code anywhere'
+
+
 def is_registered(comm_class, key):
     r"""Determine if a comm object has been registered under the specified key.
     
@@ -994,9 +998,11 @@ class CommBase(tools.YggClass):
 
     def atexit(self):  # pragma: debug
         r"""Close operations."""
-        self.debug('atexit begins')
+        self.debug('atexit begins (n_msg=%d)', self.n_msg)
         self.language_atexit()
         self.debug('atexit after language_atexit, but before close')
+        if self.direction == 'send':
+            self.linger()
         self.close()
         self.debug(
             'atexit finished: closed=%s, n_msg=%d, close_alive=%s',
@@ -1485,6 +1491,7 @@ class CommBase(tools.YggClass):
             self.suppress_special_debug = True
         Tout = self.start_timeout(timeout, key_suffix='._safe_send')
         out = False
+        error = None
         while (not Tout.is_out):
             try:
                 with self._closing_thread.lock:
@@ -1497,9 +1504,12 @@ class CommBase(tools.YggClass):
                         out = False
                         break
             except TemporaryCommunicationError as e:
+                error = e
                 self.special_debug("TemporaryCommunicationError: %s" % e)
             self.sleep()
         self.stop_timeout(key_suffix='._safe_send')
+        if error and self.is_async:
+            raise TemporaryCommunicationError(error)
         if send_1st:
             self.suppress_special_debug = False
         if out:
@@ -1686,6 +1696,8 @@ class CommBase(tools.YggClass):
                 self.exception('Failed to send: %.100s.', str(args))
             except ValueError:  # pragma: debug
                 self.exception('Failed to send (unyt array in message)')
+        except TemporaryCommunicationError if self.is_async else NeverMatch:
+            raise
         except BaseException:
             # Handle error caused by calling repr on unyt array that isn't float64
             try:
@@ -1767,6 +1779,7 @@ class CommBase(tools.YggClass):
             timeout = self.recv_timeout
         Tout = self.start_timeout(timeout, key_suffix='._safe_recv')
         out = (True, self.empty_bytes_msg)
+        error = None
         while (not Tout.is_out):
             try:
                 with self._closing_thread.lock:
@@ -1777,10 +1790,13 @@ class CommBase(tools.YggClass):
                         out = (False, self.empty_bytes_msg)
                     break
             except TemporaryCommunicationError as e:
+                error = e
                 self.periodic_debug("_safe_recv", period=1000)(
                     "TemporaryCommunicationError: %s" % e)
             self.sleep()
         self.stop_timeout(key_suffix='._safe_recv')
+        if error and self.is_async:
+            raise TemporaryCommunicationError(error)
         if out[0] and (not self.is_empty(out[1], self.empty_bytes_msg)):
             self._n_recv += 1
             self._last_recv = time.perf_counter()
@@ -1917,6 +1933,8 @@ class CommBase(tools.YggClass):
                 self.debug('Linger close on single use')
                 self.linger_close(active_confirm=self.is_async)
             return self.language_driver.python2language((flag, msg))
+        except TemporaryCommunicationError if self.is_async else NeverMatch:
+            raise
         except BaseException:
             self.exception('Failed to recv.')
             self.close()
