@@ -256,6 +256,12 @@ class IPCComm(CommBase.CommBase):
         self._bound = False
         super(IPCComm, self)._close(linger=linger)
 
+    def atexit(self):  # pragma: debug
+        r"""Close operations."""
+        if self.direction == 'send':
+            self.linger()
+        super(IPCComm, self).atexit()
+        
     @property
     def is_open(self):
         r"""bool: True if the queue is not None."""
