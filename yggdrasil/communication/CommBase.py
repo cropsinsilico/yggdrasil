@@ -1001,8 +1001,6 @@ class CommBase(tools.YggClass):
         self.debug('atexit begins (n_msg=%d)', self.n_msg)
         self.language_atexit()
         self.debug('atexit after language_atexit, but before close')
-        if self.direction == 'send':
-            self.linger()
         self.close()
         self.debug(
             'atexit finished: closed=%s, n_msg=%d, close_alive=%s',

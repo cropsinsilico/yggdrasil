@@ -1,4 +1,5 @@
 import uuid
+import atexit
 from yggdrasil import multitasking
 from yggdrasil.tools import ProxyObject
 from yggdrasil.components import ComponentBaseUnregistered
@@ -45,6 +46,8 @@ class AsyncComm(ProxyObject, ComponentBaseUnregistered):
         # Open backlog to match
         if self._wrapped.is_open:
             self.open()
+        if self._wrapped.is_interface:
+            atexit.register(self.atexit)
 
     def __reduce__(self):
         rv = list(super(AsyncComm, self).__reduce__())
@@ -81,6 +84,11 @@ class AsyncComm(ProxyObject, ComponentBaseUnregistered):
                 self._backlog_thread = CommBase.CommTaskLoop(
                     self, target=self.run_backlog_recv, suffix='RecvBacklog')
         return self._backlog_thread
+
+    def atexit(self):
+        r"""Close operations."""
+        if (self.direction == 'send') and self.is_open_backlog:
+            self.linger()
 
     def open(self):
         r"""Open the connection by connecting to the queue."""
