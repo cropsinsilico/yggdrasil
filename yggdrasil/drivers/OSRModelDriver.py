@@ -7,6 +7,7 @@ import pystache
 import io as sio
 import xml.etree.ElementTree as ET
 from yggdrasil import tools, platform
+from yggdrasil.components import import_component
 from yggdrasil.drivers.ExecutableModelDriver import ExecutableModelDriver
 
 
@@ -87,6 +88,9 @@ class OSRModelDriver(ExecutableModelDriver):
     @classmethod
     def compile_osr(cls):
         r"""Compile the OpenSimRoot executable with the yggdrasil flag set."""
+        for x in cls.base_languages:
+            base_cls = import_component('model', x)
+            base_cls.compile_dependencies()
         cwd = os.path.join(cls.repository, 'OpenSimRoot')
         if platform._is_win:  # pragma: windows
             cwd = os.path.join(cwd, 'StaticBuild_win64')
