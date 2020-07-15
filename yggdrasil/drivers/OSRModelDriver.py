@@ -56,11 +56,11 @@ class OSRModelDriver(ExecutableModelDriver):
             if platform._is_win:  # pragma: windows
                 cls.executable_path = os.path.join(
                     cls.repository, 'OpenSimRoot',
-                    'StaticBuild_win64', 'OpenSimRoot') + '.exe'
+                    'StaticBuild_win64', 'OpenSimRootYgg') + '.exe'
             else:
                 cls.executable_path = os.path.join(
                     cls.repository, 'OpenSimRoot',
-                    'StaticBuild', 'OpenSimRoot')
+                    'StaticBuild', 'OpenSimRootYgg')
         
     def parse_arguments(self, *args, **kwargs):
         r"""Sort model arguments to determine which one is the executable
@@ -79,10 +79,10 @@ class OSRModelDriver(ExecutableModelDriver):
             self.model_file = os.path.join(
                 self.repository, 'OpenSimRoot', 'InputFiles',
                 os.path.basename(self.model_file))
-        if not (isinstance(self.executable_path, str)
-                and os.path.isfile(self.executable_path)):
-            self.compile_osr()
-            assert(os.path.isfile(self.executable_path))
+        # if not (isinstance(self.executable_path, str)
+        #         and os.path.isfile(self.executable_path)):
+        self.compile_osr()
+        assert(os.path.isfile(self.executable_path))
 
     @classmethod
     def compile_osr(cls):
@@ -90,10 +90,9 @@ class OSRModelDriver(ExecutableModelDriver):
         cwd = os.path.join(cls.repository, 'OpenSimRoot')
         if platform._is_win:  # pragma: windows
             cwd = os.path.join(cwd, 'StaticBuild_win64')
-            cmd = ['make', 'all', '-j4']
         else:
             cwd = os.path.join(cwd, 'StaticBuild')
-            cmd = ['make', 'all', '-j4']
+        cmd = ['make', 'OpenSimRootYgg', '-j4']
         subprocess.check_call(cmd, cwd=cwd)
 
     def write_wrappers(self, **kwargs):
@@ -148,7 +147,7 @@ class OSRModelDriver(ExecutableModelDriver):
                 ocask = ET.Element('SimulaCaskOutputs')
                 ocask.text = ovars
                 cask.insert(-1, ocask)
-            root.insert(0, cask)
+            root.append(cask)
         tree = ET.ElementTree(root)
         tree.write(dst)
         return dst

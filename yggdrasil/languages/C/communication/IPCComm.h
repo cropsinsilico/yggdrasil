@@ -2,6 +2,11 @@
 #ifndef YGGIPCCOMM_H_
 #define YGGIPCCOMM_H_
 
+// OpenSimRoot has a conflicting definition for 'msg'
+#ifdef USE_OSR_YGG
+#undef IPCINSTALLED
+#endif
+
 #ifdef IPCINSTALLED
 #include <fcntl.h>           /* For O_* constants */
 #include <sys/stat.h>        /* For mode constants */
