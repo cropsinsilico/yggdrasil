@@ -225,8 +225,16 @@ def cc_flags():
         list: The necessary compiler flags and preprocessor definitions.
 
     """
-    from yggdrasil.drivers import CModelDriver
-    print(' '.join(CModelDriver.CModelDriver.get_compiler_flags(for_model=True)))
+    parser = argparse.ArgumentParser(
+        description='Get the compilation flags necessary for a C/C++ program.')
+    parser.add_argument('--cpp', action='store_true',
+                        help='Get compilation flags for a C++ program.')
+    args = parser.parse_args()
+    if args.cpp:
+        from yggdrasil.drivers.CPPModelDriver import CPPModelDriver as driver
+    else:
+        from yggdrasil.drivers.CModelDriver import CModelDriver as driver
+    print(' '.join(driver.get_compiler_flags(for_model=True)))
 
 
 def ld_flags():
@@ -237,8 +245,16 @@ def ld_flags():
         list: The necessary library linking flags.
 
     """
-    from yggdrasil.drivers import CModelDriver
-    print(' '.join(CModelDriver.CModelDriver.get_linker_flags(for_model=True)))
+    parser = argparse.ArgumentParser(
+        description='Get the linker flags necessary for a C/C++ program.')
+    parser.add_argument('--cpp', action='store_true',
+                        help='Get linker flags for a C++ program.')
+    args = parser.parse_args()
+    if args.cpp:
+        from yggdrasil.drivers.CPPModelDriver import CPPModelDriver as driver
+    else:
+        from yggdrasil.drivers.CModelDriver import CModelDriver as driver
+    print(' '.join(driver.get_linker_flags(for_model=True)))
 
 
 def rebuild_c_api():
