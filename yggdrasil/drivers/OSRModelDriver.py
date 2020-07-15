@@ -42,7 +42,7 @@ class OSRModelDriver(ExecutableModelDriver):
     repository = None
     executable_path = None
     repository_url = "https://gitlab.com/langmm/OpenSimRoot.git"
-    repository_branch = "volatile"
+    repository_branch = "volatile_active"
     _config_keys = ['repository']
     _config_attr_map = [{'attr': 'repository',
                          'key': 'repository'}]
