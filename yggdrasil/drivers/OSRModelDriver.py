@@ -139,8 +139,14 @@ class OSRModelDriver(ExecutableModelDriver):
         if not isinstance(timesync, list):
             timesync = [timesync]
         for tsync in reversed(timesync):
-            ivars = ' '.join(tsync.get('inputs', []))
-            ovars = ' '.join(tsync.get('outputs', []))
+            ivars = tsync.get('inputs', [])
+            ovars = tsync.get('outputs', [])
+            if not isinstance(ivars, list):
+                ivars = [ivars]
+            if not isinstance(ovars, list):
+                ovars = [ovars]
+            ivars = ' '.join(ivars)
+            ovars = ' '.join(ovars)
             cask = ET.Element('SimulaCask',
                               attrib={'name': tsync['name']})
             if ivars:
@@ -205,14 +211,12 @@ class OSRModelDriver(ExecutableModelDriver):
         return out
         
     @classmethod
-    def set_env_class(cls, existing=None, **kwargs):
+    def set_env_class(cls, **kwargs):
         r"""Set environment variables that are instance independent.
 
         Args:
-            existing (dict, optional): Existing dictionary of environment
-                variables that new variables should be added to. Defaults
-                to a copy of os.environ.
-            **kwargs: Additional keyword arguments are ignored.
+            **kwargs: Additional keyword arguments are passed to the
+                parent class's method.
 
         Returns:
             dict: Environment variables for the model process.
