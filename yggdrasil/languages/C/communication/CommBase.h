@@ -45,6 +45,7 @@ typedef struct comm_t {
 } comm_t;
 
 
+static inline
 void display_other(comm_t *x) {
   if (x->other != NULL) {
     comm_t* other = (comm_t*)(x->other);
