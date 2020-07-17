@@ -392,9 +392,7 @@ comm_t* yggTimesync(const char *name, const char *t_units) {
   dtypes_out[0] = create_dtype_scalar("float", 64, t_units, false);
   dtypes_out[1] = create_dtype_json_object(0, NULL, NULL, true);
   dtype_t* dtype_out = create_dtype_json_array(2, dtypes_out, false);
-  dtype_t* dtypes_in[1];
-  dtypes_in[0] = create_dtype_json_object(0, NULL, NULL, true);
-  dtype_t* dtype_in = create_dtype_json_array(1, dtypes_in, false);
+  dtype_t* dtype_in = create_dtype_json_object(0, NULL, NULL, true);
   comm_t* out = init_comm(name, "%s", CLIENT_COMM, dtype_in);
   comm_t* handle = (comm_t*)(out->handle);
   destroy_dtype(&(handle->datatype));

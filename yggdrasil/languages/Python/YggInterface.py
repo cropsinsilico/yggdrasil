@@ -159,6 +159,24 @@ def YggRpcClient(name, outfmt='%s', infmt='%s'):
                         response_kwargs=icomm_kwargs,
                         recv_timeout=False, **ocomm_kwargs)
     return out
+
+
+def YggTimesyncServer(name='timesync'):
+    r"""Get class for handling timestep synchronization requests on
+    the driver side.
+
+    Args:
+        name (str, optional): The name of the server queues. Defaults
+            to 'timesync'.
+
+    Returns:
+        :class:.ServerComm: Communication object.
+        
+    """
+    from yggdrasil.communication import ServerComm
+    out = InterfaceComm(name, comm_class=ServerComm.ServerComm,
+                        recv_timeout=False)
+    return out
     
 
 def YggTimesync(name='timesync'):

@@ -28,6 +28,7 @@ def get_ureg():
         unyt._unit_lookup_table.inv_name_alternatives["acre"] = "ac"
         unyt._unit_lookup_table.inv_name_alternatives["are"] = "a"
         unyt._unit_lookup_table.inv_name_alternatives["hectare"] = "ha"
+        unyt._unit_lookup_table.inv_name_alternatives["days"] = "day"
     return _ureg_unyt
 
 
@@ -105,12 +106,30 @@ def convert_R_unit_string(r_str):
         str: Converted string.
 
     """
+    return convert_unit_string(r_str)
+
+
+def convert_unit_string(orig_str, replacements=None):
+    r"""Convert unit string to string that the Python package can
+    understand.
+
+    Args:
+        orig_str (str): Original units string to convert.
+        replacements (dict, optional): Mapping from unit to another.
+            Defaults to empty dict.
+
+    Returns:
+        str: Converted string.
+
+    """
     out = []
-    replacements = {'h': 'hr'}
+    if replacements is None:
+        replacements = {'h': 'hr',
+                        'days': 'day'}
     regex_mu = [tools.bytes2str(b'\xc2\xb5'),
                 tools.bytes2str(b'\xce\xbcs')]
     regex = r'(?P<name>[A-Za-z%s]+)(?P<exp>-?[0-9]*)(?: |$)' % ''.join(regex_mu)
-    for x in re.finditer(regex, r_str):
+    for x in re.finditer(regex, orig_str):
         xdict = x.groupdict()
         if xdict['name'] in replacements:
             xdict['name'] = replacements[xdict['name']]
@@ -118,7 +137,11 @@ def convert_R_unit_string(r_str):
             out.append('({name}**{exp})'.format(**xdict))
         else:
             out.append(xdict['name'])
-    return '*'.join(out)
+    if out:
+        out = '*'.join(out)
+    else:
+        out = orig_str
+    return out
 
 
 def has_units(obj):
@@ -191,6 +214,7 @@ def add_units(arr, unit_str, dtype=None):
     unit_str = tools.bytes2str(unit_str)
     if is_null_unit(unit_str):
         return arr
+    unit_str = convert_unit_string(unit_str)
     if has_units(arr):
         return convert_to(arr, unit_str)
     if dtype is None:

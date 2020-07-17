@@ -148,10 +148,10 @@ class TimeSyncModelDriver(DSLModelDriver):
     def model_wrapper(cls, name, synonyms, interpolation,
                       aggregation, additional_variables, env=None):
         r"""Model wrapper."""
-        from yggdrasil.languages.Python.YggInterface import YggRpcServer
+        from yggdrasil.languages.Python.YggInterface import YggTimesyncServer
         if env is not None:
             os.environ.update(env)
-        rpc = YggRpcServer(name)
+        rpc = YggTimesyncServer(name)
         threads = {}
         times = []
         tables = {}
