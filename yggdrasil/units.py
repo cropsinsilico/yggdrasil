@@ -47,6 +47,7 @@ def convert_to_pandas_timedelta(x):
     t_unit = get_units(x)
     unit_map = {'ns': 'ns',
                 (tools.bytes2str(b'\xc2\xb5') + 's'): 'us',
+                (tools.bytes2str(b'\xce\xbcs') + 's'): 'us',
                 'ms': 'ms',
                 's': 's',
                 'min': 'm',
@@ -82,8 +83,9 @@ def convert_matlab_unit_string(m_str):  # pragma: matlab
     """
     out = m_str
     replacements = {'h': 'hr'}
-    regex_mu = tools.bytes2str(b'\xc2\xb5')
-    regex = r'(?P<name>[A-Za-z%s]+)' % regex_mu
+    regex_mu = [tools.bytes2str(b'\xc2\xb5'),
+                tools.bytes2str(b'\xce\xbcs')]
+    regex = r'(?P<name>[A-Za-z%s]+)' % ''.join(regex_mu)
     for x in re.finditer(regex, m_str):
         xdict = x.groupdict()
         if xdict['name'] in replacements:
@@ -105,8 +107,9 @@ def convert_R_unit_string(r_str):
     """
     out = []
     replacements = {'h': 'hr'}
-    regex_mu = tools.bytes2str(b'\xc2\xb5')
-    regex = r'(?P<name>[A-Za-z%s]+)(?P<exp>-?[0-9]*)(?: |$)' % regex_mu
+    regex_mu = [tools.bytes2str(b'\xc2\xb5'),
+                tools.bytes2str(b'\xce\xbcs')]
+    regex = r'(?P<name>[A-Za-z%s]+)(?P<exp>-?[0-9]*)(?: |$)' % ''.join(regex_mu)
     for x in re.finditer(regex, r_str):
         xdict = x.groupdict()
         if xdict['name'] in replacements:

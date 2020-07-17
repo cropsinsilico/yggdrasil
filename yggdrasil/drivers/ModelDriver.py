@@ -11,7 +11,7 @@ import tempfile
 from collections import OrderedDict
 from pprint import pformat
 from yggdrasil import platform, tools, languages, multitasking
-from yggdrasil.components import import_component
+from yggdrasil.components import import_component, import_all_components
 from yggdrasil.drivers.Driver import Driver
 from yggdrasil.metaschema.datatypes import is_default_typedef
 from yggdrasil.metaschema.properties.ScalarMetaschemaProperties import (
@@ -44,6 +44,7 @@ def remove_product(product, check_for_source=False, **kwargs):
         RuntimeError: If the product cannot be removed.
 
     """
+    import_all_components('model')
     source_keys = list(_map_language_ext.keys())
     if '.exe' in source_keys:  # pragma: windows
         source_keys.remove('.exe')
@@ -358,8 +359,6 @@ class ModelDriver(Driver):
     is_typed = False
     types_in_funcdef = True
     interface_inside_exec = False
-    import_after_exec = False
-    declare_functions_as_var = False
     dont_declare_channel = False
     is_dsl = False
     brackets = None
@@ -868,7 +867,7 @@ class ModelDriver(Driver):
         out = False
         if cls.language is not None:
             try:
-                out = (tools.which(cls.language_executable()) is not None)
+                out = (shutil.which(cls.language_executable()) is not None)
             except NotImplementedError:  # pragma: debug
                 out = False
         return out
@@ -1112,7 +1111,7 @@ class ModelDriver(Driver):
             dict: Environment variables for the model process.
 
         """
-        if existing is None:
+        if existing is None:  # pragma: no cover
             existing = {}
         existing.update(os.environ)
         return existing
@@ -1793,17 +1792,6 @@ class ModelDriver(Driver):
                     lines += cls.write_declaration(
                         v, definitions=definitions,
                         requires_freeing=free_vars)
-            if cls.declare_functions_as_var:
-                model_var = None
-                if model_flag:
-                    model_var = dict(model_flag, name=model_function)
-                elif not outputs_in_inputs:
-                    assert(len(outputs) == 1)
-                    model_var = dict(outputs[0], name=model_function)
-                if model_var:
-                    lines += cls.write_declaration(
-                        model_var, definitions=definitions,
-                        requires_freeing=free_vars, dont_define=True)
             lines += definitions
         lines.append(cls.format_function_param(
             'assign', name=flag_var['name'],
@@ -2651,10 +2639,10 @@ checking if the model flag indicates
                            'print', message=closing_msg))
         # This is not currently used by the tests, but may be
         # needed in the future
-        # assert(not free_vars)
-        for x in free_vars:
-            out += [cls.function_param['indent'] + line
-                    for line in cls.write_free(x)]
+        assert(not free_vars)
+        # for x in free_vars:
+        #     out += [cls.function_param['indent'] + line
+        #             for line in cls.write_free(x)]
         if output_var and ('return' in cls.function_param):
             out.append(cls.function_param['indent']
                        + cls.format_function_param(
@@ -2739,12 +2727,14 @@ checking if the model flag indicates
             list: Lines required to complete the import.
  
         """
-        if ('filename' not in kwargs) and ('import_nofile' in cls.function_param):
-            key = 'import_nofile'
-        else:
-            key = 'import'
-        out = [cls.format_function_param(key, **kwargs)]
-        return out
+        # This code is currently unused, but may be needed in the
+        # future to import a dependency directly
+        # if ('filename' not in kwargs) and ('import_nofile' in cls.function_param):
+        #     key = 'import_nofile'
+        # else:
+        #     key = 'import'
+        # return [cls.format_function_param(key, **kwargs)]
+        return [cls.format_function_param('import', **kwargs)]
 
     @classmethod
     def write_executable(cls, lines, prefix=None, suffix=None,
@@ -2782,14 +2772,9 @@ checking if the model flag indicates
             import_lines = []
             for kws in imports:
                 import_lines += cls.write_executable_import(**kws)
-            if cls.import_after_exec:
-                if suffix is None:
-                    suffix = []
-                suffix += import_lines
-            else:
-                if prefix is None:
-                    prefix = []
-                prefix += import_lines
+            if prefix is None:
+                prefix = []
+            prefix += import_lines
         # Add standard & user defined prefixes
         if ((('exec_prefix' in cls.function_param)
              and (cls.function_param['exec_prefix'] not in lines))):
@@ -2897,7 +2882,7 @@ checking if the model flag indicates
             isplit = length_allow
         else:
             isplit = line[:length_allow].rindex(' ') + 1
-        if isplit < nindent + 1:
+        if (isplit < nindent + 1) or (isplit >= len(line)):
             out = [line]
         else:
             out.append(line[:isplit] + cls.function_param.get(

@@ -23,7 +23,7 @@ _c_internal_libs = copy.deepcopy(CModelDriver.CModelDriver.internal_libraries)
 class FortranCompilerBase(CompilerBase):
     r"""Base class for Fortran compilers."""
     languages = ['fortran']
-    default_executable_env = 'FF'
+    default_executable_env = 'FC'
     default_flags_env = 'FFLAGS'
     default_flags = ['-g', '-Wall', '-cpp', '-pedantic-errors']
     linker_attributes = {'default_flags_env': 'LFLAGS',
@@ -52,7 +52,7 @@ class FortranCompilerBase(CompilerBase):
             kwargs.setdefault('module-search-path', _top_lang_dir)
         kwargs.setdefault('include_dirs', cls.get_search_path())
         out = super(FortranCompilerBase, cls).get_flags(**kwargs)
-        for x in ['-O', '-O2', '-O3', 'Os', 'Ofast']:
+        for x in ['-O', '-O2', '-O3', 'Os', 'Ofast']:  # pragma: debug
             if x in out:
                 out.remove(x)
         return out
@@ -354,8 +354,6 @@ class FortranModelDriver(CompiledModelDriver):
     is_typed = True
     types_in_funcdef = False
     interface_inside_exec = True
-    import_after_exec = False
-    declare_functions_as_var = False
     zero_based = False
     max_line_width = 72
     
@@ -469,7 +467,7 @@ class FortranModelDriver(CompiledModelDriver):
         type_match = re.search(cls.function_param['type_regex'], out)
         if type_match:
             type_match = type_match.groupdict()
-            if type_match.get('shape_var', None):
+            if type_match.get('shape_var', None):  # pragma: debug
                 if ('pointer' not in out) and ('allocatable' not in out):
                     out += ', allocatable'
                 if type_match['shape_var'][0] == '*':
@@ -487,9 +485,9 @@ class FortranModelDriver(CompiledModelDriver):
             return out
         from yggdrasil.metaschema.datatypes import get_type_class
         json_type = kwargs.get('datatype', kwargs.get('type', 'bytes'))
-        if isinstance(json_type, str):
+        if isinstance(json_type, str):  # pragma: no cover
             json_type = {'type': json_type}
-        if 'type' in kwargs:
+        if 'type' in kwargs:  # pragma: no cover
             json_type.update(kwargs)
         assert(isinstance(json_type, dict))
         json_type = get_type_class(json_type['type']).normalize_definition(
@@ -508,8 +506,9 @@ class FortranModelDriver(CompiledModelDriver):
             out = cls.get_native_type(datatype=json_subtype) + dim_str
             if not dim_str:
                 json_subtype['type'] = out.split('(')[0]
-                if json_subtype['type'] == 'character':
+                if json_subtype['type'] == 'character':  # pragma: debug
                     json_subtype['precision'] = ''
+                    raise RuntimeError("Character array requires precision.")
                 else:
                     json_subtype['precision'] = int(json_subtype['precision'] / 8)
                 json_subtype.setdefault('ndim', 'n')
@@ -682,10 +681,11 @@ class FortranModelDriver(CompiledModelDriver):
         if for_yggdrasil:
             new_vars_list = []
             for v in vars_list:
-                if isinstance(v, dict):
-                    v = dict(v, name=('yggarg(%s)' % v['name']))
-                else:
-                    v = 'yggarg(%s)' % v
+                assert(isinstance(v, dict))
+                # if isinstance(v, dict):
+                v = dict(v, name=('yggarg(%s)' % v['name']))
+                # else:
+                #     v = 'yggarg(%s)' % v
                 new_vars_list.append(v)
         out = super(FortranModelDriver, cls).prepare_variables(
             new_vars_list, for_yggdrasil=for_yggdrasil, **kwargs)
@@ -748,17 +748,17 @@ class FortranModelDriver(CompiledModelDriver):
                 imports = [imports]
             for kws in imports:
                 if ('filename' in kws) and os.path.isfile(kws['filename']):
-                    with open(kws['filename'], 'r') as fd:
-                        contents = fd.read()
-                    regex_module = (r'(?i)\s*module\s+(?P<module>.*?)'
-                                    r'(?:.*?\n)*?'
-                                    r'\s*end\s+module\s+(?P=module)')
-                    match_module = re.search(regex_module, contents)
-                    if match_module:
-                        module = match_module.groupdict('module')
-                    else:
-                        module = '%s_module' % kws['function']
-                        kws['module'] = module
+                    # with open(kws['filename'], 'r') as fd:
+                    #     contents = fd.read()
+                    # regex_module = (r'(?i)\s*module\s+(?P<module>.*?)'
+                    #                 r'(?:.*?\n)*?'
+                    #                 r'\s*end\s+module\s+(?P=module)')
+                    # match_module = re.search(regex_module, contents)
+                    # if match_module:
+                    #     module = match_module.groupdict('module')
+                    # else:
+                    module = '%s_module' % kws['function']
+                    kws['module'] = module
                     lines.insert(last_use + 1, 'use %s' % module)
                     last_use += 1
         if 'implicit none' not in lines:

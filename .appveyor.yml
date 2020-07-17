@@ -35,6 +35,7 @@ environment:
     BUILDDOCS: 0
     YGG_CONDA: 1
     YGG_TEST_FLAGS:
+    YGG_SECOND_TEST:
 
   erlang_download_url: "http://erlang.org/download/otp_win64_20.2.exe"
   erlang_exe_path: "C:\\Users\\appveyor\\erlang.exe"
@@ -47,6 +48,7 @@ environment:
     - platform: x64
       PYTHON_VERSION: "3.6"
       YGG_TEST_FLAGS: "--test-suite=examples_part1"
+      YGG_SECOND_TEST: "yggtest --ci --test-suite=types --languages cpp"
     - platform: x64
       PYTHON_VERSION: "3.6"
       YGG_TEST_FLAGS: "--test-suite=examples_part2"
@@ -63,9 +65,13 @@ environment:
       INSTALLC: 0  # Acts to exclude c and cpp
     - platform: x64
       PYTHON_VERSION: "3.7"
-      YGG_TEST_FLAGS: "--test-suite=types --languages c cpp fortran"
+      YGG_TEST_FLAGS: "--test-suite=types --languages c fortran"
 
 install:
+  # Change code page to something closer to utf-8
+  - "chcp 65001"
+  - set PYTHONIOENCODING=utf-8
+  
   - "SET PATH=%PYTHON%;%PYTHON%\\Scripts;%PATH%"
   - "git submodule update --init --recursive"
 
@@ -135,6 +141,7 @@ build: false
 test_script:
   - "yggclean"
   - "yggtest --ci %YGG_TEST_FLAGS%"
+  - "%YGG_SECOND_TEST%"
 
 after_test:
   - "codecov"

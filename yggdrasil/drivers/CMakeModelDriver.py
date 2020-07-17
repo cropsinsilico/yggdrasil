@@ -4,7 +4,7 @@ import shutil
 import logging
 import sysconfig
 from collections import OrderedDict
-from yggdrasil import platform, components, tools
+from yggdrasil import platform, components
 from yggdrasil.drivers.CompiledModelDriver import (
     LinkerBase, get_compilation_tool, get_compatible_tool)
 from yggdrasil.drivers.BuildModelDriver import (
@@ -522,9 +522,11 @@ class CMakeConfigure(BuildToolBase):
                     lines.append('    ADD_LIBRARY(%s STATIC IMPORTED)' % xl)
                 lines += ['    SET_TARGET_PROPERTIES(',
                           '        %s PROPERTIES' % xl]
-                if xe.lower() == '.dll':
-                    lines.append('        IMPORTED_IMPLIB %s'
-                                 % x.replace('.dll', '.lib'))
+                # Untested on appveyor, but required when using dynamic
+                # library directly (if dll2a not used).
+                # if xe.lower() == '.dll':
+                #     lines.append('        IMPORTED_IMPLIB %s'
+                #                  % x.replace('.dll', '.lib'))
                 lines += ['        IMPORTED_LOCATION %s)' % x,
                           'endif()',
                           'TARGET_LINK_LIBRARIES(%s %s)' % (target, xl)]
@@ -923,15 +925,35 @@ class CMakeModelDriver(BuildModelDriver):
         """
         if platform._is_win and (kwargs.get('target_compiler', None)
                                  in ['gcc', 'g++', 'gfortran']):  # pragma: windows
-            if tools.which('sh.exe') is not None:
-                # TODO: Determine which generator should be used when sh.exe on path
-                kwargs.setdefault('generator', 'MSYS Makefiles')
-            elif tools.which('mingw32-make') is not None:
-                kwargs.setdefault('generator', 'MinGW Makefiles')
-            elif kwargs.get('generator', None) is None:  # pragma: debug
-                # TODO: Unclear what this would be
-                # kwargs.setdefault('generator', 'Unix Makefiles')
-                raise RuntimeError("Could not determine GNU Makefile generator.")
+            # Remove sh from path for compilation when the rtools
+            # version of sh is on the path, but the gnu compiler being
+            # used is not part of that installation.
+            gcc = get_compilation_tool('compiler',
+                                       kwargs['target_compiler'],
+                                       None)
+            if gcc:
+                path = kwargs['env']['PATH']
+                gcc_path = gcc.get_executable(full_path=True)
+                sh_path = shutil.which('sh', path=path)
+                while sh_path:
+                    for k in ['rtools', 'git']:
+                        if k in sh_path.lower():
+                            break
+                    else:  # pragma: debug
+                        break
+                    if k not in gcc_path.lower():
+                        paths = path.split(os.pathsep)
+                        paths.remove(os.path.dirname(sh_path))
+                        path = os.pathsep.join(paths)
+                    else:  # pragma: debug
+                        break
+                    sh_path = shutil.which('sh', path=path)
+                kwargs['env']['PATH'] = path
+                if not sh_path:
+                    kwargs.setdefault('generator', 'MinGW Makefiles')
+                # This is not currently tested
+                # else:
+                #     kwargs.setdefault('generator', 'MSYS Makefiles')
         out = super(CMakeModelDriver, cls).update_compiler_kwargs(**kwargs)
         if CModelDriver._osx_sysroot is not None:
             out.setdefault('definitions', [])

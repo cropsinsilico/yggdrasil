@@ -2,7 +2,8 @@ import os
 import copy
 import unittest
 import pprint
-from yggdrasil import platform, tools
+import shutil
+from yggdrasil import platform
 from yggdrasil.tests import assert_raises, scripts, check_enabled_languages
 from yggdrasil.drivers.ModelDriver import ModelDriver, remove_product
 from yggdrasil.drivers.CompiledModelDriver import CompiledModelDriver
@@ -132,12 +133,12 @@ class TestModelDriverNoInit(TestModelParam, parent.TestDriverNoInit):
         drv.wait(False)
         assert(not drv.errors)
 
-    def test_run_model(self):
+    def test_run_model(self, **kwargs):
         r"""Test running script used without debug."""
-        self.run_model_instance()
+        self.run_model_instance(**kwargs)
 
     @unittest.skipIf(platform._is_win, "No valgrind on windows")
-    @unittest.skipIf(tools.which('valgrind') is None,
+    @unittest.skipIf(shutil.which('valgrind') is None,
                      "Valgrind not installed.")
     def test_valgrind(self):
         r"""Test running with valgrind."""
@@ -154,7 +155,7 @@ class TestModelDriverNoInit(TestModelParam, parent.TestDriverNoInit):
         
     @unittest.skipIf(platform._is_win or platform._is_mac,
                      "No strace on Windows or MacOS")
-    @unittest.skipIf(tools.which('strace') is None,
+    @unittest.skipIf(shutil.which('strace') is None,
                      "strace not installed.")
     def test_strace(self):
         r"""Test running with strace."""
@@ -275,7 +276,7 @@ class TestModelDriverNoInit(TestModelParam, parent.TestDriverNoInit):
                                 declare_functions_as_var=None, **kwargs):
         r"""Test writing and running a function definition."""
         if declare_functions_as_var is None:
-            declare_functions_as_var = self.import_cls.declare_functions_as_var
+            declare_functions_as_var = False
         if self.import_cls.function_param is None:
             self.assert_raises(NotImplementedError,
                                self.import_cls.write_function_def, None)
@@ -445,6 +446,19 @@ class TestModelDriverNoInit(TestModelParam, parent.TestDriverNoInit):
     def test_cleanup_dependencies(self):
         r"""Test cleanup_dependencies method."""
         self.import_cls.cleanup_dependencies()
+
+    def test_split_line(self, vals=None):
+        r"""Test split_line."""
+        if self.import_cls.function_param is None:
+            return
+        if vals is None:
+            vals = [('abcdef', {'length': 3, 'force_split': True},
+                     ['abc', 'def']),
+                    ('    abc', {'length': 3, 'force_split': True},
+                     ['    abc'])]
+        for line, kwargs, splits in vals:
+            self.assert_equal(
+                self.import_cls.split_line(line, **kwargs), splits)
     
 
 class TestModelDriverNoStart(TestModelParam, parent.TestDriverNoStart):

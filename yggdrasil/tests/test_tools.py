@@ -1,5 +1,4 @@
 import os
-import sys
 import tempfile
 from yggdrasil import tools, platform
 from yggdrasil.tests import YggTestClass, assert_equal, assert_warns
@@ -90,16 +89,6 @@ def test_is_comm_installed():
     assert(tools.is_comm_installed('zmq', language='any'))
 
 
-def test_which():
-    r"""Test location of executable."""
-    assert(tools.which(sys.executable) is not None)
-    if platform._is_win:  # pragma: windows
-        assert(tools.which('python.exe') is not None)
-    else:
-        assert(tools.which('python') is not None)
-    assert(tools.which('invalid') is None)
-
-
 def test_locate_file():
     r"""Test file location method."""
     # Missing file
@@ -107,7 +96,7 @@ def test_locate_file():
     assert(not tools.locate_file(['missing_file.fake']))
     # Single file
     sdir, spat, sans = make_temp_single()
-    sout = tools.locate_file(spat)
+    sout = tools.locate_file(spat, verification_func=os.path.isfile)
     assert(isinstance(sout, (bytes, str)))
     assert_equal(sout, sans[0])
     # Multiple files

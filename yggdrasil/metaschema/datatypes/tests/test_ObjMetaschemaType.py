@@ -97,6 +97,10 @@ class TestObjDict(parent.TestPlyDict):
         r"""Test conversion to/from PlantGL scene."""
         super(TestObjDict, self).test_to_from_scene(_as_obj=True, data=data)
 
+    def test_vertex_normals(self):
+        r"""Test vertex_normals."""
+        self.instance.vertex_normals
+
     @unittest.skipIf(not LPyModelDriver.is_installed(), "LPy library not installed.")
     def test_to_from_scene_incomplete(self):  # pragma: lpy
         r"""Test conversion to/from PlantGL scene with faces missing

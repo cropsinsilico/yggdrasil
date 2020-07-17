@@ -150,10 +150,8 @@ class CCompilerBase(CompilerBase):
         out = super(CompilerBase, cls).get_search_path(*args, **kwargs)
         if platform._is_mac and (_osx_sysroot is not None):
             base_path = os.path.join(_osx_sysroot, 'usr')
-            if kwargs.get('libtype', None) == 'include':
-                out.append(os.path.join(base_path, 'include'))
-            else:
-                out.append(os.path.join(base_path, 'lib'))
+            assert(kwargs.get('libtype', None) == 'include')
+            out.append(os.path.join(base_path, 'include'))
         return out
 
 
@@ -169,6 +167,7 @@ class GCCCompiler(CCompilerBase):
             + list(CCompilerBase.linker_attributes.get('flag_options', {}).items())
             + [('library_rpath', '-Wl,-rpath')]))
     toolset = 'gnu'
+    aliases = ['gnu-cc']
 
     @classmethod
     def is_installed(cls):
@@ -179,11 +178,48 @@ class GCCCompiler(CCompilerBase):
 
         """
         out = super(GCCCompiler, cls).is_installed()
-        if out and platform._is_mac:
+        if out and platform._is_mac:  # pragma: debug
             ver = cls.call(cls.version_flags, skip_flags=True, allow_error=True)
             if 'clang' in ver:
                 out = False  # Disable gcc when it is an alias for clang
         return out
+
+    def dll2a(cls, dll, dst=None, overwrite=False):
+        r"""Convert a window's .dll library into a static library.
+
+        Args:
+            dll (str): Full path to .dll library to convert.
+            dst (str, optional): Full path to location where the new
+                library should be saved. Defaults to None and will be
+                set based on lib or will be placed in the same directory
+                as dll.
+            overwrite (bool, optional): If True, the static file will
+                be created even if it already exists. Defaults to False.
+
+        Returns:
+            str: Full path to new .a static library.
+
+        """
+        # https://sourceforge.net/p/mingw-w64/wiki2/
+        # Answer%20generation%20of%20DLL%20import%20library/
+        base = os.path.splitext(os.path.basename(dll))[0]
+        if dst is None:
+            libbase = base
+            if not libbase.startswith('lib'):
+                libbase = 'lib' + libbase
+            libdir = os.path.dirname(dll)
+            dst = os.path.join(libdir, libbase + '.dll.a')
+        if (not os.path.isfile(dst)) or overwrite:
+            gendef = shutil.which("gendef")
+            dlltool = shutil.which("dlltool")
+            if gendef and dlltool:
+                subprocess.check_call([gendef, dll])
+                subprocess.check_call(
+                    [dlltool, '-D', dll, '-d', '%s.def' % base, '-l', dst])
+            else:
+                dst = dll
+        assert(os.path.isfile(dst))
+        return dst
 
 
 class ClangCompiler(CCompilerBase):
@@ -242,6 +278,7 @@ class MSVCCompiler(CCompilerBase):
                              output_first_library=False,
                              flag_options=OrderedDict(
                                  [('library_libs', ''),
+                                  ('library_libs_nonstd', ''),
                                   ('library_dirs', '/LIBPATH:%s')]),
                              shared_library_flag='/DLL',
                              search_path_envvar='LIB',
@@ -317,7 +354,8 @@ class ClangLinker(LDLinker):
     search_regex_begin = 'Library search paths:'
     flag_options = OrderedDict(LDLinker.flag_options,
                                **{'linker-version': '-mlinker-version=%s',
-                                  'library_rpath': '-rpath'})
+                                  'library_rpath': '-rpath',
+                                  'library_libs_nonstd': ''})
 
     @staticmethod
     def before_registration(cls):
@@ -390,7 +428,28 @@ class MSVCArchiver(ArchiverBase):
     compatible_toolsets = ['llvm']
     search_path_envvar = 'LIB'
     
+    # @classmethod
+    # def is_import_lib(cls, libpath):
+    #     r"""Determine if a library is an import library or a static
+    #     library.
+        
+    #     Args:
+    #         libpath (str): Full path to library.
 
+    #     Returns:
+    #         bool: True if the library is an import library, False otherwise.
+
+    #     """
+    #     if (not os.path.isfile(libpath)) or (not libpath.endswith('.lib')):
+    #         return False
+    #     out = subprocess.check_output([cls.get_executable(full_path=True),
+    #                                    '/list', libpath])
+    #     files = set(out.splitlines())
+    #     if any([f.endswith('.obj') for f in files]):
+    #         return False
+    #     return True
+
+    
 _incl_interface = _top_lang_dir
 _incl_seri = os.path.join(_top_lang_dir, 'serialize')
 _incl_comm = os.path.join(_top_lang_dir, 'communication')
@@ -672,6 +731,7 @@ class CModelDriver(CompiledModelDriver):
             for x in ['zmq', 'czmq', 'python']:
                 if x in cls.external_libraries:
                     cls.external_libraries[x]['libtype'] = 'windows_import'
+            cls.internal_libraries['python_wrapper']['libtype'] = 'windows_import'
         # Platform specific regex internal library
         if platform._is_win:  # pragma: windows
             regex_lib = cls.internal_libraries['regex_win32']
@@ -1157,8 +1217,8 @@ class CModelDriver(CompiledModelDriver):
         json_type = kwargs.get('datatype', kwargs.get('type', 'bytes'))
         if isinstance(json_type, str):
             json_type = {'type': json_type}
-        if 'type' in kwargs:
-            json_type.update(kwargs)
+        # if 'type' in kwargs:
+        #     json_type.update(kwargs)
         assert(isinstance(json_type, dict))
         json_type = get_type_class(json_type['type']).normalize_definition(
             json_type)
@@ -1402,7 +1462,7 @@ class CModelDriver(CompiledModelDriver):
 
         """
         out = []
-        if isinstance(var, str):
+        if isinstance(var, str):  # pragma: no cover
             var = {'name': var}
         if ((isinstance(var.get('datatype', False), dict)
              and (('free_%s' % var['datatype']['type'])

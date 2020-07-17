@@ -2,12 +2,14 @@ import os
 import re
 import pprint
 import tempfile
+import unittest
 from yggdrasil import platform
 from yggdrasil.tests import (
     scripts, assert_raises, assert_equal, requires_language)
 import yggdrasil.drivers.tests.test_CompiledModelDriver as parent
 from yggdrasil.drivers.CMakeModelDriver import (
     CMakeModelDriver, CMakeConfigure, CMakeBuilder)
+from yggdrasil.drivers.CModelDriver import GCCCompiler
 
 
 @requires_language('cmake', installed='any')
@@ -73,10 +75,9 @@ def test_create_include():
         testlist += [([], [fname_dll], ['ADD_LIBRARY(test SHARED IMPORTED)']),
                      ([], [fname_lib], ['ADD_LIBRARY(test STATIC IMPORTED)'])]
     else:
+        tempdir_cp = tempdir
         if platform._is_win:  # pragma: windows
             tempdir_cp = tempdir.replace('\\', re.escape('\\'))
-        else:
-            tempdir_cp = tempdir
         testlist += [([], [fname_dll], [('FIND_LIBRARY(TEST_LIBRARY NAMES %s '
                                          'test HINTS %s)')
                                         % (os.path.basename(fname_dll), tempdir_cp)]),
@@ -149,20 +150,32 @@ class TestCMakeModelParam(parent.TestCompiledModelParam):
         self.builddir = os.path.join(self.sourcedir, 'build')
         self.args = [self.target]
         self._inst_kwargs['yml']['working_dir'] = self.sourcedir
-
-    def test_sbdir(self):
-        r"""Test that source/build directories set correctly."""
-        assert_equal(self.instance.sourcedir, self.sourcedir)
-        assert_equal(self.instance.builddir, self.builddir)
         
 
 class TestCMakeModelDriverNoInit(TestCMakeModelParam,
                                  parent.TestCompiledModelDriverNoInit):
     r"""Test runner for CMakeModelDriver without init."""
-    
-    def test_sbdir(self):
-        r"""Test that source/build directories set correctly."""
+
+    def __init__(self, *args, **kwargs):
+        super(TestCMakeModelDriverNoInit, self).__init__(*args, **kwargs)
+        self._inst_kwargs['skip_compile'] = True
+
+    @unittest.skip("Redundant since called by C driver.")
+    def test_build(self):  # pragma: no cover
+        r"""Test building libraries as a shared/static library or object files."""
         pass
+    
+    def run_model_instance(self, **kwargs):
+        r"""Create a driver for a model and run it."""
+        kwargs.setdefault('skip_compile', False)
+        return super(TestCMakeModelDriverNoInit, self).run_model_instance(**kwargs)
+        
+    @unittest.skipIf(not platform._is_win, "Windows only.")
+    @unittest.skipIf(not GCCCompiler.is_installed(),
+                     "GNU compiler not installed.")
+    def test_run_model_gcc(self):
+        r"""Test compiling/running test model with gcc."""
+        self.run_model_instance(target_compiler='gcc')
     
     
 class TestCMakeModelDriverNoStart(TestCMakeModelParam,
@@ -176,7 +189,8 @@ class TestCMakeModelDriverNoStart(TestCMakeModelParam,
         # Relative paths
         self._inst_kwargs.update(sourcedir='.',
                                  builddir='build',
-                                 compiler_flags=['-Wdev'])
+                                 compiler_flags=['-Wdev'],
+                                 skip_compiler=True)
 
     def test_call_compiler(self):
         r"""Test call_compiler without full path."""
@@ -194,6 +208,11 @@ class TestCMakeModelDriverNoStart(TestCMakeModelParam,
 
 class TestCMakeModelDriver(TestCMakeModelParam, parent.TestCompiledModelDriver):
     r"""Test runner for CMakeModelDriver."""
+
+    def test_sbdir(self):
+        r"""Test that source/build directories set correctly."""
+        assert_equal(self.instance.sourcedir, self.sourcedir)
+        assert_equal(self.instance.builddir, self.builddir)
 
     def test_write_wrappers(self):
         r"""Test write_wrappers method with verbosity and existing
