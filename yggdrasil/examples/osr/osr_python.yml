@@ -1,0 +1,23 @@
+models:
+  - name: osr_model
+    language: osr
+    timesync:
+      inputs: specificLeafArea
+      outputs: carbonAllocation2Roots
+      # outputs: specificLeafArea  # rootDryWeight
+    args:
+      - ./src/osr_model.xml
+    copy_xml_to_osr: True
+  - name: other_model
+    language: python
+    args:
+      - ./src/other_model.py
+      - 3
+      - hr
+    timesync: True
+    outputs:
+      name: output
+      default_file:
+        name: other_model_output.txt
+        in_temp: True
+        filetype: table
