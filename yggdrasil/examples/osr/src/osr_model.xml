@@ -52,6 +52,33 @@
 					name="timeInterval"
 					type="time"> 1.</SimulaConstant>
 			</SimulaBase>
+			<SimulaBase name="probeAllObjects">
+				<SimulaConstant
+					name="run"
+					type="bool">
+					1 <!--this does not result in any output, just tries to run the code for debugging purposes-->
+				</SimulaConstant>
+				<SimulaConstant
+					name="timeInterval"
+					type="time">0.1</SimulaConstant>
+				<SimulaConstant
+					name="requestedVariables"
+					type="string"> carbonAllocation2Roots, saturatedWaterContent,
+				</SimulaConstant>
+			</SimulaBase>	
+			<SimulaBase name="table">
+				<SimulaConstant
+					name="run"
+					type="bool"> 1</SimulaConstant>
+				<!--SimulaConstant name="timeInterval" type="time"> 1.0	</SimulaConstant-->
+				<SimulaConstant
+					name="searchingDepth"
+					type="integer"> 5</SimulaConstant>
+				<SimulaConstant
+					name="skipTheseVariables"
+					type="string"> primaryRoot, hypocotyl,
+				</SimulaConstant>
+			</SimulaBase>
 		</SimulaBase>
 	</SimulaBase>
 	

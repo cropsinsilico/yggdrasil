@@ -15,7 +15,7 @@ def timestep_calc(t):
         dict: Map of state parameters.
 
     """
-    state = {'specificLeafArea': units.add_units(10.0, 'cm**2')}
+    state = {"carbonAllocation2Roots": units.add_units(10.0, 'g')}
     return state
 
 
@@ -43,8 +43,10 @@ def main(t_step, t_units):
     ret, state = timesync.call(t, state)
     if not ret:
         raise RuntimeError("timesync(Python): Initial sync failed.")
-    print('timesync(Python): t = % 8s, specificLeafArea = %+ 5.2f' % (
-        t, state['specificLeafArea']))
+    print('timesync(Python): t = % 8s' % t, end='')
+    for k, v in state.items():
+        print(', %s = %+ 5.2f' % (k, v), end='')
+    print('')
 
     # Send initial state to output
     flag = out.send(dict(state, time=t))
@@ -63,8 +65,10 @@ def main(t_step, t_units):
         ret, state = timesync.call(t, state)
         if not ret:
             raise RuntimeError("timesync(Python): sync for t=%f failed." % t)
-        print('timesync(Python): t = % 8s, specificLeafArea = %+ 5.2f' % (
-            t, state['specificLeafArea']))
+        print('timesync(Python): t = % 8s' % t, end='')
+        for k, v in state.items():
+            print(', %s = %+ 5.2f' % (k, v), end='')
+        print('')
 
         # Send output
         flag = out.send(dict(state, time=t))

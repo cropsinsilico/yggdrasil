@@ -1,10 +1,14 @@
 models:
+  - name: timesync
+    language: timesync
+    additional_variables:
+      osr_model: [carbonAllocation2Roots]
+      other_model: [saturatedWaterContent]
   - name: osr_model
     language: osr
     timesync:
-      inputs: specificLeafArea
-      outputs: carbonAllocation2Roots
-      # outputs: specificLeafArea  # rootDryWeight
+      inputs: carbonAllocation2Roots
+      outputs: saturatedWaterContent
     args:
       - ./src/osr_model.xml
     copy_xml_to_osr: True

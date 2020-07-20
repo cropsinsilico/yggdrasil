@@ -125,9 +125,11 @@ def convert_unit_string(orig_str, replacements=None):
     out = []
     if replacements is None:
         replacements = {'h': 'hr',
-                        'days': 'day'}
+                        'days': 'day',
+                        '100%': 'percent'}
     regex_mu = [tools.bytes2str(b'\xc2\xb5'),
-                tools.bytes2str(b'\xce\xbcs')]
+                tools.bytes2str(b'\xce\xbcs'),
+                '(?:100%)']
     regex = r'(?P<name>[A-Za-z%s]+)(?P<exp>-?[0-9]*)(?: |$)' % ''.join(regex_mu)
     for x in re.finditer(regex, orig_str):
         xdict = x.groupdict()
