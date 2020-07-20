@@ -12,6 +12,8 @@ models:
     args:
       - ./src/osr_model.xml
     copy_xml_to_osr: True
+    update_interval:
+      timesync: 0.1
   - name: other_model
     language: python
     args:

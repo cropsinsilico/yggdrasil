@@ -125,9 +125,9 @@ definitions:
             type: string
           type: array
       required:
-      - name
       - commtype
       - datatype
+      - name
       title: comm_base
       type: object
     - anyOf:
@@ -630,8 +630,8 @@ definitions:
           type: string
       required:
       - working_dir
-      - filetype
       - name
+      - filetype
       title: file_base
       type: object
     - anyOf:
@@ -1615,6 +1615,16 @@ definitions:
             the name of the server that will handle timestep synchronization. If a
             boolean is provided, the name of the server will be assumed to be 'timestep'.
             Defaults to False.
+        update_interval:
+          additionalProperties:
+            type: float
+          default:
+            timesync: 1.0
+          description: Max simulation interval at which synchronization should occur
+            (in days). Defaults to 1.0 if not provided. If the XML input file loads
+            additional export modules that output at a shorter rate, the existing
+            table of values will be extrapolated.
+          type: object
         use_symunit:
           default: false
           description: If True, input/output variables with units will be represented
@@ -1642,10 +1652,10 @@ definitions:
             is used.
           type: string
       required:
-      - language
       - working_dir
       - args
       - name
+      - language
       title: model_base
       type: object
     - anyOf:
@@ -1847,6 +1857,16 @@ definitions:
             items:
               type: string
             type: array
+          update_interval:
+            additionalProperties:
+              type: float
+            default:
+              timesync: 1.0
+            description: Max simulation interval at which synchronization should occur
+              (in days). Defaults to 1.0 if not provided. If the XML input file loads
+              additional export modules that output at a shorter rate, the existing
+              table of values will be extrapolated.
+            type: object
         title: OSRModelDriver
         type: object
       - additionalProperties: true

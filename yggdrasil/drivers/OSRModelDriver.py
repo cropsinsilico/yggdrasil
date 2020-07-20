@@ -27,6 +27,11 @@ class OSRModelDriver(ExecutableModelDriver):
             running. This is necessary if the XML file(s) use any of the
             files located there since OSR always assumes the included
             file paths are relative. Defaults to False.
+        update_interval (float, optional): Max simulation interval at which
+            synchronization should occur (in days). Defaults to 1.0 if not
+            provided. If the XML input file loads additional export modules
+            that output at a shorter rate, the existing table of values will
+            be extrapolated.
 
     """
     _schema_subtype_description = 'Model is an OSR model.'
@@ -35,7 +40,10 @@ class OSRModelDriver(ExecutableModelDriver):
                          'default': []},
         'sync_vars_out': {'type': 'array', 'items': {'type': 'string'},
                           'default': []},
-        'copy_xml_to_osr': {'type': 'boolean', 'default': False}}
+        'copy_xml_to_osr': {'type': 'boolean', 'default': False},
+        'update_interval': {'type': 'object',
+                            'additionalProperties': {'type': 'float'},
+                            'default': {'timesync': 1.0}}}
     language = 'osr'
     language_ext = '.xml'
     base_languages = ['cpp']
@@ -147,8 +155,10 @@ class OSRModelDriver(ExecutableModelDriver):
                 ovars = [ovars]
             ivars = ' '.join(ivars)
             ovars = ' '.join(ovars)
+            tupdate = self.update_interval.get(tsync['name'], 1.0)
             cask = ET.Element('SimulaCask',
-                              attrib={'name': tsync['name']})
+                              attrib={'name': tsync['name'],
+                                      'interval': str(tupdate)})
             if ivars:
                 icask = ET.Element('SimulaCaskInputs')
                 icask.text = ivars
