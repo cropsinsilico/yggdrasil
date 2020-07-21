@@ -60,7 +60,7 @@
 				</SimulaConstant>
 				<SimulaConstant
 					name="timeInterval"
-					type="time">0.1</SimulaConstant>
+					type="time">1</SimulaConstant>
 				<SimulaConstant
 					name="requestedVariables"
 					type="string"> carbonAllocation2Roots, saturatedWaterContent,

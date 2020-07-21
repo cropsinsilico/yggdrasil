@@ -167,7 +167,23 @@ class OSRModelDriver(ExecutableModelDriver):
                 ocask = ET.Element('SimulaCaskOutputs')
                 ocask.text = ovars
                 cask.insert(-1, ocask)
-            root.append(cask)
+            probe = ET.Element("SimulaBase", name="probeCaskObjects")
+            probe_vals = [ET.Element("SimulaConstant",
+                                     name="run", type="bool"),
+                          ET.Element("SimulaConstant",
+                                     name="timeInterval", type="time"),
+                          ET.Element("SimulaConstant",
+                                     name="requestedVariables",
+                                     type="string")]
+            probe_vals[0].text = '1'
+            probe_vals[1].text = str(tupdate)
+            probe_vals[2].text = ', '.join(ivars.split())
+            probe.extend(probe_vals)
+            probe_directive = ET.Element(
+                'SimulaDirective',
+                attrib={'path': "/simulationControls/outputParameters"})
+            probe_directive.append(probe)
+            root.extend([cask, probe_directive])
         tree = ET.ElementTree(root)
         tree.write(dst)
         return dst
