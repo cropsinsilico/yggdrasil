@@ -180,6 +180,11 @@ class TimeSyncModelDriver(DSLModelDriver):
             t, state = values[:]
             t_pd = units.convert_to_pandas_timedelta(t)
             client_model = rpc.ocomm[request_id].client_model
+            # Remove variables marked as external so they are not merged
+            external_variables = additional_variables.get(client_model, [])
+            for k in external_variables:
+                state.pop(k, None)
+            internal_variables = list(state.keys())
             # Update record
             with table_lock:
                 if client_model not in tables:
@@ -222,8 +227,6 @@ class TimeSyncModelDriver(DSLModelDriver):
                         table = table.append(new_data, sort=False)
                     tables[model] = table.sort_values('time')
             # Assign thread to handle checking when data is filled in
-            internal_variables = list(state.keys())
-            external_variables = additional_variables.get(client_model, [])
             threads[request_id] = multitasking.YggTaskLoop(
                 target=cls.response_loop,
                 args=(client_model, request_id, rpc, t_pd,
