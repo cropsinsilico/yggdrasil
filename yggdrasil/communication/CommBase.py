@@ -1617,15 +1617,13 @@ class CommBase(tools.YggClass):
             return False, self.empty_bytes_msg, work_comm
         if len(msg) == 1:
             msg = msg[0]
+        if self.model_name:
+            if header_kwargs is None:
+                header_kwargs = {}
+            header_kwargs.setdefault('model', self.model_name)
         if self.is_eof(msg):
-            if self.model_name and (header_kwargs is not None):
-                header_kwargs.setdefault('model', self.model_name)
             flag, msg_s = self.on_send_eof(header_kwargs=header_kwargs)
         else:
-            if self.model_name:
-                if header_kwargs is None:
-                    header_kwargs = {}
-                header_kwargs.setdefault('model', self.model_name)
             flag = True
             # Covert object
             msg_ = self.apply_transform(msg)

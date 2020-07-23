@@ -243,6 +243,8 @@ class ConnectionDriver(Driver):
         self.onexit = onexit
         # Add comms and print debug info
         self._init_comms(name, **kwargs)
+        self.models = {'input': list(self.icomm.model_env.keys()),
+                       'output': list(self.ocomm.model_env.keys())}
         # self.debug('    env: %s', str(self.env))
         self.debug(('\n' + 80 * '=' + '\n'
                     + 'class = %s\n'
@@ -510,8 +512,46 @@ class ConnectionDriver(Driver):
         self.debug('Returning')
 
     @run_remotely
-    def on_model_exit_remote(self, direction):
-        r"""Drain input and then close it (on the remote process)."""
+    def remove_model(self, direction, name):
+        r"""Remove a model from the list of models.
+
+        Args:
+            direction (str): Direction of model.
+            name (str): Name of model exiting.
+
+        Returns:
+            bool: True if all of the input/output models have signed
+                off; False otherwise.
+
+        """
+        self.debug('')
+        with self.lock:
+            if name in self.models[direction]:
+                self.models[direction].remove(name)
+            self.debug(("%s model '%s' signed off."
+                        "\n\tInput  models: %d"
+                        "\n\tOutput models: %d")
+                       % (direction.title(), name,
+                          len(self.models["input"]),
+                          len(self.models["output"])))
+            return (len(self.models[direction]) == 0)
+
+    @run_remotely
+    def on_model_exit_remote(self, direction, name):
+        r"""Drain input and then close it (on the remote process).
+
+        Args:
+            direction (str): Direction of model.
+            name (str): Name of model exiting.
+
+        Returns:
+            bool: True if all of the input/output models have signed
+                off; False otherwise.
+
+        """
+        if not self.remove_model(direction, name):
+            return False
+        self.debug("All %s models have signed off.", direction)
         if (self.onexit not in [None, 'on_model_exit', 'pass']):
             self.debug("Calling onexit = '%s'" % self.onexit)
             getattr(self, self.onexit)()
@@ -527,14 +567,14 @@ class ConnectionDriver(Driver):
         self.set_close_state('%s model exit' % direction)
         self.debug('Exit of %s model triggered close', direction)
         self.set_break_flag()
+        return True
 
-    def on_model_exit(self, direction):
+    def on_model_exit(self, direction, name):
         r"""Drain input and then close it."""
-        self.debug('')
-        self.on_model_exit_remote(direction)
-        self.wait()
-        self.debug('Finished')
-        super(ConnectionDriver, self).on_model_exit()
+        self.debug('%s model %s exiting', direction.title(), name)
+        if self.on_model_exit_remote(direction, name):
+            self.wait()
+            self.debug('Finished')
 
     def do_terminate(self):
         r"""Stop the driver by closing the communicators."""

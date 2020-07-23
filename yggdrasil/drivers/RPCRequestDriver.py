@@ -55,8 +55,13 @@ class RPCRequestDriver(ConnectionDriver):
         # Parent and attributes
         super(RPCRequestDriver, self).__init__(model_request_name, **kwargs)
         self.response_drivers = []
-        self.clients = list(self.icomm.model_env.keys())
         self._block_response = False
+
+    @property
+    @run_remotely
+    def clients(self):
+        r"""list: Clients that are connected."""
+        return self.models['input'].copy()
 
     @property
     @run_remotely
@@ -122,50 +127,33 @@ class RPCRequestDriver(ConnectionDriver):
             x.printStatus(*args, **kwargs)
 
     @run_remotely
-    def remove_client(self, name):
-        r"""Remove a client from the list of clients, sending
-        signoff for client to server and closing the driver if all
-        clients have signed off.
+    def remove_model(self, direction, name):
+        r"""Remove a model from the list of models.
 
         Args:
-            name (str): Name of client exiting.
+            direction (str): Direction of model.
+            name (str): Name of model exiting.
+
+        Returns:
+            bool: True if all of the input/output models have signed
+                off; False otherwise.
 
         """
-        self.debug('')
         with self.lock:
-            if name in self.clients:
+            if (direction == "input") and (name in self.clients):
                 super(RPCRequestDriver, self).send_message(
                     YGG_CLIENT_EOF,
                     header_kwargs={'raw': True, 'model': name})
-                self.clients.remove(name)
-        self.debug("Client '%s' signed off. nclients = %d",
-                   name, self.nclients)
-
-    def on_client_exit(self, name):
-        r"""Actions performed on the master thread when a client
-        signs off.
-
-        Args:
-            name (str): Name of client exiting.
-
-        """
-        self.remove_client(name)
-        if self.nclients == 0:
-            self.debug("All clients have signed off.")
-            self.set_close_state('client exit')
-            with self.lock:
-                self.icomm.close()
-            self.wait()
-            self.confirm_output()
-            self.debug('Finished')
-    
+            return super(RPCRequestDriver, self).remove_model(
+                direction, name)
+        
     def on_eof(self):
         r"""On EOF, decrement number of clients. Only send EOF if the number
         of clients drops to 0."""
         with self.lock:
-            self.remove_client(self.client_model)
+            self.remove_model('input', self.client_model)
             if self.nclients == 0:
-                self.debug("All clients have signed off.")
+                self.debug("All clients have signed off (EOF).")
                 return super(RPCRequestDriver, self).on_eof()
         return self.icomm.empty_obj_recv
 

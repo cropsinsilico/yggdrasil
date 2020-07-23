@@ -367,21 +367,9 @@ class YggRunner(YggClass):
 
         """
         for drv in model['input_drivers']:
-            if model['name'] in drv['dst_models']:
-                drv['dst_models'].remove(model['name'])
-            if not drv['instance'].is_alive():
-                continue
-            if (len(drv['dst_models']) == 0):
-                self.debug('on_model_exit %s (output)', drv['name'])
-                drv['instance'].on_model_exit('output')
+            drv['instance'].on_model_exit('output', model['name'])
         for drv in model['output_drivers']:
-            if model['name'] in drv['src_models']:
-                drv['src_models'].remove(model['name'])
-            if not drv['instance'].is_alive():
-                continue
-            if (len(drv['src_models']) == 0):
-                self.debug('on_model_exit %s (input)', drv['name'])
-                drv['instance'].on_model_exit('input')
+            drv['instance'].on_model_exit('input', model['name'])
     
     def do_client_exits(self, model):
         r"""Perform exits for IO drivers associated with a client model.
@@ -391,9 +379,10 @@ class YggRunner(YggClass):
                 associated IO drivers.
 
         """
+        # TODO: Exit upstream models that no longer have any open
+        # output, connections when a connection is closed.
         for srv_name in model.get('client_of', []):
             iod = self.connectiondrivers[srv_name]
-            iod['instance'].on_client_exit(model['name'])
             if iod['instance'].nclients == 0:
                 srv = self.modeldrivers[srv_name]
                 srv['instance'].stop()
