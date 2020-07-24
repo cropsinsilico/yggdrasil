@@ -955,10 +955,15 @@ class ConnectionDriver(Driver):
         any left or the communication channel is closed.
         """
         self.state = 'in loop'
-        if not self.is_valid:
+        # if not self.is_valid:
+        if (((self.single_use and self._used)
+             or self.check_flag_attr('_comm_closed'))):
             self.debug("Breaking loop")
             self.set_close_state('invalid')
             self.set_break_flag()
+            self.printStatus()
+            self.icomm.printStatus()
+            self.ocomm.printStatus()
             return
         # Receive a message
         self.state = 'receiving'
