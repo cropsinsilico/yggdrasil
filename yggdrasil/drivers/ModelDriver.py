@@ -2704,7 +2704,10 @@ checking if the model flag indicates
         # else:
         #     key = 'import'
         # return [cls.format_function_param(key, **kwargs)]
-        return [cls.format_function_param('import', **kwargs)]
+        out = []
+        if 'import' in cls.function_param:
+            out = [cls.format_function_param('import', **kwargs)]
+        return out
 
     @classmethod
     def write_executable(cls, lines, prefix=None, suffix=None,
