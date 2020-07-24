@@ -61,7 +61,8 @@ class AsyncComm(ProxyObject, ComponentBaseUnregistered):
 
     def printStatus(self, *args, **kwargs):
         r"""Print status of the communicator."""
-        lines = ['%-15s: %s' % ('open (backlog)', self.is_open_backlog)]
+        lines = ['%-15s: %s' % ('open (backlog)', self.is_open_backlog),
+                 '%-15s: %s' % ('close called (backlog)', self._closed)]
         if self.direction == 'send':
             lines.append(
                 '%-15s: %s' % ('nsent (backlog)', self.n_msg_backlog_send))
@@ -132,8 +133,8 @@ class AsyncComm(ProxyObject, ComponentBaseUnregistered):
         if self.direction == 'send':
             return self._wrapped.is_open and self.is_open_backlog
         else:
-            return (((self._wrapped.is_open and self.is_open_backlog)
-                     or (self.n_msg_backlog > 0)) and (not self._closed))
+            return ((self.is_open_backlog or (self.n_msg_backlog > 0))
+                    and (not self._closed))
 
     @property
     def is_open_direct(self):
@@ -411,17 +412,12 @@ class AsyncComm(ProxyObject, ComponentBaseUnregistered):
                 self.printStatus()
                 return (False, None)
             else:
-                if not self.is_open_backlog:
-                    self.info("No messages waiting and backlog closed.")
-                    self.printStatus()
-                return (self.is_open_backlog, self.empty_obj_recv)
+                return (True, self.empty_obj_recv)
         # Return backlogged message
         self.debug('Returning backlogged received message')
         msg, self._last_header = self.pop_backlog()
         flag = True
         if self.is_eof(msg) and self.close_on_eof_recv:
-            self.info("EOF received.")
-            self.printStatus()
             flag = False
             self.close()
         self._used = True

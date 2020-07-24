@@ -757,7 +757,7 @@ class ZMQComm(CommBase.CommBase):
             self.periodic_debug('_reply_handshake_send', period=1000)(
                 'Error receiving handshake.')
             return False
-        if msg == self.eof_msg:  # pragma: debug
+        if self.is_eof(msg):  # pragma: debug
             self.error("REPLY EOF RECV'D")
             return msg
         self.reply_socket_send.send(msg, flags=zmq.NOBLOCK)
@@ -776,7 +776,7 @@ class ZMQComm(CommBase.CommBase):
                     'Cannot initiate reply handshake')
                 return False
             socket.send(msg_send, flags=zmq.NOBLOCK)
-            if msg_send == self.eof_msg:  # pragma: debug
+            if self.is_eof(msg_send):  # pragma: debug
                 self.error("REPLY EOF SENT")
                 return True
             tries = 10

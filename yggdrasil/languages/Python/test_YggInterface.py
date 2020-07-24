@@ -93,7 +93,7 @@ def do_send_recv(language='python', fmt='%f\\n%d', msg=[float(1.0), int(2)],
             o = YggInterface.YggInit(output_interface, (name, fmt))
             o.send(*msg)
             o.send_eof()
-            o.close()
+            o.close(linger=True)
             # Input
             i = YggInterface.YggInit(input_interface, (name, fmt))
             assert_equal(i.recv(), (True, converter(msg)))

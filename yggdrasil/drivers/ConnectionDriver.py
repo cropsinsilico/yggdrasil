@@ -961,9 +961,6 @@ class ConnectionDriver(Driver):
             self.debug("Breaking loop")
             self.set_close_state('invalid')
             self.set_break_flag()
-            self.printStatus()
-            self.icomm.printStatus()
-            self.ocomm.printStatus()
             return
         # Receive a message
         self.state = 'receiving'
