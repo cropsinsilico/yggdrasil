@@ -135,7 +135,9 @@ class SelectFieldsTransform(TransformBase):
                 out = type(x)([x[self.original_order.index(k)]
                                for k in self.selected])
         elif isinstance(x, (np.ndarray, pandas.DataFrame)):
-            if self.as_single:
+            if x.empty and isinstance(x.columns, pandas.RangeIndex):
+                x = pandas.DataFrame({k: [] for k in self.selected})
+            elif self.as_single:
                 out = x[self.selected[0]]
             else:
                 out = x[self.selected]
