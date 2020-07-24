@@ -355,6 +355,7 @@ class YggRunner(YggClass):
             self.info('All models completed')
         else:
             self.error('One or more models generated errors.')
+            self.printStatus()
             self.terminate()
         self.debug('Returning')
 

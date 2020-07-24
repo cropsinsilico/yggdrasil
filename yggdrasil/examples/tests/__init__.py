@@ -272,6 +272,9 @@ class ExampleTstBase(YggTestBase, tools.YggClass):
                 assert(not self.runner.error_flag)
             try:
                 self.check_results()
+            except BaseException:  # pragma: debug
+                self.runner.printStatus()
+                raise
             finally:
                 self.example_cleanup()
                 # Remove copied makefile
