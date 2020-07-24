@@ -407,14 +407,21 @@ class AsyncComm(ProxyObject, ComponentBaseUnregistered):
         if self.n_msg_backlog == 0:
             self.verbose_debug("No messages waiting.")
             if self.is_closed:
+                self.info("No messages waiting and comm closed.")
+                self.printStatus()
                 return (False, None)
             else:
+                if not self.is_open_backlog:
+                    self.info("No messages waiting and backlog closed.")
+                    self.printStatus()
                 return (self.is_open_backlog, self.empty_obj_recv)
         # Return backlogged message
         self.debug('Returning backlogged received message')
         msg, self._last_header = self.pop_backlog()
         flag = True
         if self.is_eof(msg) and self.close_on_eof_recv:
+            self.info("EOF received.")
+            self.printStatus()
             flag = False
             self.close()
         self._used = True
