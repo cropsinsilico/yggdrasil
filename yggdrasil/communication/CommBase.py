@@ -1122,9 +1122,7 @@ class CommBase(tools.YggClass):
     @property
     def empty_obj_recv(self):
         r"""obj: Empty message object."""
-        emsg, _ = self.deserialize(self.empty_bytes_msg)
-        emsg = self.apply_transform(emsg)
-        return emsg
+        return self.apply_transform(self.serializer.empty_msg)
 
     def is_empty(self, msg, emsg):
         r"""Check that a message matches an empty message object.

@@ -42,7 +42,10 @@ class PandasSerialize(AsciiTableSerialize):
     @property
     def empty_msg(self):
         r"""obj: Object indicating empty message."""
-        return pandas.DataFrame(np.zeros(0, self.numpy_dtype))
+        if self.numpy_dtype:
+            return pandas.DataFrame(np.zeros(0, self.numpy_dtype))
+        else:
+            return pandas.DataFrame(columns=self.get_field_names())
 
     def get_field_names(self, *args, **kwargs):
         r"""Get the field names for an array of fields.
