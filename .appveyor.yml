@@ -48,10 +48,10 @@ environment:
     - platform: x64
       PYTHON_VERSION: "3.6"
       YGG_TEST_FLAGS: "--test-suite=examples_part1"
-      YGG_SECOND_TEST: "yggtest --ci --test-suite=types --languages cpp"
     - platform: x64
       PYTHON_VERSION: "3.6"
       YGG_TEST_FLAGS: "--test-suite=examples_part2"
+      YGG_SECOND_TEST: "yggtest --ci --test-suite=types --languages cpp"
     - platform: x64
       PYTHON_VERSION: "3.6"
       YGG_TEST_FLAGS: "--long-running"
