@@ -15,7 +15,8 @@ def timestep_calc(t):
         dict: Map of state parameters.
 
     """
-    state = {"carbonAllocation2Roots": units.add_units(10.0, 'g')}
+    state = {"carbonAllocation2Roots": units.add_units(10.0, 'g'),
+             "saturatedConductivity": units.add_units(10.0, 'g')}
     return state
 
 
