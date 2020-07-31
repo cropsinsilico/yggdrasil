@@ -273,7 +273,7 @@ class AsyncComm(ProxyObject, ComponentBaseUnregistered):
             self.close()
             return
         if not self.recv_backlog():
-            self.debug("Failure to receive message into backlog.")
+            self.info("Failure to receive message into backlog.")
             self._close_backlog()
             return
         self.periodic_debug('run_backlog_recv', period=1000)(
@@ -408,7 +408,11 @@ class AsyncComm(ProxyObject, ComponentBaseUnregistered):
         if self.n_msg_backlog == 0:
             self.verbose_debug("No messages waiting.")
             if self.is_closed:
-                self.info("No messages waiting and comm closed.")
+                self.info(("No messages waiting and comm closed."
+                           "%s, %s, %s")
+                          % (self.backlog_thread is not None,
+                             not self.backlog_thread.was_break,
+                             self.backlog_thread.is_alive()))
                 self.printStatus()
                 return (False, None)
             else:
