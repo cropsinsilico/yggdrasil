@@ -144,7 +144,7 @@ class AsyncComm(ProxyObject, ComponentBaseUnregistered):
     @property
     def is_open_backlog(self):
         r"""bool: True if the backlog thread is running."""
-        return ((self.backlog_thread is not None)
+        return ((self._backlog_thread is not None)
                 and (not self.backlog_thread.was_break)
                 and (self.backlog_thread.is_alive()))
 
@@ -414,6 +414,9 @@ class AsyncComm(ProxyObject, ComponentBaseUnregistered):
                              not self.backlog_thread.was_break,
                              self.backlog_thread.is_alive()))
                 self.printStatus()
+                if self.backlog_thread.was_break:
+                    self.info("Break stack:\n%s",
+                              self.backlog_thread.break_stack)
                 return (False, None)
             else:
                 return (True, self.empty_obj_recv)
