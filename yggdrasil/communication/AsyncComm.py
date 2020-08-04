@@ -114,7 +114,7 @@ class AsyncComm(ProxyObject, ComponentBaseUnregistered):
 
     def _close_backlog(self, wait=False):
         r"""Close the backlog thread."""
-        self.debug('')
+        self.info('')
         if self._backlog_thread is not None:
             self.backlog_thread.set_break_flag()
         self.backlog_ready.set()

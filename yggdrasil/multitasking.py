@@ -1088,6 +1088,7 @@ class YggTaskLoop(YggTask):
         """
         self._1st_main_terminated = True
         if not dont_break:
+            self.info("on_main_terminated")
             self.set_break_flag()
 
     def set_break_flag(self, value=True):
@@ -1149,7 +1150,8 @@ class YggTaskLoop(YggTask):
             else:
                 try:
                     self.run_loop()
-                except BreakLoopException:
+                except BreakLoopException as e:
+                    self.info("BreakLoopException: %s", e)
                     self.set_break_flag()
         self.set_break_flag()
         
@@ -1165,6 +1167,7 @@ class YggTaskLoop(YggTask):
     def run_error(self):
         r"""Actions to perform on error in try/except wrapping run."""
         super(YggTaskLoop, self).run_error()
+        self.info("run_error")
         self.set_break_flag()
         
     def run(self, *args, **kwargs):
