@@ -6,6 +6,7 @@ import io as sio
 from jsonschema.exceptions import ValidationError
 from yggdrasil import yamlfile
 from yggdrasil.tests import YggTestClass, assert_raises, assert_equal
+from yaml.constructor import ConstructorError
 _yaml_env = 'TEST_YAML_FILE'
 
 
@@ -597,6 +598,28 @@ class TestYamlComponentError(YamlTestBaseError):
     r"""Test error for non-dictionary component."""
     _error = ValidationError
     _contents = (['models: error'],)
+
+
+class TestYamlDuplicateKeyError(YamlTestBaseError):
+    r"""Test error when there are duplicates of the same key in a map."""
+    _error = ConstructorError
+    _contents = (['model:',
+                  '  name: modelA',
+                  '  driver: GCCModelDriver',
+                  '  args: ./src/modelA.c',
+                  '  inputs:',
+                  '    - inputA',
+                  '',
+                  'connections:',
+                  '  - input: outputB',
+                  '    output: inputA',
+                  '',
+                  'model:',
+                  '  name: modelB',
+                  '  driver: GCCModelDriver',
+                  '  args: ./src/modelB.c',
+                  '  outputs:',
+                  '    - outputB'],)
 
 
 class TestYamlDuplicateError(YamlTestBaseError):
