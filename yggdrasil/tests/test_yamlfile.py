@@ -52,9 +52,9 @@ def test_load_yaml_error():
 
 def test_parse_component_error():
     r"""Test errors in parse_component."""
-    assert_raises(TypeError, yamlfile.parse_component,
+    assert_raises(yamlfile.YAMLSpecificationError, yamlfile.parse_component,
                   1, 'invalid', 'invalid')
-    assert_raises(ValueError, yamlfile.parse_component,
+    assert_raises(yamlfile.YAMLSpecificationError, yamlfile.parse_component,
                   {}, 'invalid', 'invalid')
 
 
@@ -594,6 +594,26 @@ class TestYamlConnectionInputObj(YamlTestBase):
                   '    write_meth: obj'], )
 
 
+class TestYamlServerClientNoServer(YamlTestBaseError):
+    r"""Test error when is_server is set but there arn't any clients."""
+    _error = yamlfile.YAMLSpecificationError
+    _contents = (['models:',
+                  '  - name: modelA',
+                  '    driver: GCCModelDriver',
+                  '    args: ./src/modelA.c',
+                  '    is_server: True'],)
+
+
+class TestYamlServerServerNoClient(YamlTestBaseError):
+    r"""Test error when client_of is set but there arn't any servers by that name."""
+    _error = yamlfile.YAMLSpecificationError
+    _contents = (['models:',
+                  '  - name: modelA',
+                  '    driver: GCCModelDriver',
+                  '    args: ./src/modelA.c',
+                  '    client_of: modelB'],)
+
+
 class TestYamlComponentError(YamlTestBaseError):
     r"""Test error for non-dictionary component."""
     _error = ValidationError
@@ -624,7 +644,7 @@ class TestYamlDuplicateKeyError(YamlTestBaseError):
 
 class TestYamlDuplicateError(YamlTestBaseError):
     r"""Test error when there are two components with the same name."""
-    _error = ValueError
+    _error = yamlfile.YAMLSpecificationError
     _contents = (['models:',
                   '  - name: modelA',
                   '    driver: GCCModelDriver',
@@ -636,7 +656,7 @@ class TestYamlDuplicateError(YamlTestBaseError):
 
 class TestYamlConnectionError(YamlTestBaseError):
     r"""Test error when there is not connection for a model I/O channel."""
-    _error = RuntimeError
+    _error = yamlfile.YAMLSpecificationError
     _contents = (['models:',
                   '  - name: modelA',
                   '    driver: GCCModelDriver',
@@ -647,7 +667,7 @@ class TestYamlConnectionError(YamlTestBaseError):
 
 class TestYamlConnectionError_forkin(YamlTestBaseError):
     r"""Test error when there is not connection for a fork input channel."""
-    _error = RuntimeError
+    _error = yamlfile.YAMLSpecificationError
     _contents = (['models:',
                   '  - name: modelA',
                   '    driver: GCCModelDriver',

@@ -12,6 +12,11 @@ from yaml.constructor import (
     ConstructorError, BaseConstructor, Constructor, SafeConstructor)
 
 
+class YAMLSpecificationError(RuntimeError):
+    r"""Error raised when the yaml specification does not meet expectations."""
+    pass
+
+
 def no_duplicates_constructor(loader, node, deep=False):
     # https://gist.github.com/pypt/94d747fe5180851196eb
     """Check for duplicate keys."""
@@ -102,7 +107,7 @@ def load_yaml(fname):
     else:
         yamlparsed = yaml.safe_load(yamlparsed)
     if not isinstance(yamlparsed, dict):  # pragma: debug
-        raise ValueError("Loaded yaml is not a dictionary.")
+        raise YAMLSpecificationError("Loaded yaml is not a dictionary.")
     yamlparsed['working_dir'] = os.path.dirname(fname)
     if opened:
         fd.close()
@@ -213,6 +218,25 @@ def parse_yaml(files):
     for k in ['models', 'connections']:
         for yml in yml_norm[k]:
             existing = parse_component(yml, k[:-1], existing=existing)
+    # Make sure that servers have clients and clients have servers
+    for k, v in existing['model'].items():
+        if v.get('is_server', False):
+            for x in existing['model'].values():
+                if v['name'] in x.get('client_of', []):
+                    break
+            else:
+                raise YAMLSpecificationError(
+                    "Server '%s' does not have any clients.", k)
+        elif v.get('client_of', False):
+            for s in v['client_of']:
+                missing_servers = []
+                if s not in existing['model']:
+                    missing_servers.append(s)
+                if missing_servers:
+                    print(list(existing['model'].keys()))
+                    raise YAMLSpecificationError(
+                        "Servers %s do not exist, but '%s' is a client of them."
+                        % (missing_servers, v['name']))
     # Make sure that I/O channels initialized
     opp_map = {'input': 'output', 'output': 'input'}
     for io in ['input', 'output']:
@@ -228,8 +252,8 @@ def parse_yaml(files):
                     existing = parse_component(new_conn, 'connection',
                                                existing=existing)
                 else:
-                    raise RuntimeError("No driver established for %s channel %s" % (
-                        io, k))
+                    raise YAMLSpecificationError(
+                        "No driver established for %s channel %s" % (io, k))
         # Remove unused default channels
         for k in remove:
             for m in existing[io][k]['model_driver']:
@@ -268,13 +292,13 @@ def parse_component(yml, ctype, existing=None):
     """
     s = get_schema()
     if not isinstance(yml, dict):
-        raise TypeError("Component entry in yml must be a dictionary.")
+        raise YAMLSpecificationError("Component entry in yml must be a dictionary.")
     ctype_list = ['input', 'output', 'model', 'connection',
                   'model_input', 'model_output']
     if existing is None:
         existing = {k: {} for k in ctype_list}
     if ctype not in ctype_list:
-        raise ValueError("'%s' is not a recognized component.")
+        raise YAMLSpecificationError("'%s' is not a recognized component.")
     # Parse based on type
     if ctype == 'model':
         existing = parse_model(yml, existing)
@@ -294,7 +318,7 @@ def parse_component(yml, ctype, existing=None):
     if yml['name'] in existing[ctype]:
         pprint.pprint(existing)
         pprint.pprint(yml)
-        raise ValueError("%s is already a registered '%s' component." % (
+        raise YAMLSpecificationError("%s is already a registered '%s' component." % (
             yml['name'], ctype))
     existing[ctype][yml['name']] = yml
     return existing
@@ -381,8 +405,9 @@ def parse_connection(yml, existing):
                 fname = os.path.join(x['working_dir'], fname)
             fname = os.path.normpath(fname)
             if (not os.path.isfile(fname)) and (not x.get('wait_for_creation', False)):
-                raise RuntimeError(("Input '%s' not found in any of the registered "
-                                    + "model outputs and is not a file.") % x['name'])
+                raise YAMLSpecificationError(
+                    ("Input '%s' not found in any of the registered "
+                     + "model outputs and is not a file.") % x['name'])
             x['address'] = fname
         else:
             iname_list.append(x['name'])
