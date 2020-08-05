@@ -2970,9 +2970,12 @@ class CompiledModelDriver(ModelDriver):
             if dep_lib:
                 if (((not kwargs.get('dry_run', False))
                      and (not os.path.isfile(dep_lib)))):  # pragma: debug
-                    raise RuntimeError(
-                        ("Library for %s dependency does not "
-                         "exist: '%s'.") % (dep, dep_lib))
+                    if dep in internal_dependencies:
+                        cls.compile_dependencies(toolname=toolname)
+                    if not os.path.isfile(dep_lib):
+                        raise RuntimeError(
+                            ("Library for %s dependency does not "
+                             "exist: '%s'.") % (dep, dep_lib))
                 if use_library_path_internal and (dep in internal_dependencies):
                     if kwargs.get('skip_library_libs', False):
                         if isinstance(use_library_path_internal, bool):
