@@ -207,6 +207,28 @@ def yggclean():
         import_component('model', lang).cleanup_dependencies()
 
 
+def yggcompile():
+    r"""Compile interface library/libraries."""
+    from yggdrasil.tools import get_supported_lang
+    from yggdrasil.components import import_component
+    parser = argparse.ArgumentParser(
+        description='Compile yggdrasil dependency libraries')
+    parser.add_argument('language', nargs='*', default=[],
+                        help=('One or more languages to compile the '
+                              'interface libraries for.'))
+    parser.add_argument('--toolname',
+                        help=('Name of compilation tool that should be '
+                              'used.'))
+    args = parser.parse_args()
+    if (len(args.language) == 0) or ('all' in args.language):
+        args.language = get_supported_lang()
+    for lang in args.language:
+        drv = import_component('model', lang)
+        if ((hasattr(drv, 'compile_dependencies')
+             and (not getattr(drv, 'is_build_tool', False)))):
+            drv.compile_dependencies(toolname=args.toolname)
+
+
 def yggcc():
     r"""Compile C/C++ program."""
     from yggdrasil.drivers import CModelDriver

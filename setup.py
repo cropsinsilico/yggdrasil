@@ -106,6 +106,7 @@ setup(
         'console_scripts': ['ygginfo=yggdrasil.command_line:ygginfo',
                             'yggrun=yggdrasil.command_line:yggrun',
                             'cisrun=yggdrasil.command_line:yggrun',
+                            'yggcompile=yggdrasil.command_line:yggcompile',
                             'yggcc=yggdrasil.command_line:yggcc',
                             'yggccflags=yggdrasil.command_line:cc_flags',
                             'yggldflags=yggdrasil.command_line:ld_flags',
