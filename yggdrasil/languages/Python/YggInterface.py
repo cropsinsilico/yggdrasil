@@ -1,3 +1,4 @@
+import os
 from yggdrasil import tools
 from yggdrasil.communication.DefaultComm import DefaultComm
 
@@ -5,6 +6,10 @@ from yggdrasil.communication.DefaultComm import DefaultComm
 YGG_MSG_MAX = tools.get_YGG_MSG_MAX()
 YGG_MSG_EOF = tools.YGG_MSG_EOF
 YGG_MSG_BUF = tools.YGG_MSG_BUF
+YGG_SERVER_INPUT = os.environ.get('YGG_SERVER_INPUT', False)
+YGG_SERVER_OUTPUT = os.environ.get('YGG_SERVER_OUTPUT', False)
+YGG_MODEL_NAME = os.environ.get('YGG_MODEL_NAME', False)
+_global_scope_comms = {}
 
 
 def maxMsgSize():
@@ -22,13 +27,15 @@ def eof_msg():
     return YGG_MSG_EOF
 
 
-def YggInit(_type, args=None):
+def YggInit(_type, args=None, kwargs=None):
     r"""Short interface to identify functions called by another language.
 
     Args:
         _type (str): Name of class that should be returned.
-        args (list): Additional arguments that should be passed to class
-            initializer.
+        args (list, optional): Additional arguments that should be passed to
+            the class initializer.
+        kwargs (dict, optional): Additional keyword arguments that should be
+            passed to the class initializer.
 
     Returns:
         obj: An instance of the requested class.
@@ -36,6 +43,8 @@ def YggInit(_type, args=None):
     """
     if args is None:
         args = []
+    if kwargs is None:
+        kwargs = {}
     if _type.startswith('Psi'):
         _type = _type.replace('Psi', 'Ygg', 1)
     elif _type.startswith('PSI'):
@@ -48,26 +57,35 @@ def YggInit(_type, args=None):
     if isinstance(cls, (int, bytes, str)):
         obj = cls
     else:
-        obj = cls(*args)
+        obj = cls(*args, **kwargs)
     return obj
 
 
-def InterfaceComm(name, comm_class=None, **kwargs):
+def InterfaceComm(name, comm_class=None, global_scope=False, **kwargs):
     r"""Short hand for initializing a default comm for use as an interface.
 
     Args:
         name (str): The name of the message queue.
         comm_class (CommBase, optional): Communication class that should be
             used. Defaults to DefaultComm if not provided.
+        global_scope (bool, optional): If True, the comm will be checked
+            for in the global scope before creating a new one. Defaults to
+            False.
         **kwargs: Additional keyword arguments are passed to DefaultComm.
 
     """
+    global _global_scope_comms
+    if global_scope and (name in _global_scope_comms):
+        return _global_scope_comms[name]
     if comm_class is None:
         comm_class = DefaultComm
     kwargs.update(is_interface=True)
     if 'language' not in kwargs:
         kwargs['language'] = tools.get_subprocess_language()
-    return comm_class(name, **kwargs)
+    out = comm_class(name, **kwargs)
+    if global_scope:
+        _global_scope_comms[name] = out
+    return out
 
 
 def YggInput(name, format_str=None, **kwargs):
@@ -86,6 +104,10 @@ def YggInput(name, format_str=None, **kwargs):
         DefaultComm: Communication object.
         
     """
+    if ((YGG_SERVER_INPUT
+         and ((name == YGG_SERVER_INPUT)
+              or (('%s:%s' % (YGG_MODEL_NAME, name)) == YGG_SERVER_INPUT)))):
+        return YggRpcServer(YGG_MODEL_NAME, global_scope=True)
     if format_str is not None:
         kwargs['format_str'] = format_str
     kwargs.update(direction='recv', recv_timeout=False)
@@ -108,13 +130,17 @@ def YggOutput(name, format_str=None, **kwargs):
         DefaultComm: Communication object.
         
     """
+    if ((YGG_SERVER_OUTPUT
+         and ((name == YGG_SERVER_OUTPUT)
+              or (('%s:%s' % (YGG_MODEL_NAME, name)) == YGG_SERVER_OUTPUT)))):
+        return YggRpcServer(YGG_MODEL_NAME, global_scope=True)
     if format_str is not None:
         kwargs['format_str'] = format_str
     kwargs.update(direction='send')
     return InterfaceComm(name, **kwargs)
 
     
-def YggRpcServer(name, infmt='%s', outfmt='%s'):
+def YggRpcServer(name, infmt='%s', outfmt='%s', **kwargs):
     r"""Get class for handling requests and response for an RPC Server.
 
     Args:
@@ -123,6 +149,7 @@ def YggRpcServer(name, infmt='%s', outfmt='%s'):
             messages received from the request queue. Defaults to '%s'.
         outfmt (str, optional): Format string used to format variables in a
             message sent to the response queue. Defautls to '%s'.
+        **kwargs: Additional keyword arguments are passed to InterfaceComm.
 
     Returns:
         :class:.ServerComm: Communication object.
@@ -131,13 +158,13 @@ def YggRpcServer(name, infmt='%s', outfmt='%s'):
     from yggdrasil.communication import ServerComm
     icomm_kwargs = dict(format_str=infmt)
     ocomm_kwargs = dict(format_str=outfmt)
-    out = InterfaceComm(name, comm_class=ServerComm.ServerComm,
-                        response_kwargs=ocomm_kwargs,
-                        recv_timeout=False, **icomm_kwargs)
-    return out
+    kwargs.update(icomm_kwargs, comm_class=ServerComm.ServerComm,
+                  response_kwargs=ocomm_kwargs)
+    kwargs.setdefault('recv_timeout', False)
+    return InterfaceComm(name, **kwargs)
 
 
-def YggRpcClient(name, outfmt='%s', infmt='%s'):
+def YggRpcClient(name, outfmt='%s', infmt='%s', **kwargs):
     r"""Get class for handling requests and response to an RPC Server from a
     client.
 
@@ -147,6 +174,7 @@ def YggRpcClient(name, outfmt='%s', infmt='%s'):
             message sent to the request queue. Defautls to '%s'.
         infmt (str, optional): Format string used to recover variables from
             messages received from the response queue. Defautls to '%s'.
+        **kwargs: Additional keyword arguments are passed to InterfaceComm.
 
     Returns:
         :class:.ClientComm: Communication object.
@@ -155,45 +183,47 @@ def YggRpcClient(name, outfmt='%s', infmt='%s'):
     from yggdrasil.communication import ClientComm
     icomm_kwargs = dict(format_str=infmt)
     ocomm_kwargs = dict(format_str=outfmt)
-    out = InterfaceComm(name, comm_class=ClientComm.ClientComm,
-                        response_kwargs=icomm_kwargs,
-                        recv_timeout=False, **ocomm_kwargs)
-    return out
+    kwargs.update(ocomm_kwargs, comm_class=ClientComm.ClientComm,
+                  response_kwargs=icomm_kwargs)
+    kwargs.setdefault('recv_timeout', False)
+    return InterfaceComm(name, **kwargs)
 
 
-def YggTimesyncServer(name='timesync'):
+def YggTimesyncServer(name='timesync', **kwargs):
     r"""Get class for handling timestep synchronization requests on
     the driver side.
 
     Args:
         name (str, optional): The name of the server queues. Defaults
             to 'timesync'.
+        **kwargs: Additional keyword arguments are passed to InterfaceComm.
 
     Returns:
         :class:.ServerComm: Communication object.
         
     """
     from yggdrasil.communication import ServerComm
-    out = InterfaceComm(name, comm_class=ServerComm.ServerComm,
-                        recv_timeout=False)
-    return out
+    kwargs['comm_class'] = ServerComm.ServerComm
+    kwargs.setdefault('recv_timeout', False)
+    return InterfaceComm(name, **kwargs)
     
 
-def YggTimesync(name='timesync'):
+def YggTimesync(name='timesync', **kwargs):
     r"""Get class for handling timestep synchronization requests.
 
     Args:
         name (str, optional): The name of the server queues. Defaults
             to 'timesync'.
+        **kwargs: Additional keyword arguments are passed to InterfaceComm.
 
     Returns:
         :class:.ClientComm: Communication object.
         
     """
     from yggdrasil.communication import ClientComm
-    out = InterfaceComm(name, comm_class=ClientComm.ClientComm,
-                        recv_timeout=False)
-    return out
+    kwargs['comm_class'] = ClientComm.ClientComm
+    kwargs.setdefault('recv_timeout', False)
+    return InterfaceComm(name, **kwargs)
 
 
 # Specialized classes for ascii IO

@@ -594,7 +594,7 @@ class TestYamlConnectionInputObj(YamlTestBase):
                   '    write_meth: obj'], )
 
 
-class TestYamlServerClientNoServer(YamlTestBaseError):
+class TestYamlServerNoClient(YamlTestBaseError):
     r"""Test error when is_server is set but there arn't any clients."""
     _error = yamlfile.YAMLSpecificationError
     _contents = (['models:',
@@ -604,7 +604,7 @@ class TestYamlServerClientNoServer(YamlTestBaseError):
                   '    is_server: True'],)
 
 
-class TestYamlServerServerNoClient(YamlTestBaseError):
+class TestYamlClientNoServer(YamlTestBaseError):
     r"""Test error when client_of is set but there arn't any servers by that name."""
     _error = yamlfile.YAMLSpecificationError
     _contents = (['models:',
@@ -612,6 +612,63 @@ class TestYamlServerServerNoClient(YamlTestBaseError):
                   '    driver: GCCModelDriver',
                   '    args: ./src/modelA.c',
                   '    client_of: modelB'],)
+
+
+class TestYamlServerFunction(YamlTestBaseError):
+    r"""Test error raised when both is_server and function are set, but
+    is_server is bool."""
+    _error = yamlfile.YAMLSpecificationError
+    _contents = (['models:',
+                  '  - name: modelA',
+                  '    driver: GCCModelDriver',
+                  '    args: ./src/modelA.c',
+                  '    function: fake',
+                  '    is_server: True'],
+                 ['model:',
+                  '  - name: modelB',
+                  '    driver: GCCModelDriver',
+                  '    args: ./src/modelB.c',
+                  '    client_of: modelA'],)
+
+
+class TestYamlServerDictNoInput(YamlTestBaseError):
+    r"""Test error raised when is_server is a dictionary but the referenced
+    input channel cannot be located."""
+    _error = yamlfile.YAMLSpecificationError
+    _contents = (['models:',
+                  '  - name: modelA',
+                  '    driver: GCCModelDriver',
+                  '    args: ./src/modelA.c',
+                  '    function: fake',
+                  '    is_server:',
+                  '      input: A',
+                  '      output: B',
+                  '    outputs: B'],
+                 ['model:',
+                  '  - name: modelB',
+                  '    driver: GCCModelDriver',
+                  '    args: ./src/modelB.c',
+                  '    client_of: modelA'],)
+
+
+class TestYamlServerDictNoOutput(YamlTestBaseError):
+    r"""Test error raised when is_server is a dictionary but the referenced
+    output channel cannot be located."""
+    _error = yamlfile.YAMLSpecificationError
+    _contents = (['models:',
+                  '  - name: modelA',
+                  '    driver: GCCModelDriver',
+                  '    args: ./src/modelA.c',
+                  '    function: fake',
+                  '    is_server:',
+                  '      input: A',
+                  '      output: B',
+                  '    inputs: A'],
+                 ['model:',
+                  '  - name: modelB',
+                  '    driver: GCCModelDriver',
+                  '    args: ./src/modelB.c',
+                  '    client_of: modelA'],)
 
 
 class TestYamlComponentError(YamlTestBaseError):

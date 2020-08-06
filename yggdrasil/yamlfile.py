@@ -346,7 +346,37 @@ def parse_model(yml, existing):
                'driver': 'ServerDriver',
                'args': yml['name'] + '_SERVER',
                'working_dir': yml['working_dir']}
-        yml['inputs'].append(srv)
+        if yml.get('function', False) and isinstance(yml['is_server'], bool):
+            raise YAMLSpecificationError(
+                "The 'is_server' parameter is boolean for the model '%s' "
+                "and the 'function' parameter is also set. "
+                "If the 'function' and 'is_server' parameters are used "
+                "together, the 'is_server' parameter must be a mapping "
+                "with 'input' and 'output' entries specifying which of the "
+                "function's input/output variables should be received/sent "
+                "from/to clients. e.g. \n"
+                "\t-input: input_variable\n"
+                "\t-output: output_variables\n" % yml['name'])
+        if isinstance(yml['is_server'], dict):
+            replaces = {}
+            for io in ['input', 'output']:
+                replaces[io] = None
+                if not yml['is_server'][io].startswith('%s:' % yml['name']):
+                    yml['is_server'][io] = '%s:%s' % (yml['name'], yml['is_server'][io])
+                for i, x in enumerate(yml[io + 's']):
+                    if x['name'] == yml['is_server'][io]:
+                        replaces[io] = x
+                        replaces[io + '_index'] = i
+                        yml[io + 's'].pop(i)
+                        break
+                else:
+                    raise YAMLSpecificationError(
+                        "Failed to locate an existing %s channel "
+                        "with the name %s." % (io, yml['is_server'][io]))
+            srv['server_replaces'] = replaces
+            yml['inputs'].insert(replaces['input_index'], srv)
+        else:
+            yml['inputs'].append(srv)
         yml['clients'] = []
     # Mark timesync clients
     timesync = yml.pop('timesync_client_of', [])

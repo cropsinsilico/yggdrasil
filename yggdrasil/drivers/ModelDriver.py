@@ -101,12 +101,18 @@ class ModelDriver(Driver):
             that are source files. These files will be removed without checking
             their extension so users should avoid adding files to this list
             unless they are sure they should be deleted. Defaults to [].
-        is_server (bool, optional): If `True`, the model is assumed to be a
+        is_server (bool, dict, optional): If `True`, the model is assumed to be a
             server for one or more client models and an instance of
             :class:`yggdrasil.drivers.ServerDriver` is started. The
             corresponding channel that should be passed to the yggdrasil API
-            will be the name of the model. Defaults to False. Use of `is_server`
-            with `function` is not currently supported.
+            will be the name of the model. If is_server is a dictionary, it
+            should contain an 'input' key and an 'output' key. These are
+            required to be the names of existing input and output channels in
+            the model that will be co-opted by the server. (Note: This requires
+            that the co-opted output channel's send method is called once for
+            each time the co-opted input channel's recv method is called. If
+            used with the `function` parameter, `is_server` must be a dictionary.
+            Defaults to False.
         client_of (str, list, optional): The names of one or more models that
             this model will call as a server. If there are more than one, this
             should be specified as a sequence collection (list). The
@@ -226,9 +232,10 @@ class ModelDriver(Driver):
         process (:class:`yggdrasil.tools.YggPopen`): Process used to run
             the model.
         function (str): The name of the model function that should be wrapped.
-        is_server (bool): If True, the model is assumed to be a server and an
-            instance of :class:`yggdrasil.drivers.ServerDriver` is
-            started.
+        is_server (bool, dict): If True, the model is assumed to be a server
+            and an instance of :class:`yggdrasil.drivers.ServerDriver` is
+            started. If a dict, the input/output channels with the specified
+            names in the dict will be replaced with a server.
         client_of (list): The names of server models that this model is a
             client of.
         timesync (str): If set, the name of the server performing
@@ -289,7 +296,12 @@ class ModelDriver(Driver):
         'overwrite': {'type': 'boolean', 'default': True},
         'preserve_cache': {'type': 'boolean', 'default': False},
         'function': {'type': 'string'},
-        'is_server': {'type': 'boolean', 'default': False},
+        'is_server': {'anyOf': [{'type': 'boolean'},
+                                {'type': 'object',
+                                 'properties': {'input': {'type': 'string'},
+                                                'output': {'type': 'string'}},
+                                 'additionalProperties': False}],
+                      'default': False},
         'client_of': {'type': 'array', 'items': {'type': 'string'},
                       'default': []},
         'timesync': {
@@ -416,6 +428,8 @@ class ModelDriver(Driver):
         self.wrapper_products = []
         # Update for function
         if self.function:
+            if self.is_server:
+                assert(isinstance(self.is_server, dict))
             if self.function_param is None:
                 raise ValueError(("Language %s is not parameterized "
                                   "and so functions cannot be automatically "
@@ -424,11 +438,6 @@ class ModelDriver(Driver):
             if not os.path.isfile(self.model_function_file):
                 raise ValueError("Source file does not exist: '%s'"
                                  % self.model_function_file)
-            if self.is_server or self.client_of:
-                raise NotImplementedError("Use of is_server or client_of "
-                                          "parameters not currently supported "
-                                          "when using automated wrapping of "
-                                          "model functions.")
             model_dir, model_base = os.path.split(self.model_function_file)
             model_base = os.path.splitext(model_base)[0]
             self.model_function_info = self.parse_function_definition(
@@ -436,10 +445,14 @@ class ModelDriver(Driver):
             # Write file
             args[0] = os.path.join(model_dir, 'ygg_' + model_base
                                    + self.language_ext[0])
+            client_comms = ['%s:%s_%s' % (self.name, x, self.name)
+                            for x in self.client_of]
             lines = self.write_model_wrapper(
                 self.model_function_file, self.function,
-                inputs=self.inputs, outputs=self.outputs,
-                outputs_in_inputs=self.model_outputs_in_inputs)
+                inputs=copy.deepcopy(self.inputs),
+                outputs=copy.deepcopy(self.outputs),
+                outputs_in_inputs=self.model_outputs_in_inputs,
+                client_comms=client_comms)
             with open(args[0], 'w') as fd:
                 fd.write('\n'.join(lines))
         # Parse arguments
@@ -1140,6 +1153,9 @@ class ModelDriver(Driver):
         env['YGG_PYTHON_EXEC'] = sys.executable
         env['YGG_DEFAULT_COMM'] = tools.get_default_comm()
         env['YGG_NCLIENTS'] = str(len(self.clients))
+        if isinstance(self.is_server, dict):
+            env['YGG_SERVER_INPUT'] = self.is_server['input']
+            env['YGG_SERVER_OUTPUT'] = self.is_server['output']
         return env
 
     def before_start(self, no_queue_thread=False, **kwargs):
@@ -1732,7 +1748,8 @@ class ModelDriver(Driver):
     @classmethod
     def write_model_wrapper(cls, model_file, model_function,
                             inputs=[], outputs=[],
-                            outputs_in_inputs=None, verbose=False):
+                            outputs_in_inputs=None, verbose=False,
+                            client_comms=[]):
         r"""Return the lines required to wrap a model function as an integrated
         model.
 
@@ -1749,6 +1766,8 @@ class ModelDriver(Driver):
                 to the class attribute outputs_in_inputs.
             verbose (bool, optional): If True, the contents of the created file
                 are displayed. Defaults to False.
+            client_comms (list, optional): List of the names of client comms
+                that should be removed from the list of outputs. Defaults to [].
 
         Returns:
             list: Lines of code wrapping the provided model with the necessary
@@ -1764,6 +1783,25 @@ class ModelDriver(Driver):
         iter_var = {'name': 'first_iter', 'datatype': {'type': 'flag'}}
         if outputs_in_inputs is None:
             outputs_in_inputs = cls.outputs_in_inputs
+        # Replace server input w/ split input/output and remove client
+        # connections from inputs
+        for i, x in enumerate(inputs):
+            if x.get('server_replaces', False):
+                inputs[x['server_replaces']['input_index']] = (
+                    x['server_replaces']['input'])
+                outputs.insert(x['server_replaces']['output_index'],
+                               x['server_replaces']['output'])
+        outputs = [x for x in outputs if x['name'] not in client_comms]
+        if client_comms:
+            warnings.warn("When wrapping a model function, client comms "
+                          "must be initialized outside the function or "
+                          "pass a 'global_scope' parameter to the "
+                          "comm initialization so that they are persistent "
+                          "across calls and the call or recv/send methods "
+                          "must be called explicitly (as opposed to the "
+                          "function inputs/outputs which will be handled "
+                          "by the wrapper). This model's client comms are:\n"
+                          "\t%s" % client_comms)
         # Update types based on the function definition for typed languages
         model_flag = cls.update_io_from_function(
             model_file, model_function,

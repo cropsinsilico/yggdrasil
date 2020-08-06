@@ -76,6 +76,8 @@ R2python <- function(robj, not_bytes=FALSE) {
         call_python_method(out, '__setitem__', name, new_col)
       }
     }
+  } else if (is.null(robj)) {
+    out <- reticulate::r_to_py(NULL)
   } else if (is.na(robj)) {
     out <- reticulate::r_to_py(NULL)
   } else {

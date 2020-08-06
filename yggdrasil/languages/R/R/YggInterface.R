@@ -73,8 +73,28 @@ YggInterface <- function(type, ...) {
   ygg <- reticulate::import('yggdrasil.languages.Python.YggInterface', convert=FALSE)
   varargin <- list(...)
   nargin <- length(varargin)
+  arg_names <- names(varargin)
+  if (is.null(arg_names)) {
+    args <- unname(varargin)
+    kwargs <- NULL
+  } else {
+    first_named <- 0
+    for (i in length(arg_names):1) {
+      if (arg_names[i] == '') {
+        first_named <- i + 1
+	break
+      }
+    }
+    if (first_named == 0) {
+      args <- NULL
+      kwargs <- varargin
+    } else {
+      args <- unname(varargin[1:(first_named - 1)])
+      kwargs <- varargin[first_named:length(varargin)]
+    }
+  }
   pyobj <- ygg$YggInit(R2python(type, not_bytes=TRUE),
-    R2python(varargin, not_bytes=TRUE))
+    R2python(args, not_bytes=TRUE), R2python(kwargs, not_bytes=TRUE))
   if (nargin > 0) {
     out <- YggInterfaceClass$new(pyobj)
   } else {
