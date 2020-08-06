@@ -32,6 +32,7 @@ build:
     - yggtime_paper = yggdrasil.command_line:yggtime_paper
     - yggvalidate = yggdrasil.command_line:validate_yaml
     - ygginstall = yggdrasil.command_line:ygginstall
+    - yggdevup = yggdrasil.command_line:yggdevup
 
 requirements:
   host:

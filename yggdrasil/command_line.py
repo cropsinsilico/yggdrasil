@@ -446,6 +446,19 @@ def yggmodelform():
         pprint.pprint(out)
 
 
+def yggdevup():
+    r"""Cleanup old libraries, re-install languages, and re-compile interface
+    libraries following an update to the code (when doing development)."""
+    parser = argparse.ArgumentParser(
+        description=('Perform cleanup and reinitialization following an '
+                     'update to the code during development.'))
+    parser.parse_args()
+    yggclean()
+    ygginstall()
+    yggcompile()
+    ygginfo()
+
+
 if __name__ == '__main__':
     yggrun()
     sys.exit(0)
