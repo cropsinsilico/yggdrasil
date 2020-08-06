@@ -73,7 +73,9 @@ public:
     @brief Alias to allow freeing of underlying C struct at the class level.
   */
   void _destroy_pi() {
-    ygg_free(_pi);
+    if (!(_pi->is_global)) {
+      ygg_free(_pi);
+    }
     _pi = NULL;
   }
   
@@ -239,7 +241,9 @@ public:
     @brief Alias to allow freeing of underlying C struct at the class level.
   */
   void _destroy_pi() {
-    ygg_free(_pi);
+    if (!(_pi->is_global)) {
+      ygg_free(_pi);
+    }
     _pi = NULL;
   }
   
@@ -339,7 +343,9 @@ public:
     @brief Alias to allow freeing of underlying C struct at the class level.
   */
   void _destroy_pi() {
-    ygg_free(_pi);
+    if (!(_pi->is_global)) {
+      ygg_free(_pi);
+    }
     _pi = NULL;
   }
   
@@ -448,6 +454,18 @@ public:
     YggRpc(yggRpcServer(name.c_str(), inFormat.c_str(), outFormat.c_str())) {}
 
   /*!
+    @brief Constructor for YggRpcServer with explicit datatype.
+    @param[in] name constant std::string name used for input and output
+    queues.
+    @param[in] inType Pointer to a dtype_t data structure containing type info
+    for data that will be received by the server
+    @param[in] outType Pointer to a dtype_t data structure containing type info
+    for data that will be sent by the server.
+   */
+  YggRpcServer(const std::string name, dtype_t *inType, dtype_t *outType) :
+    YggRpc(yggRpcServerType(name.c_str(), inType, outType)) {}
+
+  /*!
     @brief Destructor for YggRpcServer.
     See ygg_free in YggInterface.h for details.
   */
@@ -492,6 +510,18 @@ public:
    */
   YggRpcClient(const std::string name, const std::string outFormat, const std::string inFormat) :
     YggRpc(yggRpcClient(name.c_str(), outFormat.c_str(), inFormat.c_str())) {}
+
+  /*!
+    @brief Constructor for YggRpcClient with explicit datatype.
+    @param[in] name constant std::string name used for input and output
+    queues.
+    @param[in] outType Pointer to a dtype_t data structure containing type info
+    for data that will be sent by the client.
+    @param[in] inType Pointer to a dtype_t data structure containing type info
+    for data that will be received by the client
+   */
+  YggRpcClient(const std::string name, dtype_t *outType, dtype_t *inType) :
+    YggRpc(yggRpcClientType(name.c_str(), outType, inType)) {}
 
   /*!
     @brief Destructor for YggRpcClient.

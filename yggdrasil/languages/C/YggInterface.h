@@ -18,6 +18,10 @@ extern "C" {
 #define ygg_free free_comm
 #define yggComm init_comm
 
+// Forward declaration of server interface to allow replacemnt
+static inline
+comm_t* yggRpcServer(const char *name, const char *inFormat, const char *outFormat);
+
 //==============================================================================
 /*!
   Basic IO 
@@ -81,6 +85,19 @@ yggInput_t yggInputType(const char *name, dtype_t *datatype) {
  */
 static inline
 yggOutput_t yggOutputFmt(const char *name, const char *fmtString){
+  const char* YGG_SERVER_OUTPUT = getenv("YGG_SERVER_OUTPUT");
+  if (YGG_SERVER_OUTPUT) {
+    const char* YGG_MODEL_NAME = getenv("YGG_MODEL_NAME");
+    if (strcmp(name, YGG_SERVER_OUTPUT) == 0) {
+      WITH_GLOBAL_SCOPE(return yggRpcServer(YGG_MODEL_NAME, NULL, fmtString));
+    } else {
+      char alt_name[100];
+      sprintf(alt_name, "%s:%s", YGG_MODEL_NAME, name);
+      if (strcmp(alt_name, YGG_SERVER_OUTPUT) == 0) {
+	WITH_GLOBAL_SCOPE(return yggRpcServer(YGG_MODEL_NAME, NULL, fmtString));
+      }
+    }
+  }
   return init_comm_format(name, "send", _default_comm, fmtString, 0);
 };
 
@@ -95,6 +112,19 @@ yggOutput_t yggOutputFmt(const char *name, const char *fmtString){
  */
 static inline
 yggInput_t yggInputFmt(const char *name, const char *fmtString){
+  const char* YGG_SERVER_INPUT = getenv("YGG_SERVER_INPUT");
+  if (YGG_SERVER_INPUT) {
+    const char* YGG_MODEL_NAME = getenv("YGG_MODEL_NAME");
+    if (strcmp(name, YGG_SERVER_INPUT) == 0) {
+      WITH_GLOBAL_SCOPE(return yggRpcServer(YGG_MODEL_NAME, fmtString, NULL));
+    } else {
+      char alt_name[100];
+      sprintf(alt_name, "%s:%s", YGG_MODEL_NAME, name);
+      if (strcmp(alt_name, YGG_SERVER_INPUT) == 0) {
+	WITH_GLOBAL_SCOPE(return yggRpcServer(YGG_MODEL_NAME, fmtString, NULL));
+      }
+    }
+  }
   return init_comm_format(name, "recv", _default_comm, fmtString, 0);
 };
 
@@ -379,6 +409,58 @@ comm_t* yggRpcServer(const char *name, const char *inFormat, const char *outForm
 };
 
 /*!
+  @brief Constructor for client side RPC structure w/ explicit type info.
+  Creates an instance of yggRpc_t with provided information.  
+  @param[in] name constant character pointer to name for queues.
+  @param[in] outType Pointer to a dtype_t data structure containing type info
+  for data that will be sent by the client.
+  @param[in] inType Pointer to a dtype_t data structure containing type info
+  for data that will be received by the client.
+  @return yggRpc_t structure with provided info.
+ */
+static inline
+comm_t* yggRpcClientType(const char *name, dtype_t *outType, dtype_t *inType) {
+  // Allow for any type if provided is NULL
+  if (outType == NULL) {
+    outType = create_dtype_empty(true);
+  }
+  if (inType == NULL) {
+    inType = create_dtype_empty(true);
+  }
+  comm_t* out = init_comm(name, "%s", CLIENT_COMM, inType);
+  comm_t* handle = (comm_t*)(out->handle);
+  destroy_dtype(&(handle->datatype));
+  handle->datatype = outType;
+  return out;
+};
+
+/*!
+  @brief Constructor for server side RPC structure w/ explicit type info.
+  Creates an instance of yggRpc_t with provided information.  
+  @param[in] name constant character pointer to name for queues.
+  @param[in] inType Pointer to a dtype_t data structure containing type info
+  for data that will be received by the server.
+  @param[in] outType Pointer to a dtype_t data structure containing type info
+  for data that will be sent by the server.
+  @return yggRpc_t structure with provided info.
+ */
+static inline
+comm_t* yggRpcServerType(const char *name, dtype_t *inType, dtype_t *outType) {
+  // Allow for any type if provided is NULL
+  if (inType == NULL) {
+    inType = create_dtype_empty(true);
+  }
+  if (outType == NULL) {
+    outType = create_dtype_empty(true);
+  }
+  comm_t* out = init_comm(name, "%s", SERVER_COMM, outType);
+  comm_t* handle = (comm_t*)(out->handle);
+  destroy_dtype(&(handle->datatype));
+  handle->datatype = inType;
+  return out;
+};
+
+/*!
   @brief Constructor for client side timestep synchronization calls.
   Creates an instance of comm_t with provided information.  
   @param[in] name constant character pointer to name for queues.
@@ -486,7 +568,12 @@ int vrpcCallBase(yggRpc_t rpc, const int allow_realloc,
   
   // pack the args and call
   comm_t *send_comm = (comm_t*)(rpc->handle);
-  size_t send_nargs = nargs_exp_dtype(send_comm->datatype);
+  size_t send_nargs;
+  if (is_empty_dtype(send_comm->datatype)) {
+    send_nargs = 1;
+  } else {
+    send_nargs = nargs_exp_dtype(send_comm->datatype);
+  }
   sret = vcommSend(rpc, send_nargs, ap);
   if (sret < 0) {
     ygglog_error("vrpcCall: vcommSend error: ret %d: %s", sret, strerror(errno));

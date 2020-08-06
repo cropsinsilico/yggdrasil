@@ -25,7 +25,7 @@ class FortranCompilerBase(CompilerBase):
     languages = ['fortran']
     default_executable_env = 'FC'
     default_flags_env = 'FFLAGS'
-    default_flags = ['-g', '-Wall', '-cpp', '-pedantic-errors']
+    default_flags = ['-g', '-Wall', '-cpp', '-pedantic-errors', '-ffree-line-length-0']
     linker_attributes = {'default_flags_env': 'LFLAGS',
                          'search_path_envvar': ['LIBRARY_PATH', 'LD_LIBRARY_PATH']}
     search_path_envvar = []
@@ -204,7 +204,7 @@ class FortranModelDriver(CompiledModelDriver):
         'any': 'ygggeneric'}
     function_param = {
         'import_nofile': 'use {function}',
-        'import': 'include "{filename}"',
+        'import': '#include "{filename}"',
         'index': '{variable}({index})',
         'interface': 'use fygg',
         'input': ('{channel} = ygg_input_type('
@@ -356,6 +356,8 @@ class FortranModelDriver(CompiledModelDriver):
     interface_inside_exec = True
     zero_based = False
     max_line_width = 72
+    global_scope_macro = ('#define WITH_GLOBAL_SCOPE(COMM) call '
+                          'set_global_comm(); COMM; call unset_global_comm()')
     
     @staticmethod
     def before_registration(cls):
@@ -446,6 +448,18 @@ class FortranModelDriver(CompiledModelDriver):
         out += '_%s' % commtype[:3].lower()
         return out
 
+    @classmethod
+    def get_inverse_type_map(cls):
+        r"""Get the inverse type map.
+
+        Returns:
+            dict: Mapping from native type to JSON type.
+
+        """
+        out = super(FortranModelDriver, cls).get_inverse_type_map()
+        out['yggchar_r'] = 'bytes'
+        return out
+        
     @classmethod
     def get_native_type(cls, **kwargs):
         r"""Get the native type.
@@ -710,13 +724,29 @@ class FortranModelDriver(CompiledModelDriver):
  
         """
         if 'filename' in kwargs:
+            if (not module) and os.path.isfile(kwargs['filename']):
+                with open(kwargs['filename'], 'r') as fd:
+                    contents = fd.read()
+                    if 'contains' not in contents.lower():  # pragma: debug
+                        raise ValueError("Could not locate 'contains' keyword "
+                                         "in user defined module.")
+                    idx = contents.lower().index('contains')
+                    return (contents[:idx]
+                            + '  use %s\n' % cls.interface_library
+                            + cls.global_scope_macro + '\n'
+                            + contents[idx:]).splitlines()
             kwargs['filename'] = os.path.basename(kwargs['filename'])
         out = super(FortranModelDriver, cls).write_executable_import(
             **kwargs)
         if module:
             out = (['module %s' % module,
+                    '  use %s' % cls.interface_library,
+                    cls.global_scope_macro,
                     'contains']
-                   + [cls.function_param['indent'] + x for x in out]
+                   # Use output directly when import uses directive #include
+                   + out
+                   # Indent when import uses include statement
+                   # + [cls.function_param['indent'] + x for x in out]
                    + ['end module %s' % module])
         return out
         
@@ -748,17 +778,17 @@ class FortranModelDriver(CompiledModelDriver):
                 imports = [imports]
             for kws in imports:
                 if ('filename' in kws) and os.path.isfile(kws['filename']):
-                    # with open(kws['filename'], 'r') as fd:
-                    #     contents = fd.read()
-                    # regex_module = (r'(?i)\s*module\s+(?P<module>.*?)'
-                    #                 r'(?:.*?\n)*?'
-                    #                 r'\s*end\s+module\s+(?P=module)')
-                    # match_module = re.search(regex_module, contents)
-                    # if match_module:
-                    #     module = match_module.groupdict('module')
-                    # else:
-                    module = '%s_module' % kws['function']
-                    kws['module'] = module
+                    with open(kws['filename'], 'r') as fd:
+                        contents = fd.read()
+                    regex_module = (r'(?i)\s*module\s+(?P<module>.+)\n'
+                                    r'(?:.*?\n)*?'
+                                    r'\s*end\s+module\s+(?P=module)')
+                    match_module = re.search(regex_module, contents)
+                    if match_module:
+                        module = match_module.groupdict()['module']
+                    else:
+                        module = '%s_module' % kws['function']
+                        kws['module'] = module
                     lines.insert(last_use + 1, 'use %s' % module)
                     last_use += 1
         if 'implicit none' not in lines:
@@ -821,6 +851,9 @@ class FortranModelDriver(CompiledModelDriver):
             list: Set of lines resulting from spliting the provided line.
 
         """
+        if line.startswith(('#if', '#endif', '#define', '#else', '#ifdef',
+                            '#ifndef')):
+            return [line]
         if line.lstrip().lower().startswith("include"):
             force_split = True
         return super(FortranModelDriver, cls).split_line(

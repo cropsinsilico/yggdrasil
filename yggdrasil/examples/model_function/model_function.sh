@@ -1,7 +1,7 @@
 #!/bin/bash
 
-export CIS_DEBUG="INFO"
-export CIS_NAMESPACE="model_function"
+export YGG_DEBUG="INFO"
+export YGG_NAMESPACE="model_function"
 
 yaml= 
 
@@ -36,6 +36,10 @@ case $1 in
 	echo "Running R"
 	yaml='model_function_r.yml'
 	;;
+    -f | --fortran )
+	echo "Running Fortran"
+	yaml='model_function_fortran.yml'
+	;;
 esac
 
-cisrun $yaml
+yggrun $yaml

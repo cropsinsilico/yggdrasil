@@ -3,6 +3,9 @@ subroutine yggassign_yggchar2character(in, out)
   character(len=:), allocatable :: out
   integer :: i, in_size
   in_size = size(in%x)
+  if (allocated(out)) then
+     deallocate(out)
+  end if
   allocate(character(len=in_size) :: out)
   do i = 1, in_size
      out(i:i) = in%x(i)

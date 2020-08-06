@@ -14,6 +14,8 @@ void ygg_c_free(void *x);
 void ygg_log_info_f(const char* fmt);
 void ygg_log_debug_f(const char* fmt);
 void ygg_log_error_f(const char* fmt);
+void set_global_comm();
+void unset_global_comm();
 // Methods for initializing channels
 int is_comm_format_array_type_f(const void *x);
 void* ygg_output_f(const char *name);
@@ -44,6 +46,8 @@ void *yggRpcClient_f(const char *name, const char *out_fmt,
 		     const char *in_fmt);
 void *yggRpcServer_f(const char *name, const char *in_fmt,
 		     const char *out_fmt);
+void *yggRpcClientType_f(const char *name, void *outType, void *inType);
+void *yggRpcServerType_f(const char *name, void *inType, void *outType);
 void *yggTimesync_f(const char *name, const char *t_units);
 // Method for constructing data types
 int is_dtype_format_array_f(void* type_struct);

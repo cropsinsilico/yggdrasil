@@ -211,6 +211,7 @@ def yggcompile():
     r"""Compile interface library/libraries."""
     from yggdrasil.tools import get_supported_lang
     from yggdrasil.components import import_component
+    yggclean()
     parser = argparse.ArgumentParser(
         description='Compile yggdrasil dependency libraries')
     parser.add_argument('language', nargs='*', default=[],

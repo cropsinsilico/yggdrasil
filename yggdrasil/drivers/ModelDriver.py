@@ -1794,9 +1794,12 @@ class ModelDriver(Driver):
         outputs = [x for x in outputs if x['name'] not in client_comms]
         if client_comms:
             warnings.warn("When wrapping a model function, client comms "
-                          "must be initialized outside the function or "
+                          "must either be initialized outside the function, "
                           "pass a 'global_scope' parameter to the "
-                          "comm initialization so that they are persistent "
+                          "comm initialization (e.g. Python, R, Matlab), "
+                          "or use a 'WITH_GLOBAL_SCOPE' macro "
+                          "(e.g. C, C++, Fortran) around the initialization "
+                          "so that they are persistent "
                           "across calls and the call or recv/send methods "
                           "must be called explicitly (as opposed to the "
                           "function inputs/outputs which will be handled "
