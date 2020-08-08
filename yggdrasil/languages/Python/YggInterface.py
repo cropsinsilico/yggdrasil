@@ -107,7 +107,8 @@ def YggInput(name, format_str=None, **kwargs):
     if ((YGG_SERVER_INPUT
          and ((name == YGG_SERVER_INPUT)
               or (('%s:%s' % (YGG_MODEL_NAME, name)) == YGG_SERVER_INPUT)))):
-        return YggRpcServer(YGG_MODEL_NAME, global_scope=True)
+        return YggRpcServer(YGG_MODEL_NAME, infmt=format_str,
+                            outfmt=None, global_scope=True)
     if format_str is not None:
         kwargs['format_str'] = format_str
     kwargs.update(direction='recv', recv_timeout=False)
@@ -133,7 +134,8 @@ def YggOutput(name, format_str=None, **kwargs):
     if ((YGG_SERVER_OUTPUT
          and ((name == YGG_SERVER_OUTPUT)
               or (('%s:%s' % (YGG_MODEL_NAME, name)) == YGG_SERVER_OUTPUT)))):
-        return YggRpcServer(YGG_MODEL_NAME, global_scope=True)
+        return YggRpcServer(YGG_MODEL_NAME, outfmt=format_str,
+                            infmt=None, global_scope=True)
     if format_str is not None:
         kwargs['format_str'] = format_str
     kwargs.update(direction='send')
@@ -156,8 +158,12 @@ def YggRpcServer(name, infmt='%s', outfmt='%s', **kwargs):
         
     """
     from yggdrasil.communication import ServerComm
-    icomm_kwargs = dict(format_str=infmt)
-    ocomm_kwargs = dict(format_str=outfmt)
+    icomm_kwargs = {}
+    ocomm_kwargs = {}
+    if infmt is not None:
+        icomm_kwargs['format_str'] = infmt
+    if outfmt is not None:
+        ocomm_kwargs['format_str'] = outfmt
     kwargs.update(icomm_kwargs, comm_class=ServerComm.ServerComm,
                   response_kwargs=ocomm_kwargs)
     kwargs.setdefault('recv_timeout', False)
@@ -181,8 +187,12 @@ def YggRpcClient(name, outfmt='%s', infmt='%s', **kwargs):
         
     """
     from yggdrasil.communication import ClientComm
-    icomm_kwargs = dict(format_str=infmt)
-    ocomm_kwargs = dict(format_str=outfmt)
+    icomm_kwargs = {}
+    ocomm_kwargs = {}
+    if infmt is not None:
+        icomm_kwargs['format_str'] = infmt
+    if outfmt is not None:
+        ocomm_kwargs['format_str'] = outfmt
     kwargs.update(ocomm_kwargs, comm_class=ClientComm.ClientComm,
                   response_kwargs=icomm_kwargs)
     kwargs.setdefault('recv_timeout', False)
