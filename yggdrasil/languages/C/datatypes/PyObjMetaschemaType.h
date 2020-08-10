@@ -199,6 +199,15 @@ public:
     return 1;
   }
   /*!
+    @brief Skip arguments that make of this type.
+    @param[in, out] nargs Pointer to number of arguments in ap.
+    @param[in, out] ap va_list_t Variable argument list.
+   */
+  void skip_va_elements_core(size_t *nargs, va_list_t *ap) const override {
+    va_arg(ap->va, python_t);
+    (*nargs)--;
+  }
+  /*!
     @brief Import a Python object (e.g. class or function).
     @param[in] name const char* Name of Python module and class/function.
     @returns PyObject* Python object.

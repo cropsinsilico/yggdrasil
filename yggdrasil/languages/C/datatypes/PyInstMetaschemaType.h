@@ -241,6 +241,15 @@ public:
     return 1;
   }
   /*!
+    @brief Skip arguments that make of this type.
+    @param[in, out] nargs Pointer to number of arguments in ap.
+    @param[in, out] ap va_list_t Variable argument list.
+   */
+  void skip_va_elements_core(size_t *nargs, va_list_t *ap) const override {
+    va_arg(ap->va, python_t);
+    (*nargs)--;
+  }
+  /*!
     @brief Update the type object with info from another type object.
     @param[in] new_info MetaschemaType* type object.
    */

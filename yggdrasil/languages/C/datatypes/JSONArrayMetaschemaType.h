@@ -306,9 +306,13 @@ public:
     @param[in] new_info MetaschemaType* type object.
    */
   void update(const MetaschemaType* new_info) override {
-    MetaschemaType::update(new_info);
-    JSONArrayMetaschemaType* new_info_array = (JSONArrayMetaschemaType*)new_info;
-    update_items(new_info_array->items());
+    if ((strcmp(type(), new_info->type()) != 0) && (items_.size() == 1) && (strcmp(items_[0]->type(), new_info->type()) == 0)) {
+      items_[0]->update(new_info);
+    } else {
+      MetaschemaType::update(new_info);
+      JSONArrayMetaschemaType* new_info_array = (JSONArrayMetaschemaType*)new_info;
+      update_items(new_info_array->items());
+    }
   }
   /*!
     @brief Update the type at an index.
@@ -566,6 +570,17 @@ public:
     return nargs;
   }
   /*!
+    @brief Skip arguments that make of this type.
+    @param[in, out] nargs Pointer to number of arguments in ap.
+    @param[in, out] ap va_list_t Variable argument list.
+   */
+  void skip_va_elements_core(size_t *nargs, va_list_t *ap) const override {
+    size_t i;
+    for (i = 0; i < items_.size(); i++) {
+      items_[i]->skip_va_elements_wrap(nargs, ap);
+    }
+  }
+  /*!
     @brief Convert a Python representation to a C representation.
     @param[in] pyobj PyObject* Pointer to Python object.
     @returns YggGeneric* Pointer to C object.
@@ -705,8 +720,12 @@ public:
 		   size_t *nargs, va_list_t &ap) const override {
     size_t i;
     if (!(data.IsArray())) {
-      ygglog_error("JSONArrayMetaschemaType::decode_data: Raw data is not an array.");
-      return false;
+      if (items_.size() == 1) {
+	return items_[0]->decode_data_wrap(data, allow_realloc, nargs, ap);
+      } else {
+	ygglog_error("JSONArrayMetaschemaType::decode_data: Raw data is not an array.");
+	return false;
+      }
     }
     if (data.Size() != items_.size()) {
       ygglog_error("JSONArrayMetaschemaType::decode_data: %lu items expected, but %lu found.",
@@ -739,7 +758,11 @@ public:
       }
     }
     if (!(data.IsArray())) {
-      ygglog_error("JSONArrayMetaschemaType::decode_data: Raw data is not an array.");
+      if (items_.size() == 1) {
+	return items_[0]->decode_data(data, x);
+      } else {
+	ygglog_error("JSONArrayMetaschemaType::decode_data: Raw data is not an array.");
+      }
       return false;
     }
     if (data.Size() != items_.size()) {
