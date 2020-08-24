@@ -1857,8 +1857,10 @@ class ModelDriver(Driver):
         # Loop
         loop_lines = []
         # Receive inputs
+        any_loop_inputs = False
         for x in inputs:
             if not x.get('outside_loop', False):
+                any_loop_inputs = True
                 loop_lines += cls.write_model_recv(x['channel'], x,
                                                    flag_var=flag_var,
                                                    iter_var=iter_var,
@@ -1876,8 +1878,8 @@ class ModelDriver(Driver):
             'assign', name=iter_var['name'],
             value=cls.function_param.get('false_flag',
                                          cls.function_param['false'])))
-        # Add break if there are not any inputs
-        if not inputs:
+        # Add break if there are not any inputs inside the loop
+        if not any_loop_inputs:
             loop_lines.append(cls.format_function_param(
                 'assign', name=flag_var['name'],
                 value=cls.function_param.get(
