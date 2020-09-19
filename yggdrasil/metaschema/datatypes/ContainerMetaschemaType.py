@@ -160,10 +160,13 @@ class ContainerMetaschemaType(MetaschemaType):
 
         """
         container = cls._container_type()
-        for k, v in cls._iterate(obj):
-            vtypedef = cls._get_element(typedef[cls._json_property], k, {})
-            vcls = get_type_class(vtypedef['type'])
-            cls._assign(container, k, vcls.decode_data(v, vtypedef))
+        if cls._json_property in typedef:
+            for k, v in cls._iterate(obj):
+                vtypedef = cls._get_element(typedef[cls._json_property], k, {})
+                vcls = get_type_class(vtypedef['type'])
+                cls._assign(container, k, vcls.decode_data(v, vtypedef))
+        else:
+            print('no %s: %s' % (cls._json_property, str(typedef)))
         return container
 
     @classmethod
