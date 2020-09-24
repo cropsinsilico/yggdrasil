@@ -86,3 +86,5 @@ class TestUnits(YggTestBase):
                  ('h', 'hr')]
         for x, y in pairs:
             self.assert_equal(units.convert_R_unit_string(x), y)
+            self.assert_equal(units.convert_R_unit_string(
+                units.convert_R_unit_string(x)), y)

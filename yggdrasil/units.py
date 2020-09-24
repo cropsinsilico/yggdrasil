@@ -129,16 +129,17 @@ def convert_unit_string(orig_str, replacements=None):
                         '100%': 'percent'}
     regex_mu = [tools.bytes2str(b'\xc2\xb5'),
                 tools.bytes2str(b'\xce\xbcs'),
-                '(?:100%)']
+                r'(?:100\%)']
     regex = r'(?P<name>[A-Za-z%s]+)(?P<exp>-?[0-9]*)(?: |$)' % ''.join(regex_mu)
-    for x in re.finditer(regex, orig_str):
-        xdict = x.groupdict()
-        if xdict['name'] in replacements:
-            xdict['name'] = replacements[xdict['name']]
-        if xdict['exp']:
-            out.append('({name}**{exp})'.format(**xdict))
-        else:
-            out.append(xdict['name'])
+    if re.fullmatch(r'(?:%s)+' % regex, orig_str.strip()):
+        for x in re.finditer(regex, orig_str.strip()):
+            xdict = x.groupdict()
+            if xdict['name'] in replacements:
+                xdict['name'] = replacements[xdict['name']]
+            if xdict['exp']:
+                out.append('({name}**{exp})'.format(**xdict))
+            else:
+                out.append(xdict['name'])
     if out:
         out = '*'.join(out)
     else:
