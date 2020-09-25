@@ -11,6 +11,7 @@ import subprocess
 import importlib
 from ._version import get_versions
 from yggdrasil import config
+_production_run = False
 _test_package_name = None
 _test_package = None
 logging.basicConfig()
@@ -41,6 +42,18 @@ if not os.path.isfile(config.usr_config_file):  # pragma: no cover
     config.update_language_config()
     with open(config.usr_config_file, 'r') as fd:
         print(fd.read())
+
+
+def enable_production_run():
+    global _production_run
+    _production_run = True
+    os.environ['YGG_SKIP_COMPONENT_VALIDATION'] = 'True'
+
+
+def disable_production_run():
+    global _production_run
+    _production_run = False
+    os.environ['YGG_SKIP_COMPONENT_VALIDATION'] = 'False'
 
 
 def expand_and_add(path, path_list, dir_list):  # pragma: no cover

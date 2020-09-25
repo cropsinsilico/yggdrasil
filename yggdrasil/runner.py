@@ -9,7 +9,7 @@ from itertools import chain
 import socket
 from yggdrasil.tools import YggClass
 from yggdrasil.config import ygg_cfg, cfg_environment
-from yggdrasil import platform, yamlfile
+from yggdrasil import platform, yamlfile, enable_production_run
 from yggdrasil.drivers import create_driver
 
 
@@ -501,7 +501,7 @@ class YggRunner(YggClass):
         self.debug('Returning')
 
         
-def get_runner(models, **kwargs):
+def get_runner(models, production_run=False, **kwargs):
     r"""Get runner for a set of models, getting run information from the
     environment.
 
@@ -517,6 +517,8 @@ def get_runner(models, **kwargs):
         Exception: If config option 'namespace' in 'rmq' section not set.
 
     """
+    if production_run:
+        enable_production_run()
     # Get environment variables
     rank = os.environ.get('PARALLEL_SEQ', '0')
     host = socket.gethostname()

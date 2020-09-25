@@ -186,9 +186,13 @@ def yggrun():
     parser = argparse.ArgumentParser(description='Run an integration.')
     parser.add_argument('yamlfile', nargs='+',
                         help='One or more yaml specification files.')
+    parser.add_argument('--production-run', action='store_true',
+                        help=('Turn of safe guards in order to improve '
+                              'performance.'))
     args = parser.parse_args()
     prog = sys.argv[0].split(os.path.sep)[-1]
-    runner.run(args.yamlfile, ygg_debug_prefix=prog)
+    runner.run(args.yamlfile, ygg_debug_prefix=prog,
+               production_run=args.production_run)
 
 
 def yggclean():

@@ -152,7 +152,7 @@ class ServerRequestDriver(ConnectionDriver):
 
         """
         with self.lock:
-            if msg == YGG_CLIENT_INI:
+            if isinstance(msg, bytes) and (msg == YGG_CLIENT_INI):
                 self.debug("New client signed on.")
                 self.nclients += 1
                 msg = self.icomm.empty_obj_recv

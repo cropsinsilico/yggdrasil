@@ -190,7 +190,7 @@ def get_data(obj):
         np.ndarray: Numpy array representation of the underlying data.
 
     """
-    if has_units(obj):
+    if has_units(obj) or isinstance(obj, (_unit_quantity, _unit_array)):
         out = obj.to_ndarray()
         if out.ndim == 0:
             out = out.reshape((1, ))[0]
