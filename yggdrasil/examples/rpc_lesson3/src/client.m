@@ -7,5 +7,5 @@ function out_buf = client(in_buf)
   if (~ret);
     error('client(Matlab): RPC CALL ERROR');
   end;
-  out_buf = result{1};
+  out_buf = result;
 end

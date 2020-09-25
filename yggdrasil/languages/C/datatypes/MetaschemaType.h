@@ -619,6 +619,7 @@ public:
     size_t i;
     if (ap->using_ptrs) {
       ap->iptr = ap->iptr + nargs_exp();
+      (*nargs) = (*nargs) - nargs_exp();
       return;
     }
     for (i = 0; i < skip_before_.size(); i++) {
@@ -1419,7 +1420,7 @@ public:
     va_list_t ap_copy = copy_va_list(ap);
     update_from_deserialization_args(nargs, ap_copy);
     if (nargs_exp() != *nargs) {
-      ygglog_throw_error("MetaschemaType::deserialize: %d arguments expected, but only %d provided.",
+      ygglog_throw_error("MetaschemaType::deserialize: %d arguments expected, but %d provided.",
 			 nargs_exp(), *nargs);
     }
     // Parse body
