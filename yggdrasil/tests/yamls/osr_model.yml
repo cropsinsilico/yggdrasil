@@ -2,7 +2,10 @@ model:
   name: osr_model
   language: osr
   timesync:
-    inputs: specificLeafArea
-    outputs: ovar1, ovar2
+    inputs: [carbonAllocation2Roots]
+    outputs: [carbonAllocation2Roots]
   args:
-    - {{OSR_REPOSITORY}}/OpenSimRoot/InputFiles/runMaizeYgg.xml
+    - ../../examples/osr/src/osr_model.xml
+  copy_xml_to_osr: True
+  update_interval:
+    timesync: 0.1

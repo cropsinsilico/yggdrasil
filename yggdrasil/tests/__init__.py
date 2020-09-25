@@ -68,7 +68,7 @@ yaml_list = [
     ('lpy', 'lpy_model.yml'),
     ('fortran', 'fortran_model.yml'),
     ('sbml', 'sbml_model.yml'),
-    ('osr', 'osr_model.xml')]
+    ('osr', 'osr_model.yml')]
 yamls = {k: os.path.join(yaml_dir, v) for k, v in yaml_list}
 
 # Makefile
