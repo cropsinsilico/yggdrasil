@@ -352,6 +352,22 @@ comm_t* init_comm(const char *name, const char *direction,
   return ret;
 };
 
+
+/*!
+  @brief Convert a format string to a datatype.
+  @param[in] format_str char* Format string.
+  @param[in] as_array int If 1, inputs/outputs are processed as arrays.
+  @returns dtype_t* Pointer to datatype structure.
+ */
+static
+dtype_t* formatstr2datatype(const char *format_str, const int as_array) {
+  dtype_t* datatype = NULL;
+  if (format_str != NULL) {
+    datatype = create_dtype_format(format_str, as_array, false);
+  }
+  return datatype;
+};
+
 /*!
   @brief Initialize a generic communicator using a format string to determine
   the type.
@@ -370,16 +386,7 @@ static
 comm_t* init_comm_format(const char *name, const char *direction,
 			 const comm_type t, const char *format_str,
 			 const int as_array) {
-  dtype_t* datatype = NULL;
-  if (format_str == NULL) {
-    if (strcmp(direction, "recv") == 0) {
-      datatype = NULL; // It will be set on receiving a message
-    } else {
-      datatype = NULL;
-    }
-  } else {
-    datatype = create_dtype_format(format_str, as_array, false);
-  }
+  dtype_t* datatype = formatstr2datatype(format_str, as_array);
   comm_t* out = init_comm(name, direction, t, datatype);
   if ((format_str != NULL) && (datatype == NULL)) {
     ygglog_error("init_comm_format: Failed to create type from format_str.");

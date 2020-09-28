@@ -20,7 +20,7 @@ extern "C" {
 
 // Forward declaration of server interface to allow replacemnt
 static inline
-comm_t* yggRpcServer(const char *name, const char *inFormat, const char *outFormat);
+comm_t* yggRpcServerType_global(const char *name, dtype_t *inType, dtype_t *outType);
 
 //==============================================================================
 /*!
@@ -56,6 +56,19 @@ comm_t* yggRpcServer(const char *name, const char *inFormat, const char *outForm
  */
 static inline
 yggOutput_t yggOutputType(const char *name, dtype_t *datatype) {
+  const char* YGG_SERVER_OUTPUT = getenv("YGG_SERVER_OUTPUT");
+  if (YGG_SERVER_OUTPUT) {
+    const char* YGG_MODEL_NAME = getenv("YGG_MODEL_NAME");
+    if (strcmp(name, YGG_SERVER_OUTPUT) == 0) {
+      return yggRpcServerType_global(YGG_MODEL_NAME, NULL, datatype);
+    } else {
+      char alt_name[100];
+      sprintf(alt_name, "%s:%s", YGG_MODEL_NAME, name);
+      if (strcmp(alt_name, YGG_SERVER_OUTPUT) == 0) {
+	return yggRpcServerType_global(YGG_MODEL_NAME, NULL, datatype);
+      }
+    }
+  }
   return init_comm(name, "send", _default_comm, datatype);
 };
 
@@ -70,6 +83,19 @@ yggOutput_t yggOutputType(const char *name, dtype_t *datatype) {
  */
 static inline
 yggInput_t yggInputType(const char *name, dtype_t *datatype) {
+  const char* YGG_SERVER_INPUT = getenv("YGG_SERVER_INPUT");
+  if (YGG_SERVER_INPUT) {
+    const char* YGG_MODEL_NAME = getenv("YGG_MODEL_NAME");
+    if (strcmp(name, YGG_SERVER_INPUT) == 0) {
+      return yggRpcServerType_global(YGG_MODEL_NAME, datatype, NULL);
+    } else {
+      char alt_name[100];
+      sprintf(alt_name, "%s:%s", YGG_MODEL_NAME, name);
+      if (strcmp(alt_name, YGG_SERVER_INPUT) == 0) {
+	return yggRpcServerType_global(YGG_MODEL_NAME, datatype, NULL);
+      }
+    }
+  }
   return init_comm(name, "recv", _default_comm, datatype);
 };
   
@@ -85,20 +111,15 @@ yggInput_t yggInputType(const char *name, dtype_t *datatype) {
  */
 static inline
 yggOutput_t yggOutputFmt(const char *name, const char *fmtString){
-  const char* YGG_SERVER_OUTPUT = getenv("YGG_SERVER_OUTPUT");
-  if (YGG_SERVER_OUTPUT) {
-    const char* YGG_MODEL_NAME = getenv("YGG_MODEL_NAME");
-    if (strcmp(name, YGG_SERVER_OUTPUT) == 0) {
-      WITH_GLOBAL_SCOPE(return yggRpcServer(YGG_MODEL_NAME, NULL, fmtString));
-    } else {
-      char alt_name[100];
-      sprintf(alt_name, "%s:%s", YGG_MODEL_NAME, name);
-      if (strcmp(alt_name, YGG_SERVER_OUTPUT) == 0) {
-	WITH_GLOBAL_SCOPE(return yggRpcServer(YGG_MODEL_NAME, NULL, fmtString));
-      }
+  dtype_t* datatype = formatstr2datatype(fmtString, 0);
+  comm_t* out = yggOutputType(name, datatype);
+  if ((fmtString != NULL) && (datatype == NULL)) {
+    ygglog_error("yggOutputFmt: Failed to create tyep from format_str.");
+    if (out != NULL) {
+      out->valid = 0;
     }
   }
-  return init_comm_format(name, "send", _default_comm, fmtString, 0);
+  return out;
 };
 
 /*!
@@ -112,20 +133,15 @@ yggOutput_t yggOutputFmt(const char *name, const char *fmtString){
  */
 static inline
 yggInput_t yggInputFmt(const char *name, const char *fmtString){
-  const char* YGG_SERVER_INPUT = getenv("YGG_SERVER_INPUT");
-  if (YGG_SERVER_INPUT) {
-    const char* YGG_MODEL_NAME = getenv("YGG_MODEL_NAME");
-    if (strcmp(name, YGG_SERVER_INPUT) == 0) {
-      WITH_GLOBAL_SCOPE(return yggRpcServer(YGG_MODEL_NAME, fmtString, NULL));
-    } else {
-      char alt_name[100];
-      sprintf(alt_name, "%s:%s", YGG_MODEL_NAME, name);
-      if (strcmp(alt_name, YGG_SERVER_INPUT) == 0) {
-	WITH_GLOBAL_SCOPE(return yggRpcServer(YGG_MODEL_NAME, fmtString, NULL));
-      }
+  dtype_t* datatype = formatstr2datatype(fmtString, 0);
+  comm_t* out = yggInputType(name, datatype);
+  if ((fmtString != NULL) && (datatype == NULL)) {
+    ygglog_error("yggInputFmt: Failed to create tyep from format_str.");
+    if (out != NULL) {
+      out->valid = 0;
     }
   }
-  return init_comm_format(name, "recv", _default_comm, fmtString, 0);
+  return out;
 };
 
 /*!
@@ -137,7 +153,7 @@ yggInput_t yggInputFmt(const char *name, const char *fmtString){
  */
 static inline
 yggOutput_t yggOutput(const char *name) {
-  yggOutput_t ret = yggOutputFmt(name, NULL);
+  yggOutput_t ret = yggOutputType(name, NULL);
   return ret;
 };
 
@@ -150,7 +166,7 @@ yggOutput_t yggOutput(const char *name) {
  */
 static inline
 yggInput_t yggInput(const char *name){
-  yggInput_t ret = yggInputFmt(name, NULL);
+  yggInput_t ret = yggInputType(name, NULL);
   return ret;
 };
 
@@ -457,6 +473,37 @@ comm_t* yggRpcServerType(const char *name, dtype_t *inType, dtype_t *outType) {
   comm_t* handle = (comm_t*)(out->handle);
   destroy_dtype(&(handle->datatype));
   handle->datatype = inType;
+  return out;
+};
+
+/*!
+  @brief Constructor for server side RPC structure w/ explicit type info.
+  Creates an instance of yggRpc_t with provided information after first
+  checking for a pre-existing global comm of the same name. If one doesn't
+  exist, one is created.
+  @param[in] name constant character pointer to name for queues.
+  @param[in] inType Pointer to a dtype_t data structure containing type info
+  for data that will be received by the server.
+  @param[in] outType Pointer to a dtype_t data structure containing type info
+  for data that will be sent by the server.
+  @return yggRpc_t structure with provided info.
+ */
+static inline
+comm_t* yggRpcServerType_global(const char *name, dtype_t *inType, dtype_t *outType) {
+  comm_t* out = NULL;
+  WITH_GLOBAL_SCOPE(out = get_global_scope_comm(name));
+  if (out == NULL) {
+    WITH_GLOBAL_SCOPE(return yggRpcServerType(name, inType, outType));
+  }
+  if (inType != NULL) {
+    comm_t* handle = (comm_t*)(out->handle);
+    destroy_dtype(&(handle->datatype));
+    handle->datatype = inType;
+  }
+  if (outType != NULL) {
+    destroy_dtype(&(out->datatype));
+    out->datatype = outType;
+  }
   return out;
 };
 

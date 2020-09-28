@@ -133,8 +133,8 @@ class CPPModelDriver(CModelDriver):
             r'(?P<flag_type>.+?)\s*{function_name}\s*'
             r'\((?P<inputs>(?:[^{{&])*?)'
             r'(?:,\s*(?P<outputs>'
-            r'(?:\s*(?:[^\s])+(?:\s+)(?:\()?&(?:[^{{])+)+'
-            r'))?\)\s*\{{'
+            r'(?:\s*(?:[^\s]+)(?P<ref1>&)(?:\s+)(?:\()?(?(ref1)|&)'
+            r'(?:[^{{])+)+))?\)\s*\{{'
             r'(?P<body>(?:.*?\n?)*?)'
             r'(?:(?:return +(?P<flag_var>.+?)?;(?:.*?\n?)*?\}})'
             r'|(?:\}}))'),
