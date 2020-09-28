@@ -5,3 +5,4 @@ model:
   driver: GCCModelDriver
   args: ./src/maxMsgCli.cpp
   client_of: maxMsgSrv
+  logging_level: DEBUG

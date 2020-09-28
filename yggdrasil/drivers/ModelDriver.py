@@ -154,6 +154,9 @@ class ModelDriver(Driver):
             return value will be a flag. If False, outputs are limited to
             return values. Defaults to the value of the class attribute
             outputs_in_inputs.
+        logging_level (str, optional): The level of logging messages that should
+            be displayed by the model. Defaults to the logging level as
+            determined by the configuration file and environment variables.
         **kwargs: Additional keyword arguments are passed to parent class.
 
     Class Attributes:
@@ -344,7 +347,8 @@ class ModelDriver(Driver):
                            'default': ['--leak-check=full',
                                        '--show-leak-kinds=all'],  # '-v'
                            'items': {'type': 'string'}},
-        'outputs_in_inputs': {'type': 'boolean'}}
+        'outputs_in_inputs': {'type': 'boolean'},
+        'logging_level': {'type': 'string', 'default': ''}}
     _schema_excluded_from_class = ['name', 'language', 'args', 'working_dir']
     _schema_excluded_from_class_validation = ['inputs', 'outputs']
     
@@ -625,6 +629,17 @@ class ModelDriver(Driver):
         self.model_dir = os.path.dirname(self.model_file)
         self.debug("model_file = '%s', model_dir = '%s', model_args = '%s'",
                    self.model_file, self.model_dir, self.model_args)
+
+    @property
+    def numeric_logging_level(self):
+        r"""int: Logging level for the model."""
+        out = self.logger.getEffectiveLevel()
+        if self.logging_level:
+            old_lvl = out
+            self.logger.setLevel(self.logging_level)
+            out = self.logger.getEffectiveLevel()
+            self.logger.setLevel(old_lvl)
+        return out
 
     def write_wrappers(self, **kwargs):
         r"""Write any wrappers needed to compile and/or run a model.
@@ -1156,6 +1171,9 @@ class ModelDriver(Driver):
         if isinstance(self.is_server, dict):
             env['YGG_SERVER_INPUT'] = self.is_server['input']
             env['YGG_SERVER_OUTPUT'] = self.is_server['output']
+        if self.logging_level:
+            env['YGG_DEBUG'] = self.logging_level
+            env['YGG_CLIENT_DEBUG'] = self.logging_level
         return env
 
     def before_start(self, no_queue_thread=False, **kwargs):

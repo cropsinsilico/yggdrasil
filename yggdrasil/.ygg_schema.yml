@@ -125,8 +125,8 @@ definitions:
             type: string
           type: array
       required:
-      - name
       - datatype
+      - name
       - commtype
       title: comm_base
       type: object
@@ -629,9 +629,9 @@ definitions:
             is used.
           type: string
       required:
+      - filetype
       - name
       - working_dir
-      - filetype
       title: file_base
       type: object
     - anyOf:
@@ -1393,6 +1393,12 @@ definitions:
           items:
             type: string
           type: array
+        logging_level:
+          default: ''
+          description: The level of logging messages that should be displayed by the
+            model. Defaults to the logging level as determined by the configuration
+            file and environment variables.
+          type: string
         makedir:
           description: Directory where make should be invoked from if it is not the
             same as the directory containing the makefile. Defaults to directory containing
@@ -1665,10 +1671,10 @@ definitions:
             is used.
           type: string
       required:
-      - name
       - working_dir
-      - language
+      - name
       - args
+      - language
       title: model_base
       type: object
     - anyOf:
