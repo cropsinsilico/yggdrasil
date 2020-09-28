@@ -347,16 +347,20 @@ def parse_model(yml, existing):
                'args': yml['name'] + '_SERVER',
                'working_dir': yml['working_dir']}
         if yml.get('function', False) and isinstance(yml['is_server'], bool):
-            raise YAMLSpecificationError(
-                "The 'is_server' parameter is boolean for the model '%s' "
-                "and the 'function' parameter is also set. "
-                "If the 'function' and 'is_server' parameters are used "
-                "together, the 'is_server' parameter must be a mapping "
-                "with 'input' and 'output' entries specifying which of the "
-                "function's input/output variables should be received/sent "
-                "from/to clients. e.g. \n"
-                "\t-input: input_variable\n"
-                "\t-output: output_variables\n" % yml['name'])
+            if (len(yml['inputs']) == 1) and (len(yml['outputs']) == 1):
+                yml['is_server'] = {'input': yml['inputs'][0]['name'],
+                                    'output': yml['outputs'][0]['name']}
+            else:
+                raise YAMLSpecificationError(
+                    "The 'is_server' parameter is boolean for the model '%s' "
+                    "and the 'function' parameter is also set. "
+                    "If the 'function' and 'is_server' parameters are used "
+                    "together, the 'is_server' parameter must be a mapping "
+                    "with 'input' and 'output' entries specifying which of "
+                    "the function's input/output variables should be received"
+                    "/sent from/to clients. e.g. \n"
+                    "\t-input: input_variable\n"
+                    "\t-output: output_variables\n" % yml['name'])
         if isinstance(yml['is_server'], dict):
             replaces = {}
             for io in ['input', 'output']:
