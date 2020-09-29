@@ -991,9 +991,10 @@ class FortranModelDriver(CompiledModelDriver):
             for v in cls.channels2vars(send_var):
                 if (((not cls.allows_realloc(v, from_native_type=True))
                      and cls.allows_realloc(v))):
-                    out_before.append('call yggassign(%s, %s_realloc)'
-                                      % (v['name'], v['name']))
-                    v = dict(v, name=('%s_realloc' % v['name']))
+                    if v.get('datatype', v).get('type', False) in ['1darray']:
+                        out_before.append('call yggassign(%s, %s_realloc)'
+                                          % (v['name'], v['name']))
+                        v = dict(v, name=('%s_realloc' % v['name']))
                 send_var_par.append(v)
             send_var_str = cls.prepare_input_variables(
                 send_var_par, for_yggdrasil=True)
