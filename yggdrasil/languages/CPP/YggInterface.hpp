@@ -527,7 +527,10 @@ public:
     @brief Destructor for YggRpcClient.
     See ygg_free in YggInterface.h for details.
   */
-  ~YggRpcClient() { _destroy_pi(); }
+  ~YggRpcClient() {
+    ygglog_debug("~YggRpcClient()");
+    _destroy_pi();
+  }
   
   /*!
     @brief Send request to an RPC server from the client and wait for a
