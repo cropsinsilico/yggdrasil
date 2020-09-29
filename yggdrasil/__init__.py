@@ -229,12 +229,19 @@ def run_tsts(**kwargs):  # pragma: no cover
                 test_paths.append('examples')
             elif x == 'examples_part1':
                 args.withexamples = True
+                if platform._is_win:  # pragma: windows
+                    pattern = 'test_[a-g]*.py'
+                else:
+                    pattern = 'test_[A-Za-g]*.py'
                 test_paths.append(os.path.join(
-                    'examples', 'tests', 'test_[A-Za-g]*.py'))
+                    'examples', 'tests', pattern))
             elif x == 'examples_part2':
                 args.withexamples = True
+                pattern = 'test_[g-z]*.py'
+                # if platform._is_win:  # pragma: windows
+                #     pattern = 'test_[g-z]*.py'
                 test_paths.append(os.path.join(
-                    'examples', 'tests', 'test_[g-z]*.py'))
+                    'examples', 'tests', pattern))
             # elif x.startswith('examples_'):
             #     args.withexamples = True
             #     test_paths.append(os.path.join(
