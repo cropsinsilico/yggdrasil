@@ -375,6 +375,49 @@ module fygg
   interface yggassign
      module procedure yggassign_yggchar2character
      ! module procedure yggassign_character2yggchar
+     module procedure yggassign_integer_1d_to_array
+     module procedure yggassign_integer_1d_from_array
+     module procedure yggassign_integer2_1d_to_array
+     module procedure yggassign_integer2_1d_from_array
+     module procedure yggassign_integer4_1d_to_array
+     module procedure yggassign_integer4_1d_from_array
+     module procedure yggassign_integer8_1d_to_array
+     module procedure yggassign_integer8_1d_from_array
+     ! module procedure yggassign_unsigned_1d_to_array
+     ! module procedure yggassign_unsigned_1d_from_array
+     module procedure yggassign_unsigned2_1d_to_array
+     module procedure yggassign_unsigned2_1d_from_array
+     module procedure yggassign_unsigned4_1d_to_array
+     module procedure yggassign_unsigned4_1d_from_array
+     module procedure yggassign_unsigned8_1d_to_array
+     module procedure yggassign_unsigned8_1d_from_array
+     module procedure yggassign_real_1d_to_array
+     module procedure yggassign_real_1d_from_array
+     module procedure yggassign_real4_1d_to_array
+     module procedure yggassign_real4_1d_from_array
+     module procedure yggassign_real8_1d_to_array
+     module procedure yggassign_real8_1d_from_array
+     module procedure yggassign_real16_1d_to_array
+     module procedure yggassign_real16_1d_from_array
+     module procedure yggassign_complex_1d_to_array
+     module procedure yggassign_complex_1d_from_array
+     module procedure yggassign_complex4_1d_to_array
+     module procedure yggassign_complex4_1d_from_array
+     module procedure yggassign_complex8_1d_to_array
+     module procedure yggassign_complex8_1d_from_array
+     module procedure yggassign_complex16_1d_to_array
+     module procedure yggassign_complex16_1d_from_array
+     module procedure yggassign_logical_1d_to_array
+     module procedure yggassign_logical_1d_from_array
+     module procedure yggassign_logical1_1d_to_array
+     module procedure yggassign_logical1_1d_from_array
+     module procedure yggassign_logical2_1d_to_array
+     module procedure yggassign_logical2_1d_from_array
+     module procedure yggassign_logical4_1d_to_array
+     module procedure yggassign_logical4_1d_from_array
+     module procedure yggassign_logical8_1d_to_array
+     module procedure yggassign_logical8_1d_from_array
+     ! TODO: ND array
   end interface yggassign
   interface yggarr
      module procedure ygggeneric2yggarr

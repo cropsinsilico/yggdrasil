@@ -341,7 +341,8 @@ class FortranModelDriver(CompiledModelDriver):
             r'(?:len\s*=\s*(?:(?P<length>(?:\d+))|'
             r'(?P<length_var>.+?)))?'
             r'\))?'
-            r'(?:\s*,\s*dimension\((?:(?P<shape>\d+(?:,\s*\d+)*?)'
+            r'(?:\s*,\s*dimension\((?:(?P<shape>(?:\d)+'
+            r'(?:,\s*(?:\d)+)*?)'
             r'|(?P<shape_var>.+?(?:,\s*.+)*?))\))?'
             r'(?:\s*,\s*(?P<pointer>pointer))?'
             r'(?:\s*,\s*(?P<target>target))?'
@@ -486,7 +487,7 @@ class FortranModelDriver(CompiledModelDriver):
                     out += ', allocatable'
                 if type_match['shape_var'][0] == '*':
                     out = out.replace('*', ':')
-                raise Exception("Used default native_type, but need alias")
+                # raise Exception("Used default native_type, but need alias")
             elif type_match.get('length_var', None):
                 if ((('pointer' not in out) and ('allocatable' not in out)
                      and (type_match['length_var'] != 'X'))):
@@ -594,17 +595,20 @@ class FortranModelDriver(CompiledModelDriver):
                     grp['type'] + '(kind = X)')
             except KeyError:  # pragma: debug
                 raise e
+        if grp.get('shape_var', False):
+            if not grp.get('shape', False):
+                grp['shape'] = grp['shape_var']
         if grp.get('shape', False):
             shape = grp['shape'].split(',')
             ndim = len(shape)
             out['subtype'] = out['type']
             if ndim == 1:
                 out['type'] = '1darray'
-                if shape[0] != ':':
+                if shape[0] not in '*:':
                     out['length'] = int(shape[0])
             else:
                 out['type'] = 'ndarray'
-                if shape[0] != ':':
+                if shape[0] not in '*:':
                     out['shape'] = [int(i) for i in shape]
         if out['type'] in _valid_types:
             out['subtype'] = out['type']
@@ -941,11 +945,12 @@ class FortranModelDriver(CompiledModelDriver):
             recv_var_par = cls.channels2vars(recv_var)
             allows_realloc = [cls.allows_realloc(v)
                               for v in recv_var_par]
-            if all(allows_realloc):
+            if any(allows_realloc):
                 kwargs['alt_recv_function'] = cls.function_param['recv_heap']
                 new_recv_var_par = []
-                for v in recv_var_par:
-                    if not cls.allows_realloc(v, from_native_type=True):
+                for i, v in enumerate(recv_var_par):
+                    if (((not cls.allows_realloc(v, from_native_type=True))
+                         and allows_realloc[i])):
                         out_after.append('call yggassign(%s_realloc, %s)'
                                          % (v['name'], v['name']))
                         v = dict(v, name=('%s_realloc' % v['name']))
@@ -960,6 +965,42 @@ class FortranModelDriver(CompiledModelDriver):
             channel, recv_var_str, **kwargs)
         return out + out_after
 
+    @classmethod
+    def write_model_send(cls, channel, send_var, **kwargs):
+        r"""Write a model send call include checking the return flag.
+
+        Args:
+            channel (str): Name of variable that the channel being sent to
+                was stored in.
+            send_var (dict, list): Information on one or more variables
+                containing information that will be sent.
+            flag_var (str, optional): Name of flag variable that the flag should
+                be stored in. Defaults to 'flag',
+            allow_failure (bool, optional): If True, the returned lines will
+                call a break if the flag is False. Otherwise, the returned
+                lines will issue an error. Defaults to False.
+
+        Returns:
+            list: Lines required to carry out a send call in this language.
+
+        """
+        send_var_str = send_var
+        out_before = []
+        if not isinstance(send_var, str):
+            send_var_par = []
+            for v in cls.channels2vars(send_var):
+                if (((not cls.allows_realloc(v, from_native_type=True))
+                     and cls.allows_realloc(v))):
+                    out_before.append('call yggassign(%s, %s_realloc)'
+                                      % (v['name'], v['name']))
+                    v = dict(v, name=('%s_realloc' % v['name']))
+                send_var_par.append(v)
+            send_var_str = cls.prepare_input_variables(
+                send_var_par, for_yggdrasil=True)
+        out = super(FortranModelDriver, cls).write_model_send(
+            channel, send_var_str, **kwargs)
+        return out_before + out
+    
     @classmethod
     def write_print_var(cls, var, **kwargs):
         r"""Get the lines necessary to print a variable in this language.
