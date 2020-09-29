@@ -9,5 +9,5 @@ def model_function(in_buf):
     ret, result = rpc.call(in_buf)
     if not ret:
         raise RuntimeError('client(Python): RPC CALL ERROR')
-    out_buf = result[0]
+    out_buf = result
     return out_buf

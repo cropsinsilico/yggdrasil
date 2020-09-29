@@ -616,14 +616,15 @@ class TestYamlClientNoServer(YamlTestBaseError):
 
 class TestYamlServerFunction(YamlTestBaseError):
     r"""Test error raised when both is_server and function are set, but
-    is_server is bool."""
+    there is more than one input/output."""
     _error = yamlfile.YAMLSpecificationError
     _contents = (['models:',
                   '  - name: modelA',
                   '    driver: GCCModelDriver',
                   '    args: ./src/modelA.c',
                   '    function: fake',
-                  '    is_server: True'],
+                  '    is_server: True',
+                  '    inputs: [inputA, inputB]'],
                  ['model:',
                   '  - name: modelB',
                   '    driver: GCCModelDriver',

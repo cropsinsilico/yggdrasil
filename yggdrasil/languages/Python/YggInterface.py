@@ -142,7 +142,7 @@ def YggOutput(name, format_str=None, **kwargs):
     return InterfaceComm(name, **kwargs)
 
     
-def YggRpcServer(name, infmt='%s', outfmt='%s', **kwargs):
+def YggRpcServer(name, infmt=None, outfmt=None, **kwargs):
     r"""Get class for handling requests and response for an RPC Server.
 
     Args:
@@ -170,7 +170,7 @@ def YggRpcServer(name, infmt='%s', outfmt='%s', **kwargs):
     return InterfaceComm(name, **kwargs)
 
 
-def YggRpcClient(name, outfmt='%s', infmt='%s', **kwargs):
+def YggRpcClient(name, outfmt=None, infmt=None, **kwargs):
     r"""Get class for handling requests and response to an RPC Server from a
     client.
 
