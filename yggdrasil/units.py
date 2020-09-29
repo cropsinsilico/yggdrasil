@@ -140,6 +140,13 @@ def convert_unit_string(orig_str, replacements=None):
                 out.append('({name}**{exp})'.format(**xdict))
             else:
                 out.append(xdict['name'])
+    if 'degC d' in orig_str:
+        print(repr(orig_str), repr(out))
+        m = re.search(r'(?:%s)+' % regex, orig_str.strip())
+        if m:
+            print(repr(m.group(0)), m.groupdict())
+        else:
+            print('no match')
     if out:
         out = '*'.join(out)
     else:
