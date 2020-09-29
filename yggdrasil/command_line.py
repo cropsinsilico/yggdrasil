@@ -257,12 +257,16 @@ def cc_flags():
         description='Get the compilation flags necessary for a C/C++ program.')
     parser.add_argument('--cpp', action='store_true',
                         help='Get compilation flags for a C++ program.')
+    parser.add_argument('--toolname', default=None,
+                        help=('Name of the tool that associated flags should '
+                              'be returned for.'))
     args = parser.parse_args()
     if args.cpp:
         from yggdrasil.drivers.CPPModelDriver import CPPModelDriver as driver
     else:
         from yggdrasil.drivers.CModelDriver import CModelDriver as driver
-    print(' '.join(driver.get_compiler_flags(for_model=True)))
+    print(' '.join(driver.get_compiler_flags(for_model=True,
+                                             toolname=args.toolname)))
 
 
 def ld_flags():
@@ -277,12 +281,16 @@ def ld_flags():
         description='Get the linker flags necessary for a C/C++ program.')
     parser.add_argument('--cpp', action='store_true',
                         help='Get linker flags for a C++ program.')
+    parser.add_argument('--toolname', default=None,
+                        help=('Name of the tool that associated flags should '
+                              'be returned for.'))
     args = parser.parse_args()
     if args.cpp:
         from yggdrasil.drivers.CPPModelDriver import CPPModelDriver as driver
     else:
         from yggdrasil.drivers.CModelDriver import CModelDriver as driver
-    print(' '.join(driver.get_linker_flags(for_model=True)))
+    print(' '.join(driver.get_linker_flags(for_model=True,
+                                           toolname=args.toolname)))
 
 
 def rebuild_c_api():

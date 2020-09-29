@@ -96,14 +96,24 @@ class OSRModelDriver(ExecutableModelDriver):
     @classmethod
     def compile_osr(cls):
         r"""Compile the OpenSimRoot executable with the yggdrasil flag set."""
-        for x in cls.base_languages:
-            base_cls = import_component('model', x)
-            base_cls.compile_dependencies()
+        toolname = None
         cwd = os.path.join(cls.repository, 'OpenSimRoot')
         if platform._is_win:  # pragma: windows
+            toolname = 'g++'
             cwd = os.path.join(cwd, 'StaticBuild_win64')
+            import shutil
+            import glob
+            gcc_path = shutil.which('x86_64-w64-mingw32-g++')
+            print('make: %s' % shutil.which('make'))
+            print('g++ : %s' % gcc_path)
+            if gcc_path:
+                print(sorted(glob.glob(
+                    os.path.join(os.path.dirname(gcc_path), '*'))))
         else:
             cwd = os.path.join(cwd, 'StaticBuild')
+        for x in cls.base_languages:
+            base_cls = import_component('model', x)
+            base_cls.compile_dependencies(toolname=toolname)
         cmd = ['make', 'OpenSimRootYgg', '-j4']
         subprocess.check_call(cmd, cwd=cwd)
 
@@ -216,6 +226,9 @@ class OSRModelDriver(ExecutableModelDriver):
         out = super(OSRModelDriver, cls).configure_executable_type(cfg)
         opt = 'repository'
         desc = 'The full path to the OpenSimRoot repository.'
+        # if platform._is_win:  # pragma: windows
+        #     out.append((cls.language, opt, desc))
+        #     return out
         if not cfg.has_option(cls.language, opt):
             fname = 'OpenSimRoot'
             fpath = tools.locate_file(fname)
