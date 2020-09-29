@@ -139,6 +139,7 @@ int free_comm(comm_t *x) {
       vcomms2clean[idx] = NULL;
     }
   }
+  ygglog_debug("free_comm: Finished");
   return ret;
 };
 

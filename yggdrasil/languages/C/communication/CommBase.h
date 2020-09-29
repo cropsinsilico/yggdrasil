@@ -62,6 +62,7 @@ void display_other(comm_t *x) {
 */
 static inline
 int free_comm_base(comm_t *x) {
+  ygglog_debug("free_comm_base: Started");
   if (x == NULL)
     return 0;
   if (x->last_send != NULL) {
@@ -87,6 +88,7 @@ int free_comm_base(comm_t *x) {
   x->valid = 0;
   x->name[0] = '\0';
   x->index_in_register = -1;
+  ygglog_debug("free_comm_base: Finished");
   return 0;
 };
 
