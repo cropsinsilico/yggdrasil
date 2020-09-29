@@ -465,12 +465,6 @@ public:
   YggRpcServer(const std::string name, dtype_t *inType, dtype_t *outType) :
     YggRpc(yggRpcServerType(name.c_str(), inType, outType)) {}
 
-  /*!
-    @brief Destructor for YggRpcServer.
-    See ygg_free in YggInterface.h for details.
-  */
-  ~YggRpcServer() { _destroy_pi(); }
-  
 };
 
 
@@ -523,15 +517,6 @@ public:
   YggRpcClient(const std::string name, dtype_t *outType, dtype_t *inType) :
     YggRpc(yggRpcClientType(name.c_str(), outType, inType)) {}
 
-  /*!
-    @brief Destructor for YggRpcClient.
-    See ygg_free in YggInterface.h for details.
-  */
-  ~YggRpcClient() {
-    ygglog_debug("~YggRpcClient()");
-    _destroy_pi();
-  }
-  
   /*!
     @brief Send request to an RPC server from the client and wait for a
     response, preserving the current sizes of memory at the provided output

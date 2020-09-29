@@ -493,7 +493,8 @@ comm_t* yggRpcServerType_global(const char *name, dtype_t *inType, dtype_t *outT
   comm_t* out = NULL;
   WITH_GLOBAL_SCOPE(out = get_global_scope_comm(name));
   if (out == NULL) {
-    WITH_GLOBAL_SCOPE(return yggRpcServerType(name, inType, outType));
+    WITH_GLOBAL_SCOPE(out = yggRpcServerType(name, inType, outType));
+    return out;
   }
   if (inType != NULL) {
     comm_t* handle = (comm_t*)(out->handle);
