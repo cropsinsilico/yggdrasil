@@ -237,7 +237,7 @@ def run_tsts(**kwargs):  # pragma: no cover
                     'examples', 'tests', pattern))
             elif x == 'examples_part2':
                 args.withexamples = True
-                pattern = 'test_[g-z]*.py'
+                pattern = 'test_[h-z]*.py'
                 # if platform._is_win:  # pragma: windows
                 #     pattern = 'test_[g-z]*.py'
                 test_paths.append(os.path.join(
