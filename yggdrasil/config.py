@@ -346,7 +346,8 @@ def cfg_logging(cfg=None):
     ygg_logger = logging.getLogger("yggdrasil")
     rmq_logger = logging.getLogger("pika")
     if is_model:
-        ygg_logger.setLevel(level=logLevelCLI)
+        logLevelMOD = os.environ.get('YGG_MODEL_DEBUG', logLevelCLI)
+        ygg_logger.setLevel(level=logLevelMOD)
     else:
         ygg_logger.setLevel(level=logLevelYGG)
     rmq_logger.setLevel(level=logLevelRMQ)

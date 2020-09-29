@@ -1172,8 +1172,7 @@ class ModelDriver(Driver):
             env['YGG_SERVER_INPUT'] = self.is_server['input']
             env['YGG_SERVER_OUTPUT'] = self.is_server['output']
         if self.logging_level:
-            env['YGG_DEBUG'] = self.logging_level
-            env['YGG_CLIENT_DEBUG'] = self.logging_level
+            env['YGG_MODEL_DEBUG'] = self.logging_level
         return env
 
     def before_start(self, no_queue_thread=False, **kwargs):
