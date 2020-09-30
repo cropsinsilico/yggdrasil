@@ -257,7 +257,7 @@ class RModelDriver(InterpretedModelDriver):  # pragma: R
  
         """
         out = ['library(reticulate)',
-               ('reticulate::import(\'yggdrasil.languages.Python.'
-                'YggInterface\', convert=FALSE)')]
+               ('assign("ygg", reticulate::import(\'yggdrasil.languages.Python.'
+                'YggInterface\', convert=FALSE), envir=.GlobalEnv)')]
         out += super(RModelDriver, cls).write_executable_import(**kwargs)
         return out

@@ -70,7 +70,11 @@ YggInterfaceClass <- R6::R6Class("YggInterfaceClass", list(
 
 YggInterface <- function(type, ...) {
   # print(reticulate::py_config())
-  ygg <- reticulate::import('yggdrasil.languages.Python.YggInterface', convert=FALSE)
+  if (!exists("ygg")) {
+    ygg <- reticulate::import('yggdrasil.languages.Python.YggInterface', convert=FALSE)
+    assign("ygg", ygg, envir = .GlobalEnv)
+  }
+  
   varargin <- list(...)
   nargin <- length(varargin)
   arg_names <- names(varargin)
