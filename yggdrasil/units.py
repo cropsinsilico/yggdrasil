@@ -140,8 +140,8 @@ def convert_unit_string(orig_str, replacements=None):
                 out.append('({name}**{exp})'.format(**xdict))
             else:
                 out.append(xdict['name'])
-    if 'degC d' in orig_str:
-        print(repr(orig_str), repr(out))
+    else:
+        print(repr(orig_str), type(orig_str))
         m = re.search(r'(?:%s)+' % regex, orig_str.strip())
         if m:
             print(repr(m.group(0)), m.groupdict())
@@ -232,12 +232,16 @@ def add_units(arr, unit_str, dtype=None):
             dtype = arr.dtype
         else:
             dtype = np.array([arr]).dtype
-    if isinstance(arr, np.ndarray) and (arr.ndim > 0):
-        out = unyt.unyt_array(arr, unit_str, dtype=dtype,
-                              registry=ureg)
-    else:
-        out = unyt.unyt_quantity(arr, unit_str, dtype=dtype,
-                                 registry=ureg)
+    try:
+        if isinstance(arr, np.ndarray) and (arr.ndim > 0):
+            out = unyt.unyt_array(arr, unit_str, dtype=dtype,
+                                  registry=ureg)
+        else:
+            out = unyt.unyt_quantity(arr, unit_str, dtype=dtype,
+                                     registry=ureg)
+    except BaseException:
+        raise ValueError("Error parsing unit: %s, type(%s)."
+                         % (repr(unit_str), type(unit_str)))
     return out
 
 
