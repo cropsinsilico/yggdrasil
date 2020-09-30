@@ -1,6 +1,6 @@
 import numpy as np
 from yggdrasil.tests import YggTestBase
-from yggdrasil import units
+from yggdrasil import units, tools
 
 
 class TestUnits(YggTestBase):
@@ -84,6 +84,8 @@ class TestUnits(YggTestBase):
         pairs = [('g', 'g'), ('g2', '(g**2)'),
                  ('g2 km s-2', '(g**2)*km*(s**-2)'),
                  ('degC d', 'degC*d'),
+                 (tools.bytes2str(b'\xc2\xb0C d'),
+                  tools.bytes2str(b'\xc2\xb0C*d')),
                  ('h', 'hr')]
         for x, y in pairs:
             self.assert_equal(units.convert_R_unit_string(x), y)

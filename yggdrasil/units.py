@@ -129,6 +129,7 @@ def convert_unit_string(orig_str, replacements=None):
                         '100%': 'percent'}
     regex_mu = [tools.bytes2str(b'\xc2\xb5'),
                 tools.bytes2str(b'\xce\xbcs'),
+                tools.bytes2str(b'\xc2\xb0'),
                 r'(?:100\%)']
     regex = r'(?P<name>[A-Za-z%s]+)(?P<exp>-?[0-9]*)(?: |$)' % ''.join(regex_mu)
     if re.fullmatch(r'(?:%s)+' % regex, orig_str.strip()):
