@@ -244,3 +244,20 @@ class RModelDriver(InterpretedModelDriver):  # pragma: R
             model_file = model_file.replace('\\', '/')
         return super(RModelDriver, cls).write_model_wrapper(
             model_file, model_function, **kwargs)
+
+    @classmethod
+    def write_executable_import(cls, **kwargs):
+        r"""Add import statements to executable lines.
+       
+        Args:
+            **kwargs: Keyword arguments for import statement.
+
+        Returns:
+            list: Lines required to complete the import.
+ 
+        """
+        out = ['library(reticulate)',
+               ('reticulate::import(\'yggdrasil.languages.Python.'
+                'YggInterface\', convert=FALSE)')]
+        out += super(RModelDriver, cls).write_executable_import(**kwargs)
+        return out
