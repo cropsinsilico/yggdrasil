@@ -4,7 +4,6 @@ model:
   args: ./src/client.R
   function: model_function
   client_of: server
-  logging_level: DEBUG
   inputs:
     name: in_buf
     default_file:
