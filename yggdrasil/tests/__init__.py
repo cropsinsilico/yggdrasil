@@ -13,6 +13,7 @@ import psutil
 import copy
 import pprint
 import types
+import warnings
 from pandas.testing import assert_frame_equal
 from yggdrasil.config import ygg_cfg, cfg_logging
 from yggdrasil import tools, platform, units
@@ -432,7 +433,9 @@ def assert_equal(x, y):
         AssertionError: If the two messages are not equivalent.
 
     """
-    ut.assertEqual(x, y)
+    with warnings.catch_warnings():
+        warnings.simplefilter(action='ignore', category=FutureWarning)
+        ut.assertEqual(x, y)
 
 
 def assert_not_equal(x, y):
