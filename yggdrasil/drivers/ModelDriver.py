@@ -2412,8 +2412,8 @@ checking if the model flag indicates
         lines += cls.write_if_block(flag_cond, if_block)
         # Check if single element should be expanded
         if expanded_recv_var:
-            lines.append(cls.format_function_param(
-                'print_generic', object=recv_var_str))
+            # lines.append(cls.format_function_param(
+            #     'print_generic', object=recv_var_str))
             if 'expand_mult' in cls.function_param:  # pragma: matlab
                 lines.append(cls.format_function_param(
                     'expand_mult', name=expanded_recv_var, value=recv_var_str))
