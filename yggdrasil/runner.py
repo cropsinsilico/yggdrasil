@@ -9,7 +9,8 @@ from itertools import chain
 import socket
 from yggdrasil.tools import YggClass
 from yggdrasil.config import ygg_cfg, cfg_environment
-from yggdrasil import platform, yamlfile, enable_production_run
+from yggdrasil import (
+    platform, yamlfile, enable_production_run, disable_production_run)
 from yggdrasil.drivers import create_driver
 
 
@@ -56,7 +57,8 @@ class YggRunner(YggClass):
     """
     def __init__(self, modelYmls, namespace=None, host=None, rank=0,
                  ygg_debug_level=None, rmq_debug_level=None,
-                 ygg_debug_prefix=None, connection_task_method='thread'):
+                 ygg_debug_prefix=None, connection_task_method='thread',
+                 production_run=False):
         super(YggRunner, self).__init__('runner')
         if namespace is None:
             namespace = ygg_cfg.get('rmq', 'namespace', False)
@@ -74,6 +76,7 @@ class YggRunner(YggClass):
         self._inputchannels = {}
         self._outputchannels = {}
         self._old_handlers = {}
+        self.production_run = production_run
         self.error_flag = False
         self.debug("Running in %s with path %s namespace %s rank %d",
                    os.getcwd(), sys.path, namespace, rank)
@@ -163,32 +166,38 @@ class YggRunner(YggClass):
             dict: Intermediate times from the run.
 
         """
-        if timer is None:
-            timer = time.time
-        if t0 is None:
-            t0 = timer()
-        times = {}
-        times['init'] = timer()
-        self.loadDrivers()
-        times['load drivers'] = timer()
-        self.startDrivers()
-        times['start drivers'] = timer()
-        self.set_signal_handler(signal_handler)
-        self.waitModels()
-        times['run models'] = timer()
-        self.reset_signal_handler()
-        self.closeChannels()
-        times['close channels'] = timer()
-        self.cleanup()
-        times['clean up'] = timer()
-        tprev = t0
-        key_order = ['init', 'load drivers', 'start drivers', 'run models',
-                     'close channels', 'clean up']
-        for k in key_order:
-            self.info('%20s\t%f', k, times[k] - tprev)
-            tprev = times[k]
-        self.info(40 * '=')
-        self.info('%20s\t%f', "Total", tprev - t0)
+        if self.production_run:
+            enable_production_run()
+        try:
+            if timer is None:
+                timer = time.time
+            if t0 is None:
+                t0 = timer()
+            times = {}
+            times['init'] = timer()
+            self.loadDrivers()
+            times['load drivers'] = timer()
+            self.startDrivers()
+            times['start drivers'] = timer()
+            self.set_signal_handler(signal_handler)
+            self.waitModels()
+            times['run models'] = timer()
+            self.reset_signal_handler()
+            self.closeChannels()
+            times['close channels'] = timer()
+            self.cleanup()
+            times['clean up'] = timer()
+            tprev = t0
+            key_order = ['init', 'load drivers', 'start drivers', 'run models',
+                         'close channels', 'clean up']
+            for k in key_order:
+                self.info('%20s\t%f', k, times[k] - tprev)
+                tprev = times[k]
+            self.info(40 * '=')
+            self.info('%20s\t%f', "Total", tprev - t0)
+        finally:
+            if self.production_run:
+                disable_production_run()
         return times
 
     @property
@@ -501,7 +510,7 @@ class YggRunner(YggClass):
         self.debug('Returning')
 
         
-def get_runner(models, production_run=False, **kwargs):
+def get_runner(models, **kwargs):
     r"""Get runner for a set of models, getting run information from the
     environment.
 
@@ -517,8 +526,6 @@ def get_runner(models, production_run=False, **kwargs):
         Exception: If config option 'namespace' in 'rmq' section not set.
 
     """
-    if production_run:
-        enable_production_run()
     # Get environment variables
     rank = os.environ.get('PARALLEL_SEQ', '0')
     host = socket.gethostname()

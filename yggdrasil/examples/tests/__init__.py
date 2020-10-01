@@ -264,7 +264,8 @@ class ExampleTstBase(YggTestBase, tools.YggClass):
                     ipcrm_queues()
             # Run
             os.environ.update(self.env)
-            self.runner = runner.get_runner(self.yaml, namespace=self.namespace)
+            self.runner = runner.get_runner(self.yaml, namespace=self.namespace,
+                                            production_run=True)
             self.runner.run()
             if self.expects_error:
                 assert(self.runner.error_flag)
