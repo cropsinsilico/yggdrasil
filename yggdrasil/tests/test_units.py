@@ -87,7 +87,9 @@ class TestUnits(YggTestBase):
                  (tools.bytes2str(b'\xc2\xb0C d'),
                   tools.bytes2str(b'\xc2\xb0C*d')),
                  ('h', 'hr'),
-                 ('hrs/kg', 'hr/kg')]
+                 ('hrs/kg', 'hr/kg'),
+                 ('', ''),
+                 ('cm**(-2)', '(cm**-2)')]
         for x, y in pairs:
             self.assert_equal(units.convert_R_unit_string(x), y)
             self.assert_equal(units.convert_R_unit_string(y), y)
