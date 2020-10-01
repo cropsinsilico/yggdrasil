@@ -253,6 +253,7 @@ def cc_flags():
         list: The necessary compiler flags and preprocessor definitions.
 
     """
+    from yggdrasil import platform
     parser = argparse.ArgumentParser(
         description='Get the compilation flags necessary for a C/C++ program.')
     parser.add_argument('--cpp', action='store_true',
@@ -265,8 +266,11 @@ def cc_flags():
         from yggdrasil.drivers.CPPModelDriver import CPPModelDriver as driver
     else:
         from yggdrasil.drivers.CModelDriver import CModelDriver as driver
-    print(' '.join(driver.get_compiler_flags(for_model=True,
-                                             toolname=args.toolname)))
+    out = ' '.join(driver.get_compiler_flags(for_model=True,
+                                             toolname=args.toolname))
+    if platform._is_win:  # pragma: windows:
+        out = out.encode('unicode_escape').decode('utf-8')
+    print(out)
 
 
 def ld_flags():
@@ -277,6 +281,7 @@ def ld_flags():
         list: The necessary library linking flags.
 
     """
+    from yggdrasil import platform
     parser = argparse.ArgumentParser(
         description='Get the linker flags necessary for a C/C++ program.')
     parser.add_argument('--cpp', action='store_true',
@@ -289,8 +294,11 @@ def ld_flags():
         from yggdrasil.drivers.CPPModelDriver import CPPModelDriver as driver
     else:
         from yggdrasil.drivers.CModelDriver import CModelDriver as driver
-    print(' '.join(driver.get_linker_flags(for_model=True,
-                                           toolname=args.toolname)))
+    out = ' '.join(driver.get_linker_flags(for_model=True,
+                                           toolname=args.toolname))
+    if platform._is_win:  # pragma: windows:
+        out = out.encode('unicode_escape').decode('utf-8')
+    print(out)
 
 
 def rebuild_c_api():
