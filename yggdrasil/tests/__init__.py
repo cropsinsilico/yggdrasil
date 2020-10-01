@@ -104,6 +104,14 @@ def check_enabled_languages(language):
         if language.lower() not in enabled:
             raise unittest.SkipTest("Tests for language %s not enabled.",
                                     language)
+    disabled = os.environ.get('YGG_TEST_SKIP_LANGUAGE', None)
+    if disabled is not None:
+        disabled = [x.lower() for x in disabled.split(',')]
+        if ('c++' in disabled) or ('cpp' in disabled):
+            disabled += ['c++', 'cpp']
+        if language.lower() in disabled:
+            raise unittest.SkipTest("Tests for language %s disabled.",
+                                    language)
 
 
 def requires_language(language, installed=True):

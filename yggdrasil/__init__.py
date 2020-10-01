@@ -181,6 +181,9 @@ def run_tsts(**kwargs):  # pragma: no cover
     parser.add_argument('--language', '--languages', default=[],
                         nargs="+", type=str,
                         help='Language(s) that should be tested.')
+    parser.add_argument('--skip-language', '--skip-languages', default=[],
+                        nargs="+", type=str,
+                        help='Language(s) that sould not be tested.')
     parser.add_argument('--default-comm', '--defaultcomm', type=str,
                         help=('Comm type that default should be set '
                               'to before running tests.'))
@@ -311,6 +314,11 @@ def run_tsts(**kwargs):  # pragma: no cover
             args.language = [import_component('model', x).language
                              for x in args.language]
             new_env['YGG_TEST_LANGUAGE'] = ','.join(args.language)
+        if args.skip_language:
+            from yggdrasil.components import import_component
+            args.language = [import_component('model', x).language
+                             for x in args.skip_language]
+            new_env['YGG_TEST_SKIP_LANGUAGE'] = ','.join(args.skip_language)
         if args.default_comm:
             new_env['YGG_DEFAULT_COMM'] = args.default_comm
         if args.longrunning:
