@@ -286,5 +286,4 @@ class RModelDriver(InterpretedModelDriver):  # pragma: R
                                                         new_channel)
                 out = new_contents.splitlines()
                 return out
-        out += super(RModelDriver, cls).write_executable_import(**kwargs)
-        return out
+        return super(RModelDriver, cls).write_executable_import(**kwargs)
