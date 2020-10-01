@@ -1,3 +1,5 @@
+import re
+import os
 import numpy as np
 import pandas as pd
 import logging
@@ -109,7 +111,13 @@ class RModelDriver(InterpretedModelDriver):  # pragma: R
             r'(?:.|(?:\r?\n))*?\}})'
             r'|(?:\}})'),
         'inputs_def_regex': r'\s*(?P<name>.+?)\s*(?:,|$)',
-        'outputs_def_regex': r'\s*(?P<name>.+?)\s*(?:,|$)'}
+        'outputs_def_regex': r'\s*(?P<name>.+?)\s*(?:,|$)',
+        'interface_regex': (
+            r'(?P<indent>[ \t]*)'
+            r'(?P<variable>[a-zA-Z\_]+[a-zA-Z\_0-9]*)\s*\<\-\s*'
+            r'YggInterface\(\'(?P<class>[a-zA-Z\_]+[a-zA-Z\_0-9]*)\'\s*\,\s*'
+            r'\'(?P<channel>[a-zA-Z\_]+[a-zA-Z\_0-9]*)\'\s*'
+            r'(?P<args>[^\)]*)\)')}
     brackets = (r'{', r'}')
     zero_based = False
 
@@ -256,8 +264,27 @@ class RModelDriver(InterpretedModelDriver):  # pragma: R
             list: Lines required to complete the import.
  
         """
-        out = ['library(reticulate)',
-               ('assign("ygg", reticulate::import(\'yggdrasil.languages.Python.'
-                'YggInterface\', convert=FALSE), envir=.GlobalEnv)')]
+        if kwargs.get('filename', None) and os.path.isfile(kwargs['filename']):
+            with open(kwargs['filename'], 'r') as fd:
+                contents = fd.read()
+            # For functions that contain interface calls, split them out
+            # and assign them to the global level
+            if re.search(cls.function_param['interface_regex'], contents):
+                new_contents = contents
+                for m in re.finditer(cls.function_param['interface_regex'],
+                                     contents):
+                    mdict = m.groupdict()
+                    if 'global_scope' not in mdict['args']:
+                        mdict['args'] += ', global_scope=TRUE'
+                    new_channel = (
+                        '{indent}if (!exists("{variable}")) {{\n'
+                        '{indent}  assign("{variable}", YggInterface('
+                        '\'{class}\', \'{channel}\'{args}), '
+                        'envir = .GlobalEnv)\n'
+                        '{indent}}}').format(**mdict)
+                    new_contents = new_contents.replace(m.group(0),
+                                                        new_channel)
+                out = new_contents.splitlines()
+                return out
         out += super(RModelDriver, cls).write_executable_import(**kwargs)
         return out
