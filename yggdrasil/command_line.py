@@ -269,7 +269,8 @@ def cc_flags():
     out = ' '.join(driver.get_compiler_flags(for_model=True,
                                              toolname=args.toolname))
     if platform._is_win:  # pragma: windows:
-        out = out.encode('unicode_escape').decode('utf-8')
+        out = out.replace('\\', '/')
+        # out = out.encode('unicode_escape').decode('utf-8')
     print(out)
 
 
@@ -297,7 +298,8 @@ def ld_flags():
     out = ' '.join(driver.get_linker_flags(for_model=True,
                                            toolname=args.toolname))
     if platform._is_win:  # pragma: windows:
-        out = out.encode('unicode_escape').decode('utf-8')
+        out = out.replace('\\', '/')
+        # out = out.encode('unicode_escape').decode('utf-8')
     print(out)
 
 
