@@ -351,13 +351,31 @@ def cfg_logging(cfg=None):
     else:
         ygg_logger.setLevel(level=logLevelYGG)
     rmq_logger.setLevel(level=logLevelRMQ)
+    to_stdout = False
     # For models, route the loggs to stdout so that they are displayed by the
     # model driver.
     if is_model:
+        to_stdout = True
+    try:  # pragma: no cover
+        # Direct log messages to stdout in interpreter so that messages
+        # are not red in notebooks
+        get_ipython  # noqa: F821
+        to_stdout = True
+        ygg_logger.propagate = False
+        rmq_logger.propagate = False
+    except BaseException:
+        pass
+    if to_stdout:
         handler = logging.StreamHandler(sys.stdout)
-        handler.setLevel(logLevelCLI)
-        ygg_logger.addHandler(handler)
-        rmq_logger.addHandler(handler)
+        if is_model:
+            handler.setLevel(logLevelMOD)
+        else:  # pragma: no cover
+            # This is only used for notebooks (and interpreters)
+            handler.setLevel(logLevelYGG)
+        ygg_logger.handlers = [handler]
+        rmq_logger.handlers = [handler]
+        # ygg_logger.addHandler(handler)
+        # rmq_logger.addHandler(handler)
 
 
 def cfg_environment(env=None, cfg=None):
