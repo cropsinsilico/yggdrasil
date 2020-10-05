@@ -209,9 +209,12 @@ def get_data(obj):
 
     """
     if has_units(obj) or isinstance(obj, (_unit_quantity, _unit_array)):
-        out = obj.to_ndarray()
-        if out.ndim == 0:
-            out = out.reshape((1, ))[0]
+        try:
+            out = obj.to_ndarray()
+            if out.ndim == 0:
+                out = out.reshape((1, ))[0]
+        except AttributeError:
+            out = obj
     else:
         out = obj
     return out

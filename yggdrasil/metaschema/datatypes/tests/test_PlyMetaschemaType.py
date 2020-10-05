@@ -111,6 +111,13 @@ class TestPlyDict(YggTestClassInfo):
         r"""dict: Keyword arguments for creating a class instance."""
         return _test_value
 
+    @classmethod
+    def remove_hd_faces(cls, obj):
+        r"""Remove higher dimension faces (>3 verts)."""
+        for f in obj.get('faces', []):
+            f['vertex_index'] = f['vertex_index'][:3]
+        return obj
+
     def test_count_elements(self):
         r"""Test count_elements."""
         self.assert_raises(ValueError, self.instance.count_elements, 'invalid')
@@ -186,6 +193,40 @@ class TestPlyDict(YggTestClassInfo):
         y = self.import_cls.from_dict(x)
         self.assert_equal(y, self.instance)
 
+    def test_to_from_array_dict(self, test_objs=None):
+        r"""Test transformation to/from dict of arrays."""
+        if test_objs is None:
+            orig = copy.deepcopy(self.instance)
+            for f in orig['faces']:
+                for k in ['red', 'green', 'blue']:
+                    f[k] = int(255)
+            orig_no_color = copy.deepcopy(self.instance)
+            for v in orig_no_color['vertices']:
+                for k in ['red', 'green', 'blue']:
+                    v.pop(k, None)
+            for e in orig_no_color['edges']:
+                for k in ['red', 'green', 'blue']:
+                    e.pop(k, None)
+            test_objs = [orig, orig_no_color]
+        for y0 in test_objs:
+            x = y0.as_array_dict()
+            y = self.import_cls.from_array_dict(x)
+            self.assert_equal(y, y0)
+
+    def test_to_from_trimesh(self, test_objs=None):
+        r"""Test transformation to/from trimesh class."""
+        if PlyMetaschemaType.trimesh:
+            if test_objs is None:
+                orig = copy.deepcopy(self.instance)
+                for k in ['material', 'edges']:
+                    orig.pop(k, None)
+                test_objs = [orig]
+            for y0 in test_objs:
+                y0 = self.remove_hd_faces(y0)
+                x = y0.as_trimesh()
+                y = self.import_cls.from_trimesh(x)
+                self.assert_equal(y, y0)
+
     def test_properties(self):
         r"""Test explicit exposure of specific element counts as properties
         against counts based on singular elements."""
@@ -210,6 +251,7 @@ class TestPlyMetaschemaType(parent.TestJSONObjectMetaschemaType):
         cls._valid_encoded = [cls._fulldef]
         cls._valid_decoded = [cls._value,
                               PlyMetaschemaType.PlyDict(**_test_value),
+                              PlyMetaschemaType.PlyDict(**_test_value).as_trimesh(),
                               {'vertices': [], 'faces': [],
                                'alt_verts': copy.deepcopy(_test_value['vertices'])},
                               _test_value_int64]
@@ -219,6 +261,16 @@ class TestPlyMetaschemaType(parent.TestJSONObjectMetaschemaType):
         cls._compatible_objects = [(cls._value, cls._value, None)]
         cls._encode_data_kwargs = {'comments': ['Test comment']}
 
+    @classmethod
+    def assert_result_equal(cls, x, y):
+        r"""Assert that serialized/deserialized objects equal."""
+        if PlyMetaschemaType.trimesh:
+            if isinstance(x, PlyMetaschemaType.trimesh.base.Trimesh):
+                x = PlyMetaschemaType.PlyDict.from_trimesh(x)
+            if isinstance(y, PlyMetaschemaType.trimesh.base.Trimesh):
+                y = PlyMetaschemaType.PlyDict.from_trimesh(y)
+        super(TestPlyMetaschemaType, cls).assert_result_equal(x, y)
+        
     def test_decode_data_errors(self):
         r"""Test errors in decode_data."""
         self.assert_raises(ValueError, self.import_cls.decode_data, 'hello', None)

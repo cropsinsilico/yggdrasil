@@ -157,6 +157,13 @@ def requires_language(language, installed=True):
     return wrapper
 
 
+def pprint_diff(x, y):  # pragma: no cover
+    r"""Get the diff between the pprint.pformat string for two objects."""
+    print('\n'.join(difflib.ndiff(
+        pprint.pformat(x).splitlines(),
+        pprint.pformat(y).splitlines())))
+
+
 # Wrapped class to allow handling of arrays
 class WrappedTestCase(unittest.TestCase):  # pragma: no cover
     def __init__(self, *args, **kwargs):
@@ -441,9 +448,14 @@ def assert_equal(x, y):
         AssertionError: If the two messages are not equivalent.
 
     """
-    with warnings.catch_warnings():
-        warnings.simplefilter(action='ignore', category=FutureWarning)
-        ut.assertEqual(x, y)
+    try:
+        with warnings.catch_warnings():
+            warnings.simplefilter(action='ignore', category=FutureWarning)
+            ut.assertEqual(x, y)
+    except AssertionError:  # pragma: debug
+        if type(x) == type(y):
+            pprint_diff(x, y)
+        raise
 
 
 def assert_not_equal(x, y):

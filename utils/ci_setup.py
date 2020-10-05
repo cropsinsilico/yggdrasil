@@ -22,6 +22,7 @@ INSTALLSBML = (os.environ.get('INSTALLSBML', '0') == '1')
 INSTALLAPY = (os.environ.get('INSTALLAPY', '0') == '1')
 INSTALLZMQ = (os.environ.get('INSTALLZMQ', '0') == '1')
 INSTALLRMQ = (os.environ.get('INSTALLRMQ', '0') == '1')
+INSTALLTRIMESH = (os.environ.get('INSTALLTRIMESH', '0') == '1')
 BUILDDOCS = (os.environ.get('BUILDDOCS', '0') == '1')
 
 
@@ -203,6 +204,11 @@ def deploy_package_on_ci(method):
                 "echo Installing Pika...",
                 "%s install \"pika<1.0.0b1\"" % conda_cmd
             ]
+        if INSTALLTRIMESH:
+            cmds += [
+                "echo Installing trimesh...",
+                "%s install trimesh" % conda_cmd
+            ]
         # Temp fix to install missing dependencies from jsonschema
         if PY2:
             cmds.append(("%s install contextlib2 pathlib2 "
@@ -313,6 +319,11 @@ def deploy_package_on_ci(method):
             cmds += [
                 "echo Installing Pika...",
                 "pip install \"pika<1.0.0b1\""
+            ]
+        if INSTALLTRIMESH:
+            cmds += [
+                "echo Installing trimesh...",
+                "pip install trimesh"
             ]
         cmds += [
             # Install from source dist
