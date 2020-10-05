@@ -10,12 +10,37 @@ _is_osx = (sys.platform == 'darwin')
 _is_linux = ('linux' in sys.platform)
 _is_win = (sys.platform in ['win32', 'cygwin'])
 INSTALLLPY = (os.environ.get('INSTALLLPY', '0') == '1')
+if _is_win:
+    INSTALLC = (os.environ.get('INSTALLC', '0') == '1')
+else:
+    INSTALLC = True  # c compiler usually installed by default
 INSTALLR = (os.environ.get('INSTALLR', '0') == '1')
+INSTALLFORTRAN = (os.environ.get('INSTALLFORTRAN', '0') == '1')
+if not INSTALLC:
+    INSTALLFORTRAN = False
 INSTALLSBML = (os.environ.get('INSTALLSBML', '0') == '1')
 INSTALLAPY = (os.environ.get('INSTALLAPY', '0') == '1')
 INSTALLZMQ = (os.environ.get('INSTALLZMQ', '0') == '1')
 INSTALLRMQ = (os.environ.get('INSTALLRMQ', '0') == '1')
 BUILDDOCS = (os.environ.get('BUILDDOCS', '0') == '1')
+
+
+def call_conda_command(args, **kwargs):
+    r"""Function for calling conda commands as the conda script is not
+    available on subprocesses for windows unless invoked via the shell.
+
+    Args:
+        args (list): Command arguments.
+        **kwargs: Additional keyword arguments are passed to subprocess.check_output.
+
+    Returns:
+        str: The output from the command.
+
+    """
+    if _is_win:
+        args = ' '.join(args)
+        kwargs['shell'] = True
+    return subprocess.check_output(args, **kwargs).decode("utf-8")
 
 
 def call_script(lines):
@@ -145,7 +170,9 @@ def deploy_package_on_ci(method):
     install_req = os.path.join("utils", "install_from_requirements.py")
     if method == 'conda':
         cmds += [
-            "%s install -q conda-build conda-verify scipy %s %s %s" % (
+            "%s install -q -n base conda-build conda-verify" % (
+                conda_cmd),
+            "%s install -q scipy %s %s %s" % (
                 conda_cmd,
                 os.environ.get('NUMPY', 'numpy'),
                 os.environ.get('MATPLOTLIB', 'matplotlib'),
@@ -159,7 +186,7 @@ def deploy_package_on_ci(method):
                     install_req))
         if INSTALLSBML:
             cmds += [
-                "echo Installing roadrunner for running SBML models..."
+                "echo Installing roadrunner for running SBML models...",
                 "pip install libroadrunner"]
         if INSTALLAPY:
             cmds += [
@@ -180,13 +207,14 @@ def deploy_package_on_ci(method):
         if PY2:
             cmds.append(("%s install contextlib2 pathlib2 "
                          "\"configparser >=3.5\"") % conda_cmd)
-        index_dir = os.path.join("${CONDA_PREFIX}", "conda-bld")
+        # Assumes that an environment is active
+        prefix_dir = os.path.dirname(os.path.dirname(os.environ['CONDA_PREFIX']))
+        index_dir = os.path.join(prefix_dir, "conda-bld")
         cmds += [
             # Install from conda build
-            "%s build %s --python %s" % (
-                conda_cmd, os.path.join('recipe', 'meta.yaml'), PYVER),
+            "%s build %s --python %s" % (conda_cmd, 'recipe', PYVER),
             "%s index %s" % (conda_cmd, index_dir),
-            "%s install -c file:/${CONDA_PREFIX}/conda-bld yggdrasil" % conda_cmd,
+            "%s install -c file:/%s/conda-bld yggdrasil" % (conda_cmd, prefix_dir),
             "%s list" % conda_cmd
         ]
     elif method == 'pip':
@@ -234,6 +262,22 @@ def deploy_package_on_ci(method):
             else:
                 raise NotImplementedError("Could not determine "
                                           "R installation method.")
+        if INSTALLFORTRAN:
+            cmds.append("echo Installing Fortran...")
+            if _in_conda:
+                if _is_win:
+                    cmds.append(("%s install -c conda-forge "
+                                 "m2w64-gcc-fortran make "
+                                 "m2w64-toolchain_win-64") % conda_cmd)
+                else:
+                    cmds.append("%s install -c conda-forge fortran-compiler" % conda_cmd)
+            elif _is_linux:
+                cmds += ["sudo apt-get install gfortran"]
+            elif _is_osx:
+                cmds += ["brew install gfortran"]
+            else:
+                raise NotImplementedError("Could not determine "
+                                          "Fortran installation method.")
         if INSTALLSBML:
             cmds += ['pip install libroadrunner']
         if INSTALLAPY:
@@ -259,8 +303,9 @@ def deploy_package_on_ci(method):
             elif _is_osx:
                 cmds.append("bash ci/install-czmq-osx.sh")
             elif _is_win:
-                cmds += ["call ci\\install-czmq-windows.bat",
-                         "echo \"%PATH%\""]
+                cmds.append("%s install czmq zeromq" % conda_cmd)
+                # cmds += ["call ci\\install-czmq-windows.bat",
+                #          "echo \"%PATH%\""]
             else:
                 raise NotImplementedError("Could not determine "
                                           "ZeroMQ installation method.")

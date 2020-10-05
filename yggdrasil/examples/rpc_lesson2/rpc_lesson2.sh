@@ -34,6 +34,11 @@ case $1 in
 	yaml1='server_python.yml'
 	yaml2='client_r.yml'
 	;;
+    -f | --fortran )
+	echo "Running Fortran"
+	yaml1='server_python.yml'
+	yaml2='client_fortran.yml'
+	;;
 esac
 
 yggrun $yaml1 $yaml2

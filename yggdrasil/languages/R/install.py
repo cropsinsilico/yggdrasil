@@ -64,10 +64,21 @@ def write_makevars(fname=None):
         logger.info("Makevars file already exists: %s" % fname)
         return None, None
     lines = []
-    for x in ['CC', 'CFLAGS', 'CXX', 'CXXFLAGS']:
+    ldver = None
+    if sys.platform.lower() == 'darwin':
+        regex = r'PROJECT:ld64-(?P<version>\d+(?:\.\d+)?)'
+        out = subprocess.check_output([os.environ.get('LD', 'ld'), '-v'],
+                                      stderr=subprocess.STDOUT)
+        match = re.search(regex, out.decode('utf-8'))
+        if match:
+            ldver = match.group('version')
+    for x in ['CC', 'CFLAGS', 'CXX', 'CXXFLAGS', 'LD', 'LDFLAGS']:
         env = os.environ.get(x, '')
         if not env:
             continue
+        if (x in ['CFLAGS', 'CXXFLAGS', 'LDFLAGS']) and ldver:
+            if '-mlinker-version' not in env:
+                env += ' -mlinker-version=%s' % ldver
         lines.append('%s=%s' % (x, env))
     if lines:
         logger.info("Writing Makevars to %s" % fname)

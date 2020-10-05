@@ -59,6 +59,12 @@ case $1 in
 	yaml2='rpcFibCli_r.yml'
 	yaml3='rpcFibCliPar_r.yml'
 	;;
+    -f | --fortran )
+	echo "Running Fortran"
+	yaml1='rpcFibSrv_fortran.yml'
+	yaml2='rpcFibCli_fortran.yml'
+	yaml3='rpcFibCliPar_fortran.yml'
+	;;
     * )
 	echo "Running ", $1
 	yaml=$1

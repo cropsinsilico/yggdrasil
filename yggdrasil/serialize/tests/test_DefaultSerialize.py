@@ -24,7 +24,7 @@ class TestDefaultSerialize(parent.TestSerializeBase):
         if (len(self._inst_kwargs) == 0) and (self._cls == 'DefaultSerialize'):
             self.instance.initialize_from_message(np.int64(1))
             self.assert_raises(RuntimeError, self.instance.update_serializer,
-                               type='ply')
+                               datatype={'type': 'ply'})
         
 
 class TestDefaultSerialize_format(TestDefaultSerialize):
@@ -45,9 +45,11 @@ class TestDefaultSerialize_uniform(TestDefaultSerialize):
     
     def get_options(self):
         r"""Get testing options."""
-        out = {'kwargs': {'type': 'array', 'items': {'type': '1darray',
-                                                     'subtype': 'float',
-                                                     'precision': 64}},
+        out = {'kwargs': {'datatype':
+                          {'type': 'array',
+                           'items': {'type': '1darray',
+                                     'subtype': 'float',
+                                     'precision': 64}}},
                'empty': [],
                'objects': [[np.zeros(3, 'float'), np.zeros(3, 'float')],
                            [np.ones(3, 'float'), np.ones(3, 'float')]],
@@ -89,7 +91,7 @@ class TestDefaultSerialize_type(TestDefaultSerialize):
 
     def get_options(self):
         r"""Get testing options."""
-        out = {'kwargs': {'type': 'float'},
+        out = {'kwargs': {'datatype': {'type': 'float'}},
                'empty': b'',
                'objects': [float(x) for x in range(5)],
                'extra_kwargs': {},

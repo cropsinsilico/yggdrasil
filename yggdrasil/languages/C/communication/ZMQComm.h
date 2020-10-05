@@ -393,7 +393,7 @@ char* check_reply_send(const comm_t *comm, const char *data, const int len,
 		       int *new_len) {
   // Prevent C4100 warning on windows by referencing param
 #ifdef _WIN32
-  comm;
+  UNUSED(comm);
 #endif
   char *out = (char*)malloc(len + 1);
   memcpy(out, data, len + 1);

@@ -19,6 +19,17 @@ Possible Errors
   General Errors
   --------------
 
+Linux Errors
+------------
+  
+- Importing |yggdrasil| installed using conda causes ``ImportError: /usr/lib/x86_64-linux-gnu/libstdc++.so.6: version 'GLIBCXX_3.4.22' not found (required by <some python package>)``
+    **Possible Cause:** For some reason (e.g. path modification), the Python package raising the import error is trying to use the system version of libstdc++ rather than the conda version that the package was compiled against.
+    **Solutions:**
+    
+    #. Add the conda library path so that libraries installed by conda are found before the system libraries: ``export LD_LIBRARY_PATH=$CONDA_PREFIX/lib:$LD_LIBRARY_PATH``.
+    #. Preload the conda libstdc++ after verifying the path to your conda install's libstdc++ shared object library: ``export LD_PRELOAD=$CONDA_PREFIX/lib/libstdc++.so.6``
+
+
 MacOS Errors
 ------------
 

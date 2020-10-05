@@ -5,7 +5,8 @@ import logging
 import sysconfig
 from collections import OrderedDict
 from yggdrasil import platform, components
-from yggdrasil.drivers.CompiledModelDriver import LinkerBase
+from yggdrasil.drivers.CompiledModelDriver import (
+    LinkerBase, get_compilation_tool, get_compatible_tool)
 from yggdrasil.drivers.BuildModelDriver import (
     BuildModelDriver, BuildToolBase)
 from yggdrasil.drivers import CModelDriver
@@ -229,7 +230,7 @@ class CMakeConfigure(BuildToolBase):
         return out
 
     @classmethod
-    def get_flags(cls, sourcedir='.', builddir=None, **kwargs):
+    def get_flags(cls, sourcedir='.', builddir=None, target_compiler=None, **kwargs):
         r"""Get a list of configuration/generation flags.
 
         Args:
@@ -238,6 +239,8 @@ class CMakeConfigure(BuildToolBase):
                 (the current working directory).
             builddir (str, optional): Directory that will contain the build tree.
                 Defaults to '.' (this current working directory).
+            target_compiler(str, optional): Compiler that should be used by cmake.
+                Defaults to None and the default for the target language will be used.
             **kwargs: Additional keyword arguments are passed to the parent
                 class's method.
 
@@ -275,9 +278,28 @@ class CMakeConfigure(BuildToolBase):
             generator = kwargs.get('generator', None)
             if generator is None:
                 generator = cls.generator()
-            if (generator is not None) and (not generator.endswith(('Win64', 'ARM'))):
-                if platform._is_64bit:
-                    out.append('-DCMAKE_GENERATOR_PLATFORM=x64')
+            if (((generator is not None) and generator.startswith('Visual')
+                 and (not generator.endswith(('Win64', 'ARM')))
+                 and platform._is_64bit)):
+                out.append('-DCMAKE_GENERATOR_PLATFORM=x64')
+        if target_compiler is not None:
+            compiler = get_compilation_tool('compiler', target_compiler)
+            cmake_vars = {'c_compiler': 'CMAKE_C_COMPILER',
+                          'c_flags': 'CMAKE_C_FLAGS',
+                          'c++_compiler': 'CMAKE_CXX_COMPILER',
+                          'c++_flags': 'CMAKE_CXX_FLAGS',
+                          'fortran_compiler': 'CMAKE_Fortran_COMPILER',
+                          'fortran_flags': 'CMAKE_Fortran_FLAGS'}
+            for k in ['c', 'c++', 'fortran']:
+                try:
+                    itool = get_compatible_tool(compiler, 'compiler', k)
+                except ValueError:
+                    continue
+                if itool.default_executable_env is None:
+                    out.append('-D%s=%s' % (cmake_vars['%s_compiler' % k],
+                                            itool.toolname))
+                if itool.default_flags_env is None:
+                    out.append('-D%s=%s' % (cmake_vars['%s_flags' % k], ''))
         return out
 
     @classmethod
@@ -339,10 +361,22 @@ class CMakeConfigure(BuildToolBase):
         if os.path.isfile(include_file):
             os.remove(include_file)
         return out
+
+    @classmethod
+    def fix_path(cls, x, is_gnu=False):
+        r"""Fix paths so that they conform to the format expected by the OS
+        and/or build tool."""
+        if platform._is_win:  # pragma: windows
+            if is_gnu:
+                x = x.replace('\\', '/')
+            else:
+                x = x.replace('\\', re.escape('\\'))
+        return x
         
     @classmethod
-    def create_include(cls, fname, target, compile_flags=None, linker_flags=None,
-                       driver=None, logging_level=None, configuration='Release',
+    def create_include(cls, fname, target, driver=None, toolname=None,
+                       compile_flags=None, linker_flags=None,
+                       logging_level=None, configuration='Release',
                        verbose=False, **kwargs):
         r"""Create CMakeList include file with necessary includes,
         definitions, and linker flags.
@@ -350,13 +384,15 @@ class CMakeConfigure(BuildToolBase):
         Args:
             fname (str): File where the include file should be saved.
             target (str): Target that links should be added to.
+            driver (CompiledModelDriver): The CompiledModelDriver that
+                should be used to get compiler/linker flags.
+            toolname (str, optional): Name of compiler tool that should be used.
+                Defaults to None and the default compiler for the language will
+                be used.
             compile_flags (list, optional): Additional compile flags that
                 should be set. Defaults to [].
             linker_flags (list, optional): Additional linker flags that
                 should be set. Defaults to [].
-            driver (CompiledModelDriver, optional): The CompiledModelDriver that
-                should be used to get compiler/linker flags. Defaults to
-                CModelDriver.
             logging_level (int, optional): Logging level that should be passed
                 as a definition to the C compiler. Defaults to None and will be
                 ignored.
@@ -377,19 +413,18 @@ class CMakeConfigure(BuildToolBase):
             compile_flags = []
         if linker_flags is None:
             linker_flags = []
-        if driver is None:  # pragma: debug
-            driver = CModelDriver.CModelDriver
+        assert(driver is not None)
         use_library_path = True  # platform._is_win
         library_flags = []
         external_library_flags = []
         internal_library_flags = []
         compile_flags = driver.get_compiler_flags(
-            skip_defaults=True, skip_sysroot=True,
+            toolname=toolname, skip_defaults=True, skip_sysroot=True,
             flags=compile_flags, use_library_path=use_library_path,
             dont_link=True, for_model=True, dry_run=True,
             logging_level=logging_level)
         linker_flags = driver.get_linker_flags(
-            skip_defaults=True,
+            toolname=toolname, skip_defaults=True,
             flags=linker_flags, for_model=True, dry_run=True,
             use_library_path='external_library_flags',
             external_library_flags=external_library_flags,
@@ -401,15 +436,21 @@ class CMakeConfigure(BuildToolBase):
         library_flags += internal_library_flags + external_library_flags
         # Suppress warnings on windows about the security of strcpy etc.
         # and target x64 if the current platform is 64bit
+        is_gnu = True
         if platform._is_win:  # pragma: windows
-            compiler = driver.get_tool('compiler')
+            compiler = driver.get_tool('compiler', toolname=toolname)
+            is_gnu = compiler.is_gnu
             new_flags = compiler.default_flags
             def_flags = compiler.get_env_flags()
-            if not (('/MD' in def_flags) or ('-MD' in def_flags)):
+            if (((compiler.toolname in ['cl', 'msvc'])
+                 and (not (('/MD' in def_flags) or ('-MD' in def_flags))))):
                 if configuration.lower() == 'debug':  # pragma: debug
                     new_flags.append("/MTd")
                 else:
                     new_flags.append("/MT")
+            else:
+                preamble_lines += ['SET(CMAKE_FIND_LIBRARY_PREFIXES "")',
+                                   'SET(CMAKE_FIND_LIBRARY_SUFFIXES ".lib" ".dll")']
             for x in new_flags:
                 if x not in compile_flags:
                     compile_flags.append(x)
@@ -423,9 +464,7 @@ class CMakeConfigure(BuildToolBase):
             if x.startswith('-D'):
                 preamble_lines.append('ADD_DEFINITIONS(%s)' % x)
             elif x.startswith('-I'):
-                xdir = x.split('-I', 1)[-1]
-                if platform._is_win:  # pragma: windows
-                    xdir = xdir.replace('\\', re.escape('\\'))
+                xdir = cls.fix_path(x.split('-I', 1)[-1], is_gnu=is_gnu)
                 new_dir = 'INCLUDE_DIRECTORIES(%s)' % xdir
                 if new_dir not in preamble_lines:
                     preamble_lines.append(new_dir)
@@ -444,19 +483,19 @@ class CMakeConfigure(BuildToolBase):
             if x.startswith('-l'):
                 lines.append('TARGET_LINK_LIBRARIES(%s %s)' % (target, x))
             elif x.startswith('-L'):
-                libdir = x.split('-L')[-1]
-                if platform._is_win:  # pragma: windows
-                    libdir = libdir.replace('\\', re.escape('\\'))
+                libdir = cls.fix_path(x.split('-L')[-1], is_gnu=is_gnu)
                 preamble_lines.append('LINK_DIRECTORIES(%s)' % libdir)
             elif x.startswith('/LIBPATH:'):  # pragma: windows
                 libdir = x.split('/LIBPATH:')[-1]
                 if '"' in libdir:
                     libdir = libdir.split('"')[1]
-                if platform._is_win:
-                    libdir = libdir.replace('\\', re.escape('\\'))
+                libdir = cls.fix_path(libdir, is_gnu=is_gnu)
                 preamble_lines.append('LINK_DIRECTORIES(%s)' % libdir)
             elif os.path.isfile(x):
                 library_flags.append(x)
+            elif x.startswith('-mlinker-version='):
+                preamble_lines.insert(0, 'target_link_options(%s PRIVATE %s)'
+                                      % (target, x))
             elif x.startswith('-') or x.startswith('/'):
                 raise ValueError("Could not parse linker flag '%s'." % x)
             else:
@@ -467,9 +506,8 @@ class CMakeConfigure(BuildToolBase):
             xd, xf = os.path.split(x)
             xl, xe = os.path.splitext(xf)
             xl = driver.get_tool('linker').libpath2libname(xf)
-            if platform._is_win:  # pragma: windows
-                x = x.replace('\\', re.escape('\\'))
-                xd = xd.replace('\\', re.escape('\\'))
+            x = cls.fix_path(x, is_gnu=is_gnu)
+            xd = cls.fix_path(xd, is_gnu=is_gnu)
             xn = os.path.splitext(xl)[0]
             new_dir = 'LINK_DIRECTORIES(%s)' % xd
             if new_dir not in preamble_lines:
@@ -478,15 +516,18 @@ class CMakeConfigure(BuildToolBase):
                 # if cls.add_libraries:  # pragma: no cover
                 # Version adding library
                 lines.append('if (NOT TARGET %s)' % xl)
-                if xe.lower() in ['.so', '.dll', '.dylib']:  # pragma: no cover
+                if xe.lower() in ['.so', '.dll', '.dylib']:
                     lines.append('    ADD_LIBRARY(%s SHARED IMPORTED)' % xl)
                 else:
                     lines.append('    ADD_LIBRARY(%s STATIC IMPORTED)' % xl)
                 lines += ['    SET_TARGET_PROPERTIES(',
-                          '        %s PROPERTIES' % xl,
-                          # '        LINKER_LANGUAGE CXX',
-                          # '        CXX_STANDARD 11',
-                          '        IMPORTED_LOCATION %s)' % x,
+                          '        %s PROPERTIES' % xl]
+                # Untested on appveyor, but required when using dynamic
+                # library directly (if dll2a not used).
+                # if xe.lower() == '.dll':
+                #     lines.append('        IMPORTED_IMPLIB %s'
+                #                  % x.replace('.dll', '.lib'))
+                lines += ['        IMPORTED_LOCATION %s)' % x,
                           'endif()',
                           'TARGET_LINK_LIBRARIES(%s %s)' % (target, xl)]
             else:
@@ -521,6 +562,7 @@ class CMakeBuilder(LinkerBase):
                                 ('target', '--target'),
                                 ('configuration', '--config')])
     executable_ext = ''
+    tool_suffix_format = ''
 
     @classmethod
     def call(cls, *args, **kwargs):
@@ -680,6 +722,9 @@ class CMakeModelDriver(BuildModelDriver):
             model executable. Defaults to None.
         target_language (str, optional): Language that the target is written in.
             Defaults to None and will be set based on the source files provided.
+        target_compiler (str, optional): Compilation tool that should be used
+            for the target language. Defaults to None and will be set based on
+            the selected language driver.
         configuration (str, optional): Build type/configuration that should be
             built. Defaults to 'Release'.
         **kwargs: Additional keyword arguments are passed to parent class.
@@ -694,6 +739,8 @@ class CMakeModelDriver(BuildModelDriver):
         target_language (str): Language that the target is written in.
         target_language_driver (ModelDriver): Language driver for the target
             language.
+        target_compiler (str): Compilation tool that should be used
+            for the target language.
         configuration (str): Build type/configuration that should be built.
             This is only used on Windows.
 
@@ -708,6 +755,7 @@ class CMakeModelDriver(BuildModelDriver):
                           'builddir': {'type': 'string'},
                           'target': {'type': 'string'},
                           'target_language': {'type': 'string'},
+                          'target_compiler': {'type': 'string'},
                           'configuration': {'type': 'string',
                                             'default': 'Release'}}
     language = 'cmake'
@@ -755,6 +803,7 @@ class CMakeModelDriver(BuildModelDriver):
         self.get_tool_instance('compiler').create_include(
             include_file, self.target,
             driver=self.target_language_driver,
+            toolname=self.target_compiler,
             logging_level=self.logger.getEffectiveLevel(),
             configuration=self.configuration)
         assert(os.path.isfile(include_file))
@@ -874,6 +923,37 @@ class CMakeModelDriver(BuildModelDriver):
                 flags.
 
         """
+        if platform._is_win and (kwargs.get('target_compiler', None)
+                                 in ['gcc', 'g++', 'gfortran']):  # pragma: windows
+            # Remove sh from path for compilation when the rtools
+            # version of sh is on the path, but the gnu compiler being
+            # used is not part of that installation.
+            gcc = get_compilation_tool('compiler',
+                                       kwargs['target_compiler'],
+                                       None)
+            if gcc:
+                path = kwargs['env']['PATH']
+                gcc_path = gcc.get_executable(full_path=True)
+                sh_path = shutil.which('sh', path=path)
+                while sh_path:
+                    for k in ['rtools', 'git']:
+                        if k in sh_path.lower():
+                            break
+                    else:  # pragma: debug
+                        break
+                    if k not in gcc_path.lower():
+                        paths = path.split(os.pathsep)
+                        paths.remove(os.path.dirname(sh_path))
+                        path = os.pathsep.join(paths)
+                    else:  # pragma: debug
+                        break
+                    sh_path = shutil.which('sh', path=path)
+                kwargs['env']['PATH'] = path
+                if not sh_path:
+                    kwargs.setdefault('generator', 'MinGW Makefiles')
+                # This is not currently tested
+                # else:
+                #     kwargs.setdefault('generator', 'MSYS Makefiles')
         out = super(CMakeModelDriver, cls).update_compiler_kwargs(**kwargs)
         if CModelDriver._osx_sysroot is not None:
             out.setdefault('definitions', [])

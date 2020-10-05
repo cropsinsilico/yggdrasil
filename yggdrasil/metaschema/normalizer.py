@@ -77,6 +77,7 @@ def create(*args, **kwargs):
             self._path_stack = []
             self._schema_path_stack = []
             self._normalized_stack = []
+            self._working_dir_stack = []
 
         @classmethod
         def normalize_schema(cls, schema, **kwargs):
@@ -276,6 +277,9 @@ def create(*args, **kwargs):
 
             """
             old_normalized = self._normalized
+            working_dir = None
+            if isinstance(instance, dict) and ('working_dir' in instance):
+                working_dir = instance['working_dir']
             if path is not None:
                 # self._normalized_stack.append(self._normalized)
                 self._normalized = UninitializedNormalized()
@@ -286,6 +290,8 @@ def create(*args, **kwargs):
                 self._path_stack.append(path)
             if schema_path is not None:
                 self._schema_path_stack.append(schema_path)
+            if working_dir is not None:
+                self._working_dir_stack.append(working_dir)
             failed = False
             try:
                 for error in self._old_settings['descend'](instance, schema,
@@ -308,6 +314,8 @@ def create(*args, **kwargs):
                     self._path_stack.pop()
                 if schema_path is not None:
                     self._schema_path_stack.pop()
+                if working_dir is not None:
+                    self._working_dir_stack.pop()
 
         def validate(self, instance, _schema=None, normalize=False, **kwargs):
             r"""Validate an instance against a schema.

@@ -160,6 +160,30 @@ def parse_yaml(files, as_function=False):
     yml_norm = s.validate(yml_prep, normalize=True)
     # print('normalized')
     # pprint.pprint(yml_norm)
+    # Determine if any of the models require synchronization
+    timesync_names = []
+    for yml in yml_norm['models']:
+        if yml.get('timesync', False):
+            if yml['timesync'] is True:
+                yml['timesync'] = 'timesync'
+            tsync = yml['timesync']
+            timesync_names.append(tsync)
+            yml.setdefault('timesync_client_of', [])
+            yml['timesync_client_of'].append(tsync)
+    for tsync in set(timesync_names):
+        for m in yml_norm['models']:
+            if m['name'] == tsync:
+                assert(m['language'] == 'timesync')
+                m.update(is_server=True, inputs=[], outputs=[])
+                break
+        else:
+            yml_norm['models'].append({'name': tsync,
+                                       'args': [],
+                                       'language': 'timesync',
+                                       'is_server': True,
+                                       'working_dir': os.getcwd(),
+                                       'inputs': [],
+                                       'outputs': []})
     # Parse models, then connections to ensure connections can be processed
     existing = None
     for k in ['models', 'connections']:
@@ -322,12 +346,19 @@ def parse_model(yml, existing):
                'working_dir': yml['working_dir']}
         yml['inputs'].append(srv)
         yml['clients'] = []
+    # Mark timesync clients
+    timesync = yml.pop('timesync_client_of', [])
+    if timesync:
+        yml.setdefault('client_of', [])
+        yml['client_of'] += timesync
     # Add client driver
     if yml.get('client_of', []):
-        srv_names = yml['client_of']
-        yml['client_of'] = srv_names
-        for srv in srv_names:
-            cli = {'name': '%s:%s_%s' % (yml['name'], srv, yml['name']),
+        for srv in yml['client_of']:
+            if srv in timesync:
+                cli_name = '%s:%s' % (yml['name'], srv)
+            else:
+                cli_name = '%s:%s_%s' % (yml['name'], srv, yml['name'])
+            cli = {'name': cli_name,
                    'commtype': 'default',
                    'datatype': {'type': 'bytes'},
                    'driver': 'ClientDriver',

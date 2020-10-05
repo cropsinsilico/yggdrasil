@@ -584,14 +584,14 @@ class FileComm(CommBase.CommBase):
             out = 0
         return out
 
-    def on_send_eof(self):
+    def on_send_eof(self, *args, **kwargs):
         r"""Close file when EOF to be sent.
 
         Returns:
             bool: False so that message not sent.
 
         """
-        flag, msg_s = super(FileComm, self).on_send_eof()
+        flag, msg_s = super(FileComm, self).on_send_eof(*args, **kwargs)
         try:
             self.file_flush()
         except (AttributeError, ValueError):  # pragma: debug

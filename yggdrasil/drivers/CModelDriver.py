@@ -9,7 +9,8 @@ import sysconfig
 from collections import OrderedDict
 from yggdrasil import platform, tools
 from yggdrasil.drivers.CompiledModelDriver import (
-    CompiledModelDriver, CompilerBase, ArchiverBase)
+    CompiledModelDriver, CompilerBase, LinkerBase, ArchiverBase,
+    get_compilation_tool)
 from yggdrasil.metaschema.properties.ScalarMetaschemaProperties import (
     _valid_types)
 from yggdrasil.languages import get_language_dir
@@ -20,6 +21,7 @@ from numpy import distutils as numpy_distutils
 _default_internal_libtype = 'object'
 # if platform._is_win:  # pragma: windows
 #     _default_internal_libtype = 'static'
+_top_lang_dir = get_language_dir('c')
 
 
 def get_OSX_SYSROOT():
@@ -92,6 +94,9 @@ class CCompilerBase(CompilerBase):
             cls.linker_attributes = dict(cls.linker_attributes,
                                          search_path_flags=['-Xlinker', '--verbose'],
                                          search_regex=[r'SEARCH_DIR\("=([^"]+)"\);'])
+        elif platform._is_win and (cls.toolname not in [None, 'cl', 'msvc']):
+            cls.default_executable_env = None
+            cls.default_flags_env = None
         CompilerBase.before_registration(cls)
 
     @classmethod
@@ -128,18 +133,100 @@ class CCompilerBase(CompilerBase):
             kwargs.setdefault('linker_language', 'c++')
         return super(CCompilerBase, cls).call(args, **kwargs)
     
+    @classmethod
+    def get_search_path(cls, *args, **kwargs):
+        r"""Determine the paths searched by the tool for external library files.
+
+        Args:
+            *args: Additional arguments are passed to the parent
+                class's method.
+            **kwargs: Additional keyword arguments are passed to the
+                parent class's method.
+
+        Returns:
+            list: List of paths that the tools will search.
+
+        """
+        out = super(CompilerBase, cls).get_search_path(*args, **kwargs)
+        if platform._is_mac and (_osx_sysroot is not None):
+            base_path = os.path.join(_osx_sysroot, 'usr')
+            assert(kwargs.get('libtype', None) == 'include')
+            out.append(os.path.join(base_path, 'include'))
+        return out
+
 
 class GCCCompiler(CCompilerBase):
     r"""Interface class for gcc compiler/linker."""
     toolname = 'gcc'
     platforms = ['MacOS', 'Linux', 'Windows']
     default_archiver = 'ar'
+    linker_attributes = dict(
+        CCompilerBase.linker_attributes,
+        flag_options=OrderedDict(
+            list(LinkerBase.flag_options.items())
+            + list(CCompilerBase.linker_attributes.get('flag_options', {}).items())
+            + [('library_rpath', '-Wl,-rpath')]))
+    toolset = 'gnu'
+    aliases = ['gnu-cc']
+
+    @classmethod
+    def is_installed(cls):
+        r"""Determine if this tool is installed by looking for the executable.
+
+        Returns:
+            bool: True if the tool is installed, False otherwise.
+
+        """
+        out = super(GCCCompiler, cls).is_installed()
+        if out and platform._is_mac:  # pragma: debug
+            ver = cls.call(cls.version_flags, skip_flags=True, allow_error=True)
+            if 'clang' in ver:
+                out = False  # Disable gcc when it is an alias for clang
+        return out
+
+    def dll2a(cls, dll, dst=None, overwrite=False):
+        r"""Convert a window's .dll library into a static library.
+
+        Args:
+            dll (str): Full path to .dll library to convert.
+            dst (str, optional): Full path to location where the new
+                library should be saved. Defaults to None and will be
+                set based on lib or will be placed in the same directory
+                as dll.
+            overwrite (bool, optional): If True, the static file will
+                be created even if it already exists. Defaults to False.
+
+        Returns:
+            str: Full path to new .a static library.
+
+        """
+        # https://sourceforge.net/p/mingw-w64/wiki2/
+        # Answer%20generation%20of%20DLL%20import%20library/
+        base = os.path.splitext(os.path.basename(dll))[0]
+        if dst is None:
+            libbase = base
+            if not libbase.startswith('lib'):
+                libbase = 'lib' + libbase
+            libdir = os.path.dirname(dll)
+            dst = os.path.join(libdir, libbase + '.dll.a')
+        if (not os.path.isfile(dst)) or overwrite:
+            gendef = shutil.which("gendef")
+            dlltool = shutil.which("dlltool")
+            if gendef and dlltool:
+                subprocess.check_call([gendef, dll])
+                subprocess.check_call(
+                    [dlltool, '-D', dll, '-d', '%s.def' % base, '-l', dst])
+            else:
+                dst = dll
+        assert(os.path.isfile(dst))
+        return dst
 
 
 class ClangCompiler(CCompilerBase):
-    r"""clang compiler on Apple Mac OS."""
+    r"""Interface class for clang compiler/linker."""
     toolname = 'clang'
-    platforms = ['MacOS']
+    platforms = ['MacOS', 'Linux', 'Windows']
+    default_linker = 'clang'
     default_archiver = 'libtool'
     flag_options = OrderedDict(list(CCompilerBase.flag_options.items())
                                + [('sysroot', '--sysroot'),
@@ -147,6 +234,10 @@ class ClangCompiler(CCompilerBase):
                                                 'prepend': True}),
                                   ('mmacosx-version-min',
                                    '-mmacosx-version-min=%s')])
+    # Set to False since ClangLinker has its own class to handle
+    # conflict between versions of clang and ld.
+    is_linker = False
+    toolset = 'llvm'
 
 
 class MSVCCompiler(CCompilerBase):
@@ -159,6 +250,7 @@ class MSVCCompiler(CCompilerBase):
     # of complex types. Use '/TC' instead of '/TP' for strictly C
     default_flags = ['/W4',      # Display all errors
                      '/Zi',      # Symbolic debug in .pdb (implies debug)
+                     # '/MD',
                      # '/MTd',     # Use LIBCMTD.lib to create multithreaded .exe
                      # '/Z7',      # Symbolic debug in .obj (implies debug)
                      "/EHsc",    # Catch C++ exceptions only (C don't throw C++)
@@ -174,7 +266,8 @@ class MSVCCompiler(CCompilerBase):
     search_path_envvar = 'INCLUDE'
     search_path_flags = None
     version_flags = []
-    product_exts = ['.dir', '.ilk', '.pdb', '.sln', '.vcxproj', '.vcxproj.filters']
+    product_exts = ['.dir', '.ilk', '.pdb', '.sln', '.vcxproj', '.vcxproj.filters',
+                    '.exp', '.lib']
     combine_with_linker = True  # Must be explicit; linker is separate .exe
     linker_attributes = dict(GCCCompiler.linker_attributes,
                              default_executable=None,
@@ -185,20 +278,22 @@ class MSVCCompiler(CCompilerBase):
                              output_first_library=False,
                              flag_options=OrderedDict(
                                  [('library_libs', ''),
+                                  ('library_libs_nonstd', ''),
                                   ('library_dirs', '/LIBPATH:%s')]),
                              shared_library_flag='/DLL',
                              search_path_envvar='LIB',
                              search_path_flags=None)
+    toolset = 'msvc'
     
     @classmethod
-    def language_version(cls, **kwargs):  # pragma: windows
-        r"""Determine the version of this language.
+    def tool_version(cls, **kwargs):  # pragma: windows
+        r"""Determine the version of this tool.
 
         Args:
             **kwargs: Keyword arguments are passed to cls.call.
 
         Returns:
-            str: Version of compiler/interpreter for this language.
+            str: Version of the tool.
 
         """
         out = cls.call(cls.version_flags, skip_flags=True,
@@ -207,17 +302,109 @@ class MSVCCompiler(CCompilerBase):
             raise RuntimeError("Version call failed: %s" % out)
         return out.split('Copyright')[0]
 
-    
+
+# C Linkers
+class LDLinker(LinkerBase):
+    r"""Linker class for ld tool."""
+    toolname = 'ld'
+    # Languages disabled for ld by default to prevent it being
+    # selected instead of the default which seems to be happening
+    # on the CI
+    languages = ['c']  # ['c', 'c++', 'fortran']
+    default_executable_env = 'LD'
+    default_flags_env = 'LDFLAGS'
+    version_flags = ['-v']
+    search_path_envvar = ['LIBRARY_PATH', 'LD_LIBRARY_PATH']
+
+    @classmethod
+    def tool_version(cls, **kwargs):
+        r"""Determine the version of this tool.
+
+        Args:
+            **kwargs: Keyword arguments are passed to cls.call.
+
+        Returns:
+            str: Version of the tool.
+
+        """
+        out = cls.call(cls.version_flags, skip_flags=True,
+                       allow_error=True, **kwargs)
+        if platform._is_mac:
+            regex = r'PROJECT:ld64-(?P<version>\d+(?:\.\d+)?)'
+        else:
+            regex = (r'GNU ld \(GNU Binutils(?: for (?P<os>.+))?\) '
+                     r'(?P<version>\d+(?:\.\d+){0,2})')
+        match = re.search(regex, out)
+        if match is None:  # pragma: debug
+            raise RuntimeError("Could not locate version in string: %s" % out)
+        return match.group('version')
+
+
+class ClangLinker(LDLinker):
+    r"""Interface class for clang linker (calls to ld)."""
+    toolname = ClangCompiler.toolname
+    aliases = ClangCompiler.aliases
+    languages = ClangCompiler.languages
+    platforms = ClangCompiler.platforms
+    default_executable = ClangCompiler.default_executable
+    default_executable_env = ClangCompiler.default_executable_env
+    toolset = ClangCompiler.toolset
+    search_path_flags = ['-Xlinker', '-v']
+    search_regex = [r'\t([^\t\n]+)\n']
+    search_regex_begin = 'Library search paths:'
+    flag_options = OrderedDict(LDLinker.flag_options,
+                               **{'linker-version': '-mlinker-version=%s',
+                                  'library_rpath': '-rpath',
+                                  'library_libs_nonstd': ''})
+
+    @staticmethod
+    def before_registration(cls):
+        r"""Operations that should be performed to modify class attributes prior
+        to registration including things like platform dependent properties and
+        checking environment variables for default settings.
+        """
+        LDLinker.before_registration(cls)
+        if platform._is_win:  # pragma: windows
+            # One windows clang calls the MSVC linker LINK.exe which does not
+            # accept rpath. Runtime libraries must be in the same directory
+            # as the executable or a directory in the PATH env variable.
+            cls.flag_options.pop('library_rpath', None)
+
+    @classmethod
+    def get_flags(cls, *args, **kwargs):
+        r"""Get a list of linker flags."""
+        # Handle case where clang (10.0.0) is trying to pass
+        # -platform_version to a version of ld64 that dosn't support
+        # it (<520).
+        # https://bugs.llvm.org/show_bug.cgi?id=44813
+        # https://reviews.llvm.org/D71579
+        # https://reviews.llvm.org/D74784
+        out = cls.call(cls.version_flags, skip_flags=True, allow_error=True)
+        regex = r'clang version (?P<version>\d+)\.\d+\.\d+'
+        match = re.search(regex, out)
+        if (match is not None) and (int(match.group('version')) >= 10):
+            ld_version = LDLinker.tool_version()
+            if float(ld_version) < 520:
+                kwargs['linker-version'] = ld_version
+        out = super(ClangLinker, cls).get_flags(*args, **kwargs)
+        if '-lstdc++' not in out:
+            out.append('-lstdc++')
+        return out
+
+
 # C Archivers
 class ARArchiver(ArchiverBase):
     r"""Archiver class for ar tool."""
     toolname = 'ar'
-    languages = ['c', 'c++']
+    languages = ['c', 'c++', 'fortran']
     default_executable_env = 'AR'
     default_flags_env = None
     static_library_flag = 'rcs'
     output_key = ''
     output_first_library = True
+    toolset = 'gnu'
+    compatible_toolsets = ['llvm']
+    search_path_envvar = 'LIBRARY_PATH'
 
 
 class LibtoolArchiver(ArchiverBase):
@@ -226,6 +413,8 @@ class LibtoolArchiver(ArchiverBase):
     languages = ['c', 'c++']
     default_executable_env = 'LIBTOOL'
     static_library_flag = '-static'  # This is the default
+    toolset = 'clang'
+    search_path_envvar = 'LIBRARY_PATH'
     
 
 class MSVCArchiver(ArchiverBase):
@@ -235,9 +424,32 @@ class MSVCArchiver(ArchiverBase):
     platforms = ['Windows']
     static_library_flag = None
     output_key = '/OUT:%s'
+    toolset = 'msvc'
+    compatible_toolsets = ['llvm']
+    search_path_envvar = 'LIB'
     
+    # @classmethod
+    # def is_import_lib(cls, libpath):
+    #     r"""Determine if a library is an import library or a static
+    #     library.
+        
+    #     Args:
+    #         libpath (str): Full path to library.
 
-_top_lang_dir = get_language_dir('c')
+    #     Returns:
+    #         bool: True if the library is an import library, False otherwise.
+
+    #     """
+    #     if (not os.path.isfile(libpath)) or (not libpath.endswith('.lib')):
+    #         return False
+    #     out = subprocess.check_output([cls.get_executable(full_path=True),
+    #                                    '/list', libpath])
+    #     files = set(out.splitlines())
+    #     if any([f.endswith('.obj') for f in files]):
+    #         return False
+    #     return True
+
+    
 _incl_interface = _top_lang_dir
 _incl_seri = os.path.join(_top_lang_dir, 'serialize')
 _incl_comm = os.path.join(_top_lang_dir, 'communication')
@@ -247,15 +459,20 @@ if (_python_inc is None) or (not os.path.isfile(_python_inc)):  # pragma: no cov
 else:
     _python_inc = os.path.dirname(_python_inc)
 try:
-    _python_lib = ygg_cfg.get('c', 'python_shared',
-                              ygg_cfg.get('c', 'python_static', None))
+    if platform._is_win:  # pragma: windows
+        libtype_order = ['static', 'shared']
+    else:
+        libtype_order = ['shared', 'static']
+    _python_lib = ygg_cfg.get('c', 'python_%s' % libtype_order[0],
+                              ygg_cfg.get('c', 'python_%s' % libtype_order[1], None))
     if (_python_lib is None) or (not os.path.isfile(_python_lib)):  # pragma: no cover
-        _python_lib = tools.get_python_c_library(allow_failure=False)
+        _python_lib = tools.get_python_c_library(
+            allow_failure=False, libtype=libtype_order[0])
 except BaseException:  # pragma: debug
     warnings.warn("ERROR LOCATING PYTHON LIBRARY")
     _python_lib = None
 _numpy_inc = numpy_distutils.misc_util.get_numpy_include_dirs()
-_numpy_lib = None
+_numpy_lib = None  # os.path.join(os.path.dirname(_numpy_inc[0]), 'lib', 'npymath.lib')
 
 
 class CModelDriver(CompiledModelDriver):
@@ -291,8 +508,10 @@ class CModelDriver(CompiledModelDriver):
                    'language': 'c'}}
     internal_libraries = {
         'ygg': {'source': os.path.join(_incl_interface, 'YggInterface.c'),
+                'language': 'c',
                 'linker_language': 'c++',  # Some dependencies are C++
-                'internal_dependencies': ['regex', 'datatypes'],
+                'internal_dependencies': ['regex', 'datatypes',
+                                          'python_wrapper'],
                 'external_dependencies': ['rapidjson',
                                           'python', 'numpy'],
                 'include_dirs': [_incl_comm, _incl_seri],
@@ -315,13 +534,23 @@ class CModelDriver(CompiledModelDriver):
                       'internal_dependencies': ['regex'],
                       'external_dependencies': ['rapidjson',
                                                 'python', 'numpy'],
-                      'include_dirs': []}}
+                      'include_dirs': []},
+        'python_wrapper': {'source': 'python_wrapper.c',
+                           'directory': _top_lang_dir,
+                           'language': 'c',
+                           'libtype': 'shared',
+                           'external_dependencies': ['python', 'numpy'],
+                           'linker_language': 'c',
+                           'include_dirs': [_top_lang_dir]}}
     type_map = {
+        'comm': 'comm_t*',
+        'dtype': 'dtype_t*',
         'int': 'intX_t',
         'float': 'double',
         'string': 'string_t',
         'array': 'json_array_t',
         'object': 'json_object_t',
+        'integer': 'int',
         'boolean': 'bool',
         'null': 'void*',
         'uint': 'uintX_t',
@@ -338,13 +567,14 @@ class CModelDriver(CompiledModelDriver):
         'function': 'python_function_t',
         'instance': 'python_instance_t',
         'any': 'generic_t'}
+    type_class_map = {}
     function_param = {
         'import': '#include \"{filename}\"',
         'index': '{variable}[{index}]',
         'interface': '#include \"{interface_library}\"',
-        'input': ('yggInput_t {channel} = yggInputType('
+        'input': ('{channel} = yggInputType('
                   '\"{channel_name}\", {channel_type});'),
-        'output': ('yggOutput_t {channel} = yggOutputType('
+        'output': ('{channel} = yggOutputType('
                    '\"{channel_name}\", {channel_type});'),
         'recv_heap': 'yggRecvRealloc',
         'recv_stack': 'yggRecv',
@@ -362,6 +592,30 @@ class CModelDriver(CompiledModelDriver):
         'init_function': 'init_python()',
         'init_instance': 'init_generic()',
         'init_any': 'init_generic()',
+        'init_type_array': ('create_dtype_json_array({nitems}, '
+                            '{items}, {use_generic})'),
+        'init_type_object': ('create_dtype_json_object({nitems}, '
+                             '{keys}, {values}, {use_generic})'),
+        'init_type_ply': 'create_dtype_ply({use_generic})',
+        'init_type_obj': 'create_dtype_obj({use_generic})',
+        'init_type_1darray': ('create_dtype_1darray(\"{subtype}\", '
+                              '{precision}, {length}, \"{units}\", '
+                              '{use_generic})'),
+        'init_type_ndarray': ('create_dtype_ndarray(\"{subtype}\", '
+                              '{precision}, {ndim}, {shape}, '
+                              '\"{units}\", {use_generic})'),
+        'init_type_ndarray_arr': ('create_dtype_ndarray_arr(\"{subtype}\", '
+                                  '{precision}, {ndim}, {shape}, '
+                                  '\"{units}\", {use_generic})'),
+        'init_type_scalar': ('create_dtype_scalar(\"{subtype}\", '
+                             '{precision}, \"{units}\", '
+                             '{use_generic})'),
+        'init_type_default': ('create_dtype_default(\"{type}\", '
+                              '{use_generic})'),
+        'init_type_pyobj': ('create_dtype_pyobj(\"{type}\", '
+                            '{use_generic})'),
+        'init_type_empty': ('create_dtype_empty({use_generic})'),
+        'init_type_schema': ('create_dtype_schema({use_generic})'),
         'copy_array': '{name} = copy_json_array({value});',
         'copy_object': '{name} = copy_json_object({value});',
         'copy_schema': '{name} = copy_schema({value});',
@@ -399,8 +653,11 @@ class CModelDriver(CompiledModelDriver):
         'assign': '{name} = {value};',
         'assign_copy': 'memcpy({name}, {value}, {N}*sizeof({native_type}));',
         'comment': '//',
-        'true': '1',
-        'false': '0',
+        'true': 'true',
+        'false': 'false',
+        'true_flag': '1',
+        'false_flag': '0',
+        'null': 'NULL',
         'not': '!',
         'and': '&&',
         'indent': 2 * ' ',
@@ -458,16 +715,23 @@ class CModelDriver(CompiledModelDriver):
         if kwargs.get('second_pass', False):
             return
         if _python_lib:
-            if _python_lib.endswith(('.lib', '.a')):
+            if ((_python_lib.endswith(('.lib', '.a'))
+                 and not _python_lib.endswith('.dll.a'))):
                 cls.external_libraries['python']['libtype'] = 'static'
                 cls.external_libraries['python']['static'] = _python_lib
             else:
                 cls.external_libraries['python']['libtype'] = 'shared'
                 cls.external_libraries['python']['shared'] = _python_lib
-        for x in ['zmq', 'czmq']:
-            if x in cls.external_libraries:
-                if platform._is_win:  # pragma: windows
-                    cls.external_libraries[x]['libtype'] = 'static'
+        if platform._is_win:  # pragma: windows
+            for libtype in ['static', 'shared']:
+                if libtype in cls.external_libraries['python']:
+                    continue
+                cls.external_libraries['python'][libtype] = tools.get_python_c_library(
+                    allow_failure=True, libtype=libtype)
+            for x in ['zmq', 'czmq', 'python']:
+                if x in cls.external_libraries:
+                    cls.external_libraries[x]['libtype'] = 'windows_import'
+            cls.internal_libraries['python_wrapper']['libtype'] = 'windows_import'
         # Platform specific regex internal library
         if platform._is_win:  # pragma: windows
             regex_lib = cls.internal_libraries['regex_win32']
@@ -482,7 +746,7 @@ class CModelDriver(CompiledModelDriver):
             shutil.copy(stdint_win, os.path.join(_top_lang_dir, 'stdint.h'))
             cls.internal_libraries['datatypes']['include_dirs'] += [_top_lang_dir]
         if platform._is_linux:
-            for x in ['ygg', 'datatypes']:
+            for x in ['ygg', 'datatypes', 'python_wrapper']:
                 if 'compiler_flags' not in cls.internal_libraries[x]:
                     cls.internal_libraries[x]['compiler_flags'] = []
                 if '-fPIC' not in cls.internal_libraries[x]['compiler_flags']:
@@ -526,6 +790,39 @@ class CModelDriver(CompiledModelDriver):
         return out
 
     @classmethod
+    def get_dependency_info(cls, dep, toolname=None, default=None):
+        r"""Get the dictionary of information associated with a
+        dependency.
+
+        Args:
+            dep (str): Name of internal or external dependency or full path
+                to the library.
+            toolname (str, optional): Name of compiler tool that should be used.
+                Defaults to None and the default compiler for the language will
+                be used.
+            default (dict, optional): Information dictionary that should
+                be returned if dep cannot be located. Defaults to None
+                and an error will be raised if dep cannot be found.
+
+        Returns:
+            dict: Dependency info.
+
+        """
+        replaced_toolname = False
+        if platform._is_win and (dep == 'python_wrapper'):
+            # The Python library is compiled against MSVC so a wrapper is requried
+            # to reconcile the differences in FILE* between gcc and MSVC.
+            if get_compilation_tool('compiler', 'cl').is_installed():
+                replaced_toolname = True
+                toolname = 'cl'
+        out = super(CModelDriver, cls).get_dependency_info(
+            dep, toolname=toolname, default=default)
+        if replaced_toolname:
+            out['remove_flags'] = ['/TP']
+            out['toolname'] = toolname
+        return out
+
+    @classmethod
     def call_linker(cls, obj, language=None, **kwargs):
         r"""Link several object files to create an executable or library (shared
         or static), checking for errors.
@@ -549,9 +846,11 @@ class CModelDriver(CompiledModelDriver):
             kwargs['skip_interface_flags'] = True
         return super(CModelDriver, cls).call_linker(obj, language=language,
                                                     **kwargs)
-        
+
     @classmethod
-    def update_ld_library_path(cls, env, paths_to_add=None, add_to_front=False):
+    def update_ld_library_path(cls, env, paths_to_add=None,
+                               add_to_front=False, add_libpython_dir=False,
+                               toolname=None, **kwargs):
         r"""Update provided dictionary of environment variables so that
         LD_LIBRARY_PATH includes the interface directory containing the interface
         libraries.
@@ -562,46 +861,79 @@ class CModelDriver(CompiledModelDriver):
                 provided, defaults to [cls.get_language_dir()].
             add_to_front (bool, optional): If True, new paths are added to the
                 front, rather than the end. Defaults to False.
+            add_libpython_dir (bool, optional): If True, the directory
+                containing the Python C library will be added. Defaults
+                to False.
+            toolname (str, optional): Name of compiler tool that should be used.
+                Defaults to None and the default compiler for the language will
+                be used.
+            **kwargs: Additional keyword arguments are ignored.
 
         Returns:
             dict: Updated dictionary of environment variables.
 
         """
         if paths_to_add is None:
-            paths_to_add = [cls.get_language_dir()]
+            paths_to_add = []
+        paths_to_add = paths_to_add + [cls.get_language_dir()]
+        if add_libpython_dir:
+            paths_to_add = paths_to_add + [os.path.dirname(
+                cls.get_dependency_library('python', toolname=toolname))]
+        env_var = None
         if platform._is_linux:
+            env_var = 'LD_LIBRARY_PATH'
+        elif platform._is_win:
+            env_var = 'PATH'
+        if env_var is not None:
             path_list = []
-            prev_path = env.pop('LD_LIBRARY_PATH', '')
+            prev_path = env.pop(env_var, '')
+            prev_path_list = prev_path.split(os.pathsep)
             if prev_path:
                 path_list.append(prev_path)
             for x in paths_to_add:
-                if x not in prev_path:
+                if x not in prev_path_list:
                     if add_to_front:
                         path_list.insert(0, x)
                     else:
                         path_list.append(x)
             if path_list:
-                env['LD_LIBRARY_PATH'] = os.pathsep.join(path_list)
+                env[env_var] = os.pathsep.join(path_list)
         return env
 
-    def set_env(self, **kwargs):
-        r"""Get environment variables that should be set for the model process.
+    @classmethod
+    def update_python_path(cls, env):
+        r"""Update provided dictionary of environment variables so that
+        PYTHONPATH and PYTHONHOME are set as needed (primarily on windows).
+
+        Args:
+            env (dict): Dictionary of enviroment variables to be updated.
+
+        Returns:
+            dict: Updated dictionary of environment variables.
+
+        """
+        if platform._is_win:  # pragma: windows
+            env.setdefault('PYTHONHOME', sysconfig.get_config_var('prefix'))
+            env.setdefault('PYTHONPATH', os.pathsep.join([
+                sysconfig.get_path('stdlib'), sysconfig.get_path('purelib'),
+                os.path.join(sysconfig.get_config_var('prefix'), 'DLLs')]))
+        return env
+
+    @classmethod
+    def set_env_class(cls, **kwargs):
+        r"""Set environment variables that are instance independent.
 
         Args:
             **kwargs: Additional keyword arguments are passed to the parent
-                class's method.
+                class's method and update_ld_library_path.
 
         Returns:
             dict: Environment variables for the model process.
 
         """
-        out = super(CModelDriver, self).set_env(**kwargs)
-        out = self.update_ld_library_path(out)
-        if platform._is_win:  # pragma: windows
-            out.setdefault('PYTHONHOME', sysconfig.get_config_var('prefix'))
-            out.setdefault('PYTHONPATH', os.pathsep.join([
-                sysconfig.get_path('stdlib'), sysconfig.get_path('purelib'),
-                os.path.join(sysconfig.get_config_var('prefix'), 'DLLs')]))
+        out = super(CModelDriver, cls).set_env_class(**kwargs)
+        out = cls.update_ld_library_path(out, **kwargs)
+        out = cls.update_python_path(out)
         return out
     
     @classmethod
@@ -885,6 +1217,8 @@ class CModelDriver(CompiledModelDriver):
         json_type = kwargs.get('datatype', kwargs.get('type', 'bytes'))
         if isinstance(json_type, str):
             json_type = {'type': json_type}
+        # if 'type' in kwargs:
+        #     json_type.update(kwargs)
         assert(isinstance(json_type, dict))
         json_type = get_type_class(json_type['type']).normalize_definition(
             json_type)
@@ -1075,13 +1409,15 @@ class CModelDriver(CompiledModelDriver):
         if var.get('allow_realloc', False):
             type_name += '*'
             var = dict(var, native_type=type_name)
-        if ((type_name.endswith('*')
-             or (type_name in ['bytes_t', 'string_t', 'unicode_t']))):
+        if (((type_name.endswith('*')
+              or (type_name in ['bytes_t', 'string_t', 'unicode_t']))
+             and (not type_name.startswith(('comm_t', 'dtype_t')))
+             and (not (('length' in var.get('datatype', var))
+                       or ('shape' in var.get('datatype', var)))))):
             kwargs.get('requires_freeing', []).append(var)
             kwargs.setdefault('value', 'NULL')
         elif var.get('is_length_var', False):
             kwargs.setdefault('value', '0')
-        var = dict(var, name=cls.get_name_declare(var))
         out = super(CModelDriver, cls).write_declaration(var, **kwargs)
         for k in ['length', 'ndim', 'shape']:
             if ((isinstance(var.get(k + '_var', None), dict)
@@ -1126,7 +1462,7 @@ class CModelDriver(CompiledModelDriver):
 
         """
         out = []
-        if isinstance(var, str):
+        if isinstance(var, str):  # pragma: no cover
             var = {'name': var}
         if ((isinstance(var.get('datatype', False), dict)
              and (('free_%s' % var['datatype']['type'])
@@ -1349,189 +1685,6 @@ class CModelDriver(CompiledModelDriver):
         kwargs['output_type'] = output_type
         return super(CModelDriver, cls).write_function_def(
             function_name, **kwargs)
-        
-    @classmethod
-    def write_native_type_definition(cls, name, datatype, name_base=None,
-                                     requires_freeing=None, no_decl=False,
-                                     use_generic=False):
-        r"""Get lines declaring the data type within the language.
-
-        Args:
-            name (str): Name of variable that definition should be stored in.
-            datatype (dict): Type definition.
-            requires_freeing (list, optional): List that variables requiring
-                freeing should be appended to. Defaults to None.
-            no_decl (bool, optional): If True, the variable is defined without
-                declaring it (assumes that variable has already been declared).
-                Defaults to False.
-            use_generic (bool, optional): If True variables serialized
-                and/or deserialized by the type will be assumed to be
-                generic objects. Defaults to False.
-
-        Returns:
-            list: Lines required to define a type definition.
-
-        """
-        out = []
-        fmt = None
-        keys = {}
-        if use_generic:
-            keys['use_generic'] = 'true'
-        else:
-            keys['use_generic'] = 'false'
-        typename = datatype['type']
-        if name_base is None:
-            name_base = name
-        if datatype['type'] == 'array':
-            if 'items' in datatype:
-                assert(isinstance(datatype['items'], list))
-                keys['nitems'] = len(datatype['items'])
-                keys['items'] = '%s_items' % name_base
-                fmt = ('create_dtype_json_array({nitems}, {items}, '
-                       '{use_generic})')
-                out += [('dtype_t** %s = '
-                         '(dtype_t**)malloc(%d*sizeof(dtype_t*));')
-                        % (keys['items'], keys['nitems'])]
-                for i, x in enumerate(datatype['items']):
-                    # Prevent recusion
-                    x_copy = copy.deepcopy(x)
-                    x_copy.pop('items', None)
-                    x_copy.pop('properties', None)
-                    out += cls.write_native_type_definition(
-                        '%s[%d]' % (keys['items'], i), x_copy,
-                        name_base=('%s_item%d' % (name_base, i)),
-                        requires_freeing=requires_freeing, no_decl=True,
-                        use_generic=use_generic)
-                assert(isinstance(requires_freeing, list))
-                requires_freeing += [keys['items']]
-            else:
-                keys['use_generic'] = 'true'
-                fmt = ('create_dtype_json_array(0, NULL, '
-                       '{use_generic})')
-        elif datatype['type'] == 'object':
-            keys['use_generic'] = 'true'
-            if 'properties' in datatype:
-                assert(isinstance(datatype['properties'], dict))
-                keys['nitems'] = len(datatype['properties'])
-                keys['keys'] = '%s_keys' % name_base
-                keys['values'] = '%s_vals' % name_base
-                fmt = ('create_dtype_json_object({nitems}, {keys}, '
-                       '{values}, {use_generic})')
-                out += [('dtype_t** %s = '
-                         '(dtype_t**)malloc(%d*sizeof(dtype_t*));')
-                        % (keys['values'], keys['nitems']),
-                        ('char** %s = (char**)malloc(%d*sizeof(char*));')
-                        % (keys['keys'], keys['nitems'])]
-                for i, (k, v) in enumerate(datatype['properties'].items()):
-                    # Prevent recusion
-                    v_copy = copy.deepcopy(v)
-                    v_copy.pop('items', None)
-                    v_copy.pop('properties', None)
-                    out += ['%s[%d] = \"%s\";' % (keys['keys'], i, k)]
-                    out += cls.write_native_type_definition(
-                        '%s[%d]' % (keys['values'], i), v_copy,
-                        name_base=('%s_prop%d' % (name_base, i)),
-                        requires_freeing=requires_freeing, no_decl=True,
-                        use_generic=use_generic)
-                assert(isinstance(requires_freeing, list))
-                requires_freeing += [keys['values'], keys['keys']]
-            else:
-                fmt = ('create_dtype_json_object(0, NULL, NULL, '
-                       '{use_generic})')
-        elif datatype['type'] in ['ply', 'obj']:
-            fmt = 'create_dtype_%s({use_generic})' % datatype['type']
-        elif datatype['type'] == '1darray':
-            fmt = ('create_dtype_1darray(\"{subtype}\", {precision}, {length}, '
-                   '\"{units}\", {use_generic})')
-            for k in ['subtype', 'precision']:
-                keys[k] = datatype[k]
-            keys['length'] = datatype.get('length', '0')
-            keys['units'] = datatype.get('units', '')
-        elif datatype['type'] == 'ndarray':
-            fmt = ('create_dtype_ndarray(\"{subtype}\", {precision},'
-                   ' {ndim}, {shape}, \"{units}\", {use_generic})')
-            for k in ['subtype', 'precision']:
-                keys[k] = datatype[k]
-            if 'shape' in datatype:
-                shape_var = '%s_shape' % name_base
-                out += ['size_t %s[%d] = {%s};' % (
-                    shape_var, len(datatype['shape']),
-                    ', '.join([str(s) for s in datatype['shape']]))]
-                keys['ndim'] = len(datatype['shape'])
-                keys['shape'] = shape_var
-                fmt = fmt.replace('create_dtype_ndarray',
-                                  'create_dtype_ndarray_arr')
-            else:
-                keys['ndim'] = 0
-                keys['shape'] = 'NULL'
-            keys['units'] = datatype.get('units', '')
-        elif (typename == 'scalar') or (typename in _valid_types):
-            fmt = ('create_dtype_scalar(\"{subtype}\", {precision}, '
-                   '\"{units}\", {use_generic})')
-            keys['subtype'] = datatype.get('subtype', datatype['type'])
-            keys['units'] = datatype.get('units', '')
-            if keys['subtype'] in ['bytes', 'string', 'unicode']:
-                keys['precision'] = datatype.get('precision', 0)
-            else:
-                keys['precision'] = datatype['precision']
-            typename = 'scalar'
-        elif datatype['type'] in ['boolean', 'null', 'number',
-                                  'integer', 'string']:
-            fmt = 'create_dtype_default(\"{type}\", {use_generic})'
-            keys['type'] = datatype['type']
-        elif (typename in ['class', 'function']):
-            fmt = 'create_dtype_pyobj(\"{type}\", {use_generic})'
-            keys['type'] = typename
-        elif typename == 'instance':
-            keys['use_generic'] = 'true'
-            # fmt = 'create_dtype_pyinst(NULL, NULL)'
-            fmt = 'create_dtype_empty({use_generic})'
-        elif typename == 'schema':
-            keys['use_generic'] = 'true'
-            fmt = 'create_dtype_schema({use_generic})'
-        elif typename == 'any':
-            keys['use_generic'] = 'true'
-            fmt = 'create_dtype_empty({use_generic})'
-        else:  # pragma: debug
-            raise ValueError("Cannot create C version of type '%s'"
-                             % typename)
-        def_line = '%s = %s;' % (name, fmt.format(**keys))
-        if not no_decl:
-            def_line = 'dtype_t* ' + def_line
-        out.append(def_line)
-        return out
-
-    @classmethod
-    def write_channel_def(cls, key, datatype=None, requires_freeing=None,
-                          use_generic=False, **kwargs):
-        r"""Write an channel declaration/definition.
-
-        Args:
-            key (str): Entry in cls.function_param that should be used.
-            datatype (dict, optional): Data type associated with the channel.
-                Defaults to None and is ignored.
-            requires_freeing (list, optional): List that variables requiring
-                freeing should be appended to. Defaults to None.
-            use_generic (bool, optional): If True variables serialized
-                and/or deserialized by the channel will be assumed to be
-                generic objects. Defaults to False.
-            **kwargs: Additional keyword arguments are passed as parameters
-                to format_function_param.
-
-        Returns:
-            list: Lines required to declare and define an output channel.
-
-        """
-        out = []
-        if (datatype is not None) and ('{channel_type}' in cls.function_param[key]):
-            kwargs['channel_type'] = '%s_type' % kwargs['channel']
-            out += cls.write_native_type_definition(
-                kwargs['channel_type'], datatype,
-                requires_freeing=requires_freeing,
-                use_generic=use_generic)
-        out += super(CModelDriver, cls).write_channel_def(key, datatype=datatype,
-                                                          **kwargs)
-        return out
 
     @classmethod
     def write_assign_to_output(cls, dst_var, src_var,
@@ -1708,11 +1861,6 @@ class CModelDriver(CompiledModelDriver):
                                name='%s[0]' % dst_var['name'])
             else:
                 dst_var = '%s[0]' % dst_var
-        if ((outputs_in_inputs and isinstance(dst_var, dict)
-             and isinstance(dst_var['datatype'], dict)
-             and ('copy_' + dst_var['datatype']['type']
-                  in cls.function_param))):
-            kwargs['copy'] = True
         out += super(CModelDriver, cls).write_assign_to_output(
             dst_var, src_var, outputs_in_inputs=outputs_in_inputs,
             **kwargs)

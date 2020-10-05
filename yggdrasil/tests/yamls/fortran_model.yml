@@ -1,0 +1,6 @@
+model:
+  name: fortran_model
+  language: fortran
+  args:
+    - ../scripts/fortran_model.py
+      

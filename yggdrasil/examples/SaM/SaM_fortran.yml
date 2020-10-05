@@ -1,0 +1,21 @@
+---
+
+model:
+  name: SaMFortran
+  driver: FortranModelDriver
+  args: src/SaM.f90
+
+  inputs:
+    - name: input1_fortran
+      driver: FileInputDriver
+      args: ./Input/SaM_input.txt
+    - name: static_fortran
+      driver: FileInputDriver
+      args: ./Input/SaM_static.txt
+
+  outputs:
+    - name: output_fortran
+      driver: FileOutputDriver
+      args: SaM_output.txt
+      in_temp: True
+

@@ -106,6 +106,8 @@ def write_datatype_mapping_table(**kwargs):
         if lang == 'cpp':
             lang = 'c++'
         ldrv = components.import_component('model', lang)
+        if not ldrv.full_language:
+            continue
         for k in args.keys():
             entry = ldrv.type_map.get(k, '')
             if entry:

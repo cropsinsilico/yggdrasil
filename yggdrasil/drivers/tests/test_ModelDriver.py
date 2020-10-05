@@ -1,7 +1,9 @@
 import os
 import copy
 import unittest
-from yggdrasil import platform, tools
+import pprint
+import shutil
+from yggdrasil import platform
 from yggdrasil.tests import assert_raises, scripts, check_enabled_languages
 from yggdrasil.drivers.ModelDriver import ModelDriver, remove_product
 from yggdrasil.drivers.CompiledModelDriver import CompiledModelDriver
@@ -131,12 +133,12 @@ class TestModelDriverNoInit(TestModelParam, parent.TestDriverNoInit):
         drv.wait(False)
         assert(not drv.errors)
 
-    def test_run_model(self):
+    def test_run_model(self, **kwargs):
         r"""Test running script used without debug."""
-        self.run_model_instance()
+        self.run_model_instance(**kwargs)
 
     @unittest.skipIf(platform._is_win, "No valgrind on windows")
-    @unittest.skipIf(tools.which('valgrind') is None,
+    @unittest.skipIf(shutil.which('valgrind') is None,
                      "Valgrind not installed.")
     def test_valgrind(self):
         r"""Test running with valgrind."""
@@ -153,7 +155,7 @@ class TestModelDriverNoInit(TestModelParam, parent.TestDriverNoInit):
         
     @unittest.skipIf(platform._is_win or platform._is_mac,
                      "No strace on Windows or MacOS")
-    @unittest.skipIf(tools.which('strace') is None,
+    @unittest.skipIf(shutil.which('strace') is None,
                      "strace not installed.")
     def test_strace(self):
         r"""Test running with strace."""
@@ -270,8 +272,11 @@ class TestModelDriverNoInit(TestModelParam, parent.TestDriverNoInit):
         assert_raises(RuntimeError, self.import_cls.run_code, lines)
 
     def test_write_function_def(self, inputs=None, outputs=None,
-                                outputs_in_inputs=None, **kwargs):
+                                outputs_in_inputs=None,
+                                declare_functions_as_var=None, **kwargs):
         r"""Test writing and running a function definition."""
+        if declare_functions_as_var is None:
+            declare_functions_as_var = False
         if self.import_cls.function_param is None:
             self.assert_raises(NotImplementedError,
                                self.import_cls.write_function_def, None)
@@ -302,6 +307,8 @@ class TestModelDriverNoInit(TestModelParam, parent.TestDriverNoInit):
             output_var = self.import_cls.prepare_output_variables(
                 outputs, in_inputs=self.import_cls.outputs_in_inputs,
                 in_definition=True)
+            if not self.import_cls.types_in_funcdef:
+                kwargs['outputs'] = outputs
             definition = self.import_cls.write_function_def(
                 'test_function', inputs=inputs, output_var=output_var,
                 function_contents=function_contents,
@@ -316,12 +323,23 @@ class TestModelDriverNoInit(TestModelParam, parent.TestDriverNoInit):
                 function_contents=function_contents,
                 outputs_in_inputs=outputs_in_inputs,
                 skip_interface=True)
-            parsed = self.import_cls.parse_function_definition(
-                None, 'test_function', contents='\n'.join(definition),
-                outputs_in_inputs=outputs_in_inputs,
-                expected_outputs=outputs)
-            self.assert_equal(len(parsed.get('inputs', [])), len(inputs))
-            self.assert_equal(len(parsed.get('outputs', [])), len(outputs))
+            parsed = None
+            try:
+                parsed = self.import_cls.parse_function_definition(
+                    None, 'test_function', contents='\n'.join(definition),
+                    outputs_in_inputs=outputs_in_inputs,
+                    expected_outputs=outputs)
+                self.assert_equal(len(parsed.get('inputs', [])), len(inputs))
+                self.assert_equal(len(parsed.get('outputs', [])), len(outputs))
+            except BaseException:  # pragma: debug
+                pprint.pprint(definition)
+                if parsed:
+                    pprint.pprint(parsed)
+                    print("Expected inputs:")
+                    pprint.pprint(inputs)
+                    print("Expected outputs:")
+                    pprint.pprint(outputs)
+                raise
             if inputs:
                 for xp, x0 in zip(parsed['inputs'], inputs):
                     assert(xp['name'] == x0['name'])
@@ -337,6 +355,13 @@ class TestModelDriverNoInit(TestModelParam, parent.TestDriverNoInit):
                     lines += self.import_cls.write_declaration(x)
                 if outputs_in_inputs:
                     lines += self.import_cls.write_declaration(flag_var)
+                if declare_functions_as_var:
+                    if outputs_in_inputs:
+                        lines += self.import_cls.write_declaration(
+                            dict(flag_var, name='test_function'))
+                    elif len(outputs) > 0:
+                        lines += self.import_cls.write_declaration(
+                            dict(outputs[0], name='test_function'))
             for x in inputs:
                 lines.append(self.import_cls.format_function_param(
                     'assign', **x))
@@ -358,8 +383,8 @@ class TestModelDriverNoInit(TestModelParam, parent.TestDriverNoInit):
         else:
             lines = []
             if 'declare' in self.import_cls.function_param:
-                lines.append(self.import_cls.function_param['declare'].format(
-                    type_name='int', variable='x'))
+                lines += self.import_cls.write_declaration(
+                    {'name': 'x', 'type': 'integer'})
             cond = [self.import_cls.function_param['true'],
                     self.import_cls.function_param['false']]
             block_contents = [
@@ -382,13 +407,13 @@ class TestModelDriverNoInit(TestModelParam, parent.TestDriverNoInit):
         else:
             lines = []
             if 'declare' in self.import_cls.function_param:
-                lines.append(self.import_cls.function_param['declare'].format(
-                    type_name='int', variable='i'))
-                lines.append(self.import_cls.function_param['declare'].format(
-                    type_name='int', variable='x'))
+                lines += self.import_cls.write_declaration(
+                    {'name': 'i', 'type': 'integer'})
+                lines += self.import_cls.write_declaration(
+                    {'name': 'x', 'type': 'integer'})
             loop_contents = self.import_cls.function_param['assign'].format(
                 name='x', value='i')
-            lines += self.import_cls.write_for_loop('i', 0, 1, loop_contents)
+            lines += self.import_cls.write_for_loop('i', 1, 2, loop_contents)
             self.run_generated_code(lines)
 
     def test_write_while_loop(self):
@@ -421,6 +446,19 @@ class TestModelDriverNoInit(TestModelParam, parent.TestDriverNoInit):
     def test_cleanup_dependencies(self):
         r"""Test cleanup_dependencies method."""
         self.import_cls.cleanup_dependencies()
+
+    def test_split_line(self, vals=None):
+        r"""Test split_line."""
+        if self.import_cls.function_param is None:
+            return
+        if vals is None:
+            vals = [('abcdef', {'length': 3, 'force_split': True},
+                     ['abc', 'def']),
+                    ('    abc', {'length': 3, 'force_split': True},
+                     ['    abc'])]
+        for line, kwargs, splits in vals:
+            self.assert_equal(
+                self.import_cls.split_line(line, **kwargs), splits)
     
 
 class TestModelDriverNoStart(TestModelParam, parent.TestDriverNoStart):

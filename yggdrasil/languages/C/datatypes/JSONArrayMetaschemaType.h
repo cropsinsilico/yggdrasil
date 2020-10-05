@@ -33,6 +33,9 @@ public:
 			  const char *format_str = "",
 			  const bool use_generic=true) :
     MetaschemaType("array", use_generic) {
+    if ((items.size() == 0) && (strlen(format_str) == 0)){
+      update_use_generic(true);
+    }
     strncpy(format_str_, format_str, 1000);
     strncpy(item_key_, "items", 100);
     update_items(items, true);
@@ -59,11 +62,6 @@ public:
       ygglog_throw_error("JSONArrayMetaschemaType: Items missing.");
     if (!(type_doc[item_key_].IsArray()))
       ygglog_throw_error("JSONArrayMetaschemaType: Items must be an array.");
-    if (type_doc.HasMember("format_str")) {
-      if (!(type_doc["format_str"].IsString()))
-	ygglog_throw_error("JSONArrayMetaschemaType: format_str must be a string.");
-      strncpy(format_str_, type_doc["format_str"].GetString(), 1000);
-    }
     rapidjson::SizeType i;
     MetaschemaTypeVector items;
     for (i = 0; i < type_doc[item_key_].Size(); i++) {
@@ -179,13 +177,13 @@ public:
     if (all_arrays()) {
       printf("%s%-15s = %s\n", indent, "all_arrays", "true");
     }
-    printf("%s%zu Elements\n", indent, items_.size());
+    printf("%s%ld Elements\n", indent, items_.size());
     char new_indent[100] = "";
     strcat(new_indent, indent);
     strcat(new_indent, "    ");
     size_t i;
     for (i = 0; i < items_.size(); i++) {
-      printf("%sElement %zu:\n", indent, i);
+      printf("%sElement %ld:\n", indent, i);
       items_[i]->display(new_indent);
     }
   }
@@ -265,7 +263,7 @@ public:
     strcat(new_indent, indent);
     strcat(new_indent, "    ");
     data->get_data(arg);
-    printf("%sArray with %zu elements:\n", indent, arg.size());
+    printf("%sArray with %ld elements:\n", indent, arg.size());
     for (it = arg.begin(); it != arg.end(); it++) {
       (*it)->display(new_indent);
     }
@@ -313,6 +311,24 @@ public:
     update_items(new_info_array->items());
   }
   /*!
+    @brief Update the type at an index.
+    @param[in] i size_t Index where item type should be added.
+    @param[in] x MetaschemaType* Type to insert at index i.
+  */
+  void update_type_element(size_t i, const MetaschemaType* x) override {
+    if (i > items_.size()) {
+      ygglog_throw_error("JSONArrayMetaschemaType::update_type_element: Cannot add type at index %lu, there are only %lu types present.",
+			 i, items_.size());
+    } else if (i == items_.size()) {
+      items_.push_back(x->copy());
+    } else {
+      MetaschemaType* old = items_[i];
+      items_[i] = x->copy();
+      delete old;
+      old = NULL;
+    }
+  }
+  /*!
     @brief Update the item types.
     @param[in] new_items MetaschemaTypeVector Vector of new types describing items.
     @param[in] force bool If true, the existing items are overwritten, otherwise they are only updated.
@@ -342,6 +358,12 @@ public:
 	} else {
 	  items_.push_back(new_items[i]->copy());
 	}
+      }
+    }
+    // if ((strlen(format_str_) > 0) && (all_arrays())) {
+    if (all_arrays()) {
+      for (i = 0; i < items_.size(); i++) {
+	items_[i]->set_in_table(true);
       }
     }
     // Force children to follow parent use_generic
@@ -383,6 +405,28 @@ public:
     return out;
   }
   /*!
+    @brief Set the type associated with an item.
+    An error will be raised if the property identified by key is
+    already present and the provided type does not match the existing
+    type.
+    @param[in] index const size_t Index of the item to set the type for.
+    @param[in] itemtype const MetaschemaType* Pointer to item type that
+    should be associated with the provided index.
+   */
+  void set_item_type(const size_t index, const MetaschemaType* itemtype) override {
+    if (index < items_.size()) {
+      if ((*(items_[index])) != (*itemtype)) {
+	printf("New type:\n");
+	itemtype->display();
+	printf("Existing type:\n");
+	items_[index]->display();
+	ygglog_throw_error("JSONArrayMetaschemaType::set_item_type: New type dosn't match existing type for item %ld", index);
+      }
+    } else {
+      items_.push_back(itemtype->copy());
+    }
+  }
+  /*!
     @brief Update the type object with info from provided variable arguments for serialization.
     @param[in,out] nargs size_t Number of arguments contained in ap. On output
     the number of unused arguments will be assigned to this address.
@@ -395,7 +439,12 @@ public:
     if (use_generic())
       return out;
     if ((all_arrays()) && (*nargs >= (nitems() + 1))) {
-      size_t nrows = va_arg(ap.va, size_t);
+      size_t nrows;
+      if (ap.using_ptrs) {
+	nrows = ((size_t*)get_va_list_ptr_cpp(&ap))[0];
+      } else {
+	nrows = va_arg(ap.va, size_t);
+      }
       skip_before_.push_back(sizeof(size_t));
       out++;
       for (i = 0; i < items_.size(); i++) {
@@ -443,7 +492,12 @@ public:
     if (use_generic())
       return out;
     if ((all_arrays()) && (*nargs >= (nitems() + 1))) {
-      size_t *nrows = va_arg(ap.va, size_t*);
+      size_t *nrows;
+      if (ap.using_ptrs) {
+	nrows = (size_t*)get_va_list_ptr_cpp(&ap);
+      } else {
+	nrows = va_arg(ap.va, size_t*);
+      }
       size_t inrows;
       skip_before_.push_back(sizeof(size_t*));
       out++;
@@ -462,8 +516,7 @@ public:
       iout = items_[i]->update_from_deserialization_args(&new_nargs, ap);
       if (iout == 0) {
 	for (iout = 0; iout < items_[i]->nargs_exp(); iout++) {
-	  // Can use void* here since all variables will be pointers
-	  va_arg(ap.va, void*);
+	  va_list_t_skip(&ap, sizeof(void*));
 	}
       }
       out = out + iout;
@@ -572,10 +625,6 @@ public:
    */
   bool encode_type_prop(rapidjson::Writer<rapidjson::StringBuffer> *writer) const override {
     if (!(MetaschemaType::encode_type_prop(writer))) { return false; }
-    if (strlen(format_str_) > 0) {
-      writer->Key("format_str");
-      writer->String(format_str_, (rapidjson::SizeType)strlen(format_str_));
-    }
     writer->Key(item_key_);
     writer->StartArray();
     size_t i;

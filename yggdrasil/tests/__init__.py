@@ -40,6 +40,7 @@ script_list = [
     ('error', 'error_model.py'),
     ('lpy', 'lpy_model.lpy'),
     ('r', 'r_model.R'),
+    ('fortran', ['hellofunc.f90', 'fortran_model.f90']),
     ('sbml', 'sbml_model.xml')]
 scripts = {}
 for k, v in script_list:
@@ -64,6 +65,7 @@ yaml_list = [
     ('python', 'python_model.yml'),
     ('error', 'error_model.yml'),
     ('lpy', 'lpy_model.yml'),
+    ('fortran', 'fortran_model.yml'),
     ('sbml', 'sbml_model.yml')]
 yamls = {k: os.path.join(yaml_dir, v) for k, v in yaml_list}
 

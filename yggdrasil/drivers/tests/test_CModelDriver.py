@@ -2,7 +2,15 @@ import os
 import unittest
 from yggdrasil import platform
 import yggdrasil.drivers.tests.test_CompiledModelDriver as parent
-from yggdrasil.drivers.CModelDriver import CModelDriver
+from yggdrasil.drivers.CModelDriver import CModelDriver, LDLinker
+
+
+def test_LDLinker_tool_version():
+    r"""Test the tool_version method of the LDLinker class."""
+    if LDLinker.is_installed():
+        LDLinker.tool_version()
+        LDLinker.get_search_path()
+        LDLinker.get_env_flags()
 
 
 class TestCModelParam(parent.TestCompiledModelParam):
@@ -112,7 +120,18 @@ class TestCModelDriverNoInit(TestCModelParam,
         self.test_write_function_def(inputs=inputs, outputs=outputs,
                                      dont_add_lengths=True)
         
-    
+    def test_GCCCompiler_dll2a(self):
+        r"""Test the dll2a method of the GCCCompiler class."""
+        gcc = self.import_cls.get_tool('compiler', toolname='gcc',
+                                       default=None)
+        if gcc:
+            kws = {'toolname': 'gcc'}
+            if platform._is_win:
+                kws['libtype'] = 'shared'
+            dll = self.import_cls.get_dependency_library('python', **kws)
+            gcc.dll2a(dll, overwrite=True)
+
+
 class TestCModelDriverNoStart(TestCModelParam,
                               parent.TestCompiledModelDriverNoStart):
     r"""Test runner for CModelDriver without start."""

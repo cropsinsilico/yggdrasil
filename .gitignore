@@ -7,6 +7,7 @@ yggdrasil/tests/scripts/Makefile
 .ipynb_checkpoints
 
 # Library things
+*.exp
 *.a
 *.lib
 *.so
@@ -23,6 +24,7 @@ docs/source/yggdrasil*.rst
 docs/source/modules.rst
 docs/source/examples/*.rst
 docs/source/tables
+docs/source/temp
 
 # Dev setup
 requirements_pruned.txt
@@ -57,6 +59,7 @@ tmp/
 # Compiled things - not managed
 *.pyc
 *.o
+*.mod
 
 # Tooling things - not managed
 *.vscode

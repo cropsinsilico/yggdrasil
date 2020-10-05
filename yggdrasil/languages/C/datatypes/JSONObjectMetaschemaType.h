@@ -285,6 +285,22 @@ public:
     update_properties(new_info_obj->properties());
   }
   /*!
+    @brief Update the type associated with a key.
+    @param[in] k const char* Key where item type should be added.
+    @param[in] x MetaschemaType* Type to insert at key k.
+  */
+  void update_type_element(const char* k, const MetaschemaType* x) override {
+    MetaschemaTypeMap::iterator it;
+    MetaschemaTypeMap::iterator old_it;
+    old_it = properties_.find(k);
+    if (old_it != properties_.end()) {
+      MetaschemaType* old = old_it->second;
+      delete old;
+      old = NULL;
+    }
+    properties_[k] = x->copy();
+  }
+  /*!
     @brief Update the property types.
     @param[in] new_properties MetaschemaTypeMap Map of new types describing properties.
     @param[in] force bool If true, the existing properties are overwritten, otherwise they are only updated.
@@ -362,6 +378,29 @@ public:
     return out;
   }
   /*!
+    @brief Set the type associated with a property.
+    An error will be raised if the property identified by key is
+    already present and the provided type does not match the existing
+    type.
+    @param[in] key const char* Property key to set type for.
+    @param[in] proptype const MetaschemaType* Pointer to property type
+    that should be associated with the provided key.
+   */
+  void set_property_type(const char* key, const MetaschemaType* proptype) override {
+    MetaschemaTypeMap::const_iterator it = properties_.find(key);
+    if (it != properties_.end()) {
+      if ((*(it->second)) != (*proptype)) {
+	printf("New type:\n");
+	proptype->display();
+	printf("Existing type:\n");
+	it->second->display();
+	ygglog_throw_error("JSONObjectMetaschemaType::set_property_type: New type dosn't match existing type for property '%s'", key);
+      }
+    } else {
+      properties_[key] = proptype->copy();
+    }
+  }
+  /*!
     @brief Update the type object with info from provided variable arguments for serialization.
     @param[in,out] nargs size_t Number of arguments contained in ap. On output
     the number of unused arguments will be assigned to this address.
@@ -414,8 +453,7 @@ public:
       iout = it->second->update_from_deserialization_args(&new_nargs, ap);
       if (iout == 0) {
 	for (iout = 0; iout < it->second->nargs_exp(); iout++) {
-	  // Can use void* here since all variables will be pointers
-	  va_arg(ap.va, void*);
+	  va_list_t_skip(&ap, sizeof(void*));
 	}
       }
       out = out + iout;

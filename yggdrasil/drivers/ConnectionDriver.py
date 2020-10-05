@@ -310,6 +310,8 @@ class ConnectionDriver(Driver):
                 else:
                     all_files = False
                     ikws += s['comm'].get_subtype_properties(icomm_cls._commtype)
+                    if (icomm_cls._commtype == 'buffer') and self.as_process:
+                        x['buffer_task_method'] = 'process'
             ikws = list(set(ikws))
             for k in ikws:
                 if (k not in comm_kws) and (k in kwargs):
@@ -774,11 +776,15 @@ class ConnectionDriver(Driver):
 
     def update_serializer(self, msg):
         r"""Update the serializer for the output comm based on input."""
-        sinfo = self.icomm.serializer.typedef
-        sinfo.update(self.icomm.serializer.serializer_info)
+        sinfo_keys = ['format_str', 'field_names', 'field_units']
+        stype = self.icomm.serializer.typedef
+        sinfo = self.icomm.serializer.serializer_info
+        for k in sinfo_keys:
+            if k in sinfo:
+                stype[k] = sinfo[k]
         for t in self.icomm.transform:
-            t.set_original_datatype(sinfo)
-            sinfo = t.transformed_datatype
+            t.set_original_datatype(stype)
+            stype = t.transformed_datatype
         sinfo.pop('seritype', None)
         self.debug('Before update:\n'
                    + '  icomm:\n    sinfo:\n%s\n    typedef:\n%s\n'
@@ -789,17 +795,21 @@ class ConnectionDriver(Driver):
                    self.pprint(self.ocomm.serializer.typedef, 2))
         for t in self.translator:
             if isinstance_component(t, 'transform'):
-                t.set_original_datatype(sinfo)
-                sinfo = t.transformed_datatype
+                t.set_original_datatype(stype)
+                stype = t.transformed_datatype
         for t in self.ocomm.transform:
-            t.set_original_datatype(sinfo)
-            sinfo = t.transformed_datatype
+            t.set_original_datatype(stype)
+            stype = t.transformed_datatype
+        for k in sinfo_keys:
+            if k in stype:
+                sinfo[k] = stype.pop(k)
+        sinfo['datatype'] = stype
         self.ocomm.serializer.initialize_serializer(sinfo)
         self.ocomm.serializer.update_serializer(skip_type=True,
                                                 **self.icomm._last_header)
-        if (((sinfo['type'] == 'array')
+        if (((stype['type'] == 'array')
              and (self.ocomm.serializer.typedef['type'] != 'array')
-             and (len(sinfo['items']) == 1))):
+             and (len(stype['items']) == 1))):
             # if (((self.icomm.serializer.typedef['type'] == 'array')
             #      and (self.ocomm.serializer.typedef['type'] != 'array')
             #      and (len(self.icomm.serializer.typedef['items']) == 1))):

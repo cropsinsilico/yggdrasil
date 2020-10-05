@@ -1,0 +1,8 @@
+models:
+  - name: fortran_model1
+    language: fortran  # Runs the fortran script using default Fortran
+    args: ./src/gs_lesson2.f90
+
+  - name: fortran_model2
+    language: fortran
+    args: ./src/gs_lesson2.f90

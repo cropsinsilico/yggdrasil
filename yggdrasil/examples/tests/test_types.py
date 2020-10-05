@@ -237,7 +237,7 @@ class TestExampleTypes(ExampleTstBase):
         os.environ['TEST_LANGUAGE'] = language
         os.environ['TEST_LANGUAGE_EXT'] = language_ext
         os.environ['TEST_TYPENAME'] = typename
-        if language == 'c' and (not using_generics):
+        if (language in ['c', 'fortran']) and (not using_generics):
             yaml_fields['vars'] = True
             if typename in ['array', 'object']:
                 yaml_fields['dtype'] = True

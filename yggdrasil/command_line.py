@@ -6,6 +6,7 @@ import logging
 import subprocess
 import argparse
 import pprint
+import shutil
 
 
 logger = logging.getLogger(__name__)
@@ -48,7 +49,7 @@ def ygginfo():
                 else:
                     exec_name = drv.language_executable()
                     if not os.path.isabs(exec_name):
-                        exec_name = tools.which(exec_name)
+                        exec_name = shutil.which(exec_name)
                     vardict.append((curr_prefix + 'Location', exec_name))
                 vardict.append((curr_prefix + 'Version',
                                 drv.language_version()))
@@ -88,8 +89,12 @@ def ygginfo():
         if args.verbose:
             # Conda info
             if os.environ.get('CONDA_PREFIX', ''):
-                out = tools.bytes2str(subprocess.check_output(
-                    ['conda', 'info'])).strip()
+                if platform._is_win:  # pragma: windows
+                    out = tools.bytes2str(subprocess.check_output(
+                        'conda info', shell=True)).strip()
+                else:
+                    out = tools.bytes2str(subprocess.check_output(
+                        ['conda', 'info'])).strip()
                 curr_prefix += prefix
                 vardict.append((curr_prefix + 'Conda Info:', "\n%s%s"
                                 % (curr_prefix + prefix,

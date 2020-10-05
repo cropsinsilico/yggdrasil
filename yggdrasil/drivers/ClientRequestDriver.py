@@ -105,6 +105,14 @@ class ClientRequestDriver(ConnectionDriver):
         return self.last_header['response_address']
 
     @property
+    def client_model(self):
+        r"""str: Name of the client model."""
+        # NOTE: This means that any client_model value in the last
+        # header will not be propagated to the server. This also assumes
+        # that there is only one client model serviced by this driver
+        return self.name.split(':')[0]
+
+    @property
     def request_name(self):
         r"""str: The name of the channel used to send requests to the server
         request driver."""
@@ -164,7 +172,11 @@ class ClientRequestDriver(ConnectionDriver):
             return False
         # Start response driver
         is_eof = kwargs.get('is_eof', False)
-        if not is_eof:
+        if is_eof:
+            kwargs.setdefault('header_kwargs', {})
+            kwargs['header_kwargs'].setdefault('client_model',
+                                               self.client_model)
+        else:
             with self.lock:
                 if (not self.is_comm_open) or self._block_response:  # pragma: debug
                     return False
@@ -187,4 +199,27 @@ class ClientRequestDriver(ConnectionDriver):
             kwargs['header_kwargs'].setdefault(
                 'response_address', response_driver.response_address)
             kwargs['header_kwargs'].setdefault('request_id', self.request_id)
+            kwargs['header_kwargs'].setdefault('client_model',
+                                               self.client_model)
         return super(ClientRequestDriver, self).send_message(*args, **kwargs)
+
+    def run_loop(self):
+        r"""Run the driver. Continue looping over messages until there are not
+        any left or the communication channel is closed.
+        """
+        super(ClientRequestDriver, self).run_loop()
+        if not self.was_break:
+            self.prune_response_drivers()
+
+    def prune_response_drivers(self):
+        r"""Remove response drivers that are no longer being used."""
+        with self.lock:
+            remove_idx = []
+            for i, x in enumerate(self.response_drivers):
+                if (((not x.is_alive())
+                     and x.icomm.is_confirmed_recv
+                     and x.ocomm.is_confirmed_send)):
+                    x.cleanup()
+                    remove_idx.append(i)
+            for i in remove_idx[::-1]:
+                self.response_drivers.pop(i)

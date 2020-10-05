@@ -261,10 +261,17 @@ int ipc_comm_send(const comm_t *x, const char *data, const size_t len) {
       ygglog_debug("ipc_comm_send(%s): msgsnd, sleep", x->name);
       usleep(YGG_SLEEP_TIME);
     } else {
-      ygglog_error("ipc_comm_send:  msgsend(%d, %p, %d, IPC_NOWAIT) ret(%d), errno(%d): %s",
-		   (int*)(x->handle), &t, len, ret, errno, strerror(errno));
-      ret = -1;
-      break;
+      struct msqid_ds buf;
+      int rtrn = msgctl(handle, IPC_STAT, &buf);
+      if ((rtrn == 0) && ((buf.msg_qnum + len) > buf.msg_qbytes)) {
+	ygglog_debug("ipc_comm_send(%s): msgsnd, queue full, sleep", x->name);
+	usleep(YGG_SLEEP_TIME);
+      } else {
+	ygglog_error("ipc_comm_send:  msgsend(%d, %p, %d, IPC_NOWAIT) ret(%d), errno(%d): %s",
+		     ((int*)(x->handle))[0], &t, len, ret, errno, strerror(errno));
+	ret = -1;
+	break;
+      }
     }
   }
   ygglog_debug("ipc_comm_send(%s): returning %d", x->name, ret);
@@ -395,7 +402,7 @@ static inline
 int free_ipc_comm(comm_t *x) {
   // Prevent C4100 warning on windows by referencing param
 #ifdef _WIN32
-  x;
+  UNUSED(x);
 #endif
   ipc_install_error();
   return 1;
@@ -410,7 +417,7 @@ static inline
 int new_ipc_address(comm_t *comm) {
   // Prevent C4100 warning on windows by referencing param
 #ifdef _WIN32
-  comm;
+  UNUSED(comm);
 #endif
   ipc_install_error();
   return -1;
@@ -425,7 +432,7 @@ static inline
 int init_ipc_comm(comm_t *comm) {
   // Prevent C4100 warning on windows by referencing param
 #ifdef _WIN32
-  comm;
+  UNUSED(comm);
 #endif
   ipc_install_error();
   return -1;
@@ -440,7 +447,7 @@ static inline
 int ipc_comm_nmsg(const comm_t *x) {
   // Prevent C4100 warning on windows by referencing param
 #ifdef _WIN32
-  x;
+  UNUSED(x);
 #endif
   ipc_install_error();
   return -1;
@@ -459,9 +466,9 @@ static inline
 int ipc_comm_send(const comm_t *x, const char *data, const size_t len) {
   // Prevent C4100 warning on windows by referencing param
 #ifdef _WIN32
-  x;
-  data;
-  len;
+  UNUSED(x);
+  UNUSED(data);
+  UNUSED(len);
 #endif
   ipc_install_error();
   return -1;
@@ -484,10 +491,10 @@ int ipc_comm_recv(const comm_t *x, char **data, const size_t len,
 		  const int allow_realloc) {
   // Prevent C4100 warning on windows by referencing param
 #ifdef _WIN32
-  x;
-  data;
-  len;
-  allow_realloc;
+  UNUSED(x);
+  UNUSED(data);
+  UNUSED(len);
+  UNUSED(allow_realloc);
 #endif
   ipc_install_error();
   return -1;

@@ -288,6 +288,11 @@ class CommBase(tools.YggClass):
             input/outputs to/from a model being wrapped. The receive/send
             calls for this comm will be outside the loop for the model.
             Defaults to False.
+        default_file (:class:FileComm, optional): Comm information for
+            a file that input should be drawn from (for input comms)
+            or that output should be sent to (for output comms) in
+            the event that a yaml does not pair the comm with another
+            model comm or a file.
         **kwargs: Additional keywords arguments are passed to parent class.
 
     Class Attributes:
@@ -409,7 +414,7 @@ class CommBase(tools.YggClass):
         if isinstance(kwargs.get('datatype', None), MetaschemaType):
             self.datatype = kwargs.pop('datatype')
         super(CommBase, self).__init__(name, **kwargs)
-        if not self.__class__.is_installed(language='python'):
+        if not self.__class__.is_installed(language='python'):  # pragma: debug
             raise RuntimeError("Comm class %s not installed" % self.__class__)
         suffix = determine_suffix(no_suffix=no_suffix,
                                   reverse_names=reverse_names,
@@ -419,7 +424,7 @@ class CommBase(tools.YggClass):
         self._name = name + suffix
         if address is None:
             if self.name not in os.environ:
-                model_name = os.environ.get('YGG_MODEL_NAME', '')
+                model_name = self.model_name
                 prefix = '%s:' % model_name
                 if model_name and (not self.name.startswith(prefix)):
                     self._name = prefix + self.name
@@ -747,6 +752,11 @@ class CommBase(tools.YggClass):
                 name_cls = self.__class__
             self._comm_class = str(name_cls).split("'")[1].split(".")[-1]
         return self._comm_class
+
+    @property
+    def model_name(self):
+        r"""str: Name of the model using the comm."""
+        return os.environ.get('YGG_MODEL_NAME', '')
 
     @classmethod
     def underlying_comm_class(self):
@@ -1112,9 +1122,7 @@ class CommBase(tools.YggClass):
     @property
     def empty_obj_recv(self):
         r"""obj: Empty message object."""
-        emsg, _ = self.deserialize(self.empty_bytes_msg)
-        emsg = self.apply_transform(emsg)
-        return emsg
+        return self.apply_transform(self.serializer.empty_msg)
 
     def is_empty(self, msg, emsg):
         r"""Check that a message matches an empty message object.
@@ -1371,6 +1379,7 @@ class CommBase(tools.YggClass):
         # Don't send metadata for files
         # kwargs.setdefault('dont_encode', self.is_file)
         kwargs.setdefault('no_metadata', self.is_file)
+        kwargs.setdefault('max_header_size', self.maxMsgSize)
         return self.serializer.serialize(*args, **kwargs)
 
     def deserialize(self, *args, **kwargs):
@@ -1467,15 +1476,28 @@ class CommBase(tools.YggClass):
         # self.remove_work_comm(workcomm.uuid, in_thread=True)
         return ret
             
-    def on_send_eof(self):
+    def on_send_eof(self, header_kwargs=None):
         r"""Actions to perform when EOF being sent.
+
+        Args:
+            header_kwargs (dict, optional): Keyword arguments that should be
+                added to the header.
 
         Returns:
             bool: True if EOF message should be sent, False otherwise.
 
         """
         self.debug('')
-        msg_s = self.eof_msg
+        if header_kwargs:
+            msg_s = self.serialize(self.eof_msg,
+                                   header_kwargs=header_kwargs)
+        else:
+            msg_s = self.eof_msg
+        msg_len = len(msg_s)
+        if (msg_len > self.maxMsgSize) and (self.maxMsgSize != 0):  # pragma: debug
+            raise NotImplementedError(("EOF message with header (%d) "
+                                       "exceeds max message size (%d).")
+                                      % (msg_len, self.maxMsgSize))
         with self._closing_thread.lock:
             if not self._eof_sent.is_set():
                 self._eof_sent.set()
@@ -1504,7 +1526,7 @@ class CommBase(tools.YggClass):
         if len(msg) == 1:
             msg = msg[0]
         if self.is_eof(msg):
-            flag, msg_s = self.on_send_eof()
+            flag, msg_s = self.on_send_eof(header_kwargs=header_kwargs)
         else:
             flag = True
             # Covert object

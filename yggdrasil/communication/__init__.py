@@ -1,3 +1,4 @@
+from contextlib import contextmanager
 from yggdrasil.components import import_component
 
 
@@ -94,6 +95,40 @@ def cleanup_comms(comm=None):
 
     """
     return import_component('comm', comm).cleanup_comms()
+
+
+@contextmanager
+def open_file_comm(fname, mode, filetype='binary', **kwargs):
+    r"""Context manager to open a file comm in a way similar to how
+    Python opens file descriptors.
+
+    Args:
+        fname (str): Path to file that should be opened.
+        mode (str): Mode that file should be opened in. Supported values
+            include 'r', 'w', and 'a'.
+        filetype (str, optional): Type of file being opened. Defaults to
+            'binary'.
+
+    Returns:
+        CommBase: File comm.
+
+    """
+    comm = None
+    try:
+        comm_cls = import_component('file', filetype)
+        if mode == 'r':
+            kwargs['direction'] = 'recv'
+        elif mode in ['w', 'a']:
+            kwargs['direction'] = 'send'
+            if mode == 'a':
+                kwargs['append'] = True
+        else:
+            raise ValueError("Unsupported mode: '%s'" % mode)
+        comm = comm_cls('file', address=fname, **kwargs)
+        yield comm
+    finally:
+        if comm is not None:
+            comm.close()
 
 
 __all__ = ['new_comm', 'get_comm', 'cleanup_comms']

@@ -59,14 +59,22 @@ class BufferComm(CommBase.CommBase):
         name (str): The name of the message queue.
         address (LockedBuffer, optional): Existing buffer that should be
             used. If not provided, a new buffer is created.
+        buffer_task_method (str, optional): Type of tasks that buffer
+            will be used to share information between. Defaults to 'thread'.
         **kwargs: Additional keyword arguments are passed to CommBase.
         
     Attributes:
         address (LockedBuffer): Buffer containing messages.
+        buffer_task_method (str): Type of tasks that buffer will be
+            used to share information between.
         
     """
     _commtype = 'buffer'
     no_serialization = True
+
+    def __init__(self, *args, buffer_task_method="thread", **kwargs):
+        self.buffer_task_method = buffer_task_method
+        super(BufferComm, self).__init__(*args, **kwargs)
 
     @classmethod
     def is_installed(cls, language=None):
@@ -93,7 +101,7 @@ class BufferComm(CommBase.CommBase):
         super(BufferComm, self).bind()
         if not isinstance(self.address, LockedBuffer):
             if self.address == 'address':
-                self.address = LockedBuffer()
+                self.address = LockedBuffer(task_method=self.buffer_task_method)
             else:  # pragma: debug
                 raise ValueError("Invalid address for a buffer: %s"
                                  % self.address)
