@@ -437,7 +437,7 @@ def assert_warns(warning, *args, **kwargs):
     yield ut.assertWarns(warning, *args, **kwargs)
 
 
-def assert_equal(x, y):
+def assert_equal(x, y, dont_print_diff=False):
     r"""Assert that two messages are equivalent.
 
     Args:
@@ -453,7 +453,7 @@ def assert_equal(x, y):
             warnings.simplefilter(action='ignore', category=FutureWarning)
             ut.assertEqual(x, y)
     except AssertionError:  # pragma: debug
-        if type(x) == type(y):
+        if (not dont_print_diff) and (type(x) == type(y)):
             pprint_diff(x, y)
         raise
 

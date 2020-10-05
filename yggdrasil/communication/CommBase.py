@@ -1137,7 +1137,7 @@ class CommBase(tools.YggClass):
         """
         from yggdrasil.tests import assert_equal
         try:
-            assert_equal(msg, emsg)
+            assert_equal(msg, emsg, dont_print_diff=True)
         except AssertionError:
             return False
         return True
