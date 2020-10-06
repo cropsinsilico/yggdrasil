@@ -251,10 +251,12 @@ class TestPlyMetaschemaType(parent.TestJSONObjectMetaschemaType):
         cls._valid_encoded = [cls._fulldef]
         cls._valid_decoded = [cls._value,
                               PlyMetaschemaType.PlyDict(**_test_value),
-                              PlyMetaschemaType.PlyDict(**_test_value).as_trimesh(),
                               {'vertices': [], 'faces': [],
                                'alt_verts': copy.deepcopy(_test_value['vertices'])},
                               _test_value_int64]
+        if PlyMetaschemaType.trimesh:
+            cls._valid_decoded.append(
+                PlyMetaschemaType.PlyDict(**_test_value).as_trimesh())
         cls._invalid_encoded = [{}]
         cls._invalid_decoded = [{'vertices': [{k: 0.0 for k in 'xyz'}],
                                  'faces': [{'vertex_index': [0, 1, 2]}]}]

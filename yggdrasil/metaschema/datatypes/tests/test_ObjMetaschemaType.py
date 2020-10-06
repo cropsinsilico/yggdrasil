@@ -176,11 +176,13 @@ class TestObjMetaschemaType(parent.TestPlyMetaschemaType):
         cls._valid_encoded = [cls._fulldef]
         cls._valid_decoded = [cls._value,
                               ObjMetaschemaType.ObjDict(**_test_value),
-                              ObjMetaschemaType.ObjDict(**_test_value).as_trimesh(),
                               {'vertices': cls._value['vertices'],
                                'faces': [[{'vertex_index': 0},
                                           {'vertex_index': 1},
                                           {'vertex_index': 2}]]}]
+        if ObjMetaschemaType.trimesh:
+            cls._valid_decoded.append(
+                ObjMetaschemaType.ObjDict(**_test_value).as_trimesh())
         # TODO: Add tests for faces with just texcoord or normal?
         cls._invalid_encoded = [{}]
         cls._invalid_decoded = [{'vertices': [{k: 0.0 for k in 'xyz'}],
