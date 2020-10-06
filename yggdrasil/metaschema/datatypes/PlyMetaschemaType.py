@@ -299,13 +299,13 @@ class PlyDict(dict):
             for i in range(old_colr.shape[0]):
                 for j, k in enumerate(['red', 'green', 'blue']):
                     if not np.isnan(old_colr[i, j]):
-                        kws['vertices'][i][k] = int(old_colr[i, j])
+                        kws['vertices'][i][k] = np.int32(old_colr[i, j])
         if isinstance(kws.get('edges', None), np.ndarray):
             old_edge = kws.pop('edges')
             assert(old_edge.shape[1] == 2)
             kws['edges'] = [
-                {k: int(old_edge[i, j]) for j, k in enumerate(['vertex1',
-                                                               'vertex2'])}
+                {k: np.int32(old_edge[i, j]) for j, k
+                 in enumerate(['vertex1', 'vertex2'])}
                 for i in range(old_edge.shape[0])]
         if isinstance(in_dict.get('edge_colors', None), np.ndarray):
             old_colr = in_dict['edge_colors']
@@ -313,13 +313,14 @@ class PlyDict(dict):
             for i in range(old_colr.shape[0]):
                 for j, k in enumerate(['red', 'green', 'blue']):
                     if not np.isnan(old_colr[i, j]):
-                        kws['edges'][i][k] = int(old_colr[i, j])
+                        kws['edges'][i][k] = np.int32(old_colr[i, j])
         if isinstance(kws.get('faces', None), np.ndarray):
             old_face = kws.pop('faces')
             assert(old_face.shape[1] >= 3)
             kws['faces'] = [
                 {'vertex_index': [
-                    int(old_face[i, j]) for j in range(old_face.shape[1])
+                    np.int32(old_face[i, j]) for j
+                    in range(old_face.shape[1])
                     if (not np.isnan(old_face[i, j]))]}
                 for i in range(old_face.shape[0])]
         if isinstance(in_dict.get('face_colors', None), np.ndarray):
@@ -328,7 +329,7 @@ class PlyDict(dict):
             for i in range(old_colr.shape[0]):
                 for j, k in enumerate(['red', 'green', 'blue']):
                     if not np.isnan(old_colr[i, j]):
-                        kws['faces'][i][k] = int(old_colr[i, j])
+                        kws['faces'][i][k] = np.int32(old_colr[i, j])
         return cls.from_dict(kws)
 
     def as_array_dict(self):

@@ -281,7 +281,7 @@ class ObjDict(PlyDict):
             old_edge = kws['lines']
             assert(old_edge.shape[1] == 2)
             kws['lines'] = [
-                [{'vertex_index': int(old_edge[i, j])}
+                [{'vertex_index': np.int32(old_edge[i, j])}
                  for j in range(old_edge.shape[1])
                  if (not np.isnan(old_edge[i, j]))]
                 for i in range(old_edge.shape[0])]
@@ -289,7 +289,7 @@ class ObjDict(PlyDict):
             old_face = kws['faces']
             assert(old_face.shape[1] >= 3)
             kws['faces'] = [
-                [{'vertex_index': int(old_face[i, j])}
+                [{'vertex_index': np.int32(old_face[i, j])}
                  for j in range(old_face.shape[1])
                  if (not np.isnan(old_face[i, j]))]
                 for i in range(old_face.shape[0])]
@@ -299,7 +299,7 @@ class ObjDict(PlyDict):
             for i in range(old_texc.shape[0]):
                 for j in range(old_texc.shape[1]):
                     if not np.isnan(old_texc[i, j]):
-                        kws['faces'][i][j]['texcoord_index'] = int(
+                        kws['faces'][i][j]['texcoord_index'] = np.int32(
                             old_texc[i, j])
         if isinstance(in_dict.get('face_normals', None), np.ndarray):
             old_norm = in_dict['face_normals']
@@ -307,19 +307,19 @@ class ObjDict(PlyDict):
             for i in range(old_norm.shape[0]):
                 for j in range(old_norm.shape[1]):
                     if not np.isnan(old_norm[i, j]):
-                        kws['faces'][i][j]['normal_index'] = int(
+                        kws['faces'][i][j]['normal_index'] = np.int32(
                             old_norm[i, j])
         if isinstance(kws.get('points', None), np.ndarray):
             old_pnts = kws['points']
             kws['points'] = [
-                [int(old_pnts[i, j]) for j in range(old_pnts.shape[1])
+                [np.int32(old_pnts[i, j]) for j in range(old_pnts.shape[1])
                  if (not np.isnan(old_pnts[i, j]))]
                 for i in range(old_pnts.shape[0])]
         if isinstance(kws.get('curves', None), np.ndarray):
             old_curv = kws['curves']
             kws['curves'] = [
                 {'vertex_indices': [
-                    int(old_curv[i, j]) for j in range(old_curv.shape[1])
+                    np.int32(old_curv[i, j]) for j in range(old_curv.shape[1])
                     if (not np.isnan(old_curv[i, j]))]}
                 for i in range(old_curv.shape[0])]
             assert('curve_params' in in_dict)
@@ -332,14 +332,14 @@ class ObjDict(PlyDict):
         if isinstance(kws.get('curve2Ds', None), np.ndarray):
             old_curv = kws['curve2Ds']
             kws['curve2Ds'] = [
-                [int(old_curv[i, j]) for j in range(old_curv.shape[1])
+                [np.int32(old_curv[i, j]) for j in range(old_curv.shape[1])
                  if (not np.isnan(old_curv[i, j]))]
                 for i in range(old_curv.shape[0])]
         if isinstance(kws.get('surfaces', None), np.ndarray):
             old_surf = kws['surfaces']
             kws['surfaces'] = [
                 {'vertex_indices': [
-                    {'vertex_index': int(old_surf[i, j])}
+                    {'vertex_index': np.int32(old_surf[i, j])}
                     for j in range(old_surf.shape[1])
                     if (not np.isnan(old_surf[i, j]))]}
                 for i in range(old_surf.shape[0])]
@@ -359,7 +359,7 @@ class ObjDict(PlyDict):
                 for j in range(old_texc.shape[1]):
                     if not np.isnan(old_texc[i, j]):
                         kws['surfaces'][i]['vertex_indices'][j][
-                            'texcoord_index'] = int(old_texc[i, j])
+                            'texcoord_index'] = np.int32(old_texc[i, j])
         if isinstance(in_dict.get('surface_normals', None), np.ndarray):
             old_norm = in_dict['surface_normals']
             assert(old_norm.shape[0] == len(kws['surfaces']))
@@ -367,7 +367,7 @@ class ObjDict(PlyDict):
                 for j in range(old_norm.shape[1]):
                     if not np.isnan(old_norm[i, j]):
                         kws['surfaces'][i]['vertex_indices'][j][
-                            'normal_index'] = int(old_norm[i, j])
+                            'normal_index'] = np.int32(old_norm[i, j])
         return cls.from_dict(kws)
         
     def as_array_dict(self):
