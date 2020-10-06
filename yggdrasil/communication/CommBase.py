@@ -458,7 +458,6 @@ class CommBase(tools.YggClass):
         self.recv_timeout = recv_timeout
         self.close_on_eof_recv = close_on_eof_recv
         self.close_on_eof_send = close_on_eof_send
-        self._last_header = None
         self._work_comms = {}
         self.single_use = single_use
         self.touches_model = touches_model
@@ -1747,14 +1746,14 @@ class CommBase(tools.YggClass):
         else:
             return True
 
-    def on_recv(self, s_msg, second_pass=False):
+    def on_recv(self, s_msg, previous_header=None):
         r"""Process raw received message including handling deserializing
         message and handling EOF.
 
         Args:
             s_msg (bytes, str): Raw bytes message.
-            second_pass (bool, optional): If True, this is the second pass for
-                a message and _last_header will not be set. Defaults to False.
+            previous_header (dict, optional): If not None, this is the header
+                for the message. Defaults to None.
 
         Returns:
             tuple (bool, str, dict): Success or failure, processed message, and
@@ -1762,9 +1761,7 @@ class CommBase(tools.YggClass):
 
         """
         flag = True
-        metadata = None
-        if second_pass:
-            metadata = self._last_header
+        metadata = previous_header
         msg_, header = self.deserialize(s_msg, metadata=metadata)
         if self.is_eof(msg_):
             flag = self.on_recv_eof()
@@ -1773,8 +1770,6 @@ class CommBase(tools.YggClass):
             msg = self.apply_transform(msg_)
         else:
             msg = msg_
-        if not second_pass:
-            self._last_header = header
         if not header.get('incomplete', False):
             # if not self._used:
             #     self.serializer = serialize.get_serializer(**header)
@@ -1796,22 +1791,31 @@ class CommBase(tools.YggClass):
         """
         if self.single_use and self._used:
             raise RuntimeError("This comm is single use and it was already used.")
+        return_header = kwargs.pop('return_header', False)
+        if return_header:
+            out_error = (False, None, None)
+        else:
+            out_error = (False, None)
         if self.is_closed:
             self.debug('Comm closed')
-            return (False, None)
+            return out_error
         try:
-            flag, msg = self.recv_multipart(*args, **kwargs)
+            flag, msg, header = self.recv_multipart(*args, **kwargs)
         except BaseException:
             self.exception('Failed to recv.')
-            return (False, None)
+            return out_error
         if flag and (not self.evaluate_filter(msg)):
             assert(not self.single_use)
             self.debug("Recieved message skipped based on filter: %.100s", str(msg))
+            kwargs['return_header'] = return_header
             return self.recv(*args, **kwargs)
         if self.single_use and self._used:
             self.debug('Linger close on single use')
             self.linger_close()
-        out = (flag, msg)
+        if return_header:
+            out = (flag, msg, header)
+        else:
+            out = (flag, msg)
         out = self.language_driver.python2language(out)
         return out
 
@@ -1829,31 +1833,32 @@ class CommBase(tools.YggClass):
                 message.
 
         """
+        header = None
         # Receive first part of message
         flag, s_msg = self._safe_recv(*args, **kwargs)
         if not flag:
-            return flag, s_msg
+            return flag, s_msg, header
         # Parse message
         flag, msg, header = self.on_recv(s_msg)
         if not flag:
             if not header.get('raw', False):  # pragma: debug
                 self.debug("Failed to receive message header.")
-            return flag, msg
+            return flag, msg, header
         # Receive remainder of message that was not received
         if header.get('incomplete', False):
             header['body'] = msg
             flag, s_msg = self._recv_multipart_worker(header, **kwargs)
             if not flag:  # pragma: debug
-                return flag, s_msg
+                return flag, s_msg, header
             # Parse complete message
-            flag, msg, header2 = self.on_recv(s_msg, second_pass=True)
+            flag, msg, header2 = self.on_recv(s_msg, previous_header=header)
         if isinstance(s_msg, bytes):
             msg_len = len(s_msg)
         else:
             msg_len = 1
         if flag and (msg_len > 0):
             self.debug('%d bytes received from %s', msg_len, self.address)
-        return flag, msg
+        return flag, msg, header
         
     def recv_nolimit(self, *args, **kwargs):
         r"""Alias for recv."""
@@ -1944,10 +1949,11 @@ class CommBase(tools.YggClass):
         if 'field_order' in kwargs:
             kwargs.setdefault('key_order', kwargs.pop('field_order'))
         key_order = kwargs.pop('key_order', None)
-        flag, msg = self.recv(*args, **kwargs)
+        kwargs['return_header'] = True
+        flag, msg, header = self.recv(*args, **kwargs)
         if flag and (not self.is_eof(msg)):
             if self.serializer.typedef['type'] == 'array':
-                metadata = copy.deepcopy(self._last_header)
+                metadata = copy.deepcopy(header)
                 # if metadata is None:
                 #     metadata = {}
                 if key_order is not None:

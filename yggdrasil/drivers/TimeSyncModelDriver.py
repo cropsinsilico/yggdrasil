@@ -245,7 +245,8 @@ class TimeSyncModelDriver(DSLModelDriver):
                 v.terminate()
 
     @classmethod
-    def check_for_data(cls, time, tables, table_lock, open_clients):
+    def check_for_data(cls, time, tables, table_units, table_lock,
+                       open_clients):
         r"""Check for a time in the tables to determine if there is
         sufficient data available to calculate the state.
 
@@ -253,6 +254,8 @@ class TimeSyncModelDriver(DSLModelDriver):
             time (pandas.Timedelta): Time that state is requested at.
             tables (dict): Mapping from model name to pandas DataFrames
                 containing variables supplied by the model.
+            table_units (dict): Mapping from model name to dictionaries
+                mapping from variable names to units.
             table_lock (RLock): Thread-safe lock for accessing table.
             open_clients (list): Clients that are still open.
 
@@ -263,6 +266,9 @@ class TimeSyncModelDriver(DSLModelDriver):
         with table_lock:
             for k, v in tables.items():
                 if (k in open_clients) and (time > max(v.dropna()['time'])):
+                    return False
+            for k in open_clients:
+                if k not in table_units:  # pragma: debug
                     return False
         return True
 
@@ -303,7 +309,7 @@ class TimeSyncModelDriver(DSLModelDriver):
 
         """
         if not (rpc.all_clients_connected
-                and cls.check_for_data(time, tables, table_lock,
+                and cls.check_for_data(time, tables, table_units, table_lock,
                                        rpc.open_clients)):
             # Don't start sampling until all clients have connected
             # and there is data available for the requested timestep

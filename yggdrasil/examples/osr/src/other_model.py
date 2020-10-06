@@ -28,7 +28,7 @@ def main(t_step, t_units):
         t_units (str): Units of the time step.
 
     """
-    print('Hello from Python timesync: timestep = %s %s' % (t_step, t_units))
+    print('Hello from Python other_model: timestep = %s %s' % (t_step, t_units))
     t_step = units.add_units(t_step, t_units)
     t_start = units.add_units(0.0, t_units)
     t_end = units.add_units(1.0, 'day')
@@ -43,8 +43,8 @@ def main(t_step, t_units):
     t = t_start
     ret, state = timesync.call(t, state)
     if not ret:
-        raise RuntimeError("timesync(Python): Initial sync failed.")
-    print('timesync(Python): t = % 8s' % t, end='')
+        raise RuntimeError("other_model(Python): Initial sync failed.")
+    print('other_model(Python): t = % 8s' % t, end='')
     for k, v in state.items():
         print(', %s = %+ 5.2f' % (k, v), end='')
     print('')
@@ -52,7 +52,7 @@ def main(t_step, t_units):
     # Send initial state to output
     flag = out.send(dict(state, time=t))
     if not flag:
-        raise RuntimeError("timesync(Python): Failed to send "
+        raise RuntimeError("other_model(Python): Failed to send "
                            "initial output for t=%s." % t)
     
     # Iterate until end
@@ -65,8 +65,8 @@ def main(t_step, t_units):
         # Synchronize the state
         ret, state = timesync.call(t, state)
         if not ret:
-            raise RuntimeError("timesync(Python): sync for t=%f failed." % t)
-        print('timesync(Python): t = % 8s' % t, end='')
+            raise RuntimeError("other_model(Python): sync for t=%f failed." % t)
+        print('other_model(Python): t = % 8s' % t, end='')
         for k, v in state.items():
             print(', %s = %+ 5.2f' % (k, v), end='')
         print('')
@@ -74,9 +74,9 @@ def main(t_step, t_units):
         # Send output
         flag = out.send(dict(state, time=t))
         if not flag:
-            raise RuntimeError("timesync(Python): Failed to send output for t=%s." % t)
+            raise RuntimeError("other_model(Python): Failed to send output for t=%s." % t)
 
-    print('Goodbye from Python timesync')
+    print('Goodbye from Python other_model')
 
 
 if __name__ == '__main__':

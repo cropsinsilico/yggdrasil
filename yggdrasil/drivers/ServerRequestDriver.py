@@ -63,12 +63,12 @@ class ServerRequestDriver(ConnectionDriver):
     def last_header(self):
         r"""dict: Information contained in the header of the last message
         received from the client model."""
-        if self.icomm._last_header is None:
+        if self._last_header is None:
             raise AttributeError("No new requests have been received, so there "
                                  + "does not yet exist information required for "
                                  + "creating a response comm and fowarding the "
                                  + "request.")
-        return self.icomm._last_header
+        return self._last_header
 
     @property
     def request_id(self):
