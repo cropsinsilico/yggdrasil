@@ -168,8 +168,8 @@ class ConnectionDriver(Driver):
     """
 
     _connection_type = 'default'
-    _icomm_type = 'DefaultComm'
-    _ocomm_type = 'DefaultComm'
+    _icomm_type = 'default'
+    _ocomm_type = 'default'
     _direction = 'any'
     _schema_type = 'connection'
     _schema_subtype_key = 'connection_type'
