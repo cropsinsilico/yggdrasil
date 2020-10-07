@@ -23,6 +23,7 @@ INSTALLAPY = (os.environ.get('INSTALLAPY', '0') == '1')
 INSTALLZMQ = (os.environ.get('INSTALLZMQ', '0') == '1')
 INSTALLRMQ = (os.environ.get('INSTALLRMQ', '0') == '1')
 INSTALLTRIMESH = (os.environ.get('INSTALLTRIMESH', '0') == '1')
+INSTALLPYGMENTS = (os.environ.get('INSTALLPYGMENTS', '0') == '1')
 BUILDDOCS = (os.environ.get('BUILDDOCS', '0') == '1')
 
 
@@ -209,6 +210,11 @@ def deploy_package_on_ci(method):
                 "echo Installing trimesh...",
                 "%s install trimesh" % conda_cmd
             ]
+        if INSTALLPYGMENTS:
+            cmds += [
+                "echo Installing pygments...",
+                "%s install pygments" % conda_cmd
+            ]
         # Temp fix to install missing dependencies from jsonschema
         if PY2:
             cmds.append(("%s install contextlib2 pathlib2 "
@@ -324,6 +330,11 @@ def deploy_package_on_ci(method):
             cmds += [
                 "echo Installing trimesh...",
                 "pip install trimesh"
+            ]
+        if INSTALLPYGMENTS:
+            cmds += [
+                "echo Installing pygments...",
+                "pip install pygments"
             ]
         cmds += [
             # Install from source dist

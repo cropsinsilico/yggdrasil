@@ -8,13 +8,35 @@ import itertools
 import flaky
 from yggdrasil.components import ComponentMeta, import_component
 from yggdrasil import runner, tools, platform
-from yggdrasil.examples import yamls, source, ext_map
-from yggdrasil.tests import YggTestBase, check_enabled_languages
+from yggdrasil.examples import (
+    get_example_yaml, get_example_source, ext_map, display_example)
+from yggdrasil.tests import YggTestBase, check_enabled_languages, assert_raises
 
 
 _ext2lang = {v: k for k, v in ext_map.items()}
 _test_registry = {}
 _default_comm = tools.get_default_comm()
+
+
+def test_get_example_yaml():
+    r"""Test get_example_yaml."""
+    assert_raises(KeyError, get_example_yaml, 'invalid', 'invalid')
+    assert_raises(KeyError, get_example_yaml, 'python', 'invalid')
+    get_example_yaml('hello', 'r')
+    get_example_yaml('hello', 'R')
+
+
+def test_get_example_source():
+    r"""Test get_example_source."""
+    assert_raises(KeyError, get_example_source, 'invalid', 'invalid')
+    assert_raises(KeyError, get_example_source, 'invalid', 'invalid')
+    get_example_source('hello', 'r')
+    get_example_source('hello', 'R')
+
+
+def test_display_example():
+    r"""Test display_example."""
+    display_example('hello', 'r')
 
 
 def iter_pattern_match(a, b):
@@ -150,27 +172,23 @@ class ExampleTstBase(YggTestBase, tools.YggClass):
     @property
     def languages_tested(self):
         r"""list: Languages covered by the example."""
-        if self.name not in source:  # pragma: debug
+        try:
+            src = get_example_source(self.name, self.language)
+            if self.language in ['all', 'all_nomatlab']:
+                out = [_ext2lang[os.path.splitext(x)[-1]] for x in src]
+            else:
+                out = [self.language]
+        except KeyError:
             return None
-        if self.yaml is None:  # pragma: debug
-            return None
-        if self.language in ['all', 'all_nomatlab']:
-            out = [_ext2lang[os.path.splitext(x)[-1]] for x in
-                   source[self.name][self.language]]
-        else:
-            out = [self.language]
         return out
 
     @property
     def yaml(self):
         r"""str: The full path to the yaml file for this example."""
-        if self.name not in yamls:  # pragma: debug
+        try:
+            return get_example_yaml(self.name, self.language)
+        except KeyError:
             return None
-        if self.language in yamls[self.name]:
-            return yamls[self.name][self.language]
-        elif self.language.lower() in yamls[self.name]:
-            return yamls[self.name][self.language.lower()]
-        return None
 
     @property
     def yamldir(self):

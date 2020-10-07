@@ -2,18 +2,11 @@
 import os
 import glob
 import logging
-from yggdrasil import tools, languages, serialize
+from yggdrasil import tools, languages, serialize, constants
 
 
 # TODO: This can be generated from the drivers
-ext_map = {'python': '.py',
-           'matlab': '.m',
-           'r': '.R',
-           'c': '.c',
-           'cpp': '.cpp',
-           'executable': '',
-           'make': '.cpp',
-           'cmake': '.cpp'}
+ext_map = dict(constants.LANG2EXT, executable='', make='.cpp', cmake='.cpp')
 for lang in tools.get_supported_lang():
     if lang.lower() not in ext_map:
         ext_map[lang.lower()] = languages.get_language_ext(lang)
@@ -206,5 +199,64 @@ def discover_examples(parent_dir=None):
 
 ex_dict, yamls, source = discover_examples()
 
+
+def get_example_yaml(name, language):
+    r"""Get yaml file(s) associated with an example in a certain language.
+
+    Args:
+        name (str): Name of the example.
+        language (str): Language for example version that should be returned.
+
+    Returns:
+        str, list: One or more yaml file(s) associated with the example.
+
+    """
+    if name not in yamls:
+        raise KeyError("Could not locate yaml for example: '%s'" % name)
+    if language in yamls[name]:
+        return yamls[name][language]
+    elif language.lower() in yamls[name]:
+        return yamls[name][language.lower()]
+    raise KeyError("Could not locate yaml for example '%s' in language '%s'"
+                   % (name, language))
+
+
+def get_example_source(name, language):
+    r"""Get source file(s) associated with an example in a certain language.
+
+    Args:
+        name (str): Name of the example.
+        language (str): Language for example version that should be returned.
+
+    Returns:
+        str, list: One or more source file(s) associated with the example.
+
+    """
+    if name not in source:
+        raise KeyError("Could not locate source for example: '%s'" % name)
+    if language in source[name]:
+        return source[name][language]
+    elif language.lower() in source[name]:
+        return source[name][language.lower()]
+    raise KeyError("Could not locate source for example '%s' in language '%s'"
+                   % (name, language))
+
+
+def display_example(name, language, number_lines=False):
+    r"""Display the yaml and source code for an example with syntax
+    highlighting.
+
+    Args:
+        name (str): Name of the example.
+        language (str): Language that example should be displayed in.
+        number_lines (bool, optional): If True, line numbers will be added
+            to the displayed examples. Defaults to False.
+
+    """
+    ex_yml = get_example_yaml(name, language)
+    ex_src = get_example_source(name, language)
+    tools.display_source(ex_yml, number_lines=number_lines)
+    tools.display_source(ex_src, number_lines=number_lines)
+    
 
 __all__ = ['yamls', 'source']
