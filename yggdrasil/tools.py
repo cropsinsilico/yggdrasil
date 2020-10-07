@@ -181,6 +181,7 @@ def display_source(fname, number_lines=False, return_lines=False):
         pass
     if number_lines:
         lines = '\n'.join(add_line_numbers(lines.splitlines()))
+    lines = 'file: %s\n%s\n%s' % (fname, (len(fname) + 6) * '=', lines)
     if return_lines:
         return lines
     print(lines)
@@ -205,7 +206,7 @@ def display_source_diff(fname1, fname2, number_lines=False,
     diff = difflib.ndiff(src1.splitlines(), src2.splitlines())
     if number_lines:
         diff = add_line_numbers(diff, for_diff=True)
-    lines = '\n'.join(diff)
+    lines = 'file1: %s\nfile2: %s\n%s' % (fname1, fname2, '\n'.join(diff))
     if return_lines:
         return lines
     print(lines)

@@ -9,7 +9,8 @@ import flaky
 from yggdrasil.components import ComponentMeta, import_component
 from yggdrasil import runner, tools, platform
 from yggdrasil.examples import (
-    get_example_yaml, get_example_source, ext_map, display_example)
+    get_example_yaml, get_example_source, get_example_languages,
+    ext_map, display_example)
 from yggdrasil.tests import YggTestBase, check_enabled_languages, assert_raises
 
 
@@ -32,6 +33,15 @@ def test_get_example_source():
     assert_raises(KeyError, get_example_source, 'invalid', 'invalid')
     get_example_source('hello', 'r')
     get_example_source('hello', 'R')
+
+
+def test_get_example_languages():
+    r"""Test get_example_languages."""
+    assert_raises(KeyError, get_example_languages, 'invalid')
+    get_example_languages('ascii_io')
+    get_example_languages('ascii_io', language='python')
+    get_example_languages('ascii_io', language='all')
+    get_example_languages('ascii_io', language='all_nomatlab')
 
 
 def test_display_example():
@@ -79,6 +89,9 @@ def make_iter_test(is_flaky=False, **kwargs):
 class ExampleMeta(ComponentMeta):
 
     def __new__(cls, name, bases, dct):
+        if dct.get('example_name', None) is not None:
+            dct.setdefault('iter_list_language',
+                           get_example_languages(dct['example_name']))
         iter_lists = []
         iter_keys = []
         test_name_fmt = 'test'
@@ -99,7 +112,7 @@ class ExampleMeta(ComponentMeta):
             if x_iter_list is not None:
                 iter_lists.append(x_iter_list)
                 iter_keys.append(x)
-            else:  # pragma: debug
+            elif dct.get('example_name', None) is not None:  # pragma: debug
                 raise ValueError("Unsupported iter dimension: %s" % x)
         if dct.get('example_name', None) is not None:
             for x in itertools.product(*iter_lists):
@@ -132,7 +145,7 @@ class ExampleTstBase(YggTestBase, tools.YggClass):
     iter_over = ['language']
     iter_skip = []
     iter_flaky = []
-    iter_list_language = tools.get_supported_lang() + ['all', 'all_nomatlab']
+    iter_list_language = None
     iter_list_comm = tools.get_supported_comm()
     iter_list_datatype = tools.get_supported_type()
 
@@ -173,14 +186,9 @@ class ExampleTstBase(YggTestBase, tools.YggClass):
     def languages_tested(self):
         r"""list: Languages covered by the example."""
         try:
-            src = get_example_source(self.name, self.language)
-            if self.language in ['all', 'all_nomatlab']:
-                out = [_ext2lang[os.path.splitext(x)[-1]] for x in src]
-            else:
-                out = [self.language]
+            return get_example_languages(self.name, language=self.language)
         except KeyError:
             return None
-        return out
 
     @property
     def yaml(self):
@@ -262,6 +270,7 @@ class ExampleTstBase(YggTestBase, tools.YggClass):
             for x in self.languages_tested:
                 if not tools.is_lang_installed(x):
                     raise unittest.SkipTest("%s not installed." % x)
+                check_enabled_languages(x)
             # Copy platform specific makefile
             if self.language == 'make':
                 makefile = os.path.join(self.yamldir, 'src', 'Makefile')
@@ -329,7 +338,9 @@ class ExampleTstBase(YggTestBase, tools.YggClass):
     def setup_iteration_language(self, language=None):
         r"""Perform setup associated with a language iteration."""
         if language is not None:
-            check_enabled_languages(language)
+            for x in get_example_languages(self.example_name,
+                                           language=language):
+                check_enabled_languages(x)
         return language
 
     def setup_iteration_comm(self, comm=None):
