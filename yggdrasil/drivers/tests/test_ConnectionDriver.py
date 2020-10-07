@@ -463,29 +463,29 @@ def test_ConnectionDriverTranslate_errors():
     
 # Dynamically create tests based on registered file classes
 s = get_schema()
-comm_types = list(s['comm'].schema_subtypes.keys())
+comm_types = s['comm'].subtypes
 for k in comm_types:
-    if k == _default_comm:  # pragma: debug
+    if k in _default_comm:  # pragma: debug
         continue
     # Output
-    ocls = type('Test%sOutputDriver' % k,
+    ocls = type('Test%sOutputDriver' % k.title(),
                 (TestConnectionDriver, ), {'ocomm_name': k,
                                            'driver': 'OutputDriver',
                                            'args': 'test'})
     # Input
-    icls = type('Test%sInputDriver' % k,
+    icls = type('Test%sInputDriver' % k.title(),
                 (TestConnectionDriver, ), {'icomm_name': k,
                                            'driver': 'InputDriver',
                                            'args': 'test'})
     # Flags
     flag_func = None
-    if k in ['RMQComm', 'RMQAsyncComm']:
+    if k in ['RMQComm', 'RMQAsyncComm', 'rmq', 'rmq_async']:
         flag_func = unittest.skipIf(not _rmq_installed,
                                     "RMQ Server not running")
-    elif k in ['ZMQComm']:
+    elif k in ['ZMQComm', 'zmq']:
         flag_func = unittest.skipIf(not _zmq_installed,
                                     "ZMQ library not installed")
-    elif k in ['IPCComm']:
+    elif k in ['IPCComm', 'ipc']:
         flag_func = unittest.skipIf(not _ipc_installed,
                                     "IPC library not installed")
     if flag_func is not None:
