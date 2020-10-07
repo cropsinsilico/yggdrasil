@@ -296,6 +296,8 @@ class ConnectionDriver(Driver):
                     self.info('%s, %s', x, type(x))
                     assert(isinstance(x, str))
                 comm_list[i] = dict(commtype=x)
+            elif isinstance(x.get('comm', None), str):
+                comm_list[i]['commtype'] = comm_list[i].pop('comm')
             comm_list[i].setdefault('commtype', comm_type)
         any_files = False
         all_files = True

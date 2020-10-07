@@ -123,13 +123,13 @@ class TestConnectionParam(parent.TestParam):
     @property
     def inputs(self):
         r"""list: List of keyword arguments for connection input comms."""
-        out = [{'name': self.icomm_name, 'comm': self.icomm_name}]
+        out = [{'name': self.icomm_name, 'commtype': self.icomm_name}]
         return out
 
     @property
     def outputs(self):
         r"""list: List of keyword arguments for connection output comms."""
-        out = [{'name': self.ocomm_name, 'comm': self.ocomm_name}]
+        out = [{'name': self.ocomm_name, 'commtype': self.ocomm_name}]
         return out
 
     @property

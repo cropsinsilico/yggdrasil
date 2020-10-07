@@ -615,7 +615,7 @@ class Queue(ContextObject):
 
     def __setstate__(self, state):
         if state['_base'] is None:
-            state['_base'] = queue.Queue
+            state['_base'] = queue.Queue()
         super(Queue, self).__setstate__(state)
 
     @property
