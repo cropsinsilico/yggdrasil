@@ -17,7 +17,8 @@ def test_get_language_ext():
     r"""Test the get_language_ext method."""
     test_lang = tools.get_supported_lang()
     for lang in test_lang:
-        if (lang == 'executable') and (not platform._is_win):
+        if ((((lang == 'executable') and (not platform._is_win))
+             or (lang in ['function']))):
             assert_raises(ValueError, languages.get_language_ext, lang)
             languages.get_language_ext(lang, default='')
         else:
