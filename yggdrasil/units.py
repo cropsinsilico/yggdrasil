@@ -175,7 +175,8 @@ def has_units(obj):
         bool: True if the object has units, False otherwise.
 
     """
-    out = hasattr(obj, 'units')
+    out = isinstance(obj, (_unit_quantity, _unit_array))
+    # out = hasattr(obj, 'units')
     if out and (obj.units == as_unit('dimensionless')):
         out = False
     return out
@@ -208,13 +209,10 @@ def get_data(obj):
         np.ndarray: Numpy array representation of the underlying data.
 
     """
-    if has_units(obj) or isinstance(obj, (_unit_quantity, _unit_array)):
-        try:
-            out = obj.to_ndarray()
-            if out.ndim == 0:
-                out = out.reshape((1, ))[0]
-        except AttributeError:
-            out = obj
+    if has_units(obj):
+        out = obj.to_ndarray()
+        if out.ndim == 0:
+            out = out.reshape((1, ))[0]
     else:
         out = obj
     return out

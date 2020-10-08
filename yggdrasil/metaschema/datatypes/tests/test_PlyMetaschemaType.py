@@ -267,8 +267,6 @@ class TestPlyMetaschemaType(parent.TestJSONObjectMetaschemaType):
     def assert_result_equal(cls, x, y):
         r"""Assert that serialized/deserialized objects equal."""
         if PlyMetaschemaType.trimesh:
-            if isinstance(x, PlyMetaschemaType.trimesh.base.Trimesh):
-                x = PlyMetaschemaType.PlyDict.from_trimesh(x)
             if isinstance(y, PlyMetaschemaType.trimesh.base.Trimesh):
                 y = PlyMetaschemaType.PlyDict.from_trimesh(y)
         super(TestPlyMetaschemaType, cls).assert_result_equal(x, y)

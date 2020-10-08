@@ -22,7 +22,7 @@ _default_comm = tools.get_default_comm()
 def test_get_example_yaml():
     r"""Test get_example_yaml."""
     assert_raises(KeyError, get_example_yaml, 'invalid', 'invalid')
-    assert_raises(KeyError, get_example_yaml, 'python', 'invalid')
+    assert_raises(KeyError, get_example_yaml, 'hello', 'invalid')
     get_example_yaml('hello', 'r')
     get_example_yaml('hello', 'R')
 
@@ -30,7 +30,7 @@ def test_get_example_yaml():
 def test_get_example_source():
     r"""Test get_example_source."""
     assert_raises(KeyError, get_example_source, 'invalid', 'invalid')
-    assert_raises(KeyError, get_example_source, 'invalid', 'invalid')
+    assert_raises(KeyError, get_example_source, 'hello', 'invalid')
     get_example_source('hello', 'r')
     get_example_source('hello', 'R')
 

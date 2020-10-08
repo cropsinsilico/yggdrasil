@@ -3,6 +3,12 @@ from yggdrasil.tests import YggTestBase
 from yggdrasil import units, tools
 
 
+class DummyUnits(int):
+    r"""Dummy class for testing that has units attribute."""
+
+    units = 'cm'
+
+
 class TestUnits(YggTestBase):
     r"""Tests for using pint for units."""
 
@@ -10,6 +16,7 @@ class TestUnits(YggTestBase):
         r"""Setup, create variables for testing."""
         self._vars_nounits = [1.0, np.zeros(5), int(1)]
         self._vars_units = [units.add_units(v, 'cm') for v in self._vars_nounits]
+        self._vars_nounits.append(DummyUnits(1))
         super(TestUnits, self).setup(*args, **kwargs)
 
     def test_has_units(self):
@@ -18,6 +25,10 @@ class TestUnits(YggTestBase):
             assert(not units.has_units(v))
         for v in self._vars_units:
             assert(units.has_units(v))
+
+    def test_invalid_unit(self):
+        r"""Test error when an invalid unit is added."""
+        self.assert_raises(ValueError, units.add_units, 1.0, 'invalid')
 
     def test_get_data(self):
         r"""Test get_data."""
