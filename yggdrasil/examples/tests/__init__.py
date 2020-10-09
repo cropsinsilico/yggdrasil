@@ -185,18 +185,12 @@ class ExampleTstBase(YggTestBase, tools.YggClass):
     @property
     def languages_tested(self):
         r"""list: Languages covered by the example."""
-        try:
-            return get_example_languages(self.name, language=self.language)
-        except KeyError:
-            return None
+        return get_example_languages(self.name, language=self.language)
 
     @property
     def yaml(self):
         r"""str: The full path to the yaml file for this example."""
-        try:
-            return get_example_yaml(self.name, self.language)
-        except KeyError:
-            return None
+        return get_example_yaml(self.name, self.language)
 
     @property
     def yamldir(self):
@@ -261,53 +255,50 @@ class ExampleTstBase(YggTestBase, tools.YggClass):
 
     def run_example(self):
         r"""This runs an example in the correct language."""
-        if self.yaml is None:
-            if self.name is not None:
-                raise unittest.SkipTest("Could not locate example %s in language %s." %
-                                        (self.name, self.language))
+        assert(self.yaml is not None)
+        assert(self.name is not None)
+        # Check that language is installed
+        for x in self.languages_tested:
+            if not tools.is_lang_installed(x):
+                raise unittest.SkipTest("%s not installed." % x)
+            check_enabled_languages(x)
+        # Copy platform specific makefile
+        if self.language == 'make':
+            makefile = os.path.join(self.yamldir, 'src', 'Makefile')
+            if platform._is_win:  # pragma: windows
+                makedrv = import_component('model', 'make')
+                assert(makedrv.get_tool('compiler').toolname == 'nmake')
+                make_ext = '_windows'
+            else:
+                make_ext = '_linux'
+            shutil.copy(makefile + make_ext, makefile)
+        # Check that comm is installed
+        if self.comm in ['ipc', 'IPCComm']:
+            from yggdrasil.communication.IPCComm import (
+                ipcrm_queues, ipc_queues)
+            qlist = ipc_queues()
+            if qlist:  # pragma: debug
+                print('Existing queues:', qlist)
+                ipcrm_queues()
+        # Run
+        os.environ.update(self.env)
+        self.runner = runner.get_runner(self.yaml, namespace=self.namespace,
+                                        production_run=True)
+        self.runner.run()
+        if self.expects_error:
+            assert(self.runner.error_flag)
         else:
-            # Check that language is installed
-            for x in self.languages_tested:
-                if not tools.is_lang_installed(x):
-                    raise unittest.SkipTest("%s not installed." % x)
-                check_enabled_languages(x)
-            # Copy platform specific makefile
+            assert(not self.runner.error_flag)
+        try:
+            self.check_results()
+        finally:
+            self.example_cleanup()
+            # Remove copied makefile
             if self.language == 'make':
                 makefile = os.path.join(self.yamldir, 'src', 'Makefile')
-                if platform._is_win:  # pragma: windows
-                    makedrv = import_component('model', 'make')
-                    assert(makedrv.get_tool('compiler').toolname == 'nmake')
-                    make_ext = '_windows'
-                else:
-                    make_ext = '_linux'
-                shutil.copy(makefile + make_ext, makefile)
-            # Check that comm is installed
-            if self.comm in ['ipc', 'IPCComm']:
-                from yggdrasil.communication.IPCComm import (
-                    ipcrm_queues, ipc_queues)
-                qlist = ipc_queues()
-                if qlist:  # pragma: debug
-                    print('Existing queues:', qlist)
-                    ipcrm_queues()
-            # Run
-            os.environ.update(self.env)
-            self.runner = runner.get_runner(self.yaml, namespace=self.namespace,
-                                            production_run=True)
-            self.runner.run()
-            if self.expects_error:
-                assert(self.runner.error_flag)
-            else:
-                assert(not self.runner.error_flag)
-            try:
-                self.check_results()
-            finally:
-                self.example_cleanup()
-                # Remove copied makefile
-                if self.language == 'make':
-                    makefile = os.path.join(self.yamldir, 'src', 'Makefile')
-                    if os.path.isfile(makefile):
-                        os.remove(makefile)
-                self.runner = None
+                if os.path.isfile(makefile):
+                    os.remove(makefile)
+            self.runner = None
 
     def example_cleanup(self):
         r"""Cleanup files created during the test."""
