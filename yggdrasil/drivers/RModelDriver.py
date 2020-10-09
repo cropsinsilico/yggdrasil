@@ -274,8 +274,9 @@ class RModelDriver(InterpretedModelDriver):  # pragma: R
                 for m in re.finditer(cls.function_param['interface_regex'],
                                      contents):
                     mdict = m.groupdict()
-                    if 'global_scope' not in mdict['args']:
-                        mdict['args'] += ', global_scope=TRUE'
+                    assert('global_scope' in mdict['args'])
+                    # if 'global_scope' not in mdict['args']:
+                    #     mdict['args'] += ', global_scope=TRUE'
                     new_channel = (
                         '{indent}if (!exists("{variable}")) {{\n'
                         '{indent}  assign("{variable}", YggInterface('
