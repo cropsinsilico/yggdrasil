@@ -113,6 +113,8 @@ def run_tsts(**kwargs):  # pragma: no cover
             which invokes coverage. Defaults to True.
         withexamples (bool, optional): If True, example testing will be
             enabled. Defaults to False.
+        withdemos (bool, optional): If True, demo testing will be
+            enabled. Defaults to False.
         language (str, optional): Language to test. Defaults to None
             and all languages will be tested.
 
@@ -134,6 +136,8 @@ def run_tsts(**kwargs):  # pragma: no cover
          True, {'help': 'Record coverage during tests.'}),
         (['withexamples', 'with-examples'], ['noexamples', 'no-examples'],
          False, {'help': 'Run example tests when encountered.'}),
+        (['withdemos', 'with-demos'], ['nodemos', 'no-demos'],
+         False, {'help': 'Run demo tests when encountered.'}),
         (['longrunning', 'long-running'], ['nolongrunning', 'no-long-running'],
          False, {'help': 'Run long tests when encounterd.'}),
         (['verbose', 'v'], ['quiet'],
@@ -194,7 +198,7 @@ def run_tsts(**kwargs):  # pragma: no cover
     suite_args = ('--test-suite', '--test-suites')
     suite_kws = dict(nargs='+', action="extend", type=str,
                      choices=['examples', 'examples_part1',
-                              'examples_part2', 'types', 'timing'],
+                              'examples_part2', 'demos', 'types', 'timing'],
                      help='Test suite(s) that should be run.',
                      dest='test_suites')
     try:
@@ -253,6 +257,9 @@ def run_tsts(**kwargs):  # pragma: no cover
             #     test_paths.append(os.path.join(
             #         'examples', 'tests',
             #         'test_%s*.py'.format(x.split('examples_')[-1])))
+            elif x == 'demos':
+                args.withdemos = True
+                test_paths.append('demos')
             elif x == 'types':
                 args.withexamples = True
                 args.longrunning = True
@@ -309,6 +316,8 @@ def run_tsts(**kwargs):  # pragma: no cover
         # Set env
         if args.withexamples:
             new_env['YGG_ENABLE_EXAMPLE_TESTS'] = 'True'
+        if args.withdemos:
+            new_env['YGG_ENABLE_DEMO_TESTS'] = 'True'
         if args.language:
             from yggdrasil.components import import_component
             args.language = [import_component('model', x).language

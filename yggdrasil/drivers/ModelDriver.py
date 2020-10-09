@@ -635,10 +635,7 @@ class ModelDriver(Driver):
         r"""int: Logging level for the model."""
         out = self.logger.getEffectiveLevel()
         if self.logging_level:
-            old_lvl = out
-            self.logger.setLevel(self.logging_level)
-            out = self.logger.getEffectiveLevel()
-            self.logger.setLevel(old_lvl)
+            out = logging.getLevelName(self.logging_level)
         return out
 
     def write_wrappers(self, **kwargs):
@@ -977,8 +974,6 @@ class ModelDriver(Driver):
             if not out:  # pragma: no cover
                 break
             out = (cls.cfg.get(cls.language, k, None) is not None)
-            if not out:
-                break
         return out
 
     @classmethod

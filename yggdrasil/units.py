@@ -165,11 +165,13 @@ def convert_unit_string(orig_str, replacements=None):
     return out
 
 
-def has_units(obj):
+def has_units(obj, check_dimensionless=False):
     r"""Determine if a Python object has associated units.
 
     Args:
         obj (object): Object to be tested for units.
+        check_dimensionless (bool, optional): If True, an object with
+            dimensionless units will return True.
 
     Returns:
         bool: True if the object has units, False otherwise.
@@ -177,7 +179,8 @@ def has_units(obj):
     """
     out = isinstance(obj, (_unit_quantity, _unit_array))
     # out = hasattr(obj, 'units')
-    if out and (obj.units == as_unit('dimensionless')):
+    if ((out and (obj.units == as_unit('dimensionless'))
+         and (not check_dimensionless))):
         out = False
     return out
 
@@ -209,7 +212,7 @@ def get_data(obj):
         np.ndarray: Numpy array representation of the underlying data.
 
     """
-    if has_units(obj):
+    if has_units(obj, check_dimensionless=True):
         out = obj.to_ndarray()
         if out.ndim == 0:
             out = out.reshape((1, ))[0]
