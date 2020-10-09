@@ -94,27 +94,29 @@ class OSRModelDriver(ExecutableModelDriver):
         assert(os.path.isfile(self.executable_path))
 
     @classmethod
-    def compile_osr(cls):
-        r"""Compile the OpenSimRoot executable with the yggdrasil flag set."""
+    def compile_osr(cls, target='OpenSimRootYgg'):
+        r"""Compile the OpenSimRoot executable with the yggdrasil flag set.
+
+        Args:
+            target (str): Make target that should be build. Defaults to
+                'OpenSimRootYgg' (the yggdrasil-instrumented version of the
+                OSR executable).
+
+        """
         toolname = None
         cwd = os.path.join(cls.repository, 'OpenSimRoot')
         if platform._is_win:  # pragma: windows
             toolname = 'g++'
             cwd = os.path.join(cwd, 'StaticBuild_win64')
-            import shutil
-            import glob
-            gcc_path = shutil.which('x86_64-w64-mingw32-g++')
-            print('make: %s' % shutil.which('make'))
-            print('g++ : %s' % gcc_path)
-            if gcc_path:
-                print(sorted(glob.glob(
-                    os.path.join(os.path.dirname(gcc_path), '*'))))
         else:
             cwd = os.path.join(cwd, 'StaticBuild')
-        for x in cls.base_languages:
-            base_cls = import_component('model', x)
-            base_cls.compile_dependencies(toolname=toolname)
-        cmd = ['make', 'OpenSimRootYgg', '-j4']
+        if target != 'cleanygg':
+            for x in cls.base_languages:
+                base_cls = import_component('model', x)
+                base_cls.compile_dependencies(toolname=toolname)
+        elif not os.path.isfile(cls.executable_path):
+            return
+        cmd = ['make', target, '-j4']
         subprocess.check_call(cmd, cwd=cwd)
 
     def write_wrappers(self, **kwargs):
@@ -132,21 +134,19 @@ class OSRModelDriver(ExecutableModelDriver):
         out.append(self.wrap_xml(self.model_file_orig, self.model_file))
         return out
 
-    def wrap_xml(self, src, dst=None):
+    def wrap_xml(self, src, dst):
         r"""Wrap the input XML, adding tags for the inputs/outputs specified for
         this model.
 
         Args:
             src (str): Full path to the XML file that should be wrapped.
-            dst (str, optional): Full path to the location where the updated XML
-                should be saved. Defaults to None and will be set based on src.
+            dst (str): Full path to the location where the updated XML should
+                be saved.
 
         Returns:
             str: Full path to XML file produced.
 
         """
-        if dst is None:
-            dst = '_copy'.join(os.path.splitext(src))
         with open(src, 'r') as fd:
             src_contents = fd.read()
         src_contents = pystache.render(
@@ -159,10 +159,8 @@ class OSRModelDriver(ExecutableModelDriver):
         for tsync in reversed(timesync):
             ivars = tsync.get('inputs', [])
             ovars = tsync.get('outputs', [])
-            if not isinstance(ivars, list):
-                ivars = [ivars]
-            if not isinstance(ovars, list):
-                ovars = [ovars]
+            assert(isinstance(ivars, list))
+            assert(isinstance(ovars, list))
             ivars = ' '.join(ivars)
             ovars = ' '.join(ovars)
             tupdate = self.update_interval.get(tsync['name'], 1.0)
@@ -232,21 +230,19 @@ class OSRModelDriver(ExecutableModelDriver):
         if not cfg.has_option(cls.language, opt):
             fname = 'OpenSimRoot'
             fpath = tools.locate_file(fname)
-            if fpath:
-                logger.info('Located %s: %s' % (fname, fpath))
-                cfg.set(cls.language, opt, fpath)
-            else:
+            if not fpath:
                 logger.info('Could not locate %s, attempting to clone' % fname)
                 try:
                     fpath = os.path.join(tempfile.gettempdir(), fname)
-                    if not os.path.isdir(fpath):
+                    if not os.path.isdir(fpath):  # pragma: config
                         git.Repo.clone_from(cls.repository_url, fpath,
                                             branch=cls.repository_branch)
-                    cfg.set(cls.language, opt, fpath)
                 except BaseException as e:  # pragma: debug
                     logger.info('Failed to clone from %s. error = %s'
                                 % (cls.repository_url, str(e)))
                     out.append((cls.language, opt, desc))
+            logger.info('Located %s: %s' % (fname, fpath))
+            cfg.set(cls.language, opt, fpath)
         return out
         
     @classmethod
@@ -296,5 +292,11 @@ class OSRModelDriver(ExecutableModelDriver):
                 from the command line using the executable for this language.
 
         """
-        args = [cls.executable_path] + args
+        args = [cls.language_executable()] + args
         return super(OSRModelDriver, cls).executable_command(args, **kwargs)
+
+    @classmethod
+    def cleanup_dependencies(cls, *args, **kwargs):
+        r"""Cleanup dependencies."""
+        cls.compile_osr(target='cleanygg')
+        super(OSRModelDriver, cls).cleanup_dependencies(*args, **kwargs)

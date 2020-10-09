@@ -267,7 +267,8 @@ def cc_flags():
     else:
         from yggdrasil.drivers.CModelDriver import CModelDriver as driver
     out = ' '.join(driver.get_compiler_flags(for_model=True,
-                                             toolname=args.toolname))
+                                             toolname=args.toolname,
+                                             dry_run=True))
     if platform._is_win:  # pragma: windows:
         out = out.replace('\\', '/')
         # out = out.encode('unicode_escape').decode('utf-8')
@@ -296,7 +297,8 @@ def ld_flags():
     else:
         from yggdrasil.drivers.CModelDriver import CModelDriver as driver
     out = ' '.join(driver.get_linker_flags(for_model=True,
-                                           toolname=args.toolname))
+                                           toolname=args.toolname,
+                                           dry_run=True))
     if platform._is_win:  # pragma: windows:
         out = out.replace('\\', '/')
         # out = out.encode('unicode_escape').decode('utf-8')
