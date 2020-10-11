@@ -8,9 +8,8 @@ from pprint import pformat
 from itertools import chain
 import socket
 from yggdrasil.tools import YggClass
-from yggdrasil.config import ygg_cfg, cfg_environment
-from yggdrasil import (
-    platform, yamlfile, enable_production_run, disable_production_run)
+from yggdrasil.config import ygg_cfg, cfg_environment, temp_config
+from yggdrasil import platform, yamlfile
 from yggdrasil.drivers import create_driver
 
 
@@ -166,9 +165,7 @@ class YggRunner(YggClass):
             dict: Intermediate times from the run.
 
         """
-        if self.production_run:
-            enable_production_run()
-        try:
+        with temp_config(production_run=self.production_run):
             if timer is None:
                 timer = time.time
             if t0 is None:
@@ -195,9 +192,6 @@ class YggRunner(YggClass):
                 tprev = times[k]
             self.info(40 * '=')
             self.info('%20s\t%f', "Total", tprev - t0)
-        finally:
-            if self.production_run:
-                disable_production_run()
         return times
 
     @property

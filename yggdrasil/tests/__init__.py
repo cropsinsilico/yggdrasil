@@ -14,6 +14,7 @@ import copy
 import pprint
 import types
 import warnings
+import json
 from pandas.testing import assert_frame_equal
 from yggdrasil.config import ygg_cfg, cfg_logging
 from yggdrasil import tools, platform, units
@@ -98,7 +99,7 @@ def check_enabled_languages(language):
     """
     enabled = os.environ.get('YGG_TEST_LANGUAGE', None)
     if enabled is not None:
-        enabled = [x.lower() for x in enabled.split(',')]
+        enabled = [x.lower() for x in json.loads(enabled)]
         if ('c++' in enabled) or ('cpp' in enabled):
             enabled += ['c++', 'cpp']
         if language.lower() not in enabled:
@@ -106,7 +107,7 @@ def check_enabled_languages(language):
                                     language)
     disabled = os.environ.get('YGG_TEST_SKIP_LANGUAGE', None)
     if disabled is not None:
-        disabled = [x.lower() for x in disabled.split(',')]
+        disabled = [x.lower() for x in json.loads(disabled)]
         if ('c++' in disabled) or ('cpp' in disabled):
             disabled += ['c++', 'cpp']
         if language.lower() in disabled:

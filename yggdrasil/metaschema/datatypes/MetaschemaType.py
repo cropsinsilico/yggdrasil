@@ -3,7 +3,7 @@ import copy
 import uuid
 import importlib
 import jsonschema
-from yggdrasil import tools, _production_run
+from yggdrasil import tools
 from yggdrasil.metaschema import (get_metaschema, get_validator, encoder,
                                   validate_instance)
 from yggdrasil.metaschema.datatypes import (
@@ -646,8 +646,6 @@ class MetaschemaType(object):
             bytes, str: Serialized message.
 
         """
-        if _production_run:
-            dont_check = True
         for k in ['size', 'data', 'datatype']:
             if k in kwargs:
                 raise RuntimeError("'%s' is a reserved keyword in the metadata." % k)
@@ -716,8 +714,6 @@ class MetaschemaType(object):
             ValueError: If msg does not contain the header separator.
 
         """
-        if _production_run:
-            dont_check = True
         if not isinstance(msg, bytes):
             raise TypeError("Message to be deserialized is not bytes type.")
         # Check for header

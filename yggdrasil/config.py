@@ -12,6 +12,9 @@ import shutil
 import logging
 import warnings
 import configparser
+import copy
+import argparse
+from contextlib import contextmanager
 from collections import OrderedDict
 from yggdrasil import tools
 env_prefixes = tools.get_env_prefixes()
@@ -25,6 +28,90 @@ loc_config_file = os.path.join(os.getcwd(), config_file)
 logger = logging.getLogger(__name__)
 
 
+# Set associated environment variables
+_cfg_map = {
+    ('debug', 'ygg'): {
+        'env': 'YGG_DEBUG', 'arg': 'loglevel',
+        'help': 'Logging level for yggdrasil operations.'},
+    ('debug', 'rmq', 'RMQ_DEBUG'): {
+        'env': 'YGG_CLIENT_DEBUG', 'arg': 'rmq-loglevel',
+        'help': 'Logging level for RabbitMQ operations.'},
+    ('debug', 'client'): {
+        'env': 'YGG_CLIENT_DEBUG', 'arg': 'client-loglevel',
+        'help': 'Logging level for yggdrasil operations on model processes.'},
+    ('jsonschema', 'validate_components'): {
+        'env': 'YGG_VALIDATE_COMPONENTS', 'arg': 'validate-components',
+        'action': 'store_true',
+        'help': ('Validate components on creation using their JSON schema '
+                 '(Decreases performance).')},
+    ('jsonschema', 'validate_messages'): {
+        'env': 'YGG_VALIDATE_MESSAGES', 'arg': 'validate-messages',
+        'type': str, 'choices': ['False', 'True', 'First'],
+        'help': ('Which messages should be validated during communication. '
+                 '\'True\': all messages (decreases performance), '
+                 '\'False\': no messages, or '
+                 '\'First\': only the first message a comm sends/receives.')},
+    ('rmq', 'namespace'): {
+        'env': 'YGG_NAMESPACE', 'help': 'RabbitMQ namespace.'},
+    ('rmq', 'host'): {
+        'env': 'YGG_MSG_HOST', 'help': 'RabbitMQ host address.'},
+    ('rmq', 'vhost'): {
+        'env': 'YGG_MSG_VHOST', 'help': 'RabbitMQ virtual host address.'},
+    ('rmq', 'user'): {
+        'env': 'YGG_MSG_USER', 'help': 'RabbitMQ username.'},
+    ('rmq', 'password'): {
+        'env': 'YGG_MSG_PW', 'help': 'RabbitMQ password.'},
+    ('parallel', 'cluster'): {
+        'env': 'YGG_CLUSTER', 'help': 'Cluster that should be used.'},
+    ('testing', 'enable_examples'): {
+        'env': 'YGG_ENABLE_EXAMPLE_TESTS', 'arg': 'with-examples',
+        'action': 'store_true',
+        'help': 'Run example tests when encountered.'},
+    ('testing', 'enable_demos'): {
+        'env': 'YGG_ENABLE_DEMO_TESTS', 'arg': 'with-demos',
+        'action': 'store_true',
+        'help': 'Run demo tests when encountered.'},
+    ('testing', 'languages'): {
+        'env': 'YGG_TEST_LANGUAGE', 'arg': 'language',
+        'default': [], 'nargs': '+', 'type': str,
+        'help': 'Language(s) that sould not be tested.'},
+    ('testing', 'skip_languages'): {
+        'env': 'YGG_TEST_SKIP_LANGUAGE', 'arg': 'skip-language',
+        'default': [], 'nargs': '+', 'type': str,
+        'help': 'Language(s) that sould not be tested.'},
+    ('testing', 'enable_long'): {
+        'env': 'YGG_ENABLE_LONG_TESTS', 'arg': 'long-running',
+        'action': 'store_true',
+        'help': 'Run long tests when encounterd.'},
+    ('testing', 'enable_production_runs'): {
+        'env': 'YGG_TEST_PRODUCTION_RUNS',
+        'action': 'store_true',
+        'help': 'Run production level tests when encountered.'},
+    ('general', 'default_comm'): {
+        'env': 'YGG_DEFAULT_COMM', 'type': str,
+        'help': 'Comm type that should be used by default.'}
+}
+_key2env = {}
+for k, v in _cfg_map.items():
+    arg = []
+    if 'arg' in v:
+        arg = [v['arg']]
+    if k[0] not in ['debug']:
+        new_arg = k[1].replace('_', '-')
+        if new_arg not in arg:
+            arg.append(new_arg)
+    for x in copy.deepcopy(arg):
+        _key2env[x.replace('-', '_')] = v['env']
+        new_arg = x.replace('-', '')
+        if new_arg not in arg:
+            arg.append(new_arg)
+    v['args'] = arg
+    v['kwargs'] = {
+        kk: v[kk] for kk in ['default', 'type', 'nargs', 'help', 'choices',
+                             'action']
+        if kk in v}
+
+    
 class YggConfigParser(configparser.ConfigParser, object):
     r"""Config parser that returns None if option not provided on get."""
 
@@ -136,16 +223,17 @@ class YggConfigParser(configparser.ConfigParser, object):
         """
         section = section.lower()
         option = option.lower()
-        if self.has_section(section) and self.has_option(section, option):
+        out = None
+        if (out is None) and ((section, option) in _cfg_map):
+            out = os.environ.get(_cfg_map[(section, option)]['env'], None)
+        if (((out is None) and self.has_section(section)
+             and self.has_option(section, option))):
             # Super does not work for ConfigParser as not inherited from object
             out = configparser.ConfigParser.get(self, section, option, **kwargs)
-            # Count empty strings as not provided
-            if not out:
-                return default
-            else:
-                return self.backwards_str2val(out)
-        else:
-            return default
+        # Count empty strings as not provided
+        if out:
+            return self.backwards_str2val(out)
+        return default
 
 
 def get_language_order(drivers):
@@ -264,21 +352,6 @@ def update_language_config(languages=None, skip_warnings=False,
                           RuntimeWarning)
     
 
-# Set associated environment variables
-env_map = [('debug', 'ygg', 'YGG_DEBUG'),
-           ('debug', 'rmq', 'RMQ_DEBUG'),
-           ('debug', 'client', 'YGG_CLIENT_DEBUG'),
-           ('jsonschema', 'validate_components', 'YGG_SKIP_COMPONENT_VALIDATION'),
-           ('jsonschema', 'validate_all_messages', 'YGG_VALIDATE_ALL_MESSAGES'),
-           ('rmq', 'namespace', 'YGG_NAMESPACE'),
-           ('rmq', 'host', 'YGG_MSG_HOST'),
-           ('rmq', 'vhost', 'YGG_MSG_VHOST'),
-           ('rmq', 'user', 'YGG_MSG_USER'),
-           ('rmq', 'password', 'YGG_MSG_PW'),
-           ('parallel', 'cluster', 'YGG_CLUSTER'),
-           ]
-
-
 def get_ygg_loglevel(cfg=None, default='DEBUG'):
     r"""Get the current log level.
 
@@ -393,10 +466,10 @@ def cfg_environment(env=None, cfg=None):
         env = os.environ
     if cfg is None:
         cfg = ygg_cfg
-    for s, o, e in env_map:
-        v = cfg.get(s, o)
-        if v:
-            env[e] = v
+    for k, v in _cfg_map.items():
+        val = cfg.get(*k)
+        if val:
+            env.setdefault(v['env'], val)
 
             
 # Initialize config
@@ -408,3 +481,163 @@ ygg_cfg = YggConfigParser.from_files([def_config_file, usr_config_file,
 # Do initial update of logging & environment (legacy)
 cfg_logging()
 cfg_environment()
+
+
+def get_config_parser(parser=None, description=None, skip_sections=None):
+    r"""Create a parser or add to an existing parser arguments based on
+    configuration options.
+
+    Args:
+        parser (argparse.ArgumentParser, optional): Existing argument parser
+            that arguments should be added to. Defaults to None and a new
+            parser is created.
+        description (str, optional): The description that should be used if
+            a new parser is created. Defaults to None.
+        skip_sections (list, optional): Configuration sections that should be
+            skipped when adding arguments to the parser. Defaults to None and
+            arguments for all configuration sections will be added.
+
+    Returns:
+        argparse.ArgumentParser: Argument parser with arguments added that
+            are associated with configuration options.
+
+    """
+    if skip_sections is None:
+        skip_sections = []
+    if parser is None:
+        parser = argparse.ArgumentParser(description=description)
+    for k, v in _cfg_map.items():
+        if k[0] in skip_sections:
+            continue
+        parser.add_argument(*['--' + x for x in v['args']], **v['kwargs'])
+    parser.add_argument('--production-run', action='store_true',
+                        help=('Turn off safe guards in order to improve '
+                              'performance. This is equivalent to '
+                              '\'--validate-components '
+                              '--validate-messages=True\''))
+    parser.add_argument('--debug', action='store_true',
+                        help=('Turn on debugging utilties including '
+                              'increased logging and validation. This is '
+                              'equivalent to \'--loglevel=DEBUG '
+                              '--client-loglevel=DEBUG '
+                              '--validate-components=False '
+                              '--validate-messages=False\''))
+    return parser
+
+
+def resolve_config_parser(args):
+    r"""Process argument results by setting flags that are set by combination
+    arguments.
+
+    Args:
+        args (argparse.ArgumentParser): Argument parser to set combination
+            child flags for.
+
+    Returns:
+        argparse.ArgumentParser: Argument parser with child flags for
+            combination flags set.
+
+    """
+    if args.debug and args.production_run:  # pragma: debug
+        raise ValueError("\'--debug\' and \'--production-run\' flags are "
+                         "incompatible.")
+    if args.production_run:
+        args.validate_components = False
+        args.validate_messages = 'False'
+    elif args.debug:
+        args.loglevel = 'DEBUG'
+        args.client_loglevel = 'DEBUG'
+        args.validate_components = True
+        args.validate_messages = 'True'
+    return args
+
+
+def acquire_env(new_env):
+    r"""Get the existing environment variable values and set the environment
+    based on the provided dictionary.
+
+    Args:
+        new_env (dict): Mapping from configuration key to values that
+            environment variables should be set to.
+
+    Returns:
+        dict: Mapping of environment variables and values that were overridden
+            by new_env.
+
+    """
+    old_env = {}
+    if 'production_run' in new_env:
+        if new_env['production_run']:
+            new_env['validate_components'] = False
+            new_env['validate_messages'] = 'False'
+        new_env.pop('production_run')
+    # old_env = {k: os.environ.get(k, None) for k in _key2env.values()}
+    for k, v in new_env.items():
+        k_env = _key2env.get(k, k)
+        old_env.setdefault(k_env, os.environ.get(k_env, None))
+        if (((k_env in ['YGG_TEST_LANGUAGE', 'YGG_TEST_SKIP_LANGUAGE'])
+             and isinstance(v, list))):
+            if len(v) == 0:
+                continue
+            from yggdrasil.components import import_component
+            v = [import_component('model', x).language for x in v]
+        if not isinstance(v, str):
+            v = json.dumps(v)
+        os.environ[k_env] = v
+    return old_env
+
+
+def restore_env(old_env):
+    r"""Restore environment variables to a previous state.
+
+    Args:
+        old_env (dict): Mapping from environment variable to value for state
+            that should be restored.
+
+    """
+    for k, v in old_env.items():
+        if v is None:
+            os.environ.pop(k, None)
+        else:
+            os.environ[k] = v
+
+
+@contextmanager
+def parser_config(args, **kwargs):
+    r"""Context manager for a run that modifies configuration options using
+    values from an argument parser.
+
+    Args:
+        args (argparse.Namespace): Argument parsing results.
+        **kwargs: Additional environment variable key/value pairs and/or
+            argument name key/value pairs that should be added to the
+            environment.
+
+    """
+    args = resolve_config_parser(args)
+    for k0 in _key2env.keys():
+        k = k0.replace('-', '_')
+        if getattr(args, k, None) is not None:
+            kwargs[k0] = getattr(args, k)
+    old_env = acquire_env(kwargs)
+    try:
+        yield
+    finally:
+        restore_env(old_env)
+
+
+@contextmanager
+def temp_config(**kwargs):
+    r"""Context manager for a run that modifies configuration options using
+    a dictionary of key/value pairs.
+
+    Args:
+        **kwargs: Environment variable key/value pairs and/or argument name
+            key/value pairs that should be added to the environment.
+
+    """
+    old_env = acquire_env(kwargs)
+    try:
+        yield
+    finally:
+        restore_env(old_env)

@@ -182,17 +182,16 @@ def ygginfo():
 
 def yggrun():
     r"""Start a run."""
-    from yggdrasil import runner
+    from yggdrasil import runner, config
     parser = argparse.ArgumentParser(description='Run an integration.')
     parser.add_argument('yamlfile', nargs='+',
                         help='One or more yaml specification files.')
-    parser.add_argument('--production-run', action='store_true',
-                        help=('Turn of safe guards in order to improve '
-                              'performance.'))
+    config.get_config_parser(parser, skip_sections='testing')
     args = parser.parse_args()
     prog = sys.argv[0].split(os.path.sep)[-1]
-    runner.run(args.yamlfile, ygg_debug_prefix=prog,
-               production_run=args.production_run)
+    with config.parser_config(args):
+        runner.run(args.yamlfile, ygg_debug_prefix=prog,
+                   production_run=args.production_run)
 
 
 def yggclean():
