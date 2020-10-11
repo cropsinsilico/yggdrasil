@@ -14,7 +14,7 @@ class TestFSPM2020Demo(DemoTstBase):
             'plant_v1': ('yamls/plant_v1.yml', 'yamls/light.yml'),
             'plant_v1_cpp': ('yamls/plant_v1.yml', 'yamls/light_cpp.yml'),
             'plant_v1_R': ('yamls/plant_v1.yml', 'yamls/light_R.yml'),
-            'plant_v2_f90': ('yamls/plant_v1.yml',
+            'plant_v1_f90': ('yamls/plant_v1.yml',
                              'yamls/light_fortran.yml'),
             'plant_v2': ('yamls/plant_v2.yml', 'yamls/light.yml',
                          'yamls/roots.yml'),

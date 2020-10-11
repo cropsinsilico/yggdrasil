@@ -18,23 +18,27 @@ class TestOSRModelParam(parent.TestExecutableModelParam):
         return out
 
     @unittest.skipIf(True, "Requires partner model.")
-    def test_run_model(self, *args, **kwargs):
+    def test_run_model(self, *args, **kwargs):  # pragma: no cover
         r"""Test running script used without debug."""
         pass
 
     @unittest.skipIf(True, "Requires partner model.")
-    def test_valgrind(self, *args, **kwargs):
+    def test_valgrind(self, *args, **kwargs):  # pragma: no cover
         pass
 
     @unittest.skipIf(True, "Requires partner model.")
-    def test_strace(self, *args, **kwargs):
+    def test_strace(self, *args, **kwargs):  # pragma: no cover
         pass
 
 
 class TestOSRModelDriverNoInit(TestOSRModelParam,
                                parent.TestExecutableModelDriverNoInit):
     r"""Test runner for OSRModelDriver without init."""
-    pass
+
+    def test_cleanup_dependencies(self):
+        r"""Test cleanup_dependencies method."""
+        super(TestOSRModelDriverNoInit, self).test_cleanup_dependencies()
+        self.import_cls.cleanup_dependencies()
         
 
 class TestOSRModelDriverNoStart(TestOSRModelParam,

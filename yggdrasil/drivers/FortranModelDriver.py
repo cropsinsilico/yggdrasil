@@ -858,8 +858,8 @@ class FortranModelDriver(CompiledModelDriver):
         if line.startswith(('#if', '#endif', '#define', '#else', '#ifdef',
                             '#ifndef')):
             return [line]
-        if line.lstrip().lower().startswith("include"):
-            force_split = True
+        # if line.lstrip().lower().startswith("include"):
+        #     force_split = True
         return super(FortranModelDriver, cls).split_line(
             line, length=length, force_split=force_split)
 
