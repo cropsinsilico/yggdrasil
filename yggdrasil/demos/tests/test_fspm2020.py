@@ -2,7 +2,7 @@ from yggdrasil.demos.tests import DemoTstBase
 import unittest
 try:
     import trimesh
-except ImportError:
+except ImportError:  # pragma: debug
     trimesh = None
 
 
