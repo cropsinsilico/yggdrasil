@@ -543,12 +543,14 @@ def resolve_config_parser(args):
                          "incompatible.")
     if args.production_run:
         args.validate_components = False
-        args.validate_messages = 'False'
+        args.validate_messages = False
     elif args.debug:
         args.loglevel = 'DEBUG'
         args.client_loglevel = 'DEBUG'
         args.validate_components = True
-        args.validate_messages = 'True'
+        args.validate_messages = True
+    if args.validate_messages in ['True', 'False']:
+        args.validate_messages = (args.validate_messages == 'True')
     return args
 
 
@@ -566,11 +568,22 @@ def acquire_env(new_env):
 
     """
     old_env = {}
+    if new_env.get('debug', '') and new_env.get('production_run', ''):  # pragma: debug
+        raise ValueError("'debug' and 'production_run' variables are "
+                         "incompatible.")
     if 'production_run' in new_env:
         if new_env['production_run']:
             new_env['validate_components'] = False
-            new_env['validate_messages'] = 'False'
+            new_env['validate_messages'] = False
         new_env.pop('production_run')
+    if 'debug' in new_env:
+        if new_env['debug']:
+            new_env['loglevel'] = 'DEBUG'
+            new_env['client_loglevel'] = 'DEBUG'
+            new_env['validate_components'] = True
+            new_env['validate_messages'] = True
+    if new_env.get('validate_messages', '') in ['True', 'False']:
+        new_env['validate_messages'] = (new_env['validate_messages'] == 'True')
     # old_env = {k: os.environ.get(k, None) for k in _key2env.values()}
     for k, v in new_env.items():
         k_env = _key2env.get(k, k)
