@@ -1,3 +1,4 @@
+import os
 import copy
 import pprint
 import numpy as np
@@ -712,8 +713,9 @@ class SerializeBase(tools.YggClass):
                         metadata['metadata'] = {
                             'datatype': self.datatype.encode_type(
                                 args, typedef=self.typedef)}
-        if ((self.initialized
-             and (not tools.check_environ_bool('YGG_VALIDATE_ALL_MESSAGES')))):
+        validate_msgs = os.environ.get('YGG_VALIDATE_MESSAGES', 'first').lower()
+        if (((self.initialized and (validate_msgs == 'first'))
+             or (validate_msgs in ['false', '0']))):
             metadata.setdefault('dont_check', True)
         out = self.encoded_datatype.serialize(data, **metadata)
         return out
@@ -736,8 +738,9 @@ class SerializeBase(tools.YggClass):
         if (((self.func_deserialize is not None)
              and (self.encoded_typedef['type'] == 'bytes'))):
             kwargs['dont_decode'] = True
-        if ((self.initialized
-             and (not tools.check_environ_bool('YGG_VALIDATE_ALL_MESSAGES')))):
+        validate_msgs = os.environ.get('YGG_VALIDATE_MESSAGES', 'first').lower()
+        if (((self.initialized and (validate_msgs == 'first'))
+             or (validate_msgs in ['false', '0']))):
             kwargs.setdefault('dont_check', True)
         out, metadata = self.encoded_datatype.deserialize(msg, **kwargs)
         if (self.func_deserialize is not None):

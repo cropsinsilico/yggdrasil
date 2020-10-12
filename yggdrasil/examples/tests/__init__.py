@@ -8,13 +8,45 @@ import itertools
 import flaky
 from yggdrasil.components import ComponentMeta, import_component
 from yggdrasil import runner, tools, platform
-from yggdrasil.examples import yamls, source, ext_map
-from yggdrasil.tests import YggTestBase, check_enabled_languages
+from yggdrasil.examples import (
+    get_example_yaml, get_example_source, get_example_languages,
+    ext_map, display_example)
+from yggdrasil.tests import YggTestBase, check_enabled_languages, assert_raises
 
 
 _ext2lang = {v: k for k, v in ext_map.items()}
 _test_registry = {}
 _default_comm = tools.get_default_comm()
+
+
+def test_get_example_yaml():
+    r"""Test get_example_yaml."""
+    assert_raises(KeyError, get_example_yaml, 'invalid', 'invalid')
+    assert_raises(KeyError, get_example_yaml, 'hello', 'invalid')
+    get_example_yaml('hello', 'r')
+    get_example_yaml('hello', 'R')
+
+
+def test_get_example_source():
+    r"""Test get_example_source."""
+    assert_raises(KeyError, get_example_source, 'invalid', 'invalid')
+    assert_raises(KeyError, get_example_source, 'hello', 'invalid')
+    get_example_source('hello', 'r')
+    get_example_source('hello', 'R')
+
+
+def test_get_example_languages():
+    r"""Test get_example_languages."""
+    assert_raises(KeyError, get_example_languages, 'invalid')
+    get_example_languages('ascii_io')
+    get_example_languages('ascii_io', language='python')
+    get_example_languages('ascii_io', language='all')
+    get_example_languages('ascii_io', language='all_nomatlab')
+
+
+def test_display_example():
+    r"""Test display_example."""
+    display_example('hello', 'r')
 
 
 def iter_pattern_match(a, b):
@@ -57,6 +89,9 @@ def make_iter_test(is_flaky=False, **kwargs):
 class ExampleMeta(ComponentMeta):
 
     def __new__(cls, name, bases, dct):
+        if dct.get('example_name', None) is not None:
+            dct.setdefault('iter_list_language',
+                           get_example_languages(dct['example_name']))
         iter_lists = []
         iter_keys = []
         test_name_fmt = 'test'
@@ -77,7 +112,7 @@ class ExampleMeta(ComponentMeta):
             if x_iter_list is not None:
                 iter_lists.append(x_iter_list)
                 iter_keys.append(x)
-            else:  # pragma: debug
+            elif dct.get('example_name', None) is not None:  # pragma: debug
                 raise ValueError("Unsupported iter dimension: %s" % x)
         if dct.get('example_name', None) is not None:
             for x in itertools.product(*iter_lists):
@@ -110,7 +145,7 @@ class ExampleTstBase(YggTestBase, tools.YggClass):
     iter_over = ['language']
     iter_skip = []
     iter_flaky = []
-    iter_list_language = tools.get_supported_lang() + ['all', 'all_nomatlab']
+    iter_list_language = None
     iter_list_comm = tools.get_supported_comm()
     iter_list_datatype = tools.get_supported_type()
 
@@ -150,27 +185,12 @@ class ExampleTstBase(YggTestBase, tools.YggClass):
     @property
     def languages_tested(self):
         r"""list: Languages covered by the example."""
-        if self.name not in source:  # pragma: debug
-            return None
-        if self.yaml is None:  # pragma: debug
-            return None
-        if self.language in ['all', 'all_nomatlab']:
-            out = [_ext2lang[os.path.splitext(x)[-1]] for x in
-                   source[self.name][self.language]]
-        else:
-            out = [self.language]
-        return out
+        return get_example_languages(self.name, language=self.language)
 
     @property
     def yaml(self):
         r"""str: The full path to the yaml file for this example."""
-        if self.name not in yamls:  # pragma: debug
-            return None
-        if self.language in yamls[self.name]:
-            return yamls[self.name][self.language]
-        elif self.language.lower() in yamls[self.name]:
-            return yamls[self.name][self.language.lower()]
-        return None
+        return get_example_yaml(self.name, self.language)
 
     @property
     def yamldir(self):
@@ -235,51 +255,51 @@ class ExampleTstBase(YggTestBase, tools.YggClass):
 
     def run_example(self):
         r"""This runs an example in the correct language."""
-        if self.yaml is None:
-            if self.name is not None:
-                raise unittest.SkipTest("Could not locate example %s in language %s." %
-                                        (self.name, self.language))
+        assert(self.yaml is not None)
+        assert(self.name is not None)
+        # Check that language is installed
+        for x in self.languages_tested:
+            if not tools.is_lang_installed(x):
+                raise unittest.SkipTest("%s not installed." % x)
+            check_enabled_languages(x)
+        # Copy platform specific makefile
+        print(self.language, platform._is_win)
+        if self.language == 'make':
+            makefile = os.path.join(self.yamldir, 'src', 'Makefile')
+            if platform._is_win:  # pragma: windows
+                makedrv = import_component('model', 'make')
+                assert(makedrv.get_tool('compiler').toolname == 'nmake')
+                make_ext = '_windows'
+            else:
+                make_ext = '_linux'
+            shutil.copy(makefile + make_ext, makefile)
+        # Check that comm is installed
+        if self.comm in ['ipc', 'IPCComm']:
+            from yggdrasil.communication.IPCComm import (
+                ipcrm_queues, ipc_queues)
+            qlist = ipc_queues()
+            if qlist:  # pragma: debug
+                print('Existing queues:', qlist)
+                ipcrm_queues()
+        # Run
+        os.environ.update(self.env)
+        self.runner = runner.get_runner(self.yaml, namespace=self.namespace,
+                                        production_run=True)
+        self.runner.run()
+        if self.expects_error:
+            assert(self.runner.error_flag)
         else:
-            # Check that language is installed
-            for x in self.languages_tested:
-                if not tools.is_lang_installed(x):
-                    raise unittest.SkipTest("%s not installed." % x)
-            # Copy platform specific makefile
+            assert(not self.runner.error_flag)
+        try:
+            self.check_results()
+        finally:
+            self.example_cleanup()
+            # Remove copied makefile
             if self.language == 'make':
                 makefile = os.path.join(self.yamldir, 'src', 'Makefile')
-                if platform._is_win:  # pragma: windows
-                    makedrv = import_component('model', 'make')
-                    assert(makedrv.get_tool('compiler').toolname == 'nmake')
-                    make_ext = '_windows'
-                else:
-                    make_ext = '_linux'
-                shutil.copy(makefile + make_ext, makefile)
-            # Check that comm is installed
-            if self.comm in ['ipc', 'IPCComm']:
-                from yggdrasil.communication.IPCComm import (
-                    ipcrm_queues, ipc_queues)
-                qlist = ipc_queues()
-                if qlist:  # pragma: debug
-                    print('Existing queues:', qlist)
-                    ipcrm_queues()
-            # Run
-            os.environ.update(self.env)
-            self.runner = runner.get_runner(self.yaml, namespace=self.namespace)
-            self.runner.run()
-            if self.expects_error:
-                assert(self.runner.error_flag)
-            else:
-                assert(not self.runner.error_flag)
-            try:
-                self.check_results()
-            finally:
-                self.example_cleanup()
-                # Remove copied makefile
-                if self.language == 'make':
-                    makefile = os.path.join(self.yamldir, 'src', 'Makefile')
-                    if os.path.isfile(makefile):
-                        os.remove(makefile)
-                self.runner = None
+                if os.path.isfile(makefile):
+                    os.remove(makefile)
+            self.runner = None
 
     def example_cleanup(self):
         r"""Cleanup files created during the test."""
@@ -310,7 +330,9 @@ class ExampleTstBase(YggTestBase, tools.YggClass):
     def setup_iteration_language(self, language=None):
         r"""Perform setup associated with a language iteration."""
         if language is not None:
-            check_enabled_languages(language)
+            for x in get_example_languages(self.example_name,
+                                           language=language):
+                check_enabled_languages(x)
         return language
 
     def setup_iteration_comm(self, comm=None):

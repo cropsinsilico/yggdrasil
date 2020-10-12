@@ -45,16 +45,19 @@ environment:
   rabbitmq_installer_path: "C:\\Users\\appveyor\\rabbitmq-server-3.7.3.exe"
 
   matrix:
+    # - platform: x64
+    #   PYTHON_VERSION: "3.6"
+    #   YGG_TEST_FLAGS: "examples/tests/test_osr.py --with-examples"
     - platform: x64
       PYTHON_VERSION: "3.6"
       YGG_TEST_FLAGS: "--test-suite=examples_part1"
     - platform: x64
       PYTHON_VERSION: "3.6"
-      YGG_TEST_FLAGS: "--test-suite=examples_part2"
+      YGG_TEST_FLAGS: "--test-suite=examples_part2 --skip-language=osr"
       YGG_SECOND_TEST: "yggtest --ci --test-suite=types --languages cpp"
     - platform: x64
       PYTHON_VERSION: "3.6"
-      YGG_TEST_FLAGS: "--long-running"
+      YGG_TEST_FLAGS: "--long-running --skip-language=osr"
     - platform: x64
       PYTHON_VERSION: "3.7"
       INSTALLZMQ: 0

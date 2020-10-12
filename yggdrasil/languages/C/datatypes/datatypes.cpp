@@ -2669,6 +2669,23 @@ extern "C" {
     }
   }
 
+  int skip_va_elements(const dtype_t* dtype, size_t *nargs, va_list_t *ap) {
+    try {
+      if (dtype == NULL) {
+	return 1;
+      }
+      if (dtype->obj == NULL) {
+	return 1;
+      }
+      MetaschemaType *obj = dtype2class(dtype);
+      obj->skip_va_elements(nargs, ap);
+    } catch(...) {
+      ygglog_error("skip_va_elements: C++ exception thrown.");
+      return 1;
+    }
+    return 0;
+  }
+  
   int is_empty_dtype(const dtype_t* dtype) {
     if (dtype == NULL) {
       return 1;

@@ -1,0 +1,6 @@
+model:
+  name: server
+  language: python
+  args: ./src/server.py
+  function: model_function
+  is_server: True

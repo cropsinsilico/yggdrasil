@@ -7,6 +7,10 @@ from yggdrasil.metaschema.encoder import encode_json, decode_json
 from yggdrasil.metaschema.datatypes import _schema_dir
 from yggdrasil.metaschema.datatypes.JSONObjectMetaschemaType import (
     JSONObjectMetaschemaType)
+try:
+    import trimesh
+except ImportError:
+    trimesh = None
 
 
 _schema_file = os.path.join(_schema_dir, 'ply.json')
@@ -262,6 +266,9 @@ class PlyDict(dict):
         self.setdefault('faces', [])
         self._type_class.validate(self)
 
+    def convert_arrays(self):
+        r"""Check fields and convert arrays to nested structures."""
+
     @classmethod
     def from_dict(cls, in_dict):
         r"""Get a version of the object from a dictionary."""
@@ -272,6 +279,118 @@ class PlyDict(dict):
         r"""Get a version of the object as a pure dictionary."""
         out = dict(**self)
         return out
+
+    @classmethod
+    def from_array_dict(cls, in_dict):
+        r"""Get a version of the object from a dictionary of arrays."""
+        kws = {}
+        for k in ['material', 'vertices', 'edges', 'faces']:
+            if k in in_dict:
+                kws[k] = copy.deepcopy(in_dict[k])
+        if isinstance(kws.get('vertices', None), np.ndarray):
+            old_vert = kws.pop('vertices')
+            assert(old_vert.shape[1] == 3)
+            kws['vertices'] = [
+                {k: old_vert[i, j] for j, k in enumerate('xyz')}
+                for i in range(old_vert.shape[0])]
+        if isinstance(in_dict.get('vertex_colors', None), np.ndarray):
+            old_colr = in_dict['vertex_colors']
+            assert(old_colr.shape == (len(kws['vertices']), 3))
+            for i in range(old_colr.shape[0]):
+                for j, k in enumerate(['red', 'green', 'blue']):
+                    if not np.isnan(old_colr[i, j]):
+                        kws['vertices'][i][k] = np.int32(old_colr[i, j])
+        if isinstance(kws.get('edges', None), np.ndarray):
+            old_edge = kws.pop('edges')
+            assert(old_edge.shape[1] == 2)
+            kws['edges'] = [
+                {k: np.int32(old_edge[i, j]) for j, k
+                 in enumerate(['vertex1', 'vertex2'])}
+                for i in range(old_edge.shape[0])]
+        if isinstance(in_dict.get('edge_colors', None), np.ndarray):
+            old_colr = in_dict['edge_colors']
+            assert(old_colr.shape == (len(kws['edges']), 3))
+            for i in range(old_colr.shape[0]):
+                for j, k in enumerate(['red', 'green', 'blue']):
+                    if not np.isnan(old_colr[i, j]):
+                        kws['edges'][i][k] = np.int32(old_colr[i, j])
+        if isinstance(kws.get('faces', None), np.ndarray):
+            old_face = kws.pop('faces')
+            assert(old_face.shape[1] >= 3)
+            kws['faces'] = [
+                {'vertex_index': [
+                    np.int32(old_face[i, j]) for j
+                    in range(old_face.shape[1])
+                    if (not np.isnan(old_face[i, j]))]}
+                for i in range(old_face.shape[0])]
+        if isinstance(in_dict.get('face_colors', None), np.ndarray):
+            old_colr = in_dict['face_colors']
+            assert(old_colr.shape == (len(kws['faces']), 3))
+            for i in range(old_colr.shape[0]):
+                for j, k in enumerate(['red', 'green', 'blue']):
+                    if not np.isnan(old_colr[i, j]):
+                        kws['faces'][i][k] = np.int32(old_colr[i, j])
+        return cls.from_dict(kws)
+
+    def as_array_dict(self):
+        r"""Get a version of the object as a dictionary of arrays."""
+        out = {}
+        if self.get('material', None):
+            out['material'] = self['material']
+        if self.get('vertices', None):
+            out['vertices'] = np.asarray(
+                [[v[k] for k in 'xyz'] for v in self['vertices']])
+            out['vertex_colors'] = np.NaN * np.ones(out['vertices'].shape,
+                                                    dtype='int32')
+            for i, v in enumerate(self['vertices']):
+                for j, k in enumerate(['red', 'green', 'blue']):
+                    out['vertex_colors'][i, j] = v.get(k, np.NaN)
+            if np.all(np.isnan(out['vertex_colors'])):
+                out.pop('vertex_colors')
+        if self.get('faces', None):
+            def fkey(x):
+                return len(x['vertex_index'])
+            face_shp = (len(self['faces']),
+                        len(max(self['faces'], key=fkey)['vertex_index']))
+            out['faces'] = np.NaN * np.ones(face_shp, dtype='int32')
+            out['face_colors'] = np.NaN * np.ones(
+                (face_shp[0], 3), dtype='int32')
+            for i, f in enumerate(self['faces']):
+                out['faces'][i, :fkey(f)] = f['vertex_index']
+                for j, k in enumerate(['red', 'green', 'blue']):
+                    out['face_colors'][i, j] = f.get(k, np.NaN)
+            if np.all(np.isnan(out['face_colors'])):
+                out.pop('face_colors')
+        if self.get('edges', None):
+            out['edges'] = np.asarray(
+                [[v[k] for k in ['vertex1', 'vertex2']]
+                 for v in self['edges']])
+            out['edge_colors'] = np.NaN * np.ones(
+                (out['edges'].shape[0], 3), dtype='int32')
+            for i, f in enumerate(self['edges']):
+                for j, k in enumerate(['red', 'green', 'blue']):
+                    out['edge_colors'][i, j] = f.get(k, np.NaN)
+            if np.all(np.isnan(out['edge_colors'])):
+                out.pop('edge_colors')
+        return out
+
+    @classmethod
+    def from_trimesh(cls, in_mesh):
+        r"""Get a version of the object from a trimesh class."""
+        kws = dict(vertices=in_mesh.vertices,
+                   vertex_colors=in_mesh.visual.vertex_colors,
+                   faces=in_mesh.faces.astype('int32'))
+        kws['vertex_colors'] = kws['vertex_colors'][:, :3]
+        return cls.from_array_dict(kws)
+
+    def as_trimesh(self, **kwargs):
+        r"""Get a version of the object as a trimesh class."""
+        kws0 = self.as_array_dict()
+        kws = {'vertices': kws0.get('vertices', None),
+               'vertex_colors': kws0.get('vertex_colors', None),
+               'faces': kws0.get('faces', None)}
+        kws.update(kwargs, process=False)
+        return trimesh.base.Trimesh(**kws)
     
     def count_elements(self, element_name):
         r"""Get the count of a certain element in the dictionary.
@@ -647,6 +766,12 @@ def get_key_order(all_keys, default_order):
     out = sorted(all_keys, key=sort_key)
     return out
 
+
+if trimesh:
+    python_types = (dict, PlyDict, trimesh.base.Trimesh)
+else:
+    python_types = (dict, PlyDict)
+
    
 # The base class could be anything since it is discarded during registration,
 # but is set to JSONObjectMetaschemaType here for transparancy since this is
@@ -655,7 +780,7 @@ class PlyMetaschemaType(JSONObjectMetaschemaType):
     r"""Ply 3D structure map."""
 
     _empty_msg = {'vertices': [], 'faces': []}
-    python_types = (dict, PlyDict)
+    python_types = python_types
     schema_file = _schema_file
     _replaces_existing = False
 
@@ -691,6 +816,8 @@ class PlyMetaschemaType(JSONObjectMetaschemaType):
             bytes, str: Serialized message.
 
         """
+        if trimesh and isinstance(obj, trimesh.base.Trimesh):
+            obj = PlyDict.from_trimesh(obj)
         # Add comments to identify generated files
         default_comments = ['author ygg_auto', 'File generated by yggdrasil']
         for c in default_comments:
@@ -865,6 +992,26 @@ class PlyMetaschemaType(JSONObjectMetaschemaType):
         # Return
         return PlyDict(obj)
 
+    @classmethod
+    def coerce_type(cls, obj, typedef=None, **kwargs):
+        r"""Coerce objects of specific types to match the data type.
+
+        Args:
+            obj (object): Object to be coerced.
+            typedef (dict, optional): Type defintion that object should be
+                coerced to. Defaults to None.
+            **kwargs: Additional keyword arguments are metadata entries that may
+                aid in coercing the type.
+
+        Returns:
+            object: Coerced object.
+
+        """
+        if trimesh and isinstance(obj, trimesh.base.Trimesh):
+            obj = PlyDict.from_trimesh(obj)
+        return super(PlyMetaschemaType, cls).coerce_type(
+            obj, typedef=typedef, **kwargs)
+        
     @classmethod
     def updated_fixed_properties(cls, obj):
         r"""Get a version of the fixed properties schema that includes information

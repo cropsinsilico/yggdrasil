@@ -19,7 +19,8 @@ import signal
 import uuid as uuid_gen
 import subprocess
 import importlib
-from yggdrasil import platform
+import difflib
+from yggdrasil import platform, constants
 from yggdrasil.components import import_component, ComponentBase
 
 
@@ -107,6 +108,109 @@ def str2bytes(x, recurse=False):
         raise TypeError("Cannot convert type '%s' to bytes." % type(x))
     return out
 
+
+def add_line_numbers(lines, for_diff=False):
+    r"""Add number to lines.
+
+    Args:
+        lines (list): Lines to number.
+        for_diff (bool, optional): If True, those lines beginning with
+            removed/notation diff characters (-, ?) will not be numbered.
+            Defaults to False.
+
+    Returns:
+        list: Numbered lines.
+
+    """
+    out = []
+    i = 0
+    for line in lines:
+        if for_diff and line.startswith(('-', '?')):
+            out.append('    ' + line)
+        else:
+            i += 1
+            out.append('%2d: %s' % (i, line))
+    return out
+
+
+def display_source(fname, number_lines=False, return_lines=False):
+    r"""Display source code with syntax highlighting (if available).
+
+    Args:
+        fname (str, list): Full path(s) to one or more source files.
+        number_lines (bool, optional): If True, line numbers will be added
+            to the displayed examples. Defaults to False.
+        return_lines (bool, optional): If True, the lines are returned rather
+            than displayed. Defaults to False.
+
+    """
+    if isinstance(fname, list):
+        out = ''
+        for f in fname:
+            iout = display_source(f, number_lines=number_lines,
+                                  return_lines=return_lines)
+            if return_lines:
+                out += iout
+        if return_lines:
+            return out
+        return
+    with open(fname, 'r') as fd:
+        lines = fd.read()
+    language = constants.EXT2LANG[os.path.splitext(fname)[-1]]
+    try:
+        from pygments import highlight
+        from pygments.lexers import PythonLexer
+        from pygments.lexers.data import YamlLexer
+        from pygments.lexers.c_cpp import CLexer, CppLexer
+        from pygments.lexers.r import SLexer
+        from pygments.lexers.fortran import FortranLexer
+        from pygments.lexers.matlab import MatlabLexer
+        from pygments.lexers.html import XmlLexer
+        from pygments.formatters import Terminal256Formatter
+        lexer_map = {'python': PythonLexer,
+                     'yaml': YamlLexer,
+                     'c': CLexer,
+                     'c++': CppLexer,
+                     'r': SLexer,
+                     'fortran': FortranLexer,
+                     'matlab': MatlabLexer,
+                     'xml': XmlLexer}
+        lines = highlight(lines, lexer_map[language](),
+                          Terminal256Formatter())
+    except ImportError:
+        pass
+    if number_lines:
+        lines = '\n'.join(add_line_numbers(lines.splitlines()))
+    lines = 'file: %s\n%s\n%s' % (fname, (len(fname) + 6) * '=', lines)
+    if return_lines:
+        return lines
+    print(lines)
+
+
+def display_source_diff(fname1, fname2, number_lines=False,
+                        return_lines=False):
+    r"""Display a diff between two source code files with syntax highlighting
+    (if available).
+
+    Args:
+        fname1 (str): Name of first source file.
+        fname2 (src): Name of second source file.
+        number_lines (bool, optional): If True, line numbers will be added
+            to the displayed examples. Defaults to False.
+        return_lines (bool, optional): If True, the lines are returned rather
+            than displayed. Defaults to False.
+
+    """
+    src1 = display_source(fname1, return_lines=True)
+    src2 = display_source(fname2, return_lines=True)
+    diff = difflib.ndiff(src1.splitlines(), src2.splitlines())
+    if number_lines:
+        diff = add_line_numbers(diff, for_diff=True)
+    lines = 'file1: %s\nfile2: %s\n%s' % (fname1, fname2, '\n'.join(diff))
+    if return_lines:
+        return lines
+    print(lines)
+    
 
 def get_fds():  # pragma: debug
     r"""Get a list of open file descriptors."""

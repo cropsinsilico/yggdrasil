@@ -3,6 +3,7 @@ import copy
 import unittest
 import pprint
 import shutil
+import logging
 from yggdrasil import platform
 from yggdrasil.tests import assert_raises, scripts, check_enabled_languages
 from yggdrasil.drivers.ModelDriver import ModelDriver, remove_product
@@ -49,7 +50,7 @@ class TestModelParam(parent.TestParam):
                            'with_strace', 'strace_flags',
                            'with_valgrind', 'valgrind_flags',
                            'model_index', 'model_file', 'model_args',
-                           'products', 'overwrite']
+                           'products', 'overwrite', 'numeric_logging_level']
         self.src = None
         if self.import_cls.language is not None:
             self.src = scripts[self.import_cls.language.lower()]
@@ -128,7 +129,11 @@ class TestModelDriverNoInit(TestModelParam, parent.TestDriverNoInit):
         r"""Create a driver for a model and run it."""
         inst_kwargs = copy.deepcopy(self.inst_kwargs)
         inst_kwargs.update(kwargs)
+        logger = logging.getLogger("yggdrasil")
+        if logger.getEffectiveLevel() >= 20:
+            inst_kwargs.setdefault('logging_level', 'INFO')
         drv = self.create_instance(kwargs=inst_kwargs)
+        getattr(drv, 'numeric_logging_level')
         drv.start()
         drv.wait(False)
         assert(not drv.errors)
@@ -190,9 +195,6 @@ class TestModelDriverNoInit(TestModelParam, parent.TestDriverNoInit):
         else:
             kwargs['args'] = ['invalid']
             self.assert_raises(ValueError, self.import_cls, **kwargs)
-            kwargs['args'] = [__file__]
-            kwargs['is_server'] = True
-            self.assert_raises(NotImplementedError, self.import_cls, **kwargs)
                                
     def test_get_native_type(self):
         r"""Test translation to native type."""

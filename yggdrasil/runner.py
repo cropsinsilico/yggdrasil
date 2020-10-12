@@ -9,7 +9,7 @@ from pprint import pformat
 from itertools import chain
 import socket
 from yggdrasil.tools import YggClass
-from yggdrasil.config import ygg_cfg, cfg_environment
+from yggdrasil.config import ygg_cfg, cfg_environment, temp_config
 from yggdrasil import platform, yamlfile
 from yggdrasil.drivers import create_driver
 
@@ -190,7 +190,7 @@ class YggRunner(YggClass):
     def __init__(self, modelYmls, namespace=None, host=None, rank=0,
                  ygg_debug_level=None, rmq_debug_level=None,
                  ygg_debug_prefix=None, connection_task_method='thread',
-                 as_function=False):
+                 as_function=False, production_run=False):
         super(YggRunner, self).__init__('runner')
         if namespace is None:
             namespace = ygg_cfg.get('rmq', 'namespace', False)
@@ -208,6 +208,7 @@ class YggRunner(YggClass):
         self._inputchannels = {}
         self._outputchannels = {}
         self._old_handlers = {}
+        self.production_run = production_run
         self.error_flag = False
         self.as_function = as_function
         self.debug("Running in %s with path %s namespace %s rank %d",
@@ -305,31 +306,32 @@ class YggRunner(YggClass):
             dict: Intermediate times from the run.
 
         """
-        if timer is None:
-            timer = time.time
-        if t0 is None:
-            t0 = timer()
-        times = {}
-        times['init'] = timer()
-        self.loadDrivers()
-        times['load drivers'] = timer()
-        self.startDrivers()
-        times['start drivers'] = timer()
-        self.set_signal_handler(signal_handler)
-        if not self.as_function:
-            self.waitModels()
-            times['run models'] = timer()
-            self.atexit()
-            times['at exit'] = timer()
-        tprev = t0
-        key_order = ['init', 'load drivers', 'start drivers', 'run models',
-                     'at exit']
-        for k in key_order:
-            if k in times:
-                self.info('%20s\t%f', k, times[k] - tprev)
-                tprev = times[k]
-        self.info(40 * '=')
-        self.info('%20s\t%f', "Total", tprev - t0)
+        with temp_config(production_run=self.production_run):
+            if timer is None:
+                timer = time.time
+            if t0 is None:
+                t0 = timer()
+            times = {}
+            times['init'] = timer()
+            self.loadDrivers()
+            times['load drivers'] = timer()
+            self.startDrivers()
+            times['start drivers'] = timer()
+            self.set_signal_handler(signal_handler)
+            if not self.as_function:
+                 self.waitModels()
+                 times['run models'] = timer()
+                 self.atexit()
+                 times['at exit'] = timer()
+            tprev = t0
+            key_order = ['init', 'load drivers', 'start drivers', 'run models',
+                         'at exit']
+            for k in key_order:
+                if k in times:
+                    self.info('%20s\t%f', k, times[k] - tprev)
+                    tprev = times[k]
+            self.info(40 * '=')
+            self.info('%20s\t%f', "Total", tprev - t0)
         return times
 
     @property

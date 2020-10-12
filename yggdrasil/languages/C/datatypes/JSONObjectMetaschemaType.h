@@ -501,6 +501,17 @@ public:
     return nargs;
   }
   /*!
+    @brief Skip arguments that make of this type.
+    @param[in, out] nargs Pointer to number of arguments in ap.
+    @param[in, out] ap va_list_t Variable argument list.
+   */
+  void skip_va_elements_core(size_t *nargs, va_list_t *ap) const override {
+    MetaschemaTypeMap::const_iterator it;
+    for (it = properties_.begin(); it != properties_.end(); it++) {
+      it->second->skip_va_elements_wrap(nargs, ap);
+    }
+  }
+  /*!
     @brief Convert a Python representation to a C representation.
     @param[in] pyobj PyObject* Pointer to Python object.
     @returns YggGeneric* Pointer to C object.

@@ -63,12 +63,12 @@ class ServerRequestDriver(ConnectionDriver):
     def last_header(self):
         r"""dict: Information contained in the header of the last message
         received from the client model."""
-        if self.icomm._last_header is None:
+        if self._last_header is None:
             raise AttributeError("No new requests have been received, so there "
                                  + "does not yet exist information required for "
                                  + "creating a response comm and fowarding the "
                                  + "request.")
-        return self.icomm._last_header
+        return self._last_header
 
     @property
     def request_id(self):
@@ -152,7 +152,7 @@ class ServerRequestDriver(ConnectionDriver):
 
         """
         with self.lock:
-            if msg == YGG_CLIENT_INI:
+            if isinstance(msg, bytes) and (msg == YGG_CLIENT_INI):
                 self.debug("New client signed on.")
                 self.nclients += 1
                 msg = self.icomm.empty_obj_recv

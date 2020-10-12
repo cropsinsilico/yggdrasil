@@ -97,6 +97,13 @@ function x_py = matlab2python(x_ml)
 	x_py.append(matlab2python(x_ml(i)));
       end
       x_py = py.numpy.array(x_py);
+    elseif isa(x_ml, 'string');
+      try
+	x_py = py.str(x_ml);
+      catch
+	x_py = py.unicode(x_ml);
+      end
+      x_py = x_py.encode('utf-8');
     elseif isa(x_ml, 'char');
       try
         x_py = py.str(x_ml);
@@ -150,22 +157,26 @@ function x_py = matlab2python(x_ml)
     end;
   elseif ismatrix(x_ml);
     if isa(x_ml, 'cell')
-      if isa(x_ml{1}, 'numeric')
-	cl0 = class(x_ml{1});
-	all_match = true;
-	for i = 2:numel(x_ml)
-	  if (~isa(x_ml, cl0))
-	    all_match = false;
-	    break;
+      if length(x_ml) > 0
+        if isa(x_ml{1}, 'numeric')
+  	  cl0 = class(x_ml{1});
+ 	  all_match = true;
+	  for i = 2:numel(x_ml)
+	    if (~isa(x_ml, cl0))
+	      all_match = false;
+	      break;
+	    end;
 	  end;
-	end;
+        else
+	  all_match = false;
+        end;
+        if all_match
+          x_py = matlab2python(cell2mat(x_ml))
+        else
+	  x_py = matlab2python(reduce_dim(x_ml));
+        end;
       else
-	all_match = false;
-      end;
-      if all_match
-        x_py = matlab2python(cell2mat(x_ml))
-      else
-	x_py = matlab2python(reduce_dim(x_ml));
+	x_py = py.list();
       end;
     elseif isa(x_ml, 'table')
       arr_dict = py.dict();

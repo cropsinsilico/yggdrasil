@@ -17,11 +17,10 @@ function timesync(t_step, t_units)
 
   % Initialize state and synchronize with other models
   t = t_start;
-  [ret, result] = timesync.call(t, state);
+  [ret, state] = timesync.call(t, state);
   if (~ret);
     error('timesync(Matlab): Initial sync failed.');
   end;
-  state = result{1};
   [t_data, t_unit] = separateUnits(t);
   fprintf('timesync(Matlab): t = %5.1f %-1s, x = %+ 5.2f, y = %+ 5.2f\n', ...
 	  t_data, symunit2str(t_unit), state('x'), state('y'));
@@ -44,11 +43,10 @@ function timesync(t_step, t_units)
     state('y') = cos(2.0 * pi * t / (5.0 * str2symunit('day')));
 
     % Synchronize the state
-    [ret, result] = timesync.call(t, state);
+    [ret, state] = timesync.call(t, state);
     if (~ret);
       error(sprintf('timesync(Matlab): sync for t=%f failed.\n', t));
     end;
-    state = result{1};
     [t_data, t_unit] = separateUnits(t);
     fprintf('timesync(Matlab): t = %5.1f %-1s, x = %+ 5.2f, y = %+ 5.2f\n', ...
   	    t_data, symunit2str(t_unit), state('x'), state('y'));

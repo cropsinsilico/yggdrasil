@@ -42,9 +42,11 @@ typedef struct comm_t {
   void *reply; //!< Reply information.
   int is_file; //!< Flag specifying if the comm connects directly to a file.
   int is_work_comm; //!< Flag specifying if comm is a temporary work comm.
+  int is_global; //!< Flag specifying if the comm is global.
 } comm_t;
 
 
+static inline
 void display_other(comm_t *x) {
   if (x->other != NULL) {
     comm_t* other = (comm_t*)(x->other);
@@ -60,6 +62,7 @@ void display_other(comm_t *x) {
 */
 static inline
 int free_comm_base(comm_t *x) {
+  ygglog_debug("free_comm_base: Started");
   if (x == NULL)
     return 0;
   if (x->last_send != NULL) {
@@ -85,6 +88,7 @@ int free_comm_base(comm_t *x) {
   x->valid = 0;
   x->name[0] = '\0';
   x->index_in_register = -1;
+  ygglog_debug("free_comm_base: Finished");
   return 0;
 };
 
@@ -115,6 +119,7 @@ comm_t empty_comm_base() {
   ret.reply = NULL;
   ret.is_file = 0;
   ret.is_work_comm = 0;
+  ret.is_global = 0;
   return ret;
 };
 
