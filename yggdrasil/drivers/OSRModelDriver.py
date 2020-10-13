@@ -118,7 +118,9 @@ class OSRModelDriver(ExecutableModelDriver):
                 toolname = 'cl'
                 env['YGG_OSR_CXX'] = toolname
                 if toolname == 'cl':
-                    msvc_bin = os.path.dirname(shutil.which(toolname))
+                    print('cl.exe', shutil.which(toolname),
+                          shutil.which(toolname + '.exe'))
+                    msvc_bin = os.path.dirname(shutil.which(toolname + '.exe'))
                     env['YGG_OSR_LINK'] = os.path.join(msvc_bin, 'link.exe')
                 cwd = os.path.join(cwd, 'StaticBuild_win64')
             else:
