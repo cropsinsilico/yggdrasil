@@ -117,15 +117,16 @@ class OSRModelDriver(ExecutableModelDriver):
             env = copy.deepcopy(os.environ)
             if platform._is_win:  # pragma: windows
                 toolname = 'cl'
-                env['YGG_OSR_CXX'] = toolname
+                env['YGG_OSR_TOOL'] = toolname
                 if toolname == 'cl':
                     cl_path = shutil.which(toolname + '.exe')
                     print('cl.exe', shutil.which(toolname), cl_path)
                     if cl_path:
                         msvc_bin = os.path.dirname(cl_path)
+                        env['YGG_OSR_CXX'] = cl_path
                         env['YGG_OSR_LINK'] = os.path.join(msvc_bin, 'link.exe')
                     else:  # pragma: debug
-                        env.pop('YGG_OSR_CXX')
+                        env.pop('YGG_OSR_TOOL')
                         warnings.warn(
                             "The MSVC compiler is not installed. Be aware "
                             "that the GNU compiler takes a *very* long time "
