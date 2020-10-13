@@ -1,0 +1,16 @@
+model:
+  name: client
+  language: c++
+  args: ./src/client.cpp
+  function: model_function
+  client_of: server
+  inputs:
+    name: in_buf
+    default_file:
+      name: ./Input/input.txt
+      filetype: ascii
+  outputs:
+    name: out_buf
+    default_file:
+      name: ./client_output.txt
+      in_temp: true

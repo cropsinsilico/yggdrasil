@@ -2175,7 +2175,7 @@ class CompiledModelDriver(ModelDriver):
 
         """
         out = super(CompiledModelDriver, self).write_wrappers(**kwargs)
-        kwargs.setdefault('logging_level', self.logger.getEffectiveLevel())
+        kwargs.setdefault('logging_level', self.numeric_logging_level)
         for k in self._schema_properties.keys():
             kwargs.setdefault(k, getattr(self, k, None))
         out += self.get_tool_instance('compiler').write_wrappers(**kwargs)
@@ -2981,9 +2981,12 @@ class CompiledModelDriver(ModelDriver):
             if dep_lib:
                 if (((not kwargs.get('dry_run', False))
                      and (not os.path.isfile(dep_lib)))):  # pragma: debug
-                    raise RuntimeError(
-                        ("Library for %s dependency does not "
-                         "exist: '%s'.") % (dep, dep_lib))
+                    if dep in internal_dependencies:
+                        cls.compile_dependencies(toolname=toolname)
+                    if not os.path.isfile(dep_lib):
+                        raise RuntimeError(
+                            ("Library for %s dependency does not "
+                             "exist: '%s'.") % (dep, dep_lib))
                 if use_library_path_internal and (dep in internal_dependencies):
                     if kwargs.get('skip_library_libs', False):
                         if isinstance(use_library_path_internal, bool):
@@ -3387,7 +3390,7 @@ class CompiledModelDriver(ModelDriver):
             compiler = self.get_tool_instance('compiler', toolname=toolname)
             out = self.set_env_compiler(
                 compiler=compiler, existing=out,
-                logging_level=self.logger.getEffectiveLevel(),
+                logging_level=self.numeric_logging_level,
                 **compile_kwargs)
         return out
         
@@ -3457,7 +3460,7 @@ class CompiledModelDriver(ModelDriver):
         if source_files is None:
             source_files = self.source_files
         if not skip_interface_flags:
-            kwargs['logging_level'] = self.logger.getEffectiveLevel()
+            kwargs['logging_level'] = self.numeric_logging_level
         default_kwargs = dict(out=self.model_file,
                               compiler_flags=self.compiler_flags,
                               for_model=True,

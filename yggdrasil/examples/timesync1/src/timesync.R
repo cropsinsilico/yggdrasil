@@ -22,11 +22,10 @@ main <- function(t_step, t_units) {
 
   # Initialize state and synchronize with other models
   t <- t_start
-  c(ret, result) %<-% timesync$call(t, state)
+  c(ret, state) %<-% timesync$call(t, state)
   if (!ret) {
     stop('timesync(R): Initial sync failed.')
   }
-  state <- result[[1]]
   fprintf('timesync(R): t = %5.1f %-1s, x = %+ 5.2f, y = %+ 5.2f\n',
           units::drop_units(t), units::deparse_unit(t),
 	  state[['x']], state[['y']])
@@ -47,11 +46,10 @@ main <- function(t_step, t_units) {
     state <- timestep_calc(t)
 
     # Synchronize the state
-    c(ret, result) %<-% timesync$call(t, state)
+    c(ret, state) %<-% timesync$call(t, state)
     if (!ret) {
       stop(sprintf('timesync(R): sync for t=%f failed.', t))
     }
-    state <- result[[1]]
     fprintf('timesync(R): t = %5.1f %-1s, x = %+ 5.2f, y = %+ 5.2f\n',
             units::drop_units(t), units::deparse_unit(t),
   	    state[['x']], state[['y']])

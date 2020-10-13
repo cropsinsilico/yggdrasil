@@ -101,12 +101,18 @@ class ModelDriver(Driver):
             that are source files. These files will be removed without checking
             their extension so users should avoid adding files to this list
             unless they are sure they should be deleted. Defaults to [].
-        is_server (bool, optional): If `True`, the model is assumed to be a
+        is_server (bool, dict, optional): If `True`, the model is assumed to be a
             server for one or more client models and an instance of
             :class:`yggdrasil.drivers.ServerDriver` is started. The
             corresponding channel that should be passed to the yggdrasil API
-            will be the name of the model. Defaults to False. Use of `is_server`
-            with `function` is not currently supported.
+            will be the name of the model. If is_server is a dictionary, it
+            should contain an 'input' key and an 'output' key. These are
+            required to be the names of existing input and output channels in
+            the model that will be co-opted by the server. (Note: This requires
+            that the co-opted output channel's send method is called once for
+            each time the co-opted input channel's recv method is called. If
+            used with the `function` parameter, `is_server` must be a dictionary.
+            Defaults to False.
         client_of (str, list, optional): The names of one or more models that
             this model will call as a server. If there are more than one, this
             should be specified as a sequence collection (list). The
@@ -148,6 +154,9 @@ class ModelDriver(Driver):
             return value will be a flag. If False, outputs are limited to
             return values. Defaults to the value of the class attribute
             outputs_in_inputs.
+        logging_level (str, optional): The level of logging messages that should
+            be displayed by the model. Defaults to the logging level as
+            determined by the configuration file and environment variables.
         **kwargs: Additional keyword arguments are passed to parent class.
 
     Class Attributes:
@@ -226,9 +235,10 @@ class ModelDriver(Driver):
         process (:class:`yggdrasil.tools.YggPopen`): Process used to run
             the model.
         function (str): The name of the model function that should be wrapped.
-        is_server (bool): If True, the model is assumed to be a server and an
-            instance of :class:`yggdrasil.drivers.ServerDriver` is
-            started.
+        is_server (bool, dict): If True, the model is assumed to be a server
+            and an instance of :class:`yggdrasil.drivers.ServerDriver` is
+            started. If a dict, the input/output channels with the specified
+            names in the dict will be replaced with a server.
         client_of (list): The names of server models that this model is a
             client of.
         timesync (str): If set, the name of the server performing
@@ -289,12 +299,45 @@ class ModelDriver(Driver):
         'overwrite': {'type': 'boolean', 'default': True},
         'preserve_cache': {'type': 'boolean', 'default': False},
         'function': {'type': 'string'},
-        'is_server': {'type': 'boolean', 'default': False},
+        'is_server': {'anyOf': [{'type': 'boolean'},
+                                {'type': 'object',
+                                 'properties': {'input': {'type': 'string'},
+                                                'output': {'type': 'string'}},
+                                 'additionalProperties': False}],
+                      'default': False},
         'client_of': {'type': 'array', 'items': {'type': 'string'},
                       'default': []},
-        'timesync': {'anyOf': [{'type': 'boolean'},
-                               {'type': 'string'}],
-                     'default': False},
+        'timesync': {
+            'anyOf': [
+                {'type': 'boolean'}, {'type': 'string'},
+                {'type': 'object',
+                 'properties': {
+                     'name': {'type': 'string', 'default': 'timesync'},
+                     'inputs': {'anyOf': [
+                         {'type': 'string'},
+                         {'type': 'array',
+                          'items': {'type': 'string'}}]},
+                     'outputs': {'anyOf': [
+                         {'type': 'string'},
+                         {'type': 'array',
+                          'items': {'type': 'string'}}]}}},
+                {'type': 'array',
+                 'items': {
+                     'anyOf': [
+                         {'type': 'string'},
+                         {'type': 'object',
+                          'properties': {
+                              'name': {'type': 'string',
+                                       'default': 'timesync'},
+                              'inputs': {'anyOf': [
+                                  {'type': 'string'},
+                                  {'type': 'array',
+                                   'items': {'type': 'string'}}]},
+                              'outputs': {'anyOf': [
+                                  {'type': 'string'},
+                                  {'type': 'array',
+                                   'items': {'type': 'string'}}]}}}]}}],
+            'default': False},
         'with_strace': {'type': 'boolean', 'default': False},
         'strace_flags': {'type': 'array',
                          'default': ['-e', 'trace=memory'],
@@ -304,7 +347,8 @@ class ModelDriver(Driver):
                            'default': ['--leak-check=full',
                                        '--show-leak-kinds=all'],  # '-v'
                            'items': {'type': 'string'}},
-        'outputs_in_inputs': {'type': 'boolean'}}
+        'outputs_in_inputs': {'type': 'boolean'},
+        'logging_level': {'type': 'string', 'default': ''}}
     _schema_excluded_from_class = ['name', 'language', 'args', 'working_dir']
     _schema_excluded_from_class_validation = ['inputs', 'outputs']
     
@@ -388,6 +432,8 @@ class ModelDriver(Driver):
         self.wrapper_products = []
         # Update for function
         if self.function:
+            if self.is_server:
+                assert(isinstance(self.is_server, dict))
             if self.function_param is None:
                 raise ValueError(("Language %s is not parameterized "
                                   "and so functions cannot be automatically "
@@ -396,11 +442,6 @@ class ModelDriver(Driver):
             if not os.path.isfile(self.model_function_file):
                 raise ValueError("Source file does not exist: '%s'"
                                  % self.model_function_file)
-            if self.is_server or self.client_of:
-                raise NotImplementedError("Use of is_server or client_of "
-                                          "parameters not currently supported "
-                                          "when using automated wrapping of "
-                                          "model functions.")
             model_dir, model_base = os.path.split(self.model_function_file)
             model_base = os.path.splitext(model_base)[0]
             self.model_function_info = self.parse_function_definition(
@@ -408,10 +449,14 @@ class ModelDriver(Driver):
             # Write file
             args[0] = os.path.join(model_dir, 'ygg_' + model_base
                                    + self.language_ext[0])
+            client_comms = ['%s:%s_%s' % (self.name, x, self.name)
+                            for x in self.client_of]
             lines = self.write_model_wrapper(
                 self.model_function_file, self.function,
-                inputs=self.inputs, outputs=self.outputs,
-                outputs_in_inputs=self.model_outputs_in_inputs)
+                inputs=copy.deepcopy(self.inputs),
+                outputs=copy.deepcopy(self.outputs),
+                outputs_in_inputs=self.model_outputs_in_inputs,
+                client_comms=client_comms)
             with open(args[0], 'w') as fd:
                 fd.write('\n'.join(lines))
         # Parse arguments
@@ -584,6 +629,14 @@ class ModelDriver(Driver):
         self.model_dir = os.path.dirname(self.model_file)
         self.debug("model_file = '%s', model_dir = '%s', model_args = '%s'",
                    self.model_file, self.model_dir, self.model_args)
+
+    @property
+    def numeric_logging_level(self):
+        r"""int: Logging level for the model."""
+        out = self.logger.getEffectiveLevel()
+        if self.logging_level:
+            out = logging.getLevelName(self.logging_level)
+        return out
 
     def write_wrappers(self, **kwargs):
         r"""Write any wrappers needed to compile and/or run a model.
@@ -1044,7 +1097,7 @@ class ModelDriver(Driver):
         before the libraries are configured.
 
         Args:
-            cfg (CisConfigParser): Config class that options should be set for.
+            cfg (YggConfigParser): Config class that options should be set for.
         
         Returns:
             list: Section, option, description tuples for options that could not
@@ -1058,7 +1111,7 @@ class ModelDriver(Driver):
         r"""Add configuration options for external libraries in this language.
 
         Args:
-            cfg (CisConfigParser): Config class that options should be set for.
+            cfg (YggConfigParser): Config class that options should be set for.
         
         Returns:
             list: Section, option, description tuples for options that could not
@@ -1110,6 +1163,11 @@ class ModelDriver(Driver):
         env['YGG_PYTHON_EXEC'] = sys.executable
         env['YGG_DEFAULT_COMM'] = tools.get_default_comm()
         env['YGG_NCLIENTS'] = str(len(self.clients))
+        if isinstance(self.is_server, dict):
+            env['YGG_SERVER_INPUT'] = self.is_server['input']
+            env['YGG_SERVER_OUTPUT'] = self.is_server['output']
+        if self.logging_level:
+            env['YGG_MODEL_DEBUG'] = self.logging_level
         return env
 
     def before_start(self, no_queue_thread=False, **kwargs):
@@ -1248,7 +1306,8 @@ class ModelDriver(Driver):
                 except BaseException:  # pragma: debug
                     self.exception("Error killing model process")
             assert(self.model_process_complete)
-            if self.model_process.returncode != 0:
+            if (((self.model_process is not None)
+                 and (self.model_process.returncode != 0))):
                 self.error("return code of %s indicates model error.",
                            str(self.model_process.returncode))
             self.event_process_kill_complete.set()
@@ -1702,7 +1761,8 @@ class ModelDriver(Driver):
     @classmethod
     def write_model_wrapper(cls, model_file, model_function,
                             inputs=[], outputs=[],
-                            outputs_in_inputs=None, verbose=False):
+                            outputs_in_inputs=None, verbose=False,
+                            client_comms=[]):
         r"""Return the lines required to wrap a model function as an integrated
         model.
 
@@ -1719,6 +1779,8 @@ class ModelDriver(Driver):
                 to the class attribute outputs_in_inputs.
             verbose (bool, optional): If True, the contents of the created file
                 are displayed. Defaults to False.
+            client_comms (list, optional): List of the names of client comms
+                that should be removed from the list of outputs. Defaults to [].
 
         Returns:
             list: Lines of code wrapping the provided model with the necessary
@@ -1734,6 +1796,28 @@ class ModelDriver(Driver):
         iter_var = {'name': 'first_iter', 'datatype': {'type': 'flag'}}
         if outputs_in_inputs is None:
             outputs_in_inputs = cls.outputs_in_inputs
+        # Replace server input w/ split input/output and remove client
+        # connections from inputs
+        for i, x in enumerate(inputs):
+            if x.get('server_replaces', False):
+                inputs[x['server_replaces']['input_index']] = (
+                    x['server_replaces']['input'])
+                outputs.insert(x['server_replaces']['output_index'],
+                               x['server_replaces']['output'])
+        outputs = [x for x in outputs if x['name'] not in client_comms]
+        if client_comms:
+            warnings.warn("When wrapping a model function, client comms "
+                          "must either be initialized outside the function, "
+                          "pass a 'global_scope' parameter to the "
+                          "comm initialization (e.g. Python, R, Matlab), "
+                          "or use a 'WITH_GLOBAL_SCOPE' macro "
+                          "(e.g. C, C++, Fortran) around the initialization "
+                          "so that they are persistent "
+                          "across calls and the call or recv/send methods "
+                          "must be called explicitly (as opposed to the "
+                          "function inputs/outputs which will be handled "
+                          "by the wrapper). This model's client comms are:\n"
+                          "\t%s" % client_comms)
         # Update types based on the function definition for typed languages
         model_flag = cls.update_io_from_function(
             model_file, model_function,
@@ -1786,8 +1870,10 @@ class ModelDriver(Driver):
         # Loop
         loop_lines = []
         # Receive inputs
+        any_loop_inputs = False
         for x in inputs:
             if not x.get('outside_loop', False):
+                any_loop_inputs = True
                 loop_lines += cls.write_model_recv(x['channel'], x,
                                                    flag_var=flag_var,
                                                    iter_var=iter_var,
@@ -1805,8 +1891,8 @@ class ModelDriver(Driver):
             'assign', name=iter_var['name'],
             value=cls.function_param.get('false_flag',
                                          cls.function_param['false'])))
-        # Add break if there are not any inputs
-        if not inputs:
+        # Add break if there are not any inputs inside the loop
+        if not any_loop_inputs:
             loop_lines.append(cls.format_function_param(
                 'assign', name=flag_var['name'],
                 value=cls.function_param.get(
@@ -2322,8 +2408,8 @@ checking if the model flag indicates
         lines += cls.write_if_block(flag_cond, if_block)
         # Check if single element should be expanded
         if expanded_recv_var:
-            lines.append(cls.format_function_param(
-                'print_generic', object=recv_var_str))
+            # lines.append(cls.format_function_param(
+            #     'print_generic', object=recv_var_str))
             if 'expand_mult' in cls.function_param:  # pragma: matlab
                 lines.append(cls.format_function_param(
                     'expand_mult', name=expanded_recv_var, value=recv_var_str))

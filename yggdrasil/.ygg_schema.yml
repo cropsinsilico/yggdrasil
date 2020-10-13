@@ -125,9 +125,9 @@ definitions:
             type: string
           type: array
       required:
+      - datatype
       - commtype
       - name
-      - datatype
       title: comm_base
       type: object
     - anyOf:
@@ -224,6 +224,8 @@ definitions:
           description: '[DEPRECATED] Name of driver class that should be used.'
           type: string
         inputs:
+          default:
+          - {}
           description: One or more name(s) of model output channel(s) and/or new channel/file
             objects that the connection should receive messages from. A full description
             of file entries and the available options can be found :ref:`here<yaml_file_options>`.
@@ -239,6 +241,8 @@ definitions:
             to None.
           type: string
         outputs:
+          default:
+          - {}
           description: One or more name(s) of model input channel(s) and/or new channel/file
             objects that the connection should send messages to. A full description
             of file entries and the available options can be found :ref:`here<yaml_file_options>`.
@@ -249,9 +253,9 @@ definitions:
           minItems: 1
           type: array
         translator:
-          description: Function or string specifying a function that should be used
-            to translate messages from the input communicator(s) before passing them
-            to the output communicator(s). If a string, the format should be "<package.module>:<function>"
+          description: Function or string specifying function that should be used
+            to translate messages from the input communicator before passing them
+            to the output communicator. If a string, the format should be "<package.module>:<function>"
             so that <function> can be imported from <package>. Defaults to None and
             messages are passed directly. This can also be a list of functions/strings
             that will be called on the messages in the order they are provided.
@@ -261,8 +265,8 @@ definitions:
             - $ref: '#/definitions/transform'
           type: array
       required:
-      - outputs
       - inputs
+      - outputs
       title: connection_base
       type: object
     - anyOf:
@@ -582,8 +586,8 @@ definitions:
           type: string
       required:
       - filetype
-      - working_dir
       - name
+      - working_dir
       title: file_base
       type: object
     - anyOf:
@@ -1191,6 +1195,13 @@ definitions:
           description: Build type/configuration that should be built. Defaults to
             'Release'.
           type: string
+        copy_xml_to_osr:
+          default: false
+          description: If True, the XML file(s) will be copied to the OSR repository
+            InputFiles direcitory before running. This is necessary if the XML file(s)
+            use any of the files located there since OSR always assumes the included
+            file paths are relative. Defaults to False.
+          type: boolean
         driver:
           description: '[DEPRECATED] Name of driver class that should be used.'
           type: string
@@ -1282,13 +1293,26 @@ definitions:
             type: string
           type: array
         is_server:
+          anyOf:
+          - type: boolean
+          - additionalProperties: false
+            properties:
+              input:
+                type: string
+              output:
+                type: string
+            type: object
           default: false
-          description: If `True`, the model is assumed to be a server for one or more
-            client models and an instance of :class:`yggdrasil.drivers.ServerDriver`
+          description: 'If `True`, the model is assumed to be a server for one or
+            more client models and an instance of :class:`yggdrasil.drivers.ServerDriver`
             is started. The corresponding channel that should be passed to the yggdrasil
-            API will be the name of the model. Defaults to False. Use of `is_server`
-            with `function` is not currently supported.
-          type: boolean
+            API will be the name of the model. If is_server is a dictionary, it should
+            contain an ''input'' key and an ''output'' key. These are required to
+            be the names of existing input and output channels in the model that will
+            be co-opted by the server. (Note: This requires that the co-opted output
+            channel''s send method is called once for each time the co-opted input
+            channel''s recv method is called. If used with the `function` parameter,
+            `is_server` must be a dictionary. Defaults to False.'
         language:
           default: executable
           description: The programming language that the model is written in. A list
@@ -1301,9 +1325,11 @@ definitions:
           - cpp
           - executable
           - fortran
+          - function
           - lpy
           - make
           - matlab
+          - osr
           - python
           - r
           - sbml
@@ -1324,6 +1350,12 @@ definitions:
           items:
             type: string
           type: array
+        logging_level:
+          default: ''
+          description: The level of logging messages that should be displayed by the
+            model. Defaults to the logging level as determined by the configuration
+            file and environment variables.
+          type: string
         makedir:
           description: Directory where make should be invoked from if it is not the
             same as the directory containing the makefile. Defaults to directory containing
@@ -1454,6 +1486,20 @@ definitions:
           items:
             type: string
           type: array
+        sync_vars_in:
+          default: []
+          description: Variables that should be synchronized from other models. Defaults
+            to [].
+          items:
+            type: string
+          type: array
+        sync_vars_out:
+          default: []
+          description: Variables that should be synchronized to other models. Defaults
+            to [].
+          items:
+            type: string
+          type: array
         synonyms:
           additionalProperties:
             additionalProperties:
@@ -1500,6 +1546,44 @@ definitions:
           anyOf:
           - type: boolean
           - type: string
+          - properties:
+              inputs:
+                anyOf:
+                - type: string
+                - items:
+                    type: string
+                  type: array
+              name:
+                default: timesync
+                type: string
+              outputs:
+                anyOf:
+                - type: string
+                - items:
+                    type: string
+                  type: array
+            type: object
+          - items:
+              anyOf:
+              - type: string
+              - properties:
+                  inputs:
+                    anyOf:
+                    - type: string
+                    - items:
+                        type: string
+                      type: array
+                  name:
+                    default: timesync
+                    type: string
+                  outputs:
+                    anyOf:
+                    - type: string
+                    - items:
+                        type: string
+                      type: array
+                type: object
+            type: array
           default: false
           description: If set, the model is assumed to call a send then receive of
             the state at each timestep for syncronization with other models that are
@@ -1507,6 +1591,16 @@ definitions:
             the name of the server that will handle timestep synchronization. If a
             boolean is provided, the name of the server will be assumed to be 'timestep'.
             Defaults to False.
+        update_interval:
+          additionalProperties:
+            type: float
+          default:
+            timesync: 1.0
+          description: Max simulation interval at which synchronization should occur
+            (in days). Defaults to 1.0 if not provided. If the XML input file loads
+            additional export modules that output at a shorter rate, the existing
+            table of values will be extrapolated.
+          type: object
         use_symunit:
           default: false
           description: If True, input/output variables with units will be represented
@@ -1535,12 +1629,45 @@ definitions:
           type: string
       required:
       - args
-      - working_dir
       - name
       - language
+      - working_dir
       title: model_base
       type: object
     - anyOf:
+      - additionalProperties: true
+        description: Schema for model component ['function'] subtype.
+        properties:
+          interpreter:
+            description: Name or path of interpreter executable that should be used
+              to run the model. If not provided, the interpreter will be determined
+              based on configuration options for the language (if present) and the
+              default_interpreter class attribute.
+            type: string
+          interpreter_flags:
+            default: []
+            description: Flags that should be passed to the interpreter when running
+              the model. If not provided, the flags are determined based on configuration
+              options for the language (if present) and the default_interpreter_flags
+              class attribute.
+            items:
+              type: string
+            type: array
+          language:
+            default: executable
+            description: The programming language that the model is written in. A
+              list of available languages can be found :ref:`here <schema_table_model_subtype_rst>`.
+            enum:
+            - function
+            type: string
+          skip_interpreter:
+            default: false
+            description: If True, no interpreter will be added to the arguments. This
+              should only be used for subclasses that will not be invoking the model
+              via the command line. Defaults to False.
+            type: boolean
+        title: FunctionModelDriver
+        type: object
       - additionalProperties: true
         description: Schema for model component ['make'] subtype.
         properties:
@@ -1699,41 +1826,15 @@ definitions:
         title: LPyModelDriver
         type: object
       - additionalProperties: true
-        description: Schema for model component ['matlab'] subtype.
+        description: Schema for model component ['executable'] subtype.
         properties:
-          interpreter:
-            description: Name or path of interpreter executable that should be used
-              to run the model. If not provided, the interpreter will be determined
-              based on configuration options for the language (if present) and the
-              default_interpreter class attribute.
-            type: string
-          interpreter_flags:
-            default: []
-            description: Flags that should be passed to the interpreter when running
-              the model. If not provided, the flags are determined based on configuration
-              options for the language (if present) and the default_interpreter_flags
-              class attribute.
-            items:
-              type: string
-            type: array
           language:
             default: executable
-            description: Model is written in Matlab.
+            description: Model is an executable.
             enum:
-            - matlab
+            - executable
             type: string
-          skip_interpreter:
-            default: false
-            description: If True, no interpreter will be added to the arguments. This
-              should only be used for subclasses that will not be invoking the model
-              via the command line. Defaults to False.
-            type: boolean
-          use_symunit:
-            default: false
-            description: If True, input/output variables with units will be represented
-              in Matlab using symunit. Defaults to False.
-            type: boolean
-        title: MatlabModelDriver
+        title: ExecutableModelDriver
         type: object
       - additionalProperties: true
         description: Schema for model component ['c'] subtype.
@@ -1833,6 +1934,85 @@ definitions:
               type: string
             type: array
         title: CPPModelDriver
+        type: object
+      - additionalProperties: true
+        description: Schema for model component ['osr'] subtype.
+        properties:
+          copy_xml_to_osr:
+            default: false
+            description: If True, the XML file(s) will be copied to the OSR repository
+              InputFiles direcitory before running. This is necessary if the XML file(s)
+              use any of the files located there since OSR always assumes the included
+              file paths are relative. Defaults to False.
+            type: boolean
+          language:
+            default: executable
+            description: Model is an OSR model.
+            enum:
+            - osr
+            type: string
+          sync_vars_in:
+            default: []
+            description: Variables that should be synchronized from other models.
+              Defaults to [].
+            items:
+              type: string
+            type: array
+          sync_vars_out:
+            default: []
+            description: Variables that should be synchronized to other models. Defaults
+              to [].
+            items:
+              type: string
+            type: array
+          update_interval:
+            additionalProperties:
+              type: float
+            default:
+              timesync: 1.0
+            description: Max simulation interval at which synchronization should occur
+              (in days). Defaults to 1.0 if not provided. If the XML input file loads
+              additional export modules that output at a shorter rate, the existing
+              table of values will be extrapolated.
+            type: object
+        title: OSRModelDriver
+        type: object
+      - additionalProperties: true
+        description: Schema for model component ['matlab'] subtype.
+        properties:
+          interpreter:
+            description: Name or path of interpreter executable that should be used
+              to run the model. If not provided, the interpreter will be determined
+              based on configuration options for the language (if present) and the
+              default_interpreter class attribute.
+            type: string
+          interpreter_flags:
+            default: []
+            description: Flags that should be passed to the interpreter when running
+              the model. If not provided, the flags are determined based on configuration
+              options for the language (if present) and the default_interpreter_flags
+              class attribute.
+            items:
+              type: string
+            type: array
+          language:
+            default: executable
+            description: Model is written in Matlab.
+            enum:
+            - matlab
+            type: string
+          skip_interpreter:
+            default: false
+            description: If True, no interpreter will be added to the arguments. This
+              should only be used for subclasses that will not be invoking the model
+              via the command line. Defaults to False.
+            type: boolean
+          use_symunit:
+            default: false
+            description: If True, input/output variables with units will be represented
+              in Matlab using symunit. Defaults to False.
+            type: boolean
+        title: MatlabModelDriver
         type: object
       - additionalProperties: true
         description: Schema for model component ['R', 'r'] subtype.
@@ -2176,17 +2356,6 @@ definitions:
             - f2008
             type: string
         title: FortranModelDriver
-        type: object
-      - additionalProperties: true
-        description: Schema for model component ['executable'] subtype.
-        properties:
-          language:
-            default: executable
-            description: Model is an executable.
-            enum:
-            - executable
-            type: string
-        title: ExecutableModelDriver
         type: object
     description: Schema for model components.
     title: model

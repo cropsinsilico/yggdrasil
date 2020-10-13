@@ -26,7 +26,8 @@ R2python <- function(robj, not_bytes=FALSE) {
   } else if (is(robj, "units")) {
     x <- units(robj)
     ygg_units <- reticulate::import('yggdrasil.units', convert=FALSE)
-    pyunits <- ygg_units$convert_R_unit_string(R2python(units::deparse_unit(robj), not_bytes=TRUE))
+    pyunits <- R2python(units::deparse_unit(robj), not_bytes=TRUE)
+    # pyunits <- ygg_units$convert_R_unit_string(R2python(units::deparse_unit(robj), not_bytes=TRUE))
     pydata <- R2python(units::drop_units(robj))
     out <- ygg_units$add_units(pydata, pyunits)
   } else if (is(robj, "integer64")) {
@@ -76,6 +77,8 @@ R2python <- function(robj, not_bytes=FALSE) {
         call_python_method(out, '__setitem__', name, new_col)
       }
     }
+  } else if (is.null(robj)) {
+    out <- reticulate::r_to_py(NULL)
   } else if (is.na(robj)) {
     out <- reticulate::r_to_py(NULL)
   } else {

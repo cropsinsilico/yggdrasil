@@ -313,10 +313,12 @@ class ForkComm(CommBase.CommBase):
                 message.
 
         """
+        return_header = kwargs.pop('return_header', False)
         timeout = kwargs.pop('timeout', None)
         if timeout is None:
             timeout = self.recv_timeout
         kwargs['timeout'] = 0
+        kwargs['return_header'] = True
         first_comm = True
         T = self.start_timeout(timeout, key_suffix='recv:forkd')
         out = None
@@ -326,14 +328,14 @@ class ForkComm(CommBase.CommBase):
                     break
                 x = self.curr_comm
                 if x.is_open:
-                    flag, msg = x.recv(*args, **kwargs)
+                    flag, msg, header = x.recv(*args, **kwargs)
                     if x.is_eof(msg):
                         self.eof_recv[self.curr_comm_index % len(self)] = 1
                         if sum(self.eof_recv) == len(self):
-                            out = (flag, msg)
+                            out = (flag, msg, header)
                         self.on_recv(x)
                     elif (not x.is_empty_recv(msg)):
-                        out = (flag, msg)
+                        out = (flag, msg, header)
                         self.on_recv(x)
                 self.curr_comm_index += 1
             first_comm = False
@@ -343,9 +345,11 @@ class ForkComm(CommBase.CommBase):
         if out is None:
             if self.is_closed:
                 self.debug('Comm closed')
-                out = (False, None)
+                out = (False, None, None)
             else:
-                out = (True, self.last_comm.empty_obj_recv)
+                out = (True, self.last_comm.empty_obj_recv, None)
+        if not return_header:
+            out = (out[0], out[1])
         return out
 
     def on_recv(self, x):

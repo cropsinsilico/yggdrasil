@@ -56,6 +56,28 @@ def test_str2bytes():
         assert_equal(tools.str2bytes(x, recurse=True), exp)
 
 
+def test_display_source():
+    r"""Test display_source."""
+    fname = os.path.abspath(__file__)
+    tools.display_source([fname], number_lines=True)
+    tools.display_source([fname], return_lines=True)
+
+
+def test_display_source_diff():
+    r"""Test display_source_diff."""
+    fname1 = os.path.abspath(__file__)
+    fname2 = os.path.join(tempfile.gettempdir(), os.path.basename(fname1))
+    with open(fname1, 'r') as fd:
+        lines = fd.read()
+    with open(fname2, 'w') as fd:
+        fd.write(lines[:int(len(lines) / 2)] + 'additional')
+    try:
+        tools.display_source_diff(fname1, fname2, number_lines=True)
+        tools.display_source_diff(fname1, fname2, return_lines=True)
+    finally:
+        os.remove(fname2)
+
+
 def test_get_conda_prefix():
     r"""Test get_conda_prefix."""
     tools.get_conda_prefix()

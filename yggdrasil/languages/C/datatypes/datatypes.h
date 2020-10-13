@@ -8,6 +8,7 @@
 #include "ObjDict.h"
 
 #define MSG_HEAD_SEP "YGG_MSG_HEAD"
+/*! @brief Size of COMM buffer. */
 #define COMMBUFFSIZ 2000
 #define FMT_LEN 100
 
@@ -940,6 +941,16 @@ void display_python(python_t x);
   @param[in] x python_function_t* Pointer to Python function structure that should be freed.
 */
 void destroy_python_function(python_function_t *x);
+
+
+/*!
+  @brief Skip datatype arguments.
+  @param[in] dtype dtype_t* Type structure to skip arguments for.
+  @param[in, out] nargs Pointer to number of arguments in ap.
+  @param[in, out] ap va_list_t Variable argument list.
+  @returns int 0 if there are no errors, 1 otherwise.
+ */
+int skip_va_elements(const dtype_t* dtype, size_t *nargs, va_list_t *ap);
 
 
 /*!

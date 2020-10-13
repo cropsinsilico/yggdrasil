@@ -180,7 +180,7 @@ public:
     UNUSED(nargs);
     UNUSED(ap);
 #endif
-    ygglog_error("AsciiTableMetaschemaType::encode_data: AsciiTable type cannot be JSON encoded.");
+    ygglog_error("AsciiTableMetaschemaType::encode_data: AsciiTable data cannot be JSON encoded.");
     return false;
   }
   /*!

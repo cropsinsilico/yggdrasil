@@ -8,6 +8,32 @@ import git
 import io as sio
 from yggdrasil.schema import standardize, get_schema
 from urllib.parse import urlparse
+from yaml.constructor import (
+    ConstructorError, BaseConstructor, Constructor, SafeConstructor)
+
+
+class YAMLSpecificationError(RuntimeError):
+    r"""Error raised when the yaml specification does not meet expectations."""
+    pass
+
+
+def no_duplicates_constructor(loader, node, deep=False):
+    # https://gist.github.com/pypt/94d747fe5180851196eb
+    """Check for duplicate keys."""
+    mapping = {}
+    for key_node, value_node in node.value:
+        key = loader.construct_object(key_node, deep=deep)
+        value = loader.construct_object(value_node, deep=deep)
+        if key in mapping:
+            raise ConstructorError("while constructing a mapping", node.start_mark,
+                                   "found duplicate key (%s)" % key, key_node.start_mark)
+        mapping[key] = value
+    return loader.construct_mapping(node, deep)
+
+
+for cls in (BaseConstructor, Constructor, SafeConstructor):
+    cls.add_constructor(yaml.resolver.BaseResolver.DEFAULT_MAPPING_TAG,
+                        no_duplicates_constructor)
 
 
 def load_yaml(fname):
@@ -81,7 +107,7 @@ def load_yaml(fname):
     else:
         yamlparsed = yaml.safe_load(yamlparsed)
     if not isinstance(yamlparsed, dict):  # pragma: debug
-        raise ValueError("Loaded yaml is not a dictionary.")
+        raise YAMLSpecificationError("Loaded yaml is not a dictionary.")
     yamlparsed['working_dir'] = os.path.dirname(fname)
     if opened:
         fd.close()
@@ -133,12 +159,14 @@ def prep_yaml(files):
     return yml_all
 
 
-def parse_yaml(files):
+def parse_yaml(files, as_function=False):
     r"""Parse list of yaml files.
 
     Args:
         files (str, list): Either the path to a single yaml file or a list of
             yaml files.
+        as_function (bool, optional): If True, the missing input/output channels
+            will be created for using model(s) as a function. Defaults to False.
 
     Raises:
         ValueError: If the yml dictionary is missing a required keyword or has
@@ -158,6 +186,35 @@ def parse_yaml(files):
     yml_norm = s.validate(yml_prep, normalize=True)
     # print('normalized')
     # pprint.pprint(yml_norm)
+    # Determine if any of the models require synchronization
+    timesync_names = []
+    for yml in yml_norm['models']:
+        if yml.get('timesync', False):
+            if yml['timesync'] is True:
+                yml['timesync'] = 'timesync'
+            if not isinstance(yml['timesync'], list):
+                yml['timesync'] = [yml['timesync']]
+            for i, tsync in enumerate(yml['timesync']):
+                if isinstance(tsync, str):
+                    tsync = {'name': tsync}
+                    yml['timesync'][i] = tsync
+            timesync_names.append(tsync['name'])
+            yml.setdefault('timesync_client_of', [])
+            yml['timesync_client_of'].append(tsync['name'])
+    for tsync in set(timesync_names):
+        for m in yml_norm['models']:
+            if m['name'] == tsync:
+                assert(m['language'] == 'timesync')
+                m.update(is_server=True, inputs=[], outputs=[])
+                break
+        else:
+            yml_norm['models'].append({'name': tsync,
+                                       'args': [],
+                                       'language': 'timesync',
+                                       'is_server': True,
+                                       'working_dir': os.getcwd(),
+                                       'inputs': [],
+                                       'outputs': []})
     # Parse models, then connections to ensure connections can be processed
     existing = None
     for k in ['models', 'connections']:
@@ -172,6 +229,27 @@ def parse_yaml(files):
         existing = parse_component(yml, 'connection', existing=existing)
         existing['model'][yml['dst_models'][0]]['clients'] = yml['src_models']
     existing.pop('server')
+    if as_function:
+        existing = add_model_function(existing)
+    # Make sure that servers have clients and clients have servers
+    for k, v in existing['model'].items():
+        if v.get('is_server', False):
+            for x in existing['model'].values():
+                if v['name'] in x.get('client_of', []):
+                    break
+            else:
+                raise YAMLSpecificationError(
+                    "Server '%s' does not have any clients.", k)
+        elif v.get('client_of', False):
+            for s in v['client_of']:
+                missing_servers = []
+                if s not in existing['model']:
+                    missing_servers.append(s)
+                if missing_servers:
+                    print(list(existing['model'].keys()))
+                    raise YAMLSpecificationError(
+                        "Servers %s do not exist, but '%s' is a client of them."
+                        % (missing_servers, v['name']))
     # Make sure that I/O channels initialized
     opp_map = {'input': 'output', 'output': 'input'}
     for io in ['input', 'output']:
@@ -187,8 +265,8 @@ def parse_yaml(files):
                     existing = parse_component(new_conn, 'connection',
                                                existing=existing)
                 else:
-                    raise RuntimeError("No driver established for %s channel %s" % (
-                        io, k))
+                    raise YAMLSpecificationError(
+                        "No driver established for %s channel %s" % (io, k))
         # Remove unused default channels
         for k in remove:
             for m in existing[io][k]['model_driver']:
@@ -201,6 +279,50 @@ def parse_yaml(files):
     existing = link_model_io(existing)
     # print('drivers')
     # pprint.pprint(existing)
+    return existing
+
+
+def add_model_function(existing):
+    r"""Patch input/output channels that are not connected to a function model.
+
+    Args:
+        existing (dict): Dictionary of existing components.
+
+    Returns:
+        dict: Updated dictionary of components.
+
+    """
+    new_model = {'name': 'function_model',
+                 'language': 'function',
+                 'args': 'function',
+                 'working_dir': os.getcwd(),
+                 'inputs': [],
+                 'outputs': []}
+    new_connections = []
+    # Locate unmatched channels
+    miss = {}
+    dir2opp = {'input': 'output', 'output': 'input'}
+    for io in dir2opp.keys():
+        miss[io] = [k for k in existing[io].keys()]
+    for conn in existing['connection'].values():
+        for io1, io2 in dir2opp.items():
+            if ((io1 + 's') in conn):
+                for x in conn[io1 + 's']:
+                    if x in miss[io2]:
+                        miss[io2].remove(x)
+    # Create connections to function model
+    for io1, io2 in dir2opp.items():
+        for i in miss[io1]:
+            function_channel = 'function_%s' % i
+            function_comm = copy.deepcopy(existing[io1][i])
+            function_comm['name'] = function_channel
+            new_model[io2 + 's'].append(function_comm)
+            new_connections.append({io1 + 's': [{'name': function_channel}],
+                                    io2 + 's': [{'name': i}]})
+    # Parse new components
+    existing = parse_component(new_model, 'model', existing=existing)
+    for new_conn in new_connections:
+        existing = parse_component(new_conn, 'connection', existing=existing)
     return existing
 
 
@@ -227,32 +349,32 @@ def parse_component(yml, ctype, existing=None):
     """
     s = get_schema()
     if not isinstance(yml, dict):
-        raise TypeError("Component entry in yml must be a dictionary.")
+        raise YAMLSpecificationError("Component entry in yml must be a dictionary.")
     ctype_list = ['input', 'output', 'model', 'connection', 'server']
     if existing is None:
         existing = {k: {} for k in ctype_list}
     if ctype not in ctype_list:
-        raise ValueError("'%s' is not a recognized component.")
+        raise YAMLSpecificationError("'%s' is not a recognized component.")
     # Parse based on type
     if ctype == 'model':
         existing = parse_model(yml, existing)
     elif ctype == 'connection':
         existing = parse_connection(yml, existing)
     elif ctype in ['input', 'output']:
-        for k in ['icomm_kws', 'ocomm_kws']:
+        for k in ['inputs', 'outputs']:
             if k not in yml:
                 continue
-            for x in yml[k]['comm']:
-                if 'comm' not in x:
+            for x in yml[k]:
+                if 'commtype' not in x:
                     if 'filetype' in x:
-                        x['comm'] = s['file'].subtype2class[x['filetype']]
+                        x['commtype'] = s['file'].subtype2class[x['filetype']]
                     elif 'commtype' in x:
-                        x['comm'] = s['comm'].subtype2class[x['commtype']]
+                        x['commtype'] = s['comm'].subtype2class[x['commtype']]
     # Ensure component dosn't already exist
     if yml['name'] in existing[ctype]:
         pprint.pprint(existing)
         pprint.pprint(yml)
-        raise ValueError("%s is already a registered '%s' component." % (
+        raise YAMLSpecificationError("%s is already a registered '%s' component." % (
             yml['name'], ctype))
     existing[ctype][yml['name']] = yml
     return existing
@@ -293,10 +415,47 @@ def parse_model(yml, existing):
     # Add server input
     if yml.get('is_server', False):
         srv = {'name': '%s:%s' % (yml['name'], yml['name']),
-               'working_dir': yml['working_dir'],
-               'is_timesync': (language == 'timesync')}
+               'commtype': 'default',
+               'datatype': {'type': 'bytes'},
+               'driver': 'ServerDriver',
+               'args': yml['name'] + '_SERVER',
+               'working_dir': yml['working_dir']}
+        if yml.get('function', False) and isinstance(yml['is_server'], bool):
+            if (len(yml['inputs']) == 1) and (len(yml['outputs']) == 1):
+                yml['is_server'] = {'input': yml['inputs'][0]['name'],
+                                    'output': yml['outputs'][0]['name']}
+            else:
+                raise YAMLSpecificationError(
+                    "The 'is_server' parameter is boolean for the model '%s' "
+                    "and the 'function' parameter is also set. "
+                    "If the 'function' and 'is_server' parameters are used "
+                    "together, the 'is_server' parameter must be a mapping "
+                    "with 'input' and 'output' entries specifying which of "
+                    "the function's input/output variables should be received"
+                    "/sent from/to clients. e.g. \n"
+                    "\t-input: input_variable\n"
+                    "\t-output: output_variables\n" % yml['name'])
+        if isinstance(yml['is_server'], dict):
+            replaces = {}
+            for io in ['input', 'output']:
+                replaces[io] = None
+                if not yml['is_server'][io].startswith('%s:' % yml['name']):
+                    yml['is_server'][io] = '%s:%s' % (yml['name'], yml['is_server'][io])
+                for i, x in enumerate(yml[io + 's']):
+                    if x['name'] == yml['is_server'][io]:
+                        replaces[io] = x
+                        replaces[io + '_index'] = i
+                        yml[io + 's'].pop(i)
+                        break
+                else:
+                    raise YAMLSpecificationError(
+                        "Failed to locate an existing %s channel "
+                        "with the name %s." % (io, yml['is_server'][io]))
+            srv['server_replaces'] = replaces
+            yml['inputs'].insert(replaces['input_index'], srv)
+        else:
+            yml['inputs'].append(srv)
         yml['clients'] = []
-        yml['inputs'].append(srv)
         existing['server'].setdefault(srv['name'], [])
     # Add client output
     if yml.get('client_of', []):
@@ -350,8 +509,9 @@ def parse_connection(yml, existing):
                 fname = os.path.join(x['working_dir'], fname)
             fname = os.path.normpath(fname)
             if (not os.path.isfile(fname)) and (not x.get('wait_for_creation', False)):
-                raise RuntimeError(("Input '%s' not found in any of the registered "
-                                    + "model outputs and is not a file.") % x['name'])
+                raise YAMLSpecificationError(
+                    ("Input '%s' not found in any of the registered "
+                     + "model outputs and is not a file.") % x['name'])
             x['address'] = fname
         else:
             iname_list.append(x['name'])
@@ -379,22 +539,23 @@ def parse_connection(yml, existing):
     name = args
     # Connection
     xx = {'src_models': [], 'dst_models': [],
-          'icomm_kws': {'comm': []},
-          'ocomm_kws': {'comm': []}}
+          'inputs': [], 'outputs': []}
     for i, y in enumerate(yml['inputs']):
         if is_file['inputs'][i]:
-            xx['icomm_kws']['comm'].append(y)
+            xx['inputs'].append(y)
         else:
-            xx['icomm_kws']['comm'].append(existing['output'][y['name']])
-            xx['icomm_kws']['comm'][-1].update(**y)
+            new = existing['output'][y['name']]
+            new.update(y)
+            xx['inputs'].append(new)
             xx['src_models'] += existing['output'][y['name']]['model_driver']
             del existing['output'][y['name']]
     for i, y in enumerate(yml['outputs']):
         if is_file['outputs'][i]:
-            xx['ocomm_kws']['comm'].append(y)
+            xx['outputs']['comm'].append(y)
         else:
-            xx['ocomm_kws']['comm'].append(existing['input'][y['name']])
-            xx['ocomm_kws']['comm'][-1].update(**y)
+            new = existing['input'][y['name']]
+            new.update(y)
+            xx['outputs'].append(new)
             xx['dst_models'] += existing['input'][y['name']]['model_driver']
             del existing['input'][y['name']]
     # TODO: Split comms if models are not co-located and the master

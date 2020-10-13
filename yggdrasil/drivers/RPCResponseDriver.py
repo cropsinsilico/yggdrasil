@@ -25,15 +25,18 @@ class RPCResponseDriver(ConnectionDriver):
         if msg_id is None:
             msg_id = str(uuid.uuid4())
         # Input communicator
-        icomm_kws = kwargs.get('icomm_kws', {})
-        icomm_kws['name'] = 'server_model_response.' + msg_id
-        # icomm_kws['is_response_client'] = True
-        kwargs['icomm_kws'] = icomm_kws
+        inputs = kwargs.get('inputs', [{}])
+        inputs[0]['comm'] = comm
+        inputs[0]['name'] = 'server_model_response.' + msg_id
+        inputs[0]['is_response_client'] = True
+        kwargs['inputs'] = inputs
         # Output communicator
-        ocomm_kws = kwargs.get('ocomm_kws', {})
-        ocomm_kws['name'] = 'client_model_response.' + msg_id
-        ocomm_kws['address'] = model_response_address
-        kwargs['ocomm_kws'] = ocomm_kws
+        outputs = kwargs.get('outputs', [{}])
+        outputs[0]['comm'] = None
+        outputs[0]['name'] = 'client_model_response.' + msg_id
+        if model_response_address is not None:
+            outputs[0]['address'] = model_response_address
+        kwargs['outputs'] = outputs
         # Overall keywords
         kwargs['single_use'] = True
         super(RPCResponseDriver, self).__init__(icomm_kws['name'], **kwargs)

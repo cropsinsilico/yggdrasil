@@ -45,13 +45,20 @@ class RPCRequestDriver(ConnectionDriver):
 
     def __init__(self, model_request_name, **kwargs):
         # Input communicator
-        # icomm_kws = kwargs.get('icomm_kws', {})
-        # icomm_kws['close_on_eof_recv'] = False
-        # kwargs['icomm_kws'] = icomm_kws
+        inputs = kwargs.get('inputs', [{}])
+        inputs[0]['comm'] = None
+        inputs[0]['name'] = model_request_name
+        kwargs['inputs'] = inputs
         # Output communicator
-        ocomm_kws = kwargs.get('ocomm_kws', {})
-        ocomm_kws['is_client'] = True
-        kwargs['ocomm_kws'] = ocomm_kws
+        outputs = kwargs.get('outputs', [{}])
+        outputs[0]['comm'] = comm
+        outputs[0]['name'] = request_name
+        if comm_address is not None:
+            outputs[0]['address'] = comm_address
+        outputs[0]['no_suffix'] = True
+        outputs[0]['is_client'] = True
+        outputs[0]['close_on_eof_send'] = False
+        kwargs['outputs'] = outputs
         # Parent and attributes
         super(RPCRequestDriver, self).__init__(model_request_name, **kwargs)
         self.response_drivers = []
@@ -83,12 +90,12 @@ class RPCRequestDriver(ConnectionDriver):
     def last_header(self):
         r"""dict: Information contained in the header of the last message
         received from the client model."""
-        if self.icomm._last_header is None:
+        if self._last_header is None:
             raise AttributeError("No new requests have been received, so there "
                                  + "does not yet exist information required for "
                                  + "creating a response comm and fowarding the "
                                  + "request.")
-        return self.icomm._last_header
+        return self._last_header
 
     @property
     def request_id(self):

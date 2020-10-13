@@ -604,6 +604,7 @@ int free_zmq_comm(comm_t *x) {
     }
     x->handle = NULL;
   }
+  ygglog_debug("free_zmq_comm: finished");
   return ret;
 };
 

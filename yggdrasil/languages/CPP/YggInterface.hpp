@@ -3,6 +3,7 @@
 #define YGGINTERFACE_HPP_
 
 #include "YggInterface.h"
+#include <string>
 
 
 /*!
@@ -23,6 +24,13 @@ public:
     should be the argument to an input driver in the yaml specification file.
    */
   YggInput(const char *name) : _pi(yggInput(name)) {}
+  
+  /*!
+    @brief Constructor for YggInput w/ C++ std::string.
+    @param[in] name const std::string Name of input queue. This should be the
+    argument to an input driver in the yaml specification file.
+   */
+  YggInput(const std::string name) : _pi(yggInput(name.c_str())) {}
 
   /*! @brief Empty constructor for inheritance. */
   YggInput(yggInput_t x) : _pi(x) {}
@@ -36,6 +44,14 @@ public:
   YggInput(const char *name, const char *fmt) : _pi(yggInputFmt(name, fmt)) {}
 
   /*!
+    @brief Constructor for YggInput with format.
+    @param[in] name const std::string Name of input queue. This
+    should be the argument to an input driver in the yaml specification file.
+    @param[in] fmt const std::string Format string for parsing messages.
+   */
+  YggInput(const std::string name, const std::string fmt) : _pi(yggInputFmt(name.c_str(), fmt.c_str())) {}
+
+  /*!
     @brief Constructor for YggIntput with explicit datatype.
     @param[in] name constant character pointer to name of input queue. This
     should be the argument to an input driver in the yaml specification file.
@@ -45,10 +61,21 @@ public:
   YggInput(const char *name, dtype_t *datatype) : _pi(yggInputType(name, datatype)) {}
 
   /*!
+    @brief Constructor for YggIntput with explicit datatype.
+    @param[in] name const std::string Name of input queue. This
+    should be the argument to an input driver in the yaml specification file.
+    @param[in] datatype Pointer to a dtype_t data structure containing type informaiton.
+    containing type information.
+   */
+  YggInput(const std::string name, dtype_t *datatype) : _pi(yggInputType(name.c_str(), datatype)) {}
+
+  /*!
     @brief Alias to allow freeing of underlying C struct at the class level.
   */
   void _destroy_pi() {
-    ygg_free(_pi);
+    if (!(_pi->is_global)) {
+      ygg_free(_pi);
+    }
     _pi = NULL;
   }
   
@@ -169,12 +196,27 @@ public:
   YggOutput(const char *name) : _pi(yggOutput(name)) {}
   
   /*!
+    @brief Constructor for YggOutput.
+    @param[in] name const std::string name of output queue. This
+    should be the argument to an output driver in the yaml specification file.
+   */
+  YggOutput(const std::string name) : _pi(yggOutput(name.c_str())) {}
+  
+  /*!
     @brief Constructor for YggOutput with format.
     @param[in] name constant character pointer to name of output queue. This
     should be the argument to an output driver in the yaml specification file.
     @param[in] fmt character pointer to format string for formatting variables.
    */
   YggOutput(const char *name, const char *fmt) : _pi(yggOutputFmt(name, fmt)) {}
+
+  /*!
+    @brief Constructor for YggOutput with format.
+    @param[in] name const std::string name of output queue. This
+    should be the argument to an output driver in the yaml specification file.
+    @param[in] fmt const std::string format string for formatting variables.
+   */
+  YggOutput(const std::string name, const std::string fmt) : _pi(yggOutputFmt(name.c_str(), fmt.c_str())) {}
 
   /*!
     @brief Constructor for YggOutput with explicit datatype.
@@ -184,6 +226,14 @@ public:
    */
   YggOutput(const char *name, dtype_t *datatype) : _pi(yggOutputType(name, datatype)) {}
 
+  /*!
+    @brief Constructor for YggOutput with explicit datatype.
+    @param[in] name const std::string name of output queue. This
+    should be the argument to an output driver in the yaml specification file.
+    @param[in] datatype Pointer to a dtype_t data structure containing type informaiton.
+   */
+  YggOutput(const std::string name, dtype_t *datatype) : _pi(yggOutputType(name.c_str(), datatype)) {}
+
   /*! @brief Empty constructor for inheritance. */
   YggOutput(yggOutput_t x) : _pi(x) {}
   
@@ -191,7 +241,9 @@ public:
     @brief Alias to allow freeing of underlying C struct at the class level.
   */
   void _destroy_pi() {
-    ygg_free(_pi);
+    if (!(_pi->is_global)) {
+      ygg_free(_pi);
+    }
     _pi = NULL;
   }
   
@@ -291,7 +343,9 @@ public:
     @brief Alias to allow freeing of underlying C struct at the class level.
   */
   void _destroy_pi() {
-    ygg_free(_pi);
+    if (!(_pi->is_global)) {
+      ygg_free(_pi);
+    }
     _pi = NULL;
   }
   
@@ -388,11 +442,29 @@ public:
     YggRpc(yggRpcServer(name, inFormat, outFormat)) {}
 
   /*!
-    @brief Destructor for YggRpcServer.
-    See ygg_free in YggInterface.h for details.
-  */
-  ~YggRpcServer() { _destroy_pi(); }
-  
+    @brief Constructor for YggRpcServer.
+    @param[in] name constant std::string name used for input and output
+    queues.
+    @param[in] inFormat const std::string format that should be used for
+    parsing input.
+    @param[in] outFormat const std::string format that should be used for
+    formatting output.
+   */
+  YggRpcServer(const std::string name, const std::string inFormat, const std::string outFormat) :
+    YggRpc(yggRpcServer(name.c_str(), inFormat.c_str(), outFormat.c_str())) {}
+
+  /*!
+    @brief Constructor for YggRpcServer with explicit datatype.
+    @param[in] name constant std::string name used for input and output
+    queues.
+    @param[in] inType Pointer to a dtype_t data structure containing type info
+    for data that will be received by the server
+    @param[in] outType Pointer to a dtype_t data structure containing type info
+    for data that will be sent by the server.
+   */
+  YggRpcServer(const std::string name, dtype_t *inType, dtype_t *outType) :
+    YggRpc(yggRpcServerType(name.c_str(), inType, outType)) {}
+
 };
 
 
@@ -422,11 +494,29 @@ public:
     YggRpc(yggRpcClient(name, outFormat, inFormat)) {}
 
   /*!
-    @brief Destructor for YggRpcClient.
-    See ygg_free in YggInterface.h for details.
-  */
-  ~YggRpcClient() { _destroy_pi(); }
-  
+    @brief Constructor for YggRpcClient.
+    @param[in] name constant std::string name used for input and output
+    queues.
+    @param[in] outFormat const std::string format that should be used for
+    formatting output.
+    @param[in] inFormat const std::string format that should be used for
+    parsing input.
+   */
+  YggRpcClient(const std::string name, const std::string outFormat, const std::string inFormat) :
+    YggRpc(yggRpcClient(name.c_str(), outFormat.c_str(), inFormat.c_str())) {}
+
+  /*!
+    @brief Constructor for YggRpcClient with explicit datatype.
+    @param[in] name constant std::string name used for input and output
+    queues.
+    @param[in] outType Pointer to a dtype_t data structure containing type info
+    for data that will be sent by the client.
+    @param[in] inType Pointer to a dtype_t data structure containing type info
+    for data that will be received by the client
+   */
+  YggRpcClient(const std::string name, dtype_t *outType, dtype_t *inType) :
+    YggRpc(yggRpcClientType(name.c_str(), outType, inType)) {}
+
   /*!
     @brief Send request to an RPC server from the client and wait for a
     response, preserving the current sizes of memory at the provided output
@@ -496,6 +586,16 @@ public:
   YggTimesync(const char *name="timesync", const char *t_units="") :
     YggRpcClient(yggTimesync(name, t_units)) {}
   
+  /*!
+    @brief Constructor for YggTimesync.
+    @param[in] name const std::string name used for input and output
+    queues.
+    @param[in] t_units const std::string Units that should be used for the
+    timestep. "" indicates no units.
+   */
+  YggTimesync(const std::string name="timesync", const std::string t_units="") :
+    YggRpcClient(yggTimesync(name.c_str(), t_units.c_str())) {}
+  
 };
 
 
@@ -515,6 +615,13 @@ public:
    */
   YggAsciiFileOutput(const char *name) :
     YggOutput(yggAsciiFileOutput(name)) {}
+  
+  /*!
+    @brief Constructor for YggAsciiFileOutput.
+    @param[in] name constant std::string the name of an output channel.
+   */
+  YggAsciiFileOutput(const std::string name) :
+    YggOutput(yggAsciiFileOutput(name.c_str())) {}
   
   /*! @brief Empty constructor for inheritance. */
   YggAsciiFileOutput(yggOutput_t x) :
@@ -546,6 +653,13 @@ public:
    */
   YggAsciiFileInput(const char *name) :
     YggInput(yggAsciiFileInput(name)) {}
+
+  /*!
+    @brief Constructor for YggAsciiFileInput.
+    @param[in] name constant std::string the name of an input channel.
+   */
+  YggAsciiFileInput(const std::string name) :
+    YggInput(yggAsciiFileInput(name.c_str())) {}
 
   /*! @brief Empty constructor for inheritance. */
   YggAsciiFileInput(yggInput_t x) :
@@ -585,6 +699,15 @@ public:
   YggAsciiTableOutput(const char *name, const char *format_str) :
     YggAsciiFileOutput(yggAsciiTableOutput(name, format_str)) {}
 
+  /*!
+    @brief Constructor for YggAsciiTableOutput.
+    @param[in] name constant std::string the name of an output channel.
+    @param[in] format_str const std::string format string that should be used
+    to format rows into table lines.
+   */
+  YggAsciiTableOutput(const std::string name, const std::string format_str) :
+    YggAsciiFileOutput(yggAsciiTableOutput(name.c_str(), format_str.c_str())) {}
+
 };
 
 
@@ -607,6 +730,15 @@ public:
    */
   YggAsciiArrayOutput(const char *name, const char *format_str) :
     YggAsciiFileOutput(yggAsciiArrayOutput(name, format_str)) {}
+
+  /*!
+    @brief Constructor for YggAsciiArrayOutput.
+    @param[in] name constant std::string the name of an output channel.
+    @param[in] format_str const std::string format string that should be used
+    to format arrays into a table.
+   */
+  YggAsciiArrayOutput(const std::string name, const std::string format_str) :
+    YggAsciiFileOutput(yggAsciiArrayOutput(name.c_str(), format_str.c_str())) {}
 
 };
 
@@ -632,6 +764,16 @@ public:
   YggAsciiTableInput(const char *name) :
     YggAsciiFileInput(yggAsciiTableInput(name)) {}
 
+  /*!
+    @brief Constructor for YggAsciiTableInput.
+    Due to issues with the C++ version of vsscanf, flags and precision
+    indicators for floating point format specifiers (e.g. %e, %f), must be
+    removed so that table input can be properly parsed.
+    @param[in] name constant std::string the name of an input channel.
+   */
+  YggAsciiTableInput(const std::string name) :
+    YggAsciiFileInput(yggAsciiTableInput(name.c_str())) {}
+
 };
 
 /*!
@@ -655,6 +797,16 @@ public:
   YggAsciiArrayInput(const char *name) :
     YggAsciiFileInput(yggAsciiArrayInput(name)) {}
 
+  /*!
+    @brief Constructor for YggAsciiArrayInput.
+    Due to issues with the C++ version of vsscanf, flags and precision
+    indicators for floating point format specifiers (e.g. %e, %f), must be
+    removed so that table input can be properly parsed.
+    @param[in] name constant std::string the name of an input channel.
+   */
+  YggAsciiArrayInput(const std::string name) :
+    YggAsciiFileInput(yggAsciiArrayInput(name.c_str())) {}
+
 };
 
 
@@ -674,6 +826,13 @@ public:
    */
   YggPlyOutput(const char *name) :
     YggOutput(yggPlyOutput(name)) {}
+  
+  /*!
+    @brief Constructor for YggPlyOutput.
+    @param[in] name constant std::string the name of an output channel.
+   */
+  YggPlyOutput(const std::string name) :
+    YggOutput(yggPlyOutput(name.c_str())) {}
   
   /*! @brief Empty constructor for inheritance. */
   YggPlyOutput(yggOutput_t x) :
@@ -699,6 +858,13 @@ public:
   YggPlyInput(const char *name) :
     YggInput(yggPlyInput(name)) {}
 
+  /*!
+    @brief Constructor for YggPlyInput.
+    @param[in] name constant std::string the name of an input channel.
+   */
+  YggPlyInput(const std::string name) :
+    YggInput(yggPlyInput(name.c_str())) {}
+
   /*! @brief Empty constructor for inheritance. */
   YggPlyInput(yggInput_t x) :
     YggInput(x) {}
@@ -722,6 +888,13 @@ public:
    */
   YggObjOutput(const char *name) :
     YggOutput(yggObjOutput(name)) {}
+  
+  /*!
+    @brief Constructor for YggObjOutput.
+    @param[in] name constant std::string the name of an output channel.
+   */
+  YggObjOutput(const std::string name) :
+    YggOutput(yggObjOutput(name.c_str())) {}
   
   /*! @brief Empty constructor for inheritance. */
   YggObjOutput(yggOutput_t x) :
@@ -747,6 +920,13 @@ public:
   YggObjInput(const char *name) :
     YggInput(yggObjInput(name)) {}
 
+  /*!
+    @brief Constructor for YggObjInput.
+    @param[in] name constant std::string the name of an input channel.
+   */
+  YggObjInput(const std::string name) :
+    YggInput(yggObjInput(name.c_str())) {}
+
   /*! @brief Empty constructor for inheritance. */
   YggObjInput(yggInput_t x) :
     YggInput(x) {}
@@ -770,6 +950,13 @@ public:
    */
   YggGenericOutput(const char *name) :
     YggOutput(yggGenericOutput(name)) {}
+  
+  /*!
+    @brief Constructor for YggGenericOutput.
+    @param[in] name constant std::string the name of an output channel.
+   */
+  YggGenericOutput(const std::string name) :
+    YggOutput(yggGenericOutput(name.c_str())) {}
   
   /*! @brief Empty constructor for inheritance. */
   YggGenericOutput(yggOutput_t x) :
@@ -795,6 +982,13 @@ public:
   YggGenericInput(const char *name) :
     YggInput(yggGenericInput(name)) {}
 
+  /*!
+    @brief Constructor for YggGenericInput.
+    @param[in] name constant std::string the name of an input channel.
+   */
+  YggGenericInput(const std::string name) :
+    YggInput(yggGenericInput(name.c_str())) {}
+
   /*! @brief Empty constructor for inheritance. */
   YggGenericInput(yggInput_t x) :
     YggInput(x) {}
@@ -818,6 +1012,13 @@ public:
    */
   YggAnyOutput(const char *name) :
     YggOutput(yggAnyOutput(name)) {}
+  
+  /*!
+    @brief Constructor for YggAnyOutput.
+    @param[in] name constant std::string the name of an output channel.
+   */
+  YggAnyOutput(const std::string name) :
+    YggOutput(yggAnyOutput(name.c_str())) {}
   
   /*! @brief Empty constructor for inheritance. */
   YggAnyOutput(yggOutput_t x) :
@@ -843,6 +1044,13 @@ public:
   YggAnyInput(const char *name) :
     YggInput(yggAnyInput(name)) {}
 
+  /*!
+    @brief Constructor for YggAnyInput.
+    @param[in] name constant std::string the name of an input channel.
+   */
+  YggAnyInput(const std::string name) :
+    YggInput(yggAnyInput(name.c_str())) {}
+
   /*! @brief Empty constructor for inheritance. */
   YggAnyInput(yggInput_t x) :
     YggInput(x) {}
@@ -866,6 +1074,13 @@ public:
    */
   YggJSONArrayOutput(const char *name) :
     YggOutput(yggJSONArrayOutput(name)) {}
+  
+  /*!
+    @brief Constructor for YggJSONArrayOutput.
+    @param[in] name constant std::string the name of an output channel.
+   */
+  YggJSONArrayOutput(const std::string name) :
+    YggOutput(yggJSONArrayOutput(name.c_str())) {}
   
   /*! @brief Empty constructor for inheritance. */
   YggJSONArrayOutput(yggOutput_t x) :
@@ -891,6 +1106,13 @@ public:
   YggJSONArrayInput(const char *name) :
     YggInput(yggJSONArrayInput(name)) {}
 
+  /*!
+    @brief Constructor for YggJSONArrayInput.
+    @param[in] name constant std::string the name of an input channel.
+   */
+  YggJSONArrayInput(const std::string name) :
+    YggInput(yggJSONArrayInput(name.c_str())) {}
+
   /*! @brief Empty constructor for inheritance. */
   YggJSONArrayInput(yggInput_t x) :
     YggInput(x) {}
@@ -915,6 +1137,13 @@ public:
   YggJSONObjectOutput(const char *name) :
     YggOutput(yggJSONObjectOutput(name)) {}
   
+  /*!
+    @brief Constructor for YggJSONObjectOutput.
+    @param[in] name constant std::string the name of an output channel.
+   */
+  YggJSONObjectOutput(const std::string name) :
+    YggOutput(yggJSONObjectOutput(name.c_str())) {}
+  
   /*! @brief Empty constructor for inheritance. */
   YggJSONObjectOutput(yggOutput_t x) :
     YggOutput(x) {}
@@ -938,6 +1167,13 @@ public:
    */
   YggJSONObjectInput(const char *name) :
     YggInput(yggJSONObjectInput(name)) {}
+
+  /*!
+    @brief Constructor for YggJSONObjectInput.
+    @param[in] name constant std::string the name of an input channel.
+   */
+  YggJSONObjectInput(const std::string name) :
+    YggInput(yggJSONObjectInput(name.c_str())) {}
 
   /*! @brief Empty constructor for inheritance. */
   YggJSONObjectInput(yggInput_t x) :

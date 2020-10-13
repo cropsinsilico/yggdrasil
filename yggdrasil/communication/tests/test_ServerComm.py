@@ -101,9 +101,11 @@ class TestServerComm(test_CommBase.TestCommBase):
         r"""Test RPC nolimit call."""
         self.send_instance.sched_task(0.0, self.send_instance.call_nolimit,
                                       args=[self.msg_long], store_output=True)
-        flag, msg_recv = self.recv_instance.recv_nolimit(timeout=self.timeout)
+        flag, msg_recv, header = self.recv_instance.recv_nolimit(
+            timeout=self.timeout, return_header=True)
         assert(flag)
         self.assert_equal(msg_recv, self.msg_long)
+        assert(isinstance(header, dict))
         flag = self.recv_instance.send_nolimit(msg_recv)
         assert(flag)
         T = self.recv_instance.start_timeout()

@@ -64,6 +64,8 @@ def new_comm(name, comm=None, use_async=False, **kwargs):
         Comm: Communicator of given class.
 
     """
+    if comm is None:
+        comm = kwargs.get('commtype', None)
     if isinstance(comm, list):
         if len(comm) == 1:
             kwargs.update(comm[0])

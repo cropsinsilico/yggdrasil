@@ -127,11 +127,15 @@ class ConnectionDriver(Driver):
 
     Args:
         name (str): Name that should be used to set names of input/output comms.
-        icomm_kws (dict, optional): Keyword arguments for the input communicator.
-        ocomm_kws (dict, optional): Keyword arguments for the output communicator.
-        translator (str, func, optional): Function or string specifying a function
-            that should be used to translate messages from the input communicator(s)
-            before passing them to the output communicator(s). If a string, the
+        inputs (list, optional): One or more dictionaries containing keyword
+            arguments for constructing input communicators. Defaults to an
+            empty dictionary if not provided.
+        outputs (list, optional): One or more dictionaries containing keyword
+            arguments for constructing output communicators. Defaults to an
+            empty dictionary if not provided.
+        translator (str, func, optional): Function or string specifying function
+            that should be used to translate messages from the input communicator
+            before passing them to the output communicator. If a string, the
             format should be "<package.module>:<function>" so that <function>
             can be imported from <package>. Defaults to None and messages are
             passed directly. This can also be a list of functions/strings that
@@ -167,8 +171,8 @@ class ConnectionDriver(Driver):
     """
 
     _connection_type = 'default'
-    _icomm_type = 'DefaultComm'
-    _ocomm_type = 'DefaultComm'
+    _icomm_type = 'default'
+    _ocomm_type = 'default'
     _direction = 'any'
     _schema_type = 'connection'
     _schema_subtype_key = 'connection_type'
@@ -178,10 +182,11 @@ class ConnectionDriver(Driver):
     _connection_type = 'connection'
     _schema_required = ['inputs', 'outputs']
     _schema_properties = {
-        'connection_type': {'type': 'string'},  # 'default': 'default'},
+        'connection_type': {'type': 'string'},
         'inputs': {'type': 'array', 'minItems': 1,
                    'items': {'anyOf': [{'$ref': '#/definitions/comm'},
                                        {'$ref': '#/definitions/file'}]},
+                   'default': [{}],
                    'description': (
                        'One or more name(s) of model output channel(s) '
                        'and/or new channel/file objects that the '
@@ -192,6 +197,7 @@ class ConnectionDriver(Driver):
         'outputs': {'type': 'array', 'minItems': 1,
                     'items': {'anyOf': [{'$ref': '#/definitions/comm'},
                                         {'$ref': '#/definitions/file'}]},
+                    'default': [{}],
                     'description': (
                         'One or more name(s) of model input channel(s) '
                         'and/or new channel/file objects that the '
@@ -209,6 +215,7 @@ class ConnectionDriver(Driver):
         '_comm_closed', '_skip_after_loop', 'shared', 'task_thread']
 
     def __init__(self, name, translator=None, single_use=False, onexit=None, **kwargs):
+        # kwargs['method'] = 'process'
         super(ConnectionDriver, self).__init__(name, **kwargs)
         # Shared attributes (set once or synced using events)
         self.single_use = single_use
@@ -218,6 +225,7 @@ class ConnectionDriver(Driver):
                            _comm_closed=multitasking.DummyEvent(),
                            _skip_after_loop=multitasking.DummyEvent())
         # Attributes used by process
+        self._last_header = None
         self._eof_sent = False
         self._first_send_done = False
         self._used = False
@@ -254,13 +262,12 @@ class ConnectionDriver(Driver):
                    self.icomm.name, self.icomm.address,
                    self.ocomm.name, self.ocomm.address)
 
-    def _init_single_comm(self, name, io, comm_kws):
+    def _init_single_comm(self, io, comm_list, **kwargs):
         r"""Parse keyword arguments for input/output comm."""
         self.debug("Creating %s comm", io)
-        if comm_kws is None:
-            comm_kws = dict()
-        else:
-            comm_kws = copy.deepcopy(comm_kws)
+        s = get_schema()
+        comm_kws = dict()
+        assert(isinstance(comm_list, list))
         if io == 'input':
             direction = 'recv'
             attr_comm = 'icomm'
@@ -272,18 +279,53 @@ class ConnectionDriver(Driver):
         comm_kws['dont_open'] = True
         comm_kws['reverse_names'] = True
         comm_kws['use_async'] = True
-        comm_kws.setdefault('name', name)
-        if self.as_process:
-            comm_kws.setdefault('buffer_task_method', 'process')
+        comm_kws['name'] = self.name
+        if not comm_list:
+            comm_list.append({'commtype': comm_type})
+        for i, x in enumerate(comm_list):
+            if x is None:
+                comm_list[i] = dict()
+            elif not isinstance(x, dict):
+                if not isinstance(x, str):  # pragma: debug
+                    self.info('%s, %s', x, type(x))
+                    assert(isinstance(x, str))
+                comm_list[i] = dict(commtype=x)
+            elif isinstance(x.get('comm', None), str):
+                comm_list[i]['commtype'] = comm_list[i].pop('comm')
+            comm_list[i].setdefault('commtype', comm_type)
+        any_files = False
+        all_files = True
+        if not touches_model:
+            comm_kws['no_suffix'] = True
+            ikws = []
+            for x in comm_list:
+                icomm_cls = import_component('comm', x['commtype'])
+                if icomm_cls.is_file:
+                    any_files = True
+                    ikws += s['file'].get_subtype_properties(icomm_cls._filetype)
+                else:
+                    all_files = False
+                    ikws += s['comm'].get_subtype_properties(icomm_cls._commtype)
+                    if (icomm_cls._commtype == 'buffer') and self.as_process:
+                        x['buffer_task_method'] = 'process'
+            ikws = list(set(ikws))
+            for k in ikws:
+                if (k not in comm_kws) and (k in kwargs):
+                    comm_kws[k] = kwargs.pop(k)
+            if ('comm_env' in kwargs) and ('comm_env' not in comm_kws):
+                comm_kws['env'] = kwargs.pop('comm_env')
+        if any_files and (io == 'input'):
+            kwargs.setdefault('timeout_send_1st', 60)
+        comm_kws['comm'] = copy.deepcopy(comm_list)
         self.debug('%s comm_kws:\n%s', attr_comm, self.pprint(comm_kws, 1))
         setattr(self, attr_comm, new_comm(**comm_kws))
         setattr(self, '%s_kws' % attr_comm, comm_kws)
 
-    def _init_comms(self, name, icomm_kws=None, ocomm_kws=None, **kwargs):
+    def _init_comms(self, name, **kwargs):
         r"""Parse keyword arguments for input/output comms."""
-        self._init_single_comm(name, 'input', icomm_kws)
+        kwargs = self._init_single_comm('input', self.inputs, **kwargs)
         try:
-            self._init_single_comm(name, 'output', ocomm_kws)
+            kwargs = self._init_single_comm('output', self.outputs, **kwargs)
         except BaseException:
             self.icomm.close()
             raise
@@ -743,10 +785,12 @@ class ConnectionDriver(Driver):
         with self.lock:
             if self.icomm.is_closed:
                 return False
-            flag, msg = self.icomm.recv(**kwargs)
+            flag, msg, header = self.icomm.recv(return_header=True, **kwargs)
         if self.icomm.is_eof(msg):
+            self._last_header = header
             return self.on_eof()
         if flag:
+            self._last_header = header
             return msg
         else:
             return flag
@@ -814,7 +858,7 @@ class ConnectionDriver(Driver):
         sinfo['datatype'] = stype
         self.ocomm.serializer.initialize_serializer(sinfo)
         self.ocomm.serializer.update_serializer(skip_type=True,
-                                                **self.icomm._last_header)
+                                                **self._last_header)
         if (((stype['type'] == 'array')
              and (self.ocomm.serializer.typedef['type'] != 'array')
              and (len(stype['items']) == 1))):

@@ -25,7 +25,7 @@ class FortranCompilerBase(CompilerBase):
     languages = ['fortran']
     default_executable_env = 'FC'
     default_flags_env = 'FFLAGS'
-    default_flags = ['-g', '-Wall', '-cpp', '-pedantic-errors']
+    default_flags = ['-g', '-Wall', '-cpp', '-pedantic-errors', '-ffree-line-length-0']
     linker_attributes = {'default_flags_env': 'LFLAGS',
                          'search_path_envvar': ['LIBRARY_PATH', 'LD_LIBRARY_PATH']}
     search_path_envvar = []
@@ -204,7 +204,7 @@ class FortranModelDriver(CompiledModelDriver):
         'any': 'ygggeneric'}
     function_param = {
         'import_nofile': 'use {function}',
-        'import': 'include "{filename}"',
+        'import': '#include "{filename}"',
         'index': '{variable}({index})',
         'interface': 'use fygg',
         'input': ('{channel} = ygg_input_type('
@@ -341,7 +341,8 @@ class FortranModelDriver(CompiledModelDriver):
             r'(?:len\s*=\s*(?:(?P<length>(?:\d+))|'
             r'(?P<length_var>.+?)))?'
             r'\))?'
-            r'(?:\s*,\s*dimension\((?:(?P<shape>\d+(?:,\s*\d+)*?)'
+            r'(?:\s*,\s*dimension\((?:(?P<shape>(?:\d)+'
+            r'(?:,\s*(?:\d)+)*?)'
             r'|(?P<shape_var>.+?(?:,\s*.+)*?))\))?'
             r'(?:\s*,\s*(?P<pointer>pointer))?'
             r'(?:\s*,\s*(?P<target>target))?'
@@ -356,6 +357,8 @@ class FortranModelDriver(CompiledModelDriver):
     interface_inside_exec = True
     zero_based = False
     max_line_width = 72
+    global_scope_macro = ('#define WITH_GLOBAL_SCOPE(COMM) call '
+                          'set_global_comm(); COMM; call unset_global_comm()')
     
     @staticmethod
     def before_registration(cls):
@@ -447,6 +450,18 @@ class FortranModelDriver(CompiledModelDriver):
         return out
 
     @classmethod
+    def get_inverse_type_map(cls):
+        r"""Get the inverse type map.
+
+        Returns:
+            dict: Mapping from native type to JSON type.
+
+        """
+        out = super(FortranModelDriver, cls).get_inverse_type_map()
+        out['yggchar_r'] = 'bytes'
+        return out
+        
+    @classmethod
     def get_native_type(cls, **kwargs):
         r"""Get the native type.
 
@@ -472,7 +487,7 @@ class FortranModelDriver(CompiledModelDriver):
                     out += ', allocatable'
                 if type_match['shape_var'][0] == '*':
                     out = out.replace('*', ':')
-                raise Exception("Used default native_type, but need alias")
+                # raise Exception("Used default native_type, but need alias")
             elif type_match.get('length_var', None):
                 if ((('pointer' not in out) and ('allocatable' not in out)
                      and (type_match['length_var'] != 'X'))):
@@ -580,17 +595,20 @@ class FortranModelDriver(CompiledModelDriver):
                     grp['type'] + '(kind = X)')
             except KeyError:  # pragma: debug
                 raise e
+        if grp.get('shape_var', False):
+            if not grp.get('shape', False):
+                grp['shape'] = grp['shape_var']
         if grp.get('shape', False):
             shape = grp['shape'].split(',')
             ndim = len(shape)
             out['subtype'] = out['type']
             if ndim == 1:
                 out['type'] = '1darray'
-                if shape[0] != ':':
+                if shape[0] not in '*:':
                     out['length'] = int(shape[0])
             else:
                 out['type'] = 'ndarray'
-                if shape[0] != ':':
+                if shape[0] not in '*:':
                     out['shape'] = [int(i) for i in shape]
         if out['type'] in _valid_types:
             out['subtype'] = out['type']
@@ -710,13 +728,29 @@ class FortranModelDriver(CompiledModelDriver):
  
         """
         if 'filename' in kwargs:
+            if (not module) and os.path.isfile(kwargs['filename']):
+                with open(kwargs['filename'], 'r') as fd:
+                    contents = fd.read()
+                    if 'contains' not in contents.lower():  # pragma: debug
+                        raise ValueError("Could not locate 'contains' keyword "
+                                         "in user defined module.")
+                    idx = contents.lower().index('contains')
+                    return (contents[:idx]
+                            + '  use %s\n' % cls.interface_library
+                            + cls.global_scope_macro + '\n'
+                            + contents[idx:]).splitlines()
             kwargs['filename'] = os.path.basename(kwargs['filename'])
         out = super(FortranModelDriver, cls).write_executable_import(
             **kwargs)
         if module:
             out = (['module %s' % module,
+                    '  use %s' % cls.interface_library,
+                    cls.global_scope_macro,
                     'contains']
-                   + [cls.function_param['indent'] + x for x in out]
+                   # Use output directly when import uses directive #include
+                   + out
+                   # Indent when import uses include statement
+                   # + [cls.function_param['indent'] + x for x in out]
                    + ['end module %s' % module])
         return out
         
@@ -748,17 +782,17 @@ class FortranModelDriver(CompiledModelDriver):
                 imports = [imports]
             for kws in imports:
                 if ('filename' in kws) and os.path.isfile(kws['filename']):
-                    # with open(kws['filename'], 'r') as fd:
-                    #     contents = fd.read()
-                    # regex_module = (r'(?i)\s*module\s+(?P<module>.*?)'
-                    #                 r'(?:.*?\n)*?'
-                    #                 r'\s*end\s+module\s+(?P=module)')
-                    # match_module = re.search(regex_module, contents)
-                    # if match_module:
-                    #     module = match_module.groupdict('module')
-                    # else:
-                    module = '%s_module' % kws['function']
-                    kws['module'] = module
+                    with open(kws['filename'], 'r') as fd:
+                        contents = fd.read()
+                    regex_module = (r'(?i)\s*module\s+(?P<module>.+)\n'
+                                    r'(?:.*?\n)*?'
+                                    r'\s*end\s+module\s+(?P=module)')
+                    match_module = re.search(regex_module, contents)
+                    if match_module:
+                        module = match_module.groupdict()['module']
+                    else:
+                        module = '%s_module' % kws['function']
+                        kws['module'] = module
                     lines.insert(last_use + 1, 'use %s' % module)
                     last_use += 1
         if 'implicit none' not in lines:
@@ -821,8 +855,11 @@ class FortranModelDriver(CompiledModelDriver):
             list: Set of lines resulting from spliting the provided line.
 
         """
-        if line.lstrip().lower().startswith("include"):
-            force_split = True
+        if line.startswith(('#if', '#endif', '#define', '#else', '#ifdef',
+                            '#ifndef')):
+            return [line]
+        # if line.lstrip().lower().startswith("include"):
+        #     force_split = True
         return super(FortranModelDriver, cls).split_line(
             line, length=length, force_split=force_split)
 
@@ -908,11 +945,12 @@ class FortranModelDriver(CompiledModelDriver):
             recv_var_par = cls.channels2vars(recv_var)
             allows_realloc = [cls.allows_realloc(v)
                               for v in recv_var_par]
-            if all(allows_realloc):
+            if any(allows_realloc):
                 kwargs['alt_recv_function'] = cls.function_param['recv_heap']
                 new_recv_var_par = []
-                for v in recv_var_par:
-                    if not cls.allows_realloc(v, from_native_type=True):
+                for i, v in enumerate(recv_var_par):
+                    if (((not cls.allows_realloc(v, from_native_type=True))
+                         and allows_realloc[i])):
                         out_after.append('call yggassign(%s_realloc, %s)'
                                          % (v['name'], v['name']))
                         v = dict(v, name=('%s_realloc' % v['name']))
@@ -927,6 +965,43 @@ class FortranModelDriver(CompiledModelDriver):
             channel, recv_var_str, **kwargs)
         return out + out_after
 
+    @classmethod
+    def write_model_send(cls, channel, send_var, **kwargs):
+        r"""Write a model send call include checking the return flag.
+
+        Args:
+            channel (str): Name of variable that the channel being sent to
+                was stored in.
+            send_var (dict, list): Information on one or more variables
+                containing information that will be sent.
+            flag_var (str, optional): Name of flag variable that the flag should
+                be stored in. Defaults to 'flag',
+            allow_failure (bool, optional): If True, the returned lines will
+                call a break if the flag is False. Otherwise, the returned
+                lines will issue an error. Defaults to False.
+
+        Returns:
+            list: Lines required to carry out a send call in this language.
+
+        """
+        send_var_str = send_var
+        out_before = []
+        if not isinstance(send_var, str):
+            send_var_par = []
+            for v in cls.channels2vars(send_var):
+                if (((not cls.allows_realloc(v, from_native_type=True))
+                     and cls.allows_realloc(v))):
+                    if v.get('datatype', v).get('type', False) in ['1darray']:
+                        out_before.append('call yggassign(%s, %s_realloc)'
+                                          % (v['name'], v['name']))
+                        v = dict(v, name=('%s_realloc' % v['name']))
+                send_var_par.append(v)
+            send_var_str = cls.prepare_input_variables(
+                send_var_par, for_yggdrasil=True)
+        out = super(FortranModelDriver, cls).write_model_send(
+            channel, send_var_str, **kwargs)
+        return out_before + out
+    
     @classmethod
     def write_print_var(cls, var, **kwargs):
         r"""Get the lines necessary to print a variable in this language.

@@ -1,0 +1,29 @@
+models:
+  - name: timesync
+    language: timesync
+    additional_variables:
+      osr_model: [carbonAllocation2Roots, saturatedConductivity]
+      other_model: [saturatedWaterContent]
+  - name: osr_model
+    language: osr
+    timesync:
+      inputs:  [carbonAllocation2Roots, saturatedConductivity]
+      outputs: [saturatedWaterContent]
+    args:
+      - ./src/osr_model.xml
+    copy_xml_to_osr: True
+    update_interval:
+      timesync: 0.1
+  - name: other_model
+    language: fortran
+    args:
+      - ./src/other_model.f90
+      - 3
+      - hr
+    timesync: True
+    outputs:
+      name: output
+      default_file:
+        name: other_model_output.txt
+        in_temp: True
+        filetype: table

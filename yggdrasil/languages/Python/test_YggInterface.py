@@ -162,18 +162,20 @@ class TestBase(YggTestClassInfo):
     def iodriver_args(self):
         r"""list: Connection driver arguments."""
         args = [self.name]
-        kwargs = {'icomm_kws': {'partner_model': self.model1},
-                  'ocomm_kws': {'partner_model': self.model2}}
+        kwargs = {'inputs': [{'partner_model': self.model1}],
+                  'outputs': [{'partner_model': self.model2}]}
         if self.is_file:
             args += [self.filename]
             if (self.direction == 'output'):
                 filecomm_kwargs = self.testing_options['kwargs']
                 filecomm_kwargs['comm'] = self.filecomm
-                kwargs['ocomm_kws'] = filecomm_kwargs
+                return ([self.name, self.filename],
+                        {'outputs': [filecomm_kwargs]})
             elif (self.direction == 'input'):
                 filecomm_kwargs = self.testing_options['kwargs']
                 filecomm_kwargs['comm'] = self.filecomm
-                kwargs['icomm_kws'] = filecomm_kwargs
+                return ([self.name, self.filename],
+                        {'inputs': [filecomm_kwargs]})
         return (args, kwargs)
 
     def get_options(self):

@@ -4,17 +4,148 @@ import os
 import time
 import signal
 import traceback
+import atexit
 from pprint import pformat
 from itertools import chain
 import socket
 from yggdrasil.tools import YggClass
-from yggdrasil.config import ygg_cfg, cfg_environment
+from yggdrasil.config import ygg_cfg, cfg_environment, temp_config
 from yggdrasil import platform, yamlfile
 from yggdrasil.drivers import create_driver
 
 
 COLOR_TRACE = '\033[30;43;22m'
 COLOR_NORMAL = '\033[0m'
+
+
+class YggFunction(YggClass):
+    r"""This class wraps function-like behavior around a model.
+
+    Args:
+        model_yaml (str, list): Full path to one or more yaml files containing
+            model information including the location of the source code and any
+            input(s)/output(s).
+        **kwargs: Additional keyword arguments are passed to the YggRunner
+            constructor.
+
+    Attributes:
+        outputs (dict): Input channels providing access to model output.
+        inputs (dict): Output channels providing access to model input.
+        runner (YggRunner): Runner for model.
+
+    """
+    
+    def __init__(self, model_yaml, **kwargs):
+        from yggdrasil.languages.Python.YggInterface import (
+            YggInput, YggOutput)
+        # Create and start runner in another process
+        self.runner = YggRunner(model_yaml, as_function=True, **kwargs)
+        # Start the drivers
+        self.runner.run()
+        self.model_driver = self.runner.modeldrivers['function_model']
+        for k in self.runner.modeldrivers.keys():
+            if k != 'function_model':
+                self.__name__ = k
+                break
+        # Create input/output channels
+        self.inputs = {}
+        self.outputs = {}
+        # import zmq; ctx = zmq.Context()
+        for drv in self.model_driver['input_drivers']:
+            os.environ.update(**drv['instance'].env)
+            var_name = drv['name'].split('function_')[-1]
+            self.outputs[var_name] = drv.copy()
+            self.outputs[var_name]['vars'] = [
+                iv.split(':')[-1] for iv in drv.get('vars', [var_name])]
+            self.outputs[var_name]['comm'] = YggInput(drv['name'])  # , is_interface=True)
+            # context=ctx)
+        for drv in self.model_driver['output_drivers']:
+            var_name = drv['name'].split('function_')[-1]
+            os.environ.update(**drv['instance'].env)
+            self.inputs[var_name] = drv.copy()
+            self.inputs[var_name]['vars'] = [
+                iv.split(':')[-1] for iv in drv.get('vars', [var_name])]
+            self.inputs[var_name]['comm'] = YggOutput(drv['name'])  # , is_interface=True)
+            # context=ctx)
+        self._stop_called = False
+        atexit.register(self.stop)
+        # Get arguments
+        self.arguments = []
+        for k, v in self.inputs.items():
+            self.arguments += v['vars']
+        self.returns = []
+        for k, v in self.outputs.items():
+            self.returns += v['vars']
+
+    def widget_function(self, *args, **kwargs):
+        # import matplotlib.pyplot as plt
+        # ncols = min(3, len(arguments))
+        # nrows = int(ceil(float(len(arguments))/float(ncols)))
+        # plt.show()
+        out = self(*args, **kwargs)
+        return out
+
+    def widget(self, *args, **kwargs):
+        from ipywidgets import interact_manual
+        return interact_manual(self.widget_function, *args, **kwargs)
+        
+    def __call__(self, **kwargs):
+        r"""Call the model as a function by sending variables.
+
+        Args:
+           **kwargs: Any keyword arguments are expected to be named input
+               variables for the model.
+
+        Raises:
+            RuntimeError: If an input argument is missing.
+            RuntimeError: If sending an input argument to a model fails.
+            RuntimeError: If receiving an output value from a model fails.
+
+        Returns:
+            dict: Returned values for each return variable.
+
+        """
+        # Check for arguments
+        for a in self.arguments:
+            if a not in kwargs:
+                raise RuntimeError("Required argument %s not provided." % a)
+        # Send
+        for k, v in self.inputs.items():
+            flag = v['comm'].send([kwargs[a] for a in v['vars']])
+            if not flag:
+                raise RuntimeError("Failed to send %s" % k)
+        # Receive
+        out = {}
+        for k, v in self.outputs.items():
+            flag, data = v['comm'].recv(timeout=60.0)
+            if not flag:
+                raise RuntimeError("Failed to receive variable %s" % v)
+            ivars = v['vars']
+            if isinstance(data, (list, tuple)):
+                assert(len(data) == len(ivars))
+                for a, d in zip(ivars, data):
+                    out[a] = d
+            else:
+                assert(len(ivars) == 1)
+                out[ivars[0]] = data
+        return out
+
+    def stop(self):
+        r"""Stop the model(s) from running."""
+        if self._stop_called:
+            return
+        self._stop_called = True
+        for x in self.inputs.values():
+            x['comm'].send_eof()
+        for x in self.outputs.values():
+            x['comm'].close()
+        self.model_driver['instance'].terminate()
+        self.runner.waitModels()
+        for x in self.inputs.values():
+            x['comm'].close()
+        self.runner.atexit()
+        # self.runner.terminate()
+        # self.runner.atexit()
 
 
 class YggRunner(YggClass):
@@ -37,6 +168,8 @@ class YggRunner(YggClass):
             Defaults to environment variable 'RMQ_DEBUG'.
         ygg_debug_prefix (str, optional): Prefix for Ygg debug messages.
             Defaults to namespace.
+        as_function (bool, optional): If True, the missing input/output channels
+            will be created for using model(s) as a function. Defaults to False.
 
     Attributes:
         namespace (str): Name that should be used to uniquely identify any RMQ
@@ -53,7 +186,8 @@ class YggRunner(YggClass):
     """
     def __init__(self, modelYmls, namespace=None, host=None, rank=0,
                  ygg_debug_level=None, rmq_debug_level=None,
-                 ygg_debug_prefix=None, connection_task_method='thread'):
+                 ygg_debug_prefix=None, connection_task_method='thread',
+                 as_function=False, production_run=False):
         super(YggRunner, self).__init__('runner')
         if namespace is None:
             namespace = ygg_cfg.get('rmq', 'namespace', False)
@@ -67,13 +201,15 @@ class YggRunner(YggClass):
         self.connectiondrivers = {}
         self.interrupt_time = 0
         self._old_handlers = {}
+        self.production_run = production_run
         self.error_flag = False
+        self.as_function = as_function
         self.debug("Running in %s with path %s namespace %s rank %d",
                    os.getcwd(), sys.path, namespace, rank)
         # Update environment based on config
         cfg_environment()
         # Parse yamls
-        self.drivers = yamlfile.parse_yaml(modelYmls)
+        self.drivers = yamlfile.parse_yaml(modelYmls, as_function=as_function)
         self.connectiondrivers = self.drivers['connection']
         self.modeldrivers = self.drivers['model']
 
@@ -81,6 +217,13 @@ class YggRunner(YggClass):
         r"""Print with color."""
         s = ''.join(str(i) for i in args)
         print((COLOR_TRACE + '{}' + COLOR_NORMAL).format(s))
+
+    def atexit(self, *args, **kwargs):
+        r"""At exit ensure that the runner has stopped and cleaned up."""
+        self.debug('')
+        self.reset_signal_handler()
+        self.closeChannels()
+        self.cleanup()
 
     def signal_handler(self, sig, frame):
         r"""Terminate all drivers on interrrupt."""
@@ -151,32 +294,32 @@ class YggRunner(YggClass):
             dict: Intermediate times from the run.
 
         """
-        if timer is None:
-            timer = time.time
-        if t0 is None:
-            t0 = timer()
-        times = {}
-        times['init'] = timer()
-        self.loadDrivers()
-        times['load drivers'] = timer()
-        self.startDrivers()
-        times['start drivers'] = timer()
-        self.set_signal_handler(signal_handler)
-        self.waitModels()
-        times['run models'] = timer()
-        self.reset_signal_handler()
-        self.closeChannels()
-        times['close channels'] = timer()
-        self.cleanup()
-        times['clean up'] = timer()
-        tprev = t0
-        key_order = ['init', 'load drivers', 'start drivers', 'run models',
-                     'close channels', 'clean up']
-        for k in key_order:
-            self.info('%20s\t%f', k, times[k] - tprev)
-            tprev = times[k]
-        self.info(40 * '=')
-        self.info('%20s\t%f', "Total", tprev - t0)
+        with temp_config(production_run=self.production_run):
+            if timer is None:
+                timer = time.time
+            if t0 is None:
+                t0 = timer()
+            times = {}
+            times['init'] = timer()
+            self.loadDrivers()
+            times['load drivers'] = timer()
+            self.startDrivers()
+            times['start drivers'] = timer()
+            self.set_signal_handler(signal_handler)
+            if not self.as_function:
+                self.waitModels()
+                times['run models'] = timer()
+                self.atexit()
+                times['at exit'] = timer()
+            tprev = t0
+            key_order = ['init', 'load drivers', 'start drivers', 'run models',
+                         'at exit']
+            for k in key_order:
+                if k in times:
+                    self.info('%20s\t%f', k, times[k] - tprev)
+                    tprev = times[k]
+            self.info(40 * '=')
+            self.info('%20s\t%f', "Total", tprev - t0)
         return times
 
     @property
@@ -368,9 +511,21 @@ class YggRunner(YggClass):
 
         """
         for drv in model['input_drivers']:
-            drv['instance'].on_model_exit('output', model['name'])
+            if model['name'] in drv['models']:
+                drv['models'].remove(model['name'])
+            if not drv['instance'].is_alive():
+                continue
+            if (len(drv['models']) == 0):
+                self.debug('on_model_exit %s', drv['name'])
+                drv['instance'].on_model_exit('output', model['name'])
         for drv in model['output_drivers']:
-            drv['instance'].on_model_exit('input', model['name'])
+            if model['name'] in drv['models']:
+                drv['models'].remove(model['name'])
+            if not drv['instance'].is_alive():
+                continue
+            if (len(drv['models']) == 0):
+                self.debug('on_model_exit %s', drv['name'])
+                drv['instance'].on_model_exit('input', model['name'])
     
     def do_client_exits(self, model):
         r"""Perform exits for IO drivers associated with a client model.
@@ -405,6 +560,9 @@ class YggRunner(YggClass):
         for driver in self.all_drivers:
             if 'instance' in driver:
                 driver['instance'].cleanup()
+        # self.inputdrivers = {}
+        # self.outputdrivers = {}
+        # self.modeldrivers = {}
 
     def printStatus(self):
         r"""Print the status of all drivers, starting with the IO drivers."""

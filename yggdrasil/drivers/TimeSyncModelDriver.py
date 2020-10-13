@@ -148,10 +148,10 @@ class TimeSyncModelDriver(DSLModelDriver):
     def model_wrapper(cls, name, synonyms, interpolation,
                       aggregation, additional_variables, env=None):
         r"""Model wrapper."""
-        from yggdrasil.languages.Python.YggInterface import YggRpcServer
+        from yggdrasil.languages.Python.YggInterface import YggTimesyncServer
         if env is not None:
             os.environ.update(env)
-        rpc = YggRpcServer(name)
+        rpc = YggTimesyncServer(name)
         threads = {}
         times = []
         tables = {}
@@ -180,6 +180,11 @@ class TimeSyncModelDriver(DSLModelDriver):
             t, state = values[:]
             t_pd = units.convert_to_pandas_timedelta(t)
             client_model = rpc.ocomm[request_id].client_model
+            # Remove variables marked as external so they are not merged
+            external_variables = additional_variables.get(client_model, [])
+            for k in external_variables:
+                state.pop(k, None)
+            internal_variables = list(state.keys())
             # Update record
             with table_lock:
                 if client_model not in tables:
@@ -222,8 +227,6 @@ class TimeSyncModelDriver(DSLModelDriver):
                         table = table.append(new_data, sort=False)
                     tables[model] = table.sort_values('time')
             # Assign thread to handle checking when data is filled in
-            internal_variables = list(state.keys())
-            external_variables = additional_variables.get(client_model, [])
             threads[request_id] = multitasking.YggTaskLoop(
                 target=cls.response_loop,
                 args=(client_model, request_id, rpc, t_pd,
@@ -242,7 +245,8 @@ class TimeSyncModelDriver(DSLModelDriver):
                 v.terminate()
 
     @classmethod
-    def check_for_data(cls, time, tables, table_lock, open_clients):
+    def check_for_data(cls, time, tables, table_units, table_lock,
+                       open_clients):
         r"""Check for a time in the tables to determine if there is
         sufficient data available to calculate the state.
 
@@ -250,6 +254,8 @@ class TimeSyncModelDriver(DSLModelDriver):
             time (pandas.Timedelta): Time that state is requested at.
             tables (dict): Mapping from model name to pandas DataFrames
                 containing variables supplied by the model.
+            table_units (dict): Mapping from model name to dictionaries
+                mapping from variable names to units.
             table_lock (RLock): Thread-safe lock for accessing table.
             open_clients (list): Clients that are still open.
 
@@ -260,6 +266,9 @@ class TimeSyncModelDriver(DSLModelDriver):
         with table_lock:
             for k, v in tables.items():
                 if (k in open_clients) and (time > max(v.dropna()['time'])):
+                    return False
+            for k in open_clients:
+                if k not in table_units:  # pragma: debug
                     return False
         return True
 
@@ -300,7 +309,7 @@ class TimeSyncModelDriver(DSLModelDriver):
 
         """
         if not (rpc.all_clients_connected
-                and cls.check_for_data(time, tables, table_lock,
+                and cls.check_for_data(time, tables, table_units, table_lock,
                                        rpc.open_clients)):
             # Don't start sampling until all clients have connected
             # and there is data available for the requested timestep

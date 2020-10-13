@@ -619,8 +619,8 @@ class ComponentBase(ComponentBaseUnregistered):
     def __init__(self, skip_component_schema_normalization=None, **kwargs):
         if skip_component_schema_normalization is None:
             skip_component_schema_normalization = (
-                os.environ.get('YGG_SKIP_COMPONENT_VALIDATION', 'None').lower()
-                in ['true', '1'])
+                not (os.environ.get('YGG_VALIDATE_COMPONENTS', 'None').lower()
+                     in ['true', '1']))
         comptype = self._schema_type
         if (comptype is None) and (not self._schema_properties):
             self.extra_kwargs = kwargs
