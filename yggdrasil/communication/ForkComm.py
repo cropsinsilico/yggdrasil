@@ -359,7 +359,6 @@ class ForkComm(CommBase.CommBase):
             x (CommBase): Communication that message was received from.
 
         """
-        self._last_header = x._last_header
         self.transform = x.transform
         if not self.serializer.initialized:
             self.serializer = x.serializer

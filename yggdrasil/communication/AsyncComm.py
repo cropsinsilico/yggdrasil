@@ -27,7 +27,7 @@ class AsyncComm(ProxyObject, ComponentBaseUnregistered):
 
     __slots__ = ['_backlog_buffer', '_backlog_thread',
                  'backlog_ready', '_used_direct', 'close_on_eof_recv',
-                 '_used', '_last_header', '_closed']
+                 '_used', '_closed']
     __overrides__ = ['_input_args', '_input_kwargs']
     _disconnect_attr = ['backlog_ready', '_backlog_thread', '_wrapped']
 
@@ -38,7 +38,6 @@ class AsyncComm(ProxyObject, ComponentBaseUnregistered):
         self._used_direct = False
         self.close_on_eof_recv = wrapped.close_on_eof_recv
         self._used = False
-        self._last_header = None
         self._closed = False
         wrapped.close_on_eof_recv = False
         wrapped.is_async = True
@@ -306,7 +305,8 @@ class AsyncComm(ProxyObject, ComponentBaseUnregistered):
         data = None
         try:
             kwargs.setdefault('timeout', 0)
-            flag, data = self._wrapped.recv(**kwargs)
+            kwargs['return_header'] = True
+            flag, data, header = self._wrapped.recv(**kwargs)
             if flag:
                 if self._wrapped.is_empty_recv(data):
                     async_flag = FLAG_TRYAGAIN
@@ -321,7 +321,7 @@ class AsyncComm(ProxyObject, ComponentBaseUnregistered):
         except TemporaryCommunicationError:
             async_flag = FLAG_TRYAGAIN
         self.suppress_special_debug = False
-        return async_flag, data
+        return async_flag, data, header
 
     def send_backlog(self):
         r"""Send a message from the send backlog to the queue."""
@@ -342,10 +342,10 @@ class AsyncComm(ProxyObject, ComponentBaseUnregistered):
         if not self.is_open_direct:
             flag = False
         else:
-            async_flag, data = self.recv_direct()
+            async_flag, data, header = self.recv_direct()
             flag = bool(async_flag)
             if async_flag == FLAG_SUCCESS:
-                self.add_backlog((data, self._wrapped._last_header))
+                self.add_backlog((data, header))
         self.confirm_recv()
         return flag
 
@@ -384,7 +384,7 @@ class AsyncComm(ProxyObject, ComponentBaseUnregistered):
         """
         return self.send(self.eof_msg, *args, **kwargs)
 
-    def recv(self, timeout=None, **kwargs):
+    def recv(self, timeout=None, return_header=False, **kwargs):
         r"""Receive a message.
 
         Args:
@@ -417,18 +417,22 @@ class AsyncComm(ProxyObject, ComponentBaseUnregistered):
                 if self.backlog_thread.was_break:
                     self.info("Break stack:\n%s",
                               self.backlog_thread.break_stack)
-                return (False, None)
+                out = (False, None, None)
             else:
-                return (True, self.empty_obj_recv)
+                out = (True, self.empty_obj_recv, None)
         # Return backlogged message
-        self.debug('Returning backlogged received message')
-        msg, self._last_header = self.pop_backlog()
-        flag = True
-        if self.is_eof(msg) and self.close_on_eof_recv:
-            flag = False
-            self.close()
-        self._used = True
-        return (flag, msg)
+        else:
+            self.debug('Returning backlogged received message')
+            msg, header = self.pop_backlog()
+            flag = True
+            if self.is_eof(msg) and self.close_on_eof_recv:
+                flag = False
+                self.close()
+            self._used = True
+            out = (flag, msg, header)
+        if not return_header:
+            out = (out[0], out[1])
+        return out
 
     def purge(self):
         r"""Purge all messages from the comm."""
