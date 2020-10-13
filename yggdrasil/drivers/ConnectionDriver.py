@@ -265,16 +265,17 @@ class ConnectionDriver(Driver):
     def _init_single_comm(self, io, comm_list, **kwargs):
         r"""Parse keyword arguments for input/output comm."""
         self.debug("Creating %s comm", io)
-        s = get_schema()
         comm_kws = dict()
         assert(isinstance(comm_list, list))
         if io == 'input':
             direction = 'recv'
             attr_comm = 'icomm'
             comm_kws['close_on_eof_recv'] = False
+            comm_type = self._icomm_type
         else:
             direction = 'send'
             attr_comm = 'ocomm'
+            comm_type = self._ocomm_type
         comm_kws['direction'] = direction
         comm_kws['dont_open'] = True
         comm_kws['reverse_names'] = True
@@ -293,29 +294,8 @@ class ConnectionDriver(Driver):
             elif isinstance(x.get('comm', None), str):
                 comm_list[i]['commtype'] = comm_list[i].pop('comm')
             comm_list[i].setdefault('commtype', comm_type)
-        any_files = False
-        all_files = True
-        if not touches_model:
-            comm_kws['no_suffix'] = True
-            ikws = []
-            for x in comm_list:
-                icomm_cls = import_component('comm', x['commtype'])
-                if icomm_cls.is_file:
-                    any_files = True
-                    ikws += s['file'].get_subtype_properties(icomm_cls._filetype)
-                else:
-                    all_files = False
-                    ikws += s['comm'].get_subtype_properties(icomm_cls._commtype)
-                    if (icomm_cls._commtype == 'buffer') and self.as_process:
-                        x['buffer_task_method'] = 'process'
-            ikws = list(set(ikws))
-            for k in ikws:
-                if (k not in comm_kws) and (k in kwargs):
-                    comm_kws[k] = kwargs.pop(k)
-            if ('comm_env' in kwargs) and ('comm_env' not in comm_kws):
-                comm_kws['env'] = kwargs.pop('comm_env')
-        if any_files and (io == 'input'):
-            kwargs.setdefault('timeout_send_1st', 60)
+            if self.as_process:
+                comm_list[i]['buffer_task_method'] = 'process'
         comm_kws['comm'] = copy.deepcopy(comm_list)
         self.debug('%s comm_kws:\n%s', attr_comm, self.pprint(comm_kws, 1))
         setattr(self, attr_comm, new_comm(**comm_kws))

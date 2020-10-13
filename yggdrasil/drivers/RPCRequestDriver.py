@@ -46,15 +46,11 @@ class RPCRequestDriver(ConnectionDriver):
     def __init__(self, model_request_name, **kwargs):
         # Input communicator
         inputs = kwargs.get('inputs', [{}])
-        inputs[0]['comm'] = None
-        inputs[0]['name'] = model_request_name
+        inputs[0]['name'] = model_request_name + '.client_model_request'
         kwargs['inputs'] = inputs
         # Output communicator
         outputs = kwargs.get('outputs', [{}])
-        outputs[0]['comm'] = comm
-        outputs[0]['name'] = request_name
-        if comm_address is not None:
-            outputs[0]['address'] = comm_address
+        outputs[0]['name'] = model_request_name + '.client_model_request'
         outputs[0]['no_suffix'] = True
         outputs[0]['is_client'] = True
         outputs[0]['close_on_eof_send'] = False

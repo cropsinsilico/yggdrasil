@@ -303,6 +303,7 @@ class AsyncComm(ProxyObject, ComponentBaseUnregistered):
             "Receiving message from %s", self.address)
         self.suppress_special_debug = True
         data = None
+        header = None
         try:
             kwargs.setdefault('timeout', 0)
             kwargs['return_header'] = True
