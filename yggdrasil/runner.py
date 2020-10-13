@@ -319,10 +319,10 @@ class YggRunner(YggClass):
             times['start drivers'] = timer()
             self.set_signal_handler(signal_handler)
             if not self.as_function:
-                 self.waitModels()
-                 times['run models'] = timer()
-                 self.atexit()
-                 times['at exit'] = timer()
+                self.waitModels()
+                times['run models'] = timer()
+                self.atexit()
+                times['at exit'] = timer()
             tprev = t0
             key_order = ['init', 'load drivers', 'start drivers', 'run models',
                          'at exit']
