@@ -7,6 +7,7 @@ import tempfile
 import logging
 import pystache
 import io as sio
+import warnings
 import xml.etree.ElementTree as ET
 from yggdrasil import tools, platform
 from yggdrasil.components import import_component
@@ -106,7 +107,7 @@ class OSRModelDriver(ExecutableModelDriver):
                 OSR executable).
 
         """
-        if cls.repository is not None:
+        if (cls.repository is not None) and CPPModelDriver.is_installed():
             toolname = None
             # toolname = CPPModelDriver.get_tool('compiler',
             #                                    return_prop='name',
@@ -118,10 +119,18 @@ class OSRModelDriver(ExecutableModelDriver):
                 toolname = 'cl'
                 env['YGG_OSR_CXX'] = toolname
                 if toolname == 'cl':
-                    print('cl.exe', shutil.which(toolname),
-                          shutil.which(toolname + '.exe'))
-                    msvc_bin = os.path.dirname(shutil.which(toolname + '.exe'))
-                    env['YGG_OSR_LINK'] = os.path.join(msvc_bin, 'link.exe')
+                    cl_path = shutil.which(toolname + '.exe')
+                    print('cl.exe', shutil.which(toolname), cl_path)
+                    if cl_path:
+                        msvc_bin = os.path.dirname(cl_path)
+                        env['YGG_OSR_LINK'] = os.path.join(msvc_bin, 'link.exe')
+                    else:  # pragma: debug
+                        env.pop('YGG_OSR_CXX')
+                        warnings.warn(
+                            "The MSVC compiler is not installed. Be aware "
+                            "that the GNU compiler takes a *very* long time "
+                            "to compile OpenSimRoot against yggdrasil on "
+                            "Windows (> 1 hr).")
                 cwd = os.path.join(cwd, 'StaticBuild_win64')
             else:
                 cwd = os.path.join(cwd, 'StaticBuild')
