@@ -108,11 +108,13 @@ class OSRModelDriver(ExecutableModelDriver):
         """
         if cls.repository is not None:
             toolname = None
+            # toolname = CPPModelDriver.get_tool('compiler',
+            #                                    return_prop='name',
+            #                                    default=None)
             cwd = os.path.join(cls.repository, 'OpenSimRoot')
             flags = ['-j4']
             env = copy.deepcopy(os.environ)
             if platform._is_win:  # pragma: windows
-                # toolname = 'g++'
                 toolname = 'cl'
                 env['YGG_OSR_CXX'] = toolname
                 if toolname == 'cl':
@@ -121,7 +123,6 @@ class OSRModelDriver(ExecutableModelDriver):
                 cwd = os.path.join(cwd, 'StaticBuild_win64')
             else:
                 cwd = os.path.join(cwd, 'StaticBuild')
-                # flags.append('-j4')
             if target != 'cleanygg':
                 for x in cls.base_languages:
                     base_cls = import_component('model', x)
