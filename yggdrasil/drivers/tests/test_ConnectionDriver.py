@@ -124,12 +124,16 @@ class TestConnectionParam(parent.TestParam):
     def inputs(self):
         r"""list: List of keyword arguments for connection input comms."""
         out = [{'name': self.icomm_name, 'commtype': self.icomm_name}]
+        if not self.is_output:
+            out[0].update(self.testing_options['kwargs'])
         return out
 
     @property
     def outputs(self):
         r"""list: List of keyword arguments for connection output comms."""
         out = [{'name': self.ocomm_name, 'commtype': self.ocomm_name}]
+        if self.is_output:
+            out[0].update(self.testing_options['kwargs'])
         return out
 
     @property
@@ -156,7 +160,6 @@ class TestConnectionParam(parent.TestParam):
     def inst_kwargs(self):
         r"""dict: Keyword arguments for tested class."""
         out = super(TestConnectionParam, self).inst_kwargs
-        out.update(self.testing_options['kwargs'])
         out['inputs'] = self.inputs
         out['outputs'] = self.outputs
         return out

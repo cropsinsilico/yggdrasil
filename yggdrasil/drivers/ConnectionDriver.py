@@ -262,7 +262,7 @@ class ConnectionDriver(Driver):
                    self.icomm.name, self.icomm.address,
                    self.ocomm.name, self.ocomm.address)
 
-    def _init_single_comm(self, io, comm_list, **kwargs):
+    def _init_single_comm(self, io, comm_list):
         r"""Parse keyword arguments for input/output comm."""
         self.debug("Creating %s comm", io)
         comm_kws = dict()
@@ -303,9 +303,9 @@ class ConnectionDriver(Driver):
 
     def _init_comms(self, name, **kwargs):
         r"""Parse keyword arguments for input/output comms."""
-        kwargs = self._init_single_comm('input', self.inputs, **kwargs)
+        self._init_single_comm('input', self.inputs)
         try:
-            kwargs = self._init_single_comm('output', self.outputs, **kwargs)
+            self._init_single_comm('output', self.outputs)
         except BaseException:
             self.icomm.close()
             raise

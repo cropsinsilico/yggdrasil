@@ -551,7 +551,7 @@ def parse_connection(yml, existing):
             del existing['output'][y['name']]
     for i, y in enumerate(yml['outputs']):
         if is_file['outputs'][i]:
-            xx['outputs']['comm'].append(y)
+            xx['outputs'].append(y)
         else:
             new = existing['input'][y['name']]
             new.update(y)
