@@ -269,6 +269,9 @@ def cc_flags():
                                              toolname=args.toolname,
                                              dry_run=True))
     if platform._is_win:  # pragma: windows:
+        if out.endswith(' /link'):
+            out = out[:-(len(' /link'))]
+        out = out.replace('/', '-')
         out = out.replace('\\', '/')
         # out = out.encode('unicode_escape').decode('utf-8')
     print(out)
@@ -299,6 +302,7 @@ def ld_flags():
                                            toolname=args.toolname,
                                            dry_run=True))
     if platform._is_win:  # pragma: windows:
+        out = out.replace('/', '-')
         out = out.replace('\\', '/')
         # out = out.encode('unicode_escape').decode('utf-8')
     print(out)

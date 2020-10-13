@@ -1,14 +1,18 @@
 import os
 import git
+import copy
+import shutil
 import subprocess
 import tempfile
 import logging
 import pystache
 import io as sio
+import warnings
 import xml.etree.ElementTree as ET
 from yggdrasil import tools, platform
 from yggdrasil.components import import_component
 from yggdrasil.drivers.ExecutableModelDriver import ExecutableModelDriver
+from yggdrasil.drivers.CPPModelDriver import CPPModelDriver
 
 
 logger = logging.getLogger(__name__)
@@ -84,7 +88,7 @@ class OSRModelDriver(ExecutableModelDriver):
         super(OSRModelDriver, self).parse_arguments(*args, **kwargs)
         self.model_file_orig = self.model_file
         self.model_file = '_copy'.join(os.path.splitext(self.model_file_orig))
-        if self.copy_xml_to_osr:
+        if self.copy_xml_to_osr and (self.repository is not None):
             self.model_file = os.path.join(
                 self.repository, 'OpenSimRoot', 'InputFiles',
                 os.path.basename(self.model_file))
@@ -103,21 +107,41 @@ class OSRModelDriver(ExecutableModelDriver):
                 OSR executable).
 
         """
-        toolname = None
-        cwd = os.path.join(cls.repository, 'OpenSimRoot')
-        if platform._is_win:  # pragma: windows
-            toolname = 'g++'
-            cwd = os.path.join(cwd, 'StaticBuild_win64')
-        else:
-            cwd = os.path.join(cwd, 'StaticBuild')
-        if target != 'cleanygg':
-            for x in cls.base_languages:
-                base_cls = import_component('model', x)
-                base_cls.compile_dependencies(toolname=toolname)
-        elif not os.path.isfile(cls.executable_path):
-            return
-        cmd = ['make', target, '-j4']
-        subprocess.check_call(cmd, cwd=cwd)
+        if (cls.repository is not None) and CPPModelDriver.is_installed():
+            toolname = None
+            # toolname = CPPModelDriver.get_tool('compiler',
+            #                                    return_prop='name',
+            #                                    default=None)
+            cwd = os.path.join(cls.repository, 'OpenSimRoot')
+            flags = ['-j4']
+            env = copy.deepcopy(os.environ)
+            if platform._is_win:  # pragma: windows
+                toolname = 'cl'
+                env['YGG_OSR_CXX'] = toolname
+                if toolname == 'cl':
+                    cl_path = shutil.which(toolname + '.exe')
+                    print('cl.exe', shutil.which(toolname), cl_path)
+                    if cl_path:
+                        msvc_bin = os.path.dirname(cl_path)
+                        env['YGG_OSR_LINK'] = os.path.join(msvc_bin, 'link.exe')
+                    else:  # pragma: debug
+                        env.pop('YGG_OSR_CXX')
+                        warnings.warn(
+                            "The MSVC compiler is not installed. Be aware "
+                            "that the GNU compiler takes a *very* long time "
+                            "to compile OpenSimRoot against yggdrasil on "
+                            "Windows (> 1 hr).")
+                cwd = os.path.join(cwd, 'StaticBuild_win64')
+            else:
+                cwd = os.path.join(cwd, 'StaticBuild')
+            if target != 'cleanygg':
+                for x in cls.base_languages:
+                    base_cls = import_component('model', x)
+                    base_cls.compile_dependencies(toolname=toolname)
+            elif not os.path.isfile(cls.executable_path):
+                return
+            cmd = ['make', target] + flags
+            subprocess.check_call(cmd, cwd=cwd, env=env)
 
     def write_wrappers(self, **kwargs):
         r"""Write any wrappers needed to compile and/or run a model.
@@ -258,7 +282,10 @@ class OSRModelDriver(ExecutableModelDriver):
 
         """
         out = super(OSRModelDriver, cls).set_env_class(**kwargs)
-        out['OSR_REPOSITORY'] = cls.repository
+        if cls.repository is not None:
+            out['OSR_REPOSITORY'] = cls.repository
+        kwargs['existing'] = out
+        out = CPPModelDriver.set_env_class(**kwargs)
         return out
         
     @classmethod
