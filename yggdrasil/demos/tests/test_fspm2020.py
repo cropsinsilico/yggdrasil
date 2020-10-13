@@ -1,4 +1,5 @@
-from yggdrasil.demos.tests import DemoTstBase
+import os
+from yggdrasil.demos.tests import DemoTstBase, _demo_dir
 import unittest
 try:
     import trimesh
@@ -22,3 +23,9 @@ class TestFSPM2020Demo(DemoTstBase):
                            'yamls/roots.yml'),
             'simple_io': ('yamls/plant_output_mesh.yml',
                           'yamls/plant_io_mesh.yml')}
+
+    def __init__(self, *args, **kwargs):
+        super(TestFSPM2020Demo, self).__init__(*args, **kwargs)
+        out_dir = os.path.join(_demo_dir, self.demo_name, 'output')
+        if not os.path.isdir(out_dir):
+            os.mkdir(out_dir)
