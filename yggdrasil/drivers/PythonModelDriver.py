@@ -94,6 +94,14 @@ class PythonModelDriver(InterpretedModelDriver):
         cls.supported_comms = tools.get_supported_comm()
         InterpretedModelDriver.finalize_registration(cls)
         
+    @property
+    def debug_flags(self):
+        r"""list: Flags that should be prepended to an executable command to
+        enable debugging."""
+        out = super(PythonModelDriver, self).debug_flags
+        out.append('PYTHONMALLOC=malloc')
+        return out
+        
     @classmethod
     def is_language_installed(self):
         r"""Determine if this model driver is installed on the current

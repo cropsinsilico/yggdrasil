@@ -293,7 +293,8 @@ class ConnectionDriver(Driver):
                 comm_list[i] = dict(commtype=x)
             elif isinstance(x.get('comm', None), str):
                 comm_list[i]['commtype'] = comm_list[i].pop('comm')
-            comm_list[i].setdefault('commtype', comm_type)
+            if 'filetype' not in comm_list[i]:
+                comm_list[i].setdefault('commtype', comm_type)
             if self.as_process:
                 comm_list[i]['buffer_task_method'] = 'process'
         comm_kws['comm'] = copy.deepcopy(comm_list)
