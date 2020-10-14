@@ -129,6 +129,10 @@ class OSRModelDriver(ExecutableModelDriver):
                         msvc_bin = os.path.dirname(cl_path)
                         env['YGG_OSR_CXX'] = cl_path
                         env['YGG_OSR_LINK'] = os.path.join(msvc_bin, 'link.exe')
+                        for k in ['CL', '_CL_']:
+                            v = os.environ.get(k, None)
+                            if v is not None:
+                                env[k] = v.replace('/', '-').replace('\\', '/')
                     else:  # pragma: debug
                         env.pop('YGG_OSR_TOOL')
                         warnings.warn(
