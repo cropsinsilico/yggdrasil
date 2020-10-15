@@ -168,12 +168,12 @@ class TestBase(YggTestClassInfo):
             args += [self.filename]
             if (self.direction == 'output'):
                 filecomm_kwargs = self.testing_options['kwargs']
-                filecomm_kwargs['comm'] = self.filecomm
+                filecomm_kwargs['filetype'] = self.filecomm
                 return ([self.name, self.filename],
                         {'outputs': [filecomm_kwargs]})
             elif (self.direction == 'input'):
                 filecomm_kwargs = self.testing_options['kwargs']
-                filecomm_kwargs['comm'] = self.filecomm
+                filecomm_kwargs['filetype'] = self.filecomm
                 return ([self.name, self.filename],
                         {'inputs': [filecomm_kwargs]})
         return (args, kwargs)
@@ -364,7 +364,7 @@ class TestYggRpcClient(TestYggOutput):
         super(TestYggRpcClient, self).__init__(*args, **kwargs)
         self._inst_args = [self.name + '_' + self.model1,
                            self.fmt_str, self.fmt_str]
-        self.test_comm_kwargs = {'comm': 'ServerComm',
+        self.test_comm_kwargs = {'commtype': 'server',
                                  'response_kwargs': {'format_str': self.fmt_str}}
         self._messages = [(b'one', np.int32(1), 1.0)]
         
@@ -377,7 +377,7 @@ class TestYggRpcClient(TestYggOutput):
     def iodriver_args(self):
         r"""list: Connection driver arguments."""
         args, kwargs = super(TestYggRpcClient, self).iodriver_args
-        kwargs['icomm_kws']['comm'] = [
+        kwargs['icomm_kws']['comm_list'] = [
             {'name': '%s:%s_%s' % (
                 self.model1, self.name, self.model1),
              'partner_model': self.model1}]
@@ -411,7 +411,7 @@ class TestYggRpcServer(TestYggInput):
     def __init__(self, *args, **kwargs):
         super(TestYggRpcServer, self).__init__(*args, **kwargs)
         self._inst_args = [self.name, self.fmt_str, self.fmt_str]
-        self.test_comm_kwargs = {'comm': 'ClientComm',
+        self.test_comm_kwargs = {'commtype': 'client',
                                  'response_kwargs': {'format_str': self.fmt_str}}
         self._messages = [(b'one', np.int32(1), 1.0)]
         
@@ -424,7 +424,7 @@ class TestYggRpcServer(TestYggInput):
     def iodriver_args(self):
         r"""list: Connection driver arguments."""
         args, kwargs = super(TestYggRpcServer, self).iodriver_args
-        kwargs['icomm_kws']['comm'] = [
+        kwargs['icomm_kws']['comm_list'] = [
             {'name': '%s:%s_%s' % (
                 self.model1, self.name, self.model1),
              'partner_model': self.model1}]

@@ -15,7 +15,7 @@ class TestServerComm(test_CommBase.TestCommBase):
     @property
     def send_inst_kwargs(self):
         r"""dict: Keyword arguments for send instance."""
-        return {'comm': 'ClientComm'}
+        return {'commtype': 'client'}
     
     @property
     def inst_kwargs(self):
@@ -48,7 +48,8 @@ class TestServerComm(test_CommBase.TestCommBase):
 
     def test_newcomm_server(self):
         r"""Test creation of server using newcomm."""
-        inst = new_comm('testserver_%s' % str(uuid.uuid4()), comm=self.comm)
+        inst = new_comm('testserver_%s' % str(uuid.uuid4()),
+                        commtype=self.commtype)
         self.remove_instance(inst)
         
     def test_eof_no_close(self):
@@ -130,9 +131,9 @@ class TestServerComm(test_CommBase.TestCommBase):
 
         """
         target = comm
-        if comm.comm_class == 'ServerComm':
+        if comm._commtype == 'server':
             target = comm.icomm
-        elif comm.comm_class == 'ClientComm':
+        elif comm._commtype == 'client':
             target = comm.ocomm
         return super(TestServerComm, self).add_filter(target, filter=filter)
         

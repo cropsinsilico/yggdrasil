@@ -11,8 +11,8 @@ def test_wait_for_creation():
     r"""Test FileComm waiting for creation."""
     msg_send = b'Test message\n'
     name = 'temp_file_create.txt'
-    kwargs = {'in_temp': True, 'comm': 'FileComm', 'dont_open': True}
-    # kwargs = {'wait_for_creation': 5, 'in_temp': True, comm='FileComm'}
+    kwargs = {'in_temp': True, 'commtype': 'binary', 'dont_open': True}
+    # kwargs = {'wait_for_creation': 5, 'in_temp': True, commtype='binary'}
     send_instance = new_comm(name, direction='send', **kwargs)
     recv_instance = new_comm(name, direction='recv',
                              wait_for_creation=5.0, **kwargs)
@@ -48,6 +48,11 @@ class TestFileComm(parent.TestCommBase):
                  + ['fd', 'read_meth', 'append', 'in_temp',
                     'is_series', 'wait_for_creation', 'serializer',
                     'platform_newline'])
+    
+    @property
+    def commtype(self):
+        r"""str: Subtype associated with comm class."""
+        return self.import_cls._filetype
     
     def teardown(self):
         r"""Remove the file."""

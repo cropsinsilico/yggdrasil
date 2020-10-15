@@ -18,7 +18,7 @@ import json
 from pandas.testing import assert_frame_equal
 from yggdrasil.config import ygg_cfg, cfg_logging
 from yggdrasil import tools, platform, units
-from yggdrasil.communication import cleanup_comms
+from yggdrasil.communication import cleanup_comms, import_comm
 from yggdrasil.components import import_component
 
 
@@ -534,7 +534,7 @@ class YggTestBase(unittest.TestCase):
         r"""int: The number of comms."""
         out = 0
         for k in self.cleanup_comm_classes:
-            cls = import_component('comm', k)
+            cls = import_comm(k)
             out += cls.comm_count()
         return out
 
@@ -1168,8 +1168,9 @@ def generate_component_tests(comptype, base_class, target_globals,
                                     class_file_format % subtype_cls)
         if os.path.isfile(new_cls_file):
             continue
-        new_attr.setdefault(class_attr, subtype_cls)
-        new_cls = type(new_cls_name, (base_class, ), new_attr)
+        inew_attr = copy.deepcopy(new_attr)
+        inew_attr.setdefault(class_attr, subtype_cls)
+        new_cls = type(new_cls_name, (base_class, ), inew_attr)
         target_globals[new_cls.__name__] = new_cls
         del new_cls
 

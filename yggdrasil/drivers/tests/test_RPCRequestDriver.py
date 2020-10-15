@@ -27,16 +27,16 @@ class TestRPCRequestParam(parent.TestConnectionParam):
     def send_comm_kwargs(self):
         r"""dict: Keyword arguments for send comm."""
         out = self.instance.icomm.opp_comm_kwargs()
-        out['request_comm'] = out['comm']
-        out['comm'] = 'ClientComm'
+        out['request_commtype'] = out['commtype']
+        out['commtype'] = 'client'
         return out
 
     @property
     def recv_comm_kwargs(self):
         r"""dict: Keyword arguments for recv comm."""
         out = self.instance.ocomm.opp_comm_kwargs()
-        out['request_comm'] = out['comm']
-        out['comm'] = 'ServerComm'
+        out['request_commtype'] = out['commtype']
+        out['commtype'] = 'server'
         return out
 
     

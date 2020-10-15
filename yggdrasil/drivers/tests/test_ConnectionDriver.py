@@ -218,13 +218,13 @@ class TestConnectionParam(parent.TestParam):
             del kwargs['comm_address']
         if comm in ['ocomm', 'both']:
             for x in kwargs['outputs']:
-                x.update(base_comm=self.ocomm_name,
-                         new_comm_class='ErrorComm',
+                x.update(base_commtype=self.ocomm_name,
+                         new_commtype='ErrorComm',
                          error_on_init=error_on_init)
         if comm in ['icomm', 'both']:
             for x in kwargs['inputs']:
-                x.update(base_comm=self.icomm_name,
-                         new_comm_class='ErrorComm',
+                x.update(base_commtype=self.icomm_name,
+                         new_commtype='ErrorComm',
                          error_on_init=error_on_init)
         # Get error class
         if (error_class is None) and (comm in ['ocomm', 'icomm', 'both']):
@@ -332,9 +332,9 @@ class TestConnectionDriver(TestConnectionParam, parent.TestDriver):
         r"""Initialize comm object pair."""
         super(TestConnectionDriver, self).setup(*args, **kwargs)
         # CommBase is dummy class that never opens
-        if (self.send_comm.comm_class != 'CommBase'):
+        if (self.send_comm._commtype is not None):
             assert(self.send_comm.is_open)
-        if (self.recv_comm.comm_class != 'CommBase'):
+        if (self.recv_comm._commtype is not None):
             assert(self.recv_comm.is_open)
         self.nmsg_recv = 1
 

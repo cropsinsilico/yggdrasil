@@ -49,6 +49,11 @@ class RMQAsyncComm(RMQComm.RMQComm):
         self._qres_event.set()
         super(RMQAsyncComm, self)._init_before_open(**kwargs)
 
+    # @classmethod
+    # def underlying_comm_class(self):
+    #     r"""str: Name of underlying communication class."""
+    #     return 'rmq'
+
     @property
     def rmq_lock(self):
         r"""Lock associated with RMQ ioloop thread."""

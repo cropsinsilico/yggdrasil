@@ -291,13 +291,11 @@ class ConnectionDriver(Driver):
                     self.info('%s, %s', x, type(x))
                     assert(isinstance(x, str))
                 comm_list[i] = dict(commtype=x)
-            elif isinstance(x.get('comm', None), str):
-                comm_list[i]['commtype'] = comm_list[i].pop('comm')
             if 'filetype' not in comm_list[i]:
                 comm_list[i].setdefault('commtype', comm_type)
             if self.as_process:
                 comm_list[i]['buffer_task_method'] = 'process'
-        comm_kws['comm'] = copy.deepcopy(comm_list)
+        comm_kws['comm_list'] = copy.deepcopy(comm_list)
         self.debug('%s comm_kws:\n%s', attr_comm, self.pprint(comm_kws, 1))
         setattr(self, attr_comm, new_comm(**comm_kws))
         setattr(self, '%s_kws' % attr_comm, comm_kws)

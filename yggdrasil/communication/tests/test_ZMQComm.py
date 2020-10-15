@@ -40,7 +40,7 @@ def test_format_address():
 def test_invalid_protocol():
     r"""Test raise of an error in the event of an invalid protocol."""
     assert_raises(ValueError, new_comm, 'test_invalid_protocol',
-                  comm='ZMQComm', protocol='invalid')
+                  commtype='zmq', protocol='invalid')
 
 
 @unittest.skipIf(not _zmq_installed, "ZMQ library not installed")
@@ -51,7 +51,7 @@ def test_error_on_send_open_twice():
     for s, r in ZMQComm._socket_type_pairs:
         # Send comm
         name1 = 'test_%s' % s
-        comm1 = new_comm(name1 + '_1', comm='ZMQComm', socket_type=s,
+        comm1 = new_comm(name1 + '_1', commtype='zmq', socket_type=s,
                          dont_open=True, socket_action='bind')
         assert_raises(zmq.ZMQError, ZMQComm.ZMQComm,
                       name1 + '_2', socket_type=s,
@@ -237,5 +237,5 @@ class TestZMQCommROUTER(TestZMQComm):
 # @unittest.skipIf(_zmq_installed, "ZMQ library installed")
 # def test_not_running():
 #     r"""Test raise of an error if a ZMQ library is not installed."""
-#     comm_kwargs = dict(comm='ZMQComm', direction='send', reverse_names=True)
+#     comm_kwargs = dict(commtype='zmq', direction='send', reverse_names=True)
 #     assert_raises(RuntimeError, new_comm, 'test', **comm_kwargs)

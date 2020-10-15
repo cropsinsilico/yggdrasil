@@ -32,7 +32,7 @@ def get_queue(qid=None):
             kwargs['flags'] = sysv_ipc.IPC_CREX
         mq = sysv_ipc.MessageQueue(qid, **kwargs)
         key = str(mq.key)
-        CommBase.register_comm('IPCComm', key, mq)
+        IPCComm.register_comm(key, mq)
         return mq
     else:  # pragma: windows
         logger.warning("IPC not installed. Queue cannot be returned.")
@@ -50,9 +50,9 @@ def remove_queue(mq):
 
     """
     key = str(mq.key)
-    if not CommBase.is_registered('IPCComm', key):
+    if not IPCComm.is_registered(key):
         raise KeyError("Queue not registered.")
-    CommBase.unregister_comm('IPCComm', key)
+    IPCComm.unregister_comm(key)
     
 
 def ipcs(options=[]):
@@ -166,7 +166,7 @@ class IPCServer(CommBase.CommServer):
     r"""IPC server object for cleaning up server queue."""
 
     def terminate(self, *args, **kwargs):
-        CommBase.unregister_comm('IPCComm', self.srv_address)
+        IPCComm.unregister_comm(self.srv_address)
         super(IPCServer, self).terminate(*args, **kwargs)
 
 
@@ -195,11 +195,6 @@ class IPCComm(CommBase.CommBase):
         self._server_class = IPCServer
         super(IPCComm, self)._init_before_open(**kwargs)
             
-    @classmethod
-    def underlying_comm_class(self):
-        r"""str: Name of underlying communication class."""
-        return 'IPCComm'
-
     @classmethod
     def close_registry_entry(cls, value):
         r"""Close a registry entry."""

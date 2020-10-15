@@ -208,16 +208,16 @@ class ZMQProxy(CommBase.CommServer):
                                        nretry=nretry,
                                        retry_timeout=retry_timeout)
         self.cli_socket.setsockopt(zmq.LINGER, 0)
-        CommBase.register_comm('ZMQComm', 'ROUTER_server_' + self.cli_address,
-                               self.cli_socket)
+        ZMQComm.register_comm('ROUTER_server_' + self.cli_address,
+                              self.cli_socket)
         # Bind backend
         self.srv_socket = zmq_context.socket(zmq.DEALER)
         self.srv_socket.setsockopt(zmq.LINGER, 0)
         self.srv_address = bind_socket(self.srv_socket, srv_address,
                                        nretry=nretry,
                                        retry_timeout=retry_timeout)
-        CommBase.register_comm('ZMQComm', 'DEALER_server_' + self.srv_address,
-                               self.srv_socket)
+        ZMQComm.register_comm('DEALER_server_' + self.srv_address,
+                              self.srv_socket)
         # Set up poller
         # self.poller = zmq.Poller()
         # self.poller.register(frontend, zmq.POLLIN)
@@ -283,8 +283,8 @@ class ZMQProxy(CommBase.CommServer):
         if self.srv_socket:
             self.srv_socket.close()
             self.srv_socket = None
-        CommBase.unregister_comm('ZMQComm', 'ROUTER_server_' + self.cli_address)
-        CommBase.unregister_comm('ZMQComm', 'DEALER_server_' + self.srv_address)
+        ZMQComm.unregister_comm('ROUTER_server_' + self.cli_address)
+        ZMQComm.unregister_comm('DEALER_server_' + self.srv_address)
 
 
 class ZMQComm(CommBase.CommBase):
@@ -486,11 +486,6 @@ class ZMQComm(CommBase.CommBase):
                 self, target=reply_target, suffix='Reply')
         return self._reply_thread
     
-    @classmethod
-    def underlying_comm_class(self):
-        r"""str: Name of underlying communication class."""
-        return 'ZMQComm'
-
     @classmethod
     def close_registry_entry(cls, value):
         r"""Close a registry entry."""

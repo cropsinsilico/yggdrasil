@@ -8,7 +8,8 @@ import time
 from yggdrasil import tools, multitasking
 from yggdrasil.tools import YGG_MSG_EOF
 from yggdrasil.communication import (
-    new_comm, get_comm, determine_suffix, TemporaryCommunicationError)
+    new_comm, get_comm, determine_suffix, TemporaryCommunicationError,
+    import_comm)
 from yggdrasil.components import import_component, create_component
 from yggdrasil.metaschema.datatypes import MetaschemaTypeError
 from yggdrasil.metaschema.datatypes.MetaschemaType import MetaschemaType
@@ -24,61 +25,65 @@ class NeverMatch(Exception):
     'An exception class that is never raised by any code anywhere'
 
 
-def is_registered(comm_class, key):
+class IncompleteBaseComm(Exception):
+    r"""An exception class for methods that are incomplete for base classes."""
+
+
+def is_registered(commtype, key):
     r"""Determine if a comm object has been registered under the specified key.
     
     Args:
-        comm_class (str): Comm class to check for the key under.
+        commtype (str): Comm class to check for the key under.
         key (str): Key that should be checked.
 
     """
     global _registered_comms
     with _registered_comms.lock:
-        if comm_class not in _registered_comms:
+        if commtype not in _registered_comms:
             return False
-        return (key in _registered_comms[comm_class])
+        return (key in _registered_comms[commtype])
 
 
-def get_comm_registry(comm_class):
+def get_comm_registry(commtype):
     r"""Get the comm registry for a comm class.
 
     Args:
-        comm_class (str): Comm class to get registry for.
+        commtype (str): Comm class to get registry for.
 
     Returns:
         dict: Dictionary of registered comm objects.
 
     """
     with _registered_comms.lock:
-        if comm_class is None:
-            out = {}
-        else:
-            out = _registered_comms.get(comm_class, {})
+        # if commtype is None:
+        #     out = {}
+        # else:
+        out = _registered_comms.get(commtype, {})
     return out
 
 
-def register_comm(comm_class, key, value):
+def register_comm(commtype, key, value):
     r"""Add a comm object to the global registry.
 
     Args:
-        comm_class (str): Comm class to register the object under.
+        commtype (str): Comm class to register the object under.
         key (str): Key that should be used to register the object.
         value (obj): Object being registered.
 
     """
     global _registered_comms
     with _registered_comms.lock:
-        if comm_class not in _registered_comms:
-            _registered_comms.add_subdict(comm_class)
-        if key not in _registered_comms[comm_class]:
-            _registered_comms[comm_class][key] = value
+        if commtype not in _registered_comms:
+            _registered_comms.add_subdict(commtype)
+        if key not in _registered_comms[commtype]:
+            _registered_comms[commtype][key] = value
 
 
-def unregister_comm(comm_class, key, dont_close=False):
+def unregister_comm(commtype, key, dont_close=False):
     r"""Remove a comm object from the global registry and close it.
 
     Args:
-        comm_class (str): Comm class to check for key under.
+        commtype (str): Comm class to check for key under.
         key (str): Key for object that should be removed from the registry.
         dont_close (bool, optional): If True, the comm will be removed from
             the registry, but it won't be closed. Defaults to False.
@@ -89,37 +94,37 @@ def unregister_comm(comm_class, key, dont_close=False):
     """
     global _registered_comms
     with _registered_comms.lock:
-        if comm_class not in _registered_comms:
+        if commtype not in _registered_comms:
             return False
-        if key not in _registered_comms[comm_class]:
+        if key not in _registered_comms[commtype]:
             return False
-        value = _registered_comms[comm_class].pop(key)
+        value = _registered_comms[commtype].pop(key)
         if dont_close:
             return False
-        out = import_component('comm', comm_class).close_registry_entry(value)
+        out = import_comm(commtype).close_registry_entry(value)
         del value
     return out
 
 
-def cleanup_comms(comm_class, close_func=None):
+def cleanup_comms(commtype, close_func=None):
     r"""Clean up comms of a certain type.
 
     Args:
-        comm_class (str): Comm class that should be cleaned up.
+        commtype (str): Comm class that should be cleaned up.
 
     Returns:
         int: Number of comms closed.
 
     """
     count = 0
-    if comm_class is None:
-        return count
+    # if commtype is None:
+    #     return count
     global _registered_comms
     with _registered_comms.lock:
-        if comm_class in _registered_comms:
-            keys = list(_registered_comms[comm_class].keys())
+        if commtype in _registered_comms:
+            keys = list(_registered_comms[commtype].keys())
             for k in keys:
-                flag = unregister_comm(comm_class, k)
+                flag = unregister_comm(commtype, k)
                 if flag:  # pragma: debug
                     count += 1
     return count
@@ -417,10 +422,7 @@ class CommBase(tools.YggClass):
                  single_use=False, reverse_names=False, no_suffix=False,
                  is_client=False, is_response_client=False,
                  is_server=False, is_response_server=False,
-                 comm=None, is_async=False, **kwargs):
-        self._comm_class = None
-        if comm is not None:
-            assert(comm == self.comm_class)
+                 is_async=False, **kwargs):
         if isinstance(kwargs.get('datatype', None), MetaschemaType):
             self.datatype = kwargs.pop('datatype')
         super(CommBase, self).__init__(name, **kwargs)
@@ -736,7 +738,7 @@ class CommBase(tools.YggClass):
 
         """
         lang_list = tools.get_supported_lang()
-        comm_class = str(cls).split("'")[1].split(".")[-1]
+        commtype = cls._commtype
         use_any = False
         if language in [None, 'all']:
             language = lang_list
@@ -754,8 +756,7 @@ class CommBase(tools.YggClass):
                     out = True
                     break
         else:
-            if comm_class in ['CommBase', 'AsyncComm', 'ForkComm',
-                              'ErrorClass']:
+            if commtype in [None, 'server', 'client', 'fork']:
                 out = (language in lang_list)
             else:
                 # Check driver
@@ -777,26 +778,16 @@ class CommBase(tools.YggClass):
         return b''
         
     @property
-    def comm_class(self):
-        r"""str: Name of communication class."""
-        # TODO: Change this to return self._commtype
-        if self._comm_class is None:
-            if getattr(self, '_is_error_class', False):
-                name_cls = self.__class__.__bases__[0]
-            else:
-                name_cls = self.__class__
-            self._comm_class = str(name_cls).split("'")[1].split(".")[-1]
-        return self._comm_class
-
-    @property
     def model_name(self):
         r"""str: Name of the model using the comm."""
         return os.environ.get('YGG_MODEL_NAME', '')
 
     @classmethod
-    def underlying_comm_class(self):
+    def underlying_comm_class(cls):
         r"""str: Name of underlying communication class."""
-        return None
+        if cls._commtype in [None, 'fork']:
+            return False
+        return cls._commtype
 
     @classmethod
     def close_registry_entry(cls, value):
@@ -813,25 +804,37 @@ class CommBase(tools.YggClass):
         r"""dict: Registry of comms of this class."""
         return get_comm_registry(cls.underlying_comm_class())
 
-    def register_comm(self, key, value):
-        r"""Register a comm."""
-        self.debug("Registering %s comm: %s", self.comm_class, key)
-        register_comm(self.comm_class, key, value)
+    @classmethod
+    def is_registered(cls, key):
+        r"""bool: True if the comm is registered, False otherwise."""
+        commtype = cls.underlying_comm_class()
+        return is_registered(commtype, key)
 
-    def unregister_comm(self, key, dont_close=False):
+    @classmethod
+    def register_comm(cls, key, value):
+        r"""Register a comm."""
+        # commtype = cls._commtype
+        commtype = cls.underlying_comm_class()
+        logger.debug("Registering %s comm: %s" % (commtype, key))
+        register_comm(commtype, key, value)
+
+    @classmethod
+    def unregister_comm(cls, key, dont_close=False):
         r"""Unregister a comm."""
-        self.debug("Unregistering %s comm: %s (dont_close = %s)",
-                   self.comm_class, key, dont_close)
-        unregister_comm(self.comm_class, key, dont_close=dont_close)
+        # commtype = cls._commtype
+        commtype = cls.underlying_comm_class()
+        logger.debug("Unregistering %s comm: %s (dont_close = %s)",
+                     commtype, key, dont_close)
+        unregister_comm(commtype, key, dont_close=dont_close)
 
     @classmethod
     def comm_count(cls):
         r"""int: Number of communication connections."""
         out = len(cls.comm_registry())
         if out > 0:
-            logger.info('There are %d %s comms: %s',
-                        len(cls.comm_registry()), cls.__name__,
-                        [k for k in cls.comm_registry().keys()])
+            logger.debug('There are %d %s comms: %s',
+                         len(cls.comm_registry()), cls.__name__,
+                         [k for k in cls.comm_registry().keys()])
         return out
 
     @classmethod
@@ -849,13 +852,13 @@ class CommBase(tools.YggClass):
             kwargs.setdefault('address', env[name])
         elif name in os.environ:
             kwargs.setdefault('address', os.environ[name])
-        new_comm_class = kwargs.pop('new_comm_class', None)
+        new_commtype = kwargs.pop('new_commtype', None)
         if dont_create:
             args = tuple([name] + list(args))
         else:
             args, kwargs = cls.new_comm_kwargs(name, *args, **kwargs)
-        if new_comm_class is not None:
-            new_cls = import_component('comm', new_comm_class)
+        if new_commtype is not None:
+            new_cls = import_comm(new_commtype)
             return new_cls(*args, **kwargs)
         return cls(*args, **kwargs)
 
@@ -886,7 +889,7 @@ class CommBase(tools.YggClass):
             dict: Keyword arguments for opposite comm object.
 
         """
-        kwargs = {'comm': self.comm_class, 'use_async': self.is_async}
+        kwargs = {'commtype': self._commtype, 'use_async': self.is_async}
         kwargs['address'] = self.opp_address
         kwargs['serializer'] = self.serializer
         if self.direction == 'send':
@@ -1326,7 +1329,11 @@ class CommBase(tools.YggClass):
     @property
     def get_work_comm_kwargs(self):
         r"""dict: Keyword arguments for an existing work comm."""
-        return dict(comm=self.comm_class, direction='recv',
+        if self._commtype is None:
+            raise IncompleteBaseComm(
+                "Base comm class '%s' cannot create work comm."
+                % self.__class__.__name__)
+        return dict(commtype=self._commtype, direction='recv',
                     recv_timeout=self.recv_timeout,
                     is_interface=self.is_interface,
                     single_use=True)
@@ -1334,7 +1341,11 @@ class CommBase(tools.YggClass):
     @property
     def create_work_comm_kwargs(self):
         r"""dict: Keyword arguments for a new work comm."""
-        return dict(comm=self.comm_class, direction='send',
+        if self._commtype is None:
+            raise IncompleteBaseComm(
+                "Base comm class '%s' cannot create work comm."
+                % self.__class__.__name__)
+        return dict(commtype=self._commtype, direction='send',
                     recv_timeout=self.recv_timeout,
                     is_interface=self.is_interface,
                     uuid=str(uuid.uuid4()), single_use=True)
@@ -1375,7 +1386,7 @@ class CommBase(tools.YggClass):
         kws = self.create_work_comm_kwargs
         kws.update(**kwargs)
         if work_comm_name is None:
-            cls = kws.get("comm", tools.get_default_comm())
+            cls = kws.get('commtype', 'default')
             work_comm_name = '%s_temp_%s_%s.%s' % (
                 self.name, cls, kws['direction'], kws['uuid'])
         c = new_comm(work_comm_name, **kws)
@@ -1455,7 +1466,7 @@ class CommBase(tools.YggClass):
         kws['uuid'] = header['id']
         kws['address'] = header['address']
         if work_comm_name is None:
-            cls = kws.get("comm", tools.get_default_comm())
+            cls = kws.get('commtype', 'default')
             work_comm_name = '%s_temp_%s_%s.%s' % (
                 self.name, cls, kws['direction'], header['id'])
         c = get_comm(work_comm_name, **kws)
@@ -1512,9 +1523,9 @@ class CommBase(tools.YggClass):
             self._last_send = time.perf_counter()
         return out
     
-    def _send(self, msg, *args, **kwargs):
+    def _send(self, msg, *args, **kwargs):  # pragma: debug
         r"""Raw send. Should be overridden by inheriting class."""
-        raise NotImplementedError("_send method needs implemented.")
+        raise IncompleteBaseComm("_send method needs implemented.")
 
     def _send_multipart(self, msg, **kwargs):
         r"""Send a message larger than maxMsgSize in multiple parts.
@@ -1795,9 +1806,9 @@ class CommBase(tools.YggClass):
             self._last_recv = time.perf_counter()
         return out
 
-    def _recv(self, *args, **kwargs):
+    def _recv(self, *args, **kwargs):  # pragma: debug
         r"""Raw recv. Should be overridden by inheriting class."""
-        raise NotImplementedError("_recv method needs implemented.")
+        raise IncompleteBaseComm("_recv method needs implemented.")
 
     def _recv_multipart(self, data, leng_exp, **kwargs):
         r"""Receive a message larger than YGG_MSG_MAX that is sent in multiple
@@ -1979,6 +1990,7 @@ class CommBase(tools.YggClass):
             msg_len = 1
         if flag and (msg_len > 0):
             self.debug('%d bytes received from %s', msg_len, self.address)
+        header['commtype'] = self._commtype
         return flag, msg, header
         
     def recv_nolimit(self, *args, **kwargs):

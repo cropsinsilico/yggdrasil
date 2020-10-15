@@ -12,6 +12,22 @@ class NoMessages(TemporaryCommunicationError):
     pass
 
 
+def import_comm(commtype=None):
+    r"""Import a comm class from its component subtype.
+
+    Args:
+        commtype (str, optional): Communication class subtype. Defaults to
+            the default comm type for the current OS.
+
+    Returns:
+        CommBase: Associated communication class.
+
+    """
+    if commtype in ['server', 'client', 'fork']:
+        commtype = '%sComm' % commtype.title()
+    return import_component('comm', commtype)
+
+
 def determine_suffix(no_suffix=False, reverse_names=False,
                      direction='send', **kwargs):
     r"""Determine the suffix that should be used for the comm name.
@@ -47,13 +63,15 @@ def determine_suffix(no_suffix=False, reverse_names=False,
     return suffix
 
 
-def new_comm(name, comm=None, use_async=False, **kwargs):
+def new_comm(name, commtype=None, use_async=False, **kwargs):
     r"""Return a new communicator, creating necessary components for
     communication (queues, sockets, channels, etc.).
 
     Args:
         name (str): Communicator name.
-        comm (str, optional): Name of communicator class.
+        commtype (str, list, optional): Name of communicator type or a list
+            of specifiers for multiple communicators that should be joined.
+            Defaults to None.
         use_async (bool, optional): If True, send/recv operations will
             be performed asynchronously on new threads. Defaults to
             False.
@@ -64,25 +82,18 @@ def new_comm(name, comm=None, use_async=False, **kwargs):
         Comm: Communicator of given class.
 
     """
-    if comm is None:
-        comm = kwargs.get('commtype', None)
-    if isinstance(comm, list):
-        if len(comm) == 1:
-            kwargs.update(comm[0])
+    assert('comm' not in kwargs)
+    if isinstance(commtype, list):
+        if len(commtype) == 1:
+            kwargs.update(commtype[0])
             kwargs.setdefault('name', name)
             return new_comm(use_async=use_async, **kwargs)
         else:
-            kwargs['comm'] = comm
-            comm = 'ForkComm'
-    if comm is None:
-        for k in ['commtype', 'filetype']:
-            if k in kwargs:
-                comm = kwargs.pop(k)
-                break
-    elif comm in ['DefaultComm', 'default']:
-        commtype = kwargs.pop('commtype', 'default')
-        assert(commtype == 'default')
-    comm_cls = import_component('comm', comm)
+            kwargs['comm_list'] = commtype
+            commtype = 'fork'
+    if (commtype is None) and kwargs.get('filetype', None):
+        commtype = kwargs.pop('filetype')
+    comm_cls = import_comm(commtype)
     if kwargs.get('is_interface', False):
         use_async = False
     if use_async:
@@ -109,18 +120,18 @@ def get_comm(name, **kwargs):
     return new_comm(name, **kwargs)
     
 
-def cleanup_comms(comm=None):
+def cleanup_comms(commtype=None):
     r"""Call cleanup_comms for the appropriate communicator class.
 
     Args:
-        comm (str, optional): Name of communicator class. Defaults to
-            tools.get_default_comm() if not provided.
+        commtype (str, optional): Name of communicator class. Defaults to
+            'default' if not provided.
 
     Returns:
         int: Number of comms closed.
 
     """
-    return import_component('comm', comm).cleanup_comms()
+    return import_comm(commtype).cleanup_comms()
 
 
 @contextmanager

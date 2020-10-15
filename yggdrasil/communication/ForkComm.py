@@ -1,5 +1,4 @@
-from yggdrasil.communication import CommBase, get_comm
-from yggdrasil.components import import_component
+from yggdrasil.communication import CommBase, get_comm, import_comm
 
 
 _address_sep = ':YGG_ADD:'
@@ -25,7 +24,7 @@ class ForkComm(CommBase.CommBase):
     Args:
         name (str): The environment variable where communication address is
             stored.
-        comm (list, optional): The list of options for the comms that
+        comm_list (list, optional): The list of options for the comms that
             should be bundled. If not provided, the bundle will be empty.
         **kwargs: Additional keyword arguments are passed to the parent class.
 
@@ -35,40 +34,40 @@ class ForkComm(CommBase.CommBase):
 
     """
 
+    _commtype = 'fork'
     _dont_register = True
     
-    def __init__(self, name, comm=None, is_async=False, **kwargs):
+    def __init__(self, name, comm_list=None, is_async=False, **kwargs):
         self.comm_list = []
         self.curr_comm_index = 0
         self.eof_recv = []
         address = kwargs.pop('address', None)
-        if (comm in [None, 'ForkComm']):
+        if comm_list is None:
             if isinstance(address, list):
                 ncomm = len(address)
             else:
                 ncomm = 0
-            comm = [None for i in range(ncomm)]
-        assert(isinstance(comm, list))
-        ncomm = len(comm)
+            comm_list = [None for i in range(ncomm)]
+        assert(isinstance(comm_list, list))
+        ncomm = len(comm_list)
         for i in range(ncomm):
-            if comm[i] is None:
-                comm[i] = {}
-            if comm[i].get('name', None) is None:
-                comm[i]['name'] = get_comm_name(name, i)
+            if comm_list[i] is None:
+                comm_list[i] = {}
+            if comm_list[i].get('name', None) is None:
+                comm_list[i]['name'] = get_comm_name(name, i)
         if isinstance(address, list):
             assert(len(address) == ncomm)
             for i in range(ncomm):
-                comm[i]['address'] = address[i]
+                comm_list[i]['address'] = address[i]
         for i in range(ncomm):
             ikw = dict(**kwargs)
-            ikw.update(**comm[i])
+            ikw.update(**comm_list[i])
             ikw.setdefault('use_async', is_async)
             iname = ikw.pop('name')
             self.comm_list.append(get_comm(iname, **ikw))
             self.eof_recv.append(0)
         if ncomm > 0:
             kwargs['address'] = [x.address for x in self.comm_list]
-        kwargs['comm'] = 'ForkComm'
         super(ForkComm, self).__init__(name, is_async=is_async, **kwargs)
         assert(not self.single_use)
         assert(not self.is_server)
@@ -120,23 +119,23 @@ class ForkComm(CommBase.CommBase):
         r"""Get keyword arguments for new comm."""
         if 'address' not in kwargs:
             addresses = []
-            comm = kwargs.get('comm', None)
+            comm_list = kwargs.get('comm_list', None)
             ncomm = kwargs.pop('ncomm', 0)
-            if comm is None:
-                comm = [None for i in range(ncomm)]
-            assert(isinstance(comm, list))
-            ncomm = len(comm)
+            if comm_list is None:
+                comm_list = [None for i in range(ncomm)]
+            assert(isinstance(comm_list, list))
+            ncomm = len(comm_list)
             for i in range(ncomm):
-                x = comm[i]
+                x = comm_list[i]
                 if x is None:
                     x = {}
                 iname = x.pop('name', get_comm_name(name, i))
-                icls = import_component('comm', x.get('comm', None))
+                icls = import_comm(x.get('commtype', None))
                 _, ickw = icls.new_comm_kwargs(iname, **x)
                 ickw['name'] = iname
-                comm[i] = ickw
+                comm_list[i] = ickw
                 addresses.append(ickw['address'])
-            kwargs['comm'] = comm
+            kwargs['comm_list'] = comm_list
             kwargs['address'] = addresses
         args = tuple([name] + list(args))
         return args, kwargs
@@ -173,9 +172,9 @@ class ForkComm(CommBase.CommBase):
 
         """
         kwargs = super(ForkComm, self).opp_comm_kwargs()
-        kwargs['comm'] = [x.opp_comm_kwargs() for x in self.comm_list]
+        kwargs['comm_list'] = [x.opp_comm_kwargs() for x in self.comm_list]
         # for i, x in enumerate(self.comm_list):
-        #     kwargs['comm'][i]['name'] = x.name
+        #     kwargs['comm_list'][i]['name'] = x.name
         return kwargs
 
     def bind(self):

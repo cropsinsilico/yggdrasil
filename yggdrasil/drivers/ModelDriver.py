@@ -737,6 +737,7 @@ class ModelDriver(Driver):
                          % (' '.join(cmd), unused_kwargs.get('cwd', os.getcwd())))
             logger.debug("Process keyword arguments:\n%s\n",
                          '    ' + pformat(unused_kwargs).replace('\n', '\n    '))
+            print(' '.join(cmd))
             proc = tools.popen_nobuffer(cmd, **unused_kwargs)
             if return_process:
                 return proc

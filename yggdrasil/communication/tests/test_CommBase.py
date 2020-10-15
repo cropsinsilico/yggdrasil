@@ -43,7 +43,15 @@ class TestCommBase(YggTestClassInfo):
     @property
     def cleanup_comm_classes(self):
         r"""list: Comm classes that should be cleaned up following the test."""
-        return set([self.comm, self.send_inst_kwargs['comm']])
+        return set([self.commtype, self.comm, self.send_inst_kwargs['commtype']])
+
+    @property
+    def commtype(self):
+        r"""str: Subtype associated with comm class."""
+        out = self.import_cls._commtype
+        if out is None:
+            out = self.comm
+        return out
 
     @property
     def name(self):
@@ -68,7 +76,7 @@ class TestCommBase(YggTestClassInfo):
     @property
     def send_inst_kwargs(self):
         r"""dict: Keyword arguments for send instance."""
-        out = {'comm': self.comm, 'reverse_names': True,
+        out = {'commtype': self.commtype, 'reverse_names': True,
                'direction': 'send', 'use_async': self.use_async}
         out.update(self.testing_options['kwargs'])
         return out
@@ -81,7 +89,9 @@ class TestCommBase(YggTestClassInfo):
     @property
     def inst_kwargs(self):
         r"""dict: Keyword arguments for tested class."""
-        return self.send_instance.opp_comm_kwargs()
+        out = self.send_instance.opp_comm_kwargs()
+        out['commtype'] = self.commtype
+        return out
 
     @property
     def recv_instance(self):
@@ -152,13 +162,14 @@ class TestCommBase(YggTestClassInfo):
         r"""Get comm instance with ErrorClass parent class."""
         try:
             send_kwargs = self.send_inst_kwargs
-            err_kwargs = dict(base_comm=send_kwargs['comm'], new_comm_class='ErrorComm')
+            err_kwargs = dict(base_commtype=send_kwargs['commtype'],
+                              new_commtype='ErrorComm')
             err_name = self.name + '_' + self.uuid
             if not recv:
                 send_kwargs.update(**err_kwargs)
             send_inst = new_comm(err_name, **send_kwargs)
             recv_kwargs = send_inst.opp_comm_kwargs()
-            recv_kwargs['comm'] = send_kwargs['comm']
+            recv_kwargs['commtype'] = send_kwargs['commtype']
             if recv:
                 recv_kwargs.update(**err_kwargs)
             recv_inst = new_comm(err_name, **recv_kwargs)
@@ -251,33 +262,33 @@ class TestCommBase(YggTestClassInfo):
 
     def test_work_comm(self):
         r"""Test creating/removing a work comm."""
+        if self.comm in ['CommBase', 'AsyncComm']:
+            self.assert_raises(CommBase.IncompleteBaseComm,
+                               self.instance.create_work_comm)
+            self.assert_raises(CommBase.IncompleteBaseComm, getattr,
+                               self.instance, 'get_work_comm_kwargs')
+            return
         wc_send = self.instance.create_work_comm()
         self.assert_raises(KeyError, self.instance.add_work_comm, wc_send)
         # Create recv instance in way that tests new_comm
         header_recv = dict(id=self.uuid + '1', address=wc_send.address)
         recv_kwargs = self.instance.get_work_comm_kwargs
         recv_kwargs['work_comm_name'] = 'test_worker_%s' % header_recv['id']
-        recv_kwargs['new_comm_class'] = wc_send.comm_class
+        recv_kwargs['new_commtype'] = wc_send._commtype
         if isinstance(wc_send.opp_address, str):
             os.environ[recv_kwargs['work_comm_name']] = wc_send.opp_address
         else:
             recv_kwargs['address'] = wc_send.opp_address
         wc_recv = self.instance.create_work_comm(**recv_kwargs)
         # wc_recv = self.instance.get_work_comm(header_recv)
-        if self.comm in ['CommBase', 'AsyncComm']:
-            flag = wc_send.send(self.test_msg)
-            assert(not flag)
-            flag, msg_recv = wc_recv.recv()
-            assert(not flag)
-        else:
-            flag = wc_send.send(self.test_msg)
-            assert(flag)
-            flag, msg_recv = wc_recv.recv(self.timeout)
-            assert(flag)
-            self.assert_equal(msg_recv, self.test_msg)
-            # Assert errors on second attempt
-            # self.assert_raises(RuntimeError, wc_send.send, self.test_msg)
-            self.assert_raises(RuntimeError, wc_recv.recv)
+        flag = wc_send.send(self.test_msg)
+        assert(flag)
+        flag, msg_recv = wc_recv.recv(self.timeout)
+        assert(flag)
+        self.assert_equal(msg_recv, self.test_msg)
+        # Assert errors on second attempt
+        # self.assert_raises(RuntimeError, wc_send.send, self.test_msg)
+        self.assert_raises(RuntimeError, wc_recv.recv)
         self.instance.remove_work_comm(wc_send.uuid)
         self.instance.remove_work_comm(wc_recv.uuid)
         self.instance.remove_work_comm(wc_recv.uuid)
@@ -390,10 +401,6 @@ class TestCommBase(YggTestClassInfo):
             assert(not flag)
             flag, msg_recv0 = frecv_meth(**recv_kwargs)
             assert(not flag)
-            if self.comm == 'CommBase':
-                self.assert_raises(NotImplementedError, self.recv_instance._send,
-                                   self.test_msg)
-                self.assert_raises(NotImplementedError, self.recv_instance._recv)
         else:
             for i in range(n_send):
                 flag = fsend_meth(*send_args, **send_kwargs)
@@ -453,8 +460,8 @@ class TestCommBase(YggTestClassInfo):
 
     def test_cleanup_comms(self):
         r"""Test cleanup_comms for comm class."""
-        CommBase.cleanup_comms(self.recv_instance.comm_class)
-        assert(len(CommBase.get_comm_registry(self.recv_instance.comm_class)) == 0)
+        self.recv_instance.cleanup_comms()
+        assert(len(self.recv_instance.comm_registry()) == 0)
 
     def test_drain_messages(self):
         r"""Test waiting for messages to drain."""

@@ -142,6 +142,7 @@ class FileComm(CommBase.CommBase):
             cls._schema_properties.update(
                 cls._default_serializer_class._schema_properties)
             del cls._schema_properties['seritype']
+        cls._commtype = cls._filetype
 
     @classmethod
     def get_testing_options(cls, read_meth=None, **kwargs):
@@ -211,9 +212,9 @@ class FileComm(CommBase.CommBase):
         return True
 
     @classmethod
-    def underlying_comm_class(self):
+    def underlying_comm_class(cls):
         r"""str: Name of underlying communication class."""
-        return 'FileComm'
+        return cls._filetype
 
     @classmethod
     def close_registry_entry(cls, value):

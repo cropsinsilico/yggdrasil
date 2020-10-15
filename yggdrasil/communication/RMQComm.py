@@ -68,7 +68,7 @@ class RMQServer(CommBase.CommServer):
     r"""RMQ server object for cleaning up server connections."""
 
     def terminate(self, *args, **kwargs):
-        CommBase.unregister_comm('RMQComm', self.srv_address)
+        RMQComm.unregister_comm(self.srv_address)
         super(RMQServer, self).terminate(*args, **kwargs)
 
 
@@ -187,11 +187,6 @@ class RMQComm(CommBase.CommBase):
                 user, password, host, port, virtual_host)
             kwargs['address'] = _rmq_param_sep.join([url, exchange, queue])
         return args, kwargs
-
-    @classmethod
-    def underlying_comm_class(self):
-        r"""str: Name of underlying communication class."""
-        return 'RMQComm'
 
     def opp_comm_kwargs(self):
         r"""Get keyword arguments to initialize communication with opposite

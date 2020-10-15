@@ -2,14 +2,14 @@ from yggdrasil.tests import ErrorClass
 from yggdrasil.components import import_component
 
 
-def ErrorComm(name, base_comm='CommBase', **kwargs):  # pragma: debug
+def ErrorComm(name, base_commtype='CommBase', **kwargs):  # pragma: debug
     r"""Wrapper to return errored version of a comm class.
 
     Args:
         name (str): The environment variable where communication address is
             stored.
-        base_comm (str, optional): Name of the base comm that should be used.
-            Defaults to 'CommBase'.
+        base_commtype (str, optional): Name of the base comm that should be
+            used. Defaults to 'CommBase'.
         **kwargs: Additional keyword arguments are passed to the class
             constructor.
 
@@ -18,6 +18,6 @@ def ErrorComm(name, base_comm='CommBase', **kwargs):  # pragma: debug
             requested locaiton.
 
     """
-    base_class = import_component('comm', base_comm)
+    base_class = import_component('comm', base_commtype)
     out = ErrorClass(base_class, name, **kwargs)
     return out

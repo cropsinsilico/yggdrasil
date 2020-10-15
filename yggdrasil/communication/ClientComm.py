@@ -1,6 +1,5 @@
 import uuid
-from yggdrasil.components import import_component
-from yggdrasil.communication import (CommBase, new_comm, get_comm)
+from yggdrasil.communication import CommBase, new_comm, get_comm, import_comm
 
 
 class ClientComm(CommBase.CommBase):
@@ -9,8 +8,8 @@ class ClientComm(CommBase.CommBase):
     Args:
         name (str): The environment variable where communication address is
             stored.
-        request_comm (str, optional): Comm class that should be used for the
-            request comm. Defaults to None.
+        request_commtype (str, optional): Comm class that should be used for
+            the request comm. Defaults to None.
         response_kwargs (dict, optional): Keyword arguments for the response
             comm. Defaults to empty dict.
         **kwargs: Additional keywords arguments are passed to the output comm.
@@ -23,9 +22,10 @@ class ClientComm(CommBase.CommBase):
 
     """
 
+    _commtype = 'client'
     _dont_register = True
     
-    def __init__(self, name, request_comm=None, response_kwargs=None,
+    def __init__(self, name, request_commtype=None, response_kwargs=None,
                  dont_open=False, is_async=False, **kwargs):
         if response_kwargs is None:
             response_kwargs = dict()
@@ -33,13 +33,13 @@ class ClientComm(CommBase.CommBase):
         ocomm_kwargs = kwargs
         ocomm_kwargs['direction'] = 'send'
         ocomm_kwargs['dont_open'] = True
-        ocomm_kwargs['comm'] = request_comm
+        ocomm_kwargs['commtype'] = request_commtype
         ocomm_kwargs.setdefault('use_async', is_async)
         self.response_kwargs = response_kwargs
         self.ocomm = get_comm(ocomm_name, **ocomm_kwargs)
         self.icomm = dict()
         self.icomm_order = []
-        self.response_kwargs.setdefault('comm', self.ocomm.comm_class)
+        self.response_kwargs.setdefault('commtype', self.ocomm._commtype)
         self.response_kwargs.setdefault('recv_timeout', self.ocomm.recv_timeout)
         self.response_kwargs.setdefault('language', self.ocomm.language)
         self.response_kwargs.setdefault('use_async', self.ocomm.is_async)
@@ -64,7 +64,7 @@ class ClientComm(CommBase.CommBase):
             bool: Is the comm installed.
 
         """
-        return import_component('comm').is_installed(language=language)
+        return import_comm().is_installed(language=language)
 
     @property
     def maxMsgSize(self):
@@ -74,29 +74,29 @@ class ClientComm(CommBase.CommBase):
     @classmethod
     def underlying_comm_class(self):
         r"""str: Name of underlying communication class."""
-        return import_component('comm').underlying_comm_class()
+        return import_comm().underlying_comm_class()
 
     @classmethod
     def comm_count(cls):
         r"""int: Number of communication connections."""
-        return import_component('comm').comm_count()
+        return import_comm().comm_count()
 
     @classmethod
-    def new_comm_kwargs(cls, name, request_comm=None, **kwargs):
+    def new_comm_kwargs(cls, name, request_commtype=None, **kwargs):
         r"""Initialize communication with new comms.
 
         Args:
             name (str): Name for new comm.
-            request_comm (str, optional): Name of class for new output comm.
-                Defaults to None.
+            request_commtype (str, optional): Name of class for new output
+                comm. Defaults to None.
 
         """
         args = [name]
-        ocomm_class = import_component('comm', request_comm)
+        ocomm_class = import_comm(request_commtype)
         kwargs['direction'] = 'send'
         if 'address' not in kwargs:
             oargs, kwargs = ocomm_class.new_comm_kwargs(name, **kwargs)
-        kwargs['request_comm'] = request_comm
+        kwargs['request_commtype'] = request_commtype
         return args, kwargs
 
     @property
@@ -115,8 +115,8 @@ class ClientComm(CommBase.CommBase):
 
         """
         kwargs = super(ClientComm, self).opp_comm_kwargs()
-        kwargs['comm'] = "ServerComm"
-        kwargs['request_comm'] = self.ocomm.comm_class
+        kwargs['commtype'] = "server"
+        kwargs['request_commtype'] = self.ocomm._commtype
         kwargs['response_kwargs'] = self.response_kwargs
         return kwargs
         

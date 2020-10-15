@@ -14,12 +14,12 @@ def test_queue():
     r"""Test creation/removal of queue."""
     mq = IPCComm.get_queue()
     key = str(mq.key)
-    assert(CommBase.is_registered('IPCComm', key))
-    CommBase.unregister_comm('IPCComm', key, dont_close=True)
+    assert(CommBase.is_registered('ipc', key))
+    IPCComm.IPCComm.unregister_comm(key, dont_close=True)
     assert_raises(KeyError, IPCComm.remove_queue, mq)
-    CommBase.register_comm('IPCComm', key, mq)
+    IPCComm.IPCComm.register_comm(key, mq)
     IPCComm.remove_queue(mq)
-    assert(not CommBase.is_registered('IPCComm', key))
+    assert(not CommBase.is_registered('ipc', key))
 
 
 @unittest.skipIf(not _ipc_installed, "IPC library not installed")
@@ -87,5 +87,5 @@ def test_ipcrm_queues_not_isntalled():  # pragma: windows
 @unittest.skipIf(_ipc_installed, "IPC library installed")
 def test_not_running():  # pragma: windows
     r"""Test raise of an error if a IPC library is not installed."""
-    comm_kwargs = dict(comm='IPCComm', direction='send', reverse_names=True)
+    comm_kwargs = dict(commtype='ipc', direction='send', reverse_names=True)
     assert_raises(RuntimeError, new_comm, 'test', **comm_kwargs)

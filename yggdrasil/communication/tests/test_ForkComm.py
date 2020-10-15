@@ -74,5 +74,5 @@ class TestForkCommList(TestForkComm):
     def inst_kwargs(self):
         r"""list: Keyword arguments for tested class."""
         out = super(TestForkComm, self).inst_kwargs
-        out['comm'] = 'ForkComm'  # To force test of construction from addresses
+        out['comm_list'] = None  # To force test of construction from addresses
         return out
