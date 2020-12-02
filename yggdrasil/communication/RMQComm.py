@@ -5,11 +5,15 @@ logger = logging.getLogger(__name__)
 try:
     import pika
     _rmq_installed = True
+    _pika_version_maj = int(float(pika.__version__.split('.')[0]))
+    if _pika_version_maj >= 1:  # pragma: debug
+        raise ImportError("pika version 1.0 not yet supported.")
 except ImportError:
     logger.debug("Could not import pika. "
                  + "RabbitMQ support will be disabled.")
     pika = None
     _rmq_installed = False
+    _pika_version_maj = 0
 
 
 _rmq_param_sep = '_RMQPARAM_'

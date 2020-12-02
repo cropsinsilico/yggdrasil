@@ -1,13 +1,6 @@
 from yggdrasil import tools, multitasking
 from yggdrasil.communication import RMQComm
-if RMQComm._rmq_installed:
-    import pika
-    _pika_version_maj = int(float(pika.__version__.split('.')[0]))
-    if _pika_version_maj >= 1:  # pragma: debug
-        raise ImportError("pika version 1.0 not yet supported.")
-else:
-    pika = False
-    _pika_version_maj = 0
+from yggdrasil.communication.RMQComm import pika
 
 
 class RMQAsyncComm(RMQComm.RMQComm):
@@ -290,7 +283,7 @@ class RMQAsyncComm(RMQComm.RMQComm):
         parameters = pika.URLParameters(self.url)
         kwargs = dict(on_open_callback=self.on_connection_open,
                       on_open_error_callback=self.on_connection_open_error)
-        if _pika_version_maj < 1:
+        if RMQComm._pika_version_maj < 1:
             kwargs['stop_ioloop_on_close'] = False
         self.connection = pika.SelectConnection(parameters, **kwargs)
 
@@ -311,7 +304,7 @@ class RMQAsyncComm(RMQComm.RMQComm):
         r"""Actions that must be taken when the connection is closed. Set the
         channel to None. If the connection is meant to be closing, stop the
         IO loop. Otherwise, wait 5 seconds and try to reconnect."""
-        if _pika_version_maj < 1:
+        if RMQComm._pika_version_maj < 1:
             reply_code = args[0]
             reply_text = args[1]
         # else:
@@ -329,7 +322,7 @@ class RMQAsyncComm(RMQComm.RMQComm):
                 self.warning('Connection closed, reopening in %f seconds: (%s) %s',
                              self.sleeptime, reply_code, reply_text)
                 self._reconnecting = True
-                if _pika_version_maj < 1:
+                if RMQComm._pika_version_maj < 1:
                     connection.add_timeout(self.sleeptime, self.reconnect)
                 # else:
                 #     connection.ioloop.call_later(self.sleeptime, self.reconnect)
@@ -385,7 +378,7 @@ class RMQAsyncComm(RMQComm.RMQComm):
         r"""Actions to perform when the channel is closed. Close the
         connection."""
         with self.rmq_lock:
-            if _pika_version_maj < 1:
+            if RMQComm._pika_version_maj < 1:
                 reply_code = args[0]
                 reply_text = args[1]
                 self.debug('::channel %i was closed: (%s) %s',
@@ -453,7 +446,7 @@ class RMQAsyncComm(RMQComm.RMQComm):
         if self.direction == 'recv':
             kwargs = dict(on_message_callback=self.on_message,
                           queue=self.queue)
-            if _pika_version_maj < 1:
+            if RMQComm._pika_version_maj < 1:
                 kwargs['consumer_callback'] = kwargs.pop('on_message_callback')
             self.consumer_tag = self.channel.basic_consume(**kwargs)
         with self.rmq_lock:
