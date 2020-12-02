@@ -40,16 +40,17 @@ comm_t* get_global_scope_comm(const char *name) {
   }
   size_t i;
   comm_t* icomm = NULL;
+  int current_thread = get_thread_id();
   for (i = 0; i < ncomms2clean; i++) {
     if (vcomms2clean[i] != NULL) {
       icomm = (comm_t*)(vcomms2clean[i]);
-      if (strcmp(icomm->name, name) == 0) {
+      if ((strcmp(icomm->name, name) == 0) && (icomm->thread_id == current_thread)) {
   	return icomm;
       } else {
 	const char* YGG_MODEL_NAME = getenv("YGG_MODEL_NAME");
 	char alt_name[100];
 	sprintf(alt_name, "%s:%s", YGG_MODEL_NAME, name);
-	if (strcmp(icomm->name, alt_name) == 0) {
+	if ((strcmp(icomm->name, alt_name) == 0) && (icomm->thread_id == current_thread)) {
 	  return icomm;
 	}
       }
@@ -87,6 +88,10 @@ static
 int free_comm_type(comm_t *x) {
   comm_type t = x->type;
   int ret = 1;
+  if (x->thread_id != get_thread_id()) {
+    ygglog_error("free_comm_type: Thread is attempting to use a comm it did not initialize");
+    return ret;
+  }
   if (t == IPC_COMM)
     ret = free_ipc_comm(x);
   else if (t == ZMQ_COMM)
@@ -448,6 +453,10 @@ int comm_send_single(const comm_t *x, const char *data, const size_t len) {
     ygglog_error("comm_send_single: Invalid comm");
     return ret;
   }
+  if (x->thread_id != get_thread_id()) {
+    ygglog_error("comm_send_single: Thread is attempting to use a comm it did not initialize");
+    return ret;
+  }
   comm_type t = x->type;
   if (t == IPC_COMM)
     ret = ipc_comm_send(x, data, len);
@@ -789,6 +798,10 @@ int comm_recv_single(comm_t *x, char **data, const size_t len,
   int ret = -1;
   if ((x == NULL) || (x->valid == 0)) {
     ygglog_error("comm_recv_single: Invalid comm");
+    return ret;
+  }
+  if (x->thread_id != get_thread_id()) {
+    ygglog_error("comm_recv_single: Thread is attempting to use a comm it did not initialize");
     return ret;
   }
   comm_type t = x->type;

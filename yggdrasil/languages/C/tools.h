@@ -7,6 +7,10 @@
 #endif
 #endif
 
+#ifdef _OPENMP
+#include <omp.h>
+#endif
+
 #include <string.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -216,6 +220,23 @@ typedef struct python_t {
   void *kwargs;
   PyObject *obj;
 } python_t;
+
+
+/*!
+  @brief Get the ID for the current thread (if inside one).
+  @returns int Thread ID.
+ */
+static inline
+int get_thread_id() {
+  int out = 0;
+#ifdef _OPENMP
+  out = omp_get_thread_num();
+/* #elif defined pthread_self */
+/*   // TODO: Finalize/test support for pthread */
+/*   out = pthread_self(); */
+#endif
+  return out;
+};
 
 
 /*!
