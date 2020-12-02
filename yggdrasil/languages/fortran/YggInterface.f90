@@ -845,13 +845,13 @@ module fygg
      type(c_ptr) :: obj
   end type yggpyinst
   type, bind(c) :: yggpyfunc
-     character(kind=c_char), dimension(100) :: name = c_null_char
+     character(kind=c_char), dimension(1000) :: name = c_null_char
      type(c_ptr) :: args = c_null_ptr
      type(c_ptr) :: kwargs = c_null_ptr
      type(c_ptr) :: obj = c_null_ptr
   end type yggpyfunc
   type, bind(c) :: yggpython
-     character(kind=c_char), dimension(100) :: name = c_null_char
+     character(kind=c_char), dimension(1000) :: name = c_null_char
      type(c_ptr) :: args = c_null_ptr
      type(c_ptr) :: kwargs = c_null_ptr
      type(c_ptr) :: obj = c_null_ptr
