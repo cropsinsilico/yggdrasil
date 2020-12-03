@@ -110,6 +110,8 @@ def setup_package_on_ci(method, python):
             # "%s config --set channel_priority strict" % conda_cmd,
             "%s config --add channels conda-forge" % conda_cmd,
             "%s update -q conda" % conda_cmd,
+            "%s config --set allow_conda_downgrades true" % conda_cmd,
+            "%s install -n root conda=4.9" % conda_cmd,
             "%s create -q -n test-environment python=%s" % (conda_cmd, python)
         ]
     elif method == 'pip':
