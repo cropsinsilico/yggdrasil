@@ -1,0 +1,50 @@
+name: Python Package using Conda
+
+on: [push]
+
+jobs:
+  build:
+    env:
+      INSTALLR: 1
+      INSTALLC: 1
+      INSTALLFORTRAN: 1
+      INSTALLSBML: 1
+      INSTALLZMQ: 1
+      INSTALLRMQ: 0
+      INSTALLTRIMESH: 1
+      INSTALLPYGMENTS: 1
+      INSTALLLPY: 0
+    runs-on: ${{ matrix.os }}
+    strategy:
+      max-parallel: 5
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+        python-version: [3.6, 3.8]
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Set up Python
+      uses: actions/setup-python@v2
+      with:
+        python-version: ${{ matrix.python-version }}
+    - name: Install dependencies
+      run: |
+        # $CONDA is an environment variable pointing to the root of the miniconda directory
+        # $CONDA/bin/conda env update --file environment.yml --name base
+        $CONDA/bin/conda config --add channels conda-forge
+        python utils/ci_setup.py conda deploy
+    - name: Lint with flake8
+      run: |
+        $CONDA/bin/conda install flake8
+        # stop the build if there are Python syntax errors or undefined names
+        $CONDA/bin/flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
+        # exit-zero treats all errors as warnings. The GitHub editor is 127 chars wide
+        $CONDA/bin/flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
+    - name: Non-example tests
+      run: |
+        # conda install pytest
+        # $CONDA/bin/pytest
+        yggtest --ci
+    - name: Example tests
+      run: |
+        yggtest --ci --with-examples
