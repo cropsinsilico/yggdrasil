@@ -264,7 +264,6 @@ def run_tsts(**kwargs):  # pragma: no cover
     argv += expanded_test_paths
     # Run test command and perform cleanup before logging any errors
     logger.info("Running %s from %s", argv, os.getcwd())
-    print("Running %s from %s", argv, os.getcwd())
     new_config = {}
     pth_file = 'ygg_coverage.pth'
     assert(not os.path.isfile(pth_file))
