@@ -286,10 +286,10 @@ def deploy_package_on_ci(method, verbose=False):
             "%s build %s --python %s %s" % (
                 conda_cmd, 'recipe', PYVER, build_flags),
             "%s index %s" % (conda_cmd, index_dir),
-            # "%s install %s --use-local --update-deps yggdrasil" % (
-            #     conda_cmd, install_flags),
-            "%s install %s --update-deps -c file:/%s/conda-bld yggdrasil" % (
-                conda_cmd, install_flags, prefix_dir),
+            "%s install %s --use-local --update-deps yggdrasil" % (
+                conda_cmd, install_flags),
+            # "%s install %s --update-deps -c file:/%s/conda-bld yggdrasil" % (
+            #     conda_cmd, install_flags, prefix_dir),
         ]
     elif method == 'pip':
         if verbose:
