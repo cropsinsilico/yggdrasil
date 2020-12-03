@@ -280,7 +280,7 @@ def deploy_package_on_ci(method, verbose=False):
         else:
             build_flags = '-q'
             install_flags = '-q'
-        install_flags = '-vvv'
+        install_flags = '-vv'
         cmds += [
             "%s build %s --python %s %s" % (
                 conda_cmd, 'recipe', PYVER, build_flags),
