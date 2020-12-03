@@ -287,7 +287,7 @@ def deploy_package_on_ci(method, verbose=False):
             "%s build %s --python %s %s" % (
                 conda_cmd, 'recipe', PYVER, build_flags),
             "%s index %s" % (conda_cmd, index_dir),
-            "%s install %s --use-local yggdrasil" % (
+            "%s install %s --use-local yggdrasil>=1.3.0" % (
                 conda_cmd, install_flags),
             # "%s install %s -c file:/%s/conda-bld yggdrasil" % (
             #     conda_cmd, install_flags, prefix_dir),
