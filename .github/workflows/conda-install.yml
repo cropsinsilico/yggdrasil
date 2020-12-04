@@ -35,7 +35,7 @@ jobs:
     - name: Check conda
       run: |
         conda info
-        conda lis
+        conda list
     # - name: Set up Python
     #   uses: actions/setup-python@v2
     #   with:
