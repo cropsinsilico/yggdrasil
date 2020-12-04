@@ -32,6 +32,10 @@ jobs:
         auto-update-conda: true
         python-version: ${{ matrix.python-version }}
         channels: conda-forge
+    - name: Check conda
+      run: |
+        conda info
+        conda lis
     # - name: Set up Python
     #   uses: actions/setup-python@v2
     #   with:
