@@ -213,15 +213,20 @@ def deploy_package_on_ci(method):
         if not conda_prefix:
             if os.environ.get('GITHUB_ACTIONS', False):
                 conda_prefix = os.environ['CONDA']
+                prefix_dir = conda_prefix
             else:
                 conda_prefix = shutil.which('conda')
-        prefix_dir = os.path.dirname(os.path.dirname(conda_prefix))
+                prefix_dir = os.path.dirname(os.path.dirname(conda_prefix))
+        else:
+            prefix_dir = os.path.dirname(os.path.dirname(conda_prefix))
         index_dir = os.path.join(prefix_dir, "conda-bld")
         cmds += [
             # Install from conda build
             "%s build %s --python %s" % (conda_cmd, 'recipe', PYVER),
             "%s index %s" % (conda_cmd, index_dir),
-            "%s install -c file:/%s/conda-bld yggdrasil" % (conda_cmd, prefix_dir),
+            "%s install --update-deps --use-local yggdrasil" % conda_cmd,
+            # "%s install --update-deps -c file:/%s/conda-bld yggdrasil" % (
+            #     conda_cmd, prefix_dir),
             "%s list" % conda_cmd
         ]
     elif method == 'pip':
