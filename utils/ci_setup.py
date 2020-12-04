@@ -161,8 +161,7 @@ def verify_package_on_ci(method):
         assert(shutil.which("Rscript"))
     subprocess.check_call(["flake8", "yggdrasil"], cwd=src_dir)
     if method == 'conda':
-        from create_coveragerc import run
-        run()
+        subprocess.check_call(["python", "create_coveragerc.py"], cwd=src_dir)
     if not os.path.isfile(".coveragerc"):
         raise RuntimeError(".coveragerc file dosn't exist.")
     with open(".coveragerc", "r") as fd:
