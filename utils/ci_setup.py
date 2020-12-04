@@ -3,6 +3,7 @@ import sys
 import argparse
 import uuid
 import pprint
+import shutil
 import subprocess
 PYVER = ('%s.%s' % sys.version_info[:2])
 PY2 = (sys.version_info[0] == 2)
@@ -98,7 +99,9 @@ def setup_package_on_ci(method, python):
     """
     cmds = []
     major, minor = [int(x) for x in python.split('.')]
-    if _is_win:
+    if os.environ.get('GITHUB_ACTIONS', False):
+        conda_cmd = '$CONDA/bin/conda'
+    elif _is_win:
         conda_cmd = 'call conda'
     else:
         conda_cmd = 'conda'
@@ -273,8 +276,13 @@ def deploy_package_on_ci(method, verbose=False):
     if method == 'conda':
         # Install from conda build
         # Assumes that an environment is active
-        prefix_dir = os.path.dirname(os.path.dirname(
-            os.environ['CONDA_PREFIX']))
+        conda_prefix = os.environ.get('CONDA_PREFIX', None)
+        if not conda_prefix:
+            if os.environ.get('GITHUB_ACTIONS', False):
+                conda_prefix = os.environ['CONDA']
+            else:
+                conda_prefix = shutil.which('conda')
+        prefix_dir = os.path.dirname(os.path.dirname(conda_prefix))
         index_dir = os.path.join(prefix_dir, "conda-bld")
         if verbose:
             build_flags = ''
