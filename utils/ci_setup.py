@@ -3,6 +3,7 @@ import sys
 import argparse
 import uuid
 import pprint
+import shutil
 import subprocess
 PYVER = ('%s.%s' % sys.version_info[:2])
 PY2 = (sys.version_info[0] == 2)
@@ -208,7 +209,13 @@ def deploy_package_on_ci(method):
             cmds.append(("%s install contextlib2 pathlib2 "
                          "\"configparser >=3.5\"") % conda_cmd)
         # Assumes that an environment is active
-        prefix_dir = os.path.dirname(os.path.dirname(os.environ['CONDA_PREFIX']))
+        conda_prefix = os.environ.get('CONDA_PREFIX', None)
+        if not conda_prefix:
+            if os.environ.get('GITHUB_ACTIONS', False):
+                conda_prefix = os.environ['CONDA']
+            else:
+                conda_prefix = shutil.which('conda')
+        prefix_dir = os.path.dirname(os.path.dirname(conda_prefix))
         index_dir = os.path.join(prefix_dir, "conda-bld")
         cmds += [
             # Install from conda build
