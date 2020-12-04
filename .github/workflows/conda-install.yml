@@ -32,6 +32,11 @@ jobs:
         auto-update-conda: true
         python-version: ${{ matrix.python-version }}
         channels: conda-forge
+    - name: Install old MacOSX SDK for compatibility with the conda llvm (7)
+      shell: bash -l {0}
+      run: |
+        ./utils/setup_old_mac_sdk.sh
+      if: matrix.os == 'macos-latest'
     # - name: Set up Python
     #   uses: actions/setup-python@v2
     #   with:
