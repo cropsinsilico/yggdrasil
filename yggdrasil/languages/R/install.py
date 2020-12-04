@@ -140,12 +140,10 @@ def install_packages(package_list, update=False, repos=None, **kwargs):
     req_nover = []
     for x in package_list:
         out = re.fullmatch(regex_ver, x).groupdict()
-        print(x, out)
         if out['ver'] and ('=' in out['comparison']):
             req_ver.append((out['name'], out['ver']))
         else:
             req_nover.append(out['name'])
-    print(req_ver, req_nover)
     if repos is None:
         repos = 'http://cloud.r-project.org'
     R_cmd = []
@@ -164,6 +162,7 @@ def install_packages(package_list, update=False, repos=None, **kwargs):
             R_cmd = ['req <- %s' % req_list,
                      'for (x in req) {',
                      '  if (!is.element(x, installed.packages()[,1])) {',
+                     '    print(sprintf("Installing \'%s\' from CRAN.", x))',
                      '    install.packages(x, dep=TRUE, repos="%s")' % repos,
                      '  } else {',
                      '    print(sprintf("%s already installed.", x))',

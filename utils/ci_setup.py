@@ -131,7 +131,44 @@ def setup_package_on_ci(method, python):
         raise ValueError("Method must be 'conda' or 'pip', not '%s'"
                          % method)
     call_script(cmds)
-    
+
+
+def verify_package_on_ci(method):
+    r"""Verify that the package was installed correctly.
+
+    Args:
+        method (str): Method that was used to build and install
+            the package. Valid values include 'conda' and 'pip'.
+
+    """
+    src_dir = os.path.join(os.getcwd(),
+                           os.path.dirname(os.path.dirname(__file__)))
+    src_version = subprocess.check_output(
+        ["python", "-c",
+         "'import versioneer; print(versioneer.get_version())'"],
+        cwd=src_dir)
+    bld_version = subprocess.check_output(
+        ["python", "-c",
+         "'import yggdrasil; print(yggdrasil.__version__)'"],
+        cwd=os.path.dirname(src_dir))
+    if src_version != bld_version:
+        raise RuntimeError("Installed version does not match the version of "
+                           "this source code.\n"
+                           "\tSource version: %s\n\tBuild  version: %s"
+                           % (src_version, bld_version))
+    if INSTALLR:
+        assert(shutil.which("R"))
+        assert(shutil.which("Rscript"))
+    subprocess.check_call(["flake8", "yggdrasil"], cwd=src_dir)
+    if method == 'conda':
+        from create_coveragerc import run
+        run()
+    if not os.path.isfile(".coveragerc"):
+        raise RuntimeError(".coveragerc file dosn't exist.")
+    with open(".coveragerc", "r") as fd:
+        print(fd.read())
+    subprocess.check_call(["ygginfo", "--verbose"], cwd=src_dir)
+
 
 def deploy_package_on_ci(method):
     r"""Build and install the package and its dependencies on a CI
@@ -203,6 +240,11 @@ def deploy_package_on_ci(method):
             cmds += [
                 "echo Installing Pika...",
                 "%s install \"pika<1.0.0b1\"" % conda_cmd
+            ]
+        if INSTALLR:
+            cmds += [
+                "echo Installing R...",
+                "%s install r-base" % conda_cmd
             ]
         # Temp fix to install missing dependencies from jsonschema
         if PY2:
@@ -370,8 +412,12 @@ if __name__ == "__main__":
         help="Version of python that should be tested.")
     parser_dep = subparsers.add_parser(
         'deploy', help="Build and install package.")
+    parser_ver = subparsers.add_parser(
+        'verify', help="Verify that the package was installed correctly.")
     args = parser.parse_args()
     if args.operation in ['env', 'setup']:
         setup_package_on_ci(args.method, args.python)
     elif args.operation == 'deploy':
         deploy_package_on_ci(args.method)
+    elif args.operation == 'verify':
+        verify_package_on_ci(args.method)

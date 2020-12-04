@@ -129,7 +129,9 @@ def create_coveragerc(installed_languages):
     return True
 
 
-if __name__ == "__main__":
+def run():
+    r"""Run coverage creation function after getting a list of installed
+    languages."""
     LANG_PATH = os.path.join(os.path.abspath(os.path.dirname(__file__)),
                              'yggdrasil', 'languages')
     sys.path.insert(0, LANG_PATH)
@@ -141,3 +143,7 @@ if __name__ == "__main__":
     flag = create_coveragerc(installed_languages)
     if not flag:
         raise Exception("Failed to create/update converagerc file.")
+
+
+if __name__ == "__main__":
+    run()
