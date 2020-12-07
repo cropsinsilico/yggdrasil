@@ -261,6 +261,8 @@ def deploy_package_on_ci(method, verbose=False):
             conda_pkgs += ['czmq', 'zeromq']
     if BUILDDOCS:
         requirements_files.append('requirements_documentation.txt')
+        if not _in_conda:
+            os_pkgs.append("doxygen")
     # Install dependencies
     if method == 'conda':
         cmds += [
