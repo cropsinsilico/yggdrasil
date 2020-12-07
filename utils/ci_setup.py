@@ -180,7 +180,8 @@ def deploy_package_on_ci(method, verbose=False):
         _in_conda = True
         default_pkgs = conda_pkgs
     elif method == 'pip':
-        _in_conda = (_is_win or INSTALLLPY)
+        _in_conda = ((_is_win or INSTALLLPY)
+                     and (not os.environ.get('GITHUB_ACTIONS', False)))
         default_pkgs = pip_pkgs
     else:  # pragma: debug
         raise ValueError("Method must be 'conda' or 'pip', not '%s'"

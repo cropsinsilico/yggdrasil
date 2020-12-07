@@ -26,6 +26,10 @@ jobs:
           - os: ubuntu-latest
             python-version: 3.8
             install-method: conda
+        # exclude:
+        #   - os: windows-latest
+        #     python-version: 3.6
+        #     install-method: pip
       fail-fast: false
 
     steps:
