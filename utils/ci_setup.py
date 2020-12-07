@@ -244,6 +244,8 @@ def deploy_package_on_ci(method, verbose=False):
                 os.environ['YGG_USE_SUDO_FOR_R'] = '1'
             elif _is_osx:
                 os_pkgs += ["r", "udunits"]
+            elif _is_win:
+                os_pkgs += ["r.project"]
             else:
                 raise NotImplementedError("Could not determine "
                                           "R installation method.")
@@ -267,6 +269,8 @@ def deploy_package_on_ci(method, verbose=False):
             cmds += ["sudo apt-get install %s" % ' '.join(os_pkgs)]
         elif _is_osx:
             cmds += ["brew install %s" % ' '.join(os_pkgs)]
+        elif _is_win:
+            cmds += ["choco install %s" % ' '.join(os_pkgs)]
         else:
             raise NotImplementedError("No native package manager supported "
                                       "on Windows.")
