@@ -228,8 +228,12 @@ def deploy_package_on_ci(method, verbose=False):
                      os.environ.get('JSONSCHEMA', 'jsonschema')]
     if _is_linux:
         os_pkgs += ["strace", "valgrind"]
-    elif _is_osx:
-        os_pkgs += ["valgrind"]
+    # Valgrind failure:
+    # "valgrind: This formula either does not compile or function as expected
+    # on macOS versions newer than High Sierra due to an upstream
+    # incompatibility."
+    # elif _is_osx:
+    #     os_pkgs += ["valgrind"]
     if INSTALLSBML:
         pip_pkgs.append('libroadrunner')
     if INSTALLAPY:
