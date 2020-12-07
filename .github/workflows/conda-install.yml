@@ -4,7 +4,7 @@ on: [push]
 
 jobs:
   build:
-    name: Build (${{ matrix.python-version }}, ${{ matrix.os }})
+    name: Build (${{ matrix.python-version }}, ${{ matrix.os }}, ${{ matrix.install-method }})
     env:
       INSTALLR: 1
       INSTALLC: 1
