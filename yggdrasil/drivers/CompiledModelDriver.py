@@ -250,10 +250,10 @@ class CompilationToolBase(object):
             it is True, only the flag will be added to the list of flags. The
             order of entries indicates the order the flags should be added to
             the list.
-        search_path_envvar (str): Environment variables containing a list of paths
+        search_path_envvar (list): Environment variables containing a list of paths
             to search for library files. Either search_path_envvar or
             search_path_flags must be set. [REQUIRED]
-        search_path_env (str): Path relative to the env prefix that should
+        search_path_env (list): Paths relative to the env prefix that should
             be searched if the VIRTUAL_ENV or CONDA_PREFIX environment
             variable is set.
         search_path_flags (list): Flags that should be passed to the tool
@@ -787,8 +787,7 @@ class CompilationToolBase(object):
                 paths.append(os.path.join(prefix, suffix))
         # Get search paths from environment variable
         if (cls.search_path_envvar is not None) and (not env_only):
-            if not isinstance(cls.search_path_envvar, list):
-                cls.search_path_envvar = [cls.search_path_envvar]
+            assert(isinstance(cls.search_path_envvar, list))
             for ienv in cls.search_path_envvar:
                 ienv_paths = os.environ.get(ienv, '').split(os.pathsep)
                 for x in ienv_paths:
@@ -811,8 +810,7 @@ class CompilationToolBase(object):
         # Get search paths from the virtualenv/conda environment
         if (cls.search_path_env is not None):
             for iprefix in cls.get_env_prefixes():
-                if not isinstance(cls.search_path_env, list):
-                    cls.search_path_env = [cls.search_path_env]
+                assert(isinstance(cls.search_path_env, list))
                 for ienv in cls.search_path_env:
                     ienv_path = os.path.join(iprefix, ienv)
                     if (ienv_path not in paths) and os.path.isdir(ienv_path):
@@ -1840,7 +1838,7 @@ class ArchiverBase(LinkerBase):
             setattr(cls, k, None)
         if platform._is_win:  # pragma: windows
             cls.library_ext = '.lib'
-            cls.search_path_env = os.path.join('library', 'lib')
+            cls.search_path_env = [os.path.join('library', 'lib')]
         else:
             cls.library_ext = '.a'
 
