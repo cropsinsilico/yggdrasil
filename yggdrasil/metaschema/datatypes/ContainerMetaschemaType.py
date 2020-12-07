@@ -160,10 +160,11 @@ class ContainerMetaschemaType(MetaschemaType):
 
         """
         container = cls._container_type()
-        for k, v in cls._iterate(obj):
-            vtypedef = cls._get_element(typedef[cls._json_property], k, {})
-            vcls = get_type_class(vtypedef['type'])
-            cls._assign(container, k, vcls.decode_data(v, vtypedef))
+        if cls._json_property in typedef:
+            for k, v in cls._iterate(obj):
+                vtypedef = cls._get_element(typedef[cls._json_property], k, {})
+                vcls = get_type_class(vtypedef['type'])
+                cls._assign(container, k, vcls.decode_data(v, vtypedef))
         return container
 
     @classmethod
@@ -191,12 +192,13 @@ class ContainerMetaschemaType(MetaschemaType):
             return obj
         map_typedef = typedef[cls._json_property]
         map_out = cls._container_type()
-        for k, v in cls._iterate(map_typedef):
-            if not cls._has_element(obj, k):
-                return obj
-            cls._assign(map_out, k,
-                        get_type_class(v['type']).coerce_type(
-                            obj[k], typedef=v))
+        for k, v in cls._iterate(obj):
+            if cls._has_element(map_typedef, k):
+                cls._assign(map_out, k,
+                            get_type_class(map_typedef[k]['type']).coerce_type(
+                                v, typedef=map_typedef[k]))
+            else:
+                cls._assign(map_out, k, v)
         return map_out
         
     @classmethod

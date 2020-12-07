@@ -1,6 +1,6 @@
 from yggdrasil import tools, multitasking
 from yggdrasil.communication import RMQComm
-pika = RMQComm.pika
+from yggdrasil.communication.RMQComm import pika
 
 
 class RMQAsyncComm(RMQComm.RMQComm):

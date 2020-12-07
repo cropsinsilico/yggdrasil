@@ -224,6 +224,7 @@ class ConnectionDriver(Driver):
                            _comm_closed=multitasking.DummyEvent(),
                            _skip_after_loop=multitasking.DummyEvent())
         # Attributes used by process
+        self._last_header = None
         self._eof_sent = False
         self._first_send_done = False
         self._used = False
@@ -728,10 +729,12 @@ class ConnectionDriver(Driver):
         with self.lock:
             if self.icomm.is_closed:
                 return False
-            flag, msg = self.icomm.recv(**kwargs)
+            flag, msg, header = self.icomm.recv(return_header=True, **kwargs)
         if self.icomm.is_eof(msg):
+            self._last_header = header
             return self.on_eof()
         if flag:
+            self._last_header = header
             return msg
         else:
             return flag
@@ -799,7 +802,7 @@ class ConnectionDriver(Driver):
         sinfo['datatype'] = stype
         self.ocomm.serializer.initialize_serializer(sinfo)
         self.ocomm.serializer.update_serializer(skip_type=True,
-                                                **self.icomm._last_header)
+                                                **self._last_header)
         if (((stype['type'] == 'array')
              and (self.ocomm.serializer.typedef['type'] != 'array')
              and (len(stype['items']) == 1))):

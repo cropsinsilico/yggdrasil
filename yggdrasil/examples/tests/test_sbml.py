@@ -1,10 +1,5 @@
 import os
 from yggdrasil.examples.tests import ExampleTstBase
-try:
-    import roadrunner
-    rr_ver = tuple([int(x) for x in roadrunner.__version__.split('.')])
-except ImportError:
-    rr_ver = (0, 0, 0)
 
 
 class TestExampleSBML1(ExampleTstBase):
@@ -20,10 +15,7 @@ class TestExampleSBML1(ExampleTstBase):
     @property
     def expected_output_files(self):
         r"""Expected output file."""
-        if rr_ver < (2, 0, 0):
-            return [os.path.join(self.yamldir, 'Output', 'expected.txt')]
-        else:
-            return [os.path.join(self.yamldir, 'Output', 'expected-2.0.0.txt')]
+        return [os.path.join(self.yamldir, 'Output', 'expected.txt')]
         
     @property
     def output_files(self):
@@ -39,12 +31,8 @@ class TestExampleSBML2(TestExampleSBML1):
     @property
     def expected_output_files(self):
         r"""Expected output file."""
-        if rr_ver < (2, 0, 0):
-            return [os.path.join(self.yamldir, 'Output', 'expected%d.txt')
-                    % i for i in range(2)]
-        else:
-            return [os.path.join(self.yamldir, 'Output', 'expected%d-2.0.0.txt')
-                    % i for i in range(2)]
+        return [os.path.join(self.yamldir, 'Output', 'expected%d.txt')
+                % i for i in range(2)]
         
     @property
     def output_files(self):

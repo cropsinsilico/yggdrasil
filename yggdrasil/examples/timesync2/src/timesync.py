@@ -85,10 +85,9 @@ def main(t_step, t_units, model):
 
     # Initialize state and synchronize with other models
     t = t_start
-    ret, result = timesync.call(t, state)
+    ret, state = timesync.call(t, state)
     if not ret:
         raise RuntimeError("timesync(Python): Initial sync failed.")
-    state = result[0]
     print('timesync(Python): t = % 8s' % t, end='')
     for k, v in state.items():
         print(', %s = %+ 5.2f' % (k, v), end='')
@@ -108,10 +107,9 @@ def main(t_step, t_units, model):
         state = timestep_calc(t, model)
 
         # Synchronize the state
-        ret, result = timesync.call(t, state)
+        ret, state = timesync.call(t, state)
         if not ret:
             raise RuntimeError("timesync(Python): sync for t=%f failed." % t)
-        state = result[0]
         print('timesync(Python): t = % 8s' % t, end='')
         for k, v in state.items():
             print(', %s = %+ 5.2f' % (k, v), end='')

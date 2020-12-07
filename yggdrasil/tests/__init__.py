@@ -13,6 +13,8 @@ import psutil
 import copy
 import pprint
 import types
+import warnings
+import json
 from pandas.testing import assert_frame_equal
 from yggdrasil.config import ygg_cfg, cfg_logging
 from yggdrasil import tools, platform, units
@@ -41,7 +43,8 @@ script_list = [
     ('lpy', 'lpy_model.lpy'),
     ('r', 'r_model.R'),
     ('fortran', ['hellofunc.f90', 'fortran_model.f90']),
-    ('sbml', 'sbml_model.xml')]
+    ('sbml', 'sbml_model.xml'),
+    ('osr', 'osr_model.xml')]
 scripts = {}
 for k, v in script_list:
     if isinstance(v, list):
@@ -66,7 +69,8 @@ yaml_list = [
     ('error', 'error_model.yml'),
     ('lpy', 'lpy_model.yml'),
     ('fortran', 'fortran_model.yml'),
-    ('sbml', 'sbml_model.yml')]
+    ('sbml', 'sbml_model.yml'),
+    ('osr', 'osr_model.yml')]
 yamls = {k: os.path.join(yaml_dir, v) for k, v in yaml_list}
 
 # Makefile
@@ -95,11 +99,19 @@ def check_enabled_languages(language):
     """
     enabled = os.environ.get('YGG_TEST_LANGUAGE', None)
     if enabled is not None:
-        enabled = [x.lower() for x in enabled.split(',')]
+        enabled = [x.lower() for x in json.loads(enabled)]
         if ('c++' in enabled) or ('cpp' in enabled):
             enabled += ['c++', 'cpp']
         if language.lower() not in enabled:
             raise unittest.SkipTest("Tests for language %s not enabled.",
+                                    language)
+    disabled = os.environ.get('YGG_TEST_SKIP_LANGUAGE', None)
+    if disabled is not None:
+        disabled = [x.lower() for x in json.loads(disabled)]
+        if ('c++' in disabled) or ('cpp' in disabled):
+            disabled += ['c++', 'cpp']
+        if language.lower() in disabled:
+            raise unittest.SkipTest("Tests for language %s disabled.",
                                     language)
 
 
@@ -144,6 +156,13 @@ def requires_language(language, installed=True):
         return function
     
     return wrapper
+
+
+def pprint_diff(x, y):  # pragma: no cover
+    r"""Get the diff between the pprint.pformat string for two objects."""
+    print('\n'.join(difflib.ndiff(
+        pprint.pformat(x).splitlines(),
+        pprint.pformat(y).splitlines())))
 
 
 # Wrapped class to allow handling of arrays
@@ -419,7 +438,7 @@ def assert_warns(warning, *args, **kwargs):
     yield ut.assertWarns(warning, *args, **kwargs)
 
 
-def assert_equal(x, y):
+def assert_equal(x, y, dont_print_diff=False):
     r"""Assert that two messages are equivalent.
 
     Args:
@@ -430,7 +449,14 @@ def assert_equal(x, y):
         AssertionError: If the two messages are not equivalent.
 
     """
-    ut.assertEqual(x, y)
+    try:
+        with warnings.catch_warnings():
+            warnings.simplefilter(action='ignore', category=FutureWarning)
+            ut.assertEqual(x, y)
+    except AssertionError:  # pragma: debug
+        if (not dont_print_diff) and (type(x) == type(y)):
+            pprint_diff(x, y)
+        raise
 
 
 def assert_not_equal(x, y):

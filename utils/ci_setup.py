@@ -23,6 +23,8 @@ INSTALLSBML = (os.environ.get('INSTALLSBML', '0') == '1')
 INSTALLAPY = (os.environ.get('INSTALLAPY', '0') == '1')
 INSTALLZMQ = (os.environ.get('INSTALLZMQ', '0') == '1')
 INSTALLRMQ = (os.environ.get('INSTALLRMQ', '0') == '1')
+INSTALLTRIMESH = (os.environ.get('INSTALLTRIMESH', '0') == '1')
+INSTALLPYGMENTS = (os.environ.get('INSTALLPYGMENTS', '0') == '1')
 BUILDDOCS = (os.environ.get('BUILDDOCS', '0') == '1')
 
 
@@ -97,7 +99,9 @@ def setup_package_on_ci(method, python):
     """
     cmds = []
     major, minor = [int(x) for x in python.split('.')]
-    if _is_win:
+    if os.environ.get('GITHUB_ACTIONS', False):
+        conda_cmd = '$CONDA/bin/conda'
+    elif _is_win:
         conda_cmd = 'call conda'
     else:
         conda_cmd = 'conda'
@@ -109,6 +113,8 @@ def setup_package_on_ci(method, python):
             # "%s config --set channel_priority strict" % conda_cmd,
             "%s config --add channels conda-forge" % conda_cmd,
             "%s update -q conda" % conda_cmd,
+            # "%s config --set allow_conda_downgrades true" % conda_cmd,
+            # "%s install -n root conda=4.9" % conda_cmd,
             "%s create -q -n test-environment python=%s" % (conda_cmd, python)
         ]
     elif method == 'pip':
@@ -169,13 +175,15 @@ def verify_package_on_ci(method):
     subprocess.check_call(["ygginfo", "--verbose"], cwd=src_dir)
 
 
-def deploy_package_on_ci(method):
+def deploy_package_on_ci(method, verbose=False):
     r"""Build and install the package and its dependencies on a CI
     resource.
 
     Args:
         method (str): Method that should be used to build and install
             the package. Valid values include 'conda' and 'pip'.
+        verbose (bool, optional): If True, setup steps are run with verbosity
+            turned up. Defaults to False.
 
     Raises:
         ValueError: If method is not 'conda' or 'pip'.
@@ -188,120 +196,70 @@ def deploy_package_on_ci(method):
     cmds = [
         # Check that we have the expected version of Python
         "python --version",
-        # Upgrade pip and setuptools and wheel to get clean install
-        "pip install --upgrade wheel"
     ]
+    # Upgrade pip and setuptools and wheel to get clean install
+    upgrade_pkgs = ['wheel', 'setuptools']
     if not _is_win:
-        cmds += ["pip install --upgrade pip"]
-    cmds += ["pip install --upgrade wheel"]
-    if PY2:  # Python 2
-        cmds.append("pip install setuptools==43.0.0")
-    else:
-        cmds.append("pip install --upgrade setuptools")
-    cmds += [
-        # Uninstall default numpy and matplotlib to allow installation
-        # of specific versions
-        "pip uninstall -y numpy",
-        "pip uninstall -y matplotlib"
-    ]
+        upgrade_pkgs.insert(0, 'pip')
+    cmds += ["pip install --upgrade %s" % ' '.join(upgrade_pkgs)]
+    # Uninstall default numpy and matplotlib to allow installation
+    # of specific versions
+    cmds += ["pip uninstall -y numpy matplotlib"]
+    # Get dependencies
     install_req = os.path.join("utils", "install_from_requirements.py")
+    conda_pkgs = []
+    pip_pkgs = []
+    requirements_files = ['requirements_testing.txt']
+    _in_conda = False
     if method == 'conda':
-        cmds += [
-            "%s install -q -n base conda-build conda-verify" % (
-                conda_cmd),
-            "%s install -q scipy %s %s %s" % (
-                conda_cmd,
-                os.environ.get('NUMPY', 'numpy'),
-                os.environ.get('MATPLOTLIB', 'matplotlib'),
-                os.environ.get('JSONSCHEMA', 'jsonschema')),
-            "%s info -a" % conda_cmd,
-            "python %s conda requirements_testing.txt" % install_req
-        ]
-        if BUILDDOCS:
-            cmds.append(
-                "python %s conda requirements_documentation.txt" % (
-                    install_req))
-        if INSTALLSBML:
-            cmds += [
-                "echo Installing roadrunner for running SBML models...",
-                "pip install libroadrunner"]
-        if INSTALLAPY:
-            cmds += [
-                "echo Installing AstroPy...",
-                "%s install astropy" % conda_cmd
-            ]
-        if INSTALLLPY:
-            cmds += [
-                "echo Installing LPy...",
-                "%s install openalea.lpy boost=1.66.0 -c openalea" % conda_cmd
-            ]
-        if INSTALLRMQ:
-            cmds += [
-                "echo Installing Pika...",
-                "%s install \"pika<1.0.0b1\"" % conda_cmd
-            ]
-        if INSTALLR:
-            cmds += [
-                "echo Installing R...",
-                "%s install r-base" % conda_cmd
-            ]
-        # Temp fix to install missing dependencies from jsonschema
-        if PY2:
-            cmds.append(("%s install contextlib2 pathlib2 "
-                         "\"configparser >=3.5\"") % conda_cmd)
-        # Assumes that an environment is active
-        conda_prefix = os.environ.get('CONDA_PREFIX', None)
-        if not conda_prefix:
-            if os.environ.get('GITHUB_ACTIONS', False):
-                conda_prefix = os.environ['CONDA']
-                prefix_dir = conda_prefix
-            else:
-                conda_prefix = shutil.which('conda')
-                prefix_dir = os.path.dirname(os.path.dirname(conda_prefix))
-        else:
-            prefix_dir = os.path.dirname(os.path.dirname(conda_prefix))
-        index_dir = os.path.join(prefix_dir, "conda-bld")
-        cmds += [
-            # Install from conda build
-            "%s build %s --python %s" % (conda_cmd, 'recipe', PYVER),
-            "%s index %s" % (conda_cmd, index_dir),
-            "%s install --update-deps --use-local yggdrasil" % conda_cmd,
-            # "%s install --update-deps -c file:/%s/conda-bld yggdrasil" % (
-            #     conda_cmd, prefix_dir),
-            "%s list" % conda_cmd
-        ]
+        _in_conda = True
+        default_pkgs = conda_pkgs
     elif method == 'pip':
         _in_conda = (_is_win or INSTALLLPY)
-        # May need to uninstall conda version of numpy and matplotlib
-        # on LPy test
-        if _in_conda:
-            # Installing via pip causes import error on Windows and
-            # a conflict when installing LPy
-            cmds += [
-                "%s install %s scipy" % (
-                    conda_cmd,
-                    os.environ.get('NUMPY', 'numpy')),
-                "pip install %s %s" % (
-                    os.environ.get('MATPLOTLIB', 'matplotlib'),
-                    os.environ.get('JSONSCHEMA', 'jsonschema'))
-            ]
-        else:
-            cmds += [
-                "pip install %s %s %s" % (
-                    os.environ.get('NUMPY', 'numpy'),
-                    os.environ.get('MATPLOTLIB', 'matplotlib'),
-                    os.environ.get('JSONSCHEMA', 'jsonschema'))]
-        cmds.append(
-            "python %s pip requirements_testing.txt" % install_req)
-        if BUILDDOCS:
-            cmds.append(
-                "python %s pip requirements_documentation.txt" % (
-                    install_req))
+        default_pkgs = pip_pkgs
+    else:  # pragma: debug
+        raise ValueError("Method must be 'conda' or 'pip', not '%s'"
+                         % method)
+    # Installing via pip causes import error on Windows and
+    # a conflict when installing LPy
+    conda_pkgs += ['scipy', os.environ.get('NUMPY', 'numpy')]
+    default_pkgs += [os.environ.get('MATPLOTLIB', 'matplotlib'),
+                     os.environ.get('JSONSCHEMA', 'jsonschema')]
+    if INSTALLSBML:
+        pip_pkgs.append('libroadrunner')
+    if INSTALLAPY:
+        default_pkgs.append('astropy')
+    if INSTALLRMQ:
+        default_pkgs.append("\"pika<1.0.0b1\"")
+    if INSTALLTRIMESH:
+        default_pkgs.append('trimesh')
+    if INSTALLPYGMENTS:
+        default_pkgs.append('pygments')
+    if INSTALLR and _in_conda:
+        # Required to ensure the conda version of R is used in builc
+        default_pkgs.append('r-base')
+    if (method == 'pip') and _in_conda:
         if INSTALLR:
+            conda_pkgs.append('r-base')
+        if INSTALLFORTRAN:
+            if _is_win:
+                conda_pkgs += ['m2w64-gcc-fortran', 'make',
+                               'm2w64-toolchain_win-64']
+            else:
+                conda_pkgs += ['fortran-compiler']
+        if INSTALLZMQ:
+            conda_pkgs += ['czmq', 'zeromq']
+    if BUILDDOCS:
+        requirements_files.append('requirements_documentation.txt')
+    # Install dependencies
+    if method == 'conda':
+        cmds += [
+            "%s install -q -n base conda-build conda-verify" % conda_cmd,
+        ]
+    elif method == 'pip':
+        if INSTALLR and (not _in_conda):
             cmds.append("echo Installing R...")
-            if _in_conda:
-                cmds.append("%s install r-base" % conda_cmd)
-            elif _is_linux:
+            if _is_linux:
                 cmds += [("sudo add-apt-repository 'deb https://cloud"
                           ".r-project.org/bin/linux/ubuntu xenial-cran35/'"),
                          ("sudo apt-key adv --keyserver keyserver.ubuntu.com "
@@ -315,62 +273,83 @@ def deploy_package_on_ci(method):
             else:
                 raise NotImplementedError("Could not determine "
                                           "R installation method.")
-        if INSTALLFORTRAN:
+        if INSTALLFORTRAN and (not _in_conda):
             cmds.append("echo Installing Fortran...")
-            if _in_conda:
-                if _is_win:
-                    cmds.append(("%s install -c conda-forge "
-                                 "m2w64-gcc-fortran make "
-                                 "m2w64-toolchain_win-64") % conda_cmd)
-                else:
-                    cmds.append("%s install -c conda-forge fortran-compiler" % conda_cmd)
-            elif _is_linux:
+            if _is_linux:
                 cmds += ["sudo apt-get install gfortran"]
             elif _is_osx:
                 cmds += ["brew install gfortran"]
             else:
                 raise NotImplementedError("Could not determine "
                                           "Fortran installation method.")
-        if INSTALLSBML:
-            cmds += ['pip install libroadrunner']
-        if INSTALLAPY:
-            cmds += [
-                "echo Installing AstroPy...",
-                "pip install astropy"
-            ]
-        if INSTALLLPY:
-            if not _in_conda:  # pragma: debug
-                raise RuntimeError("Could not detect conda environment. "
-                                   "Cannot proceed with a conda deployment "
-                                   "(required for LPy).")
-            cmds += [
-                "echo Installing LPy...",
-                "%s install openalea.lpy boost=1.66.0 -c openalea" % conda_cmd
-            ]
-        if INSTALLZMQ:
+        if INSTALLZMQ and (not _in_conda):
             cmds.append("echo Installing ZeroMQ...")
-            if INSTALLLPY:
-                cmds.append("%s install czmq zeromq" % conda_cmd)
-            elif _is_linux:
+            if _is_linux:
                 cmds.append("./ci/install-czmq-linux.sh")
             elif _is_osx:
                 cmds.append("bash ci/install-czmq-osx.sh")
-            elif _is_win:
-                cmds.append("%s install czmq zeromq" % conda_cmd)
-                # cmds += ["call ci\\install-czmq-windows.bat",
-                #          "echo \"%PATH%\""]
+            # elif _is_win:
+            #     cmds += ["call ci\\install-czmq-windows.bat",
+            #              "echo \"%PATH%\""]
             else:
                 raise NotImplementedError("Could not determine "
                                           "ZeroMQ installation method.")
-        if INSTALLRMQ:
-            cmds += [
-                "echo Installing Pika...",
-                "pip install \"pika<1.0.0b1\""
-            ]
+    if _in_conda:
+        if conda_pkgs:
+            cmds += ["%s install %s" % (conda_cmd, ' '.join(conda_pkgs))]
+    else:
+        pip_pkgs += conda_pkgs
+    if pip_pkgs:
+        cmds += ["pip install %s" % ' '.join(pip_pkgs)]
+    for x in requirements_files:
+        cmds += ["python %s %s %s" % (install_req, method, x)]
+    if INSTALLLPY:
+        if _in_conda:
+            cmds += ["%s install openalea.lpy boost=1.66.0 -c openalea"
+                     % conda_cmd]
+        else:  # pragma: debug
+            raise RuntimeError("Could not detect conda environment. "
+                               "Cannot proceed with a conda deployment "
+                               "(required for LPy).")
+    # Install yggdrasil
+    if method == 'conda':
+        # Install from conda build
+        # Assumes that an environment is active
+        conda_prefix = os.environ.get('CONDA_PREFIX', None)
+        if not conda_prefix:
+            if os.environ.get('GITHUB_ACTIONS', False):
+                conda_prefix = os.environ['CONDA']
+                prefix_dir = conda_prefix
+            else:
+                conda_prefix = shutil.which('conda')
+                prefix_dir = os.path.dirname(os.path.dirname(conda_prefix))
+        else:
+            prefix_dir = os.path.dirname(os.path.dirname(conda_prefix))
+        index_dir = os.path.join(prefix_dir, "conda-bld")
+        if verbose:
+            build_flags = ''
+            install_flags = '-vvv'
+        else:
+            build_flags = '-q'
+            install_flags = '-q'
         cmds += [
-            # Install from source dist
-            "python setup.py sdist"
+            "%s build %s --python %s %s" % (
+                conda_cmd, 'recipe', PYVER, build_flags),
+            "%s index %s" % (conda_cmd, index_dir),
+            "%s install %s --use-local --update-deps yggdrasil" % (
+                conda_cmd, install_flags),
+            # "%s install %s --update-deps -c file:/%s/conda-bld yggdrasil" % (
+            #     conda_cmd, install_flags, prefix_dir),
         ]
+    elif method == 'pip':
+        if verbose:
+            build_flags = ''
+            install_flags = '--verbose'
+        else:
+            build_flags = '--quiet'
+            install_flags = ''
+        # Install from source dist
+        cmds += ["python setup.py %s sdist" % build_flags]
         if _is_win:  # pragma: windows
             cmds += [
                 "for %%a in (\"dist\\*.tar.gz\") do set YGGSDIST=%%a",
@@ -380,15 +359,16 @@ def deploy_package_on_ci(method):
         else:
             sdist = "dist/*.tar.gz"
         cmds += [
-            "pip install --verbose %s" % sdist,
-            "pip list",
+            "pip install %s %s" % (install_flags, sdist),
             "python create_coveragerc.py"
         ]
-        if _in_conda:
-            cmds.append("%s list" % conda_cmd)
     else:  # pragma: debug
         raise ValueError("Method must be 'conda' or 'pip', not '%s'"
                          % method)
+    # Print summary of what was installed
+    cmds.append('pip list')
+    if _in_conda:
+        cmds.append("%s list" % conda_cmd)
     call_script(cmds)
 
 
@@ -411,12 +391,15 @@ if __name__ == "__main__":
         help="Version of python that should be tested.")
     parser_dep = subparsers.add_parser(
         'deploy', help="Build and install package.")
+    parser_dep.add_argument(
+        '--verbose', action='store_true',
+        help="Turn up verbosity of output from setup step.")
     parser_ver = subparsers.add_parser(
         'verify', help="Verify that the package was installed correctly.")
     args = parser.parse_args()
     if args.operation in ['env', 'setup']:
         setup_package_on_ci(args.method, args.python)
     elif args.operation == 'deploy':
-        deploy_package_on_ci(args.method)
+        deploy_package_on_ci(args.method, verbose=args.verbose)
     elif args.operation == 'verify':
         verify_package_on_ci(args.method)

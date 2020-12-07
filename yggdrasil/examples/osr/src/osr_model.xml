@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!--
+	Simulation file for SimRoot version 5. This development version, build July 2007
+	Author: Jouke Postma
+	Note: 
+	
+	PLEASE KEEP THIS HEADER UP TO DATE! LIST BELOW WHO YOU ARE, WHEN AND WHAT CHANGES YOU MADE AND WHY. LIST YOUR SOURCE AS MUCH AS POSSIBLE!
+
+	change log: 
+	11-july-07 added support for include files. 
+	
+	
+-->
+<!--STYLE SHEET SECTION: feel free to attach any stylesheet of your choosing-->
+<!--?xml-stylesheet type="text/xsl" href="tree-view2.xsl"?-->
+<?xml-stylesheet type="text/xsl" href="XML/treeview.xsl"?>
+
+<!--SIMULATION MODEL-->
+<SimulationModel xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../scripts/XML/SimulaXMLSchema.xsd">
+  
+	<SimulaBase name="soil">
+	</SimulaBase>	
+
+	
+	<SimulaBase name="plants">
+		<SimulaBase name="maize" objectGenerator="seedling">
+			<SimulaConstant name="plantType" type="string">
+			<!-- 	H99 w64a 36H56 noRCAinLaterals maize-aerenchyma--> 
+				maize-aerenchyma
+			</SimulaConstant>	
+			<SimulaConstant name="plantingTime"  unit="day" type="time">
+				0
+			</SimulaConstant>	
+			<SimulaConstant name="plantPosition" type="coordinate">
+					0 -2 0
+			</SimulaConstant>
+		</SimulaBase>	
+	</SimulaBase>	
+
+	<!-- <SimulaIncludeFile fileName="plantParameters/Maize/Maize/simulationControlParameters.xml"/> -->
+	<SimulaBase name="simulationControls">
+		<SimulaBase name="outputParameters">
+			<SimulaBase name="defaults">
+			<!-- optional section - if an export module section does not list end/start/interval times than you can specify a default here-->
+				<SimulaConstant
+					name="startTime"
+					type="time"> 0.</SimulaConstant>
+				<SimulaConstant
+					name="endTime"
+					type="time"> 1</SimulaConstant>
+				<SimulaConstant
+					name="timeInterval"
+					type="time"> 1.</SimulaConstant>
+			</SimulaBase>
+			<SimulaBase name="probeAllObjects">
+				<SimulaConstant
+					name="run"
+					type="bool">
+					1 <!--this does not result in any output, just tries to run the code for debugging purposes-->
+				</SimulaConstant>
+				<SimulaConstant
+					name="timeInterval"
+					type="time">1</SimulaConstant>
+				<SimulaConstant
+					name="requestedVariables"
+					type="string"> carbonAllocation2Roots, saturatedWaterContent,
+				</SimulaConstant>
+			</SimulaBase>	
+			<SimulaBase name="table">
+				<SimulaConstant
+					name="run"
+					type="bool"> 1</SimulaConstant>
+				<!--SimulaConstant name="timeInterval" type="time"> 1.0	</SimulaConstant-->
+				<SimulaConstant
+					name="searchingDepth"
+					type="integer"> 5</SimulaConstant>
+				<SimulaConstant
+					name="skipTheseVariables"
+					type="string"> primaryRoot, hypocotyl,
+				</SimulaConstant>
+			</SimulaBase>
+		</SimulaBase>
+	</SimulaBase>
+	
+	<SimulaIncludeFile fileName="templates/plantTemplateFullModel.xml"/>
+	<!-- SimulaIncludeFile fileName="environments/Rocksprings/Rocksprings-maize.xml"/-->
+	<SimulaIncludeFile fileName="environments/WageningseBovenBuurt/WageningseBovenBuurt-maize.xml"/>
+
+	<SimulaIncludeFile fileName="templates/plantTemplate.IncludeGeometry.xml" />
+	<SimulaIncludeFile fileName="templates/plantTemplate.IncludeDryweight.xml" />
+
+	<!--SimulaIncludeFile fileName="templates/plantTemplate.IncludePhosphorusBC.xml" /-->
+	<!--SimulaIncludeFile fileName="templates/plantTemplate.IncludePhosphorus3D.xml" /-->
+	<!--SimulaIncludeFile fileName="templates/plantTemplate.IncludeNitrateBasic.xml"/-->
+	<!--SimulaIncludeFile fileName="templates/plantTemplate.IncludeWaterModule.xml"/>
+	<SimulaIncludeFile fileName="templates/plantTemplate.IncludeNitrate3D.xml"/-->
+	<!--SimulaIncludeFile fileName="templates/plantTemplate.IncludePotassium3D.xml" /-->
+
+	<SimulaIncludeFile fileName="templates/configurationCarbon.xml"/>
+	<SimulaIncludeFile fileName="templates/plantTemplate.IncludeStress.xml"/>
+	<SimulaIncludeFile fileName="templates/plantTemplate.IncludeRootHairs.xml"/>
+	<SimulaIncludeFile fileName="templates/plantTemplate.IncludeAerenchyma.xml"/>
+	<SimulaIncludeFile fileName="templates/plantTemplate.IncludeRootLengthProfile.xml"/>
+	<!--SimulaIncludeFile fileName="templates/plantTemplate.IncludeLocalNutrientResponses.xml"/-->
+
+	<SimulaBase name="rootTypeParameters" >
+	  <!--SimulaIncludeFile fileName="plantParameters/Maize/H99/maize.xml"/>
+		<SimulaIncludeFile fileName="plantParameters/Maize/W64a/maize.xml"/>
+		<SimulaIncludeFile fileName="plantParameters/Maize/36H56/maize.xml"/-->
+	  <SimulaIncludeFile fileName="plantParameters/Maize/Maize/maize.xml"/>
+	</SimulaBase>
+</SimulationModel>
+
+

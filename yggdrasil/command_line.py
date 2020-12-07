@@ -182,13 +182,16 @@ def ygginfo():
 
 def yggrun():
     r"""Start a run."""
-    from yggdrasil import runner
+    from yggdrasil import runner, config
     parser = argparse.ArgumentParser(description='Run an integration.')
     parser.add_argument('yamlfile', nargs='+',
                         help='One or more yaml specification files.')
+    config.get_config_parser(parser, skip_sections='testing')
     args = parser.parse_args()
     prog = sys.argv[0].split(os.path.sep)[-1]
-    runner.run(args.yamlfile, ygg_debug_prefix=prog)
+    with config.parser_config(args):
+        runner.run(args.yamlfile, ygg_debug_prefix=prog,
+                   production_run=args.production_run)
 
 
 def yggclean():
@@ -205,6 +208,29 @@ def yggclean():
         args.language = get_supported_lang()
     for lang in args.language:
         import_component('model', lang).cleanup_dependencies()
+
+
+def yggcompile():
+    r"""Compile interface library/libraries."""
+    from yggdrasil.tools import get_supported_lang
+    from yggdrasil.components import import_component
+    yggclean()
+    parser = argparse.ArgumentParser(
+        description='Compile yggdrasil dependency libraries')
+    parser.add_argument('language', nargs='*', default=[],
+                        help=('One or more languages to compile the '
+                              'interface libraries for.'))
+    parser.add_argument('--toolname',
+                        help=('Name of compilation tool that should be '
+                              'used.'))
+    args = parser.parse_args()
+    if (len(args.language) == 0) or ('all' in args.language):
+        args.language = get_supported_lang()
+    for lang in args.language:
+        drv = import_component('model', lang)
+        if ((hasattr(drv, 'compile_dependencies')
+             and (not getattr(drv, 'is_build_tool', False)))):
+            drv.compile_dependencies(toolname=args.toolname)
 
 
 def yggcc():
@@ -226,8 +252,29 @@ def cc_flags():
         list: The necessary compiler flags and preprocessor definitions.
 
     """
-    from yggdrasil.drivers import CModelDriver
-    print(' '.join(CModelDriver.CModelDriver.get_compiler_flags(for_model=True)))
+    from yggdrasil import platform
+    parser = argparse.ArgumentParser(
+        description='Get the compilation flags necessary for a C/C++ program.')
+    parser.add_argument('--cpp', action='store_true',
+                        help='Get compilation flags for a C++ program.')
+    parser.add_argument('--toolname', default=None,
+                        help=('Name of the tool that associated flags should '
+                              'be returned for.'))
+    args = parser.parse_args()
+    if args.cpp:
+        from yggdrasil.drivers.CPPModelDriver import CPPModelDriver as driver
+    else:
+        from yggdrasil.drivers.CModelDriver import CModelDriver as driver
+    out = ' '.join(driver.get_compiler_flags(for_model=True,
+                                             toolname=args.toolname,
+                                             dry_run=True))
+    if platform._is_win:  # pragma: windows:
+        if out.endswith(' /link'):
+            out = out[:-(len(' /link'))]
+        out = out.replace('/', '-')
+        out = out.replace('\\', '/')
+        # out = out.encode('unicode_escape').decode('utf-8')
+    print(out)
 
 
 def ld_flags():
@@ -238,8 +285,27 @@ def ld_flags():
         list: The necessary library linking flags.
 
     """
-    from yggdrasil.drivers import CModelDriver
-    print(' '.join(CModelDriver.CModelDriver.get_linker_flags(for_model=True)))
+    from yggdrasil import platform
+    parser = argparse.ArgumentParser(
+        description='Get the linker flags necessary for a C/C++ program.')
+    parser.add_argument('--cpp', action='store_true',
+                        help='Get linker flags for a C++ program.')
+    parser.add_argument('--toolname', default=None,
+                        help=('Name of the tool that associated flags should '
+                              'be returned for.'))
+    args = parser.parse_args()
+    if args.cpp:
+        from yggdrasil.drivers.CPPModelDriver import CPPModelDriver as driver
+    else:
+        from yggdrasil.drivers.CModelDriver import CModelDriver as driver
+    out = ' '.join(driver.get_linker_flags(for_model=True,
+                                           toolname=args.toolname,
+                                           dry_run=True))
+    if platform._is_win:  # pragma: windows:
+        out = out.replace('/', '-')
+        out = out.replace('\\', '/')
+        # out = out.encode('unicode_escape').decode('utf-8')
+    print(out)
 
 
 def rebuild_c_api():
@@ -406,6 +472,19 @@ def yggmodelform():
     out = get_model_form_schema(fname_dst=args.file)
     if not args.file:
         pprint.pprint(out)
+
+
+def yggdevup():
+    r"""Cleanup old libraries, re-install languages, and re-compile interface
+    libraries following an update to the code (when doing development)."""
+    parser = argparse.ArgumentParser(
+        description=('Perform cleanup and reinitialization following an '
+                     'update to the code during development.'))
+    parser.parse_args()
+    yggclean()
+    ygginstall()
+    yggcompile()
+    ygginfo()
 
 
 if __name__ == '__main__':

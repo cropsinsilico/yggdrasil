@@ -15,7 +15,7 @@ import pandas as pd
 import logging
 import pickle
 from yggdrasil.components import import_component
-from yggdrasil import tools, runner, examples, platform
+from yggdrasil import tools, runner, examples, platform, config
 from yggdrasil import platform as ygg_platform
 from yggdrasil.tests import YggTestBase
 from yggdrasil.drivers import MatlabModelDriver
@@ -637,8 +637,8 @@ class TimedRun(YggTestBase, tools.YggClass):
                             self.lang_src, self.lang_dst, self.comm_type,
                             nrep=nrep, matlab_running=self.matlab_running,
                             max_errors=self.max_errors)
-        copy_env = ['TMPDIR', 'YGG_SKIP_COMPONENT_VALIDATION',
-                    'YGG_VALIDATE_ALL_MESSAGES', 'CONDA_PREFIX']
+        copy_env = ['TMPDIR', 'CONDA_PREFIX']
+        copy_env += [v['env'] for v in config._cfg_map.values()]
         if platform._is_win:  # pragma: windows
             copy_env += ['HOMEPATH', 'NUMBER_OF_PROCESSORS',
                          'INCLUDE', 'LIB', 'LIBPATH']

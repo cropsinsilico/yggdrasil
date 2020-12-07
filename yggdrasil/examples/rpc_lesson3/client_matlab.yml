@@ -1,0 +1,16 @@
+model:
+  name: client
+  language: matlab
+  args: ./src/client.m
+  function: client  # Matlab requires the same name
+  client_of: server
+  inputs:
+    name: in_buf
+    default_file:
+      name: ./Input/input.txt
+      filetype: ascii
+  outputs:
+    name: out_buf
+    default_file:
+      name: ./client_output.txt
+      in_temp: true

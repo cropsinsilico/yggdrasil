@@ -18,6 +18,13 @@ void ygg_log_error_f(const char* fmt) {
   ygglog_error(fmt);
 }
 
+void set_global_comm_f() {
+  global_scope_comm = 1;
+}
+void unset_global_comm_f() {
+  global_scope_comm = 0;
+}
+
 // Methods for initializing channels
 int is_comm_format_array_type_f(const void *x) {
   return is_comm_format_array_type((const comm_t*)x);
@@ -127,6 +134,13 @@ void *yggRpcClient_f(const char *name, const char *out_fmt,
 void *yggRpcServer_f(const char *name, const char *in_fmt,
 		     const char *out_fmt) {
   return (void*)yggRpcServer(name, in_fmt, out_fmt);
+}
+
+void *yggRpcClientType_f(const char *name, void *outType, void *inType) {
+  return (void*)yggRpcClientType(name, (dtype_t*)outType, (dtype_t*)inType);
+}
+void *yggRpcServerType_f(const char *name, void *inType, void *outType) {
+  return (void*)yggRpcServerType(name, (dtype_t*)inType, (dtype_t*)outType);
 }
 
 void *yggTimesync_f(const char *name, const char *t_units) {

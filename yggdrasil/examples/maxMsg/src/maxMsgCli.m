@@ -11,7 +11,7 @@ fprintf('maxMsgCli(M): Hello message size is %d.\n', msg_size);
 rpc = YggInterface('YggRpcClient', 'maxMsgSrv_maxMsgCli', '%s', '%s');
 
 % Create a max message
-output = randsample(charset, msg_size-1, true);
+output = string(randsample(charset, msg_size-1, true));
 
 % Call RPC server
 [flag, vars] = rpc.call(output);

@@ -6,6 +6,7 @@ import io as sio
 from jsonschema.exceptions import ValidationError
 from yggdrasil import yamlfile
 from yggdrasil.tests import YggTestClass, assert_raises, assert_equal
+from yaml.constructor import ConstructorError
 _yaml_env = 'TEST_YAML_FILE'
 
 
@@ -51,9 +52,9 @@ def test_load_yaml_error():
 
 def test_parse_component_error():
     r"""Test errors in parse_component."""
-    assert_raises(TypeError, yamlfile.parse_component,
+    assert_raises(yamlfile.YAMLSpecificationError, yamlfile.parse_component,
                   1, 'invalid', 'invalid')
-    assert_raises(ValueError, yamlfile.parse_component,
+    assert_raises(yamlfile.YAMLSpecificationError, yamlfile.parse_component,
                   {}, 'invalid', 'invalid')
 
 
@@ -593,15 +594,115 @@ class TestYamlConnectionInputObj(YamlTestBase):
                   '    write_meth: obj'], )
 
 
+class TestYamlServerNoClient(YamlTestBaseError):
+    r"""Test error when is_server is set but there arn't any clients."""
+    _error = yamlfile.YAMLSpecificationError
+    _contents = (['models:',
+                  '  - name: modelA',
+                  '    driver: GCCModelDriver',
+                  '    args: ./src/modelA.c',
+                  '    is_server: True'],)
+
+
+class TestYamlClientNoServer(YamlTestBaseError):
+    r"""Test error when client_of is set but there arn't any servers by that name."""
+    _error = yamlfile.YAMLSpecificationError
+    _contents = (['models:',
+                  '  - name: modelA',
+                  '    driver: GCCModelDriver',
+                  '    args: ./src/modelA.c',
+                  '    client_of: modelB'],)
+
+
+class TestYamlServerFunction(YamlTestBaseError):
+    r"""Test error raised when both is_server and function are set, but
+    there is more than one input/output."""
+    _error = yamlfile.YAMLSpecificationError
+    _contents = (['models:',
+                  '  - name: modelA',
+                  '    driver: GCCModelDriver',
+                  '    args: ./src/modelA.c',
+                  '    function: fake',
+                  '    is_server: True',
+                  '    inputs: [inputA, inputB]'],
+                 ['model:',
+                  '  - name: modelB',
+                  '    driver: GCCModelDriver',
+                  '    args: ./src/modelB.c',
+                  '    client_of: modelA'],)
+
+
+class TestYamlServerDictNoInput(YamlTestBaseError):
+    r"""Test error raised when is_server is a dictionary but the referenced
+    input channel cannot be located."""
+    _error = yamlfile.YAMLSpecificationError
+    _contents = (['models:',
+                  '  - name: modelA',
+                  '    driver: GCCModelDriver',
+                  '    args: ./src/modelA.c',
+                  '    function: fake',
+                  '    is_server:',
+                  '      input: A',
+                  '      output: B',
+                  '    outputs: B'],
+                 ['model:',
+                  '  - name: modelB',
+                  '    driver: GCCModelDriver',
+                  '    args: ./src/modelB.c',
+                  '    client_of: modelA'],)
+
+
+class TestYamlServerDictNoOutput(YamlTestBaseError):
+    r"""Test error raised when is_server is a dictionary but the referenced
+    output channel cannot be located."""
+    _error = yamlfile.YAMLSpecificationError
+    _contents = (['models:',
+                  '  - name: modelA',
+                  '    driver: GCCModelDriver',
+                  '    args: ./src/modelA.c',
+                  '    function: fake',
+                  '    is_server:',
+                  '      input: A',
+                  '      output: B',
+                  '    inputs: A'],
+                 ['model:',
+                  '  - name: modelB',
+                  '    driver: GCCModelDriver',
+                  '    args: ./src/modelB.c',
+                  '    client_of: modelA'],)
+
+
 class TestYamlComponentError(YamlTestBaseError):
     r"""Test error for non-dictionary component."""
     _error = ValidationError
     _contents = (['models: error'],)
 
 
+class TestYamlDuplicateKeyError(YamlTestBaseError):
+    r"""Test error when there are duplicates of the same key in a map."""
+    _error = ConstructorError
+    _contents = (['model:',
+                  '  name: modelA',
+                  '  driver: GCCModelDriver',
+                  '  args: ./src/modelA.c',
+                  '  inputs:',
+                  '    - inputA',
+                  '',
+                  'connections:',
+                  '  - input: outputB',
+                  '    output: inputA',
+                  '',
+                  'model:',
+                  '  name: modelB',
+                  '  driver: GCCModelDriver',
+                  '  args: ./src/modelB.c',
+                  '  outputs:',
+                  '    - outputB'],)
+
+
 class TestYamlDuplicateError(YamlTestBaseError):
     r"""Test error when there are two components with the same name."""
-    _error = ValueError
+    _error = yamlfile.YAMLSpecificationError
     _contents = (['models:',
                   '  - name: modelA',
                   '    driver: GCCModelDriver',
@@ -613,7 +714,7 @@ class TestYamlDuplicateError(YamlTestBaseError):
 
 class TestYamlConnectionError(YamlTestBaseError):
     r"""Test error when there is not connection for a model I/O channel."""
-    _error = RuntimeError
+    _error = yamlfile.YAMLSpecificationError
     _contents = (['models:',
                   '  - name: modelA',
                   '    driver: GCCModelDriver',
@@ -624,7 +725,7 @@ class TestYamlConnectionError(YamlTestBaseError):
 
 class TestYamlConnectionError_forkin(YamlTestBaseError):
     r"""Test error when there is not connection for a fork input channel."""
-    _error = RuntimeError
+    _error = yamlfile.YAMLSpecificationError
     _contents = (['models:',
                   '  - name: modelA',
                   '    driver: GCCModelDriver',

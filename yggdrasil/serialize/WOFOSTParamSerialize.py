@@ -71,6 +71,8 @@ class WOFOSTParamSerialize(AsciiMapSerialize):
                         "cel": "degC"}
         for k, v in replacements.items():
             x = x.replace(k, v)
+        if x == '-':
+            x = ""
         out = units.convert_R_unit_string(x)
         return out
             
@@ -84,12 +86,12 @@ class WOFOSTParamSerialize(AsciiMapSerialize):
             dict: Deserialized Python dictionary.
 
         """
-        regex = (r'(?:(?:(?P<name>[^!]*?)\s*=\s*)|(?:\s+))'
-                 r'(?P<value1>(?:-?[\d.]+(?:.[\d+])?)|(?:\'.*?\'))?'
-                 r'\s*(?:(?P<unwrapped_units>[^!,\']*?))?'
-                 r'(?:,\s+(?P<value2>[^!,]*?)'
-                 r'(?:,?))?\s*(?:!\s*(?P<description>.*?)?\s*'
-                 r'(?:\[(?P<units>.*?)\])?)?\s*')
+        regex = (r'(?:(?:(?P<name>[^\!]*?)\s*=\s*)|(?:\s+))'
+                 r'(?P<value1>(?:-?[\d.]+(?:\.[\d+])?)|(?:\'[^\']*?\'))?'
+                 r'\s*(?:(?P<unwrapped_units>[^\!\,\']*?))?'
+                 r'(?:\,\s+(?P<value2>[^\!\,]*?)'
+                 r'(?:\,?))?\s*(?:\!\s*(?P<description>[^\[\]]*?)?\s*'
+                 r'(?:\[\s*(?P<units>[^\]]*?)\s*\][^\[\]]*)?)?\s*')
         out = dict()
         lines = tools.bytes2str(msg.split(self.newline), recurse=True)
         k = None
@@ -105,8 +107,8 @@ class WOFOSTParamSerialize(AsciiMapSerialize):
                 if is_arr:
                     if ';' in k_units:
                         u1, u2 = k_units.split(';')
-                        u1 = self.parse_units(u1)
-                        u2 = self.parse_units(u2)
+                        u1 = self.parse_units(u1.strip())
+                        u2 = self.parse_units(u2.strip())
                         out[k][0] = units.add_units(out[k][0], u1)
                         out[k][1] = units.add_units(out[k][1], u2)
                     else:

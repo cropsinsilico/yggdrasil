@@ -7,6 +7,10 @@
 #endif
 #endif
 
+#ifdef _OPENMP
+#include <omp.h>
+#endif
+
 #include <string.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -15,6 +19,29 @@
 #include <time.h>
 
 
+#ifdef USE_OSR_YGG
+struct complex_float{
+  float re;
+  float im;
+};
+struct complex_double{
+  double re;
+  double im;
+};
+struct complex_long_double{
+  long double re;
+  long double im;
+};
+typedef struct complex_float complex_float;
+typedef struct complex_double complex_double;
+typedef struct complex_long_double complex_long_double;
+#define creal(x) x.re
+#define crealf(x) x.re
+#define creall(x) x.re
+#define cimag(x) x.im
+#define cimagf(x) x.im
+#define cimagl(x) x.im
+#else /*USE_YGG_OSR*/
 #ifdef _MSC_VER
 #ifdef __cplusplus
 #include <complex>
@@ -28,14 +55,14 @@ typedef std::complex<long double> complex_long_double;
 #define cimag(x) x.imag()
 #define cimagf(x) x.imag()
 #define cimagl(x) x.imag()
-#endif
-#else
+#endif /*creal*/
+#else /*__cplusplus*/
 #include <complex.h>
 typedef _Fcomplex complex_float;
 typedef _Dcomplex complex_double;
 typedef _Lcomplex complex_long_double;
 #define print_complex(x) printf("%lf+%lfj\n", (double)(x._Val[0]), (double)(x._Val[1]))
-#endif
+#endif /*__cplusplus*/
 #else // Unix
 #ifdef __cplusplus
 #include <complex>
@@ -49,14 +76,15 @@ typedef std::complex<long double> complex_long_double;
 #define cimag(x) x.imag()
 #define cimagf(x) x.imag()
 #define cimagl(x) x.imag()
-#endif
-#else
+#endif /*creal*/
+#else /*__cplusplus*/
 #include <complex.h>
 typedef float _Complex complex_float;
 typedef double _Complex complex_double;
 typedef long double _Complex complex_long_double;
-#endif
-#endif
+#endif /*__cplusplus*/
+#endif /*Unix*/
+#endif /*USE_YGG_OSR*/
 #ifndef print_complex
 #define print_complex(x) printf("%lf+%lfj\n", (double)creal(x), (double)cimag(x))
 #endif
@@ -192,6 +220,23 @@ typedef struct python_t {
   void *kwargs;
   PyObject *obj;
 } python_t;
+
+
+/*!
+  @brief Get the ID for the current thread (if inside one).
+  @returns int Thread ID.
+ */
+static inline
+int get_thread_id() {
+  int out = 0;
+#ifdef _OPENMP
+  out = omp_get_thread_num();
+/* #elif defined pthread_self */
+/*   // TODO: Finalize/test support for pthread */
+/*   out = pthread_self(); */
+#endif
+  return out;
+};
 
 
 /*!

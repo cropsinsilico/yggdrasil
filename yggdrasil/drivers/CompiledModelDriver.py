@@ -250,10 +250,10 @@ class CompilationToolBase(object):
             it is True, only the flag will be added to the list of flags. The
             order of entries indicates the order the flags should be added to
             the list.
-        search_path_envvar (str): Environment variables containing a list of paths
+        search_path_envvar (list): Environment variables containing a list of paths
             to search for library files. Either search_path_envvar or
             search_path_flags must be set. [REQUIRED]
-        search_path_env (str): Path relative to the env prefix that should
+        search_path_env (list): Paths relative to the env prefix that should
             be searched if the VIRTUAL_ENV or CONDA_PREFIX environment
             variable is set.
         search_path_flags (list): Flags that should be passed to the tool
@@ -787,8 +787,7 @@ class CompilationToolBase(object):
                 paths.append(os.path.join(prefix, suffix))
         # Get search paths from environment variable
         if (cls.search_path_envvar is not None) and (not env_only):
-            if not isinstance(cls.search_path_envvar, list):
-                cls.search_path_envvar = [cls.search_path_envvar]
+            assert(isinstance(cls.search_path_envvar, list))
             for ienv in cls.search_path_envvar:
                 ienv_paths = os.environ.get(ienv, '').split(os.pathsep)
                 for x in ienv_paths:
@@ -811,8 +810,7 @@ class CompilationToolBase(object):
         # Get search paths from the virtualenv/conda environment
         if (cls.search_path_env is not None):
             for iprefix in cls.get_env_prefixes():
-                if not isinstance(cls.search_path_env, list):
-                    cls.search_path_env = [cls.search_path_env]
+                assert(isinstance(cls.search_path_env, list))
                 for ienv in cls.search_path_env:
                     ienv_path = os.path.join(iprefix, ienv)
                     if (ienv_path not in paths) and os.path.isdir(ienv_path):
@@ -1840,7 +1838,7 @@ class ArchiverBase(LinkerBase):
             setattr(cls, k, None)
         if platform._is_win:  # pragma: windows
             cls.library_ext = '.lib'
-            cls.search_path_env = os.path.join('library', 'lib')
+            cls.search_path_env = [os.path.join('library', 'lib')]
         else:
             cls.library_ext = '.a'
 
@@ -2169,7 +2167,7 @@ class CompiledModelDriver(ModelDriver):
 
         """
         out = super(CompiledModelDriver, self).write_wrappers(**kwargs)
-        kwargs.setdefault('logging_level', self.logger.getEffectiveLevel())
+        kwargs.setdefault('logging_level', self.numeric_logging_level)
         for k in self._schema_properties.keys():
             kwargs.setdefault(k, getattr(self, k, None))
         out += self.get_tool_instance('compiler').write_wrappers(**kwargs)
@@ -2970,9 +2968,12 @@ class CompiledModelDriver(ModelDriver):
             if dep_lib:
                 if (((not kwargs.get('dry_run', False))
                      and (not os.path.isfile(dep_lib)))):  # pragma: debug
-                    raise RuntimeError(
-                        ("Library for %s dependency does not "
-                         "exist: '%s'.") % (dep, dep_lib))
+                    if dep in internal_dependencies:
+                        cls.compile_dependencies(toolname=toolname)
+                    if not os.path.isfile(dep_lib):
+                        raise RuntimeError(
+                            ("Library for %s dependency does not "
+                             "exist: '%s'.") % (dep, dep_lib))
                 if use_library_path_internal and (dep in internal_dependencies):
                     if kwargs.get('skip_library_libs', False):
                         if isinstance(use_library_path_internal, bool):
@@ -3241,7 +3242,7 @@ class CompiledModelDriver(ModelDriver):
                 desc_end = '%s headers' % k
             elif t in ['static', 'shared']:
                 desc_end = '%s %s library' % (k, t)
-            else:  # pragma: no cover
+            else:  # pragma: completion
                 desc_end = '%s %s' % (k, t)
             desc = 'The full path to the directory containing %s.' % desc_end
             if cfg.has_option(k_lang, opt):
@@ -3261,7 +3262,7 @@ class CompiledModelDriver(ModelDriver):
                         tool = cls.get_tool('compiler', default=None)
                     elif t == 'shared':
                         tool = cls.get_tool('linker', default=None)
-                    else:
+                    else:  # pragma: completion
                         tool = cls.get_tool('archiver', default=None)
                 except NotImplementedError:  # pragma: debug
                     pass
@@ -3376,7 +3377,7 @@ class CompiledModelDriver(ModelDriver):
             compiler = self.get_tool_instance('compiler', toolname=toolname)
             out = self.set_env_compiler(
                 compiler=compiler, existing=out,
-                logging_level=self.logger.getEffectiveLevel(),
+                logging_level=self.numeric_logging_level,
                 **compile_kwargs)
         return out
         
@@ -3446,7 +3447,7 @@ class CompiledModelDriver(ModelDriver):
         if source_files is None:
             source_files = self.source_files
         if not skip_interface_flags:
-            kwargs['logging_level'] = self.logger.getEffectiveLevel()
+            kwargs['logging_level'] = self.numeric_logging_level
         default_kwargs = dict(out=self.model_file,
                               compiler_flags=self.compiler_flags,
                               for_model=True,
