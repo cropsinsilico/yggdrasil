@@ -6,6 +6,10 @@ jobs:
   build:
     name: Build (${{ matrix.python-version }}, ${{ matrix.os }}, ${{ matrix.install-method }})
     env:
+      NUMPY: numpy
+      MATPLOTLIB: matplotlib
+      MPLBACKEND: agg
+      JSONSCHEMA: jsonschema
       INSTALLR: 1
       INSTALLC: 1
       INSTALLFORTRAN: 1
@@ -15,6 +19,7 @@ jobs:
       INSTALLTRIMESH: 1
       INSTALLPYGMENTS: 1
       INSTALLLPY: 0
+      BUILDDOCS: 0
     runs-on: ${{ matrix.os }}
     strategy:
       max-parallel: 5

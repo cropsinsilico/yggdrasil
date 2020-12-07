@@ -241,6 +241,7 @@ def deploy_package_on_ci(method, verbose=False):
                          ("sudo apt-key adv --keyserver keyserver.ubuntu.com "
                           "--recv-keys E298A3A825C0D65DFD57CBB651716619E084DAB9")]
                 os_pkgs += ["r-base", "r-base-dev", "libudunits2-dev"]
+                os.environ['YGG_USE_SUDO_FOR_R'] = '1'
             elif _is_osx:
                 os_pkgs += ["r", "udunits"]
             else:
