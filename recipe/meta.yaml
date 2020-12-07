@@ -39,6 +39,7 @@ requirements:
     - czmq
     - pip
     - python
+    - r-base
     - sysv_ipc  # [unix]
     - zeromq
   run:

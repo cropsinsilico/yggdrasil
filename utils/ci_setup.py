@@ -235,9 +235,6 @@ def deploy_package_on_ci(method, verbose=False):
         default_pkgs.append('trimesh')
     if INSTALLPYGMENTS:
         default_pkgs.append('pygments')
-    if INSTALLR and _in_conda:
-        # Required to ensure the conda version of R is used in builc
-        default_pkgs.append('r-base')
     if (method == 'pip') and _in_conda:
         if INSTALLR:
             conda_pkgs.append('r-base')
