@@ -209,6 +209,7 @@ def deploy_package_on_ci(method, verbose=False):
     install_req = os.path.join("utils", "install_from_requirements.py")
     conda_pkgs = []
     pip_pkgs = []
+    os_pkgs = []
     requirements_files = ['requirements_testing.txt']
     _in_conda = False
     if method == 'conda':
@@ -225,12 +226,20 @@ def deploy_package_on_ci(method, verbose=False):
     conda_pkgs += ['scipy', os.environ.get('NUMPY', 'numpy')]
     default_pkgs += [os.environ.get('MATPLOTLIB', 'matplotlib'),
                      os.environ.get('JSONSCHEMA', 'jsonschema')]
+    if _is_linux:
+        os_pkgs += ["strace", "valgrind"]
+    elif _is_osx:
+        os_pkgs += ["valgrind"]
     if INSTALLSBML:
         pip_pkgs.append('libroadrunner')
     if INSTALLAPY:
         default_pkgs.append('astropy')
     if INSTALLRMQ:
         default_pkgs.append("\"pika<1.0.0b1\"")
+        if _is_linux:
+            os_pkgs.append("rabbitmq-server")
+        elif _is_osx:
+            os_pkgs.append("rabbitmq")
     if INSTALLTRIMESH:
         default_pkgs.append('trimesh')
     if INSTALLPYGMENTS:
@@ -260,25 +269,16 @@ def deploy_package_on_ci(method, verbose=False):
                 cmds += [("sudo add-apt-repository 'deb https://cloud"
                           ".r-project.org/bin/linux/ubuntu xenial-cran35/'"),
                          ("sudo apt-key adv --keyserver keyserver.ubuntu.com "
-                          "--recv-keys E298A3A825C0D65DFD57CBB651716619E084DAB9"),
-                         "sudo apt update",
-                         "sudo apt-get install r-base r-base-dev",
-                         "sudo apt-get install libudunits2-dev"]
+                          "--recv-keys E298A3A825C0D65DFD57CBB651716619E084DAB9")]
+                os_pkgs += ["r-base", "r-base-dev", "libudunits2-dev"]
             elif _is_osx:
-                cmds += ["brew install r",
-                         "brew install udunits"]
+                os_pkgs += ["r", "udunits"]
             else:
                 raise NotImplementedError("Could not determine "
                                           "R installation method.")
         if INSTALLFORTRAN and (not _in_conda):
             cmds.append("echo Installing Fortran...")
-            if _is_linux:
-                cmds += ["sudo apt-get install gfortran"]
-            elif _is_osx:
-                cmds += ["brew install gfortran"]
-            else:
-                raise NotImplementedError("Could not determine "
-                                          "Fortran installation method.")
+            os_pkgs.append("gfortran")
         if INSTALLZMQ and (not _in_conda):
             cmds.append("echo Installing ZeroMQ...")
             if _is_linux:
@@ -291,6 +291,15 @@ def deploy_package_on_ci(method, verbose=False):
             else:
                 raise NotImplementedError("Could not determine "
                                           "ZeroMQ installation method.")
+    if os_pkgs:
+        if _is_linux:
+            cmds += ["sudo apt update"]
+            cmds += ["sudo apt-get install %s" % ' '.join(os_pkgs)]
+        elif _is_osx:
+            cmds += ["brew install %s" % ' '.join(os_pkgs)]
+        else:
+            raise NotImplementedError("No native package manager supported "
+                                      "on Windows.")
     if _in_conda:
         if conda_pkgs:
             cmds += ["%s install %s" % (conda_cmd, ' '.join(conda_pkgs))]
