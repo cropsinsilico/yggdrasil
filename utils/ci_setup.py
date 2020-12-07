@@ -26,6 +26,7 @@ INSTALLRMQ = (os.environ.get('INSTALLRMQ', '0') == '1')
 INSTALLTRIMESH = (os.environ.get('INSTALLTRIMESH', '0') == '1')
 INSTALLPYGMENTS = (os.environ.get('INSTALLPYGMENTS', '0') == '1')
 BUILDDOCS = (os.environ.get('BUILDDOCS', '0') == '1')
+GITHUB_ACTIONS = os.environ.get('GITHUB_ACTIONS', False)
 
 
 def call_conda_command(args, **kwargs):
@@ -99,7 +100,7 @@ def setup_package_on_ci(method, python):
     """
     cmds = []
     major, minor = [int(x) for x in python.split('.')]
-    if os.environ.get('GITHUB_ACTIONS', False):
+    if GITHUB_ACTIONS:
         conda_cmd = '$CONDA/bin/conda'
     elif _is_win:
         conda_cmd = 'call conda'
@@ -180,8 +181,7 @@ def deploy_package_on_ci(method, verbose=False):
         _in_conda = True
         default_pkgs = conda_pkgs
     elif method == 'pip':
-        _in_conda = ((_is_win or INSTALLLPY)
-                     and (not os.environ.get('GITHUB_ACTIONS', False)))
+        _in_conda = ((_is_win or INSTALLLPY) and (not GITHUB_ACTIONS))
         default_pkgs = pip_pkgs
     else:  # pragma: debug
         raise ValueError("Method must be 'conda' or 'pip', not '%s'"
@@ -235,7 +235,6 @@ def deploy_package_on_ci(method, verbose=False):
         ]
     elif method == 'pip':
         if INSTALLR and (not _in_conda):
-            cmds.append("echo Installing R...")
             if _is_linux:
                 cmds += [("sudo add-apt-repository 'deb https://cloud"
                           ".r-project.org/bin/linux/ubuntu xenial-cran35/'"),
@@ -247,8 +246,7 @@ def deploy_package_on_ci(method, verbose=False):
             else:
                 raise NotImplementedError("Could not determine "
                                           "R installation method.")
-        if INSTALLFORTRAN and (not _in_conda):
-            cmds.append("echo Installing Fortran...")
+        if INSTALLFORTRAN and (not _in_conda) and (not GITHUB_ACTIONS):
             os_pkgs.append("gfortran")
         if INSTALLZMQ and (not _in_conda):
             cmds.append("echo Installing ZeroMQ...")
@@ -294,7 +292,7 @@ def deploy_package_on_ci(method, verbose=False):
         # Assumes that an environment is active
         conda_prefix = os.environ.get('CONDA_PREFIX', None)
         if not conda_prefix:
-            if os.environ.get('GITHUB_ACTIONS', False):
+            if GITHUB_ACTIONS:
                 conda_prefix = os.environ['CONDA']
                 prefix_dir = conda_prefix
             else:
