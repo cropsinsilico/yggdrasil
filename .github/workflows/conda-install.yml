@@ -61,3 +61,5 @@ jobs:
       shell: bash -l {0}
       run: |
         yggtest --ci --with-examples
+    - name: Upload coverage report
+      uses: codecov/codecov-action@v1
