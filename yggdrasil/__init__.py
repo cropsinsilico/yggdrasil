@@ -126,7 +126,7 @@ def run_tsts(**kwargs):  # pragma: no cover
         (['nocapture', 's'], ['capture'],
          True, {'help': 'Don\'t capture output from tests.'}),
         (['stop', 'x'], ['dontstop', 'dont-stop'],
-         True, {'help': 'Stop after first test failure.'}),
+         False, {'help': 'Stop after first test failure.'}),
         (['nologcapture'], ['logcapture'],
          True, {'help': ('Don\'t capture output from log '
                          'messages generated during tests.')}),
