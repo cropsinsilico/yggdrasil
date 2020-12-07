@@ -139,42 +139,6 @@ def setup_package_on_ci(method, python):
     call_script(cmds)
 
 
-def verify_package_on_ci(method):
-    r"""Verify that the package was installed correctly.
-
-    Args:
-        method (str): Method that was used to build and install
-            the package. Valid values include 'conda' and 'pip'.
-
-    """
-    src_dir = os.path.join(os.getcwd(),
-                           os.path.dirname(os.path.dirname(__file__)))
-    src_version = subprocess.check_output(
-        ["python", "-c",
-         "'import versioneer; print(versioneer.get_version())'"],
-        cwd=src_dir)
-    bld_version = subprocess.check_output(
-        ["python", "-c",
-         "'import yggdrasil; print(yggdrasil.__version__)'"],
-        cwd=os.path.dirname(src_dir))
-    if src_version != bld_version:
-        raise RuntimeError("Installed version does not match the version of "
-                           "this source code.\n"
-                           "\tSource version: %s\n\tBuild  version: %s"
-                           % (src_version, bld_version))
-    if INSTALLR:
-        assert(shutil.which("R"))
-        assert(shutil.which("Rscript"))
-    subprocess.check_call(["flake8", "yggdrasil"], cwd=src_dir)
-    if method == 'conda':
-        subprocess.check_call(["python", "create_coveragerc.py"], cwd=src_dir)
-    if not os.path.isfile(".coveragerc"):
-        raise RuntimeError(".coveragerc file dosn't exist.")
-    with open(".coveragerc", "r") as fd:
-        print(fd.read())
-    subprocess.check_call(["ygginfo", "--verbose"], cwd=src_dir)
-
-
 def deploy_package_on_ci(method, verbose=False):
     r"""Build and install the package and its dependencies on a CI
     resource.
@@ -382,6 +346,65 @@ def deploy_package_on_ci(method, verbose=False):
     if _in_conda:
         cmds.append("%s list" % conda_cmd)
     call_script(cmds)
+
+
+def verify_package_on_ci(method):
+    r"""Verify that the package was installed correctly.
+
+    Args:
+        method (str): Method that was used to build and install
+            the package. Valid values include 'conda' and 'pip'.
+
+    """
+    src_dir = os.path.join(os.getcwd(),
+                           os.path.dirname(os.path.dirname(__file__)))
+    src_version = subprocess.check_output(
+        ["python", "-c",
+         "'import versioneer; print(versioneer.get_version())'"],
+        cwd=src_dir)
+    bld_version = subprocess.check_output(
+        ["python", "-c",
+         "'import yggdrasil; print(yggdrasil.__version__)'"],
+        cwd=os.path.dirname(src_dir))
+    if src_version != bld_version:
+        raise RuntimeError("Installed version does not match the version of "
+                           "this source code.\n"
+                           "\tSource version: %s\n\tBuild  version: %s"
+                           % (src_version, bld_version))
+    if INSTALLR:
+        assert(shutil.which("R"))
+        assert(shutil.which("Rscript"))
+    subprocess.check_call(["flake8", "yggdrasil"], cwd=src_dir)
+    if method == 'conda':
+        subprocess.check_call(["python", "create_coveragerc.py"], cwd=src_dir)
+    if not os.path.isfile(".coveragerc"):
+        raise RuntimeError(".coveragerc file dosn't exist.")
+    with open(".coveragerc", "r") as fd:
+        print(fd.read())
+    subprocess.check_call(["ygginfo", "--verbose"], cwd=src_dir)
+    # Verify that languages are installed
+    from yggdrasil.tools import is_lang_installed, is_comm_installed
+    installed_lang = [(INSTALLC, 'c'),
+                      (INSTALLR, 'R'),
+                      (INSTALLFORTRAN, 'fortran'),
+                      (INSTALLSBML, 'sbml'),
+                      (INSTALLLPY, 'lpy')]
+    installed_comm = [(INSTALLZMQ, 'zmq'),
+                      (INSTALLRMQ, 'rmq')]
+    errors = []
+    for flag, name in installed_lang:
+        if flag and (not is_lang_installed(name)):
+            errors.append("Language '%s' should be installed, but is not.")
+        elif (not flag) and is_lang_installed(name):
+            errors.append("Language '%s' should NOT be installed, but is.")
+    for flag, name in installed_comm:
+        if flag and (not is_comm_installed(name)):
+            errors.append("Comm '%s' should be installed, but is not.")
+        elif (not flag) and is_comm_installed(name):
+            errors.append("Comm '%s' should NOT be installed, but is.")
+    if errors:
+        raise AssertionError("One or more languages was not installed as "
+                             "expected\n\t%s" % "\n\t".join(errors))
 
 
 if __name__ == "__main__":
