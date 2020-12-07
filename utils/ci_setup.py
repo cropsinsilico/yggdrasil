@@ -393,14 +393,16 @@ def verify_package_on_ci(method):
     errors = []
     for flag, name in installed_lang:
         if flag and (not is_lang_installed(name)):
-            errors.append("Language '%s' should be installed, but is not.")
+            errors.append("Language '%s' should be installed, but is not."
+                          % name)
         elif (not flag) and is_lang_installed(name):
-            errors.append("Language '%s' should NOT be installed, but is.")
+            errors.append("Language '%s' should NOT be installed, but is."
+                          % name)
     for flag, name in installed_comm:
         if flag and (not is_comm_installed(name)):
-            errors.append("Comm '%s' should be installed, but is not.")
+            errors.append("Comm '%s' should be installed, but is not." % name)
         elif (not flag) and is_comm_installed(name):
-            errors.append("Comm '%s' should NOT be installed, but is.")
+            errors.append("Comm '%s' should NOT be installed, but is." % name)
     if errors:
         raise AssertionError("One or more languages was not installed as "
                              "expected\n\t%s" % "\n\t".join(errors))
