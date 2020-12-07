@@ -387,6 +387,7 @@ def verify_package_on_ci(method):
         print(fd.read())
     subprocess.check_call(["ygginfo", "--verbose"], cwd=src_dir)
     # Verify that languages are installed
+    sys.stdout.flush()
     from yggdrasil.tools import is_lang_installed, is_comm_installed
     installed_lang = [(INSTALLC, 'c'),
                       (INSTALLR, 'R'),

@@ -14,11 +14,11 @@ jobs:
       INSTALLC: 1
       INSTALLFORTRAN: 1
       INSTALLSBML: 1
+      INSTALLLPY: 0
       INSTALLZMQ: 1
       INSTALLRMQ: 0
       INSTALLTRIMESH: 1
       INSTALLPYGMENTS: 1
-      INSTALLLPY: 0
       BUILDDOCS: 0
     runs-on: ${{ matrix.os }}
     strategy:
@@ -85,6 +85,13 @@ jobs:
     name: Build the Docs
     runs-on: ubuntu-latest
     env:
+      INSTALLR: 1
+      INSTALLC: 1
+      INSTALLFORTRAN: 1
+      INSTALLSBML: 1
+      INSTALLLPY: 0
+      INSTALLZMQ: 1
+      INSTALLRMQ: 0
       BUILDDOCS: 1
     steps:
     - uses: actions/checkout@v2
