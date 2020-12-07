@@ -21,9 +21,7 @@ jobs:
       matrix:
         os: [ubuntu-latest, macos-latest, windows-latest]
         python-version: [3.6, 3.8]
-        include:
-          - install-method: "pip"
-          - install-method: "conda"
+        install-method: [pip, conda]
       fail-fast: false
 
     steps:
