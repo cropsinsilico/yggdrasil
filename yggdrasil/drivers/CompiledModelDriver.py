@@ -3242,7 +3242,7 @@ class CompiledModelDriver(ModelDriver):
                 desc_end = '%s headers' % k
             elif t in ['static', 'shared']:
                 desc_end = '%s %s library' % (k, t)
-            else:  # pragma: no cover
+            else:  # pragma: completion
                 desc_end = '%s %s' % (k, t)
             desc = 'The full path to the directory containing %s.' % desc_end
             if cfg.has_option(k_lang, opt):
@@ -3262,7 +3262,7 @@ class CompiledModelDriver(ModelDriver):
                         tool = cls.get_tool('compiler', default=None)
                     elif t == 'shared':
                         tool = cls.get_tool('linker', default=None)
-                    else:
+                    else:  # pragma: completion
                         tool = cls.get_tool('archiver', default=None)
                 except NotImplementedError:  # pragma: debug
                     pass
