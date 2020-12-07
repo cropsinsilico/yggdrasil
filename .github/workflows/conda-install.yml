@@ -22,11 +22,11 @@ jobs:
         os: [ubuntu-latest, macos-latest, windows-latest]
         python-version: [3.6]
         install-method: [pip, conda]
+        include:
+          - os: ubuntu-latest
+            python-version: 3.8
+            install-method: conda
       fail-fast: false
-      include:
-        - os: ubuntu-latest
-          python-version: 3.8
-          install-method: conda
 
     steps:
     - uses: actions/checkout@v2
