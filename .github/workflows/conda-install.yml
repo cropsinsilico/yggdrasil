@@ -34,11 +34,11 @@ jobs:
         os: [ubuntu-latest, macos-latest, windows-latest]
         python-version: [3.6]
         install-method: [pip]
-      fail-fast: false
         exclude:
           - os: windows-latest
             python-version: 3.6
             install-method: pip
+      fail-fast: false
     services:
       rabbitmq:
         image: rabbitmq
