@@ -5,22 +5,21 @@ on:
     branches-ignore:
       - 'gh-pages'
 
-defaults:
-  env:
-    NUMPY: numpy
-    MATPLOTLIB: matplotlib
-    MPLBACKEND: agg
-    JSONSCHEMA: jsonschema
-    INSTALLR: 1
-    INSTALLC: 1
-    INSTALLFORTRAN: 1
-    INSTALLSBML: 1
-    INSTALLLPY: 0
-    INSTALLZMQ: 1
-    INSTALLRMQ: 0
-    INSTALLTRIMESH: 1
-    INSTALLPYGMENTS: 1
-    BUILDDOCS: 0
+env:
+  NUMPY: numpy
+  MATPLOTLIB: matplotlib
+  MPLBACKEND: agg
+  JSONSCHEMA: jsonschema
+  INSTALLR: 1
+  INSTALLC: 1
+  INSTALLFORTRAN: 1
+  INSTALLSBML: 1
+  INSTALLLPY: 0
+  INSTALLZMQ: 1
+  INSTALLRMQ: 0
+  INSTALLTRIMESH: 1
+  INSTALLPYGMENTS: 1
+  BUILDDOCS: 0
 
 jobs:
   build_pip:
