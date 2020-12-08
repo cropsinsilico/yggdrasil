@@ -121,8 +121,13 @@ jobs:
         echo "PATH=$HOME/miniconda/bin:$PATH" >> $GITHUB_ENV
     - name: Add miniconda bin to path (Windows)
       if: matrix.install-method == 'conda' && matrix.os == 'windows-latest'
+      shell: bash -l {0}
       run: |
-        echo "PATH=%PYTHON%;%PYTHON%\\Scripts;%PATH%" | Out-File -FilePath $env:GITHUB_PATH -Append
+        echo "PATH=$HOME/miniconda/bin:$PATH" >> $GITHUB_ENV
+    # - name: Add miniconda bin to path (Windows)
+    #   if: matrix.install-method == 'conda' && matrix.os == 'windows-latest'
+    #   run: |
+    #     echo "PATH=%PYTHON%;%PYTHON%\\Scripts;%PATH%" | Out-File -FilePath $env:GITHUB_PATH -Append
     - name: Install old MacOSX SDK for compatibility with the conda llvm (7)
       if: matrix.os == 'macos-latest' && matrix.install-method == 'conda'
       shell: bash -l {0}
