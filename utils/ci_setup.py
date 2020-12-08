@@ -244,9 +244,14 @@ def deploy_package_on_ci(method, verbose=False):
         ]
     # Install dependencies
     if method == 'conda':
-        cmds += [
-            "%s install -q -n base conda-build conda-verify" % conda_cmd,
-        ]
+        if GITHUB_ACTIONS:
+            cmds += [
+                "%s install -q conda-build conda-verify" % conda_cmd,
+            ]
+        else:
+            cmds += [
+                "%s install -q -n base conda-build conda-verify" % conda_cmd,
+            ]
     elif method == 'pip':
         if INSTALLR and (not _in_conda):
             if _is_linux:
