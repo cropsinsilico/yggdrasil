@@ -19,6 +19,7 @@ INSTALLR = (os.environ.get('INSTALLR', '0') == '1')
 INSTALLFORTRAN = (os.environ.get('INSTALLFORTRAN', '0') == '1')
 if not INSTALLC:
     INSTALLFORTRAN = False
+    INSTALLZMQ = False
 INSTALLSBML = (os.environ.get('INSTALLSBML', '0') == '1')
 INSTALLAPY = (os.environ.get('INSTALLAPY', '0') == '1')
 INSTALLZMQ = (os.environ.get('INSTALLZMQ', '0') == '1')
@@ -324,10 +325,14 @@ def deploy_package_on_ci(method, verbose=False):
             "%s build %s --python %s %s" % (
                 conda_cmd, 'recipe', PYVER, build_flags),
             "%s index %s" % (conda_cmd, index_dir),
+            "%s install %s --use-local --only-deps yggdrasil" % (
+                conda_cmd, install_flags),
+            "%s install %s --use-local --no-deps yggdrasil" % (
+                conda_cmd, install_flags),
             # "%s install %s --use-local --update-deps yggdrasil" % (
             #     conda_cmd, install_flags),
-            "%s install %s --update-deps -c file:/%s/conda-bld yggdrasil" % (
-                conda_cmd, install_flags, prefix_dir),
+            # "%s install %s --update-deps -c file:/%s/conda-bld yggdrasil" % (
+            #     conda_cmd, install_flags, prefix_dir),
         ]
     elif method == 'pip':
         if verbose:
