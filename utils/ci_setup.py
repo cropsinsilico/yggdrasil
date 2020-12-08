@@ -112,7 +112,7 @@ def setup_package_on_ci(method, python):
             "echo Installing Python using conda...",
             # Configure conda
             "%s config --set always_yes yes --set changeps1 no" % conda_cmd,
-            "%s config --set channel_priority strict" % conda_cmd,
+            # "%s config --set channel_priority strict" % conda_cmd,
             "%s config --add channels conda-forge" % conda_cmd,
             "%s update -q conda" % conda_cmd,
             # "%s config --set allow_conda_downgrades true" % conda_cmd,
@@ -181,6 +181,11 @@ def deploy_package_on_ci(method, verbose=False):
     if method == 'conda':
         _in_conda = True
         default_pkgs = conda_pkgs
+        cmds += [
+            "%s clean --all" % conda_cmd,  # TODO: This might remove cache
+            "%s info" % conda_cmd,
+            "%s list" % conda_cmd,
+        ]
     elif method == 'pip':
         _in_conda = ((_is_win or INSTALLLPY) and (not GITHUB_ACTIONS))
         default_pkgs = pip_pkgs
