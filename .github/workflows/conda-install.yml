@@ -46,7 +46,7 @@ jobs:
         submodules: true
     - name: Set up MSVC Compiler
       uses: ilammy/msvc-dev-cmd@v1
-      if: matrix.os == 'windows-latest'
+      if: matrix.os == 'windows-latest' && env.INSTALLC == 1
     - name: Set up miniconda
       uses: conda-incubator/setup-miniconda@v2
       if: matrix.install-method == 'conda'
