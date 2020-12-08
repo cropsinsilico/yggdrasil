@@ -40,13 +40,10 @@ jobs:
       fail-fast: false
     services:
       rabbitmq:
-        image: rabbitmq
+        image: rabbitmq:latest
         ports:
           - 5672/tcp
-        env:
-          RABBITMQ_USER: guest
-          RABBITMQ_PASSWORD: guest
-          RABBITMQ_VHOST: "/"
+        options: --health-cmd "rabbitmqctl node_health_check" --health-interval 10s --health-timeout 5s --health-retries 5
 
     steps:
     - uses: actions/checkout@v2
