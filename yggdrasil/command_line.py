@@ -17,6 +17,7 @@ def ygginfo():
     from yggdrasil import __version__, tools, config, platform
     from yggdrasil.components import import_component
     lang_list = tools.get_installed_lang()
+    comm_list = tools.get_installed_comm()
     prefix = '    '
     curr_prefix = ''
     vardict = [
@@ -31,6 +32,8 @@ def ygginfo():
     parser.add_argument('--no-languages', action='store_true',
                         dest='no_languages',
                         help='Don\'t print information about individual languages.')
+    parser.add_argument('--no-comms', action='store_true', dest='no_comms',
+                        help='Don\'t print information about individual comms.')
     parser.add_argument('--verbose', action='store_true',
                         help='Increase the verbosity of the printed information.')
     args = parser.parse_args()
@@ -83,6 +86,35 @@ def ygginfo():
                                 drv.is_configured()))
                 vardict.append((curr_prefix + "Disabled",
                                 drv.is_disabled()))
+                curr_prefix = curr_prefix.rsplit(prefix, 1)[0]
+            curr_prefix = curr_prefix.rsplit(prefix, 1)[0]
+        # Add comm information
+        if not args.no_comms:
+            # Fully installed comms
+            vardict.append(('Comms Available for All Languages:', ''))
+            curr_prefix += prefix
+            for comm in sorted(comm_list):
+                cmm = import_component('comm', comm)
+                vardict.append((curr_prefix + '%s' % comm.upper(), ''))
+            curr_prefix = curr_prefix.rsplit(prefix, 1)[0]
+            # Partially installed comms
+            vardict.append(('Comms Available for Some/No Languages:', ''))
+            curr_prefix += prefix
+            for comm in tools.get_supported_comm():
+                if comm in comm_list:
+                    continue
+                cmm = import_component('comm', comm)
+                vardict.append((curr_prefix + '%s:' % comm.upper(), ''))
+                curr_prefix += prefix
+                avail = [cmm.is_installed(language=lang) for lang in lang_list]
+                vardict.append(
+                    (curr_prefix + "Available for ",
+                     sorted([lang_list[i].upper() for i in range(len(avail))
+                             if avail[i]])))
+                vardict.append(
+                    (curr_prefix + "Not Available for ",
+                     sorted([lang_list[i].upper() for i in range(len(avail))
+                             if not avail[i]])))
                 curr_prefix = curr_prefix.rsplit(prefix, 1)[0]
             curr_prefix = curr_prefix.rsplit(prefix, 1)[0]
         # Add verbose information
