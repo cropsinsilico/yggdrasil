@@ -5,24 +5,26 @@ on:
     branches-ignore:
       - 'gh-pages'
 
+defaults:
+  env:
+    NUMPY: numpy
+    MATPLOTLIB: matplotlib
+    MPLBACKEND: agg
+    JSONSCHEMA: jsonschema
+    INSTALLR: 1
+    INSTALLC: 1
+    INSTALLFORTRAN: 1
+    INSTALLSBML: 1
+    INSTALLLPY: 0
+    INSTALLZMQ: 1
+    INSTALLRMQ: 0
+    INSTALLTRIMESH: 1
+    INSTALLPYGMENTS: 1
+    BUILDDOCS: 0
+
 jobs:
   build_pip:
     name: Build (${{ matrix.python-version }}, ${{ matrix.os }}, ${{ matrix.install-method }})
-    env:
-      NUMPY: numpy
-      MATPLOTLIB: matplotlib
-      MPLBACKEND: agg
-      JSONSCHEMA: jsonschema
-      INSTALLR: 1
-      INSTALLC: 1
-      INSTALLFORTRAN: 1
-      INSTALLSBML: 1
-      INSTALLLPY: 0
-      INSTALLZMQ: 1
-      INSTALLRMQ: 0
-      INSTALLTRIMESH: 1
-      INSTALLPYGMENTS: 1
-      BUILDDOCS: 0
     runs-on: ${{ matrix.os }}
     strategy:
       max-parallel: 5
@@ -32,17 +34,26 @@ jobs:
         install-method: [pip]
         installrmq: [true]
       fail-fast: false
+        exclude:
+          - os: windows-latest
+            python-version: 3.6
+            install-method: pip
+	    installrmq: true
 
     steps:
     - uses: actions/checkout@v2
       with:
         submodules: true
-    - name: Turn on RabbitMQ installation on Linux
-      if: matrix.installrmq == true
+    - name: Turn on RabbitMQ installation
+      if: matrix.installrmq == true && matrix.os != 'windows-latest'
       run: echo "INSTALLRMQ=1" >> $GITHUB_ENV
+    - name: Turn on RabbitMQ installation
+      if: matrix.installrmq == true && matrix.os == 'windows-latest'
+      run: echo "INSTALLRMQ=1" | Out-File -FilePath $env:GITHUB_PATH -Append
     - name: Turn off C installation on Windows
       if: matrix.os == 'windows-latest' && matrix.install-method == 'pip'
-      run: echo "INSTALLC=0" >> $GITHUB_ENV
+      run: echo "INSTALLC=0" | Out-File -FilePath $env:GITHUB_PATH -Append
+      # run: echo "INSTALLC=0" >> $GITHUB_ENV
     - name: Set up MSVC Compiler
       uses: ilammy/msvc-dev-cmd@v1
       if: matrix.os == 'windows-latest' && env.INSTALLC == 1
@@ -55,7 +66,7 @@ jobs:
       run: |
         python utils/ci_setup.py ${{ matrix.install-method }} deploy
     - name: Start RabbitMQ Server
-      if: env.INSTALLRMQ == 1
+      if: env.INSTALLRMQ == 1 && matrix.os != 'windows-latest'
       run: |
         ./utils/setup_rabbitmq.sh
     - name: Verify installation
@@ -71,21 +82,6 @@ jobs:
       uses: codecov/codecov-action@v1
   build_conda:
     name: Build (${{ matrix.python-version }}, ${{ matrix.os }}, ${{ matrix.install-method }})
-    env:
-      NUMPY: numpy
-      MATPLOTLIB: matplotlib
-      MPLBACKEND: agg
-      JSONSCHEMA: jsonschema
-      INSTALLR: 1
-      INSTALLC: 1
-      INSTALLFORTRAN: 1
-      INSTALLSBML: 1
-      INSTALLLPY: 0
-      INSTALLZMQ: 1
-      INSTALLRMQ: 0
-      INSTALLTRIMESH: 1
-      INSTALLPYGMENTS: 1
-      BUILDDOCS: 0
     runs-on: ${{ matrix.os }}
     strategy:
       max-parallel: 5
@@ -123,7 +119,7 @@ jobs:
       run: |
         python utils/ci_setup.py ${{ matrix.install-method }} deploy
     - name: Start RabbitMQ Server
-      if: env.INSTALLRMQ == 1
+      if: env.INSTALLRMQ == 1 && matrix.os != 'windows-latest'
       shell: bash -l {0}
       run: |
         ./utils/setup_rabbitmq.sh
@@ -145,13 +141,6 @@ jobs:
     name: Build the Docs
     runs-on: ubuntu-latest
     env:
-      INSTALLR: 1
-      INSTALLC: 1
-      INSTALLFORTRAN: 1
-      INSTALLSBML: 1
-      INSTALLLPY: 0
-      INSTALLZMQ: 1
-      INSTALLRMQ: 0
       BUILDDOCS: 1
     steps:
     - uses: actions/checkout@v2
