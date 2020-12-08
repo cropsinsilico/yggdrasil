@@ -47,10 +47,10 @@ jobs:
           - os: macos-latest
             python-version: 3.6
             install-method: pip
-            shell: bash -l {0}
-        #   - os: windows-latest
-        #     python-version: 3.6
-        #     install-method: pip
+            shell: 'bash -l {0}'
+          # - os: windows-latest
+          #   python-version: 3.6
+          #   install-method: pip
       fail-fast: false
 
     steps:
