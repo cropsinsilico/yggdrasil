@@ -22,6 +22,44 @@ static void **vcomms2clean = NULL;
 static size_t ncomms2clean = 0;
 static size_t clean_registered = 0;
 
+/*! @brief Memory to keep track of global scope comms. */
+static size_t global_scope_comm = 0;
+#define WITH_GLOBAL_SCOPE(COMM) global_scope_comm = 1; COMM; global_scope_comm = 0
+
+
+/*!
+  @brief Retrieve a registered global comm if it exists.
+  @param[in] const char* name Name that comm might be registered under.
+  @returns comm_t* Pointer to registered comm. NULL if one does not exist
+  with the specified name.
+ */
+static
+comm_t* get_global_scope_comm(const char *name) {
+  if (!(global_scope_comm)) {
+    return NULL;
+  }
+  size_t i;
+  comm_t* icomm = NULL;
+  int current_thread = get_thread_id();
+  for (i = 0; i < ncomms2clean; i++) {
+    if (vcomms2clean[i] != NULL) {
+      icomm = (comm_t*)(vcomms2clean[i]);
+      if ((strcmp(icomm->name, name) == 0) && (icomm->thread_id == current_thread)) {
+  	return icomm;
+      } else {
+	const char* YGG_MODEL_NAME = getenv("YGG_MODEL_NAME");
+	char alt_name[100];
+	sprintf(alt_name, "%s:%s", YGG_MODEL_NAME, name);
+	if ((strcmp(icomm->name, alt_name) == 0) && (icomm->thread_id == current_thread)) {
+	  return icomm;
+	}
+      }
+    }
+  }
+  return NULL;
+};
+
+
 // Forward declaration of eof
 static
 int comm_send_eof(const comm_t *x);
@@ -50,6 +88,10 @@ static
 int free_comm_type(comm_t *x) {
   comm_type t = x->type;
   int ret = 1;
+  if (x->thread_id != get_thread_id()) {
+    ygglog_error("free_comm_type: Thread is attempting to use a comm it did not initialize");
+    return ret;
+  }
   if (t == IPC_COMM)
     ret = free_ipc_comm(x);
   else if (t == ZMQ_COMM)
@@ -102,6 +144,7 @@ int free_comm(comm_t *x) {
       vcomms2clean[idx] = NULL;
     }
   }
+  ygglog_debug("free_comm: Finished");
   return ret;
 };
 
@@ -285,10 +328,14 @@ comm_t* init_comm(const char *name, const char *direction,
   SetErrorMode(SEM_FAILCRITICALERRORS | SEM_NOGPFAULTERRORBOX);
   _set_abort_behavior(0,_WRITE_ABORT_MSG);
 #endif
+  comm_t *ret = get_global_scope_comm(name);
+  if (ret != NULL) {
+    return ret;
+  }
   if ((datatype == NULL) && (strcmp(direction, "send") == 0)) {
     datatype = create_dtype_scalar("bytes", 0, "", false);
   }
-  comm_t *ret = init_comm_base(name, direction, t, datatype);
+  ret = init_comm_base(name, direction, t, datatype);
   if (ret == NULL) {
     ygglog_error("init_comm(%s): Could not initialize base.", name);
     return ret;
@@ -304,8 +351,28 @@ comm_t* init_comm(const char *name, const char *direction,
       ret->valid = 0;
     }
   }
+  if (global_scope_comm) {
+    ret->is_global = 1;
+    ygglog_debug("init_comm(%s): Global comm!", name);
+  }
   ygglog_debug("init_comm(%s): Initialized comm.", name);
   return ret;
+};
+
+
+/*!
+  @brief Convert a format string to a datatype.
+  @param[in] format_str char* Format string.
+  @param[in] as_array int If 1, inputs/outputs are processed as arrays.
+  @returns dtype_t* Pointer to datatype structure.
+ */
+static
+dtype_t* formatstr2datatype(const char *format_str, const int as_array) {
+  dtype_t* datatype = NULL;
+  if (format_str != NULL) {
+    datatype = create_dtype_format(format_str, as_array, false);
+  }
+  return datatype;
 };
 
 /*!
@@ -326,16 +393,7 @@ static
 comm_t* init_comm_format(const char *name, const char *direction,
 			 const comm_type t, const char *format_str,
 			 const int as_array) {
-  dtype_t* datatype = NULL;
-  if (format_str == NULL) {
-    if (strcmp(direction, "recv") == 0) {
-      datatype = NULL; // It will be set on receiving a message
-    } else {
-      datatype = NULL;
-    }
-  } else {
-    datatype = create_dtype_format(format_str, as_array, false);
-  }
+  dtype_t* datatype = formatstr2datatype(format_str, as_array);
   comm_t* out = init_comm(name, direction, t, datatype);
   if ((format_str != NULL) && (datatype == NULL)) {
     ygglog_error("init_comm_format: Failed to create type from format_str.");
@@ -393,6 +451,10 @@ int comm_send_single(const comm_t *x, const char *data, const size_t len) {
   int ret = -1;
   if ((x == NULL) || (x->valid == 0)) {
     ygglog_error("comm_send_single: Invalid comm");
+    return ret;
+  }
+  if (x->thread_id != get_thread_id()) {
+    ygglog_error("comm_send_single: Thread is attempting to use a comm it did not initialize");
     return ret;
   }
   comm_type t = x->type;
@@ -736,6 +798,10 @@ int comm_recv_single(comm_t *x, char **data, const size_t len,
   int ret = -1;
   if ((x == NULL) || (x->valid == 0)) {
     ygglog_error("comm_recv_single: Invalid comm");
+    return ret;
+  }
+  if (x->thread_id != get_thread_id()) {
+    ygglog_error("comm_recv_single: Thread is attempting to use a comm it did not initialize");
     return ret;
   }
   comm_type t = x->type;

@@ -1,0 +1,11 @@
+model:
+  name: osr_model
+  language: osr
+  timesync:
+    inputs: [carbonAllocation2Roots]
+    outputs: [carbonAllocation2Roots]
+  args:
+    - ../../examples/osr/src/osr_model.xml
+  copy_xml_to_osr: True
+  update_interval:
+    timesync: 0.1

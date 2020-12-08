@@ -559,6 +559,84 @@ public:
     return out;
   }
   /*!
+    @brief Skip arguments that make of this type.
+    @param[in, out] nargs Pointer to number of arguments in ap.
+    @param[in, out] ap va_list_t Variable argument list.
+   */
+  void skip_va_elements(size_t *nargs, va_list_t *ap) const {
+    skip_va_elements_wrap(nargs, ap);
+    // size_t i;
+    // std::vector<size_t> skip_bytes = nbytes_va();
+    // for (i = 0; i < skip_bytes.size(); i++) {
+    //   printf("Skip %d bytes (sizeof(void*) = %d)\n", (int)(skip_bytes[i]),
+    // 	     (int)(sizeof(void*)));
+    //   va_list_t_skip(ap, sizeof(void*));  // skip_bytes[i]);
+    // }
+  }
+  /*!
+    @brief Skip arguments that make of this type.
+    @param[in, out] nargs Pointer to number of arguments in ap.
+    @param[in, out] ap va_list_t Variable argument list.
+   */
+  virtual void skip_va_elements_core(size_t *nargs, va_list_t *ap) const {
+    switch (type_code_) {
+    case T_BOOLEAN: {
+      va_arg(ap->va, int);
+      (*nargs)--;
+      return;
+    }
+    case T_INTEGER: {
+      va_arg(ap->va, int);
+      (*nargs)--;
+      return;
+    }
+    case T_NULL: {
+      va_arg(ap->va, void*);
+      (*nargs)--;
+      return;
+    }
+    case T_NUMBER: {
+      va_arg(ap->va, double);
+      (*nargs)--;
+      return;
+    }
+    case T_STRING: {
+      va_arg(ap->va, char*);
+      (*nargs)--;
+      return;
+    }
+    default: {
+      ygglog_error("MetaschemaType::skip_va_elements_core: Cannot skip arguments for type '%s'.", type_);
+    }
+    }
+  }
+  /*!
+    @brief Skip arguments that make of this type.
+    @param[in, out] nargs Pointer to number of arguments in ap.
+    @param[in, out] ap va_list_t Variable argument list.
+   */
+  void skip_va_elements_wrap(size_t *nargs, va_list_t *ap) const {
+    size_t i;
+    if (ap->using_ptrs) {
+      ap->iptr = ap->iptr + nargs_exp();
+      (*nargs) = (*nargs) - nargs_exp();
+      return;
+    }
+    for (i = 0; i < skip_before_.size(); i++) {
+      va_list_t_skip(ap, skip_before_[i]);
+      (*nargs)--;
+    }
+    if (use_generic()) {
+      pop_generic(nargs, *ap);
+    } else {
+      skip_va_elements_core(nargs, ap);
+    }
+    for (i = 0; i < skip_after_.size(); i++) {
+      va_list_t_skip(ap, skip_after_[i]);
+      (*nargs)--;
+    }
+  }
+  /*!
     @brief Get the number of arguments expected to be filled/used by the type.
     @returns size_t Number of arguments.
    */
@@ -1342,7 +1420,7 @@ public:
     va_list_t ap_copy = copy_va_list(ap);
     update_from_deserialization_args(nargs, ap_copy);
     if (nargs_exp() != *nargs) {
-      ygglog_throw_error("MetaschemaType::deserialize: %d arguments expected, but only %d provided.",
+      ygglog_throw_error("MetaschemaType::deserialize: %d arguments expected, but %d provided.",
 			 nargs_exp(), *nargs);
     }
     // Parse body

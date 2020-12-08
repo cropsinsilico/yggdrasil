@@ -178,10 +178,11 @@ class FixedMetaschemaType(MetaschemaType):
             bool: True if the object could be of this type, False otherwise.
 
         """
-        if not super(FixedMetaschemaType, cls).validate(obj,
-                                                        raise_errors=raise_errors):
+        if not super(FixedMetaschemaType, cls).validate(
+                obj, raise_errors=raise_errors):
             return False
         try:
+            obj = cls.coerce_type(obj)
             jsonschema.validate(obj, cls.updated_fixed_properties(obj),
                                 cls=cls.validator())
         except (jsonschema.exceptions.ValidationError, AssertionError):

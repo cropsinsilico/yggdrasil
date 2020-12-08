@@ -88,6 +88,13 @@ class TestObjDict(parent.TestPlyDict):
         r"""dict: Keyword arguments for creating a class instance."""
         return _test_value
 
+    @classmethod
+    def remove_hd_faces(cls, obj):
+        r"""Remove higher dimension faces (>3 verts)."""
+        if 'faces' in obj:
+            obj['faces'] = [f[:3] for f in obj['faces']]
+        return obj
+
     def test_apply_scalar_map(self):
         r"""Test applying a scalar colormap."""
         super(TestObjDict, self).test_apply_scalar_map(_as_obj=True)
@@ -101,6 +108,46 @@ class TestObjDict(parent.TestPlyDict):
         r"""Test vertex_normals."""
         self.instance.vertex_normals
 
+    def test_to_from_array_dict(self, test_objs=None):
+        r"""Test transformation to/from dict of arrays."""
+        if test_objs is None:
+            orig = copy.deepcopy(self.instance)
+            orig_edges = copy.deepcopy(self.instance)
+            for v in orig_edges['texcoords']:
+                v.pop('w', None)
+            orig_nocolor = copy.deepcopy(self.instance)
+            for v in orig_nocolor['vertices']:
+                for k in ['red', 'green', 'blue']:
+                    v.pop(k, None)
+            for v in orig_nocolor['params']:
+                v.pop('w', None)
+            for v in orig_nocolor['texcoords']:
+                v.pop('v', None)
+                v.pop('w', None)
+            for surf in orig_nocolor['surfaces']:
+                for v in surf['vertex_indices']:
+                    v.pop('texcoord_index', None)
+                    v.pop('normal_index', None)
+            test_objs = [orig, orig_edges, orig_nocolor]
+        super(TestObjDict, self).test_to_from_array_dict(test_objs=test_objs)
+            
+    def test_to_from_trimesh(self, test_objs=None):
+        r"""Test transformation to/from trimesh class."""
+        if test_objs is None:
+            orig = copy.deepcopy(self.instance)
+            for k in ['material', 'params', 'points', 'surfaces', 'texcoords',
+                      'curves', 'curve2Ds', 'lines', 'edges', 'normals']:
+                orig.pop(k, None)
+            for vlist in orig['faces']:
+                for v in vlist:
+                    v.pop('texcoord_index', None)
+                    v.pop('normal_index', None)
+            for v in orig['vertices']:
+                for k in ['w']:  # , 'red', 'blue', 'green']:
+                    v.pop(k, None)
+            test_objs = [orig]
+        super(TestObjDict, self).test_to_from_trimesh(test_objs=test_objs)
+            
     @unittest.skipIf(not LPyModelDriver.is_installed(), "LPy library not installed.")
     def test_to_from_scene_incomplete(self):  # pragma: lpy
         r"""Test conversion to/from PlantGL scene with faces missing
@@ -133,6 +180,9 @@ class TestObjMetaschemaType(parent.TestPlyMetaschemaType):
                                'faces': [[{'vertex_index': 0},
                                           {'vertex_index': 1},
                                           {'vertex_index': 2}]]}]
+        if ObjMetaschemaType.trimesh:
+            cls._valid_decoded.append(
+                ObjMetaschemaType.ObjDict(**_test_value).as_trimesh())
         # TODO: Add tests for faces with just texcoord or normal?
         cls._invalid_encoded = [{}]
         cls._invalid_decoded = [{'vertices': [{k: 0.0 for k in 'xyz'}],
@@ -152,3 +202,11 @@ class TestObjMetaschemaType(parent.TestPlyMetaschemaType):
                                             {'vertex_index': 2}]]},
                                 None]
         cls._compatible_objects = [(cls._value, cls._value, None)]
+
+    @classmethod
+    def assert_result_equal(cls, x, y):
+        r"""Assert that serialized/deserialized objects equal."""
+        if ObjMetaschemaType.trimesh:
+            if isinstance(y, ObjMetaschemaType.trimesh.base.Trimesh):
+                y = ObjMetaschemaType.ObjDict.from_trimesh(y)
+        super(TestObjMetaschemaType, cls).assert_result_equal(x, y)

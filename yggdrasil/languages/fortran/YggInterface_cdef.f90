@@ -25,6 +25,13 @@
        use, intrinsic :: iso_c_binding, only: c_int
        integer(kind=c_int), intent(in), value :: seconds
      end subroutine fsleep
+
+     subroutine set_global_comm() bind(c, name="set_global_comm_f")
+       implicit none
+     end subroutine set_global_comm
+     subroutine unset_global_comm() bind(c, name="unset_global_comm_f")
+       implicit none
+     end subroutine unset_global_comm
   
      ! Methods for initializing channels
      function is_comm_format_array_type_c(x) result(out) &
@@ -252,6 +259,26 @@
        character(kind=c_char), dimension(*), intent(in) :: out_fmt
        type(c_ptr) :: channel
      end function ygg_rpc_server_c
+
+     function ygg_rpc_client_type_c(name, out_type, in_type) result(channel) &
+          bind(c, name="yggRpcClientType_f")
+       use, intrinsic :: iso_c_binding, only: c_ptr, c_char
+       implicit none
+       character(kind=c_char), dimension(*), intent(in) :: name
+       type(c_ptr), value, intent(in) :: out_type
+       type(c_ptr), value, intent(in) :: in_type
+       type(c_ptr) :: channel
+     end function ygg_rpc_client_type_c
+
+     function ygg_rpc_server_type_c(name, in_type, out_type) result(channel) &
+          bind(c, name="yggRpcServerType_f")
+       use, intrinsic :: iso_c_binding, only: c_ptr, c_char
+       implicit none
+       character(kind=c_char), dimension(*), intent(in) :: name
+       type(c_ptr), value, intent(in) :: in_type
+       type(c_ptr), value, intent(in) :: out_type
+       type(c_ptr) :: channel
+     end function ygg_rpc_server_type_c
 
      function ygg_timesync_c(name, t_units) result(channel) &
           bind(c, name="yggTimesync_f")

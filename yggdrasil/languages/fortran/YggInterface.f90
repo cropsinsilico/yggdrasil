@@ -375,6 +375,49 @@ module fygg
   interface yggassign
      module procedure yggassign_yggchar2character
      ! module procedure yggassign_character2yggchar
+     module procedure yggassign_integer_1d_to_array
+     module procedure yggassign_integer_1d_from_array
+     module procedure yggassign_integer2_1d_to_array
+     module procedure yggassign_integer2_1d_from_array
+     module procedure yggassign_integer4_1d_to_array
+     module procedure yggassign_integer4_1d_from_array
+     module procedure yggassign_integer8_1d_to_array
+     module procedure yggassign_integer8_1d_from_array
+     ! module procedure yggassign_unsigned_1d_to_array
+     ! module procedure yggassign_unsigned_1d_from_array
+     module procedure yggassign_unsigned2_1d_to_array
+     module procedure yggassign_unsigned2_1d_from_array
+     module procedure yggassign_unsigned4_1d_to_array
+     module procedure yggassign_unsigned4_1d_from_array
+     module procedure yggassign_unsigned8_1d_to_array
+     module procedure yggassign_unsigned8_1d_from_array
+     module procedure yggassign_real_1d_to_array
+     module procedure yggassign_real_1d_from_array
+     module procedure yggassign_real4_1d_to_array
+     module procedure yggassign_real4_1d_from_array
+     module procedure yggassign_real8_1d_to_array
+     module procedure yggassign_real8_1d_from_array
+     module procedure yggassign_real16_1d_to_array
+     module procedure yggassign_real16_1d_from_array
+     module procedure yggassign_complex_1d_to_array
+     module procedure yggassign_complex_1d_from_array
+     module procedure yggassign_complex4_1d_to_array
+     module procedure yggassign_complex4_1d_from_array
+     module procedure yggassign_complex8_1d_to_array
+     module procedure yggassign_complex8_1d_from_array
+     module procedure yggassign_complex16_1d_to_array
+     module procedure yggassign_complex16_1d_from_array
+     module procedure yggassign_logical_1d_to_array
+     module procedure yggassign_logical_1d_from_array
+     module procedure yggassign_logical1_1d_to_array
+     module procedure yggassign_logical1_1d_from_array
+     module procedure yggassign_logical2_1d_to_array
+     module procedure yggassign_logical2_1d_from_array
+     module procedure yggassign_logical4_1d_to_array
+     module procedure yggassign_logical4_1d_from_array
+     module procedure yggassign_logical8_1d_to_array
+     module procedure yggassign_logical8_1d_from_array
+     ! TODO: ND array
   end interface yggassign
   interface yggarr
      module procedure ygggeneric2yggarr
@@ -802,13 +845,13 @@ module fygg
      type(c_ptr) :: obj
   end type yggpyinst
   type, bind(c) :: yggpyfunc
-     character(kind=c_char, len=1000) :: name = c_null_char
+     character(kind=c_char), dimension(1000) :: name = c_null_char
      type(c_ptr) :: args = c_null_ptr
      type(c_ptr) :: kwargs = c_null_ptr
      type(c_ptr) :: obj = c_null_ptr
   end type yggpyfunc
   type, bind(c) :: yggpython
-     character(kind=c_char, len=1000) :: name = c_null_char
+     character(kind=c_char), dimension(1000) :: name = c_null_char
      type(c_ptr) :: args = c_null_ptr
      type(c_ptr) :: kwargs = c_null_ptr
      type(c_ptr) :: obj = c_null_ptr
@@ -889,6 +932,8 @@ module fygg
        LINE_SIZE_MAX
 
   include "YggInterface_cdef.f90"
+
+#define WITH_GLOBAL_SCOPE(COMM) call set_global_comm(); COMM; call unset_global_comm()
 
 contains
 
@@ -1345,15 +1390,29 @@ contains
     channel%comm = ygg_json_object_input_c(c_name)
   end function ygg_json_object_input
 
-  function ygg_rpc_client(name, out_fmt, in_fmt) result(channel)
+  function ygg_rpc_client(name, out_fmt_in, in_fmt_in) result(channel)
     implicit none
     character(len=*), intent(in) :: name
-    character(len=*), intent(in) :: out_fmt
-    character(len=*), intent(in) :: in_fmt
+    character(len=*), intent(in), optional :: out_fmt_in
+    character(len=*), intent(in), optional :: in_fmt_in
+    character(len=:), allocatable :: out_fmt
+    character(len=:), allocatable :: in_fmt
     character(len=len_trim(name)+1) :: c_name
-    character(len=len_trim(out_fmt)+1) :: c_out_fmt
-    character(len=len_trim(in_fmt)+1) :: c_in_fmt
+    character(len=:), allocatable :: c_out_fmt
+    character(len=:), allocatable :: c_in_fmt
     type(yggcomm) :: channel
+    if (present(out_fmt_in)) then
+       out_fmt = out_fmt_in
+    else
+       out_fmt = "%s"
+    end if
+    if (present(in_fmt_in)) then
+       in_fmt = in_fmt_in
+    else
+       in_fmt = "%s"
+    end if
+    allocate(character(len=len_trim(in_fmt)+1) :: c_in_fmt)
+    allocate(character(len=len_trim(out_fmt)+1) :: c_out_fmt)
     c_name = trim(name)//c_null_char
     c_out_fmt = trim(out_fmt)//c_null_char
     c_in_fmt = trim(in_fmt)//c_null_char
@@ -1362,15 +1421,29 @@ contains
     channel%comm = ygg_rpc_client_c(c_name, c_out_fmt, c_in_fmt)
   end function ygg_rpc_client
 
-  function ygg_rpc_server(name, in_fmt, out_fmt) result(channel)
+  function ygg_rpc_server(name, in_fmt_in, out_fmt_in) result(channel)
     implicit none
     character(len=*), intent(in) :: name
-    character(len=*), intent(in) :: in_fmt
-    character(len=*), intent(in) :: out_fmt
+    character(len=*), intent(in), optional :: in_fmt_in
+    character(len=*), intent(in), optional :: out_fmt_in
+    character(len=:), allocatable :: in_fmt
+    character(len=:), allocatable :: out_fmt
     character(len=len_trim(name)+1) :: c_name
-    character(len=len_trim(in_fmt)+1) :: c_in_fmt
-    character(len=len_trim(out_fmt)+1) :: c_out_fmt
+    character(len=:), allocatable :: c_in_fmt
+    character(len=:), allocatable :: c_out_fmt
     type(yggcomm) :: channel
+    if (present(in_fmt_in)) then
+       in_fmt = in_fmt_in
+    else
+       in_fmt = "%s"
+    end if
+    if (present(out_fmt_in)) then
+       out_fmt = out_fmt_in
+    else
+       out_fmt = "%s"
+    end if
+    allocate(character(len=len_trim(in_fmt)+1) :: c_in_fmt)
+    allocate(character(len=len_trim(out_fmt)+1) :: c_out_fmt)
     c_name = trim(name)//c_null_char
     c_in_fmt = trim(in_fmt)//c_null_char
     c_out_fmt = trim(out_fmt)//c_null_char
@@ -1378,6 +1451,52 @@ contains
     call fix_format_str(c_out_fmt)
     channel%comm = ygg_rpc_server_c(c_name, c_in_fmt, c_out_fmt)
   end function ygg_rpc_server
+
+  function ygg_rpc_client_type(name, out_type_in, in_type_in) result(channel)
+    implicit none
+    character(len=*), intent(in) :: name
+    type(yggdtype), optional :: out_type_in
+    type(yggdtype), optional :: in_type_in
+    type(c_ptr) :: c_out_type
+    type(c_ptr) :: c_in_type
+    character(len=len_trim(name)+1) :: c_name
+    type(yggcomm) :: channel
+    if (present(out_type_in)) then
+       c_out_type = out_type_in%ptr
+    else
+       c_out_type = c_null_ptr
+    end if
+    if (present(in_type_in)) then
+       c_in_type = in_type_in%ptr
+    else
+       c_in_type = c_null_ptr
+    end if
+    c_name = trim(name)//c_null_char
+    channel%comm = ygg_rpc_client_type_c(c_name, c_out_type, c_in_type)
+  end function ygg_rpc_client_type
+
+  function ygg_rpc_server_type(name, in_type_in, out_type_in) result(channel)
+    implicit none
+    character(len=*), intent(in) :: name
+    type(yggdtype), optional :: in_type_in
+    type(yggdtype), optional :: out_type_in
+    type(c_ptr) :: c_in_type
+    type(c_ptr) :: c_out_type
+    character(len=len_trim(name)+1) :: c_name
+    type(yggcomm) :: channel
+    if (present(in_type_in)) then
+       c_in_type = in_type_in%ptr
+    else
+       c_in_type = c_null_ptr
+    end if
+    if (present(out_type_in)) then
+       c_out_type = out_type_in%ptr
+    else
+       c_out_type = c_null_ptr
+    end if
+    c_name = trim(name)//c_null_char
+    channel%comm = ygg_rpc_server_type_c(c_name, c_in_type, c_out_type)
+  end function ygg_rpc_server_type
 
   function ygg_timesync(name, units) result(channel)
     implicit none

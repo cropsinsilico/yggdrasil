@@ -131,16 +131,17 @@ class CPPModelDriver(CModelDriver):
         try_except='}} catch ({error_type} {error_var}) {{',
         function_def_regex=(
             r'(?P<flag_type>.+?)\s*{function_name}\s*'
-            r'\((?P<inputs>(?:[^{{&])*?)'
+            r'\((?P<inputs>(?:[^{{\&])*?)'
             r'(?:,\s*(?P<outputs>'
-            r'(?:\s*(?:[^\s])+(?:\s+)(?:\()?&(?:[^{{])+)+'
-            r'))?\)\s*\{{'
+            r'(?:\s*(?:[^\s\&]+)'
+            r'(?:(?:\&\s+)|(?:\s+(?:\()?\&))'
+            r'(?:[^{{])+)+))?\)\s*\{{'
             r'(?P<body>(?:.*?\n?)*?)'
             r'(?:(?:return +(?P<flag_var>.+?)?;(?:.*?\n?)*?\}})'
             r'|(?:\}}))'),
         outputs_def_regex=(
             r'\s*(?P<native_type>(?:[^\s])+)(\s+)?'
-            r'(\()?(?P<ref>&)(?(1)(?:\s*)|(?:\s+))'
+            r'(\()?(?P<ref>\&)(?(1)(?:\s*)|(?:\s+))'
             r'(?P<name>.+?)(?(2)(?:\)|(?:)))(?P<shape>(?:\[.+?\])+)?\s*(?:,|$)(?:\n)?'))
     include_arg_count = True
     include_channel_obj = False
@@ -171,6 +172,7 @@ class CPPModelDriver(CModelDriver):
             + cls.language_ext[0])
         internal_libs[cls.interface_library]['include_dirs'].append(
             cls.get_language_dir())
+        internal_libs[cls.interface_library]['language'] = cls.language
         cls.internal_libraries = internal_libs
 
     @classmethod

@@ -169,22 +169,23 @@ class ServerComm(CommBase.CommBase):
                 and (len(self.clients) >= self.nclients_expected))
 
     # RESPONSE COMM
-    def create_response_comm(self):
+    def create_response_comm(self, header):
         r"""Create a response comm based on information from the last header."""
-        if not isinstance(self.icomm._last_header, dict):  # pragma: debug
+        if not isinstance(header, dict):  # pragma: debug
             raise RuntimeError("No header received with last message.")
-        elif 'response_address' not in self.icomm._last_header:  # pragma: debug
+        elif 'response_address' not in header:  # pragma: debug
             raise RuntimeError("Last header does not contain response address.")
-        comm_kwargs = dict(address=self.icomm._last_header['response_address'],
+        comm_kwargs = dict(address=header['response_address'],
                            direction='send', is_response_server=True,
                            single_use=True, **self.response_kwargs)
-        request_id = self.icomm._last_header['request_id']
+        request_id = header['request_id']
         while request_id in self.ocomm:  # pragma: debug
             request_id += str(uuid.uuid4())
+        header['response_id'] = request_id
         self.ocomm[request_id] = get_comm(
             self.name + '.server_response_comm.' + request_id,
             **comm_kwargs)
-        client_model = self.icomm._last_header.get('client_model', '')
+        client_model = header.get('client_model', '')
         self.ocomm[request_id].client_model = client_model
         if client_model and (client_model not in self.clients):
             self.clients.append(client_model)
@@ -197,7 +198,6 @@ class ServerComm(CommBase.CommBase):
                 comm that should be removed.
 
         """
-        # self.icomm._last_header = None
         ocomm = self.ocomm.pop(request_id, None)
         if ocomm is not None:
             ocomm.close_in_thread(no_wait=True)
@@ -254,11 +254,12 @@ class ServerComm(CommBase.CommBase):
                 response should be sent to.
 
         """
+        kwargs['return_header'] = True
         request_id = None
-        flag, msg = self.recv(*args, **kwargs)
+        flag, msg, header = self.recv(*args, **kwargs)
         if ((flag and (not self.icomm.is_eof(msg))
              and (not self.icomm.is_empty_recv(msg)))):
-            request_id = next(reversed(self.ocomm.keys()))
+            request_id = header['response_id']
         return flag, msg, request_id
     
     def recv(self, *args, **kwargs):
@@ -276,15 +277,21 @@ class ServerComm(CommBase.CommBase):
         # if self.is_closed:
         #     self.debug("recv(): Connection closed.")
         #     return (False, None)
-        flag, msg = self.icomm.recv(*args, **kwargs)
+        return_header = kwargs.pop('return_header', False)
+        kwargs['return_header'] = True
+        flag, msg, header = self.icomm.recv(*args, **kwargs)
         if flag:
             if isinstance(msg, bytes) and (msg == YGG_CLIENT_EOF):
-                self.closed_clients.append(
-                    self.icomm._last_header['client_model'])
+                self.closed_clients.append(header['client_model'])
+                kwargs['return_header'] = return_header
                 return self.recv(*args, **kwargs)
             elif not (self.icomm.is_eof(msg) or self.icomm.is_empty_recv(msg)):
-                self.create_response_comm()
-        return flag, msg
+                self.create_response_comm(header)
+        if return_header:
+            out = (flag, msg, header)
+        else:
+            out = (flag, msg)
+        return out
 
     # OLD STYLE ALIASES
     def rpcSend(self, *args, **kwargs):

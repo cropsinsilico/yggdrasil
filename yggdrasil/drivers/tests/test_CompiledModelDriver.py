@@ -58,7 +58,7 @@ class DummyCompiler(CompiledModelDriver.CompilerBase):
     _dont_register = True
     toolname = 'dummy'
     languages = ['dummy']
-    search_path_envvar = 'PATH'
+    search_path_envvar = ['PATH']
     _language_ext = ['.c']
     default_linker = False
     default_archiver = None

@@ -8,6 +8,32 @@ import git
 import io as sio
 from yggdrasil.schema import standardize, get_schema
 from urllib.parse import urlparse
+from yaml.constructor import (
+    ConstructorError, BaseConstructor, Constructor, SafeConstructor)
+
+
+class YAMLSpecificationError(RuntimeError):
+    r"""Error raised when the yaml specification does not meet expectations."""
+    pass
+
+
+def no_duplicates_constructor(loader, node, deep=False):
+    # https://gist.github.com/pypt/94d747fe5180851196eb
+    """Check for duplicate keys."""
+    mapping = {}
+    for key_node, value_node in node.value:
+        key = loader.construct_object(key_node, deep=deep)
+        value = loader.construct_object(value_node, deep=deep)
+        if key in mapping:
+            raise ConstructorError("while constructing a mapping", node.start_mark,
+                                   "found duplicate key (%s)" % key, key_node.start_mark)
+        mapping[key] = value
+    return loader.construct_mapping(node, deep)
+
+
+for cls in (BaseConstructor, Constructor, SafeConstructor):
+    cls.add_constructor(yaml.resolver.BaseResolver.DEFAULT_MAPPING_TAG,
+                        no_duplicates_constructor)
 
 
 def load_yaml(fname):
@@ -81,7 +107,7 @@ def load_yaml(fname):
     else:
         yamlparsed = yaml.safe_load(yamlparsed)
     if not isinstance(yamlparsed, dict):  # pragma: debug
-        raise ValueError("Loaded yaml is not a dictionary.")
+        raise YAMLSpecificationError("Loaded yaml is not a dictionary.")
     yamlparsed['working_dir'] = os.path.dirname(fname)
     if opened:
         fd.close()
@@ -164,10 +190,15 @@ def parse_yaml(files):
         if yml.get('timesync', False):
             if yml['timesync'] is True:
                 yml['timesync'] = 'timesync'
-            tsync = yml['timesync']
-            timesync_names.append(tsync)
+            if not isinstance(yml['timesync'], list):
+                yml['timesync'] = [yml['timesync']]
+            for i, tsync in enumerate(yml['timesync']):
+                if isinstance(tsync, str):
+                    tsync = {'name': tsync}
+                    yml['timesync'][i] = tsync
+            timesync_names.append(tsync['name'])
             yml.setdefault('timesync_client_of', [])
-            yml['timesync_client_of'].append(tsync)
+            yml['timesync_client_of'].append(tsync['name'])
     for tsync in set(timesync_names):
         for m in yml_norm['models']:
             if m['name'] == tsync:
@@ -187,6 +218,25 @@ def parse_yaml(files):
     for k in ['models', 'connections']:
         for yml in yml_norm[k]:
             existing = parse_component(yml, k[:-1], existing=existing)
+    # Make sure that servers have clients and clients have servers
+    for k, v in existing['model'].items():
+        if v.get('is_server', False):
+            for x in existing['model'].values():
+                if v['name'] in x.get('client_of', []):
+                    break
+            else:
+                raise YAMLSpecificationError(
+                    "Server '%s' does not have any clients.", k)
+        elif v.get('client_of', False):
+            for s in v['client_of']:
+                missing_servers = []
+                if s not in existing['model']:
+                    missing_servers.append(s)
+                if missing_servers:
+                    print(list(existing['model'].keys()))
+                    raise YAMLSpecificationError(
+                        "Servers %s do not exist, but '%s' is a client of them."
+                        % (missing_servers, v['name']))
     # Make sure that I/O channels initialized
     opp_map = {'input': 'output', 'output': 'input'}
     for io in ['input', 'output']:
@@ -202,8 +252,8 @@ def parse_yaml(files):
                     existing = parse_component(new_conn, 'connection',
                                                existing=existing)
                 else:
-                    raise RuntimeError("No driver established for %s channel %s" % (
-                        io, k))
+                    raise YAMLSpecificationError(
+                        "No driver established for %s channel %s" % (io, k))
         # Remove unused default channels
         for k in remove:
             for m in existing[io][k]['model_driver']:
@@ -242,13 +292,13 @@ def parse_component(yml, ctype, existing=None):
     """
     s = get_schema()
     if not isinstance(yml, dict):
-        raise TypeError("Component entry in yml must be a dictionary.")
+        raise YAMLSpecificationError("Component entry in yml must be a dictionary.")
     ctype_list = ['input', 'output', 'model', 'connection',
                   'model_input', 'model_output']
     if existing is None:
         existing = {k: {} for k in ctype_list}
     if ctype not in ctype_list:
-        raise ValueError("'%s' is not a recognized component.")
+        raise YAMLSpecificationError("'%s' is not a recognized component.")
     # Parse based on type
     if ctype == 'model':
         existing = parse_model(yml, existing)
@@ -268,7 +318,7 @@ def parse_component(yml, ctype, existing=None):
     if yml['name'] in existing[ctype]:
         pprint.pprint(existing)
         pprint.pprint(yml)
-        raise ValueError("%s is already a registered '%s' component." % (
+        raise YAMLSpecificationError("%s is already a registered '%s' component." % (
             yml['name'], ctype))
     existing[ctype][yml['name']] = yml
     return existing
@@ -296,7 +346,41 @@ def parse_model(yml, existing):
                'driver': 'ServerDriver',
                'args': yml['name'] + '_SERVER',
                'working_dir': yml['working_dir']}
-        yml['inputs'].append(srv)
+        if yml.get('function', False) and isinstance(yml['is_server'], bool):
+            if (len(yml['inputs']) == 1) and (len(yml['outputs']) == 1):
+                yml['is_server'] = {'input': yml['inputs'][0]['name'],
+                                    'output': yml['outputs'][0]['name']}
+            else:
+                raise YAMLSpecificationError(
+                    "The 'is_server' parameter is boolean for the model '%s' "
+                    "and the 'function' parameter is also set. "
+                    "If the 'function' and 'is_server' parameters are used "
+                    "together, the 'is_server' parameter must be a mapping "
+                    "with 'input' and 'output' entries specifying which of "
+                    "the function's input/output variables should be received"
+                    "/sent from/to clients. e.g. \n"
+                    "\t-input: input_variable\n"
+                    "\t-output: output_variables\n" % yml['name'])
+        if isinstance(yml['is_server'], dict):
+            replaces = {}
+            for io in ['input', 'output']:
+                replaces[io] = None
+                if not yml['is_server'][io].startswith('%s:' % yml['name']):
+                    yml['is_server'][io] = '%s:%s' % (yml['name'], yml['is_server'][io])
+                for i, x in enumerate(yml[io + 's']):
+                    if x['name'] == yml['is_server'][io]:
+                        replaces[io] = x
+                        replaces[io + '_index'] = i
+                        yml[io + 's'].pop(i)
+                        break
+                else:
+                    raise YAMLSpecificationError(
+                        "Failed to locate an existing %s channel "
+                        "with the name %s." % (io, yml['is_server'][io]))
+            srv['server_replaces'] = replaces
+            yml['inputs'].insert(replaces['input_index'], srv)
+        else:
+            yml['inputs'].append(srv)
         yml['clients'] = []
     # Mark timesync clients
     timesync = yml.pop('timesync_client_of', [])
@@ -355,8 +439,9 @@ def parse_connection(yml, existing):
                 fname = os.path.join(x['working_dir'], fname)
             fname = os.path.normpath(fname)
             if (not os.path.isfile(fname)) and (not x.get('wait_for_creation', False)):
-                raise RuntimeError(("Input '%s' not found in any of the registered "
-                                    + "model outputs and is not a file.") % x['name'])
+                raise YAMLSpecificationError(
+                    ("Input '%s' not found in any of the registered "
+                     + "model outputs and is not a file.") % x['name'])
             x['address'] = fname
         else:
             iname_list.append(x['name'])

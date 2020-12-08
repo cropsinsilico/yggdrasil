@@ -466,6 +466,119 @@ public:
     return MetaschemaType::nbytes_va_core();
   }
   /*!
+    @brief Skip arguments that make of this type.
+    @param[in, out] nargs Pointer to number of arguments in ap.
+    @param[in, out] ap va_list_t Variable argument list.
+   */
+  void skip_va_elements_core(size_t *nargs, va_list_t *ap) const override {
+    switch (type_code()) {
+    case T_1DARRAY:
+    case T_NDARRAY: {
+      va_arg(ap->va, unsigned char*);
+      (*nargs)--;
+      return;
+    }
+    case T_SCALAR: {
+      switch (subtype_code_) {
+      case T_INT: {
+	switch (precision_) {
+	case 8: {
+	  va_arg(ap->va, int);
+	  break;
+	}
+	case 16: {
+	  va_arg(ap->va, int);
+	  break;
+	}
+	case 32: {
+	  va_arg(ap->va, int32_t);
+	  break;
+	}
+	case 64: {
+	  va_arg(ap->va, int64_t);
+	  break;
+	}
+	default: {
+	  ygglog_throw_error("ScalarMetaschemaType::skip_va_elements_core: Unsupported integer precision '%lu'.",
+			     precision_);
+	}
+	}
+	break;
+      }
+      case T_UINT: {
+	switch (precision_) {
+	case 8: {
+	  va_arg(ap->va, unsigned int);
+	  break;
+	}
+	case 16: {
+	  va_arg(ap->va, unsigned int);
+	  break;
+	}
+	case 32: {
+	  va_arg(ap->va, uint32_t);
+	  break;
+	}
+	case 64: {
+	  va_arg(ap->va, uint64_t);
+	  break;
+	}
+	default: {
+	  ygglog_throw_error("ScalarMetaschemaType::skip_va_elements_core: Unsupported unsigned integer precision '%lu'.",
+			     precision_);
+	}
+	}
+	break;
+      }
+      case T_FLOAT: {
+	size_t bytes_precision = nbytes();
+	if (sizeof(float) == bytes_precision) {
+	  va_arg(ap->va, double);
+	} else if (sizeof(double) == bytes_precision) {
+	  va_arg(ap->va, double);
+	} else if (sizeof(long double) == bytes_precision) {
+	  va_arg(ap->va, long double);
+	} else {
+	  ygglog_throw_error("ScalarMetaschemaType::skip_va_elements_core: Unsupported float precision '%lu'.",
+			     precision_);
+	}
+	break;
+      }
+      case T_COMPLEX: {
+	size_t bytes_precision = nbytes();
+	if (sizeof(float) == (bytes_precision / 2)) {
+	  va_arg(ap->va, complex_float_t);
+	} else if (sizeof(double) == (bytes_precision / 2)) {
+	  va_arg(ap->va, complex_double_t);
+	} else if (sizeof(long double) == (bytes_precision / 2)) {
+	  va_arg(ap->va, complex_long_double_t);
+	} else {
+	  ygglog_throw_error("ScalarMetaschemaType::skip_va_elements_core: Unsupported complex precision '%lu'.",
+			     precision_);
+	}
+	break;
+      }
+      case T_BYTES:
+      case T_UNICODE: {
+	va_arg(ap->va, char*);
+	va_arg(ap->va, size_t);
+	(*nargs)--;
+	break;
+      }
+      default: {
+	ygglog_throw_error("ScalarMetaschemaType::skip_va_elements_core: Unsupported subtype '%s'.",
+			   subtype_);
+      }
+      }
+      break;
+    }
+    default: {
+      ygglog_error("ScalarMetaschemaType::skip_va_elements_core: Cannot skip arguments for type '%s'.", type());
+    }
+    }
+    (*nargs)--;
+  }
+  /*!
     @brief Determine the dimensions of the equivalent numpy array.
     @param[in, out] nd int* Address of integer where number of dimensions should be stored.
     @param[in, out] dims npy_intp** Address of pointer to memory where dimensions should be stored.
