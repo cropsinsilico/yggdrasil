@@ -1,6 +1,9 @@
 name: Python Package using Conda
 
-on: [push]
+on:
+  push:
+    branches-ignore:
+      - 'gh-pages'
 
 jobs:
   build:
