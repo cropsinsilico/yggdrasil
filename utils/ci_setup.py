@@ -228,6 +228,14 @@ def deploy_package_on_ci(method, verbose=False):
         requirements_files.append('requirements_documentation.txt')
         if not _in_conda:
             os_pkgs.append("doxygen")
+    if GITHUB_ACTIONS and _is_linux and _in_conda:
+        # Do both to ensure that the path is set for the installation
+        # and in following steps
+        cmds += [
+            "export LD_LIBRARY_PATH=$CONDA_PREFIX/lib:$LD_LIBRARY_PATH",
+            "echo -n \"LD_LIBRARY_PATH=\" >> $GITHUB_ENV",
+            "echo $CONDA_PREFIX/lib:$LD_LIBRARY_PATH >> $GITHUB_ENV"
+        ]
     # Install dependencies
     if method == 'conda':
         cmds += [
