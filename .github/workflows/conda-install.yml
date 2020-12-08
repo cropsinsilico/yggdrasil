@@ -26,30 +26,39 @@ jobs:
   build_pip:
     name: Build (${{ matrix.python-version }}, ${{ matrix.os }}, ${{ matrix.install-method }})
     runs-on: ${{ matrix.os }}
+    env:
+      INSTALLRMQ: 1
     strategy:
       max-parallel: 5
       matrix:
         os: [ubuntu-latest, macos-latest, windows-latest]
         python-version: [3.6]
         install-method: [pip]
-        installrmq: [true]
       fail-fast: false
         exclude:
           - os: windows-latest
             python-version: 3.6
             install-method: pip
-	    installrmq: true
+    services:
+      rabbitmq:
+        image: rabbitmq
+        ports:
+          - 5672/tcp
+        env:
+          RABBITMQ_USER: guest
+          RABBITMQ_PASSWORD: guest
+          RABBITMQ_VHOST: "/"
 
     steps:
     - uses: actions/checkout@v2
       with:
         submodules: true
-    - name: Turn on RabbitMQ installation
-      if: matrix.installrmq == true && matrix.os != 'windows-latest'
-      run: echo "INSTALLRMQ=1" >> $GITHUB_ENV
-    - name: Turn on RabbitMQ installation
-      if: matrix.installrmq == true && matrix.os == 'windows-latest'
-      run: echo "INSTALLRMQ=1" | Out-File -FilePath $env:GITHUB_PATH -Append
+    # - name: Turn on RabbitMQ installation
+    #   if: matrix.installrmq == true && matrix.os != 'windows-latest'
+    #   run: echo "INSTALLRMQ=1" >> $GITHUB_ENV
+    # - name: Turn on RabbitMQ installation
+    #   if: matrix.installrmq == true && matrix.os == 'windows-latest'
+    #   run: echo "INSTALLRMQ=1" | Out-File -FilePath $env:GITHUB_PATH -Append
     - name: Turn off C installation on Windows
       if: matrix.os == 'windows-latest' && matrix.install-method == 'pip'
       run: echo "INSTALLC=0" | Out-File -FilePath $env:GITHUB_PATH -Append

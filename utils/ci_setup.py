@@ -206,10 +206,10 @@ def deploy_package_on_ci(method, verbose=False):
         default_pkgs.append('astropy')
     if INSTALLRMQ:
         default_pkgs.append("\"pika<1.0.0b1\"")
-        if _is_linux:
-            os_pkgs.append("rabbitmq-server")
-        elif _is_osx:
-            os_pkgs.append("rabbitmq")
+        # if _is_linux:
+        #     os_pkgs.append("rabbitmq-server")
+        # elif _is_osx:
+        #     os_pkgs.append("rabbitmq")
     if INSTALLTRIMESH:
         default_pkgs.append('trimesh')
     if INSTALLPYGMENTS:
