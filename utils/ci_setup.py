@@ -17,12 +17,12 @@ else:
     INSTALLC = True  # c compiler usually installed by default
 INSTALLR = (os.environ.get('INSTALLR', '0') == '1')
 INSTALLFORTRAN = (os.environ.get('INSTALLFORTRAN', '0') == '1')
+INSTALLZMQ = (os.environ.get('INSTALLZMQ', '0') == '1')
 if not INSTALLC:
     INSTALLFORTRAN = False
     INSTALLZMQ = False
 INSTALLSBML = (os.environ.get('INSTALLSBML', '0') == '1')
 INSTALLAPY = (os.environ.get('INSTALLAPY', '0') == '1')
-INSTALLZMQ = (os.environ.get('INSTALLZMQ', '0') == '1')
 INSTALLRMQ = (os.environ.get('INSTALLRMQ', '0') == '1')
 INSTALLTRIMESH = (os.environ.get('INSTALLTRIMESH', '0') == '1')
 INSTALLPYGMENTS = (os.environ.get('INSTALLPYGMENTS', '0') == '1')
