@@ -384,13 +384,14 @@ class FortranModelDriver(CompiledModelDriver):
         if platform._is_win:  # pragma: windows
             cl_compiler = get_compilation_tool('compiler', 'cl')
             if not cl_compiler.is_installed():  # pragma: debug
-                logger.info("The MSVC compiler could not be located. The Python C API "
-                            "assumes the MSVC CRT will be used on windows so there may "
-                            "be errors when accessing some behavior of the Python C API."
-                            "In particular, segfaults are known to occur when trying to "
-                            "call display_python due to differences in the internal "
-                            "structure of FILE* objects between MSVC and other "
-                            "standards.")
+                logger.info(
+                    "The MSVC compiler could not be located. The Python C API "
+                    "assumes the MSVC CRT will be used on windows so there may "
+                    "be errors when accessing some behavior of the Python C API. "
+                    "In particular, segfaults are known to occur when trying to "
+                    "call display_python due to differences in the internal "
+                    "structure of FILE* objects between MSVC and other "
+                    "standards.")
 
     @classmethod
     def set_env_class(cls, **kwargs):
