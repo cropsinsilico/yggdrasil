@@ -85,6 +85,50 @@ jobs:
         yggtest --ci --with-examples
     - name: Upload coverage report
       uses: codecov/codecov-action@v1
+
+  build_rmq:
+    name: Build RMQ (${{ matrix.python-version }}, ${{ matrix.os }}, ${{ matrix.install-method }})
+    runs-on: ${{ matrix.os }}
+    env:
+      INSTALLRMQ: 1
+    strategy:
+      max-parallel: 5
+      matrix:
+        os: [ubuntu-latest]
+        python-version: [3.6]
+        install-method: [pip]
+      fail-fast: false
+    services:
+      rabbitmq:
+        image: rabbitmq:latest
+        ports:
+          - 5672/tcp
+        options: --health-cmd "rabbitmqctl node_health_check" --health-interval 10s --health-timeout 5s --health-retries 5
+
+    steps:
+    - uses: actions/checkout@v2
+      with:
+        submodules: true
+    - name: Set up Python
+      uses: actions/setup-python@v2
+      if: matrix.install-method == 'pip'
+      with:
+        python-version: ${{ matrix.python-version }}
+    - name: Install dependencies
+      run: |
+        python utils/ci_setup.py ${{ matrix.install-method }} deploy
+    - name: Verify installation
+      run: |
+        python utils/ci_setup.py ${{ matrix.install-method }} verify
+    - name: Non-example tests
+      run: |
+        yggtest --ci
+    - name: Example tests
+      run: |
+        yggtest --ci --with-examples
+    - name: Upload coverage report
+      uses: codecov/codecov-action@v1
+
   build_conda:
     name: Build (${{ matrix.python-version }}, ${{ matrix.os }}, ${{ matrix.install-method }})
     runs-on: ${{ matrix.os }}
