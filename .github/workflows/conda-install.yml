@@ -70,10 +70,10 @@ jobs:
     - name: Install dependencies
       run: |
         python utils/ci_setup.py ${{ matrix.install-method }} deploy
-    - name: Start RabbitMQ Server
-      if: env.INSTALLRMQ == 1 && matrix.os != 'windows-latest'
-      run: |
-        ./utils/setup_rabbitmq.sh
+    # - name: Start RabbitMQ Server
+    #   if: env.INSTALLRMQ == 1 && matrix.os != 'windows-latest'
+    #   run: |
+    #     ./utils/setup_rabbitmq.sh
     - name: Verify installation
       run: |
         python utils/ci_setup.py ${{ matrix.install-method }} verify
