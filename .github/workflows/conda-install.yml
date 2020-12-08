@@ -6,7 +6,7 @@ on:
       - 'gh-pages'
 
 jobs:
-  build:
+  build_pip:
     name: Build (${{ matrix.python-version }}, ${{ matrix.os }}, ${{ matrix.install-method }})
     env:
       NUMPY: numpy
@@ -29,37 +29,80 @@ jobs:
       matrix:
         os: [ubuntu-latest, macos-latest, windows-latest]
         python-version: [3.6]
-        install-method: [pip, conda]
-        shell: 'bash -l {0}'
-        include:
-          - os: ubuntu-latest
-            python-version: 3.8
-            install-method: conda
-          - os: macos-latest
-            python-version: 3.6
-            install-method: pip
-            shell: 
-          - os: windows-latest
-            python-version: 3.6
-            install-method: pip
-            installc: true
-        exclude:
-          - os: macos-latest
-            python-version: 3.6
-            install-method: pip
-            shell: 'bash -l {0}'
-          # - os: windows-latest
-          #   python-version: 3.6
-          #   install-method: pip
+        install-method: [pip]
+        installrmq: [true]
       fail-fast: false
 
     steps:
     - uses: actions/checkout@v2
       with:
         submodules: true
-    - name: Set matrix based environment variables
-      if: matrix.installc == true
-      run: echo "INSTALLC=1" >> $GITHUB_ENV
+    - name: Turn on RabbitMQ installation on Linux
+      if: matrix.installrmq == true
+      run: echo "INSTALLRMQ=1" >> $GITHUB_ENV
+    - name: Turn off C installation on Windows
+      if: matrix.os == 'windows-latest' && matrix.install-method == 'pip'
+      run: echo "INSTALLC=0" >> $GITHUB_ENV
+    - name: Set up MSVC Compiler
+      uses: ilammy/msvc-dev-cmd@v1
+      if: matrix.os == 'windows-latest' && env.INSTALLC == 1
+    - name: Set up Python
+      uses: actions/setup-python@v2
+      if: matrix.install-method == 'pip'
+      with:
+        python-version: ${{ matrix.python-version }}
+    - name: Install dependencies
+      run: |
+        python utils/ci_setup.py ${{ matrix.install-method }} deploy
+    - name: Start RabbitMQ Server
+      if: env.INSTALLRMQ == 1
+      run: |
+        ./utils/setup_rabbitmq.sh
+    - name: Verify installation
+      run: |
+        python utils/ci_setup.py ${{ matrix.install-method }} verify
+    - name: Non-example tests
+      run: |
+        yggtest --ci
+    - name: Example tests
+      run: |
+        yggtest --ci --with-examples
+    - name: Upload coverage report
+      uses: codecov/codecov-action@v1
+  build_conda:
+    name: Build (${{ matrix.python-version }}, ${{ matrix.os }}, ${{ matrix.install-method }})
+    env:
+      NUMPY: numpy
+      MATPLOTLIB: matplotlib
+      MPLBACKEND: agg
+      JSONSCHEMA: jsonschema
+      INSTALLR: 1
+      INSTALLC: 1
+      INSTALLFORTRAN: 1
+      INSTALLSBML: 1
+      INSTALLLPY: 0
+      INSTALLZMQ: 1
+      INSTALLRMQ: 0
+      INSTALLTRIMESH: 1
+      INSTALLPYGMENTS: 1
+      BUILDDOCS: 0
+    runs-on: ${{ matrix.os }}
+    strategy:
+      max-parallel: 5
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+        python-version: [3.6]
+        install-method: [conda]
+        include:
+          - os: ubuntu-latest
+            python-version: 3.8
+            install-method: conda
+      fail-fast: false
+
+    steps:
+    - uses: actions/checkout@v2
+      with:
+        submodules: true
     - name: Set up MSVC Compiler
       uses: ilammy/msvc-dev-cmd@v1
       if: matrix.os == 'windows-latest' && env.INSTALLC == 1
@@ -70,35 +113,30 @@ jobs:
         auto-update-conda: true
         python-version: ${{ matrix.python-version }}
         channels: conda-forge
-    - name: Set up Python
-      uses: actions/setup-python@v2
-      if: matrix.install-method == 'pip'
-      with:
-        python-version: ${{ matrix.python-version }}
     - name: Install old MacOSX SDK for compatibility with the conda llvm (7)
       if: matrix.os == 'macos-latest' && matrix.install-method == 'conda'
-      shell: ${{ matrix.shell }}
+      shell: bash -l {0}
       run: |
         ./utils/setup_old_mac_sdk.sh
     - name: Install dependencies
-      shell: ${{ matrix.shell }}
+      shell: bash -l {0}
       run: |
         python utils/ci_setup.py ${{ matrix.install-method }} deploy
     - name: Start RabbitMQ Server
       if: env.INSTALLRMQ == 1
-      shell: ${{ matrix.shell }}
+      shell: bash -l {0}
       run: |
         ./utils/setup_rabbitmq.sh
     - name: Verify installation
-      shell: ${{ matrix.shell }}
+      shell: bash -l {0}
       run: |
         python utils/ci_setup.py ${{ matrix.install-method }} verify
     - name: Non-example tests
-      shell: ${{ matrix.shell }}
+      shell: bash -l {0}
       run: |
         yggtest --ci
     - name: Example tests
-      shell: ${{ matrix.shell }}
+      shell: bash -l {0}
       run: |
         yggtest --ci --with-examples
     - name: Upload coverage report
@@ -143,7 +181,7 @@ jobs:
         FOLDER: docs/build/html/
   deploy:
     name: Publish package
-    needs: [build, docs]
+    needs: [build_pip, build_conda, docs]
     if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags')
     runs-on: ubuntu-latest
     steps:
