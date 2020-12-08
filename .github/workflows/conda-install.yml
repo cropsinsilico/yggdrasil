@@ -57,8 +57,9 @@ jobs:
     #   run: echo "INSTALLRMQ=1" | Out-File -FilePath $env:GITHUB_PATH -Append
     - name: Turn off C installation on Windows
       if: matrix.os == 'windows-latest' && matrix.install-method == 'pip'
-      run: echo "INSTALLC=0" | Out-File -FilePath $env:GITHUB_PATH -Append
-      # run: echo "INSTALLC=0" >> $GITHUB_ENV
+      # run: echo "INSTALLC=0" | Out-File -FilePath $env:GITHUB_PATH -Append
+      shell: bash -l {0}
+      run: echo "INSTALLC=0" >> $GITHUB_ENV
     - name: Set up MSVC Compiler
       uses: ilammy/msvc-dev-cmd@v1
       if: matrix.os == 'windows-latest' && env.INSTALLC == 1
