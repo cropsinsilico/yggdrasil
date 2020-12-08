@@ -25,8 +25,8 @@ jobs:
   build_pip:
     name: Build (${{ matrix.python-version }}, ${{ matrix.os }}, ${{ matrix.install-method }})
     runs-on: ${{ matrix.os }}
-    env:
-      INSTALLRMQ: 1
+    # env:
+    #   INSTALLRMQ: 1
     strategy:
       max-parallel: 5
       matrix:
@@ -38,12 +38,12 @@ jobs:
         #     python-version: 3.6
         #     install-method: pip
       fail-fast: false
-    services:
-      rabbitmq:
-        image: rabbitmq:latest
-        ports:
-          - 5672/tcp
-        options: --health-cmd "rabbitmqctl node_health_check" --health-interval 10s --health-timeout 5s --health-retries 5
+    # services:
+    #   rabbitmq:
+    #     image: rabbitmq:latest
+    #     ports:
+    #       - 5672/tcp
+    #     options: --health-cmd "rabbitmqctl node_health_check" --health-interval 10s --health-timeout 5s --health-retries 5
 
     steps:
     - uses: actions/checkout@v2
