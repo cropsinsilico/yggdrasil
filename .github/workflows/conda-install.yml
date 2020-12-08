@@ -114,7 +114,8 @@ jobs:
         auto-update-conda: true
         python-version: ${{ matrix.python-version }}
         channels: conda-forge
-        channel-priority: strict
+        # channel-priority: strict
+        use-only-tar-bz2: true
     - name: Add miniconda bin to path (Unix)
       if: matrix.install-method == 'conda' && matrix.os != 'windows-latest'
       run: |
