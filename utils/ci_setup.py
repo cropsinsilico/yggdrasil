@@ -332,6 +332,7 @@ def deploy_package_on_ci(method, verbose=False):
             build_flags = '-q'
             install_flags = '-q'
         cmds += [
+            "%s clean --all" % conda_cmd,
             "%s build %s --python %s %s" % (
                 conda_cmd, 'recipe', PYVER, build_flags),
             "%s index %s" % (conda_cmd, index_dir),
