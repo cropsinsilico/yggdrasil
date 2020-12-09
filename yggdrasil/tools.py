@@ -3,6 +3,7 @@ from __future__ import print_function
 import threading
 import logging
 import pprint
+import psutil
 import os
 import sys
 import sysconfig
@@ -226,10 +227,7 @@ def get_shell():
         str: Name of the shell.
 
     """
-    if platform._is_win:  # pragma: windows
-        return os.environ['COMSPEC']
-    else:
-        return os.environ['SHELL']
+    return psutil.Process(os.getppid()).name()
 
 
 def check_environ_bool(name, valid_values=['true', '1', True, 1]):
