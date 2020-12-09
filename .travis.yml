@@ -196,7 +196,7 @@ jobs:
       dist: xenial
       sudo: true
     - os: linux
-      env: YGG_TEST_FLAGS="--test-suite=timing" YGG_DEFAULT_COMM=ZMQComm
+      env: YGG_TEST_FLAGS="--test-suite=timing tests/test_multitasking.py" YGG_DEFAULT_COMM=ZMQComm
       python: 3.7
       dist: xenial
       sudo: true

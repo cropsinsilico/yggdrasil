@@ -12,7 +12,7 @@ _test_nrep = 1
 _test_lang = 'c'
 # On windows, it's possible to not have a C/C++ communication library installed
 if 'c' not in timing.get_lang_list():  # pragma: windows
-    _test_lang = 'python'
+    _test_lang = 'python'  # pragma: testing
 # _test_run = timing.TimedRun(_test_lang, _test_lang)
 # _test_run.time_run(_test_count, _test_size, nrep=_test_nrep)
 _this_platform = (platform._platform,

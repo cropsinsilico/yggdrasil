@@ -3,6 +3,7 @@ import sys
 import argparse
 import uuid
 import pprint
+import shutil
 import subprocess
 PYVER = ('%s.%s' % sys.version_info[:2])
 PY2 = (sys.version_info[0] == 2)
@@ -98,7 +99,9 @@ def setup_package_on_ci(method, python):
     """
     cmds = []
     major, minor = [int(x) for x in python.split('.')]
-    if _is_win:
+    if os.environ.get('GITHUB_ACTIONS', False):
+        conda_cmd = '$CONDA/bin/conda'
+    elif _is_win:
         conda_cmd = 'call conda'
     else:
         conda_cmd = 'conda'
@@ -110,6 +113,8 @@ def setup_package_on_ci(method, python):
             # "%s config --set channel_priority strict" % conda_cmd,
             "%s config --add channels conda-forge" % conda_cmd,
             "%s update -q conda" % conda_cmd,
+            # "%s config --set allow_conda_downgrades true" % conda_cmd,
+            # "%s install -n root conda=4.9" % conda_cmd,
             "%s create -q -n test-environment python=%s" % (conda_cmd, python)
         ]
     elif method == 'pip':
@@ -271,8 +276,13 @@ def deploy_package_on_ci(method, verbose=False):
     if method == 'conda':
         # Install from conda build
         # Assumes that an environment is active
-        prefix_dir = os.path.dirname(os.path.dirname(
-            os.environ['CONDA_PREFIX']))
+        conda_prefix = os.environ.get('CONDA_PREFIX', None)
+        if not conda_prefix:
+            if os.environ.get('GITHUB_ACTIONS', False):
+                conda_prefix = os.environ['CONDA']
+            else:
+                conda_prefix = shutil.which('conda')
+        prefix_dir = os.path.dirname(os.path.dirname(conda_prefix))
         index_dir = os.path.join(prefix_dir, "conda-bld")
         if verbose:
             build_flags = ''
@@ -284,8 +294,10 @@ def deploy_package_on_ci(method, verbose=False):
             "%s build %s --python %s %s" % (
                 conda_cmd, 'recipe', PYVER, build_flags),
             "%s index %s" % (conda_cmd, index_dir),
-            "%s install %s -c file:/%s/conda-bld yggdrasil" % (
-                conda_cmd, install_flags, prefix_dir),
+            "%s install %s --use-local --update-deps yggdrasil" % (
+                conda_cmd, install_flags),
+            # "%s install %s --update-deps -c file:/%s/conda-bld yggdrasil" % (
+            #     conda_cmd, install_flags, prefix_dir),
         ]
     elif method == 'pip':
         if verbose:

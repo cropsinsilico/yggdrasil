@@ -44,6 +44,7 @@ typedef struct comm_t {
   int is_work_comm; //!< Flag specifying if comm is a temporary work comm.
   int is_rpc; //!< Flag specifying if comm is the receiving comm for a client/server request connection.
   int is_global; //!< Flag specifying if the comm is global.
+  int thread_id; //!< ID for the thread that created the comm.
 } comm_t;
 
 
@@ -122,6 +123,7 @@ comm_t empty_comm_base() {
   ret.is_work_comm = 0;
   ret.is_rpc = 0;
   ret.is_global = 0;
+  ret.thread_id = 0;
   return ret;
 };
 
@@ -187,6 +189,7 @@ comm_t* new_comm_base(char *address, const char *direction,
   ret->sent_eof[0] = 0;
   ret->recv_eof[0] = 0;
   ret->used[0] = 0;
+  ret->thread_id = get_thread_id();
   return ret;
 };
 

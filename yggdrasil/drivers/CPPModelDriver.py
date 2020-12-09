@@ -172,6 +172,7 @@ class CPPModelDriver(CModelDriver):
             + cls.language_ext[0])
         internal_libs[cls.interface_library]['include_dirs'].append(
             cls.get_language_dir())
+        internal_libs[cls.interface_library]['language'] = cls.language
         cls.internal_libraries = internal_libs
 
     @classmethod

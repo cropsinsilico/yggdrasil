@@ -47,10 +47,10 @@ environment:
   matrix:
     - platform: x64
       PYTHON_VERSION: "3.6"
-      YGG_TEST_FLAGS: "--test-suite=examples_part1"
+      YGG_TEST_FLAGS: "drivers/tests/test_OSRModelDriver.py --test-suite=examples_part1"
     - platform: x64
       PYTHON_VERSION: "3.6"
-      YGG_TEST_FLAGS: "--test-suite=examples_part2"
+      YGG_TEST_FLAGS: "--test-suite=examples_part2 --languages c cpp"
       YGG_SECOND_TEST: "yggtest --ci --test-suite=types --languages cpp"
     - platform: x64
       PYTHON_VERSION: "3.6"
@@ -59,9 +59,10 @@ environment:
       PYTHON_VERSION: "3.7"
       INSTALLZMQ: 0
       YGG_TEST_FLAGS: "--long-running"
+      YGG_SECOND_TEST: "yggtest --ci --test-suite=examples_part2"
     - platform: x64
       PYTHON_VERSION: "3.6"
-      YGG_TEST_FLAGS: "--test-suite=types tests/test_config.py drivers/tests/test_CompiledModelDriver.py"
+      YGG_TEST_FLAGS: "--test-suite=types tests/test_config.py drivers/tests/test_CompiledModelDriver.py drivers/tests/test_CMakeModelDriver.py drivers/tests/test_MakeModelDriver.py"
       INSTALLC: 0  # Acts to exclude c and cpp
     - platform: x64
       PYTHON_VERSION: "3.7"
