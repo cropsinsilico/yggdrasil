@@ -219,6 +219,19 @@ def get_fds():  # pragma: debug
     return out.splitlines()[1:]
 
 
+def get_shell():
+    r"""Get the type of shell that yggdrasil was called from.
+
+    Returns:
+        str: Name of the shell.
+
+    """
+    if platform._is_win:  # pragma: windows
+        return os.environ['COMSPEC']
+    else:
+        return os.environ['SHELL']
+
+
 def check_environ_bool(name, valid_values=['true', '1', True, 1]):
     r"""Check to see if a boolean environment variable is set to True.
 

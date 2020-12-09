@@ -78,6 +78,11 @@ def test_display_source_diff():
         os.remove(fname2)
 
 
+def test_get_shell():
+    r"""Test get_shell."""
+    tools.get_shell()
+
+
 def test_get_conda_prefix():
     r"""Test get_conda_prefix."""
     tools.get_conda_prefix()
