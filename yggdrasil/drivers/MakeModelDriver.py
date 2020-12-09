@@ -226,11 +226,13 @@ class MakeCompiler(BuildToolBase):
         compiler = language_driver.get_tool('compiler', toolname=language_compiler)
         compile_flags = language_driver.get_compiler_flags(
             for_model=True, skip_defaults=True, dont_skip_env_defaults=True,
-            logging_level=logging_level, dont_link=True, toolnane=language_compiler)
+            logging_level=logging_level, dont_link=True, toolname=language_compiler)
         linker = language_driver.get_tool('linker', toolname=language_compiler)
         linker_flags = language_driver.get_linker_flags(
             for_model=True, skip_defaults=True, dont_skip_env_defaults=True,
             toolname=language_compiler)
+        print('COMPILER FLAGS: %s' % ' '.join(compile_flags))
+        print('LINKER FLAGS: %s' % ' '.join(linker_flags))
         for k in ['env_compiler', 'env_compiler_flags',
                   'env_linker', 'env_linker_flags']:
             kwargs.setdefault(k, cls._schema_properties[k]['default'])
