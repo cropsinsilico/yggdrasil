@@ -331,15 +331,23 @@ def deploy_package_on_ci(method, verbose=False):
         else:
             build_flags = '-q'
             install_flags = '-q'
+        curr_env = os.environ['CONDA_DEFAULT_ENV']
         cmds += [
             "%s clean --all" % conda_cmd,
+            # Build in base
+            # https://github.com/conda/conda/issues/7758#issuecomment-660328841
+            "%s deactivate" % conda_cmd,
             "%s build %s --python %s %s" % (
                 conda_cmd, 'recipe', PYVER, build_flags),
             "%s index %s" % (conda_cmd, index_dir),
-            "%s install %s --only-deps -c file:/%s/conda-bld yggdrasil" % (
-                conda_cmd, install_flags, prefix_dir),
+            "%s activate %s" % (conda_cmd, curr_env),
+            # "%s install %s --only-deps -c file:/%s/conda-bld yggdrasil" % (
+            #     conda_cmd, install_flags, prefix_dir),
             "%s install %s -c file:/%s/conda-bld yggdrasil" % (
                 conda_cmd, install_flags, prefix_dir),
+            # Install & then update
+            # https://github.com/conda/conda/issues/466#issuecomment-378050252
+            "%s update yggdrasil" % conda_cmd,
             # "%s install %s --use-local --only-deps yggdrasil" % (
             #     conda_cmd, install_flags),
             # "%s install %s --use-local --no-deps yggdrasil" % (
