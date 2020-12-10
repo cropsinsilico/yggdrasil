@@ -346,8 +346,16 @@ def deploy_package_on_ci(method, verbose=False):
             build_flags = '-q'
             install_flags = '-q'
         curr_env = os.environ['CONDA_DEFAULT_ENV']
-        # if GITHUB_ACTIONS and os.environ.get('GHA_SHELL', False):
-        #     cmds.append('%s init %s' % (conda_cmd, os.environ['GHA_SHELL']))
+        if GITHUB_ACTIONS and os.environ.get('GHA_SHELL', False):
+            assert(os.environ['GHA_SHELL'] == 'bash')
+            if _is_linux:
+                startup_file = '.bashrc'
+            else:
+                startup_file = '.bash_profile'
+            cmds += [
+                'source %s' % os.path.join('~', startup_file),
+                '%s init %s' % (conda_cmd, os.environ['GHA_SHELL'])
+            ]
         cmds += [
             "%s clean --all" % conda_cmd,
             # Build in base
@@ -412,6 +420,12 @@ def verify_package_on_ci(method):
             the package. Valid values include 'conda' and 'pip'.
 
     """
+    # Check that temp is set correctly
+    if GITHUB_ACTIONS and _is_win:
+        import tempfile
+        tempdir = os.path.normcase(os.path.normpath(tempfile.gettempdir()))
+        print('TEMPDIR', tempdir)
+        assert('runner~1' not in tempdir)
     src_dir = os.path.join(os.getcwd(),
                            os.path.dirname(os.path.dirname(__file__)))
     src_version = subprocess.check_output(
