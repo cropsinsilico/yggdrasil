@@ -346,8 +346,8 @@ def deploy_package_on_ci(method, verbose=False):
             build_flags = '-q'
             install_flags = '-q'
         curr_env = os.environ['CONDA_DEFAULT_ENV']
-        if GITHUB_ACTIONS and ('GHA_SHELL' in os.environ):
-            cmds.append('%s init %s' % (conda_cmd, os.environ['GHA_SHELL']))
+        # if GITHUB_ACTIONS and os.environ.get('GHA_SHELL', False):
+        #     cmds.append('%s init %s' % (conda_cmd, os.environ['GHA_SHELL']))
         cmds += [
             "%s clean --all" % conda_cmd,
             # Build in base
