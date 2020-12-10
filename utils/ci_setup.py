@@ -312,11 +312,19 @@ def deploy_package_on_ci(method, without_build=False, verbose=False):
         # https://github.com/actions/virtual-environments/issues/712
         shell = psutil.Process(os.getppid()).name().lower()
         if re.fullmatch('pwsh|pwsh.exe|powershell.exe', shell):
-            cmds.append(
-                "echo \"TEMP=$env:USERPROFILE\\AppData\\Local\\Temp\" >> $env:GITHUB_ENV")
+            cmds += [
+                ("echo \"TEMP=$env:USERPROFILE\\AppData\\Local\\Temp\" >> "
+                 "$env:GITHUB_ENV"),
+                ("echo \"TMPDIR=$env:USERPROFILE\\AppData\\Local\\Temp\" >> "
+                 "$env:GITHUB_ENV")
+            ]
         else:
-            cmds.append(
-                "echo \"TEMP=$USERPROFILE\\AppData\\Local\\Temp\" >> $GITHUB_ENV")
+            cmds += [
+                ("echo \"TEMP=$USERPROFILE\\AppData\\Local\\Temp\" >> "
+                 "$GITHUB_ENV"),
+                ("echo \"TMPDIR=$USERPROFILE\\AppData\\Local\\Temp\" >> "
+                 "$GITHUB_ENV")
+            ]
     if GITHUB_ACTIONS and _is_linux and _in_conda:
         # Do both to ensure that the path is set for the installation
         # and in following steps
@@ -447,7 +455,7 @@ def verify_package_on_ci(method):
     if GITHUB_ACTIONS and _is_win:
         import tempfile
         tempdir = os.path.normcase(os.path.normpath(tempfile.gettempdir()))
-        print('TEMPDIR', tempdir)
+        print('TEMPDIR', tempdir, os.environ.get('TEMP', None))
         assert('runner~1' not in tempdir)
     src_dir = os.path.join(os.getcwd(),
                            os.path.dirname(os.path.dirname(__file__)))
