@@ -83,6 +83,11 @@ def test_get_shell():
     tools.get_shell()
 
 
+def test_in_powershell():
+    r"""Test in_powershell."""
+    tools.in_powershell()
+
+
 def test_get_conda_prefix():
     r"""Test get_conda_prefix."""
     tools.get_conda_prefix()

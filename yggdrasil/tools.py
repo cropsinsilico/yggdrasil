@@ -5,6 +5,7 @@ import logging
 import pprint
 import psutil
 import os
+import re
 import sys
 import sysconfig
 try:
@@ -228,6 +229,19 @@ def get_shell():
 
     """
     return psutil.Process(os.getppid()).name()
+
+
+def in_powershell():
+    r"""Determine if yggdrasil is running from a Windows Powershell.
+
+    Returns:
+        bool: True if running from Powershell, False otherwise.
+
+    """
+    if not platform._is_win:
+        return False
+    shell = get_shell().lower()
+    return bool(re.fullmatch('pwsh|pwsh.exe|powershell.exe', shell))
 
 
 def check_environ_bool(name, valid_values=['true', '1', True, 1]):

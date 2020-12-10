@@ -1,6 +1,5 @@
 """Testing things."""
 import os
-import re
 import shutil
 import uuid
 import difflib
@@ -53,8 +52,7 @@ for k, v in script_list:
     else:
         scripts[k] = os.path.join(script_dir, v)
 # scripts = {k: os.path.join(script_dir, v) for k, v in script_list}
-if re.fullmatch('pwsh|pwsh.exe|powershell.exe',
-                tools.get_shell().lower()):  # pragma: windows
+if platform._is_win and (not tools.in_powershell()):  # pragma: windows
     scripts['executable'] = ['timeout', '0']
 else:
     scripts['executable'] = ['sleep', 0.1]
