@@ -147,6 +147,8 @@ jobs:
     defaults:
       run:
         shell: bash -l {0}
+    env:
+      GHA_SHELL: bash
 
     steps:
     - uses: actions/checkout@v2
