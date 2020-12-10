@@ -159,7 +159,7 @@ jobs:
         auto-update-conda: true
         channels: conda-forge
         use-only-tar-bz2: true
-	activate-environment: ''
+        activate-environment: ''
     - name: Build package
       run: |
         ${{ matrix.install-method }} install psutil
