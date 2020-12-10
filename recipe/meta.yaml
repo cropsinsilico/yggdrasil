@@ -1,5 +1,5 @@
 {% set name = "yggdrasil" %}
-{% set version = "1.3.0" %}
+{% set version = "1.4.0" %}
 
 package:
   name: {{ name|lower }}
@@ -10,7 +10,7 @@ source:
 
 build:
   number: 0
-  script: "{{ PYTHON }} -m pip install . --no-deps --ignore-installed --no-cache-dir -vvv "
+  script: '{{ PYTHON }} -m pip install . --no-deps --ignore-installed --no-cache-dir -vvv '
   skip: true  # [(win and vc<14) or py<35]
   entry_points:
     - ygginfo = yggdrasil.command_line:ygginfo
@@ -92,7 +92,7 @@ about:
   license: BSD-3-Clause
   license_family: BSD
   license_file: LICENSE.txt
-  summary: 'A framework for connecting computational models from multiple languages.'
+  summary: A framework for connecting computational models from multiple languages.
 
   description: |
     The Crops in Silico (CiS) framework, yggdrasil, provides support for
