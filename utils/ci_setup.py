@@ -1,5 +1,7 @@
 import os
+import re
 import sys
+import psutil
 import argparse
 import uuid
 import pprint
@@ -234,6 +236,18 @@ def deploy_package_on_ci(method, verbose=False):
         requirements_files.append('requirements_documentation.txt')
         if not _in_conda:
             os_pkgs.append("doxygen")
+    if GITHUB_ACTIONS and _is_win:
+        # Patch for bug where TEMP is set incorrectly for windows GHA
+        # https://github.com/actions/virtual-environments/issues/712
+        shell = psutil.Process(os.getppid()).name().lower()
+        if re.fullmatch('pwsh|pwsh.exe|powershell.exe', shell):
+            cmds.append(
+                "echo \"TEMP=$env:USERPROFILE\\AppData\\Local\\Temp\" >> $env:GITHUB_ENV")
+        else:
+            cmds.append(
+                "echo \"TEMP=$USERPROFILE\\AppData\\Local\\Temp\" >> $GITHUB_ENV")
+        
+        # echo "TEMP=$env:USERPROFILE\AppData\Local\Temp" >> $env:GITHUB_ENV
     if GITHUB_ACTIONS and _is_linux and _in_conda:
         # Do both to ensure that the path is set for the installation
         # and in following steps
