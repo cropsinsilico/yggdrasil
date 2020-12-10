@@ -1,3 +1,5 @@
+import flaky
+import pytest
 from yggdrasil.tests import assert_raises, assert_equal
 import yggdrasil.drivers.tests.test_ConnectionDriver as parent
 from yggdrasil import runner, tools
@@ -131,6 +133,8 @@ class TestClientDriver(TestClientParam, parent.TestConnectionDriver):
         assert(flag)
         assert_equal(cli_msg, msg_send)
 
+    @flaky.flaky(max_runs=3)
+    @pytest.mark.timeout(60)
     def test_send_recv_nolimit(self):
         r"""Test routing of a large message between client and server."""
         self.test_send_recv(msg_send=self.msg_long)
