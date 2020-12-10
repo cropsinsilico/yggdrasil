@@ -144,6 +144,9 @@ jobs:
             python-version: 3.8
             install-method: conda
       fail-fast: false
+    defaults:
+      run:
+        shell: bash -l {0}
 
     steps:
     - uses: actions/checkout@v2
@@ -162,42 +165,27 @@ jobs:
         # channel-priority: strict
         use-only-tar-bz2: true
     - name: Add miniconda bin to path (Unix)
-      if: matrix.install-method == 'conda' && matrix.os != 'windows-latest'
+      if: matrix.install-method == 'conda'
       run: |
         echo "PATH=$HOME/miniconda/bin:$PATH" >> $GITHUB_ENV
-    - name: Add miniconda bin to path (Windows)
-      if: matrix.install-method == 'conda' && matrix.os == 'windows-latest'
-      shell: bash -l {0}
-      run: |
-        echo "PATH=$HOME/miniconda/bin:$PATH" >> $GITHUB_ENV
-    # - name: Add miniconda bin to path (Windows)
-    #   if: matrix.install-method == 'conda' && matrix.os == 'windows-latest'
-    #   run: |
-    #     echo "PATH=%PYTHON%;%PYTHON%\\Scripts;%PATH%" | Out-File -FilePath $env:GITHUB_PATH -Append
     - name: Install old MacOSX SDK for compatibility with the conda llvm (7)
       if: matrix.os == 'macos-latest' && matrix.install-method == 'conda'
-      shell: bash -l {0}
       run: |
         ./utils/setup_old_mac_sdk.sh
     - name: Install dependencies
-      shell: bash -l {0}
       run: |
         python utils/ci_setup.py ${{ matrix.install-method }} deploy
     - name: Start RabbitMQ Server
       if: env.INSTALLRMQ == 1 && matrix.os != 'windows-latest'
-      shell: bash -l {0}
       run: |
         ./utils/setup_rabbitmq.sh
     - name: Verify installation
-      shell: bash -l {0}
       run: |
         python utils/ci_setup.py ${{ matrix.install-method }} verify
     - name: Non-example tests
-      shell: bash -l {0}
       run: |
         yggtest --ci
     - name: Example tests
-      shell: bash -l {0}
       run: |
         yggtest --ci --with-examples
     - name: Upload coverage report
