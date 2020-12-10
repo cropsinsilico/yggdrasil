@@ -30,6 +30,26 @@ INSTALLTRIMESH = (os.environ.get('INSTALLTRIMESH', '0') == '1')
 INSTALLPYGMENTS = (os.environ.get('INSTALLPYGMENTS', '0') == '1')
 BUILDDOCS = (os.environ.get('BUILDDOCS', '0') == '1')
 GITHUB_ACTIONS = os.environ.get('GITHUB_ACTIONS', False)
+CONDA_ENV = os.environ.get('CONDA_DEFAULT_ENV', None)
+CONDA_PREFIX = os.environ.get('CONDA_PREFIX', None)
+if (not CONDA_PREFIX) and CONDA_ENV:
+    if GITHUB_ACTIONS:
+        CONDA_PREFIX = os.environ['CONDA']
+    else:
+        CONDA_PREFIX = os.path.dirname(os.path.dirname(shutil.which('conda')))
+if os.path.dirname(CONDA_PREFIX).endswith('envs'):
+    CONDA_PREFIX = os.path.dirname(os.path.dirname(CONDA_PREFIX))
+if GITHUB_ACTIONS:
+    CONDA_CMD = '$CONDA/bin/conda'
+elif _is_win:
+    CONDA_CMD = 'call conda'
+else:
+    CONDA_CMD = 'conda'
+SUMMARY_CMDS = ["python --version",
+                "pip list"]
+if CONDA_ENV:
+    SUMMARY_CMDS += ["%s info" % CONDA_CMD,
+                     "%s list" % CONDA_CMD]
 
 
 def call_conda_command(args, **kwargs):
@@ -103,23 +123,17 @@ def setup_package_on_ci(method, python):
     """
     cmds = []
     major, minor = [int(x) for x in python.split('.')]
-    if GITHUB_ACTIONS:
-        conda_cmd = '$CONDA/bin/conda'
-    elif _is_win:
-        conda_cmd = 'call conda'
-    else:
-        conda_cmd = 'conda'
     if method == 'conda':
         cmds += [
             "echo Installing Python using conda...",
             # Configure conda
-            "%s config --set always_yes yes --set changeps1 no" % conda_cmd,
-            # "%s config --set channel_priority strict" % conda_cmd,
-            "%s config --add channels conda-forge" % conda_cmd,
-            "%s update -q conda" % conda_cmd,
-            # "%s config --set allow_conda_downgrades true" % conda_cmd,
-            # "%s install -n root conda=4.9" % conda_cmd,
-            "%s create -q -n test-environment python=%s" % (conda_cmd, python)
+            "%s config --set always_yes yes --set changeps1 no" % CONDA_CMD,
+            # "%s config --set channel_priority strict" % CONDA_CMD,
+            "%s config --add channels conda-forge" % CONDA_CMD,
+            "%s update -q conda" % CONDA_CMD,
+            # "%s config --set allow_conda_downgrades true" % CONDA_CMD,
+            # "%s install -n root conda=4.9" % CONDA_CMD,
+            "%s create -q -n test-environment python=%s" % (CONDA_CMD, python)
         ]
     elif method == 'pip':
         if INSTALLLPY or _is_win:
@@ -143,13 +157,81 @@ def setup_package_on_ci(method, python):
     call_script(cmds)
 
 
-def deploy_package_on_ci(method, verbose=False):
+def build_package_on_ci(method, return_commands=False, verbose=False):
+    r"""Build the package on a CI resource.
+
+    Args:
+        method (str): Method that should be used to build the package.
+            Valid values include 'conda' and 'pip'.
+        return_commands (bool, optional): If True, the commands necessary to
+            build the package are returned instead of running them. Defaults
+            to False.
+        verbose (bool, optional): If True, setup steps are run with verbosity
+            turned up. Defaults to False.
+
+    """
+    cmds = SUMMARY_CMDS.copy()
+    # Upgrade pip and setuptools and wheel to get clean install
+    upgrade_pkgs = ['wheel', 'setuptools']
+    if not _is_win:
+        upgrade_pkgs.insert(0, 'pip')
+    cmds += ["pip install --upgrade %s" % ' '.join(upgrade_pkgs)]
+    if method == 'conda':
+        index_dir = os.path.join(CONDA_PREFIX, "conda-bld")
+        if verbose:
+            build_flags = ''
+        else:
+            build_flags = '-q'
+        # Must always build in base to avoid errors (and don't change the
+        # version of Python used in the environment)
+        # https://github.com/conda/conda/issues/9124
+        # https://github.com/conda/conda/issues/7758#issuecomment-660328841
+        assert(CONDA_ENV == 'base')
+        # if GITHUB_ACTIONS and os.environ.get('GHA_SHELL', False):
+        #     assert(os.environ['GHA_SHELL'] == 'bash')
+        #     if _is_linux:
+        #         startup_file = '.bashrc'
+        #     else:
+        #         startup_file = '.bash_profile'
+        #     cmds += [
+        #         '%s init %s' % (CONDA_CMD, os.environ['GHA_SHELL'])
+        #         'source %s' % os.path.join('~', startup_file),
+        #     ]
+        cmds += [
+            # "%s clean --all" % CONDA_CMD,
+            # "%s deactivate" % CONDA_CMD,
+            "%s install -q -n base conda-build conda-verify" % CONDA_CMD,
+            "%s build %s --python %s %s" % (
+                CONDA_CMD, 'recipe', PYVER, build_flags),
+            "%s index %s" % (CONDA_CMD, index_dir),
+            # "%s activate %s" % (CONDA_CMD, CONDA_ENV),
+        ]
+    elif method == 'pip':
+        if verbose:
+            build_flags = ''
+        else:
+            build_flags = '--quiet'
+        # Install from source dist
+        cmds += ["python setup.py %s sdist" % build_flags]
+    else:  # pragma: debug
+        raise ValueError("Method must be 'conda' or 'pip', not '%s'"
+                         % method)
+    # Print summary of what was installed
+    cmds += SUMMARY_CMDS
+    if return_commands:
+        return cmds
+    call_script(cmds)
+
+
+def deploy_package_on_ci(method, without_build=False, verbose=False):
     r"""Build and install the package and its dependencies on a CI
     resource.
 
     Args:
         method (str): Method that should be used to build and install
             the package. Valid values include 'conda' and 'pip'.
+        without_build (bool, optional): If True, the package will not be
+            built prior to install. Defaults to False.
         verbose (bool, optional): If True, setup steps are run with verbosity
             turned up. Defaults to False.
 
@@ -157,19 +239,11 @@ def deploy_package_on_ci(method, verbose=False):
         ValueError: If method is not 'conda' or 'pip'.
 
     """
-    if _is_win:
-        conda_cmd = 'call conda'
+    if without_build:
+        cmds = SUMMARY_CMDS.copy()
     else:
-        conda_cmd = 'conda'
-    cmds = [
-        # Check that we have the expected version of Python
-        "python --version",
-    ]
-    # Upgrade pip and setuptools and wheel to get clean install
-    upgrade_pkgs = ['wheel', 'setuptools']
-    if not _is_win:
-        upgrade_pkgs.insert(0, 'pip')
-    cmds += ["pip install --upgrade %s" % ' '.join(upgrade_pkgs)]
+        cmds = build_package_on_ci(method, return_commands=True,
+                                   verbose=verbose)
     # Uninstall default numpy and matplotlib to allow installation
     # of specific versions
     cmds += ["pip uninstall -y numpy matplotlib"]
@@ -183,11 +257,9 @@ def deploy_package_on_ci(method, verbose=False):
     if method == 'conda':
         _in_conda = True
         default_pkgs = conda_pkgs
-        cmds += [
-            "%s clean --all" % conda_cmd,  # TODO: This might remove cache
-            "%s info" % conda_cmd,
-            "%s list" % conda_cmd,
-        ]
+        # cmds += [
+        #     "%s clean --all" % CONDA_CMD,  # TODO: This might remove cache
+        # ]
     elif method == 'pip':
         _in_conda = ((_is_win or INSTALLLPY) and (not GITHUB_ACTIONS))
         default_pkgs = pip_pkgs
@@ -246,8 +318,6 @@ def deploy_package_on_ci(method, verbose=False):
         else:
             cmds.append(
                 "echo \"TEMP=$USERPROFILE\\AppData\\Local\\Temp\" >> $GITHUB_ENV")
-        
-        # echo "TEMP=$env:USERPROFILE\AppData\Local\Temp" >> $env:GITHUB_ENV
     if GITHUB_ACTIONS and _is_linux and _in_conda:
         # Do both to ensure that the path is set for the installation
         # and in following steps
@@ -257,16 +327,7 @@ def deploy_package_on_ci(method, verbose=False):
             "echo $CONDA_PREFIX/lib:$LD_LIBRARY_PATH >> $GITHUB_ENV"
         ]
     # Install dependencies
-    if method == 'conda':
-        # if GITHUB_ACTIONS:
-        #     cmds += [
-        #         "%s install -q conda-build conda-verify" % conda_cmd,
-        #     ]
-        # else:
-        cmds += [
-            "%s install -q -n base conda-build conda-verify" % conda_cmd,
-        ]
-    elif method == 'pip':
+    if method == 'pip':
         if INSTALLR and (not _in_conda):
             if _is_linux:
                 cmds += [("sudo add-apt-repository 'deb https://cloud"
@@ -309,7 +370,7 @@ def deploy_package_on_ci(method, verbose=False):
                                       "on Windows.")
     if _in_conda:
         if conda_pkgs:
-            cmds += ["%s install %s" % (conda_cmd, ' '.join(conda_pkgs))]
+            cmds += ["%s install %s" % (CONDA_CMD, ' '.join(conda_pkgs))]
     else:
         pip_pkgs += conda_pkgs
     if pip_pkgs:
@@ -319,7 +380,7 @@ def deploy_package_on_ci(method, verbose=False):
     if INSTALLLPY:
         if _in_conda:
             cmds += ["%s install openalea.lpy boost=1.66.0 -c openalea"
-                     % conda_cmd]
+                     % CONDA_CMD]
         else:  # pragma: debug
             raise RuntimeError("Could not detect conda environment. "
                                "Cannot proceed with a conda deployment "
@@ -327,69 +388,34 @@ def deploy_package_on_ci(method, verbose=False):
     # Install yggdrasil
     if method == 'conda':
         # Install from conda build
-        # Assumes that an environment is active
-        conda_prefix = os.environ.get('CONDA_PREFIX', None)
-        if not conda_prefix:
-            if GITHUB_ACTIONS:
-                conda_prefix = os.environ['CONDA']
-                prefix_dir = conda_prefix
-            else:
-                conda_prefix = shutil.which('conda')
-                prefix_dir = os.path.dirname(os.path.dirname(conda_prefix))
-        else:
-            prefix_dir = os.path.dirname(os.path.dirname(conda_prefix))
-        index_dir = os.path.join(prefix_dir, "conda-bld")
+        # Assumes that the target environment is active
         if verbose:
-            build_flags = ''
             install_flags = '-vvv'
         else:
-            build_flags = '-q'
             install_flags = '-q'
-        curr_env = os.environ['CONDA_DEFAULT_ENV']
-        if GITHUB_ACTIONS and os.environ.get('GHA_SHELL', False):
-            assert(os.environ['GHA_SHELL'] == 'bash')
-            if _is_linux:
-                startup_file = '.bashrc'
-            else:
-                startup_file = '.bash_profile'
-            cmds += [
-                'source %s' % os.path.join('~', startup_file),
-                '%s init %s' % (conda_cmd, os.environ['GHA_SHELL'])
-            ]
         cmds += [
-            "%s clean --all" % conda_cmd,
-            # Build in base
-            # https://github.com/conda/conda/issues/7758#issuecomment-660328841
-            "%s deactivate" % conda_cmd,
-            "%s build %s --python %s %s" % (
-                conda_cmd, 'recipe', PYVER, build_flags),
-            "%s index %s" % (conda_cmd, index_dir),
-            "%s activate %s" % (conda_cmd, curr_env),
+            # "%s clean --all" % CONDA_CMD,
             # "%s install %s --only-deps -c file:/%s/conda-bld yggdrasil" % (
-            #     conda_cmd, install_flags, prefix_dir),
+            #     CONDA_CMD, install_flags, CONDA_PREFIX),
             "%s install %s -c file:/%s/conda-bld yggdrasil" % (
-                conda_cmd, install_flags, prefix_dir),
+                CONDA_CMD, install_flags, CONDA_PREFIX),
             # Install & then update
             # https://github.com/conda/conda/issues/466#issuecomment-378050252
-            "%s update yggdrasil" % conda_cmd,
+            "%s update yggdrasil" % CONDA_CMD,
             # "%s install %s --use-local --only-deps yggdrasil" % (
-            #     conda_cmd, install_flags),
+            #     CONDA_CMD, install_flags),
             # "%s install %s --use-local --no-deps yggdrasil" % (
-            #     conda_cmd, install_flags),
+            #     CONDA_CMD, install_flags),
             # "%s install %s --use-local --update-deps yggdrasil" % (
-            #     conda_cmd, install_flags),
+            #     CONDA_CMD, install_flags),
             # "%s install %s --update-deps -c file:/%s/conda-bld yggdrasil" % (
-            #     conda_cmd, install_flags, prefix_dir),
+            #     CONDA_CMD, install_flags, CONDA_PREFIX),
         ]
     elif method == 'pip':
         if verbose:
-            build_flags = ''
             install_flags = '--verbose'
         else:
-            build_flags = '--quiet'
             install_flags = ''
-        # Install from source dist
-        cmds += ["python setup.py %s sdist" % build_flags]
         if _is_win:  # pragma: windows
             cmds += [
                 "for %%a in (\"dist\\*.tar.gz\") do set YGGSDIST=%%a",
@@ -406,9 +432,7 @@ def deploy_package_on_ci(method, verbose=False):
         raise ValueError("Method must be 'conda' or 'pip', not '%s'"
                          % method)
     # Print summary of what was installed
-    cmds.append('pip list')
-    if _in_conda:
-        cmds.append("%s list" % conda_cmd)
+    cmds += SUMMARY_CMDS
     call_script(cmds)
 
 
@@ -501,17 +525,29 @@ if __name__ == "__main__":
     parser_env.add_argument(
         'python',
         help="Version of python that should be tested.")
+    parser_bld = subparsers.add_parser(
+        'build', help="Build the package.")
+    parser_bld.add_argument(
+        '--verbose', action='store_true',
+        help="Turn up verbosity of output from build step.")
     parser_dep = subparsers.add_parser(
         'deploy', help="Build and install package.")
     parser_dep.add_argument(
+        '--without-build', action='store_true',
+        help=("Perform installation steps without building first. (Assumes "
+              "the package has already been built)."))
+    parser_dep.add_argument(
         '--verbose', action='store_true',
-        help="Turn up verbosity of output from setup step.")
+        help="Turn up verbosity of output from deploy step.")
     parser_ver = subparsers.add_parser(
         'verify', help="Verify that the package was installed correctly.")
     args = parser.parse_args()
     if args.operation in ['env', 'setup']:
         setup_package_on_ci(args.method, args.python)
+    elif args.operation == 'build':
+        build_package_on_ci(args.method, verbose=args.verbose)
     elif args.operation == 'deploy':
-        deploy_package_on_ci(args.method, verbose=args.verbose)
+        deploy_package_on_ci(args.method, without_build=args.without_build,
+                             verbose=args.verbose)
     elif args.operation == 'verify':
         verify_package_on_ci(args.method)
