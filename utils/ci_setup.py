@@ -38,7 +38,7 @@ if (not CONDA_PREFIX) and CONDA_ENV:
 if ((isinstance(CONDA_PREFIX, str)
      and os.path.dirname(CONDA_PREFIX).endswith('envs'))):
     CONDA_PREFIX = os.path.dirname(os.path.dirname(CONDA_PREFIX))
-if _is_win and (not GITHUB_ACTIONS):
+if _is_win:
     CONDA_CMD = 'call conda'
 else:
     CONDA_CMD = 'conda'
