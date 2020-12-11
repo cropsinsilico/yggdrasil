@@ -3,7 +3,6 @@ from __future__ import print_function
 import threading
 import logging
 import pprint
-import psutil
 import os
 import re
 import sys
@@ -228,7 +227,15 @@ def get_shell():
         str: Name of the shell.
 
     """
-    return psutil.Process(os.getppid()).name()
+    shell = os.environ.get('SHELL', None)
+    if not shell:
+        if platform._is_win:  # pragma: windows
+            shell = os.environ.get('COMSPEC', None)
+        assert(shell)
+    # return psutil.Process(os.getppid()).name()
+    if platform._is_win:  # pragma: windows
+        shell = shell.lower()
+    return shell
 
 
 def in_powershell():
@@ -240,8 +247,7 @@ def in_powershell():
     """
     if not platform._is_win:
         return False
-    shell = get_shell().lower()
-    print('SHELL', shell)
+    shell = get_shell()
     return bool(re.match('pwsh|pwsh.exe|powershell.exe', shell))
 
 
