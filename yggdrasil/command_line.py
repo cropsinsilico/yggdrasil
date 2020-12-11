@@ -276,6 +276,36 @@ def yggcc():
     print("executable: %s" % out)
 
 
+def cc_toolname():
+    r"""Output the name of the compiler used to compile C or C++ programs."""
+    parser = argparse.ArgumentParser(
+        description='Get the compiler used for C/C++ programs.')
+    parser.add_argument('--cpp', action='store_true',
+                        help='Get the compiler used for C++ programs.')
+    args = parser.parse_args()
+    if args.cpp:
+        from yggdrasil.drivers.CPPModelDriver import CPPModelDriver as driver
+    else:
+        from yggdrasil.drivers.CModelDriver import CModelDriver as driver
+    out = driver.get_tool('compiler', return_prop='name')
+    print(out)
+
+
+def ld_toolname():
+    r"""Output the name of the linker used to compile C or C++ programs."""
+    parser = argparse.ArgumentParser(
+        description='Get the linker used for C/C++ programs.')
+    parser.add_argument('--cpp', action='store_true',
+                        help='Get the linker used for C++ programs.')
+    args = parser.parse_args()
+    if args.cpp:
+        from yggdrasil.drivers.CPPModelDriver import CPPModelDriver as driver
+    else:
+        from yggdrasil.drivers.CModelDriver import CModelDriver as driver
+    out = driver.get_tool('linker', return_prop='name')
+    print(out)
+
+
 def cc_flags():
     r"""Get the compiler flags necessary for including the interface
     library in a C or C++ program.

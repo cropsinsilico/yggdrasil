@@ -61,11 +61,11 @@ with open("requirements_testing.txt", 'r') as fd:
 if '--user' in sys.argv:
     script_dir = os.path.realpath(os.path.join(get_python_lib(),
                                                '../../../bin/'))
-    warnings.warn("When installing locally, you may need to add the script " +
-                  "directory to your path manually in order to have access " +
-                  "to the command line entry points (e.g. yggrun). " +
-                  "If 'yggrun' is not a recognized command, try adding " +
-                  "'%s' to your PATH." % script_dir)
+    warnings.warn("When installing locally, you may need to add the script "
+                  + "directory to your path manually in order to have access "
+                  + "to the command line entry points (e.g. yggrun). "
+                  + "If 'yggrun' is not a recognized command, try adding "
+                  + "'%s' to your PATH." % script_dir)
     
     
 setup(
@@ -108,6 +108,8 @@ setup(
                             'cisrun=yggdrasil.command_line:yggrun',
                             'yggcompile=yggdrasil.command_line:yggcompile',
                             'yggcc=yggdrasil.command_line:yggcc',
+                            'yggcctool=yggdrasil.command_line:cc_toolname',
+                            'yggldtool=yggdrasil.command_line:ld_toolname',
                             'yggccflags=yggdrasil.command_line:cc_flags',
                             'yggldflags=yggdrasil.command_line:ld_flags',
                             'yggtest=yggdrasil:run_tsts',
