@@ -160,7 +160,7 @@ def requires_language(language, installed=True):
 
 def pprint_diff(x, y):  # pragma: no cover
     r"""Get the diff between the pprint.pformat string for two objects."""
-    print('\n'.join(difflib.ndiff(
+    tools.print_encoded('\n'.join(difflib.ndiff(
         pprint.pformat(x).splitlines(),
         pprint.pformat(y).splitlines())))
 

@@ -214,10 +214,9 @@ class SerializeBase(tools.YggClass):
             assert(table_string_type in ['bytes', 'unicode', 'string'])
             if table_string_type == 'string':
                 table_string_type = 'unicode'
-            if np.dtype(int) == np.int32:  # pragma: windows
+            int_type = np.int32
+            if np.dtype(int) == int_type:  # pragma: windows
                 int_type = int
-            else:
-                int_type = np.int32
             if table_string_type == 'bytes':
                 np_dtype_str = 'S'
                 rows = [(b'one', int_type(1), 1.0),
