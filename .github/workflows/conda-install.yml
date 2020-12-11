@@ -72,9 +72,7 @@ jobs:
       with:
         python-version: ${{ matrix.python-version }}
     - name: Install dependencies
-      run: |
-        ${{ matrix.install-method }} install psutil
-        python utils/ci_setup.py ${{ matrix.install-method }} deploy
+      run: python utils/ci_setup.py ${{ matrix.install-method }} deploy
     # - name: Start RabbitMQ Server
     #   if: env.INSTALLRMQ == 1 && matrix.os != 'windows-latest'
     #   run: ./utils/setup_rabbitmq.sh
@@ -116,9 +114,7 @@ jobs:
       with:
         python-version: ${{ matrix.python-version }}
     - name: Install dependencies
-      run: |
-        ${{ matrix.install-method }} install psutil
-        python utils/ci_setup.py ${{ matrix.install-method }} deploy
+      run: python utils/ci_setup.py ${{ matrix.install-method }} deploy
     - name: Verify installation
       run: python utils/ci_setup.py ${{ matrix.install-method }} verify
     - name: Non-example tests
@@ -169,9 +165,7 @@ jobs:
         use-only-tar-bz2: true
         activate-environment: ''
     - name: Build package
-      run: |
-        ${{ matrix.install-method }} install psutil
-        python utils/ci_setup.py ${{ matrix.install-method }} build
+      run: python utils/ci_setup.py ${{ matrix.install-method }} build
     - name: Set up miniconda test environment
       uses: conda-incubator/setup-miniconda@v2
       if: matrix.install-method == 'conda'
@@ -196,9 +190,7 @@ jobs:
       if: matrix.os == 'macos-latest' && matrix.install-method == 'conda'
       run: ./utils/setup_old_mac_sdk.sh
     - name: Install dependencies
-      run: |
-        ${{ matrix.install-method }} install psutil
-        python utils/ci_setup.py ${{ matrix.install-method }} deploy --without-build
+      run: python utils/ci_setup.py ${{ matrix.install-method }} deploy --without-build
     - name: Start RabbitMQ Server
       if: env.INSTALLRMQ == 1 && matrix.os != 'windows-latest'
       run: ./utils/setup_rabbitmq.sh
@@ -224,9 +216,7 @@ jobs:
       with:
         python-version: 3.8
     - name: Install dependencies
-      run: |
-        pip install psutil
-        python utils/ci_setup.py pip deploy
+      run: python utils/ci_setup.py pip deploy
     - name: Verify installation
       run: python utils/ci_setup.py pip verify
     - name: Build the docs
@@ -255,9 +245,7 @@ jobs:
       with:
         python-version: 3.8
     - name: Install dependencies
-      run: |
-        pip install psutil
-        python utils/ci_setup.py pip deploy
+      run: python utils/ci_setup.py pip deploy
     - name: Verify installation
       run: python utils/ci_setup.py pip verify
     - name: Build the package
