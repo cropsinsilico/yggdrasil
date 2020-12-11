@@ -164,6 +164,10 @@ jobs:
     #     channels: conda-forge
     #     use-only-tar-bz2: true
     #     activate-environment: ''
+    - name: Set up Python 3.8
+      uses: actions/setup-python@v2
+      with:
+        python-version: 3.8
     - name: Build package
       run: python utils/ci_setup.py ${{ matrix.install-method }} build
     - name: Set up miniconda test environment
