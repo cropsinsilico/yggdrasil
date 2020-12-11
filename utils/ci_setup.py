@@ -384,7 +384,7 @@ def deploy_package_on_ci(method, without_build=False, verbose=False):
             # "%s clean --all" % CONDA_CMD,
             # "%s install %s --only-deps -c file:/%s/conda-bld yggdrasil" % (
             #     CONDA_CMD, install_flags, CONDA_PREFIX),
-            "%s install %s --update-deps --use-local yggdrasil" % (
+            "%s install %s --use-local yggdrasil" % (
                 CONDA_CMD, install_flags),
             # "%s install %s --update-deps -c file:/%s/conda-bld yggdrasil" % (
             #     CONDA_CMD, install_flags, CONDA_PREFIX),
