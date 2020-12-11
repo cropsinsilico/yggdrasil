@@ -38,10 +38,19 @@ if (not CONDA_PREFIX) and CONDA_ENV:
 if ((isinstance(CONDA_PREFIX, str)
      and os.path.dirname(CONDA_PREFIX).endswith('envs'))):
     CONDA_PREFIX = os.path.dirname(os.path.dirname(CONDA_PREFIX))
-if _is_win:
-    CONDA_CMD = 'call conda'
+if shutil.which('conda'):
+    if _is_win:
+        CONDA_CMD = 'call conda'
+    else:
+        CONDA_CMD = 'conda'
+elif os.environ.get('CONDA', None):
+    if _is_win:
+        CONDA_CMD = 'call %s' % os.path.join(os.environ['CONDA'],
+                                             'condabin', 'conda.bat')
+    else:
+        CONDA_CMD = os.path.join(os.environ['CONDA'], 'bin', 'conda')
 else:
-    CONDA_CMD = 'conda'
+    CONDA_CMD = None
 SUMMARY_CMDS = ["python --version",
                 "pip list"]
 if CONDA_ENV:
@@ -194,6 +203,11 @@ def build_package_on_ci(method, return_commands=False, verbose=False):
         #         '%s init %s' % (CONDA_CMD, os.environ['GHA_SHELL'])
         #         'source %s' % os.path.join('~', startup_file),
         #     ]
+        if GITHUB_ACTIONS:
+            cmds += [
+                "%s config --add channels conda-forge" % CONDA_CMD,
+                "%s update -q conda" % CONDA_CMD,
+            ]
         cmds += [
             # "%s clean --all" % CONDA_CMD,
             # "%s deactivate" % CONDA_CMD,
