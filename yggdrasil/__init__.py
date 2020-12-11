@@ -110,17 +110,17 @@ def run_tsts(**kwargs):  # pragma: no cover
     parser = argparse.ArgumentParser(description='Run yggdrasil tests.')
     arguments = [
         (['withcoverage', 'with-coverage'], ['nocover', 'no-cover'],
-         True, {'help': 'Record coverage during tests.'}),
+         False, {'help': 'Record coverage during tests.'}),
         (['verbose', 'v'], ['quiet'],
-         True, {'help': ('Increase verbosity of output from '
-                         'the test runner.')}),
+         False, {'help': ('Increase verbosity of output from '
+                          'the test runner.')}),
         (['nocapture', 's'], ['capture'],
-         True, {'help': 'Don\'t capture output from tests.'}),
+         False, {'help': 'Don\'t capture output from tests.'}),
         (['stop', 'x'], ['dontstop', 'dont-stop'],
          False, {'help': 'Stop after first test failure.'}),
         (['nologcapture'], ['logcapture'],
-         True, {'help': ('Don\'t capture output from log '
-                         'messages generated during tests.')}),
+         False, {'help': ('Don\'t capture output from log '
+                          'messages generated during tests.')}),
         (['noflaky', 'no-flaky'], ['flaky'],
          False, {'help': 'Don\'t re-run flaky tests.'}),
     ]
@@ -171,6 +171,8 @@ def run_tsts(**kwargs):  # pragma: no cover
     # Peform ci tests/operations
     # Call bash script?
     if args.ci:
+        args.verbose = True
+        args.withcoverage = True
         extra_argv += ['-c', 'setup.cfg', '--cov-config=.coveragerc']
     # Separate out paths from options
     argv = [test_cmd]
