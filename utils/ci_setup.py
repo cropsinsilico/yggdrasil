@@ -455,7 +455,8 @@ def verify_package_on_ci(method):
     if GITHUB_ACTIONS and _is_win:
         import tempfile
         tempdir = os.path.normcase(os.path.normpath(tempfile.gettempdir()))
-        print('TEMPDIR', tempdir, os.environ.get('TEMP', None))
+        print('TEMPDIR', tempdir, os.environ.get('TMPDIR', None),
+              os.environ.get('TEMP', None))
         assert('runner~1' not in tempdir)
     src_dir = os.path.join(os.getcwd(),
                            os.path.dirname(os.path.dirname(__file__)))
