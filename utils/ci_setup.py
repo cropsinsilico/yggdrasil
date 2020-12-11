@@ -433,13 +433,6 @@ def verify_package_on_ci(method):
             the package. Valid values include 'conda' and 'pip'.
 
     """
-    # Check that temp is set correctly
-    if GITHUB_ACTIONS and _is_win:
-        import tempfile
-        tempdir = os.path.normcase(os.path.normpath(tempfile.gettempdir()))
-        print('TEMPDIR', tempdir, os.environ.get('TMPDIR', None),
-              os.environ.get('TEMP', None))
-        assert('runner~1' not in tempdir)
     src_dir = os.path.join(os.getcwd(),
                            os.path.dirname(os.path.dirname(__file__)))
     src_version = subprocess.check_output(
