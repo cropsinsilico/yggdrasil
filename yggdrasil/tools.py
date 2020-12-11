@@ -241,7 +241,8 @@ def in_powershell():
     if not platform._is_win:
         return False
     shell = get_shell().lower()
-    return bool(re.fullmatch('pwsh|pwsh.exe|powershell.exe', shell))
+    print('SHELL', shell)
+    return bool(re.match('pwsh|pwsh.exe|powershell.exe', shell))
 
 
 def check_environ_bool(name, valid_values=['true', '1', True, 1]):
