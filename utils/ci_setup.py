@@ -35,6 +35,10 @@ if (not CONDA_PREFIX) and CONDA_ENV:
         CONDA_PREFIX = os.environ['CONDA']
     else:
         CONDA_PREFIX = os.path.dirname(os.path.dirname(shutil.which('conda')))
+if (not CONDA_PREFIX) and GITHUB_ACTIONS and os.environ.get('CONDA', None):
+    CONDA_PREFIX = os.environ['CONDA']
+    if not CONDA_ENV:
+        CONDA_ENV = 'base'
 if ((isinstance(CONDA_PREFIX, str)
      and os.path.dirname(CONDA_PREFIX).endswith('envs'))):
     CONDA_PREFIX = os.path.dirname(os.path.dirname(CONDA_PREFIX))
