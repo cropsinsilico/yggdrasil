@@ -213,7 +213,7 @@ def build_package_on_ci(method, return_commands=False, verbose=False):
                 "%s update -q conda" % CONDA_CMD,
             ]
         cmds += [
-            # "%s clean --all" % CONDA_CMD,
+            "%s clean --all" % CONDA_CMD,
             # "%s deactivate" % CONDA_CMD,
             "%s install -q -n base conda-build conda-verify" % CONDA_CMD,
             "%s build %s --python %s %s" % (
