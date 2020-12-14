@@ -263,7 +263,6 @@ class ExampleTstBase(YggTestBase, tools.YggClass):
                 raise unittest.SkipTest("%s not installed." % x)
             check_enabled_languages(x)
         # Copy platform specific makefile
-        print(self.language, platform._is_win)
         if self.language == 'make':
             makefile = os.path.join(self.yamldir, 'src', 'Makefile')
             if platform._is_win:  # pragma: windows

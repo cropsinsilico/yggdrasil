@@ -197,16 +197,6 @@ def build_package_on_ci(method, return_commands=False, verbose=False):
         # https://github.com/conda/conda/issues/9124
         # https://github.com/conda/conda/issues/7758#issuecomment-660328841
         assert(CONDA_ENV == 'base')
-        # if GITHUB_ACTIONS and os.environ.get('GHA_SHELL', False):
-        #     assert(os.environ['GHA_SHELL'] == 'bash')
-        #     if _is_linux:
-        #         startup_file = '.bashrc'
-        #     else:
-        #         startup_file = '.bash_profile'
-        #     cmds += [
-        #         '%s init %s' % (CONDA_CMD, os.environ['GHA_SHELL'])
-        #         'source %s' % os.path.join('~', startup_file),
-        #     ]
         if GITHUB_ACTIONS:
             cmds += [
                 "%s config --add channels conda-forge" % CONDA_CMD,

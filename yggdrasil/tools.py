@@ -1367,8 +1367,6 @@ class YggClass(ComponentBase):
     def error(self):
         r"""Log an error level message."""
         self.errors.append('ERROR')
-        if platform._is_win:
-            print('SHELL', get_shell())
         return self.logger.error
         # return super(YggClass, self).error
 
