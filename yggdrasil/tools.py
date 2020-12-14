@@ -231,6 +231,8 @@ def get_shell():
     if not shell:
         if platform._is_win:  # pragma: windows
             shell = os.environ.get('COMSPEC', None)
+        else:
+            shell = '/bin/sh'  # Default used by subprocess
         assert(shell)
     # return psutil.Process(os.getppid()).name()
     if platform._is_win:  # pragma: windows
