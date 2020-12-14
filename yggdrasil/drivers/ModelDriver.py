@@ -1047,6 +1047,11 @@ class ModelDriver(Driver):
             for lib in libraries:
                 if not cls.is_library_installed(lib, **kwargs):
                     return False
+        # Check for server on RabbitMQ
+        if commtype in ['rmq', 'rmq_async']:
+            from yggdrasil.communication.RMQComm import check_rmq_server
+            if not check_rmq_server():
+                return False
         return True
     
     @classmethod
