@@ -54,7 +54,7 @@ for k, v in script_list:
 # scripts = {k: os.path.join(script_dir, v) for k, v in script_list}
 if platform._is_win and (not tools.in_powershell()):  # pragma: windows
     # scripts['executable'] = ['timeout', '0']
-    scripts['executable'] = ['ping', '-n', '0', '127.0.0.1']
+    scripts['executable'] = ['ping', '-n', '1', '127.0.0.1']
 else:
     scripts['executable'] = ['sleep', 0.1]
     
