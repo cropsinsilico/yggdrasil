@@ -169,7 +169,9 @@ jobs:
       with:
         python-version: ${{ matrix.python-version }}
     - name: Build package
-      run: python utils/ci_setup.py ${{ matrix.install-method }} build
+      run: |
+        python --version
+        python utils/ci_setup.py ${{ matrix.install-method }} build
     - name: Set up miniconda test environment
       uses: conda-incubator/setup-miniconda@v2
       if: matrix.install-method == 'conda'
