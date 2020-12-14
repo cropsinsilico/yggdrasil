@@ -398,6 +398,7 @@ def deploy_package_on_ci(method, without_build=False, verbose=False):
             install_flags = '-vvv'
         else:
             install_flags = '-q'
+        install_flags = '-vv'
         cmds += [
             # "%s clean --all" % CONDA_CMD,
             "%s install %s -c file:/%s/conda-bld yggdrasil" % (
