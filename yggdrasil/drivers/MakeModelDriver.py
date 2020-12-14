@@ -231,8 +231,6 @@ class MakeCompiler(BuildToolBase):
         linker_flags = language_driver.get_linker_flags(
             for_model=True, skip_defaults=True, dont_skip_env_defaults=True,
             toolname=language_compiler)
-        print('COMPILER FLAGS: %s' % ' '.join(compile_flags))
-        print('LINKER FLAGS: %s' % ' '.join(linker_flags))
         for k in ['env_compiler', 'env_compiler_flags',
                   'env_linker', 'env_linker_flags']:
             kwargs.setdefault(k, cls._schema_properties[k]['default'])
