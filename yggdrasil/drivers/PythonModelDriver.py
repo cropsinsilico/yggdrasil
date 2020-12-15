@@ -58,7 +58,8 @@ class PythonModelDriver(InterpretedModelDriver):
         'and': 'and',
         'indent': 4 * ' ',
         'quote': '\"',
-        'print_generic': 'print({object})',
+        'print_generic': ('from yggdrasil.tools import print_encoded; '
+                          'print_encoded({object})'),
         'print': 'print(\"{message}\")',
         'fprintf': 'print(\"{message}\" % ({variables}))',
         'error': 'raise Exception("{error_msg}")',
