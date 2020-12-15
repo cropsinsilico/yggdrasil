@@ -520,6 +520,13 @@ def verify_package_on_ci(method):
     if errors:
         raise AssertionError("One or more languages was not installed as "
                              "expected\n\t%s" % "\n\t".join(errors))
+    if _is_win:  # pragma: windows
+        for k in ['HOME', 'USERPROFILE', 'HOMEDRIVE', 'HOMEPATH']:
+            print('%s = %s' % (k, os.environ.get(k, None)))
+        if os.environ.get('HOMEDRIVE', None):
+            assert(os.path.expanduser('~').startswith(os.environ['HOMEDRIVE']))
+        else:
+            assert(os.path.expanduser('~').lower().startswith('c:'))
 
 
 if __name__ == "__main__":

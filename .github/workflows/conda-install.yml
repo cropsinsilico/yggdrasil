@@ -53,11 +53,6 @@ jobs:
       if: matrix.install-method == 'pip'
       with:
         python-version: ${{ matrix.python-version }}
-    - name: Check Python version
-      if: matrix.os == 'macos-latest'
-      run: |
-        which python
-        python --version
     - name: Install dependencies
       run: python utils/ci_setup.py ${{ matrix.install-method }} deploy
     - name: Verify installation

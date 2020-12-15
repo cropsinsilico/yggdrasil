@@ -645,7 +645,8 @@ class TimedRun(YggTestBase, tools.YggClass):
         copy_env = ['TMPDIR', 'CONDA_PREFIX']
         copy_env += [v['env'] for v in config._cfg_map.values()]
         if platform._is_win:  # pragma: windows
-            copy_env += ['HOMEPATH', 'NUMBER_OF_PROCESSORS',
+            copy_env += ['HOME', 'USERPROFILE', 'HOMEDRIVE', 'HOMEPATH',
+                         'NUMBER_OF_PROCESSORS',
                          'INCLUDE', 'LIB', 'LIBPATH']
         cmd = [sys.executable, self.pyperfscript, '--append=' + self.filename,
                '--inherit-environ=' + ','.join(copy_env),
