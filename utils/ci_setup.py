@@ -275,8 +275,8 @@ def deploy_package_on_ci(method, without_build=False, verbose=False):
     # https://github.com/conda/conda/issues/8051
     if _in_conda and GITHUB_ACTIONS:
         cmds += [
-            "%s config --remove channels conda-forge",
-            "%s config --add channels conda-forge"
+            "%s config --remove channels conda-forge" % CONDA_CMD,
+            "%s config --add channels conda-forge" % CONDA_CMD
         ]
     # Installing via pip causes import error on Windows and
     # a conflict when installing LPy
