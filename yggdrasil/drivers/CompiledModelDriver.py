@@ -2278,7 +2278,13 @@ class CompiledModelDriver(ModelDriver):
                             'archiver', return_prop='name', default=None),
                         archiver_flags=cls.get_tool(
                             'archiver', return_prop='flags', default=None))
-                out = get_compatible_tool(toolname, tooltype, cls.language)(**kwargs)
+                try:
+                    out = get_compatible_tool(toolname, tooltype,
+                                              cls.language)(**kwargs)
+                except ValueError:
+                    if default is False:
+                        raise
+                    return default
             else:
                 out_tool = cls.get_tool('compiler', toolname=toolname, default=None)
                 if out_tool is None:  # pragma: debug

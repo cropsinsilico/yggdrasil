@@ -130,6 +130,9 @@ class TestCModelDriverNoInit(TestCModelParam,
                 kws['libtype'] = 'shared'
             dll = self.import_cls.get_dependency_library('python', **kws)
             gcc.dll2a(dll, overwrite=True)
+        else:
+            self.assert_raises(ValueError, self.import_cls.get_tool,
+                               'compiler', toolname='gcc')
 
 
 class TestCModelDriverNoStart(TestCModelParam,
