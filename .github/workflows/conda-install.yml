@@ -159,11 +159,11 @@ jobs:
       if: matrix.os == 'macos-latest'
       # shell: bash --noprofile --norc -eo pipefail {0}
       run: |
-        which python
-        python --version
+        which $CONDA/bin/python
+        $CONDA/bin/python --version
     - name: Build package
       # shell: bash --noprofile --norc -eo pipefail {0}
-      run: python utils/ci_setup.py ${{ matrix.install-method }} build
+      run: $CONDA/bin/python utils/ci_setup.py ${{ matrix.install-method }} build
     - name: Set up miniconda test environment
       uses: conda-incubator/setup-miniconda@v2
       if: matrix.install-method == 'conda'
