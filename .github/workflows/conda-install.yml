@@ -147,22 +147,22 @@ jobs:
     #     channels: conda-forge
     #     use-only-tar-bz2: true
     #     activate-environment: ''
-    - name: Set up Python base environment
-      uses: actions/setup-python@v2
-      with:
-        python-version: ${{ matrix.python-version }}
+    # - name: Set up Python base environment
+    #   uses: actions/setup-python@v2
+    #   with:
+    #     python-version: ${{ matrix.python-version }}
     - name: Add miniconda bin to path
       if: matrix.install-method == 'conda'
       run: |
         echo "PATH=$HOME/miniconda/bin:$PATH" >> $GITHUB_ENV
     - name: Check Python version
       if: matrix.os == 'macos-latest'
-      shell: bash --noprofile --norc -eo pipefail {0}
+      # shell: bash --noprofile --norc -eo pipefail {0}
       run: |
         which python
         python --version
     - name: Build package
-      shell: bash --noprofile --norc -eo pipefail {0}
+      # shell: bash --noprofile --norc -eo pipefail {0}
       run: python utils/ci_setup.py ${{ matrix.install-method }} build
     - name: Set up miniconda test environment
       uses: conda-incubator/setup-miniconda@v2
