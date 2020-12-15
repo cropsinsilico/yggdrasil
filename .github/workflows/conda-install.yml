@@ -139,6 +139,14 @@ jobs:
     - name: Set up MSVC Compiler
       uses: ilammy/msvc-dev-cmd@v1
       if: matrix.os == 'windows-latest' && env.INSTALLC == 1
+    - name: Set up miniconda test environment
+      uses: conda-incubator/setup-miniconda@v2
+      if: matrix.install-method == 'conda' && matrix.os == 'windows-latest'
+      with:
+        channels: conda-forge
+        use-only-tar-bz2: true
+        activate-environment: ''
+        auto-activate-base: false
     - name: Add miniconda bin to path - Unix
       if: matrix.install-method == 'conda' && matrix.os != 'windows-latest'
       run: |
@@ -177,7 +185,7 @@ jobs:
       shell: powershell
       run: |
         Get-Command $env:CONDA\condabin\python.exe | Select-Object -ExpandProperty Definition
-        $env:CONDA\condabin\python.exe --version
+        "$env:CONDA\condabin\python.exe" --version
     - name: Build package
       shell: bash --noprofile --norc -eo pipefail {0}
       run: python utils/ci_setup.py ${{ matrix.install-method }} build --python ${{ matrix.python-version }}
