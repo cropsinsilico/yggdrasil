@@ -43,8 +43,8 @@ jobs:
       shell: bash -l {0}
       run: |
         echo "INSTALLC=0" >> $GITHUB_ENV
-        echo "TMPDIR=$USERPROFILE\AppData\Local\Temp" >> $GITHUB_ENV
-        echo "TEMP=$USERPROFILE\AppData\Local\Temp" >> $GITHUB_ENV
+        echo "TMPDIR=$USERPROFILE\\AppData\\Local\\Temp" >> $GITHUB_ENV
+        echo "TEMP=$USERPROFILE\\AppData\\Local\\Temp" >> $GITHUB_ENV
     - name: Set up MSVC Compiler
       uses: ilammy/msvc-dev-cmd@v1
       if: matrix.os == 'windows-latest' && env.INSTALLC == 1
