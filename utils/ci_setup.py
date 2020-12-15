@@ -168,12 +168,16 @@ def setup_package_on_ci(method, python):
     call_script(cmds)
 
 
-def build_package_on_ci(method, return_commands=False, verbose=False):
+def build_package_on_ci(method, python=None, return_commands=False,
+                        verbose=False):
     r"""Build the package on a CI resource.
 
     Args:
         method (str): Method that should be used to build the package.
             Valid values include 'conda' and 'pip'.
+        python (str, optional): Version of Python that package should be
+            built for. Defaults to None if not provided and the current
+            version of Python will be used.
         return_commands (bool, optional): If True, the commands necessary to
             build the package are returned instead of running them. Defaults
             to False.
@@ -181,6 +185,8 @@ def build_package_on_ci(method, return_commands=False, verbose=False):
             turned up. Defaults to False.
 
     """
+    if python is None:
+        python = PYVER
     cmds = SUMMARY_CMDS.copy()
     # Upgrade pip and setuptools and wheel to get clean install
     upgrade_pkgs = ['wheel', 'setuptools']
@@ -208,7 +214,7 @@ def build_package_on_ci(method, return_commands=False, verbose=False):
             # "%s deactivate" % CONDA_CMD,
             "%s install -q -n base conda-build conda-verify" % CONDA_CMD,
             "%s build %s --python %s %s" % (
-                CONDA_CMD, 'recipe', PYVER, build_flags),
+                CONDA_CMD, 'recipe', python, build_flags),
             "%s index %s" % (CONDA_CMD, index_dir),
             # "%s activate %s" % (CONDA_CMD, CONDA_ENV),
         ]
@@ -229,13 +235,18 @@ def build_package_on_ci(method, return_commands=False, verbose=False):
     call_script(cmds)
 
 
-def deploy_package_on_ci(method, without_build=False, verbose=False):
+def deploy_package_on_ci(method, python=None, without_build=False,
+                         verbose=False):
     r"""Build and install the package and its dependencies on a CI
     resource.
 
     Args:
         method (str): Method that should be used to build and install
             the package. Valid values include 'conda' and 'pip'.
+        python (str, optional): Version of Python that package should be
+            built for. Defaults to None if not provided and the current
+            version of Python will be used. This will be ignored if
+            without_build is True.
         without_build (bool, optional): If True, the package will not be
             built prior to install. Defaults to False.
         verbose (bool, optional): If True, setup steps are run with verbosity
@@ -248,8 +259,8 @@ def deploy_package_on_ci(method, without_build=False, verbose=False):
     if without_build:
         cmds = SUMMARY_CMDS.copy()
     else:
-        cmds = build_package_on_ci(method, return_commands=True,
-                                   verbose=verbose)
+        cmds = build_package_on_ci(method, python=python,
+                                   return_commands=True, verbose=verbose)
     # Uninstall default numpy and matplotlib to allow installation
     # of specific versions
     cmds += ["pip uninstall -y numpy matplotlib"]
@@ -528,10 +539,16 @@ if __name__ == "__main__":
     parser_bld = subparsers.add_parser(
         'build', help="Build the package.")
     parser_bld.add_argument(
+        '--python', default=None,
+        help="Version of python that package should be built for.")
+    parser_bld.add_argument(
         '--verbose', action='store_true',
         help="Turn up verbosity of output from build step.")
     parser_dep = subparsers.add_parser(
         'deploy', help="Build and install package.")
+    parser_dep.add_argument(
+        '--python', default=None,
+        help="Version of python that package should be built/installed for.")
     parser_dep.add_argument(
         '--without-build', action='store_true',
         help=("Perform installation steps without building first. (Assumes "
@@ -545,9 +562,11 @@ if __name__ == "__main__":
     if args.operation in ['env', 'setup']:
         setup_package_on_ci(args.method, args.python)
     elif args.operation == 'build':
-        build_package_on_ci(args.method, verbose=args.verbose)
+        build_package_on_ci(args.method, python=args.python,
+                            verbose=args.verbose)
     elif args.operation == 'deploy':
-        deploy_package_on_ci(args.method, without_build=args.without_build,
+        deploy_package_on_ci(args.method, python=args.python,
+                             without_build=args.without_build,
                              verbose=args.verbose)
     elif args.operation == 'verify':
         verify_package_on_ci(args.method)

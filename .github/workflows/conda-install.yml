@@ -162,7 +162,7 @@ jobs:
         $CONDA/bin/python --version
     - name: Build package
       shell: bash --noprofile --norc -eo pipefail {0}
-      run: python utils/ci_setup.py ${{ matrix.install-method }} build
+      run: python utils/ci_setup.py ${{ matrix.install-method }} build --python ${{ matrix.python-version }}
     - name: Set up miniconda test environment
       uses: conda-incubator/setup-miniconda@v2
       if: matrix.install-method == 'conda'
