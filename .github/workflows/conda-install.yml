@@ -145,7 +145,7 @@ jobs:
         channels: conda-forge
         use-only-tar-bz2: true
         activate-environment: ''
-        auto-activate-base: false
+        # auto-activate-base: false
     - name: Add miniconda bin to path - Unix
       if: matrix.install-method == 'conda' && matrix.os != 'windows-latest'
       run: |
