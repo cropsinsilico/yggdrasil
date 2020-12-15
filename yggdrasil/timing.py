@@ -114,8 +114,13 @@ def write_pyperf_script(script_file, nmsg, msg_size,
         'comm_type = "%s"' % comm_type,
         'matlab_running = %s' % str(matlab_running)]
     if os.environ.get('TMPDIR', ''):
-        lines += [
-            'os.environ["TMPDIR"] = "%s"' % os.environ['TMPDIR']]
+        tmpdir = os.environ['TMPDIR']
+        if platform._is_win:  # pragma: windows
+            tmpdir = repr(tmpdir)
+            assert(tmpdir.startswith('\'') and tmpdir.endswith('\''))
+            tmpdir = tmpdir[1:-1]
+            # tmpdir = tmpdir.replace('\\', '\\\\')
+        lines += ['os.environ["TMPDIR"] = "%s"' % tmpdir]
     lines += [
         'timer = timing.TimedRun(lang_src, lang_dst,'
         '                        comm_type=comm_type,'
