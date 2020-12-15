@@ -31,7 +31,7 @@ jobs:
         os: [ubuntu-latest, macos-latest, windows-latest]
         python-version: [3.6]
         install-method: [pip]
-        test-flags: [--long-running, --with-examples]
+        test-flags: [--long-running, --test-suite=examples]
       fail-fast: false
 
     steps:
@@ -64,10 +64,6 @@ jobs:
       run: python utils/ci_setup.py ${{ matrix.install-method }} verify
     - name: Run tests
       run: yggtest --ci ${{ matrix.test-flags }}
-    # - name: Non-example tests
-    #   run: yggtest --ci
-    # - name: Example tests
-    #   run: yggtest --ci --with-examples
     - name: Upload coverage report
       uses: codecov/codecov-action@v1
 
@@ -82,6 +78,7 @@ jobs:
         os: [ubuntu-latest]
         python-version: [3.6]
         install-method: [pip]
+        test-flags: [--long-running]
       fail-fast: false
     services:
       rabbitmq:
@@ -103,10 +100,8 @@ jobs:
       run: python utils/ci_setup.py ${{ matrix.install-method }} deploy
     - name: Verify installation
       run: python utils/ci_setup.py ${{ matrix.install-method }} verify
-    - name: Non-example tests
-      run: yggtest --ci
-    - name: Example tests
-      run: yggtest --ci --with-examples
+    - name: Run tests
+      run: yggtest --ci ${{ matrix.test-flags }}
     - name: Upload coverage report
       uses: codecov/codecov-action@v1
 
@@ -119,6 +114,7 @@ jobs:
         os: [ubuntu-latest, macos-latest, windows-latest]
         python-version: [3.6]
         install-method: [conda]
+        test-flags: [--long-running]  # , --test-suite=examples]
         include:
           - os: ubuntu-latest
             python-version: 3.8
@@ -213,10 +209,8 @@ jobs:
       run: ./utils/setup_rabbitmq.sh
     - name: Verify installation
       run: python utils/ci_setup.py ${{ matrix.install-method }} verify
-    - name: Non-example tests
-      run: yggtest --ci
-    - name: Example tests
-      run: yggtest --ci --with-examples
+    - name: Run tests
+      run: yggtest --ci ${{ matrix.test-flags }}
     - name: Upload coverage report
       uses: codecov/codecov-action@v1
   docs:
