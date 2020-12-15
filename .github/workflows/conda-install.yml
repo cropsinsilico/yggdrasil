@@ -149,6 +149,11 @@ jobs:
       run: |
         which python
         python --version
+    - name: Change ownership of conda on MacOS
+      shell: bash --noprofile --norc -eo pipefail {0}
+      if: matrix.os == 'macos-latest'
+      run: |
+        sudo chown -R $(whoami) $CONDA
     - name: Check Python version (that conda expects)
       if: matrix.os == 'macos-latest'
       shell: bash --noprofile --norc -eo pipefail {0}
