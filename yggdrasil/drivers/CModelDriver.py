@@ -1,5 +1,6 @@
 import os
 import re
+import sys
 import warnings
 import copy
 import shutil
@@ -459,7 +460,7 @@ if (_python_inc is None) or (not os.path.isfile(_python_inc)):  # pragma: no cov
 else:
     _python_inc = os.path.dirname(_python_inc)
 try:
-    if platform._is_win:  # pragma: windows
+    if platform._is_win or (sys.version_info[:2] < (3, 8)):  # pragma: windows
         libtype_order = ['static', 'shared']
     else:
         libtype_order = ['shared', 'static']
