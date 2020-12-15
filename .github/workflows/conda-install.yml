@@ -31,7 +31,7 @@ jobs:
         os: [ubuntu-latest, macos-latest, windows-latest]
         python-version: [3.6]
         install-method: [pip]
-        test-flags: [, --with-examples]
+        test-flags: [--long-running, --with-examples]
       fail-fast: false
 
     steps:
