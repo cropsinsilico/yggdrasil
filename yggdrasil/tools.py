@@ -303,13 +303,23 @@ def get_python_c_library(allow_failure=False, libtype=None):
         base = '%spython%s%s' % (prefix,
                                  cvars['py_version_nodot'],
                                  libtype2ext[libtype])
+    elif libtype == 'static':
+        base = cvars.get('LIBRARY')
     else:
         if libtype is None:
             libtype = 'shared'
-        libtype2key = {'shared': 'LDLIBRARY', 'static': 'LIBRARY'}
-        base = cvars.get(libtype2key[libtype], None)
-        if platform._is_mac and base.endswith('/Python'):  # pragma: no cover
-            base = 'libpython%s.dylib' % cvars['py_version_short']
+        if platform._is_mac:
+            libtype2ext = {'shared': '.dylib', 'static': '.a'}
+        else:
+            libtype2ext = {'shared': '.so', 'static': '.a'}
+        prefix = 'lib'
+        base = '%spython%s%s' % (prefix,
+                                 cvars['py_version_short'],
+                                 libtype2ext[libtype])
+        # libtype2key = {'shared': 'LDLIBRARY', 'static': 'LIBRARY'}
+        # base = cvars.get(libtype2key[libtype], None)
+    if platform._is_mac and base.endswith('/Python'):  # pragma: no cover
+        base = 'libpython%s.dylib' % cvars['py_version_short']
     if base is None:  # pragma: debug
         raise RuntimeError(("Could not determine base name for the Python "
                             "C API library.\n"
@@ -324,12 +334,12 @@ def get_python_c_library(allow_failure=False, libtype=None):
             dir_try.append(os.path.join(cvars['prefix'], 'libs'))
         else:
             dir_try.append(os.path.join(cvars['prefix'], 'lib'))
-    if cvars.get('LIBDIR', None):
-        dir_try.append(cvars['LIBDIR'])
-    if cvars.get('LIBDEST', None):
-        dir_try.append(cvars['LIBDEST'])
-    for k in ['stdlib', 'purelib', 'platlib', 'platstdlib', 'data', 'srcdir']:
-        if paths.get(k, None):
+    for k in ["LIBPL", "LIBDIR", "LIBDEST", "Prefix", "ExecPrefix",
+              "BaseExecPrefix"]:
+        if cvars.get(k, None) and (cvars[k] not in dir_try):
+            dir_try.append(cvars[k])
+    for k in ['stdlib', 'purelib', 'platlib', 'platstdlib', 'data']:
+        if paths.get(k, None) and (paths[k] not in dir_try):
             dir_try.append(paths[k])
     dir_try.append(os.path.join(paths['data'], 'lib'))
     if distutils_sysconfig is not None:
