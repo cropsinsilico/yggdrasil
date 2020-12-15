@@ -1042,6 +1042,18 @@ def popen_nobuffer(*args, **kwargs):
     return YggPopen(*args, **kwargs)
 
 
+def pprint_encoded(obj, *args, **kwargs):
+    r"""Pretty print an object, catching encoding errors as necessary.
+
+    Args:
+        obj (object): Python object to pprint.
+        *args: Additional arguments are passed to pprint.pformat.
+        **kwargs: Additional keyword arguments are passed to pprint.pformat.
+
+    """
+    print_encoded(pprint.pformat(obj, *args, **kwargs))
+
+
 def print_encoded(msg, *args, **kwargs):
     r"""Print bytes to stdout, encoding if possible.
 
