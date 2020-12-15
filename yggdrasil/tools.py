@@ -1075,6 +1075,8 @@ def print_encoded(msg, *args, **kwargs):
 
 
     """
+    if not isinstance(msg, (str, bytes)):
+        msg = str(msg)
     try:
         print(bytes2str(msg), *args, **kwargs)
     except (UnicodeEncodeError, UnicodeDecodeError):  # pragma: debug
