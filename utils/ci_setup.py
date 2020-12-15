@@ -58,7 +58,8 @@ else:
 SUMMARY_CMDS = ["python --version",
                 "pip list"]
 if CONDA_ENV:
-    SUMMARY_CMDS += ["%s info" % CONDA_CMD,
+    SUMMARY_CMDS += ["echo 'CONDA_PREFIX=%s'" % CONDA_PREFIX,
+                     "%s info" % CONDA_CMD,
                      "%s list" % CONDA_CMD]
 
 
