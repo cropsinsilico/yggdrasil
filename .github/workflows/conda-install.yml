@@ -149,6 +149,10 @@ jobs:
       run: |
         which python
         python --version
+    - name: Check Python version (that conda expects)
+      if: matrix.os == 'macos-latest'
+      shell: bash --noprofile --norc -eo pipefail {0}
+      run: |
         which $CONDA/bin/python
         $CONDA/bin/python --version
     - name: Build package
