@@ -170,6 +170,11 @@ jobs:
       run: |
         which python
         python --version
+    - name: Check for Python library
+      if: matrix.python-version == '3.8'
+      run: |
+        ls /usr/share/miniconda/envs/test/lib
+        ls /usr/share/miniconda/envs/test/lib/python3.8/config-3.8-x86_64-linux-gnu
     - name: Check Python version in shell - Windows
       if: matrix.os == 'windows-latest'
       shell: powershell
