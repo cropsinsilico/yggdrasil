@@ -93,6 +93,7 @@ class ExampleMeta(ComponentMeta):
         if dct.get('example_name', None) is not None:
             dct.setdefault('iter_list_language',
                            get_example_languages(dct['example_name']))
+        timeout = dct.get('timeout', 600)
         iter_lists = []
         iter_keys = []
         test_name_fmt = 'test'
@@ -126,7 +127,10 @@ class ExampleMeta(ComponentMeta):
                         **{k: v for k, v in
                            zip(iter_keys, x)})
                     itest_func.__name__ = itest_name
-                    dct[itest_name] = pytest.mark.timeout(timeout=600)(itest_func)
+                    if timeout is not None:
+                        itest_func = pytest.mark.timeout(timeout=timeout)(
+                            itest_func)
+                    dct[itest_name] = itest_func
         out = super(ExampleMeta, cls).__new__(cls, name, bases, dct)
         if out.example_name is not None:
             global _test_registry
