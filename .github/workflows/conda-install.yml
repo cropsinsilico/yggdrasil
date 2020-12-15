@@ -83,7 +83,8 @@ jobs:
     services:
       rabbitmq:
         image: rabbitmq:latest
-        # ports:
+        ports:
+          - 5672:5672
         #   - 5672/tcp
         options: --health-cmd "rabbitmqctl node_health_check" --health-interval 10s --health-timeout 5s --health-retries 5
 
