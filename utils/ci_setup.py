@@ -271,6 +271,13 @@ def deploy_package_on_ci(method, without_build=False, verbose=False):
     else:  # pragma: debug
         raise ValueError("Method must be 'conda' or 'pip', not '%s'"
                          % method)
+    # Refresh channel
+    # https://github.com/conda/conda/issues/8051
+    if _in_conda and GITHUB_ACTIONS:
+        cmds += [
+            "%s config --remove channels conda-forge",
+            "%s config --add channels conda-forge"
+        ]
     # Installing via pip causes import error on Windows and
     # a conflict when installing LPy
     conda_pkgs += ['scipy', os.environ.get('NUMPY', 'numpy')]
