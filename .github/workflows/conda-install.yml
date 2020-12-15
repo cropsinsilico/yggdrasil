@@ -23,7 +23,7 @@ env:
 
 jobs:
   build_pip:
-    name: Build (${{ matrix.python-version }}, ${{ matrix.os }}, ${{ matrix.install-method }})
+    name: Build (${{ matrix.python-version }}, ${{ matrix.os }}, ${{ matrix.install-method }}, ${{ matrix.test-flags }})
     runs-on: ${{ matrix.os }}
     strategy:
       max-parallel: 5
@@ -31,6 +31,7 @@ jobs:
         os: [ubuntu-latest, macos-latest, windows-latest]
         python-version: [3.6]
         install-method: [pip]
+	test-flags: [, --with-examples]
       fail-fast: false
 
     steps:
@@ -61,10 +62,12 @@ jobs:
       run: python utils/ci_setup.py ${{ matrix.install-method }} deploy
     - name: Verify installation
       run: python utils/ci_setup.py ${{ matrix.install-method }} verify
-    - name: Non-example tests
-      run: yggtest --ci
-    - name: Example tests
-      run: yggtest --ci --with-examples
+    - name: Run tests
+      run: yggtest --ci ${{ matrix.test-flags }}
+    # - name: Non-example tests
+    #   run: yggtest --ci
+    # - name: Example tests
+    #   run: yggtest --ci --with-examples
     - name: Upload coverage report
       uses: codecov/codecov-action@v1
 
