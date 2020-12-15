@@ -464,6 +464,9 @@ def verify_package_on_ci(method):
             the package. Valid values include 'conda' and 'pip'.
 
     """
+    if _is_win and (not INSTALLZMQ):
+        INSTALLC = False
+        INSTALLFORTRAN = False
     src_dir = os.path.join(os.getcwd(),
                            os.path.dirname(os.path.dirname(__file__)))
     src_version = subprocess.check_output(
