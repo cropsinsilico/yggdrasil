@@ -287,9 +287,11 @@ def deploy_package_on_ci(method, python=None, without_build=False,
     # https://github.com/conda/conda/issues/8051
     if _in_conda and GITHUB_ACTIONS:
         cmds += [
+            "%s config --set channel_priority strict" % CONDA_CMD,
+            # "%s install -n root conda=4.9" % CONDA_CMD,
+            # "%s config --set allow_conda_downgrades true" % CONDA_CMD,
             "%s config --remove channels conda-forge" % CONDA_CMD,
             "%s config --add channels conda-forge" % CONDA_CMD,
-            "%s config --set allow_conda_downgrades true" % CONDA_CMD
         ]
     # Installing via pip causes import error on Windows and
     # a conflict when installing LPy
