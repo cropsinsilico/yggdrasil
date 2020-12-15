@@ -151,6 +151,10 @@ jobs:
       uses: actions/setup-python@v2
       with:
         python-version: ${{ matrix.python-version }}
+    - name: Add miniconda bin to path
+      if: matrix.install-method == 'conda'
+      run: |
+        echo "PATH=$HOME/miniconda/bin:$PATH" >> $GITHUB_ENV
     - name: Check Python version
       if: matrix.os == 'macos-latest'
       shell: bash --noprofile --norc -eo pipefail {0}
@@ -170,10 +174,6 @@ jobs:
         channels: conda-forge
         # channel-priority: strict
         use-only-tar-bz2: true
-    - name: Add miniconda bin to path
-      if: matrix.install-method == 'conda'
-      run: |
-        echo "PATH=$HOME/miniconda/bin:$PATH" >> $GITHUB_ENV
     - name: Install old MacOSX SDK for compatibility with the conda llvm (7)
       if: matrix.os == 'macos-latest' && matrix.install-method == 'conda'
       run: ./utils/setup_old_mac_sdk.sh
