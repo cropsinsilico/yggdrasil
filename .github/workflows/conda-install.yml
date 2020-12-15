@@ -159,7 +159,8 @@ jobs:
       if: matrix.install-method == 'conda' && matrix.os == 'windows-latest'
       shell: powershell
       run: |
-        echo "${CONDA}/condabin" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
+        # echo "${CONDA}/condabin" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
+        echo "C:\Miniconda\condabin" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
     - name: Change ownership of conda on MacOS
       shell: bash  # --noprofile --norc -eo pipefail {0}
       if: matrix.os == 'macos-latest'
