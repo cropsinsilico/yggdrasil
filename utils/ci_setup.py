@@ -214,7 +214,7 @@ def build_package_on_ci(method, python=None, return_commands=False,
                 "%s update -q conda" % CONDA_CMD,
             ]
         cmds += [
-            "%s clean --all" % CONDA_CMD,
+            # "%s clean --all" % CONDA_CMD,  # Might invalidate cache
             # "%s deactivate" % CONDA_CMD,
             "%s install -q -n base conda-build conda-verify" % CONDA_CMD,
             "%s build %s --python %s %s" % (
@@ -278,9 +278,6 @@ def deploy_package_on_ci(method, python=None, without_build=False,
     if method == 'conda':
         _in_conda = True
         default_pkgs = conda_pkgs
-        # cmds += [
-        #     "%s clean --all" % CONDA_CMD,  # TODO: This might remove cache
-        # ]
     elif method == 'pip':
         _in_conda = ((_is_win or INSTALLLPY) and (not GITHUB_ACTIONS))
         default_pkgs = pip_pkgs
@@ -416,24 +413,10 @@ def deploy_package_on_ci(method, python=None, without_build=False,
             install_flags = '-q'
         install_flags = '-vv'
         cmds += [
-            # "%s clean --all" % CONDA_CMD,
             "%s install %s --update-deps -c file:/%s/conda-bld yggdrasil" % (
                 CONDA_CMD, install_flags, CONDA_PREFIX),
-            # "%s install %s --use-local yggdrasil" % (
-            #     CONDA_CMD, install_flags),
-            # "%s install %s --update-deps -c file:/%s/conda-bld yggdrasil" % (
-            #     CONDA_CMD, install_flags, CONDA_PREFIX),
-            # Install & then update
+            # Related issues if this stops working again
             # https://github.com/conda/conda/issues/466#issuecomment-378050252
-            # "%s update yggdrasil" % CONDA_CMD,
-            # "%s install %s --use-local --only-deps yggdrasil" % (
-            #     CONDA_CMD, install_flags),
-            # "%s install %s --use-local --no-deps yggdrasil" % (
-            #     CONDA_CMD, install_flags),
-            # "%s install %s --use-local --update-deps yggdrasil" % (
-            #     CONDA_CMD, install_flags),
-            # "%s install %s --update-deps -c file:/%s/conda-bld yggdrasil" % (
-            #     CONDA_CMD, install_flags, CONDA_PREFIX),
         ]
     elif method == 'pip':
         if verbose:
