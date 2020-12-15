@@ -146,6 +146,7 @@ jobs:
         echo "PATH=$CONDA/bin:$PATH" >> $GITHUB_ENV
     - name: Add miniconda bin to path - Windows
       if: matrix.install-method == 'conda' && matrix.os == 'windows-latest'
+      shell: powershell
       run: |
         echo "$env.PATH=$env.CONDA\condabin;$env.PATH" >> $env.GITHUB_ENV
     - name: Change ownership of conda on MacOS
@@ -153,11 +154,18 @@ jobs:
       if: matrix.os == 'macos-latest'
       run: |
         sudo chown -R $(whoami) $CONDA
-    - name: Check Python version
+    - name: Check Python version in shell - Unix
       shell: bash
+      if: matrix.os != 'windows-latest'
       run: |
         which python
         python --version
+    - name: Check Python version in shell - Windows
+      if: matrix.os == 'windows-latest'
+      shell: powershell
+      run: |
+        Get-Command python.exe | Select-Object -ExpandProperty Definition
+        python.exe --version
     - name: Check Python version (that conda expects) - Unix
       if: matrix.os != 'windows-latest'
       shell: bash
@@ -168,8 +176,8 @@ jobs:
       if: matrix.os == 'windows-latest'
       shell: powershell
       run: |
-        Get-Command python.exe | Select-Object -ExpandProperty Definition
-        python.exe --version
+        Get-Command $env.CONDA\condabin\python.exe | Select-Object -ExpandProperty Definition
+        $env.CONDA\condabin\python.exe --version
     - name: Build package
       shell: bash --noprofile --norc -eo pipefail {0}
       run: python utils/ci_setup.py ${{ matrix.install-method }} build --python ${{ matrix.python-version }}
