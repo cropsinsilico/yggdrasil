@@ -148,7 +148,7 @@ jobs:
       if: matrix.install-method == 'conda' && matrix.os == 'windows-latest'
       shell: powershell
       run: |
-        echo "$env.PATH=$env.CONDA\condabin;$env.PATH" >> $env.GITHUB_ENV
+        echo "${PATH}/condabin" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
     - name: Change ownership of conda on MacOS
       shell: bash  # --noprofile --norc -eo pipefail {0}
       if: matrix.os == 'macos-latest'
@@ -176,8 +176,8 @@ jobs:
       if: matrix.os == 'windows-latest'
       shell: powershell
       run: |
-        Get-Command $env.CONDA\condabin\python.exe | Select-Object -ExpandProperty Definition
-        $env.CONDA\condabin\python.exe --version
+        Get-Command $env:CONDA\condabin\python.exe | Select-Object -ExpandProperty Definition
+        $env:CONDA\condabin\python.exe --version
     - name: Build package
       shell: bash --noprofile --norc -eo pipefail {0}
       run: python utils/ci_setup.py ${{ matrix.install-method }} build --python ${{ matrix.python-version }}
