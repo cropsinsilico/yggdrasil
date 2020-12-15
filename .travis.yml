@@ -105,6 +105,11 @@ before_install:
       python utils/ci_setup.py pip env $YGG_PYTHON
     fi
 
+    # Perform the conda build in the base environment
+    if [[ -n "$YGG_CONDA" ]]; then
+      python utils/ci_setup.py conda build --python $YGG_CONDA
+    fi
+
     # Activate environment
     if [[ -n "$YGG_CONDA" || $INSTALLLPY == '1' ]]; then
       source activate test-environment
@@ -125,7 +130,7 @@ install:
 
     # Build and install
     if [[ -n "$YGG_CONDA" ]]; then
-      python utils/ci_setup.py conda deploy
+      python utils/ci_setup.py conda deploy --without-build
       python utils/ci_setup.py conda verify
     else
       if [[ $INSTALLR == '1' ]]; then
