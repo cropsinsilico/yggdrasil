@@ -143,7 +143,7 @@ jobs:
       if: matrix.install-method == 'conda'
       run: |
         echo "PATH=$HOME/miniconda/bin:$PATH" >> $GITHUB_ENV
-        # echo "PATH=$CONDA/bin:$PATH" >> $GITHUB_ENV
+        echo "PATH=$CONDA/bin:$PATH" >> $GITHUB_ENV
     - name: Check Python version
       shell: bash --noprofile --norc -eo pipefail {0}
       run: |
