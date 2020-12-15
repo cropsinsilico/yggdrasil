@@ -303,8 +303,11 @@ def get_python_c_library(allow_failure=False, libtype=None):
         base = '%spython%s%s' % (prefix,
                                  cvars['py_version_nodot'],
                                  libtype2ext[libtype])
-    elif libtype == 'static':
-        base = cvars.get('LIBRARY')
+    elif sys.version_info[:2] < (3, 8):
+        if libtype is None:
+            libtype = 'shared'
+        libtype2key = {'shared': 'LDLIBRARY', 'static': 'LIBRARY'}
+        base = cvars.get(libtype2key[libtype], None)
     else:
         if libtype is None:
             libtype = 'shared'
@@ -316,8 +319,6 @@ def get_python_c_library(allow_failure=False, libtype=None):
         base = '%spython%s%s' % (prefix,
                                  cvars['py_version_short'],
                                  libtype2ext[libtype])
-        # libtype2key = {'shared': 'LDLIBRARY', 'static': 'LIBRARY'}
-        # base = cvars.get(libtype2key[libtype], None)
     if platform._is_mac and base.endswith('/Python'):  # pragma: no cover
         base = 'libpython%s.dylib' % cvars['py_version_short']
     if base is None:  # pragma: debug
