@@ -536,6 +536,13 @@ class CMakeConfigure(BuildToolBase):
                              % (xn.upper(), xf, xn, xd))
                 lines.append('TARGET_LINK_LIBRARIES(%s ${%s_LIBRARY})'
                              % (target, xn.upper()))
+        # Link local lib on MacOS because on Mac >=10.14 setting sysroot
+        # clobbers the default paths.
+        # https://stackoverflow.com/questions/54068035/linking-not-working-in
+        # -homebrews-cmake-since-mojave
+        if platform._is_mac:
+            # TODO: Include might need to be added as well
+            preamble_lines.append('LINK_DIRECTORIES(/usr/local/lib)')
         lines = preamble_lines + lines
         log_msg = 'CMake include file:\n\t' + '\n\t'.join(lines)
         if verbose:

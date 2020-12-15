@@ -379,9 +379,7 @@ def deploy_package_on_ci(method, python=None, without_build=False,
             cmds += ["sudo apt update"]
             cmds += ["sudo apt-get install %s" % ' '.join(os_pkgs)]
         elif _is_osx:
-            os_pkgs.append("gettext")
-            cmds += ["brew install %s" % ' '.join(os_pkgs),
-                     "brew link gettext --force"]
+            cmds += ["brew install %s" % ' '.join(os_pkgs)]
         elif _is_win:
             cmds += ["choco install %s" % ' '.join(os_pkgs)]
         else:
