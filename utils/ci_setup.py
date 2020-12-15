@@ -42,7 +42,11 @@ if (not CONDA_PREFIX) and GITHUB_ACTIONS and os.environ.get('CONDA', None):
 if ((isinstance(CONDA_PREFIX, str)
      and os.path.dirname(CONDA_PREFIX).endswith('envs'))):
     CONDA_PREFIX = os.path.dirname(os.path.dirname(CONDA_PREFIX))
-if shutil.which('conda'):
+try:
+    CONDA_CMD_WHICH = shutil.which('conda')
+except AttributeError:
+    CONDA_CMD_WHICH = None
+if CONDA_CMD_WHICH:
     if _is_win:
         CONDA_CMD = 'call conda'
     else:
