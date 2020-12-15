@@ -158,14 +158,14 @@ jobs:
         echo "PATH=$CONDA/bin:$PATH" >> $GITHUB_ENV
     - name: Check Python version
       if: matrix.os == 'macos-latest'
-      # shell: bash --noprofile --norc -eo pipefail {0}
+      shell: bash --noprofile --norc -eo pipefail {0}
       run: |
         which python
         python --version
         which $CONDA/bin/python
         $CONDA/bin/python --version
     - name: Build package
-      # shell: bash --noprofile --norc -eo pipefail {0}
+      shell: bash --noprofile --norc -eo pipefail {0}
       run: $CONDA/bin/python utils/ci_setup.py ${{ matrix.install-method }} build
     - name: Set up miniconda test environment
       uses: conda-incubator/setup-miniconda@v2
