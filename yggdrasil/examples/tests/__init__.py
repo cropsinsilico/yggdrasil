@@ -6,6 +6,7 @@ import tempfile
 import shutil
 import itertools
 import flaky
+import pytest
 from yggdrasil.components import ComponentMeta, import_component
 from yggdrasil import runner, tools, platform
 from yggdrasil.examples import (
@@ -125,7 +126,7 @@ class ExampleMeta(ComponentMeta):
                         **{k: v for k, v in
                            zip(iter_keys, x)})
                     itest_func.__name__ = itest_name
-                    dct[itest_name] = itest_func
+                    dct[itest_name] = pytest.mark.timeout(timeout=600)(itest_func)
         out = super(ExampleMeta, cls).__new__(cls, name, bases, dct)
         if out.example_name is not None:
             global _test_registry
