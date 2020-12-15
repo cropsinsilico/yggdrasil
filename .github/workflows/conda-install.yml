@@ -52,10 +52,13 @@ jobs:
       if: matrix.install-method == 'pip'
       with:
         python-version: ${{ matrix.python-version }}
-    - name: Install dependencies
+    - name: Check Python version
+      if: matrix.os == 'macos-latest'
       run: |
+        which python
         python --version
-        python utils/ci_setup.py ${{ matrix.install-method }} deploy
+    - name: Install dependencies
+      run: python utils/ci_setup.py ${{ matrix.install-method }} deploy
     - name: Verify installation
       run: python utils/ci_setup.py ${{ matrix.install-method }} verify
     - name: Non-example tests
@@ -148,10 +151,13 @@ jobs:
       uses: actions/setup-python@v2
       with:
         python-version: ${{ matrix.python-version }}
-    - name: Build package
+    - name: Check Python version
+      if: matrix.os == 'macos-latest'
       run: |
+        which python
         python --version
-        python utils/ci_setup.py ${{ matrix.install-method }} build
+    - name: Build package
+      run: python utils/ci_setup.py ${{ matrix.install-method }} build
     - name: Set up miniconda test environment
       uses: conda-incubator/setup-miniconda@v2
       if: matrix.install-method == 'conda'
