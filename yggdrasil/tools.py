@@ -328,8 +328,9 @@ def get_python_c_library(allow_failure=False, libtype=None):
         dir_try.append(cvars['LIBDIR'])
     if cvars.get('LIBDEST', None):
         dir_try.append(cvars['LIBDEST'])
-    for k in ['stdlib', 'purelib', 'platlib', 'platstdlib', 'data']:
-        dir_try.append(paths[k])
+    for k in ['stdlib', 'purelib', 'platlib', 'platstdlib', 'data', 'srcdir']:
+        if paths.get(k, None):
+            dir_try.append(paths[k])
     dir_try.append(os.path.join(paths['data'], 'lib'))
     if distutils_sysconfig is not None:
         dir_try.append(os.path.dirname(
