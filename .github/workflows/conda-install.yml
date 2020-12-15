@@ -170,17 +170,10 @@ jobs:
         channels: conda-forge
         # channel-priority: strict
         use-only-tar-bz2: true
-    - name: Add miniconda bin to path and initialize conda shell
+    - name: Add miniconda bin to path
       if: matrix.install-method == 'conda'
       run: |
         echo "PATH=$HOME/miniconda/bin:$PATH" >> $GITHUB_ENV
-        # conda init ${{ env.GHA_SHELL }}
-    # - name: Source bash_profile so that changes take effect
-    #   if: matrix.install-method == 'conda' && matrix.os != 'ubuntu-latest'
-    #   run: source ~/.bash_profile
-    # - name: Source bashrc so that changes take effect
-    #   if: matrix.install-method == 'conda' && matrix.os == 'ubuntu-latest'
-    #   run: source ~/.bashrc
     - name: Install old MacOSX SDK for compatibility with the conda llvm (7)
       if: matrix.os == 'macos-latest' && matrix.install-method == 'conda'
       run: ./utils/setup_old_mac_sdk.sh
