@@ -384,7 +384,7 @@ class ClangLinker(LDLinker):
         match = re.search(regex, out)
         if (match is not None) and (int(match.group('version')) >= 10):
             ld_version = LDLinker.tool_version()
-            if float(ld_version) < 520:
+            if float(ld_version.split('.')[0]) < 520:
                 kwargs['linker-version'] = ld_version
         out = super(ClangLinker, cls).get_flags(*args, **kwargs)
         if '-lstdc++' not in out:
