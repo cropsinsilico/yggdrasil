@@ -250,7 +250,7 @@ def build_package_on_ci(method, python=None, return_commands=False,
 
 
 def deploy_package_on_ci(method, python=None, without_build=False,
-                         verbose=False):
+                         verbose=False, windows_package_manager='vcpkg'):
     r"""Build and install the package and its dependencies on a CI
     resource.
 
@@ -265,6 +265,8 @@ def deploy_package_on_ci(method, python=None, without_build=False,
             built prior to install. Defaults to False.
         verbose (bool, optional): If True, setup steps are run with verbosity
             turned up. Defaults to False.
+        windows_package_manager (str, optional): Name of the package
+            manager that should be used on windows. Defaults to 'vcpkg'.
 
     Raises:
         ValueError: If method is not 'conda' or 'pip'.
@@ -283,6 +285,8 @@ def deploy_package_on_ci(method, python=None, without_build=False,
     conda_pkgs = []
     pip_pkgs = []
     os_pkgs = []
+    choco_pkgs = []
+    vcpkg_pkgs = []
     requirements_files = ['requirements_testing.txt']
     _in_conda = False
     if method == 'conda':
@@ -367,11 +371,11 @@ def deploy_package_on_ci(method, python=None, without_build=False,
             elif _is_osx:
                 os_pkgs += ["r", "udunits"]
             elif _is_win:
-                os_pkgs += ["r.project"]
+                choco_pkgs += ["r.project"]
             else:
                 raise NotImplementedError("Could not determine "
                                           "R installation method.")
-        if INSTALLFORTRAN and (not _in_conda) and (not _is_win):
+        if INSTALLFORTRAN and (not _in_conda):  # and (not _is_win):
             os_pkgs.append("gfortran")
         if INSTALLZMQ and (not _in_conda):
             cmds.append("echo Installing ZeroMQ...")
@@ -379,6 +383,8 @@ def deploy_package_on_ci(method, python=None, without_build=False,
                 os_pkgs += ["libczmq-dev", "libzmq3-dev"]
             elif _is_osx:
                 os_pkgs += ["czmq", "zmq"]
+            elif _is_win:
+                vcpkg_pkgs += ["czmq", "zeromq"]
             else:
                 raise NotImplementedError("Could not determine "
                                           "ZeroMQ installation method.")
@@ -392,7 +398,7 @@ def deploy_package_on_ci(method, python=None, without_build=False,
             # else:
             #     raise NotImplementedError("Could not determine "
             #                               "ZeroMQ installation method.")
-    if os_pkgs:
+    if os_pkgs or (_is_win and (choco_pkgs or vcpkg_pkgs)):
         if _is_linux:
             cmds += ["sudo apt update"]
             cmds += ["sudo apt-get install %s" % ' '.join(os_pkgs)]
@@ -401,7 +407,17 @@ def deploy_package_on_ci(method, python=None, without_build=False,
                 cmds += ["brew uninstall --ignore-dependencies pkg-config"]
             cmds += ["brew install %s" % ' '.join(os_pkgs)]
         elif _is_win:
-            cmds += ["choco install %s" % ' '.join(os_pkgs)]
+            if windows_package_manager == 'choco':
+                choco_pkgs += os_pkgs
+            elif windows_package_manager == 'vcpkg':
+                vcpkg_pkgs += os_pkgs
+            else:
+                raise NotImplementedError("Invalid package manager: '%s'"
+                                          % windows_package_manager)
+            if choco_pkgs:
+                cmds += ["choco install %s" % ' '.join(os_pkgs)]
+            if vcpkg_pkgs:
+                cmds += ["vcpkg.exe install %s" % ' '.join(os_pkgs)]
         else:
             raise NotImplementedError("No native package manager supported "
                                       "on Windows.")
