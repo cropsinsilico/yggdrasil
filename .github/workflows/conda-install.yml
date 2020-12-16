@@ -190,14 +190,12 @@ jobs:
       run: |
         echo "PATH=$HOME/miniconda/bin:$PATH" >> $GITHUB_ENV
         echo "PATH=$CONDA/bin:$PATH" >> $GITHUB_ENV
-    - name: Add miniconda bin to path - Windows
-      if: matrix.install-method == 'conda' && matrix.os == 'windows-latest'
-      shell: powershell
-      run: |
-        echo "${CONDA}"
-        # echo "${CONDA}/condabin" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
-        "C:\Miniconda`r`nC:\Miniconda\condabin`r`nC:\Miniconda\Scripts`r`nC:\Miniconda\Library\bin`r`n" + (Get-Content $env:GITHUB_PATH | Out-String) | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8
-        # echo "C:\Miniconda\condabin" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
+    # - name: Add miniconda bin to path - Windows
+    #   if: matrix.install-method == 'conda' && matrix.os == 'windows-latest'
+    #   shell: powershell
+    #   run: |
+    #     echo "${CONDA}"
+    #     "C:\Miniconda`r`nC:\Miniconda\condabin`r`nC:\Miniconda\Scripts`r`nC:\Miniconda\Library\bin`r`n" + (Get-Content $env:GITHUB_PATH | Out-String) | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8
     - name: Change ownership of conda on MacOS
       shell: bash  # --noprofile --norc -eo pipefail {0}
       if: matrix.os == 'macos-latest'
