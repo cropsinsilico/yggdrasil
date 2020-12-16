@@ -473,6 +473,8 @@ def verify_package_on_ci(method):
     if _is_win and (not INSTALLZMQ):
         INSTALLC = False
         INSTALLFORTRAN = False
+    elif (not INSTALLFORTRAN) and shutil.which('gfortran'):
+        INSTALLFORTRAN = True
     src_dir = os.path.join(os.getcwd(),
                            os.path.dirname(os.path.dirname(__file__)))
     src_version = subprocess.check_output(
