@@ -376,7 +376,10 @@ def deploy_package_on_ci(method, python=None, without_build=False,
                 raise NotImplementedError("Could not determine "
                                           "R installation method.")
         if INSTALLFORTRAN and (not _in_conda):  # and (not _is_win):
-            os_pkgs.append("gfortran")
+            if _is_osx:
+                os_pkgs.append("gcc")
+            else:
+                os_pkgs.append("gfortran")
         if INSTALLZMQ and (not _in_conda):
             cmds.append("echo Installing ZeroMQ...")
             if _is_linux:
