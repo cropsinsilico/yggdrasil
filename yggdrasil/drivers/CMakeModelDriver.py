@@ -542,6 +542,7 @@ class CMakeConfigure(BuildToolBase):
         # -homebrews-cmake-since-mojave
         if platform._is_mac:
             # TODO: Include might need to be added as well
+            preamble_lines.append('LINK_DIRECTORIES(/usr/lib)')
             preamble_lines.append('LINK_DIRECTORIES(/usr/local/lib)')
         lines = preamble_lines + lines
         log_msg = 'CMake include file:\n\t' + '\n\t'.join(lines)
