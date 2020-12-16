@@ -389,7 +389,7 @@ def deploy_package_on_ci(method, python=None, without_build=False,
                 os_pkgs.append("gfortran")
             elif _is_osx:
                 os_pkgs.append("gcc")
-                os_pkgs.append("gfortran")
+                # os_pkgs.append("gfortran")
             elif _is_win:
                 vcpkg_pkgs.append("vcpkg-gfortran")
         if INSTALLZMQ and (not _in_conda):
