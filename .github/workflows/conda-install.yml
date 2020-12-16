@@ -188,7 +188,7 @@ jobs:
     - name: Add miniconda bin to path - Unix
       if: matrix.install-method == 'conda' && matrix.os != 'windows-latest'
       run: |
-        echo "PATH=$HOME/miniconda/bin:$PATH" >> $GITHUB_ENV
+        # echo "PATH=$HOME/miniconda/bin:$PATH" >> $GITHUB_ENV
         echo "PATH=$CONDA/bin:$PATH" >> $GITHUB_ENV
     # - name: Add miniconda bin to path - Windows
     #   if: matrix.install-method == 'conda' && matrix.os == 'windows-latest'
