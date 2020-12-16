@@ -373,15 +373,22 @@ def deploy_package_on_ci(method, python=None, without_build=False,
         if INSTALLZMQ and (not _in_conda):
             cmds.append("echo Installing ZeroMQ...")
             if _is_linux:
-                cmds.append("./ci/install-czmq-linux.sh")
+                os_pkgs += ["libczmq-dev", "libzmq-dev"]  # "libzmq3-dev"]
             elif _is_osx:
-                cmds.append("bash ci/install-czmq-osx.sh")
-            # elif _is_win:
-            #     cmds += ["call ci\\install-czmq-windows.bat",
-            #              "echo \"%PATH%\""]
+                os_pkgs += ["czmq", "zmq"]
             else:
                 raise NotImplementedError("Could not determine "
                                           "ZeroMQ installation method.")
+            # if _is_linux:
+            #     cmds.append("./ci/install-czmq-linux.sh")
+            # elif _is_osx:
+            #     cmds.append("bash ci/install-czmq-osx.sh")
+            # # elif _is_win:
+            # #     cmds += ["call ci\\install-czmq-windows.bat",
+            # #              "echo \"%PATH%\""]
+            # else:
+            #     raise NotImplementedError("Could not determine "
+            #                               "ZeroMQ installation method.")
     if os_pkgs:
         if _is_linux:
             cmds += ["sudo apt update"]
