@@ -46,7 +46,7 @@ jobs:
       with:
         submodules: true
     - name: Set C installation based on matrix value
-      if: matrix.install-c != 'true'
+      if: matrix.install-c != true
       shell: bash -l {0}
       run: echo "INSTALLC=0" >> $GITHUB_ENV
     - name: Patch TEMP/TMPDIR on Windows
