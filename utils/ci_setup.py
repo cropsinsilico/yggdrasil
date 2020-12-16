@@ -461,9 +461,13 @@ def deploy_package_on_ci(method, python=None, without_build=False,
             install_flags = '-q'
         if (not GITHUB_ACTIONS) and _is_linux:
             install_flags = ''
+        if _is_win:
+            index_channel = CONDA_INDEX
+        else:
+            index_channel = "file:/%s" % CONDA_INDEX
         cmds += [
-            "%s install %s --update-deps -c file:/%s yggdrasil" % (
-                CONDA_CMD, install_flags, CONDA_INDEX),
+            "%s install %s --update-deps -c %s yggdrasil" % (
+                CONDA_CMD, install_flags, index_channel)
             # Related issues if this stops working again
             # https://github.com/conda/conda/issues/466#issuecomment-378050252
         ]
