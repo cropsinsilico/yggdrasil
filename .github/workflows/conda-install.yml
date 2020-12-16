@@ -23,7 +23,7 @@ env:
 
 jobs:
   build_pip:
-    name: Build (${{ matrix.python-version }}, ${{ matrix.os }}, ${{ matrix.install-method }}, ${{ matrix.test-flags }})
+    name: Build (${{ matrix.python-version }}, ${{ matrix.os }}, ${{ matrix.install-method }}, ${{ matrix.test-flags }}), Install C = ${{ matrix.install-c }}
     runs-on: ${{ matrix.os }}
     strategy:
       max-parallel: 5
@@ -32,17 +32,27 @@ jobs:
         python-version: [3.6]
         install-method: [pip]
         test-flags: [--long-running, --test-suite=examples]
+        install-c: [true]
+        include:
+          - os: windows-latest
+            python-version: 3.6
+            install-method: pip
+            test-flags: --long-running
+            install-c: false
       fail-fast: false
 
     steps:
     - uses: actions/checkout@v2
       with:
         submodules: true
-    - name: Turn off C installation on Windows & patch TEMP
+    - name: Set C installation based on matrix value
+      if: matrix.install-c != 'true'
+      shell: bash -l {0}
+      run: echo "INSTALLC=0" >> $GITHUB_ENV
+    - name: Patch TEMP/TMPDIR on Windows
       if: matrix.os == 'windows-latest' && matrix.install-method == 'pip'
       shell: bash -l {0}
       run: |
-        echo "INSTALLC=0" >> $GITHUB_ENV
         echo "TMPDIR=$USERPROFILE\\AppData\\Local\\Temp" >> $GITHUB_ENV
         echo "TEMP=$USERPROFILE\\AppData\\Local\\Temp" >> $GITHUB_ENV
     - name: Set up MSVC Compiler
@@ -104,7 +114,6 @@ jobs:
         image: rabbitmq:latest
         ports:
           - 5672:5672
-        #   - 5672/tcp
         options: --health-cmd "rabbitmqctl node_health_check" --health-interval 10s --health-timeout 5s --health-retries 5
 
     steps:
