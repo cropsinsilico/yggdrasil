@@ -418,7 +418,6 @@ def deploy_package_on_ci(method, python=None, without_build=False,
             install_flags = '-vvv'
         else:
             install_flags = '-q'
-        install_flags = '-vv'
         cmds += [
             "%s install %s --update-deps -c file:/%s/conda-bld yggdrasil" % (
                 CONDA_CMD, install_flags, CONDA_PREFIX),
