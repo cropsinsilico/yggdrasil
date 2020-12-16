@@ -427,9 +427,9 @@ def deploy_package_on_ci(method, python=None, without_build=False,
                 raise NotImplementedError("Invalid package manager: '%s'"
                                           % windows_package_manager)
             if choco_pkgs:
-                cmds += ["choco install %s" % ' '.join(os_pkgs)]
+                cmds += ["choco install %s" % ' '.join(choco_pkgs)]
             if vcpkg_pkgs:
-                cmds += ["vcpkg.exe install %s" % ' '.join(os_pkgs)]
+                cmds += ["vcpkg.exe install %s" % ' '.join(vcpkg_pkgs)]
         else:
             raise NotImplementedError("No native package manager supported "
                                       "on Windows.")
