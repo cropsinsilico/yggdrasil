@@ -456,6 +456,7 @@ def verify_package_on_ci(method):
             the package. Valid values include 'conda' and 'pip'.
 
     """
+    global INSTALLC, INSTALLFORTRAN
     if _is_win and (not INSTALLZMQ):
         INSTALLC = False
         INSTALLFORTRAN = False
