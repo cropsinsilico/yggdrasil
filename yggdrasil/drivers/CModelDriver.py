@@ -469,8 +469,7 @@ try:
         _python_lib = tools.get_python_c_library(
             allow_failure=False, libtype=libtype_order[0])
 except BaseException as e:  # pragma: debug
-    warnings.warn("ERROR LOCATING PYTHON LIBRARY: %s, is_win = %s"
-                  % (e, platform._is_win))
+    warnings.warn("ERROR LOCATING PYTHON LIBRARY: %s" % e)
     _python_lib = None
 _numpy_inc = numpy_distutils.misc_util.get_numpy_include_dirs()
 _numpy_lib = None  # os.path.join(os.path.dirname(_numpy_inc[0]), 'lib', 'npymath.lib')
