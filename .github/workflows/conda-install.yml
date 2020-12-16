@@ -171,6 +171,10 @@ jobs:
     - name: Set up MSVC Compiler
       uses: ilammy/msvc-dev-cmd@v1
       if: matrix.os == 'windows-latest' && env.INSTALLC == 1
+    - name: Record location of MSVC tools on Windows
+      if: matrix.os == 'windows-latest' && env.INSTALLC == 1
+      run: |
+        echo "YGG_LINK_PATH=$(which link.exe)" >> $GITHUB_ENV
     - name: Cache conda
       uses: actions/cache@v1
       env:

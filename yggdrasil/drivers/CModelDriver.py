@@ -285,6 +285,27 @@ class MSVCCompiler(CCompilerBase):
                              search_path_flags=None)
     toolset = 'msvc'
     
+    @staticmethod
+    def before_registration(cls):
+        r"""Operations that should be performed to modify class attributes prior
+        to registration including things like platform dependent properties and
+        checking environment variables for default settings.
+        """
+        compiler_path = shutil.which('cl.exe')
+        linker_path = shutil.which('link.exe')
+        if (((compiler_path and linker_path)
+             and (os.path.dirname(compiler_path)
+                  != os.path.dirname(linker_path)))):
+            cls.linker_attributes['default_executable'] = os.path.join(
+                os.path.dirname(compiler_path), os.path.basename(linker_path))
+            print('PREVIOUS', linker_path)
+            print('DEFAULT', cls.linker_attributes['default_executable'])
+            if os.environ.get('YGG_LINK_PATH', None):
+                print('YGG_LINK_PATH', os.environ['YGG_LINK_PATH'])
+                assert(os.environ['YGG_LINK_PATH']
+                       == cls.linker_attributes['default_executable'])
+        CCompilerBase.before_registration(cls)
+        
     @classmethod
     def tool_version(cls, **kwargs):  # pragma: windows
         r"""Determine the version of this tool.
