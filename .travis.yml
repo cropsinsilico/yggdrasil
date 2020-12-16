@@ -131,16 +131,22 @@ install:
     # Build and install
     if [[ -n "$YGG_CONDA" ]]; then
       travis_wait python utils/ci_setup.py conda deploy --without-build
-      python utils/ci_setup.py conda verify
+      # python utils/ci_setup.py conda verify
     else
       if [[ $INSTALLR == '1' ]]; then
         export YGG_USE_SUDO_FOR_R=1
       fi
       python utils/ci_setup.py pip deploy
-      python utils/ci_setup.py pip verify
+      # python utils/ci_setup.py pip verify
     fi
 
 script:
+  - |
+    if [[ -n "$YGG_CONDA" ]]; then
+      python utils/ci_setup.py conda verify
+    else
+      python utils/ci_setup.py pip verify
+    fi
   - yggtest --ci $YGG_TEST_FLAGS
   - $YGG_SECOND_TEST
 
