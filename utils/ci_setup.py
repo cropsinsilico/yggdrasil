@@ -432,8 +432,12 @@ def deploy_package_on_ci(method, python=None, without_build=False,
             if choco_pkgs:
                 cmds += ["choco install %s" % ' '.join(choco_pkgs)]
             if vcpkg_pkgs:
-                cmds += ["vcpkg.exe install %s --triplet x64-windows"
-                         % ' '.join(vcpkg_pkgs)]
+                vcpkg_exe = 'vcpkg.exe'
+                if os.environ.get('VCPKG_ROOT', None):
+                    vcpkg_exe = os.path.join(os.environ['VCPKG_ROOT'],
+                                             vcpkg_exe)
+                cmds += ["%s install %s --triplet x64-windows"
+                         % (vcpkg_exe, ' '.join(vcpkg_pkgs))]
         else:
             raise NotImplementedError("No native package manager supported "
                                       "on Windows.")
