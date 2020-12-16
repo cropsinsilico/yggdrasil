@@ -30,6 +30,7 @@ BUILDDOCS = (os.environ.get('BUILDDOCS', '0') == '1')
 GITHUB_ACTIONS = os.environ.get('GITHUB_ACTIONS', False)
 CONDA_ENV = os.environ.get('CONDA_DEFAULT_ENV', None)
 CONDA_PREFIX = os.environ.get('CONDA_PREFIX', None)
+CONDA_INDEX = None
 try:
     CONDA_CMD_WHICH = shutil.which('conda')
 except AttributeError:
@@ -51,6 +52,12 @@ if (not CONDA_PREFIX):
 if ((isinstance(CONDA_PREFIX, str)
      and os.path.dirname(CONDA_PREFIX).endswith('envs'))):
     CONDA_PREFIX = os.path.dirname(os.path.dirname(CONDA_PREFIX))
+if CONDA_PREFIX:
+    CONDA_INDEX = os.path.join(CONDA_PREFIX, "conda-bld")
+    if not os.path.isdir(CONDA_INDEX):
+        if GITHUB_ACTIONS and _is_win and CONDA_PREFIX.endswith('Library'):
+            CONDA_INDEX = os.path.join(os.path.dirname(CONDA_PREFIX),
+                                       "conda-bld")
 if CONDA_CMD_WHICH:
     if _is_win:
         CONDA_CMD = 'call conda'
@@ -203,7 +210,7 @@ def build_package_on_ci(method, python=None, return_commands=False,
         upgrade_pkgs.insert(0, 'pip')
     cmds += ["pip install --upgrade %s" % ' '.join(upgrade_pkgs)]
     if method == 'conda':
-        index_dir = os.path.join(CONDA_PREFIX, "conda-bld")
+        assert(CONDA_INDEX and os.path.isdir(CONDA_INDEX))
         if verbose:
             build_flags = ''
         else:
@@ -229,7 +236,7 @@ def build_package_on_ci(method, python=None, return_commands=False,
             "%s install -q -n base conda-build conda-verify" % CONDA_CMD,
             "%s build %s --python %s %s" % (
                 CONDA_CMD, 'recipe', python, build_flags),
-            "%s index %s" % (CONDA_CMD, index_dir),
+            "%s index %s" % (CONDA_CMD, CONDA_INDEX),
             # "%s activate %s" % (CONDA_CMD, CONDA_ENV),
         ]
     elif method == 'pip':
@@ -443,6 +450,7 @@ def deploy_package_on_ci(method, python=None, without_build=False,
                                "(required for LPy).")
     # Install yggdrasil
     if method == 'conda':
+        assert(CONDA_INDEX and os.path.isdir(CONDA_INDEX))
         # Install from conda build
         # Assumes that the target environment is active
         if verbose:
@@ -450,8 +458,8 @@ def deploy_package_on_ci(method, python=None, without_build=False,
         else:
             install_flags = '-q'
         cmds += [
-            "%s install %s --update-deps -c file:/%s/conda-bld yggdrasil" % (
-                CONDA_CMD, install_flags, CONDA_PREFIX),
+            "%s install %s --update-deps -c file:/%s yggdrasil" % (
+                CONDA_CMD, install_flags, CONDA_INDEX),
             # Related issues if this stops working again
             # https://github.com/conda/conda/issues/466#issuecomment-378050252
         ]
