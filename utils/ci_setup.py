@@ -30,22 +30,27 @@ BUILDDOCS = (os.environ.get('BUILDDOCS', '0') == '1')
 GITHUB_ACTIONS = os.environ.get('GITHUB_ACTIONS', False)
 CONDA_ENV = os.environ.get('CONDA_DEFAULT_ENV', None)
 CONDA_PREFIX = os.environ.get('CONDA_PREFIX', None)
-if (not CONDA_PREFIX) and CONDA_ENV:
-    if GITHUB_ACTIONS:
-        CONDA_PREFIX = os.environ['CONDA']
+try:
+    CONDA_CMD_WHICH = shutil.which('conda')
+except AttributeError:
+    if _is_win:
+        CONDA_CMD_WHICH = None
     else:
-        CONDA_PREFIX = os.path.dirname(os.path.dirname(shutil.which('conda')))
-if (not CONDA_PREFIX) and GITHUB_ACTIONS and os.environ.get('CONDA', None):
-    CONDA_PREFIX = os.environ['CONDA']
-    if not CONDA_ENV:
+        try:
+            CONDA_CMD_WHICH = subprocess.check_output(
+                ['which', 'conda']).strip().decode('utf-8')
+        except subprocess.CalledProcessError:
+            CONDA_CMD_WHICH = None
+if (not CONDA_PREFIX):
+    if CONDA_CMD_WHICH:
+        CONDA_PREFIX = os.path.dirname(os.path.dirname(CONDA_CMD_WHICH))
+    elif GITHUB_ACTIONS and os.environ.get('CONDA', None):
+        CONDA_PREFIX = os.environ['CONDA']
+    if CONDA_PREFIX and (not CONDA_ENV):
         CONDA_ENV = 'base'
 if ((isinstance(CONDA_PREFIX, str)
      and os.path.dirname(CONDA_PREFIX).endswith('envs'))):
     CONDA_PREFIX = os.path.dirname(os.path.dirname(CONDA_PREFIX))
-try:
-    CONDA_CMD_WHICH = shutil.which('conda')
-except AttributeError:
-    CONDA_CMD_WHICH = None
 if CONDA_CMD_WHICH:
     if _is_win:
         CONDA_CMD = 'call conda'
