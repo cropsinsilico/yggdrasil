@@ -130,7 +130,7 @@ install:
 
     # Build and install
     if [[ -n "$YGG_CONDA" ]]; then
-      python utils/ci_setup.py conda deploy --without-build
+      travis_wait python utils/ci_setup.py conda deploy --without-build
       python utils/ci_setup.py conda verify
     else
       if [[ $INSTALLR == '1' ]]; then
