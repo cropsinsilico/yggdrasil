@@ -210,7 +210,6 @@ def build_package_on_ci(method, python=None, return_commands=False,
         upgrade_pkgs.insert(0, 'pip')
     cmds += ["pip install --upgrade %s" % ' '.join(upgrade_pkgs)]
     if method == 'conda':
-        assert(CONDA_INDEX and os.path.isdir(CONDA_INDEX))
         if verbose:
             build_flags = ''
         else:
@@ -220,6 +219,7 @@ def build_package_on_ci(method, python=None, return_commands=False,
         # https://github.com/conda/conda/issues/9124
         # https://github.com/conda/conda/issues/7758#issuecomment-660328841
         assert(CONDA_ENV == 'base')
+        assert(CONDA_INDEX)
         if GITHUB_ACTIONS:
             cmds += [
                 "%s config --add channels conda-forge" % CONDA_CMD,
@@ -254,6 +254,8 @@ def build_package_on_ci(method, python=None, return_commands=False,
     if return_commands:
         return cmds
     call_script(cmds)
+    if method == 'conda':
+        assert(CONDA_INDEX and os.path.isdir(CONDA_INDEX))
 
 
 def deploy_package_on_ci(method, python=None, without_build=False,
