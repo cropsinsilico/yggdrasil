@@ -373,7 +373,7 @@ def deploy_package_on_ci(method, python=None, without_build=False,
         if INSTALLZMQ and (not _in_conda):
             cmds.append("echo Installing ZeroMQ...")
             if _is_linux:
-                os_pkgs += ["libczmq-dev", "libzmq-dev"]  # "libzmq3-dev"]
+                os_pkgs += ["libczmq-dev", "libzmq3-dev"]
             elif _is_osx:
                 os_pkgs += ["czmq", "zmq"]
             else:
