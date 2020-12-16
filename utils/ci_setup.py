@@ -395,7 +395,7 @@ def deploy_package_on_ci(method, python=None, without_build=False,
             cmds += ["sudo apt-get install %s" % ' '.join(os_pkgs)]
         elif _is_osx:
             if not _in_conda:
-                cmds += ["brew uninstall pkg-config"]
+                cmds += ["brew uninstall --ignore-dependencies pkg-config"]
             cmds += ["brew install %s" % ' '.join(os_pkgs)]
         elif _is_win:
             cmds += ["choco install %s" % ' '.join(os_pkgs)]
