@@ -218,6 +218,8 @@ def build_package_on_ci(method, python=None, return_commands=False,
                 "%s config --add channels conda-forge" % CONDA_CMD,
                 "%s update -q conda" % CONDA_CMD,
             ]
+        if _is_win:
+            cmds.append("%s clean --all" % CONDA_CMD)  # Might invalidate cache
         cmds += [
             # "%s clean --all" % CONDA_CMD,  # Might invalidate cache
             # "%s deactivate" % CONDA_CMD,
