@@ -818,6 +818,10 @@ class CompilationToolBase(object):
         # Get libtype specific search paths
         if platform._is_win:  # pragma: windows
             base_paths = []
+            if os.environ.get('VCPKG_ROOT', None):
+                base_paths.append(os.path.join(os.environ['VCPKG_ROOT'],
+                                               'installed',
+                                               'x64-windows'))
         else:
             base_paths = ['/usr', os.path.join('/usr', 'local')]
         if platform._is_mac:
