@@ -155,7 +155,7 @@ def setup_package_on_ci(method, python):
             "echo Installing Python using conda...",
             # Configure conda
             "%s config --set always_yes yes --set changeps1 no" % CONDA_CMD,
-            # "%s config --set channel_priority strict" % CONDA_CMD,
+            "%s config --set channel_priority strict" % CONDA_CMD,
             "%s config --add channels conda-forge" % CONDA_CMD,
             "%s update -q conda" % CONDA_CMD,
             # "%s config --set allow_conda_downgrades true" % CONDA_CMD,
