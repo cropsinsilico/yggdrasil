@@ -457,6 +457,8 @@ def deploy_package_on_ci(method, python=None, without_build=False,
             install_flags = '-vvv'
         else:
             install_flags = '-q'
+        if (not GITHUB_ACTIONS) and _is_linux:
+            install_flags = ''
         cmds += [
             "%s install %s --update-deps -c file:/%s yggdrasil" % (
                 CONDA_CMD, install_flags, CONDA_INDEX),
