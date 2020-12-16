@@ -222,6 +222,7 @@ def build_package_on_ci(method, python=None, return_commands=False,
             cmds.append("%s clean --all" % CONDA_CMD)  # Might invalidate cache
             if GITHUB_ACTIONS:
                 build_flags = ''
+                build_flags += ' --no-test'
         cmds += [
             # "%s clean --all" % CONDA_CMD,  # Might invalidate cache
             # "%s deactivate" % CONDA_CMD,
