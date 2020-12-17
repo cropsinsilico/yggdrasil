@@ -254,9 +254,9 @@ jobs:
         ls /usr/share/miniconda/envs/test/lib/python3.8/config-3.8-x86_64-linux-gnu
     - name: Install dependencies
       run: python utils/ci_setup.py ${{ matrix.install-method }} deploy --without-build
-    - name: Start RabbitMQ Server
-      if: env.INSTALLRMQ == 1 && matrix.os != 'windows-latest'
-      run: ./utils/setup_rabbitmq.sh
+    - name: Check for vcpkg libraries
+      if: matrix.os == 'windows-latest'
+      run: ls C:\\vcpkg\\installed\\x64-windows\\lib
     - name: Verify installation
       run: python utils/ci_setup.py ${{ matrix.install-method }} verify
     - name: Run tests
