@@ -3272,11 +3272,14 @@ class CompiledModelDriver(ModelDriver):
                 tool = None
                 try:
                     if t == 'include':
-                        tool = cls.get_tool('compiler', default=None)
+                        tool = cls.get_tool('compiler', default=None,
+                                            language=v.get('language', None))
                     elif t == 'shared':
-                        tool = cls.get_tool('linker', default=None)
+                        tool = cls.get_tool('linker', default=None,
+                                            language=v.get('language', None))
                     else:  # pragma: completion
-                        tool = cls.get_tool('archiver', default=None)
+                        tool = cls.get_tool('archiver', default=None,
+                                            language=v.get('language', None))
                 except NotImplementedError:  # pragma: debug
                     pass
                 fpath = None
