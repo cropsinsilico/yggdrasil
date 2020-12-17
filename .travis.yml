@@ -43,7 +43,7 @@ env:
   matrix:
     - YGG_TEST_FLAGS="--test-suite=examples_part1 --test-suite=demos" INSTALLTRIMESH=1
     - YGG_TEST_FLAGS="--test-suite=examples_part2"
-    - YGG_CONDA=yes YGG_TEST_FLAGS="--long-running" CC=gcc CFLAGS="-Wall -g" INSTALLRMQ=1 INSTALLAPY=1 INSTALLTRIMESH=1 INSTALLPYGMENTS=1 YGG_SECOND_TEST="yggtest --ci --default-comm=IPCComm --long-running"
+    - YGG_CONDA=yes YGG_TEST_FLAGS="--long-running" CC=gcc CFLAGS="-Wall -g" INSTALLRMQ=1 INSTALLAPY=1 INSTALLTRIMESH=1 INSTALLPYGMENTS=1 YGG_SECOND_TEST="yggtest --ci --default-comm=IPCComm --test-suite=timing"  # --long-running"
 
 before_install:
   - |
