@@ -2602,7 +2602,7 @@ class CompiledModelDriver(ModelDriver):
                                       "libraries of types %s were found.")
                                      % (libtype, dep, libtype_found))
             # TODO: CLEANUP
-            if platform._is_win and out.endswith('.lib'):  # pragma: windows
+            if platform._is_win and out and out.endswith('.lib'):  # pragma: windows
                 if tool is None:
                     tool = cls.get_tool('compiler', language=dep_lang,
                                         toolname=toolname)
