@@ -94,6 +94,7 @@ typedef long double _Complex complex_long_double;
 extern "C" {
 #endif
 
+#include <math.h> // Required to prevent error when using mingw on windows
 #ifdef _DEBUG
 #undef _DEBUG
 #include <Python.h>
