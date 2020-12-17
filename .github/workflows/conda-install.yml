@@ -185,6 +185,7 @@ jobs:
         channels: conda-forge
         use-only-tar-bz2: true
         activate-environment: ''
+        python-version: ${{ matrix.python-version }}
         # auto-activate-base: false
     - name: Set up MSVC Compiler
       uses: ilammy/msvc-dev-cmd@v1
@@ -240,7 +241,7 @@ jobs:
       run: python utils/ci_setup.py ${{ matrix.install-method }} build --python ${{ matrix.python-version }}
     - name: Set up miniconda test environment
       uses: conda-incubator/setup-miniconda@v2
-      if: matrix.install-method == 'conda'
+      if: matrix.install-method == 'conda' && matrix.os != 'windows-latest'
       with:
         # TODO: Move autoupdate into script?
         # auto-update-conda: true
