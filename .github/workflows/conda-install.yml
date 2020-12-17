@@ -55,14 +55,10 @@ jobs:
       run: |
         echo "TMPDIR=$USERPROFILE\\AppData\\Local\\Temp" >> $GITHUB_ENV
         echo "TEMP=$USERPROFILE\\AppData\\Local\\Temp" >> $GITHUB_ENV
+        echo "VCPKG_ROOT=C:\\vcpkg" >> $GITHUB_ENV
     - name: Set up MSVC Compiler
       uses: ilammy/msvc-dev-cmd@v1
       if: matrix.os == 'windows-latest' && env.INSTALLC == 1
-    - name: Restore from cache and install vcpkg
-      uses: lukka/run-vcpkg@v6
-      with:
-        setupOnly: true
-        vcpkgTriplet: x64-windows
     - name: Cache pip - Linux
       uses: actions/cache@v2
       if: startsWith(runner.os, 'Linux')
