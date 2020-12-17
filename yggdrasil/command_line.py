@@ -120,7 +120,7 @@ def ygginfo():
         # Add verbose information
         if args.verbose:
             # Environment variabless
-            env_vars = ['PATH', 'CONDA_PREFIX', 'CONDA']
+            env_vars = ['PATH', 'CONDA_PREFIX', 'CONDA', 'SDKROOT']
             if platform._is_win:  # pragma: windows
                 env_vars += ['VCPKG_ROOT']
             vardict.append(('Environment variables:', ''))
