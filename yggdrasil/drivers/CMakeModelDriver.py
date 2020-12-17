@@ -544,8 +544,15 @@ class CMakeConfigure(BuildToolBase):
             # TODO: Include might need to be added as well
             preamble_lines.append('LINK_DIRECTORIES(/usr/lib)')
             preamble_lines.append('LINK_DIRECTORIES(/usr/local/lib)')
+            verbose = True
         lines = preamble_lines + lines
-        log_msg = 'CMake include file:\n\t' + '\n\t'.join(lines)
+        log_msg = (
+            'CMake compiler flags:\n\t%s\n'
+            'CMake linker flags:\n\t%s\n'
+            'CMake library flags:\n\t%s\n'
+            'CMake include file:\n\t%s') % (
+                ' '.join(compile_flags), ' '.join(linker_flags),
+                ' '.join(library_flags), '\n\t'.join(lines))
         if verbose:
             logger.info(log_msg)
         else:
