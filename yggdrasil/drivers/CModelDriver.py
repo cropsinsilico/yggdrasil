@@ -298,6 +298,8 @@ class MSVCCompiler(CCompilerBase):
                   != os.path.dirname(linker_path)))):
             cls.linker_attributes['default_executable'] = os.path.join(
                 os.path.dirname(compiler_path), os.path.basename(linker_path))
+            for k in ['PATH', 'Path']:
+                print(k, os.environ.get(k, None))
             print('PREVIOUS', linker_path)
             print('DEFAULT', cls.linker_attributes['default_executable'])
             if os.environ.get('YGG_LINK_PATH', None):

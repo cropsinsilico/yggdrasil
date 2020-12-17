@@ -194,6 +194,7 @@ jobs:
       if: matrix.os == 'windows-latest' && env.INSTALLC == 1
       run: |
         echo "YGG_LINK_PATH=$(which link.exe)" >> $GITHUB_ENV
+        echo "YGG_MSVC_BIN=$(dirname $(which link.exe))" $GITHUB_ENV
     - name: Add miniconda bin to path - Unix
       if: matrix.install-method == 'conda' && matrix.os != 'windows-latest'
       run: |
