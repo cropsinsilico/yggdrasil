@@ -3301,6 +3301,9 @@ class CompiledModelDriver(ModelDriver):
                     fpath = tools.locate_file(
                         fname, directory_list=search_list,
                         environment_variable=None)
+                    logger.info("%s.search_path_envvar: split '%s', %s"
+                                % (tool, os.pathsep,
+                                   tool.search_path_envvar))
             if fpath:
                 logger.info('Located %s: %s' % (fname, fpath))
                 # if (t in ['static']) and platform._is_mac:
@@ -3311,7 +3314,7 @@ class CompiledModelDriver(ModelDriver):
                 #         os.symlink(fpath_orig, fpath)
                 cfg.set(k_lang, opt, fpath)
             else:
-                logger.info('Could not locate %s (search_list = %s)'
+                logger.info('Could not locate %s (search_list = \n\t%s)'
                             % (fname, '\n\t'.join(search_list)))
                 out.append((k_lang, opt, desc))
         return out
