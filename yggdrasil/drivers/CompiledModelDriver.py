@@ -3277,6 +3277,7 @@ class CompiledModelDriver(ModelDriver):
                 except NotImplementedError:  # pragma: debug
                     pass
                 fpath = None
+                fname = '*'.join(os.path.splitext(fname))
                 if tool is not None:
                     search_list = tool.get_search_path(libtype=t)
                     # On windows search for both gnu and msvc library
