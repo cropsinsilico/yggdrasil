@@ -341,6 +341,8 @@ class LDLinker(LinkerBase):
     default_executable_env = 'LD'
     default_flags_env = 'LDFLAGS'
     version_flags = ['-v']
+    search_path_envvar = CCompilerBase.linker_attributes[
+        'search_path_envvar'].copy()
     # search_path_envvar = ['LIBRARY_PATH', 'LD_LIBRARY_PATH']
 
     @classmethod
@@ -431,6 +433,8 @@ class ARArchiver(ArchiverBase):
     output_first_library = True
     toolset = 'gnu'
     compatible_toolsets = ['llvm']
+    search_path_envvar = CCompilerBase.linker_attributes[
+        'search_path_envvar'].copy()
     # search_path_envvar = ['LIBRARY_PATH']
 
 
@@ -441,6 +445,8 @@ class LibtoolArchiver(ArchiverBase):
     default_executable_env = 'LIBTOOL'
     static_library_flag = '-static'  # This is the default
     toolset = 'clang'
+    search_path_envvar = CCompilerBase.linker_attributes[
+        'search_path_envvar'].copy()
     # search_path_envvar = ['LIBRARY_PATH']
     
 
@@ -453,6 +459,8 @@ class MSVCArchiver(ArchiverBase):
     output_key = '/OUT:%s'
     toolset = 'msvc'
     compatible_toolsets = ['llvm']
+    search_path_envvar = CCompilerBase.linker_attributes[
+        'search_path_envvar'].copy()
     # search_path_envvar = ['LIB']
     
     # @classmethod
