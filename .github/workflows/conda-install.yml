@@ -187,17 +187,17 @@ jobs:
           hashFiles('recipe/meta.yaml') }}
     - name: Set up miniconda base environment on Windows
       uses: conda-incubator/setup-miniconda@v2
-      if: matrix.install-method == 'conda' && matrix.os == 'windows-latest'
+      if: matrix.install-method == 'conda'  # && matrix.os == 'windows-latest'
       with:
         channels: conda-forge
         use-only-tar-bz2: true
         activate-environment: ''
         # auto-activate-base: false
-    - name: Add miniconda bin to path - Unix
-      if: matrix.install-method == 'conda' && matrix.os != 'windows-latest'
-      run: |
-        # echo "PATH=$HOME/miniconda/bin:$PATH" >> $GITHUB_ENV
-        echo "PATH=$CONDA/bin:$PATH" >> $GITHUB_ENV
+    # - name: Add miniconda bin to path - Unix
+    #   if: matrix.install-method == 'conda' && matrix.os != 'windows-latest'
+    #   run: |
+    #     # echo "PATH=$HOME/miniconda/bin:$PATH" >> $GITHUB_ENV
+    #     echo "PATH=$CONDA/bin:$PATH" >> $GITHUB_ENV
     # - name: Add miniconda bin to path - Windows
     #   if: matrix.install-method == 'conda' && matrix.os == 'windows-latest'
     #   shell: powershell
