@@ -262,8 +262,10 @@ jobs:
       run: python utils/ci_setup.py ${{ matrix.install-method }} verify
     - name: Run tests
       run: yggtest --ci ${{ matrix.test-flags }}
-    - name: Check for coverage report
-      run: ls -l
+    - name: Generate XML version of coverage report and check for coverage report
+      run: |
+        coverage xml
+        ls -la
     - name: Upload coverage report
       uses: codecov/codecov-action@v1
   docs:
