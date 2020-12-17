@@ -177,7 +177,7 @@ jobs:
           hashFiles('recipe/meta.yaml') }}
     - name: Set up miniconda base environment on Windows
       uses: conda-incubator/setup-miniconda@v2
-      if: matrix.install-method == 'conda'  # && matrix.os == 'windows-latest'
+      if: matrix.install-method == 'conda' && matrix.os == 'windows-latest'
       with:
         channels: conda-forge
         use-only-tar-bz2: true
@@ -190,11 +190,11 @@ jobs:
       if: matrix.os == 'windows-latest' && env.INSTALLC == 1
       run: |
         echo "YGG_LINK_PATH=$(which link.exe)" >> $GITHUB_ENV
-    # - name: Add miniconda bin to path - Unix
-    #   if: matrix.install-method == 'conda' && matrix.os != 'windows-latest'
-    #   run: |
-    #     # echo "PATH=$HOME/miniconda/bin:$PATH" >> $GITHUB_ENV
-    #     echo "PATH=$CONDA/bin:$PATH" >> $GITHUB_ENV
+    - name: Add miniconda bin to path - Unix
+      if: matrix.install-method == 'conda' && matrix.os != 'windows-latest'
+      run: |
+        # echo "PATH=$HOME/miniconda/bin:$PATH" >> $GITHUB_ENV
+        echo "PATH=$CONDA/bin:$PATH" >> $GITHUB_ENV
     # - name: Add miniconda bin to path - Windows
     #   if: matrix.install-method == 'conda' && matrix.os == 'windows-latest'
     #   shell: powershell
@@ -261,6 +261,8 @@ jobs:
       run: python utils/ci_setup.py ${{ matrix.install-method }} verify
     - name: Run tests
       run: yggtest --ci ${{ matrix.test-flags }}
+    - name: Check for coverage report
+      run: ls -l
     - name: Upload coverage report
       uses: codecov/codecov-action@v1
   docs:
