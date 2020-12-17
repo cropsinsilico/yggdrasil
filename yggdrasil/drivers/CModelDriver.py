@@ -306,8 +306,10 @@ class MSVCCompiler(CCompilerBase):
             print('DEFAULT', cls.linker_attributes['default_executable'])
             if os.environ.get('YGG_LINK_PATH', None):
                 print('YGG_LINK_PATH', os.environ['YGG_LINK_PATH'])
-                assert(os.environ['YGG_LINK_PATH']
-                       == cls.linker_attributes['default_executable'])
+                assert(os.path.isfile(
+                    cls.linker_attributes['default_executable']))
+                # assert(os.environ['YGG_LINK_PATH']
+                #        == cls.linker_attributes['default_executable'])
         CCompilerBase.before_registration(cls)
         
     @classmethod
