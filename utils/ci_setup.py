@@ -384,7 +384,8 @@ def deploy_package_on_ci(method, python=None, without_build=False,
             else:
                 raise NotImplementedError("Could not determine "
                                           "R installation method.")
-        if INSTALLFORTRAN and (not _in_conda):  # and (not _is_win):
+        if INSTALLFORTRAN and ((not _in_conda) or (not _is_win)):
+            # Fortran is not installed via conda on linux/macos
             if _is_linux:
                 os_pkgs.append("gfortran")
             elif _is_osx:
