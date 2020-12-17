@@ -300,14 +300,12 @@ class MSVCCompiler(CCompilerBase):
                   != os.path.dirname(linker_path)))):
             cls.linker_attributes['default_executable'] = os.path.join(
                 os.path.dirname(compiler_path), os.path.basename(linker_path))
-            print('PREVIOUS', linker_path)
-            print('DEFAULT', cls.linker_attributes['default_executable'])
-            if os.environ.get('YGG_LINK_PATH', None):
-                print('YGG_LINK_PATH', os.environ['YGG_LINK_PATH'])
-                assert(os.path.isfile(
-                    cls.linker_attributes['default_executable']))
-                # assert(os.environ['YGG_LINK_PATH']
-                #        == cls.linker_attributes['default_executable'])
+            assert(os.path.isfile(
+                cls.linker_attributes['default_executable']))
+            # if os.environ.get('YGG_LINK_PATH', None):
+            #     print('YGG_LINK_PATH', os.environ['YGG_LINK_PATH'])
+            #     # assert(os.environ['YGG_LINK_PATH']
+            #     #        == cls.linker_attributes['default_executable'])
         CCompilerBase.before_registration(cls)
         
     @classmethod
