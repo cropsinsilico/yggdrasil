@@ -169,13 +169,6 @@ jobs:
       run: |
         echo "TMPDIR=$USERPROFILE\AppData\Local\Temp" >> $GITHUB_ENV
         echo "TEMP=$USERPROFILE\AppData\Local\Temp" >> $GITHUB_ENV
-    - name: Set up MSVC Compiler
-      uses: ilammy/msvc-dev-cmd@v1
-      if: matrix.os == 'windows-latest' && env.INSTALLC == 1
-    - name: Record location of MSVC tools on Windows
-      if: matrix.os == 'windows-latest' && env.INSTALLC == 1
-      run: |
-        echo "YGG_LINK_PATH=$(which link.exe)" >> $GITHUB_ENV
     - name: Cache conda
       uses: actions/cache@v1
       env:
@@ -194,6 +187,13 @@ jobs:
         use-only-tar-bz2: true
         activate-environment: ''
         # auto-activate-base: false
+    - name: Set up MSVC Compiler
+      uses: ilammy/msvc-dev-cmd@v1
+      if: matrix.os == 'windows-latest' && env.INSTALLC == 1
+    - name: Record location of MSVC tools on Windows
+      if: matrix.os == 'windows-latest' && env.INSTALLC == 1
+      run: |
+        echo "YGG_LINK_PATH=$(which link.exe)" >> $GITHUB_ENV
     # - name: Add miniconda bin to path - Unix
     #   if: matrix.install-method == 'conda' && matrix.os != 'windows-latest'
     #   run: |
