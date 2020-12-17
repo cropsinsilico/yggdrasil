@@ -822,6 +822,9 @@ class CompilationToolBase(object):
                 base_paths.append(os.path.join(os.environ['VCPKG_ROOT'],
                                                'installed',
                                                'x64-windows'))
+                if libtype == 'shared':
+                    paths.append(os.path.join(os.environ['VCPKG_ROOT'],
+                                              'packages'))
         else:
             base_paths = ['/usr', os.path.join('/usr', 'local')]
         if platform._is_mac:
