@@ -441,7 +441,7 @@ def deploy_package_on_ci(method, python=None, without_build=False,
                 # if os.environ.get('VCPKG_ROOT', None):
                 #     vcpkg_exe = os.path.join(os.environ['VCPKG_ROOT'],
                 #                              vcpkg_exe)
-                cmds += ["%s install %s --triplet x64-windows"
+                cmds += ["%s install %s"  # --triplet x64-windows"
                          % (vcpkg_exe, ' '.join(vcpkg_pkgs))]
         else:
             raise NotImplementedError("No native package manager supported "

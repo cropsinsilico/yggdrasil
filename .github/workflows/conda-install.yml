@@ -62,6 +62,7 @@ jobs:
       uses: lukka/run-vcpkg@v6
       with:
         setupOnly: true
+        vcpkgTriplet: x64-windows
     - name: Cache pip - Linux
       uses: actions/cache@v2
       if: startsWith(runner.os, 'Linux')
