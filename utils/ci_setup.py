@@ -422,7 +422,7 @@ def deploy_package_on_ci(method, python=None, without_build=False,
                 cmds += ["brew uninstall --ignore-dependencies pkg-config"]
             if 'gcc' in os_pkgs:
                 cmds += ["brew reinstall gcc"]
-                os.remove('gcc')
+                os_pkgs.remove('gcc')
             cmds += ["brew install %s" % ' '.join(os_pkgs)]
         elif _is_win:
             if windows_package_manager == 'choco':
