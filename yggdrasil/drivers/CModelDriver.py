@@ -71,10 +71,8 @@ class CCompilerBase(CompilerBase):
     default_flags = ['-g', '-Wall']
     # GCC & CLANG have similar call patterns
     linker_attributes = {'default_flags_env': 'LDFLAGS',
-                         'search_path_envvar': [
-                             'LIBRARY_PATH', 'LD_LIBRARY_PATH',
-                             'LIB', 'LIBPATH']}
-    search_path_envvar = ['C_INCLUDE_PATH', 'INCLUDE']
+                         'search_path_envvar': ['LIBRARY_PATH', 'LD_LIBRARY_PATH']}
+    search_path_envvar = ['C_INCLUDE_PATH']
     search_path_flags = ['-E', '-v', '-xc', '/dev/null']
     search_regex_begin = '#include "..." search starts here:'
     search_regex_end = 'End of search list.'
@@ -265,7 +263,7 @@ class MSVCCompiler(CCompilerBase):
     default_linker = 'LINK'
     default_archiver = 'LIB'
     linker_switch = '/link'
-    # search_path_envvar = ['INCLUDE']
+    search_path_envvar = ['INCLUDE']
     search_path_flags = None
     version_flags = []
     product_exts = ['.dir', '.ilk', '.pdb', '.sln', '.vcxproj', '.vcxproj.filters',
@@ -283,7 +281,7 @@ class MSVCCompiler(CCompilerBase):
                                   ('library_libs_nonstd', ''),
                                   ('library_dirs', '/LIBPATH:%s')]),
                              shared_library_flag='/DLL',
-                             # search_path_envvar=['LIB'],
+                             search_path_envvar=['LIB'],
                              search_path_flags=None)
     toolset = 'msvc'
     
@@ -337,9 +335,7 @@ class LDLinker(LinkerBase):
     default_executable_env = 'LD'
     default_flags_env = 'LDFLAGS'
     version_flags = ['-v']
-    search_path_envvar = CCompilerBase.linker_attributes[
-        'search_path_envvar'].copy()
-    # search_path_envvar = ['LIBRARY_PATH', 'LD_LIBRARY_PATH']
+    search_path_envvar = ['LIBRARY_PATH', 'LD_LIBRARY_PATH']
 
     @classmethod
     def tool_version(cls, **kwargs):
@@ -429,9 +425,7 @@ class ARArchiver(ArchiverBase):
     output_first_library = True
     toolset = 'gnu'
     compatible_toolsets = ['llvm']
-    search_path_envvar = CCompilerBase.linker_attributes[
-        'search_path_envvar'].copy()
-    # search_path_envvar = ['LIBRARY_PATH']
+    search_path_envvar = ['LIBRARY_PATH']
 
 
 class LibtoolArchiver(ArchiverBase):
@@ -441,9 +435,7 @@ class LibtoolArchiver(ArchiverBase):
     default_executable_env = 'LIBTOOL'
     static_library_flag = '-static'  # This is the default
     toolset = 'clang'
-    search_path_envvar = CCompilerBase.linker_attributes[
-        'search_path_envvar'].copy()
-    # search_path_envvar = ['LIBRARY_PATH']
+    search_path_envvar = ['LIBRARY_PATH']
     
 
 class MSVCArchiver(ArchiverBase):
@@ -455,9 +447,7 @@ class MSVCArchiver(ArchiverBase):
     output_key = '/OUT:%s'
     toolset = 'msvc'
     compatible_toolsets = ['llvm']
-    search_path_envvar = CCompilerBase.linker_attributes[
-        'search_path_envvar'].copy()
-    # search_path_envvar = ['LIB']
+    search_path_envvar = ['LIB']
     
     # @classmethod
     # def is_import_lib(cls, libpath):
