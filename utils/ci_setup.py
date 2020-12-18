@@ -351,7 +351,8 @@ def deploy_package_on_ci(method, python=None, without_build=False,
                                'm2w64-toolchain_win-64']
             else:
                 conda_pkgs += ['fortran-compiler']
-        elif not shutil.which('gfortran'):
+        else:
+            # elif not shutil.which('gfortran'):
             # Fortran is not installed via conda on linux/macos
             if _is_linux:
                 os_pkgs.append("gfortran")
