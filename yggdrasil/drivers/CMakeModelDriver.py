@@ -457,15 +457,21 @@ class CMakeConfigure(BuildToolBase):
                     compile_flags.append(x)
         # Find Python using cmake
         # https://martinopilia.com/posts/2018/09/15/building-python-extension.html
-        preamble_lines.append('find_package(PythonInterp REQUIRED)')
-        preamble_lines.append('find_package(PythonLibs REQUIRED)')
-        preamble_lines.append('INCLUDE_DIRECTORIES(${PYTHON_INCLUDE_DIRS})')
-        lines.append('TARGET_LINK_LIBRARIES(%s ${PYTHON_LIBRARIES})'
-                     % target)
+        # preamble_lines.append('find_package(PythonInterp REQUIRED)')
+        # preamble_lines.append('find_package(PythonLibs REQUIRED)')
+        # preamble_lines.append('INCLUDE_DIRECTORIES(${PYTHON_INCLUDE_DIRS})')
+        # lines.append('TARGET_LINK_LIBRARIES(%s ${PYTHON_LIBRARIES})'
+        #              % target)
         python_flags = sysconfig.get_config_var('LIBS')
+        if platform._is_mac:
+            import pprint
+            logger.info("CONFIG VARS: %s"
+                        % pprint.pformat(sysconfig.get_config_vars()))
+            logger.info("PYTHON FLAGS: %s" % sysconfig.get_config_var('LDFLAGS'))
+            logger.info("PYTHON LIBS: %s" % python_flags)
         if python_flags:
             for x in python_flags.split():
-                if x.startswith('-l') and (x not in linker_flags):
+                if x.startswith(('-L', '-l')) and (x not in linker_flags):
                     linker_flags.append(x)
         # Compilation flags
         for x in compile_flags:
