@@ -552,8 +552,9 @@ def verify_package_on_ci(method):
     with open(".coveragerc", "r") as fd:
         print(fd.read())
     subprocess.check_call(["ygginfo", "--verbose"], cwd=src_dir)
-    subprocess.check_call(["yggccflags"], cwd=src_dir)
-    subprocess.check_call(["yggldflags"], cwd=src_dir)
+    if INSTALLC:
+        subprocess.check_call(["yggccflags"], cwd=src_dir)
+        subprocess.check_call(["yggldflags"], cwd=src_dir)
     # Verify that languages are installed
     sys.stdout.flush()
     from yggdrasil.tools import is_lang_installed, is_comm_installed
