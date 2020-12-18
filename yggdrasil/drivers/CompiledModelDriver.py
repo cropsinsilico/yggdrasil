@@ -1565,7 +1565,7 @@ class LinkerBase(CompilationToolBase):
             cls.library_ext = '.dll'
             cls.executable_ext = '.exe'
             cls.search_path_env += [
-                'DLLs', os.path.join('library', 'bin')]
+                'DLLs', os.path.join('library', 'bin'), 'Library']
             cls.all_library_ext = ['.dll', '.lib', '.dll.a']
         elif platform._is_mac:
             # TODO: Dynamic library by default on windows?
@@ -1845,7 +1845,8 @@ class ArchiverBase(LinkerBase):
             setattr(cls, k, None)
         if platform._is_win:  # pragma: windows
             cls.library_ext = '.lib'
-            cls.search_path_env = [os.path.join('library', 'lib')]
+            cls.search_path_env = [os.path.join('library', 'lib'),
+                                   'Library']
         else:
             cls.library_ext = '.a'
 
