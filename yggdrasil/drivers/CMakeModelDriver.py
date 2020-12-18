@@ -454,6 +454,11 @@ class CMakeConfigure(BuildToolBase):
             for x in new_flags:
                 if x not in compile_flags:
                     compile_flags.append(x)
+        # Find Python using cmake
+        preamble_lines.append('find_package(PythonLibs REQUIRED)')
+        preamble_lines.append('INCLUDE_DIRECTORIES(${PYTHON_INCLUDE_DIRS})')
+        lines.append('TARGET_LINK_LIBRARIES(%s ${PYTHON_LIBRARIES})'
+                     % target)
         python_flags = sysconfig.get_config_var('LIBS')
         if python_flags:
             for x in python_flags.split():
