@@ -1,5 +1,6 @@
 import os
 import re
+import sys
 import shutil
 import logging
 import sysconfig
@@ -455,6 +456,8 @@ class CMakeConfigure(BuildToolBase):
                 if x not in compile_flags:
                     compile_flags.append(x)
         # Find Python using cmake
+        # https://martinopilia.com/posts/2018/09/15/building-python-extension.html
+        preamble_lines.append('find_package(PythonInterp REQUIRED)')
         preamble_lines.append('find_package(PythonLibs REQUIRED)')
         preamble_lines.append('INCLUDE_DIRECTORIES(${PYTHON_INCLUDE_DIRS})')
         lines.append('TARGET_LINK_LIBRARIES(%s ${PYTHON_LIBRARIES})'
@@ -975,6 +978,8 @@ class CMakeModelDriver(BuildModelDriver):
                 # else:
                 #     kwargs.setdefault('generator', 'MSYS Makefiles')
         out = super(CMakeModelDriver, cls).update_compiler_kwargs(**kwargs)
+        out.setdefault('definitions', [])
+        out['definitions'].append('PYTHON_EXECUTABLE=%s' % sys.executable)
         if CModelDriver._osx_sysroot is not None:
             out.setdefault('definitions', [])
             out['definitions'].append(
