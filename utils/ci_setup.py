@@ -359,7 +359,8 @@ def deploy_package_on_ci(method, python=None, without_build=False,
                 os_pkgs.append("gcc")
                 os_pkgs.append("gfortran")
             elif _is_win and (not _in_conda):
-                vcpkg_pkgs.append("vcpkg-gfortran")
+                choco_pkgs += ["mingw"]
+                # vcpkg_pkgs.append("vcpkg-gfortran")
     if INSTALLR:
         if (method == 'pip') and _in_conda:
             conda_pkgs.append('r-base')
