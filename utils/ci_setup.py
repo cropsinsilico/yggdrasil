@@ -344,32 +344,26 @@ def deploy_package_on_ci(method, python=None, without_build=False,
         default_pkgs.append('trimesh')
     if INSTALLPYGMENTS:
         default_pkgs.append('pygments')
-    if (method == 'pip') and _in_conda:
-        if INSTALLR:
-            conda_pkgs.append('r-base')
-        if INSTALLFORTRAN:
+    if INSTALLFORTRAN:
+        if (method == 'pip') and _in_conda:
             if _is_win:
                 conda_pkgs += ['m2w64-gcc-fortran', 'make',
                                'm2w64-toolchain_win-64']
             else:
                 conda_pkgs += ['fortran-compiler']
-        if INSTALLZMQ:
-            conda_pkgs += ['czmq', 'zeromq']
-    if BUILDDOCS:
-        requirements_files.append('requirements_documentation.txt')
-        if not _in_conda:
-            os_pkgs.append("doxygen")
-    if GITHUB_ACTIONS and _is_linux and _in_conda:
-        # Do both to ensure that the path is set for the installation
-        # and in following steps
-        cmds += [
-            "export LD_LIBRARY_PATH=$CONDA_PREFIX/lib:$LD_LIBRARY_PATH",
-            "echo -n \"LD_LIBRARY_PATH=\" >> $GITHUB_ENV",
-            "echo $CONDA_PREFIX/lib:$LD_LIBRARY_PATH >> $GITHUB_ENV"
-        ]
-    # Install dependencies
-    if method == 'pip':
-        if INSTALLR and (not _in_conda):
+        elif not shutil.which('gfortran'):
+            # Fortran is not installed via conda on linux/macos
+            if _is_linux:
+                os_pkgs.append("gfortran")
+            elif _is_osx:
+                os_pkgs.append("gcc")
+                os_pkgs.append("gfortran")
+            elif _is_win and (not _in_conda):
+                vcpkg_pkgs.append("vcpkg-gfortran")
+    if INSTALLR:
+        if (method == 'pip') and _in_conda:
+            conda_pkgs.append('r-base')
+        elif not _in_conda:
             if _is_linux:
                 cmds += [("sudo add-apt-repository 'deb https://cloud"
                           ".r-project.org/bin/linux/ubuntu xenial-cran35/'"),
@@ -384,16 +378,10 @@ def deploy_package_on_ci(method, python=None, without_build=False,
             else:
                 raise NotImplementedError("Could not determine "
                                           "R installation method.")
-        if INSTALLFORTRAN and ((not _in_conda) or (not _is_win)):
-            # Fortran is not installed via conda on linux/macos
-            if _is_linux:
-                os_pkgs.append("gfortran")
-            elif _is_osx:
-                os_pkgs.append("gcc")
-                os_pkgs.append("gfortran")
-            elif _is_win:
-                vcpkg_pkgs.append("vcpkg-gfortran")
-        if INSTALLZMQ and (not _in_conda):
+    if INSTALLZMQ:
+        if (method == 'pip') and _in_conda:
+            conda_pkgs += ['czmq', 'zeromq']
+        elif not _in_conda:
             if _is_linux:
                 os_pkgs += ["libczmq-dev", "libzmq3-dev"]
             elif _is_osx:
@@ -414,6 +402,19 @@ def deploy_package_on_ci(method, python=None, without_build=False,
             # else:
             #     raise NotImplementedError("Could not determine "
             #                               "ZeroMQ installation method.")
+    if BUILDDOCS:
+        requirements_files.append('requirements_documentation.txt')
+        if not _in_conda:
+            os_pkgs.append("doxygen")
+    if GITHUB_ACTIONS and _is_linux and _in_conda:
+        # Do both to ensure that the path is set for the installation
+        # and in following steps
+        cmds += [
+            "export LD_LIBRARY_PATH=$CONDA_PREFIX/lib:$LD_LIBRARY_PATH",
+            "echo -n \"LD_LIBRARY_PATH=\" >> $GITHUB_ENV",
+            "echo $CONDA_PREFIX/lib:$LD_LIBRARY_PATH >> $GITHUB_ENV"
+        ]
+    # Install dependencies
     if os_pkgs or (_is_win and (choco_pkgs or vcpkg_pkgs)):
         if _is_linux:
             cmds += ["sudo apt update"]
