@@ -119,8 +119,20 @@ def ygginfo():
             curr_prefix = curr_prefix.rsplit(prefix, 1)[0]
         # Add verbose information
         if args.verbose:
+            # Path variables
+            path_vars = ['PATH', 'C_INCLUDE_PATH', 'INCLUDE', 'LIBRARY_PATH',
+                         'LD_LIBRARY_PATH', 'LIB']
+            vardict.append(('Environment paths:', ''))
+            curr_prefix += prefix
+            for k in path_vars:
+                vardict.append(
+                    (curr_prefix + k, '\n%s%s'
+                     % (curr_prefix + prefix,
+                        ("\n" + curr_prefix + prefix).join(
+                            os.environ.get(k, '').split(os.pathsep)))))
+            curr_prefix = curr_prefix.rsplit(prefix, 1)[0]
             # Environment variabless
-            env_vars = ['PATH', 'CONDA_PREFIX', 'CONDA', 'SDKROOT']
+            env_vars = ['CONDA_PREFIX', 'CONDA', 'SDKROOT']
             if platform._is_win:  # pragma: windows
                 env_vars += ['VCPKG_ROOT']
             vardict.append(('Environment variables:', ''))
