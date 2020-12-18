@@ -381,8 +381,8 @@ class FortranModelDriver(CompiledModelDriver):
             if cxx_lib not in cls.external_libraries:
                 cls.external_libraries[cxx_lib] = cxx_orig.copy()
                 cls.internal_libraries['fygg']['external_dependencies'].append(cxx_lib)
-                if platform._is_win:  # pragma: windows
-                    cls.external_libraries[cxx_lib]['libtype'] = 'windows_import'
+                # if platform._is_win:  # pragma: windows
+                #     cls.external_libraries[cxx_lib]['libtype'] = 'windows_import'
         if platform._is_win:  # pragma: windows
             cl_compiler = get_compilation_tool('compiler', 'cl')
             if not cl_compiler.is_installed():  # pragma: debug
