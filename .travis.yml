@@ -274,8 +274,8 @@ jobs:
         provider: pypi
         skip_existing: true
         distributions: sdist bdist_wheel --universal
-        user: langmm
+        username: "__token__"
         password:
-          secure: cYP65ktykU8vzNpjDxVJ7hb5VIA8pcG0+LfaboyJ/7jJ85OFFMb7k12cuzmcFgyCMzxaMaR74ZwSL1Zs3jwfpsfKt22rdXV3YtAlrbLfHDd1ReoPeg6ZHSHYlZq/pkGowB7OHZMPaF7Pwjl2igWE1ZrJ8q/K2vVCt/cv9JhZXZS3nnC3iTY9jbvq/sWp6QChy61s5ekxf9m3PJBcS3s/n34ZyuQt8eF73YSMlztWNLTBWKIfK2LOpDXXKDWhFRDhlmt3mA88I2HI1ZxFyANIrrMwGEBIJOVWlAfnPOdoI36JW9wqv3DXj9RGVDNcVwfW5/juxMF+DSHORwQDuTn3E6Z0Q/ic6rLndI+vzHjYdjPeLXutggOEGTjq32LP6FkJ+3LyrFoQXwZIZ+FqLRni/HyppoyIQ+S5NneLB7Wj5Hyja7ycmwLZnlnixUz3qHOvIv6Hpv/koDltqyB5gzf0xvbNUMkRCHuuovtbqtmRtxA1BL8VKoGVzZ7zHrWG+iTGZXSFhgrcO1k8OYzxaWR2O/NeeURuy3ViD+xzPSvMASRX0sCULOf3o2rgDdJyTBjW5KZcLqVcOiGZoHgwOjZY0NQ50R7mE7T+CQmoYtil1Ovmm8b6NUhoE0z6jEgDVfEhKo9/WACHamzIQ4afrYsEWlQhDSg+dvrzS7OciILOK+Q=
+          secure: "iRsnZ8i1fWoqZVQd7LzX8L+z3aS/c1io/tUHApJE8ujHdNF7owtLyg1JG9eUWdinfApv0WS7uaoUxdM44I3eMpFdsXBXCEcQZ77ZQEJ5kO+QqqSfPX6BO/hKTcckuw3UMWYMxWk7BmreUFBFwV1vx5/o0Wv+vql968+zhHILtWnaW+1jhDwHn2FmUZ9ESXww87FyJhcpvvsCQOXBTKEWN2AOToLaU4NWvzrHi5B7Vr9+4rZ70HyUwCIhb53ktZ+3Xn0zZwbf5or7XbRPrkfiVHqX2ywfa2lQU+59KHwXG0UHt8cSqvD08Tig3QgFO76SAsLXaJ+GI1YPTJ/Q/2xC+5N5tWDi1wL8SXmetjnku3/PGk9tfljVbMVErDLq8Vchra/w8AQ1EAyyhV4xBRIWJr/PlwsjxHB+qNnJ5S/x/0ZeSylUsPlQNTsqRqHdMYNJR1m1/pJqzZ6WURMVW2A341fRHHZNFQDNFePWvEA1qWKmeCWkKeKAu22TbIl0YlIX4m/y87BfjuHq4pditoIMws5K9SH4HVgrm4Kcqo8JlYN8bsTDlKw0ydtHZAYnh2BS6KHaCQqM+03/8yBrnrP0nzei1qkFVfAoAKcPMIsEYcPcme9MgJG5j/pAAzY1VeY52zgc7F9FRVmufKxEfro2Gcid/PW0reaPZgqD98B+ubo="
         on:
           tags: true
