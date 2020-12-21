@@ -422,14 +422,11 @@ def deploy_package_on_ci(method, python=None, without_build=False,
             cmds += ["sudo apt update"]
             cmds += ["sudo apt-get install %s" % ' '.join(os_pkgs)]
         elif _is_osx:
-            # if not _in_conda:
-            #     cmds += ["brew install gettext"]
-            #     cmds += ["brew link gettext"]
-            #     # cmds += ["brew uninstall --ignore-dependencies pkg-config"]
-            if 'gcc' in os_pkgs:
-                cmds += ["brew reinstall gcc"]
-                os_pkgs.remove('gcc')
-            cmds += ["brew install %s" % ' '.join(os_pkgs)]
+            if not os.environ.get('TRAVIS_OS_NAME', False):
+                if 'gcc' in os_pkgs:
+                    cmds += ["brew reinstall gcc"]
+                    os_pkgs.remove('gcc')
+                cmds += ["brew install %s" % ' '.join(os_pkgs)]
         elif _is_win:
             if windows_package_manager == 'choco':
                 choco_pkgs += os_pkgs
