@@ -852,7 +852,7 @@ class CommBase(tools.YggClass):
             kwargs.setdefault('address', env[name])
         elif name in os.environ:
             kwargs.setdefault('address', os.environ[name])
-        new_commtype = kwargs.pop('new_commtype', None)
+        new_commtype = kwargs.pop('commtype', None)
         if dont_create:
             args = tuple([name] + list(args))
         else:

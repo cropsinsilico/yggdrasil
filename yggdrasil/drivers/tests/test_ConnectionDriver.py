@@ -219,12 +219,12 @@ class TestConnectionParam(parent.TestParam):
         if comm in ['ocomm', 'both']:
             for x in kwargs['outputs']:
                 x.update(base_commtype=self.ocomm_name,
-                         new_commtype='ErrorComm',
+                         commtype='ErrorComm',
                          error_on_init=error_on_init)
         if comm in ['icomm', 'both']:
             for x in kwargs['inputs']:
                 x.update(base_commtype=self.icomm_name,
-                         new_commtype='ErrorComm',
+                         commtype='ErrorComm',
                          error_on_init=error_on_init)
         # Get error class
         if (error_class is None) and (comm in ['ocomm', 'icomm', 'both']):

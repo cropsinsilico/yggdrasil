@@ -162,14 +162,15 @@ class TestCommBase(YggTestClassInfo):
         r"""Get comm instance with ErrorClass parent class."""
         try:
             send_kwargs = self.send_inst_kwargs
-            err_kwargs = dict(base_commtype=send_kwargs['commtype'],
-                              new_commtype='ErrorComm')
+            base_commtype = send_kwargs['commtype']
+            err_kwargs = dict(base_commtype=base_commtype,
+                              commtype='ErrorComm')
             err_name = self.name + '_' + self.uuid
             if not recv:
                 send_kwargs.update(**err_kwargs)
             send_inst = new_comm(err_name, **send_kwargs)
             recv_kwargs = send_inst.opp_comm_kwargs()
-            recv_kwargs['commtype'] = send_kwargs['commtype']
+            recv_kwargs['commtype'] = base_commtype
             if recv:
                 recv_kwargs.update(**err_kwargs)
             recv_inst = new_comm(err_name, **recv_kwargs)
@@ -274,7 +275,7 @@ class TestCommBase(YggTestClassInfo):
         header_recv = dict(id=self.uuid + '1', address=wc_send.address)
         recv_kwargs = self.instance.get_work_comm_kwargs
         recv_kwargs['work_comm_name'] = 'test_worker_%s' % header_recv['id']
-        recv_kwargs['new_commtype'] = wc_send._commtype
+        recv_kwargs['commtype'] = wc_send._commtype
         if isinstance(wc_send.opp_address, str):
             os.environ[recv_kwargs['work_comm_name']] = wc_send.opp_address
         else:
