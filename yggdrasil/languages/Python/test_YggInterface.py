@@ -81,8 +81,8 @@ def do_send_recv(language='python', fmt='%f\\n%d', msg=[float(1.0), int(2)],
     # Create and start drivers to transport messages
     iodrv = ConnectionDriver.ConnectionDriver(
         name,
-        icomm_kws={'partner_model': 'model1'},
-        ocomm_kws={'partner_model': 'model2'})
+        inputs=[{'partner_model': 'model1'}],
+        outputs=[{'partner_model': 'model2'}])
     iodrv.start()
     os.environ.update(iodrv.icomm.opp_comms)
     os.environ.update(iodrv.ocomm.opp_comms)
@@ -377,7 +377,7 @@ class TestYggRpcClient(TestYggOutput):
     def iodriver_args(self):
         r"""list: Connection driver arguments."""
         args, kwargs = super(TestYggRpcClient, self).iodriver_args
-        kwargs['icomm_kws']['comm_list'] = [
+        kwargs['inputs'] = [
             {'name': '%s:%s_%s' % (
                 self.model1, self.name, self.model1),
              'partner_model': self.model1}]
@@ -424,7 +424,7 @@ class TestYggRpcServer(TestYggInput):
     def iodriver_args(self):
         r"""list: Connection driver arguments."""
         args, kwargs = super(TestYggRpcServer, self).iodriver_args
-        kwargs['icomm_kws']['comm_list'] = [
+        kwargs['inputs'] = [
             {'name': '%s:%s_%s' % (
                 self.model1, self.name, self.model1),
              'partner_model': self.model1}]
