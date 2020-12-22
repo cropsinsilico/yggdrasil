@@ -14,12 +14,12 @@ addons:
   homebrew: &native_deps_brew
     packages:
       - valgrind
-      - zmq
-      - czmq
-      - r
-      - udunits
-      - gcc
-      - gfortran
+      # - zmq
+      # - czmq
+      # - r
+      # - udunits
+      # - gcc
+      # - gfortran
     update: true
 
 os:
