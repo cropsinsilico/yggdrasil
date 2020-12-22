@@ -100,6 +100,10 @@ jobs:
       run: |
         yggtest --ci --with-examples --language=c yggdrasil/examples/tests/test_timed_pipe.py --debug
         yggtest --ci --test-suite=timing --debug
+    - name: Run CMake tests
+      if: matrix.os == 'macos-latest'
+      run: |
+        yggtest --ci yggdrasil/drivers/tests/test_CMakeModelDriver.py::TestCMakeModelDriverNoInit::test_run_model
     - name: Run tests
       run: yggtest --ci ${{ matrix.test-flags }}
     - name: Upload coverage report
