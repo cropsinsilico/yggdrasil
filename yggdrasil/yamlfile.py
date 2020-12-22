@@ -394,24 +394,6 @@ def parse_model(yml, existing):
     _lang2driver = get_schema()['model'].subtype2class
     language = yml.pop('language')
     yml['driver'] = _lang2driver[language]
-    # Add timesync server
-    if yml.get('timesync', False):
-        if yml['timesync'] is True:
-            yml['timesync'] = 'timesync'
-        tsync = yml['timesync']
-        yml.setdefault('client_of', [])
-        yml['client_of'].append(tsync)
-        if tsync not in existing['model']:
-            tsync_yml = {'name': tsync, 'args': [],
-                         'language': 'timesync', 'is_server': True,
-                         'working_dir': os.getcwd(),
-                         'inputs': [], 'outputs': []}
-            existing = parse_component(tsync_yml, 'model',
-                                       existing=existing)
-    if (language == 'timesync'):
-        if (yml['name'] in existing['model']):
-            existing['model'].pop(yml['name'])
-        yml.update(is_server=True, inputs=[], outputs=[])
     # Add server input
     if yml.get('is_server', False):
         srv = {'name': '%s:%s' % (yml['name'], yml['name']),
@@ -457,11 +439,16 @@ def parse_model(yml, existing):
             yml['inputs'].append(srv)
         yml['clients'] = []
         existing['server'].setdefault(srv['name'], [])
+    # Mark timesync clients
+    timesync = yml.pop('timesync_client_of', [])
+    if timesync:
+        yml.setdefault('client_of', [])
+        yml['client_of'] += timesync
     # Add client output
     if yml.get('client_of', []):
         for srv in yml['client_of']:
             srv_name = '%s:%s' % (srv, srv)
-            if srv == yml.get('timesync', False):
+            if srv in timesync:
                 cli_name = '%s:%s' % (yml['name'], srv)
             else:
                 cli_name = '%s:%s_%s' % (yml['name'], srv, yml['name'])
