@@ -6,10 +6,6 @@ int main(int argc, char *argv[]) {
     printf("Error in C pipe_src: The message count and size must be provided as input arguments.\n");
     return -1;
   }
-  // Prevent C4100 warning on windows by referencing param
-#ifdef _WIN32
-  argc;
-#endif
   int exit_code = 0;
   int ret = 0;
 

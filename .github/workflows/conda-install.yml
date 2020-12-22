@@ -95,6 +95,11 @@ jobs:
     #   run: ls C:\\vcpkg\\installed\\x64-windows\\lib
     - name: Verify installation
       run: python utils/ci_setup.py ${{ matrix.install-method }} verify
+    - name: Run timing tests
+      if: matrix.os == 'windows-latest'
+      run: |
+        yggtest --ci --with-examples --language=c yggdrasil/examples/tests/test_timed_pipe.py --debug
+        yggtest --ci --test-suite=timing --debug
     - name: Run tests
       run: yggtest --ci ${{ matrix.test-flags }}
     - name: Upload coverage report
