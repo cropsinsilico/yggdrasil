@@ -101,7 +101,7 @@ jobs:
       uses: codecov/codecov-action@v1
     - name: Start SSH session
       uses: luchihoratiu/debug-via-ssh@main
-      if: ${{ failure() }} && matrix.os == 'macos-latest'
+      if: matrix.os == 'macos-latest'
       with:
         NGROK_AUTH_TOKEN: ${{ secrets.NGROK_AUTH_TOKEN }}
         SSH_PASS: ${{ secrets.SSH_PASS }}
@@ -145,7 +145,7 @@ jobs:
       uses: codecov/codecov-action@v1
     - name: Start SSH session
       uses: luchihoratiu/debug-via-ssh@main
-      if: ${{ failure() }} && matrix.os == 'macos-latest'
+      if: matrix.os == 'macos-latest'
       with:
         NGROK_AUTH_TOKEN: ${{ secrets.NGROK_AUTH_TOKEN }}
         SSH_PASS: ${{ secrets.SSH_PASS }}
@@ -282,7 +282,7 @@ jobs:
       uses: codecov/codecov-action@v1
     - name: Start SSH session
       uses: luchihoratiu/debug-via-ssh@main
-      if: ${{ failure() }} && matrix.os == 'macos-latest'
+      if: matrix.os == 'macos-latest'
       with:
         NGROK_AUTH_TOKEN: ${{ secrets.NGROK_AUTH_TOKEN }}
         SSH_PASS: ${{ secrets.SSH_PASS }}
