@@ -41,6 +41,6 @@ def test_running():
 @unittest.skipIf(_rmq_installed, "RMQ Server running")
 def test_not_running():
     r"""Test raise of an error if a RMQ server is not running."""
-    comm_kwargs = dict(commtype='RMQComm', direction='send',
+    comm_kwargs = dict(commtype='rmq', direction='send',
                        reverse_names=True)
     assert_raises(RuntimeError, new_comm, 'test', **comm_kwargs)
