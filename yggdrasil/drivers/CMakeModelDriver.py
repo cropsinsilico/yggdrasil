@@ -468,12 +468,6 @@ class CMakeConfigure(BuildToolBase):
         # lines.append('TARGET_LINK_LIBRARIES(%s ${PYTHON_LIBRARIES})'
         #              % target)
         python_flags = sysconfig.get_config_var('LIBS')
-        if platform._is_mac:
-            import pprint
-            logger.info("CONFIG VARS: %s"
-                        % pprint.pformat(sysconfig.get_config_vars()))
-            logger.info("PYTHON FLAGS: %s" % sysconfig.get_config_var('LDFLAGS'))
-            logger.info("PYTHON LIBS: %s" % python_flags)
         if python_flags:
             for x in python_flags.split():
                 if x.startswith(('-L', '-l')) and (x not in linker_flags):
@@ -560,11 +554,8 @@ class CMakeConfigure(BuildToolBase):
         # https://stackoverflow.com/questions/54068035/linking-not-working-in
         # -homebrews-cmake-since-mojave
         if platform._is_mac:
-            # TODO: Include might need to be added as well
-            print('BEFORE MAC SPECIFIC', pretarget_lines)
             pretarget_lines.append('LINK_DIRECTORIES(/usr/lib)')
             pretarget_lines.append('LINK_DIRECTORIES(/usr/local/lib)')
-            verbose = True
         lines = preamble_lines + lines
         log_msg = (
             'CMake compiler flags:\n\t%s\n'
@@ -841,7 +832,8 @@ class CMakeModelDriver(BuildModelDriver):
             driver=self.target_language_driver,
             toolname=self.target_compiler,
             logging_level=self.logger.getEffectiveLevel(),
-            configuration=self.configuration)
+            configuration=self.configuration,
+            verbose=kwargs.get('verbose', False))
         assert(os.path.isfile(include_file))
         out.append(include_file)
         # Create copy of cmakelists and modify
