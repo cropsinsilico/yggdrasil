@@ -28,7 +28,8 @@ jobs:
     strategy:
       max-parallel: 5
       matrix:
-        os: [ubuntu-latest, macos-latest, windows-latest]
+        # os: [ubuntu-latest, macos-latest, windows-latest]
+        os: [macos-latest]
         python-version: [3.6]
         install-method: [pip]
         test-flags: [--long-running, --test-suite=examples]
@@ -110,16 +111,16 @@ jobs:
       with:
         NGROK_AUTH_TOKEN: ${{ secrets.NGROK_AUTH_TOKEN }}
         SSH_PASS: ${{ secrets.SSH_PASS }}
-    - name: Run tests
-      run: yggtest --ci ${{ matrix.test-flags }}
-    - name: Upload coverage report
-      uses: codecov/codecov-action@v1
-    - name: Start SSH session
-      uses: luchihoratiu/debug-via-ssh@main
-      if: matrix.os == 'macos-latest'
-      with:
-        NGROK_AUTH_TOKEN: ${{ secrets.NGROK_AUTH_TOKEN }}
-        SSH_PASS: ${{ secrets.SSH_PASS }}
+    # - name: Run tests
+    #   run: yggtest --ci ${{ matrix.test-flags }}
+    # - name: Upload coverage report
+    #   uses: codecov/codecov-action@v1
+    # - name: Start SSH session
+    #   uses: luchihoratiu/debug-via-ssh@main
+    #   if: matrix.os == 'macos-latest'
+    #   with:
+    #     NGROK_AUTH_TOKEN: ${{ secrets.NGROK_AUTH_TOKEN }}
+    #     SSH_PASS: ${{ secrets.SSH_PASS }}
 
   build_rmq:
     name: Build RMQ (${{ matrix.python-version }}, ${{ matrix.os }}, ${{ matrix.install-method }})
@@ -165,196 +166,196 @@ jobs:
         NGROK_AUTH_TOKEN: ${{ secrets.NGROK_AUTH_TOKEN }}
         SSH_PASS: ${{ secrets.SSH_PASS }}
 
-  build_conda:
-    name: Build (${{ matrix.python-version }}, ${{ matrix.os }}, ${{ matrix.install-method }})
-    runs-on: ${{ matrix.os }}
-    strategy:
-      max-parallel: 5
-      matrix:
-        os: [ubuntu-latest, macos-latest, windows-latest]
-        python-version: [3.6]
-        install-method: [conda]
-        test-flags: [--long-running]  # , --test-suite=examples]
-        include:
-          - os: ubuntu-latest
-            python-version: 3.8
-            install-method: conda
-      fail-fast: false
-    defaults:
-      run:
-        shell: bash -l {0}
-    env:
-      GHA_SHELL: bash
+  # build_conda:
+  #   name: Build (${{ matrix.python-version }}, ${{ matrix.os }}, ${{ matrix.install-method }})
+  #   runs-on: ${{ matrix.os }}
+  #   strategy:
+  #     max-parallel: 5
+  #     matrix:
+  #       os: [ubuntu-latest, macos-latest, windows-latest]
+  #       python-version: [3.6]
+  #       install-method: [conda]
+  #       test-flags: [--long-running]  # , --test-suite=examples]
+  #       include:
+  #         - os: ubuntu-latest
+  #           python-version: 3.8
+  #           install-method: conda
+  #     fail-fast: false
+  #   defaults:
+  #     run:
+  #       shell: bash -l {0}
+  #   env:
+  #     GHA_SHELL: bash
 
-    steps:
-    - uses: actions/checkout@v2
-      with:
-        submodules: true
-    - name: Patch TEMP on Windows
-      if: matrix.os == 'windows-latest'
-      run: |
-        echo "TMPDIR=$USERPROFILE\AppData\Local\Temp" >> $GITHUB_ENV
-        echo "TEMP=$USERPROFILE\AppData\Local\Temp" >> $GITHUB_ENV
-    - name: Cache conda
-      uses: actions/cache@v1
-      env:
-        # Increase this value to reset cache if file not changed
-        CACHE_NUMBER: 0
-      with:
-        path: ~/conda_pkgs_dir
-        key:
-          ${{ runner.os }}-conda-${{ env.CACHE_NUMBER }}-${{
-          hashFiles('recipe/meta.yaml') }}
-    - name: Set up miniconda base environment on Windows
-      uses: conda-incubator/setup-miniconda@v2
-      if: matrix.install-method == 'conda' && matrix.os == 'windows-latest'
-      with:
-        channels: conda-forge
-        use-only-tar-bz2: true
-        activate-environment: ''
-        # auto-activate-base: false
-    - name: Set up MSVC Compiler
-      uses: ilammy/msvc-dev-cmd@v1
-      if: matrix.os == 'windows-latest' && env.INSTALLC == 1
-    - name: Record location of MSVC tools on Windows
-      if: matrix.os == 'windows-latest' && env.INSTALLC == 1
-      run: |
-        echo "YGG_LINK_PATH=$(which link.exe)" >> $GITHUB_ENV
-        echo "YGG_MSVC_BIN=$(dirname $(which link.exe))" $GITHUB_ENV
-    - name: Add miniconda bin to path - Unix
-      if: matrix.install-method == 'conda' && matrix.os != 'windows-latest'
-      run: |
-        # echo "PATH=$HOME/miniconda/bin:$PATH" >> $GITHUB_ENV
-        echo "PATH=$CONDA/bin:$PATH" >> $GITHUB_ENV
-    # - name: Add miniconda bin to path - Windows
-    #   if: matrix.install-method == 'conda' && matrix.os == 'windows-latest'
-    #   shell: powershell
-    #   run: |
-    #     echo "${CONDA}"
-    #     "C:\Miniconda`r`nC:\Miniconda\condabin`r`nC:\Miniconda\Scripts`r`nC:\Miniconda\Library\bin`r`n" + (Get-Content $env:GITHUB_PATH | Out-String) | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8
-    - name: Change ownership of conda on MacOS
-      shell: bash  # --noprofile --norc -eo pipefail {0}
-      if: matrix.os == 'macos-latest'
-      run: |
-        sudo chown -R $(whoami) $CONDA
-    - name: Check Python version in shell - Unix
-      shell: bash
-      if: matrix.os != 'windows-latest'
-      run: |
-        which python
-        python --version
-    - name: Check Python version in shell - Windows
-      if: matrix.os == 'windows-latest'
-      shell: powershell
-      run: |
-        Get-Command python.exe | Select-Object -ExpandProperty Definition
-        python.exe --version
-        python --version
-    - name: Check Python version (that conda expects) - Unix
-      if: matrix.os != 'windows-latest'
-      shell: bash
-      run: |
-        which $CONDA/bin/python
-        $CONDA/bin/python --version
-    - name: Check Python version (that conda expects) - Windows
-      if: matrix.os == 'windows-latest'
-      shell: powershell
-      run: |
-        C:\Miniconda\python.exe --version
-        C:\Miniconda\python --version
-    - name: Build package
-      shell: bash --noprofile --norc -eo pipefail {0}
-      run: python utils/ci_setup.py ${{ matrix.install-method }} build --python ${{ matrix.python-version }}
-    - name: Set up miniconda test environment
-      uses: conda-incubator/setup-miniconda@v2
-      if: matrix.install-method == 'conda'
-      with:
-        # TODO: Move autoupdate into script?
-        # auto-update-conda: true
-        python-version: ${{ matrix.python-version }}
-        channels: conda-forge
-        # channel-priority: strict
-        use-only-tar-bz2: true
-    - name: Install old MacOSX SDK for compatibility with the conda llvm (7)
-      if: matrix.os == 'macos-latest' && matrix.install-method == 'conda'
-      run: ./utils/setup_old_mac_sdk.sh
-    - name: Check for Python library
-      if: matrix.python-version == '3.8'
-      run: |
-        ls /usr/share/miniconda/envs/test/lib
-        ls /usr/share/miniconda/envs/test/lib/python3.8/config-3.8-x86_64-linux-gnu
-    - name: Install dependencies
-      run: python utils/ci_setup.py ${{ matrix.install-method }} deploy --without-build
-    - name: Verify installation
-      run: python utils/ci_setup.py ${{ matrix.install-method }} verify
-    - name: Run tests
-      run: yggtest --ci ${{ matrix.test-flags }}
-    - name: Generate XML version of coverage report and check for coverage report
-      run: |
-        coverage xml
-        ls -la
-    - name: Upload coverage report
-      uses: codecov/codecov-action@v1
-    - name: Start SSH session
-      uses: luchihoratiu/debug-via-ssh@main
-      if: matrix.os == 'macos-latest'
-      with:
-        NGROK_AUTH_TOKEN: ${{ secrets.NGROK_AUTH_TOKEN }}
-        SSH_PASS: ${{ secrets.SSH_PASS }}
-  docs:
-    name: Build the Docs
-    runs-on: ubuntu-latest
-    env:
-      BUILDDOCS: 1
-    steps:
-    - uses: actions/checkout@v2
-      with:
-        submodules: true
-    - name: Set up Python
-      uses: actions/setup-python@v2
-      with:
-        python-version: 3.8
-    - name: Install dependencies
-      run: python utils/ci_setup.py pip deploy
-    - name: Verify installation
-      run: python utils/ci_setup.py pip verify
-    - name: Build the docs
-      run: |
-        cd docs
-        make autodoc
-        cd ../
-    - name: Publish docs to Github pages
-      if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags')
-      uses: JamesIves/github-pages-deploy-action@3.7.1
-      with:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        BRANCH: gh-pages
-        FOLDER: docs/build/html/
-  deploy:
-    name: Publish package
-    needs: [build_pip, build_conda, build_rmq, docs]
-    if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags')
-    runs-on: ubuntu-latest
-    steps:
-    - uses: actions/checkout@v2
-      with:
-        submodules: true
-    - name: Set up Python
-      uses: actions/setup-python@v2
-      with:
-        python-version: 3.8
-    - name: Install dependencies
-      run: python utils/ci_setup.py pip deploy
-    - name: Verify installation
-      run: python utils/ci_setup.py pip verify
-    - name: Build the package
-      run: |
-        python setup.py sdist
-        python setup.py bdist_wheel
-    - name: Publish package to PyPI
-      uses: pypa/gh-action-pypi-publish@master
-      with:
-        user: __token__
-        password: ${{ secrets.pypi }}
-        skip_existing: true
+  #   steps:
+  #   - uses: actions/checkout@v2
+  #     with:
+  #       submodules: true
+  #   - name: Patch TEMP on Windows
+  #     if: matrix.os == 'windows-latest'
+  #     run: |
+  #       echo "TMPDIR=$USERPROFILE\AppData\Local\Temp" >> $GITHUB_ENV
+  #       echo "TEMP=$USERPROFILE\AppData\Local\Temp" >> $GITHUB_ENV
+  #   - name: Cache conda
+  #     uses: actions/cache@v1
+  #     env:
+  #       # Increase this value to reset cache if file not changed
+  #       CACHE_NUMBER: 0
+  #     with:
+  #       path: ~/conda_pkgs_dir
+  #       key:
+  #         ${{ runner.os }}-conda-${{ env.CACHE_NUMBER }}-${{
+  #         hashFiles('recipe/meta.yaml') }}
+  #   - name: Set up miniconda base environment on Windows
+  #     uses: conda-incubator/setup-miniconda@v2
+  #     if: matrix.install-method == 'conda' && matrix.os == 'windows-latest'
+  #     with:
+  #       channels: conda-forge
+  #       use-only-tar-bz2: true
+  #       activate-environment: ''
+  #       # auto-activate-base: false
+  #   - name: Set up MSVC Compiler
+  #     uses: ilammy/msvc-dev-cmd@v1
+  #     if: matrix.os == 'windows-latest' && env.INSTALLC == 1
+  #   - name: Record location of MSVC tools on Windows
+  #     if: matrix.os == 'windows-latest' && env.INSTALLC == 1
+  #     run: |
+  #       echo "YGG_LINK_PATH=$(which link.exe)" >> $GITHUB_ENV
+  #       echo "YGG_MSVC_BIN=$(dirname $(which link.exe))" $GITHUB_ENV
+  #   - name: Add miniconda bin to path - Unix
+  #     if: matrix.install-method == 'conda' && matrix.os != 'windows-latest'
+  #     run: |
+  #       # echo "PATH=$HOME/miniconda/bin:$PATH" >> $GITHUB_ENV
+  #       echo "PATH=$CONDA/bin:$PATH" >> $GITHUB_ENV
+  #   # - name: Add miniconda bin to path - Windows
+  #   #   if: matrix.install-method == 'conda' && matrix.os == 'windows-latest'
+  #   #   shell: powershell
+  #   #   run: |
+  #   #     echo "${CONDA}"
+  #   #     "C:\Miniconda`r`nC:\Miniconda\condabin`r`nC:\Miniconda\Scripts`r`nC:\Miniconda\Library\bin`r`n" + (Get-Content $env:GITHUB_PATH | Out-String) | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8
+  #   - name: Change ownership of conda on MacOS
+  #     shell: bash  # --noprofile --norc -eo pipefail {0}
+  #     if: matrix.os == 'macos-latest'
+  #     run: |
+  #       sudo chown -R $(whoami) $CONDA
+  #   - name: Check Python version in shell - Unix
+  #     shell: bash
+  #     if: matrix.os != 'windows-latest'
+  #     run: |
+  #       which python
+  #       python --version
+  #   - name: Check Python version in shell - Windows
+  #     if: matrix.os == 'windows-latest'
+  #     shell: powershell
+  #     run: |
+  #       Get-Command python.exe | Select-Object -ExpandProperty Definition
+  #       python.exe --version
+  #       python --version
+  #   - name: Check Python version (that conda expects) - Unix
+  #     if: matrix.os != 'windows-latest'
+  #     shell: bash
+  #     run: |
+  #       which $CONDA/bin/python
+  #       $CONDA/bin/python --version
+  #   - name: Check Python version (that conda expects) - Windows
+  #     if: matrix.os == 'windows-latest'
+  #     shell: powershell
+  #     run: |
+  #       C:\Miniconda\python.exe --version
+  #       C:\Miniconda\python --version
+  #   - name: Build package
+  #     shell: bash --noprofile --norc -eo pipefail {0}
+  #     run: python utils/ci_setup.py ${{ matrix.install-method }} build --python ${{ matrix.python-version }}
+  #   - name: Set up miniconda test environment
+  #     uses: conda-incubator/setup-miniconda@v2
+  #     if: matrix.install-method == 'conda'
+  #     with:
+  #       # TODO: Move autoupdate into script?
+  #       # auto-update-conda: true
+  #       python-version: ${{ matrix.python-version }}
+  #       channels: conda-forge
+  #       # channel-priority: strict
+  #       use-only-tar-bz2: true
+  #   - name: Install old MacOSX SDK for compatibility with the conda llvm (7)
+  #     if: matrix.os == 'macos-latest' && matrix.install-method == 'conda'
+  #     run: ./utils/setup_old_mac_sdk.sh
+  #   - name: Check for Python library
+  #     if: matrix.python-version == '3.8'
+  #     run: |
+  #       ls /usr/share/miniconda/envs/test/lib
+  #       ls /usr/share/miniconda/envs/test/lib/python3.8/config-3.8-x86_64-linux-gnu
+  #   - name: Install dependencies
+  #     run: python utils/ci_setup.py ${{ matrix.install-method }} deploy --without-build
+  #   - name: Verify installation
+  #     run: python utils/ci_setup.py ${{ matrix.install-method }} verify
+  #   - name: Run tests
+  #     run: yggtest --ci ${{ matrix.test-flags }}
+  #   - name: Generate XML version of coverage report and check for coverage report
+  #     run: |
+  #       coverage xml
+  #       ls -la
+  #   - name: Upload coverage report
+  #     uses: codecov/codecov-action@v1
+  #   - name: Start SSH session
+  #     uses: luchihoratiu/debug-via-ssh@main
+  #     if: matrix.os == 'macos-latest'
+  #     with:
+  #       NGROK_AUTH_TOKEN: ${{ secrets.NGROK_AUTH_TOKEN }}
+  #       SSH_PASS: ${{ secrets.SSH_PASS }}
+  # docs:
+  #   name: Build the Docs
+  #   runs-on: ubuntu-latest
+  #   env:
+  #     BUILDDOCS: 1
+  #   steps:
+  #   - uses: actions/checkout@v2
+  #     with:
+  #       submodules: true
+  #   - name: Set up Python
+  #     uses: actions/setup-python@v2
+  #     with:
+  #       python-version: 3.8
+  #   - name: Install dependencies
+  #     run: python utils/ci_setup.py pip deploy
+  #   - name: Verify installation
+  #     run: python utils/ci_setup.py pip verify
+  #   - name: Build the docs
+  #     run: |
+  #       cd docs
+  #       make autodoc
+  #       cd ../
+  #   - name: Publish docs to Github pages
+  #     if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags')
+  #     uses: JamesIves/github-pages-deploy-action@3.7.1
+  #     with:
+  #       GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  #       BRANCH: gh-pages
+  #       FOLDER: docs/build/html/
+  # deploy:
+  #   name: Publish package
+  #   needs: [build_pip, build_conda, build_rmq, docs]
+  #   if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags')
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #   - uses: actions/checkout@v2
+  #     with:
+  #       submodules: true
+  #   - name: Set up Python
+  #     uses: actions/setup-python@v2
+  #     with:
+  #       python-version: 3.8
+  #   - name: Install dependencies
+  #     run: python utils/ci_setup.py pip deploy
+  #   - name: Verify installation
+  #     run: python utils/ci_setup.py pip verify
+  #   - name: Build the package
+  #     run: |
+  #       python setup.py sdist
+  #       python setup.py bdist_wheel
+  #   - name: Publish package to PyPI
+  #     uses: pypa/gh-action-pypi-publish@master
+  #     with:
+  #       user: __token__
+  #       password: ${{ secrets.pypi }}
+  #       skip_existing: true
         
