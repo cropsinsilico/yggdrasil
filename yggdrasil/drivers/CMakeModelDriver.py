@@ -404,6 +404,10 @@ class CMakeConfigure(BuildToolBase):
                 are displayed. Defaults to False.
             **kwargs: Additional keyword arguments are ignored.
 
+        Returns:
+            list: Lines that should be added before the executable is defined
+                in the CMakeLists.txt (e.g. LINK_DIRECTORIES commands).
+
         Raises:
             ValueError: If a linker or compiler flag cannot be interpreted.
 
@@ -433,6 +437,7 @@ class CMakeConfigure(BuildToolBase):
             internal_library_flags=internal_library_flags,
             skip_library_libs=True, library_flags=library_flags)
         lines = []
+        pretarget_lines = []
         preamble_lines = []
         library_flags += internal_library_flags + external_library_flags
         # Suppress warnings on windows about the security of strcpy etc.
@@ -498,13 +503,13 @@ class CMakeConfigure(BuildToolBase):
                 lines.append('TARGET_LINK_LIBRARIES(%s %s)' % (target, x))
             elif x.startswith('-L'):
                 libdir = cls.fix_path(x.split('-L')[-1], is_gnu=is_gnu)
-                preamble_lines.append('LINK_DIRECTORIES(%s)' % libdir)
+                pretarget_lines.append('LINK_DIRECTORIES(%s)' % libdir)
             elif x.startswith('/LIBPATH:'):  # pragma: windows
                 libdir = x.split('/LIBPATH:')[-1]
                 if '"' in libdir:
                     libdir = libdir.split('"')[1]
                 libdir = cls.fix_path(libdir, is_gnu=is_gnu)
-                preamble_lines.append('LINK_DIRECTORIES(%s)' % libdir)
+                pretarget_lines.append('LINK_DIRECTORIES(%s)' % libdir)
             elif os.path.isfile(x):
                 library_flags.append(x)
             elif x.startswith('-mlinker-version='):
@@ -525,7 +530,7 @@ class CMakeConfigure(BuildToolBase):
             xn = os.path.splitext(xl)[0]
             new_dir = 'LINK_DIRECTORIES(%s)' % xd
             if new_dir not in preamble_lines:
-                preamble_lines.append(new_dir)
+                pretarget_lines.append(new_dir)
             if cls.add_libraries or (xorig in internal_library_flags):
                 # if cls.add_libraries:  # pragma: no cover
                 # Version adding library
@@ -556,8 +561,9 @@ class CMakeConfigure(BuildToolBase):
         # -homebrews-cmake-since-mojave
         if platform._is_mac:
             # TODO: Include might need to be added as well
-            preamble_lines.append('LINK_DIRECTORIES(/usr/lib)')
-            preamble_lines.append('LINK_DIRECTORIES(/usr/local/lib)')
+            print('BEFORE MAC SPECIFIC', pretarget_lines)
+            pretarget_lines.append('LINK_DIRECTORIES(/usr/lib)')
+            pretarget_lines.append('LINK_DIRECTORIES(/usr/local/lib)')
             verbose = True
         lines = preamble_lines + lines
         log_msg = (
@@ -572,12 +578,13 @@ class CMakeConfigure(BuildToolBase):
         else:
             logger.debug(log_msg)
         if fname is None:
-            return lines
+            return pretarget_lines + lines
         else:
             if os.path.isfile(fname):
                 os.remove(fname)
             with open(fname, 'w') as fd:
                 fd.write('\n'.join(lines))
+            return pretarget_lines
 
     
 class CMakeBuilder(LinkerBase):
@@ -829,7 +836,7 @@ class CMakeModelDriver(BuildModelDriver):
         else:
             include_base = 'ygg_cmake_%s.txt' % self.target
         include_file = os.path.join(self.sourcedir, include_base)
-        self.get_tool_instance('compiler').create_include(
+        newlines_before = self.get_tool_instance('compiler').create_include(
             include_file, self.target,
             driver=self.target_language_driver,
             toolname=self.target_compiler,
@@ -838,7 +845,6 @@ class CMakeModelDriver(BuildModelDriver):
         assert(os.path.isfile(include_file))
         out.append(include_file)
         # Create copy of cmakelists and modify
-        newlines_before = []
         newlines_after = []
         if os.path.isfile(self.buildfile):
             if not os.path.isfile(self.buildfile_copy):
