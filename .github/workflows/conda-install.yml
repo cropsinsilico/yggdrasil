@@ -35,12 +35,12 @@ jobs:
         # test-flags: [--long-running, --test-suite=examples]
         test-flags: [--long-running]
         install-c: [true]
-        include:
-          - os: windows-latest
-            python-version: 3.6
-            install-method: pip
-            test-flags: --long-running
-            install-c: false
+        # include:
+        #   - os: windows-latest
+        #     python-version: 3.6
+        #     install-method: pip
+        #     test-flags: --long-running
+        #     install-c: false
       fail-fast: false
 
     steps:
