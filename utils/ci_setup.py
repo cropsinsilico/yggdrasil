@@ -387,10 +387,10 @@ def deploy_package_on_ci(method, python=None, without_build=False,
             if _is_linux:
                 os_pkgs += ["libczmq-dev", "libzmq3-dev"]
             elif _is_osx:
-                if os.environ.get('TRAVIS_OS_NAME', False):
-                    cmds.append("bash ci/install-czmq-osx.sh")
-                else:
-                    os_pkgs += ["czmq", "zmq"]
+                # if os.environ.get('TRAVIS_OS_NAME', False):
+                #     cmds.append("bash ci/install-czmq-osx.sh")
+                # else:
+                os_pkgs += ["czmq", "zmq"]
             elif _is_win:
                 vcpkg_pkgs += ["czmq", "zeromq"]
             else:
