@@ -428,7 +428,16 @@ def deploy_package_on_ci(method, python=None, without_build=False,
             if 'gcc' in os_pkgs:
                 cmds += ["brew reinstall gcc"]
                 os_pkgs.remove('gcc')
-            cmds += ["brew install %s" % ' '.join(os_pkgs)]
+            pkgs_from_src = []
+            if os.environ.get('TRAVIS_OS_NAME', False):
+                for k in ['zmq', 'czmq']:
+                    if k in os_pkgs:
+                        pkgs_from_src.append(k)
+                        os_pkgs.remove(k)
+            if pkgs_from_src:
+                cmds += ["brew install --build-from-source %s" % ' '.join(pkgs_from_src)]
+            if os_pkgs:
+                cmds += ["brew install %s" % ' '.join(os_pkgs)]
         elif _is_win:
             if windows_package_manager == 'choco':
                 choco_pkgs += os_pkgs
