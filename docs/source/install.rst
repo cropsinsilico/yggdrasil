@@ -9,7 +9,7 @@ Installation
 
    **Windows Users**
 
-   If you will be running C/C++ models on a Windows operatoring system, you will first need to install Microsoft Visual Studio, regardless of the installation method you end up using. Visual Studio Community can be downloaded for free from `here <https://visualstudio.microsoft.com/vs/community/>`_. During installation, we recommend selecting the components below. If you forget to add something during the initial download, you can always modify the installation via the "Visual Studio Installer" program.
+   If you will be running C/C++/Fortran models on a Windows operatoring system, you will first need to install Microsoft Visual Studio, regardless of the installation method you end up using. Visual Studio Community can be downloaded for free from `here <https://visualstudio.microsoft.com/vs/community/>`_. During installation, we recommend selecting the components below. If you forget to add something during the initial download, you can always modify the installation via the "Visual Studio Installer" program.
 
     * "Desktop development with C++" - Workload under "Windows" section
     * "MSVC v140 - VS 2015 C++ build tools (v14.00)" - Individual component under "Compilers, build tools, and runtimes" section.
@@ -146,6 +146,27 @@ in C or C++ will require installing the ZeroMQ libraries for C and C++.
 If you install |yggdrasil| using conda, these will be installed 
 automatically as dependencies. If you are not using conda, you will need to 
 install them yourself.
+
+Installing via vcpkg
+~~~~~~~~~~~~~~~~~~~~
+
+You can install the ZeroMQ C and C++ libraries via vcpkg (instructions for 
+installing vcpkg found `here <https://github.com/microsoft/vcpkg>`_; we 
+recommend runnin ``.\vcpkg\vcpkg integrate install`` following the listed installation 
+steps in order to make packages installed via vcpkg locatable to MSVC and
+|yggdrasil|). To 
+do so run the following from your command prompt::
+
+  > vcpkg install czmq zeromq --triplet x64-windows
+
+The ``--triplet x64-windows`` flag indicates a 64 bit version of Windows 
+(most common). If you have a 32 bit Windows installation, omit the flag.
+If you did not run ``.\vcpkg\vcpkg integrate install`` when installing vcpkg,
+you will need to add the paths to the czmq and zeromq libraries/headers to 
+the |yggdrasil| configuration file (See :ref:`Configuration Options <config_rst>`).
+
+Building from Source
+~~~~~~~~~~~~~~~~~~~~
 
 Instructions for installing the ZeroMQ C and C++ libraries can be found 
 `here <https://github.com/zeromq/czmq#building-and-installing>`_ 

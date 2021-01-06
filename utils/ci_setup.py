@@ -450,8 +450,6 @@ def deploy_package_on_ci(method, python=None, without_build=False,
                 cmds += ["choco install %s" % ' '.join(choco_pkgs)]
             if vcpkg_pkgs:
                 vcpkg_exe = 'vcpkg.exe'
-                print(shutil.which(vcpkg_exe),
-                      os.environ.get('VCPKG_ROOT', None))
                 # if os.environ.get('VCPKG_ROOT', None):
                 #     vcpkg_exe = os.path.join(os.environ['VCPKG_ROOT'],
                 #                              vcpkg_exe)
