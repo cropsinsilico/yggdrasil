@@ -461,6 +461,10 @@ def update_config():
         prelang = parser.parse_known_args()[0].languages
     lang_args = {}
     lang_args2kwargs = {}
+    lang_args.setdefault('c', [])
+    lang_args['c'].append(
+        (('--vcpkg-dir', ),
+         {'help': 'Directory containing the vcpkg installation.'}))
     if platform._is_mac:
         lang_args.setdefault('c', [])
         lang_args['c'].append(

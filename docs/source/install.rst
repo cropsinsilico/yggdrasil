@@ -14,7 +14,7 @@ Installation
     * "Desktop development with C++" - Workload under "Windows" section
     * "MSVC v140 - VS 2015 C++ build tools (v14.00)" - Individual component under "Compilers, build tools, and runtimes" section.
 
-   If you *do not use conda* to install |yggdrasil|, you will also need to initialize the command line build tools in any prompt you will be calling |yggdrasil| from. This can be done by calling |yggdrasil| from a developer prompt, or by locating the ``vsvarsall.bat`` script that comes with Visual Studio. Information on the developer prompt and how to locate the ``vsvarsall.bat`` script can be found `here <https://docs.microsoft.com/en-us/cpp/build/building-on-the-command-line?view=vs-2019>`_. The script used must be the one associated with Visual Studio 2015 build tools, which can be installed from within Visual Studio 2019. On a 64bit Windows machine, the command to initialize these tools within a prompt will probably look something like this::
+   If you *do not use conda* to install |yggdrasil|, you will also need to initialize the command line build tools in any prompt you will be calling |yggdrasil| from. This can be done by calling |yggdrasil| from a "VS2015 x64 Native Tools Developer Command Prompt", or by locating the ``vsvarsall.bat`` script that comes with Visual Studio. Information on the developer prompt and how to locate the ``vsvarsall.bat`` script can be found `here <https://docs.microsoft.com/en-us/cpp/build/building-on-the-command-line?view=vs-2019>`_. The prompt/script used must enable the Visual Studio 2015 build tools (the specific year) to be compatible with the Python C library (see the discussion `here <https://wiki.python.org/moin/WindowsCompilers>`_). The VS 2015 tools prompt/script will be installed from within Visual Studio 2019 by selecting the components indicated above. On a 64bit Windows machine (assuming you will be using 64 bit Python), the command to initialize these tools within a regular command prompt will look something like this, but the exact path will vary with your particular installation::
 
      $ call "C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\vcvarsall.bat" amd64
 
@@ -115,14 +115,14 @@ script (e.g. ``.bashrc`` or ``.bash_profile``), using one of the following::
 
   $ export PATH=$PATH:<scripts_dir>  # (linux/osx, bash)
   $ setenv PATH $PATH:<scripts_dir>  # (linux/osx, tcsh)
-  $ set PATH "%PATH%:<scripts_dir>   # (windows)
+  $ set PATH=%PATH%:<scripts_dir>   # (windows)
 
 These commands will only add the directory to your path for the current 
 session. For the change to be permanent on Linux/MacOS, the appropriate command 
 from above can be added to your ``.bashrc`` or ``.bash_profile``. On 
 Windows (>=7), the following command will permanently modify your path::
 
-  $ setx PATH "%PATH%:<scripts_dir>
+  $ setx PATH=%PATH%:<scripts_dir>
 
 The changes will take affect the next time you open the terminal.
 
@@ -147,23 +147,40 @@ If you install |yggdrasil| using conda, these will be installed
 automatically as dependencies. If you are not using conda, you will need to 
 install them yourself.
 
+.. note::
+   Although not required, the ZeroMQ libraries are also recommended for message 
+   passing on Linux and MacOS operating systems as the IPC V message queues 
+   have default upper limits of 2048 bytes on some operating systems and will 
+   have to send larger messages piecemeal, adding to the message passing 
+   overhead. We recommend installing zeromq & czmq via apt on Linux 
+   (``apt-get libczmq-dev libzmq3-dev``) or Homebrew 
+   on Mac (``brew install czmq zmq``) if you do not use conda.
+
 Installing via vcpkg
 ~~~~~~~~~~~~~~~~~~~~
 
 You can install the ZeroMQ C and C++ libraries via vcpkg (instructions for 
-installing vcpkg found `here <https://github.com/microsoft/vcpkg>`_; we 
-recommend runnin ``.\vcpkg\vcpkg integrate install`` following the listed installation 
-steps in order to make packages installed via vcpkg locatable to MSVC and
-|yggdrasil|). To 
-do so run the following from your command prompt::
+installing vcpkg found `here <https://github.com/microsoft/vcpkg>`_. To 
+do so run the following from your "VS2015 x64 Native Tools Developer Command Prompt"::
 
   > vcpkg install czmq zeromq --triplet x64-windows
 
-The ``--triplet x64-windows`` flag indicates a 64 bit version of Windows 
-(most common). If you have a 32 bit Windows installation, omit the flag.
-If you did not run ``.\vcpkg\vcpkg integrate install`` when installing vcpkg,
-you will need to add the paths to the czmq and zeromq libraries/headers to 
-the |yggdrasil| configuration file (See :ref:`Configuration Options <config_rst>`).
+.. note::
+   The ``--triplet x64-windows`` flag indicates a 64 bit version of Windows 
+   (the most common). If you have a 32 bit Windows installation or are using a 
+   32 bit version of Python, omit the flag.
+
+When you run ``yggconfig`` following installation of yggdrasil
+If you did not set the ``VCPKG_ROOT`` environment variable before installing vcpkg, 
+you will need to add a flag indicating the location of the vcpkg installation when 
+running ``yggconfig`` following installation of yggdrasil. e.g.::
+
+  > yggconfig --vcpkg-dir=C:\path\to\vcpkg\root\directory
+
+If you do not do this, you will need to manually add the paths to the czmq and 
+zeromq libraries/headers to your |yggdrasil| configuration file (See 
+:ref:`Configuration Options <config_rst>`).
+
 
 Building from Source
 ~~~~~~~~~~~~~~~~~~~~
@@ -178,13 +195,6 @@ that it cannot find these libraries, you can manually set them in your
 If you install these libraries after installing |yggdrasil| you can re-configure
 |yggdrasil| and have it search for the libraries again by calling ``yggconfig``
 from the command line or by setting the appropriate config options manually.
-
-.. note::
-   Although not required, the ZeroMQ libraries are also recommended for message 
-   passing on Linux and MacOS operating systems as the IPC V message queues 
-   have default upper limits of 2048 bytes on some operating systems and will 
-   have to send larger messages piecemeal, adding to the message passing 
-   overhead.
 
 
 Additional Steps for Matlab Models

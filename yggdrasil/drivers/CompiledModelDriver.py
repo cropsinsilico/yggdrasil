@@ -757,7 +757,7 @@ class CompilationToolBase(object):
         return tools.get_env_prefixes()
             
     @classmethod
-    def get_search_path(cls, env_only=False, libtype=None):
+    def get_search_path(cls, env_only=False, libtype=None, cfg=None):
         r"""Determine the paths searched by the tool for external library files.
 
         Args:
@@ -766,6 +766,8 @@ class CompilationToolBase(object):
                 Defaults to False.
             libtype (str, optional): Library type being searched for.
                 Defaults to None.
+            cfg (YggConfigParser, optional): Configuration object currently
+                being updated. Defaults to the global configuration.
 
         Returns:
             list: List of paths that the tools will search.
@@ -818,13 +820,20 @@ class CompilationToolBase(object):
         # Get libtype specific search paths
         if platform._is_win:  # pragma: windows
             base_paths = []
-            if os.environ.get('VCPKG_ROOT', None):
-                base_paths.append(os.path.join(os.environ['VCPKG_ROOT'],
-                                               'installed',
-                                               'x64-windows'))
-                if libtype == 'shared':
-                    paths.append(os.path.join(os.environ['VCPKG_ROOT'],
-                                              'packages'))
+            vcpkg_dir = cfg.get('c', 'vcpkg_dir', None)
+            if vcpkg_dir is not None:
+                typ2dir = {'include': 'include',
+                           'shared': 'bin',
+                           'static': 'lib'}
+                if platform._is_64bit:
+                    arch = 'x64-windows'
+                else:  # pragma: debug
+                    arch = 'x86-windows'
+                    raise NotImplementedError("Not yet tested on 32bit Python")
+                if libtype in typ2dir:
+                    paths.append(os.path.join(vcpkg_dir, 'installed', arch,
+                                              typ2dir[libtype]))
+                    assert(os.path.isdir(paths[-1]))
             if os.environ.get('ChocolateyInstall'.upper(), None):
                 base_paths.append(os.environ['ChocolateyInstall'])
             else:
@@ -3243,7 +3252,7 @@ class CompiledModelDriver(ModelDriver):
         r"""Add configuration options for an external library.
 
         Args:
-            cfg (CisConfigParser): Config class that options should be set for.
+            cfg (YggConfigParser): Config class that options should be set for.
         
         Returns:
             list: Section, option, description tuples for options that could not
@@ -3293,7 +3302,7 @@ class CompiledModelDriver(ModelDriver):
                 fpath = None
                 fname = '*'.join(os.path.splitext(fname))
                 if tool is not None:
-                    search_list = tool.get_search_path(libtype=t)
+                    search_list = tool.get_search_path(libtype=t, cfg=cfg)
                     # On windows search for both gnu and msvc library
                     # naming conventions
                     if platform._is_win:  # pragma: windows
