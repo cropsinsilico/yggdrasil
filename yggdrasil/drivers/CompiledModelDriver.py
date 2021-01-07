@@ -773,6 +773,9 @@ class CompilationToolBase(object):
             list: List of paths that the tools will search.
 
         """
+        if cfg is None:
+            from yggdrasil.config import ygg_cfg
+            cfg = ygg_cfg
         if (cls.search_path_flags is None) and (cls.search_path_envvar is None):
             raise NotImplementedError("get_search_path method not implemented for "
                                       "%s tool '%s'" % (cls.tooltype, cls.toolname))

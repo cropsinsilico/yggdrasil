@@ -796,8 +796,10 @@ class CModelDriver(CompiledModelDriver):
                 be set.
 
         """
-        # Set vcpkg_dir before calling parent so that it can be used in
-        # get_search_path when searching for dependencies
+        # Set vcpkg_dir & macos_sdkroot before calling parent so that it can be
+        # used in get_search_path when searching for dependencies
+        if (cls.language is not None) and (not cfg.has_section(cls.language)):
+            cfg.add_section(cls.language)
         if vcpkg_dir is None:
             vcpkg_dir = os.environ.get('VCPKG_ROOT', None)
         if vcpkg_dir is not None:
