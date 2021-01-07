@@ -55,7 +55,10 @@ jobs:
       run: |
         echo "TMPDIR=$USERPROFILE\\AppData\\Local\\Temp" >> $GITHUB_ENV
         echo "TEMP=$USERPROFILE\\AppData\\Local\\Temp" >> $GITHUB_ENV
-        echo "VCPKG_ROOT=C:\\vcpkg" >> $GITHUB_ENV
+    - name: Set VCPKG_ROOT on Windows
+      if: matrix.os == 'windows-latest' && matrix.install-method == 'pip' && env.INSTALLC == 1
+      shell: bash -l {0}
+      run: echo "VCPKG_ROOT=C:\\vcpkg" >> $GITHUB_ENV
     - name: Set up MSVC Compiler
       uses: ilammy/msvc-dev-cmd@v1
       if: matrix.os == 'windows-latest' && env.INSTALLC == 1
