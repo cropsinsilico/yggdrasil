@@ -142,7 +142,7 @@ install:
       if [[ $INSTALLR == '1' ]]; then
         export YGG_USE_SUDO_FOR_R=1
       fi
-      python utils/ci_setup.py pip deploy
+      travis_wait python utils/ci_setup.py pip deploy
       # python utils/ci_setup.py pip verify
     fi
 
