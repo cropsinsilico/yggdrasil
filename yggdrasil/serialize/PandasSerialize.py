@@ -157,7 +157,7 @@ class PandasSerialize(AsciiTableSerialize):
                      # Not in pandas <0.24
                      # line_terminator=self.newline.decode("utf-8"),
                      sep=self.delimiter.decode("utf-8"),
-                     mode='wb', encoding='utf8',
+                     mode='w', encoding='utf8',
                      header=(not self.dont_write_header))
         if self.write_header_once:
             self.dont_write_header = True
