@@ -137,7 +137,8 @@ class RModelDriver(InterpretedModelDriver):  # pragma: R
             try:
                 cls.run_executable(['-e', 'library(%s)' % lib.split()[0]])
                 cls._library_cache[lib] = True
-            except RuntimeError:
+            except RuntimeError as e:
+                logger.info('Error checking for R library %s: %s' % (lib, e))
                 cls._library_cache[lib] = False
         return cls._library_cache[lib]
         
