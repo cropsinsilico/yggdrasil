@@ -74,9 +74,30 @@ Manual Installation
    should manually install the non-Python dependencies, particularly the
    ZeroMQ C and C++ libraries and R packages (see below).
 
-If you do not want to use conda, |yggdrasil| can also be installed 
+.. warning::
+   **Windows Users** Be warned that there is 260 character limit to the size of the ``PATH`` environment variable (see note `here <https://docs.microsoft.com/en-us/windows/win32/fileio/naming-a-file#maximum-path-length-limitation>`_). If you modify the path (e.g. to add Python or the Python scripts directory), be sure that you do not exceed this limit. If you do, Windows will not report an error, but the characters past the limit will be ignored and so those directories will not be availble on the command prompt.
+
+If you do not want to use conda, you can install Python yourself and then install 
+|yggdrasil| via ``pip`` or from the source code (See below). Python can be installed 
+in a number of ways, but be sure that you get Python>=3.5. Installation methods include:
+
+* Executable installer from the `Python Software Foundaction <https://www.python.org/downloads/>`_ (Recommended for Windows)
+* Package manager, e.g.
+  * ``brew install python3`` on Mac (be sure to include the 3)
+  * ``apt-get install python`` on Linux
+  * ``choco install python3`` on Windows
+* `Microsoft Visual Studio <https://visualstudio.microsoft.com/vs/features/python/>`_
+* `Microsoft Store <https://www.microsoft.com/en-us/p/python-38/9mssztt1n39l?activetab=pivot:overviewtab>`_ (Windows only; we do not recommend this method as it can be difficult to get working correctly as it requires tracking down the Scripts direcotry modifying the path yourself, see discussion `here <https://dev.to/naruaika/why-i-didn-t-install-python-from-the-microsoft-store-5cbd>`_)
+
+.. note::
+   **Mac Users** Python 2 is included on Mac as the default Python (as ``python``), but ``python3`` is what you will want to use (Python 2 has been deprecated). If you have Mac OS Catalina, you will already have Python 3, but you may need to enable developer tools to use it. You can check to see if Python 3 is installed (or prompt the developer tool `installation <https://apple.stackexchange.com/questions/376077/is-usr-bin-python3-provided-with-macos-catalina>`_) by running ``python3 --version`` and ``python --version``. If these commands do not return the same version, you will need to be sure to always use ``python3`` and ``pip3`` during installation (as opposed to the versions of the executables without the ``3``), or set Python 3 to be the default version of Python (see `this article <https://opensource.com/article/19/5/python-3-default-mac>`_).
+
+.. note::
+   **Windows Users** If you install Python, but your prompt cannot locate Python (i.e. ``where python`` fails), you may need to add the directory containing the Python executable (and the ``Scripts`` directory inside that as discussed below) to you ``PATH`` environment variable (e.g. ``set path=%path%;C:\path\to\Python\directory`` or ``setx path=%path%;C:\path\to\Python\directory`` to make the change for new prompts). For more information on setting the path, including instruction on seting in via the GUI, see `this article <https://datatofish.com/add-python-to-windows-path/>`_. 
+
+Once Python is installed, |yggdrasil| can be installed from the command line/prompt 
 from either `PyPI <https://pypi.org/project/yggdrasil-framework/>`_ 
-using ``pip``::
+using ``pip`` ::
 
   $ pip install yggdrasil-framework
 
@@ -108,7 +129,10 @@ Python commands::
 
   >>> import os
   >>> from distutils.sysconfig import get_python_lib
-  >>> os.path.realpath(os.path.join(get_python_lib(), '../../../bin/'))
+  >>> os.path.realpath(os.path.join(get_python_lib(), '..', '..', '..', 'bin'))
+
+.. note::
+   *Windows Users* If you used the Windows store to install Python, the above commands will not yield the correct scripts directory. It will be something along the lines of ``%userprofile%\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.9_qbz5n2kfra8p0\LocalCache\local-packages\Python39\Scripts``
 
 The displayed path can then be added either on the command link or in a startup
 script (e.g. ``.bashrc`` or ``.bash_profile``), using one of the following::
