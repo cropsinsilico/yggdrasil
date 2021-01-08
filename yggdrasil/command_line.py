@@ -176,8 +176,12 @@ def ygginfo():
                 vardict.append((curr_prefix + "R C Compiler:", ""))
                 curr_prefix += prefix
                 for x in ['CC', 'CFLAGS', 'CXX', 'CXXFLAGS']:
-                    out = tools.bytes2str(subprocess.check_output(
-                        [interp, 'CMD', 'config', x])).strip()
+                    try:
+                        out = tools.bytes2str(subprocess.check_output(
+                            [interp, 'CMD', 'config', x],
+                            stderr=subprocess.STDOUT)).strip()
+                    except subprocess.CalledProcessError:
+                        out = 'ERROR (missing Rtools?)'
                     vardict.append((curr_prefix + x, "%s"
                                     % ("\n" + curr_prefix + prefix).join(
                                         out.splitlines(False))))
