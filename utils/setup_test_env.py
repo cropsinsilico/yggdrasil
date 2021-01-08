@@ -944,6 +944,9 @@ if __name__ == "__main__":
     parser_dep.add_argument(
         '--always-yes', action='store_true',
         help="Pass -y to conda commands to avoid user interaction.")
+    parser_dep.add_argument(
+        '--only-python', '--python-only', action='store_true',
+        help="Only install python dependencies.")
     for k, v in install_opts.items():
         if v:
             parser_dep.add_argument(
@@ -992,6 +995,9 @@ if __name__ == "__main__":
     parser_pkg.add_argument(
         '--always-yes', action='store_true',
         help="Pass -y to conda commands to avoid user interaction.")
+    parser_pkg.add_argument(
+        '--only-python', '--python-only', action='store_true',
+        help="Only install python dependencies.")
     for k, v in install_opts.items():
         if v:
             parser_pkg.add_argument(
@@ -1028,7 +1034,8 @@ if __name__ == "__main__":
                      for_development=args.for_development,
                      windows_package_manager=args.windows_package_manager,
                      install_opts=install_opts,
-                     conda_env=args.conda_env, always_yes=args.always_yes)
+                     conda_env=args.conda_env, always_yes=args.always_yes,
+                     only_python=args.only_python)
     elif args.operation == 'install':
         install_pkg(args.method, python=args.python,
                     without_build=args.without_build,
@@ -1039,6 +1046,7 @@ if __name__ == "__main__":
                     include_doc_deps=args.include_doc_deps,
                     windows_package_manager=args.windows_package_manager,
                     install_opts=install_opts,
-                    conda_env=args.conda_env, always_yes=args.always_yes)
+                    conda_env=args.conda_env, always_yes=args.always_yes,
+                    only_python=args.only_python)
     elif args.operation == 'verify':
         verify_pkg(install_opts=install_opts)
