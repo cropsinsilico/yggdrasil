@@ -108,7 +108,7 @@ install:
   # Setup environment
   # Currently conda is used reguardless of the installation method as
   # that is how python is installed by appveyor
-  - "python utils\\ci_setup.py pip env %PYTHON_VERSION%"
+  - "python utils\\setup_test_env.py env conda %PYTHON_VERSION%" --env-name=test-environment
 
   # Activate environment (should be conda reguardless)
   - "activate test-environment"
@@ -117,8 +117,9 @@ install:
   - if "%INSTALLC%" == "1" call "ci\\install-compilers.bat"
 
   # Build and install
-  - "python utils\\ci_setup.py pip deploy"
-  - "python utils\\ci_setup.py pip verify"
+  - "python utils\\setup_test_env.py deps pip
+  - "python utils\\setup_test_env.py install pip --no-deps
+  - "python utils\\setup_test_env.py verify"
   - "echo %PATH%"
 
 cache:

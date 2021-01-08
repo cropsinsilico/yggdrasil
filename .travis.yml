@@ -105,26 +105,31 @@ before_install:
     fi
 
     # Setup environment
-    if [[ -n "$YGG_CONDA" ]]; then
-      python utils/ci_setup.py conda env $YGG_CONDA
+    if [[ -n "$YGG_CONDA" || $INSTALLLPY == '1' ]]; then
+      python utils/setup_test_env.py env conda $YGG_CONDA --env-name=test-environment
     else
-      python utils/ci_setup.py pip env $YGG_PYTHON
+      # No environment required on Linux because Travis is managing the version
+      # of Python that is installed
+      if [[ $TRAVIS_OS_NAME == 'osx' ]]; then
+        python utils/setup_test_env.py env virtualenv $YGG_PYTHON --env-name=test-environment
+      fi
     fi
 
     # Perform the conda build in the base environment
     if [[ -n "$YGG_CONDA" ]]; then
-      python utils/ci_setup.py conda build --python $YGG_CONDA
+      python utils/setup_test_env.py build conda --python $YGG_CONDA
     fi
 
     # Activate environment
     if [[ -n "$YGG_CONDA" || $INSTALLLPY == '1' ]]; then
       source activate test-environment
+      # TODO: Check if this can be removed
       if [[ $TRAVIS_OS_NAME == 'linux' ]]; then
         export LD_LIBRARY_PATH=$CONDA_PREFIX/lib:$LD_LIBRARY_PATH
       fi
     fi
     if [[ -n "$YGG_PYTHON" && $TRAVIS_OS_NAME == 'osx' ]]; then
-      source venv/bin/activate
+      source test-environment/bin/activate
     fi
 
 install:
@@ -134,25 +139,18 @@ install:
       ccache -s
     fi
 
-    # Build and install
+    # Install dependencies & package
     if [[ -n "$YGG_CONDA" ]]; then
-      travis_wait python utils/ci_setup.py conda deploy --without-build
-      # python utils/ci_setup.py conda verify
+      travis_wait python utils/setup_test_env.py install conda --without-build
     else
       if [[ $INSTALLR == '1' ]]; then
         export YGG_USE_SUDO_FOR_R=1
       fi
-      travis_wait python utils/ci_setup.py pip deploy
-      # python utils/ci_setup.py pip verify
+      travis_wait python utils/setup_test_env.py install pip
     fi
 
 script:
-  - |
-    if [[ -n "$YGG_CONDA" ]]; then
-      python utils/ci_setup.py conda verify
-    else
-      python utils/ci_setup.py pip verify
-    fi
+  - python utils/setup_test_env.py verify
   - yggtest --ci $YGG_TEST_FLAGS
   - $YGG_SECOND_TEST
 

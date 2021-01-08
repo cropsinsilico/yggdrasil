@@ -94,9 +94,9 @@ jobs:
       with:
         python-version: ${{ matrix.python-version }}
     - name: Install dependencies
-      run: python utils/ci_setup.py ${{ matrix.install-method }} deploy
+      run: python utils/setup_test_env.py deploy ${{ matrix.install-method }}
     - name: Verify installation
-      run: python utils/ci_setup.py ${{ matrix.install-method }} verify
+      run: python utils/setup_test_env.py verify
     - name: Run tests
       run: yggtest --ci ${{ matrix.test-flags }}
     - name: Upload coverage report
@@ -138,9 +138,9 @@ jobs:
       with:
         python-version: ${{ matrix.python-version }}
     - name: Install dependencies
-      run: python utils/ci_setup.py ${{ matrix.install-method }} deploy
+      run: python utils/setup_test_env.py deploy ${{ matrix.install-method }}
     - name: Verify installation
-      run: python utils/ci_setup.py ${{ matrix.install-method }} verify
+      run: python utils/setup_test_env.py verify
     - name: Run tests
       run: yggtest --ci ${{ matrix.test-flags }}
     - name: Upload coverage report
@@ -203,55 +203,26 @@ jobs:
     - name: Set up MSVC Compiler
       uses: ilammy/msvc-dev-cmd@v1
       if: matrix.os == 'windows-latest' && env.INSTALLC == 1
-    - name: Record location of MSVC tools on Windows
-      if: matrix.os == 'windows-latest' && env.INSTALLC == 1
-      run: |
-        echo "YGG_LINK_PATH=$(which link.exe)" >> $GITHUB_ENV
-        echo "YGG_MSVC_BIN=$(dirname $(which link.exe))" $GITHUB_ENV
+    # - name: Record location of MSVC tools on Windows
+    #   if: matrix.os == 'windows-latest' && env.INSTALLC == 1
+    #   run: |
+    #     echo "YGG_LINK_PATH=$(which link.exe)" >> $GITHUB_ENV
+    #     echo "YGG_MSVC_BIN=$(dirname $(which link.exe))" >> $GITHUB_ENV
+    # This step and the next allows conda to be called before the
+    # conda-incubator/setup-miniconda@v2 action is used to create the test
+    # environment so that the package can be built in the base environment.
     - name: Add miniconda bin to path - Unix
       if: matrix.install-method == 'conda' && matrix.os != 'windows-latest'
       run: |
-        # echo "PATH=$HOME/miniconda/bin:$PATH" >> $GITHUB_ENV
         echo "PATH=$CONDA/bin:$PATH" >> $GITHUB_ENV
-    # - name: Add miniconda bin to path - Windows
-    #   if: matrix.install-method == 'conda' && matrix.os == 'windows-latest'
-    #   shell: powershell
-    #   run: |
-    #     echo "${CONDA}"
-    #     "C:\Miniconda`r`nC:\Miniconda\condabin`r`nC:\Miniconda\Scripts`r`nC:\Miniconda\Library\bin`r`n" + (Get-Content $env:GITHUB_PATH | Out-String) | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8
     - name: Change ownership of conda on MacOS
       shell: bash  # --noprofile --norc -eo pipefail {0}
       if: matrix.os == 'macos-latest'
       run: |
         sudo chown -R $(whoami) $CONDA
-    - name: Check Python version in shell - Unix
-      shell: bash
-      if: matrix.os != 'windows-latest'
-      run: |
-        which python
-        python --version
-    - name: Check Python version in shell - Windows
-      if: matrix.os == 'windows-latest'
-      shell: powershell
-      run: |
-        Get-Command python.exe | Select-Object -ExpandProperty Definition
-        python.exe --version
-        python --version
-    - name: Check Python version (that conda expects) - Unix
-      if: matrix.os != 'windows-latest'
-      shell: bash
-      run: |
-        which $CONDA/bin/python
-        $CONDA/bin/python --version
-    - name: Check Python version (that conda expects) - Windows
-      if: matrix.os == 'windows-latest'
-      shell: powershell
-      run: |
-        C:\Miniconda\python.exe --version
-        C:\Miniconda\python --version
     - name: Build package
       shell: bash --noprofile --norc -eo pipefail {0}
-      run: python utils/ci_setup.py ${{ matrix.install-method }} build --python ${{ matrix.python-version }}
+      run: python utils/setup_test_env.py build ${{ matrix.install-method }} --python ${{ matrix.python-version }}
     - name: Set up miniconda test environment
       uses: conda-incubator/setup-miniconda@v2
       if: matrix.install-method == 'conda'
@@ -260,20 +231,15 @@ jobs:
         # auto-update-conda: true
         python-version: ${{ matrix.python-version }}
         channels: conda-forge
-        # channel-priority: strict
         use-only-tar-bz2: true
+        # channel-priority: strict
     - name: Install old MacOSX SDK for compatibility with the conda llvm (7)
       if: matrix.os == 'macos-latest' && matrix.install-method == 'conda'
       run: ./utils/setup_old_mac_sdk.sh
-    - name: Check for Python library
-      if: matrix.python-version == '3.8'
-      run: |
-        ls /usr/share/miniconda/envs/test/lib
-        ls /usr/share/miniconda/envs/test/lib/python3.8/config-3.8-x86_64-linux-gnu
     - name: Install dependencies
-      run: python utils/ci_setup.py ${{ matrix.install-method }} deploy --without-build
+      run: python utils/setup_test_env.py deploy ${{ matrix.install-method }} --without-build
     - name: Verify installation
-      run: python utils/ci_setup.py ${{ matrix.install-method }} verify
+      run: python utils/setup_test_env.py verify
     - name: Run tests
       run: yggtest --ci ${{ matrix.test-flags }}
     - name: Generate XML version of coverage report and check for coverage report
@@ -302,9 +268,9 @@ jobs:
       with:
         python-version: 3.8
     - name: Install dependencies
-      run: python utils/ci_setup.py pip deploy
+      run: python utils/setup_test_env.py deploy pip
     - name: Verify installation
-      run: python utils/ci_setup.py pip verify
+      run: python utils/setup_test_env.py verify
     - name: Build the docs
       run: |
         cd docs
@@ -331,9 +297,9 @@ jobs:
       with:
         python-version: 3.8
     - name: Install dependencies
-      run: python utils/ci_setup.py pip deploy
+      run: python utils/setup_test_env.py deploy pip
     - name: Verify installation
-      run: python utils/ci_setup.py pip verify
+      run: python utils/setup_test_env.py verify
     - name: Build the package
       run: |
         python setup.py sdist

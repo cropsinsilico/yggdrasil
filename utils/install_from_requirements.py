@@ -1,12 +1,11 @@
 # https://www.python.org/dev/peps/pep-0508/
 from pip._vendor.packaging.requirements import Requirement, InvalidRequirement
 import os
-import sys
 import argparse
-from ci_setup import call_conda_command
+from setup_test_env import call_conda_command, locate_conda_exe
 
 
-def prune(fname_in, fname_out=None, excl_suffix=None):
+def prune(fname_in, fname_out=None, excl_suffix=None, incl_suffix=None):
     r"""Prune a requirements.txt file to remove/select dependencies that are
     dependent on the current environment.
 
@@ -17,6 +16,8 @@ def prune(fname_in, fname_out=None, excl_suffix=None):
             created. Defaults to None and is set to <fname_in[0]>_pruned.txt.
         excl_suffix (str, optional): Lines ending in this string will be
             excluded. Defaults to None and is ignored.
+        incl_suffix (str, optional): Only lines ending in this string will be
+            included. Defaults to None and is ignored.
 
     Returns:
         str: Full path to created file.
@@ -34,6 +35,8 @@ def prune(fname_in, fname_out=None, excl_suffix=None):
                 continue
             if excl_suffix and line.endswith(excl_suffix):
                 continue
+            if incl_suffix and (not line.endswith(incl_suffix)):
+                continue
             try:
                 req = Requirement(line.split('#')[0].strip())
                 if req.marker and (not req.marker.evaluate()):
@@ -50,45 +53,8 @@ def prune(fname_in, fname_out=None, excl_suffix=None):
     return fname_out
 
 
-def locate_conda_exe(conda_env, name):
-    r"""Determine the full path to an executable in a specific conda environment.
-
-    Args:
-        conda_env (str): Name of conda environment that executable should be
-            returned for.
-        name (str): Name of the executable to locate.
-
-    Returns:
-        str: Full path to the executable.
-
-    """
-    conda_prefix = os.environ.get('CONDA_PREFIX', None)
-    assert(conda_prefix)
-    if os.path.dirname(conda_prefix).endswith('envs'):
-        conda_prefix = os.path.dirname(conda_prefix)
-    else:
-        conda_prefix = os.path.join(conda_prefix, 'envs')
-    if (sys.platform in ['win32', 'cygwin']):
-        if not name.endswith('.exe'):
-            name += '.exe'
-        if name.startswith('python'):
-            out = os.path.join(conda_prefix, conda_env, name)
-        else:
-            out = os.path.join(conda_prefix, conda_env,
-                               'Scripts', name)
-    else:
-        out = os.path.join(conda_prefix, conda_env, 'bin', name)
-    try:
-        assert(os.path.isfile(out))
-    except AssertionError:
-        out = os.path.expanduser(os.path.join('~', '.conda', 'envs', name))
-        if not os.path.isfile(out):
-            raise
-    return out
-
-
 def install_from_requirements(method, fname_in, conda_env=None,
-                              user=False):
+                              user=False, unique_to_method=False):
     r"""Install packages via pip or conda from one or more pip-style
     requirements file(s).
 
@@ -100,15 +66,21 @@ def install_from_requirements(method, fname_in, conda_env=None,
             should be installed into. Defaults to None and is ignored.
         user (bool, optional): If True, install in user mode. Defaults to
             False.
+        unique_to_method (bool, optional): If True, only those packages that
+            can only be installed via the specified method will be installed.
 
     """
-    if method not in ['pip', 'conda']:
-        raise ValueError("Invalid method: '%s'" % method)
-    elif method == 'pip':
+    if method == 'pip':
         excl_suffix = '# conda'
     elif method == 'conda':
         excl_suffix = '# pip'
-    temp_file = prune(fname_in, excl_suffix=excl_suffix)
+    else:
+        raise ValueError("Invalid method: '%s'" % method)
+    if unique_to_method:
+        incl_suffix = '# %s' % method
+    else:
+        incl_suffix = None
+    temp_file = prune(fname_in, excl_suffix=excl_suffix, incl_suffix=incl_suffix)
     try:
         if method == 'conda':
             args = ['conda', 'install', '-y']
@@ -150,6 +122,9 @@ if __name__ == "__main__":
                               'installed into.'))
     parser.add_argument('--user', action='store_true',
                         help=('Install in user mode.'))
+    parser.add_argument('--unique-to-method', action='store_true',
+                        help=('Only install packages that are unique to the specified '
+                              'installation method.'))
     args = parser.parse_args()
     install_from_requirements(args.method, args.files, conda_env=args.conda_env,
-                              user=args.user)
+                              user=args.user, unique_to_method=args.unique_to_method)
