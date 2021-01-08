@@ -269,7 +269,7 @@ class ModelDriver(Driver):
                          'schema_table_model_subtype_rst>`.')},
         'args': {'type': 'array',
                  'items': {'type': 'string'}},
-        'inputs': {'type': 'array', 'default': [{'name': 'default'}],
+        'inputs': {'type': 'array', 'default': [],
                    'items': {'$ref': '#/definitions/comm'},
                    'description': (
                        'A mapping object containing the entry for a '
@@ -280,7 +280,7 @@ class ModelDriver(Driver):
                        'entries and the options available for '
                        'channels can be found :ref:`here<'
                        'yaml_comm_options>`.')},
-        'outputs': {'type': 'array', 'default': [{'name': 'default'}],
+        'outputs': {'type': 'array', 'default': [],
                     'items': {'$ref': '#/definitions/comm'},
                     'description': (
                         'A mapping object containing the entry for a '
