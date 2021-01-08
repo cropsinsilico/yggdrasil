@@ -526,6 +526,8 @@ def install_deps(method, return_commands=False, verbose=False, for_development=F
     if install_opts['R']:
         if (method == 'pip') and fallback_to_conda:
             conda_pkgs.append('r-base')
+            if _is_win:
+                conda_pkgs.append('rtools')
         elif not fallback_to_conda:
             if _is_linux:
                 cmds += [("sudo add-apt-repository 'deb https://cloud"

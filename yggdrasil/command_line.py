@@ -78,6 +78,11 @@ def ygginfo():
                           (not import_component('model', b).is_installed())]))
                 vardict.append((curr_prefix + "Dependencies Installed",
                                 drv.are_dependencies_installed()))
+                if not drv.are_dependencies_installed():
+                    vardict.append(
+                        (curr_prefix + "Dependencies Not Installed",
+                         [b for b in drv.interface_dependencies if
+                          (not drv.is_library_installed(b))]))
                 vardict.append((curr_prefix + "Interface Installed",
                                 drv.is_interface_installed()))
                 vardict.append((curr_prefix + "Comm Installed",
