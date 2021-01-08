@@ -117,8 +117,7 @@ install:
   - if "%INSTALLC%" == "1" call "ci\\install-compilers.bat"
 
   # Build and install
-  - "python utils\\setup_test_env.py deps pip
-  - "python utils\\setup_test_env.py install pip --no-deps
+  - "python utils\\setup_test_env.py install pip
   - "python utils\\setup_test_env.py verify"
   - "echo %PATH%"
 
