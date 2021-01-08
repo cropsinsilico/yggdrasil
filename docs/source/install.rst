@@ -245,6 +245,11 @@ R2017b            2.7, 3.3, 3.4, 3.5, 3.6
 Additional Steps for R Models
 -----------------------------
 
+Rtools (Windows only)
+~~~~~~~~~~~~~~~~~~~~~
+
+On Windows, if you do not install the R dependencies via conda, you will also need to install Rtools so that the R dependencies with C/C++/Fortran components can be compiled if they need to be installed from source. The Rtools installer and instructions for installing Rtools for R<4.0.0 can be found `here <https://cran.r-project.org/bin/windows/Rtools/history.html>`_. For R>=4.0.0, you will need to install Rtools40 instead (installer/instructions `here <https://cran.r-project.org/bin/windows/Rtools/>`_).
+
 R Interpreter
 ~~~~~~~~~~~~~
 
