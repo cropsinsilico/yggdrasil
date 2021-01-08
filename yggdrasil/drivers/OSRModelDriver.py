@@ -98,17 +98,26 @@ class OSRModelDriver(ExecutableModelDriver):
         assert(os.path.isfile(self.executable_path))
 
     @classmethod
-    def compile_osr(cls, target='OpenSimRootYgg'):
+    def compile_dependencies(cls, *args, **kwargs):
+        cls.compile_osr(*args, **kwargs)
+
+    @classmethod
+    def compile_osr(cls, target='OpenSimRootYgg', toolname=None):
         r"""Compile the OpenSimRoot executable with the yggdrasil flag set.
 
         Args:
-            target (str): Make target that should be build. Defaults to
+            target (str, optional): Make target that should be build. Defaults to
                 'OpenSimRootYgg' (the yggdrasil-instrumented version of the
                 OSR executable).
+            toolname (str, optional): C++ compiler that should be used. Forced
+                to be 'cl.exe' on windows. Otherwise the default C++ compiler will
+                be used.
 
         """
         if (cls.repository is not None) and CPPModelDriver.is_installed():
-            toolname = None
+            if not os.path.isdir(cls.repository):  # pragma: deb
+                # This will only need to be called if the tempdir was cleaned up
+                cls.clone_repository(cls.repository)
             # toolname = CPPModelDriver.get_tool('compiler',
             #                                    return_prop='name',
             #                                    default=None)
@@ -239,6 +248,25 @@ class OSRModelDriver(ExecutableModelDriver):
 
         """
         return (cls.repository is not None)
+
+    @classmethod
+    def clone_repository(cls, dest=None):
+        r"""Clone the OpenSimRoot repository.
+
+        Args:
+            dest (str, optional): Full path to location where the repository should
+                be cloned. Defaults to '$TEMP/OpenSimRoot'.
+
+        Returns:
+            str: Full path to location where the repository was cloned.
+
+        """
+        if dest is None:
+            dest = os.path.join(tempfile.gettempdir(), 'OpenSimRoot')
+        if not os.path.isdir(dest):  # pragma: config
+            git.Repo.clone_from(cls.repository_url, dest,
+                                branch=cls.repository_branch)
+        return dest
         
     @classmethod
     def configure_executable_type(cls, cfg):
@@ -260,16 +288,14 @@ class OSRModelDriver(ExecutableModelDriver):
         # if platform._is_win:  # pragma: windows
         #     out.append((cls.language, opt, desc))
         #     return out
-        if not cfg.has_option(cls.language, opt):
+        if (((not cfg.has_option(cls.language, opt))
+             or (not os.path.isdir(cfg.get(cls.language, opt))))):
             fname = 'OpenSimRoot'
             fpath = tools.locate_file(fname)
             if not fpath:
                 logger.info('Could not locate %s, attempting to clone' % fname)
                 try:
-                    fpath = os.path.join(tempfile.gettempdir(), fname)
-                    if not os.path.isdir(fpath):  # pragma: config
-                        git.Repo.clone_from(cls.repository_url, fpath,
-                                            branch=cls.repository_branch)
+                    fpath = cls.clone_repository()
                 except BaseException as e:  # pragma: debug
                     logger.info('Failed to clone from %s. error = %s'
                                 % (cls.repository_url, str(e)))
