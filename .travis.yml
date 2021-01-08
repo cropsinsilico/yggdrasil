@@ -141,7 +141,8 @@ install:
 
     # Install dependencies & package
     if [[ -n "$YGG_CONDA" ]]; then
-      travis_wait python utils/setup_test_env.py install conda --without-build
+      travis_wait python utils/setup_test_env.py deps conda
+      travis_wait python utils/setup_test_env.py install conda --without-build --without-deps
     else
       if [[ $INSTALLR == '1' ]]; then
         export YGG_USE_SUDO_FOR_R=1
