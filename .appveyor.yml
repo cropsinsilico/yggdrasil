@@ -135,6 +135,7 @@ build: false
 
 test_script:
   - "yggclean"
+  - "yggcompile"
   - "yggtest --ci %YGG_TEST_FLAGS%"
   - "%YGG_SECOND_TEST%"
 

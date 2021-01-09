@@ -152,6 +152,7 @@ install:
 
 script:
   - python utils/setup_test_env.py verify
+  - travis_wait yggcompile
   - yggtest --ci $YGG_TEST_FLAGS
   - $YGG_SECOND_TEST
 

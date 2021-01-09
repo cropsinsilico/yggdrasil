@@ -97,6 +97,8 @@ jobs:
       run: python utils/setup_test_env.py install ${{ matrix.install-method }}
     - name: Verify installation
       run: python utils/setup_test_env.py verify
+    - name: Compile libraries
+      run: yggcompile
     - name: Run tests
       run: yggtest --ci ${{ matrix.test-flags }}
     - name: Upload coverage report
@@ -141,6 +143,8 @@ jobs:
       run: python utils/setup_test_env.py install ${{ matrix.install-method }}
     - name: Verify installation
       run: python utils/setup_test_env.py verify
+    - name: Compile libraries
+      run: yggcompile
     - name: Run tests
       run: yggtest --ci ${{ matrix.test-flags }}
     - name: Upload coverage report
@@ -240,6 +244,8 @@ jobs:
       run: python utils/setup_test_env.py install ${{ matrix.install-method }} --without-build
     - name: Verify installation
       run: python utils/setup_test_env.py verify
+    - name: Compile libraries
+      run: yggcompile
     - name: Run tests
       run: yggtest --ci ${{ matrix.test-flags }}
     - name: Generate XML version of coverage report and check for coverage report
