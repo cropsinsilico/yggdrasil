@@ -51,6 +51,7 @@ class OSRModelDriver(ExecutableModelDriver):
     language = 'osr'
     language_ext = '.xml'
     base_languages = ['cpp']
+    interface_dependencies = ['make']
     repository = None
     executable_path = None
     repository_url = "https://gitlab.com/langmm/OpenSimRoot.git"
@@ -96,6 +97,24 @@ class OSRModelDriver(ExecutableModelDriver):
         #         and os.path.isfile(self.executable_path)):
         self.compile_osr()
         assert(os.path.isfile(self.executable_path))
+
+    @classmethod
+    def is_library_installed(cls, lib, **kwargs):
+        r"""Determine if a dependency is installed.
+
+        Args:
+            lib (str): Name of the library that should be checked.
+            **kwargs: Additional keyword arguments are ignored.
+
+        Returns:
+            bool: True if the library is installed, False otherwise.
+
+        """
+        # Need to treat gnu make as dependency since OSR Makefile is not
+        # compatible with nmake
+        if lib == 'make':
+            return bool(shutil.which('make'))
+        return super(OSRModelDriver, cls).is_library_installed(lib, **kwargs)
 
     @classmethod
     def compile_dependencies(cls, *args, **kwargs):
