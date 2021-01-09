@@ -18,6 +18,12 @@ Installation
 
      $ call "C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\vcvarsall.bat" amd64
 
+.. note::
+
+   **Mac Users**
+
+   If you will be running C/C++/Fortran models, you will need to install the command line developer tools on Mac which provides several utilities for compilation and code management (e.g. clang, gcc, make, git). `This <https://cloudtechpoint.medium.com/how-to-install-command-line-tools-homebrew-in-macos-without-xcode-1b910742d923>`_ article outlines how to check if they are installed and install them if they are not. It also describes how to install the Homebrew package manager, which will be useful for installing non-Python dependencies if you do not plan on using conda to install |yggdrasil|.
+
 
 Conda Installation (recommended)
 --------------------------------
@@ -76,6 +82,10 @@ Manual Installation
 
 .. warning::
    **Windows Users** Be warned that there is 260 character limit to the size of the ``PATH`` environment variable (see note `here <https://docs.microsoft.com/en-us/windows/win32/fileio/naming-a-file#maximum-path-length-limitation>`_). If you modify the path (e.g. to add Python or the Python scripts directory), be sure that you do not exceed this limit. If you do, Windows will not report an error, but the characters past the limit will be ignored and so those directories will not be availble on the command prompt.
+
+.. note::
+
+   **Windows Users** If you do not use conda to install dependencies, we highly recommend installing two package managers, Chocolatey and vcpkg, to handle the installation of the non-Python dependencies. Instructions for installing Chocolatey can be found `here <https://chocolatey.org/install>`_ and instructions for installing vcpkg can be found `here <https://github.com/microsoft/vcpkg>`_.
 
 If you do not want to use conda, you can install Python yourself and then install 
 |yggdrasil| via ``pip`` or from the source code (See below). Python can be installed 
@@ -351,3 +361,12 @@ downloading, installing, and starting a RabbitMQ server can be found
 `here <https://www.rabbitmq.com/download.html>`_. The default values
 for RabbitMQ related properties in the config file are set to the defaults
 for starting a RabbitMQ server.
+
+Additional Steps for OpenSimRoot
+--------------------------------
+
+If you would like to use OpenSimRoot, you will need to install GNU make. If you are on Linux/Mac or used conda to install |yggdrasil| it is likely that it will already be installed (you can run ``make --version`` to check). If it is not installed, and you are using a Mac OS, you can install XCode and the command line developer tools to get make and several other GNU tools (see relavent section of `this article <https://cloudtechpoint.medium.com/how-to-install-command-line-tools-homebrew-in-macos-without-xcode-1b910742d923>`_). If you are not on Mac, we recommend installing it via a package manager, e.g.
+
+* ``brew install make`` on Mac
+* ``apt-get install make`` on Linux
+* ``choco install make`` on Windows
