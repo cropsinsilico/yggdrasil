@@ -358,7 +358,7 @@ def build_pkg(method, python=None, return_commands=False,
         cmds += [
             # "%s clean --all" % CONDA_CMD,  # Might invalidate cache
             # "%s deactivate" % CONDA_CMD,
-            "%s install -q -n base conda-build conda-verify" % CONDA_CMD,
+            "%s install -q -n base conda-build conda-smithy conda-verify" % CONDA_CMD,
             "%s build %s --python %s %s" % (
                 CONDA_CMD, 'recipe', python, build_flags),
             "%s index %s" % (CONDA_CMD, CONDA_INDEX),
