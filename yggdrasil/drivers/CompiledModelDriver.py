@@ -2636,7 +2636,7 @@ class CompiledModelDriver(ModelDriver):
             if (((libinfo.get('libtype', None) == 'windows_import')
                  and (libtype == 'static'))):
                 # Name import lib using dll
-                import_lib = True
+                import_lib = (tool.toolname == 'cl')
                 libtype = 'shared'
             out = tool.get_output_file(dep, libtype=libtype, no_src_ext=True,
                                        build_library=True,
@@ -2997,6 +2997,8 @@ class CompiledModelDriver(ModelDriver):
                 if (((not kwargs.get('dry_run', False))
                      and (not os.path.isfile(dep_lib)))):  # pragma: debug
                     if dep in internal_dependencies:
+                        # If this is called recursively, verify that dep_lib is produced
+                        # by compiling dep.
                         cls.compile_dependencies(toolname=toolname)
                     if not os.path.isfile(dep_lib):
                         raise RuntimeError(
@@ -3414,8 +3416,10 @@ class CompiledModelDriver(ModelDriver):
         return out
         
     @classmethod
-    def compile_dependencies(cls, toolname=None, **kwargs):
+    def compile_dependencies(cls, toolname=None, dep=None, **kwargs):
         r"""Compile any required internal libraries, including the interface."""
+        if dep is None:
+            dep = cls.interface_library
         kwargs.setdefault('products', [])
         base_libraries = []
         compiler = cls.get_tool('compiler', toolname=toolname)
@@ -3426,11 +3430,8 @@ class CompiledModelDriver(ModelDriver):
             base_cls = import_component('model', x)
             base_libraries.append(base_cls.interface_library)
             base_cls.compile_dependencies(toolname=toolname, **kwargs)
-        if (((cls.interface_library is not None) and cls.is_installed()
-             and (cls.interface_library not in base_libraries))):
-            # cls.call_compiler(cls.interface_library)
-            dep_order = cls.get_dependency_order(cls.interface_library,
-                                                 toolname=toolname)
+        if (dep is not None) and cls.is_installed() and (dep not in base_libraries):
+            dep_order = cls.get_dependency_order(dep, toolname=toolname)
             for k in dep_order[::-1]:
                 if isinstance(k, tuple):
                     assert(len(k) == 2)
