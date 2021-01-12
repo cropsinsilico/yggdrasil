@@ -978,6 +978,8 @@ class CMakeModelDriver(BuildModelDriver):
                 kwargs['env']['PATH'] = path
                 if not sh_path:
                     kwargs.setdefault('generator', 'MinGW Makefiles')
+                elif shutil.which('make', path=path):
+                    kwargs.setdefault('generator', 'Unix Makefiles')
                 # This is not currently tested
                 # else:
                 #     kwargs.setdefault('generator', 'MSYS Makefiles')
