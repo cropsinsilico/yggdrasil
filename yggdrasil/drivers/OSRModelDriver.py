@@ -148,11 +148,6 @@ class OSRModelDriver(ExecutableModelDriver):
                 env['YGG_OSR_TOOL'] = toolname
                 if toolname == 'cl':
                     cl_path = shutil.which(toolname + '.exe')
-                    print('cl.exe', shutil.which(toolname), cl_path)
-                    subprocess.check_call(['yggccflags', '--cpp',
-                                           '--toolname=%s' % toolname])
-                    subprocess.check_call(['yggldflags', '--cpp',
-                                           '--toolname=%s' % toolname])
                     if cl_path:
                         msvc_bin = os.path.dirname(cl_path)
                         env['YGG_OSR_CXX'] = cl_path

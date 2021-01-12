@@ -839,11 +839,6 @@ class CompilationToolBase(object):
                     assert(os.path.isdir(paths[-1]))
             if os.environ.get('ChocolateyInstall'.upper(), None):
                 base_paths.append(os.environ['ChocolateyInstall'])
-            else:
-                print('ChocolateyInstall',
-                      os.environ.get('ChocolateyInstall', None))
-                print('ChocolateyInstall'.upper(),
-                      os.environ.get('ChocolateyInstall'.upper(), None))
         else:
             base_paths = ['/usr', os.path.join('/usr', 'local')]
         if platform._is_mac:
