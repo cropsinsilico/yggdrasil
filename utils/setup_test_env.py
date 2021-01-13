@@ -5,6 +5,7 @@ import uuid
 import pprint
 import shutil
 import subprocess
+import warnings
 PYVER = ('%s.%s' % sys.version_info[:2])
 PY2 = (sys.version_info[0] == 2)
 _is_osx = (sys.platform == 'darwin')
@@ -264,6 +265,10 @@ def create_env(method, python, name=None, packages=None, init=_on_ci):
         name = '%s%s' % (method, python.replace('.', ''))
     if packages is None:
         packages = []
+    if 'requests' not in packages:
+        # Not strictly required, but useful for determine the versions of
+        # dependencies required by packages during testing
+        packages.append('requests')
     if method == 'conda':
         if conda_env_exists(name):
             print("Conda env with name '%s' already exists." % name)
@@ -489,6 +494,21 @@ def install_deps(method, return_commands=False, verbose=False, for_development=F
     # a conflict when installing LPy
     conda_pkgs += ['scipy']
     if install_opts['sbml'] and fallback_to_conda:
+        numpy_ver = 'numpy==1.19.3'
+        # This allows requests to be used to determine the version of
+        # numpy that libroadrunner is pinned to and falls back to a
+        # hardcoded version if requests is not installed.
+        try:
+            new_numpy_ver = get_pip_dependency_version(
+                'libroadrunner', 'numpy')
+            if new_numpy_ver != numpy_ver:
+                warnings.warn(
+                    "Update the hardcoded version of numpy "
+                    "required for libroadrunner to '%s' on the line above."
+                    % new_numpy_ver)
+            numpy_ver = new_numpy_ver
+        except ImportError:
+            pass
         conda_pkgs.append(
             get_pip_dependency_version('libroadrunner', 'numpy'))
     else:

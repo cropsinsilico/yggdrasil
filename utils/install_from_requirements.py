@@ -3,7 +3,6 @@ from pip._vendor.packaging.requirements import Requirement, InvalidRequirement
 import os
 import re
 import uuid
-import requests
 import pprint
 import argparse
 from setup_test_env import (
@@ -38,6 +37,7 @@ def get_pip_dependencies(pkg):
         list: The package's dependencies.
 
     """
+    import requests
     url = 'https://pypi.org/pypi/{}/json'
     json = requests.get(url.format(pkg)).json()
     return json['info']['requires_dist']
