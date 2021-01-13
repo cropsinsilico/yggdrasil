@@ -449,6 +449,7 @@ def install_deps(method, return_commands=False, verbose=False, for_development=F
     choco_pkgs = []
     vcpkg_pkgs = []
     requirements_files = ['requirements_optional.txt']
+    skip_pkgs = []
     if method == 'conda':
         fallback_to_conda = True
         default_pkgs = conda_pkgs
@@ -492,26 +493,7 @@ def install_deps(method, return_commands=False, verbose=False, for_development=F
     #     conda_pkgs.append("\"blas=*=openblas\"")
     # Installing via pip causes import error on Windows and
     # a conflict when installing LPy
-    conda_pkgs += ['scipy']
-    if install_opts['sbml'] and fallback_to_conda:
-        numpy_ver = 'numpy=1.19.3'
-        # This allows requests to be used to determine the version of
-        # numpy that libroadrunner is pinned to and falls back to a
-        # hardcoded version if requests is not installed.
-        try:
-            new_numpy_ver = get_pip_dependency_version(
-                'libroadrunner', 'numpy').replace('==', '=')
-            if new_numpy_ver != numpy_ver:
-                warnings.warn(
-                    "Update the hardcoded version of numpy "
-                    "required for libroadrunner to '%s' on the line above."
-                    % new_numpy_ver)
-            numpy_ver = new_numpy_ver
-        except (ImportError, ModuleNotFoundError):
-            pass
-        conda_pkgs.append(numpy_ver)
-    else:
-        conda_pkgs.append(os.environ.get('NUMPY', 'numpy'))
+    conda_pkgs += ['scipy', os.environ.get('NUMPY', 'numpy')]
     for k in ['matplotlib', 'jsonschema']:
         if os.environ.get(k.upper(), k) != k:
             default_pkgs.append(os.environ[k.upper()])
@@ -632,11 +614,33 @@ def install_deps(method, return_commands=False, verbose=False, for_development=F
         else:
             raise NotImplementedError("No native package manager supported "
                                       "on Windows.")
+    if install_opts['sbml'] and fallback_to_conda:
+        # Until the sbml package is updated to allow numpy != 1.19.3,
+        # sbml will need to be installed separately without deps in order
+        # to work in a conda env
+        numpy_ver = 'numpy==1.19.3'
+        try:
+            new_numpy_ver = get_pip_dependency_version(
+                'libroadrunner', 'numpy')
+            if new_numpy_ver != numpy_ver:
+                warnings.warn(
+                    "libroadrunner has updated it's numpy requirement. "
+                    "Assuming the new requirement is not strict (%s), "
+                    "this code can be removed and libroadrunner can be "
+                    "installed normally (numpy should be installed with "
+                    "conda if a conda environment is being used to avoid "
+                    "inconsistencies)." % new_numpy_ver)
+            numpy_ver = new_numpy_ver
+        except (ImportError, ModuleNotFoundError):
+            pass
+        conda_pkgs.insert(numpy_ver.replace('==', '>='))
+        skip_pkgs.append('libroadrunner')
     if not fallback_to_conda:
         default_pkgs += conda_pkgs
     if requirements_files:
         kwargs = dict(conda_env=conda_env, python_cmd=python_cmd,
                       install_opts=install_opts, append_cmds=cmds,
+                      skip_packages=skip_pkgs, verbose=verbose,
                       verbose_prune=True)
         install_from_requirements(method, requirements_files,
                                   additional_packages=default_pkgs, **kwargs)
@@ -652,6 +656,12 @@ def install_deps(method, return_commands=False, verbose=False, for_development=F
             install_from_requirements('pip', list(set(requirements_files)),
                                       additional_packages=pip_pkgs,
                                       unique_to_method=True, **kwargs)
+    if 'libroadrunner' in skip_pkgs:
+        pip_flags = '--no-dependencies'
+        if verbose:
+            pip_flags += ' --verbose'
+        cmds.append('%s -m pip install %s libroadrunner'
+                    % (python_cmd, pip_flags))
     if install_opts['lpy']:
         if verbose:
             install_flags = '-vvv'
