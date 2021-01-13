@@ -482,6 +482,9 @@ def install_deps(method, return_commands=False, verbose=False, for_development=F
             "%s config --add channels conda-forge" % CONDA_CMD,
         ]
     # Required for non-strict channel priority
+    # https://github.com/conda-forge/conda-forge.github.io/pull/670
+    # https://conda.io/projects/conda/en/latest/user-guide/concepts/ ...
+    #    packages.html?highlight=openblas#installing-numpy-with-blas-variants
     # if fallback_to_conda:
     #     conda_pkgs.append("\"blas=*=openblas\"")
     # Installing via pip causes import error on Windows and
@@ -741,6 +744,9 @@ def install_pkg(method, python=None, without_build=False,
             "%s install %s --update-deps -c %s yggdrasil" % (
                 CONDA_CMD, install_flags, index_channel)
             # Required for non-strict channel priority
+            # https://github.com/conda-forge/conda-forge.github.io/pull/670
+            # https://conda.io/projects/conda/en/latest/user-guide/concepts/ ...
+            #    packages.html?highlight=openblas#installing-numpy-with-blas-variants
             # "%s install %s --update-deps -c %s yggdrasil \"blas=*=openblas\"" % (
             #     CONDA_CMD, install_flags, index_channel)
         ]

@@ -4,7 +4,8 @@ import os
 import re
 import argparse
 from setup_test_env import (
-    call_conda_command, locate_conda_exe, get_install_opts, PYTHON_CMD, CONDA_CMD)
+    call_conda_command, locate_conda_exe, get_install_opts,
+    PYTHON_CMD, CONDA_CMD, _is_win)
 
 
 def prune(fname_in, fname_out=None, excl_method=None, incl_method=None,
@@ -168,11 +169,17 @@ def install_from_requirements(method, fname_in, conda_env=None,
                 cmd_list = []
             else:
                 cmd_list = append_cmds
-            cmd_list += [
-                ' '.join(args),
-                ('%s -c \'exec(\"import os;if os.path.isfile'
-                 '(\\"%s\\"): os.remove(\\"%s\\")\")\'')
-                % (python_cmd, temp_file, temp_file)]
+            cmd_list += [' '.join(args)]
+            if _is_win:
+                cmd_list.append(
+                    ('%s -c \'exec(\"import os;if os.path.isfile'
+                     '(\\"%s\\"): os.remove(\\"%s\\")\")\'')
+                    % (python_cmd, temp_file, temp_file))
+            else:
+                cmd_list.append(
+                    ('%s -c \'import os\nif os.path.isfile'
+                     '(\\"%s\\"): os.remove(\\"%s\\")\'')
+                    % (python_cmd, temp_file, temp_file))
         if return_cmds:
             return cmd_list
         if isinstance(append_cmds, list):
