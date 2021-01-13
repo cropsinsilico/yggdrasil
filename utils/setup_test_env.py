@@ -423,6 +423,8 @@ def install_deps(method, return_commands=False, verbose=False, for_development=F
             via pip. Defaults to False.
 
     """
+    from install_from_requirements import (
+        install_from_requirements, get_pip_dependency_version)
     install_opts = get_install_opts(install_opts)
     python_cmd = PYTHON_CMD
     conda_flags = ''
@@ -435,7 +437,6 @@ def install_deps(method, return_commands=False, verbose=False, for_development=F
     # of specific versions
     cmds = ["%s -m pip uninstall -y numpy matplotlib" % python_cmd]
     # Get dependencies
-    from install_from_requirements import install_from_requirements
     # install_req = os.path.join("utils", "install_from_requirements.py")
     conda_pkgs = []
     pip_pkgs = []
@@ -486,7 +487,12 @@ def install_deps(method, return_commands=False, verbose=False, for_development=F
     #     conda_pkgs.append("\"blas=*=openblas\"")
     # Installing via pip causes import error on Windows and
     # a conflict when installing LPy
-    conda_pkgs += ['scipy', os.environ.get('NUMPY', 'numpy')]
+    conda_pkgs += ['scipy']
+    if install_opts['sbml'] and fallback_to_conda:
+        conda_pkgs.append(
+            get_pip_dependency_version('libroadrunner', 'numpy'))
+    else:
+        conda_pkgs.append(os.environ.get('NUMPY', 'numpy'))
     for k in ['matplotlib', 'jsonschema']:
         if os.environ.get(k.upper(), k) != k:
             default_pkgs.append(os.environ[k.upper()])
