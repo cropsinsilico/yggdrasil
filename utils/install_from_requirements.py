@@ -71,7 +71,8 @@ def get_pip_dependency_version(pkg, dep):
 
 
 def prune(fname_in, fname_out=None, excl_method=None, incl_method=None,
-          install_opts=None, additional_packages=[], verbose=False):
+          install_opts=None, additional_packages=[], skip_packages=[],
+          verbose=False):
     r"""Prune a requirements.txt file to remove/select dependencies that are
     dependent on the current environment.
 
@@ -92,6 +93,8 @@ def prune(fname_in, fname_out=None, excl_method=None, incl_method=None,
         additional_packages (list, optional): Additional packages that should
             be installed. Defaults to empty list. Versions specified here take
             precedence over versions in the provided files.
+        skip_packages (list, optional): A list of packages that should not
+            be added to the pruned list. Defaults to an empty list.
         verbose (bool, optional): If True, setup steps are run with verbosity
             turned up. Defaults to False.
 
@@ -111,9 +114,12 @@ def prune(fname_in, fname_out=None, excl_method=None, incl_method=None,
     orig_lines = additional_packages.copy()
     for line in additional_packages:
         pkg = isolate_package_name(line)
-        if pkg not in packages:
-            new_lines.append(line)
-            packages.append(pkg)
+        if pkg in packages:
+            continue
+        if pkg in skip_packages:
+            continue
+        new_lines.append(line)
+        packages.append(pkg)
     for ifname_in in fname_in:
         with open(ifname_in, 'r') as fd:
             old_lines = fd.readlines()
@@ -124,6 +130,8 @@ def prune(fname_in, fname_out=None, excl_method=None, incl_method=None,
                 continue
             pkg = isolate_package_name(line)
             if pkg in packages:
+                continue
+            if pkg in skip_packages:
                 continue
             packages.append(pkg)
             skip_line = False
@@ -178,7 +186,7 @@ def install_from_requirements(method, fname_in, conda_env=None,
                               user=False, unique_to_method=False,
                               python_cmd=None, install_opts=None,
                               verbose=False, verbose_prune=False,
-                              additional_packages=[],
+                              additional_packages=[], skip_packages=[],
                               return_cmds=False, append_cmds=None,
                               temp_file=None):
     r"""Install packages via pip or conda from one or more pip-style
@@ -208,6 +216,8 @@ def install_from_requirements(method, fname_in, conda_env=None,
             will be set to True as well.
         additional_packages (list, optional): Additional packages that should
             be installed. Defaults to empty list.
+        skip_packages (list, optional): A list of packages that should not
+            be added to the pruned list. Defaults to an empty list.
         return_cmds (bool, optional): If True, the necessary commands will be
             returned. Defaults to False.
         append_cmds (list, optional): List that commands should be appended to.
@@ -238,7 +248,8 @@ def install_from_requirements(method, fname_in, conda_env=None,
     temp_file = prune(fname_in, fname_out=temp_file,
                       excl_method=excl_method, incl_method=incl_method,
                       install_opts=install_opts, verbose=verbose_prune,
-                      additional_packages=additional_packages)
+                      additional_packages=additional_packages,
+                      skip_packages=skip_packages)
     try:
         if method == 'conda':
             args = [CONDA_CMD, 'install', '-y']
