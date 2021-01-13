@@ -63,6 +63,9 @@ def prune(fname_in, fname_out=None, excl_method=None, incl_method=None,
                 m = re.fullmatch(regex_comment, comment)
                 if m:
                     values = [x.strip() for x in m.group('vals').split(',')]
+                    if verbose:
+                        print('line: %s, values = %s, excl = %s, incl = %s'
+                              % (line, values, excl_method, incl_method))
                     if excl_method and (excl_method in values):
                         continue
                     if incl_method and (incl_method not in values):
