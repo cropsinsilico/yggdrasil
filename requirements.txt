@@ -1,5 +1,6 @@
 jsonschema>=3
-matplotlib
+libroadrunner  # [pip,sbml]
+matplotlib     # [pip]
 numpy>=1.13.0
 pandas
 pyperf

@@ -1,11 +1,14 @@
 # https://www.python.org/dev/peps/pep-0508/
 from pip._vendor.packaging.requirements import Requirement, InvalidRequirement
 import os
+import re
 import argparse
-from setup_test_env import call_conda_command, locate_conda_exe
+from setup_test_env import (
+    call_conda_command, locate_conda_exe, get_install_opts, PYTHON_CMD, CONDA_CMD)
 
 
-def prune(fname_in, fname_out=None, excl_suffix=None, incl_suffix=None):
+def prune(fname_in, fname_out=None, excl_method=None, incl_method=None,
+          install_opts=None, additional_packages=[]):
     r"""Prune a requirements.txt file to remove/select dependencies that are
     dependent on the current environment.
 
@@ -14,15 +17,27 @@ def prune(fname_in, fname_out=None, excl_suffix=None, incl_suffix=None):
             should be read.
         fname_out (str, optional): Full path to requirements file that should be
             created. Defaults to None and is set to <fname_in[0]>_pruned.txt.
-        excl_suffix (str, optional): Lines ending in this string will be
-            excluded. Defaults to None and is ignored.
-        incl_suffix (str, optional): Only lines ending in this string will be
-            included. Defaults to None and is ignored.
+        excl_method (str, optional): Installation method (pip or conda) that
+            should be ignored. Defaults to None and is ignored.
+        incl_method (str, optional): Installation method (pip or conda) that
+            should be installed (requirements with without an installation method
+            or with a different method will be ignored). Defaults to None and is
+            ignored.
+        install_opts (dict, optional): Mapping from language/package to bool
+            specifying whether or not the language/package should be installed.
+            If not provided, get_install_opts is used to create it.
+        additional_packages (list, optional): Additional packages that should
+            be installed. Defaults to empty list.
 
     Returns:
         str: Full path to created file.
 
     """
+    regex_constrain = r'(?:pip)|(?:conda)|(?:[a-zA-Z][a-zA-Z0-9]*)'
+    regex_comment = r'\s*\[\s*(?P<vals>%s(?:\s*\,\s*%s)*)\s*\]\s*' % (
+        regex_constrain, regex_constrain)
+    # regex_elem = r'(?P<val>%s)\s*(?:(?:\,)|(?:\]))' % regex_constrain
+    install_opts = get_install_opts(install_opts)
     if not isinstance(fname_in, (list, tuple)):
         fname_in = [fname_in]
     new_lines = []
@@ -33,18 +48,35 @@ def prune(fname_in, fname_out=None, excl_suffix=None, incl_suffix=None):
             line = line.strip()
             if line.startswith('#'):
                 continue
-            if excl_suffix and line.endswith(excl_suffix):
-                continue
-            if incl_suffix and (not line.endswith(incl_suffix)):
-                continue
+            req_name = line
+            if '#' in line:
+                req_name, comment = line.split('#')
+                m = re.fullmatch(regex_comment, comment)
+                if m:
+                    skip_line = False
+                    values = [x.strip() for x in m.group('vals').split(',')]
+                    if excl_method and (excl_method in values):
+                        continue
+                    if incl_method and (incl_method not in values):
+                        continue
+                    for v in values:
+                        if v not in ['pip', 'conda']:
+                            if v not in install_opts:
+                                raise RuntimeError("Unsupported install opt: '%s'" % v)
+                            if not install_opts[v]:
+                                skip_line = True
+                                break
+                    if skip_line:
+                        continue
             try:
-                req = Requirement(line.split('#')[0].strip())
+                req = Requirement(req_name.strip())
                 if req.marker and (not req.marker.evaluate()):
                     continue
                 new_lines.append(req.name + str(req.specifier))
             except InvalidRequirement as e:
                 print(e)
                 continue
+    new_lines += additional_packages
     # Write file
     if fname_out is None:
         fname_out = '_pruned'.join(os.path.splitext(fname_in[0]))
@@ -54,7 +86,9 @@ def prune(fname_in, fname_out=None, excl_suffix=None, incl_suffix=None):
 
 
 def install_from_requirements(method, fname_in, conda_env=None,
-                              user=False, unique_to_method=False):
+                              user=False, unique_to_method=False,
+                              python_cmd=None, install_opts=None,
+                              verbose=False, additional_packages=[]):
     r"""Install packages via pip or conda from one or more pip-style
     requirements file(s).
 
@@ -68,33 +102,53 @@ def install_from_requirements(method, fname_in, conda_env=None,
             False.
         unique_to_method (bool, optional): If True, only those packages that
             can only be installed via the specified method will be installed.
+        install_opts (dict, optional): Mapping from language/package to bool
+            specifying whether or not the language/package should be installed.
+            If not provided, get_install_opts is used to create it.
+        python_cmd (str, optional): Python executable that should be used to
+            call pip. Defaults to None and will be determined from conda_env if
+            provided. Otherwise the current executable will be used.
+        verbose (bool, optional): If True, setup steps are run with verbosity
+            turned up. Defaults to False.
+        additional_packages (list, optional): Additional packages that should
+            be installed. Defaults to empty list.
 
     """
+    install_opts = get_install_opts(install_opts)
+    if python_cmd is None:
+        python_cmd = PYTHON_CMD
+    if conda_env:
+        python_cmd = locate_conda_exe(conda_env, 'python')
     if method == 'pip':
-        excl_suffix = '# conda'
+        excl_method = 'conda'
     elif method == 'conda':
-        excl_suffix = '# pip'
+        excl_method = 'pip'
     else:
         raise ValueError("Invalid method: '%s'" % method)
     if unique_to_method:
-        incl_suffix = '# %s' % method
+        incl_method = method
     else:
-        incl_suffix = None
-    temp_file = prune(fname_in, excl_suffix=excl_suffix, incl_suffix=incl_suffix)
+        incl_method = None
+    temp_file = prune(fname_in, excl_method=excl_method, incl_method=incl_method,
+                      install_opts=install_opts, additional_packages=additional_packages)
     try:
         if method == 'conda':
-            args = ['conda', 'install', '-y']
+            args = [CONDA_CMD, 'install', '-y']
+            if verbose:
+                args.append('-vvv')
+            else:
+                args.append('-q')
             if conda_env:
                 args += ['--name', conda_env]
             args += ['--file', temp_file]
             if user:
                 args.append('--user')
+            args.append('--update-all')
         elif method == 'pip':
-            if conda_env:
-                pip_cmd = locate_conda_exe(conda_env, 'pip')
-            else:
-                pip_cmd = 'pip'
-            args = [pip_cmd, 'install', '-r', temp_file]
+            args = [python_cmd, '-m', 'pip', 'install']
+            if verbose:
+                args.append('--verbose')
+            args += ['-r', temp_file]
             if user:
                 args.append('--user')
         print(call_conda_command(args))
@@ -109,6 +163,7 @@ def install_from_requirements(method, fname_in, conda_env=None,
 
 
 if __name__ == "__main__":
+    install_opts = get_install_opts()
     parser = argparse.ArgumentParser(
         "Install dependencies via pip or conda from one or more "
         "pip-style requirements files.")
@@ -125,6 +180,28 @@ if __name__ == "__main__":
     parser.add_argument('--unique-to-method', action='store_true',
                         help=('Only install packages that are unique to the specified '
                               'installation method.'))
+    parser.add_argument('--verbose', action='store_true',
+                        help="Turn up verbosity of output.")
+    parser.add_argument('--additional-packages', nargs='+',
+                        help="Additional packages that should be installed.")
+    for k, v in install_opts.items():
+        if v:
+            parser.add_argument(
+                '--dont-install-%s' % k, action='store_true',
+                help=("Don't install %s" % k))
+        else:
+            parser.add_argument(
+                '--install-%s' % k, action='store_true',
+                help=("Install %s" % k))
     args = parser.parse_args()
+    new_opts = {}
+    for k, v in install_opts.items():
+        if v and getattr(args, 'dont_install_%s' % k, False):
+            new_opts[k] = False
+        elif (not v) and getattr(args, 'install_%s' % k, False):
+            new_opts[k] = True
+    install_opts.update(new_opts)
     install_from_requirements(args.method, args.files, conda_env=args.conda_env,
-                              user=args.user, unique_to_method=args.unique_to_method)
+                              user=args.user, unique_to_method=args.unique_to_method,
+                              install_opts=install_opts, verbose=args.verbose,
+                              additional_packages=args.additional_packages)
