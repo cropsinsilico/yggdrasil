@@ -2,6 +2,7 @@
 from pip._vendor.packaging.requirements import Requirement, InvalidRequirement
 import os
 import re
+import pprint
 import argparse
 from setup_test_env import (
     call_conda_command, locate_conda_exe, get_install_opts,
@@ -9,7 +10,7 @@ from setup_test_env import (
 
 
 def prune(fname_in, fname_out=None, excl_method=None, incl_method=None,
-          install_opts=None, additional_packages=[]):
+          install_opts=None, additional_packages=[], verbose=False):
     r"""Prune a requirements.txt file to remove/select dependencies that are
     dependent on the current environment.
 
@@ -29,6 +30,8 @@ def prune(fname_in, fname_out=None, excl_method=None, incl_method=None,
             If not provided, get_install_opts is used to create it.
         additional_packages (list, optional): Additional packages that should
             be installed. Defaults to empty list.
+        verbose (bool, optional): If True, setup steps are run with verbosity
+            turned up. Defaults to False.
 
     Returns:
         str: Full path to created file.
@@ -42,9 +45,11 @@ def prune(fname_in, fname_out=None, excl_method=None, incl_method=None,
     if not isinstance(fname_in, (list, tuple)):
         fname_in = [fname_in]
     new_lines = []
+    orig_lines = []
     for ifname_in in fname_in:
         with open(ifname_in, 'r') as fd:
             old_lines = fd.readlines()
+            orig_lines += old_lines
         for line in old_lines:
             line = line.strip()
             if line.startswith('#'):
@@ -77,12 +82,17 @@ def prune(fname_in, fname_out=None, excl_method=None, incl_method=None,
             except InvalidRequirement as e:
                 print(e)
                 continue
+    orig_lines += additional_packages
     new_lines += additional_packages
     # Write file
     if fname_out is None:
         fname_out = '_pruned'.join(os.path.splitext(fname_in[0]))
     with open(fname_out, 'w') as fd:
         fd.write('\n'.join(new_lines))
+    if verbose:
+        print('INSTALL OPTS:\n%s' % pprint.pformat(install_opts))
+        print('ORIGINAL DEP LIST:\n\t%s\nPRUNED DEP LIST:\n\t%s'
+              % ('\n\t'.join(orig_lines), '\n\t'.join(new_lines)))
     return fname_out
 
 
@@ -142,7 +152,7 @@ def install_from_requirements(method, fname_in, conda_env=None,
         incl_method = None
     temp_file = prune(fname_in, fname_out=temp_file,
                       excl_method=excl_method, incl_method=incl_method,
-                      install_opts=install_opts,
+                      install_opts=install_opts, verbose=verbose,
                       additional_packages=additional_packages)
     try:
         if method == 'conda':
