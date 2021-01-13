@@ -188,7 +188,7 @@ def install_from_requirements(method, fname_in, conda_env=None,
             else:
                 cmd_list.append(
                     ('%s -c \'import os\nif os.path.isfile'
-                     '(\\"%s\\"): os.remove(\\"%s\\")\'')
+                     '(\"%s\"): os.remove(\"%s\")\'')
                     % (python_cmd, temp_file, temp_file))
         if return_cmds:
             return cmd_list
