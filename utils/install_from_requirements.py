@@ -39,7 +39,7 @@ def prune(fname_in, fname_out=None, excl_method=None, incl_method=None,
 
     """
     verbose = True
-    regex_constrain = r'(?:pip)|(?:conda)|(?:[a-zA-Z][a-zA-Z0-9]*)'
+    regex_constrain = r'(?:(?:pip)|(?:conda)|(?:[a-zA-Z][a-zA-Z0-9]*))'
     regex_comment = r'\s*\[\s*(?P<vals>%s(?:\s*\,\s*%s)*)\s*\]\s*' % (
         regex_constrain, regex_constrain)
     # regex_elem = r'(?P<val>%s)\s*(?:(?:\,)|(?:\]))' % regex_constrain
