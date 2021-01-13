@@ -3,6 +3,7 @@ from pip._vendor.packaging.requirements import Requirement, InvalidRequirement
 import os
 import re
 import uuid
+import requests
 import pprint
 import argparse
 from setup_test_env import (
@@ -25,6 +26,48 @@ def isolate_package_name(entry):
     for k in keys:
         out = out.split(k)[0].strip()
     return out.strip()
+
+
+def get_pip_dependencies(pkg):
+    r"""Get the dependencies required by a package via pip.
+
+    Args:
+        pkg (str): The name of a pip-installable package.
+
+    Returns:
+        list: The package's dependencies.
+
+    """
+    url = 'https://pypi.org/pypi/{}/json'
+    json = requests.get(url.format(pkg)).json()
+    return json['info']['requires_dist']
+
+
+def get_pip_dependency_version(pkg, dep):
+    r"""Get the version of a dependency required by a pip-installable
+    package.
+
+    Args:
+        pkg (str): The name of a pip-installable package.
+        dep (str): The name of a dependency of pkg.
+
+    Returns:
+        str: The version of the dependency required by the package.
+
+    """
+    reqs = get_pip_dependencies(pkg)
+    dep_regex = r'%s(?:\s*\((?P<ver>[^\)]+)\))?' % dep
+    for x in reqs:
+        m = re.fullmatch(dep_regex, x)
+        if m:
+            ver = ''
+            if m.group('ver'):
+                ver = m.group('ver').strip()
+            return dep + ver
+    raise RuntimeError(
+        ("Could not locate the dependency '%s' "
+         "in the list of requirements for package '%s': %s")
+        % (dep, pkg, reqs))
 
 
 def prune(fname_in, fname_out=None, excl_method=None, incl_method=None,
