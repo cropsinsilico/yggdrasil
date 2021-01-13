@@ -633,7 +633,7 @@ def install_deps(method, return_commands=False, verbose=False, for_development=F
             numpy_ver = new_numpy_ver
         except (ImportError, ModuleNotFoundError):
             pass
-        conda_pkgs.insert(numpy_ver.replace('==', '>='))
+        conda_pkgs.insert(0, numpy_ver.replace('==', '>='))
         skip_pkgs.append('libroadrunner')
     if not fallback_to_conda:
         default_pkgs += conda_pkgs
