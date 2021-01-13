@@ -487,8 +487,9 @@ def install_deps(method, return_commands=False, verbose=False, for_development=F
     # Installing via pip causes import error on Windows and
     # a conflict when installing LPy
     conda_pkgs += ['scipy', os.environ.get('NUMPY', 'numpy')]
-    default_pkgs += [os.environ.get('MATPLOTLIB', 'matplotlib'),
-                     os.environ.get('JSONSCHEMA', 'jsonschema')]
+    for k in ['matplotlib', 'jsonschema']:
+        if os.environ.get(k.upper(), k) != k:
+            default_pkgs.append(os.environ[k.upper()])
     if _is_linux:
         os_pkgs += ["strace", "valgrind"]
     # Valgrind failure:
