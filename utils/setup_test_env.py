@@ -610,7 +610,8 @@ def install_deps(method, return_commands=False, verbose=False, for_development=F
         default_pkgs += conda_pkgs
     if requirements_files:
         kwargs = dict(conda_env=conda_env, python_cmd=python_cmd,
-                      install_opts=install_opts, append_cmds=cmds)
+                      install_opts=install_opts, append_cmds=cmds,
+                      verbose_prune=True)
         install_from_requirements(method, requirements_files,
                                   additional_packages=default_pkgs, **kwargs)
         if (method == 'pip') and fallback_to_conda:

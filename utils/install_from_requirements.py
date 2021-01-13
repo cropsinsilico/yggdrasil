@@ -38,7 +38,6 @@ def prune(fname_in, fname_out=None, excl_method=None, incl_method=None,
         str: Full path to created file.
 
     """
-    verbose = True
     regex_constrain = r'(?:(?:pip)|(?:conda)|(?:[a-zA-Z][a-zA-Z0-9]*))'
     regex_comment = r'\s*\[\s*(?P<vals>%s(?:\s*\,\s*%s)*)\s*\]\s*' % (
         regex_constrain, regex_constrain)
@@ -109,7 +108,8 @@ def prune(fname_in, fname_out=None, excl_method=None, incl_method=None,
 def install_from_requirements(method, fname_in, conda_env=None,
                               user=False, unique_to_method=False,
                               python_cmd=None, install_opts=None,
-                              verbose=False, additional_packages=[],
+                              verbose=False, verbose_prune=False,
+                              additional_packages=[],
                               return_cmds=False, append_cmds=None,
                               temp_file=None):
     r"""Install packages via pip or conda from one or more pip-style
@@ -133,6 +133,10 @@ def install_from_requirements(method, fname_in, conda_env=None,
             provided. Otherwise the current executable will be used.
         verbose (bool, optional): If True, setup steps are run with verbosity
             turned up. Defaults to False.
+        verbose_prune (bool, optional): If True, additional information will
+            be printed when determine the list of requirements that should be
+            installed. Defaults to False. If verbose is True, verbose_prune
+            will be set to True as well.
         additional_packages (list, optional): Additional packages that should
             be installed. Defaults to empty list.
         return_cmds (bool, optional): If True, the necessary commands will be
@@ -144,6 +148,8 @@ def install_from_requirements(method, fname_in, conda_env=None,
             be stored. Defaults to None and one will be created.
 
     """
+    if verbose:
+        verbose_prune = True
     return_temp = (return_cmds or isinstance(append_cmds, list))
     install_opts = get_install_opts(install_opts)
     if python_cmd is None:
@@ -162,7 +168,7 @@ def install_from_requirements(method, fname_in, conda_env=None,
         incl_method = None
     temp_file = prune(fname_in, fname_out=temp_file,
                       excl_method=excl_method, incl_method=incl_method,
-                      install_opts=install_opts, verbose=verbose,
+                      install_opts=install_opts, verbose=verbose_prune,
                       additional_packages=additional_packages)
     try:
         if method == 'conda':
