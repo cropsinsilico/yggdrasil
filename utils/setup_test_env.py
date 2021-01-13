@@ -456,15 +456,12 @@ def install_deps(method, return_commands=False, verbose=False, for_development=F
     # would be missed when installing in development mode
     if for_development:
         if method == 'conda':
-            requirements_files.append('requirements.txt')
+            requirements_files += ['requirements.txt',
+                                   'requirements_condaonly.txt']
         elif method == 'pip':
-            requirements_files.append('requirements_piponly.txt')
-        if fallback_to_conda:
-            # TODO: This includes some 'optional' packages that could be
-            # controlled by install_opts, but installing in this way
-            # ignores them and assumes that more packages is better than
-            # less in the case of development
-            requirements_files.append('requirements_condaonly.txt')
+            # requirements.txt not needed because dev install will
+            # pick up and install those deps
+            requirements_files += ['requirements_piponly.txt']
         default_pkgs.append('ipython')
         include_dev_deps = True
     if not skip_test_deps:
@@ -617,11 +614,15 @@ def install_deps(method, return_commands=False, verbose=False, for_development=F
         install_from_requirements(method, requirements_files,
                                   additional_packages=default_pkgs, **kwargs)
         if (method == 'pip') and fallback_to_conda:
-            install_from_requirements('conda', requirements_files,
+            requirements_files += ['requirements_condaonly.txt']
+            install_from_requirements('conda', list(set(requirements_files)),
                                       additional_packages=conda_pkgs,
                                       unique_to_method=True, **kwargs)
         elif (method == 'conda'):
-            install_from_requirements('pip', requirements_files,
+            # Adding these ensures that pip-specific packages are installed
+            requirements_files += ['requirements.txt',
+                                   'requirements_piponly.txt']
+            install_from_requirements('pip', list(set(requirements_files)),
                                       additional_packages=pip_pkgs,
                                       unique_to_method=True, **kwargs)
     if install_opts['lpy']:
