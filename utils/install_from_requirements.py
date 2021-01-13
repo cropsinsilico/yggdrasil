@@ -2,6 +2,7 @@
 from pip._vendor.packaging.requirements import Requirement, InvalidRequirement
 import os
 import re
+import uuid
 import pprint
 import argparse
 from setup_test_env import (
@@ -87,7 +88,7 @@ def prune(fname_in, fname_out=None, excl_method=None, incl_method=None,
     new_lines += additional_packages
     # Write file
     if fname_out is None:
-        fname_out = '_pruned'.join(os.path.splitext(fname_in[0]))
+        fname_out = ('_pruned%s' % str(uuid.uuid4())).join(os.path.splitext(fname_in[0]))
     with open(fname_out, 'w') as fd:
         fd.write('\n'.join(new_lines))
     if verbose:
