@@ -494,13 +494,13 @@ def install_deps(method, return_commands=False, verbose=False, for_development=F
     # a conflict when installing LPy
     conda_pkgs += ['scipy']
     if install_opts['sbml'] and fallback_to_conda:
-        numpy_ver = 'numpy==1.19.3'
+        numpy_ver = 'numpy=1.19.3'
         # This allows requests to be used to determine the version of
         # numpy that libroadrunner is pinned to and falls back to a
         # hardcoded version if requests is not installed.
         try:
             new_numpy_ver = get_pip_dependency_version(
-                'libroadrunner', 'numpy')
+                'libroadrunner', 'numpy').replace('==', '=')
             if new_numpy_ver != numpy_ver:
                 warnings.warn(
                     "Update the hardcoded version of numpy "
