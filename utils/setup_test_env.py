@@ -507,7 +507,7 @@ def install_deps(method, return_commands=False, verbose=False, for_development=F
                     "required for libroadrunner to '%s' on the line above."
                     % new_numpy_ver)
             numpy_ver = new_numpy_ver
-        except ImportError:
+        except (ImportError, ModuleNotFoundError):
             pass
         conda_pkgs.append(
             get_pip_dependency_version('libroadrunner', 'numpy'))
