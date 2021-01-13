@@ -10,6 +10,23 @@ from setup_test_env import (
     PYTHON_CMD, CONDA_CMD, _is_win)
 
 
+def isolate_package_name(entry):
+    r"""Get the package name without any constraints or conditions.
+
+    Args:
+        entry (str): Requirements entry.
+
+    Returns:
+        str: Package name.
+
+    """
+    keys = ['<', '>', '=', ';', '#']
+    out = entry
+    for k in keys:
+        out = out.split(k)[0].strip()
+    return out.strip()
+
+
 def prune(fname_in, fname_out=None, excl_method=None, incl_method=None,
           install_opts=None, additional_packages=[], verbose=False):
     r"""Prune a requirements.txt file to remove/select dependencies that are
@@ -30,7 +47,8 @@ def prune(fname_in, fname_out=None, excl_method=None, incl_method=None,
             specifying whether or not the language/package should be installed.
             If not provided, get_install_opts is used to create it.
         additional_packages (list, optional): Additional packages that should
-            be installed. Defaults to empty list.
+            be installed. Defaults to empty list. Versions specified here take
+            precedence over versions in the provided files.
         verbose (bool, optional): If True, setup steps are run with verbosity
             turned up. Defaults to False.
 
@@ -45,8 +63,14 @@ def prune(fname_in, fname_out=None, excl_method=None, incl_method=None,
     install_opts = get_install_opts(install_opts)
     if not isinstance(fname_in, (list, tuple)):
         fname_in = [fname_in]
+    packages = []
     new_lines = []
-    orig_lines = []
+    orig_lines = additional_packages.copy()
+    for line in additional_packages:
+        pkg = isolate_package_name(line)
+        if pkg not in packages:
+            new_lines.append(line)
+            packages.append(pkg)
     for ifname_in in fname_in:
         with open(ifname_in, 'r') as fd:
             old_lines = fd.readlines()
@@ -55,6 +79,10 @@ def prune(fname_in, fname_out=None, excl_method=None, incl_method=None,
             line = line.strip()
             if line.startswith('#'):
                 continue
+            pkg = isolate_package_name(line)
+            if pkg in packages:
+                continue
+            packages.append(pkg)
             skip_line = False
             req_name = line
             if '#' in line:
@@ -90,8 +118,6 @@ def prune(fname_in, fname_out=None, excl_method=None, incl_method=None,
             except InvalidRequirement as e:
                 print(e)
                 continue
-    orig_lines += additional_packages
-    new_lines += additional_packages
     # Write file
     if fname_out is None:
         fname_out = ('_pruned%s' % str(uuid.uuid4())).join(os.path.splitext(fname_in[0]))
