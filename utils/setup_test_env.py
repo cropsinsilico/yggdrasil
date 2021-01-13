@@ -509,8 +509,7 @@ def install_deps(method, return_commands=False, verbose=False, for_development=F
             numpy_ver = new_numpy_ver
         except (ImportError, ModuleNotFoundError):
             pass
-        conda_pkgs.append(
-            get_pip_dependency_version('libroadrunner', 'numpy'))
+        conda_pkgs.append(numpy_ver)
     else:
         conda_pkgs.append(os.environ.get('NUMPY', 'numpy'))
     for k in ['matplotlib', 'jsonschema']:
