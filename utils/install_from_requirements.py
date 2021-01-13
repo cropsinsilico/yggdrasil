@@ -88,7 +88,9 @@ def prune(fname_in, fname_out=None, excl_method=None, incl_method=None,
 def install_from_requirements(method, fname_in, conda_env=None,
                               user=False, unique_to_method=False,
                               python_cmd=None, install_opts=None,
-                              verbose=False, additional_packages=[]):
+                              verbose=False, additional_packages=[],
+                              return_cmds=False, append_cmds=None,
+                              temp_file=None):
     r"""Install packages via pip or conda from one or more pip-style
     requirements file(s).
 
@@ -112,8 +114,16 @@ def install_from_requirements(method, fname_in, conda_env=None,
             turned up. Defaults to False.
         additional_packages (list, optional): Additional packages that should
             be installed. Defaults to empty list.
+        return_cmds (bool, optional): If True, the necessary commands will be
+            returned. Defaults to False.
+        append_cmds (list, optional): List that commands should be appended to.
+            Defaults to None and is ignored. If provided, the temporary file
+            is returned. This keyword will be ignored if return_cmds is True.
+        temp_file (str, optional): File where pruned requirements list should
+            be stored. Defaults to None and one will be created.
 
     """
+    return_temp = (return_cmds or isinstance(append_cmds, list))
     install_opts = get_install_opts(install_opts)
     if python_cmd is None:
         python_cmd = PYTHON_CMD
@@ -129,8 +139,10 @@ def install_from_requirements(method, fname_in, conda_env=None,
         incl_method = method
     else:
         incl_method = None
-    temp_file = prune(fname_in, excl_method=excl_method, incl_method=incl_method,
-                      install_opts=install_opts, additional_packages=additional_packages)
+    temp_file = prune(fname_in, fname_out=temp_file,
+                      excl_method=excl_method, incl_method=incl_method,
+                      install_opts=install_opts,
+                      additional_packages=additional_packages)
     try:
         if method == 'conda':
             args = [CONDA_CMD, 'install', '-y']
@@ -151,6 +163,20 @@ def install_from_requirements(method, fname_in, conda_env=None,
             args += ['-r', temp_file]
             if user:
                 args.append('--user')
+        if return_temp:
+            if return_cmds:
+                cmd_list = []
+            else:
+                cmd_list = append_cmds
+            cmd_list += [
+                ' '.join(args),
+                ('%s -c \'exec(\"import os;if os.path.isfile'
+                 '(\\"%s\\"): os.remove(\\"%s\\")\")\'')
+                % (python_cmd, temp_file, temp_file)]
+        if return_cmds:
+            return cmd_list
+        if isinstance(append_cmds, list):
+            return temp_file
         print(call_conda_command(args))
     except BaseException:
         if os.path.isfile(temp_file):
@@ -158,7 +184,7 @@ def install_from_requirements(method, fname_in, conda_env=None,
                 print(fd.read())
         raise
     finally:
-        if os.path.isfile(temp_file):
+        if os.path.isfile(temp_file) and (not return_temp):
             os.remove(temp_file)
 
 

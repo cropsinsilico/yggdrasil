@@ -69,7 +69,8 @@ SUMMARY_CMDS = ["%s --version" % PYTHON_CMD,
 if CONDA_ENV:
     SUMMARY_CMDS += ["echo 'CONDA_PREFIX=%s'" % CONDA_PREFIX,
                      "%s info" % CONDA_CMD,
-                     "%s list" % CONDA_CMD]
+                     "%s list" % CONDA_CMD,
+                     "%s config --show-sources" % CONDA_CMD]
 
 
 def call_conda_command(args, **kwargs):
@@ -333,7 +334,7 @@ def build_pkg(method, python=None, return_commands=False,
     upgrade_pkgs = ['wheel', 'setuptools']
     if not _is_win:
         upgrade_pkgs.insert(0, 'pip')
-    cmds += ["%s -m pip install --upgrade %s" % (PYTHON_CMD, ' '.join(upgrade_pkgs))]
+    # cmds += ["%s -m pip install --upgrade %s" % (PYTHON_CMD, ' '.join(upgrade_pkgs))]
     if method == 'conda':
         if verbose:
             build_flags = ''
@@ -358,7 +359,8 @@ def build_pkg(method, python=None, return_commands=False,
         cmds += [
             # "%s clean --all" % CONDA_CMD,  # Might invalidate cache
             # "%s deactivate" % CONDA_CMD,
-            "%s install -q -n base conda-build conda-smithy conda-verify" % CONDA_CMD,
+            "%s update --all" % CONDA_CMD,
+            "%s install -q -n base conda-build conda-verify" % CONDA_CMD,
             "%s build %s --python %s %s" % (
                 CONDA_CMD, 'recipe', python, build_flags),
             "%s index %s" % (CONDA_CMD, CONDA_INDEX),
@@ -370,6 +372,7 @@ def build_pkg(method, python=None, return_commands=False,
         else:
             build_flags = '--quiet'
         # Install from source dist
+        cmds += ["%s -m pip install --upgrade %s" % (PYTHON_CMD, ' '.join(upgrade_pkgs))]
         cmds += ["%s setup.py %s sdist" % (PYTHON_CMD, build_flags)]
     else:  # pragma: debug
         raise ValueError("Method must be 'conda' or 'pip', not '%s'"
@@ -432,19 +435,19 @@ def install_deps(method, return_commands=False, verbose=False, for_development=F
     # of specific versions
     cmds = ["%s -m pip uninstall -y numpy matplotlib" % python_cmd]
     # Get dependencies
-    install_req = os.path.join("utils", "install_from_requirements.py")
+    from install_from_requirements import install_from_requirements
+    # install_req = os.path.join("utils", "install_from_requirements.py")
     conda_pkgs = []
     pip_pkgs = []
     os_pkgs = []
     choco_pkgs = []
     vcpkg_pkgs = []
-    requirements_files = []
+    requirements_files = ['requirements_optional.txt']
     if method == 'conda':
         fallback_to_conda = True
         default_pkgs = conda_pkgs
     elif method == 'pip':
         fallback_to_conda = ((_is_win and _on_appveyor) or install_opts['lpy'])
-        # _in_conda = ((_is_win or install_opts['lpy']) and (not _on_gha))
         default_pkgs = pip_pkgs
     else:  # pragma: debug
         raise ValueError("Method must be 'conda' or 'pip', not '%s'"
@@ -478,6 +481,9 @@ def install_deps(method, return_commands=False, verbose=False, for_development=F
             "%s config --remove channels conda-forge" % CONDA_CMD,
             "%s config --add channels conda-forge" % CONDA_CMD,
         ]
+    # Required for non-strict channel priority
+    # if fallback_to_conda:
+    #     conda_pkgs.append("\"blas=*=openblas\"")
     # Installing via pip causes import error on Windows and
     # a conflict when installing LPy
     conda_pkgs += ['scipy', os.environ.get('NUMPY', 'numpy')]
@@ -491,28 +497,8 @@ def install_deps(method, return_commands=False, verbose=False, for_development=F
     # incompatibility."
     # elif _is_osx:
     #     os_pkgs += ["valgrind"]
-    if install_opts['sbml']:
-        pip_pkgs.append('libroadrunner')
-    if install_opts['astropy']:
-        default_pkgs.append('astropy')
-    if install_opts['rmq']:
-        default_pkgs.append("\"pika<1.0.0b1\"")
-        # if _is_linux:
-        #     os_pkgs.append("rabbitmq-server")
-        # elif _is_osx:
-        #     os_pkgs.append("rabbitmq")
-    if install_opts['trimesh']:
-        default_pkgs.append('trimesh')
-    if install_opts['pygments']:
-        default_pkgs.append('pygments')
     if install_opts['fortran']:
-        if (method == 'pip') and fallback_to_conda:
-            if _is_win:
-                conda_pkgs += ['m2w64-gcc-fortran', 'make',
-                               'm2w64-toolchain_win-64', 'cmake']
-            else:
-                conda_pkgs += ['fortran-compiler']
-        else:
+        if not fallback_to_conda:
             # elif not shutil.which('gfortran'):
             # Fortran is not installed via conda on linux/macos
             if _is_linux:
@@ -524,11 +510,9 @@ def install_deps(method, return_commands=False, verbose=False, for_development=F
                 choco_pkgs += ["mingw"]
                 # vcpkg_pkgs.append("vcpkg-gfortran")
     if install_opts['R']:
-        if (method == 'pip') and fallback_to_conda:
-            conda_pkgs.append('r-base')
-            if _is_win:
-                conda_pkgs.append('rtools')
-        elif not fallback_to_conda:
+        # TODO: Test split installation where r-base is installed from conda
+        # and the R dependencies are installed from CRAN?
+        if not fallback_to_conda:
             if _is_linux:
                 cmds += [("sudo add-apt-repository 'deb https://cloud"
                           ".r-project.org/bin/linux/ubuntu xenial-cran35/'"),
@@ -544,9 +528,7 @@ def install_deps(method, return_commands=False, verbose=False, for_development=F
                 raise NotImplementedError("Could not determine "
                                           "R installation method.")
     if install_opts['zmq']:
-        if (method == 'pip') and fallback_to_conda:
-            conda_pkgs += ['czmq', 'zeromq']
-        elif not fallback_to_conda:
+        if not fallback_to_conda:
             if _is_linux:
                 os_pkgs += ["libczmq-dev", "libzmq3-dev"]
             elif _is_osx:
@@ -585,7 +567,7 @@ def install_deps(method, return_commands=False, verbose=False, for_development=F
             "echo -n \"LD_LIBRARY_PATH=\" >> $GITHUB_ENV",
             "echo %s/lib:$LD_LIBRARY_PATH >> $GITHUB_ENV" % conda_prefix
         ]
-    # Install dependencies
+    # Install dependencies using package manager(s)
     if (not only_python) and (os_pkgs or (_is_win and (choco_pkgs or vcpkg_pkgs))):
         if _is_linux:
             cmds += ["sudo apt update"]
@@ -624,29 +606,21 @@ def install_deps(method, return_commands=False, verbose=False, for_development=F
         else:
             raise NotImplementedError("No native package manager supported "
                                       "on Windows.")
-    if fallback_to_conda:
-        if verbose:
-            install_flags = '-vvv'
-        else:
-            install_flags = '-q'
-        install_flags += conda_flags
-        if conda_pkgs:
-            cmds += ["%s install %s %s" % (CONDA_CMD, install_flags,
-                                           ' '.join(conda_pkgs))]
-    else:
-        pip_pkgs += conda_pkgs
-    if pip_pkgs:
-        if verbose:
-            install_flags = '--verbose'
-        else:
-            install_flags = ''
-        cmds += ["%s -m pip install %s %s" % (python_cmd, install_flags,
-                                              ' '.join(pip_pkgs))]
-    for x in requirements_files:
-        flags = ''
-        if conda_env:
-            flags += ' --conda-env %s' % conda_env
-        cmds += ["%s %s %s %s%s" % (python_cmd, install_req, method, x, flags)]
+    if not fallback_to_conda:
+        default_pkgs += conda_pkgs
+    if requirements_files:
+        kwargs = dict(conda_env=conda_env, python_cmd=python_cmd,
+                      install_opts=install_opts, append_cmds=cmds)
+        install_from_requirements(method, requirements_files,
+                                  additional_packages=default_pkgs, **kwargs)
+        if (method == 'pip') and fallback_to_conda:
+            install_from_requirements('conda', requirements_files,
+                                      additional_packages=conda_pkgs,
+                                      unique_to_method=True, **kwargs)
+        elif (method == 'conda'):
+            install_from_requirements('pip', requirements_files,
+                                      additional_packages=pip_pkgs,
+                                      unique_to_method=True, **kwargs)
     if install_opts['lpy']:
         if verbose:
             install_flags = '-vvv'
@@ -766,6 +740,9 @@ def install_pkg(method, python=None, without_build=False,
             # https://github.com/conda/conda/issues/466#issuecomment-378050252
             "%s install %s --update-deps -c %s yggdrasil" % (
                 CONDA_CMD, install_flags, index_channel)
+            # Required for non-strict channel priority
+            # "%s install %s --update-deps -c %s yggdrasil \"blas=*=openblas\"" % (
+            #     CONDA_CMD, install_flags, index_channel)
         ]
     elif method == 'pip':
         if verbose:
@@ -1021,6 +998,14 @@ if __name__ == "__main__":
                 help=("Verify that %s is installed." % k))
     # Call methods
     args = parser.parse_args()
+    if args.operation in ['deps', 'install', 'verify']:
+        new_opts = {}
+        for k, v in install_opts.items():
+            if v and getattr(args, 'dont_install_%s' % k, False):
+                new_opts[k] = False
+            elif (not v) and getattr(args, 'install_%s' % k, False):
+                new_opts[k] = True
+        install_opts.update(new_opts)
     if args.operation in ['env', 'setup']:
         create_env(args.method, args.python, name=args.env_name)
     elif args.operation == 'build':
