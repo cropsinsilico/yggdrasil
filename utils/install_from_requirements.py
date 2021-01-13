@@ -56,12 +56,12 @@ def prune(fname_in, fname_out=None, excl_method=None, incl_method=None,
             line = line.strip()
             if line.startswith('#'):
                 continue
+            skip_line = False
             req_name = line
             if '#' in line:
                 req_name, comment = line.split('#')
                 m = re.fullmatch(regex_comment, comment)
                 if m:
-                    skip_line = False
                     values = [x.strip() for x in m.group('vals').split(',')]
                     if excl_method and (excl_method in values):
                         continue
@@ -74,8 +74,12 @@ def prune(fname_in, fname_out=None, excl_method=None, incl_method=None,
                             if not install_opts[v]:
                                 skip_line = True
                                 break
-                    if skip_line:
-                        continue
+                elif incl_method:
+                    skip_line = True
+            elif incl_method:
+                skip_line = True
+            if skip_line:
+                continue
             try:
                 req = Requirement(req_name.strip())
                 if req.marker and (not req.marker.evaluate()):
@@ -94,7 +98,8 @@ def prune(fname_in, fname_out=None, excl_method=None, incl_method=None,
     if verbose:
         print('INSTALL OPTS:\n%s' % pprint.pformat(install_opts))
         print('ORIGINAL DEP LIST:\n\t%s\nPRUNED DEP LIST:\n\t%s'
-              % ('\n\t'.join(orig_lines), '\n\t'.join(new_lines)))
+              % ('\n\t'.join([x.strip() for x in orig_lines]),
+                 '\n\t'.join(new_lines)))
     return fname_out
 
 
