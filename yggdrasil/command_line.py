@@ -292,6 +292,7 @@ def yggcompile():
     for lang in args.language:
         drv = import_component('model', lang)
         if ((hasattr(drv, 'compile_dependencies')
+             and drv.is_installed()
              and (not getattr(drv, 'is_build_tool', False)))):
             drv.compile_dependencies(toolname=args.toolname)
 
