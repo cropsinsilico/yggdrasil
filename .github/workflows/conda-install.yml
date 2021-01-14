@@ -40,6 +40,11 @@ jobs:
             test-flags: --long-running
             install-c: false
           - os: ubuntu-latest
+            python-version: 3.8
+            install-method: conda
+            test-flags: --long-running
+            install-c: true
+          - os: ubuntu-latest
             python-version: 3.6
             install-method: conda
             test-flags: --long-running
