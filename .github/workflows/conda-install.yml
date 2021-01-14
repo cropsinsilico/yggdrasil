@@ -79,6 +79,11 @@ jobs:
     - if: matrix.install-method == 'pip'
       name: (PIP) Install dependencies & package
       run: python utils/setup_test_env.py install ${{ matrix.install-method }}
+    - if: matrix.os == 'windows-latest' && matrix.install-method == 'pip' && env.INSTALLC
+        == 1
+      name: (WINDOWS,PIP) Set the vcpkg root config value
+      run: yggconfig --vcpkg-dir=C:\\vcpkg
+      shell: bash -l {0}
     - env:
         CACHE_NUMBER: 0
       if: matrix.install-method == 'conda'
@@ -246,6 +251,11 @@ jobs:
     - if: matrix.install-method == 'pip'
       name: (PIP) Install dependencies & package
       run: python utils/setup_test_env.py install ${{ matrix.install-method }}
+    - if: matrix.os == 'windows-latest' && matrix.install-method == 'pip' && env.INSTALLC
+        == 1
+      name: (WINDOWS,PIP) Set the vcpkg root config value
+      run: yggconfig --vcpkg-dir=C:\\vcpkg
+      shell: bash -l {0}
     - env:
         CACHE_NUMBER: 0
       if: matrix.install-method == 'conda'

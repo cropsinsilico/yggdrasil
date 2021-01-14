@@ -605,12 +605,8 @@ def install_deps(method, return_commands=False, verbose=False, for_development=F
             if choco_pkgs:
                 cmds += ["choco install %s" % ' '.join(choco_pkgs)]
             if vcpkg_pkgs:
-                vcpkg_exe = 'vcpkg.exe'
-                # if os.environ.get('VCPKG_ROOT', None):
-                #     vcpkg_exe = os.path.join(os.environ['VCPKG_ROOT'],
-                #                              vcpkg_exe)
                 cmds += ["%s install %s --triplet x64-windows"
-                         % (vcpkg_exe, ' '.join(vcpkg_pkgs))]
+                         % ('vcpkg.exe', ' '.join(vcpkg_pkgs))]
         else:
             raise NotImplementedError("No native package manager supported "
                                       "on Windows.")
