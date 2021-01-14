@@ -115,12 +115,13 @@ jobs:
     runs-on: ${{ matrix.os }}
     env:
       INSTALLRMQ: 1
+      INSTALLAPY: 1
     strategy:
       max-parallel: 5
       matrix:
         os: [ubuntu-latest]
         python-version: [3.6]
-        install-method: [pip]
+        install-method: [pip,conda]
         test-flags: [--long-running]
       fail-fast: false
     services:
