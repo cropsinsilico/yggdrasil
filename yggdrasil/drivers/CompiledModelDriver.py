@@ -794,10 +794,7 @@ class CompilationToolBase(object):
         if (cls.search_path_envvar is not None) and (not env_only):
             assert(isinstance(cls.search_path_envvar, list))
             for ienv in cls.search_path_envvar:
-                ienv_paths = os.environ.get(ienv, '').split(os.pathsep)
-                for x in ienv_paths:
-                    if x:
-                        paths.append(x)
+                paths += os.environ.get(ienv, '').split(os.pathsep)
         # Get flags based on path
         if (cls.search_path_flags is not None) and (not env_only):
             output = cls.call(cls.search_path_flags, skip_flags=True,
@@ -809,17 +806,13 @@ class CompilationToolBase(object):
                 output = re.split(cls.search_regex_end, output)[0]
             # Search for paths
             for r in cls.search_regex:
-                for x in re.findall(r, output):
-                    if os.path.isdir(x):
-                        paths.append(x)
+                paths += re.findall(r, output)
         # Get search paths from the virtualenv/conda environment
         if (cls.search_path_env is not None):
             for iprefix in cls.get_env_prefixes():
                 assert(isinstance(cls.search_path_env, list))
                 for ienv in cls.search_path_env:
-                    ienv_path = os.path.join(iprefix, ienv)
-                    if (ienv_path not in paths) and os.path.isdir(ienv_path):
-                        paths.append(ienv_path)
+                    paths.append(os.path.join(iprefix, ienv))
         # Get libtype specific search paths
         if platform._is_win:  # pragma: windows
             base_paths = []
@@ -849,7 +842,11 @@ class CompilationToolBase(object):
             suffix = 'lib'
         for base in base_paths:
             paths.append(os.path.join(base, suffix))
-        return paths
+        out = []
+        for x in paths:
+            if x and (x not in out) and os.path.isdir(x):
+                out.append(x)
+        return out
 
     @classmethod
     def get_executable_command(cls, args, skip_flags=False, unused_kwargs=None,

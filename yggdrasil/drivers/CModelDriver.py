@@ -154,7 +154,9 @@ class CCompilerBase(CompilerBase):
         if platform._is_mac and (macos_sdkroot is not None):
             base_path = os.path.join(macos_sdkroot, 'usr')
             assert(libtype == 'include')
-            out.append(os.path.join(base_path, 'include'))
+            new = os.path.join(base_path, 'include')
+            if new not in out:
+                out.append(new)
         return out
 
 
