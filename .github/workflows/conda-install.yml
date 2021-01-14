@@ -26,7 +26,7 @@ jobs:
     name: Build (${{ matrix.python-version }}, ${{ matrix.os }}, ${{ matrix.install-method }}, ${{ matrix.test-flags }}), Install C = ${{ matrix.install-c }}
     runs-on: ${{ matrix.os }}
     strategy:
-      max-parallel: 5
+      max-parallel: 20
       matrix:
         os: [ubuntu-latest, macos-latest, windows-latest]
         python-version: [3.6]
