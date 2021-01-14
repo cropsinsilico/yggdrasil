@@ -157,9 +157,9 @@ script:
   - $YGG_SECOND_TEST
 
 
-after_success:
-  - |
-    codecov
+# after_success:
+#   - |
+#     codecov
 
 
 stages:

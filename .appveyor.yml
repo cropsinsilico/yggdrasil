@@ -139,5 +139,5 @@ test_script:
   - "yggtest --ci %YGG_TEST_FLAGS%"
   - "%YGG_SECOND_TEST%"
 
-after_test:
-  - "codecov"
+# after_test:
+#   - "codecov"
