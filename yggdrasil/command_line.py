@@ -137,7 +137,8 @@ def ygginfo():
                             os.environ.get(k, '').split(os.pathsep)))))
             curr_prefix = curr_prefix.rsplit(prefix, 1)[0]
             # Environment variabless
-            env_vars = ['CONDA_PREFIX', 'CONDA', 'SDKROOT']
+            env_vars = ['CONDA_PREFIX', 'CONDA', 'SDKROOT', 'CC', 'CXX',
+                        'FC', 'GFORTRAN']
             if platform._is_win:  # pragma: windows
                 env_vars += ['VCPKG_ROOT']
             vardict.append(('Environment variables:', ''))
