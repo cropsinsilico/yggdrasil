@@ -64,13 +64,13 @@ jobs:
       if: matrix.install-c != true && matrix.install-method != 'conda'
       shell: bash -l {0}
       run: echo "INSTALLC=0" >> $GITHUB_ENV
-    - name: [WINDOWS] Patch TEMP/TMPDIR on Windows
+    - name: (WINDOWS) Patch TEMP/TMPDIR on Windows
       if: matrix.os == 'windows-latest' && matrix.install-method == 'pip'
       shell: bash -l {0}
       run: |
         echo "TMPDIR=$USERPROFILE\\AppData\\Local\\Temp" >> $GITHUB_ENV
         echo "TEMP=$USERPROFILE\\AppData\\Local\\Temp" >> $GITHUB_ENV
-    - name: [WINDOWS] Set up MSVC Compiler
+    - name: (WINDOWS) Set up MSVC Compiler
       uses: ilammy/msvc-dev-cmd@v1
       if: matrix.os == 'windows-latest' && env.INSTALLC == 1
       with:
@@ -79,11 +79,11 @@ jobs:
     # ========================================================
     # Pip specific installation steps
     # ========================================================
-    # - name: [WINDOWS,PIP] Set VCPKG_ROOT on Windows
+    # - name: (WINDOWS,PIP) Set VCPKG_ROOT on Windows
     #   if: matrix.os == 'windows-latest' && matrix.install-method == 'pip' && env.INSTALLC == 1
     #   shell: bash -l {0}
     #   run: echo "VCPKG_ROOT=C:\\vcpkg" >> $GITHUB_ENV
-    - name: [LINUX,PIP] Cache pip
+    - name: (LINUX,PIP) Cache pip
       uses: actions/cache@v2
       if: startsWith(runner.os, 'Linux') && matrix.install-method == 'pip'
       with:
@@ -91,7 +91,7 @@ jobs:
         key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
         restore-keys: |
           ${{ runner.os }}-pip-
-    - name: [MACOS,PIP] Cache pip
+    - name: (MACOS,PIP) Cache pip
       uses: actions/cache@v2
       if: startsWith(runner.os, 'macOS') && matrix.install-method == 'pip'
       with:
@@ -99,7 +99,7 @@ jobs:
         key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
         restore-keys: |
           ${{ runner.os }}-pip-
-    - name: [WINDOWS,PIP] Cache pip
+    - name: (WINDOWS,PIP) Cache pip
       uses: actions/cache@v2
       if: startsWith(runner.os, 'Windows') && matrix.install-method == 'pip'
       with:
@@ -107,12 +107,12 @@ jobs:
         key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
         restore-keys: |
           ${{ runner.os }}-pip-
-    - name: [PIP] Set up Python
+    - name: (PIP) Set up Python
       uses: actions/setup-python@v2
       if: matrix.install-method == 'pip'
       with:
         python-version: ${{ matrix.python-version }}
-    - name: [PIP] Install dependencies & package
+    - name: (PIP) Install dependencies & package
       if: matrix.install-method == 'pip'
       run: python utils/setup_test_env.py install ${{ matrix.install-method }}
     # ========================================================
@@ -120,7 +120,7 @@ jobs:
     # ========================================================
     # Conda specific installation steps
     # ========================================================
-    - name: [CONDA] Cache conda
+    - name: (CONDA) Cache conda
       uses: actions/cache@v1
       if: matrix.install-method == 'conda'
       env:
@@ -131,7 +131,7 @@ jobs:
         key:
           ${{ runner.os }}-conda-${{ env.CACHE_NUMBER }}-${{
           hashFiles('recipe/meta.yaml') }}
-    - name: [WINDOWS,CONDA] Set up miniconda base environment
+    - name: (WINDOWS,CONDA) Set up miniconda base environment
       uses: conda-incubator/setup-miniconda@v2
       if: matrix.install-method == 'conda' && matrix.os == 'windows-latest'
       with:
@@ -141,25 +141,25 @@ jobs:
         # auto-activate-base: false
     # This step might need to stay here so that dev prompt comes before
     # conda?
-    # - name: [WINDOWS,CONDA] Set up MSVC Compiler
+    # - name: (WINDOWS,CONDA) Set up MSVC Compiler
     #   uses: ilammy/msvc-dev-cmd@v1
     #   if: matrix.install-method == 'conda' && matrix.os == 'windows-latest' && env.INSTALLC == 1
     # This step and the next allows conda to be called before the
     # conda-incubator/setup-miniconda@v2 action is used to create the
     # test environment so that the package can be built in the base
     # environment.
-    - name: [UNIX,CONDA] Add miniconda bin to path
+    - name: (UNIX,CONDA) Add miniconda bin to path
       if: matrix.install-method == 'conda' && matrix.os != 'windows-latest'
       run: echo "PATH=$CONDA/bin:$PATH" >> $GITHUB_ENV
-    - name: [MACOS,CONDA] Change ownership of conda on MacOS
+    - name: (MACOS,CONDA) Change ownership of conda on MacOS
       shell: bash
       if: matrix.install-method == 'conda' && matrix.os == 'macos-latest'
       run: sudo chown -R $(whoami) $CONDA
-    - name: [CONDA] Build package in base environment
+    - name: (CONDA) Build package in base environment
       if: matrix.install-method == 'conda'
       shell: bash --noprofile --norc -eo pipefail {0}
       run: python utils/setup_test_env.py build ${{ matrix.install-method }} --python ${{ matrix.python-version }}
-    - name: [CONDA] Set up miniconda test environment
+    - name: (CONDA) Set up miniconda test environment
       uses: conda-incubator/setup-miniconda@v2
       if: matrix.install-method == 'conda'
       with:
@@ -169,10 +169,10 @@ jobs:
         channels: conda-forge
         use-only-tar-bz2: true
         channel-priority: strict
-    - name: [MACOS,CONDA] Install old MacOSX SDK for compatibility with the conda llvm (7)
+    - name: (MACOS,CONDA) Install old MacOSX SDK for compatibility with the conda llvm (7)
       if: matrix.os == 'macos-latest' && matrix.install-method == 'conda'
       run: ./utils/setup_old_mac_sdk.sh
-    - name: [CONDA] Install dependencies & package from existing build
+    - name: (CONDA) Install dependencies & package from existing build
       if: matrix.install-method == 'conda'
       run: python utils/setup_test_env.py install ${{ matrix.install-method }} --without-build
     # ========================================================
@@ -220,12 +220,12 @@ jobs:
     - uses: actions/checkout@v2
       with:
         submodules: true
-    - name: [WINDOWS] Patch TEMP on Windows
+    - name: (WINDOWS) Patch TEMP on Windows
       if: matrix.os == 'windows-latest'
       run: |
         echo "TMPDIR=$USERPROFILE\AppData\Local\Temp" >> $GITHUB_ENV
         echo "TEMP=$USERPROFILE\AppData\Local\Temp" >> $GITHUB_ENV
-    - name: [WINDOWS] Set up MSVC Compiler
+    - name: (WINDOWS) Set up MSVC Compiler
       uses: ilammy/msvc-dev-cmd@v1
       if: matrix.os == 'windows-latest' && env.INSTALLC == 1
       with:
@@ -234,12 +234,12 @@ jobs:
     # ========================================================
     # Pip specific installation steps
     # ========================================================
-    - name: [PIP] Set up Python for pip install
+    - name: (PIP) Set up Python for pip install
       uses: actions/setup-python@v2
       if: matrix.install-method == 'pip'
       with:
         python-version: ${{ matrix.python-version }}
-    - name: [PIP] Install dependencies & package
+    - name: (PIP) Install dependencies & package
       if: matrix.install-method == 'pip'
       run: python utils/setup_test_env.py install ${{ matrix.install-method }}
     # ========================================================
@@ -247,7 +247,7 @@ jobs:
     # ========================================================
     # Conda specific installation steps
     # ========================================================
-    - name: [CONDA] Cache conda
+    - name: (CONDA) Cache conda
       uses: actions/cache@v1
       if: matrix.install-method == 'conda'
       env:
@@ -258,7 +258,7 @@ jobs:
         key:
           ${{ runner.os }}-conda-${{ env.CACHE_NUMBER }}-${{
           hashFiles('recipe/meta.yaml') }}
-    - name: [WINDOWS,CONDA] Set up miniconda base environment
+    - name: (WINDOWS,CONDA) Set up miniconda base environment
       uses: conda-incubator/setup-miniconda@v2
       if: matrix.install-method == 'conda' && matrix.os == 'windows-latest'
       with:
@@ -269,18 +269,18 @@ jobs:
     # conda-incubator/setup-miniconda@v2 action is used to create the
     # test environment so that the package can be built in the base
     # environment.
-    - name: [UNIX,CONDA] Add miniconda bin to path
+    - name: (UNIX,CONDA) Add miniconda bin to path
       if: matrix.install-method == 'conda' && matrix.os != 'windows-latest'
       run: echo "PATH=$CONDA/bin:$PATH" >> $GITHUB_ENV
-    - name: [MACOS,CONDA] Change ownership of conda on MacOS
+    - name: (MACOS,CONDA) Change ownership of conda on MacOS
       shell: bash
       if: matrix.install-method == 'conda' && matrix.os == 'macos-latest'
       run: sudo chown -R $(whoami) $CONDA
-    - name: [CONDA] Build package in base environment
+    - name: (CONDA) Build package in base environment
       if: matrix.install-method == 'conda'
       shell: bash --noprofile --norc -eo pipefail {0}
       run: python utils/setup_test_env.py build ${{ matrix.install-method }} --python ${{ matrix.python-version }}
-    - name: [CONDA] Set up miniconda test environment
+    - name: (CONDA) Set up miniconda test environment
       uses: conda-incubator/setup-miniconda@v2
       if: matrix.install-method == 'conda'
       with:
@@ -290,10 +290,10 @@ jobs:
         channels: conda-forge
         use-only-tar-bz2: true
         channel-priority: strict
-    - name: [MACOS,CONDA] Install old MacOSX SDK for compatibility with the conda llvm (7)
+    - name: (MACOS,CONDA) Install old MacOSX SDK for compatibility with the conda llvm (7)
       if: matrix.os == 'macos-latest' && matrix.install-method == 'conda'
       run: ./utils/setup_old_mac_sdk.sh
-    - name: [CONDA] Install dependencies & package from existing build
+    - name: (CONDA) Install dependencies & package from existing build
       if: matrix.install-method == 'conda'
       run: python utils/setup_test_env.py install ${{ matrix.install-method }} --without-build
     # ========================================================
@@ -340,7 +340,7 @@ jobs:
   #   - uses: actions/checkout@v2
   #     with:
   #       submodules: true
-  #   - name: [WINDOWS] Patch TEMP on Windows
+  #   - name: (WINDOWS) Patch TEMP on Windows
   #     if: matrix.os == 'windows-latest'
   #     run: |
   #       echo "TMPDIR=$USERPROFILE\AppData\Local\Temp" >> $GITHUB_ENV
@@ -352,7 +352,7 @@ jobs:
   #   # ========================================================
   #   # Conda specific installation steps
   #   # ========================================================
-  #   - name: [CONDA] Cache conda
+  #   - name: (CONDA) Cache conda
   #     uses: actions/cache@v1
   #     if: matrix.install-method == 'conda'
   #     env:
@@ -363,7 +363,7 @@ jobs:
   #       key:
   #         ${{ runner.os }}-conda-${{ env.CACHE_NUMBER }}-${{
   #         hashFiles('recipe/meta.yaml') }}
-  #   - name: [WINDOWS,CONDA] Set up miniconda base environment
+  #   - name: (WINDOWS,CONDA) Set up miniconda base environment
   #     uses: conda-incubator/setup-miniconda@v2
   #     if: matrix.install-method == 'conda' && matrix.os == 'windows-latest'
   #     with:
@@ -373,25 +373,25 @@ jobs:
   #       # auto-activate-base: false
   #   # This step might need to stay here so that dev prompt comes before
   #   # conda?
-  #   # - name: [WINDOWS,CONDA] Set up MSVC Compiler
+  #   # - name: (WINDOWS,CONDA) Set up MSVC Compiler
   #   #   uses: ilammy/msvc-dev-cmd@v1
   #   #   if: matrix.install-method == 'conda' && matrix.os == 'windows-latest' && env.INSTALLC == 1
   #   # This step and the next allows conda to be called before the
   #   # conda-incubator/setup-miniconda@v2 action is used to create the
   #   # test environment so that the package can be built in the base
   #   # environment.
-  #   - name: [UNIX,CONDA] Add miniconda bin to path
+  #   - name: (UNIX,CONDA) Add miniconda bin to path
   #     if: matrix.install-method == 'conda' && matrix.os != 'windows-latest'
   #     run: echo "PATH=$CONDA/bin:$PATH" >> $GITHUB_ENV
-  #   - name: [MACOS,CONDA] Change ownership of conda on MacOS
+  #   - name: (MACOS,CONDA) Change ownership of conda on MacOS
   #     shell: bash
   #     if: matrix.install-method == 'conda' && matrix.os == 'macos-latest'
   #     run: sudo chown -R $(whoami) $CONDA
-  #   - name: [CONDA] Build package in base environment
+  #   - name: (CONDA) Build package in base environment
   #     if: matrix.install-method == 'conda'
   #     shell: bash --noprofile --norc -eo pipefail {0}
   #     run: python utils/setup_test_env.py build ${{ matrix.install-method }} --python ${{ matrix.python-version }}
-  #   - name: [CONDA] Set up miniconda test environment
+  #   - name: (CONDA) Set up miniconda test environment
   #     uses: conda-incubator/setup-miniconda@v2
   #     if: matrix.install-method == 'conda'
   #     with:
@@ -401,10 +401,10 @@ jobs:
   #       channels: conda-forge
   #       use-only-tar-bz2: true
   #       channel-priority: strict
-  #   - name: [MACOS,CONDA] Install old MacOSX SDK for compatibility with the conda llvm (7)
+  #   - name: (MACOS,CONDA) Install old MacOSX SDK for compatibility with the conda llvm (7)
   #     if: matrix.os == 'macos-latest' && matrix.install-method == 'conda'
   #     run: ./utils/setup_old_mac_sdk.sh
-  #   - name: [CONDA] Install dependencies & package from existing build
+  #   - name: (CONDA) Install dependencies & package from existing build
   #     if: matrix.install-method == 'conda'
   #     run: python utils/setup_test_env.py install ${{ matrix.install-method }} --without-build
   #   # ========================================================
