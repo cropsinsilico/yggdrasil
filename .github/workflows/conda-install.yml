@@ -230,7 +230,7 @@ jobs:
       if: matrix.os == 'windows-latest' && env.INSTALLC == 1
       with:
         toolset: 14.0
-	
+
     # ========================================================
     # Pip specific installation steps
     # ========================================================
@@ -348,7 +348,7 @@ jobs:
   #   - name: Set up MSVC Compiler
   #     uses: ilammy/msvc-dev-cmd@v1
   #     if: matrix.os == 'windows-latest' && env.INSTALLC == 1
-	
+
   #   # ========================================================
   #   # Conda specific installation steps
   #   # ========================================================
