@@ -12,6 +12,46 @@ import shutil
 logger = logging.getLogger(__name__)
 
 
+def githook():
+    r"""Git hook to determine if the Github workflow need to be
+    re-generated."""
+    try:
+        files = subprocess.check_output(
+            ["git", "diff-index", "--cached", "--name-only",
+             "--diff-filter=ACMRTUXB", "HEAD"],
+            stderr=subprocess.PIPE).decode('utf-8').splitlines()
+    except subprocess.CalledProcessError:
+        return 1
+    regen = ('.github/workflows/conda-install-base.yml' in files)
+    if regen:
+        try:
+            gitdir = subprocess.check_output(
+                ["git", "rev-parse", "--git-dir"],
+                stderr=subprocess.PIPE).decode('utf-8').strip()
+        except subprocess.CalledProcessError:
+            return 1
+        workflow_dir = os.path.join(gitdir, '..', '.github', 'workflows')
+        try:
+            subprocess.run(
+                ['python', 'generate_conda_install.py'],
+                cwd=workflow_dir, check=True,
+                stderr=subprocess.STDOUT,
+                stdout=subprocess.PIPE)
+        except subprocess.CalledProcessError as e:
+            print(e.stdout)
+            return 1
+        try:
+            subprocess.run(
+                ['git', 'add',
+                 os.path.join(workflow_dir, 'conda-install.yml')],
+                check=True,
+                stderr=subprocess.STDOUT,
+                stdout=subprocess.PIPE)
+        except subprocess.CalledProcessError:
+            return 1
+    return 0
+
+
 def ygginfo():
     r"""Print information about yggdrasil installation."""
     from yggdrasil import __version__, tools, config, platform

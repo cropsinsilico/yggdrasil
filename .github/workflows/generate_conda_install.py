@@ -1,4 +1,4 @@
-# python generate_conda_install.py conda-install-base.yml conda-install.yml
+import os
 import yaml
 import pprint
 import argparse
@@ -24,13 +24,15 @@ if __name__ == "__main__":
         '--verbose', action='store_true',
         help="Print yaml contents.")
     args = parser.parse_args()
-    with open(args.base, 'r') as fd:
+    base = os.path.join(os.path.dirname(__file__), args.base)
+    dest = os.path.join(os.path.dirname(__file__), args.dest)
+    with open(base, 'r') as fd:
         contents = yaml.load(fd, Loader=yaml.SafeLoader)
     if args.verbose:
         pprint.pprint(contents)
-    with open(args.dest, 'w') as fd:
+    with open(dest, 'w') as fd:
         fd.write(('# DO NOT MODIFY THIS FILE, IT IS GENERATED.\n'
-                  '# To make changes modify \'%s\'\n'
+                  '# To make changes, modify \'%s\'\n'
                   '# and run \'python generate_conda_install.py\'\n')
                  % args.base)
         yaml.dump(contents, fd, Dumper=NoAliasDumper)
