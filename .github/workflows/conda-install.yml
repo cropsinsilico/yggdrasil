@@ -1,3 +1,6 @@
+# DO NOT MODIFY THIS FILE, IT IS GENERATED.
+# To make changes modify 'conda-install-base.yml'
+# and run 'python generate_conda_install.py'
 name: Python Package using Conda
 true:
   push:

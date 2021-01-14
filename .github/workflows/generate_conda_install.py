@@ -1,7 +1,7 @@
 # python generate_conda_install.py conda-install-base.yml conda-install.yml
-import sys
 import yaml
 import pprint
+import argparse
 
 
 class NoAliasDumper(yaml.SafeDumper):
@@ -10,11 +10,27 @@ class NoAliasDumper(yaml.SafeDumper):
 
 
 if __name__ == "__main__":
-    fileA = sys.argv[1]
-    fileB = sys.argv[2]
-    with open(sys.argv[1], 'r') as fd:
+    parser = argparse.ArgumentParser(
+        "Generate a Github Actions (GHA) workflow yaml file from "
+        "a version of the file that uses anchors (not supported by "
+        "GHA as of 2021-01-14).")
+    parser.add_argument(
+        '--base', '--base-file', default='conda-install-base.yml',
+        help="Version of GHA workflow yaml that contains anchors.")
+    parser.add_argument(
+        '--dest', default='conda-install.yml',
+        help="Name of target GHA workflow yaml file.")
+    parser.add_argument(
+        '--verbose', action='store_true',
+        help="Print yaml contents.")
+    args = parser.parse_args()
+    with open(args.base, 'r') as fd:
         contents = yaml.load(fd, Loader=yaml.SafeLoader)
-    if '--verbose' in sys.argv:
+    if args.verbose:
         pprint.pprint(contents)
-    with open(sys.argv[2], 'w') as fd:
+    with open(args.dest, 'w') as fd:
+        fd.write(('# DO NOT MODIFY THIS FILE, IT IS GENERATED.\n'
+                  '# To make changes modify \'%s\'\n'
+                  '# and run \'python generate_conda_install.py\'\n')
+                 % args.base)
         yaml.dump(contents, fd, Dumper=NoAliasDumper)
