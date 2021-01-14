@@ -70,7 +70,7 @@ jobs:
       shell: bash -l {0}
       run: echo "INSTALLC=0" >> $GITHUB_ENV
     - name: (WINDOWS) Patch TEMP/TMPDIR on Windows
-      if: matrix.os == 'windows-latest' && matrix.install-method == 'pip'
+      if: matrix.os == 'windows-latest'
       shell: bash -l {0}
       run: |
         echo "TMPDIR=$USERPROFILE\\AppData\\Local\\Temp" >> $GITHUB_ENV
