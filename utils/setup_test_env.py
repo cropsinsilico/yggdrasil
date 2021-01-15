@@ -832,6 +832,10 @@ def verify_pkg(install_opts=None):
         install_opts['fortran'] = False
     elif (not install_opts['fortran']) and shutil.which('gfortran'):
         install_opts['fortran'] = True
+    if (not install_opts['R']) and shutil.which('R'):
+        install_opts['R'] = True
+    if (not install_opts['c']) and shutil.which('gcc'):
+        install_opts['c'] = True
     src_dir = os.path.join(os.getcwd(),
                            os.path.dirname(os.path.dirname(__file__)))
     src_version = subprocess.check_output(
