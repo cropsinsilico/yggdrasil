@@ -253,6 +253,9 @@ jobs:
         install-c: [true]
       fail-fast: false
     services: *rmq_services
+    defaults:
+      run:
+        shell: bash -l {0}
     steps: *steps
     
   test_stripped:
