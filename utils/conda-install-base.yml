@@ -4,6 +4,8 @@ name: Python Package using Conda
   push:
     branches-ignore:
       - 'gh-pages'
+  schedule:
+    - cron: "0 10 * * 1"  # 3AM PST
 
 env:
   NUMPY: numpy

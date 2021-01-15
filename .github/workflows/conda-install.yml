@@ -6,6 +6,8 @@ name: Python Package using Conda
   push:
     branches-ignore:
     - gh-pages
+  schedule:
+  - cron: 0 10 * * 1
 env:
   NUMPY: numpy
   MATPLOTLIB: matplotlib
