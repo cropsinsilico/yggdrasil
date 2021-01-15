@@ -1,4 +1,4 @@
-name: Python Package using Conda
+name: Test of package installation & execution
 
 'on':  # quotes required so that pyyaml doesn't make this a bool
   push:

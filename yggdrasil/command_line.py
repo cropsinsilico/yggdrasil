@@ -22,7 +22,7 @@ def githook():
             stderr=subprocess.PIPE).decode('utf-8').splitlines()
     except subprocess.CalledProcessError:
         return 1
-    regen = (os.path.join('utils', 'conda-install-base.yml') in files)
+    regen = (os.path.join('utils', 'test-install-base.yml') in files)
     if regen:
         try:
             gitdir = subprocess.check_output(
@@ -35,7 +35,7 @@ def githook():
         try:
             subprocess.run(
                 ['git', 'add',
-                 os.path.join(workflow_dir, 'conda-install.yml')],
+                 os.path.join(workflow_dir, 'test-install.yml')],
                 check=True,
                 stderr=subprocess.STDOUT,
                 stdout=subprocess.PIPE)
@@ -67,12 +67,12 @@ def generate_gha_workflow(args=None, gitdir=None):
     parser.add_argument(
         '--base', '--base-file',
         default=os.path.join(gitdir, '..', 'utils',
-                             'conda-install-base.yml'),
+                             'test-install-base.yml'),
         help="Version of GHA workflow yaml that contains anchors.")
     parser.add_argument(
         '--dest',
         default=os.path.join(gitdir, '..', '.github', 'workflows',
-                             'conda-install.yml'),
+                             'test-install.yml'),
         help="Name of target GHA workflow yaml file.")
     parser.add_argument(
         '--verbose', action='store_true',

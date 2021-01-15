@@ -1,7 +1,7 @@
 # DO NOT MODIFY THIS FILE, IT IS GENERATED.
-# To make changes, modify '.git/../utils/conda-install-base.yml'
+# To make changes, modify '.git/../utils/test-install-base.yml'
 # and run 'ygggha'
-name: Python Package using Conda
+name: Test of package installation & execution
 'on':
   push:
     branches-ignore:
