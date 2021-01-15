@@ -22,7 +22,7 @@ def githook():
             stderr=subprocess.PIPE).decode('utf-8').splitlines()
     except subprocess.CalledProcessError:
         return 1
-    regen = ('.github/workflows/conda-install-base.yml' in files)
+    regen = (os.path.join('utils', 'conda-install-base.yml') in files)
     if regen:
         try:
             gitdir = subprocess.check_output(
@@ -34,7 +34,7 @@ def githook():
         try:
             subprocess.run(
                 ['python', 'generate_conda_install.py'],
-                cwd=workflow_dir, check=True,
+                cwd=os.path.join(gitdir, '..', 'utils'), check=True,
                 stderr=subprocess.STDOUT,
                 stdout=subprocess.PIPE)
         except subprocess.CalledProcessError as e:

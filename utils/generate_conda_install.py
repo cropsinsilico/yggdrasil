@@ -15,17 +15,22 @@ if __name__ == "__main__":
         "a version of the file that uses anchors (not supported by "
         "GHA as of 2021-01-14).")
     parser.add_argument(
-        '--base', '--base-file', default='conda-install-base.yml',
+        '--base', '--base-file',
+        default=os.path.join(os.path.dirname(__file__),
+                             'conda-install-base.yml'),
         help="Version of GHA workflow yaml that contains anchors.")
     parser.add_argument(
-        '--dest', default='conda-install.yml',
+        '--dest',
+        default=os.path.join(os.path.dirname(__file__),
+                             '..', '.github', 'workflows',
+                             'conda-install.yml'),
         help="Name of target GHA workflow yaml file.")
     parser.add_argument(
         '--verbose', action='store_true',
         help="Print yaml contents.")
     args = parser.parse_args()
-    base = os.path.join(os.path.dirname(__file__), args.base)
-    dest = os.path.join(os.path.dirname(__file__), args.dest)
+    base = args.base
+    dest = args.dest
     with open(base, 'r') as fd:
         contents = yaml.load(fd, Loader=yaml.SafeLoader)
     if args.verbose:
