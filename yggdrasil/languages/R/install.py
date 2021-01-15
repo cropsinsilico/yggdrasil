@@ -6,6 +6,7 @@ import tempfile
 import subprocess
 import logging
 import argparse
+import shutil
 PY_MAJOR_VERSION = sys.version_info[0]
 logger = logging.getLogger(__name__)
 logger.setLevel(level=logging.INFO)
@@ -210,7 +211,10 @@ def call_R(R_cmd, **kwargs):
         fd.write('\n'.join(R_cmd))
         logger.info('Running:\n    ' + '\n    '.join(R_cmd))
     try:
-        out = make_call(['Rscript', R_script], **kwargs)
+        Rexe = shutil.which('Rscript')
+        if not Rexe:
+            Rexe = 'Rscript'
+        out = make_call([Rexe, R_script], **kwargs)
     finally:
         os.remove(R_script)
     return out
@@ -231,6 +235,7 @@ def make_call(R_cmd, with_sudo=False, **kwargs):
         bool: True if the call was successful, False otherwise.
 
     """
+    print("R INIT", shutil.which("R"), shutil.which("Rscript"))
     if with_sudo and (sys.platform not in ['win32', 'cygwin']):
         R_cmd.insert(0, 'sudo')
     try:
