@@ -230,6 +230,32 @@ jobs:
         shell: bash -l {0}
     steps: *steps
     
+  test_stripped:
+    name: Test stripped install (${{ matrix.python-version }}, ${{ matrix.os }}, ${{ matrix.install-method }})
+    runs-on: ${{ matrix.os }}
+    env:
+      INSTALLR: 0
+      INSTALLC: 0
+      INSTALLFORTRAN: 0
+      INSTALLSBML: 0
+      INSTALLLPY: 0
+      INSTALLZMQ: 0
+      INSTALLRMQ: 0
+      INSTALLTRIMESH: 0
+      INSTALLPYGMENTS: 0
+    strategy:
+      max-parallel: 5
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+        python-version: [3.6]
+        install-method: [pip]
+        test-flags: [--long-running]
+      fail-fast: false
+    defaults:
+      run:
+        shell: bash -l {0}
+    steps: *steps
+    
   docs:
     name: Build the Docs
     runs-on: ubuntu-latest
@@ -261,7 +287,7 @@ jobs:
         FOLDER: docs/build/html/
   deploy:
     name: Publish package
-    needs: [build_pip, build_rmq, docs]
+    needs: [test, test_rmq, test_stripped, docs]
     if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags')
     runs-on: ubuntu-latest
     steps:
