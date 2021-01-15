@@ -39,26 +39,6 @@ jobs:
             install-method: pip
             test-flags: --long-running
             install-c: false
-          - os: ubuntu-latest
-            python-version: 3.8
-            install-method: conda
-            test-flags: --long-running
-            install-c: true
-          - os: ubuntu-latest
-            python-version: 3.6
-            install-method: conda
-            test-flags: --long-running
-            install-c: true
-          - os: macos-latest
-            python-version: 3.6
-            install-method: conda
-            test-flags: --long-running
-            install-c: true
-          - os: windows-latest
-            python-version: 3.6
-            install-method: conda
-            test-flags: --long-running
-            install-c: true
       fail-fast: false
 
     steps: &steps
