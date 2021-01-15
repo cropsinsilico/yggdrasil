@@ -241,6 +241,8 @@ def make_call(R_cmd, with_sudo=False, **kwargs):
     try:
         logger.info("Calling %s on %s (with_sudo=%s)"
                     % (' '.join(R_cmd), sys.platform, with_sudo))
+        if sys.platform in ['win32', 'cygwin']:
+            kwargs.setdefault('shell', True)
         R_proc = subprocess.check_output(R_cmd, **kwargs)
         if PY_MAJOR_VERSION == 3:
             R_proc = R_proc.decode("utf-8")
