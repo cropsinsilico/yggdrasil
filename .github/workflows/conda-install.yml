@@ -88,9 +88,10 @@ jobs:
         echo "TEMP=$USERPROFILE\\AppData\\Local\\Temp" >> $GITHUB_ENV
 
         '
-    - name: (WINDOWS) Set up MSVC Compiler
+    - name: (WINDOWS,PIP) Set up MSVC Compiler
       uses: ilammy/msvc-dev-cmd@v1
-      if: matrix.os == 'windows-latest' && env.INSTALLC == 1
+      if: matrix.os == 'windows-latest' && matrix.install-method == 'pip' && env.INSTALLC
+        == 1
       with:
         toolset: 14.0
     - name: (LINUX,PIP) Cache pip
@@ -149,6 +150,10 @@ jobs:
         channels: conda-forge
         use-only-tar-bz2: true
         activate-environment: ''
+    - name: (WINDOWS,CONDA) Set up MSVC Compiler
+      uses: ilammy/msvc-dev-cmd@v1
+      if: matrix.install-method == 'conda' && matrix.os == 'windows-latest' && env.INSTALLC
+        == 1
     - name: (UNIX,CONDA) Add miniconda bin to path
       if: matrix.install-method == 'conda' && matrix.os != 'windows-latest'
       run: echo "PATH=$CONDA/bin:$PATH" >> $GITHUB_ENV
@@ -230,9 +235,10 @@ jobs:
         echo "TEMP=$USERPROFILE\\AppData\\Local\\Temp" >> $GITHUB_ENV
 
         '
-    - name: (WINDOWS) Set up MSVC Compiler
+    - name: (WINDOWS,PIP) Set up MSVC Compiler
       uses: ilammy/msvc-dev-cmd@v1
-      if: matrix.os == 'windows-latest' && env.INSTALLC == 1
+      if: matrix.os == 'windows-latest' && matrix.install-method == 'pip' && env.INSTALLC
+        == 1
       with:
         toolset: 14.0
     - name: (LINUX,PIP) Cache pip
@@ -291,6 +297,10 @@ jobs:
         channels: conda-forge
         use-only-tar-bz2: true
         activate-environment: ''
+    - name: (WINDOWS,CONDA) Set up MSVC Compiler
+      uses: ilammy/msvc-dev-cmd@v1
+      if: matrix.install-method == 'conda' && matrix.os == 'windows-latest' && env.INSTALLC
+        == 1
     - name: (UNIX,CONDA) Add miniconda bin to path
       if: matrix.install-method == 'conda' && matrix.os != 'windows-latest'
       run: echo "PATH=$CONDA/bin:$PATH" >> $GITHUB_ENV
@@ -372,9 +382,10 @@ jobs:
         echo "TEMP=$USERPROFILE\\AppData\\Local\\Temp" >> $GITHUB_ENV
 
         '
-    - name: (WINDOWS) Set up MSVC Compiler
+    - name: (WINDOWS,PIP) Set up MSVC Compiler
       uses: ilammy/msvc-dev-cmd@v1
-      if: matrix.os == 'windows-latest' && env.INSTALLC == 1
+      if: matrix.os == 'windows-latest' && matrix.install-method == 'pip' && env.INSTALLC
+        == 1
       with:
         toolset: 14.0
     - name: (LINUX,PIP) Cache pip
@@ -433,6 +444,10 @@ jobs:
         channels: conda-forge
         use-only-tar-bz2: true
         activate-environment: ''
+    - name: (WINDOWS,CONDA) Set up MSVC Compiler
+      uses: ilammy/msvc-dev-cmd@v1
+      if: matrix.install-method == 'conda' && matrix.os == 'windows-latest' && env.INSTALLC
+        == 1
     - name: (UNIX,CONDA) Add miniconda bin to path
       if: matrix.install-method == 'conda' && matrix.os != 'windows-latest'
       run: echo "PATH=$CONDA/bin:$PATH" >> $GITHUB_ENV

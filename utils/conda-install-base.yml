@@ -78,15 +78,15 @@ jobs:
       run: |
         echo "TMPDIR=$USERPROFILE\\AppData\\Local\\Temp" >> $GITHUB_ENV
         echo "TEMP=$USERPROFILE\\AppData\\Local\\Temp" >> $GITHUB_ENV
-    - name: (WINDOWS) Set up MSVC Compiler
-      uses: ilammy/msvc-dev-cmd@v1
-      if: matrix.os == 'windows-latest' && env.INSTALLC == 1
-      with:
-        toolset: 14.0
 
     # ========================================================
     # Pip specific installation steps
     # ========================================================
+    - name: (WINDOWS,PIP) Set up MSVC Compiler
+      uses: ilammy/msvc-dev-cmd@v1
+      if: matrix.os == 'windows-latest' && matrix.install-method == 'pip' && env.INSTALLC == 1
+      with:
+        toolset: 14.0
     # - name: (WINDOWS,PIP) Set VCPKG_ROOT on Windows
     #   if: matrix.os == 'windows-latest' && matrix.install-method == 'pip' && env.INSTALLC == 1
     #   shell: bash -l {0}
@@ -152,11 +152,14 @@ jobs:
         use-only-tar-bz2: true
         activate-environment: ''
         # auto-activate-base: false
+    # The compiler must be initialized after the base environment for
+    # conda so that it dosn't interfere with the base environment
+    # initialization
     # This step might need to stay here so that dev prompt comes before
     # conda?
-    # - name: (WINDOWS,CONDA) Set up MSVC Compiler
-    #   uses: ilammy/msvc-dev-cmd@v1
-    #   if: matrix.install-method == 'conda' && matrix.os == 'windows-latest' && env.INSTALLC == 1
+    - name: (WINDOWS,CONDA) Set up MSVC Compiler
+      uses: ilammy/msvc-dev-cmd@v1
+      if: matrix.install-method == 'conda' && matrix.os == 'windows-latest' && env.INSTALLC == 1
     # This step and the next allows conda to be called before the
     # conda-incubator/setup-miniconda@v2 action is used to create the
     # test environment so that the package can be built in the base
