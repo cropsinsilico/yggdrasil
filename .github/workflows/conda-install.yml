@@ -461,7 +461,6 @@ jobs:
     runs-on: ${{ matrix.os }}
     env:
       INSTALLRMQ: 1
-      INSTALLAPY: 1
     strategy:
       max-parallel: 5
       matrix:
