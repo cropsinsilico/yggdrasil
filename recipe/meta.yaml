@@ -35,6 +35,7 @@ build:
     - yggvalidate = yggdrasil.command_line:validate_yaml
     - ygginstall = yggdrasil.command_line:ygginstall
     - yggdevup = yggdrasil.command_line:yggdevup
+    - ygggha = yggdrasil.command_line:generate_gha_workflow
 
 requirements:
   host:

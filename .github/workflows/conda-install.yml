@@ -1,31 +1,514 @@
 # DO NOT MODIFY THIS FILE, IT IS GENERATED.
-# To make changes, modify 'conda-install-base.yml'
-# and run 'python generate_conda_install.py'
+# To make changes, modify '.git/../utils/conda-install-base.yml'
+# and run 'ygggha'
+name: Python Package using Conda
+'on':
+  push:
+    branches-ignore:
+    - gh-pages
 env:
-  BUILDDOCS: 0
-  INSTALLC: 1
-  INSTALLFORTRAN: 1
-  INSTALLLPY: 0
-  INSTALLPYGMENTS: 1
-  INSTALLR: 1
-  INSTALLRMQ: 0
-  INSTALLSBML: 1
-  INSTALLTRIMESH: 1
-  INSTALLZMQ: 1
-  JSONSCHEMA: jsonschema
+  NUMPY: numpy
   MATPLOTLIB: matplotlib
   MPLBACKEND: agg
-  NUMPY: numpy
-  TEST: 0
+  JSONSCHEMA: jsonschema
+  INSTALLR: 1
+  INSTALLC: 1
+  INSTALLFORTRAN: 1
+  INSTALLSBML: 1
+  INSTALLLPY: 0
+  INSTALLZMQ: 1
+  INSTALLRMQ: 0
+  INSTALLTRIMESH: 1
+  INSTALLPYGMENTS: 1
+  BUILDDOCS: 0
 jobs:
+  test:
+    name: Test (${{ matrix.python-version }}, ${{ matrix.os }}, ${{ matrix.install-method
+      }}, ${{ matrix.test-flags }}), Install C = ${{ matrix.install-c }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      max-parallel: 20
+      matrix:
+        os:
+        - ubuntu-latest
+        - macos-latest
+        - windows-latest
+        python-version:
+        - 3.6
+        install-method:
+        - pip
+        test-flags:
+        - --long-running
+        - --test-suite=examples
+        install-c:
+        - true
+        include:
+        - os: windows-latest
+          python-version: 3.6
+          install-method: pip
+          test-flags: --long-running
+          install-c: false
+        - os: ubuntu-latest
+          python-version: 3.8
+          install-method: conda
+          test-flags: --long-running
+          install-c: true
+        - os: ubuntu-latest
+          python-version: 3.6
+          install-method: conda
+          test-flags: --long-running
+          install-c: true
+        - os: macos-latest
+          python-version: 3.6
+          install-method: conda
+          test-flags: --long-running
+          install-c: true
+        - os: windows-latest
+          python-version: 3.6
+          install-method: conda
+          test-flags: --long-running
+          install-c: true
+      fail-fast: false
+    defaults:
+      run:
+        shell: bash -l {0}
+    steps:
+    - uses: actions/checkout@v2
+      with:
+        submodules: true
+    - name: Set C installation based on matrix value
+      if: matrix.install-c != true && matrix.install-method != 'conda'
+      shell: bash -l {0}
+      run: echo "INSTALLC=0" >> $GITHUB_ENV
+    - name: (WINDOWS) Patch TEMP/TMPDIR on Windows
+      if: matrix.os == 'windows-latest'
+      shell: bash -l {0}
+      run: 'echo "TMPDIR=$USERPROFILE\\AppData\\Local\\Temp" >> $GITHUB_ENV
+
+        echo "TEMP=$USERPROFILE\\AppData\\Local\\Temp" >> $GITHUB_ENV
+
+        '
+    - name: (WINDOWS) Set up MSVC Compiler
+      uses: ilammy/msvc-dev-cmd@v1
+      if: matrix.os == 'windows-latest' && env.INSTALLC == 1
+      with:
+        toolset: 14.0
+    - name: (LINUX,PIP) Cache pip
+      uses: actions/cache@v2
+      if: startsWith(runner.os, 'Linux') && matrix.install-method == 'pip'
+      with:
+        path: ~/.cache/pip
+        key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
+        restore-keys: '${{ runner.os }}-pip-
+
+          '
+    - name: (MACOS,PIP) Cache pip
+      uses: actions/cache@v2
+      if: startsWith(runner.os, 'macOS') && matrix.install-method == 'pip'
+      with:
+        path: ~/Library/Caches/pip
+        key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
+        restore-keys: '${{ runner.os }}-pip-
+
+          '
+    - name: (WINDOWS,PIP) Cache pip
+      uses: actions/cache@v2
+      if: startsWith(runner.os, 'Windows') && matrix.install-method == 'pip'
+      with:
+        path: ~\AppData\Local\pip\Cache
+        key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
+        restore-keys: '${{ runner.os }}-pip-
+
+          '
+    - name: (PIP) Set up Python
+      uses: actions/setup-python@v2
+      if: matrix.install-method == 'pip'
+      with:
+        python-version: ${{ matrix.python-version }}
+    - name: (PIP) Install dependencies & package
+      if: matrix.install-method == 'pip'
+      run: python utils/setup_test_env.py install ${{ matrix.install-method }}
+    - name: (WINDOWS,PIP) Set the vcpkg root config value
+      if: matrix.os == 'windows-latest' && matrix.install-method == 'pip' && env.INSTALLC
+        == 1
+      shell: bash -l {0}
+      run: yggconfig --vcpkg-dir=C:\\vcpkg
+    - name: (CONDA) Cache conda
+      uses: actions/cache@v1
+      if: matrix.install-method == 'conda'
+      env:
+        CACHE_NUMBER: 0
+      with:
+        path: ~/conda_pkgs_dir
+        key: ${{ runner.os }}-conda-${{ env.CACHE_NUMBER }}-${{ hashFiles('recipe/meta.yaml')
+          }}
+    - name: (WINDOWS,CONDA) Set up miniconda base environment
+      uses: conda-incubator/setup-miniconda@v2
+      if: matrix.install-method == 'conda' && matrix.os == 'windows-latest'
+      with:
+        channels: conda-forge
+        use-only-tar-bz2: true
+        activate-environment: ''
+    - name: (UNIX,CONDA) Add miniconda bin to path
+      if: matrix.install-method == 'conda' && matrix.os != 'windows-latest'
+      run: echo "PATH=$CONDA/bin:$PATH" >> $GITHUB_ENV
+    - name: (MACOS,CONDA) Change ownership of conda on MacOS
+      shell: bash
+      if: matrix.install-method == 'conda' && matrix.os == 'macos-latest'
+      run: sudo chown -R $(whoami) $CONDA
+    - name: (CONDA) Build package in base environment
+      if: matrix.install-method == 'conda'
+      shell: bash --noprofile --norc -eo pipefail {0}
+      run: python utils/setup_test_env.py build ${{ matrix.install-method }} --python
+        ${{ matrix.python-version }}
+    - name: (CONDA) Set up miniconda test environment
+      uses: conda-incubator/setup-miniconda@v2
+      if: matrix.install-method == 'conda'
+      with:
+        python-version: ${{ matrix.python-version }}
+        channels: conda-forge
+        use-only-tar-bz2: true
+        channel-priority: strict
+    - name: (MACOS,CONDA) Install old MacOSX SDK for compatibility with the conda
+        llvm (7)
+      if: matrix.os == 'macos-latest' && matrix.install-method == 'conda'
+      run: ./utils/setup_old_mac_sdk.sh
+    - name: (CONDA) Install dependencies & package from existing build
+      if: matrix.install-method == 'conda'
+      run: python utils/setup_test_env.py install ${{ matrix.install-method }} --without-build
+    - name: Verify installation
+      run: python utils/setup_test_env.py verify
+    - name: Compile libraries
+      run: yggcompile
+    - name: Run tests
+      run: yggtest --ci ${{ matrix.test-flags }}
+    - name: Upload coverage report
+      uses: codecov/codecov-action@v1
+  test_rmq:
+    name: Test RMQ (${{ matrix.python-version }}, ${{ matrix.os }}, ${{ matrix.install-method
+      }})
+    runs-on: ${{ matrix.os }}
+    env:
+      INSTALLRMQ: 1
+      INSTALLAPY: 1
+    strategy:
+      max-parallel: 5
+      matrix:
+        os:
+        - ubuntu-latest
+        python-version:
+        - 3.6
+        install-method:
+        - pip
+        - conda
+        test-flags:
+        - --long-running
+      fail-fast: false
+    services:
+      rabbitmq:
+        image: rabbitmq:latest
+        ports:
+        - 5672:5672
+        options: --health-cmd "rabbitmqctl node_health_check" --health-interval 10s
+          --health-timeout 5s --health-retries 5
+    defaults:
+      run:
+        shell: bash -l {0}
+    steps:
+    - uses: actions/checkout@v2
+      with:
+        submodules: true
+    - name: Set C installation based on matrix value
+      if: matrix.install-c != true && matrix.install-method != 'conda'
+      shell: bash -l {0}
+      run: echo "INSTALLC=0" >> $GITHUB_ENV
+    - name: (WINDOWS) Patch TEMP/TMPDIR on Windows
+      if: matrix.os == 'windows-latest'
+      shell: bash -l {0}
+      run: 'echo "TMPDIR=$USERPROFILE\\AppData\\Local\\Temp" >> $GITHUB_ENV
+
+        echo "TEMP=$USERPROFILE\\AppData\\Local\\Temp" >> $GITHUB_ENV
+
+        '
+    - name: (WINDOWS) Set up MSVC Compiler
+      uses: ilammy/msvc-dev-cmd@v1
+      if: matrix.os == 'windows-latest' && env.INSTALLC == 1
+      with:
+        toolset: 14.0
+    - name: (LINUX,PIP) Cache pip
+      uses: actions/cache@v2
+      if: startsWith(runner.os, 'Linux') && matrix.install-method == 'pip'
+      with:
+        path: ~/.cache/pip
+        key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
+        restore-keys: '${{ runner.os }}-pip-
+
+          '
+    - name: (MACOS,PIP) Cache pip
+      uses: actions/cache@v2
+      if: startsWith(runner.os, 'macOS') && matrix.install-method == 'pip'
+      with:
+        path: ~/Library/Caches/pip
+        key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
+        restore-keys: '${{ runner.os }}-pip-
+
+          '
+    - name: (WINDOWS,PIP) Cache pip
+      uses: actions/cache@v2
+      if: startsWith(runner.os, 'Windows') && matrix.install-method == 'pip'
+      with:
+        path: ~\AppData\Local\pip\Cache
+        key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
+        restore-keys: '${{ runner.os }}-pip-
+
+          '
+    - name: (PIP) Set up Python
+      uses: actions/setup-python@v2
+      if: matrix.install-method == 'pip'
+      with:
+        python-version: ${{ matrix.python-version }}
+    - name: (PIP) Install dependencies & package
+      if: matrix.install-method == 'pip'
+      run: python utils/setup_test_env.py install ${{ matrix.install-method }}
+    - name: (WINDOWS,PIP) Set the vcpkg root config value
+      if: matrix.os == 'windows-latest' && matrix.install-method == 'pip' && env.INSTALLC
+        == 1
+      shell: bash -l {0}
+      run: yggconfig --vcpkg-dir=C:\\vcpkg
+    - name: (CONDA) Cache conda
+      uses: actions/cache@v1
+      if: matrix.install-method == 'conda'
+      env:
+        CACHE_NUMBER: 0
+      with:
+        path: ~/conda_pkgs_dir
+        key: ${{ runner.os }}-conda-${{ env.CACHE_NUMBER }}-${{ hashFiles('recipe/meta.yaml')
+          }}
+    - name: (WINDOWS,CONDA) Set up miniconda base environment
+      uses: conda-incubator/setup-miniconda@v2
+      if: matrix.install-method == 'conda' && matrix.os == 'windows-latest'
+      with:
+        channels: conda-forge
+        use-only-tar-bz2: true
+        activate-environment: ''
+    - name: (UNIX,CONDA) Add miniconda bin to path
+      if: matrix.install-method == 'conda' && matrix.os != 'windows-latest'
+      run: echo "PATH=$CONDA/bin:$PATH" >> $GITHUB_ENV
+    - name: (MACOS,CONDA) Change ownership of conda on MacOS
+      shell: bash
+      if: matrix.install-method == 'conda' && matrix.os == 'macos-latest'
+      run: sudo chown -R $(whoami) $CONDA
+    - name: (CONDA) Build package in base environment
+      if: matrix.install-method == 'conda'
+      shell: bash --noprofile --norc -eo pipefail {0}
+      run: python utils/setup_test_env.py build ${{ matrix.install-method }} --python
+        ${{ matrix.python-version }}
+    - name: (CONDA) Set up miniconda test environment
+      uses: conda-incubator/setup-miniconda@v2
+      if: matrix.install-method == 'conda'
+      with:
+        python-version: ${{ matrix.python-version }}
+        channels: conda-forge
+        use-only-tar-bz2: true
+        channel-priority: strict
+    - name: (MACOS,CONDA) Install old MacOSX SDK for compatibility with the conda
+        llvm (7)
+      if: matrix.os == 'macos-latest' && matrix.install-method == 'conda'
+      run: ./utils/setup_old_mac_sdk.sh
+    - name: (CONDA) Install dependencies & package from existing build
+      if: matrix.install-method == 'conda'
+      run: python utils/setup_test_env.py install ${{ matrix.install-method }} --without-build
+    - name: Verify installation
+      run: python utils/setup_test_env.py verify
+    - name: Compile libraries
+      run: yggcompile
+    - name: Run tests
+      run: yggtest --ci ${{ matrix.test-flags }}
+    - name: Upload coverage report
+      uses: codecov/codecov-action@v1
+  test_stripped:
+    name: Test stripped install (${{ matrix.python-version }}, ${{ matrix.os }}, ${{
+      matrix.install-method }})
+    runs-on: ${{ matrix.os }}
+    env:
+      INSTALLR: 0
+      INSTALLC: 0
+      INSTALLFORTRAN: 0
+      INSTALLSBML: 0
+      INSTALLLPY: 0
+      INSTALLZMQ: 0
+      INSTALLRMQ: 0
+      INSTALLTRIMESH: 0
+      INSTALLPYGMENTS: 0
+    strategy:
+      max-parallel: 5
+      matrix:
+        os:
+        - ubuntu-latest
+        - macos-latest
+        - windows-latest
+        python-version:
+        - 3.6
+        install-method:
+        - pip
+        test-flags:
+        - --long-running
+      fail-fast: false
+    defaults:
+      run:
+        shell: bash -l {0}
+    steps:
+    - uses: actions/checkout@v2
+      with:
+        submodules: true
+    - name: Set C installation based on matrix value
+      if: matrix.install-c != true && matrix.install-method != 'conda'
+      shell: bash -l {0}
+      run: echo "INSTALLC=0" >> $GITHUB_ENV
+    - name: (WINDOWS) Patch TEMP/TMPDIR on Windows
+      if: matrix.os == 'windows-latest'
+      shell: bash -l {0}
+      run: 'echo "TMPDIR=$USERPROFILE\\AppData\\Local\\Temp" >> $GITHUB_ENV
+
+        echo "TEMP=$USERPROFILE\\AppData\\Local\\Temp" >> $GITHUB_ENV
+
+        '
+    - name: (WINDOWS) Set up MSVC Compiler
+      uses: ilammy/msvc-dev-cmd@v1
+      if: matrix.os == 'windows-latest' && env.INSTALLC == 1
+      with:
+        toolset: 14.0
+    - name: (LINUX,PIP) Cache pip
+      uses: actions/cache@v2
+      if: startsWith(runner.os, 'Linux') && matrix.install-method == 'pip'
+      with:
+        path: ~/.cache/pip
+        key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
+        restore-keys: '${{ runner.os }}-pip-
+
+          '
+    - name: (MACOS,PIP) Cache pip
+      uses: actions/cache@v2
+      if: startsWith(runner.os, 'macOS') && matrix.install-method == 'pip'
+      with:
+        path: ~/Library/Caches/pip
+        key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
+        restore-keys: '${{ runner.os }}-pip-
+
+          '
+    - name: (WINDOWS,PIP) Cache pip
+      uses: actions/cache@v2
+      if: startsWith(runner.os, 'Windows') && matrix.install-method == 'pip'
+      with:
+        path: ~\AppData\Local\pip\Cache
+        key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
+        restore-keys: '${{ runner.os }}-pip-
+
+          '
+    - name: (PIP) Set up Python
+      uses: actions/setup-python@v2
+      if: matrix.install-method == 'pip'
+      with:
+        python-version: ${{ matrix.python-version }}
+    - name: (PIP) Install dependencies & package
+      if: matrix.install-method == 'pip'
+      run: python utils/setup_test_env.py install ${{ matrix.install-method }}
+    - name: (WINDOWS,PIP) Set the vcpkg root config value
+      if: matrix.os == 'windows-latest' && matrix.install-method == 'pip' && env.INSTALLC
+        == 1
+      shell: bash -l {0}
+      run: yggconfig --vcpkg-dir=C:\\vcpkg
+    - name: (CONDA) Cache conda
+      uses: actions/cache@v1
+      if: matrix.install-method == 'conda'
+      env:
+        CACHE_NUMBER: 0
+      with:
+        path: ~/conda_pkgs_dir
+        key: ${{ runner.os }}-conda-${{ env.CACHE_NUMBER }}-${{ hashFiles('recipe/meta.yaml')
+          }}
+    - name: (WINDOWS,CONDA) Set up miniconda base environment
+      uses: conda-incubator/setup-miniconda@v2
+      if: matrix.install-method == 'conda' && matrix.os == 'windows-latest'
+      with:
+        channels: conda-forge
+        use-only-tar-bz2: true
+        activate-environment: ''
+    - name: (UNIX,CONDA) Add miniconda bin to path
+      if: matrix.install-method == 'conda' && matrix.os != 'windows-latest'
+      run: echo "PATH=$CONDA/bin:$PATH" >> $GITHUB_ENV
+    - name: (MACOS,CONDA) Change ownership of conda on MacOS
+      shell: bash
+      if: matrix.install-method == 'conda' && matrix.os == 'macos-latest'
+      run: sudo chown -R $(whoami) $CONDA
+    - name: (CONDA) Build package in base environment
+      if: matrix.install-method == 'conda'
+      shell: bash --noprofile --norc -eo pipefail {0}
+      run: python utils/setup_test_env.py build ${{ matrix.install-method }} --python
+        ${{ matrix.python-version }}
+    - name: (CONDA) Set up miniconda test environment
+      uses: conda-incubator/setup-miniconda@v2
+      if: matrix.install-method == 'conda'
+      with:
+        python-version: ${{ matrix.python-version }}
+        channels: conda-forge
+        use-only-tar-bz2: true
+        channel-priority: strict
+    - name: (MACOS,CONDA) Install old MacOSX SDK for compatibility with the conda
+        llvm (7)
+      if: matrix.os == 'macos-latest' && matrix.install-method == 'conda'
+      run: ./utils/setup_old_mac_sdk.sh
+    - name: (CONDA) Install dependencies & package from existing build
+      if: matrix.install-method == 'conda'
+      run: python utils/setup_test_env.py install ${{ matrix.install-method }} --without-build
+    - name: Verify installation
+      run: python utils/setup_test_env.py verify
+    - name: Compile libraries
+      run: yggcompile
+    - name: Run tests
+      run: yggtest --ci ${{ matrix.test-flags }}
+    - name: Upload coverage report
+      uses: codecov/codecov-action@v1
+  docs:
+    name: Build the Docs
+    runs-on: ubuntu-latest
+    env:
+      BUILDDOCS: 1
+    steps:
+    - uses: actions/checkout@v2
+      with:
+        submodules: true
+    - name: Set up Python
+      uses: actions/setup-python@v2
+      with:
+        python-version: 3.8
+    - name: Install dependencies
+      run: python utils/setup_test_env.py install pip
+    - name: Verify installation
+      run: python utils/setup_test_env.py verify
+    - name: Build the docs
+      run: 'cd docs
+
+        make autodoc
+
+        cd ../
+
+        '
+    - name: Publish docs to Github pages
+      if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags')
+      uses: JamesIves/github-pages-deploy-action@3.7.1
+      with:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        BRANCH: gh-pages
+        FOLDER: docs/build/html/
   deploy:
-    if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags')
     name: Publish package
     needs:
     - test
     - test_rmq
     - test_stripped
     - docs
+    if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags')
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
@@ -48,490 +531,6 @@ jobs:
     - name: Publish package to PyPI
       uses: pypa/gh-action-pypi-publish@master
       with:
+        user: __token__
         password: ${{ secrets.pypi }}
         skip_existing: true
-        user: __token__
-  docs:
-    env:
-      BUILDDOCS: 1
-    name: Build the Docs
-    runs-on: ubuntu-latest
-    steps:
-    - uses: actions/checkout@v2
-      with:
-        submodules: true
-    - name: Set up Python
-      uses: actions/setup-python@v2
-      with:
-        python-version: 3.8
-    - name: Install dependencies
-      run: python utils/setup_test_env.py install pip
-    - name: Verify installation
-      run: python utils/setup_test_env.py verify
-    - name: Build the docs
-      run: 'cd docs
-
-        make autodoc
-
-        cd ../
-
-        '
-    - if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags')
-      name: Publish docs to Github pages
-      uses: JamesIves/github-pages-deploy-action@3.7.1
-      with:
-        BRANCH: gh-pages
-        FOLDER: docs/build/html/
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-  test:
-    defaults:
-      run:
-        shell: bash -l {0}
-    name: Test (${{ matrix.python-version }}, ${{ matrix.os }}, ${{ matrix.install-method
-      }}, ${{ matrix.test-flags }}), Install C = ${{ matrix.install-c }}
-    runs-on: ${{ matrix.os }}
-    steps:
-    - uses: actions/checkout@v2
-      with:
-        submodules: true
-    - if: matrix.install-c != true && matrix.install-method != 'conda'
-      name: Set C installation based on matrix value
-      run: echo "INSTALLC=0" >> $GITHUB_ENV
-      shell: bash -l {0}
-    - if: matrix.os == 'windows-latest'
-      name: (WINDOWS) Patch TEMP/TMPDIR on Windows
-      run: 'echo "TMPDIR=$USERPROFILE\\AppData\\Local\\Temp" >> $GITHUB_ENV
-
-        echo "TEMP=$USERPROFILE\\AppData\\Local\\Temp" >> $GITHUB_ENV
-
-        '
-      shell: bash -l {0}
-    - if: matrix.os == 'windows-latest' && env.INSTALLC == 1
-      name: (WINDOWS) Set up MSVC Compiler
-      uses: ilammy/msvc-dev-cmd@v1
-      with:
-        toolset: 14.0
-    - if: startsWith(runner.os, 'Linux') && matrix.install-method == 'pip'
-      name: (LINUX,PIP) Cache pip
-      uses: actions/cache@v2
-      with:
-        key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
-        path: ~/.cache/pip
-        restore-keys: '${{ runner.os }}-pip-
-
-          '
-    - if: startsWith(runner.os, 'macOS') && matrix.install-method == 'pip'
-      name: (MACOS,PIP) Cache pip
-      uses: actions/cache@v2
-      with:
-        key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
-        path: ~/Library/Caches/pip
-        restore-keys: '${{ runner.os }}-pip-
-
-          '
-    - if: startsWith(runner.os, 'Windows') && matrix.install-method == 'pip'
-      name: (WINDOWS,PIP) Cache pip
-      uses: actions/cache@v2
-      with:
-        key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
-        path: ~\AppData\Local\pip\Cache
-        restore-keys: '${{ runner.os }}-pip-
-
-          '
-    - if: matrix.install-method == 'pip'
-      name: (PIP) Set up Python
-      uses: actions/setup-python@v2
-      with:
-        python-version: ${{ matrix.python-version }}
-    - if: matrix.install-method == 'pip'
-      name: (PIP) Install dependencies & package
-      run: python utils/setup_test_env.py install ${{ matrix.install-method }}
-    - if: matrix.os == 'windows-latest' && matrix.install-method == 'pip' && env.INSTALLC
-        == 1
-      name: (WINDOWS,PIP) Set the vcpkg root config value
-      run: yggconfig --vcpkg-dir=C:\\vcpkg
-      shell: bash -l {0}
-    - env:
-        CACHE_NUMBER: 0
-      if: matrix.install-method == 'conda'
-      name: (CONDA) Cache conda
-      uses: actions/cache@v1
-      with:
-        key: ${{ runner.os }}-conda-${{ env.CACHE_NUMBER }}-${{ hashFiles('recipe/meta.yaml')
-          }}
-        path: ~/conda_pkgs_dir
-    - if: matrix.install-method == 'conda' && matrix.os == 'windows-latest'
-      name: (WINDOWS,CONDA) Set up miniconda base environment
-      uses: conda-incubator/setup-miniconda@v2
-      with:
-        activate-environment: ''
-        channels: conda-forge
-        use-only-tar-bz2: true
-    - if: matrix.install-method == 'conda' && matrix.os != 'windows-latest'
-      name: (UNIX,CONDA) Add miniconda bin to path
-      run: echo "PATH=$CONDA/bin:$PATH" >> $GITHUB_ENV
-    - if: matrix.install-method == 'conda' && matrix.os == 'macos-latest'
-      name: (MACOS,CONDA) Change ownership of conda on MacOS
-      run: sudo chown -R $(whoami) $CONDA
-      shell: bash
-    - if: matrix.install-method == 'conda'
-      name: (CONDA) Build package in base environment
-      run: python utils/setup_test_env.py build ${{ matrix.install-method }} --python
-        ${{ matrix.python-version }}
-      shell: bash --noprofile --norc -eo pipefail {0}
-    - if: matrix.install-method == 'conda'
-      name: (CONDA) Set up miniconda test environment
-      uses: conda-incubator/setup-miniconda@v2
-      with:
-        channel-priority: strict
-        channels: conda-forge
-        python-version: ${{ matrix.python-version }}
-        use-only-tar-bz2: true
-    - if: matrix.os == 'macos-latest' && matrix.install-method == 'conda'
-      name: (MACOS,CONDA) Install old MacOSX SDK for compatibility with the conda
-        llvm (7)
-      run: ./utils/setup_old_mac_sdk.sh
-    - if: matrix.install-method == 'conda'
-      name: (CONDA) Install dependencies & package from existing build
-      run: python utils/setup_test_env.py install ${{ matrix.install-method }} --without-build
-    - name: Verify installation
-      run: python utils/setup_test_env.py verify
-    - name: Compile libraries
-      run: yggcompile
-    - name: Run tests
-      run: yggtest --ci ${{ matrix.test-flags }}
-    - name: Upload coverage report
-      uses: codecov/codecov-action@v1
-    strategy:
-      fail-fast: false
-      matrix:
-        include:
-        - install-c: false
-          install-method: pip
-          os: windows-latest
-          python-version: 3.6
-          test-flags: --long-running
-        - install-c: true
-          install-method: conda
-          os: ubuntu-latest
-          python-version: 3.8
-          test-flags: --long-running
-        - install-c: true
-          install-method: conda
-          os: ubuntu-latest
-          python-version: 3.6
-          test-flags: --long-running
-        - install-c: true
-          install-method: conda
-          os: macos-latest
-          python-version: 3.6
-          test-flags: --long-running
-        - install-c: true
-          install-method: conda
-          os: windows-latest
-          python-version: 3.6
-          test-flags: --long-running
-        install-c:
-        - true
-        install-method:
-        - pip
-        os:
-        - ubuntu-latest
-        - macos-latest
-        - windows-latest
-        python-version:
-        - 3.6
-        test-flags:
-        - --long-running
-        - --test-suite=examples
-      max-parallel: 20
-  test_rmq:
-    defaults:
-      run:
-        shell: bash -l {0}
-    env:
-      INSTALLAPY: 1
-      INSTALLRMQ: 1
-    name: Test RMQ (${{ matrix.python-version }}, ${{ matrix.os }}, ${{ matrix.install-method
-      }})
-    runs-on: ${{ matrix.os }}
-    services:
-      rabbitmq:
-        image: rabbitmq:latest
-        options: --health-cmd "rabbitmqctl node_health_check" --health-interval 10s
-          --health-timeout 5s --health-retries 5
-        ports:
-        - 5672:5672
-    steps:
-    - uses: actions/checkout@v2
-      with:
-        submodules: true
-    - if: matrix.install-c != true && matrix.install-method != 'conda'
-      name: Set C installation based on matrix value
-      run: echo "INSTALLC=0" >> $GITHUB_ENV
-      shell: bash -l {0}
-    - if: matrix.os == 'windows-latest'
-      name: (WINDOWS) Patch TEMP/TMPDIR on Windows
-      run: 'echo "TMPDIR=$USERPROFILE\\AppData\\Local\\Temp" >> $GITHUB_ENV
-
-        echo "TEMP=$USERPROFILE\\AppData\\Local\\Temp" >> $GITHUB_ENV
-
-        '
-      shell: bash -l {0}
-    - if: matrix.os == 'windows-latest' && env.INSTALLC == 1
-      name: (WINDOWS) Set up MSVC Compiler
-      uses: ilammy/msvc-dev-cmd@v1
-      with:
-        toolset: 14.0
-    - if: startsWith(runner.os, 'Linux') && matrix.install-method == 'pip'
-      name: (LINUX,PIP) Cache pip
-      uses: actions/cache@v2
-      with:
-        key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
-        path: ~/.cache/pip
-        restore-keys: '${{ runner.os }}-pip-
-
-          '
-    - if: startsWith(runner.os, 'macOS') && matrix.install-method == 'pip'
-      name: (MACOS,PIP) Cache pip
-      uses: actions/cache@v2
-      with:
-        key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
-        path: ~/Library/Caches/pip
-        restore-keys: '${{ runner.os }}-pip-
-
-          '
-    - if: startsWith(runner.os, 'Windows') && matrix.install-method == 'pip'
-      name: (WINDOWS,PIP) Cache pip
-      uses: actions/cache@v2
-      with:
-        key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
-        path: ~\AppData\Local\pip\Cache
-        restore-keys: '${{ runner.os }}-pip-
-
-          '
-    - if: matrix.install-method == 'pip'
-      name: (PIP) Set up Python
-      uses: actions/setup-python@v2
-      with:
-        python-version: ${{ matrix.python-version }}
-    - if: matrix.install-method == 'pip'
-      name: (PIP) Install dependencies & package
-      run: python utils/setup_test_env.py install ${{ matrix.install-method }}
-    - if: matrix.os == 'windows-latest' && matrix.install-method == 'pip' && env.INSTALLC
-        == 1
-      name: (WINDOWS,PIP) Set the vcpkg root config value
-      run: yggconfig --vcpkg-dir=C:\\vcpkg
-      shell: bash -l {0}
-    - env:
-        CACHE_NUMBER: 0
-      if: matrix.install-method == 'conda'
-      name: (CONDA) Cache conda
-      uses: actions/cache@v1
-      with:
-        key: ${{ runner.os }}-conda-${{ env.CACHE_NUMBER }}-${{ hashFiles('recipe/meta.yaml')
-          }}
-        path: ~/conda_pkgs_dir
-    - if: matrix.install-method == 'conda' && matrix.os == 'windows-latest'
-      name: (WINDOWS,CONDA) Set up miniconda base environment
-      uses: conda-incubator/setup-miniconda@v2
-      with:
-        activate-environment: ''
-        channels: conda-forge
-        use-only-tar-bz2: true
-    - if: matrix.install-method == 'conda' && matrix.os != 'windows-latest'
-      name: (UNIX,CONDA) Add miniconda bin to path
-      run: echo "PATH=$CONDA/bin:$PATH" >> $GITHUB_ENV
-    - if: matrix.install-method == 'conda' && matrix.os == 'macos-latest'
-      name: (MACOS,CONDA) Change ownership of conda on MacOS
-      run: sudo chown -R $(whoami) $CONDA
-      shell: bash
-    - if: matrix.install-method == 'conda'
-      name: (CONDA) Build package in base environment
-      run: python utils/setup_test_env.py build ${{ matrix.install-method }} --python
-        ${{ matrix.python-version }}
-      shell: bash --noprofile --norc -eo pipefail {0}
-    - if: matrix.install-method == 'conda'
-      name: (CONDA) Set up miniconda test environment
-      uses: conda-incubator/setup-miniconda@v2
-      with:
-        channel-priority: strict
-        channels: conda-forge
-        python-version: ${{ matrix.python-version }}
-        use-only-tar-bz2: true
-    - if: matrix.os == 'macos-latest' && matrix.install-method == 'conda'
-      name: (MACOS,CONDA) Install old MacOSX SDK for compatibility with the conda
-        llvm (7)
-      run: ./utils/setup_old_mac_sdk.sh
-    - if: matrix.install-method == 'conda'
-      name: (CONDA) Install dependencies & package from existing build
-      run: python utils/setup_test_env.py install ${{ matrix.install-method }} --without-build
-    - name: Verify installation
-      run: python utils/setup_test_env.py verify
-    - name: Compile libraries
-      run: yggcompile
-    - name: Run tests
-      run: yggtest --ci ${{ matrix.test-flags }}
-    - name: Upload coverage report
-      uses: codecov/codecov-action@v1
-    strategy:
-      fail-fast: false
-      matrix:
-        install-method:
-        - pip
-        - conda
-        os:
-        - ubuntu-latest
-        python-version:
-        - 3.6
-        test-flags:
-        - --long-running
-      max-parallel: 5
-  test_stripped:
-    defaults:
-      run:
-        shell: bash -l {0}
-    env:
-      INSTALLC: 0
-      INSTALLFORTRAN: 0
-      INSTALLLPY: 0
-      INSTALLPYGMENTS: 0
-      INSTALLR: 0
-      INSTALLRMQ: 0
-      INSTALLSBML: 0
-      INSTALLTRIMESH: 0
-      INSTALLZMQ: 0
-    name: Test stripped install (${{ matrix.python-version }}, ${{ matrix.os }}, ${{
-      matrix.install-method }})
-    runs-on: ${{ matrix.os }}
-    steps:
-    - uses: actions/checkout@v2
-      with:
-        submodules: true
-    - if: matrix.install-c != true && matrix.install-method != 'conda'
-      name: Set C installation based on matrix value
-      run: echo "INSTALLC=0" >> $GITHUB_ENV
-      shell: bash -l {0}
-    - if: matrix.os == 'windows-latest'
-      name: (WINDOWS) Patch TEMP/TMPDIR on Windows
-      run: 'echo "TMPDIR=$USERPROFILE\\AppData\\Local\\Temp" >> $GITHUB_ENV
-
-        echo "TEMP=$USERPROFILE\\AppData\\Local\\Temp" >> $GITHUB_ENV
-
-        '
-      shell: bash -l {0}
-    - if: matrix.os == 'windows-latest' && env.INSTALLC == 1
-      name: (WINDOWS) Set up MSVC Compiler
-      uses: ilammy/msvc-dev-cmd@v1
-      with:
-        toolset: 14.0
-    - if: startsWith(runner.os, 'Linux') && matrix.install-method == 'pip'
-      name: (LINUX,PIP) Cache pip
-      uses: actions/cache@v2
-      with:
-        key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
-        path: ~/.cache/pip
-        restore-keys: '${{ runner.os }}-pip-
-
-          '
-    - if: startsWith(runner.os, 'macOS') && matrix.install-method == 'pip'
-      name: (MACOS,PIP) Cache pip
-      uses: actions/cache@v2
-      with:
-        key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
-        path: ~/Library/Caches/pip
-        restore-keys: '${{ runner.os }}-pip-
-
-          '
-    - if: startsWith(runner.os, 'Windows') && matrix.install-method == 'pip'
-      name: (WINDOWS,PIP) Cache pip
-      uses: actions/cache@v2
-      with:
-        key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
-        path: ~\AppData\Local\pip\Cache
-        restore-keys: '${{ runner.os }}-pip-
-
-          '
-    - if: matrix.install-method == 'pip'
-      name: (PIP) Set up Python
-      uses: actions/setup-python@v2
-      with:
-        python-version: ${{ matrix.python-version }}
-    - if: matrix.install-method == 'pip'
-      name: (PIP) Install dependencies & package
-      run: python utils/setup_test_env.py install ${{ matrix.install-method }}
-    - if: matrix.os == 'windows-latest' && matrix.install-method == 'pip' && env.INSTALLC
-        == 1
-      name: (WINDOWS,PIP) Set the vcpkg root config value
-      run: yggconfig --vcpkg-dir=C:\\vcpkg
-      shell: bash -l {0}
-    - env:
-        CACHE_NUMBER: 0
-      if: matrix.install-method == 'conda'
-      name: (CONDA) Cache conda
-      uses: actions/cache@v1
-      with:
-        key: ${{ runner.os }}-conda-${{ env.CACHE_NUMBER }}-${{ hashFiles('recipe/meta.yaml')
-          }}
-        path: ~/conda_pkgs_dir
-    - if: matrix.install-method == 'conda' && matrix.os == 'windows-latest'
-      name: (WINDOWS,CONDA) Set up miniconda base environment
-      uses: conda-incubator/setup-miniconda@v2
-      with:
-        activate-environment: ''
-        channels: conda-forge
-        use-only-tar-bz2: true
-    - if: matrix.install-method == 'conda' && matrix.os != 'windows-latest'
-      name: (UNIX,CONDA) Add miniconda bin to path
-      run: echo "PATH=$CONDA/bin:$PATH" >> $GITHUB_ENV
-    - if: matrix.install-method == 'conda' && matrix.os == 'macos-latest'
-      name: (MACOS,CONDA) Change ownership of conda on MacOS
-      run: sudo chown -R $(whoami) $CONDA
-      shell: bash
-    - if: matrix.install-method == 'conda'
-      name: (CONDA) Build package in base environment
-      run: python utils/setup_test_env.py build ${{ matrix.install-method }} --python
-        ${{ matrix.python-version }}
-      shell: bash --noprofile --norc -eo pipefail {0}
-    - if: matrix.install-method == 'conda'
-      name: (CONDA) Set up miniconda test environment
-      uses: conda-incubator/setup-miniconda@v2
-      with:
-        channel-priority: strict
-        channels: conda-forge
-        python-version: ${{ matrix.python-version }}
-        use-only-tar-bz2: true
-    - if: matrix.os == 'macos-latest' && matrix.install-method == 'conda'
-      name: (MACOS,CONDA) Install old MacOSX SDK for compatibility with the conda
-        llvm (7)
-      run: ./utils/setup_old_mac_sdk.sh
-    - if: matrix.install-method == 'conda'
-      name: (CONDA) Install dependencies & package from existing build
-      run: python utils/setup_test_env.py install ${{ matrix.install-method }} --without-build
-    - name: Verify installation
-      run: python utils/setup_test_env.py verify
-    - name: Compile libraries
-      run: yggcompile
-    - name: Run tests
-      run: yggtest --ci ${{ matrix.test-flags }}
-    - name: Upload coverage report
-      uses: codecov/codecov-action@v1
-    strategy:
-      fail-fast: false
-      matrix:
-        install-method:
-        - pip
-        os:
-        - ubuntu-latest
-        - macos-latest
-        - windows-latest
-        python-version:
-        - 3.6
-        test-flags:
-        - --long-running
-      max-parallel: 5
-name: Python Package using Conda
-'on':
-  push:
-    branches-ignore:
-    - gh-pages

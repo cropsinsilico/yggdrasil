@@ -20,7 +20,6 @@ env:
   INSTALLTRIMESH: 1
   INSTALLPYGMENTS: 1
   BUILDDOCS: 0
-  TEST: 0
 
 jobs:
   test:

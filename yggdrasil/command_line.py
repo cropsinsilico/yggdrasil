@@ -31,15 +31,7 @@ def githook():
         except subprocess.CalledProcessError:
             return 1
         workflow_dir = os.path.join(gitdir, '..', '.github', 'workflows')
-        try:
-            subprocess.run(
-                ['python', 'generate_conda_install.py'],
-                cwd=os.path.join(gitdir, '..', 'utils'), check=True,
-                stderr=subprocess.STDOUT,
-                stdout=subprocess.PIPE)
-        except subprocess.CalledProcessError as e:
-            print(e.stdout)
-            return 1
+        generate_gha_workflow(args=[], gitdir=gitdir)
         try:
             subprocess.run(
                 ['git', 'add',
@@ -50,6 +42,57 @@ def githook():
         except subprocess.CalledProcessError:
             return 1
     return 0
+
+
+def generate_gha_workflow(args=None, gitdir=None):
+    r"""Re-generate the Github actions workflow yaml."""
+    import yaml
+    from yggdrasil.metaschema.encoder import decode_yaml, encode_yaml
+    from collections import OrderedDict
+
+    class NoAliasDumper(yaml.SafeDumper):
+        def ignore_aliases(self, data):
+            return True
+    if gitdir is None:
+        try:
+            gitdir = subprocess.check_output(
+                ["git", "rev-parse", "--git-dir"],
+                stderr=subprocess.PIPE).decode('utf-8').strip()
+        except subprocess.CalledProcessError:
+            return 1
+    parser = argparse.ArgumentParser(
+        "Generate a Github Actions (GHA) workflow yaml file from "
+        "a version of the file that uses anchors (not supported by "
+        "GHA as of 2021-01-14).")
+    parser.add_argument(
+        '--base', '--base-file',
+        default=os.path.join(gitdir, '..', 'utils',
+                             'conda-install-base.yml'),
+        help="Version of GHA workflow yaml that contains anchors.")
+    parser.add_argument(
+        '--dest',
+        default=os.path.join(gitdir, '..', '.github', 'workflows',
+                             'conda-install.yml'),
+        help="Name of target GHA workflow yaml file.")
+    parser.add_argument(
+        '--verbose', action='store_true',
+        help="Print yaml contents.")
+    args = parser.parse_args(args=args)
+    base = args.base
+    dest = args.dest
+    with open(base, 'r') as fd:
+        contents = decode_yaml(fd.read(), sorted_dict_type=OrderedDict)
+        # contents = yaml.load(fd, Loader=yaml.SafeLoader)
+    if args.verbose:
+        pprint.pprint(contents)
+    with open(dest, 'w') as fd:
+        fd.write(('# DO NOT MODIFY THIS FILE, IT IS GENERATED.\n'
+                  '# To make changes, modify \'%s\'\n'
+                  '# and run \'ygggha\'\n')
+                 % args.base)
+        fd.write(encode_yaml(contents, sorted_dict_type=OrderedDict,
+                             Dumper=NoAliasDumper))
+        # yaml.dump(contents, fd, Dumper=NoAliasDumper)
 
 
 def ygginfo():
