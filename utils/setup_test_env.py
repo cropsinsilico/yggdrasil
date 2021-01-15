@@ -11,6 +11,7 @@ PY2 = (sys.version_info[0] == 2)
 _is_osx = (sys.platform == 'darwin')
 _is_linux = ('linux' in sys.platform)
 _is_win = (sys.platform in ['win32', 'cygwin'])
+_is_unix = (_is_osx or _is_linux)
 _on_gha = bool(os.environ.get('GITHUB_ACTIONS', False))
 _on_travis = bool(os.environ.get('TRAVIS_OS_NAME', False))
 _on_appveyor = bool(os.environ.get('APPVEYOR_BUILD_FOLDER', False))
@@ -518,8 +519,8 @@ def install_deps(method, return_commands=False, verbose=False, for_development=F
                 choco_pkgs += ["mingw"]
                 # vcpkg_pkgs.append("vcpkg-gfortran")
     if install_opts['R']:
-        # TODO: Test split installation where r-base is installed from conda
-        # and the R dependencies are installed from CRAN?
+        # TODO: Test split installation where r-base is installed from
+        # conda and the R dependencies are installed from CRAN?
         if not fallback_to_conda:
             if _is_linux:
                 cmds += [("sudo add-apt-repository 'deb https://cloud"
@@ -527,7 +528,6 @@ def install_deps(method, return_commands=False, verbose=False, for_development=F
                          ("sudo apt-key adv --keyserver keyserver.ubuntu.com "
                           "--recv-keys E298A3A825C0D65DFD57CBB651716619E084DAB9")]
                 os_pkgs += ["r-base", "r-base-dev", "libudunits2-dev"]
-                os.environ['YGG_USE_SUDO_FOR_R'] = '1'
             elif _is_osx:
                 os_pkgs += ["r", "udunits"]
             elif _is_win:
@@ -805,6 +805,10 @@ def install_pkg(method, python=None, without_build=False,
         pass
     else:  # pragma: debug
         raise ValueError("Invalid method: '%s'" % method)
+    # Follow up if on Unix as R installation may require sudo
+    if install_opts['R'] and _is_unix:
+        # os.environ['YGG_USE_SUDO_FOR_R'] = '1'
+        cmds.append('ygginstall r --sudoR')
     # Print summary of what was installed
     cmds = SUMMARY_CMDS + cmds + SUMMARY_CMDS
     call_script(cmds)
@@ -832,9 +836,15 @@ def verify_pkg(install_opts=None):
         install_opts['fortran'] = False
     elif (not install_opts['fortran']) and shutil.which('gfortran'):
         install_opts['fortran'] = True
-    if (not install_opts['R']) and shutil.which('R'):
-        install_opts['R'] = True
-    if (not install_opts['c']) and shutil.which('gcc'):
+    if (not install_opts['R']) and shutil.which('Rscript'):
+        if not (_on_gha and _is_linux):
+            # The installation on GHA-ubuntu machines requires sudo
+            # and so installation will not be complete unless it is
+            # enabled explicitly. This does not seem to be True on
+            # GHA-macos builds and R is not installed by default on
+            # Travis/Appveyor.
+            install_opts['R'] = True
+    if (not install_opts['c']) and shutil.which('gcc') and (not _is_win):
         install_opts['c'] = True
     src_dir = os.path.join(os.getcwd(),
                            os.path.dirname(os.path.dirname(__file__)))

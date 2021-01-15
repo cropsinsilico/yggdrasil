@@ -343,6 +343,10 @@ If you install R and/or the R dependencies after installing |yggdrasil|, you can
   $ ygginstall R
 
 from your terminal (Linux/Mac) or Anaconda prompt (Windows).
+
+.. note::
+   If you see errors along the lines of ``'lib = "/usr/local/lib/R/site-library"' is not writable`` when running ``ygginstall R``, it is likely that the directory R is attempting to install in requires staff privileges to edit. On Unix systems (Linux/Mac), if you have ``sudo`` access you can either add yourself to the staff group (e.g. ``sudo usermod -a -G staff your_user_name``; then log off and back on) or add the ``--sudoR`` flag to the installation call (i.e. ``ygginstall R --sudoR``). On windows, you can open R from an administrator prompt and install the dependencies from CRAN directly as shown above. If you do not have administrator access, you can pick a directory that you have write access to and add it to the list of paths checked by R for R libraries in your .Rprofile file (i.e. add ``.libPaths( c( "~/userLibrary" , .libPaths() ) )``). `This article <https://support.rstudio.com/hc/en-us/articles/360047157094-Managing-R-with-Rprofile-Renviron-Rprofile-site-Renviron-site-rsession-conf-and-repos-conf>`_ describes what the .Rprofile file is and how to locate it. `This article <https://www.accelebrate.com/library/how-to-articles/r-rstudio-library>`_ discusses this in the context of Rstudio and how to make these changes via the Rstudio GUI on Windows.
+
    
 Additional Steps for RabbitMQ Message Passing
 ---------------------------------------------
