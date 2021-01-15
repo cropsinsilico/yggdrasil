@@ -356,11 +356,11 @@ def build_pkg(method, python=None, return_commands=False,
                 "%s config --add channels conda-forge" % CONDA_CMD,
                 "%s update -q conda" % CONDA_CMD,
             ]
-        # if _is_win:
-        #     # cmds.append("%s clean --all" % CONDA_CMD)  # Might invalidate cache
-        #     if _on_gha:
-        #         # build_flags = ''
-        #         build_flags += ' --no-test'
+        if _is_win and _on_gha:
+            # The tests issue a command that is too long for the
+            # windows command prompt which is used to build the conda
+            # package on Github Actions
+            build_flags += ' --no-test'
         cmds += [
             # "%s clean --all" % CONDA_CMD,  # Might invalidate cache
             # "%s deactivate" % CONDA_CMD,
