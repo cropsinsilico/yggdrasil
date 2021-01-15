@@ -1,5 +1,4 @@
 import unittest
-import zmq
 import copy
 from yggdrasil import platform
 from yggdrasil.tests import assert_raises, assert_equal
@@ -48,6 +47,7 @@ def test_invalid_protocol():
 @unittest.skipIf(platform._is_win, "Testing on Windows")
 def test_error_on_send_open_twice():
     r"""Test creation of the same send socket twice for an error."""
+    import zmq
     for s, r in ZMQComm._socket_type_pairs:
         # Send comm
         name1 = 'test_%s' % s
