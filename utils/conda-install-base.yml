@@ -237,7 +237,6 @@ jobs:
       INSTALLR: 0
       INSTALLC: 0
       INSTALLFORTRAN: 0
-      INSTALLSBML: 0
       INSTALLLPY: 0
       INSTALLZMQ: 0
       INSTALLRMQ: 0
