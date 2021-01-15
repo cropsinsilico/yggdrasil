@@ -14,12 +14,6 @@ addons:
   homebrew: &native_deps_brew
     packages:
       - valgrind
-      # - zmq
-      # - czmq
-      # - r
-      # - udunits
-      # - gcc
-      # - gfortran
     update: true
 
 os:
@@ -70,16 +64,16 @@ before_install:
 
     # Install miniconda
     if [[ -n "$YGG_CONDA" || $INSTALLLPY == '1' ]]; then
-      echo Installing Python using conda...;
+      # echo Installing Python using conda...;
       if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then MINICONDA_OS=Linux; else MINICONDA_OS=MacOSX; fi
-      # At one point this saved time when testing in a Python 2.7 conda environment, but
-      # recent version of conda build have issues when the base conda is not Python 3
-      # wget https://repo.anaconda.com/miniconda/Miniconda${YGG_CONDA:0:1}-latest-$MINICONDA_OS-x86_64.sh -O miniconda.sh
-      wget https://repo.anaconda.com/miniconda/Miniconda3-latest-$MINICONDA_OS-x86_64.sh -O miniconda.sh
-      bash miniconda.sh -b -p $HOME/miniconda
-      export PATH="$HOME/miniconda/bin:$PATH"
-      hash -r
-
+      ./utils/install_conda.sh $MINICONDA_OS $HOME/miniconda
+      # # At one point this saved time when testing in a Python 2.7 conda environment, but
+      # # recent version of conda build have issues when the base conda is not Python 3
+      # # wget https://repo.anaconda.com/miniconda/Miniconda${YGG_CONDA:0:1}-latest-$MINICONDA_OS-x86_64.sh -O miniconda.sh
+      # wget https://repo.anaconda.com/miniconda/Miniconda3-latest-$MINICONDA_OS-x86_64.sh -O miniconda.sh
+      # bash miniconda.sh -b -p $HOME/miniconda
+      # export PATH="$HOME/miniconda/bin:$PATH"
+      # hash -r
     fi
     # Download and point to older SDK on OSX
     echo "TRAVIS_OS_NAME = ${TRAVIS_OS_NAME}"
@@ -144,9 +138,9 @@ install:
       travis_wait python utils/setup_test_env.py deps conda
       travis_wait python utils/setup_test_env.py install conda --without-build --without-deps
     else
-      if [[ $INSTALLR == '1' ]]; then
-        export YGG_USE_SUDO_FOR_R=1
-      fi
+      # if [[ $INSTALLR == '1' ]]; then
+      #   export YGG_USE_SUDO_FOR_R=1
+      # fi
       travis_wait python utils/setup_test_env.py install pip
     fi
 
