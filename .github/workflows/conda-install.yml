@@ -1,11 +1,6 @@
 # DO NOT MODIFY THIS FILE, IT IS GENERATED.
 # To make changes, modify 'conda-install-base.yml'
 # and run 'python generate_conda_install.py'
-name: Python Package using Conda
-true:
-  push:
-    branches-ignore:
-    - gh-pages
 env:
   BUILDDOCS: 0
   INSTALLC: 1
@@ -21,6 +16,7 @@ env:
   MATPLOTLIB: matplotlib
   MPLBACKEND: agg
   NUMPY: numpy
+  TEST: 0
 jobs:
   deploy:
     if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags')
@@ -534,3 +530,8 @@ jobs:
         test-flags:
         - --long-running
       max-parallel: 5
+name: Python Package using Conda
+'on':
+  push:
+    branches-ignore:
+    - gh-pages

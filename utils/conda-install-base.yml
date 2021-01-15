@@ -1,6 +1,6 @@
 name: Python Package using Conda
 
-on:
+'on':  # quotes required so that pyyaml doesn't make this a bool
   push:
     branches-ignore:
       - 'gh-pages'
@@ -20,6 +20,7 @@ env:
   INSTALLTRIMESH: 1
   INSTALLPYGMENTS: 1
   BUILDDOCS: 0
+  TEST: 0
 
 jobs:
   test:
