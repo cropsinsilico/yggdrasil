@@ -2,6 +2,7 @@
 from pip._vendor.packaging.requirements import Requirement, InvalidRequirement
 import os
 import re
+import copy
 import uuid
 import pprint
 import argparse
@@ -111,7 +112,7 @@ def prune(fname_in, fname_out=None, excl_method=None, incl_method=None,
         fname_in = [fname_in]
     packages = []
     new_lines = []
-    orig_lines = additional_packages.copy()
+    orig_lines = copy.copy(additional_packages)
     for line in additional_packages:
         pkg = isolate_package_name(line)
         if pkg in packages:
