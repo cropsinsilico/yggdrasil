@@ -531,6 +531,7 @@ def install_deps(method, return_commands=False, verbose=False, for_development=F
             elif _is_osx:
                 os_pkgs += ["r", "udunits"]
             elif _is_win:
+                print("R INIT", shutil.which("R"), shutil.which("Rscript"))
                 choco_pkgs += ["r.project"]
             else:
                 raise NotImplementedError("Could not determine "
@@ -880,6 +881,9 @@ def verify_pkg(install_opts=None):
     for name in ['c', 'R', 'fortran', 'sbml', 'lpy']:
         flag = install_opts[name]
         if flag and (not is_lang_installed(name)):
+            if _is_win:
+                print("R INIT", shutil.which("R"),
+                      shutil.which("Rscript"))
             errors.append("Language '%s' should be installed, but is not."
                           % name)
         elif (not flag) and is_lang_installed(name):
@@ -899,8 +903,6 @@ def verify_pkg(install_opts=None):
         raise AssertionError("One or more languages was not installed as "
                              "expected\n\t%s" % "\n\t".join(errors))
     if _is_win:  # pragma: windows
-        for k in ['HOME', 'USERPROFILE', 'HOMEDRIVE', 'HOMEPATH']:
-            print('%s = %s' % (k, os.environ.get(k, None)))
         if os.environ.get('HOMEDRIVE', None):
             assert(os.path.expanduser('~').startswith(os.environ['HOMEDRIVE']))
         else:
