@@ -354,6 +354,9 @@ def update_language_config(languages=None, skip_warnings=False,
                            + "Please set this in %s to: %s")
                           % (opt, sect, ygg_cfg_usr.file_to_update, desc),
                           RuntimeWarning)
+    if verbose:
+        with open(usr_config_file, 'r') as fd:
+            print(fd.read())
     
 
 def get_ygg_loglevel(cfg=None, default='DEBUG'):
