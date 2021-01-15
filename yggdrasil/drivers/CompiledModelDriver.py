@@ -817,7 +817,11 @@ class CompilationToolBase(object):
         if platform._is_win:  # pragma: windows
             base_paths = []
             vcpkg_dir = cfg.get('c', 'vcpkg_dir', None)
+            logger.info("vcpkg_dir = '%s'" % vcpkg_dir)
             if vcpkg_dir is not None:
+                if not os.path.isdir(vcpkg_dir):  # pragma: debug
+                    raise RuntimeError("vcpkg_dir is not valid: '%s'"
+                                       % vcpkg_dir)
                 typ2dir = {'include': 'include',
                            'shared': 'bin',
                            'static': 'lib'}

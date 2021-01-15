@@ -335,8 +335,12 @@ def update_language_config(languages=None, skip_warnings=False,
             logger.info(("%s language both enabled and disabled. "
                          "No action will be taken.") % idrv.language)
         elif idrv.language in disable_languages:
+            if not ygg_cfg_usr.has_section(idrv.language):
+                ygg_cfg_usr.add_section(idrv.language)
             ygg_cfg_usr.set(idrv.language, 'disable', 'True')
         elif idrv.language in enable_languages:
+            if not ygg_cfg_usr.has_section(idrv.language):
+                ygg_cfg_usr.add_section(idrv.language)
             ygg_cfg_usr.set(idrv.language, 'disable', 'False')
         if ygg_cfg_usr.get(idrv.language, 'disable', 'False').lower() == 'true':
             continue  # pragma: no cover

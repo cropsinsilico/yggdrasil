@@ -213,11 +213,14 @@ def ygginfo():
             vardict.append(('Environment paths:', ''))
             curr_prefix += prefix
             for k in path_vars:
-                vardict.append(
-                    (curr_prefix + k, '\n%s%s'
-                     % (curr_prefix + prefix,
-                        ("\n" + curr_prefix + prefix).join(
-                            os.environ.get(k, '').split(os.pathsep)))))
+                if os.environ.get(k, ''):
+                    vardict.append(
+                        (curr_prefix + k, '\n%s%s'
+                         % (curr_prefix + prefix,
+                            ("\n" + curr_prefix + prefix).join(
+                                os.environ[k].split(os.pathsep)))))
+                else:
+                    vardict.append((curr_prefix + k, ''))
             curr_prefix = curr_prefix.rsplit(prefix, 1)[0]
             # Environment variabless
             env_vars = ['CONDA_PREFIX', 'CONDA', 'SDKROOT', 'CC', 'CXX',
@@ -244,6 +247,12 @@ def ygginfo():
                                    ("\n" + curr_prefix + prefix).join(
                                        out.splitlines(False)))))
                 curr_prefix = curr_prefix.rsplit(prefix, 1)[0]
+            # Configuration
+            with open(config.usr_config_file, 'r') as fd:
+                contents = fd.read()
+            vardict.append(
+                ('Configuration file:', '\n\t%s' % (
+                    '\n\t'.join(contents.splitlines()))))
             # R and reticulate info
             Rdrv = import_component("model", "R")
             if Rdrv.is_installed():

@@ -38,9 +38,11 @@ if not os.path.isfile(config.usr_config_file):  # pragma: no cover
     from yggdrasil.languages import install_languages
     shutil.copy(config.def_config_file, config.usr_config_file)
     install_languages.install_all_languages(from_setup=True)
-    config.update_language_config()
-    with open(config.usr_config_file, 'r') as fd:
-        print(fd.read())
+    if not any([x.endswith('yggconfig') for x in sys.argv]):
+        # Don't configure if that is what is going to happen anyway
+        config.update_language_config()
+        with open(config.usr_config_file, 'r') as fd:
+            print(fd.read())
 
 
 def expand_and_add(path, path_list, dir_list):  # pragma: no cover
