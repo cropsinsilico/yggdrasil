@@ -80,11 +80,11 @@ before_install:
       export PATH="$HOME/miniconda/bin:$PATH"
       hash -r
 
-      # Download and point to older SDK on OSX
-      echo "TRAVIS_OS_NAME = ${TRAVIS_OS_NAME}"
-      if [[ $TRAVIS_OS_NAME == 'osx' ]]; then
-        ./utils/setup_old_mac_sdk.sh
-      fi
+    fi
+    # Download and point to older SDK on OSX
+    echo "TRAVIS_OS_NAME = ${TRAVIS_OS_NAME}"
+    if [[ $TRAVIS_OS_NAME == 'osx' ]]; then
+      ./utils/setup_old_mac_sdk.sh
     fi
 
     # Install RabbitMQ & Start a server
