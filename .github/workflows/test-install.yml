@@ -112,6 +112,10 @@ jobs:
       if: matrix.os == 'windows-latest' && matrix.install-method == 'pip' && env.INSTALLC
         == 1
       run: yggconfig --vcpkg-dir=C:\\vcpkg
+    - name: (WINDOWS,PIP) Update R requirements
+      if: matrix.os == 'windows-latest' && matrix.install-method == 'pip' && env.INSTALLR
+        == 1
+      run: ygginstall R --update-r-requirements
     - name: (CONDA) Cache conda
       uses: actions/cache@v1
       if: matrix.install-method == 'conda'
@@ -268,6 +272,10 @@ jobs:
       if: matrix.os == 'windows-latest' && matrix.install-method == 'pip' && env.INSTALLC
         == 1
       run: yggconfig --vcpkg-dir=C:\\vcpkg
+    - name: (WINDOWS,PIP) Update R requirements
+      if: matrix.os == 'windows-latest' && matrix.install-method == 'pip' && env.INSTALLR
+        == 1
+      run: ygginstall R --update-r-requirements
     - name: (CONDA) Cache conda
       uses: actions/cache@v1
       if: matrix.install-method == 'conda'
@@ -423,6 +431,10 @@ jobs:
       if: matrix.os == 'windows-latest' && matrix.install-method == 'pip' && env.INSTALLC
         == 1
       run: yggconfig --vcpkg-dir=C:\\vcpkg
+    - name: (WINDOWS,PIP) Update R requirements
+      if: matrix.os == 'windows-latest' && matrix.install-method == 'pip' && env.INSTALLR
+        == 1
+      run: ygginstall R --update-r-requirements
     - name: (CONDA) Cache conda
       uses: actions/cache@v1
       if: matrix.install-method == 'conda'
@@ -581,6 +593,10 @@ jobs:
       if: matrix.os == 'windows-latest' && matrix.install-method == 'pip' && env.INSTALLC
         == 1
       run: yggconfig --vcpkg-dir=C:\\vcpkg
+    - name: (WINDOWS,PIP) Update R requirements
+      if: matrix.os == 'windows-latest' && matrix.install-method == 'pip' && env.INSTALLR
+        == 1
+      run: ygginstall R --update-r-requirements
     - name: (CONDA) Cache conda
       uses: actions/cache@v1
       if: matrix.install-method == 'conda'
@@ -737,6 +753,10 @@ jobs:
       if: matrix.os == 'windows-latest' && matrix.install-method == 'pip' && env.INSTALLC
         == 1
       run: yggconfig --vcpkg-dir=C:\\vcpkg
+    - name: (WINDOWS,PIP) Update R requirements
+      if: matrix.os == 'windows-latest' && matrix.install-method == 'pip' && env.INSTALLR
+        == 1
+      run: ygginstall R --update-r-requirements
     - name: (CONDA) Cache conda
       uses: actions/cache@v1
       if: matrix.install-method == 'conda'
