@@ -634,6 +634,8 @@ def install_deps(method, return_commands=False, verbose=False, for_development=F
             pass
         conda_pkgs.insert(0, numpy_ver.replace('==', '>='))
         skip_pkgs.append('libroadrunner')
+    if install_opts['astropy'] and fallback_to_conda and _on_travis:
+        conda_pkgs.insert(0, 'astropy>=4.1')
     if not fallback_to_conda:
         default_pkgs += conda_pkgs
     if requirements_files:
@@ -812,8 +814,6 @@ def install_pkg(method, python=None, without_build=False,
     if install_opts['R'] and _is_unix:
         # os.environ['YGG_USE_SUDO_FOR_R'] = '1'
         cmds.append('ygginstall r --sudoR')
-    if install_opts['astropy'] and fallback_to_conda and _on_travis:
-        cmds.append('%s install astropy=4.1' % CONDA_CMD)
     # Print summary of what was installed
     cmds = SUMMARY_CMDS + cmds + SUMMARY_CMDS
     call_script(cmds)
