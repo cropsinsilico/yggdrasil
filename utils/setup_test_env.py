@@ -486,6 +486,8 @@ def install_deps(method, return_commands=False, verbose=False, for_development=F
             "%s config --remove channels conda-forge" % CONDA_CMD,
             "%s config --add channels conda-forge" % CONDA_CMD,
         ]
+    if fallback_to_conda:
+        cmds.append("%s update --all" % CONDA_CMD)
     # Required for non-strict channel priority
     # https://github.com/conda-forge/conda-forge.github.io/pull/670
     # https://conda.io/projects/conda/en/latest/user-guide/concepts/ ...
