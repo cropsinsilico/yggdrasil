@@ -10,6 +10,7 @@ LazyData: true
 Imports:
     bit64,
     reticulate,
+    Rcpp,
     units,
     zeallot,
     R6
