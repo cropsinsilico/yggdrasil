@@ -742,7 +742,8 @@ class ModelDriver(Driver):
                 return proc
             out, err = proc.communicate()
             if proc.returncode != 0:
-                # logger.error(out)
+                logger.info('%s' % out)
+                logger.info('%s' % err)
                 raise RuntimeError("Command '%s' failed with code %d."
                                    % (' '.join(cmd), proc.returncode))
             out = out.decode("utf-8")
