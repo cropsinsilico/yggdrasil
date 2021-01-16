@@ -534,7 +534,7 @@ def install_deps(method, return_commands=False, verbose=False, for_development=F
                 os_pkgs += ["r", "udunits"]
             elif _is_win:
                 print("R INIT", shutil.which("R"), shutil.which("Rscript"))
-                choco_pkgs += ["r.project"]
+                choco_pkgs += ["r.project", "rtools"]
             else:
                 raise NotImplementedError("Could not determine "
                                           "R installation method.")
@@ -606,7 +606,7 @@ def install_deps(method, return_commands=False, verbose=False, for_development=F
                 raise NotImplementedError("Invalid package manager: '%s'"
                                           % windows_package_manager)
             if choco_pkgs:
-                cmds += ["choco install %s" % ' '.join(choco_pkgs)]
+                cmds += ["choco install %s --force" % ' '.join(choco_pkgs)]
             if vcpkg_pkgs:
                 cmds += ["%s install %s --triplet x64-windows"
                          % ('vcpkg.exe', ' '.join(vcpkg_pkgs))]
