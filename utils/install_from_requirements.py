@@ -173,8 +173,9 @@ def prune(fname_in, fname_out=None, excl_method=None, incl_method=None,
     # Write file
     if fname_out is None:
         fname_out = ('_pruned%s' % str(uuid.uuid4())).join(os.path.splitext(fname_in[0]))
-    with open(fname_out, 'w') as fd:
-        fd.write('\n'.join(new_lines))
+    if new_lines:
+        with open(fname_out, 'w') as fd:
+            fd.write('\n'.join(new_lines))
     if verbose:
         print('INSTALL OPTS:\n%s' % pprint.pformat(install_opts))
         print('ORIGINAL DEP LIST:\n\t%s\nPRUNED DEP LIST:\n\t%s'
@@ -253,6 +254,7 @@ def install_from_requirements(method, fname_in, conda_env=None,
                       skip_packages=skip_packages)
     try:
         if method == 'conda':
+            assert(CONDA_CMD)
             args = [CONDA_CMD, 'install', '-y']
             if verbose:
                 args.append('-vvv')
@@ -265,6 +267,7 @@ def install_from_requirements(method, fname_in, conda_env=None,
                 args.append('--user')
             args.append('--update-all')
         elif method == 'pip':
+            assert(python_cmd)
             args = [python_cmd, '-m', 'pip', 'install']
             if verbose:
                 args.append('--verbose')
@@ -276,22 +279,24 @@ def install_from_requirements(method, fname_in, conda_env=None,
                 cmd_list = []
             else:
                 cmd_list = append_cmds
-            cmd_list += [' '.join(args)]
-            if _is_win:
-                cmd_list.append(
-                    ('%s -c \'exec(\"import os;if os.path.isfile'
-                     '(\\"%s\\"): os.remove(\\"%s\\")\")\'')
-                    % (python_cmd, temp_file, temp_file))
-            else:
-                cmd_list.append(
-                    ('%s -c \'import os\nif os.path.isfile'
-                     '(\"%s\"): os.remove(\"%s\")\'')
-                    % (python_cmd, temp_file, temp_file))
+            if os.path.isfile(temp_file):
+                cmd_list += [' '.join(args)]
+                if _is_win:
+                    cmd_list.append(
+                        ('%s -c \'exec(\"import os;if os.path.isfile'
+                         '(\\"%s\\"): os.remove(\\"%s\\")\")\'')
+                        % (python_cmd, temp_file, temp_file))
+                else:
+                    cmd_list.append(
+                        ('%s -c \'import os\nif os.path.isfile'
+                         '(\"%s\"): os.remove(\"%s\")\'')
+                        % (python_cmd, temp_file, temp_file))
         if return_cmds:
             return cmd_list
         if isinstance(append_cmds, list):
             return temp_file
-        print(call_conda_command(args))
+        if os.path.isfile(temp_file):
+            print(call_conda_command(args))
     except BaseException:
         if os.path.isfile(temp_file):
             with open(temp_file, 'r') as fd:
