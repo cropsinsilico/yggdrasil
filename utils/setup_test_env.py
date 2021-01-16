@@ -606,7 +606,9 @@ def install_deps(method, return_commands=False, verbose=False, for_development=F
                 raise NotImplementedError("Invalid package manager: '%s'"
                                           % windows_package_manager)
             if choco_pkgs:
-                cmds += ["choco install %s --force" % ' '.join(choco_pkgs)]
+                # cmds += ["choco install %s --force" % ' '.join(choco_pkgs)]
+                for x in choco_pkgs:
+                    cmds.append("choco install %s --force" % x)
             if vcpkg_pkgs:
                 cmds += ["%s install %s --triplet x64-windows"
                          % ('vcpkg.exe', ' '.join(vcpkg_pkgs))]
