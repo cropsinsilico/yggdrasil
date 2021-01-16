@@ -638,6 +638,8 @@ def install_deps(method, return_commands=False, verbose=False, for_development=F
         skip_pkgs.append('libroadrunner')
     if install_opts['astropy'] and fallback_to_conda and _on_travis:
         conda_pkgs.insert(0, 'astropy>=4.1')
+    if install_opts['fortran'] and fallback_to_conda and _on_travis:
+        conda_pkgs.append('fortran-compiler')
     if not fallback_to_conda:
         default_pkgs += conda_pkgs
     if requirements_files:
