@@ -67,15 +67,16 @@ jobs:
 
         '
       shell: bash -l {0}
-    - name: Install R
-      uses: r-lib/actions/setup-r@v1
-      if: matrix.os == 'windows-latest' && env.INSTALLR == 1
     - name: (WINDOWS,PIP) Set up MSVC Compiler
       uses: ilammy/msvc-dev-cmd@v1
       if: matrix.os == 'windows-latest' && matrix.install-method == 'pip' && env.INSTALLC
         == 1
       with:
         toolset: 14.0
+    - name: Install R
+      uses: r-lib/actions/setup-r@v1
+      if: matrix.os == 'windows-latest' && matrix.install-method == 'pip' && env.INSTALLR
+        == 1
     - name: (LINUX,PIP) Cache pip
       uses: actions/cache@v2
       if: startsWith(runner.os, 'Linux') && matrix.install-method == 'pip'
@@ -230,15 +231,16 @@ jobs:
 
         '
       shell: bash -l {0}
-    - name: Install R
-      uses: r-lib/actions/setup-r@v1
-      if: matrix.os == 'windows-latest' && env.INSTALLR == 1
     - name: (WINDOWS,PIP) Set up MSVC Compiler
       uses: ilammy/msvc-dev-cmd@v1
       if: matrix.os == 'windows-latest' && matrix.install-method == 'pip' && env.INSTALLC
         == 1
       with:
         toolset: 14.0
+    - name: Install R
+      uses: r-lib/actions/setup-r@v1
+      if: matrix.os == 'windows-latest' && matrix.install-method == 'pip' && env.INSTALLR
+        == 1
     - name: (LINUX,PIP) Cache pip
       uses: actions/cache@v2
       if: startsWith(runner.os, 'Linux') && matrix.install-method == 'pip'
@@ -392,15 +394,16 @@ jobs:
 
         '
       shell: bash -l {0}
-    - name: Install R
-      uses: r-lib/actions/setup-r@v1
-      if: matrix.os == 'windows-latest' && env.INSTALLR == 1
     - name: (WINDOWS,PIP) Set up MSVC Compiler
       uses: ilammy/msvc-dev-cmd@v1
       if: matrix.os == 'windows-latest' && matrix.install-method == 'pip' && env.INSTALLC
         == 1
       with:
         toolset: 14.0
+    - name: Install R
+      uses: r-lib/actions/setup-r@v1
+      if: matrix.os == 'windows-latest' && matrix.install-method == 'pip' && env.INSTALLR
+        == 1
     - name: (LINUX,PIP) Cache pip
       uses: actions/cache@v2
       if: startsWith(runner.os, 'Linux') && matrix.install-method == 'pip'
@@ -557,15 +560,16 @@ jobs:
 
         '
       shell: bash -l {0}
-    - name: Install R
-      uses: r-lib/actions/setup-r@v1
-      if: matrix.os == 'windows-latest' && env.INSTALLR == 1
     - name: (WINDOWS,PIP) Set up MSVC Compiler
       uses: ilammy/msvc-dev-cmd@v1
       if: matrix.os == 'windows-latest' && matrix.install-method == 'pip' && env.INSTALLC
         == 1
       with:
         toolset: 14.0
+    - name: Install R
+      uses: r-lib/actions/setup-r@v1
+      if: matrix.os == 'windows-latest' && matrix.install-method == 'pip' && env.INSTALLR
+        == 1
     - name: (LINUX,PIP) Cache pip
       uses: actions/cache@v2
       if: startsWith(runner.os, 'Linux') && matrix.install-method == 'pip'
@@ -720,15 +724,16 @@ jobs:
 
         '
       shell: bash -l {0}
-    - name: Install R
-      uses: r-lib/actions/setup-r@v1
-      if: matrix.os == 'windows-latest' && env.INSTALLR == 1
     - name: (WINDOWS,PIP) Set up MSVC Compiler
       uses: ilammy/msvc-dev-cmd@v1
       if: matrix.os == 'windows-latest' && matrix.install-method == 'pip' && env.INSTALLC
         == 1
       with:
         toolset: 14.0
+    - name: Install R
+      uses: r-lib/actions/setup-r@v1
+      if: matrix.os == 'windows-latest' && matrix.install-method == 'pip' && env.INSTALLR
+        == 1
     - name: (LINUX,PIP) Cache pip
       uses: actions/cache@v2
       if: startsWith(runner.os, 'Linux') && matrix.install-method == 'pip'
