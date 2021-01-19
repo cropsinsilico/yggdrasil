@@ -22,6 +22,7 @@ env:
   INSTALLTRIMESH: 1
   INSTALLPYGMENTS: 1
   BUILDDOCS: 0
+  YGG_GHA_JOB_ID_SUFFIX:
 
 jobs:
   test_pip:
@@ -50,6 +51,9 @@ jobs:
     - name: Set C installation based on matrix value
       if: matrix.install-c != true && matrix.install-method != 'conda'
       run: echo "INSTALLC=0" >> $GITHUB_ENV
+      shell: bash -l {0}
+    - name: Store an ID string for the job
+      run: echo "YGG_GHA_JOB_ID=${{ matrix.os }}-${{ matrix.install-method }}-C${{ env.INSTALLC }}-RMQ${{ env.INSTALLRMQ }}${{ env.YGG_GHA_JOB_ID_SUFFIX }}.txt" >> $GITHUB_ENV
       shell: bash -l {0}
     - name: (WINDOWS) Patch TEMP/TMPDIR on Windows
       if: matrix.os == 'windows-latest'
@@ -192,6 +196,23 @@ jobs:
       run: yggtest --ci ${{ matrix.test-flags }}
     - name: Upload coverage report
       uses: codecov/codecov-action@v1
+    - name: Download the last successful workflow environment log
+      if: ${{ always() }}
+      continue-on-error: true
+      uses: dawidd6/action-download-artifact@v2
+      with:
+        workflow: test-install.yml
+        workflow_conclusion: success
+        name: environment-log-${{ env.YGG_GHA_JOB_ID }}
+        path: old_environment_log.txt
+    - name: Create a log of Python package versions
+      if: ${{ always() }}
+      run: python utils/setup_test_env.py log
+    - uses: actions/upload-artifact@v2
+      if: ${{ success() }}
+      with:
+        name: environment-log-${{ env.YGG_GHA_JOB_ID }}
+        path: new_environment_log.txt
     # - name: Start SSH session
     #   uses: luchihoratiu/debug-via-ssh@main
     #   if: ${{ failure() }}
@@ -278,6 +299,7 @@ jobs:
       INSTALLRMQ: 0
       INSTALLTRIMESH: 0
       INSTALLPYGMENTS: 0
+      YGG_GHA_JOB_ID_SUFFIX: -stripped
     strategy:
       max-parallel: 5
       matrix:
