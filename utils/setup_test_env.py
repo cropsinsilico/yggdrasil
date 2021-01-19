@@ -534,7 +534,7 @@ def install_deps(method, return_commands=False, verbose=False, for_development=F
                 os_pkgs += ["r", "udunits"]
             elif _is_win:
                 print("R INIT", shutil.which("R"), shutil.which("Rscript"))
-                choco_pkgs += ["r.project", "rtools"]
+                choco_pkgs += ["r.project"]  # , "rtools"]
             else:
                 raise NotImplementedError("Could not determine "
                                           "R installation method.")
@@ -608,6 +608,8 @@ def install_deps(method, return_commands=False, verbose=False, for_development=F
             if choco_pkgs:
                 # cmds += ["choco install %s --force" % ' '.join(choco_pkgs)]
                 for x in choco_pkgs:
+                    if x == 'r.project':
+                        x += ' --params "\'/AddToPath\'"'
                     cmds.append("choco install %s --force" % x)
             if vcpkg_pkgs:
                 cmds += ["%s install %s --triplet x64-windows"
