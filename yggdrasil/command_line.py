@@ -307,7 +307,7 @@ def ygginfo():
                                                 ("\n" + curr_prefix + prefix).join(
                                                     out.splitlines(False)))))
                 # conda_binary
-                if platform._is_win:  # pragma: windows
+                if platform._is_win and shutil.which('conda'):  # pragma: windows
                     out = Rdrv.run_executable(
                         ["-e", ("library(reticulate); "
                                 "conda <- reticulate:::conda_binary(\"auto\"); "
