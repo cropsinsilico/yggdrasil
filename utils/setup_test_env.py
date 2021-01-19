@@ -93,16 +93,18 @@ def call_conda_command(args, **kwargs):
     return subprocess.check_output(args, **kwargs).decode("utf-8")
 
 
-def call_script(lines):
+def call_script(lines, force_bash=False):
     r"""Write lines to a script and call it.
 
     Args:
         lines (list): Lines that should be written to the script.
+        force_bash (bool, optional): If True, bash will be used, even
+            on windows. Defaults to False.
 
     """
     if not lines:
         return
-    if _is_win:  # pragma: windows
+    if _is_win and (not force_bash):  # pragma: windows
         script_ext = '.bat'
         error_check = 'if %errorlevel% neq 0 exit /b %errorlevel%'
         for i in range(len(lines), 0, -1):
@@ -914,6 +916,34 @@ def verify_pkg(install_opts=None):
             assert(os.path.expanduser('~').lower().startswith('c:'))
 
 
+def log_environment(new_filename='new_environment_log.txt',
+                    old_filename='old_environment_log.txt'):
+    r"""Create a record of the Python package versions.
+
+    Args:
+        new_filename (str, optional): Name of the file where the
+            environment information should be stored. Defaults to
+            'new_environment_log.txt'.
+        old_filename (str, optional): Name of the file where previous
+            environment information is stored for diff. Defaults to
+            'old_environment_log.txt'.
+
+    """
+    if os.path.isfile(new_filename):
+        raise RuntimeError("Package list already exists: '%s'"
+                           % new_filename)
+    cmds = ["echo \"$(date)\" >> %s" % new_filename,
+            "%s --version >> %s" % (PYTHON_CMD, new_filename),
+            "%s -m pip list >> %s" % (PYTHON_CMD, new_filename)]
+    if shutil.which('conda'):
+        cmds.append("%s list >> %s" % (CONDA_CMD, new_filename))
+    if os.path.isfile(old_filename):
+        cmds.append("diff %s %s || :" % (old_filename, new_filename))
+    call_script(cmds, force_bash=True)
+    with open(new_filename, 'r') as fd:
+        print(fd.read())
+
+
 if __name__ == "__main__":
     install_opts = get_install_opts()
     parser = argparse.ArgumentParser(
@@ -1055,6 +1085,16 @@ if __name__ == "__main__":
             parser_ver.add_argument(
                 '--install-%s' % k, action='store_true',
                 help=("Verify that %s is installed." % k))
+    # Environment logging
+    parser_log = subparsers.add_parser(
+        'log', help="Create a log of the Python environment.")
+    parser_log.add_argument(
+        '--new-filename', default='new_environment_log.txt',
+        help="File where the new environment log should be saved.")
+    parser_log.add_argument(
+        '--old-filename', default='old_environment_log.txt',
+        help=("File containing previous environment log that the new "
+              "log should be diffed against."))
     # Call methods
     args = parser.parse_args()
     if args.operation in ['deps', 'install', 'verify']:
@@ -1094,3 +1134,6 @@ if __name__ == "__main__":
                     only_python=args.only_python)
     elif args.operation == 'verify':
         verify_pkg(install_opts=install_opts)
+    elif args.operation == 'log':
+        log_environment(new_filename=args.new_filename,
+                        old_filename=args.old_filename)
