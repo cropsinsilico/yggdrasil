@@ -6,6 +6,8 @@ import pprint
 import shutil
 import subprocess
 import warnings
+import difflib
+from datetime import datetime
 PYVER = ('%s.%s' % sys.version_info[:2])
 PY2 = (sys.version_info[0] == 2)
 _is_osx = (sys.platform == 'darwin')
@@ -935,16 +937,23 @@ def log_environment(new_filename='new_environment_log.txt',
     if os.path.isfile(new_filename):
         raise RuntimeError("Package list already exists: '%s'"
                            % new_filename)
-    cmds = ["echo \"$(date)\" >> %s" % new_filename,
+    now = datetime.now()
+    cmds = ["echo \"%s\" >> %s" % (now.strftime("%Y/%m/%d %H:%M:%S"),
+                                   new_filename),
             "%s --version >> %s" % (PYTHON_CMD, new_filename),
             "%s -m pip list >> %s" % (PYTHON_CMD, new_filename)]
     if shutil.which('conda'):
         cmds.append("%s list >> %s" % (CONDA_CMD, new_filename))
+    call_script(cmds)
+    assert(os.path.isfile(new_filename))
     if os.path.isfile(old_filename):
-        cmds.append("diff %s %s || :" % (old_filename, new_filename))
-    call_script(cmds, force_bash=True)
-    with open(new_filename, 'r') as fd:
-        print(fd.read())
+        with open(new_filename, 'r') as fd:
+            new_contents = fd.read()
+        with open(old_filename, 'r') as fd:
+            old_contents = fd.read()
+        diff = difflib.ndiff(old_contents.splitlines(),
+                             new_contents.splitlines())
+        print('\n'.join(diff))
 
 
 if __name__ == "__main__":
