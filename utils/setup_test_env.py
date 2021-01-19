@@ -510,61 +510,64 @@ def install_deps(method, return_commands=False, verbose=False, for_development=F
     # incompatibility."
     # elif _is_osx:
     #     os_pkgs += ["valgrind"]
-    if install_opts['fortran']:
-        if not fallback_to_conda:
-            # elif not shutil.which('gfortran'):
-            # Fortran is not installed via conda on linux/macos
-            if _is_linux:
-                os_pkgs.append("gfortran")
-            elif _is_osx:
-                os_pkgs.append("gcc")
-                os_pkgs.append("gfortran")
-            elif _is_win and (not fallback_to_conda):
-                choco_pkgs += ["mingw"]
-                # vcpkg_pkgs.append("vcpkg-gfortran")
-    if install_opts['R']:
+    if install_opts['fortran'] and (not fallback_to_conda):
+        # Fortran is not installed via conda on linux/macos
+        if _is_linux:
+            os_pkgs.append("gfortran")
+        elif _is_osx:
+            os_pkgs.append("gcc")
+            os_pkgs.append("gfortran")
+        elif _is_win and (not fallback_to_conda):
+            choco_pkgs += ["mingw"]
+            # vcpkg_pkgs.append("vcpkg-gfortran")
+    if install_opts['R'] and (not fallback_to_conda):
         # TODO: Test split installation where r-base is installed from
         # conda and the R dependencies are installed from CRAN?
-        if not (fallback_to_conda or shutil.which('R')):
-            if _is_linux:
-                cmds += [("sudo add-apt-repository 'deb https://cloud"
-                          ".r-project.org/bin/linux/ubuntu xenial-cran35/'"),
-                         ("sudo apt-key adv --keyserver keyserver.ubuntu.com "
-                          "--recv-keys E298A3A825C0D65DFD57CBB651716619E084DAB9")]
-                os_pkgs += ["r-base", "r-base-dev", "libudunits2-dev"]
-            elif _is_osx:
-                os_pkgs += ["r", "udunits"]
-            elif _is_win:
-                choco_pkgs += ["r.project --params \"\'/AddToPath\'\"",
-                               "rtools"]
-            else:
-                raise NotImplementedError("Could not determine "
-                                          "R installation method.")
-    if install_opts['zmq']:
-        if not fallback_to_conda:
-            if _is_linux:
-                os_pkgs += ["libczmq-dev", "libzmq3-dev"]
-            elif _is_osx:
-                # if _on_travis:
-                #     cmds.append("bash ci/install-czmq-osx.sh")
-                # else:
-                os_pkgs += ["czmq", "zmq"]
-            elif _is_win:
-                vcpkg_pkgs += ["czmq", "zeromq"]
-            else:
-                raise NotImplementedError("Could not determine "
-                                          "ZeroMQ installation method.")
-            # cmds.append("echo Installing ZeroMQ...")
-            # if _is_linux:
-            #     cmds.append("./ci/install-czmq-linux.sh")
-            # elif _is_osx:
+        if _is_linux:
+            cmds += [
+                ("sudo add-apt-repository 'deb https://cloud"
+                 ".r-project.org/bin/linux/ubuntu xenial-cran35/'"),
+                ("sudo apt-key adv --keyserver keyserver.ubuntu.com "
+                 "--recv-keys E298A3A825C0D65DFD57CBB651716619E084DAB9")]
+            if not shutil.which('R'):
+                os_pkgs += ["r-base", "r-base-dev"]
+            os_pkgs += ["libudunits2-dev"]
+        elif _is_osx:
+            if not shutil.which('R'):
+                os_pkgs += ["r"]
+            os_pkgs += ["udunits"]
+        elif _is_win:
+            if not shutil.which('R'):
+                choco_pkgs += [
+                    "r.project --params \"\'/AddToPath\'\"",
+                    "rtools"]
+        else:
+            raise NotImplementedError("Could not determine "
+                                      "R installation method.")
+    if install_opts['zmq'] and (not fallback_to_conda):
+        if _is_linux:
+            os_pkgs += ["libczmq-dev", "libzmq3-dev"]
+        elif _is_osx:
+            # if _on_travis:
             #     cmds.append("bash ci/install-czmq-osx.sh")
-            # # elif _is_win:
-            # #     cmds += ["call ci\\install-czmq-windows.bat",
-            # #              "echo \"%PATH%\""]
             # else:
-            #     raise NotImplementedError("Could not determine "
-            #                               "ZeroMQ installation method.")
+            os_pkgs += ["czmq", "zmq"]
+        elif _is_win:
+            vcpkg_pkgs += ["czmq", "zeromq"]
+        else:
+            raise NotImplementedError("Could not determine "
+                                      "ZeroMQ installation method.")
+        # cmds.append("echo Installing ZeroMQ...")
+        # if _is_linux:
+        #     cmds.append("./ci/install-czmq-linux.sh")
+        # elif _is_osx:
+        #     cmds.append("bash ci/install-czmq-osx.sh")
+        # # elif _is_win:
+        # #     cmds += ["call ci\\install-czmq-windows.bat",
+        # #              "echo \"%PATH%\""]
+        # else:
+        #     raise NotImplementedError("Could not determine "
+        #                               "ZeroMQ installation method.")
     if include_doc_deps or BUILDDOCS:
         requirements_files.append('requirements_documentation.txt')
         if not fallback_to_conda:
