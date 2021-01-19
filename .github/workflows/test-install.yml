@@ -67,6 +67,9 @@ jobs:
 
         '
       shell: bash -l {0}
+    - name: Install R
+      uses: r-lib/actions/setup-r@v1
+      if: matrix.os == 'windows-latest' && env.INSTALLR == 1
     - name: (WINDOWS,PIP) Set up MSVC Compiler
       uses: ilammy/msvc-dev-cmd@v1
       if: matrix.os == 'windows-latest' && matrix.install-method == 'pip' && env.INSTALLC
@@ -227,6 +230,9 @@ jobs:
 
         '
       shell: bash -l {0}
+    - name: Install R
+      uses: r-lib/actions/setup-r@v1
+      if: matrix.os == 'windows-latest' && env.INSTALLR == 1
     - name: (WINDOWS,PIP) Set up MSVC Compiler
       uses: ilammy/msvc-dev-cmd@v1
       if: matrix.os == 'windows-latest' && matrix.install-method == 'pip' && env.INSTALLC
@@ -386,6 +392,9 @@ jobs:
 
         '
       shell: bash -l {0}
+    - name: Install R
+      uses: r-lib/actions/setup-r@v1
+      if: matrix.os == 'windows-latest' && env.INSTALLR == 1
     - name: (WINDOWS,PIP) Set up MSVC Compiler
       uses: ilammy/msvc-dev-cmd@v1
       if: matrix.os == 'windows-latest' && matrix.install-method == 'pip' && env.INSTALLC
@@ -548,6 +557,9 @@ jobs:
 
         '
       shell: bash -l {0}
+    - name: Install R
+      uses: r-lib/actions/setup-r@v1
+      if: matrix.os == 'windows-latest' && env.INSTALLR == 1
     - name: (WINDOWS,PIP) Set up MSVC Compiler
       uses: ilammy/msvc-dev-cmd@v1
       if: matrix.os == 'windows-latest' && matrix.install-method == 'pip' && env.INSTALLC
@@ -708,6 +720,9 @@ jobs:
 
         '
       shell: bash -l {0}
+    - name: Install R
+      uses: r-lib/actions/setup-r@v1
+      if: matrix.os == 'windows-latest' && env.INSTALLR == 1
     - name: (WINDOWS,PIP) Set up MSVC Compiler
       uses: ilammy/msvc-dev-cmd@v1
       if: matrix.os == 'windows-latest' && matrix.install-method == 'pip' && env.INSTALLC

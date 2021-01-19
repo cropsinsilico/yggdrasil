@@ -523,7 +523,7 @@ def install_deps(method, return_commands=False, verbose=False, for_development=F
     if install_opts['R']:
         # TODO: Test split installation where r-base is installed from
         # conda and the R dependencies are installed from CRAN?
-        if not fallback_to_conda:
+        if not (fallback_to_conda or shutil.which('R')):
             if _is_linux:
                 cmds += [("sudo add-apt-repository 'deb https://cloud"
                           ".r-project.org/bin/linux/ubuntu xenial-cran35/'"),
@@ -533,8 +533,8 @@ def install_deps(method, return_commands=False, verbose=False, for_development=F
             elif _is_osx:
                 os_pkgs += ["r", "udunits"]
             elif _is_win:
-                print("R INIT", shutil.which("R"), shutil.which("Rscript"))
-                choco_pkgs += ["r.project"]  # , "rtools"]
+                choco_pkgs += ["r.project --params \"\'/AddToPath\'\"",
+                               "rtools"]
             else:
                 raise NotImplementedError("Could not determine "
                                           "R installation method.")
@@ -606,10 +606,8 @@ def install_deps(method, return_commands=False, verbose=False, for_development=F
                 raise NotImplementedError("Invalid package manager: '%s'"
                                           % windows_package_manager)
             if choco_pkgs:
-                # cmds += ["choco install %s --force" % ' '.join(choco_pkgs)]
+                # cmds += ["choco install %s" % ' '.join(choco_pkgs)]
                 for x in choco_pkgs:
-                    if x == 'r.project':
-                        x += ' --params "\'/AddToPath\'"'
                     cmds.append("choco install %s --force" % x)
             if vcpkg_pkgs:
                 cmds += ["%s install %s --triplet x64-windows"
@@ -891,9 +889,6 @@ def verify_pkg(install_opts=None):
     for name in ['c', 'R', 'fortran', 'sbml', 'lpy']:
         flag = install_opts[name]
         if flag and (not is_lang_installed(name)):
-            if _is_win:
-                print("R INIT", shutil.which("R"),
-                      shutil.which("Rscript"))
             errors.append("Language '%s' should be installed, but is not."
                           % name)
         elif (not flag) and is_lang_installed(name):

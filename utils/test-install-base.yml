@@ -57,6 +57,9 @@ jobs:
         echo "TMPDIR=$USERPROFILE\\AppData\\Local\\Temp" >> $GITHUB_ENV
         echo "TEMP=$USERPROFILE\\AppData\\Local\\Temp" >> $GITHUB_ENV
       shell: bash -l {0}
+    - name: Install R
+      uses: r-lib/actions/setup-r@v1
+      if: matrix.os == 'windows-latest' && env.INSTALLR == 1
 
     # ========================================================
     # Pip specific installation steps
