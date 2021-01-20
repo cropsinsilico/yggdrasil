@@ -43,7 +43,7 @@ jobs:
         test-flags:
         - --long-running
         - --test-suite=examples
-        - --test-suite=types
+        - --test-suite=types --skip-languages osr
         install-c:
         - true
         include:
@@ -238,7 +238,17 @@ jobs:
         - true
         include:
         - os: ubuntu-latest
+          python-version: 3.7
+          install-method: conda
+          test-flags: --long-running
+          install-c: true
+        - os: ubuntu-latest
           python-version: 3.8
+          install-method: conda
+          test-flags: --long-running
+          install-c: true
+        - os: ubuntu-latest
+          python-version: 3.9
           install-method: conda
           test-flags: --long-running
           install-c: true
@@ -413,7 +423,6 @@ jobs:
       INSTALLRMQ: 1
       INSTALLAPY: 1
     strategy:
-      max-parallel: 5
       matrix:
         os:
         - ubuntu-latest
@@ -422,7 +431,7 @@ jobs:
         install-method:
         - pip
         test-flags:
-        - --long-running
+        - --long-running --languages python R matlab
         install-c:
         - true
       fail-fast: false
@@ -600,7 +609,6 @@ jobs:
       INSTALLRMQ: 1
       INSTALLAPY: 1
     strategy:
-      max-parallel: 5
       matrix:
         os:
         - ubuntu-latest
@@ -609,7 +617,7 @@ jobs:
         install-method:
         - conda
         test-flags:
-        - --long-running
+        - --long-running --languages python R matlab
         install-c:
         - true
       fail-fast: false
@@ -797,7 +805,6 @@ jobs:
       INSTALLPYGMENTS: 0
       YGG_GHA_JOB_ID_SUFFIX: -stripped
     strategy:
-      max-parallel: 5
       matrix:
         os:
         - ubuntu-latest

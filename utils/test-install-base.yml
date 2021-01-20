@@ -34,7 +34,7 @@ jobs:
         os: [ubuntu-latest, macos-latest, windows-latest]
         python-version: [3.6]
         install-method: [pip]
-        test-flags: [--long-running, --test-suite=examples, --test-suite=types]
+        test-flags: [--long-running, --test-suite=examples, --test-suite=types --skip-languages osr]
         install-c: [true]
         include:
           - os: windows-latest
@@ -240,7 +240,17 @@ jobs:
         install-c: [true]
         include:
           - os: ubuntu-latest
+            python-version: 3.7
+            install-method: conda
+            test-flags: --long-running
+            install-c: true
+          - os: ubuntu-latest
             python-version: 3.8
+            install-method: conda
+            test-flags: --long-running
+            install-c: true
+          - os: ubuntu-latest
+            python-version: 3.9
             install-method: conda
             test-flags: --long-running
             install-c: true
@@ -257,12 +267,11 @@ jobs:
       INSTALLRMQ: 1
       INSTALLAPY: 1
     strategy:
-      max-parallel: 5
       matrix:
         os: [ubuntu-latest]
         python-version: [3.6]
         install-method: [pip]
-        test-flags: [--long-running]
+        test-flags: [--long-running --languages python R matlab]
         install-c: [true]
       fail-fast: false
     services: &rmq_services
@@ -280,12 +289,11 @@ jobs:
       INSTALLRMQ: 1
       INSTALLAPY: 1
     strategy:
-      max-parallel: 5
       matrix:
         os: [ubuntu-latest]
         python-version: [3.6]
         install-method: [conda]
-        test-flags: [--long-running]
+        test-flags: [--long-running --languages python R matlab]
         install-c: [true]
       fail-fast: false
     services: *rmq_services
@@ -308,7 +316,6 @@ jobs:
       INSTALLPYGMENTS: 0
       YGG_GHA_JOB_ID_SUFFIX: -stripped
     strategy:
-      max-parallel: 5
       matrix:
         os: [ubuntu-latest, macos-latest, windows-latest]
         python-version: [3.6]
