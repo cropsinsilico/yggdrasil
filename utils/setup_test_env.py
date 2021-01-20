@@ -293,6 +293,7 @@ def create_env(method, python, name=None, packages=None, init=_on_ci):
                                                  ' '.join(packages))
         ]
     elif method == 'virtualenv':
+        python_cmd = PYTHON_CMD
         if (sys.version_info[0] != major) or (sys.version_info[1] != minor):
             if _is_osx:
                 try:
@@ -300,20 +301,20 @@ def create_env(method, python, name=None, packages=None, init=_on_ci):
                 except BaseException:
                     cmds.append('brew install python%d' % major)
                 try:
-                    PYTHON_CMD = shutil.which('python%d' % major)
+                    python_cmd = shutil.which('python%d' % major)
                 except AttributeError:
-                    PYTHON_CMD = 'python%d' % major
+                    python_cmd = 'python%d' % major
             else:  # pragma: debug
                 raise RuntimeError(("The version of Python (%d.%d) does not match the "
                                     "desired version (%s) and virtualenv cannot create "
                                     "an environment with a different version of Python.")
                                    % (sys.version_info[0], sys.version_info[1], python))
         cmds += [
-            "%s -m pip install --upgrade pip virtualenv" % PYTHON_CMD,
-            "virtualenv -p %s %s" % (PYTHON_CMD, name)
+            "%s -m pip install --upgrade pip virtualenv" % python_cmd,
+            "virtualenv -p %s %s" % (python_cmd, name)
         ]
         if packages:
-            cmds.append("%s -m pip install %s" % (PYTHON_CMD, ' '.join(packages)))
+            cmds.append("%s -m pip install %s" % (python_cmd, ' '.join(packages)))
     else:  # pragma: debug
         raise ValueError("Unsupport environment management method: '%s'"
                          % method)
