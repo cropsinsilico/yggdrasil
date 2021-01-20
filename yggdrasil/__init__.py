@@ -154,7 +154,7 @@ def run_tsts(**kwargs):  # pragma: no cover
                               'services.'))
     suite_args = ('--test-suite', '--test-suites')
     suite_kws = dict(nargs='+', action="extend", type=str,
-                     choices=['examples', 'examples_part1',
+                     choices=['all', 'top', 'examples', 'examples_part1',
                               'examples_part2', 'demos', 'types', 'timing'],
                      help='Test suite(s) that should be run.',
                      dest='test_suites')
@@ -192,8 +192,15 @@ def run_tsts(**kwargs):  # pragma: no cover
         else:
             test_paths.append(x)
     if args.test_suites:
+        if 'all' in args.test_suites:
+            args.test_suites.remove('all')
+            for x in ['top', 'examples', 'demos', 'types', 'timing']:
+                if x not in args.test_suites:
+                    args.test_suites.append(x)
         for x in args.test_suites:
-            if x == 'examples':
+            if x == 'top':
+                test_paths.append(package_dir)
+            elif x == 'examples':
                 args.enable_examples = True
                 test_paths.append('examples')
             elif x == 'examples_part1':
