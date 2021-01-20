@@ -95,7 +95,7 @@ class OSRModelDriver(ExecutableModelDriver):
                 os.path.basename(self.model_file))
         # if not (isinstance(self.executable_path, str)
         #         and os.path.isfile(self.executable_path)):
-        self.compile_osr()
+        self.compile_dependencies()
         assert(os.path.isfile(self.executable_path))
 
     @classmethod
@@ -114,14 +114,11 @@ class OSRModelDriver(ExecutableModelDriver):
         # compatible with nmake
         if lib == 'make':
             return bool(shutil.which('make'))
-        return super(OSRModelDriver, cls).is_library_installed(lib, **kwargs)
+        return super(OSRModelDriver, cls).is_library_installed(
+            lib, **kwargs)  # pragma: debug
 
     @classmethod
-    def compile_dependencies(cls, *args, **kwargs):
-        cls.compile_osr(*args, **kwargs)
-
-    @classmethod
-    def compile_osr(cls, target='OpenSimRootYgg', toolname=None):
+    def compile_dependencies(cls, target='OpenSimRootYgg', toolname=None):
         r"""Compile the OpenSimRoot executable with the yggdrasil flag set.
 
         Args:
@@ -374,5 +371,5 @@ class OSRModelDriver(ExecutableModelDriver):
     @classmethod
     def cleanup_dependencies(cls, *args, **kwargs):
         r"""Cleanup dependencies."""
-        cls.compile_osr(target='cleanygg')
+        cls.compile_dependencies(target='cleanygg')
         super(OSRModelDriver, cls).cleanup_dependencies(*args, **kwargs)
