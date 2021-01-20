@@ -213,7 +213,7 @@ class CMakeConfigure(BuildToolBase):
         """
         try:
             out = super(CMakeConfigure, cls).call(args, **kwargs)
-        except RuntimeError as e:
+        except RuntimeError as e:  # pragma: appveyor
             if platform._is_win:  # pragma: windows
                 error_MSB4019 = (r'error MSB4019: The imported project '
                                  r'"C:\Microsoft.Cpp.Default.props" was not found.')
