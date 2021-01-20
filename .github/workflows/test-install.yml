@@ -42,7 +42,7 @@ jobs:
         install-method:
         - pip
         test-flags:
-        - --long-running --test-suites timing demos top
+        - --long-running --test-suite=timing --test-suite=demos --test-suite=top
         - --test-suite=examples
         - --test-suite=types --skip-languages osr
         install-c:
