@@ -223,43 +223,43 @@ jobs:
           update: true
 
     # Docs
-    - stage: deploy
-      name: "Deploy docs"
-      python: 3.6
-      env: BUILDDOCS=1
-      script: |
-              cd docs
-              make autodoc
-              cd "$TRAVIS_BUILD_DIR"
-      after_success: skip
-      if: (tag IS present)
-      deploy:
-        provider: pages
-        skip_cleanup: true
-        local_dir: docs/build/html/
-        keep-history: true
-        github_token: $GITHUB_TOKEN  # Set in travis-ci.org dashboard
-        on:
-          tags: true
-        verbose: true
-      addons:
-        apt:
-          packages:
-            - *native_deps_apt
-            - doxygen
-          update: true
+    # - stage: deploy
+    #   name: "Deploy docs"
+    #   python: 3.6
+    #   env: BUILDDOCS=1
+    #   script: |
+    #           cd docs
+    #           make autodoc
+    #           cd "$TRAVIS_BUILD_DIR"
+    #   after_success: skip
+    #   if: (tag IS present)
+    #   deploy:
+    #     provider: pages
+    #     skip_cleanup: true
+    #     local_dir: docs/build/html/
+    #     keep-history: true
+    #     github_token: $GITHUB_TOKEN  # Set in travis-ci.org dashboard
+    #     on:
+    #       tags: true
+    #     verbose: true
+    #   addons:
+    #     apt:
+    #       packages:
+    #         - *native_deps_apt
+    #         - doxygen
+    #       update: true
 
     # Deploy
-    - stage: deploy
-      name: "Deploy to PyPI"
-      script: skip
-      if: (tag IS present)
-      deploy:
-        provider: pypi
-        skip_existing: true
-        distributions: sdist bdist_wheel --universal
-        username: "__token__"
-        password:
-          secure: "iRsnZ8i1fWoqZVQd7LzX8L+z3aS/c1io/tUHApJE8ujHdNF7owtLyg1JG9eUWdinfApv0WS7uaoUxdM44I3eMpFdsXBXCEcQZ77ZQEJ5kO+QqqSfPX6BO/hKTcckuw3UMWYMxWk7BmreUFBFwV1vx5/o0Wv+vql968+zhHILtWnaW+1jhDwHn2FmUZ9ESXww87FyJhcpvvsCQOXBTKEWN2AOToLaU4NWvzrHi5B7Vr9+4rZ70HyUwCIhb53ktZ+3Xn0zZwbf5or7XbRPrkfiVHqX2ywfa2lQU+59KHwXG0UHt8cSqvD08Tig3QgFO76SAsLXaJ+GI1YPTJ/Q/2xC+5N5tWDi1wL8SXmetjnku3/PGk9tfljVbMVErDLq8Vchra/w8AQ1EAyyhV4xBRIWJr/PlwsjxHB+qNnJ5S/x/0ZeSylUsPlQNTsqRqHdMYNJR1m1/pJqzZ6WURMVW2A341fRHHZNFQDNFePWvEA1qWKmeCWkKeKAu22TbIl0YlIX4m/y87BfjuHq4pditoIMws5K9SH4HVgrm4Kcqo8JlYN8bsTDlKw0ydtHZAYnh2BS6KHaCQqM+03/8yBrnrP0nzei1qkFVfAoAKcPMIsEYcPcme9MgJG5j/pAAzY1VeY52zgc7F9FRVmufKxEfro2Gcid/PW0reaPZgqD98B+ubo="
-        on:
-          tags: true
+    # - stage: deploy
+    #   name: "Deploy to PyPI"
+    #   script: skip
+    #   if: (tag IS present)
+    #   deploy:
+    #     provider: pypi
+    #     skip_existing: true
+    #     distributions: sdist bdist_wheel --universal
+    #     username: "__token__"
+    #     password:
+    #       secure: "iRsnZ8i1fWoqZVQd7LzX8L+z3aS/c1io/tUHApJE8ujHdNF7owtLyg1JG9eUWdinfApv0WS7uaoUxdM44I3eMpFdsXBXCEcQZ77ZQEJ5kO+QqqSfPX6BO/hKTcckuw3UMWYMxWk7BmreUFBFwV1vx5/o0Wv+vql968+zhHILtWnaW+1jhDwHn2FmUZ9ESXww87FyJhcpvvsCQOXBTKEWN2AOToLaU4NWvzrHi5B7Vr9+4rZ70HyUwCIhb53ktZ+3Xn0zZwbf5or7XbRPrkfiVHqX2ywfa2lQU+59KHwXG0UHt8cSqvD08Tig3QgFO76SAsLXaJ+GI1YPTJ/Q/2xC+5N5tWDi1wL8SXmetjnku3/PGk9tfljVbMVErDLq8Vchra/w8AQ1EAyyhV4xBRIWJr/PlwsjxHB+qNnJ5S/x/0ZeSylUsPlQNTsqRqHdMYNJR1m1/pJqzZ6WURMVW2A341fRHHZNFQDNFePWvEA1qWKmeCWkKeKAu22TbIl0YlIX4m/y87BfjuHq4pditoIMws5K9SH4HVgrm4Kcqo8JlYN8bsTDlKw0ydtHZAYnh2BS6KHaCQqM+03/8yBrnrP0nzei1qkFVfAoAKcPMIsEYcPcme9MgJG5j/pAAzY1VeY52zgc7F9FRVmufKxEfro2Gcid/PW0reaPZgqD98B+ubo="
+    #     on:
+    #       tags: true
