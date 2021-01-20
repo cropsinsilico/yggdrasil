@@ -118,7 +118,7 @@ jobs:
       with:
         python-version: ${{ matrix.python-version }}
     - name: (PIP) Set up Virtual Env
-      if: env.USEVIRTUALENV == 1
+      if: env.USEVIRTUALENV == 1 && matrix.install-method == 'pip'
       run: 'python utils/setup_test_env.py env virtualenv ${{ matrix.python-version
         }} --env-name=test
 
@@ -324,7 +324,7 @@ jobs:
       with:
         python-version: ${{ matrix.python-version }}
     - name: (PIP) Set up Virtual Env
-      if: env.USEVIRTUALENV == 1
+      if: env.USEVIRTUALENV == 1 && matrix.install-method == 'pip'
       run: 'python utils/setup_test_env.py env virtualenv ${{ matrix.python-version
         }} --env-name=test
 
@@ -520,7 +520,7 @@ jobs:
       with:
         python-version: ${{ matrix.python-version }}
     - name: (PIP) Set up Virtual Env
-      if: env.USEVIRTUALENV == 1
+      if: env.USEVIRTUALENV == 1 && matrix.install-method == 'pip'
       run: 'python utils/setup_test_env.py env virtualenv ${{ matrix.python-version
         }} --env-name=test
 
@@ -718,7 +718,7 @@ jobs:
       with:
         python-version: ${{ matrix.python-version }}
     - name: (PIP) Set up Virtual Env
-      if: env.USEVIRTUALENV == 1
+      if: env.USEVIRTUALENV == 1 && matrix.install-method == 'pip'
       run: 'python utils/setup_test_env.py env virtualenv ${{ matrix.python-version
         }} --env-name=test
 
@@ -914,7 +914,7 @@ jobs:
       with:
         python-version: ${{ matrix.python-version }}
     - name: (PIP) Set up Virtual Env
-      if: env.USEVIRTUALENV == 1
+      if: env.USEVIRTUALENV == 1 && matrix.install-method == 'pip'
       run: 'python utils/setup_test_env.py env virtualenv ${{ matrix.python-version
         }} --env-name=test
 
