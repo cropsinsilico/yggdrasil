@@ -43,6 +43,7 @@ jobs:
         test-flags:
         - --long-running
         - --test-suite=examples
+        - --test-suite=types
         install-c:
         - true
         include:
@@ -51,6 +52,11 @@ jobs:
           install-method: pip
           test-flags: --long-running
           install-c: false
+        - os: ubuntu-latest
+          python-version: 3.6
+          install-method: pip
+          test-flags: --test-suite=timing --test-suite=demos
+          install-c: true
       fail-fast: false
     steps:
     - uses: actions/checkout@v2
