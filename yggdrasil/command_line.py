@@ -95,7 +95,7 @@ def generate_gha_workflow(args=None, gitdir=None):
         # yaml.dump(contents, fd, Dumper=NoAliasDumper)
 
 
-def ygginfo():
+def ygginfo(args=None, return_str=False):
     r"""Print information about yggdrasil installation."""
     from yggdrasil import __version__, tools, config, platform
     from yggdrasil.components import import_component
@@ -119,7 +119,7 @@ def ygginfo():
                         help='Don\'t print information about individual comms.')
     parser.add_argument('--verbose', action='store_true',
                         help='Increase the verbosity of the printed information.')
-    args = parser.parse_args()
+    args = parser.parse_args(args=args)
     try:
         # Add language information
         if not args.no_languages:
@@ -333,7 +333,10 @@ def ygginfo():
         line_format = '%-' + str(max_len) + 's' + prefix + '%s'
         for k, v in vardict:
             lines.append(line_format % (k, v))
-        logger.info("yggdrasil info:\n%s" % '\n'.join(lines))
+        msg = "yggdrasil info:\n%s" % '\n'.join(lines)
+        if return_str:
+            return msg
+        logger.info(msg)
 
 
 def yggrun():

@@ -300,6 +300,8 @@ class TimedRun(YggTestBase, tools.YggClass):
                and (self.lang_dst in self._lang_list)
                and (self.comm_type in self._comm_list))
         if (not out) and raise_error:
+            from yggdrasil.command_line import ygginfo
+            msg_info = ygginfo(args=['--verbose'], return_str=True)
             msg = ['Cannot run test with parameters:',
                    '\tOperating System: %s' % self.platform,
                    '\tPython Version: %s' % self.python_ver,
@@ -312,7 +314,8 @@ class TimedRun(YggTestBase, tools.YggClass):
                    '\tPython Version: %s' % _python_version,
                    '\tMatlab Running: %s' % MatlabModelDriver.is_matlab_running(),
                    '\tSupported Languages: %s' % ', '.join(self._lang_list),
-                   '\tSupported Communication: %s' % ', '.join(self._comm_list)]
+                   '\tSupported Communication: %s' % ', '.join(self._comm_list),
+                   '\n\n' + msg_info]
             raise RuntimeError('\n'.join(msg))
         return out
 
