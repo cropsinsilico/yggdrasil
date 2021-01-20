@@ -22,6 +22,7 @@ env:
   INSTALLRMQ: 0
   INSTALLTRIMESH: 1
   INSTALLPYGMENTS: 1
+  USEVIRTUALENV: 0
   BUILDDOCS: 0
   YGG_GHA_JOB_ID_SUFFIX: null
 jobs:
@@ -121,6 +122,14 @@ jobs:
       if: matrix.install-method == 'pip'
       with:
         python-version: ${{ matrix.python-version }}
+    - name: (PIP) Set up Virtual Env
+      if: env.USEVIRTUALENV == 1
+      run: 'python utils/setup_test_env.py env virtualenv ${{ matrix.python-version
+        }} --env-name=test
+
+        source test/bin/activate
+
+        '
     - name: (PIP) Install dependencies & package
       if: matrix.install-method == 'pip'
       run: python utils/setup_test_env.py install ${{ matrix.install-method }}
@@ -319,6 +328,14 @@ jobs:
       if: matrix.install-method == 'pip'
       with:
         python-version: ${{ matrix.python-version }}
+    - name: (PIP) Set up Virtual Env
+      if: env.USEVIRTUALENV == 1
+      run: 'python utils/setup_test_env.py env virtualenv ${{ matrix.python-version
+        }} --env-name=test
+
+        source test/bin/activate
+
+        '
     - name: (PIP) Install dependencies & package
       if: matrix.install-method == 'pip'
       run: python utils/setup_test_env.py install ${{ matrix.install-method }}
@@ -422,6 +439,8 @@ jobs:
     env:
       INSTALLRMQ: 1
       INSTALLAPY: 1
+      USEVIRTUALENV: 1
+      YGG_DEFAULT_COMM: IPCComm
     strategy:
       matrix:
         os:
@@ -505,6 +524,14 @@ jobs:
       if: matrix.install-method == 'pip'
       with:
         python-version: ${{ matrix.python-version }}
+    - name: (PIP) Set up Virtual Env
+      if: env.USEVIRTUALENV == 1
+      run: 'python utils/setup_test_env.py env virtualenv ${{ matrix.python-version
+        }} --env-name=test
+
+        source test/bin/activate
+
+        '
     - name: (PIP) Install dependencies & package
       if: matrix.install-method == 'pip'
       run: python utils/setup_test_env.py install ${{ matrix.install-method }}
@@ -608,6 +635,7 @@ jobs:
     env:
       INSTALLRMQ: 1
       INSTALLAPY: 1
+      USEVIRTUALENV: 1
     strategy:
       matrix:
         os:
@@ -694,6 +722,14 @@ jobs:
       if: matrix.install-method == 'pip'
       with:
         python-version: ${{ matrix.python-version }}
+    - name: (PIP) Set up Virtual Env
+      if: env.USEVIRTUALENV == 1
+      run: 'python utils/setup_test_env.py env virtualenv ${{ matrix.python-version
+        }} --env-name=test
+
+        source test/bin/activate
+
+        '
     - name: (PIP) Install dependencies & package
       if: matrix.install-method == 'pip'
       run: python utils/setup_test_env.py install ${{ matrix.install-method }}
@@ -882,6 +918,14 @@ jobs:
       if: matrix.install-method == 'pip'
       with:
         python-version: ${{ matrix.python-version }}
+    - name: (PIP) Set up Virtual Env
+      if: env.USEVIRTUALENV == 1
+      run: 'python utils/setup_test_env.py env virtualenv ${{ matrix.python-version
+        }} --env-name=test
+
+        source test/bin/activate
+
+        '
     - name: (PIP) Install dependencies & package
       if: matrix.install-method == 'pip'
       run: python utils/setup_test_env.py install ${{ matrix.install-method }}
