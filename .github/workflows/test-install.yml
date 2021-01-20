@@ -204,7 +204,6 @@ jobs:
       uses: dawidd6/action-download-artifact@v2
       with:
         workflow: test-install.yml
-        workflow_conclusion: success
         name: environment-log-${{ env.YGG_GHA_JOB_ID }}
         path: old_environment_log.txt
     - name: Create a log of Python package versions
@@ -390,7 +389,6 @@ jobs:
       uses: dawidd6/action-download-artifact@v2
       with:
         workflow: test-install.yml
-        workflow_conclusion: success
         name: environment-log-${{ env.YGG_GHA_JOB_ID }}
         path: old_environment_log.txt
     - name: Create a log of Python package versions
@@ -575,7 +573,6 @@ jobs:
       uses: dawidd6/action-download-artifact@v2
       with:
         workflow: test-install.yml
-        workflow_conclusion: success
         name: environment-log-${{ env.YGG_GHA_JOB_ID }}
         path: old_environment_log.txt
     - name: Create a log of Python package versions
@@ -763,7 +760,6 @@ jobs:
       uses: dawidd6/action-download-artifact@v2
       with:
         workflow: test-install.yml
-        workflow_conclusion: success
         name: environment-log-${{ env.YGG_GHA_JOB_ID }}
         path: old_environment_log.txt
     - name: Create a log of Python package versions
@@ -950,7 +946,6 @@ jobs:
       uses: dawidd6/action-download-artifact@v2
       with:
         workflow: test-install.yml
-        workflow_conclusion: success
         name: environment-log-${{ env.YGG_GHA_JOB_ID }}
         path: old_environment_log.txt
     - name: Create a log of Python package versions
