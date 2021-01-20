@@ -196,6 +196,9 @@ jobs:
       run: yggcompile
     - name: Run tests
       run: yggtest --ci ${{ matrix.test-flags }}
+    - name: (CONDA) Generate XML version of coverage report
+      if: matrix.install-method == 'conda'
+      run: coverage xml
     - name: Upload coverage report
       uses: codecov/codecov-action@v1
     - name: Download the last successful workflow environment log
@@ -381,6 +384,9 @@ jobs:
       run: yggcompile
     - name: Run tests
       run: yggtest --ci ${{ matrix.test-flags }}
+    - name: (CONDA) Generate XML version of coverage report
+      if: matrix.install-method == 'conda'
+      run: coverage xml
     - name: Upload coverage report
       uses: codecov/codecov-action@v1
     - name: Download the last successful workflow environment log
@@ -565,6 +571,9 @@ jobs:
       run: yggcompile
     - name: Run tests
       run: yggtest --ci ${{ matrix.test-flags }}
+    - name: (CONDA) Generate XML version of coverage report
+      if: matrix.install-method == 'conda'
+      run: coverage xml
     - name: Upload coverage report
       uses: codecov/codecov-action@v1
     - name: Download the last successful workflow environment log
@@ -752,6 +761,9 @@ jobs:
       run: yggcompile
     - name: Run tests
       run: yggtest --ci ${{ matrix.test-flags }}
+    - name: (CONDA) Generate XML version of coverage report
+      if: matrix.install-method == 'conda'
+      run: coverage xml
     - name: Upload coverage report
       uses: codecov/codecov-action@v1
     - name: Download the last successful workflow environment log
@@ -938,6 +950,9 @@ jobs:
       run: yggcompile
     - name: Run tests
       run: yggtest --ci ${{ matrix.test-flags }}
+    - name: (CONDA) Generate XML version of coverage report
+      if: matrix.install-method == 'conda'
+      run: coverage xml
     - name: Upload coverage report
       uses: codecov/codecov-action@v1
     - name: Download the last successful workflow environment log
