@@ -6,3 +6,4 @@ nose
 pytest>=4.6  # Required by pytest-cov, but not resolved by pip on linux
 pytest-cov
 pytest-timeout
+pytest-drop-dup-tests  # [pip]
