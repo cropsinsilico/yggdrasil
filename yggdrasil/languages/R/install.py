@@ -235,7 +235,6 @@ def make_call(R_cmd, with_sudo=False, **kwargs):
         bool: True if the call was successful, False otherwise.
 
     """
-    print("R INIT", shutil.which("R"), shutil.which("Rscript"))
     if with_sudo and (sys.platform not in ['win32', 'cygwin']):
         R_cmd.insert(0, 'sudo')
     try:
