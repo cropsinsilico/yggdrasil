@@ -215,6 +215,7 @@ jobs:
       continue-on-error: true
       uses: dawidd6/action-download-artifact@v2
       with:
+        github_token: ${{ secrets.GITHUB_TOKEN }}
         workflow: test-install.yml
         name: environment-log-${{ env.YGG_GHA_JOB_ID }}
         path: old_environment_log.txt
