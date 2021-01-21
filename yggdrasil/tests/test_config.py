@@ -38,6 +38,9 @@ def test_update_language_config():
             config.ygg_cfg_usr.remove_section(languages[1])
             config.update_language_config(
                 languages[1], enable_languages=[languages[1]])
+        if config.ygg_cfg_usr.has_option('c', 'vcpkg_dir'):
+            config.update_language_config(
+                'c', vcpkg_dir=config.ygg_cfg_usr.get('c', 'vcpkg_dir'))
     finally:
         shutil.move(cfg_copy, cfg_orig)
         config.ygg_cfg_usr.reload()
