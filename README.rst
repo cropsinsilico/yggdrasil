@@ -1,4 +1,4 @@
-|tag version| |PyPI version| |Travis Build Status| |Appveyor Build status| 
+|tag version| |PyPI version| |GHA Build Status|  
 |codecov| |PEP8| |license| |platform|
 
 yggdrasil, originally created as a framework for the Crops in Silico (CiS) 
@@ -44,6 +44,8 @@ If you use yggdrasil in your research, please cite the accompanying paper:
    :target: https://travis-ci.org/cropsinsilico/yggdrasil
 .. |Appveyor Build status| image:: https://img.shields.io/appveyor/ci/langmm/yggdrasil.svg?style=flat-square
    :target: https://ci.appveyor.com/project/langmm/yggdrasil/branch/master
+.. |GHA Build Status| image:: https://img.shields.io/github/workflow/status/cropsinsilico/yggdrasil/test-install?style=flat-square
+   :target: https://github.com/cropsinsilico/yggdrasil/actions?query=workflow%3A%22Test+of+package+installation+%26+execution%22
 ..
    .. |Coverage Status| image:: https://coveralls.io/repos/github/cropsinsilico/yggdrasil/badge.svg?branch=master
       :target: https://coveralls.io/github/cropsinsilico/yggdrasil?branch=master
