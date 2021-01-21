@@ -22,7 +22,7 @@ from yggdrasil.drivers import MatlabModelDriver
 import matplotlib as mpl
 if os.environ.get('DISPLAY', '') == '':  # pragma: debug
     mpl.use('Agg')
-elif ygg_platform._is_mac:
+elif ygg_platform._is_mac:  # pragma: travis
     mpl.use('TkAgg')
 import matplotlib.pyplot as plt  # noqa: E402
 logger = logging.getLogger(__name__)
