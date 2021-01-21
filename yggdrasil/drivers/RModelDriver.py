@@ -184,6 +184,12 @@ class RModelDriver(InterpretedModelDriver):  # pragma: R
         return out
         
     @classmethod
+    def run_executable(cls, args, **kwargs):
+        kwargs.setdefault('env', os.environ.copy())
+        kwargs['env']['YGG_TEST_ENVIRONMENT'] = 'True'
+        return super(RModelDriver, cls).run_executable(args, **kwargs)
+
+    @classmethod
     def comm_atexit(cls, comm):  # pragma: no cover
         r"""Operations performed on comm at exit including draining receive.
         

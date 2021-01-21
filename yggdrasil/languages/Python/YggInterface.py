@@ -41,6 +41,7 @@ def YggInit(_type, args=None, kwargs=None):
         obj: An instance of the requested class.
 
     """
+    print("YGG_TEST_ENVIRONMENT", os.environ.get("YGG_TEST_ENVIRONMENT", None))
     if args is None:
         args = []
     if kwargs is None:

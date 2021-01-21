@@ -69,6 +69,8 @@ YggInterfaceClass <- R6::R6Class("YggInterfaceClass", list(
 )
 
 YggInterface <- function(type, ...) {
+  print("YGG_TEST_ENVIRONMENT")
+  print(Sys.getenv(c("YGG_TEST_ENVIRONMENT")))
   # print(reticulate::py_config())
   if (!exists("ygg")) {
     ygg <- reticulate::import('yggdrasil.languages.Python.YggInterface', convert=FALSE)
