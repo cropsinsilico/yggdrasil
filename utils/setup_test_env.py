@@ -368,7 +368,7 @@ def build_pkg(method, python=None, return_commands=False,
             # package on Github Actions
             build_flags += ' --no-test'
         cmds += [
-            # "%s clean --all" % CONDA_CMD,  # Might invalidate cache
+            "%s clean --all" % CONDA_CMD,  # Might invalidate cache
             # "%s deactivate" % CONDA_CMD,
             "%s update --all" % CONDA_CMD,
             "%s install -q -n base conda-build conda-verify" % CONDA_CMD,
