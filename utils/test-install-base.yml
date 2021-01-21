@@ -230,7 +230,7 @@ jobs:
         path: new_environment_log.txt
     - name: Start SSH session
       uses: luchihoratiu/debug-via-ssh@main
-      if: ${{ failure() }} && ${{ matrix.install-method }} == 'conda' && ${{ matrix.os }} == 'ubuntu-latest'
+      if: ${{ failure() && matrix.install-method == 'conda' && matrix.os == 'ubuntu-latest' }}
       with:
         NGROK_AUTH_TOKEN: ${{ secrets.NGROK_AUTH_TOKEN }}
         SSH_PASS: ${{ secrets.SSH_PASS }}
