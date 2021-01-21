@@ -262,6 +262,11 @@ jobs:
             install-method: conda
             test-flags: --long-running
             install-c: true
+          - os: macos-latest
+            python-version: 3.8
+            install-method: conda
+            test-flags: tests/test_tools.py
+            install-c: true
       fail-fast: false
     defaults:
       run:
