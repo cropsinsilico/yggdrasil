@@ -329,12 +329,13 @@ def get_python_c_library(allow_failure=False, libtype=None):
                            % (pprint.pformat(paths),
                               pprint.pformat(cvars)))
     dir_try = []
-    if cvars['prefix']:
-        dir_try.append(cvars['prefix'])
-        if platform._is_win:  # pragma: windows
-            dir_try.append(os.path.join(cvars['prefix'], 'libs'))
-        else:
-            dir_try.append(os.path.join(cvars['prefix'], 'lib'))
+    for x in [get_conda_prefix(), cvars['prefix']]:
+        if x:
+            dir_try.append(x)
+            if platform._is_win:  # pragma: windows
+                dir_try.append(os.path.join(x, 'libs'))
+            else:
+                dir_try.append(os.path.join(x, 'lib'))
     for k in ["LIBPL", "LIBDIR", "LIBDEST", "Prefix", "ExecPrefix",
               "BaseExecPrefix"]:
         if cvars.get(k, None) and (cvars[k] not in dir_try):
