@@ -27,7 +27,7 @@ env:
 
 jobs:
   test_pip:
-    name: Test (${{ matrix.python-version }}, ${{ matrix.os }}, ${{ matrix.install-method }}, ${{ matrix.test-flags }}), Install C = ${{ matrix.install-c }}
+    name: Test (${{ matrix.python-version }}, ${{ matrix.os }}, ${{ matrix.install-method }}, ${{ matrix.test-flags1 }}, ${{ matrix.test-flags2 }}), Install C = ${{ matrix.install-c }}
     runs-on: ${{ matrix.os }}
     strategy:
       max-parallel: 20
@@ -35,19 +35,16 @@ jobs:
         os: [ubuntu-latest, macos-latest, windows-latest]
         python-version: [3.6]
         install-method: [pip]
-        test-flags: [--long-running --test-suite=timing --test-suite=demos --test-suite=top, --test-suite=examples, --test-suite=types --skip-languages osr]
+        test-flags1: [--long-running --test-suite=timing --test-suite=demos --test-suite=top, --test-suite=examples, --test-suite=types --skip-languages osr]
+        test-flags2: [""]
         install-c: [true]
         include:
           - os: windows-latest
             python-version: 3.6
             install-method: pip
-            test-flags: --long-running
+            test-flags1: --long-running --languages cpp
+            test-flags2: --long-running --skip-languages c++
             install-c: false
-          # - os: ubuntu-latest
-          #   python-version: 3.6
-          #   install-method: pip
-          #   test-flags: "--test-suite=timing --test-suite=demos"
-          #   install-c: true
       fail-fast: false
 
     steps: &steps
@@ -204,8 +201,11 @@ jobs:
       run: python utils/setup_test_env.py verify
     - name: Compile libraries
       run: yggcompile
-    - name: Run tests
-      run: yggtest --ci ${{ matrix.test-flags }}
+    - name: Run tests (1st)
+      run: yggtest --ci ${{ matrix.test-flags1 }}
+    - name: Run tests (2nd)
+      if: matrix.test-flags2 != ''
+      run: yggtest --ci ${{ matrix.test-flags2 }}
     - name: (CONDA) Generate XML version of coverage report
       if: matrix.install-method == 'conda'
       run: coverage xml
@@ -236,7 +236,7 @@ jobs:
     #     SSH_PASS: ${{ secrets.SSH_PASS }}
 
   test_conda:
-    name: Test (${{ matrix.python-version }}, ${{ matrix.os }}, ${{ matrix.install-method }}, ${{ matrix.test-flags }}), Install C = ${{ matrix.install-c }}
+    name: Test (${{ matrix.python-version }}, ${{ matrix.os }}, ${{ matrix.install-method }}, ${{ matrix.test-flags1 }}, ${{ matrix.test-flags2 }}), Install C = ${{ matrix.install-c }}
     runs-on: ${{ matrix.os }}
     strategy:
       max-parallel: 20
@@ -244,28 +244,33 @@ jobs:
         os: [ubuntu-latest, macos-latest, windows-latest]
         python-version: [3.6]
         install-method: [conda]
-        test-flags: [--long-running]
+        test-flags1: [--long-running]
+        test-flags2: [""]
         install-c: [true]
         include:
           - os: ubuntu-latest
             python-version: 3.7
             install-method: conda
-            test-flags: --long-running
+            test-flags1: --long-running
+            test-flags2: ""
             install-c: true
           - os: ubuntu-latest
             python-version: 3.8
             install-method: conda
-            test-flags: --long-running
+            test-flags1: --long-running
+            test-flags2: ""
             install-c: true
           - os: ubuntu-latest
             python-version: 3.9
             install-method: conda
-            test-flags: --long-running
+            test-flags1: --long-running
+            test-flags2: ""
             install-c: true
           - os: macos-latest
             python-version: 3.8
             install-method: conda
-            test-flags: tests/test_tools.py
+            test-flags1: tests/test_tools.py
+            test-flags2: ""
             install-c: true
       fail-fast: false
     defaults:
@@ -286,7 +291,8 @@ jobs:
         os: [ubuntu-latest]
         python-version: [3.6]
         install-method: [pip]
-        test-flags: [--long-running --languages python R matlab]
+        test-flags1: [--long-running --languages python R matlab]
+        test-flags2: [""]
         install-c: [true]
       fail-fast: false
     services: &rmq_services
@@ -309,7 +315,8 @@ jobs:
         os: [ubuntu-latest]
         python-version: [3.6]
         install-method: [conda]
-        test-flags: [--long-running --languages python R matlab]
+        test-flags1: [--long-running --languages python R matlab]
+        test-flags2: [""]
         install-c: [true]
       fail-fast: false
     services: *rmq_services
@@ -336,7 +343,8 @@ jobs:
         os: [ubuntu-latest, macos-latest, windows-latest]
         python-version: [3.6]
         install-method: [pip]
-        test-flags: [--long-running]
+        test-flags1: [--long-running]
+        test-flags2: [""]
         install-c: [false]
       fail-fast: false
     steps: *steps
