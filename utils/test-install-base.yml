@@ -245,7 +245,7 @@ jobs:
         python-version: [3.6]
         install-method: [conda]
         test-flags1: [--long-running]
-        test-flags2: [""]
+        test-flags2: [--with-examples examples/tests/test_backwards.py]
         install-c: [true]
         include:
           - os: ubuntu-latest

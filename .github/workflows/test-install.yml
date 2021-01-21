@@ -243,7 +243,7 @@ jobs:
         test-flags1:
         - --long-running
         test-flags2:
-        - ''
+        - --with-examples examples/tests/test_backwards.py
         install-c:
         - true
         include:

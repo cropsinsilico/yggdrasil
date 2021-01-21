@@ -213,7 +213,7 @@ class CMakeConfigure(BuildToolBase):
         """
         try:
             out = super(CMakeConfigure, cls).call(args, **kwargs)
-        except RuntimeError as e:  # pragma: appveyor
+        except RuntimeError as e:
             if platform._is_win:  # pragma: windows
                 error_MSB4019 = (r'error MSB4019: The imported project '
                                  r'"C:\Microsoft.Cpp.Default.props" was not found.')
@@ -972,9 +972,9 @@ class CMakeModelDriver(BuildModelDriver):
                         paths = path.split(os.pathsep)
                         paths.remove(os.path.dirname(sh_path))
                         path = os.pathsep.join(paths)
+                        sh_path = shutil.which('sh', path=path)
                     else:  # pragma: debug
                         break
-                    sh_path = shutil.which('sh', path=path)
                 kwargs['env']['PATH'] = path
                 if not sh_path:
                     kwargs.setdefault('generator', 'MinGW Makefiles')
