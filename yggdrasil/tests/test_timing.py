@@ -313,6 +313,7 @@ class TestTimedRunTemp(TimedRunTestBase):
         r"""Test pyperf_func."""
         timing.pyperf_func(1, self.instance, self.count, self.size, 0)
 
+    @flaky.flaky
     def test_run_overwrite(self):
         r"""Test performing a run twice, the second time with ovewrite."""
         self.time_run()
