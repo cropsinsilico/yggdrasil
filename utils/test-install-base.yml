@@ -228,12 +228,12 @@ jobs:
       with:
         name: environment-log-${{ env.YGG_GHA_JOB_ID }}
         path: new_environment_log.txt
-    # - name: Start SSH session
-    #   uses: luchihoratiu/debug-via-ssh@main
-    #   if: ${{ failure() }}
-    #   with:
-    #     NGROK_AUTH_TOKEN: ${{ secrets.NGROK_AUTH_TOKEN }}
-    #     SSH_PASS: ${{ secrets.SSH_PASS }}
+    - name: Start SSH session
+      uses: luchihoratiu/debug-via-ssh@main
+      if: ${{ failure() }} && ${{ matrix.install-method }} == 'conda' && ${{ matrix.os }} == 'ubuntu-latest'
+      with:
+        NGROK_AUTH_TOKEN: ${{ secrets.NGROK_AUTH_TOKEN }}
+        SSH_PASS: ${{ secrets.SSH_PASS }}
 
   test_conda:
     name: Test (${{ matrix.python-version }}, ${{ matrix.os }}, ${{ matrix.install-method }}, ${{ matrix.test-flags1 }}, ${{ matrix.test-flags2 }}), Install C = ${{ matrix.install-c }}
