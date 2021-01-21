@@ -68,7 +68,7 @@ jobs:
       shell: bash -l {0}
     - name: Store an ID string for the job
       run: echo "YGG_GHA_JOB_ID=${{ matrix.os }}-${{ matrix.install-method }}-C${{
-        env.INSTALLC }}-RMQ${{ env.INSTALLRMQ }}${{ env.YGG_GHA_JOB_ID_SUFFIX }}.txt"
+        env.INSTALLC }}-RMQ${{ env.INSTALLRMQ }}${{ env.YGG_GHA_JOB_ID_SUFFIX }}"
         >> $GITHUB_ENV
       shell: bash -l {0}
     - name: (WINDOWS) Patch TEMP/TMPDIR on Windows
@@ -215,7 +215,7 @@ jobs:
         github_token: ${{ secrets.GITHUB_TOKEN }}
         workflow: test-install.yml
         name: environment-log-${{ env.YGG_GHA_JOB_ID }}
-        path: old_environment_log.txt
+        path: .
     - name: Create a log of Python package versions
       if: ${{ always() }}
       run: python utils/setup_test_env.py log
@@ -285,7 +285,7 @@ jobs:
       shell: bash -l {0}
     - name: Store an ID string for the job
       run: echo "YGG_GHA_JOB_ID=${{ matrix.os }}-${{ matrix.install-method }}-C${{
-        env.INSTALLC }}-RMQ${{ env.INSTALLRMQ }}${{ env.YGG_GHA_JOB_ID_SUFFIX }}.txt"
+        env.INSTALLC }}-RMQ${{ env.INSTALLRMQ }}${{ env.YGG_GHA_JOB_ID_SUFFIX }}"
         >> $GITHUB_ENV
       shell: bash -l {0}
     - name: (WINDOWS) Patch TEMP/TMPDIR on Windows
@@ -432,7 +432,7 @@ jobs:
         github_token: ${{ secrets.GITHUB_TOKEN }}
         workflow: test-install.yml
         name: environment-log-${{ env.YGG_GHA_JOB_ID }}
-        path: old_environment_log.txt
+        path: .
     - name: Create a log of Python package versions
       if: ${{ always() }}
       run: python utils/setup_test_env.py log
@@ -482,7 +482,7 @@ jobs:
       shell: bash -l {0}
     - name: Store an ID string for the job
       run: echo "YGG_GHA_JOB_ID=${{ matrix.os }}-${{ matrix.install-method }}-C${{
-        env.INSTALLC }}-RMQ${{ env.INSTALLRMQ }}${{ env.YGG_GHA_JOB_ID_SUFFIX }}.txt"
+        env.INSTALLC }}-RMQ${{ env.INSTALLRMQ }}${{ env.YGG_GHA_JOB_ID_SUFFIX }}"
         >> $GITHUB_ENV
       shell: bash -l {0}
     - name: (WINDOWS) Patch TEMP/TMPDIR on Windows
@@ -629,7 +629,7 @@ jobs:
         github_token: ${{ secrets.GITHUB_TOKEN }}
         workflow: test-install.yml
         name: environment-log-${{ env.YGG_GHA_JOB_ID }}
-        path: old_environment_log.txt
+        path: .
     - name: Create a log of Python package versions
       if: ${{ always() }}
       run: python utils/setup_test_env.py log
@@ -681,7 +681,7 @@ jobs:
       shell: bash -l {0}
     - name: Store an ID string for the job
       run: echo "YGG_GHA_JOB_ID=${{ matrix.os }}-${{ matrix.install-method }}-C${{
-        env.INSTALLC }}-RMQ${{ env.INSTALLRMQ }}${{ env.YGG_GHA_JOB_ID_SUFFIX }}.txt"
+        env.INSTALLC }}-RMQ${{ env.INSTALLRMQ }}${{ env.YGG_GHA_JOB_ID_SUFFIX }}"
         >> $GITHUB_ENV
       shell: bash -l {0}
     - name: (WINDOWS) Patch TEMP/TMPDIR on Windows
@@ -828,7 +828,7 @@ jobs:
         github_token: ${{ secrets.GITHUB_TOKEN }}
         workflow: test-install.yml
         name: environment-log-${{ env.YGG_GHA_JOB_ID }}
-        path: old_environment_log.txt
+        path: .
     - name: Create a log of Python package versions
       if: ${{ always() }}
       run: python utils/setup_test_env.py log
@@ -878,7 +878,7 @@ jobs:
       shell: bash -l {0}
     - name: Store an ID string for the job
       run: echo "YGG_GHA_JOB_ID=${{ matrix.os }}-${{ matrix.install-method }}-C${{
-        env.INSTALLC }}-RMQ${{ env.INSTALLRMQ }}${{ env.YGG_GHA_JOB_ID_SUFFIX }}.txt"
+        env.INSTALLC }}-RMQ${{ env.INSTALLRMQ }}${{ env.YGG_GHA_JOB_ID_SUFFIX }}"
         >> $GITHUB_ENV
       shell: bash -l {0}
     - name: (WINDOWS) Patch TEMP/TMPDIR on Windows
@@ -1025,7 +1025,7 @@ jobs:
         github_token: ${{ secrets.GITHUB_TOKEN }}
         workflow: test-install.yml
         name: environment-log-${{ env.YGG_GHA_JOB_ID }}
-        path: old_environment_log.txt
+        path: .
     - name: Create a log of Python package versions
       if: ${{ always() }}
       run: python utils/setup_test_env.py log

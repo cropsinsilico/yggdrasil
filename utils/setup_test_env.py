@@ -936,8 +936,11 @@ def log_environment(new_filename='new_environment_log.txt',
 
     """
     if os.path.isfile(new_filename):
-        raise RuntimeError("Package list already exists: '%s'"
-                           % new_filename)
+        if os.path.isfile(old_filename):
+            raise RuntimeError("Package list already exists: '%s'"
+                               % new_filename)
+        else:
+            shutil.move(new_filename, old_filename)
     now = datetime.now()
     cmds = ["echo \"%s\" >> %s" % (now.strftime("%Y/%m/%d %H:%M:%S"),
                                    new_filename),
