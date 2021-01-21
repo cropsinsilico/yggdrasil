@@ -224,7 +224,7 @@ def ygginfo(args=None, return_str=False):
             curr_prefix = curr_prefix.rsplit(prefix, 1)[0]
             # Environment variabless
             env_vars = ['CONDA_PREFIX', 'CONDA', 'SDKROOT', 'CC', 'CXX',
-                        'FC', 'GFORTRAN', 'DISPLAY']
+                        'FC', 'GFORTRAN', 'DISPLAY', 'CL', '_CL_']
             if platform._is_win:  # pragma: windows
                 env_vars += ['VCPKG_ROOT']
             vardict.append(('Environment variables:', ''))

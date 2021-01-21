@@ -131,7 +131,7 @@ class OSRModelDriver(ExecutableModelDriver):
 
         """
         if (cls.repository is not None) and CPPModelDriver.is_installed():
-            if not os.path.isdir(cls.repository):  # pragma: deb
+            if not os.path.isdir(cls.repository):  # pragma: debug
                 # This will only need to be called if the tempdir was cleaned up
                 cls.clone_repository(cls.repository)
             # toolname = CPPModelDriver.get_tool('compiler',
@@ -151,7 +151,7 @@ class OSRModelDriver(ExecutableModelDriver):
                         env['YGG_OSR_LINK'] = os.path.join(msvc_bin, 'link.exe')
                         for k in ['CL', '_CL_']:
                             v = os.environ.get(k, None)
-                            if v is not None:
+                            if v is not None:  # pragma: appveyor
                                 env[k] = v.replace('/', '-').replace('\\', '/')
                     else:  # pragma: debug
                         env.pop('YGG_OSR_TOOL')
