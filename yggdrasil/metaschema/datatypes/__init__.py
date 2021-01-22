@@ -9,7 +9,8 @@ from yggdrasil.metaschema.properties import get_metaschema_property
 
 
 _schema_dir = os.path.join(os.path.dirname(__file__), 'schemas')
-_base_validator = jsonschema.validators.validator_for({"$schema": ""})
+# _base_validator = jsonschema.validators.validator_for({"$schema": ""})
+_base_validator = jsonschema.validators._LATEST_VERSION
 YGG_MSG_HEAD = b'YGG_MSG_HEAD'
 _property_attributes = ['properties', 'definition_properties',
                         'metadata_properties', 'extract_properties']
