@@ -430,7 +430,9 @@ class CommBase(tools.YggClass):
                     self._name = prefix + self.name
                 if self.name not in os.environ:
                     import pprint
-                    env_str = pprint.pformat(os.environ)
+                    env_str = pprint.pformat(os.environ.copy())
+                    print(env_str)
+                    self.info("ENV:\n%s" % env_str)
                     raise RuntimeError(
                         'Cannot see %s in env (model = %s). Env:\n%s' %
                         (self.name, model_name, env_str))
