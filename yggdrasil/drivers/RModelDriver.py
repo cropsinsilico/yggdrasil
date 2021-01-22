@@ -167,14 +167,14 @@ class RModelDriver(InterpretedModelDriver):  # pragma: R
     #                 % ' '.join(self.valgrind_flags), '--vanilla', '-f']
     #     return super(RModelDriver, self).debug_flags
         
-    def set_env(self):
+    def set_env(self, **kwargs):
         r"""Get environment variables that should be set for the model process.
 
         Returns:
             dict: Environment variables for the model process.
 
         """
-        out = super(RModelDriver, self).set_env()
+        out = super(RModelDriver, self).set_env(**kwargs)
         out['RETICULATE_PYTHON'] = PythonModelDriver.get_interpreter()
         if CModelDriver.is_language_installed():
             c_linker = CModelDriver.get_tool('linker')
@@ -183,12 +183,6 @@ class RModelDriver(InterpretedModelDriver):  # pragma: R
                                                       add_to_front=True)
         return out
         
-    @classmethod
-    def run_executable(cls, args, **kwargs):
-        kwargs.setdefault('env', os.environ.copy())
-        kwargs['env']['YGG_TEST_ENVIRONMENT'] = 'True'
-        return super(RModelDriver, cls).run_executable(args, **kwargs)
-
     @classmethod
     def comm_atexit(cls, comm):  # pragma: no cover
         r"""Operations performed on comm at exit including draining receive.

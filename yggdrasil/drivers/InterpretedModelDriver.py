@@ -167,7 +167,7 @@ class InterpretedModelDriver(ModelDriver):
         return cls.get_interpreter()
 
     @classmethod
-    def executable_command(cls, args, exec_type='interpreter', unused_kwargs={},
+    def executable_command(cls, args, exec_type='interpreter', unused_kwargs=None,
                            skip_interpreter_flags=False, **kwargs):
         r"""Compose a command for running a program in this language with the
         provied arguments. If not already present, the interpreter command and
@@ -207,7 +207,8 @@ class InterpretedModelDriver(ModelDriver):
                 args = new_args + args
         elif exec_type != 'direct':
             raise ValueError("Invalid exec_type '%s'" % exec_type)
-        unused_kwargs.update(kwargs)
+        if isinstance(unused_kwargs, dict):
+            unused_kwargs.update(kwargs)
         return args
 
     @classmethod
@@ -226,14 +227,14 @@ class InterpretedModelDriver(ModelDriver):
                and (not any([cmd.endswith(e) for e in cls.language_ext])))
         return out
 
-    def set_env(self):
+    def set_env(self, **kwargs):
         r"""Get environment variables that should be set for the model process.
 
         Returns:
             dict: Environment variables for the model process.
 
         """
-        out = super(InterpretedModelDriver, self).set_env()
+        out = super(InterpretedModelDriver, self).set_env(**kwargs)
         if self.path_env_variable is not None:  # pragma: debug
             if self.language != 'matlab':
                 raise NotImplementedError(

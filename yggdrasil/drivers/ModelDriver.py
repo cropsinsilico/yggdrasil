@@ -775,11 +775,16 @@ class ModelDriver(Driver):
         # NOTE: Setting forward_signals to False allows faster debugging
         # but should not be used in deployment for cases where models are not
         # running locally.
+        if self.language == 'R':
+            print("In run_model, Env:\n%s" % pformat(env))
         default_kwargs = dict(env=env, working_dir=self.working_dir,
                               forward_signals=False,
                               shell=platform._is_win)
         for k, v in default_kwargs.items():
             kwargs.setdefault(k, v)
+        if self.language == 'R':
+            print("In run_model, Env (after setting default):\n%s"
+                  % pformat(kwargs['env']))
         return self.run_executable(command, return_process=return_process, **kwargs)
 
     @property
