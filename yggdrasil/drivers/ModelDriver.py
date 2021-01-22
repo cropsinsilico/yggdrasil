@@ -775,16 +775,11 @@ class ModelDriver(Driver):
         # NOTE: Setting forward_signals to False allows faster debugging
         # but should not be used in deployment for cases where models are not
         # running locally.
-        if self.language == 'R':
-            print("In run_model, Env:\n%s" % pformat(env))
         default_kwargs = dict(env=env, working_dir=self.working_dir,
                               forward_signals=False,
                               shell=platform._is_win)
         for k, v in default_kwargs.items():
             kwargs.setdefault(k, v)
-        if self.language == 'R':
-            print("In run_model, Env (after setting default):\n%s"
-                  % pformat(kwargs['env']))
         return self.run_executable(command, return_process=return_process, **kwargs)
 
     @property
@@ -1179,6 +1174,9 @@ class ModelDriver(Driver):
             env['YGG_SERVER_OUTPUT'] = self.is_server['output']
         if self.logging_level:
             env['YGG_MODEL_DEBUG'] = self.logging_level
+        replace = [k for k in env.keys() if ':' in k]
+        for k in replace:
+            env[k.replace(':', '__COLON__')] = env[k]
         return env
 
     def before_start(self, no_queue_thread=False, **kwargs):
