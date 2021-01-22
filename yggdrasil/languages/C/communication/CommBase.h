@@ -238,8 +238,7 @@ comm_t* init_comm_base(const char *name, const char *direction,
 	  strncat(temp_name, full_name + i, 1);
 	}
       }
-      strcpy(full_name, temp_name);
-      address = getenv(full_name);
+      address = getenv(temp_name);
     }
     ygglog_debug("init_comm_base: model_name = %s, full_name = %s, address = %s",
 		 model_name, full_name, address);
