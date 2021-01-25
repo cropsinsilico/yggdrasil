@@ -645,12 +645,19 @@ class TimedRun(YggTestBase, tools.YggClass):
                             self.lang_src, self.lang_dst, self.comm_type,
                             nrep=nrep, matlab_running=self.matlab_running,
                             max_errors=self.max_errors)
-        copy_env = ['TMPDIR', 'CONDA_PREFIX']
+        copy_env = ['TMPDIR', 'CONDA_PREFIX', 'PATHEXT'
+                    'CC', 'CFLAGS', 'CXX', 'CXXFLAGS', 'CPPFLAGS',
+                    'F77', 'F90', 'F95', 'FC', 'FFLAGS', 'FORTRANFLAGS',
+                    'GFORTRAN', 'LD', 'LDFLAGS', 'LD_LIBRARY_PATH']
         copy_env += [v['env'] for v in config._cfg_map.values()]
+        if platform._is_mac:
+            copy_env += ['SDKROOT', 'MACOSX_DEPLOYMENT_TARGET',
+                         'CONDA_BUILD_SYSROOT']
         if platform._is_win:  # pragma: windows
             copy_env += ['HOME', 'USERPROFILE', 'HOMEDRIVE', 'HOMEPATH',
                          'NUMBER_OF_PROCESSORS',
-                         'INCLUDE', 'LIB', 'LIBPATH']
+                         'INCLUDE', 'LIB', 'LIBPATH',
+                         'ChocolateyInstall', 'VCPKG_ROOT']
         cmd = [sys.executable, self.pyperfscript, '--append=' + self.filename,
                '--inherit-environ=' + ','.join(copy_env),
                '--warmups=%d' % _pyperf_warmups]

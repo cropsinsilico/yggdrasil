@@ -251,7 +251,8 @@ def ygginfo(args=None, return_str=False):
             with open(config.usr_config_file, 'r') as fd:
                 contents = fd.read()
             vardict.append(
-                ('Configuration file:', '\n\t%s' % (
+                ('Configuration file:', '%s\n\t%s' % (
+                    config.usr_config_file,
                     '\n\t'.join(contents.splitlines()))))
             # R and reticulate info
             Rdrv = import_component("model", "R")
