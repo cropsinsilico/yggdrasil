@@ -225,7 +225,7 @@ def get_install_opts(old=None):
             'R': True,
             'fortran': True,
             'zmq': True,
-            'sbml': True,
+            'sbml': False,
             'astropy': False,
             'rmq': False,
             'trimesh': True,
@@ -822,16 +822,16 @@ def install_pkg(method, python=None, without_build=False,
         pass
     else:  # pragma: debug
         raise ValueError("Invalid method: '%s'" % method)
-    # Follow up if on Unix as R installation may require sudo
-    if install_opts['R'] and _is_unix:
-        # os.environ['YGG_USE_SUDO_FOR_R'] = '1'
-        cmds.append('ygginstall r --sudoR')
     # Print summary of what was installed
     cmds = SUMMARY_CMDS + cmds + SUMMARY_CMDS
     call_script(cmds)
     if method.endswith('-dev'):
         print(call_conda_command([python_cmd, 'setup.py', 'develop'],
                                  cwd=_pkg_dir))
+    # Follow up if on Unix as R installation may require sudo
+    if install_opts['R'] and _is_unix:
+        # cmds.append('ygginstall r --sudoR')
+        subprocess.check_call(["ygginstall", "r", "--sudoR"])
     if method == 'conda':
         src_dir = os.path.join(os.getcwd(),
                                os.path.dirname(os.path.dirname(__file__)))
