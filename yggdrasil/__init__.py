@@ -174,8 +174,8 @@ def run_tsts(**kwargs):  # pragma: no cover
     if args.ci:
         args.verbose = True
         args.withcoverage = True
-        extra_argv += ['-c', 'setup.cfg', '--cov-config=.coveragerc',
-                       '--cov-fail-under=100']
+        extra_argv += ['-c', 'setup.cfg', '--cov-config=.coveragerc']
+        # '--cov-fail-under=100']
     extra_argv.append('--ignore=yggdrasil/rapidjson/')
     # Separate out paths from options
     argv = [test_cmd]
