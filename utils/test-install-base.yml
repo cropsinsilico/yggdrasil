@@ -282,76 +282,76 @@ jobs:
         shell: bash -l {0}
     steps: *steps
 
-  # test_rmq_pip:
-  #   name: Test RMQ (${{ matrix.python-version }}, ${{ matrix.os }}, ${{ matrix.install-method }})
-  #   runs-on: ${{ matrix.os }}
-  #   env:
-  #     INSTALLRMQ: 1
-  #     INSTALLAPY: 1
-  #     USEVIRTUALENV: 1
-  #     YGG_DEFAULT_COMM: IPCComm
-  #   strategy:
-  #     matrix:
-  #       os: [ubuntu-latest]
-  #       python-version: [3.6]
-  #       install-method: [pip]
-  #       test-flags1: [--long-running --languages python R matlab]
-  #       test-flags2: [""]
-  #       install-c: [true]
-  #     fail-fast: false
-  #   services: &rmq_services
-  #     rabbitmq:
-  #       image: rabbitmq:latest
-  #       ports:
-  #         - 5672:5672
-  #       options: --health-cmd "rabbitmqctl node_health_check" --health-interval 10s --health-timeout 5s --health-retries 5
-  #   steps: *steps
+  test_rmq_pip:
+    name: Test RMQ (${{ matrix.python-version }}, ${{ matrix.os }}, ${{ matrix.install-method }})
+    runs-on: ${{ matrix.os }}
+    env:
+      INSTALLRMQ: 1
+      INSTALLAPY: 1
+      USEVIRTUALENV: 1
+      YGG_DEFAULT_COMM: IPCComm
+    strategy:
+      matrix:
+        os: [ubuntu-latest]
+        python-version: [3.6]
+        install-method: [pip]
+        test-flags1: [--long-running --languages python R matlab]
+        test-flags2: [""]
+        install-c: [true]
+      fail-fast: false
+    services: &rmq_services
+      rabbitmq:
+        image: rabbitmq:latest
+        ports:
+          - 5672:5672
+        options: --health-cmd "rabbitmqctl node_health_check" --health-interval 10s --health-timeout 5s --health-retries 5
+    steps: *steps
     
-  # test_rmq_conda:
-  #   name: Test RMQ (${{ matrix.python-version }}, ${{ matrix.os }}, ${{ matrix.install-method }})
-  #   runs-on: ${{ matrix.os }}
-  #   env:
-  #     INSTALLRMQ: 1
-  #     INSTALLAPY: 1
-  #     USEVIRTUALENV: 1
-  #   strategy:
-  #     matrix:
-  #       os: [ubuntu-latest]
-  #       python-version: [3.6]
-  #       install-method: [conda]
-  #       test-flags1: [--long-running --languages python R matlab]
-  #       test-flags2: [""]
-  #       install-c: [true]
-  #     fail-fast: false
-  #   services: *rmq_services
-  #   defaults:
-  #     run:
-  #       shell: bash -l {0}
-  #   steps: *steps
+  test_rmq_conda:
+    name: Test RMQ (${{ matrix.python-version }}, ${{ matrix.os }}, ${{ matrix.install-method }})
+    runs-on: ${{ matrix.os }}
+    env:
+      INSTALLRMQ: 1
+      INSTALLAPY: 1
+      USEVIRTUALENV: 1
+    strategy:
+      matrix:
+        os: [ubuntu-latest]
+        python-version: [3.6]
+        install-method: [conda]
+        test-flags1: [--long-running --languages python R matlab]
+        test-flags2: [""]
+        install-c: [true]
+      fail-fast: false
+    services: *rmq_services
+    defaults:
+      run:
+        shell: bash -l {0}
+    steps: *steps
     
-  # test_stripped:
-  #   name: Test stripped install (${{ matrix.python-version }}, ${{ matrix.os }}, ${{ matrix.install-method }})
-  #   runs-on: ${{ matrix.os }}
-  #   env:
-  #     INSTALLR: 0
-  #     INSTALLC: 0
-  #     INSTALLFORTRAN: 0
-  #     INSTALLLPY: 0
-  #     INSTALLZMQ: 0
-  #     INSTALLRMQ: 0
-  #     INSTALLTRIMESH: 0
-  #     INSTALLPYGMENTS: 0
-  #     YGG_GHA_JOB_ID_SUFFIX: -stripped
-  #   strategy:
-  #     matrix:
-  #       os: [ubuntu-latest, macos-latest, windows-latest]
-  #       python-version: [3.6]
-  #       install-method: [pip]
-  #       test-flags1: [--long-running]
-  #       test-flags2: [""]
-  #       install-c: [false]
-  #     fail-fast: false
-  #   steps: *steps
+  test_stripped:
+    name: Test stripped install (${{ matrix.python-version }}, ${{ matrix.os }}, ${{ matrix.install-method }})
+    runs-on: ${{ matrix.os }}
+    env:
+      INSTALLR: 0
+      INSTALLC: 0
+      INSTALLFORTRAN: 0
+      INSTALLLPY: 0
+      INSTALLZMQ: 0
+      INSTALLRMQ: 0
+      INSTALLTRIMESH: 0
+      INSTALLPYGMENTS: 0
+      YGG_GHA_JOB_ID_SUFFIX: -stripped
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+        python-version: [3.6]
+        install-method: [pip]
+        test-flags1: [--long-running]
+        test-flags2: [""]
+        install-c: [false]
+      fail-fast: false
+    steps: *steps
     
   docs:
     name: Build the Docs
