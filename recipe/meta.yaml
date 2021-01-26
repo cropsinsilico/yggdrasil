@@ -81,7 +81,7 @@ requirements:
     - zeromq
     - {{ compiler('c') }}  # [win]
     - {{ compiler('cxx') }}  # [win]
-    - {{ compiler('fortran') }}  # [not win]
+    # - {{ compiler('fortran') }}  # [not win]
     # - fortran-compiler  # [not win]
     - m2w64-gcc-fortran  # [win]
     - m2w64-toolchain_win-64  # [win]
