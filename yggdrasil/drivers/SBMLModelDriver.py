@@ -115,6 +115,7 @@ class SBMLModelDriver(DSLModelDriver):  # pragma: sbml
                 v['vars'] = selections
         while True:
             time = None
+            flag = False
             for k, v in input_map.items():
                 flag, value = v['comm'].recv_dict(key_order=v['vars'])
                 if not flag:
