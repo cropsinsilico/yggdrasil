@@ -143,8 +143,9 @@ install:
 script:
   - python utils/setup_test_env.py verify
   - travis_wait yggcompile
-  - yggtest --ci $YGG_TEST_FLAGS
-  - $YGG_SECOND_TEST
+  - yggtest --ci --with-examples --language=c examples/tests/test_timed_pipe.py
+  # - yggtest --ci $YGG_TEST_FLAGS
+  # - $YGG_SECOND_TEST
 
 
 # after_success:
@@ -203,9 +204,9 @@ jobs:
           - $HOME/Library/Caches/pip
           - $HOME/Library/Caches/Homebrew
       env: YGG_CONDA=3.7 YGG_TEST_FLAGS="serialize --test-suite=examples_part1 communication/tests/test_IPCComm.py communication/tests/test_RMQAsyncComm.py --test-suite=timing" # INSTALLZMQ=0
-      script:
-        - yggconfig --remove-file
-        - yggtest --ci tests/test_config.py $YGG_TEST_FLAGS
+      # script:
+      #   - yggconfig --remove-file
+      #   - yggtest --ci tests/test_config.py $YGG_TEST_FLAGS
       
     - name: "Build docs"
       python: 3.6
