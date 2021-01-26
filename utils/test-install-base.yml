@@ -242,7 +242,7 @@ jobs:
       max-parallel: 20
       matrix:
         os: [ubuntu-latest, macos-latest, windows-latest]
-        python-version: [3.6]
+        python-version: [3.7]
         install-method: [conda]
         test-flags1: [--long-running]
         test-flags2: [--with-examples examples/tests/test_backwards.py]
