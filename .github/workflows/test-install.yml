@@ -43,7 +43,9 @@ jobs:
         install-method:
         - pip
         test-flags1:
-        - --with-examples --language=c examples/tests/test_timed_pipe.py
+        - --long-running --test-suite=timing --test-suite=demos --test-suite=top
+        - --test-suite=examples
+        - --test-suite=types --skip-languages osr
         test-flags2:
         - ''
         install-c:
@@ -189,10 +191,11 @@ jobs:
     - name: Compile libraries
       run: yggcompile
     - name: Run tests (1st)
-      run: yggtest --ci ${{ matrix.test-flags1 }}
+      run: yggtest --ci --with-examples examples/tests/test_timed_pipe.py --language
+        c cpp
     - name: Run tests (2nd)
-      if: matrix.test-flags2 != ''
-      run: yggtest --ci ${{ matrix.test-flags2 }}
+      run: yggtest --ci --with-examples examples/tests/test_gs_lesson[3-4].py --language
+        c cpp
     - name: Start SSH session
       uses: luchihoratiu/debug-via-ssh@main
       if: ${{ failure() && matrix.install-method == 'conda' && matrix.os == 'macos-latest'
@@ -239,9 +242,9 @@ jobs:
         install-method:
         - conda
         test-flags1:
-        - --with-examples --language=c examples/tests/test_timed_pipe.py
+        - --long-running
         test-flags2:
-        - ''
+        - --with-examples examples/tests/test_backwards.py
         install-c:
         - true
       fail-fast: false
@@ -388,10 +391,11 @@ jobs:
     - name: Compile libraries
       run: yggcompile
     - name: Run tests (1st)
-      run: yggtest --ci ${{ matrix.test-flags1 }}
+      run: yggtest --ci --with-examples examples/tests/test_timed_pipe.py --language
+        c cpp
     - name: Run tests (2nd)
-      if: matrix.test-flags2 != ''
-      run: yggtest --ci ${{ matrix.test-flags2 }}
+      run: yggtest --ci --with-examples examples/tests/test_gs_lesson[3-4].py --language
+        c cpp
     - name: Start SSH session
       uses: luchihoratiu/debug-via-ssh@main
       if: ${{ failure() && matrix.install-method == 'conda' && matrix.os == 'macos-latest'
@@ -592,10 +596,11 @@ jobs:
     - name: Compile libraries
       run: yggcompile
     - name: Run tests (1st)
-      run: yggtest --ci ${{ matrix.test-flags1 }}
+      run: yggtest --ci --with-examples examples/tests/test_timed_pipe.py --language
+        c cpp
     - name: Run tests (2nd)
-      if: matrix.test-flags2 != ''
-      run: yggtest --ci ${{ matrix.test-flags2 }}
+      run: yggtest --ci --with-examples examples/tests/test_gs_lesson[3-4].py --language
+        c cpp
     - name: Start SSH session
       uses: luchihoratiu/debug-via-ssh@main
       if: ${{ failure() && matrix.install-method == 'conda' && matrix.os == 'macos-latest'
@@ -798,10 +803,11 @@ jobs:
     - name: Compile libraries
       run: yggcompile
     - name: Run tests (1st)
-      run: yggtest --ci ${{ matrix.test-flags1 }}
+      run: yggtest --ci --with-examples examples/tests/test_timed_pipe.py --language
+        c cpp
     - name: Run tests (2nd)
-      if: matrix.test-flags2 != ''
-      run: yggtest --ci ${{ matrix.test-flags2 }}
+      run: yggtest --ci --with-examples examples/tests/test_gs_lesson[3-4].py --language
+        c cpp
     - name: Start SSH session
       uses: luchihoratiu/debug-via-ssh@main
       if: ${{ failure() && matrix.install-method == 'conda' && matrix.os == 'macos-latest'
@@ -1002,10 +1008,11 @@ jobs:
     - name: Compile libraries
       run: yggcompile
     - name: Run tests (1st)
-      run: yggtest --ci ${{ matrix.test-flags1 }}
+      run: yggtest --ci --with-examples examples/tests/test_timed_pipe.py --language
+        c cpp
     - name: Run tests (2nd)
-      if: matrix.test-flags2 != ''
-      run: yggtest --ci ${{ matrix.test-flags2 }}
+      run: yggtest --ci --with-examples examples/tests/test_gs_lesson[3-4].py --language
+        c cpp
     - name: Start SSH session
       uses: luchihoratiu/debug-via-ssh@main
       if: ${{ failure() && matrix.install-method == 'conda' && matrix.os == 'macos-latest'
