@@ -888,7 +888,7 @@ class CModelDriver(CompiledModelDriver):
     @classmethod
     def update_ld_library_path(cls, env, paths_to_add=None,
                                add_to_front=False, add_libpython_dir=False,
-                               toolname=None, **kwargs):
+                               toolname=None, env_var=None, **kwargs):
         r"""Update provided dictionary of environment variables so that
         LD_LIBRARY_PATH includes the interface directory containing the interface
         libraries.
@@ -905,6 +905,9 @@ class CModelDriver(CompiledModelDriver):
             toolname (str, optional): Name of compiler tool that should be used.
                 Defaults to None and the default compiler for the language will
                 be used.
+            env_var (str, optional): Environment variable where the paths
+                should be added. Defaults to None and is only set for
+                linux (LD_LIBRARY_PATH) and windows (PATH).
             **kwargs: Additional keyword arguments are ignored.
 
         Returns:
@@ -925,11 +928,11 @@ class CModelDriver(CompiledModelDriver):
                 raise NotImplementedError("Not yet tested on 32bit Python")
             paths_to_add.append(os.path.join(ygg_cfg.get('c', 'vcpkg_dir'),
                                              'installed', arch, 'bin'))
-        env_var = None
-        if platform._is_linux:
-            env_var = 'LD_LIBRARY_PATH'
-        elif platform._is_win:
-            env_var = 'PATH'
+        if env_var is None:
+            if platform._is_linux:
+                env_var = 'LD_LIBRARY_PATH'
+            elif platform._is_win:
+                env_var = 'PATH'
         if env_var is not None:
             path_list = []
             prev_path = env.pop(env_var, '')

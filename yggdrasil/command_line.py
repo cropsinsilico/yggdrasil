@@ -131,6 +131,9 @@ class SubCommand(metaclass=SubCommandMeta):
         for k in ['language', 'languages']:
             v = getattr(args, k, None)
             if isinstance(v, list):
+                v_flag = getattr(args, k + '_flag', None)
+                if isinstance(v_flag, list):
+                    v.extend(v_flag)
                 if (len(v) == 0) or ('all' in v):
                     setattr(args, k, LANGUAGES['all'])
                     args.all_languages = True
@@ -839,6 +842,16 @@ class update_config(SubCommand):
     name = "config"
     help = 'Update the user config file.'
     arguments = [
+        (('languages', ),
+         {'nargs': '*',
+          # 'choices': ['all'] + LANGUAGES_WITH_ALIASES['all'],
+          'default': [],
+          'help': 'One or more languages that should be configured.'}),
+        (('--languages', ),
+         {'nargs': '+', 'dest': 'languages_flag',
+          # 'choices': ['all'] + LANGUAGES_WITH_ALIASES['all'],
+          'default': [],
+          'help': 'One or more languages that should be configured.'}),
         (('--show-file', ),
          {'action': 'store_true',
           'help': 'Print the path to the config file without updating it.'}),
@@ -848,11 +861,6 @@ class update_config(SubCommand):
         (('--overwrite', ),
          {'action': 'store_true',
           'help': 'Overwrite the existing file.'}),
-        (('--languages', ),
-         {'nargs': '+',
-          'choices': ['all'] + LANGUAGES_WITH_ALIASES['all'],
-          'default': ['all'],
-          'help': 'One or more languages that should be configured.'}),
         (('--disable-languages', ),
          {'nargs': '+', 'default': [],
           'choices': LANGUAGES_WITH_ALIASES['all'],
@@ -864,6 +872,7 @@ class update_config(SubCommand):
         (('--quiet', '-q'),
          {'action': 'store_true',
           'help': 'Suppress output.'})]
+    # TODO: Move these into the language directories?
     language_arguments = {
         'c': [
             ConditionalArgumentTuple(
@@ -874,7 +883,11 @@ class update_config(SubCommand):
                 ('--macos-sdkroot', '--sdkroot'),
                 {'help': ('The full path to the MacOS SDK that '
                           'should be used.')},
-                conditions={'os': ['MacOS']})]}
+                conditions={'os': ['MacOS']})],
+        'matlab': [
+            (('--disable-engine', ),
+             {'action': 'store_true',
+              'help': 'Disable use of the Matlab engine for Python.'})]}
         
     @classmethod
     def add_arguments(cls, parser, **kwargs):
