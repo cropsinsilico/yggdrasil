@@ -837,8 +837,12 @@ class ModelDriver(Driver):
                 and cls.is_configured() and (not cls.is_disabled()))
 
     @classmethod
-    def are_base_languages_installed(cls):
+    def are_base_languages_installed(cls, missing=None):
         r"""Determine if the base languages are installed.
+
+        Args:
+            missing (list, optional): A pre-existing list that
+                missing base languages should be appended to.
 
         Returns:
             bool: True if the base langauges are installed. False otherwise.
@@ -846,9 +850,13 @@ class ModelDriver(Driver):
         """
         out = True
         for x in cls.base_languages:
-            if not out:  # pragma: no cover
+            if (not out) and (not isinstance(missing, list)):  # pragma: no cover
                 break
             out = import_component('model', x).is_installed()
+            if isinstance(missing, list) and (not out):
+                missing.append(x)
+        if missing:
+            out = False
         return out
 
     @classmethod
