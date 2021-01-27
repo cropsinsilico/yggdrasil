@@ -18,7 +18,7 @@ LANGUAGES = {
     'interpreted': [
         'python', 'matlab', 'r', 'sbml', 'lpy'],
     'other': [
-        'executable']}
+        'executable', 'timesync']}
 LANGUAGES['all'] = (
     LANGUAGES['compiled']
     + LANGUAGES['interpreted']
@@ -29,7 +29,7 @@ LANGUAGES_WITH_ALIASES = {
     'interpreted': [
         'python', 'matlab', 'r', 'R', 'sbml', 'lpy'],
     'other': [
-        'executable']}
+        'executable', 'timesync']}
 LANGUAGES_WITH_ALIASES['all'] = (
     LANGUAGES_WITH_ALIASES['compiled']
     + LANGUAGES_WITH_ALIASES['interpreted']
