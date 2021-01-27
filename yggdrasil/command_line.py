@@ -119,6 +119,8 @@ class SubCommand(metaclass=SubCommandMeta):
 
     @classmethod
     def parse_args(cls, parser, args=None, allow_unknown=False):
+        # TODO: Check choices for positional arguments that can
+        # have more than one element
         if isinstance(args, argparse.Namespace):
             return args
         if cls.allow_unknown or allow_unknown:
@@ -296,6 +298,7 @@ class ygginfo(SubCommand):
             arguments=[
                 (('language', ),
                  {'choices': LANGUAGES_WITH_ALIASES['compiled'],
+                  'type': str.lower,
                   'help': 'Language to get tool information for.'}),
                 (('--toolname', ),
                  {'default': None,
@@ -671,8 +674,8 @@ class yggcompile(SubCommand):
             "libraries are first deleted.")
     arguments = [
         (('language', ),
-         {'nargs': '*', 'default': [],
-          'choices': ['all'] + LANGUAGES_WITH_ALIASES['compiled'],
+         {'nargs': '*', 'default': ['all'],
+          # 'choices': ['all'] + LANGUAGES_WITH_ALIASES['compiled'],
           'help': ("One or more languages to compile dependencies "
                    "for.")}),
         (('--toolname', ),
@@ -706,8 +709,8 @@ class yggclean(SubCommand):
     help = "Remove dependency libraries compiled by yggdrasil."
     arguments = [
         (('language', ),
-         {'nargs': '*', 'default': [],
-          'choices': ['all'] + LANGUAGES_WITH_ALIASES['all'],
+         {'nargs': '*', 'default': ['all'],
+          # 'choices': ['all'] + LANGUAGES_WITH_ALIASES['all'],
           'help': ("One or more languages to clean up dependencies "
                    "for.")})]
 
