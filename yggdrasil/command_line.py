@@ -692,7 +692,7 @@ class yggcompile(SubCommand):
     def func(cls, args):
         from yggdrasil.components import import_component
         yggclean.func(args)
-        error_on_missing = getattr(args, 'all_languages', False)
+        error_on_missing = (not getattr(args, 'all_languages', False))
         missing = []
         for lang in args.language:
             import_component('model', lang).cleanup_dependencies()
