@@ -1030,7 +1030,9 @@ class run_tsts(SubCommand):
          {'help': 'Config file for coverage. Default: .coveragerc'}),
         (('--ignore', ),
          {'action': 'append',
-          'help': 'Ignore path during collection.'})]
+          'help': 'Ignore path during collection.'}),
+        (('--rootdir', ),
+         {'help': 'Define root directory for tests.'})]
     allow_unknown = True
 
     @classmethod
@@ -1047,14 +1049,13 @@ class run_tsts(SubCommand):
         if args.ci:
             args.verbose = True
             args.withcoverage = True
-            args.setup_cfg = os.path.join(
-                os.getcwd(), 'setup.cfg')
+            args.setup_cfg = 'setup.cfg'
             args.pytest_config = args.setup_cfg
-            args.cov_config = os.path.join(
-                os.getcwd(), '.coveragerc')
+            args.cov_config = '.coveragerc'
             if not args.ignore:
                 args.ignore = []
             args.ignore.append('yggdrasil/rapidjson/')
+            args.rootdir = package_dir
         # Separate out paths from options
         test_paths = []
         if args.test_suites:
@@ -1185,6 +1186,8 @@ class run_tsts(SubCommand):
             argv += ['--cov-config=%s' % args.cov_config]
         if args.ignore:
             argv += ['--ignore=%s' % x for x in args.ignore]
+        if args.rootdir:
+            argv += ['--rootdir=%s' % args.rootdir]
         argv += args.extra
         # Run test command and perform cleanup before logging any errors
         logger.info("Running %s from %s", argv, os.getcwd())
@@ -1243,6 +1246,7 @@ class run_tsts(SubCommand):
                 os.chdir(initial_dir)
                 if os.path.isfile(pth_file):
                     os.remove(pth_file)
+        print('error_code', error_code)
         return error_code
 
 
