@@ -202,9 +202,7 @@ jobs:
     - name: Compile libraries
       run: yggcompile
     - name: Run tests (1st)
-      run: yggtest --ci --with-examples examples/tests/test_timed_pipe.py --language c cpp
-    - name: Run tests (2nd)
-      run: yggtest --ci --with-examples examples/tests/test_gs_lesson[3-4].py --language c cpp
+      run: yggtest --ci --with-examples examples/tests/test_timed_pipe.py examples/tests/test_gs_lesson[3-4].py --language c cpp
     # - name: Run tests (1st)
     #   run: yggtest --ci ${{ matrix.test-flags1 }}
     # - name: Run tests (2nd)
