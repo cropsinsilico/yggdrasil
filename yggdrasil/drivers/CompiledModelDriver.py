@@ -4,7 +4,6 @@ import six
 import copy
 import glob
 import logging
-import warnings
 import subprocess
 import shutil
 from collections import OrderedDict
@@ -2076,9 +2075,9 @@ class CompiledModelDriver(ModelDriver):
                 if (((default_tool is None)
                      or (not default_tool.is_installed()))):  # pragma: debug
                     if not tools.is_subprocess():
-                        warnings.warn(('Default %s for %s (%s) not installed. '
-                                       'Attempting to locate an alternative .')
-                                      % (k, cls.language, default_tool_name))
+                        logger.debug(('Default %s for %s (%s) not installed. '
+                                      'Attempting to locate an alternative .')
+                                     % (k, cls.language, default_tool_name))
                     setattr(cls, 'default_%s' % k, None)
 
     def parse_arguments(self, args, **kwargs):
@@ -3212,9 +3211,9 @@ class CompiledModelDriver(ModelDriver):
             if default_tool_name:
                 default_tool = get_compilation_tool(k, default_tool_name)
                 if not default_tool.is_installed():  # pragma: debug
-                    warnings.warn(('Default %s for %s (%s) not installed. '
-                                   'Attempting to locate an alternative .')
-                                  % (k, cls.language, default_tool_name))
+                    logger.debug(('Default %s for %s (%s) not installed. '
+                                  'Attempting to locate an alternative .')
+                                 % (k, cls.language, default_tool_name))
                     default_tool_name = None
             # Determine compilation tools based on language/platform
             if default_tool_name is None:  # pragma: no cover
