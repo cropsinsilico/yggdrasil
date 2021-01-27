@@ -202,13 +202,6 @@ jobs:
     - name: Run tests (2nd)
       if: matrix.test-flags2 != ''
       run: yggtest --ci ${{ matrix.test-flags2 }}
-    - name: Start SSH session
-      uses: luchihoratiu/debug-via-ssh@main
-      if: ${{ failure() && matrix.install-method == 'conda' && matrix.os == 'macos-latest'
-        }}
-      with:
-        NGROK_AUTH_TOKEN: ${{ secrets.NGROK_AUTH_TOKEN }}
-        SSH_PASS: ${{ secrets.SSH_PASS }}
     - name: (CONDA) Generate XML version of coverage report
       if: matrix.install-method == 'conda'
       run: coverage xml
@@ -426,13 +419,6 @@ jobs:
     - name: Run tests (2nd)
       if: matrix.test-flags2 != ''
       run: yggtest --ci ${{ matrix.test-flags2 }}
-    - name: Start SSH session
-      uses: luchihoratiu/debug-via-ssh@main
-      if: ${{ failure() && matrix.install-method == 'conda' && matrix.os == 'macos-latest'
-        }}
-      with:
-        NGROK_AUTH_TOKEN: ${{ secrets.NGROK_AUTH_TOKEN }}
-        SSH_PASS: ${{ secrets.SSH_PASS }}
     - name: (CONDA) Generate XML version of coverage report
       if: matrix.install-method == 'conda'
       run: coverage xml
@@ -630,13 +616,6 @@ jobs:
     - name: Run tests (2nd)
       if: matrix.test-flags2 != ''
       run: yggtest --ci ${{ matrix.test-flags2 }}
-    - name: Start SSH session
-      uses: luchihoratiu/debug-via-ssh@main
-      if: ${{ failure() && matrix.install-method == 'conda' && matrix.os == 'macos-latest'
-        }}
-      with:
-        NGROK_AUTH_TOKEN: ${{ secrets.NGROK_AUTH_TOKEN }}
-        SSH_PASS: ${{ secrets.SSH_PASS }}
     - name: (CONDA) Generate XML version of coverage report
       if: matrix.install-method == 'conda'
       run: coverage xml
@@ -836,13 +815,6 @@ jobs:
     - name: Run tests (2nd)
       if: matrix.test-flags2 != ''
       run: yggtest --ci ${{ matrix.test-flags2 }}
-    - name: Start SSH session
-      uses: luchihoratiu/debug-via-ssh@main
-      if: ${{ failure() && matrix.install-method == 'conda' && matrix.os == 'macos-latest'
-        }}
-      with:
-        NGROK_AUTH_TOKEN: ${{ secrets.NGROK_AUTH_TOKEN }}
-        SSH_PASS: ${{ secrets.SSH_PASS }}
     - name: (CONDA) Generate XML version of coverage report
       if: matrix.install-method == 'conda'
       run: coverage xml
@@ -1040,13 +1012,6 @@ jobs:
     - name: Run tests (2nd)
       if: matrix.test-flags2 != ''
       run: yggtest --ci ${{ matrix.test-flags2 }}
-    - name: Start SSH session
-      uses: luchihoratiu/debug-via-ssh@main
-      if: ${{ failure() && matrix.install-method == 'conda' && matrix.os == 'macos-latest'
-        }}
-      with:
-        NGROK_AUTH_TOKEN: ${{ secrets.NGROK_AUTH_TOKEN }}
-        SSH_PASS: ${{ secrets.SSH_PASS }}
     - name: (CONDA) Generate XML version of coverage report
       if: matrix.install-method == 'conda'
       run: coverage xml
