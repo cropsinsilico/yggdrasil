@@ -803,6 +803,7 @@ class ld_flags(cc_toolname):
     @classmethod
     def parse_args(cls, *args, **kwargs):
         args = super(ld_flags, cls).parse_args(*args, **kwargs)
+        args.tool = 'linker'
         args.flags = True
         return args
 
