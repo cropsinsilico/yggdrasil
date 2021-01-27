@@ -315,7 +315,11 @@ class ygginfo(SubCommand):
                     help='Get information about a compiler.'),
                 ArgumentParser(
                     name='linker',
-                    help='Get information about a linker.'),
+                    help='Get information about a linker.',
+                    arguments=[
+                        (('--library', ),
+                         {'action': 'store_true',
+                          'help': 'Get flags for linking a library.'})]),
                 ArgumentParser(
                     name='archiver',
                     help='Get information about a archiver.')])]
@@ -334,9 +338,12 @@ class ygginfo(SubCommand):
                     if flags[-1] == '/link':  # pragma: windows
                         flags = flags[:-1]
                 else:
-                    libtype = 'shared'
                     if args.tool == 'archiver':
                         libtype = 'static'
+                    elif getattr(args, 'library', False):
+                        libtype = 'shared'
+                    else:
+                        libtype = 'object'
                     flags = drv.get_linker_flags(
                         for_model=True, toolname=args.toolname,
                         dry_run=True, libtype=libtype)
@@ -744,8 +751,8 @@ class cc_toolname(SubCommand):
         return args
 
     @classmethod
-    def func(cls, args):
-        ygginfo.func(args)
+    def func(cls, args, **kwargs):
+        ygginfo.func(args, **kwargs)
 
 
 class ld_toolname(cc_toolname):
