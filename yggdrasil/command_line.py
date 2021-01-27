@@ -911,7 +911,7 @@ class update_config(SubCommand):
                     v_args[0][0].lstrip('-').replace('-', '_'))
                 if hasattr(args, name):
                     lang_kwargs.setdefault(k, {})
-                    lang_kwargs[name] = getattr(args, name)
+                    lang_kwargs[k][name] = getattr(args, name)
         logger.info('CONFIG LANG KWARGS: %s' % lang_kwargs)
         config.update_language_config(
             args.languages, overwrite=args.overwrite,
