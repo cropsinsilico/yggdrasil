@@ -350,6 +350,21 @@ jobs:
         install-c: [false]
       fail-fast: false
     steps: *steps
+
+  test_czmq:
+    name: Build & test czmq 4.2.1 on MacOS catalina
+    runs-on: macos-latest
+    steps:
+    - uses: actions/checkout@v2
+      with:
+        submodules: true
+    # - uses: actions/checkout@v2
+    #   with:
+    #     repository: zeromq/czmq
+    - name: Install CZMQ & dependencies
+      run: ./ci/install-czmq-osx.sh
+    - name: Run the CZMQ selftests
+      run: make check
     
   docs:
     name: Build the Docs
