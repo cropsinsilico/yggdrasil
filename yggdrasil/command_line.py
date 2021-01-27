@@ -1055,25 +1055,8 @@ class run_tsts(SubCommand):
             if not args.ignore:
                 args.ignore = []
             args.ignore.append('yggdrasil/rapidjson/')
-            # extra += ['-c', 'setup.cfg', '--cov-config=.coveragerc']
-        # extra.append('--ignore=yggdrasil/rapidjson/')
         # Separate out paths from options
-        # argv = ['pytest']
         test_paths = []
-        # i = 0
-        # max_flag = max((i for i in range(len(x))
-        #                 if extra[i].startswith('-')), default=-1)
-        # while i < len(extra):
-        #     if extra[i].endswith('yggtest'):
-        #         pass
-        #     elif extra[i].startswith('-'):
-        #         argv.append(extra[i])
-        #         if (i + 1) < len(extra):
-        #             argv.append(extra[i + 1])
-        #             i += 1
-        #     else:
-        #         test_paths.append(extra[i])
-        #     i += 1
         if args.test_suites:
             if 'all' in args.test_suites:
                 args.test_suites.remove('all')
@@ -1119,8 +1102,6 @@ class run_tsts(SubCommand):
         cls.expand_and_add(extra + test_paths, args.extra,
                            [package_dir, os.getcwd()],
                            add_on_nomatch=True)
-        # args.test_paths = test_paths
-        # args.argv = argv
         return args
 
     @classmethod
@@ -1205,18 +1186,6 @@ class run_tsts(SubCommand):
         if args.ignore:
             argv += ['--ignore=%s' % x for x in args.ignore]
         argv += args.extra
-        # # Get expanded tests to allow for paths that are relative to
-        # # either the yggdrasil root directory or the current working
-        # # directory
-        # expanded_test_paths = []
-        # if not test_paths:
-        #     expanded_test_paths.append(package_dir)
-        # else:
-        #     for x in test_paths:
-        #         if not cls.expand_and_add(x, expanded_test_paths,
-        #                                   [package_dir, os.getcwd()]):
-        #             expanded_test_paths.append(x)
-        # argv += expanded_test_paths
         # Run test command and perform cleanup before logging any errors
         logger.info("Running %s from %s", argv, os.getcwd())
         new_config = {}
