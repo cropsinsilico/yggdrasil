@@ -905,6 +905,7 @@ class update_config(SubCommand):
                 if hasattr(args, name):
                     lang_kwargs.setdefault(k, {})
                     lang_kwargs[name] = getattr(args, name)
+        logger.info('CONFIG LANG KWARGS: %s' % lang_kwargs)
         config.update_language_config(
             args.languages, overwrite=args.overwrite,
             verbose=(not args.quiet),

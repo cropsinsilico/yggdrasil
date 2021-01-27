@@ -37,6 +37,7 @@ if not os.path.isfile(config.usr_config_file):  # pragma: config
     from yggdrasil.languages import install_languages
     shutil.copy(config.def_config_file, config.usr_config_file)
     install_languages.install_all_languages(from_setup=True)
+    logger.info("CONFIG: %s" % sys.argv)
     if not any([x.endswith(('yggconfig', 'yggconfig.exe', 'config'))
                 for x in sys.argv]):
         # Don't configure if that is what is going to happen anyway
