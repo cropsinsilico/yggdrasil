@@ -1022,7 +1022,15 @@ class run_tsts(SubCommand):
           'choices': ['all', 'top', 'examples', 'examples_part1',
                       'examples_part2', 'demos', 'types', 'timing'],
           'help': 'Test suite(s) that should be run.',
-          'dest': 'test_suites'})]
+          'dest': 'test_suites'}),
+        (('--pytest-config', '-c'),
+         {'help': ('Pytest configuration file that should be used '
+                   'instead of the defaults.')}),
+        (('--cov-config', ),
+         {'help': 'Config file for coverage. Default: .coveragerc'}),
+        (('--ignore', ),
+         {'action': 'append',
+          'help': 'Ignore path during collection.'})]
     allow_unknown = True
 
     @classmethod
@@ -1039,22 +1047,33 @@ class run_tsts(SubCommand):
         if args.ci:
             args.verbose = True
             args.withcoverage = True
-            extra += ['-c', 'setup.cfg', '--cov-config=.coveragerc']
-        extra.append('--ignore=yggdrasil/rapidjson/')
+            args.setup_cfg = os.path.join(
+                os.getcwd(), 'setup.cfg')
+            args.pytest_config = args.setup_cfg
+            args.cov_config = os.path.join(
+                os.getcwd(), '.coveragerc')
+            if not args.ignore:
+                args.ignore = []
+            args.ignore.append('yggdrasil/rapidjson/')
+            # extra += ['-c', 'setup.cfg', '--cov-config=.coveragerc']
+        # extra.append('--ignore=yggdrasil/rapidjson/')
         # Separate out paths from options
-        argv = ['pytest']
+        # argv = ['pytest']
         test_paths = []
-        i = 0
-        while i < len(extra):
-            if extra[i].endswith('yggtest'):
-                pass
-            elif extra[i].startswith('-'):
-                argv.append(extra[i])
-                if (i + 1) < len(extra):
-                    argv.append(extra[i + 1])
-            else:
-                test_paths.append(extra[i])
-            i += 1
+        # i = 0
+        # max_flag = max((i for i in range(len(x))
+        #                 if extra[i].startswith('-')), default=-1)
+        # while i < len(extra):
+        #     if extra[i].endswith('yggtest'):
+        #         pass
+        #     elif extra[i].startswith('-'):
+        #         argv.append(extra[i])
+        #         if (i + 1) < len(extra):
+        #             argv.append(extra[i + 1])
+        #             i += 1
+        #     else:
+        #         test_paths.append(extra[i])
+        #     i += 1
         if args.test_suites:
             if 'all' in args.test_suites:
                 args.test_suites.remove('all')
@@ -1093,12 +1112,20 @@ class run_tsts(SubCommand):
                     args.enable_production_runs = True
                     test_paths.append(os.path.join('tests', 'test_timing.py'))
         args = config.resolve_config_parser(args)
-        args.test_paths = test_paths
-        args.argv = argv
+        args.extra = []
+        # Get expanded tests to allow for paths that are relative to
+        # either the yggdrasil root directory or the current working
+        # directory
+        cls.expand_and_add(extra + test_paths, args.extra,
+                           [package_dir, os.getcwd()],
+                           add_on_nomatch=True)
+        # args.test_paths = test_paths
+        # args.argv = argv
         return args
 
     @classmethod
-    def expand_and_add(cls, path, path_list, dir_list):
+    def expand_and_add(cls, path, path_list, dir_list,
+                       add_on_nomatch=False):
         r"""Expand the specified path and add it's expanded forms to
         the provided list.
 
@@ -1109,15 +1136,29 @@ class run_tsts(SubCommand):
                 added to.
             dir_list (list): Directories that should be tried for
                 relative paths.
+            add_on_nomatch (bool, optional): If True, path will be added
+                to path_list even if there are not matches. Defaults to
+                False.
 
         Returns:
             int: The number of expansions added to path_list.
 
         """
         import glob
+        if isinstance(path, list):
+            nadded = 0
+            for x in path:
+                nadded += cls.expand_and_add(x, path_list, dir_list,
+                                             add_on_nomatch=add_on_nomatch)
+            return nadded
+        if path.startswith('-') or path.endswith('yggtest'):
+            return 0
         if os.path.isabs(path):
             matches = sorted(glob.glob(path))
             path_list += matches
+            if (not matches) and add_on_nomatch:
+                path_list.append(path)
+                return 1
             return len(matches)
         # Try checking for function
         for func_sep in ['::', ':']:
@@ -1134,13 +1175,16 @@ class run_tsts(SubCommand):
                                         path_list, dir_list)
             if nadded:
                 return nadded
+        if add_on_nomatch:
+            path_list.append(path)
+            return 1
         return 0
 
     @classmethod
     def func(cls, args):
         from yggdrasil import config
-        argv = args.argv
-        test_paths = args.test_paths
+        argv = ['pytest']
+        # test_paths = args.test_paths
         if args.verbose:
             argv.append('-v')
         if args.nocapture:
@@ -1154,18 +1198,25 @@ class run_tsts(SubCommand):
             # argv.append('--cov-append')
         if args.noflaky:
             argv += ['-p', 'no:flaky']
-        # Get expanded tests to allow for paths that are relative to
-        # either the yggdrasil root directory or the current working
-        # directory
-        expanded_test_paths = []
-        if not test_paths:
-            expanded_test_paths.append(package_dir)
-        else:
-            for x in test_paths:
-                if not cls.expand_and_add(x, expanded_test_paths,
-                                          [package_dir, os.getcwd()]):
-                    expanded_test_paths.append(x)
-        argv += expanded_test_paths
+        if args.pytest_config:
+            argv += ['-c', args.pytest_config]
+        if args.cov_config:
+            argv += ['--cov-config=%s' % args.cov_config]
+        if args.ignore:
+            argv += ['--ignore=%s' % x for x in args.ignore]
+        argv += args.extra
+        # # Get expanded tests to allow for paths that are relative to
+        # # either the yggdrasil root directory or the current working
+        # # directory
+        # expanded_test_paths = []
+        # if not test_paths:
+        #     expanded_test_paths.append(package_dir)
+        # else:
+        #     for x in test_paths:
+        #         if not cls.expand_and_add(x, expanded_test_paths,
+        #                                   [package_dir, os.getcwd()]):
+        #             expanded_test_paths.append(x)
+        # argv += expanded_test_paths
         # Run test command and perform cleanup before logging any errors
         logger.info("Running %s from %s", argv, os.getcwd())
         new_config = {}
@@ -1182,6 +1233,11 @@ class run_tsts(SubCommand):
             try:
                 # Perform CI specific pretest operations
                 if args.ci:
+                    if not os.path.isfile(args.setup_cfg):
+                        raise RuntimeError("The CI tests must be run "
+                                           "from the root directory "
+                                           "of the yggdrasil git "
+                                           "repository.")
                     top_dir = os.path.dirname(os.getcwd())
                     src_cmd = ('python -c \"import versioneer; '
                                'print(versioneer.get_version())\"')
@@ -1197,10 +1253,9 @@ class run_tsts(SubCommand):
                                             "\tSource version: %s\n"
                                             "\tBuild  version: %s\n")
                                            % (src_ver, dst_ver))
-                    if os.environ.get("INSTALLR", None) == "1":
-                        print(shutil.which("R"))
-                        print(shutil.which("Rscript"))
-                    subprocess.check_call(["flake8", "yggdrasil"])
+                    subprocess.check_call(
+                        ["flake8", "yggdrasil", "--append-config",
+                         args.setup_cfg])
                     if os.environ.get("YGG_CONDA", None):
                         subprocess.check_call(
                             ["python", "create_coveragerc.py"])
