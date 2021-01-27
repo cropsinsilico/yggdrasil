@@ -13,6 +13,7 @@ build:
   script: '{{ PYTHON }} -m pip install . --no-deps --ignore-installed --no-cache-dir -vvv '
   skip: true  # [(win and vc<14) or py<35]
   entry_points:
+    - yggdrasil = yggdrasil.command_line:main
     - ygginfo = yggdrasil.command_line:ygginfo
     - yggrun = yggdrasil.command_line:yggrun
     - cisrun = yggdrasil.command_line:yggrun

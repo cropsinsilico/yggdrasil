@@ -103,7 +103,8 @@ setup(
         "Development Status :: 5 - Production/Stable",
     ],
     entry_points={
-        'console_scripts': ['ygginfo=yggdrasil.command_line:ygginfo',
+        'console_scripts': ['yggdrasil=yggdrasil.command_line:main',
+                            'ygginfo=yggdrasil.command_line:ygginfo',
                             'yggrun=yggdrasil.command_line:yggrun',
                             'cisrun=yggdrasil.command_line:yggrun',
                             'yggcompile=yggdrasil.command_line:yggcompile',
@@ -112,7 +113,7 @@ setup(
                             'yggldtool=yggdrasil.command_line:ld_toolname',
                             'yggccflags=yggdrasil.command_line:cc_flags',
                             'yggldflags=yggdrasil.command_line:ld_flags',
-                            'yggtest=yggdrasil:run_tsts',
+                            'yggtest=yggdrasil.command_line:run_tsts',
                             'yggmetaschema=yggdrasil.command_line:regen_metaschema',
                             'yggschema=yggdrasil.command_line:regen_schema',
                             'yggbuildapi_c=yggdrasil.command_line:rebuild_c_api',
