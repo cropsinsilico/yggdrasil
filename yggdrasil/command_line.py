@@ -99,7 +99,7 @@ class SubCommandMeta(type):
     r"""Meta class for subcommands."""
 
     def __call__(cls, *args, **kwargs):
-        cls.call(*args, **kwargs)
+        return cls.call(*args, **kwargs)
 
 
 def ReplacementWarning(old, new):
@@ -144,7 +144,7 @@ class SubCommand(metaclass=SubCommandMeta):
     def call(cls, args=None, **kwargs):
         parser = cls.get_parser(args=args)
         args = cls.parse_args(parser, args=args)
-        cls.func(args, **kwargs)
+        return cls.func(args, **kwargs)
 
     @classmethod
     def get_parser(cls, args=None):
