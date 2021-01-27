@@ -201,7 +201,7 @@ jobs:
       run: yggtest --ci ${{ matrix.test-flags1 }}
     - name: Run tests (2nd)
       if: matrix.test-flags2 != ''
-      run: yggtest --ci ${{ matrix.test-flags2 }}
+      run: yggtest --ci --cov-append ${{ matrix.test-flags2 }}
     - name: (CONDA) Generate XML version of coverage report
       if: matrix.install-method == 'conda'
       run: coverage xml
@@ -418,7 +418,7 @@ jobs:
       run: yggtest --ci ${{ matrix.test-flags1 }}
     - name: Run tests (2nd)
       if: matrix.test-flags2 != ''
-      run: yggtest --ci ${{ matrix.test-flags2 }}
+      run: yggtest --ci --cov-append ${{ matrix.test-flags2 }}
     - name: (CONDA) Generate XML version of coverage report
       if: matrix.install-method == 'conda'
       run: coverage xml
@@ -615,7 +615,7 @@ jobs:
       run: yggtest --ci ${{ matrix.test-flags1 }}
     - name: Run tests (2nd)
       if: matrix.test-flags2 != ''
-      run: yggtest --ci ${{ matrix.test-flags2 }}
+      run: yggtest --ci --cov-append ${{ matrix.test-flags2 }}
     - name: (CONDA) Generate XML version of coverage report
       if: matrix.install-method == 'conda'
       run: coverage xml
@@ -814,7 +814,7 @@ jobs:
       run: yggtest --ci ${{ matrix.test-flags1 }}
     - name: Run tests (2nd)
       if: matrix.test-flags2 != ''
-      run: yggtest --ci ${{ matrix.test-flags2 }}
+      run: yggtest --ci --cov-append ${{ matrix.test-flags2 }}
     - name: (CONDA) Generate XML version of coverage report
       if: matrix.install-method == 'conda'
       run: coverage xml
@@ -1011,7 +1011,7 @@ jobs:
       run: yggtest --ci ${{ matrix.test-flags1 }}
     - name: Run tests (2nd)
       if: matrix.test-flags2 != ''
-      run: yggtest --ci ${{ matrix.test-flags2 }}
+      run: yggtest --ci --cov-append ${{ matrix.test-flags2 }}
     - name: (CONDA) Generate XML version of coverage report
       if: matrix.install-method == 'conda'
       run: coverage xml

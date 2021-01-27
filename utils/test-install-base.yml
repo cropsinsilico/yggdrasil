@@ -207,7 +207,7 @@ jobs:
       run: yggtest --ci ${{ matrix.test-flags1 }}
     - name: Run tests (2nd)
       if: matrix.test-flags2 != ''
-      run: yggtest --ci ${{ matrix.test-flags2 }}
+      run: yggtest --ci --cov-append ${{ matrix.test-flags2 }}
     # - name: Start SSH session
     #   uses: luchihoratiu/debug-via-ssh@main
     #   if: ${{ failure() && matrix.install-method == 'conda' && matrix.os == 'macos-latest' }}
