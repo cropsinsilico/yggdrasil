@@ -108,7 +108,7 @@ class CPPModelDriver(CModelDriver):
     language = 'c++'
     language_ext = ['.cpp', '.CPP', '.cxx', '.C', '.c++', '.cc', '.cp', '.tcc',
                     '.hpp', '.HPP', '.hxx', '.H', '.h++', '.hh', '.hp', '.h']
-    language_aliases = ['cpp']
+    language_aliases = ['cpp', 'cxx']
     base_languages = ['c']
     interface_library = 'ygg++'
     # To prevent inheritance
