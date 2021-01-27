@@ -1095,14 +1095,17 @@ class run_tsts(SubCommand):
                     args.long_running = True
                     args.enable_production_runs = True
                     test_paths.append(os.path.join('tests', 'test_timing.py'))
-        args = config.resolve_config_parser(args)
-        args.extra = []
+        if (not test_paths) and all(x.startswith('-') for x in extra):
+            test_paths.append(package_dir)
         # Get expanded tests to allow for paths that are relative to
         # either the yggdrasil root directory or the current working
         # directory
+        args = config.resolve_config_parser(args)
+        args.extra = []
         cls.expand_and_add(extra + test_paths, args.extra,
                            [package_dir, os.getcwd()],
                            add_on_nomatch=True)
+            
         return args
 
     @classmethod
