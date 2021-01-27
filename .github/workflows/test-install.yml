@@ -50,6 +50,13 @@ jobs:
         - ''
         install-c:
         - true
+        include:
+        - os: windows-latest
+          python-version: 3.6
+          install-method: pip
+          test-flags1: --long-running --languages cpp
+          test-flags2: --long-running --skip-languages c++
+          install-c: false
       fail-fast: false
     steps:
     - uses: actions/checkout@v2
@@ -191,8 +198,10 @@ jobs:
     - name: Compile libraries
       run: yggcompile
     - name: Run tests (1st)
-      run: yggtest --ci --with-examples examples/tests/test_timed_pipe.py examples/tests/test_gs_lesson[3-4].py
-        --language c cpp
+      run: yggtest --ci ${{ matrix.test-flags1 }}
+    - name: Run tests (2nd)
+      if: matrix.test-flags2 != ''
+      run: yggtest --ci ${{ matrix.test-flags2 }}
     - name: Start SSH session
       uses: luchihoratiu/debug-via-ssh@main
       if: ${{ failure() && matrix.install-method == 'conda' && matrix.os == 'macos-latest'
@@ -244,6 +253,31 @@ jobs:
         - --with-examples examples/tests/test_backwards.py
         install-c:
         - true
+        include:
+        - os: ubuntu-latest
+          python-version: 3.7
+          install-method: conda
+          test-flags1: --long-running
+          test-flags2: ''
+          install-c: true
+        - os: ubuntu-latest
+          python-version: 3.8
+          install-method: conda
+          test-flags1: --long-running
+          test-flags2: ''
+          install-c: true
+        - os: ubuntu-latest
+          python-version: 3.9
+          install-method: conda
+          test-flags1: --long-running
+          test-flags2: ''
+          install-c: true
+        - os: macos-latest
+          python-version: 3.8
+          install-method: conda
+          test-flags1: tests/test_tools.py
+          test-flags2: ''
+          install-c: true
       fail-fast: false
     defaults:
       run:
@@ -388,8 +422,10 @@ jobs:
     - name: Compile libraries
       run: yggcompile
     - name: Run tests (1st)
-      run: yggtest --ci --with-examples examples/tests/test_timed_pipe.py examples/tests/test_gs_lesson[3-4].py
-        --language c cpp
+      run: yggtest --ci ${{ matrix.test-flags1 }}
+    - name: Run tests (2nd)
+      if: matrix.test-flags2 != ''
+      run: yggtest --ci ${{ matrix.test-flags2 }}
     - name: Start SSH session
       uses: luchihoratiu/debug-via-ssh@main
       if: ${{ failure() && matrix.install-method == 'conda' && matrix.os == 'macos-latest'
@@ -590,8 +626,10 @@ jobs:
     - name: Compile libraries
       run: yggcompile
     - name: Run tests (1st)
-      run: yggtest --ci --with-examples examples/tests/test_timed_pipe.py examples/tests/test_gs_lesson[3-4].py
-        --language c cpp
+      run: yggtest --ci ${{ matrix.test-flags1 }}
+    - name: Run tests (2nd)
+      if: matrix.test-flags2 != ''
+      run: yggtest --ci ${{ matrix.test-flags2 }}
     - name: Start SSH session
       uses: luchihoratiu/debug-via-ssh@main
       if: ${{ failure() && matrix.install-method == 'conda' && matrix.os == 'macos-latest'
@@ -794,8 +832,10 @@ jobs:
     - name: Compile libraries
       run: yggcompile
     - name: Run tests (1st)
-      run: yggtest --ci --with-examples examples/tests/test_timed_pipe.py examples/tests/test_gs_lesson[3-4].py
-        --language c cpp
+      run: yggtest --ci ${{ matrix.test-flags1 }}
+    - name: Run tests (2nd)
+      if: matrix.test-flags2 != ''
+      run: yggtest --ci ${{ matrix.test-flags2 }}
     - name: Start SSH session
       uses: luchihoratiu/debug-via-ssh@main
       if: ${{ failure() && matrix.install-method == 'conda' && matrix.os == 'macos-latest'
@@ -996,8 +1036,10 @@ jobs:
     - name: Compile libraries
       run: yggcompile
     - name: Run tests (1st)
-      run: yggtest --ci --with-examples examples/tests/test_timed_pipe.py examples/tests/test_gs_lesson[3-4].py
-        --language c cpp
+      run: yggtest --ci ${{ matrix.test-flags1 }}
+    - name: Run tests (2nd)
+      if: matrix.test-flags2 != ''
+      run: yggtest --ci ${{ matrix.test-flags2 }}
     - name: Start SSH session
       uses: luchihoratiu/debug-via-ssh@main
       if: ${{ failure() && matrix.install-method == 'conda' && matrix.os == 'macos-latest'

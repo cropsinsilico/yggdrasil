@@ -54,7 +54,7 @@ requirements:
   run:
     - cmake
     - czmq  # [not osx]
-    - czmq<=4.2.0  # [osx]
+    - czmq!=4.2.1  # [osx]
     - flaky
     - git
     - GitPython
