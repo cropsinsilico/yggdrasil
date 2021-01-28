@@ -694,7 +694,7 @@ class yggcompile(SubCommand):
     @classmethod
     def func(cls, args):
         from yggdrasil.components import import_component
-        yggclean.func(args)
+        yggclean.func(args, verbose=False)
         error_on_missing = (not getattr(args, 'all_languages', False))
         missing = []
         for lang in args.language:
@@ -725,11 +725,11 @@ class yggclean(SubCommand):
                    "for.")})]
 
     @classmethod
-    def func(cls, args):
+    def func(cls, args, verbose=True):
         from yggdrasil.components import import_component
         for lang in args.language:
             import_component('model', lang).cleanup_dependencies(
-                verbose=True)
+                verbose=verbose)
 
 
 class cc_toolname(SubCommand):
