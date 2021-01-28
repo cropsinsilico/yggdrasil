@@ -1266,7 +1266,6 @@ class run_tsts(SubCommand):
                 os.chdir(initial_dir)
                 if os.path.isfile(pth_file):
                     os.remove(pth_file)
-        print('error_code', error_code)
         return error_code
 
 
