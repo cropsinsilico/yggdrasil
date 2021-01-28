@@ -885,8 +885,9 @@ class update_config(SubCommand):
                           'should be used.')},
                 conditions={'os': ['MacOS']})],
         'matlab': [
-            (('--disable-engine', ),
+            (('--disable-matlab-engine-for-python', ),
              {'action': 'store_true',
+              'dest': 'disable_engine',
               'help': 'Disable use of the Matlab engine for Python.'})]}
         
     @classmethod
@@ -896,11 +897,13 @@ class update_config(SubCommand):
         if args is None:
             args = sys.argv[1:]
         if ('-h' in args) or ('--help' in args):
+            args = [x for x in args if x not in ['-h', '--help']]
+        preargs = parser.parse_known_args(args=args)[0]
+        prelang = preargs.languages
+        if preargs.languages_flag:
+            prelang += preargs.languages_flag
+        if (len(prelang) == 0) or ('all' in prelang):
             prelang = LANGUAGES['all']
-        else:
-            prelang = parser.parse_known_args(args=args)[0].languages
-            if 'all' in prelang:
-                prelang = LANGUAGES['all']
         # TODO: The languages could be subparsers
         for k, v in cls.language_arguments.items():
             if k in prelang:
