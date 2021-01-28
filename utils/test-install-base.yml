@@ -364,10 +364,11 @@ jobs:
     - name: Install CZMQ & dependencies
       run: sudo ./ci/install-czmq-osx.sh
       shell: bash -l {0}
-    - name: Run the CZMQ selftests
+    - name: Build and run the CZMQ selftests
       run: |
         cd czmq
-        make check
+        make all VERBOSE=1
+        ctest -V
       shell: bash -l {0}
     
   docs:
