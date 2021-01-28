@@ -57,7 +57,7 @@ int check_channels(comm_t* comm) {
   char *key = comm->address;
   int error_code = 0;
 #ifdef _OPENMP
-  #pragma omp critical
+#pragma omp critical (ipc)
   {
 #endif
   for (i = 0; i < _yggChannelsUsed; i++ ) {
@@ -87,7 +87,7 @@ int check_channels(comm_t* comm) {
 static inline
 void add_channel(const comm_t* comm) {
 #ifdef _OPENMP
-  #pragma omp critical
+#pragma omp critical (ipc)
   {
 #endif
   // printf("add_channel(%s): %d, %s\n", comm->name, _yggChannelsUsed, comm->address);
@@ -119,7 +119,7 @@ int remove_comm(const comm_t* comm, const int close_comm) {
   unsigned i;
   int ich = atoi(comm->address);
 #ifdef _OPENMP
-  #pragma omp critical
+#pragma omp critical (ipc)
   {
 #endif
   for (i = 0; i < _yggChannelsUsed; i++) {
@@ -156,7 +156,7 @@ int new_ipc_address(comm_t *comm) {
   // TODO: small chance of reusing same number
   int key = 0;
 #ifdef _OPENMP
-  #pragma omp critical
+#pragma omp critical (ipc)
   {
 #endif
   if (!(_ipc_rand_seeded)) {

@@ -21,9 +21,13 @@ extern "C" {
 static void **vcomms2clean = NULL;
 static size_t ncomms2clean = 0;
 static size_t clean_registered = 0;
+static size_t clean_called = 0;
 
 /*! @brief Memory to keep track of global scope comms. */
 static size_t global_scope_comm = 0;
+#ifdef _OPENMP
+#pragma omp threadprivate(global_scope_comm)
+#endif
 #define WITH_GLOBAL_SCOPE(COMM) global_scope_comm = 1; COMM; global_scope_comm = 0
 
 
@@ -171,32 +175,32 @@ int free_comm(comm_t *x) {
 static
 void clean_comms(void) {
   size_t i;
-  if (get_thread_id() != 0)
-    ygglog_error("clean_comms: Cleanup called on thread other than main.");
-    return;
 #ifdef _OPENMP
   #pragma omp critical
   {
 #endif
-  ygglog_debug("atexit begin");
-  for (i = 0; i < ncomms2clean; i++) {
-    if (vcomms2clean[i] != NULL) {
-      free_comm((comm_t*)(vcomms2clean[i]));
+  if (!(clean_called)) {
+    ygglog_debug("atexit begin");
+    for (i = 0; i < ncomms2clean; i++) {
+      if (vcomms2clean[i] != NULL) {
+	free_comm((comm_t*)(vcomms2clean[i]));
+      }
     }
-  }
-  if (vcomms2clean != NULL) {
-    free(vcomms2clean);
-    vcomms2clean = NULL;
-  }
-  ncomms2clean = 0;
+    if (vcomms2clean != NULL) {
+      free(vcomms2clean);
+      vcomms2clean = NULL;
+    }
+    ncomms2clean = 0;
 #if defined(ZMQINSTALLED)
-  // #if defined(_MSC_VER) && defined(ZMQINSTALLED)
-  zsys_shutdown();
+    // #if defined(_MSC_VER) && defined(ZMQINSTALLED)
+    ygg_zsys_shutdown();
 #endif
-  if (Py_IsInitialized()) {
-    Py_Finalize();
-  }
+    if (Py_IsInitialized()) {
+      Py_Finalize();
+    }
   /* printf(""); */
+    clean_called = 1;
+  }
 #ifdef _OPENMP
   }
 #endif

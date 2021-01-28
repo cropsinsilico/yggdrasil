@@ -43,9 +43,8 @@ typedef struct ygg_zsock_t {
 static
 void* ygg_zsys_init() {
 #ifdef _OPENMP
-  #pragma omp critical
+#pragma omp critical (zmq)
   {
-#endif
     if (!(ygg_s_process_ctx)) {
       if (get_thread_id() == 0) {
 	/* ygg_s_process_ctx = zmq_ctx_new(); */
@@ -56,10 +55,25 @@ void* ygg_zsys_init() {
 		     "before the threaded porition of your model.");
       }
     }
-#ifdef _OPENMP
   }
 #endif
   return ygg_s_process_ctx;
+};
+
+
+/*!
+  @brief Shutdown zeromq.
+ */
+static
+void ygg_zsys_shutdown() {
+#ifdef _OPENMP
+#pragma omp critical (zmq)
+  {
+#endif
+    zsys_shutdown();
+#ifdef _OPENMP
+  }    
+#endif
 };
 
 
@@ -102,7 +116,7 @@ ygg_zsock_new(int type) {
   assert(self);
   self->tag = 0xcafe0004;
   self->type = type;
-  #pragma omp critical
+#pragma omp critical (zmq)
   {
     void* ctx = ygg_zsys_init();
     assert(ctx);
@@ -388,7 +402,7 @@ char *set_reply_send(const comm_t *comm) {
       strncpy(host, "127.0.0.1", 50);
     char address[100];
 #ifdef _OPENMP
-  #pragma omp critical
+#pragma omp critical (zmq-port)
   {
 #endif
     if (_last_port_set == 0) {
@@ -398,19 +412,12 @@ char *set_reply_send(const comm_t *comm) {
       ygglog_debug("_last_port = %d", _last_port);
     }
     sprintf(address, "%s://%s:*[%d-]", protocol, host, _last_port + 1);
-#ifdef _OPENMP
-  }
-#endif
     int port = zsock_bind(zrep->sockets[0], "%s", address);
     if (port == -1) {
       ygglog_error("set_reply_send(%s): Could not bind socket to address = %s",
 		   comm->name, address);
       return out;
     }
-#ifdef _OPENMP
-  #pragma omp critical
-  {
-#endif
     _last_port = port;
 #ifdef _OPENMP
   }
@@ -581,7 +588,7 @@ int new_zmq_address(comm_t *comm) {
     // TODO: small chance of reusing same number
     int key = 0;
 #ifdef _OPENMP
-  #pragma omp critical
+#pragma omp critical (zmq-port)
   {
 #endif
     if (!(_zmq_rand_seeded)) {
@@ -597,7 +604,7 @@ int new_zmq_address(comm_t *comm) {
     sprintf(address, "%s://%s", protocol, comm->name);
   } else {
 #ifdef _OPENMP
-  #pragma omp critical
+#pragma omp critical (zmq-port)
   {
 #endif
      if (_last_port_set == 0) {
@@ -627,7 +634,7 @@ int new_zmq_address(comm_t *comm) {
   }
   // Add port to address
 #ifdef _OPENMP
-  #pragma omp critical
+#pragma omp critical (zmq-port)
   {
 #endif
   if ((strcmp(protocol, "inproc") != 0) &&
@@ -910,6 +917,23 @@ int zmq_comm_recv(const comm_t* x, char **data, const size_t len,
 
 // Definitions in the case where ZMQ libraries not installed
 #else /*ZMQINSTALLED*/
+
+/*!
+  @brief Print error message about ZMQ library not being installed.
+ */
+static inline
+ygg_zsys_shutdown() {
+  ygglog_error("Compiler flag 'ZMQINSTALLED' not defined so ZMQ bindings are disabled.");
+};
+
+/*!
+  @brief Print error message about ZMQ library not being installed.
+ */
+static inline
+void* ygg_zsys_init() {
+  ygglog_error("Compiler flag 'ZMQINSTALLED' not defined so ZMQ bindings are disabled.");
+  return NULL;
+};
 
 /*!
   @brief Print error message about ZMQ library not being installed.
