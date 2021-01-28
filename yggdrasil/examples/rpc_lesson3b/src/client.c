@@ -5,13 +5,6 @@
 
 int model_function(char* in_buf, uint64_t length_in_buf,
 		   char** out_buf, uint64_t* length_out_buf) {
-  char* nthread_str = getenv("NTHREAD");
-  if (nthread_str) {
-    printf("NTHREAD: %s\n", getenv("NTHREAD"));
-  } else {
-    printf("NO NTHREAD VAR\n");
-    return -1;
-  }
   int nthreads = atoi(getenv("NTHREAD"));
   omp_set_num_threads(nthreads);
   #pragma omp parallel
