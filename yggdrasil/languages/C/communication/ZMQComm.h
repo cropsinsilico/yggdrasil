@@ -923,7 +923,7 @@ int zmq_comm_recv(const comm_t* x, char **data, const size_t len,
   @brief Print error message about ZMQ library not being installed.
  */
 static inline
-ygg_zsys_shutdown() {
+void ygg_zsys_shutdown() {
   ygglog_error("Compiler flag 'ZMQINSTALLED' not defined so ZMQ bindings are disabled.");
 };
 
