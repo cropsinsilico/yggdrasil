@@ -728,7 +728,8 @@ class yggclean(SubCommand):
     def func(cls, args):
         from yggdrasil.components import import_component
         for lang in args.language:
-            import_component('model', lang).cleanup_dependencies()
+            import_component('model', lang).cleanup_dependencies(
+                verbose=True)
 
 
 class cc_toolname(SubCommand):

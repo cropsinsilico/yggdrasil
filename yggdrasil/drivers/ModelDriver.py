@@ -1379,11 +1379,12 @@ class ModelDriver(Driver):
         remove_products(products, source_products, timer_class=self)
             
     @classmethod
-    def cleanup_dependencies(cls, products=[]):
+    def cleanup_dependencies(cls, products=[], verbose=False):
         r"""Cleanup dependencies."""
         for x in products:
             if os.path.isfile(x):
-                print("Removing %s" % x)
+                if verbose:  # pragma: debug
+                    print("Removing %s" % x)
                 os.remove(x)
                 
     # Methods for automated model wrapping

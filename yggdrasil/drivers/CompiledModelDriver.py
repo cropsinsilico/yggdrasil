@@ -3442,7 +3442,7 @@ class CompiledModelDriver(ModelDriver):
                     cls.call_compiler(k, toolname=toolname, **kwargs)
 
     @classmethod
-    def cleanup_dependencies(cls, products=None, **kwargs):
+    def cleanup_dependencies(cls, products=None, verbose=False, **kwargs):
         r"""Cleanup dependencies."""
         if products is None:
             products = []
@@ -3458,7 +3458,8 @@ class CompiledModelDriver(ModelDriver):
                 if suffix in products[i]:
                     new_products += glob.glob(products[i].replace(suffix, '*'))
             products += new_products
-        super(CompiledModelDriver, cls).cleanup_dependencies(products=products)
+        super(CompiledModelDriver, cls).cleanup_dependencies(
+            products=products, verbose=verbose)
 
     def compile_model(self, source_files=None, skip_interface_flags=False,
                       **kwargs):
