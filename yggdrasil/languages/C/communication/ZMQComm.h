@@ -70,6 +70,7 @@ void ygg_zsys_shutdown() {
 #pragma omp critical (zmq)
   {
 #endif
+    ygg_s_process_ctx = NULL;
     zsys_shutdown();
 #ifdef _OPENMP
   }    
