@@ -87,33 +87,45 @@ enable_long_tests = tools.check_environ_bool("YGG_ENABLE_LONG_TESTS")
 skip_extra_examples = tools.check_environ_bool("YGG_SKIP_EXTRA_EXAMPLES")
 
 
-def check_enabled_languages(language):
+def check_enabled_languages(language, return_decorators=False):
     r"""Determine if the specified language is enabled by the value
     or values specified in YGG_TEST_LANGUAGE.
 
     Args:
         language (str): Language to check.
+        return_decorators (bool, optional): If True, a skip error is
+            not raised and a list of decorators is returned. Defaults
+            to False.
 
     Raises:
         unittest.SkipTest: If the specified language is not enabled.
 
     """
     enabled = os.environ.get('YGG_TEST_LANGUAGE', None)
+    decorators = []
     if enabled is not None:
         enabled = [x.lower() for x in json.loads(enabled)]
-        if ('c++' in enabled) or ('cpp' in enabled):
-            enabled += ['c++', 'cpp']
-        if language.lower() not in enabled:
-            raise unittest.SkipTest("Tests for language %s not enabled.",
-                                    language)
+        if ('c++' in enabled) or ('cpp' in enabled) or ('cxx' in enabled):
+            enabled += ['c++', 'cpp', 'cxx']
+        msg = "Tests for language %s not enabled." % language
+        cond = (language.lower() not in enabled)
+        if return_decorators:
+            decorators.append(unittest.skipIf(cond, msg))
+        elif cond:
+            raise unittest.SkipTest(msg)
     disabled = os.environ.get('YGG_TEST_SKIP_LANGUAGE', None)
-    if disabled is not None:
+    if (disabled is not None) and (msg is None):
         disabled = [x.lower() for x in json.loads(disabled)]
         if ('c++' in disabled) or ('cpp' in disabled):
             disabled += ['c++', 'cpp']
-        if language.lower() in disabled:
-            raise unittest.SkipTest("Tests for language %s disabled.",
-                                    language)
+        msg = "Tests for language %s disabled." % language
+        cond = (language.lower() in disabled)
+        if return_decorators:
+            decorators.append(unittest.skipIf(cond, msg))
+        elif cond:
+            raise unittest.SkipTest(msg)
+    if return_decorators:
+        return decorators
 
 
 def requires_language(language, installed=True):
@@ -148,10 +160,7 @@ def requires_language(language, installed=True):
         elif installed is False:
             skips.append(unittest.skipIf(drv.is_installed(),
                                          "%s installed"))
-        skips.append(unittest.skipIf(
-            (test_language is not None)
-            and (test_language != drv.language.lower()),
-            "Test for language %s not enabled." % drv.language))
+        skips += check_enabled_languages(language, return_decorators=True)
         for s in skips:
             function = s(function)
         return function
