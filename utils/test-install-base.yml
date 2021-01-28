@@ -363,8 +363,10 @@ jobs:
     #     repository: zeromq/czmq
     - name: Install CZMQ & dependencies
       run: sudo ./ci/install-czmq-osx.sh
+      shell: bash -l {0}
     - name: Run the CZMQ selftests
       run: make check
+      shell: bash -l {0}
     
   docs:
     name: Build the Docs
