@@ -403,7 +403,7 @@ char *set_reply_send(const comm_t *comm) {
       strncpy(host, "127.0.0.1", 50);
     char address[100];
 #ifdef _OPENMP
-#pragma omp critical (zmq-port)
+#pragma omp critical (zmqport)
   {
 #endif
     if (_last_port_set == 0) {
@@ -589,7 +589,7 @@ int new_zmq_address(comm_t *comm) {
     // TODO: small chance of reusing same number
     int key = 0;
 #ifdef _OPENMP
-#pragma omp critical (zmq-port)
+#pragma omp critical (zmqport)
   {
 #endif
     if (!(_zmq_rand_seeded)) {
@@ -605,7 +605,7 @@ int new_zmq_address(comm_t *comm) {
     sprintf(address, "%s://%s", protocol, comm->name);
   } else {
 #ifdef _OPENMP
-#pragma omp critical (zmq-port)
+#pragma omp critical (zmqport)
   {
 #endif
      if (_last_port_set == 0) {
@@ -635,7 +635,7 @@ int new_zmq_address(comm_t *comm) {
   }
   // Add port to address
 #ifdef _OPENMP
-#pragma omp critical (zmq-port)
+#pragma omp critical (zmqport)
   {
 #endif
   if ((strcmp(protocol, "inproc") != 0) &&
