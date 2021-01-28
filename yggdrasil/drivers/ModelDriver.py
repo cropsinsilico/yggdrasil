@@ -291,6 +291,8 @@ class ModelDriver(Driver):
                         'entries and the options available for '
                         'channels can be found :ref:`here<'
                         'yaml_comm_options>`.')},
+        'env': {'type': 'object', 'default': {},
+                'additional_properties': {'type': 'string'}},
         'products': {'type': 'array', 'default': [],
                      'items': {'type': 'string'}},
         'source_products': {'type': 'array', 'default': [],

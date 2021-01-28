@@ -125,9 +125,9 @@ definitions:
             type: string
           type: array
       required:
+      - name
       - datatype
       - commtype
-      - name
       title: comm_base
       type: object
     - anyOf:
@@ -265,8 +265,8 @@ definitions:
             - $ref: '#/definitions/transform'
           type: array
       required:
-      - inputs
       - outputs
+      - inputs
       title: connection_base
       type: object
     - anyOf:
@@ -629,9 +629,9 @@ definitions:
             is used.
           type: string
       required:
+      - working_dir
       - name
       - filetype
-      - working_dir
       title: file_base
       type: object
     - anyOf:
@@ -1249,6 +1249,13 @@ definitions:
         driver:
           description: '[DEPRECATED] Name of driver class that should be used.'
           type: string
+        env:
+          additional_properties:
+            type: string
+          default: {}
+          description: Dictionary of environment variables that should be set when
+            the driver starts. Defaults to {}.
+          type: object
         env_compiler:
           default: CC
           description: Environment variable where the compiler executable should be
@@ -1670,9 +1677,9 @@ definitions:
             is used.
           type: string
       required:
+      - language
       - name
       - args
-      - language
       - working_dir
       title: model_base
       type: object
