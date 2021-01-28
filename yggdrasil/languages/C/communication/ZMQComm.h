@@ -17,18 +17,110 @@ extern "C" {
 
 static unsigned _zmq_rand_seeded = 0;
 static unsigned _last_port_set = 0;
-static unsigned _yggSocketsCreated = 0;
 static int _last_port = 49152;
 /* static double _wait_send_t = 0;  // 0.0001; */
 static char _reply_msg[100] = "YGG_REPLY";
 static char _purge_msg[100] = "YGG_PURGE";
 static int _zmq_sleeptime = 10000;
+static void *ygg_s_process_ctx = NULL;
+
+
+typedef struct ygg_zsock_t {
+  uint32_t tag;               //  Object tag for runtime detection
+  void *handle;               //  The libzmq socket handle
+  char *endpoint;             //  Last bound endpoint, if any
+  char *cache;                //  Holds last zsock_brecv strings
+  int type;                   //  Socket type
+  size_t cache_size;          //  Current size of cache
+  uint32_t routing_id;        //  Routing ID for server sockets
+} ygg_zsock_t;
+
+
+/*!
+  @brief Initialize zeromq.
+  @returns A zeromq context.
+*/
+static
+void* ygg_zsys_init() {
+#ifdef _OPENMP
+  #pragma omp critical
+  {
+#endif
+    if (!(ygg_s_process_ctx)) {
+      if (get_thread_id() == 0) {
+	/* ygg_s_process_ctx = zmq_ctx_new(); */
+	ygg_s_process_ctx = zsys_init();
+      } else {
+	ygglog_error("ygg_zsys_init: Can only initialize the "
+		     "zeromq context on the main thread. Call ygg_init "
+		     "before the threaded porition of your model.");
+      }
+    }
+#ifdef _OPENMP
+  }
+#endif
+  return ygg_s_process_ctx;
+};
+
+
+/*!
+  @brief Destroy a socket in thread safe way.
+  @param[in] self_p zsock_t** Pointer to a CZMQ socket wrapper struct.
+*/
+static
+void ygg_zsock_destroy(zsock_t **self_p) {
+#ifdef _OPENMP
+  // Recreation of czmq zsock_destroy that is OMP aware
+  assert(self_p);
+  if (*self_p) {
+    ygg_zsock_t *self = (ygg_zsock_t*)(*self_p);
+    assert (zsock_is (*self_p));
+    self->tag = 0xDeadBeef;
+    zmq_close (self->handle);
+    freen (self->endpoint);
+    freen (self->cache);
+    freen (self);
+    *self_p = NULL;
+  }
+#else
+  zsock_destroy(self_p);
+#endif
+};
+
+
+/*!
+  @brief Get a new socket, using the exising context.
+  @param[in] type int Socket type.
+  @returns zsock_t* CZMQ socket wrapper struct.
+*/
+static
+zsock_t *
+ygg_zsock_new(int type) {
+#ifdef _OPENMP
+  // Recreation of czmq zsock_new that is OMP aware
+  ygg_zsock_t *self = (ygg_zsock_t *) zmalloc (sizeof (ygg_zsock_t));
+  assert(self);
+  self->tag = 0xcafe0004;
+  self->type = type;
+  #pragma omp critical
+  {
+    void* ctx = ygg_zsys_init();
+    assert(ctx);
+    self->handle = zmq_socket (ctx, type);
+  }
+  assert (self->handle);
+  return (zsock_t*)(self);
+#else
+  return zsock_new(type);
+#endif
+};
+
 
 /*! 
   @brief Struct to store info for reply.
 */
 typedef struct zmq_reply_t {
-  int nsockets; 
+  int nsockets;
   zsock_t **sockets;
   char **addresses;
   int n_msg;
@@ -56,7 +148,7 @@ int free_zmq_reply(zmq_reply_t *x) {
     if (x->sockets != NULL) {
       for (i = 0; i < x->nsockets; i++) {
 	if (x->sockets[i] != NULL) {
-	  zsock_destroy(&(x->sockets[i]));
+	  ygg_zsock_destroy(&(x->sockets[i]));
 	  x->sockets[i] = NULL;
 	}
       }
@@ -283,7 +375,7 @@ char *set_reply_send(const comm_t *comm) {
       return out;
     }
     zrep->nsockets = 1;
-    zrep->sockets[0] = zsock_new(ZMQ_REP);
+    zrep->sockets[0] = ygg_zsock_new(ZMQ_REP);
     zsock_set_linger(zrep->sockets[0], 0);
     if (zrep->sockets[0] == NULL) {
       ygglog_error("set_reply_send(%s): Could not initialize empty socket.",
@@ -295,6 +387,10 @@ char *set_reply_send(const comm_t *comm) {
     if (strcmp(host, "localhost") == 0)
       strncpy(host, "127.0.0.1", 50);
     char address[100];
+#ifdef _OPENMP
+  #pragma omp critical
+  {
+#endif
     if (_last_port_set == 0) {
       ygglog_debug("model_index = %s", getenv("YGG_MODEL_INDEX"));
       _last_port = 49152 + 1000 * atoi(getenv("YGG_MODEL_INDEX"));
@@ -302,13 +398,23 @@ char *set_reply_send(const comm_t *comm) {
       ygglog_debug("_last_port = %d", _last_port);
     }
     sprintf(address, "%s://%s:*[%d-]", protocol, host, _last_port + 1);
+#ifdef _OPENMP
+  }
+#endif
     int port = zsock_bind(zrep->sockets[0], "%s", address);
     if (port == -1) {
       ygglog_error("set_reply_send(%s): Could not bind socket to address = %s",
 		   comm->name, address);
       return out;
     }
+#ifdef _OPENMP
+  #pragma omp critical
+  {
+#endif
     _last_port = port;
+#ifdef _OPENMP
+  }
+#endif
     sprintf(address, "%s://%s:%d", protocol, host, port);
     zrep->addresses = (char**)malloc(sizeof(char*));
     zrep->addresses[0] = (char*)malloc((strlen(address) + 1)*sizeof(char));
@@ -356,7 +462,7 @@ int set_reply_recv(const comm_t *comm, const char* address) {
     // Create new socket
     isock = zrep->nsockets;
     zrep->nsockets++;
-    zrep->sockets[isock] = zsock_new(ZMQ_REQ);
+    zrep->sockets[isock] = ygg_zsock_new(ZMQ_REQ);
     zsock_set_linger(zrep->sockets[isock], 0);
     if (zrep->sockets[isock] == NULL) {
       ygglog_error("set_reply_recv(%s): Could not initialize empty socket.",
@@ -474,15 +580,26 @@ int new_zmq_address(comm_t *comm) {
       (strcmp(protocol, "ipc") == 0)) {
     // TODO: small chance of reusing same number
     int key = 0;
+#ifdef _OPENMP
+  #pragma omp critical
+  {
+#endif
     if (!(_zmq_rand_seeded)) {
       srand(ptr2seed(comm));
       _zmq_rand_seeded = 1;
     }
+#ifdef _OPENMP
+  }
+#endif
     while (key == 0) key = rand();
     if (strlen(comm->name) == 0)
       sprintf(comm->name, "tempnewZMQ-%d", key);
     sprintf(address, "%s://%s", protocol, comm->name);
   } else {
+#ifdef _OPENMP
+  #pragma omp critical
+  {
+#endif
      if (_last_port_set == 0) {
       ygglog_debug("model_index = %s", getenv("YGG_MODEL_INDEX"));
       _last_port = 49152 + 1000 * atoi(getenv("YGG_MODEL_INDEX"));
@@ -490,10 +607,13 @@ int new_zmq_address(comm_t *comm) {
       ygglog_debug("_last_port = %d", _last_port);
     }
    sprintf(address, "%s://%s:*[%d-]", protocol, host, _last_port + 1);
+#ifdef _OPENMP
+  }
+#endif
     /* strcat(address, ":!"); // For random port */
   }
   // Bind
-  zsock_t *s = zsock_new(ZMQ_PAIR);
+  zsock_t *s = ygg_zsock_new(ZMQ_PAIR);
   if (s == NULL) {
     ygglog_error("new_zmq_address: Could not initialize empty socket.");
     return -1;
@@ -506,17 +626,23 @@ int new_zmq_address(comm_t *comm) {
     return -1;
   }
   // Add port to address
+#ifdef _OPENMP
+  #pragma omp critical
+  {
+#endif
   if ((strcmp(protocol, "inproc") != 0) &&
       (strcmp(protocol, "ipc") != 0)) {
     _last_port = port;
     sprintf(address, "%s://%s:%d", protocol, host, port);
   }
+#ifdef _OPENMP
+  }
+#endif
   strncpy(comm->address, address, COMM_ADDRESS_SIZE);
   ygglog_debug("new_zmq_address: Bound socket to %s", comm->address);
   if (strlen(comm->name) == 0)
     sprintf(comm->name, "tempnewZMQ-%d", port);
   comm->handle = (void*)s;
-  _yggSocketsCreated++;
   // Init reply
   int ret = init_zmq_reply(comm);
   return ret;
@@ -533,7 +659,7 @@ int init_zmq_comm(comm_t *comm) {
   if (comm->valid == 0)
     return ret;
   comm->msgBufSize = 100;
-  zsock_t *s = zsock_new(ZMQ_PAIR);
+  zsock_t *s = ygg_zsock_new(ZMQ_PAIR);
   if (s == NULL) {
     ygglog_error("init_zmq_address: Could not initialize empty socket.");
     return -1;
@@ -543,7 +669,7 @@ int init_zmq_comm(comm_t *comm) {
   if (ret == -1) {
     ygglog_error("init_zmq_address: Could not connect socket to address = %s",
   		 comm->address);
-    zsock_destroy(&s);
+    ygg_zsock_destroy(&s);
     return ret;
   }
   ygglog_debug("init_zmq_address: Connected socket to %s", comm->address);
@@ -595,7 +721,7 @@ int free_zmq_comm(comm_t *x) {
     zsock_t *s = (zsock_t*)(x->handle);
     if (s != NULL) {
       ygglog_debug("Destroying socket: %s", x->address);
-      zsock_destroy(&s);
+      ygg_zsock_destroy(&s);
     }
     x->handle = NULL;
   }

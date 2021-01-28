@@ -23,8 +23,6 @@ extern "C" {
 
 #ifdef IPCINSTALLED
 
-/*! Number of temporary channels created. */
-static unsigned _yggChannelsCreated = 0;
 /*! @brief Maximum number of channels. */
 #define _yggTrackChannels 256
 /*! @brief Names of channels in use. */
@@ -57,20 +55,29 @@ int check_channels(comm_t* comm) {
   // Fail if trying to re-use the same channel twice
   unsigned i;
   char *key = comm->address;
+  int error_code = 0;
+#ifdef _OPENMP
+  #pragma omp critical
+  {
+#endif
   for (i = 0; i < _yggChannelsUsed; i++ ) {
     if (_yggChannelNames[i] == atoi(comm->address)) {
     /* if (0 == strcmp(_yggChannelNames[i], key)) { */
       ygglog_error("Attempt to re-use channel: name=%s, key=%s, i=%d",
 		   comm->name, key, i);
-      return -1;
+      error_code = -1;
+      break;
     }
   }
   // Fail if > _yggTrackChannels channels used
-  if (_yggChannelsUsed >= _yggTrackChannels) {
+  if ((!error_code) && (_yggChannelsUsed >= _yggTrackChannels)) {
     ygglog_error("Too many channels in use, max: %d", _yggTrackChannels);
-    return -1;
+    error_code = -1;
   }
-  return 0;
+#ifdef _OPENMP
+  }
+#endif
+  return error_code;
 };
 
 /*!
@@ -79,8 +86,15 @@ int check_channels(comm_t* comm) {
 */
 static inline
 void add_channel(const comm_t* comm) {
+#ifdef _OPENMP
+  #pragma omp critical
+  {
+#endif
   // printf("add_channel(%s): %d, %s\n", comm->name, _yggChannelsUsed, comm->address);
   _yggChannelNames[_yggChannelsUsed++] = atoi(comm->address);
+#ifdef _OPENMP
+  }
+#endif
 };
 
 /*!
@@ -104,6 +118,10 @@ int remove_comm(const comm_t* comm, const int close_comm) {
   ret = -1;
   unsigned i;
   int ich = atoi(comm->address);
+#ifdef _OPENMP
+  #pragma omp critical
+  {
+#endif
   for (i = 0; i < _yggChannelsUsed; i++) {
     if (ich == _yggChannelNames[i]) {
       memmove(_yggChannelNames + i, _yggChannelNames + i + 1,
@@ -121,6 +139,9 @@ int remove_comm(const comm_t* comm, const int close_comm) {
   /*   /\* 	    (_yggTrackChannels - (ich + 1))*sizeof(char*)); *\/ */
   /*   _yggChannelsUsed--; */
   /* } */
+#ifdef _OPENMP
+  }
+#endif
   return ret;
 };
 
@@ -134,13 +155,20 @@ int new_ipc_address(comm_t *comm) {
   int ret;
   // TODO: small chance of reusing same number
   int key = 0;
+#ifdef _OPENMP
+  #pragma omp critical
+  {
+#endif
   if (!(_ipc_rand_seeded)) {
     srand(ptr2seed(comm));
     _ipc_rand_seeded = 1;
   }
+#ifdef _OPENMP
+  }
+#endif
   while (key == 0) {
     key = rand();
-  } // _yggChannelsUsed + 1;
+  }
   if (strlen(comm->name) == 0) {
     sprintf(comm->name, "tempnewIPC.%d", key);
   } else {
@@ -162,7 +190,6 @@ int new_ipc_address(comm_t *comm) {
   }
   comm->handle = (void*)fid;
   add_channel(comm);
-  _yggChannelsCreated++;
   return 0;
 };
 
