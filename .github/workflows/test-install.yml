@@ -1042,7 +1042,7 @@ jobs:
       with:
         submodules: true
     - name: Install CZMQ & dependencies
-      run: sudo ./ci/install-czmq-osx.sh
+      run: ./ci/install-czmq-osx.sh
       shell: bash -l {0}
     - name: Build and run the CZMQ selftests
       run: 'cd czmq
