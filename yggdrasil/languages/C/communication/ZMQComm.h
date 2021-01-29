@@ -40,9 +40,9 @@ typedef struct ygg_zsock_t {
   @brief Initialize zeromq.
   @returns A zeromq context.
 */
+#ifdef _OPENMP
 static inline
 void* ygg_zsys_init() {
-#ifdef _OPENMP
 #pragma omp critical (zmq)
   {
     if (!(ygg_s_process_ctx)) {
@@ -59,35 +59,37 @@ void* ygg_zsys_init() {
       }
     }
   }
-#endif
   return ygg_s_process_ctx;
 };
+#else
+#define ygg_zsys_init zsys_init
+#endif
 
 
 /*!
   @brief Shutdown zeromq.
  */
+#ifdef _OPENMP
 static
 void ygg_zsys_shutdown() {
-#ifdef _OPENMP
 #pragma omp critical (zmq)
   {
-#endif
     ygg_s_process_ctx = NULL;
     zsys_shutdown();
-#ifdef _OPENMP
   }    
-#endif
 };
+#else
+#define ygg_zsys_shutdown zsys_shutdown
+#endif
 
 
 /*!
   @brief Destroy a socket in thread safe way.
   @param[in] self_p zsock_t** Pointer to a CZMQ socket wrapper struct.
 */
+#ifdef _OPENMP
 static inline
 void ygg_zsock_destroy(zsock_t **self_p) {
-#ifdef _OPENMP
   // Recreation of czmq zsock_destroy that is OMP aware
   /* assert(self_p); */
   if (*self_p) {
@@ -100,10 +102,10 @@ void ygg_zsock_destroy(zsock_t **self_p) {
     freen (self);
     *self_p = NULL;
   }
-#else
-  zsock_destroy(self_p);
-#endif
 };
+#else
+#define ygg_zsock_destroy zsock_destroy
+#endif
 
 
 /*!
@@ -111,10 +113,10 @@ void ygg_zsock_destroy(zsock_t **self_p) {
   @param[in] type int Socket type.
   @returns zsock_t* CZMQ socket wrapper struct.
 */
+#ifdef _OPENMP
 static inline
 zsock_t *
 ygg_zsock_new(int type) {
-#ifdef _OPENMP
   // Recreation of czmq zsock_new that is OMP aware
   ygg_zsock_t *self = (ygg_zsock_t *) zmalloc (sizeof (ygg_zsock_t));
   if (!(self)) {
@@ -139,10 +141,10 @@ ygg_zsock_new(int type) {
     return NULL;
   }
   return (zsock_t*)(self);
-#else
-  return zsock_new(type);
-#endif
 };
+#else
+#define ygg_zsock_new zsock_new
+#endif
 
 
 /*! 

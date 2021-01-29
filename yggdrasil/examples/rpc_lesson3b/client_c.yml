@@ -4,7 +4,8 @@ model:
   args: ./src/client.c
   function: model_function
   client_of: server
-  linker_flags: [-lomp]
+  # compiler_flags: [-fopenmp]
+  # linker_flags: [-fopenmp]
   env:
     NTHREAD: 10
   inputs:

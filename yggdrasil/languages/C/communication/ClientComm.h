@@ -45,6 +45,7 @@ int new_client_address(comm_t *comm) {
 static inline
 int init_client_comm(comm_t *comm) {
   int ret = 0;
+  ygglog_debug("init_client_comm: Creating a client comm");
 #ifdef _OPENMP
 #pragma omp critical (client)
   {
