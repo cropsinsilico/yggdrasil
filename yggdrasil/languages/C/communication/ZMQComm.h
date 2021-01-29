@@ -40,15 +40,18 @@ typedef struct ygg_zsock_t {
   @brief Initialize zeromq.
   @returns A zeromq context.
 */
-static
+static inline
 void* ygg_zsys_init() {
 #ifdef _OPENMP
 #pragma omp critical (zmq)
   {
     if (!(ygg_s_process_ctx)) {
       if (get_thread_id() == 0) {
-	/* ygg_s_process_ctx = zmq_ctx_new(); */
+	ygglog_debug("ygg_zsys_init: Creating ZMQ context.");
 	ygg_s_process_ctx = zsys_init();
+	if (!(ygg_s_process_ctx)) {
+	  ygglog_error("ygg_zsys_init: ZMQ context is NULL.");
+	}
       } else {
 	ygglog_error("ygg_zsys_init: Can only initialize the "
 		     "zeromq context on the main thread. Call ygg_init "
@@ -82,14 +85,14 @@ void ygg_zsys_shutdown() {
   @brief Destroy a socket in thread safe way.
   @param[in] self_p zsock_t** Pointer to a CZMQ socket wrapper struct.
 */
-static
+static inline
 void ygg_zsock_destroy(zsock_t **self_p) {
 #ifdef _OPENMP
   // Recreation of czmq zsock_destroy that is OMP aware
-  assert(self_p);
+  /* assert(self_p); */
   if (*self_p) {
     ygg_zsock_t *self = (ygg_zsock_t*)(*self_p);
-    assert (zsock_is (*self_p));
+    /* assert (zsock_is (*self_p)); */
     self->tag = 0xDeadBeef;
     zmq_close (self->handle);
     freen (self->endpoint);
@@ -108,22 +111,33 @@ void ygg_zsock_destroy(zsock_t **self_p) {
   @param[in] type int Socket type.
   @returns zsock_t* CZMQ socket wrapper struct.
 */
-static
+static inline
 zsock_t *
 ygg_zsock_new(int type) {
 #ifdef _OPENMP
   // Recreation of czmq zsock_new that is OMP aware
   ygg_zsock_t *self = (ygg_zsock_t *) zmalloc (sizeof (ygg_zsock_t));
-  assert(self);
+  if (!(self)) {
+    ygglog_error("ygg_zsock_new: Error allocating for new socket.");
+    return NULL;
+  }
   self->tag = 0xcafe0004;
   self->type = type;
+  void* ctx = ygg_zsys_init();
+  if (!(ctx)) {
+    ygglog_error("ygg_zsock_new: Context is NULL.");
+    freen(self);
+    return NULL;
+  }
 #pragma omp critical (zmq)
   {
-    void* ctx = ygg_zsys_init();
-    assert(ctx);
     self->handle = zmq_socket (ctx, type);
   }
-  assert (self->handle);
+  if (!(self->handle)) {
+    ygglog_error("ygg_zsock_new: Error creating new socket.");
+    freen(self);
+    return NULL;
+  }
   return (zsock_t*)(self);
 #else
   return zsock_new(type);
@@ -402,6 +416,7 @@ char *set_reply_send(const comm_t *comm) {
     if (strcmp(host, "localhost") == 0)
       strncpy(host, "127.0.0.1", 50);
     char address[100];
+    int port = -1;
 #ifdef _OPENMP
 #pragma omp critical (zmqport)
   {
@@ -413,16 +428,17 @@ char *set_reply_send(const comm_t *comm) {
       ygglog_debug("_last_port = %d", _last_port);
     }
     sprintf(address, "%s://%s:*[%d-]", protocol, host, _last_port + 1);
-    int port = zsock_bind(zrep->sockets[0], "%s", address);
+    port = zsock_bind(zrep->sockets[0], "%s", address);
+    if (port != -1)
+      _last_port = port;
+#ifdef _OPENMP
+  }
+#endif
     if (port == -1) {
       ygglog_error("set_reply_send(%s): Could not bind socket to address = %s",
 		   comm->name, address);
       return out;
     }
-    _last_port = port;
-#ifdef _OPENMP
-  }
-#endif
     sprintf(address, "%s://%s:%d", protocol, host, port);
     zrep->addresses = (char**)malloc(sizeof(char*));
     zrep->addresses[0] = (char*)malloc((strlen(address) + 1)*sizeof(char));

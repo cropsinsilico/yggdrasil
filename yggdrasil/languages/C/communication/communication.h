@@ -41,7 +41,7 @@ static
 comm_t* get_global_scope_comm(const char *name) {
   comm_t* out = NULL;
 #ifdef _OPENMP
-  #pragma omp critical
+#pragma omp critical (comms)
   {
 #endif
   if (global_scope_comm) {
@@ -135,7 +135,7 @@ int free_comm(comm_t *x) {
   if (x == NULL)
     return ret;
 #ifdef _OPENMP
-  #pragma omp critical
+#pragma omp critical (comms)
   {
 #endif
   ygglog_debug("free_comm(%s)", x->name);
@@ -176,7 +176,7 @@ static
 void clean_comms(void) {
   size_t i;
 #ifdef _OPENMP
-  #pragma omp critical
+#pragma omp critical (comms)
   {
 #endif
   if (!(clean_called)) {
@@ -213,19 +213,25 @@ void clean_comms(void) {
 /*!
   @brief Initialize yggdrasil in a thread-safe way
  */
-static
+static inline
 int ygg_init() {
   int out = 0;
 #ifdef _OPENMP
-  #pragma omp critical
+#pragma omp critical (init)
   {
 #endif
+  ygglog_debug("ygg_init: clean_registered = %d", clean_registered);
   if (clean_registered == 0) {
 #if defined(ZMQINSTALLED)
-    ygg_zsys_init();
+    if (!(ygg_zsys_init())) {
+      out = -1;
+    }
 #endif
-    atexit(clean_comms);
-    clean_registered = 1;
+    if (out == 0) {
+      ygglog_debug("ygg_init: Registering cleanup");
+      atexit(clean_comms);
+      clean_registered = 1;
+    }
   }
 #ifdef _OPENMP
   }
@@ -246,19 +252,22 @@ int register_comm(comm_t *x) {
   }
   int error_flag = 0;
 #ifdef _OPENMP
-  #pragma omp critical
+#pragma omp critical (comms)
   {
 #endif
-  ygg_init();
-  void **t_vcomms2clean = (void**)realloc(vcomms2clean, sizeof(void*)*(ncomms2clean + 1));
-  if (t_vcomms2clean == NULL) {
-    ygglog_error("register_comm(%s): Failed to realloc the comm list.", x->name);
-    error_flag = -1;
-  } else {
-    vcomms2clean = t_vcomms2clean;
-    x->index_in_register = (int)ncomms2clean;
-    vcomms2clean[ncomms2clean++] = (void*)x;
-  }
+    if (ygg_init()) {
+      error_flag = 1;
+    } else {
+      void **t_vcomms2clean = (void**)realloc(vcomms2clean, sizeof(void*)*(ncomms2clean + 1));
+      if (t_vcomms2clean == NULL) {
+	ygglog_error("register_comm(%s): Failed to realloc the comm list.", x->name);
+	error_flag = -1;
+      } else {
+	vcomms2clean = t_vcomms2clean;
+	x->index_in_register = (int)ncomms2clean;
+	vcomms2clean[ncomms2clean++] = (void*)x;
+      }
+    }
 #ifdef _OPENMP
   }
 #endif
