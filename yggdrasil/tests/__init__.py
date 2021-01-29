@@ -114,7 +114,7 @@ def check_enabled_languages(language, return_decorators=False):
         elif cond:
             raise unittest.SkipTest(msg)
     disabled = os.environ.get('YGG_TEST_SKIP_LANGUAGE', None)
-    if (disabled is not None) and (msg is None):
+    if disabled is not None:
         disabled = [x.lower() for x in json.loads(disabled)]
         if ('c++' in disabled) or ('cpp' in disabled):
             disabled += ['c++', 'cpp']
