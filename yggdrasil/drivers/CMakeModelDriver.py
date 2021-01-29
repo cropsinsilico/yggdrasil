@@ -1,5 +1,6 @@
 import os
 import re
+import sys
 import shutil
 import logging
 import sysconfig
@@ -403,6 +404,10 @@ class CMakeConfigure(BuildToolBase):
                 are displayed. Defaults to False.
             **kwargs: Additional keyword arguments are ignored.
 
+        Returns:
+            list: Lines that should be added before the executable is defined
+                in the CMakeLists.txt (e.g. LINK_DIRECTORIES commands).
+
         Raises:
             ValueError: If a linker or compiler flag cannot be interpreted.
 
@@ -432,6 +437,7 @@ class CMakeConfigure(BuildToolBase):
             internal_library_flags=internal_library_flags,
             skip_library_libs=True, library_flags=library_flags)
         lines = []
+        pretarget_lines = []
         preamble_lines = []
         library_flags += internal_library_flags + external_library_flags
         # Suppress warnings on windows about the security of strcpy etc.
@@ -454,10 +460,17 @@ class CMakeConfigure(BuildToolBase):
             for x in new_flags:
                 if x not in compile_flags:
                     compile_flags.append(x)
+        # Find Python using cmake
+        # https://martinopilia.com/posts/2018/09/15/building-python-extension.html
+        # preamble_lines.append('find_package(PythonInterp REQUIRED)')
+        # preamble_lines.append('find_package(PythonLibs REQUIRED)')
+        # preamble_lines.append('INCLUDE_DIRECTORIES(${PYTHON_INCLUDE_DIRS})')
+        # lines.append('TARGET_LINK_LIBRARIES(%s ${PYTHON_LIBRARIES})'
+        #              % target)
         python_flags = sysconfig.get_config_var('LIBS')
         if python_flags:
             for x in python_flags.split():
-                if x.startswith('-l') and (x not in linker_flags):
+                if x.startswith(('-L', '-l')) and (x not in linker_flags):
                     linker_flags.append(x)
         # Compilation flags
         for x in compile_flags:
@@ -484,13 +497,13 @@ class CMakeConfigure(BuildToolBase):
                 lines.append('TARGET_LINK_LIBRARIES(%s %s)' % (target, x))
             elif x.startswith('-L'):
                 libdir = cls.fix_path(x.split('-L')[-1], is_gnu=is_gnu)
-                preamble_lines.append('LINK_DIRECTORIES(%s)' % libdir)
+                pretarget_lines.append('LINK_DIRECTORIES(%s)' % libdir)
             elif x.startswith('/LIBPATH:'):  # pragma: windows
                 libdir = x.split('/LIBPATH:')[-1]
                 if '"' in libdir:
                     libdir = libdir.split('"')[1]
                 libdir = cls.fix_path(libdir, is_gnu=is_gnu)
-                preamble_lines.append('LINK_DIRECTORIES(%s)' % libdir)
+                pretarget_lines.append('LINK_DIRECTORIES(%s)' % libdir)
             elif os.path.isfile(x):
                 library_flags.append(x)
             elif x.startswith('-mlinker-version='):
@@ -511,7 +524,7 @@ class CMakeConfigure(BuildToolBase):
             xn = os.path.splitext(xl)[0]
             new_dir = 'LINK_DIRECTORIES(%s)' % xd
             if new_dir not in preamble_lines:
-                preamble_lines.append(new_dir)
+                pretarget_lines.append(new_dir)
             if cls.add_libraries or (xorig in internal_library_flags):
                 # if cls.add_libraries:  # pragma: no cover
                 # Version adding library
@@ -536,19 +549,33 @@ class CMakeConfigure(BuildToolBase):
                              % (xn.upper(), xf, xn, xd))
                 lines.append('TARGET_LINK_LIBRARIES(%s ${%s_LIBRARY})'
                              % (target, xn.upper()))
+        # Link local lib on MacOS because on Mac >=10.14 setting sysroot
+        # clobbers the default paths.
+        # https://stackoverflow.com/questions/54068035/linking-not-working-in
+        # -homebrews-cmake-since-mojave
+        if platform._is_mac:
+            pretarget_lines.append('LINK_DIRECTORIES(/usr/lib)')
+            pretarget_lines.append('LINK_DIRECTORIES(/usr/local/lib)')
         lines = preamble_lines + lines
-        log_msg = 'CMake include file:\n\t' + '\n\t'.join(lines)
+        log_msg = (
+            'CMake compiler flags:\n\t%s\n'
+            'CMake linker flags:\n\t%s\n'
+            'CMake library flags:\n\t%s\n'
+            'CMake include file:\n\t%s') % (
+                ' '.join(compile_flags), ' '.join(linker_flags),
+                ' '.join(library_flags), '\n\t'.join(lines))
         if verbose:
             logger.info(log_msg)
         else:
             logger.debug(log_msg)
         if fname is None:
-            return lines
+            return pretarget_lines + lines
         else:
             if os.path.isfile(fname):
                 os.remove(fname)
             with open(fname, 'w') as fd:
                 fd.write('\n'.join(lines))
+            return pretarget_lines
 
     
 class CMakeBuilder(LinkerBase):
@@ -800,16 +827,16 @@ class CMakeModelDriver(BuildModelDriver):
         else:
             include_base = 'ygg_cmake_%s.txt' % self.target
         include_file = os.path.join(self.sourcedir, include_base)
-        self.get_tool_instance('compiler').create_include(
+        newlines_before = self.get_tool_instance('compiler').create_include(
             include_file, self.target,
             driver=self.target_language_driver,
             toolname=self.target_compiler,
             logging_level=self.logger.getEffectiveLevel(),
-            configuration=self.configuration)
+            configuration=self.configuration,
+            verbose=kwargs.get('verbose', False))
         assert(os.path.isfile(include_file))
         out.append(include_file)
         # Create copy of cmakelists and modify
-        newlines_before = []
         newlines_after = []
         if os.path.isfile(self.buildfile):
             if not os.path.isfile(self.buildfile_copy):
@@ -945,16 +972,20 @@ class CMakeModelDriver(BuildModelDriver):
                         paths = path.split(os.pathsep)
                         paths.remove(os.path.dirname(sh_path))
                         path = os.pathsep.join(paths)
+                        sh_path = shutil.which('sh', path=path)
                     else:  # pragma: debug
                         break
-                    sh_path = shutil.which('sh', path=path)
                 kwargs['env']['PATH'] = path
                 if not sh_path:
                     kwargs.setdefault('generator', 'MinGW Makefiles')
+                elif shutil.which('make', path=path):
+                    kwargs.setdefault('generator', 'Unix Makefiles')
                 # This is not currently tested
                 # else:
                 #     kwargs.setdefault('generator', 'MSYS Makefiles')
         out = super(CMakeModelDriver, cls).update_compiler_kwargs(**kwargs)
+        out.setdefault('definitions', [])
+        out['definitions'].append('PYTHON_EXECUTABLE=%s' % sys.executable)
         if CModelDriver._osx_sysroot is not None:
             out.setdefault('definitions', [])
             out['definitions'].append(

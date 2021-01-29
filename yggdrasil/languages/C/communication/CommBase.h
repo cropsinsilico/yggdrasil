@@ -230,6 +230,18 @@ comm_t* init_comm_base(const char *name, const char *direction,
 	address = getenv(full_name);
       }
     }
+    if (address == NULL) {
+      char temp_name[COMM_NAME_SIZE] = "";
+      size_t i;
+      for (i = 0; i < strlen(full_name); i++) {
+	if (full_name[i] == ':') {
+	  strcat(temp_name, "__COLON__");
+	} else {
+	  strncat(temp_name, full_name + i, 1);
+	}
+      }
+      address = getenv(temp_name);
+    }
     ygglog_debug("init_comm_base: model_name = %s, full_name = %s, address = %s",
 		 model_name, full_name, address);
   }

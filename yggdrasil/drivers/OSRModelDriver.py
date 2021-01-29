@@ -51,6 +51,7 @@ class OSRModelDriver(ExecutableModelDriver):
     language = 'osr'
     language_ext = '.xml'
     base_languages = ['cpp']
+    interface_dependencies = ['make']
     repository = None
     executable_path = None
     repository_url = "https://gitlab.com/langmm/OpenSimRoot.git"
@@ -94,21 +95,45 @@ class OSRModelDriver(ExecutableModelDriver):
                 os.path.basename(self.model_file))
         # if not (isinstance(self.executable_path, str)
         #         and os.path.isfile(self.executable_path)):
-        self.compile_osr()
+        self.compile_dependencies()
         assert(os.path.isfile(self.executable_path))
 
     @classmethod
-    def compile_osr(cls, target='OpenSimRootYgg'):
+    def is_library_installed(cls, lib, **kwargs):
+        r"""Determine if a dependency is installed.
+
+        Args:
+            lib (str): Name of the library that should be checked.
+            **kwargs: Additional keyword arguments are ignored.
+
+        Returns:
+            bool: True if the library is installed, False otherwise.
+
+        """
+        # Need to treat gnu make as dependency since OSR Makefile is not
+        # compatible with nmake
+        if lib == 'make':
+            return bool(shutil.which('make'))
+        return super(OSRModelDriver, cls).is_library_installed(
+            lib, **kwargs)  # pragma: debug
+
+    @classmethod
+    def compile_dependencies(cls, target='OpenSimRootYgg', toolname=None):
         r"""Compile the OpenSimRoot executable with the yggdrasil flag set.
 
         Args:
-            target (str): Make target that should be build. Defaults to
+            target (str, optional): Make target that should be build. Defaults to
                 'OpenSimRootYgg' (the yggdrasil-instrumented version of the
                 OSR executable).
+            toolname (str, optional): C++ compiler that should be used. Forced
+                to be 'cl.exe' on windows. Otherwise the default C++ compiler will
+                be used.
 
         """
         if (cls.repository is not None) and CPPModelDriver.is_installed():
-            toolname = None
+            if not os.path.isdir(cls.repository):  # pragma: debug
+                # This will only need to be called if the tempdir was cleaned up
+                cls.clone_repository(cls.repository)
             # toolname = CPPModelDriver.get_tool('compiler',
             #                                    return_prop='name',
             #                                    default=None)
@@ -120,18 +145,13 @@ class OSRModelDriver(ExecutableModelDriver):
                 env['YGG_OSR_TOOL'] = toolname
                 if toolname == 'cl':
                     cl_path = shutil.which(toolname + '.exe')
-                    print('cl.exe', shutil.which(toolname), cl_path)
-                    subprocess.check_call(['yggccflags', '--cpp',
-                                           '--toolname=%s' % toolname])
-                    subprocess.check_call(['yggldflags', '--cpp',
-                                           '--toolname=%s' % toolname])
                     if cl_path:
                         msvc_bin = os.path.dirname(cl_path)
                         env['YGG_OSR_CXX'] = cl_path
                         env['YGG_OSR_LINK'] = os.path.join(msvc_bin, 'link.exe')
                         for k in ['CL', '_CL_']:
                             v = os.environ.get(k, None)
-                            if v is not None:
+                            if v is not None:  # pragma: appveyor
                                 env[k] = v.replace('/', '-').replace('\\', '/')
                     else:  # pragma: debug
                         env.pop('YGG_OSR_TOOL')
@@ -239,6 +259,25 @@ class OSRModelDriver(ExecutableModelDriver):
 
         """
         return (cls.repository is not None)
+
+    @classmethod
+    def clone_repository(cls, dest=None):
+        r"""Clone the OpenSimRoot repository.
+
+        Args:
+            dest (str, optional): Full path to location where the repository should
+                be cloned. Defaults to '$TEMP/OpenSimRoot'.
+
+        Returns:
+            str: Full path to location where the repository was cloned.
+
+        """
+        if dest is None:
+            dest = os.path.join(tempfile.gettempdir(), 'OpenSimRoot')
+        if not os.path.isdir(dest):  # pragma: config
+            git.Repo.clone_from(cls.repository_url, dest,
+                                branch=cls.repository_branch)
+        return dest
         
     @classmethod
     def configure_executable_type(cls, cfg):
@@ -260,16 +299,14 @@ class OSRModelDriver(ExecutableModelDriver):
         # if platform._is_win:  # pragma: windows
         #     out.append((cls.language, opt, desc))
         #     return out
-        if not cfg.has_option(cls.language, opt):
+        if (((not cfg.has_option(cls.language, opt))
+             or (not os.path.isdir(cfg.get(cls.language, opt))))):
             fname = 'OpenSimRoot'
             fpath = tools.locate_file(fname)
             if not fpath:
                 logger.info('Could not locate %s, attempting to clone' % fname)
                 try:
-                    fpath = os.path.join(tempfile.gettempdir(), fname)
-                    if not os.path.isdir(fpath):  # pragma: config
-                        git.Repo.clone_from(cls.repository_url, fpath,
-                                            branch=cls.repository_branch)
+                    fpath = cls.clone_repository()
                 except BaseException as e:  # pragma: debug
                     logger.info('Failed to clone from %s. error = %s'
                                 % (cls.repository_url, str(e)))
@@ -334,5 +371,5 @@ class OSRModelDriver(ExecutableModelDriver):
     @classmethod
     def cleanup_dependencies(cls, *args, **kwargs):
         r"""Cleanup dependencies."""
-        cls.compile_osr(target='cleanygg')
+        cls.compile_dependencies(target='cleanygg')
         super(OSRModelDriver, cls).cleanup_dependencies(*args, **kwargs)

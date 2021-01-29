@@ -1,6 +1,5 @@
 import os
 import copy
-import pprint
 import numpy as np
 from yggdrasil import tools, units
 from yggdrasil.tests import assert_equal
@@ -79,9 +78,9 @@ class TestExampleTransforms(ExampleTstBase):
                 return x
         x_sent = t(cls.get_test_data())
         print('RECEIVED:')
-        pprint.pprint(x_recv)
+        tools.pprint_encoded(x_recv)
         print('EXPECTED:')
-        pprint.pprint(x_sent)
+        tools.pprint_encoded(x_sent)
         assert_equal(x_recv, x_sent)
 
     @classmethod

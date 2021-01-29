@@ -4,7 +4,6 @@ import six
 import copy
 import glob
 import logging
-import warnings
 import subprocess
 import shutil
 from collections import OrderedDict
@@ -763,7 +762,7 @@ class CompilationToolBase(object):
         return tools.get_env_prefixes()
             
     @classmethod
-    def get_search_path(cls, env_only=False, libtype=None):
+    def get_search_path(cls, env_only=False, libtype=None, cfg=None):
         r"""Determine the paths searched by the tool for external library files.
 
         Args:
@@ -772,11 +771,16 @@ class CompilationToolBase(object):
                 Defaults to False.
             libtype (str, optional): Library type being searched for.
                 Defaults to None.
+            cfg (YggConfigParser, optional): Configuration object currently
+                being updated. Defaults to the global configuration.
 
         Returns:
             list: List of paths that the tools will search.
 
         """
+        if cfg is None:
+            from yggdrasil.config import ygg_cfg
+            cfg = ygg_cfg
         if (cls.search_path_flags is None) and (cls.search_path_envvar is None):
             raise NotImplementedError("get_search_path method not implemented for "
                                       "%s tool '%s'" % (cls.tooltype, cls.toolname))
@@ -795,10 +799,7 @@ class CompilationToolBase(object):
         if (cls.search_path_envvar is not None) and (not env_only):
             assert(isinstance(cls.search_path_envvar, list))
             for ienv in cls.search_path_envvar:
-                ienv_paths = os.environ.get(ienv, '').split(os.pathsep)
-                for x in ienv_paths:
-                    if x:
-                        paths.append(x)
+                paths += os.environ.get(ienv, '').split(os.pathsep)
         # Get flags based on path
         if (cls.search_path_flags is not None) and (not env_only):
             output = cls.call(cls.search_path_flags, skip_flags=True,
@@ -810,20 +811,36 @@ class CompilationToolBase(object):
                 output = re.split(cls.search_regex_end, output)[0]
             # Search for paths
             for r in cls.search_regex:
-                for x in re.findall(r, output):
-                    if os.path.isdir(x):
-                        paths.append(x)
+                paths += re.findall(r, output)
         # Get search paths from the virtualenv/conda environment
         if (cls.search_path_env is not None):
             for iprefix in cls.get_env_prefixes():
                 assert(isinstance(cls.search_path_env, list))
                 for ienv in cls.search_path_env:
-                    ienv_path = os.path.join(iprefix, ienv)
-                    if (ienv_path not in paths) and os.path.isdir(ienv_path):
-                        paths.append(ienv_path)
+                    paths.append(os.path.join(iprefix, ienv))
         # Get libtype specific search paths
         if platform._is_win:  # pragma: windows
             base_paths = []
+            vcpkg_dir = cfg.get('c', 'vcpkg_dir', None)
+            logger.info("vcpkg_dir = '%s'" % vcpkg_dir)
+            if vcpkg_dir is not None:
+                if not os.path.isdir(vcpkg_dir):  # pragma: debug
+                    raise RuntimeError("vcpkg_dir is not valid: '%s'"
+                                       % vcpkg_dir)
+                typ2dir = {'include': 'include',
+                           'shared': 'bin',
+                           'static': 'lib'}
+                if platform._is_64bit:
+                    arch = 'x64-windows'
+                else:  # pragma: debug
+                    arch = 'x86-windows'
+                    raise NotImplementedError("Not yet tested on 32bit Python")
+                if (libtype in typ2dir) and os.path.isdir(vcpkg_dir):
+                    paths.append(os.path.join(vcpkg_dir, 'installed', arch,
+                                              typ2dir[libtype]))
+                    assert(os.path.isdir(paths[-1]))
+            if os.environ.get('ChocolateyInstall'.upper(), None):
+                base_paths.append(os.environ['ChocolateyInstall'])
         else:
             base_paths = ['/usr', os.path.join('/usr', 'local')]
         if platform._is_mac:
@@ -834,7 +851,11 @@ class CompilationToolBase(object):
             suffix = 'lib'
         for base in base_paths:
             paths.append(os.path.join(base, suffix))
-        return paths
+        out = []
+        for x in paths:
+            if x and (x not in out) and os.path.isdir(x):
+                out.append(x)
+        return out
 
     @classmethod
     def get_executable_command(cls, args, skip_flags=False, unused_kwargs=None,
@@ -1564,7 +1585,7 @@ class LinkerBase(CompilationToolBase):
             cls.library_ext = '.dll'
             cls.executable_ext = '.exe'
             cls.search_path_env += [
-                'DLLs', os.path.join('library', 'bin')]
+                'DLLs', os.path.join('library', 'bin'), 'Library']
             cls.all_library_ext = ['.dll', '.lib', '.dll.a']
         elif platform._is_mac:
             # TODO: Dynamic library by default on windows?
@@ -1844,7 +1865,8 @@ class ArchiverBase(LinkerBase):
             setattr(cls, k, None)
         if platform._is_win:  # pragma: windows
             cls.library_ext = '.lib'
-            cls.search_path_env = [os.path.join('library', 'lib')]
+            cls.search_path_env = [os.path.join('library', 'lib'),
+                                   'Library']
         else:
             cls.library_ext = '.a'
 
@@ -2059,9 +2081,9 @@ class CompiledModelDriver(ModelDriver):
                 if (((default_tool is None)
                      or (not default_tool.is_installed()))):  # pragma: debug
                     if not tools.is_subprocess():
-                        warnings.warn(('Default %s for %s (%s) not installed. '
-                                       'Attempting to locate an alternative .')
-                                      % (k, cls.language, default_tool_name))
+                        logger.debug(('Default %s for %s (%s) not installed. '
+                                      'Attempting to locate an alternative .')
+                                     % (k, cls.language, default_tool_name))
                     setattr(cls, 'default_%s' % k, None)
 
     def parse_arguments(self, args, **kwargs):
@@ -2600,7 +2622,7 @@ class CompiledModelDriver(ModelDriver):
                                       "libraries of types %s were found.")
                                      % (libtype, dep, libtype_found))
             # TODO: CLEANUP
-            if platform._is_win and out.endswith('.lib'):  # pragma: windows
+            if platform._is_win and out and out.endswith('.lib'):  # pragma: windows
                 if tool is None:
                     tool = cls.get_tool('compiler', language=dep_lang,
                                         toolname=toolname)
@@ -2619,7 +2641,7 @@ class CompiledModelDriver(ModelDriver):
             if (((libinfo.get('libtype', None) == 'windows_import')
                  and (libtype == 'static'))):
                 # Name import lib using dll
-                import_lib = True
+                import_lib = (tool.toolname == 'cl')
                 libtype = 'shared'
             out = tool.get_output_file(dep, libtype=libtype, no_src_ext=True,
                                        build_library=True,
@@ -2980,6 +3002,8 @@ class CompiledModelDriver(ModelDriver):
                 if (((not kwargs.get('dry_run', False))
                      and (not os.path.isfile(dep_lib)))):  # pragma: debug
                     if dep in internal_dependencies:
+                        # If this is called recursively, verify that dep_lib is produced
+                        # by compiling dep.
                         cls.compile_dependencies(toolname=toolname)
                     if not os.path.isfile(dep_lib):
                         raise RuntimeError(
@@ -3192,9 +3216,9 @@ class CompiledModelDriver(ModelDriver):
             if default_tool_name:
                 default_tool = get_compilation_tool(k, default_tool_name)
                 if not default_tool.is_installed():  # pragma: debug
-                    warnings.warn(('Default %s for %s (%s) not installed. '
-                                   'Attempting to locate an alternative .')
-                                  % (k, cls.language, default_tool_name))
+                    logger.debug(('Default %s for %s (%s) not installed. '
+                                  'Attempting to locate an alternative .')
+                                 % (k, cls.language, default_tool_name))
                     default_tool_name = None
             # Determine compilation tools based on language/platform
             if default_tool_name is None:  # pragma: no cover
@@ -3233,7 +3257,7 @@ class CompiledModelDriver(ModelDriver):
         r"""Add configuration options for an external library.
 
         Args:
-            cfg (CisConfigParser): Config class that options should be set for.
+            cfg (YggConfigParser): Config class that options should be set for.
         
         Returns:
             list: Section, option, description tuples for options that could not
@@ -3270,16 +3294,20 @@ class CompiledModelDriver(ModelDriver):
                 tool = None
                 try:
                     if t == 'include':
-                        tool = cls.get_tool('compiler', default=None)
+                        tool = cls.get_tool('compiler', default=None,
+                                            language=v.get('language', None))
                     elif t == 'shared':
-                        tool = cls.get_tool('linker', default=None)
+                        tool = cls.get_tool('linker', default=None,
+                                            language=v.get('language', None))
                     else:  # pragma: completion
-                        tool = cls.get_tool('archiver', default=None)
+                        tool = cls.get_tool('archiver', default=None,
+                                            language=v.get('language', None))
                 except NotImplementedError:  # pragma: debug
                     pass
                 fpath = None
+                fname = '*'.join(os.path.splitext(fname))
                 if tool is not None:
-                    search_list = tool.get_search_path(libtype=t)
+                    search_list = tool.get_search_path(libtype=t, cfg=cfg)
                     # On windows search for both gnu and msvc library
                     # naming conventions
                     if platform._is_win:  # pragma: windows
@@ -3308,7 +3336,7 @@ class CompiledModelDriver(ModelDriver):
                 #         os.symlink(fpath_orig, fpath)
                 cfg.set(k_lang, opt, fpath)
             else:
-                logger.info('Could not locate %s (search_list = %s)'
+                logger.info('Could not locate %s (search_list = \n\t%s)'
                             % (fname, '\n\t'.join(search_list)))
                 out.append((k_lang, opt, desc))
         return out
@@ -3393,8 +3421,10 @@ class CompiledModelDriver(ModelDriver):
         return out
         
     @classmethod
-    def compile_dependencies(cls, toolname=None, **kwargs):
+    def compile_dependencies(cls, toolname=None, dep=None, **kwargs):
         r"""Compile any required internal libraries, including the interface."""
+        if dep is None:
+            dep = cls.interface_library
         kwargs.setdefault('products', [])
         base_libraries = []
         compiler = cls.get_tool('compiler', toolname=toolname)
@@ -3405,11 +3435,8 @@ class CompiledModelDriver(ModelDriver):
             base_cls = import_component('model', x)
             base_libraries.append(base_cls.interface_library)
             base_cls.compile_dependencies(toolname=toolname, **kwargs)
-        if (((cls.interface_library is not None) and cls.is_installed()
-             and (cls.interface_library not in base_libraries))):
-            # cls.call_compiler(cls.interface_library)
-            dep_order = cls.get_dependency_order(cls.interface_library,
-                                                 toolname=toolname)
+        if (dep is not None) and cls.is_installed() and (dep not in base_libraries):
+            dep_order = cls.get_dependency_order(dep, toolname=toolname)
             for k in dep_order[::-1]:
                 if isinstance(k, tuple):
                     assert(len(k) == 2)
@@ -3420,7 +3447,7 @@ class CompiledModelDriver(ModelDriver):
                     cls.call_compiler(k, toolname=toolname, **kwargs)
 
     @classmethod
-    def cleanup_dependencies(cls, products=None, **kwargs):
+    def cleanup_dependencies(cls, products=None, verbose=False, **kwargs):
         r"""Cleanup dependencies."""
         if products is None:
             products = []
@@ -3436,7 +3463,8 @@ class CompiledModelDriver(ModelDriver):
                 if suffix in products[i]:
                     new_products += glob.glob(products[i].replace(suffix, '*'))
             products += new_products
-        super(CompiledModelDriver, cls).cleanup_dependencies(products=products)
+        super(CompiledModelDriver, cls).cleanup_dependencies(
+            products=products, verbose=verbose)
 
     def compile_model(self, source_files=None, skip_interface_flags=False,
                       **kwargs):

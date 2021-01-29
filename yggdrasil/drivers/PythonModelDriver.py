@@ -58,7 +58,8 @@ class PythonModelDriver(InterpretedModelDriver):
         'and': 'and',
         'indent': 4 * ' ',
         'quote': '\"',
-        'print_generic': 'print({object})',
+        'print_generic': ('from yggdrasil.tools import print_encoded; '
+                          'print_encoded({object})'),
         'print': 'print(\"{message}\")',
         'fprintf': 'print(\"{message}\" % ({variables}))',
         'error': 'raise Exception("{error_msg}")',
@@ -140,29 +141,6 @@ class PythonModelDriver(InterpretedModelDriver):
         except ImportError:
             return False
         return True
-
-    @classmethod
-    def is_comm_installed(cls, **kwargs):
-        r"""Determine if a comm is installed for the associated programming
-        language.
-
-        Args:
-            **kwargs: Additional keyword arguments are passed to the parent
-                class's method.
-
-        Returns:
-            bool: True if a comm is installed for this language.
-
-        """
-        # Call __func__ to avoid direct invoking of class which dosn't exist
-        # in after_registration where this is called
-        out = InterpretedModelDriver.is_comm_installed.__func__(cls, **kwargs)
-        if not kwargs.get('skip_config'):
-            return out
-        if out and (kwargs.get('commtype', None) in ['rmq', 'rmq_async']):
-            from yggdrasil.communication.RMQComm import check_rmq_server
-            out = check_rmq_server()
-        return out
 
     @classmethod
     def format_function_param(cls, key, default=None, **kwargs):

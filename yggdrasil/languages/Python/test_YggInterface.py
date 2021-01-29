@@ -1,5 +1,6 @@
 import os
 import numpy as np
+import flaky
 from yggdrasil.communication import get_comm
 from yggdrasil.interface import YggInterface
 from yggdrasil.tools import (
@@ -355,6 +356,7 @@ class TestYggOutputMatlab(TestYggOutput):
         self._inst_kwargs = {'format_str': self.fmt_str_matlab}
 
 
+@flaky.flaky
 class TestYggRpcClient(TestYggOutput):
     r"""Test client-side RPC communication with Python."""
 
@@ -393,7 +395,8 @@ class TestYggRpcClient(TestYggOutput):
             assert(msg_flag)
             self.assert_equal(msg_recv, msg)
         
-        
+
+@flaky.flaky
 class TestYggRpcClientMatlab(TestYggRpcClient):
     r"""Test client-side RPC communication with Python as passed through Matlab."""
     def __init__(self, *args, **kwargs):
@@ -403,6 +406,7 @@ class TestYggRpcClientMatlab(TestYggRpcClient):
                            self.fmt_str_matlab, self.fmt_str_matlab]
 
 
+@flaky.flaky
 class TestYggRpcServer(TestYggInput):
     r"""Test server-side RPC communication with Python."""
 
@@ -448,6 +452,7 @@ class TestYggRpcServer(TestYggInput):
             self.assert_equal(msg_recv, msg)
         
         
+@flaky.flaky
 class TestYggRpcServerMatlab(TestYggRpcServer):
     r"""Test server-side RPC communication with Python as passed through Matlab."""
     def __init__(self, *args, **kwargs):

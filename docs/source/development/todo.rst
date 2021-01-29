@@ -61,6 +61,7 @@ New feature/example
 * Allow users to select from list of multiple possiblities when locating libraries to avoid conflict
 * Write C/C++ as extension to rapidjson and wrap in Python
 * Add alias key to schema that is then translated into valid JSON schema
+* Add 'shell' option for executable models on Windows to allow calling different shell types.
 
 Deprecation
 -----------

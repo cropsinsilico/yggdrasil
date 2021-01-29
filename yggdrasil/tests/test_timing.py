@@ -2,6 +2,7 @@ import os
 import sys
 import copy
 import unittest
+import flaky
 from yggdrasil import tools, timing, platform
 from yggdrasil.tests import YggTestClass, assert_raises, long_running
 
@@ -307,10 +308,12 @@ class TestTimedRunTemp(TimedRunTestBase):
         out['overwrite'] = True
         return out
 
+    @flaky.flaky
     def test_pyperf_func(self):
         r"""Test pyperf_func."""
         timing.pyperf_func(1, self.instance, self.count, self.size, 0)
 
+    @flaky.flaky
     def test_run_overwrite(self):
         r"""Test performing a run twice, the second time with ovewrite."""
         self.time_run()

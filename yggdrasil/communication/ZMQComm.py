@@ -1,15 +1,22 @@
 import os
 import tempfile
 import uuid
-import zmq
 import logging
 from yggdrasil import tools
 from yggdrasil import multitasking
 from yggdrasil.communication import (
     CommBase, TemporaryCommunicationError, NoMessages)
-
-
 logger = logging.getLogger(__name__)
+try:
+    import zmq
+    _zmq_installed = True
+except ImportError:  # pragma: debug
+    logger.debug("Could not import pyzmq. "
+                 + "ZMQ support will be disabled.")
+    zmq = None
+    _zmq_installed = False
+
+
 _socket_type_pairs = [('PUSH', 'PULL'),
                       ('PUB', 'SUB'),
                       ('REP', 'REQ'),
@@ -24,7 +31,10 @@ _default_protocol = 'tcp'
 _wait_send_t = 0  # 0.0001
 _reply_msg = b'YGG_REPLY'
 _purge_msg = b'YGG_PURGE'
-_global_context = zmq.Context.instance()
+if _zmq_installed:
+    _global_context = zmq.Context.instance()
+else:  # pragma: debug
+    _global_context = None
 
 
 def get_ipc_host():

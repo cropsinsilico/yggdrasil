@@ -188,9 +188,8 @@ class ScalarMetaschemaType(MetaschemaType):
         # arr = np.fromstring(bytes, dtype=dtype)
         if 'shape' in typedef:
             arr = arr.reshape(typedef['shape'])
-        out = cls.from_array(arr, unit_str=typedef.get('units', None), dtype=dtype)
-        # Cast numpy type to native python type if they are equivalent
-        out = cls.as_python_type(out, typedef)
+        out = cls.from_array(arr, unit_str=typedef.get('units', None),
+                             dtype=dtype, typedef=typedef)
         return out
 
     @classmethod
@@ -213,8 +212,8 @@ class ScalarMetaschemaType(MetaschemaType):
         typedef1.update(**typedef)
         dtype = ScalarMetaschemaProperties.definition2dtype(typedef1)
         arr = cls.to_array(obj).astype(dtype, casting='same_kind')
-        out = cls.from_array(arr, unit_str=typedef0.get('units', None), dtype=dtype)
-        out = cls.as_python_type(out, typedef)
+        out = cls.from_array(arr, unit_str=typedef0.get('units', None),
+                             dtype=dtype, typedef=typedef)
         return units.convert_to(out, typedef1.get('units', None))
 
     @classmethod
@@ -237,7 +236,7 @@ class ScalarMetaschemaType(MetaschemaType):
         return arr
         
     @classmethod
-    def from_array(cls, arr, unit_str=None, dtype=None):
+    def from_array(cls, arr, unit_str=None, dtype=None, typedef=None):
         r"""Get object representation of the data.
 
         Args:
@@ -246,16 +245,26 @@ class ScalarMetaschemaType(MetaschemaType):
                 object.
             dtype (np.dtype, optional): Numpy data type that should be maintained
                 as a base class when adding units. Defaults to None and is
-                determined from the object.
+                determined from the object or typedef (if provided).
+            typedef (dict, optional): Type definition that should be used to
+                decode the object. Defaults to None and is determined from the
+                object or dtype (if provided).
 
         Returns:
             object: Object representation of the data in the input array.
 
         """
+        # if (typedef is None) and (dtype is not None):
+        #     typedef = ScalarMetaschemaProperties.dtype2definition(dtype)
+        # elif (dtype is None) and (typedef is not None):
+        #     dtype = ScalarMetaschemaProperties.definition2dtype(typedef)
         if (cls.name not in ['1darray', 'ndarray']) and (arr.ndim > 0):
             out = arr[0]
         else:
             out = arr
+        if typedef is not None:
+            # Cast numpy type to native python type if they are equivalent
+            out = cls.as_python_type(out, typedef)
         if unit_str is not None:
             if dtype is None:
                 dtype = ScalarMetaschemaProperties.data2dtype(out)

@@ -13,14 +13,17 @@ build:
   script: '{{ PYTHON }} -m pip install . --no-deps --ignore-installed --no-cache-dir -vvv '
   skip: true  # [(win and vc<14) or py<35]
   entry_points:
+    - yggdrasil = yggdrasil.command_line:main
     - ygginfo = yggdrasil.command_line:ygginfo
     - yggrun = yggdrasil.command_line:yggrun
     - cisrun = yggdrasil.command_line:yggrun
     - yggcompile = yggdrasil.command_line:yggcompile
     - yggcc = yggdrasil.command_line:yggcc
+    - yggcctool = yggdrasil.command_line:cc_toolname
+    - yggldtool = yggdrasil.command_line:ld_toolname
     - yggccflags = yggdrasil.command_line:cc_flags
     - yggldflags = yggdrasil.command_line:ld_flags
-    - yggtest = yggdrasil:run_tsts
+    - yggtest = yggdrasil.command_line:run_tsts
     - yggmetaschema = yggdrasil.command_line:regen_metaschema
     - yggschema = yggdrasil.command_line:regen_schema
     - yggbuildapi_c = yggdrasil.command_line:rebuild_c_api
@@ -33,23 +36,31 @@ build:
     - yggvalidate = yggdrasil.command_line:validate_yaml
     - ygginstall = yggdrasil.command_line:ygginstall
     - yggdevup = yggdrasil.command_line:yggdevup
+    - ygggha = yggdrasil.command_line:generate_gha_workflow
 
 requirements:
   host:
     - czmq
     - pip
     - python
+    - r-base
+    - r-bit64
+    - r-r6
+    - r-reticulate
+    - r-units
+    - r-zeallot
     - sysv_ipc  # [unix]
     - zeromq
   run:
     - cmake
-    - czmq
+    - czmq  # [not osx]
+    - czmq!=4.2.1  # [osx]
     - flaky
     - git
     - GitPython
     - jsonschema
     - matplotlib-base
-    - numpy
+    - numpy>=1.13.0
     - pandas
     - pyperf
     - pint  # [py2k]
@@ -72,6 +83,8 @@ requirements:
     - zeromq
     - {{ compiler('c') }}  # [win]
     - {{ compiler('cxx') }}  # [win]
+    # - {{ compiler('fortran') }}  # [not win]
+    # - fortran-compiler  # [not win]
     - m2w64-gcc-fortran  # [win]
     - m2w64-toolchain_win-64  # [win]
 

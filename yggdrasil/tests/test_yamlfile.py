@@ -187,7 +187,9 @@ class TestYamlModelOnly(YamlTestBase):
                  ['models:',
                   '  name: modelD',
                   '  driver: GCCModelDriver',
-                  '  args: ./src/modelD.c'], )
+                  '  args: ./src/modelD.c',
+                  '  env:',
+                  '    TEST_VAR: 1'], )
 
 
 class TestYamlServerClient(YamlTestBase):

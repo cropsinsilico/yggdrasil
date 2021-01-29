@@ -14,9 +14,6 @@ os: Visual Studio 2015
 
 environment:
 
-  PYPI_PASSWORD:
-    secure: vixzjLjh1xT6my9x65rOcw==
-
   global:
     PYTHON: "C:\\Miniconda3-x64"
     APPVEYOR_SAVE_CACHE_ON_ERROR: true
@@ -111,9 +108,7 @@ install:
   # Setup environment
   # Currently conda is used reguardless of the installation method as
   # that is how python is installed by appveyor
-  - "python utils\\ci_setup.py pip env %PYTHON_VERSION%"
-  # - if "%YGG_CONDA%" == "1" "python utils\\ci_setup.py conda env %PYTHON_VERSION%"
-  # - if "%YGG_CONDA%" == "0" "python utils\\ci_setup.py pip env %PYTHON_VERSION%"
+  - "python utils\\setup_test_env.py env conda %PYTHON_VERSION% --env-name=test-environment"
 
   # Activate environment (should be conda reguardless)
   - "activate test-environment"
@@ -122,9 +117,8 @@ install:
   - if "%INSTALLC%" == "1" call "ci\\install-compilers.bat"
 
   # Build and install
-  - "python utils\\ci_setup.py pip deploy"
-  # - if "%YGG_CONDA%" == "1" "python utils\\ci_setup.py conda deploy"
-  # - if "%YGG_CONDA%" == "0" "python utils\\ci_setup.py pip deploy"
+  - "python utils\\setup_test_env.py install pip"
+  - "python utils\\setup_test_env.py verify"
   - "echo %PATH%"
 
 cache:
@@ -141,29 +135,9 @@ build: false
 
 test_script:
   - "yggclean"
+  - "yggcompile"
   - "yggtest --ci %YGG_TEST_FLAGS%"
   - "%YGG_SECOND_TEST%"
 
-after_test:
-  - "codecov"
-
-# Deploy to PyPI
-# on_success:
-#   - echo "Starting Artifact Deployment"
-#   - "pip install twine"
-#   - "python setup.py bdist_wheel"
-
-#   # Specify account details for PyPI
-#   - echo [distutils]                                  > %USERPROFILE%\\.pypirc
-#   - echo index-servers =                             >> %USERPROFILE%\\.pypirc
-#   - echo     pypi                                    >> %USERPROFILE%\\.pypirc
-#   - echo [pypi]                                      >> %USERPROFILE%\\.pypirc
-#   - echo username=langmm                             >> %USERPROFILE%\\.pypirc
-#   - echo password=%PYPI_PASSWORD%                    >> %USERPROFILE%\\.pypirc
-
-#   # Workaround required to ensure setup.py finds the .pypirc under Windows
-#   - set HOME=%USERPROFILE%
-
-#   # Deploy wheel on tags
-#   - ps: If ($env:APPVEYOR_REPO_TAG -eq "true" -And $env:APPVEYOR_REPO_BRANCH -eq "master") { Invoke-Expression "twine upload --skip-existing dist/*" 2>$null } Else { write-output "Not on a tag on master, won't deploy to pypi"}
-#   # - if "%APPVEYOR_REPO_TAG%"=="true" ( python setup.py bdist_wheel upload ) else ( echo "Not deploying because not a tagged commit." )
+# after_test:
+#   - "codecov"

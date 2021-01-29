@@ -214,16 +214,19 @@ class SerializeBase(tools.YggClass):
             assert(table_string_type in ['bytes', 'unicode', 'string'])
             if table_string_type == 'string':
                 table_string_type = 'unicode'
+            int_type = np.int32
+            if np.dtype(int) == int_type:  # pragma: windows
+                int_type = int
             if table_string_type == 'bytes':
                 np_dtype_str = 'S'
-                rows = [(b'one', np.int32(1), 1.0),
-                        (b'two', np.int32(2), 2.0),
-                        (b'three', np.int32(3), 3.0)]
+                rows = [(b'one', int_type(1), 1.0),
+                        (b'two', int_type(2), 2.0),
+                        (b'three', int_type(3), 3.0)]
             else:
                 np_dtype_str = 'U'
-                rows = [('one', np.int32(1), 1.0),
-                        ('two', np.int32(2), 2.0),
-                        ('three', np.int32(3), 3.0)]
+                rows = [('one', int_type(1), 1.0),
+                        ('two', int_type(2), 2.0),
+                        ('three', int_type(3), 3.0)]
             out = {'kwargs': {}, 'empty': [], 'dtype': None,
                    'extra_kwargs': {},
                    'typedef': {'type': 'array',

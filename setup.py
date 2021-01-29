@@ -61,11 +61,11 @@ with open("requirements_testing.txt", 'r') as fd:
 if '--user' in sys.argv:
     script_dir = os.path.realpath(os.path.join(get_python_lib(),
                                                '../../../bin/'))
-    warnings.warn("When installing locally, you may need to add the script " +
-                  "directory to your path manually in order to have access " +
-                  "to the command line entry points (e.g. yggrun). " +
-                  "If 'yggrun' is not a recognized command, try adding " +
-                  "'%s' to your PATH." % script_dir)
+    warnings.warn("When installing locally, you may need to add the script "
+                  + "directory to your path manually in order to have access "
+                  + "to the command line entry points (e.g. yggrun). "
+                  + "If 'yggrun' is not a recognized command, try adding "
+                  + "'%s' to your PATH." % script_dir)
     
     
 setup(
@@ -103,14 +103,17 @@ setup(
         "Development Status :: 5 - Production/Stable",
     ],
     entry_points={
-        'console_scripts': ['ygginfo=yggdrasil.command_line:ygginfo',
+        'console_scripts': ['yggdrasil=yggdrasil.command_line:main',
+                            'ygginfo=yggdrasil.command_line:ygginfo',
                             'yggrun=yggdrasil.command_line:yggrun',
                             'cisrun=yggdrasil.command_line:yggrun',
                             'yggcompile=yggdrasil.command_line:yggcompile',
                             'yggcc=yggdrasil.command_line:yggcc',
+                            'yggcctool=yggdrasil.command_line:cc_toolname',
+                            'yggldtool=yggdrasil.command_line:ld_toolname',
                             'yggccflags=yggdrasil.command_line:cc_flags',
                             'yggldflags=yggdrasil.command_line:ld_flags',
-                            'yggtest=yggdrasil:run_tsts',
+                            'yggtest=yggdrasil.command_line:run_tsts',
                             'yggmetaschema=yggdrasil.command_line:regen_metaschema',
                             'yggschema=yggdrasil.command_line:regen_schema',
                             'yggbuildapi_c=yggdrasil.command_line:rebuild_c_api',
@@ -124,7 +127,8 @@ setup(
                             'ygginstall=yggdrasil.command_line:ygginstall',
                             'yggclean=yggdrasil.command_line:yggclean',
                             'yggmodelform=yggdrasil.command_line:yggmodelform',
-                            'yggdevup=yggdrasil.command_line:yggdevup'],
+                            'yggdevup=yggdrasil.command_line:yggdevup',
+                            'ygggha=yggdrasil.command_line:generate_gha_workflow'],
     },
     license="BSD",
     python_requires='>=3.5',

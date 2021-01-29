@@ -763,12 +763,15 @@ class MatlabModelDriver(InterpretedModelDriver):  # pragma: matlab
         return super(MatlabModelDriver, cls).executable_command(args, **kwargs)
     
     @classmethod
-    def configure(cls, cfg):
+    def configure(cls, cfg, disable_engine=None):
         r"""Add configuration options for this language. This includes locating
         any required external libraries and setting option defaults.
 
         Args:
             cfg (YggConfigParser): Config class that options should be set for.
+            disable_engine (bool, optional): Disable the use of the
+                Python engine for Matlab. If not provided, this
+                argument will be ignored.
 
         Returns:
             list: Section, option, description tuples for options that could not
@@ -795,6 +798,8 @@ class MatlabModelDriver(InterpretedModelDriver):  # pragma: matlab
                     cfg.set(cls.language, k, opts[k][1])
                 else:
                     out.append((cls.language, k, opts[k][0]))
+        if disable_engine is not None:
+            cfg.set(cls._language, 'disable_engine', str(disable_engine))
         return out
 
     @classmethod

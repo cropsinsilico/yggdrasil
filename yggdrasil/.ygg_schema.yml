@@ -126,8 +126,8 @@ definitions:
           type: array
       required:
       - datatype
-      - commtype
       - name
+      - commtype
       title: comm_base
       type: object
     - anyOf:
@@ -586,8 +586,8 @@ definitions:
           type: string
       required:
       - filetype
-      - name
       - working_dir
+      - name
       title: file_base
       type: object
     - anyOf:
@@ -1205,6 +1205,13 @@ definitions:
         driver:
           description: '[DEPRECATED] Name of driver class that should be used.'
           type: string
+        env:
+          additional_properties:
+            type: string
+          default: {}
+          description: Dictionary of environment variables that should be set when
+            the driver starts. Defaults to {}.
+          type: object
         env_compiler:
           default: CC
           description: Environment variable where the compiler executable should be
@@ -1234,8 +1241,7 @@ definitions:
             model must contain it's own calls to the |yggdrasil| interface.
           type: string
         inputs:
-          default:
-          - name: default
+          default: []
           description: A mapping object containing the entry for a model input channel
             or a list of input channel entries. If the model does not get input from
             another model, this may be ommitted. A full description of channel entries
@@ -1323,6 +1329,7 @@ definitions:
           - c++
           - cmake
           - cpp
+          - cxx
           - executable
           - fortran
           - function
@@ -1374,8 +1381,7 @@ definitions:
           description: If True, only the final timestep is output. Defaults to False.
           type: boolean
         outputs:
-          default:
-          - name: default
+          default: []
           description: A mapping object containing the entry for a model output channel
             or a list of output channel entries. If the model does not output to another
             model, this may be ommitted. A full description of channel entries and
@@ -1629,9 +1635,9 @@ definitions:
           type: string
       required:
       - args
-      - name
       - language
       - working_dir
+      - name
       title: model_base
       type: object
     - anyOf:
@@ -1886,7 +1892,7 @@ definitions:
         title: CModelDriver
         type: object
       - additionalProperties: true
-        description: Schema for model component ['c++', 'cpp'] subtype.
+        description: Schema for model component ['c++', 'cpp', 'cxx'] subtype.
         properties:
           compiler:
             description: Command or path to executable that should be used to compile
@@ -1909,6 +1915,7 @@ definitions:
             enum:
             - c++
             - cpp
+            - cxx
             type: string
           linker:
             description: Command or path to executable that should be used to link

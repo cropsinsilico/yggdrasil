@@ -6,6 +6,7 @@ import tempfile
 import shutil
 import itertools
 import flaky
+import pytest
 from yggdrasil.components import ComponentMeta, import_component
 from yggdrasil import runner, tools, platform
 from yggdrasil.examples import (
@@ -92,6 +93,7 @@ class ExampleMeta(ComponentMeta):
         if dct.get('example_name', None) is not None:
             dct.setdefault('iter_list_language',
                            get_example_languages(dct['example_name']))
+        timeout = dct.get('timeout', 600)
         iter_lists = []
         iter_keys = []
         test_name_fmt = 'test'
@@ -125,6 +127,9 @@ class ExampleMeta(ComponentMeta):
                         **{k: v for k, v in
                            zip(iter_keys, x)})
                     itest_func.__name__ = itest_name
+                    if timeout is not None:
+                        itest_func = pytest.mark.timeout(timeout=timeout)(
+                            itest_func)
                     dct[itest_name] = itest_func
         out = super(ExampleMeta, cls).__new__(cls, name, bases, dct)
         if out.example_name is not None:
@@ -263,7 +268,6 @@ class ExampleTstBase(YggTestBase, tools.YggClass):
                 raise unittest.SkipTest("%s not installed." % x)
             check_enabled_languages(x)
         # Copy platform specific makefile
-        print(self.language, platform._is_win)
         if self.language == 'make':
             makefile = os.path.join(self.yamldir, 'src', 'Makefile')
             if platform._is_win:  # pragma: windows

@@ -335,8 +335,12 @@ def update_language_config(languages=None, skip_warnings=False,
             logger.info(("%s language both enabled and disabled. "
                          "No action will be taken.") % idrv.language)
         elif idrv.language in disable_languages:
+            if not ygg_cfg_usr.has_section(idrv.language):
+                ygg_cfg_usr.add_section(idrv.language)
             ygg_cfg_usr.set(idrv.language, 'disable', 'True')
         elif idrv.language in enable_languages:
+            if not ygg_cfg_usr.has_section(idrv.language):
+                ygg_cfg_usr.add_section(idrv.language)
             ygg_cfg_usr.set(idrv.language, 'disable', 'False')
         if ygg_cfg_usr.get(idrv.language, 'disable', 'False').lower() == 'true':
             continue  # pragma: no cover
@@ -350,6 +354,9 @@ def update_language_config(languages=None, skip_warnings=False,
                            + "Please set this in %s to: %s")
                           % (opt, sect, ygg_cfg_usr.file_to_update, desc),
                           RuntimeWarning)
+    if verbose:
+        with open(usr_config_file, 'r') as fd:
+            print(fd.read())
     
 
 def get_ygg_loglevel(cfg=None, default='DEBUG'):
@@ -412,7 +419,7 @@ def cfg_logging(cfg=None):
     if cfg is None:
         cfg = ygg_cfg
     _LOG_FORMAT = "%(levelname)s:%(module)s.%(funcName)s[%(lineno)d]:%(message)s"
-    logging.basicConfig(level=logging.INFO, format=_LOG_FORMAT)
+    logging.basicConfig(format=_LOG_FORMAT)
     logLevelYGG = eval('logging.%s' % cfg.get('debug', 'ygg', 'NOTSET'))
     logLevelRMQ = eval('logging.%s' % cfg.get('debug', 'rmq', 'INFO'))
     logLevelCLI = eval('logging.%s' % cfg.get('debug', 'client', 'INFO'))

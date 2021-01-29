@@ -22,7 +22,7 @@ from yggdrasil.drivers import MatlabModelDriver
 import matplotlib as mpl
 if os.environ.get('DISPLAY', '') == '':  # pragma: debug
     mpl.use('Agg')
-elif ygg_platform._is_mac:
+elif ygg_platform._is_mac:  # pragma: travis
     mpl.use('TkAgg')
 import matplotlib.pyplot as plt  # noqa: E402
 logger = logging.getLogger(__name__)
@@ -113,9 +113,14 @@ def write_pyperf_script(script_file, nmsg, msg_size,
         'lang_dst = "%s"' % lang_dst,
         'comm_type = "%s"' % comm_type,
         'matlab_running = %s' % str(matlab_running)]
-    if os.environ.get('TMPDIR', ''):
-        lines += [
-            'os.environ["TMPDIR"] = "%s"' % os.environ['TMPDIR']]
+    # if os.environ.get('TMPDIR', ''):
+    #     tmpdir = os.environ['TMPDIR']
+    #     if platform._is_win:  # pragma: windows
+    #         tmpdir = repr(tmpdir)
+    #         assert(tmpdir.startswith('\'') and tmpdir.endswith('\''))
+    #         tmpdir = tmpdir[1:-1]
+    #         # tmpdir = tmpdir.replace('\\', '\\\\')
+    #     lines += ['os.environ["TMPDIR"] = "%s"' % tmpdir]
     lines += [
         'timer = timing.TimedRun(lang_src, lang_dst,'
         '                        comm_type=comm_type,'
@@ -295,6 +300,8 @@ class TimedRun(YggTestBase, tools.YggClass):
                and (self.lang_dst in self._lang_list)
                and (self.comm_type in self._comm_list))
         if (not out) and raise_error:
+            from yggdrasil.command_line import ygginfo
+            msg_info = ygginfo(args=['--verbose'], return_str=True)
             msg = ['Cannot run test with parameters:',
                    '\tOperating System: %s' % self.platform,
                    '\tPython Version: %s' % self.python_ver,
@@ -307,7 +314,8 @@ class TimedRun(YggTestBase, tools.YggClass):
                    '\tPython Version: %s' % _python_version,
                    '\tMatlab Running: %s' % MatlabModelDriver.is_matlab_running(),
                    '\tSupported Languages: %s' % ', '.join(self._lang_list),
-                   '\tSupported Communication: %s' % ', '.join(self._comm_list)]
+                   '\tSupported Communication: %s' % ', '.join(self._comm_list),
+                   '\n\n' + msg_info]
             raise RuntimeError('\n'.join(msg))
         return out
 
@@ -637,11 +645,19 @@ class TimedRun(YggTestBase, tools.YggClass):
                             self.lang_src, self.lang_dst, self.comm_type,
                             nrep=nrep, matlab_running=self.matlab_running,
                             max_errors=self.max_errors)
-        copy_env = ['TMPDIR', 'CONDA_PREFIX']
+        copy_env = ['TMPDIR', 'CONDA_PREFIX', 'PATHEXT'
+                    'CC', 'CFLAGS', 'CXX', 'CXXFLAGS', 'CPPFLAGS',
+                    'F77', 'F90', 'F95', 'FC', 'FFLAGS', 'FORTRANFLAGS',
+                    'GFORTRAN', 'LD', 'LDFLAGS', 'LD_LIBRARY_PATH']
         copy_env += [v['env'] for v in config._cfg_map.values()]
+        if platform._is_mac:
+            copy_env += ['SDKROOT', 'MACOSX_DEPLOYMENT_TARGET',
+                         'CONDA_BUILD_SYSROOT']
         if platform._is_win:  # pragma: windows
-            copy_env += ['HOMEPATH', 'NUMBER_OF_PROCESSORS',
-                         'INCLUDE', 'LIB', 'LIBPATH']
+            copy_env += ['HOME', 'USERPROFILE', 'HOMEDRIVE', 'HOMEPATH',
+                         'NUMBER_OF_PROCESSORS',
+                         'INCLUDE', 'LIB', 'LIBPATH',
+                         'ChocolateyInstall', 'VCPKG_ROOT']
         cmd = [sys.executable, self.pyperfscript, '--append=' + self.filename,
                '--inherit-environ=' + ','.join(copy_env),
                '--warmups=%d' % _pyperf_warmups]

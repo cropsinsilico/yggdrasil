@@ -21,9 +21,13 @@ extern "C" {
 static void **vcomms2clean = NULL;
 static size_t ncomms2clean = 0;
 static size_t clean_registered = 0;
+static size_t clean_called = 0;
 
 /*! @brief Memory to keep track of global scope comms. */
 static size_t global_scope_comm = 0;
+#ifdef _OPENMP
+#pragma omp threadprivate(global_scope_comm)
+#endif
 #define WITH_GLOBAL_SCOPE(COMM) global_scope_comm = 1; COMM; global_scope_comm = 0
 
 
@@ -35,28 +39,38 @@ static size_t global_scope_comm = 0;
  */
 static
 comm_t* get_global_scope_comm(const char *name) {
-  if (!(global_scope_comm)) {
-    return NULL;
-  }
-  size_t i;
-  comm_t* icomm = NULL;
-  int current_thread = get_thread_id();
-  for (i = 0; i < ncomms2clean; i++) {
-    if (vcomms2clean[i] != NULL) {
-      icomm = (comm_t*)(vcomms2clean[i]);
-      if ((strcmp(icomm->name, name) == 0) && (icomm->thread_id == current_thread)) {
-  	return icomm;
-      } else {
-	const char* YGG_MODEL_NAME = getenv("YGG_MODEL_NAME");
-	char alt_name[100];
-	sprintf(alt_name, "%s:%s", YGG_MODEL_NAME, name);
-	if ((strcmp(icomm->name, alt_name) == 0) && (icomm->thread_id == current_thread)) {
-	  return icomm;
+  comm_t* out = NULL;
+#ifdef _OPENMP
+#pragma omp critical (comms)
+  {
+#endif
+  if (global_scope_comm) {
+    size_t i;
+    comm_t* icomm = NULL;
+    int current_thread = get_thread_id();
+    printf("CURRENT THREAD: %d\n", current_thread);
+    for (i = 0; i < ncomms2clean; i++) {
+      if (vcomms2clean[i] != NULL) {
+	icomm = (comm_t*)(vcomms2clean[i]);
+	if ((strcmp(icomm->name, name) == 0) && (icomm->thread_id == current_thread)) {
+	  out = icomm;
+	  break;
+	} else {
+	  const char* YGG_MODEL_NAME = getenv("YGG_MODEL_NAME");
+	  char alt_name[100];
+	  sprintf(alt_name, "%s:%s", YGG_MODEL_NAME, name);
+	  if ((strcmp(icomm->name, alt_name) == 0) && (icomm->thread_id == current_thread)) {
+	    out = icomm;
+	    break;
+	  }
 	}
       }
     }
   }
-  return NULL;
+#ifdef _OPENMP
+  }
+#endif
+  return out;
 };
 
 
@@ -120,6 +134,10 @@ int free_comm(comm_t *x) {
   int ret = 0;
   if (x == NULL)
     return ret;
+#ifdef _OPENMP
+#pragma omp critical (comms)
+  {
+#endif
   ygglog_debug("free_comm(%s)", x->name);
   // Send EOF for output comms and then wait for messages to be recv'd
   if ((is_send(x->direction)) && (x->valid)) {
@@ -145,6 +163,9 @@ int free_comm(comm_t *x) {
     }
   }
   ygglog_debug("free_comm: Finished");
+#ifdef _OPENMP
+  }
+#endif
   return ret;
 };
 
@@ -154,29 +175,68 @@ int free_comm(comm_t *x) {
 static
 void clean_comms(void) {
   size_t i;
-  ygglog_debug("atexit begin");
-  for (i = 0; i < ncomms2clean; i++) {
-    if (vcomms2clean[i] != NULL) {
-      free_comm((comm_t*)(vcomms2clean[i]));
-    }
-  }
-  if (vcomms2clean != NULL) {
-    free(vcomms2clean);
-    vcomms2clean = NULL;
-  }
-  ncomms2clean = 0;
-#if defined(ZMQINSTALLED)
-  // #if defined(_MSC_VER) && defined(ZMQINSTALLED)
-  zsys_shutdown();
+#ifdef _OPENMP
+#pragma omp critical (comms)
+  {
 #endif
-  if (Py_IsInitialized()) {
-    Py_Finalize();
+  if (!(clean_called)) {
+    ygglog_debug("atexit begin");
+    for (i = 0; i < ncomms2clean; i++) {
+      if (vcomms2clean[i] != NULL) {
+	free_comm((comm_t*)(vcomms2clean[i]));
+      }
+    }
+    if (vcomms2clean != NULL) {
+      free(vcomms2clean);
+      vcomms2clean = NULL;
+    }
+    ncomms2clean = 0;
+#if defined(ZMQINSTALLED)
+    // #if defined(_MSC_VER) && defined(ZMQINSTALLED)
+    ygg_zsys_shutdown();
+#endif
+    if (Py_IsInitialized()) {
+      Py_Finalize();
+    }
+  /* printf(""); */
+    clean_called = 1;
   }
+#ifdef _OPENMP
+  }
+#endif
   ygglog_debug("atexit done");
   if (_ygg_error_flag != 0) {
     _exit(_ygg_error_flag);
   }
-  /* printf(""); */
+};
+
+/*!
+  @brief Initialize yggdrasil in a thread-safe way
+ */
+static inline
+int ygg_init() {
+  int out = 0;
+#ifdef _OPENMP
+#pragma omp critical (init)
+  {
+#endif
+  ygglog_debug("ygg_init: clean_registered = %d", clean_registered);
+  if (clean_registered == 0) {
+#if defined(ZMQINSTALLED)
+    if (!(ygg_zsys_init())) {
+      out = -1;
+    }
+#endif
+    if (out == 0) {
+      ygglog_debug("ygg_init: Registering cleanup");
+      atexit(clean_comms);
+      clean_registered = 1;
+    }
+  }
+#ifdef _OPENMP
+  }
+#endif
+  return out;
 };
 
 /*!
@@ -187,22 +247,31 @@ void clean_comms(void) {
  */
 static
 int register_comm(comm_t *x) {
-  if (clean_registered == 0) {
-    atexit(clean_comms);
-    clean_registered = 1;
-  }
   if (x == NULL) {
     return 0;
   }
-  void **t_vcomms2clean = (void**)realloc(vcomms2clean, sizeof(void*)*(ncomms2clean + 1));
-  if (t_vcomms2clean == NULL) {
-    ygglog_error("register_comm(%s): Failed to realloc the comm list.", x->name);
-    return -1;
+  int error_flag = 0;
+#ifdef _OPENMP
+#pragma omp critical (comms)
+  {
+#endif
+    if (ygg_init()) {
+      error_flag = 1;
+    } else {
+      void **t_vcomms2clean = (void**)realloc(vcomms2clean, sizeof(void*)*(ncomms2clean + 1));
+      if (t_vcomms2clean == NULL) {
+	ygglog_error("register_comm(%s): Failed to realloc the comm list.", x->name);
+	error_flag = -1;
+      } else {
+	vcomms2clean = t_vcomms2clean;
+	x->index_in_register = (int)ncomms2clean;
+	vcomms2clean[ncomms2clean++] = (void*)x;
+      }
+    }
+#ifdef _OPENMP
   }
-  vcomms2clean = t_vcomms2clean;
-  x->index_in_register = (int)ncomms2clean;
-  vcomms2clean[ncomms2clean++] = (void*)x;
-  return 0;
+#endif
+  return error_flag;
 };
 
 /*!

@@ -269,7 +269,7 @@ class ModelDriver(Driver):
                          'schema_table_model_subtype_rst>`.')},
         'args': {'type': 'array',
                  'items': {'type': 'string'}},
-        'inputs': {'type': 'array', 'default': [{'name': 'default'}],
+        'inputs': {'type': 'array', 'default': [],
                    'items': {'$ref': '#/definitions/comm'},
                    'description': (
                        'A mapping object containing the entry for a '
@@ -280,7 +280,7 @@ class ModelDriver(Driver):
                        'entries and the options available for '
                        'channels can be found :ref:`here<'
                        'yaml_comm_options>`.')},
-        'outputs': {'type': 'array', 'default': [{'name': 'default'}],
+        'outputs': {'type': 'array', 'default': [],
                     'items': {'$ref': '#/definitions/comm'},
                     'description': (
                         'A mapping object containing the entry for a '
@@ -291,6 +291,8 @@ class ModelDriver(Driver):
                         'entries and the options available for '
                         'channels can be found :ref:`here<'
                         'yaml_comm_options>`.')},
+        'env': {'type': 'object', 'default': {},
+                'additional_properties': {'type': 'string'}},
         'products': {'type': 'array', 'default': [],
                      'items': {'type': 'string'}},
         'source_products': {'type': 'array', 'default': [],
@@ -743,7 +745,8 @@ class ModelDriver(Driver):
                 return proc
             out, err = proc.communicate()
             if proc.returncode != 0:
-                logger.error(out)
+                logger.info('%s' % out)
+                logger.info('%s' % err)
                 raise RuntimeError("Command '%s' failed with code %d."
                                    % (' '.join(cmd), proc.returncode))
             out = out.decode("utf-8")
@@ -837,8 +840,12 @@ class ModelDriver(Driver):
                 and cls.is_configured() and (not cls.is_disabled()))
 
     @classmethod
-    def are_base_languages_installed(cls):
+    def are_base_languages_installed(cls, missing=None):
         r"""Determine if the base languages are installed.
+
+        Args:
+            missing (list, optional): A pre-existing list that
+                missing base languages should be appended to.
 
         Returns:
             bool: True if the base langauges are installed. False otherwise.
@@ -846,9 +853,13 @@ class ModelDriver(Driver):
         """
         out = True
         for x in cls.base_languages:
-            if not out:  # pragma: no cover
+            if (not out) and (not isinstance(missing, list)):  # pragma: no cover
                 break
             out = import_component('model', x).is_installed()
+            if isinstance(missing, list) and (not out):
+                missing.append(x)
+        if missing:
+            out = False
         return out
 
     @classmethod
@@ -1048,6 +1059,11 @@ class ModelDriver(Driver):
             for lib in libraries:
                 if not cls.is_library_installed(lib, **kwargs):
                     return False
+        # Check for server on RabbitMQ
+        if commtype in ['rmq', 'rmq_async']:
+            from yggdrasil.communication.RMQComm import check_rmq_server
+            if not check_rmq_server():
+                return False
         return True
     
     @classmethod
@@ -1169,6 +1185,9 @@ class ModelDriver(Driver):
             env['YGG_SERVER_OUTPUT'] = self.is_server['output']
         if self.logging_level:
             env['YGG_MODEL_DEBUG'] = self.logging_level
+        replace = [k for k in env.keys() if ':' in k]
+        for k in replace:
+            env[k.replace(':', '__COLON__')] = env[k]
         return env
 
     def before_start(self, no_queue_thread=False, **kwargs):
@@ -1364,11 +1383,12 @@ class ModelDriver(Driver):
         remove_products(products, source_products, timer_class=self)
             
     @classmethod
-    def cleanup_dependencies(cls, products=[]):
+    def cleanup_dependencies(cls, products=[], verbose=False):
         r"""Cleanup dependencies."""
         for x in products:
             if os.path.isfile(x):
-                print("Removing %s" % x)
+                if verbose:  # pragma: debug
+                    print("Removing %s" % x)
                 os.remove(x)
                 
     # Methods for automated model wrapping

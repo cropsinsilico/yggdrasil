@@ -2,6 +2,10 @@ import os
 import sys
 PY_MAJOR_VERSION = sys.version_info[0]
 IS_WINDOWS = (sys.platform in ['win32', 'cygwin'])
+_on_gha = bool(os.environ.get('GITHUB_ACTIONS', False))
+_on_travis = bool(os.environ.get('TRAVIS_OS_NAME', False))
+_on_appveyor = bool(os.environ.get('APPVEYOR_BUILD_FOLDER', False))
+# _on_ci = (_on_gha or _on_travis or _on_appveyor)
 # Import config parser
 try:
     from ConfigParser import RawConfigParser as HandyConfigParser
@@ -83,8 +87,10 @@ def create_coveragerc(installed_languages):
                 cp.add_section(sect_cp)
             for opt in cp_cfg.options(x):
                 if cp.has_option(sect_cp, opt):
-                    val_old = [l.strip() for l in cp.get(sect_cp, opt).split('\n')]
-                    val_new = [l.strip() for l in cp_cfg.get(x, opt).split('\n')]
+                    val_old = [line.strip() for line in
+                               cp.get(sect_cp, opt).split('\n')]
+                    val_new = [line.strip() for line in
+                               cp_cfg.get(x, opt).split('\n')]
                     for v in val_new:
                         if v not in val_old:
                             val_old.append(v)
@@ -100,11 +106,24 @@ def create_coveragerc(installed_languages):
         excl_list = excl_str.strip().split('\n')
     else:
         excl_list = []
-    # Platform
+    # Operating system
     if IS_WINDOWS:
         excl_list = rm_excl_rule(excl_list, 'pragma: windows')
     else:
         excl_list = add_excl_rule(excl_list, 'pragma: windows')
+    # CI Platform
+    if _on_gha:
+        excl_list = rm_excl_rule(excl_list, 'pragma: gha')
+    else:
+        excl_list = add_excl_rule(excl_list, 'pragma: gha')
+    if _on_travis:
+        excl_list = rm_excl_rule(excl_list, 'pragma: travis')
+    else:
+        excl_list = add_excl_rule(excl_list, 'pragma: travis')
+    if _on_appveyor:
+        excl_list = rm_excl_rule(excl_list, 'pragma: appveyor')
+    else:
+        excl_list = add_excl_rule(excl_list, 'pragma: appveyor')
     # Python version
     verlist = [2, 3]
     for v in verlist:
@@ -129,7 +148,9 @@ def create_coveragerc(installed_languages):
     return True
 
 
-if __name__ == "__main__":
+def run():
+    r"""Run coverage creation function after getting a list of installed
+    languages."""
     LANG_PATH = os.path.join(os.path.abspath(os.path.dirname(__file__)),
                              'yggdrasil', 'languages')
     sys.path.insert(0, LANG_PATH)
@@ -141,3 +162,7 @@ if __name__ == "__main__":
     flag = create_coveragerc(installed_languages)
     if not flag:
         raise Exception("Failed to create/update converagerc file.")
+
+
+if __name__ == "__main__":
+    run()

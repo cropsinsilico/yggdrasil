@@ -94,6 +94,7 @@ typedef long double _Complex complex_long_double;
 extern "C" {
 #endif
 
+#include <math.h> // Required to prevent error when using mingw on windows
 #ifdef _DEBUG
 #undef _DEBUG
 #include <Python.h>
@@ -320,7 +321,7 @@ int init_python_API() {
  */
 static inline
 void yggLog(const char* prefix, const char* fmt, va_list ap) {
-  fprintf(stdout, "%s: %d: ", prefix, ygg_getpid());
+  fprintf(stdout, "%s: %d:%d ", prefix, ygg_getpid(), get_thread_id());
   vfprintf(stdout, fmt, ap);
   fprintf(stdout, "\n");
   fflush(stdout);
