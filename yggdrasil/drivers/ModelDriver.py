@@ -1186,7 +1186,7 @@ class ModelDriver(Driver):
             env['YGG_MODEL_DEBUG'] = self.logging_level
         replace = [k for k in env.keys() if ':' in k]
         for k in replace:
-            env[k.replace(':', '__COLON__')] = env[k]
+            env[k.replace(':', '__COLON__')] = env.pop(k)
         return env
 
     def before_start(self, no_queue_thread=False, **kwargs):
