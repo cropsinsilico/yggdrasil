@@ -1212,13 +1212,13 @@ class run_tsts(SubCommand):
         # Run test command and perform cleanup before logging any errors
         logger.info("Running %s from %s", argv, os.getcwd())
         new_config = {}
-        pth_file = 'ygg_coverage.pth'
-        assert(not os.path.isfile(pth_file))
-        # Get arguments for temporary test environment
-        if args.withcoverage:
-            new_config['COVERAGE_PROCESS_START'] = 'True'
-            with open(pth_file, 'w') as fd:
-                fd.write("import coverage; coverage.process_startup()")
+        # pth_file = 'ygg_coverage.pth'
+        # assert(not os.path.isfile(pth_file))
+        # # Get arguments for temporary test environment
+        # if args.withcoverage:
+        #     new_config['COVERAGE_PROCESS_START'] = 'True'
+        #     with open(pth_file, 'w') as fd:
+        #         fd.write("import coverage; coverage.process_startup()")
         initial_dir = os.getcwd()
         error_code = 0
         with config.parser_config(args, **new_config):
@@ -1264,8 +1264,8 @@ class run_tsts(SubCommand):
                 error_code = -1
             finally:
                 os.chdir(initial_dir)
-                if os.path.isfile(pth_file):
-                    os.remove(pth_file)
+                # if os.path.isfile(pth_file):
+                #     os.remove(pth_file)
         return error_code
 
 
