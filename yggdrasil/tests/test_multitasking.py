@@ -154,7 +154,7 @@ class TestYggTask(YggTestClass):
         self.debug_flag = False
 
     @staticmethod
-    def target(cls):  # pragma: no cover
+    def target():  # pragma: no cover
         tools.sleep(10.0)
 
     def test_id(self):
@@ -179,6 +179,7 @@ class TestYggTask(YggTestClass):
         if self._inst_kwargs.get('task_method', None) == 'process':
             self.instance.start()
         self.instance.kill()
+        self.instance.exitcode
 
     def test_flag_manipulation(self):
         r"""Test flag manipulation."""
