@@ -1048,9 +1048,9 @@ jobs:
     - name: Build and run the CZMQ selftests
       run: 'cd czmq
 
-        make all VERBOSE=1
+        make check
 
-        ctest -V
+        #  ctest -V
 
         '
       shell: bash -l {0}
