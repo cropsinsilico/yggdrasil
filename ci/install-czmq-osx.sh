@@ -1,7 +1,7 @@
 #!/bin/bash
 brew update
 brew install git libtool pkg-config autoconf automake \
-     cmake ossp-uuid pcre valgrind
+     cmake ossp-uuid pcre # valgrind
 
 # Install Libsodium
 git clone git://github.com/jedisct1/libsodium.git
