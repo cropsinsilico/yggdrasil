@@ -215,6 +215,7 @@ def get_install_opts(old=None):
             'rmq': (os.environ.get('INSTALLRMQ', '0') == '1'),
             'trimesh': (os.environ.get('INSTALLTRIMESH', '0') == '1'),
             'pygments': (os.environ.get('INSTALLPYGMENTS', '0') == '1'),
+            'omp': (os.environ.get('INSTALLOMP', '0') == '1'),
         }
         if not _is_win:
             new['c'] = True  # c compiler usually installed by default
@@ -230,6 +231,7 @@ def get_install_opts(old=None):
             'rmq': False,
             'trimesh': True,
             'pygments': True,
+            'omp': False,
         }
     if old is None:
         out = {}
@@ -513,6 +515,13 @@ def install_deps(method, return_commands=False, verbose=False, for_development=F
     # incompatibility."
     # elif _is_osx:
     #     os_pkgs += ["valgrind"]
+    if install_opts['omp'] and (not fallback_to_conda):
+        if _is_linux:
+            os_pkgs.append('libomp-dev')
+        elif _is_osx:
+            os_pkgs.append('libomp')
+        elif _is_win:
+            pass
     if install_opts['fortran'] and (not fallback_to_conda):
         # Fortran is not installed via conda on linux/macos
         if _is_linux:
