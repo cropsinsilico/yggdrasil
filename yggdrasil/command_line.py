@@ -1037,7 +1037,8 @@ class run_tsts(SubCommand):
         (('--test-suite', '--test-suites'),
          {'nargs': '+', 'action': 'extend', 'type': str,
           'choices': ['all', 'top', 'examples', 'examples_part1',
-                      'examples_part2', 'demos', 'types', 'timing'],
+                      'examples_part2', 'demos', 'types', 'timing',
+                      'connections', 'models'],
           'help': 'Test suite(s) that should be run.',
           'dest': 'test_suites'}),
         (('--pytest-config', '-c'),
@@ -1078,7 +1079,8 @@ class run_tsts(SubCommand):
         if args.test_suites:
             if 'all' in args.test_suites:
                 args.test_suites.remove('all')
-                for x in ['top', 'examples', 'demos', 'types', 'timing']:
+                for x in ['top', 'examples', 'demos', 'types', 'timing',
+                          'connections', 'models']:
                     if x not in args.test_suites:
                         args.test_suites.append(x)
             for x in args.test_suites:
@@ -1112,6 +1114,17 @@ class run_tsts(SubCommand):
                     args.long_running = True
                     args.enable_production_runs = True
                     test_paths.append(os.path.join('tests', 'test_timing.py'))
+                elif x == 'connections':
+                    for f in ['test_ConnectionDriver.py',
+                              'test_FileInputDriver.py',
+                              'test_FileOutputDriver.py',
+                              'test_RPCRequestDriver.py']:
+                        test_paths.append(
+                            os.path.join('drivers', 'tests', f))
+                elif x == 'models':
+                    test_paths.append(
+                        os.path.join('drivers', 'tests',
+                                     'test_*ModelDriver.py'))
         if (not test_paths) and all(x.startswith('-') for x in extra):
             test_paths.append(package_dir)
         # Get expanded tests to allow for paths that are relative to
