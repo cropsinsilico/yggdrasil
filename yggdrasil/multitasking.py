@@ -559,8 +559,8 @@ class Task(ContextObject):
         r"""Kill the task."""
         if self.parallel and hasattr(self._base, 'kill'):
             return self._base.kill(*args, **kwargs)
-        else:
-            return self.terminate(*args, **kwargs)
+        elif hasattr(self._base, 'terminate'):
+            return self._base.terminate(*args, **kwargs)
 
 
 class DummyQueue(DummyContextObject):  # pragma: no cover
