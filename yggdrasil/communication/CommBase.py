@@ -879,6 +879,11 @@ class CommBase(tools.YggClass):
         if self.partner_model is not None:
             out[self.partner_model] = self.opp_comms
         return out
+
+    @property
+    def opp_name(self):
+        r"""str: Name that should be used for the opposite comm."""
+        return self.name
         
     @property
     def opp_address(self):
@@ -888,7 +893,7 @@ class CommBase(tools.YggClass):
     @property
     def opp_comms(self):
         r"""dict: Name/address pairs for opposite comms."""
-        return {self.name: self.opp_address}
+        return {self.opp_name: self.opp_address}
 
     def opp_comm_kwargs(self):
         r"""Get keyword arguments to initialize communication with opposite
@@ -1278,7 +1283,8 @@ class CommBase(tools.YggClass):
                 action.
 
         """
-        if self.direction != direction:
+        if (((self._commtype not in ['server', 'client'])
+             and (self.direction != direction))):
             raise RuntimeError("This comm (%s) is designated to %s and "
                                "therefore cannot %s."
                                % (self.address, self.direction, direction))

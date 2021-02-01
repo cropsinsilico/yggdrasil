@@ -84,14 +84,10 @@ class TestRPCRequestDriver(TestRPCRequestParam,
         flag, srv_msg = self.recv_comm.recv(timeout=self.route_timeout)
         assert(flag)
         assert_equal(srv_msg, msg_send)
-        self.recv_comm.direction = 'send'
         flag = self.recv_comm.send(srv_msg)
-        self.recv_comm.direction = 'recv'
         assert(flag)
         # Receive response on server side
-        self.send_comm.direction = 'recv'
         flag, cli_msg = self.send_comm.recv(timeout=self.route_timeout)
-        self.send_comm.direction = 'send'
         assert(flag)
         assert_equal(cli_msg, msg_send)
 
