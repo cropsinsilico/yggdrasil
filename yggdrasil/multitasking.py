@@ -565,7 +565,9 @@ class Task(ContextObject):
     def kill(self, *args, **kwargs):
         r"""Kill the task."""
         if self.parallel and hasattr(self._base, 'kill'):
-            self._base.kill(*args, **kwargs)
+            return self._base.kill(*args, **kwargs)
+        elif hasattr(self._base, 'terminate'):
+            return self._base.terminate(*args, **kwargs)
 
 
 class DummyQueue(DummyContextObject):  # pragma: no cover
@@ -952,9 +954,9 @@ class YggTask(YggClass):
     def exitcode(self):
         r"""Exit code."""
         if self.as_process:
-            out = self.process_instance.exitcode
-            if (out == 0) and self.check_flag_attr('error_flag'):
-                out = 1
+            out = int(self.check_flag_attr('error_flag'))
+            if self.process_instance.exitcode:
+                out = self.process_instance.exitcode
             return out
         else:
             return int(self.check_flag_attr('error_flag'))

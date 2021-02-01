@@ -447,14 +447,12 @@ class CommBase(tools.YggClass):
                           not in os.environ))):
                     import pprint
                     env_str = pprint.pformat(os.environ.copy())
-                    print(env_str)
-                    self.info("ENV:\n%s" % env_str)
                     raise RuntimeError(
                         'Cannot see %s in env (model = %s). Env:\n%s' %
                         (self.name, model_name, env_str))
-            if self.name in os.environ:
+            try:
                 self.address = os.environ[self.name]
-            else:
+            except KeyError:
                 self.address = os.environ[self.name.replace(':', '__COLON__')]
         else:
             self.address = address

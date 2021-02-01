@@ -26,5 +26,6 @@ git clone git://github.com/zeromq/czmq.git
 cd czmq
 ./autogen.sh
 ./configure # && make check
+make check
 sudo make install
 cd ..

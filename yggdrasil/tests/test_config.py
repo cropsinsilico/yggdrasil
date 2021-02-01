@@ -27,6 +27,10 @@ def test_update_language_config():
     cfg_copy = '_copy'.join(os.path.splitext(cfg_orig))
     shutil.copy2(cfg_orig, cfg_copy)
     try:
+        config.update_language_config(
+            'c', lang_kwargs={
+                'vcpkg_dir': config.ygg_cfg_usr.get(
+                    'c', 'vcpkg_dir', default=os.getcwd())})
         if len(languages) > 0:
             config.ygg_cfg_usr.remove_section(languages[0])
             config.update_language_config(
@@ -34,13 +38,12 @@ def test_update_language_config():
             config.update_language_config(
                 languages[0], disable_languages=[languages[0]],
                 enable_languages=[languages[0]])
+            config.update_language_config(
+                languages[0], enable_languages=[languages[0]])
         if len(languages) > 1:
             config.ygg_cfg_usr.remove_section(languages[1])
             config.update_language_config(
                 languages[1], enable_languages=[languages[1]])
-        if config.ygg_cfg_usr.has_option('c', 'vcpkg_dir'):
-            config.update_language_config(
-                'c', vcpkg_dir=config.ygg_cfg_usr.get('c', 'vcpkg_dir'))
     finally:
         shutil.move(cfg_copy, cfg_orig)
         config.ygg_cfg_usr.reload()

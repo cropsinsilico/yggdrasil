@@ -205,9 +205,17 @@ jobs:
       run: yggtest --ci --cov-append ${{ matrix.test-flags2 }}
     - name: (CONDA) Generate XML version of coverage report
       if: matrix.install-method == 'conda'
-      run: coverage xml
+      run: 'ls
+
+        coverage combine
+
+        coverage xml
+
+        '
     - name: Upload coverage report
       uses: codecov/codecov-action@v1
+      with:
+        name: ${{ env.YGG_GHA_JOB_ID }}
     - name: Download the last successful workflow environment log
       if: ${{ always() }}
       continue-on-error: true
@@ -422,9 +430,17 @@ jobs:
       run: yggtest --ci --cov-append ${{ matrix.test-flags2 }}
     - name: (CONDA) Generate XML version of coverage report
       if: matrix.install-method == 'conda'
-      run: coverage xml
+      run: 'ls
+
+        coverage combine
+
+        coverage xml
+
+        '
     - name: Upload coverage report
       uses: codecov/codecov-action@v1
+      with:
+        name: ${{ env.YGG_GHA_JOB_ID }}
     - name: Download the last successful workflow environment log
       if: ${{ always() }}
       continue-on-error: true
@@ -619,9 +635,17 @@ jobs:
       run: yggtest --ci --cov-append ${{ matrix.test-flags2 }}
     - name: (CONDA) Generate XML version of coverage report
       if: matrix.install-method == 'conda'
-      run: coverage xml
+      run: 'ls
+
+        coverage combine
+
+        coverage xml
+
+        '
     - name: Upload coverage report
       uses: codecov/codecov-action@v1
+      with:
+        name: ${{ env.YGG_GHA_JOB_ID }}
     - name: Download the last successful workflow environment log
       if: ${{ always() }}
       continue-on-error: true
@@ -818,9 +842,17 @@ jobs:
       run: yggtest --ci --cov-append ${{ matrix.test-flags2 }}
     - name: (CONDA) Generate XML version of coverage report
       if: matrix.install-method == 'conda'
-      run: coverage xml
+      run: 'ls
+
+        coverage combine
+
+        coverage xml
+
+        '
     - name: Upload coverage report
       uses: codecov/codecov-action@v1
+      with:
+        name: ${{ env.YGG_GHA_JOB_ID }}
     - name: Download the last successful workflow environment log
       if: ${{ always() }}
       continue-on-error: true
@@ -1015,9 +1047,17 @@ jobs:
       run: yggtest --ci --cov-append ${{ matrix.test-flags2 }}
     - name: (CONDA) Generate XML version of coverage report
       if: matrix.install-method == 'conda'
-      run: coverage xml
+      run: 'ls
+
+        coverage combine
+
+        coverage xml
+
+        '
     - name: Upload coverage report
       uses: codecov/codecov-action@v1
+      with:
+        name: ${{ env.YGG_GHA_JOB_ID }}
     - name: Download the last successful workflow environment log
       if: ${{ always() }}
       continue-on-error: true
