@@ -171,12 +171,14 @@ class TestBase(YggTestClassInfo):
                 filecomm_kwargs = self.testing_options['kwargs']
                 filecomm_kwargs['filetype'] = self.filecomm
                 return ([self.name, self.filename],
-                        {'outputs': [filecomm_kwargs]})
+                        {'inputs': kwargs['inputs'],
+                         'outputs': [filecomm_kwargs]})
             elif (self.direction == 'input'):
                 filecomm_kwargs = self.testing_options['kwargs']
                 filecomm_kwargs['filetype'] = self.filecomm
                 return ([self.name, self.filename],
-                        {'inputs': [filecomm_kwargs]})
+                        {'inputs': [filecomm_kwargs],
+                         'outputs': kwargs['outputs']})
         return (args, kwargs)
 
     def get_options(self):
