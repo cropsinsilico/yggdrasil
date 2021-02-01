@@ -102,7 +102,7 @@ def new_comm(name, commtype=None, use_async=False, **kwargs):
     if use_async:
         kwargs['is_async'] = True
     out = comm_cls.new_comm(name, **kwargs)
-    if use_async and (out._commtype is not None):
+    if use_async and (out._commtype not in [None, 'client', 'server']):
         from yggdrasil.communication.AsyncComm import AsyncComm
         out = AsyncComm(out)
     return out
