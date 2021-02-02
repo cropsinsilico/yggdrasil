@@ -51,7 +51,6 @@ class RPCRequestDriver(ConnectionDriver):
         # Output communicator
         outputs = kwargs.get('outputs', [{}])
         # outputs[0]['name'] = model_request_name + '.server_model_request'
-        outputs[0]['no_suffix'] = True
         outputs[0]['is_client'] = True
         outputs[0]['close_on_eof_send'] = False
         kwargs['outputs'] = outputs
