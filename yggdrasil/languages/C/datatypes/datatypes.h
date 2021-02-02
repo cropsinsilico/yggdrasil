@@ -1262,6 +1262,7 @@ comm_head_t init_header(const size_t size, const char *address, const char *id) 
   out.zmq_reply[0] = '\0';
   out.zmq_reply_worker[0] = '\0';
   out.model[0] = '\0';
+  out.client_model[0] = '\0';
   // Parameters that will be removed
   out.serializer_type = -1;
   out.format_str[0] = '\0';
