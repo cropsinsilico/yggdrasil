@@ -1128,9 +1128,13 @@ jobs:
         conda list
 
         '
+    - name: Set environment variable pointing to the conda library directory
+      run: echo "LDFLAGS=\"-Wl,-rpath,$CONDA_PREFIX/lib $LDFLAGS\"" >> $GITHUB_ENV
     - name: Build the CZMQ package
       continue-on-error: true
-      run: './autogen.sh
+      run: 'echo $LDFLAGS
+
+        ./autogen.sh
 
         ./configure
 

@@ -386,9 +386,12 @@ jobs:
       run: |
         conda install cmake autoconf automake libtool pkg-config libuuid pcre zeromq clang clangxx
         conda list
+    - name: Set environment variable pointing to the conda library directory
+      run: echo "LDFLAGS=\"-Wl,-rpath,$CONDA_PREFIX/lib $LDFLAGS\"" >> $GITHUB_ENV
     - name: Build the CZMQ package
       continue-on-error: true
       run: |
+        echo $LDFLAGS
         ./autogen.sh
         ./configure
     - name: Run the tests
