@@ -34,7 +34,7 @@ _cfg_map = {
         'env': 'YGG_DEBUG', 'arg': 'loglevel',
         'help': 'Logging level for yggdrasil operations.'},
     ('debug', 'rmq', 'RMQ_DEBUG'): {
-        'env': 'YGG_CLIENT_DEBUG', 'arg': 'rmq-loglevel',
+        'env': 'YGG_RMQ_DEBUG', 'arg': 'rmq-loglevel',
         'help': 'Logging level for RabbitMQ operations.'},
     ('debug', 'client'): {
         'env': 'YGG_CLIENT_DEBUG', 'arg': 'client-loglevel',
@@ -420,9 +420,15 @@ def cfg_logging(cfg=None):
         cfg = ygg_cfg
     _LOG_FORMAT = "%(levelname)s:%(module)s.%(funcName)s[%(lineno)d]:%(message)s"
     logging.basicConfig(format=_LOG_FORMAT)
-    logLevelYGG = eval('logging.%s' % cfg.get('debug', 'ygg', 'NOTSET'))
-    logLevelRMQ = eval('logging.%s' % cfg.get('debug', 'rmq', 'INFO'))
-    logLevelCLI = eval('logging.%s' % cfg.get('debug', 'client', 'INFO'))
+    logLevelYGG = eval(
+        'logging.%s' % os.environ.get(
+            'YGG_DEBUG', cfg.get('debug', 'ygg', 'NOTSET')))
+    logLevelRMQ = eval(
+        'logging.%s' % os.environ.get(
+            'YGG_RMQ_DEBUG', cfg.get('debug', 'rmq', 'INFO')))
+    logLevelCLI = eval(
+        'logging.%s' % os.environ.get(
+            'YGG_CLIENT_DEBUG', cfg.get('debug', 'client', 'INFO')))
     ygg_logger = logging.getLogger("yggdrasil")
     rmq_logger = logging.getLogger("pika")
     if is_model:
@@ -556,6 +562,9 @@ def resolve_config_parser(args):
         args.client_loglevel = 'DEBUG'
         args.validate_components = True
         args.validate_messages = True
+    else:
+        args.loglevel = 'INFO'
+        args.client_loglevel = 'INFO'
     if args.validate_messages in ['True', 'False']:
         args.validate_messages = (args.validate_messages == 'True')
     return args

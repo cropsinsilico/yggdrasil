@@ -113,7 +113,7 @@ class AsyncComm(ProxyObject, ComponentBaseUnregistered):
 
     def _close_backlog(self, wait=False):
         r"""Close the backlog thread."""
-        self.info('')
+        self.debug('')
         if self._backlog_thread is not None:
             self.backlog_thread.set_break_flag()
         self.backlog_ready.set()
@@ -272,7 +272,7 @@ class AsyncComm(ProxyObject, ComponentBaseUnregistered):
             self.close()
             return
         if not self.recv_backlog():
-            self.info("Failure to receive message into backlog.")
+            self.debug("Failure to receive message into backlog.")
             self._close_backlog()
             return
         self.periodic_debug('run_backlog_recv', period=1000)(

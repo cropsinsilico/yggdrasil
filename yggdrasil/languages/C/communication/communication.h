@@ -48,7 +48,6 @@ comm_t* get_global_scope_comm(const char *name) {
     size_t i;
     comm_t* icomm = NULL;
     int current_thread = get_thread_id();
-    printf("CURRENT THREAD: %d\n", current_thread);
     for (i = 0; i < ncomms2clean; i++) {
       if (vcomms2clean[i] != NULL) {
 	icomm = (comm_t*)(vcomms2clean[i]);

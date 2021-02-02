@@ -1204,6 +1204,9 @@ class run_tsts(SubCommand):
             argv.append('-v')
         if args.nocapture:
             argv.append('-s')
+            argv += ['-o', 'log_cli=true']
+        if args.nologcapture:
+            argv += ['-o', 'log_cli=true']
         if args.stop:
             argv.append('-x')
         if args.withcoverage:

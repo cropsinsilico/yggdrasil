@@ -3,15 +3,13 @@ such that they can be run simultaneously, passing input back and forth."""
 import os
 import sys
 import shutil
-import logging
 from ._version import get_versions
 from yggdrasil import platform, config
 from yggdrasil.runner import YggFunction
 _test_package_name = None
 _test_package = None
-logging.basicConfig()
-logger = logging.getLogger(__name__)
-    
+config.cfg_logging()
+
 
 if platform._is_win:  # pragma: windows
     # This is required to fix crash on Windows in case of Ctrl+C
