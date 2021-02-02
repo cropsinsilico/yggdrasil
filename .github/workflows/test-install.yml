@@ -1108,22 +1108,38 @@ jobs:
   test_czmq:
     name: Build & test czmq 4.2.1 on MacOS catalina
     runs-on: macos-latest
+    env:
+      USING_CONDA: 1
+    defaults:
+      run:
+        shell: bash -l {0}
     steps:
     - uses: actions/checkout@v2
       with:
-        submodules: true
-    - name: Install CZMQ & dependencies
-      run: ./ci/install-czmq-osx.sh
-      shell: bash -l {0}
-    - name: Build and run the CZMQ selftests
-      run: 'cd czmq
+        repository: zeromq/czmq
+    - name: Set up miniconda
+      uses: conda-incubator/setup-miniconda@v2
+      with:
+        channels: conda-forge
+    - name: Install dependencies using conda
+      run: 'conda install cmake autoconf automake libtool pkg-config libuuid pcre
+        zeromq clang clangxx
 
-        make check
-
-        #  ctest -V
+        conda list
 
         '
-      shell: bash -l {0}
+    - name: Build the CZMQ package
+      continue-on-error: true
+      run: './autogen.sh
+
+        ./configure
+
+        '
+    - name: Run the tests
+      continue-on-error: true
+      run: 'make check-verbose
+
+        '
   docs:
     name: Build the Docs
     runs-on: ubuntu-latest
