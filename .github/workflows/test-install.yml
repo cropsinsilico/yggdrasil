@@ -203,12 +203,11 @@ jobs:
     - name: Run tests (2nd)
       if: matrix.test-flags2 != ''
       run: yggtest --ci --cov-append ${{ matrix.test-flags2 }}
-    - name: (CONDA) Combine XML reports
-      if: matrix.install-method == 'conda'
+    - name: Combine coverage reports
       continue-on-error: true
       run: 'ls .*
 
-        coverage combine
+        coverage combine --append
 
         '
     - name: (CONDA) Generate XML version of coverage report
@@ -434,12 +433,11 @@ jobs:
     - name: Run tests (2nd)
       if: matrix.test-flags2 != ''
       run: yggtest --ci --cov-append ${{ matrix.test-flags2 }}
-    - name: (CONDA) Combine XML reports
-      if: matrix.install-method == 'conda'
+    - name: Combine coverage reports
       continue-on-error: true
       run: 'ls .*
 
-        coverage combine
+        coverage combine --append
 
         '
     - name: (CONDA) Generate XML version of coverage report
@@ -645,12 +643,11 @@ jobs:
     - name: Run tests (2nd)
       if: matrix.test-flags2 != ''
       run: yggtest --ci --cov-append ${{ matrix.test-flags2 }}
-    - name: (CONDA) Combine XML reports
-      if: matrix.install-method == 'conda'
+    - name: Combine coverage reports
       continue-on-error: true
       run: 'ls .*
 
-        coverage combine
+        coverage combine --append
 
         '
     - name: (CONDA) Generate XML version of coverage report
@@ -858,12 +855,11 @@ jobs:
     - name: Run tests (2nd)
       if: matrix.test-flags2 != ''
       run: yggtest --ci --cov-append ${{ matrix.test-flags2 }}
-    - name: (CONDA) Combine XML reports
-      if: matrix.install-method == 'conda'
+    - name: Combine coverage reports
       continue-on-error: true
       run: 'ls .*
 
-        coverage combine
+        coverage combine --append
 
         '
     - name: (CONDA) Generate XML version of coverage report
@@ -1069,12 +1065,11 @@ jobs:
     - name: Run tests (2nd)
       if: matrix.test-flags2 != ''
       run: yggtest --ci --cov-append ${{ matrix.test-flags2 }}
-    - name: (CONDA) Combine XML reports
-      if: matrix.install-method == 'conda'
+    - name: Combine coverage reports
       continue-on-error: true
       run: 'ls .*
 
-        coverage combine
+        coverage combine --append
 
         '
     - name: (CONDA) Generate XML version of coverage report
