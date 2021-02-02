@@ -145,10 +145,13 @@ class RPCRequestDriver(ConnectionDriver):
             if (direction == "input") and (name in self.clients):
                 super(RPCRequestDriver, self).send_message(
                     YGG_CLIENT_EOF,
-                    header_kwargs={'raw': True,
+                    header_kwargs={'raw': True, 'model': name,
                                    'client_model': name})
-            return super(RPCRequestDriver, self).remove_model(
+            out = super(RPCRequestDriver, self).remove_model(
                 direction, name)
+            if out:
+                self.send_eof()
+            return out
         
     def on_eof(self):
         r"""On EOF, decrement number of clients. Only send EOF if the number
@@ -187,8 +190,6 @@ class RPCRequestDriver(ConnectionDriver):
                     self.debug("Comm closed, not creating response driver.")
                     return False
                 drv_args = [self.response_address]
-                import pprint
-                pprint.pprint(self.last_header)
                 drv_kwargs = dict(
                     msg_id=self.request_id,
                     request_name=self.name,

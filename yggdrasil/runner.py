@@ -539,6 +539,7 @@ class YggRunner(YggClass):
         # output, connections when a connection is closed.
         for srv_name in model.get('client_of', []):
             iod = self.connectiondrivers[srv_name]
+            iod['instance'].remove_model('input', model['name'])
             if iod['instance'].nclients == 0:
                 srv = self.modeldrivers[srv_name]
                 srv['instance'].stop()

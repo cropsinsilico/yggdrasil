@@ -286,6 +286,8 @@ class ServerComm(CommBase.CommBase):
         flag, msg, header = self.icomm.recv(*args, **kwargs)
         if flag:
             if isinstance(msg, bytes) and (msg == YGG_CLIENT_EOF):
+                self.debug("Client signed off: %s",
+                           header['client_model'])
                 self.closed_clients.append(header['client_model'])
                 kwargs['return_header'] = return_header
                 return self.recv(*args, **kwargs)
