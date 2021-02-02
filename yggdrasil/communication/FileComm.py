@@ -420,9 +420,10 @@ class FileComm(CommBase.CommBase):
             if self._series_index != series_index:
                 if (((self.direction == 'send')
                      or os.path.isfile(self.get_series_address(series_index)))):
-                    self._file_close()
-                    self._series_index = series_index
-                    self._open()
+                    with self._closing_thread.lock:
+                        self._file_close()
+                        self._series_index = series_index
+                        self._open()
                     out = True
                     self.debug("Advanced to %d", series_index)
         if out:
@@ -571,25 +572,26 @@ class FileComm(CommBase.CommBase):
     @property
     def n_msg_recv(self):
         r"""int: The number of messages in the file."""
-        if self.is_closed:
-            return 0
-        if self.read_meth == 'read':
-            return int(self.remaining_bytes > 0)
-        elif self.read_meth == 'readline':
-            pos = self.record_position()
-            try:
-                out = 0
-                flag, msg = self._recv()
-                while len(msg) != 0 and (not self.is_eof(msg)):
-                    out += 1
+        with self._closing_thread.lock:
+            if self.is_closed:
+                return 0
+            if self.read_meth == 'read':
+                return int(self.remaining_bytes > 0)
+            elif self.read_meth == 'readline':
+                pos = self.record_position()
+                try:
+                    out = 0
                     flag, msg = self._recv()
-            except ValueError:  # pragma: debug
+                    while len(msg) != 0 and (not self.is_eof(msg)):
+                        out += 1
+                        flag, msg = self._recv()
+                except ValueError:  # pragma: debug
+                    out = 0
+                self.change_position(*pos)
+            else:  # pragma: debug
+                self.error('Unsupported read_meth: %s', self.read_meth)
                 out = 0
-            self.change_position(*pos)
-        else:  # pragma: debug
-            self.error('Unsupported read_meth: %s', self.read_meth)
-            out = 0
-        return out
+            return out
 
     def on_send_eof(self, *args, **kwargs):
         r"""Close file when EOF to be sent.
