@@ -94,7 +94,8 @@ class TestScalarMetaschemaType(parent.TestMetaschemaType):
         if cls._explicit and ('Array' not in cls._cls):
             cls._invalid_encoded.append({'type': 'scalar',
                                          'subtype': 'invalid'})
-        cls._invalid_validate.append(np.array([None, 1, list()]))
+        cls._invalid_validate.append(np.array([None, 1, list()],
+                                              dtype=object))
 
     def test_from_array(self):
         r"""Test getting object from array."""
