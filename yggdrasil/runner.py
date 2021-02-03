@@ -477,8 +477,8 @@ class YggRunner(YggClass):
                 if not d.is_alive():
                     if not d.errors:
                         self.info("%s finished running.", drv['name'])
-                        self.do_model_exits(drv)
-                        self.debug("%s completed model exits.", drv['name'])
+                        # self.do_model_exits(drv)
+                        # self.debug("%s completed model exits.", drv['name'])
                         self.do_client_exits(drv)
                         self.debug("%s completed client exits.", drv['name'])
                         running.remove(drv)
@@ -502,30 +502,30 @@ class YggRunner(YggClass):
             self.terminate()
         self.debug('Returning')
 
-    def do_model_exits(self, model):
-        r"""Perform exits for IO drivers associated with a model.
+    # def do_model_exits(self, model):
+    #     r"""Perform exits for IO drivers associated with a model.
 
-        Args:
-            model (dict): Dictionary of model parameters including any
-                associated IO drivers.
+    #     Args:
+    #         model (dict): Dictionary of model parameters including any
+    #             associated IO drivers.
 
-        """
-        for drv in model['input_drivers']:
-            if model['name'] in drv['models']:
-                drv['models'].remove(model['name'])
-            if not drv['instance'].is_alive():
-                continue
-            if (len(drv['models']) == 0):
-                self.debug('on_model_exit %s', drv['name'])
-                drv['instance'].on_model_exit('output', model['name'])
-        for drv in model['output_drivers']:
-            if model['name'] in drv['models']:
-                drv['models'].remove(model['name'])
-            if not drv['instance'].is_alive():
-                continue
-            if (len(drv['models']) == 0):
-                self.debug('on_model_exit %s', drv['name'])
-                drv['instance'].on_model_exit('input', model['name'])
+    #     """
+    #     for drv in model['input_drivers']:
+    #         #  if model['name'] in drv['models']:
+    #         #     drv['models'].remove(model['name'])
+    #         if not drv['instance'].is_alive():
+    #             continue
+    #         # if (len(drv['models']) == 0):
+    #         self.debug('on_model_exit %s', drv['name'])
+    #         drv['instance'].on_model_exit('output', model['name'])
+    #     for drv in model['output_drivers']:
+    #         # if model['name'] in drv['models']:
+    #         #     drv['models'].remove(model['name'])
+    #         if not drv['instance'].is_alive():
+    #             continue
+    #         # if (len(drv['models']) == 0):
+    #         self.debug('on_model_exit %s', drv['name'])
+    #         drv['instance'].on_model_exit('input', model['name'])
     
     def do_client_exits(self, model):
         r"""Perform exits for IO drivers associated with a client model.

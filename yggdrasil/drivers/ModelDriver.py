@@ -1273,6 +1273,11 @@ class ModelDriver(Driver):
                 return
         self.wait_process(self.timeout, key_suffix='.after_loop')
         self.kill_process()
+        if not self.errors:
+            for drv in self.yml.get('input_drivers', []):
+                drv['instance'].on_model_exit('output', self.name)
+            for drv in self.yml.get('output_drivers', []):
+                drv['instance'].on_model_exit('input', self.name)
 
     @property
     def model_process_complete(self):
