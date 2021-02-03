@@ -79,9 +79,10 @@ class ForkComm(CommBase.CommBase):
             x.disconnect()
         super(ForkComm, self).disconnect()
         
-    def printStatus(self, nindent=0):
+    def printStatus(self, nindent=0, **kwargs):
         r"""Print status of the communicator."""
-        super(ForkComm, self).printStatus(nindent=nindent)
+        super(ForkComm, self).printStatus(nindent=nindent,
+                                          **kwargs)
         for x in self.comm_list:
             x.printStatus(nindent=nindent + 1)
 

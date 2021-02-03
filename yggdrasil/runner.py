@@ -466,7 +466,7 @@ class YggRunner(YggClass):
             raise
         self.debug('ALL DRIVERS STARTED')
 
-    def waitModels(self, timeout=None):
+    def waitModels(self, timeout=False):
         r"""Wait for all model drivers to finish. When a model finishes,
         join the thread and perform exits for associated IO drivers."""
         self.debug('')

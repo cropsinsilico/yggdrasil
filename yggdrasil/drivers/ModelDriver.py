@@ -1225,7 +1225,10 @@ class ModelDriver(Driver):
         if len(line) == 0:
             # self.info("%s: Empty line from stdout" % self.name)
             self.queue_thread.set_break_flag()
-            self.queue.put(self._exit_line)
+            try:
+                self.queue.put(self._exit_line)
+            except multitasking.AliasDisconnectError:
+                self.error("Queue disconnected")
             self.debug("End of model output")
             try:
                 self.queue_close()
@@ -1252,6 +1255,9 @@ class ModelDriver(Driver):
             # This sleep is necessary to allow changes in queue without lock
             self.sleep()
             return
+        except multitasking.AliasDisconnectError:
+            self.error("Queue disconnected")
+            self.set_break_flag()
         else:
             if (line == self._exit_line):
                 self.debug("No more output")
@@ -1273,17 +1279,18 @@ class ModelDriver(Driver):
                 return
         self.wait_process(self.timeout, key_suffix='.after_loop')
         self.kill_process()
-        if not self.errors:
-            self.debug(("Closing input/output drivers:\n"
-                        "\tinput: %s\n\toutput: %s")
-                       % ([drv['name'] for drv in
-                           self.yml.get('input_drivers', [])],
-                          [drv['name'] for drv in
-                           self.yml.get('output_drivers', [])]))
-            for drv in self.yml.get('input_drivers', []):
-                drv['instance'].on_model_exit('output', self.name)
-            for drv in self.yml.get('output_drivers', []):
-                drv['instance'].on_model_exit('input', self.name)
+        self.debug(("Closing input/output drivers:\n"
+                    "\tinput: %s\n\toutput: %s")
+                   % ([drv['name'] for drv in
+                       self.yml.get('input_drivers', [])],
+                      [drv['name'] for drv in
+                       self.yml.get('output_drivers', [])]))
+        for drv in self.yml.get('input_drivers', []):
+            drv['instance'].on_model_exit('output', self.name,
+                                          errors=self.errors)
+        for drv in self.yml.get('output_drivers', []):
+            drv['instance'].on_model_exit('input', self.name,
+                                          errors=self.errors)
 
     @property
     def model_process_complete(self):
