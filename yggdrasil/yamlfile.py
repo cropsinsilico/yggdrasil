@@ -222,6 +222,8 @@ def parse_yaml(files, as_function=False):
             existing = parse_component(yml, k[:-1], existing=existing)
     # Create server/client connections
     for srv, clients in existing['server'].items():
+        if srv not in existing['input']:
+            continue
         yml = {'inputs': [{'name': x} for x in clients],
                'outputs': [{'name': srv}],
                'driver': 'RPCRequestDriver',
