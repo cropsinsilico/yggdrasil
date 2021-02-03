@@ -1,3 +1,4 @@
+import os
 from yggdrasil import multitasking
 from yggdrasil.components import import_component
 from yggdrasil.drivers.InterpretedModelDriver import InterpretedModelDriver
@@ -52,6 +53,11 @@ class DSLModelDriver(InterpretedModelDriver):  # pragma: no cover
 
         """
         return None
+
+    @classmethod
+    def model_wrapper_no_forward(cls, *args, **kwargs):
+        os.setpgrp()
+        return cls.model_wrapper(*args, **kwargs)
     
     @classmethod
     def model_wrapper(cls, *args, **kwargs):  # pragma: no cover
@@ -106,7 +112,7 @@ class DSLModelDriver(InterpretedModelDriver):  # pragma: no cover
         self.debug('Environment Variables:\n%s',
                    self.pprint(kwargs['env'], block_indent=1))
         p = multitasking.YggTask(task_method='process', with_pipe=True,
-                                 target=self.model_wrapper,
+                                 target=self.model_wrapper_no_forward,
                                  args=args, kwargs=kwargs)
         p.start()
         if return_process:
