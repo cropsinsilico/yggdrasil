@@ -229,6 +229,7 @@ jobs:
       uses: codecov/codecov-action@v1
       with:
         name: ${{ env.YGG_GHA_JOB_ID }}
+        token: ${{ secrets.CODECOV_TOKEN }}
     - name: Download the last successful workflow environment log
       if: ${{ always() }}
       continue-on-error: true
