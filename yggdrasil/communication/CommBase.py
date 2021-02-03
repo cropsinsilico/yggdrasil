@@ -1652,9 +1652,6 @@ class CommBase(tools.YggClass):
             msg_ = self.apply_transform(msg)
             # Serialize
             add_sinfo = (self._send_serializer and (not self.is_file))
-            if add_sinfo:
-                self.debug('Sending sinfo: %.100s',
-                           str(self.serializer.serializer_info))
             msg_s = self.serialize(msg_, header_kwargs=header_kwargs,
                                    add_serializer_info=add_sinfo)
             if self.no_serialization:

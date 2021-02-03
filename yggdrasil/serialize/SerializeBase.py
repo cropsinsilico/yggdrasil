@@ -694,7 +694,8 @@ class SerializeBase(tools.YggClass):
         metadata = {'no_metadata': no_metadata,
                     'max_header_size': max_header_size}
         if add_serializer_info:
-            self.debug("serializer_info = %.100s...", str(self.serializer_info))
+            self.verbose_debug("serializer_info = %.100s...",
+                               str(self.serializer_info))
             metadata.update(self.serializer_info)
             metadata['typedef_base'] = self.typedef
         if header_kwargs is not None:

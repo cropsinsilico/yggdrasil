@@ -52,20 +52,26 @@ class YggFunction(YggClass):
         self.outputs = {}
         # import zmq; ctx = zmq.Context()
         for drv in self.model_driver['input_drivers']:
-            os.environ.update(**drv['instance'].env)
+            for env in drv['instance'].model_env.values():
+                os.environ.update(env)
+            channel_name = drv['instance'].ocomm.name
             var_name = drv['name'].split('function_')[-1]
             self.outputs[var_name] = drv.copy()
             self.outputs[var_name]['vars'] = [
                 iv.split(':')[-1] for iv in drv.get('vars', [var_name])]
-            self.outputs[var_name]['comm'] = YggInput(drv['name'])  # , is_interface=True)
+            self.outputs[var_name]['comm'] = YggInput(
+                channel_name, no_suffix=True)
             # context=ctx)
         for drv in self.model_driver['output_drivers']:
+            for env in drv['instance'].model_env.values():
+                os.environ.update(env)
+            channel_name = drv['instance'].icomm.name
             var_name = drv['name'].split('function_')[-1]
-            os.environ.update(**drv['instance'].env)
             self.inputs[var_name] = drv.copy()
             self.inputs[var_name]['vars'] = [
                 iv.split(':')[-1] for iv in drv.get('vars', [var_name])]
-            self.inputs[var_name]['comm'] = YggOutput(drv['name'])  # , is_interface=True)
+            self.inputs[var_name]['comm'] = YggOutput(
+                channel_name, no_suffix=True)
             # context=ctx)
         self._stop_called = False
         atexit.register(self.stop)
@@ -137,15 +143,15 @@ class YggFunction(YggClass):
         self._stop_called = True
         for x in self.inputs.values():
             x['comm'].send_eof()
+            x['comm'].linger_close()
         for x in self.outputs.values():
             x['comm'].close()
         self.model_driver['instance'].terminate()
-        self.runner.waitModels()
+        self.runner.waitModels(timeout=10)
         for x in self.inputs.values():
             x['comm'].close()
+        self.runner.terminate()
         self.runner.atexit()
-        # self.runner.terminate()
-        # self.runner.atexit()
 
 
 class YggRunner(YggClass):
@@ -460,13 +466,16 @@ class YggRunner(YggClass):
             raise
         self.debug('ALL DRIVERS STARTED')
 
-    def waitModels(self):
+    def waitModels(self, timeout=None):
         r"""Wait for all model drivers to finish. When a model finishes,
         join the thread and perform exits for associated IO drivers."""
         self.debug('')
         running = [d for d in self.modeldrivers.values()]
         dead = []
-        while (len(running) > 0) and (not self.error_flag):
+        Tout = self.start_timeout(t=timeout,
+                                  key_suffix='.waitModels')
+        while ((len(running) > 0) and (not self.error_flag)
+               and (not Tout.is_out)):
             for drv in running:
                 d = drv['instance']
                 if d.errors:  # pragma: debug
@@ -491,6 +500,7 @@ class YggRunner(YggClass):
                 d.join(0.1)
                 if not d.is_alive():
                     dead.append(drv['name'])
+        self.stop_timeout(key_suffix='.waitModels')
         for d in self.modeldrivers.values():
             if d['instance'].errors:
                 self.error_flag = True

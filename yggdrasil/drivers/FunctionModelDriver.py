@@ -30,6 +30,18 @@ class FunctionModelDriver(InterpretedModelDriver):
         return True
 
     @classmethod
+    def is_configured(cls):
+        r"""Determine if the appropriate configuration has been performed (e.g.
+        installation of supporting libraries etc.)
+
+        Returns:
+            bool: True if the language has been configured.
+
+        """
+        # There are not any config options
+        return True
+
+    @classmethod
     def language_version(cls, **kwargs):
         r"""Determine the version of this language.
 
