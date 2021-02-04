@@ -7,7 +7,7 @@ on:
 
 jobs:
   test_conda:
-    name: Build & test czmq against conda dependencies: ${{ matrix.os }}
+    name: Using conda dependencies: ${{ matrix.os }}
     runs-on: ${{ matrix.os }}
     env:
       CONFIGURATION: Debug
@@ -90,7 +90,7 @@ jobs:
       run: |
         brew update
         brew install git libtool pkg-config autoconf automake cmake ossp-uuid pcre
-    - name: Clone, build, & install zeromq master branch
+    - name: Clone, build, and install zeromq master branch
       run: |
         cd ..
         git clone git://github.com/zeromq/libzmq.git
