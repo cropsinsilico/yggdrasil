@@ -189,7 +189,7 @@ class ServerComm(CommBase.CommBase):
         self.ocomm[request_id] = get_comm(
             self.name + '.server_response_comm.' + request_id,
             **comm_kwargs)
-        client_model = header.get('client_model', '')
+        client_model = header.get('model', '')
         self.ocomm[request_id].client_model = client_model
         if client_model and (client_model not in self.clients):
             self.clients.append(client_model)
@@ -287,8 +287,8 @@ class ServerComm(CommBase.CommBase):
         if flag:
             if isinstance(msg, bytes) and (msg == YGG_CLIENT_EOF):
                 self.debug("Client signed off: %s",
-                           header['client_model'])
-                self.closed_clients.append(header['client_model'])
+                           header['model'])
+                self.closed_clients.append(header['model'])
                 kwargs['return_header'] = return_header
                 return self.recv(*args, **kwargs)
             elif not (self.icomm.is_eof(msg) or self.icomm.is_empty_recv(msg)):

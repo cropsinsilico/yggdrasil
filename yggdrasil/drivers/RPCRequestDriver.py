@@ -145,8 +145,7 @@ class RPCRequestDriver(ConnectionDriver):
             if (direction == "input") and (name in self.clients):
                 super(RPCRequestDriver, self).send_message(
                     YGG_CLIENT_EOF,
-                    header_kwargs={'raw': True, 'model': name,
-                                   'client_model': name})
+                    header_kwargs={'raw': True, 'model': name})
             out = super(RPCRequestDriver, self).remove_model(
                 direction, name)
             if out:
