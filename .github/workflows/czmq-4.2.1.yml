@@ -11,6 +11,10 @@ jobs:
     runs-on: ${{ matrix.os }}
     env:
       CONFIGURATION: Debug
+      CONDA_PKGS_ALL: 'cmake pcre zeromq'
+      CONDA_PKGS_UNIX: 'autoconf automake libtool libuuid pkg-config'
+      CONDA_PKGS_OSX: 'clang clangxx'
+      CONDA_PKGS_WIN: 'c-compiler cxx-compiler ninja'
     strategy:
       max-parallel: 20
       matrix:
@@ -29,17 +33,15 @@ jobs:
         channels: conda-forge
     - name: Install dependencies using conda (WINDOWS)
       if: matrix.os == 'windows-latest'
-      run: conda install c-compiler cxx-compiler ninja
+      run: conda install ${{ env.CONDA_PKGS_ALL }} ${{ env.CONDA_PKGS_WIN }}
     - name: Install dependencies using conda (OSX)
       if: matrix.os == 'macos-latest'
-      run: conda install clang clangxx
-    - name: Install dependencies using conda (OSX/LINUX)
-      if: matrix.os != 'windows-latest'
-      run: conda install autoconf automake libtool libuuid pkg-config
-    - name: Install dependencies using conda (ALL)
-      run: |
-        conda install cmake pcre zeromq
-        conda list
+      run: conda install ${{ env.CONDA_PKGS_ALL }} ${{ env.CONDA_PKGS_UNIX }} ${{ env.CONDA_PKGS_OSX }}
+    - name: Install dependencies using conda (LINUX)
+      if: matrix.os == 'ubuntu-latest'
+      run: conda install ${{ env.CONDA_PKGS_ALL }} ${{ env.CONDA_PKGS_UNIX }}
+    - name: List conda packages
+      run: conda list
     - name: Set environment variable pointing to the conda library directory (OSX)
       if: matrix.os == 'macos-latest'
       run: echo "LDFLAGS=\"-Wl,-rpath,$CONDA_PREFIX/lib $LDFLAGS\"" >> $GITHUB_ENV
