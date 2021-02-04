@@ -42,9 +42,9 @@ jobs:
       run: conda install ${{ env.CONDA_PKGS_ALL }} ${{ env.CONDA_PKGS_UNIX }}
     - name: List conda packages
       run: conda list
-    - name: Set environment variable pointing to the conda library directory (OSX)
-      if: matrix.os == 'macos-latest'
-      run: echo "LDFLAGS=\"-Wl,-rpath,$CONDA_PREFIX/lib $LDFLAGS\"" >> $GITHUB_ENV
+    # - name: Set environment variable pointing to the conda library directory (OSX)
+    #   if: matrix.os == 'macos-latest'
+    #   run: echo "LDFLAGS=\"-Wl,-rpath,$CONDA_PREFIX/lib $LDFLAGS\"" >> $GITHUB_ENV
     - name: Build the CZMQ package (OSX/LINUX)
       if: matrix.os != 'windows-latest'
       run: |
