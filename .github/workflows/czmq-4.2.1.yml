@@ -62,7 +62,8 @@ jobs:
     - name: Run the tests (WINDOWS)
       if: matrix.os == 'windows-latest'
       run: |
-        ctest -C ${{ env.CONFIGURATION }} -V
+        make test
+        # ctest -C ${{ env.CONFIGURATION }} -V
     # - name: Start SSH session
     #   uses: luchihoratiu/debug-via-ssh@main
     #   if: ${{ failure() }}
