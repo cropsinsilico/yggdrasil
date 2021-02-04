@@ -4,13 +4,14 @@ on:
   push:
     branches-ignore:
       - 'gh-pages'
+env:
+  CONFIGURATION: Debug
 
 jobs:
   test_conda:
     name: Using conda dependencies (${{ matrix.os }})
     runs-on: ${{ matrix.os }}
     env:
-      CONFIGURATION: Debug
       CONDA_PKGS_ALL: 'cmake pcre zeromq'
       CONDA_PKGS_UNIX: 'autoconf automake libtool libuuid pkg-config'
       CONDA_PKGS_OSX: 'clang_osx-64 clangxx_osx-64'
@@ -65,8 +66,6 @@ jobs:
       if: matrix.os == 'windows-latest'
       run: |
         ./build/${{ env.CONFIGURATION }}/czmq_selftest.exe
-        # make test
-        # ctest -C ${{ env.CONFIGURATION }} -V
     # - name: Start SSH session
     #   uses: luchihoratiu/debug-via-ssh@main
     #   if: ${{ failure() }}
@@ -75,13 +74,16 @@ jobs:
     #     SSH_PASS: ${{ secrets.SSH_PASS }}
 
   test_brew:
-    name: Using dependencies from Homebrew (${{ matrix.os }})
-    runs-on: macos-latest
+    name: Using dependencies from package managers (${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
     strategy:
       max-parallel: 20
       fail-fast: false
       matrix:
-        os: [macos-latest]
+        os: [ubuntu-latest, macos-latest, windows-latest]
+    defaults:
+      run:
+        shell: bash -l {0}
     steps:
     - uses: actions/checkout@v2
       with:
@@ -96,14 +98,34 @@ jobs:
       run: |
         sudo apt-get update
         sudo apt-get install -y build-essential libtool pkg-config autotools-dev autoconf automake cmake uuid-dev libpcre3-dev libzmq3-dev
+    - name: Set up MSVC Compiler (WINDOWS)
+      uses: ilammy/msvc-dev-cmd@v1
+      if: matrix.os == 'windows-latest'
+    - name: Install dependencies using choco (WINDOWS)
+      if: matrix.os == 'windows-latest'
+      run: |
+        choco install cmake
+        choco install zeromq
     - name: Build the CZMQ package (OSX/LINUX)
       if: matrix.os != 'windows-latest'
       run: |
         ./autogen.sh
         ./configure
+    - name: Build the CZMQ package (WINDOWS)
+      if: matrix.os == 'windows-latest'
+      run: |
+        mkdir build
+        cd build
+        cmake .. -DCZMQ_BUILD_SHARED=ON -DCZMQ_BUILD_STATIC=OFF
+        cmake --build . --config ${{ env.CONFIGURATION }}
     - name: Run the tests (OSX/LINUX)
       if: matrix.os != 'windows-latest'
-      run: make check-verbose
+      run: |
+        make check-verbose
+    - name: Run the tests (WINDOWS)
+      if: matrix.os == 'windows-latest'
+      run: |
+        ./build/${{ env.CONFIGURATION }}/czmq_selftest.exe
     # - name: Start SSH session
     #   uses: luchihoratiu/debug-via-ssh@main
     #   if: ${{ failure() }}
@@ -113,12 +135,15 @@ jobs:
 
   test_git:
     name: Using Github master version of zeromq (${{ matrix.os }})
-    runs-on: macos-latest
+    runs-on: ${{ matrix.os }}
     strategy:
       max-parallel: 20
       fail-fast: false
       matrix:
-        os: [macos-latest]
+        os: [ubuntu-latest, macos-latest, windows-latest]
+    defaults:
+      run:
+        shell: bash -l {0}
     steps:
     - uses: actions/checkout@v2
       with:
@@ -133,24 +158,60 @@ jobs:
       run: |
         sudo apt-get update
         sudo apt-get install -y build-essential libtool pkg-config autotools-dev autoconf automake cmake uuid-dev libpcre3-dev
-    - name: Clone, build, and install zeromq master branch
-      if: matrix.os != 'windows-latest'
+    - name: Set up MSVC Compiler (WINDOWS)
+      uses: ilammy/msvc-dev-cmd@v1
+      if: matrix.os == 'windows-latest'
+    - name: Install dependencies using choco (WINDOWS)
+      if: matrix.os == 'windows-latest'
+      run: |
+        choco install cmake
+    - name: Clone zeromq master branch
       run: |
         cd ..
         git clone git://github.com/zeromq/libzmq.git
-        cd libzmq
+    - name: Build and install zeromq master branch (WINDOWS)
+      if: matrix.os == 'windows-latest'
+      run: |
+        cd ../libzmq
+        mkdir build
+        cd build
+        cmake .. -DBUILD_STATIC=OFF -DBUILD_SHARED=ON -DCMAKE_INSTALL_PREFIX=C:\\libzmq
+        cmake --build . --config ${{ env.CONFIGURATION }} --target install
+        cd ../..
+    - name: Build and install zeromq master branch (OSX/LINUX)
+      if: matrix.os != 'windows-latest'
+      run: |
+        cd ../libzmq
         ./autogen.sh
         ./configure --with-libsodium
         sudo make install
         cd ..
-    - name: Build the CZMQ package
+    - name: Run ldconfig (LINUX)
+      if: matrix.os == 'ubuntu-latest'
+      run: |
+        cd ../libzmq
+        sudo ldconfig
+        cd ..
+    - name: Build the CZMQ package (OSX/LINUX)
       if: matrix.os != 'windows-latest'
       run: |
         ./autogen.sh
         ./configure
-    - name: Run the tests
+    - name: Build the CZMQ package (WINDOWS)
+      if: matrix.os == 'windows-latest'
+      run: |
+        mkdir build
+        cd build
+        cmake .. -DCZMQ_BUILD_SHARED=ON -DCZMQ_BUILD_STATIC=OFF -DCMAKE_PREFIX_PATH=C:\\libzmq
+        cmake --build . --config ${{ env.CONFIGURATION }}
+    - name: Run the tests (OSX/LINUX)
       if: matrix.os != 'windows-latest'
-      run: make check-verbose
+      run: |
+        make check-verbose
+    - name: Run the tests (WINDOWS)
+      if: matrix.os == 'windows-latest'
+      run: |
+        ./build/${{ env.CONFIGURATION }}/czmq_selftest.exe
     # - name: Start SSH session
     #   uses: luchihoratiu/debug-via-ssh@main
     #   if: ${{ failure() }}
