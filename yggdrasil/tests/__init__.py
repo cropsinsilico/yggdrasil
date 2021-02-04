@@ -122,7 +122,7 @@ def check_enabled_languages(language, return_decorators=False):
         cond = (language.lower() in disabled)
         if return_decorators:
             decorators.append(unittest.skipIf(cond, msg))
-        elif cond:
+        elif cond:  # pragma: debug
             raise unittest.SkipTest(msg)
     if return_decorators:
         return decorators
