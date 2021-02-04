@@ -183,7 +183,7 @@ jobs:
       run: |
         cd ../libzmq
         ./autogen.sh
-        ./configure --with-libsodium
+        ./configure
         sudo make install
         cd ..
     - name: Run ldconfig (LINUX)
