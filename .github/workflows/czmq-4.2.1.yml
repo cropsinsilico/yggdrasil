@@ -65,7 +65,8 @@ jobs:
     - name: Run the tests (WINDOWS)
       if: matrix.os == 'windows-latest'
       run: |
-        ./build/${{ env.CONFIGURATION }}/czmq_selftest.exe
+        cd build/${{ env.CONFIGURATION }}
+        ./czmq_selftest.exe
     # - name: Start SSH session
     #   uses: luchihoratiu/debug-via-ssh@main
     #   if: ${{ failure() }}
@@ -125,7 +126,8 @@ jobs:
     - name: Run the tests (WINDOWS)
       if: matrix.os == 'windows-latest'
       run: |
-        ./build/${{ env.CONFIGURATION }}/czmq_selftest.exe
+        cd build/${{ env.CONFIGURATION }}
+        ./czmq_selftest.exe
     # - name: Start SSH session
     #   uses: luchihoratiu/debug-via-ssh@main
     #   if: ${{ failure() }}
@@ -212,7 +214,8 @@ jobs:
     - name: Run the tests (WINDOWS)
       if: matrix.os == 'windows-latest'
       run: |
-        ./build/${{ env.CONFIGURATION }}/czmq_selftest.exe
+        cd build/${{ env.CONFIGURATION }}
+        ./czmq_selftest.exe
     # - name: Start SSH session
     #   uses: luchihoratiu/debug-via-ssh@main
     #   if: ${{ failure() }}
