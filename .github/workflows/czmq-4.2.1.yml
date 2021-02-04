@@ -27,9 +27,18 @@ jobs:
       uses: conda-incubator/setup-miniconda@v2
       with:
         channels: conda-forge
-    - name: Install dependencies using conda
+    - name: Install dependencies using conda (WINDOWS)
+      if: matrix.os == 'windows-latest'
+      run: conda install vs2017 ninja
+    - name: Install dependencies using conda (OSX)
+      if: matrix.os == 'macos-latest'
+      run: conda install clang clangxx
+    - name: Install dependencies using conda (OSX/LINUX)
+      if: matrix.os != 'windows-latest'
+      run: conda install autoconf automake libtool libuuid pkg-config
+    - name: Install dependencies using conda (ALL)
       run: |
-        conda install cmake autoconf automake libtool pkg-config libuuid pcre zeromq clang clangxx
+        conda install cmake pcre zeromq
         conda list
     - name: Set environment variable pointing to the conda library directory (OSX)
       if: matrix.os == 'macos-latest'
@@ -71,15 +80,23 @@ jobs:
     - uses: actions/checkout@v2
       with:
         repository: zeromq/czmq
-    - name: Install dependencies using homebrew
+    - name: Install dependencies using homebrew (OSX)
+      if: matrix.os == 'macos-latest'
       run: |
         brew update
         brew install git libtool pkg-config autoconf automake cmake ossp-uuid pcre zmq
-    - name: Build the CZMQ package
+    - name: Install dependencies using apt-get (LINUX)
+      if: matrix.os == 'ubuntu-latest'
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y build-essential libtool pkg-config autotools-dev autoconf automake cmake uuid-dev libpcre3-dev libzmq3-dev
+    - name: Build the CZMQ package (OSX/LINUX)
+      if: matrix.os != 'windows-latest'
       run: |
         ./autogen.sh
         ./configure
-    - name: Run the tests
+    - name: Run the tests (OSX/LINUX)
+      if: matrix.os != 'windows-latest'
       run: make check-verbose
     # - name: Start SSH session
     #   uses: luchihoratiu/debug-via-ssh@main
@@ -98,11 +115,18 @@ jobs:
     - uses: actions/checkout@v2
       with:
         repository: zeromq/czmq
-    - name: Install dependencies using homebrew
+    - name: Install dependencies using homebrew (OSX)
+      if: matrix.os == 'macos-latest'
       run: |
         brew update
         brew install git libtool pkg-config autoconf automake cmake ossp-uuid pcre
+    - name: Install dependencies using apt-get (LINUX)
+      if: matrix.os == 'ubuntu-latest'
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y build-essential libtool pkg-config autotools-dev autoconf automake cmake uuid-dev libpcre3-dev
     - name: Clone, build, and install zeromq master branch
+      if: matrix.os != 'windows-latest'
       run: |
         cd ..
         git clone git://github.com/zeromq/libzmq.git
@@ -112,10 +136,12 @@ jobs:
         sudo make install
         cd ..
     - name: Build the CZMQ package
+      if: matrix.os != 'windows-latest'
       run: |
         ./autogen.sh
         ./configure
     - name: Run the tests
+      if: matrix.os != 'windows-latest'
       run: make check-verbose
     # - name: Start SSH session
     #   uses: luchihoratiu/debug-via-ssh@main
