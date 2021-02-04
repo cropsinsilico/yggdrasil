@@ -72,11 +72,13 @@ jobs:
     #     SSH_PASS: ${{ secrets.SSH_PASS }}
 
   test_brew:
-    name: Using dependencies from Homebrew (OSX)
+    name: Using dependencies from Homebrew (${{ matrix.os }})
     runs-on: macos-latest
     strategy:
       max-parallel: 20
       fail-fast: false
+      matrix:
+        os: [macos-latest]
     steps:
     - uses: actions/checkout@v2
       with:
@@ -107,11 +109,13 @@ jobs:
     #     SSH_PASS: ${{ secrets.SSH_PASS }}
 
   test_git:
-    name: Using Github master version of zeromq (OSX)
+    name: Using Github master version of zeromq (${{ matrix.os }})
     runs-on: macos-latest
     strategy:
       max-parallel: 20
       fail-fast: false
+      matrix:
+        os: [macos-latest]
     steps:
     - uses: actions/checkout@v2
       with:
