@@ -13,7 +13,7 @@ jobs:
       CONFIGURATION: Debug
       CONDA_PKGS_ALL: 'cmake pcre zeromq'
       CONDA_PKGS_UNIX: 'autoconf automake libtool libuuid pkg-config'
-      CONDA_PKGS_OSX: 'clang clangxx'
+      CONDA_PKGS_OSX: 'clang_osx-64 clangxx_osx-64'
       CONDA_PKGS_WIN: 'c-compiler cxx-compiler ninja'
     strategy:
       max-parallel: 20
