@@ -1,0 +1,107 @@
+name: Test of czmq 4.2.1
+
+on:
+  push:
+    branches-ignore:
+      - 'gh-pages'
+
+jobs:
+  test_conda:
+    name: Build & test czmq against conda dependencies: ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    env:
+      CONFIGURATION: Debug
+    strategy:
+      max-parallel: 20
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+      fail-fast: false
+    defaults:
+      run:
+        shell: bash -l {0}
+    steps:
+    - uses: actions/checkout@v2
+      with:
+        repository: zeromq/czmq
+    - name: Set up miniconda
+      uses: conda-incubator/setup-miniconda@v2
+      with:
+        channels: conda-forge
+    - name: Install dependencies using conda
+      run: |
+        conda install cmake autoconf automake libtool pkg-config libuuid pcre zeromq clang clangxx
+        conda list
+    - name: Set environment variable pointing to the conda library directory (OSX)
+      if: matrix.os == 'macos-latest'
+      run: echo "LDFLAGS=\"-Wl,-rpath,$CONDA_PREFIX/lib $LDFLAGS\"" >> $GITHUB_ENV
+    - name: Build the CZMQ package (OSX/LINUX)
+      if: matrix.os != 'windows-latest'
+      run: |
+        ./autogen.sh
+        ./configure
+    - name: Build the CZMQ package (WINDOWS)
+      if: matrix.os == 'windows-latest'
+      run: |
+        mkdir build
+        cd build
+        cmake .. -DCZMQ_BUILD_SHARED=ON -DCZMQ_BUILD_STATIC=OFF -DCMAKE_PREFIX_PATH=$CONDA_PREFIX/lib
+        cmake --build . --config ${{ env.CONFIGURATION }}
+    - name: Run the tests (OSX/LINUX)
+      if: matrix.os != 'windows-latest'
+      run: |
+        make check-verbose
+    - name: Run the tests (WINDOWS)
+      if: matrix.os == 'windows-latest'
+      run: |
+        ctest -C ${{ env.CONFIGURATION }} -V
+
+  test_brew:
+    name: Using dependencies from Homebrew (OSX)
+    runs-on: macos-latest
+    strategy:
+      max-parallel: 20
+      fail-fast: false
+    steps:
+    - uses: actions/checkout@v2
+      with:
+        repository: zeromq/czmq
+    - name: Install dependencies using homebrew
+      run: |
+        brew update
+        brew install git libtool pkg-config autoconf automake cmake ossp-uuid pcre zmq
+    - name: Build the CZMQ package
+      run: |
+        ./autogen.sh
+        ./configure
+    - name: Run the tests
+      run: make check-verbose
+
+  test_git:
+    name: Using Github master version of zeromq (OSX)
+    runs-on: macos-latest
+    strategy:
+      max-parallel: 20
+      fail-fast: false
+    steps:
+    - uses: actions/checkout@v2
+      with:
+        repository: zeromq/czmq
+    - name: Install dependencies using homebrew
+      run: |
+        brew update
+        brew install git libtool pkg-config autoconf automake cmake ossp-uuid pcre
+    - name: Clone, build, & install zeromq master branch
+      run: |
+        cd ..
+        git clone git://github.com/zeromq/libzmq.git
+        cd libzmq
+        ./autogen.sh
+        ./configure --with-libsodium
+        sudo make install
+        cd ..
+    - name: Build the CZMQ package
+      run: |
+        ./autogen.sh
+        ./configure
+    - name: Run the tests
+      run: make check-verbose
