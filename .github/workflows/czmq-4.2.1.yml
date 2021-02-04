@@ -101,11 +101,11 @@ jobs:
     - name: Set up MSVC Compiler (WINDOWS)
       uses: ilammy/msvc-dev-cmd@v1
       if: matrix.os == 'windows-latest'
-    - name: Install dependencies using choco (WINDOWS)
+    - name: Install dependencies using choco & vcpkg (WINDOWS)
       if: matrix.os == 'windows-latest'
       run: |
         choco install cmake
-        choco install zeromq
+        vcpkg install zeromq pcre --triplet x64-windows
     - name: Build the CZMQ package (OSX/LINUX)
       if: matrix.os != 'windows-latest'
       run: |
@@ -161,10 +161,11 @@ jobs:
     - name: Set up MSVC Compiler (WINDOWS)
       uses: ilammy/msvc-dev-cmd@v1
       if: matrix.os == 'windows-latest'
-    - name: Install dependencies using choco (WINDOWS)
+    - name: Install dependencies using choco & vcpkg (WINDOWS)
       if: matrix.os == 'windows-latest'
       run: |
         choco install cmake
+        vcpkg install pcre --triplet x64-windows
     - name: Clone zeromq master branch
       run: |
         cd ..
