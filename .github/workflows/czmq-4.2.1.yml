@@ -7,7 +7,7 @@ on:
 
 jobs:
   test_conda:
-    name: Using conda dependencies ({{ matrix.os }})
+    name: Using conda dependencies (${{ matrix.os }})
     runs-on: ${{ matrix.os }}
     env:
       CONFIGURATION: Debug
@@ -54,6 +54,12 @@ jobs:
       if: matrix.os == 'windows-latest'
       run: |
         ctest -C ${{ env.CONFIGURATION }} -V
+    # - name: Start SSH session
+    #   uses: luchihoratiu/debug-via-ssh@main
+    #   if: ${{ failure() }}
+    #   with:
+    #     NGROK_AUTH_TOKEN: ${{ secrets.NGROK_AUTH_TOKEN }}
+    #     SSH_PASS: ${{ secrets.SSH_PASS }}
 
   test_brew:
     name: Using dependencies from Homebrew (OSX)
@@ -75,6 +81,12 @@ jobs:
         ./configure
     - name: Run the tests
       run: make check-verbose
+    # - name: Start SSH session
+    #   uses: luchihoratiu/debug-via-ssh@main
+    #   if: ${{ failure() }}
+    #   with:
+    #     NGROK_AUTH_TOKEN: ${{ secrets.NGROK_AUTH_TOKEN }}
+    #     SSH_PASS: ${{ secrets.SSH_PASS }}
 
   test_git:
     name: Using Github master version of zeromq (OSX)
@@ -105,3 +117,9 @@ jobs:
         ./configure
     - name: Run the tests
       run: make check-verbose
+    # - name: Start SSH session
+    #   uses: luchihoratiu/debug-via-ssh@main
+    #   if: ${{ failure() }}
+    #   with:
+    #     NGROK_AUTH_TOKEN: ${{ secrets.NGROK_AUTH_TOKEN }}
+    #     SSH_PASS: ${{ secrets.SSH_PASS }}
