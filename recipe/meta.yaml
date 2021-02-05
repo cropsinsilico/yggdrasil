@@ -53,8 +53,7 @@ requirements:
     - zeromq
   run:
     - cmake
-    - czmq  # [not osx]
-    - czmq!=4.2.1  # [osx]
+    - czmq
     - flaky
     - git
     - GitPython

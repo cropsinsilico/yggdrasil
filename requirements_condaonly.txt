@@ -1,6 +1,5 @@
 cmake            # [conda,c]
-czmq; platform_system != 'Darwin' # [conda,zmq,c]
-czmq!=4.2.1; platform_system == 'Darwin' # [conda,zmq,c]
+czmq             # [conda,zmq,c]
 matplotlib       # [conda]
 r-rcpp<=1.0.3; platform_system == 'Darwin'  # [conda,R]
 r-base           # [conda,R]

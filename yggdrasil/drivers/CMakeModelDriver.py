@@ -436,6 +436,9 @@ class CMakeConfigure(BuildToolBase):
             use_library_path_internal='internal_library_flags',
             internal_library_flags=internal_library_flags,
             skip_library_libs=True, library_flags=library_flags)
+        print('CMAKE LINKER', toolname, linker_flags,
+              driver.get_tool('linker', toolname=toolname,
+                              return_prop='name'))
         lines = []
         pretarget_lines = []
         preamble_lines = []
@@ -937,6 +940,40 @@ class CMakeModelDriver(BuildModelDriver):
             return super(CMakeModelDriver, self).compile_model(**kwargs)
 
     @classmethod
+    def prune_sh_gcc(cls, path, gcc):
+        r"""Remove instances of sh.exe from the path that are not
+        associated with the selected gcc compiler. This can happen
+        on windows when rtools or git install a version of sh.exe
+        that is added to the path before the compiler.
+
+        Args:
+            path (str): Contents of the path variable.
+            gcc (str): Full path to the gcc executable.
+
+        Returns:
+            str: Modified path that removes the extra instances
+                of sh.exe.
+
+        """
+        # This method is not covered because it is not called on
+        # github actions where bash is always present
+        sh_path = shutil.which('sh', path=path)
+        while sh_path:
+            for k in ['rtools', 'git']:
+                if k in sh_path.lower():
+                    break
+            else:  # pragma: debug
+                break
+            if k not in gcc.lower():
+                paths = path.split(os.pathsep)
+                paths.remove(os.path.dirname(sh_path))
+                path = os.pathsep.join(paths)
+                sh_path = shutil.which('sh', path=path)
+            else:  # pragma: debug
+                break
+        return path
+
+    @classmethod
     def update_compiler_kwargs(cls, **kwargs):
         r"""Update keyword arguments supplied to the compiler get_flags method
         for various options.
@@ -952,31 +989,17 @@ class CMakeModelDriver(BuildModelDriver):
         """
         if platform._is_win and (kwargs.get('target_compiler', None)
                                  in ['gcc', 'g++', 'gfortran']):  # pragma: windows
-            # Remove sh from path for compilation when the rtools
-            # version of sh is on the path, but the gnu compiler being
-            # used is not part of that installation.
             gcc = get_compilation_tool('compiler',
                                        kwargs['target_compiler'],
                                        None)
             if gcc:
-                path = kwargs['env']['PATH']
-                gcc_path = gcc.get_executable(full_path=True)
-                sh_path = shutil.which('sh', path=path)
-                while sh_path:
-                    for k in ['rtools', 'git']:
-                        if k in sh_path.lower():
-                            break
-                    else:  # pragma: debug
-                        break
-                    if k not in gcc_path.lower():
-                        paths = path.split(os.pathsep)
-                        paths.remove(os.path.dirname(sh_path))
-                        path = os.pathsep.join(paths)
-                        sh_path = shutil.which('sh', path=path)
-                    else:  # pragma: debug
-                        break
+                path = cls.prune_sh_gcc(
+                    kwargs['env']['PATH'],
+                    gcc.get_executable(full_path=True))
                 kwargs['env']['PATH'] = path
-                if not sh_path:
+                if not shutil.which('sh', path=path):
+                    # This will not be run on Github actions where
+                    # the shell
                     kwargs.setdefault('generator', 'MinGW Makefiles')
                 elif shutil.which('make', path=path):
                     kwargs.setdefault('generator', 'Unix Makefiles')

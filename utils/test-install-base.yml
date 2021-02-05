@@ -157,6 +157,8 @@ jobs:
     - name: (WINDOWS,CONDA) Set up MSVC Compiler
       uses: ilammy/msvc-dev-cmd@v1
       if: matrix.install-method == 'conda' && matrix.os == 'windows-latest' && env.INSTALLC == 1
+      with:
+        toolset: 14.0
     # This step and the next allows conda to be called before the
     # conda-incubator/setup-miniconda@v2 action is used to create the
     # test environment so that the package can be built in the base
@@ -204,8 +206,15 @@ jobs:
       run: yggcompile
     # - name: Run tests (1st)
     #   run: yggtest --ci --with-examples examples/tests/test_timed_pipe.py examples/tests/test_gs_lesson[3-4].py --language c cpp
+    - name: Run cmake test in command prompt
+      if: matrix.os == 'windows-latest'
+      shell: cmd /C CALL {0}
+      run: yggtest --ci --nocapture drivers/tests/test_CMakeModelDriver.py
+    - name: Run cmake test w/ debug messages
+      if: matrix.os == 'macos-latest'
+      run: yggtest --ci --nocapture drivers/tests/test_CMakeModelDriver.py
     - name: Run tests (1st)
-      run: yggtest --ci ${{ matrix.test-flags1 }}
+      run: yggtest --ci --cov-append ${{ matrix.test-flags1 }}
     - name: Run tests (2nd)
       if: matrix.test-flags2 != ''
       run: yggtest --ci --cov-append ${{ matrix.test-flags2 }}
@@ -282,7 +291,7 @@ jobs:
           - os: macos-latest
             python-version: 3.8
             install-method: conda
-            test-flags1: tests/test_tools.py
+            test-flags1: tests/test_tools.py --with-examples examples/tests/test_rpc_lesson3.py
             test-flags2: ""
             install-c: true
       fail-fast: false
@@ -362,43 +371,6 @@ jobs:
       fail-fast: false
     steps: *steps
 
-  test_czmq:
-    name: Build & test czmq 4.2.1 on MacOS catalina
-    runs-on: macos-latest
-    env:
-      USING_CONDA: 1
-    defaults:
-      run:
-        shell: bash -l {0}
-    steps:
-    - uses: actions/checkout@v2
-      with:
-        repository: zeromq/czmq
-    # - name: Install dependencies using homebrew
-    #   run: |
-    #     brew update
-    #     brew install git libtool pkg-config autoconf automake cmake ossp-uuid pcre zmq
-    - name: Set up miniconda
-      uses: conda-incubator/setup-miniconda@v2
-      with:
-        channels: conda-forge
-    - name: Install dependencies using conda
-      run: |
-        conda install cmake autoconf automake libtool pkg-config libuuid pcre zeromq clang clangxx
-        conda list
-    - name: Set environment variable pointing to the conda library directory
-      run: echo "LDFLAGS=\"-Wl,-rpath,$CONDA_PREFIX/lib $LDFLAGS\"" >> $GITHUB_ENV
-    - name: Build the CZMQ package
-      continue-on-error: true
-      run: |
-        echo $LDFLAGS
-        ./autogen.sh
-        ./configure
-    - name: Run the tests
-      continue-on-error: true
-      run: |
-        make check-verbose
-    
   docs:
     name: Build the Docs
     runs-on: ubuntu-latest

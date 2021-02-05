@@ -156,6 +156,8 @@ jobs:
       uses: ilammy/msvc-dev-cmd@v1
       if: matrix.install-method == 'conda' && matrix.os == 'windows-latest' && env.INSTALLC
         == 1
+      with:
+        toolset: 14.0
     - name: (UNIX,CONDA) Add miniconda bin to path
       if: matrix.install-method == 'conda' && matrix.os != 'windows-latest'
       run: 'echo "NON_CONDA_PATH=$PATH" >> $GITHUB_ENV
@@ -198,8 +200,15 @@ jobs:
       run: python utils/setup_test_env.py verify
     - name: Compile libraries
       run: yggcompile
+    - name: Run cmake test in command prompt
+      if: matrix.os == 'windows-latest'
+      shell: cmd /C CALL {0}
+      run: yggtest --ci --nocapture drivers/tests/test_CMakeModelDriver.py
+    - name: Run cmake test w/ debug messages
+      if: matrix.os == 'macos-latest'
+      run: yggtest --ci --nocapture drivers/tests/test_CMakeModelDriver.py
     - name: Run tests (1st)
-      run: yggtest --ci ${{ matrix.test-flags1 }}
+      run: yggtest --ci --cov-append ${{ matrix.test-flags1 }}
     - name: Run tests (2nd)
       if: matrix.test-flags2 != ''
       run: yggtest --ci --cov-append ${{ matrix.test-flags2 }}
@@ -283,7 +292,7 @@ jobs:
         - os: macos-latest
           python-version: 3.8
           install-method: conda
-          test-flags1: tests/test_tools.py
+          test-flags1: tests/test_tools.py --with-examples examples/tests/test_rpc_lesson3.py
           test-flags2: ''
           install-c: true
       fail-fast: false
@@ -387,6 +396,8 @@ jobs:
       uses: ilammy/msvc-dev-cmd@v1
       if: matrix.install-method == 'conda' && matrix.os == 'windows-latest' && env.INSTALLC
         == 1
+      with:
+        toolset: 14.0
     - name: (UNIX,CONDA) Add miniconda bin to path
       if: matrix.install-method == 'conda' && matrix.os != 'windows-latest'
       run: 'echo "NON_CONDA_PATH=$PATH" >> $GITHUB_ENV
@@ -429,8 +440,15 @@ jobs:
       run: python utils/setup_test_env.py verify
     - name: Compile libraries
       run: yggcompile
+    - name: Run cmake test in command prompt
+      if: matrix.os == 'windows-latest'
+      shell: cmd /C CALL {0}
+      run: yggtest --ci --nocapture drivers/tests/test_CMakeModelDriver.py
+    - name: Run cmake test w/ debug messages
+      if: matrix.os == 'macos-latest'
+      run: yggtest --ci --nocapture drivers/tests/test_CMakeModelDriver.py
     - name: Run tests (1st)
-      run: yggtest --ci ${{ matrix.test-flags1 }}
+      run: yggtest --ci --cov-append ${{ matrix.test-flags1 }}
     - name: Run tests (2nd)
       if: matrix.test-flags2 != ''
       run: yggtest --ci --cov-append ${{ matrix.test-flags2 }}
@@ -598,6 +616,8 @@ jobs:
       uses: ilammy/msvc-dev-cmd@v1
       if: matrix.install-method == 'conda' && matrix.os == 'windows-latest' && env.INSTALLC
         == 1
+      with:
+        toolset: 14.0
     - name: (UNIX,CONDA) Add miniconda bin to path
       if: matrix.install-method == 'conda' && matrix.os != 'windows-latest'
       run: 'echo "NON_CONDA_PATH=$PATH" >> $GITHUB_ENV
@@ -640,8 +660,15 @@ jobs:
       run: python utils/setup_test_env.py verify
     - name: Compile libraries
       run: yggcompile
+    - name: Run cmake test in command prompt
+      if: matrix.os == 'windows-latest'
+      shell: cmd /C CALL {0}
+      run: yggtest --ci --nocapture drivers/tests/test_CMakeModelDriver.py
+    - name: Run cmake test w/ debug messages
+      if: matrix.os == 'macos-latest'
+      run: yggtest --ci --nocapture drivers/tests/test_CMakeModelDriver.py
     - name: Run tests (1st)
-      run: yggtest --ci ${{ matrix.test-flags1 }}
+      run: yggtest --ci --cov-append ${{ matrix.test-flags1 }}
     - name: Run tests (2nd)
       if: matrix.test-flags2 != ''
       run: yggtest --ci --cov-append ${{ matrix.test-flags2 }}
@@ -811,6 +838,8 @@ jobs:
       uses: ilammy/msvc-dev-cmd@v1
       if: matrix.install-method == 'conda' && matrix.os == 'windows-latest' && env.INSTALLC
         == 1
+      with:
+        toolset: 14.0
     - name: (UNIX,CONDA) Add miniconda bin to path
       if: matrix.install-method == 'conda' && matrix.os != 'windows-latest'
       run: 'echo "NON_CONDA_PATH=$PATH" >> $GITHUB_ENV
@@ -853,8 +882,15 @@ jobs:
       run: python utils/setup_test_env.py verify
     - name: Compile libraries
       run: yggcompile
+    - name: Run cmake test in command prompt
+      if: matrix.os == 'windows-latest'
+      shell: cmd /C CALL {0}
+      run: yggtest --ci --nocapture drivers/tests/test_CMakeModelDriver.py
+    - name: Run cmake test w/ debug messages
+      if: matrix.os == 'macos-latest'
+      run: yggtest --ci --nocapture drivers/tests/test_CMakeModelDriver.py
     - name: Run tests (1st)
-      run: yggtest --ci ${{ matrix.test-flags1 }}
+      run: yggtest --ci --cov-append ${{ matrix.test-flags1 }}
     - name: Run tests (2nd)
       if: matrix.test-flags2 != ''
       run: yggtest --ci --cov-append ${{ matrix.test-flags2 }}
@@ -1022,6 +1058,8 @@ jobs:
       uses: ilammy/msvc-dev-cmd@v1
       if: matrix.install-method == 'conda' && matrix.os == 'windows-latest' && env.INSTALLC
         == 1
+      with:
+        toolset: 14.0
     - name: (UNIX,CONDA) Add miniconda bin to path
       if: matrix.install-method == 'conda' && matrix.os != 'windows-latest'
       run: 'echo "NON_CONDA_PATH=$PATH" >> $GITHUB_ENV
@@ -1064,8 +1102,15 @@ jobs:
       run: python utils/setup_test_env.py verify
     - name: Compile libraries
       run: yggcompile
+    - name: Run cmake test in command prompt
+      if: matrix.os == 'windows-latest'
+      shell: cmd /C CALL {0}
+      run: yggtest --ci --nocapture drivers/tests/test_CMakeModelDriver.py
+    - name: Run cmake test w/ debug messages
+      if: matrix.os == 'macos-latest'
+      run: yggtest --ci --nocapture drivers/tests/test_CMakeModelDriver.py
     - name: Run tests (1st)
-      run: yggtest --ci ${{ matrix.test-flags1 }}
+      run: yggtest --ci --cov-append ${{ matrix.test-flags1 }}
     - name: Run tests (2nd)
       if: matrix.test-flags2 != ''
       run: yggtest --ci --cov-append ${{ matrix.test-flags2 }}
@@ -1105,45 +1150,6 @@ jobs:
       with:
         name: environment-log-${{ env.YGG_GHA_JOB_ID }}
         path: new_environment_log.txt
-  test_czmq:
-    name: Build & test czmq 4.2.1 on MacOS catalina
-    runs-on: macos-latest
-    env:
-      USING_CONDA: 1
-    defaults:
-      run:
-        shell: bash -l {0}
-    steps:
-    - uses: actions/checkout@v2
-      with:
-        repository: zeromq/czmq
-    - name: Set up miniconda
-      uses: conda-incubator/setup-miniconda@v2
-      with:
-        channels: conda-forge
-    - name: Install dependencies using conda
-      run: 'conda install cmake autoconf automake libtool pkg-config libuuid pcre
-        zeromq clang clangxx
-
-        conda list
-
-        '
-    - name: Set environment variable pointing to the conda library directory
-      run: echo "LDFLAGS=\"-Wl,-rpath,$CONDA_PREFIX/lib $LDFLAGS\"" >> $GITHUB_ENV
-    - name: Build the CZMQ package
-      continue-on-error: true
-      run: 'echo $LDFLAGS
-
-        ./autogen.sh
-
-        ./configure
-
-        '
-    - name: Run the tests
-      continue-on-error: true
-      run: 'make check-verbose
-
-        '
   docs:
     name: Build the Docs
     runs-on: ubuntu-latest
