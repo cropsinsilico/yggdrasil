@@ -226,8 +226,9 @@ class ZMQProxy(CommBase.CommServer):
             self.srv_address = bind_socket(self.srv_socket, srv_address,
                                            nretry=nretry,
                                            retry_timeout=retry_timeout)
-        finally:  # pragma: debug
+        except zmq.ZMQError:  # pragma: debug
             self.close_sockets()
+            raise
         CommBase.register_comm('ZMQComm', 'DEALER_server_' + self.srv_address,
                                self.srv_socket)
         # Set up poller
