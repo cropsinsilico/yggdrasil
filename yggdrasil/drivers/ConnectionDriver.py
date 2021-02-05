@@ -1001,7 +1001,7 @@ class ConnectionDriver(Driver):
             self.set_break_flag()
             self.set_close_state('receiving')
             return
-        if self.icomm.is_empty_recv(msg):
+        if (self._last_header is None) or self._last_header['is_empty']:
             self.state = 'waiting'
             self.verbose_debug(':run: Waiting for next message.')
             self.sleep()

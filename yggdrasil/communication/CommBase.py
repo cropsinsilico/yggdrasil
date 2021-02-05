@@ -1909,8 +1909,9 @@ class CommBase(tools.YggClass):
             msg = self.apply_transform(msg_)
         else:
             msg = msg_
-        if (((not self.is_empty(s_msg, self.empty_bytes_msg))
-             and (not header.get('incomplete', False)))):
+        header['is_empty'] = self.is_empty_recv(msg)
+        if not (self.is_empty(s_msg, self.empty_bytes_msg)
+                or header.get('incomplete', False)):
             # if not self._used:
             #     self.serializer = serialize.get_serializer(**header)
             #     msg, _ = self.deserialize(s_msg)
