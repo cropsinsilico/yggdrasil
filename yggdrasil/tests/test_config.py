@@ -22,7 +22,6 @@ def test_YggConfigParser():
 def test_update_language_config():
     r"""Test updating configuration for installed languages."""
     languages = tools.get_supported_lang()
-    config.update_language_config(overwrite=True, verbose=True)
     cfg_orig = config.ygg_cfg_usr.file_to_update
     cfg_copy = '_copy'.join(os.path.splitext(cfg_orig))
     shutil.copy2(cfg_orig, cfg_copy)
@@ -32,7 +31,7 @@ def test_update_language_config():
                 'c', lang_kwargs={'c': {
                     'vcpkg_dir': config.ygg_cfg_usr.get(
                         'c', 'vcpkg_dir')}})
-            # , default=os.getcwd())}})
+        config.update_language_config(overwrite=True, verbose=True)
         if len(languages) > 0:
             config.ygg_cfg_usr.remove_section(languages[0])
             config.update_language_config(
