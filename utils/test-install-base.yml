@@ -157,6 +157,8 @@ jobs:
     - name: (WINDOWS,CONDA) Set up MSVC Compiler
       uses: ilammy/msvc-dev-cmd@v1
       if: matrix.install-method == 'conda' && matrix.os == 'windows-latest' && env.INSTALLC == 1
+      with:
+        toolset: 14.0
     # This step and the next allows conda to be called before the
     # conda-incubator/setup-miniconda@v2 action is used to create the
     # test environment so that the package can be built in the base
@@ -206,12 +208,10 @@ jobs:
     #   run: yggtest --ci --with-examples examples/tests/test_timed_pipe.py examples/tests/test_gs_lesson[3-4].py --language c cpp
     - name: Run cmake test in command prompt
       if: matrix.os == 'windows-latest'
-      continue-on-error: true
       shell: cmd /C CALL {0}
       run: yggtest --ci --nocapture drivers/tests/test_CMakeModelDriver.py
     - name: Run cmake test w/ debug messages
       if: matrix.os == 'macos-latest'
-      continue-on-error: true
       run: yggtest --ci --nocapture drivers/tests/test_CMakeModelDriver.py
     - name: Run tests (1st)
       run: yggtest --ci --cov-append ${{ matrix.test-flags1 }}

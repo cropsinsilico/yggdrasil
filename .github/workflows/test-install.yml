@@ -156,6 +156,8 @@ jobs:
       uses: ilammy/msvc-dev-cmd@v1
       if: matrix.install-method == 'conda' && matrix.os == 'windows-latest' && env.INSTALLC
         == 1
+      with:
+        toolset: 14.0
     - name: (UNIX,CONDA) Add miniconda bin to path
       if: matrix.install-method == 'conda' && matrix.os != 'windows-latest'
       run: 'echo "NON_CONDA_PATH=$PATH" >> $GITHUB_ENV
@@ -200,12 +202,10 @@ jobs:
       run: yggcompile
     - name: Run cmake test in command prompt
       if: matrix.os == 'windows-latest'
-      continue-on-error: true
       shell: cmd /C CALL {0}
       run: yggtest --ci --nocapture drivers/tests/test_CMakeModelDriver.py
     - name: Run cmake test w/ debug messages
       if: matrix.os == 'macos-latest'
-      continue-on-error: true
       run: yggtest --ci --nocapture drivers/tests/test_CMakeModelDriver.py
     - name: Run tests (1st)
       run: yggtest --ci --cov-append ${{ matrix.test-flags1 }}
@@ -396,6 +396,8 @@ jobs:
       uses: ilammy/msvc-dev-cmd@v1
       if: matrix.install-method == 'conda' && matrix.os == 'windows-latest' && env.INSTALLC
         == 1
+      with:
+        toolset: 14.0
     - name: (UNIX,CONDA) Add miniconda bin to path
       if: matrix.install-method == 'conda' && matrix.os != 'windows-latest'
       run: 'echo "NON_CONDA_PATH=$PATH" >> $GITHUB_ENV
@@ -440,12 +442,10 @@ jobs:
       run: yggcompile
     - name: Run cmake test in command prompt
       if: matrix.os == 'windows-latest'
-      continue-on-error: true
       shell: cmd /C CALL {0}
       run: yggtest --ci --nocapture drivers/tests/test_CMakeModelDriver.py
     - name: Run cmake test w/ debug messages
       if: matrix.os == 'macos-latest'
-      continue-on-error: true
       run: yggtest --ci --nocapture drivers/tests/test_CMakeModelDriver.py
     - name: Run tests (1st)
       run: yggtest --ci --cov-append ${{ matrix.test-flags1 }}
@@ -616,6 +616,8 @@ jobs:
       uses: ilammy/msvc-dev-cmd@v1
       if: matrix.install-method == 'conda' && matrix.os == 'windows-latest' && env.INSTALLC
         == 1
+      with:
+        toolset: 14.0
     - name: (UNIX,CONDA) Add miniconda bin to path
       if: matrix.install-method == 'conda' && matrix.os != 'windows-latest'
       run: 'echo "NON_CONDA_PATH=$PATH" >> $GITHUB_ENV
@@ -660,12 +662,10 @@ jobs:
       run: yggcompile
     - name: Run cmake test in command prompt
       if: matrix.os == 'windows-latest'
-      continue-on-error: true
       shell: cmd /C CALL {0}
       run: yggtest --ci --nocapture drivers/tests/test_CMakeModelDriver.py
     - name: Run cmake test w/ debug messages
       if: matrix.os == 'macos-latest'
-      continue-on-error: true
       run: yggtest --ci --nocapture drivers/tests/test_CMakeModelDriver.py
     - name: Run tests (1st)
       run: yggtest --ci --cov-append ${{ matrix.test-flags1 }}
@@ -838,6 +838,8 @@ jobs:
       uses: ilammy/msvc-dev-cmd@v1
       if: matrix.install-method == 'conda' && matrix.os == 'windows-latest' && env.INSTALLC
         == 1
+      with:
+        toolset: 14.0
     - name: (UNIX,CONDA) Add miniconda bin to path
       if: matrix.install-method == 'conda' && matrix.os != 'windows-latest'
       run: 'echo "NON_CONDA_PATH=$PATH" >> $GITHUB_ENV
@@ -882,12 +884,10 @@ jobs:
       run: yggcompile
     - name: Run cmake test in command prompt
       if: matrix.os == 'windows-latest'
-      continue-on-error: true
       shell: cmd /C CALL {0}
       run: yggtest --ci --nocapture drivers/tests/test_CMakeModelDriver.py
     - name: Run cmake test w/ debug messages
       if: matrix.os == 'macos-latest'
-      continue-on-error: true
       run: yggtest --ci --nocapture drivers/tests/test_CMakeModelDriver.py
     - name: Run tests (1st)
       run: yggtest --ci --cov-append ${{ matrix.test-flags1 }}
@@ -1058,6 +1058,8 @@ jobs:
       uses: ilammy/msvc-dev-cmd@v1
       if: matrix.install-method == 'conda' && matrix.os == 'windows-latest' && env.INSTALLC
         == 1
+      with:
+        toolset: 14.0
     - name: (UNIX,CONDA) Add miniconda bin to path
       if: matrix.install-method == 'conda' && matrix.os != 'windows-latest'
       run: 'echo "NON_CONDA_PATH=$PATH" >> $GITHUB_ENV
@@ -1102,12 +1104,10 @@ jobs:
       run: yggcompile
     - name: Run cmake test in command prompt
       if: matrix.os == 'windows-latest'
-      continue-on-error: true
       shell: cmd /C CALL {0}
       run: yggtest --ci --nocapture drivers/tests/test_CMakeModelDriver.py
     - name: Run cmake test w/ debug messages
       if: matrix.os == 'macos-latest'
-      continue-on-error: true
       run: yggtest --ci --nocapture drivers/tests/test_CMakeModelDriver.py
     - name: Run tests (1st)
       run: yggtest --ci --cov-append ${{ matrix.test-flags1 }}
