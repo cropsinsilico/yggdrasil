@@ -228,7 +228,10 @@ class ZMQProxy(CommBase.CommServer):
                                            nretry=nretry,
                                            retry_timeout=retry_timeout)
         except zmq.ZMQError:  # pragma: debug
-            self.close_sockets()
+            self.cli_socket.close()
+            self.cli_socket = None
+            CommBase.unregister_comm(
+                'ZMQComm', 'ROUTER_server_' + self.cli_address)
             raise
         ZMQComm.register_comm('DEALER_server_' + self.srv_address,
                               self.srv_socket)
