@@ -1154,9 +1154,14 @@ class run_tsts(SubCommand):
                 nadded += cls.expand_and_add(x, path_list, dir_list,
                                              add_on_nomatch=add_on_nomatch)
             return nadded
-        if path.startswith('-') or path.endswith('yggtest'):
+        if path.startswith('-'):
+            if add_on_nomatch:
+                path_list.append(path)
+                return 1
             return 0
-        if os.path.isabs(path):
+        elif path.endswith('yggtest'):
+            return 0
+        elif os.path.isabs(path):
             matches = sorted(glob.glob(path))
             path_list += matches
             if (not matches) and add_on_nomatch:
