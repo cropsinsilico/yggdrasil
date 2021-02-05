@@ -8,3 +8,4 @@ pytest-cov
 pytest-timeout
 pytest-drop-dup-tests  # [pip]
 pytest-rerunfailures
+pytest-repeat
