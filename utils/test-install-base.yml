@@ -204,8 +204,17 @@ jobs:
       run: yggcompile
     # - name: Run tests (1st)
     #   run: yggtest --ci --with-examples examples/tests/test_timed_pipe.py examples/tests/test_gs_lesson[3-4].py --language c cpp
+    - name: Run cmake test in command prompt
+      if: matrix.os == 'windows-latest'
+      continue-on-error: true
+      shell: cmd /C CALL {0}
+      run: yggtest --ci --nocapture drivers/tests/test_CMakeModelDriver.py
+    - name: Run cmake test w/ debug messages
+      if: matrix.os == 'macos-latest'
+      continue-on-error: true
+      run: yggtest --ci --nocapture drivers/tests/test_CMakeModelDriver.py
     - name: Run tests (1st)
-      run: yggtest --ci ${{ matrix.test-flags1 }}
+      run: yggtest --ci --cov-append ${{ matrix.test-flags1 }}
     - name: Run tests (2nd)
       if: matrix.test-flags2 != ''
       run: yggtest --ci --cov-append ${{ matrix.test-flags2 }}
