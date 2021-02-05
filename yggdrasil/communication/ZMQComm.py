@@ -797,7 +797,9 @@ class ZMQComm(CommBase.CommBase):
                 out = socket.poll(timeout=self.zmq_sleeptime,
                                   flags=zmq.POLLIN)
                 if out == 0:
-                    self.debug("No response waiting. %d tries left.", tries)
+                    self.debug(
+                        ("No response waiting (address=%s). "
+                         "%d tries left."), key, tries)
                     tries -= 1
             if out == 0:
                 raise multitasking.BreakLoopException('No response received.')
