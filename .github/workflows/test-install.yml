@@ -292,7 +292,7 @@ jobs:
         - os: macos-latest
           python-version: 3.8
           install-method: conda
-          test-flags1: tests/test_tools.py
+          test-flags1: tests/test_tools.py --with-examples examples/tests/test_rpc_lesson3.py
           test-flags2: ''
           install-c: true
       fail-fast: false
