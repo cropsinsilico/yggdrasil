@@ -52,7 +52,7 @@ requirements:
     - sysv_ipc  # [unix]
     - zeromq
   run:
-    - cmake
+    - cmake  # [not win]
     - czmq
     - flaky
     - git
