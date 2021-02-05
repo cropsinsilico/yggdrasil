@@ -415,11 +415,11 @@ class ConnectionDriver(Driver):
     @run_remotely
     def wait_for_route(self, timeout=None):
         r"""Wait until messages have been routed."""
-        T = self.start_timeout(timeout)
+        T = self.start_timeout(timeout, key_suffix='.route')
         while ((not T.is_out)
                and (self.nrecv != (self.nsent + self.nskip))):  # pragma: debug
             self.sleep()
-        self.stop_timeout()
+        self.stop_timeout(key_suffix='.route')
         return (self.nrecv == (self.nsent + self.nskip))
 
     @property
@@ -650,7 +650,7 @@ class ConnectionDriver(Driver):
     @run_remotely
     def confirm_input(self, timeout=None):
         r"""Confirm receipt of messages from input comm."""
-        T = self.start_timeout(timeout)
+        T = self.start_timeout(timeout, key_suffix='.confirm_input')
         while not T.is_out:  # pragma: debug
             with self.lock:
                 if (not self.icomm.is_open):
@@ -658,12 +658,12 @@ class ConnectionDriver(Driver):
                 elif self.icomm.is_confirmed_recv:
                     break
             self.sleep(10 * self.sleeptime)
-        self.stop_timeout()
+        self.stop_timeout(key_suffix='.confirm_input')
 
     @run_remotely
     def confirm_output(self, timeout=None):
         r"""Confirm receipt of messages from output comm."""
-        T = self.start_timeout(timeout)
+        T = self.start_timeout(timeout, key_suffix='.confirm_output')
         while not T.is_out:  # pragma: debug
             with self.lock:
                 if (not self.ocomm.is_open):
@@ -671,12 +671,12 @@ class ConnectionDriver(Driver):
                 elif self.ocomm.is_confirmed_send:
                     break
             self.sleep(10 * self.sleeptime)
-        self.stop_timeout()
+        self.stop_timeout(key_suffix='.confirm_output')
 
     @run_remotely
     def drain_input(self, timeout=None):
         r"""Drain messages from input comm."""
-        T = self.start_timeout(timeout)
+        T = self.start_timeout(timeout, key_suffix='.drain_input')
         while not T.is_out:
             with self.lock:
                 if (not (self.icomm.is_open
@@ -686,7 +686,7 @@ class ConnectionDriver(Driver):
                       and self.icomm.is_confirmed_recv):
                     break
             self.sleep()
-        self.stop_timeout()
+        self.stop_timeout(key_suffix='.drain_input')
 
     @run_remotely
     def drain_output(self, timeout=None, dont_confirm_eof=False):
@@ -694,7 +694,7 @@ class ConnectionDriver(Driver):
         nwait = 0
         if dont_confirm_eof:
             nwait += 1
-        T = self.start_timeout(timeout)
+        T = self.start_timeout(timeout, key_suffix='.drain_output')
         while not T.is_out:
             with self.lock:
                 if (not (self.ocomm.is_open
@@ -704,7 +704,7 @@ class ConnectionDriver(Driver):
                       and self.ocomm.is_confirmed_send):
                     break
             self.sleep()  # pragma: no cover
-        self.stop_timeout()
+        self.stop_timeout(key_suffix='.drain_output')
 
     def before_loop(self):
         r"""Actions to perform prior to sending messages."""
@@ -890,7 +890,8 @@ class ConnectionDriver(Driver):
 
         """
         self.ocomm._multiple_first_send = False
-        T = self.start_timeout(self.timeout_send_1st)
+        T = self.start_timeout(self.timeout_send_1st,
+                               key_suffix='.1st_send')
         flag = self._send_message(*args, **kwargs)
         self.ocomm.suppress_special_debug = True
         if (not flag) and (not self.ocomm._type_errors):
@@ -901,7 +902,7 @@ class ConnectionDriver(Driver):
                 flag = self._send_message(*args, **kwargs)
                 if not flag:
                     self.sleep()
-        self.stop_timeout()
+        self.stop_timeout(key_suffix='.1st_send')
         self.ocomm.suppress_special_debug = False
         self._first_send_done = True
         if not flag:
@@ -972,13 +973,13 @@ class ConnectionDriver(Driver):
                 setting the timeout. Defaults to self.timeout.
 
         """
-        T = self.start_timeout(timeout)
+        T = self.start_timeout(timeout, key_suffix='.wait_close')
         while (not T.is_out):  # pragma: debug
             with self.lock:
                 if self.close_state:
                     break
             self.sleep(2 * self.sleeptime)
-        self.stop_timeout()
+        self.stop_timeout(key_suffix='.wait_close')
         self.set_close_state(state)
 
     def run_loop(self):
