@@ -1,5 +1,5 @@
 import os
-from yggdrasil import multitasking
+from yggdrasil import multitasking, platform
 from yggdrasil.components import import_component
 from yggdrasil.drivers.InterpretedModelDriver import InterpretedModelDriver
 
@@ -56,7 +56,9 @@ class DSLModelDriver(InterpretedModelDriver):  # pragma: no cover
 
     @classmethod
     def model_wrapper_no_forward(cls, *args, **kwargs):
-        os.setpgrp()
+        if not platform._is_win:
+            # TODO: Unsure how to do this on windows
+            os.setpgrp()
         return cls.model_wrapper(*args, **kwargs)
     
     @classmethod
