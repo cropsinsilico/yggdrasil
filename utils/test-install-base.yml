@@ -209,7 +209,9 @@ jobs:
     - name: Run cmake test in command prompt
       if: matrix.os == 'windows-latest'
       shell: cmd /C CALL {0}
-      run: yggtest --ci --nocapture drivers/tests/test_CMakeModelDriver.py
+      run: |
+        cmake -h
+        yggtest --ci --nocapture drivers/tests/test_CMakeModelDriver.py
     - name: Run cmake test w/ debug messages
       if: matrix.os != 'windows-latest'
       run: yggtest --ci --nocapture drivers/tests/test_CMakeModelDriver.py
