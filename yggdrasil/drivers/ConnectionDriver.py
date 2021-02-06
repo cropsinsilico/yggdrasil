@@ -574,6 +574,10 @@ class ConnectionDriver(Driver):
 
         """
         if not self.remove_model(direction, name):
+            self.debug("%s models remain: %s",
+                       direction, self.models[direction])
+            return False
+        if not self.is_alive():
             return False
         self.debug("All %s models have signed off.", direction)
         if (((self.onexit not in [None, 'on_model_exit',
@@ -582,6 +586,13 @@ class ConnectionDriver(Driver):
             self.debug("Calling onexit = '%s'" % self.onexit)
             getattr(self, self.onexit)()
         if not errors:
+            if direction == 'output':
+                T = self.start_timeout(60, key_suffix='.model_exit')
+                while (not T.is_out) and self.models['input']:
+                    self.info("remaining models: %s",
+                              self.models['input'])
+                    self.sleep(10 * self.sleeptime)
+                self.stop_timeout(key_suffix='.model_exit')
             self.drain_input(timeout=self.timeout)
         if direction == 'input':
             if not errors:
