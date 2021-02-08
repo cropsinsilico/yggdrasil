@@ -401,13 +401,15 @@ class ClangLinker(LDLinker):
         # https://bugs.llvm.org/show_bug.cgi?id=44813
         # https://reviews.llvm.org/D71579
         # https://reviews.llvm.org/D74784
+        import logging
+        logger = logging.getLogger(__name__)
         out = cls.call(cls.version_flags, skip_flags=True, allow_error=True)
         regex = r'clang version (?P<version>\d+)\.\d+\.\d+'
         match = re.search(regex, out)
-        cls.info('CLANG VERSION = %s' % out)
+        logger.info('CLANG VERSION = %s' % out)
         if (match is not None) and (int(match.group('version')) >= 10):
             ld_version = LDLinker.tool_version()
-            cls.info('LDVERSION = %s' % ld_version)
+            logger.info('LDVERSION = %s' % ld_version)
             if float(ld_version.split('.')[0]) < 520:
                 kwargs['linker-version'] = ld_version
         out = super(ClangLinker, cls).get_flags(*args, **kwargs)
