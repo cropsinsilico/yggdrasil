@@ -217,10 +217,11 @@ class CMakeConfigure(BuildToolBase):
             if platform._is_win:  # pragma: windows
                 error_MSB4019 = (r'error MSB4019: The imported project '
                                  r'"C:\Microsoft.Cpp.Default.props" was not found.')
+                error_NOVS = r'could not find any instance of Visual Studio.'
                 # This will only be called if the VC 15 build tools
                 # are installed by MSVC 19+ which is not currently
                 # supported by Appveyor CI.
-                if error_MSB4019 in str(e):  # pragma: debug
+                if (error_MSB4019 in str(e)) or (error_NOVS in str(e)):  # pragma: debug
                     old_generator = os.environ.get('CMAKE_GENERATOR', None)
                     new_generator = cls.generator(return_default=True)
                     if old_generator and (old_generator != new_generator):
@@ -436,9 +437,6 @@ class CMakeConfigure(BuildToolBase):
             use_library_path_internal='internal_library_flags',
             internal_library_flags=internal_library_flags,
             skip_library_libs=True, library_flags=library_flags)
-        print('CMAKE LINKER', toolname, linker_flags,
-              driver.get_tool('linker', toolname=toolname,
-                              return_prop='name'))
         lines = []
         pretarget_lines = []
         preamble_lines = []
@@ -509,7 +507,10 @@ class CMakeConfigure(BuildToolBase):
                 pretarget_lines.append('LINK_DIRECTORIES(%s)' % libdir)
             elif os.path.isfile(x):
                 library_flags.append(x)
-            elif x.startswith('-mlinker-version='):
+            elif x.startswith('-mlinker-version='):  # pragma: version
+                # Currently this only called when clang is >=10
+                # and ld is <520 or mlinker is set in the env
+                # flags via CFLAGS, CXXFLAGS, etc.
                 preamble_lines.insert(0, 'target_link_options(%s PRIVATE %s)'
                                       % (target, x))
             elif x.startswith('-') or x.startswith('/'):
@@ -605,9 +606,9 @@ class CMakeBuilder(LinkerBase):
                 cache = os.path.join(kwargs['working_dir'], cache)
             if os.path.isfile(cache):
                 with open(cache, 'r') as fd:
-                    print('CMakeCache.txt:\n%s' % fd.read())
+                    logger.info('CMakeCache.txt:\n%s' % fd.read())
             else:
-                print('Cache file does not exist: %s' % cache)
+                logger.error('Cache file does not exist: %s' % cache)
             raise
 
     @classmethod
