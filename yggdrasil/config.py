@@ -416,10 +416,18 @@ def cfg_logging(cfg=None):
 
     """
     is_model = tools.is_subprocess()
+    to_stdout = is_model
+    try:  # pragma: no cover
+        # Direct log messages to stdout in interpreter so that messages
+        # are not red in notebooks
+        get_ipython  # noqa: F821
+        in_notebook = True
+    except BaseException:
+        in_notebook = False
+    to_stdout = (is_model or in_notebook)
     if cfg is None:
         cfg = ygg_cfg
     _LOG_FORMAT = "%(levelname)s:%(module)s.%(funcName)s[%(lineno)d]:%(message)s"
-    logging.basicConfig(format=_LOG_FORMAT)
     logLevelYGG = eval(
         'logging.%s' % os.environ.get(
             'YGG_DEBUG', cfg.get('debug', 'ygg', 'NOTSET')))
@@ -429,37 +437,26 @@ def cfg_logging(cfg=None):
     logLevelCLI = eval(
         'logging.%s' % os.environ.get(
             'YGG_CLIENT_DEBUG', cfg.get('debug', 'client', 'INFO')))
+    if is_model:
+        logLevelYGG = os.environ.get('YGG_MODEL_DEBUG', logLevelCLI)
+    if not to_stdout:
+        logging.basicConfig(format=_LOG_FORMAT)
     ygg_logger = logging.getLogger("yggdrasil")
     rmq_logger = logging.getLogger("pika")
-    if is_model:
-        logLevelMOD = os.environ.get('YGG_MODEL_DEBUG', logLevelCLI)
-        ygg_logger.setLevel(level=logLevelMOD)
-    else:
-        ygg_logger.setLevel(level=logLevelYGG)
+    ygg_logger.setLevel(level=logLevelYGG)
     rmq_logger.setLevel(level=logLevelRMQ)
-    to_stdout = False
-    # For models, route the loggs to stdout so that they are displayed by the
-    # model driver.
-    if is_model:
-        to_stdout = True
-    try:  # pragma: no cover
-        # Direct log messages to stdout in interpreter so that messages
-        # are not red in notebooks
-        get_ipython  # noqa: F821
-        to_stdout = True
-        ygg_logger.propagate = False
-        rmq_logger.propagate = False
-    except BaseException:
-        pass
+    # For models, route the logs to stdout so that they are
+    # displayed by the model driver.
     if to_stdout:
+        formatter = logging.Formatter(fmt=_LOG_FORMAT)
         handler = logging.StreamHandler(sys.stdout)
-        if is_model:
-            handler.setLevel(logLevelMOD)
-        else:  # pragma: no cover
-            # This is only used for notebooks (and interpreters)
-            handler.setLevel(logLevelYGG)
+        handler.setFormatter(formatter)
+        handler.setLevel(logLevelYGG)
         ygg_logger.handlers = [handler]
         rmq_logger.handlers = [handler]
+        if in_notebook:  # pragma: no cover
+            ygg_logger.propagate = False
+            rmq_logger.propagate = False
         # ygg_logger.addHandler(handler)
         # rmq_logger.addHandler(handler)
 

@@ -1577,6 +1577,9 @@ class YggClass(ComponentBase):
                 scheduled task is stored in self.sched_out. Otherwise, it is not
                 stored. Defaults to False.
 
+        Returns:
+            threading.Timer: The timer object.
+
         """
         if args is None:
             args = []
@@ -1588,6 +1591,7 @@ class YggClass(ComponentBase):
             func = self._task_with_output
         tobj = threading.Timer(t, func, args=args, kwargs=kwargs)
         tobj.start()
+        return tobj
 
     def sleep(self, t=None):
         r"""Have the class sleep for some period of time.
