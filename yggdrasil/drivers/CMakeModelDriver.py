@@ -217,10 +217,11 @@ class CMakeConfigure(BuildToolBase):
             if platform._is_win:  # pragma: windows
                 error_MSB4019 = (r'error MSB4019: The imported project '
                                  r'"C:\Microsoft.Cpp.Default.props" was not found.')
+                error_NOVS = r'could not find any instance of Visual Studio.'
                 # This will only be called if the VC 15 build tools
                 # are installed by MSVC 19+ which is not currently
                 # supported by Appveyor CI.
-                if error_MSB4019 in str(e):  # pragma: debug
+                if (error_MSB4019 in str(e)) or (error_NOVS in str(e)):  # pragma: debug
                     old_generator = os.environ.get('CMAKE_GENERATOR', None)
                     new_generator = cls.generator(return_default=True)
                     if old_generator and (old_generator != new_generator):
