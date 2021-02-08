@@ -1561,7 +1561,8 @@ class YggClass(ComponentBase):
     def _task_with_output(self, func, *args, **kwargs):
         self.sched_out = func(*args, **kwargs)
 
-    def sched_task(self, t, func, args=None, kwargs=None, store_output=False):
+    def sched_task(self, t, func, args=None, kwargs=None, store_output=False,
+                   name=None):
         r"""Schedule a task that will be executed after a certain time has
         elapsed.
 
@@ -1576,6 +1577,7 @@ class YggClass(ComponentBase):
             store_output (bool, optional): If True, the output from the
                 scheduled task is stored in self.sched_out. Otherwise, it is not
                 stored. Defaults to False.
+            name (str, optional): Name for the task.
 
         Returns:
             threading.Timer: The timer object.
@@ -1590,6 +1592,8 @@ class YggClass(ComponentBase):
             args = [func] + args
             func = self._task_with_output
         tobj = threading.Timer(t, func, args=args, kwargs=kwargs)
+        if name is not None:
+            tobj.name = name
         tobj.start()
         return tobj
 

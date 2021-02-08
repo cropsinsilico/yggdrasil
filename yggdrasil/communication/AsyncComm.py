@@ -234,7 +234,8 @@ class AsyncComm(ProxyObject, ComponentBaseUnregistered):
 
         """
         with self.backlog_thread.lock:
-            self.debug("Added message to recv backlog.")
+            self.debug("Added message to %s backlog.",
+                       self.direction)
             if not self._closed:
                 self._backlog_buffer.append(payload)
                 self.backlog_ready.set()

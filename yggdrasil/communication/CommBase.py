@@ -527,6 +527,7 @@ class CommBase(tools.YggClass):
             self.bind()
         else:
             self.open()
+        self.logger._instance_name += ('=>%s' % self.address)
 
     def __getstate__(self):
         if self.is_open and (self._commtype != 'buffer'):  # pragma: debug
@@ -1000,7 +1001,7 @@ class CommBase(tools.YggClass):
             self.wait_for_confirm(timeout=self._timeout_drain,
                                   active_confirm=active_confirm)
         else:
-            if self.is_response_server and (not self.is_async):
+            if (self.direction == 'send') and (not self.is_async):
                 self.wait_for_workers(timeout=self._timeout_drain)
             self.drain_messages(variable='n_msg_send')
             self.wait_for_confirm(timeout=self._timeout_drain,
@@ -1063,9 +1064,14 @@ class CommBase(tools.YggClass):
                                   key_suffix='.wait_for_workers')
         flag = False
         while (not Tout.is_out):
-            flag = all([(x._used or x.is_closed) for x in
-                        self._work_comms.values()])
-            if flag:
+            for x in self._work_comms.values():
+                if hasattr(x, 'task_timer'):
+                    flag = (not x.task_timer.is_alive())
+                else:
+                    flag = (x._used or x.is_closed)
+                if not flag:
+                    break
+            else:
                 break
             self.sleep()
         self.stop_timeout(key_suffix='.wait_for_workers')
@@ -1584,11 +1590,19 @@ class CommBase(tools.YggClass):
 
         """
         workcomm = self.get_work_comm(info)
-        if workcomm.is_async:
+        # TODO: _send_multipart will need to be modified to
+        # use the async 'send' method instead of '_safe_send'
+        # in order for it to be async which will include
+        # changing the wrapped method (inside the async 'send')
+        # from 'send' to '_safe_send' or moving serialization
+        # outside of the send/recv
+        if self.is_async:
             return workcomm._send_multipart(msg, **kwargs)
         else:
-            self.sched_task(0, workcomm._send_multipart,
-                            args=[msg], kwargs=kwargs)
+            workcomm.task_timer = self.sched_task(
+                0, workcomm._send_multipart,
+                args=[msg], kwargs=kwargs,
+                name=(workcomm.name + '.task'))
             return True
             
     def on_send_eof(self, header_kwargs=None):
