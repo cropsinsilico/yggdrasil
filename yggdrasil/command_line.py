@@ -728,8 +728,12 @@ class yggclean(SubCommand):
     def func(cls, args, verbose=True):
         from yggdrasil.components import import_component
         for lang in args.language:
-            import_component('model', lang).cleanup_dependencies(
-                verbose=verbose)
+            if lang in ['ipc', 'ipcs']:
+                from yggdrasil.communication.IPCComm import ipcrm_queues
+                ipcrm_queues()
+            else:
+                import_component('model', lang).cleanup_dependencies(
+                    verbose=verbose)
 
 
 class cc_toolname(SubCommand):
