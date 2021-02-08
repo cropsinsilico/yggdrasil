@@ -1088,7 +1088,7 @@ class CompilationToolBase(object):
                 raise RuntimeError("Command '%s' failed with code %d:\n%s."
                                    % (' '.join(cmd), proc.returncode, output))
             try:
-                logger.info(' '.join(cmd) + '\n' + output)
+                logger.debug(' '.join(cmd) + '\n' + output)
             except UnicodeDecodeError:  # pragma: debug
                 tools.print_encoded(output)
         except (subprocess.CalledProcessError, OSError) as e:

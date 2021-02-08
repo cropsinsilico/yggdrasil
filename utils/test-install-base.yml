@@ -212,9 +212,6 @@ jobs:
       run: |
         cmake -h
         yggtest --ci --nocapture drivers/tests/test_CMakeModelDriver.py
-    - name: Run cmake test w/ debug messages
-      if: matrix.os != 'windows-latest'
-      run: yggtest --ci --nocapture drivers/tests/test_CMakeModelDriver.py drivers/tests/test_CModelDriver.py drivers/tests/test_CPPModelDriver.py
     - name: Run tests (1st)
       run: yggtest --ci --cov-append ${{ matrix.test-flags1 }}
     - name: Run tests (2nd)
