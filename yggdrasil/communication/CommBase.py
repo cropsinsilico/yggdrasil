@@ -1003,6 +1003,8 @@ class CommBase(tools.YggClass):
         else:
             if (self.direction == 'send') and (not self.is_async):
                 self.wait_for_workers(timeout=self._timeout_drain)
+            for x in self._work_comms.values():
+                x.linger()
             self.drain_messages(variable='n_msg_send')
             self.wait_for_confirm(timeout=self._timeout_drain,
                                   active_confirm=active_confirm)
