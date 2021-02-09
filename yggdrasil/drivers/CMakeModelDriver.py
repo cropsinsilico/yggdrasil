@@ -941,7 +941,7 @@ class CMakeModelDriver(BuildModelDriver):
             return super(CMakeModelDriver, self).compile_model(**kwargs)
 
     @classmethod
-    def prune_sh_gcc(cls, path, gcc):
+    def prune_sh_gcc(cls, path, gcc):  # pragma: appveyor
         r"""Remove instances of sh.exe from the path that are not
         associated with the selected gcc compiler. This can happen
         on windows when rtools or git install a version of sh.exe
@@ -998,9 +998,9 @@ class CMakeModelDriver(BuildModelDriver):
                     kwargs['env']['PATH'],
                     gcc.get_executable(full_path=True))
                 kwargs['env']['PATH'] = path
-                if not shutil.which('sh', path=path):
+                if not shutil.which('sh', path=path):  # pragma: appveyor
                     # This will not be run on Github actions where
-                    # the shell
+                    # the shell is always set
                     kwargs.setdefault('generator', 'MinGW Makefiles')
                 elif shutil.which('make', path=path):
                     kwargs.setdefault('generator', 'Unix Makefiles')
