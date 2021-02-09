@@ -215,10 +215,18 @@ jobs:
         cmake -h
         yggtest --ci --nocapture drivers/tests/test_CMakeModelDriver.py
     - name: Run tests (1st)
+      id: test1
       run: yggtest --ci --cov-append ${{ matrix.test-flags1 }}
+    - name: Re-run test failures (1st)
+      if: ${{ failure() && steps.test1.outcome == 'failure' }}
+      run: yggtest --ci --cov-append ${{ matrix.test-flags1 }} --last-failed --last-failed-no-failures=none
     - name: Run tests (2nd)
       if: matrix.test-flags2 != ''
+      id: test2
       run: yggtest --ci --cov-append ${{ matrix.test-flags2 }}
+    - name: Re-run test failures (2nd)
+      if: ${{ failure() && steps.test2.outcome == 'failure' }}
+      run: yggtest --ci --cov-append ${{ matrix.test-flags2 }} --last-failed --last-failed-no-failures=none
     # - name: Start SSH session
     #   uses: luchihoratiu/debug-via-ssh@main
     #   if: ${{ failure() && matrix.install-method == 'conda' && matrix.os == 'macos-latest' }}
