@@ -337,6 +337,10 @@ class TestConnectionDriver(TestConnectionParam, parent.TestDriver):
             assert(self.recv_comm.is_open)
         self.nmsg_recv = 1
 
+    def test_init_del(self):
+        r"""Test driver creation and deletion."""
+        self.instance.printStatus(verbose=True)
+
     def test_early_close(self):
         r"""Test early deletion of message queue."""
         self.instance.close_comm()

@@ -579,12 +579,16 @@ class ConnectionDriver(Driver):
         super(ConnectionDriver, self).cleanup()
 
     @run_remotely
-    def printStatus(self, beg_msg='', end_msg=''):
+    def printStatus(self, beg_msg='', end_msg='',
+                    verbose=False):
         r"""Print information on the status of the ConnectionDriver.
 
         Arguments:
             beg_msg (str, optional): Additional message to print at beginning.
             end_msg (str, optional): Additional message to print at end.
+            verbose (bool, optional): If True, the status of
+                individual comms will be displayed. Defaults to
+                False.
 
         """
         msg = beg_msg
@@ -603,6 +607,9 @@ class ConnectionDriver(Driver):
                 msg += '%-30s' % ('close state: ' + self.close_state)
         msg += end_msg
         print(msg)
+        if verbose:
+            self.icomm.printStatus()
+            self.ocomm.printStatus()
 
     @run_remotely
     def confirm_input(self, timeout=None):
