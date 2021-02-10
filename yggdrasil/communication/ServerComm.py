@@ -56,6 +56,29 @@ class ServerComm(CommBase.CommBase):
                                          address=self.icomm.address,
                                          is_async=self.icomm.is_async)
 
+    def get_status_message(self, nindent=0, **kwargs):
+        r"""Return lines composing a status message.
+        
+        Args:
+            nindent (int, optional): Number of tabs that should
+                be used to indent each line. Defaults to 0.
+            *kwargs: Additional arguments are passed to the
+                parent class's method.
+                
+        Returns:
+            tuple(list, prefix): Lines composing the status message and the
+                prefix string used for the last message.
+
+        """
+        lines, prefix = super(ServerComm, self).get_status_message(
+            nindent=nindent, **kwargs)
+        lines.append('%s%-15s:' % (prefix, 'request comm'))
+        lines += self.icomm.get_status_message(nindent=(nindent + 1))[0]
+        lines.append('%s%-15s:' % (prefix, 'response comms'))
+        for x in self.ocomm.values():
+            lines += x.get_status_message(nindent=(nindent + 1))[0]
+        return lines, prefix
+        
     @classmethod
     def is_installed(cls, language=None):
         r"""Determine if the necessary libraries are installed for this

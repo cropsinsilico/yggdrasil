@@ -6,6 +6,8 @@ name: Test of package installation & execution
   push:
     branches-ignore:
     - gh-pages
+    tags:
+    - '*'
   schedule:
   - cron: 0 10 * * 1
 env:
@@ -209,10 +211,18 @@ jobs:
 
         '
     - name: Run tests (1st)
+      id: test1
       run: yggtest --ci --cov-append ${{ matrix.test-flags1 }}
+    - name: Re-run test failures (1st)
+      if: ${{ failure() && steps.test1.outcome == 'failure' }}
+      run: yggtest --ci --cov-append ${{ matrix.test-flags1 }} --last-failed --last-failed-no-failures=none
     - name: Run tests (2nd)
       if: matrix.test-flags2 != ''
+      id: test2
       run: yggtest --ci --cov-append ${{ matrix.test-flags2 }}
+    - name: Re-run test failures (2nd)
+      if: ${{ failure() && steps.test2.outcome == 'failure' }}
+      run: yggtest --ci --cov-append ${{ matrix.test-flags2 }} --last-failed --last-failed-no-failures=none
     - name: Combine coverage reports
       continue-on-error: true
       run: 'ls .*
@@ -450,10 +460,18 @@ jobs:
 
         '
     - name: Run tests (1st)
+      id: test1
       run: yggtest --ci --cov-append ${{ matrix.test-flags1 }}
+    - name: Re-run test failures (1st)
+      if: ${{ failure() && steps.test1.outcome == 'failure' }}
+      run: yggtest --ci --cov-append ${{ matrix.test-flags1 }} --last-failed --last-failed-no-failures=none
     - name: Run tests (2nd)
       if: matrix.test-flags2 != ''
+      id: test2
       run: yggtest --ci --cov-append ${{ matrix.test-flags2 }}
+    - name: Re-run test failures (2nd)
+      if: ${{ failure() && steps.test2.outcome == 'failure' }}
+      run: yggtest --ci --cov-append ${{ matrix.test-flags2 }} --last-failed --last-failed-no-failures=none
     - name: Combine coverage reports
       continue-on-error: true
       run: 'ls .*
@@ -671,10 +689,18 @@ jobs:
 
         '
     - name: Run tests (1st)
+      id: test1
       run: yggtest --ci --cov-append ${{ matrix.test-flags1 }}
+    - name: Re-run test failures (1st)
+      if: ${{ failure() && steps.test1.outcome == 'failure' }}
+      run: yggtest --ci --cov-append ${{ matrix.test-flags1 }} --last-failed --last-failed-no-failures=none
     - name: Run tests (2nd)
       if: matrix.test-flags2 != ''
+      id: test2
       run: yggtest --ci --cov-append ${{ matrix.test-flags2 }}
+    - name: Re-run test failures (2nd)
+      if: ${{ failure() && steps.test2.outcome == 'failure' }}
+      run: yggtest --ci --cov-append ${{ matrix.test-flags2 }} --last-failed --last-failed-no-failures=none
     - name: Combine coverage reports
       continue-on-error: true
       run: 'ls .*
@@ -894,10 +920,18 @@ jobs:
 
         '
     - name: Run tests (1st)
+      id: test1
       run: yggtest --ci --cov-append ${{ matrix.test-flags1 }}
+    - name: Re-run test failures (1st)
+      if: ${{ failure() && steps.test1.outcome == 'failure' }}
+      run: yggtest --ci --cov-append ${{ matrix.test-flags1 }} --last-failed --last-failed-no-failures=none
     - name: Run tests (2nd)
       if: matrix.test-flags2 != ''
+      id: test2
       run: yggtest --ci --cov-append ${{ matrix.test-flags2 }}
+    - name: Re-run test failures (2nd)
+      if: ${{ failure() && steps.test2.outcome == 'failure' }}
+      run: yggtest --ci --cov-append ${{ matrix.test-flags2 }} --last-failed --last-failed-no-failures=none
     - name: Combine coverage reports
       continue-on-error: true
       run: 'ls .*
@@ -1115,10 +1149,18 @@ jobs:
 
         '
     - name: Run tests (1st)
+      id: test1
       run: yggtest --ci --cov-append ${{ matrix.test-flags1 }}
+    - name: Re-run test failures (1st)
+      if: ${{ failure() && steps.test1.outcome == 'failure' }}
+      run: yggtest --ci --cov-append ${{ matrix.test-flags1 }} --last-failed --last-failed-no-failures=none
     - name: Run tests (2nd)
       if: matrix.test-flags2 != ''
+      id: test2
       run: yggtest --ci --cov-append ${{ matrix.test-flags2 }}
+    - name: Re-run test failures (2nd)
+      if: ${{ failure() && steps.test2.outcome == 'failure' }}
+      run: yggtest --ci --cov-append ${{ matrix.test-flags2 }} --last-failed --last-failed-no-failures=none
     - name: Combine coverage reports
       continue-on-error: true
       run: 'ls .*

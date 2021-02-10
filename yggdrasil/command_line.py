@@ -1054,7 +1054,10 @@ class run_tsts(SubCommand):
          {'action': 'append',
           'help': 'Ignore path during collection.'}),
         (('--rootdir', ),
-         {'help': 'Define root directory for tests.'})]
+         {'help': 'Define root directory for tests.'}),
+        (('--count', ),
+         {'type': int, 'default': 1,
+          'help': 'Number of times to repeat a test.'})]
     allow_unknown = True
 
     @classmethod
@@ -1283,7 +1286,13 @@ class run_tsts(SubCommand):
                         print(fd.read())
                     subprocess.check_call(["yggdrasil", "info",
                                            "--verbose"])
-                error_code = subprocess.call(argv)
+                error_code = 0
+                for x in range(args.count):
+                    x_error_code = subprocess.call(argv)
+                    if x_error_code != 0:
+                        error_code = x_error_code
+                        if args.stop:
+                            break
             except BaseException:
                 logger.exception('Error in running test.')
                 error_code = -1
