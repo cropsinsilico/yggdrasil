@@ -1,0 +1,20 @@
+model:
+  name: client
+  language: c
+  args: ./src/client.c
+  function: model_function
+  client_of: server
+  # compiler_flags: [-fopenmp]
+  # linker_flags: [-fopenmp]
+  env:
+    NTHREAD: 10
+  inputs:
+    name: in_buf
+    default_file:
+      name: ./Input/input.txt
+      filetype: ascii
+  outputs:
+    name: out_buf
+    default_file:
+      name: ./client_output.txt
+      in_temp: true

@@ -147,11 +147,16 @@ class CCompilerBase(CompilerBase):
             list: List of paths that the tools will search.
 
         """
+        cfg = kwargs.get('cfg', ygg_cfg)
+        libtype = kwargs.get('libtype', None)
         out = super(CompilerBase, cls).get_search_path(*args, **kwargs)
-        if platform._is_mac and (_osx_sysroot is not None):
-            base_path = os.path.join(_osx_sysroot, 'usr')
-            assert(kwargs.get('libtype', None) == 'include')
-            out.append(os.path.join(base_path, 'include'))
+        macos_sdkroot = cfg.get('c', 'macos_sdkroot', _osx_sysroot)
+        if platform._is_mac and (macos_sdkroot is not None):
+            base_path = os.path.join(macos_sdkroot, 'usr')
+            assert(libtype == 'include')
+            new = os.path.join(base_path, 'include')
+            if new not in out:
+                out.append(new)
         return out
 
 
@@ -285,6 +290,23 @@ class MSVCCompiler(CCompilerBase):
                              search_path_flags=None)
     toolset = 'msvc'
     
+    @staticmethod
+    def before_registration(cls):
+        r"""Operations that should be performed to modify class attributes prior
+        to registration including things like platform dependent properties and
+        checking environment variables for default settings.
+        """
+        compiler_path = shutil.which('cl.exe')
+        linker_path = shutil.which('link.exe')
+        if (((compiler_path and linker_path)
+             and (os.path.dirname(compiler_path)
+                  != os.path.dirname(linker_path)))):
+            cls.linker_attributes['default_executable'] = os.path.join(
+                os.path.dirname(compiler_path), os.path.basename(linker_path))
+            assert(os.path.isfile(
+                cls.linker_attributes['default_executable']))
+        CCompilerBase.before_registration(cls)
+        
     @classmethod
     def tool_version(cls, **kwargs):  # pragma: windows
         r"""Determine the version of this tool.
@@ -384,7 +406,11 @@ class ClangLinker(LDLinker):
         match = re.search(regex, out)
         if (match is not None) and (int(match.group('version')) >= 10):
             ld_version = LDLinker.tool_version()
-            if float(ld_version) < 520:
+            if float(ld_version.split('.')[0]) < 520:  # pragma: version
+                # No longer covered as the default conda
+                # install no longer causes this configuration
+                # to occur, but this will not be deprecated
+                # as existing installs still have this mismatch
                 kwargs['linker-version'] = ld_version
         out = super(ClangLinker, cls).get_flags(*args, **kwargs)
         if '-lstdc++' not in out:
@@ -468,8 +494,8 @@ try:
     if (_python_lib is None) or (not os.path.isfile(_python_lib)):  # pragma: no cover
         _python_lib = tools.get_python_c_library(
             allow_failure=False, libtype=libtype_order[0])
-except BaseException:  # pragma: debug
-    warnings.warn("ERROR LOCATING PYTHON LIBRARY")
+except BaseException as e:  # pragma: debug
+    warnings.warn("ERROR LOCATING PYTHON LIBRARY: %s" % e)
     _python_lib = None
 _numpy_inc = numpy_distutils.misc_util.get_numpy_include_dirs()
 _numpy_lib = None  # os.path.join(os.path.dirname(_numpy_inc[0]), 'lib', 'npymath.lib')
@@ -753,7 +779,7 @@ class CModelDriver(CompiledModelDriver):
                     cls.internal_libraries[x]['compiler_flags'].append('-fPIC')
         
     @classmethod
-    def configure(cls, cfg, macos_sdkroot=None):
+    def configure(cls, cfg, macos_sdkroot=None, vcpkg_dir=None):
         r"""Add configuration options for this language. This includes locating
         any required external libraries and setting option defaults.
 
@@ -762,12 +788,35 @@ class CModelDriver(CompiledModelDriver):
             macos_sdkroot (str, optional): Full path to the root directory for
                 the MacOS SDK that should be used. Defaults to None and is
                 ignored.
+            vcpkg_dir (str, optional): Full path to the root directory containing
+                a vcpkg installation. This should be the directory that contains
+                the vcpkg executable and any packages installed by vcpkg (in
+                subdirectories). Defaults to None and is ignored.
 
         Returns:
             list: Section, option, description tuples for options that could not
                 be set.
 
         """
+        # Set vcpkg_dir & macos_sdkroot before calling parent so that it can be
+        # used in get_search_path when searching for dependencies
+        if (cls.language is not None) and (not cfg.has_section(cls.language)):
+            cfg.add_section(cls.language)
+        if vcpkg_dir is None:
+            vcpkg_dir = os.environ.get('VCPKG_ROOT', None)
+        if vcpkg_dir is not None:
+            vcpkg_dir = os.path.abspath(vcpkg_dir)
+            if not os.path.isdir(vcpkg_dir):  # pragma: debug
+                raise ValueError("Path to vcpkg root directory "
+                                 "does not exist: %s." % vcpkg_dir)
+            cfg.set(cls._language, 'vcpkg_dir', vcpkg_dir)
+        if macos_sdkroot is None:
+            macos_sdkroot = _osx_sysroot
+        if macos_sdkroot is not None:
+            if not os.path.isdir(macos_sdkroot):  # pragma: debug
+                raise ValueError("Path to MacOS SDK root directory "
+                                 "does not exist: %s." % macos_sdkroot)
+            cfg.set(cls._language, 'macos_sdkroot', macos_sdkroot)
         # Call __func__ to avoid direct invoking of class which dosn't exist
         # in after_registration where this is called
         out = CompiledModelDriver.configure.__func__(cls, cfg)
@@ -780,13 +829,6 @@ class CModelDriver(CompiledModelDriver):
         if (nplib is not None) and os.path.isfile(nplib):
             cfg.set(cls._language, 'numpy_include',
                     os.path.dirname(os.path.dirname(nplib)))
-        if macos_sdkroot is None:
-            macos_sdkroot = _osx_sysroot
-        if macos_sdkroot is not None:
-            if not os.path.isdir(macos_sdkroot):  # pragma: debug
-                raise ValueError("Path to MacOS SDK root directory "
-                                 "does not exist: %s." % macos_sdkroot)
-            cfg.set(cls._language, 'macos_sdkroot', macos_sdkroot)
         return out
 
     @classmethod
@@ -850,7 +892,7 @@ class CModelDriver(CompiledModelDriver):
     @classmethod
     def update_ld_library_path(cls, env, paths_to_add=None,
                                add_to_front=False, add_libpython_dir=False,
-                               toolname=None, **kwargs):
+                               toolname=None, env_var=None, **kwargs):
         r"""Update provided dictionary of environment variables so that
         LD_LIBRARY_PATH includes the interface directory containing the interface
         libraries.
@@ -867,6 +909,9 @@ class CModelDriver(CompiledModelDriver):
             toolname (str, optional): Name of compiler tool that should be used.
                 Defaults to None and the default compiler for the language will
                 be used.
+            env_var (str, optional): Environment variable where the paths
+                should be added. Defaults to None and is only set for
+                linux (LD_LIBRARY_PATH) and windows (PATH).
             **kwargs: Additional keyword arguments are ignored.
 
         Returns:
@@ -879,11 +924,19 @@ class CModelDriver(CompiledModelDriver):
         if add_libpython_dir:
             paths_to_add = paths_to_add + [os.path.dirname(
                 cls.get_dependency_library('python', toolname=toolname))]
-        env_var = None
-        if platform._is_linux:
-            env_var = 'LD_LIBRARY_PATH'
-        elif platform._is_win:
-            env_var = 'PATH'
+        if platform._is_win and ygg_cfg.get('c', 'vcpkg_dir', None):
+            if platform._is_64bit:
+                arch = 'x64-windows'
+            else:  # pragma: debug
+                arch = 'x86-windows'
+                raise NotImplementedError("Not yet tested on 32bit Python")
+            paths_to_add.append(os.path.join(ygg_cfg.get('c', 'vcpkg_dir'),
+                                             'installed', arch, 'bin'))
+        if env_var is None:
+            if platform._is_linux:
+                env_var = 'LD_LIBRARY_PATH'
+            elif platform._is_win:
+                env_var = 'PATH'
         if env_var is not None:
             path_list = []
             prev_path = env.pop(env_var, '')

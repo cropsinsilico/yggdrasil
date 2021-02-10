@@ -4,6 +4,7 @@ import threading
 import logging
 import pprint
 import os
+import re
 import sys
 import sysconfig
 try:
@@ -219,6 +220,39 @@ def get_fds():  # pragma: debug
     return out.splitlines()[1:]
 
 
+def get_shell():
+    r"""Get the type of shell that yggdrasil was called from.
+
+    Returns:
+        str: Name of the shell.
+
+    """
+    shell = os.environ.get('SHELL', None)
+    if not shell:
+        if platform._is_win:  # pragma: windows
+            shell = os.environ.get('COMSPEC', None)
+        else:
+            shell = '/bin/sh'  # Default used by subprocess
+        assert(shell)
+    # return psutil.Process(os.getppid()).name()
+    if platform._is_win:  # pragma: windows
+        shell = shell.lower()
+    return shell
+
+
+def in_powershell():
+    r"""Determine if yggdrasil is running from a Windows Powershell.
+
+    Returns:
+        bool: True if running from Powershell, False otherwise.
+
+    """
+    if not platform._is_win:
+        return False
+    shell = get_shell()
+    return bool(re.match('pwsh|pwsh.exe|powershell.exe', shell))
+
+
 def check_environ_bool(name, valid_values=['true', '1', True, 1]):
     r"""Check to see if a boolean environment variable is set to True.
 
@@ -269,13 +303,24 @@ def get_python_c_library(allow_failure=False, libtype=None):
         base = '%spython%s%s' % (prefix,
                                  cvars['py_version_nodot'],
                                  libtype2ext[libtype])
-    else:
+    elif sys.version_info[:2] < (3, 8):
         if libtype is None:
             libtype = 'shared'
         libtype2key = {'shared': 'LDLIBRARY', 'static': 'LIBRARY'}
         base = cvars.get(libtype2key[libtype], None)
-        if platform._is_mac and base.endswith('/Python'):  # pragma: no cover
-            base = 'libpython%s.dylib' % cvars['py_version_short']
+    else:
+        if libtype is None:
+            libtype = 'shared'
+        if platform._is_mac:
+            libtype2ext = {'shared': '.dylib', 'static': '.a'}
+        else:
+            libtype2ext = {'shared': '.so', 'static': '.a'}
+        prefix = 'lib'
+        base = '%spython%s%s' % (prefix,
+                                 cvars['py_version_short'],
+                                 libtype2ext[libtype])
+    if platform._is_mac and base.endswith('/Python'):  # pragma: no cover
+        base = 'libpython%s.dylib' % cvars['py_version_short']
     if base is None:  # pragma: debug
         raise RuntimeError(("Could not determine base name for the Python "
                             "C API library.\n"
@@ -284,18 +329,20 @@ def get_python_c_library(allow_failure=False, libtype=None):
                            % (pprint.pformat(paths),
                               pprint.pformat(cvars)))
     dir_try = []
-    if cvars['prefix']:
-        dir_try.append(cvars['prefix'])
-        if platform._is_win:  # pragma: windows
-            dir_try.append(os.path.join(cvars['prefix'], 'libs'))
-        else:
-            dir_try.append(os.path.join(cvars['prefix'], 'lib'))
-    if cvars.get('LIBDIR', None):
-        dir_try.append(cvars['LIBDIR'])
-    if cvars.get('LIBDEST', None):
-        dir_try.append(cvars['LIBDEST'])
+    for x in [get_conda_prefix(), cvars['prefix']]:
+        if x:
+            dir_try.append(x)
+            if platform._is_win:  # pragma: windows
+                dir_try.append(os.path.join(x, 'libs'))
+            else:
+                dir_try.append(os.path.join(x, 'lib'))
+    for k in ["LIBPL", "LIBDIR", "LIBDEST", "Prefix", "ExecPrefix",
+              "BaseExecPrefix"]:
+        if cvars.get(k, None) and (cvars[k] not in dir_try):
+            dir_try.append(cvars[k])
     for k in ['stdlib', 'purelib', 'platlib', 'platstdlib', 'data']:
-        dir_try.append(paths[k])
+        if paths.get(k, None) and (paths[k] not in dir_try):
+            dir_try.append(paths[k])
     dir_try.append(os.path.join(paths['data'], 'lib'))
     if distutils_sysconfig is not None:
         dir_try.append(os.path.dirname(
@@ -1008,6 +1055,18 @@ def popen_nobuffer(*args, **kwargs):
     return YggPopen(*args, **kwargs)
 
 
+def pprint_encoded(obj, *args, **kwargs):
+    r"""Pretty print an object, catching encoding errors as necessary.
+
+    Args:
+        obj (object): Python object to pprint.
+        *args: Additional arguments are passed to pprint.pformat.
+        **kwargs: Additional keyword arguments are passed to pprint.pformat.
+
+    """
+    print_encoded(pprint.pformat(obj, *args, **kwargs))
+
+
 def print_encoded(msg, *args, **kwargs):
     r"""Print bytes to stdout, encoding if possible.
 
@@ -1018,6 +1077,8 @@ def print_encoded(msg, *args, **kwargs):
 
 
     """
+    if not isinstance(msg, (str, bytes)):
+        msg = str(msg)
     try:
         print(bytes2str(msg), *args, **kwargs)
     except (UnicodeEncodeError, UnicodeDecodeError):  # pragma: debug

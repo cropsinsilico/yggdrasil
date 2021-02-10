@@ -408,6 +408,9 @@ def parse_model(yml, existing):
             x['model_driver'] = [yml['name']]
             x['partner_language'] = language
             existing = parse_component(x, io[:-1], existing=existing)
+    for k in yml.get('env', {}).keys():
+        if not isinstance(yml['env'][k], str):
+            yml['env'][k] = json.dumps(yml['env'][k])
     return existing
 
 

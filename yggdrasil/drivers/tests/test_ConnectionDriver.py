@@ -1,4 +1,5 @@
 import unittest
+import pytest
 from yggdrasil import tools, platform
 from yggdrasil.tests import MagicTestError, assert_raises
 from yggdrasil.schema import get_schema
@@ -336,12 +337,17 @@ class TestConnectionDriver(TestConnectionParam, parent.TestDriver):
             assert(self.recv_comm.is_open)
         self.nmsg_recv = 1
 
+    def test_init_del(self):
+        r"""Test driver creation and deletion."""
+        self.instance.printStatus(verbose=True)
+
     def test_early_close(self):
         r"""Test early deletion of message queue."""
         self.instance.close_comm()
         self.instance.open_comm()
         assert(self.instance.is_comm_closed)
 
+    @pytest.mark.timeout(timeout=600)
     def test_send_recv(self):
         r"""Test sending/receiving small message."""
         flag = self.send_comm.send(self.test_msg)
@@ -358,6 +364,7 @@ class TestConnectionDriver(TestConnectionParam, parent.TestDriver):
         if self.comm_name != 'CommBase':
             self.assert_equal(self.instance.n_msg, 0)
 
+    @pytest.mark.timeout(timeout=600)
     def test_send_recv_nolimit(self):
         r"""Test sending/receiving large message."""
         assert(len(self.msg_long) > self.maxMsgSize)

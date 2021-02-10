@@ -6,6 +6,7 @@ import tempfile
 import subprocess
 import logging
 import argparse
+import shutil
 PY_MAJOR_VERSION = sys.version_info[0]
 logger = logging.getLogger(__name__)
 logger.setLevel(level=logging.INFO)
@@ -140,12 +141,10 @@ def install_packages(package_list, update=False, repos=None, **kwargs):
     req_nover = []
     for x in package_list:
         out = re.fullmatch(regex_ver, x).groupdict()
-        print(x, out)
         if out['ver'] and ('=' in out['comparison']):
             req_ver.append((out['name'], out['ver']))
         else:
             req_nover.append(out['name'])
-    print(req_ver, req_nover)
     if repos is None:
         repos = 'http://cloud.r-project.org'
     R_cmd = []
@@ -164,6 +163,7 @@ def install_packages(package_list, update=False, repos=None, **kwargs):
             R_cmd = ['req <- %s' % req_list,
                      'for (x in req) {',
                      '  if (!is.element(x, installed.packages()[,1])) {',
+                     '    print(sprintf("Installing \'%s\' from CRAN.", x))',
                      '    install.packages(x, dep=TRUE, repos="%s")' % repos,
                      '  } else {',
                      '    print(sprintf("%s already installed.", x))',
@@ -211,7 +211,10 @@ def call_R(R_cmd, **kwargs):
         fd.write('\n'.join(R_cmd))
         logger.info('Running:\n    ' + '\n    '.join(R_cmd))
     try:
-        out = make_call(['Rscript', R_script], **kwargs)
+        Rexe = shutil.which('Rscript')
+        if not Rexe:
+            Rexe = 'Rscript'
+        out = make_call([Rexe, R_script], **kwargs)
     finally:
         os.remove(R_script)
     return out
@@ -237,6 +240,8 @@ def make_call(R_cmd, with_sudo=False, **kwargs):
     try:
         logger.info("Calling %s on %s (with_sudo=%s)"
                     % (' '.join(R_cmd), sys.platform, with_sudo))
+        if sys.platform in ['win32', 'cygwin']:
+            kwargs.setdefault('shell', True)
         R_proc = subprocess.check_output(R_cmd, **kwargs)
         if PY_MAJOR_VERSION == 3:
             R_proc = R_proc.decode("utf-8")

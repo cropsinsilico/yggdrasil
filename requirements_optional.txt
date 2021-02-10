@@ -1,2 +1,5 @@
-astropy
-pika<1.0.0b1
+astropy       # [astropy]
+pika<1.0.0b1  # [rmq]
+pygments      # [pygments]
+trimesh       # [trimesh]
+libroadrunner  # [pip,sbml]

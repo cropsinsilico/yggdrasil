@@ -255,7 +255,7 @@ class YggRunner(YggClass):
             object: An instance of the specified driver.
 
         """
-        yml['env'] = {}
+        yml.setdefault('env', {})
         for iod in self.io_drivers(yml['name']):
             yml['env'].update(iod['instance'].env)
             iod['models'].append(yml['name'])

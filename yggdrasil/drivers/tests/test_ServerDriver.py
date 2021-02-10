@@ -144,6 +144,7 @@ class TestServerDriver(TestServerParam, parent.TestConnectionDriver):
         # Clean up
         cli_drv2.terminate()
 
+    @pytest.mark.timeout(600)
     def test_send_recv(self, msg_send=None):
         r"""Test routing of a short message between client and server."""
         if msg_send is None:
@@ -168,7 +169,7 @@ class TestServerDriver(TestServerParam, parent.TestConnectionDriver):
         assert_equal(cli_msg, msg_send)
 
     @flaky.flaky(max_runs=3)
-    @pytest.mark.timeout(60)
+    @pytest.mark.timeout(600)
     def test_send_recv_nolimit(self):
         r"""Test routing of a large message between client and server."""
         self.test_send_recv(msg_send=self.msg_long)

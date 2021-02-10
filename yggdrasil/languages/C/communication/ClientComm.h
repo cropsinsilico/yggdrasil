@@ -22,10 +22,17 @@ static unsigned _client_rand_seeded = 0;
 */
 static inline
 int new_client_address(comm_t *comm) {
+#ifdef _OPENMP
+#pragma omp critical (client)
+  {
+#endif
   if (!(_client_rand_seeded)) {
     srand(ptr2seed(comm));
     _client_rand_seeded = 1;
   }
+#ifdef _OPENMP
+  }    
+#endif
   comm->type = _default_comm;
   return new_default_address(comm);
 };
@@ -38,10 +45,18 @@ int new_client_address(comm_t *comm) {
 static inline
 int init_client_comm(comm_t *comm) {
   int ret = 0;
+  ygglog_debug("init_client_comm: Creating a client comm");
+#ifdef _OPENMP
+#pragma omp critical (client)
+  {
+#endif
   if (!(_client_rand_seeded)) {
     srand(ptr2seed(comm));
     _client_rand_seeded = 1;
   }
+#ifdef _OPENMP
+  }    
+#endif
   // Called to create temp comm for send/recv
   if ((strlen(comm->name) == 0) && (strlen(comm->address) > 0)) {
     comm->type = _default_comm;

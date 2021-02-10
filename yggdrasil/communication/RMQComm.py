@@ -62,7 +62,9 @@ def check_rmq_server(url=None, **kwargs):
         if not connection.is_open:  # pragma: debug
             raise BaseException("Connection was not openned.")
         connection.close()
-    except BaseException:  # pragma: debug
+    except BaseException as e:  # pragma: debug
+        print("Error when attempting to connect to the RabbitMQ server: "
+              + str(e))
         out = False
     logging.getLogger("pika").propagate = True
     return out

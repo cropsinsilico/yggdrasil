@@ -20,9 +20,11 @@ def get_language_dir(lang):
     if lang.lower() in ['cmake', 'lpy']:
         mod_list.insert(0, lang[:2].upper() + lang[2:].lower())
     elif lang.lower() == 'cpp':
-        mod_list = ['c++', 'C++'] + mod_list
+        mod_list = ['c++', 'C++'] + mod_list + ['cxx', 'CXX']
     elif lang.lower() == 'c++':
-        mod_list += ['cpp', 'CPP']
+        mod_list += ['cpp', 'CPP', 'cxx', 'CXX']
+    elif lang.lower() == 'cxx':
+        mod_list += ['c++', 'C++', 'cpp', 'CPP']
     for ilang in mod_list:
         idir = os.path.join(_lang_dir, ilang)
         if os.path.isdir(idir):

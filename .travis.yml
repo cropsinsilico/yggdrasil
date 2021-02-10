@@ -43,9 +43,7 @@ env:
   matrix:
     - YGG_TEST_FLAGS="--test-suite=examples_part1 --test-suite=demos" INSTALLTRIMESH=1
     - YGG_TEST_FLAGS="--test-suite=examples_part2"
-    - YGG_CONDA=yes YGG_TEST_FLAGS="--long-running" CC=gcc CFLAGS="-Wall -g" INSTALLRMQ=1 INSTALLAPY=1 INSTALLTRIMESH=1 INSTALLPYGMENTS=1 YGG_SECOND_TEST="yggtest --ci --default-comm=IPCComm --long-running"
-    # - YGG_CONDA=yes YGG_TEST_FLAGS="--test-suite=types --languages R c"
-    # - YGG_TEST_FLAGS="--test-suite=types --languages matlab python cpp"
+    - YGG_CONDA=yes YGG_TEST_FLAGS="--long-running" CC=gcc CFLAGS="-Wall -g" INSTALLRMQ=1 INSTALLAPY=1 INSTALLTRIMESH=1 INSTALLPYGMENTS=1 YGG_SECOND_TEST="yggtest --ci --default-comm=IPCComm --test-suite=timing"  # --long-running"
 
 before_install:
   - |
@@ -53,9 +51,6 @@ before_install:
     if [[ $TRAVIS_OS_NAME == 'linux' ]]; then
        export PATH=/usr/lib/ccache:$PATH
     fi
-    # if [[ $TRAVIS_OS_NAME == 'osx' ]]; then
-    #    export PATH=/usr/local/opt/ccache/libexec:$PATH
-    # fi
 
     if [[ -n "$TRAVIS_PYTHON_VERSION" ]]; then
       if [[ -n "$YGG_CONDA" ]]; then
@@ -71,38 +66,15 @@ before_install:
     if [[ -n "$YGG_CONDA" || $INSTALLLPY == '1' ]]; then
       echo Installing Python using conda...;
       if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then MINICONDA_OS=Linux; else MINICONDA_OS=MacOSX; fi
-      # At one point this saved time when testing in a Python 2.7 conda environment, but
-      # recent version of conda build have issues when the base conda is not Python 3
-      # wget https://repo.anaconda.com/miniconda/Miniconda${YGG_CONDA:0:1}-latest-$MINICONDA_OS-x86_64.sh -O miniconda.sh
       wget https://repo.anaconda.com/miniconda/Miniconda3-latest-$MINICONDA_OS-x86_64.sh -O miniconda.sh
       bash miniconda.sh -b -p $HOME/miniconda
       export PATH="$HOME/miniconda/bin:$PATH"
       hash -r
-
-      # Download and point to older SDK on OSX
-      echo "TRAVIS_OS_NAME = ${TRAVIS_OS_NAME}"
-      if [[ $TRAVIS_OS_NAME == 'osx' ]]; then
-        conda info -a
-        # Install older Mac SDK so that conda llvm (7) can be used
-        # https://github.com/conda-forge/mpi-feedstock/issues/4
-        export MACOSX_DEPLOYMENT_TARGET=${MACOSX_DEPLOYMENT_TARGET:-10.9}
-        export CONDA_BUILD_SYSROOT="$(xcode-select -p)/Platforms/MacOSX.platform/Developer/SDKs/MacOSX${MACOSX_DEPLOYMENT_TARGET}.sdk"
-        export SDKROOT=${CONDA_BUILD_SYSROOT}
-        echo "MACOSX_DEPLOYMENT_TARGET = ${MACOSX_DEPLOYMENT_TARGET}"
-        echo "CONDA_BUILD_SYSROOT = ${CONDA_BUILD_SYSROOT}"
-        echo "SDKROOT = ${SDKROOT}"
-
-        if [[ ! -d ${CONDA_BUILD_SYSROOT} || "$OSX_FORCE_SDK_DOWNLOAD" == "1" ]]; then
-          echo "Downloading ${MACOSX_DEPLOYMENT_TARGET} sdk to ${CONDA_BUILD_SYSROOT}"
-          curl -L -O https://github.com/phracker/MacOSX-SDKs/releases/download/10.13/MacOSX${MACOSX_DEPLOYMENT_TARGET}.sdk.tar.xz
-          tar -xf MacOSX${MACOSX_DEPLOYMENT_TARGET}.sdk.tar.xz -C "$(dirname "$CONDA_BUILD_SYSROOT")"
-          ls "$(dirname "$CONDA_BUILD_SYSROOT")"
-          # set minimum sdk version to our target
-          plutil -replace MinimumSDKVersion -string ${MACOSX_DEPLOYMENT_TARGET} $(xcode-select -p)/Platforms/MacOSX.platform/Info.plist
-          plutil -replace DTSDKName -string macosx${MACOSX_DEPLOYMENT_TARGET}internal $(xcode-select -p)/Platforms/MacOSX.platform/Info.plist
-          printf "CONDA_BUILD_SYSROOT:\n  - ${CONDA_BUILD_SYSROOT}  # [osx]\n" > ~/conda_build_config.yaml
-        fi
-      fi
+    fi
+    # Download and point to older SDK on OSX
+    echo "TRAVIS_OS_NAME = ${TRAVIS_OS_NAME}"
+    if [[ $TRAVIS_OS_NAME == 'osx' ]]; then
+      ./utils/setup_old_mac_sdk.sh
     fi
 
     # Install RabbitMQ & Start a server
@@ -114,31 +86,40 @@ before_install:
           else
              sudo apt-get install rabbitmq-server
           fi
-          echo Starting RabbitMQ...;
-          export PATH="${PATH}:/usr/local/sbin";
-          sudo /bin/sh -c "RABBITMQ_PID_FILE=$TRAVIS_BUILD_DIR/rabbitmq.pid rabbitmq-server &"
-          sudo rabbitmqctl wait "$TRAVIS_BUILD_DIR/rabbitmq.pid"
+          ./utils/setup_rabbitmq.sh
+       else
+         # It has been installed via a service
+         echo Checking rabbitmq status...;
+         sudo rabbitmqctl status
        fi
-       echo Checking rabbitmq status...;
-       sudo rabbitmqctl status
     fi
 
     # Setup environment
-    if [[ -n "$YGG_CONDA" ]]; then
-      python utils/ci_setup.py conda env $YGG_CONDA
+    if [[ -n "$YGG_CONDA" || $INSTALLLPY == '1' ]]; then
+      python utils/setup_test_env.py env conda $YGG_CONDA --env-name=test-environment
     else
-      python utils/ci_setup.py pip env $YGG_PYTHON
+      # No environment required on Linux because Travis is managing the version
+      # of Python that is installed
+      if [[ $TRAVIS_OS_NAME == 'osx' ]]; then
+        python utils/setup_test_env.py env virtualenv $YGG_PYTHON --env-name=test-environment
+      fi
+    fi
+
+    # Perform the conda build in the base environment
+    if [[ -n "$YGG_CONDA" ]]; then
+      python utils/setup_test_env.py build conda --python $YGG_CONDA
     fi
 
     # Activate environment
     if [[ -n "$YGG_CONDA" || $INSTALLLPY == '1' ]]; then
       source activate test-environment
+      # TODO: Check if this can be removed
       if [[ $TRAVIS_OS_NAME == 'linux' ]]; then
         export LD_LIBRARY_PATH=$CONDA_PREFIX/lib:$LD_LIBRARY_PATH
       fi
     fi
     if [[ -n "$YGG_PYTHON" && $TRAVIS_OS_NAME == 'osx' ]]; then
-      source venv/bin/activate
+      source test-environment/bin/activate
     fi
 
 install:
@@ -148,24 +129,27 @@ install:
       ccache -s
     fi
 
-    # Build and install
+    # Install dependencies & package
     if [[ -n "$YGG_CONDA" ]]; then
-      python utils/ci_setup.py conda deploy
+      travis_wait python utils/setup_test_env.py deps conda
+      travis_wait python utils/setup_test_env.py install conda --without-build --without-deps
     else
-      if [[ $INSTALLR == '1' ]]; then
-        export YGG_USE_SUDO_FOR_R=1
-      fi
-      python utils/ci_setup.py pip deploy
+      # if [[ $INSTALLR == '1' ]]; then
+      #   export YGG_USE_SUDO_FOR_R=1
+      # fi
+      travis_wait python utils/setup_test_env.py install pip
     fi
 
 script:
+  - python utils/setup_test_env.py verify
+  - travis_wait yggcompile
   - yggtest --ci $YGG_TEST_FLAGS
   - $YGG_SECOND_TEST
 
 
-after_success:
-  - |
-    codecov
+# after_success:
+#   - |
+#     codecov
 
 
 stages:
@@ -209,7 +193,7 @@ jobs:
           - $HOME/Library/Caches/pip
           - $HOME/Library/Caches/Homebrew
           - $HOME/R/Library
-      env: YGG_PYTHON=3.6 R_LIBS_USER=$HOME/R/Library YGG_TEST_FLAGS="tests/test_tools.py --test-suite=types --languages R c" INSTALLR=0 INSTALLFORTRAN=0
+      env: YGG_PYTHON=3.6 R_LIBS_USER=$HOME/R/Library YGG_TEST_FLAGS="tests/test_tools.py --test-suite=types --languages R c" INSTALLR=0 INSTALLFORTRAN=0 INSTALLZMQ=0
     - os: osx
       python: 3.7
       language: generic  # https://github.com/travis-ci/travis-ci/issues/2312
@@ -218,7 +202,7 @@ jobs:
         directories:
           - $HOME/Library/Caches/pip
           - $HOME/Library/Caches/Homebrew
-      env: YGG_CONDA=3.7 YGG_TEST_FLAGS="serialize --test-suite=examples_part1 communication/tests/test_IPCComm.py communication/tests/test_RMQAsyncComm.py --test-suite=timing" INSTALLZMQ=0
+      env: YGG_CONDA=3.7 YGG_TEST_FLAGS="serialize --test-suite=examples_part1 communication/tests/test_IPCComm.py communication/tests/test_RMQAsyncComm.py --test-suite=timing" # INSTALLZMQ=0
       script:
         - yggconfig --remove-file
         - yggtest --ci tests/test_config.py $YGG_TEST_FLAGS
@@ -239,43 +223,43 @@ jobs:
           update: true
 
     # Docs
-    - stage: deploy
-      name: "Deploy docs"
-      python: 3.6
-      env: BUILDDOCS=1
-      script: |
-              cd docs
-              make autodoc
-              cd "$TRAVIS_BUILD_DIR"
-      after_success: skip
-      if: (tag IS present)
-      deploy:
-        provider: pages
-        skip_cleanup: true
-        local_dir: docs/build/html/
-        keep-history: true
-        github_token: $GITHUB_TOKEN  # Set in travis-ci.org dashboard
-        on:
-          tags: true
-        verbose: true
-      addons:
-        apt:
-          packages:
-            - *native_deps_apt
-            - doxygen
-          update: true
+    # - stage: deploy
+    #   name: "Deploy docs"
+    #   python: 3.6
+    #   env: BUILDDOCS=1
+    #   script: |
+    #           cd docs
+    #           make autodoc
+    #           cd "$TRAVIS_BUILD_DIR"
+    #   after_success: skip
+    #   if: (tag IS present)
+    #   deploy:
+    #     provider: pages
+    #     skip_cleanup: true
+    #     local_dir: docs/build/html/
+    #     keep-history: true
+    #     github_token: $GITHUB_TOKEN  # Set in travis-ci.org dashboard
+    #     on:
+    #       tags: true
+    #     verbose: true
+    #   addons:
+    #     apt:
+    #       packages:
+    #         - *native_deps_apt
+    #         - doxygen
+    #       update: true
 
     # Deploy
-    - stage: deploy
-      name: "Deploy to PyPI"
-      script: skip
-      if: (tag IS present)
-      deploy:
-        provider: pypi
-        skip_existing: true
-        distributions: sdist bdist_wheel --universal
-        username: "__token__"
-        password:
-          secure: "iRsnZ8i1fWoqZVQd7LzX8L+z3aS/c1io/tUHApJE8ujHdNF7owtLyg1JG9eUWdinfApv0WS7uaoUxdM44I3eMpFdsXBXCEcQZ77ZQEJ5kO+QqqSfPX6BO/hKTcckuw3UMWYMxWk7BmreUFBFwV1vx5/o0Wv+vql968+zhHILtWnaW+1jhDwHn2FmUZ9ESXww87FyJhcpvvsCQOXBTKEWN2AOToLaU4NWvzrHi5B7Vr9+4rZ70HyUwCIhb53ktZ+3Xn0zZwbf5or7XbRPrkfiVHqX2ywfa2lQU+59KHwXG0UHt8cSqvD08Tig3QgFO76SAsLXaJ+GI1YPTJ/Q/2xC+5N5tWDi1wL8SXmetjnku3/PGk9tfljVbMVErDLq8Vchra/w8AQ1EAyyhV4xBRIWJr/PlwsjxHB+qNnJ5S/x/0ZeSylUsPlQNTsqRqHdMYNJR1m1/pJqzZ6WURMVW2A341fRHHZNFQDNFePWvEA1qWKmeCWkKeKAu22TbIl0YlIX4m/y87BfjuHq4pditoIMws5K9SH4HVgrm4Kcqo8JlYN8bsTDlKw0ydtHZAYnh2BS6KHaCQqM+03/8yBrnrP0nzei1qkFVfAoAKcPMIsEYcPcme9MgJG5j/pAAzY1VeY52zgc7F9FRVmufKxEfro2Gcid/PW0reaPZgqD98B+ubo="
-        on:
-          tags: true
+    # - stage: deploy
+    #   name: "Deploy to PyPI"
+    #   script: skip
+    #   if: (tag IS present)
+    #   deploy:
+    #     provider: pypi
+    #     skip_existing: true
+    #     distributions: sdist bdist_wheel --universal
+    #     username: "__token__"
+    #     password:
+    #       secure: "iRsnZ8i1fWoqZVQd7LzX8L+z3aS/c1io/tUHApJE8ujHdNF7owtLyg1JG9eUWdinfApv0WS7uaoUxdM44I3eMpFdsXBXCEcQZ77ZQEJ5kO+QqqSfPX6BO/hKTcckuw3UMWYMxWk7BmreUFBFwV1vx5/o0Wv+vql968+zhHILtWnaW+1jhDwHn2FmUZ9ESXww87FyJhcpvvsCQOXBTKEWN2AOToLaU4NWvzrHi5B7Vr9+4rZ70HyUwCIhb53ktZ+3Xn0zZwbf5or7XbRPrkfiVHqX2ywfa2lQU+59KHwXG0UHt8cSqvD08Tig3QgFO76SAsLXaJ+GI1YPTJ/Q/2xC+5N5tWDi1wL8SXmetjnku3/PGk9tfljVbMVErDLq8Vchra/w8AQ1EAyyhV4xBRIWJr/PlwsjxHB+qNnJ5S/x/0ZeSylUsPlQNTsqRqHdMYNJR1m1/pJqzZ6WURMVW2A341fRHHZNFQDNFePWvEA1qWKmeCWkKeKAu22TbIl0YlIX4m/y87BfjuHq4pditoIMws5K9SH4HVgrm4Kcqo8JlYN8bsTDlKw0ydtHZAYnh2BS6KHaCQqM+03/8yBrnrP0nzei1qkFVfAoAKcPMIsEYcPcme9MgJG5j/pAAzY1VeY52zgc7F9FRVmufKxEfro2Gcid/PW0reaPZgqD98B+ubo="
+    #     on:
+    #       tags: true

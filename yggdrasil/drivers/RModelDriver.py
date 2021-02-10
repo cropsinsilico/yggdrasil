@@ -137,7 +137,8 @@ class RModelDriver(InterpretedModelDriver):  # pragma: R
             try:
                 cls.run_executable(['-e', 'library(%s)' % lib.split()[0]])
                 cls._library_cache[lib] = True
-            except RuntimeError:
+            except RuntimeError as e:
+                logger.info('Error checking for R library %s: %s' % (lib, e))
                 cls._library_cache[lib] = False
         return cls._library_cache[lib]
         
@@ -166,14 +167,14 @@ class RModelDriver(InterpretedModelDriver):  # pragma: R
     #                 % ' '.join(self.valgrind_flags), '--vanilla', '-f']
     #     return super(RModelDriver, self).debug_flags
         
-    def set_env(self):
+    def set_env(self, **kwargs):
         r"""Get environment variables that should be set for the model process.
 
         Returns:
             dict: Environment variables for the model process.
 
         """
-        out = super(RModelDriver, self).set_env()
+        out = super(RModelDriver, self).set_env(**kwargs)
         out['RETICULATE_PYTHON'] = PythonModelDriver.get_interpreter()
         if CModelDriver.is_language_installed():
             c_linker = CModelDriver.get_tool('linker')

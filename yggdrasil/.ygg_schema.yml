@@ -125,8 +125,8 @@ definitions:
             type: string
           type: array
       required:
-      - datatype
       - name
+      - datatype
       - commtype
       title: comm_base
       type: object
@@ -629,9 +629,9 @@ definitions:
             is used.
           type: string
       required:
-      - filetype
-      - name
       - working_dir
+      - name
+      - filetype
       title: file_base
       type: object
     - anyOf:
@@ -1249,6 +1249,13 @@ definitions:
         driver:
           description: '[DEPRECATED] Name of driver class that should be used.'
           type: string
+        env:
+          additional_properties:
+            type: string
+          default: {}
+          description: Dictionary of environment variables that should be set when
+            the driver starts. Defaults to {}.
+          type: object
         env_compiler:
           default: CC
           description: Environment variable where the compiler executable should be
@@ -1278,8 +1285,7 @@ definitions:
             model must contain it's own calls to the |yggdrasil| interface.
           type: string
         inputs:
-          default:
-          - name: default
+          default: []
           description: A mapping object containing the entry for a model input channel
             or a list of input channel entries. If the model does not get input from
             another model, this may be ommitted. A full description of channel entries
@@ -1367,6 +1373,7 @@ definitions:
           - c++
           - cmake
           - cpp
+          - cxx
           - executable
           - fortran
           - lpy
@@ -1417,8 +1424,7 @@ definitions:
           description: If True, only the final timestep is output. Defaults to False.
           type: boolean
         outputs:
-          default:
-          - name: default
+          default: []
           description: A mapping object containing the entry for a model output channel
             or a list of output channel entries. If the model does not output to another
             model, this may be ommitted. A full description of channel entries and
@@ -1671,10 +1677,10 @@ definitions:
             is used.
           type: string
       required:
-      - working_dir
+      - language
       - name
       - args
-      - language
+      - working_dir
       title: model_base
       type: object
     - anyOf:
@@ -1847,6 +1853,106 @@ definitions:
         title: ExecutableModelDriver
         type: object
       - additionalProperties: true
+        description: Schema for model component ['c'] subtype.
+        properties:
+          compiler:
+            description: Command or path to executable that should be used to compile
+              the model. If not provided, the compiler will be determined based on
+              configuration options for the language (if present) and the registered
+              compilers that are available on the current operating system.
+            type: string
+          compiler_flags:
+            default: []
+            description: Flags that should be passed to the compiler during compilation.
+              If nto provided, the compiler flags will be determined based on configuration
+              options for the language (if present), the compiler defaults, and the
+              default_compiler_flags class attribute.
+            items:
+              type: string
+            type: array
+          language:
+            default: executable
+            description: Model is written in C.
+            enum:
+            - c
+            type: string
+          linker:
+            description: Command or path to executable that should be used to link
+              the model. If not provided, the linker will be determined based on configuration
+              options for the language (if present) and the registered linkers that
+              are available on the current operating system
+            type: string
+          linker_flags:
+            default: []
+            description: Flags that should be passed to the linker during compilation.
+              If nto provided, the linker flags will be determined based on configuration
+              options for the language (if present), the linker defaults, and the
+              default_linker_flags class attribute.
+            items:
+              type: string
+            type: array
+          source_files:
+            default: []
+            description: Source files that should be compiled into an executable.
+              Defaults to an empty list and the driver will search for a source file
+              based on the model executable (the first model argument).
+            items:
+              type: string
+            type: array
+        title: CModelDriver
+        type: object
+      - additionalProperties: true
+        description: Schema for model component ['c++', 'cpp', 'cxx'] subtype.
+        properties:
+          compiler:
+            description: Command or path to executable that should be used to compile
+              the model. If not provided, the compiler will be determined based on
+              configuration options for the language (if present) and the registered
+              compilers that are available on the current operating system.
+            type: string
+          compiler_flags:
+            default: []
+            description: Flags that should be passed to the compiler during compilation.
+              If nto provided, the compiler flags will be determined based on configuration
+              options for the language (if present), the compiler defaults, and the
+              default_compiler_flags class attribute.
+            items:
+              type: string
+            type: array
+          language:
+            default: executable
+            description: Model is written in C++.
+            enum:
+            - c++
+            - cpp
+            - cxx
+            type: string
+          linker:
+            description: Command or path to executable that should be used to link
+              the model. If not provided, the linker will be determined based on configuration
+              options for the language (if present) and the registered linkers that
+              are available on the current operating system
+            type: string
+          linker_flags:
+            default: []
+            description: Flags that should be passed to the linker during compilation.
+              If nto provided, the linker flags will be determined based on configuration
+              options for the language (if present), the linker defaults, and the
+              default_linker_flags class attribute.
+            items:
+              type: string
+            type: array
+          source_files:
+            default: []
+            description: Source files that should be compiled into an executable.
+              Defaults to an empty list and the driver will search for a source file
+              based on the model executable (the first model argument).
+            items:
+              type: string
+            type: array
+        title: CPPModelDriver
+        type: object
+      - additionalProperties: true
         description: Schema for model component ['osr'] subtype.
         properties:
           copy_xml_to_osr:
@@ -1924,105 +2030,6 @@ definitions:
               in Matlab using symunit. Defaults to False.
             type: boolean
         title: MatlabModelDriver
-        type: object
-      - additionalProperties: true
-        description: Schema for model component ['c'] subtype.
-        properties:
-          compiler:
-            description: Command or path to executable that should be used to compile
-              the model. If not provided, the compiler will be determined based on
-              configuration options for the language (if present) and the registered
-              compilers that are available on the current operating system.
-            type: string
-          compiler_flags:
-            default: []
-            description: Flags that should be passed to the compiler during compilation.
-              If nto provided, the compiler flags will be determined based on configuration
-              options for the language (if present), the compiler defaults, and the
-              default_compiler_flags class attribute.
-            items:
-              type: string
-            type: array
-          language:
-            default: executable
-            description: Model is written in C.
-            enum:
-            - c
-            type: string
-          linker:
-            description: Command or path to executable that should be used to link
-              the model. If not provided, the linker will be determined based on configuration
-              options for the language (if present) and the registered linkers that
-              are available on the current operating system
-            type: string
-          linker_flags:
-            default: []
-            description: Flags that should be passed to the linker during compilation.
-              If nto provided, the linker flags will be determined based on configuration
-              options for the language (if present), the linker defaults, and the
-              default_linker_flags class attribute.
-            items:
-              type: string
-            type: array
-          source_files:
-            default: []
-            description: Source files that should be compiled into an executable.
-              Defaults to an empty list and the driver will search for a source file
-              based on the model executable (the first model argument).
-            items:
-              type: string
-            type: array
-        title: CModelDriver
-        type: object
-      - additionalProperties: true
-        description: Schema for model component ['c++', 'cpp'] subtype.
-        properties:
-          compiler:
-            description: Command or path to executable that should be used to compile
-              the model. If not provided, the compiler will be determined based on
-              configuration options for the language (if present) and the registered
-              compilers that are available on the current operating system.
-            type: string
-          compiler_flags:
-            default: []
-            description: Flags that should be passed to the compiler during compilation.
-              If nto provided, the compiler flags will be determined based on configuration
-              options for the language (if present), the compiler defaults, and the
-              default_compiler_flags class attribute.
-            items:
-              type: string
-            type: array
-          language:
-            default: executable
-            description: Model is written in C++.
-            enum:
-            - c++
-            - cpp
-            type: string
-          linker:
-            description: Command or path to executable that should be used to link
-              the model. If not provided, the linker will be determined based on configuration
-              options for the language (if present) and the registered linkers that
-              are available on the current operating system
-            type: string
-          linker_flags:
-            default: []
-            description: Flags that should be passed to the linker during compilation.
-              If nto provided, the linker flags will be determined based on configuration
-              options for the language (if present), the linker defaults, and the
-              default_linker_flags class attribute.
-            items:
-              type: string
-            type: array
-          source_files:
-            default: []
-            description: Source files that should be compiled into an executable.
-              Defaults to an empty list and the driver will search for a source file
-              based on the model executable (the first model argument).
-            items:
-              type: string
-            type: array
-        title: CPPModelDriver
         type: object
       - additionalProperties: true
         description: Schema for model component ['R', 'r'] subtype.
