@@ -206,8 +206,6 @@ jobs:
       run: python utils/setup_test_env.py verify
     - name: Compile libraries
       run: yggcompile
-    # - name: Run tests (1st)
-    #   run: yggtest --ci --with-examples examples/tests/test_timed_pipe.py examples/tests/test_gs_lesson[3-4].py --language c cpp
     - name: Run cmake test in command prompt
       if: matrix.os == 'windows-latest'
       shell: cmd /C CALL {0}
