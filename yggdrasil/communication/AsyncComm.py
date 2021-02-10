@@ -226,6 +226,8 @@ class AsyncComm(CommBase.CommBase):
         for v in self._work_comms.values():
             if (v.direction == 'send') and not v.is_confirmed_send:  # pragma: debug
                 return False
+        if self.is_open_backlog and self.n_msg_backlog_send:  # pragma: debug
+            return False
         return (self.n_msg_direct_send == 0)
 
     @property
