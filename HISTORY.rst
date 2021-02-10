@@ -2,13 +2,13 @@
 History
 =======
 
-1.5.0 (XXXX-XX-XX)
+1.4.1 (2021-02-10)
 ------------------
 
-* Move continuous integration to Github actions
-* Refactor the command line interface and add the `yggdrasil` CLI with subcommands for other command line actions
+* Move continuous integration for testing and deployment to Github actions
+* Refactor the command line interface and add the `yggdrasil [subcommand]` CLI with subcommands for other command line actions so that the CLI can be called with a specific version of Python via `python -m yggdrasil [subcommand]`
 * Fix bug where colons cause environment variables to be invalid for R models run in Conda environments on Ubuntu
-* Pin to conda czmq requirement to 4.2.0 on Mac OS until there is a fix for a bug in the czmq socket initalizaiton
+* Update the conda recipe so that the yggdrasil configuration file and R package are removed on uninstall
 
 
 1.4.0 (2020-12-09) Support for OpenSimRoot models, wrapped functions as clients/servers, & misc. features/bug fixes
