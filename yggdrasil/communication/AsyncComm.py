@@ -220,6 +220,13 @@ class AsyncComm(ProxyObject, ComponentBaseUnregistered):
         return self.n_msg_direct_send + self.n_msg_backlog_send
 
     @property
+    def is_confirmed_send(self):
+        r"""bool: True if all sent messages have been confirmed."""
+        if not self._wrapped.is_confirmed_send:
+            return False
+        return (self.n_msg_send == 0)
+        
+    @property
     def backlog_buffer(self):
         r"""list: Messages that have been received."""
         with self.backlog_thread.lock:
