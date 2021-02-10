@@ -2,7 +2,27 @@
 History
 =======
 
-1.5.0 (2021-02-10) Migrate to GHA, refactor CLI, & bug fixes
+1.5.0 (XXXX-XX-XX)
+------------------
+
+* Make async comm more generic so it can be used to wrap any comm type and is more robust
+* Change communication pattern so that a single connection driver is used by default to limit unnecessary message passing
+* Change connection to use ‘inputs’/‘outputs’ instead of ‘icomm_kws’/‘ocomm_kws’ to provide simpler mapping form the yaml to inputs
+* Migrate away from use of ‘comm’ to ‘commtype’/‘comm_list’ keyword in comms for clarity
+* Migrate away from use of comm_class to using commtype
+* Use specialized error classes to catch specific issues (timeouts, no message waiting, etc)
+* Specialize comm registration on the comm class
+* Generalize the RPC client/server drivers
+* Added support for importing models as functions
+* Modify the RPC pattern so that client/server one-to-many send operation occurs at the interface between the connection and the server
+* Add model information to message headers
+
+TODO
+~~~~
+  
+* Fix bug that causes segfault when calling yggdrasil interface from inside a threaded model
+
+1.5.0 (2021-02-10) Migrate to GHA, refactor CLI, & fix bugs
 ------------------
 
 * Move continuous integration for testing and deployment to Github actions
