@@ -76,7 +76,6 @@ yggdrasil.serialize.tests.test\_serialize module
    :undoc-members:
    :show-inheritance:
 
-
 Module contents
 ---------------
 

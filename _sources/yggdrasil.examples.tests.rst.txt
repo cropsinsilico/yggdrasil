@@ -188,6 +188,14 @@ yggdrasil.examples.tests.test\_model\_function module
    :undoc-members:
    :show-inheritance:
 
+yggdrasil.examples.tests.test\_osr module
+-----------------------------------------
+
+.. automodule:: yggdrasil.examples.tests.test_osr
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 yggdrasil.examples.tests.test\_root\_to\_shoot module
 -----------------------------------------------------
 
@@ -216,6 +224,22 @@ yggdrasil.examples.tests.test\_rpc\_lesson2 module
 --------------------------------------------------
 
 .. automodule:: yggdrasil.examples.tests.test_rpc_lesson2
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+yggdrasil.examples.tests.test\_rpc\_lesson3 module
+--------------------------------------------------
+
+.. automodule:: yggdrasil.examples.tests.test_rpc_lesson3
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+yggdrasil.examples.tests.test\_rpc\_lesson3b module
+---------------------------------------------------
+
+.. automodule:: yggdrasil.examples.tests.test_rpc_lesson3b
    :members:
    :undoc-members:
    :show-inheritance:
@@ -291,7 +315,6 @@ yggdrasil.examples.tests.test\_zzz module
    :members:
    :undoc-members:
    :show-inheritance:
-
 
 Module contents
 ---------------

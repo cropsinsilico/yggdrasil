@@ -12,7 +12,6 @@ yggdrasil.languages.tests.test\_install\_languages module
    :undoc-members:
    :show-inheritance:
 
-
 Module contents
 ---------------
 

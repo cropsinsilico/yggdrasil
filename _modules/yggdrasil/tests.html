@@ -1,39 +1,42 @@
 
 
 <!DOCTYPE html>
-<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
-<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<html class="writer-html5" lang="en" >
 <head>
-  <meta charset="utf-8">
+  <meta charset="utf-8" />
   
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>yggdrasil.tests &mdash; yggdrasil 1.1.1+410.g95af39b2 documentation</title>
+  <title>yggdrasil.tests &mdash; yggdrasil v1.5.0 documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/theme_overrides.css" type="text/css" />
+
+  
   
 
   
   
-  
+
   
 
   
-  <script type="text/javascript" src="../../_static/js/modernizr.min.js"></script>
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
   
     
       <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
         <script src="../../_static/jquery.js"></script>
         <script src="../../_static/underscore.js"></script>
         <script src="../../_static/doctools.js"></script>
-        <script src="../../_static/language_data.js"></script>
     
     <script type="text/javascript" src="../../_static/js/theme.js"></script>
 
     
-
-  
-  <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
-  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
-  <link rel="stylesheet" href="../../_static/theme_overrides.css" type="text/css" />
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" /> 
 </head>
@@ -59,7 +62,7 @@
             
             
               <div class="version">
-                1.1.1
+                v1.5.0
               </div>
             
           
@@ -76,6 +79,7 @@
           
         </div>
 
+        
         <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
           
             
@@ -111,6 +115,7 @@
             
           
         </div>
+        
       </div>
     </nav>
 
@@ -145,11 +150,13 @@
 
 
 
+
+
 <div role="navigation" aria-label="breadcrumbs navigation">
 
   <ul class="wy-breadcrumbs">
     
-      <li><a href="../../index.html">Docs</a> &raquo;</li>
+      <li><a href="../../index.html" class="icon icon-home"></a> &raquo;</li>
         
           <li><a href="../index.html">Module code</a> &raquo;</li>
         
@@ -184,11 +191,13 @@
 <span class="kn">import</span> <span class="nn">copy</span>
 <span class="kn">import</span> <span class="nn">pprint</span>
 <span class="kn">import</span> <span class="nn">types</span>
-<span class="kn">from</span> <span class="nn">pandas.testing</span> <span class="k">import</span> <span class="n">assert_frame_equal</span>
-<span class="kn">from</span> <span class="nn">yggdrasil.config</span> <span class="k">import</span> <span class="n">ygg_cfg</span><span class="p">,</span> <span class="n">cfg_logging</span>
-<span class="kn">from</span> <span class="nn">yggdrasil</span> <span class="k">import</span> <span class="n">tools</span><span class="p">,</span> <span class="n">platform</span><span class="p">,</span> <span class="n">units</span>
-<span class="kn">from</span> <span class="nn">yggdrasil.communication</span> <span class="k">import</span> <span class="n">cleanup_comms</span>
-<span class="kn">from</span> <span class="nn">yggdrasil.components</span> <span class="k">import</span> <span class="n">import_component</span>
+<span class="kn">import</span> <span class="nn">warnings</span>
+<span class="kn">import</span> <span class="nn">json</span>
+<span class="kn">from</span> <span class="nn">pandas.testing</span> <span class="kn">import</span> <span class="n">assert_frame_equal</span>
+<span class="kn">from</span> <span class="nn">yggdrasil.config</span> <span class="kn">import</span> <span class="n">ygg_cfg</span><span class="p">,</span> <span class="n">cfg_logging</span>
+<span class="kn">from</span> <span class="nn">yggdrasil</span> <span class="kn">import</span> <span class="n">tools</span><span class="p">,</span> <span class="n">platform</span><span class="p">,</span> <span class="n">units</span>
+<span class="kn">from</span> <span class="nn">yggdrasil.communication</span> <span class="kn">import</span> <span class="n">cleanup_comms</span>
+<span class="kn">from</span> <span class="nn">yggdrasil.components</span> <span class="kn">import</span> <span class="n">import_component</span>
 
 
 <span class="c1"># Test data</span>
@@ -212,7 +221,8 @@
     <span class="p">(</span><span class="s1">&#39;lpy&#39;</span><span class="p">,</span> <span class="s1">&#39;lpy_model.lpy&#39;</span><span class="p">),</span>
     <span class="p">(</span><span class="s1">&#39;r&#39;</span><span class="p">,</span> <span class="s1">&#39;r_model.R&#39;</span><span class="p">),</span>
     <span class="p">(</span><span class="s1">&#39;fortran&#39;</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;hellofunc.f90&#39;</span><span class="p">,</span> <span class="s1">&#39;fortran_model.f90&#39;</span><span class="p">]),</span>
-    <span class="p">(</span><span class="s1">&#39;sbml&#39;</span><span class="p">,</span> <span class="s1">&#39;sbml_model.xml&#39;</span><span class="p">)]</span>
+    <span class="p">(</span><span class="s1">&#39;sbml&#39;</span><span class="p">,</span> <span class="s1">&#39;sbml_model.xml&#39;</span><span class="p">),</span>
+    <span class="p">(</span><span class="s1">&#39;osr&#39;</span><span class="p">,</span> <span class="s1">&#39;osr_model.xml&#39;</span><span class="p">)]</span>
 <span class="n">scripts</span> <span class="o">=</span> <span class="p">{}</span>
 <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">script_list</span><span class="p">:</span>
     <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
@@ -220,8 +230,9 @@
     <span class="k">else</span><span class="p">:</span>
         <span class="n">scripts</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">script_dir</span><span class="p">,</span> <span class="n">v</span><span class="p">)</span>
 <span class="c1"># scripts = {k: os.path.join(script_dir, v) for k, v in script_list}</span>
-<span class="k">if</span> <span class="n">platform</span><span class="o">.</span><span class="n">_is_win</span><span class="p">:</span>  <span class="c1"># pragma: windows</span>
-    <span class="n">scripts</span><span class="p">[</span><span class="s1">&#39;executable&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;timeout&#39;</span><span class="p">,</span> <span class="s1">&#39;0&#39;</span><span class="p">]</span>
+<span class="k">if</span> <span class="n">platform</span><span class="o">.</span><span class="n">_is_win</span> <span class="ow">and</span> <span class="p">(</span><span class="ow">not</span> <span class="n">tools</span><span class="o">.</span><span class="n">in_powershell</span><span class="p">()):</span>  <span class="c1"># pragma: windows</span>
+    <span class="c1"># scripts[&#39;executable&#39;] = [&#39;timeout&#39;, &#39;0&#39;]</span>
+    <span class="n">scripts</span><span class="p">[</span><span class="s1">&#39;executable&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;ping&#39;</span><span class="p">,</span> <span class="s1">&#39;-n&#39;</span><span class="p">,</span> <span class="s1">&#39;1&#39;</span><span class="p">,</span> <span class="s1">&#39;127.0.0.1&#39;</span><span class="p">]</span>
 <span class="k">else</span><span class="p">:</span>
     <span class="n">scripts</span><span class="p">[</span><span class="s1">&#39;executable&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;sleep&#39;</span><span class="p">,</span> <span class="mf">0.1</span><span class="p">]</span>
     
@@ -237,7 +248,8 @@
     <span class="p">(</span><span class="s1">&#39;error&#39;</span><span class="p">,</span> <span class="s1">&#39;error_model.yml&#39;</span><span class="p">),</span>
     <span class="p">(</span><span class="s1">&#39;lpy&#39;</span><span class="p">,</span> <span class="s1">&#39;lpy_model.yml&#39;</span><span class="p">),</span>
     <span class="p">(</span><span class="s1">&#39;fortran&#39;</span><span class="p">,</span> <span class="s1">&#39;fortran_model.yml&#39;</span><span class="p">),</span>
-    <span class="p">(</span><span class="s1">&#39;sbml&#39;</span><span class="p">,</span> <span class="s1">&#39;sbml_model.yml&#39;</span><span class="p">)]</span>
+    <span class="p">(</span><span class="s1">&#39;sbml&#39;</span><span class="p">,</span> <span class="s1">&#39;sbml_model.yml&#39;</span><span class="p">),</span>
+    <span class="p">(</span><span class="s1">&#39;osr&#39;</span><span class="p">,</span> <span class="s1">&#39;osr_model.yml&#39;</span><span class="p">)]</span>
 <span class="n">yamls</span> <span class="o">=</span> <span class="p">{</span><span class="n">k</span><span class="p">:</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">yaml_dir</span><span class="p">,</span> <span class="n">v</span><span class="p">)</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">yaml_list</span><span class="p">}</span>
 
 <span class="c1"># Makefile</span>
@@ -253,25 +265,45 @@
 <span class="n">skip_extra_examples</span> <span class="o">=</span> <span class="n">tools</span><span class="o">.</span><span class="n">check_environ_bool</span><span class="p">(</span><span class="s2">&quot;YGG_SKIP_EXTRA_EXAMPLES&quot;</span><span class="p">)</span>
 
 
-<span class="k">def</span> <span class="nf">check_enabled_languages</span><span class="p">(</span><span class="n">language</span><span class="p">):</span>
+<span class="k">def</span> <span class="nf">check_enabled_languages</span><span class="p">(</span><span class="n">language</span><span class="p">,</span> <span class="n">return_decorators</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Determine if the specified language is enabled by the value</span>
 <span class="sd">    or values specified in YGG_TEST_LANGUAGE.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        language (str): Language to check.</span>
+<span class="sd">        return_decorators (bool, optional): If True, a skip error is</span>
+<span class="sd">            not raised and a list of decorators is returned. Defaults</span>
+<span class="sd">            to False.</span>
 
 <span class="sd">    Raises:</span>
 <span class="sd">        unittest.SkipTest: If the specified language is not enabled.</span>
 
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">enabled</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;YGG_TEST_LANGUAGE&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+    <span class="n">decorators</span> <span class="o">=</span> <span class="p">[]</span>
     <span class="k">if</span> <span class="n">enabled</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="n">enabled</span> <span class="o">=</span> <span class="p">[</span><span class="n">x</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">enabled</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;,&#39;</span><span class="p">)]</span>
-        <span class="k">if</span> <span class="p">(</span><span class="s1">&#39;c++&#39;</span> <span class="ow">in</span> <span class="n">enabled</span><span class="p">)</span> <span class="ow">or</span> <span class="p">(</span><span class="s1">&#39;cpp&#39;</span> <span class="ow">in</span> <span class="n">enabled</span><span class="p">):</span>
-            <span class="n">enabled</span> <span class="o">+=</span> <span class="p">[</span><span class="s1">&#39;c++&#39;</span><span class="p">,</span> <span class="s1">&#39;cpp&#39;</span><span class="p">]</span>
-        <span class="k">if</span> <span class="n">language</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">enabled</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="n">unittest</span><span class="o">.</span><span class="n">SkipTest</span><span class="p">(</span><span class="s2">&quot;Tests for language </span><span class="si">%s</span><span class="s2"> not enabled.&quot;</span><span class="p">,</span>
-                                    <span class="n">language</span><span class="p">)</span>
+        <span class="n">enabled</span> <span class="o">=</span> <span class="p">[</span><span class="n">x</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">enabled</span><span class="p">)]</span>
+        <span class="k">if</span> <span class="p">(</span><span class="s1">&#39;c++&#39;</span> <span class="ow">in</span> <span class="n">enabled</span><span class="p">)</span> <span class="ow">or</span> <span class="p">(</span><span class="s1">&#39;cpp&#39;</span> <span class="ow">in</span> <span class="n">enabled</span><span class="p">)</span> <span class="ow">or</span> <span class="p">(</span><span class="s1">&#39;cxx&#39;</span> <span class="ow">in</span> <span class="n">enabled</span><span class="p">):</span>
+            <span class="n">enabled</span> <span class="o">+=</span> <span class="p">[</span><span class="s1">&#39;c++&#39;</span><span class="p">,</span> <span class="s1">&#39;cpp&#39;</span><span class="p">,</span> <span class="s1">&#39;cxx&#39;</span><span class="p">]</span>
+        <span class="n">msg</span> <span class="o">=</span> <span class="s2">&quot;Tests for language </span><span class="si">%s</span><span class="s2"> not enabled.&quot;</span> <span class="o">%</span> <span class="n">language</span>
+        <span class="n">cond</span> <span class="o">=</span> <span class="p">(</span><span class="n">language</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">enabled</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">return_decorators</span><span class="p">:</span>
+            <span class="n">decorators</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">unittest</span><span class="o">.</span><span class="n">skipIf</span><span class="p">(</span><span class="n">cond</span><span class="p">,</span> <span class="n">msg</span><span class="p">))</span>
+        <span class="k">elif</span> <span class="n">cond</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">unittest</span><span class="o">.</span><span class="n">SkipTest</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+    <span class="n">disabled</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;YGG_TEST_SKIP_LANGUAGE&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">disabled</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">disabled</span> <span class="o">=</span> <span class="p">[</span><span class="n">x</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">disabled</span><span class="p">)]</span>
+        <span class="k">if</span> <span class="p">(</span><span class="s1">&#39;c++&#39;</span> <span class="ow">in</span> <span class="n">disabled</span><span class="p">)</span> <span class="ow">or</span> <span class="p">(</span><span class="s1">&#39;cpp&#39;</span> <span class="ow">in</span> <span class="n">disabled</span><span class="p">):</span>
+            <span class="n">disabled</span> <span class="o">+=</span> <span class="p">[</span><span class="s1">&#39;c++&#39;</span><span class="p">,</span> <span class="s1">&#39;cpp&#39;</span><span class="p">]</span>
+        <span class="n">msg</span> <span class="o">=</span> <span class="s2">&quot;Tests for language </span><span class="si">%s</span><span class="s2"> disabled.&quot;</span> <span class="o">%</span> <span class="n">language</span>
+        <span class="n">cond</span> <span class="o">=</span> <span class="p">(</span><span class="n">language</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="ow">in</span> <span class="n">disabled</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">return_decorators</span><span class="p">:</span>
+            <span class="n">decorators</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">unittest</span><span class="o">.</span><span class="n">skipIf</span><span class="p">(</span><span class="n">cond</span><span class="p">,</span> <span class="n">msg</span><span class="p">))</span>
+        <span class="k">elif</span> <span class="n">cond</span><span class="p">:</span>  <span class="c1"># pragma: debug</span>
+            <span class="k">raise</span> <span class="n">unittest</span><span class="o">.</span><span class="n">SkipTest</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">return_decorators</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">decorators</span>
 
 
 <span class="k">def</span> <span class="nf">requires_language</span><span class="p">(</span><span class="n">language</span><span class="p">,</span> <span class="n">installed</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
@@ -306,10 +338,7 @@
         <span class="k">elif</span> <span class="n">installed</span> <span class="ow">is</span> <span class="kc">False</span><span class="p">:</span>
             <span class="n">skips</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">unittest</span><span class="o">.</span><span class="n">skipIf</span><span class="p">(</span><span class="n">drv</span><span class="o">.</span><span class="n">is_installed</span><span class="p">(),</span>
                                          <span class="s2">&quot;</span><span class="si">%s</span><span class="s2"> installed&quot;</span><span class="p">))</span>
-        <span class="n">skips</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">unittest</span><span class="o">.</span><span class="n">skipIf</span><span class="p">(</span>
-            <span class="p">(</span><span class="n">test_language</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">)</span>
-            <span class="ow">and</span> <span class="p">(</span><span class="n">test_language</span> <span class="o">!=</span> <span class="n">drv</span><span class="o">.</span><span class="n">language</span><span class="o">.</span><span class="n">lower</span><span class="p">()),</span>
-            <span class="s2">&quot;Test for language </span><span class="si">%s</span><span class="s2"> not enabled.&quot;</span> <span class="o">%</span> <span class="n">drv</span><span class="o">.</span><span class="n">language</span><span class="p">))</span>
+        <span class="n">skips</span> <span class="o">+=</span> <span class="n">check_enabled_languages</span><span class="p">(</span><span class="n">language</span><span class="p">,</span> <span class="n">return_decorators</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
         <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">skips</span><span class="p">:</span>
             <span class="n">function</span> <span class="o">=</span> <span class="n">s</span><span class="p">(</span><span class="n">function</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">function</span>
@@ -317,9 +346,16 @@
     <span class="k">return</span> <span class="n">wrapper</span>
 
 
+<span class="k">def</span> <span class="nf">pprint_diff</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">):</span>  <span class="c1"># pragma: no cover</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Get the diff between the pprint.pformat string for two objects.&quot;&quot;&quot;</span>
+    <span class="n">tools</span><span class="o">.</span><span class="n">print_encoded</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">difflib</span><span class="o">.</span><span class="n">ndiff</span><span class="p">(</span>
+        <span class="n">pprint</span><span class="o">.</span><span class="n">pformat</span><span class="p">(</span><span class="n">x</span><span class="p">)</span><span class="o">.</span><span class="n">splitlines</span><span class="p">(),</span>
+        <span class="n">pprint</span><span class="o">.</span><span class="n">pformat</span><span class="p">(</span><span class="n">y</span><span class="p">)</span><span class="o">.</span><span class="n">splitlines</span><span class="p">())))</span>
+
+
 <span class="c1"># Wrapped class to allow handling of arrays</span>
 <span class="k">class</span> <span class="nc">WrappedTestCase</span><span class="p">(</span><span class="n">unittest</span><span class="o">.</span><span class="n">TestCase</span><span class="p">):</span>  <span class="c1"># pragma: no cover</span>
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">WrappedTestCase</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">addTypeEqualityFunc</span><span class="p">(</span><span class="n">units</span><span class="o">.</span><span class="n">_unit_quantity</span><span class="p">,</span> <span class="s1">&#39;assertUnitsEqual&#39;</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">addTypeEqualityFunc</span><span class="p">(</span><span class="n">units</span><span class="o">.</span><span class="n">_unit_array</span><span class="p">,</span> <span class="s1">&#39;assertUnitsEqual&#39;</span><span class="p">)</span>
@@ -590,7 +626,7 @@
     <span class="k">yield</span> <span class="n">ut</span><span class="o">.</span><span class="n">assertWarns</span><span class="p">(</span><span class="n">warning</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
 
 
-<span class="k">def</span> <span class="nf">assert_equal</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">):</span>
+<span class="k">def</span> <span class="nf">assert_equal</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">dont_print_diff</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Assert that two messages are equivalent.</span>
 
 <span class="sd">    Args:</span>
@@ -601,7 +637,14 @@
 <span class="sd">        AssertionError: If the two messages are not equivalent.</span>
 
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">ut</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="k">with</span> <span class="n">warnings</span><span class="o">.</span><span class="n">catch_warnings</span><span class="p">():</span>
+            <span class="n">warnings</span><span class="o">.</span><span class="n">simplefilter</span><span class="p">(</span><span class="n">action</span><span class="o">=</span><span class="s1">&#39;ignore&#39;</span><span class="p">,</span> <span class="n">category</span><span class="o">=</span><span class="ne">FutureWarning</span><span class="p">)</span>
+            <span class="n">ut</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
+    <span class="k">except</span> <span class="ne">AssertionError</span><span class="p">:</span>  <span class="c1"># pragma: debug</span>
+        <span class="k">if</span> <span class="p">(</span><span class="ow">not</span> <span class="n">dont_print_diff</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="o">==</span> <span class="nb">type</span><span class="p">(</span><span class="n">y</span><span class="p">)):</span>
+            <span class="n">pprint_diff</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
+        <span class="k">raise</span>
 
 
 <span class="k">def</span> <span class="nf">assert_not_equal</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">):</span>
@@ -640,7 +683,7 @@
     <span class="n">skip_comm_check</span> <span class="o">=</span> <span class="kc">False</span>
     <span class="n">attr_list</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
 
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_description_prefix</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;description_prefix&#39;</span><span class="p">,</span>
                                               <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="p">)</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;&#39;&quot;</span><span class="p">)[</span><span class="mi">1</span><span class="p">])</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">uuid</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">uuid</span><span class="o">.</span><span class="n">uuid4</span><span class="p">())</span>
@@ -732,7 +775,7 @@
         <span class="k">if</span> <span class="n">default_comm</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">default_comm</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_new_default_comm</span>
         <span class="k">if</span> <span class="n">default_comm</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="kn">from</span> <span class="nn">yggdrasil.communication.DefaultComm</span> <span class="k">import</span> <span class="n">DefaultComm</span>
+            <span class="kn">from</span> <span class="nn">yggdrasil.communication.DefaultComm</span> <span class="kn">import</span> <span class="n">DefaultComm</span>
             <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s1">&#39;YGG_DEFAULT_COMM&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">default_comm</span>
             <span class="n">DefaultComm</span><span class="o">.</span><span class="n">_reset_alias</span><span class="p">()</span></div>
 
@@ -967,7 +1010,7 @@
     <span class="n">_cls</span> <span class="o">=</span> <span class="kc">None</span>
     <span class="n">skip_init</span> <span class="o">=</span> <span class="kc">False</span>
 
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_inst_args</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_inst_kwargs</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_extra_instances</span> <span class="o">=</span> <span class="p">[]</span>
@@ -1121,7 +1164,7 @@
 <div class="viewcode-block" id="IOInfo"><a class="viewcode-back" href="../../yggdrasil.tests.html#yggdrasil.tests.IOInfo">[docs]</a><span class="k">class</span> <span class="nc">IOInfo</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Simple class for useful IO attributes.&quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">field_names</span> <span class="o">=</span> <span class="p">[</span><span class="sa">b</span><span class="s1">&#39;name&#39;</span><span class="p">,</span> <span class="sa">b</span><span class="s1">&#39;count&#39;</span><span class="p">,</span> <span class="sa">b</span><span class="s1">&#39;size&#39;</span><span class="p">]</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">field_units</span> <span class="o">=</span> <span class="p">[</span><span class="sa">b</span><span class="s1">&#39;n/a&#39;</span><span class="p">,</span> <span class="sa">b</span><span class="s1">&#39;umol&#39;</span><span class="p">,</span> <span class="sa">b</span><span class="s1">&#39;cm&#39;</span><span class="p">]</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">nfields</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">field_names</span><span class="p">)</span>
@@ -1133,7 +1176,7 @@
 <div class="viewcode-block" id="YggTestClassInfo"><a class="viewcode-back" href="../../yggdrasil.tests.html#yggdrasil.tests.YggTestClassInfo">[docs]</a><span class="k">class</span> <span class="nc">YggTestClassInfo</span><span class="p">(</span><span class="n">YggTestClass</span><span class="p">,</span> <span class="n">IOInfo</span><span class="p">):</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test class for a YggClass with IOInfo available.&quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">YggTestClassInfo</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
         <span class="n">IOInfo</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span></div>
 
@@ -1171,7 +1214,7 @@
 
         <span class="n">_is_error_class</span> <span class="o">=</span> <span class="kc">True</span>
         
-        <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
             <span class="n">error_on_init</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;error_on_init&#39;</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>
             <span class="k">if</span> <span class="n">error_on_init</span><span class="p">:</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">error_method</span><span class="p">()</span>
@@ -1239,7 +1282,7 @@
 <span class="sd">            name of the class being tested.</span>
 
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="kn">from</span> <span class="nn">yggdrasil.schema</span> <span class="k">import</span> <span class="n">get_schema</span>
+    <span class="kn">from</span> <span class="nn">yggdrasil.schema</span> <span class="kn">import</span> <span class="n">get_schema</span>
     <span class="n">_schema</span> <span class="o">=</span> <span class="n">get_schema</span><span class="p">()</span>
     <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">directory</span><span class="p">):</span>
         <span class="n">directory</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">directory</span><span class="p">)</span>
@@ -1267,20 +1310,25 @@
            
           </div>
           <footer>
-  
 
   <hr/>
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2017, Meagan Lang, David Raila
+        &#169; Copyright 2017, Meagan Lang, David Raila.
 
     </p>
   </div>
-  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+    
+    
+    
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
 
 </footer>
-
         </div>
       </div>
 
@@ -1288,7 +1336,6 @@
 
   </div>
   
-
 
   <script type="text/javascript">
       jQuery(function () {

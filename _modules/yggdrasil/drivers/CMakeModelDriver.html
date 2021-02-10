@@ -1,39 +1,42 @@
 
 
 <!DOCTYPE html>
-<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
-<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<html class="writer-html5" lang="en" >
 <head>
-  <meta charset="utf-8">
+  <meta charset="utf-8" />
   
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>yggdrasil.drivers.CMakeModelDriver &mdash; yggdrasil 1.1.1+410.g95af39b2 documentation</title>
+  <title>yggdrasil.drivers.CMakeModelDriver &mdash; yggdrasil v1.5.0 documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/theme_overrides.css" type="text/css" />
+
+  
   
 
   
   
-  
+
   
 
   
-  <script type="text/javascript" src="../../../_static/js/modernizr.min.js"></script>
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
   
     
       <script type="text/javascript" id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
         <script src="../../../_static/jquery.js"></script>
         <script src="../../../_static/underscore.js"></script>
         <script src="../../../_static/doctools.js"></script>
-        <script src="../../../_static/language_data.js"></script>
     
     <script type="text/javascript" src="../../../_static/js/theme.js"></script>
 
     
-
-  
-  <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
-  <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
-  <link rel="stylesheet" href="../../../_static/theme_overrides.css" type="text/css" />
     <link rel="index" title="Index" href="../../../genindex.html" />
     <link rel="search" title="Search" href="../../../search.html" /> 
 </head>
@@ -59,7 +62,7 @@
             
             
               <div class="version">
-                1.1.1
+                v1.5.0
               </div>
             
           
@@ -76,6 +79,7 @@
           
         </div>
 
+        
         <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
           
             
@@ -111,6 +115,7 @@
             
           
         </div>
+        
       </div>
     </nav>
 
@@ -145,11 +150,13 @@
 
 
 
+
+
 <div role="navigation" aria-label="breadcrumbs navigation">
 
   <ul class="wy-breadcrumbs">
     
-      <li><a href="../../../index.html">Docs</a> &raquo;</li>
+      <li><a href="../../../index.html" class="icon icon-home"></a> &raquo;</li>
         
           <li><a href="../../index.html">Module code</a> &raquo;</li>
         
@@ -173,16 +180,17 @@
   <h1>Source code for yggdrasil.drivers.CMakeModelDriver</h1><div class="highlight"><pre>
 <span></span><span class="kn">import</span> <span class="nn">os</span>
 <span class="kn">import</span> <span class="nn">re</span>
+<span class="kn">import</span> <span class="nn">sys</span>
 <span class="kn">import</span> <span class="nn">shutil</span>
 <span class="kn">import</span> <span class="nn">logging</span>
 <span class="kn">import</span> <span class="nn">sysconfig</span>
-<span class="kn">from</span> <span class="nn">collections</span> <span class="k">import</span> <span class="n">OrderedDict</span>
-<span class="kn">from</span> <span class="nn">yggdrasil</span> <span class="k">import</span> <span class="n">platform</span><span class="p">,</span> <span class="n">components</span><span class="p">,</span> <span class="n">tools</span>
-<span class="kn">from</span> <span class="nn">yggdrasil.drivers.CompiledModelDriver</span> <span class="k">import</span> <span class="p">(</span>
+<span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">OrderedDict</span>
+<span class="kn">from</span> <span class="nn">yggdrasil</span> <span class="kn">import</span> <span class="n">platform</span><span class="p">,</span> <span class="n">components</span>
+<span class="kn">from</span> <span class="nn">yggdrasil.drivers.CompiledModelDriver</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">LinkerBase</span><span class="p">,</span> <span class="n">get_compilation_tool</span><span class="p">,</span> <span class="n">get_compatible_tool</span><span class="p">)</span>
-<span class="kn">from</span> <span class="nn">yggdrasil.drivers.BuildModelDriver</span> <span class="k">import</span> <span class="p">(</span>
+<span class="kn">from</span> <span class="nn">yggdrasil.drivers.BuildModelDriver</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">BuildModelDriver</span><span class="p">,</span> <span class="n">BuildToolBase</span><span class="p">)</span>
-<span class="kn">from</span> <span class="nn">yggdrasil.drivers</span> <span class="k">import</span> <span class="n">CModelDriver</span>
+<span class="kn">from</span> <span class="nn">yggdrasil.drivers</span> <span class="kn">import</span> <span class="n">CModelDriver</span>
 
 
 <span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
@@ -389,10 +397,11 @@
             <span class="k">if</span> <span class="n">platform</span><span class="o">.</span><span class="n">_is_win</span><span class="p">:</span>  <span class="c1"># pragma: windows</span>
                 <span class="n">error_MSB4019</span> <span class="o">=</span> <span class="p">(</span><span class="sa">r</span><span class="s1">&#39;error MSB4019: The imported project &#39;</span>
                                  <span class="sa">r</span><span class="s1">&#39;&quot;C:\Microsoft.Cpp.Default.props&quot; was not found.&#39;</span><span class="p">)</span>
+                <span class="n">error_NOVS</span> <span class="o">=</span> <span class="sa">r</span><span class="s1">&#39;could not find any instance of Visual Studio.&#39;</span>
                 <span class="c1"># This will only be called if the VC 15 build tools</span>
                 <span class="c1"># are installed by MSVC 19+ which is not currently</span>
                 <span class="c1"># supported by Appveyor CI.</span>
-                <span class="k">if</span> <span class="n">error_MSB4019</span> <span class="ow">in</span> <span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">):</span>  <span class="c1"># pragma: debug</span>
+                <span class="k">if</span> <span class="p">(</span><span class="n">error_MSB4019</span> <span class="ow">in</span> <span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">))</span> <span class="ow">or</span> <span class="p">(</span><span class="n">error_NOVS</span> <span class="ow">in</span> <span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">)):</span>  <span class="c1"># pragma: debug</span>
                     <span class="n">old_generator</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;CMAKE_GENERATOR&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
                     <span class="n">new_generator</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">generator</span><span class="p">(</span><span class="n">return_default</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
                     <span class="k">if</span> <span class="n">old_generator</span> <span class="ow">and</span> <span class="p">(</span><span class="n">old_generator</span> <span class="o">!=</span> <span class="n">new_generator</span><span class="p">):</span>
@@ -576,6 +585,10 @@
 <span class="sd">                are displayed. Defaults to False.</span>
 <span class="sd">            **kwargs: Additional keyword arguments are ignored.</span>
 
+<span class="sd">        Returns:</span>
+<span class="sd">            list: Lines that should be added before the executable is defined</span>
+<span class="sd">                in the CMakeLists.txt (e.g. LINK_DIRECTORIES commands).</span>
+
 <span class="sd">        Raises:</span>
 <span class="sd">            ValueError: If a linker or compiler flag cannot be interpreted.</span>
 
@@ -605,6 +618,7 @@
             <span class="n">internal_library_flags</span><span class="o">=</span><span class="n">internal_library_flags</span><span class="p">,</span>
             <span class="n">skip_library_libs</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">library_flags</span><span class="o">=</span><span class="n">library_flags</span><span class="p">)</span>
         <span class="n">lines</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">pretarget_lines</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="n">preamble_lines</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="n">library_flags</span> <span class="o">+=</span> <span class="n">internal_library_flags</span> <span class="o">+</span> <span class="n">external_library_flags</span>
         <span class="c1"># Suppress warnings on windows about the security of strcpy etc.</span>
@@ -627,10 +641,17 @@
             <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">new_flags</span><span class="p">:</span>
                 <span class="k">if</span> <span class="n">x</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">compile_flags</span><span class="p">:</span>
                     <span class="n">compile_flags</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+        <span class="c1"># Find Python using cmake</span>
+        <span class="c1"># https://martinopilia.com/posts/2018/09/15/building-python-extension.html</span>
+        <span class="c1"># preamble_lines.append(&#39;find_package(PythonInterp REQUIRED)&#39;)</span>
+        <span class="c1"># preamble_lines.append(&#39;find_package(PythonLibs REQUIRED)&#39;)</span>
+        <span class="c1"># preamble_lines.append(&#39;INCLUDE_DIRECTORIES(${PYTHON_INCLUDE_DIRS})&#39;)</span>
+        <span class="c1"># lines.append(&#39;TARGET_LINK_LIBRARIES(%s ${PYTHON_LIBRARIES})&#39;</span>
+        <span class="c1">#              % target)</span>
         <span class="n">python_flags</span> <span class="o">=</span> <span class="n">sysconfig</span><span class="o">.</span><span class="n">get_config_var</span><span class="p">(</span><span class="s1">&#39;LIBS&#39;</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">python_flags</span><span class="p">:</span>
             <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">python_flags</span><span class="o">.</span><span class="n">split</span><span class="p">():</span>
-                <span class="k">if</span> <span class="n">x</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;-l&#39;</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">x</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">linker_flags</span><span class="p">):</span>
+                <span class="k">if</span> <span class="n">x</span><span class="o">.</span><span class="n">startswith</span><span class="p">((</span><span class="s1">&#39;-L&#39;</span><span class="p">,</span> <span class="s1">&#39;-l&#39;</span><span class="p">))</span> <span class="ow">and</span> <span class="p">(</span><span class="n">x</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">linker_flags</span><span class="p">):</span>
                     <span class="n">linker_flags</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
         <span class="c1"># Compilation flags</span>
         <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">compile_flags</span><span class="p">:</span>
@@ -657,16 +678,19 @@
                 <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;TARGET_LINK_LIBRARIES(</span><span class="si">%s</span><span class="s1"> </span><span class="si">%s</span><span class="s1">)&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">target</span><span class="p">,</span> <span class="n">x</span><span class="p">))</span>
             <span class="k">elif</span> <span class="n">x</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;-L&#39;</span><span class="p">):</span>
                 <span class="n">libdir</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">fix_path</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;-L&#39;</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="n">is_gnu</span><span class="o">=</span><span class="n">is_gnu</span><span class="p">)</span>
-                <span class="n">preamble_lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;LINK_DIRECTORIES(</span><span class="si">%s</span><span class="s1">)&#39;</span> <span class="o">%</span> <span class="n">libdir</span><span class="p">)</span>
+                <span class="n">pretarget_lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;LINK_DIRECTORIES(</span><span class="si">%s</span><span class="s1">)&#39;</span> <span class="o">%</span> <span class="n">libdir</span><span class="p">)</span>
             <span class="k">elif</span> <span class="n">x</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;/LIBPATH:&#39;</span><span class="p">):</span>  <span class="c1"># pragma: windows</span>
                 <span class="n">libdir</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;/LIBPATH:&#39;</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
                 <span class="k">if</span> <span class="s1">&#39;&quot;&#39;</span> <span class="ow">in</span> <span class="n">libdir</span><span class="p">:</span>
                     <span class="n">libdir</span> <span class="o">=</span> <span class="n">libdir</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;&quot;&#39;</span><span class="p">)[</span><span class="mi">1</span><span class="p">]</span>
                 <span class="n">libdir</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">fix_path</span><span class="p">(</span><span class="n">libdir</span><span class="p">,</span> <span class="n">is_gnu</span><span class="o">=</span><span class="n">is_gnu</span><span class="p">)</span>
-                <span class="n">preamble_lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;LINK_DIRECTORIES(</span><span class="si">%s</span><span class="s1">)&#39;</span> <span class="o">%</span> <span class="n">libdir</span><span class="p">)</span>
+                <span class="n">pretarget_lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;LINK_DIRECTORIES(</span><span class="si">%s</span><span class="s1">)&#39;</span> <span class="o">%</span> <span class="n">libdir</span><span class="p">)</span>
             <span class="k">elif</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
                 <span class="n">library_flags</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
-            <span class="k">elif</span> <span class="n">x</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;-mlinker-version=&#39;</span><span class="p">):</span>
+            <span class="k">elif</span> <span class="n">x</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;-mlinker-version=&#39;</span><span class="p">):</span>  <span class="c1"># pragma: version</span>
+                <span class="c1"># Currently this only called when clang is &gt;=10</span>
+                <span class="c1"># and ld is &lt;520 or mlinker is set in the env</span>
+                <span class="c1"># flags via CFLAGS, CXXFLAGS, etc.</span>
                 <span class="n">preamble_lines</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="s1">&#39;target_link_options(</span><span class="si">%s</span><span class="s1"> PRIVATE </span><span class="si">%s</span><span class="s1">)&#39;</span>
                                       <span class="o">%</span> <span class="p">(</span><span class="n">target</span><span class="p">,</span> <span class="n">x</span><span class="p">))</span>
             <span class="k">elif</span> <span class="n">x</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;-&#39;</span><span class="p">)</span> <span class="ow">or</span> <span class="n">x</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;/&#39;</span><span class="p">):</span>
@@ -684,7 +708,7 @@
             <span class="n">xn</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">splitext</span><span class="p">(</span><span class="n">xl</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
             <span class="n">new_dir</span> <span class="o">=</span> <span class="s1">&#39;LINK_DIRECTORIES(</span><span class="si">%s</span><span class="s1">)&#39;</span> <span class="o">%</span> <span class="n">xd</span>
             <span class="k">if</span> <span class="n">new_dir</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">preamble_lines</span><span class="p">:</span>
-                <span class="n">preamble_lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">new_dir</span><span class="p">)</span>
+                <span class="n">pretarget_lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">new_dir</span><span class="p">)</span>
             <span class="k">if</span> <span class="bp">cls</span><span class="o">.</span><span class="n">add_libraries</span> <span class="ow">or</span> <span class="p">(</span><span class="n">xorig</span> <span class="ow">in</span> <span class="n">internal_library_flags</span><span class="p">):</span>
                 <span class="c1"># if cls.add_libraries:  # pragma: no cover</span>
                 <span class="c1"># Version adding library</span>
@@ -695,9 +719,11 @@
                     <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;    ADD_LIBRARY(</span><span class="si">%s</span><span class="s1"> STATIC IMPORTED)&#39;</span> <span class="o">%</span> <span class="n">xl</span><span class="p">)</span>
                 <span class="n">lines</span> <span class="o">+=</span> <span class="p">[</span><span class="s1">&#39;    SET_TARGET_PROPERTIES(&#39;</span><span class="p">,</span>
                           <span class="s1">&#39;        </span><span class="si">%s</span><span class="s1"> PROPERTIES&#39;</span> <span class="o">%</span> <span class="n">xl</span><span class="p">]</span>
-                <span class="k">if</span> <span class="n">xe</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="o">==</span> <span class="s1">&#39;.dll&#39;</span><span class="p">:</span>
-                    <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;        IMPORTED_IMPLIB </span><span class="si">%s</span><span class="s1">&#39;</span>
-                                 <span class="o">%</span> <span class="n">x</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;.dll&#39;</span><span class="p">,</span> <span class="s1">&#39;.lib&#39;</span><span class="p">))</span>
+                <span class="c1"># Untested on appveyor, but required when using dynamic</span>
+                <span class="c1"># library directly (if dll2a not used).</span>
+                <span class="c1"># if xe.lower() == &#39;.dll&#39;:</span>
+                <span class="c1">#     lines.append(&#39;        IMPORTED_IMPLIB %s&#39;</span>
+                <span class="c1">#                  % x.replace(&#39;.dll&#39;, &#39;.lib&#39;))</span>
                 <span class="n">lines</span> <span class="o">+=</span> <span class="p">[</span><span class="s1">&#39;        IMPORTED_LOCATION </span><span class="si">%s</span><span class="s1">)&#39;</span> <span class="o">%</span> <span class="n">x</span><span class="p">,</span>
                           <span class="s1">&#39;endif()&#39;</span><span class="p">,</span>
                           <span class="s1">&#39;TARGET_LINK_LIBRARIES(</span><span class="si">%s</span><span class="s1"> </span><span class="si">%s</span><span class="s1">)&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">target</span><span class="p">,</span> <span class="n">xl</span><span class="p">)]</span>
@@ -707,19 +733,33 @@
                              <span class="o">%</span> <span class="p">(</span><span class="n">xn</span><span class="o">.</span><span class="n">upper</span><span class="p">(),</span> <span class="n">xf</span><span class="p">,</span> <span class="n">xn</span><span class="p">,</span> <span class="n">xd</span><span class="p">))</span>
                 <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;TARGET_LINK_LIBRARIES(</span><span class="si">%s</span><span class="s1"> ${</span><span class="si">%s</span><span class="s1">_LIBRARY})&#39;</span>
                              <span class="o">%</span> <span class="p">(</span><span class="n">target</span><span class="p">,</span> <span class="n">xn</span><span class="o">.</span><span class="n">upper</span><span class="p">()))</span>
+        <span class="c1"># Link local lib on MacOS because on Mac &gt;=10.14 setting sysroot</span>
+        <span class="c1"># clobbers the default paths.</span>
+        <span class="c1"># https://stackoverflow.com/questions/54068035/linking-not-working-in</span>
+        <span class="c1"># -homebrews-cmake-since-mojave</span>
+        <span class="k">if</span> <span class="n">platform</span><span class="o">.</span><span class="n">_is_mac</span><span class="p">:</span>
+            <span class="n">pretarget_lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;LINK_DIRECTORIES(/usr/lib)&#39;</span><span class="p">)</span>
+            <span class="n">pretarget_lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;LINK_DIRECTORIES(/usr/local/lib)&#39;</span><span class="p">)</span>
         <span class="n">lines</span> <span class="o">=</span> <span class="n">preamble_lines</span> <span class="o">+</span> <span class="n">lines</span>
-        <span class="n">log_msg</span> <span class="o">=</span> <span class="s1">&#39;CMake include file:</span><span class="se">\n\t</span><span class="s1">&#39;</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\n\t</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">lines</span><span class="p">)</span>
+        <span class="n">log_msg</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="s1">&#39;CMake compiler flags:</span><span class="se">\n\t</span><span class="si">%s</span><span class="se">\n</span><span class="s1">&#39;</span>
+            <span class="s1">&#39;CMake linker flags:</span><span class="se">\n\t</span><span class="si">%s</span><span class="se">\n</span><span class="s1">&#39;</span>
+            <span class="s1">&#39;CMake library flags:</span><span class="se">\n\t</span><span class="si">%s</span><span class="se">\n</span><span class="s1">&#39;</span>
+            <span class="s1">&#39;CMake include file:</span><span class="se">\n\t</span><span class="si">%s</span><span class="s1">&#39;</span><span class="p">)</span> <span class="o">%</span> <span class="p">(</span>
+                <span class="s1">&#39; &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">compile_flags</span><span class="p">),</span> <span class="s1">&#39; &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">linker_flags</span><span class="p">),</span>
+                <span class="s1">&#39; &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">library_flags</span><span class="p">),</span> <span class="s1">&#39;</span><span class="se">\n\t</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">lines</span><span class="p">))</span>
         <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
             <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">log_msg</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="n">log_msg</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">fname</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="k">return</span> <span class="n">lines</span>
+            <span class="k">return</span> <span class="n">pretarget_lines</span> <span class="o">+</span> <span class="n">lines</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">fname</span><span class="p">):</span>
                 <span class="n">os</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">fname</span><span class="p">)</span>
             <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">fname</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">fd</span><span class="p">:</span>
-                <span class="n">fd</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">lines</span><span class="p">))</span></div></div>
+                <span class="n">fd</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">lines</span><span class="p">))</span>
+            <span class="k">return</span> <span class="n">pretarget_lines</span></div></div>
 
     
 <div class="viewcode-block" id="CMakeBuilder"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.CMakeModelDriver.CMakeBuilder">[docs]</a><span class="k">class</span> <span class="nc">CMakeBuilder</span><span class="p">(</span><span class="n">LinkerBase</span><span class="p">):</span>
@@ -746,9 +786,9 @@
                 <span class="n">cache</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;working_dir&#39;</span><span class="p">],</span> <span class="n">cache</span><span class="p">)</span>
             <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">cache</span><span class="p">):</span>
                 <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">cache</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">fd</span><span class="p">:</span>
-                    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;CMakeCache.txt:</span><span class="se">\n</span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">fd</span><span class="o">.</span><span class="n">read</span><span class="p">())</span>
+                    <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;CMakeCache.txt:</span><span class="se">\n</span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">fd</span><span class="o">.</span><span class="n">read</span><span class="p">())</span>
             <span class="k">else</span><span class="p">:</span>
-                <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Cache file does not exist: </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">cache</span><span class="p">)</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s1">&#39;Cache file does not exist: </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">cache</span><span class="p">)</span>
             <span class="k">raise</span></div>
 
 <div class="viewcode-block" id="CMakeBuilder.extract_kwargs"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.CMakeModelDriver.CMakeBuilder.extract_kwargs">[docs]</a>    <span class="nd">@classmethod</span>
@@ -971,16 +1011,16 @@
         <span class="k">else</span><span class="p">:</span>
             <span class="n">include_base</span> <span class="o">=</span> <span class="s1">&#39;ygg_cmake_</span><span class="si">%s</span><span class="s1">.txt&#39;</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">target</span>
         <span class="n">include_file</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sourcedir</span><span class="p">,</span> <span class="n">include_base</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">get_tool_instance</span><span class="p">(</span><span class="s1">&#39;compiler&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">create_include</span><span class="p">(</span>
+        <span class="n">newlines_before</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_tool_instance</span><span class="p">(</span><span class="s1">&#39;compiler&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">create_include</span><span class="p">(</span>
             <span class="n">include_file</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">target</span><span class="p">,</span>
             <span class="n">driver</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">target_language_driver</span><span class="p">,</span>
             <span class="n">toolname</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">target_compiler</span><span class="p">,</span>
             <span class="n">logging_level</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">getEffectiveLevel</span><span class="p">(),</span>
-            <span class="n">configuration</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">configuration</span><span class="p">)</span>
+            <span class="n">configuration</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">configuration</span><span class="p">,</span>
+            <span class="n">verbose</span><span class="o">=</span><span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;verbose&#39;</span><span class="p">,</span> <span class="kc">False</span><span class="p">))</span>
         <span class="k">assert</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">include_file</span><span class="p">))</span>
         <span class="n">out</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">include_file</span><span class="p">)</span>
         <span class="c1"># Create copy of cmakelists and modify</span>
-        <span class="n">newlines_before</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="n">newlines_after</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">buildfile</span><span class="p">):</span>
             <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">buildfile_copy</span><span class="p">):</span>
@@ -1080,6 +1120,40 @@
                 <span class="n">kwargs</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="n">v</span><span class="p">)</span>
             <span class="k">return</span> <span class="nb">super</span><span class="p">(</span><span class="n">CMakeModelDriver</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">compile_model</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
 
+<div class="viewcode-block" id="CMakeModelDriver.prune_sh_gcc"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.CMakeModelDriver.CMakeModelDriver.prune_sh_gcc">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">prune_sh_gcc</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">path</span><span class="p">,</span> <span class="n">gcc</span><span class="p">):</span>  <span class="c1"># pragma: appveyor</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Remove instances of sh.exe from the path that are not</span>
+<span class="sd">        associated with the selected gcc compiler. This can happen</span>
+<span class="sd">        on windows when rtools or git install a version of sh.exe</span>
+<span class="sd">        that is added to the path before the compiler.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            path (str): Contents of the path variable.</span>
+<span class="sd">            gcc (str): Full path to the gcc executable.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            str: Modified path that removes the extra instances</span>
+<span class="sd">                of sh.exe.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># This method is not covered because it is not called on</span>
+        <span class="c1"># github actions where bash is always present</span>
+        <span class="n">sh_path</span> <span class="o">=</span> <span class="n">shutil</span><span class="o">.</span><span class="n">which</span><span class="p">(</span><span class="s1">&#39;sh&#39;</span><span class="p">,</span> <span class="n">path</span><span class="o">=</span><span class="n">path</span><span class="p">)</span>
+        <span class="k">while</span> <span class="n">sh_path</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;rtools&#39;</span><span class="p">,</span> <span class="s1">&#39;git&#39;</span><span class="p">]:</span>
+                <span class="k">if</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">sh_path</span><span class="o">.</span><span class="n">lower</span><span class="p">():</span>
+                    <span class="k">break</span>
+            <span class="k">else</span><span class="p">:</span>  <span class="c1"># pragma: debug</span>
+                <span class="k">break</span>
+            <span class="k">if</span> <span class="n">k</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">gcc</span><span class="o">.</span><span class="n">lower</span><span class="p">():</span>
+                <span class="n">paths</span> <span class="o">=</span> <span class="n">path</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">pathsep</span><span class="p">)</span>
+                <span class="n">paths</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">sh_path</span><span class="p">))</span>
+                <span class="n">path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">pathsep</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">paths</span><span class="p">)</span>
+                <span class="n">sh_path</span> <span class="o">=</span> <span class="n">shutil</span><span class="o">.</span><span class="n">which</span><span class="p">(</span><span class="s1">&#39;sh&#39;</span><span class="p">,</span> <span class="n">path</span><span class="o">=</span><span class="n">path</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>  <span class="c1"># pragma: debug</span>
+                <span class="k">break</span>
+        <span class="k">return</span> <span class="n">path</span></div>
+
 <div class="viewcode-block" id="CMakeModelDriver.update_compiler_kwargs"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.CMakeModelDriver.CMakeModelDriver.update_compiler_kwargs">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">update_compiler_kwargs</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Update keyword arguments supplied to the compiler get_flags method</span>
@@ -1096,16 +1170,26 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="n">platform</span><span class="o">.</span><span class="n">_is_win</span> <span class="ow">and</span> <span class="p">(</span><span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;target_compiler&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
                                  <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;gcc&#39;</span><span class="p">,</span> <span class="s1">&#39;g++&#39;</span><span class="p">,</span> <span class="s1">&#39;gfortran&#39;</span><span class="p">]):</span>  <span class="c1"># pragma: windows</span>
-            <span class="k">if</span> <span class="n">tools</span><span class="o">.</span><span class="n">which</span><span class="p">(</span><span class="s1">&#39;sh.exe&#39;</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-                <span class="c1"># TODO: Determine which generator should be used when sh.exe on path</span>
-                <span class="n">kwargs</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s1">&#39;generator&#39;</span><span class="p">,</span> <span class="s1">&#39;MSYS Makefiles&#39;</span><span class="p">)</span>
-            <span class="k">elif</span> <span class="n">tools</span><span class="o">.</span><span class="n">which</span><span class="p">(</span><span class="s1">&#39;mingw32-make&#39;</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-                <span class="n">kwargs</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s1">&#39;generator&#39;</span><span class="p">,</span> <span class="s1">&#39;MinGW Makefiles&#39;</span><span class="p">)</span>
-            <span class="k">elif</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;generator&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>  <span class="c1"># pragma: debug</span>
-                <span class="c1"># TODO: Unclear what this would be</span>
-                <span class="c1"># kwargs.setdefault(&#39;generator&#39;, &#39;Unix Makefiles&#39;)</span>
-                <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">&quot;Could not determine GNU Makefile generator.&quot;</span><span class="p">)</span>
+            <span class="n">gcc</span> <span class="o">=</span> <span class="n">get_compilation_tool</span><span class="p">(</span><span class="s1">&#39;compiler&#39;</span><span class="p">,</span>
+                                       <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;target_compiler&#39;</span><span class="p">],</span>
+                                       <span class="kc">None</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">gcc</span><span class="p">:</span>
+                <span class="n">path</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">prune_sh_gcc</span><span class="p">(</span>
+                    <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;env&#39;</span><span class="p">][</span><span class="s1">&#39;PATH&#39;</span><span class="p">],</span>
+                    <span class="n">gcc</span><span class="o">.</span><span class="n">get_executable</span><span class="p">(</span><span class="n">full_path</span><span class="o">=</span><span class="kc">True</span><span class="p">))</span>
+                <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;env&#39;</span><span class="p">][</span><span class="s1">&#39;PATH&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">path</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">shutil</span><span class="o">.</span><span class="n">which</span><span class="p">(</span><span class="s1">&#39;sh&#39;</span><span class="p">,</span> <span class="n">path</span><span class="o">=</span><span class="n">path</span><span class="p">):</span>  <span class="c1"># pragma: appveyor</span>
+                    <span class="c1"># This will not be run on Github actions where</span>
+                    <span class="c1"># the shell is always set</span>
+                    <span class="n">kwargs</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s1">&#39;generator&#39;</span><span class="p">,</span> <span class="s1">&#39;MinGW Makefiles&#39;</span><span class="p">)</span>
+                <span class="k">elif</span> <span class="n">shutil</span><span class="o">.</span><span class="n">which</span><span class="p">(</span><span class="s1">&#39;make&#39;</span><span class="p">,</span> <span class="n">path</span><span class="o">=</span><span class="n">path</span><span class="p">):</span>
+                    <span class="n">kwargs</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s1">&#39;generator&#39;</span><span class="p">,</span> <span class="s1">&#39;Unix Makefiles&#39;</span><span class="p">)</span>
+                <span class="c1"># This is not currently tested</span>
+                <span class="c1"># else:</span>
+                <span class="c1">#     kwargs.setdefault(&#39;generator&#39;, &#39;MSYS Makefiles&#39;)</span>
         <span class="n">out</span> <span class="o">=</span> <span class="nb">super</span><span class="p">(</span><span class="n">CMakeModelDriver</span><span class="p">,</span> <span class="bp">cls</span><span class="p">)</span><span class="o">.</span><span class="n">update_compiler_kwargs</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="n">out</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s1">&#39;definitions&#39;</span><span class="p">,</span> <span class="p">[])</span>
+        <span class="n">out</span><span class="p">[</span><span class="s1">&#39;definitions&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;PYTHON_EXECUTABLE=</span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">sys</span><span class="o">.</span><span class="n">executable</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">CModelDriver</span><span class="o">.</span><span class="n">_osx_sysroot</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">out</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s1">&#39;definitions&#39;</span><span class="p">,</span> <span class="p">[])</span>
             <span class="n">out</span><span class="p">[</span><span class="s1">&#39;definitions&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
@@ -1121,20 +1205,25 @@
            
           </div>
           <footer>
-  
 
   <hr/>
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2017, Meagan Lang, David Raila
+        &#169; Copyright 2017, Meagan Lang, David Raila.
 
     </p>
   </div>
-  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+    
+    
+    
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
 
 </footer>
-
         </div>
       </div>
 
@@ -1142,7 +1231,6 @@
 
   </div>
   
-
 
   <script type="text/javascript">
       jQuery(function () {

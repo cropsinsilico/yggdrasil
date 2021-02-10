@@ -1,39 +1,42 @@
 
 
 <!DOCTYPE html>
-<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
-<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<html class="writer-html5" lang="en" >
 <head>
-  <meta charset="utf-8">
+  <meta charset="utf-8" />
   
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>yggdrasil.tests.test_yamlfile &mdash; yggdrasil 1.1.1+410.g95af39b2 documentation</title>
+  <title>yggdrasil.tests.test_yamlfile &mdash; yggdrasil v1.5.0 documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/theme_overrides.css" type="text/css" />
+
+  
   
 
   
   
-  
+
   
 
   
-  <script type="text/javascript" src="../../../_static/js/modernizr.min.js"></script>
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
   
     
       <script type="text/javascript" id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
         <script src="../../../_static/jquery.js"></script>
         <script src="../../../_static/underscore.js"></script>
         <script src="../../../_static/doctools.js"></script>
-        <script src="../../../_static/language_data.js"></script>
     
     <script type="text/javascript" src="../../../_static/js/theme.js"></script>
 
     
-
-  
-  <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
-  <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
-  <link rel="stylesheet" href="../../../_static/theme_overrides.css" type="text/css" />
     <link rel="index" title="Index" href="../../../genindex.html" />
     <link rel="search" title="Search" href="../../../search.html" /> 
 </head>
@@ -59,7 +62,7 @@
             
             
               <div class="version">
-                1.1.1
+                v1.5.0
               </div>
             
           
@@ -76,6 +79,7 @@
           
         </div>
 
+        
         <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
           
             
@@ -111,6 +115,7 @@
             
           
         </div>
+        
       </div>
     </nav>
 
@@ -145,11 +150,13 @@
 
 
 
+
+
 <div role="navigation" aria-label="breadcrumbs navigation">
 
   <ul class="wy-breadcrumbs">
     
-      <li><a href="../../../index.html">Docs</a> &raquo;</li>
+      <li><a href="../../../index.html" class="icon icon-home"></a> &raquo;</li>
         
           <li><a href="../../index.html">Module code</a> &raquo;</li>
         
@@ -176,9 +183,10 @@
 <span class="kn">import</span> <span class="nn">yaml</span>
 <span class="kn">import</span> <span class="nn">flaky</span>
 <span class="kn">import</span> <span class="nn">io</span> <span class="k">as</span> <span class="nn">sio</span>
-<span class="kn">from</span> <span class="nn">jsonschema.exceptions</span> <span class="k">import</span> <span class="n">ValidationError</span>
-<span class="kn">from</span> <span class="nn">yggdrasil</span> <span class="k">import</span> <span class="n">yamlfile</span>
-<span class="kn">from</span> <span class="nn">yggdrasil.tests</span> <span class="k">import</span> <span class="n">YggTestClass</span><span class="p">,</span> <span class="n">assert_raises</span><span class="p">,</span> <span class="n">assert_equal</span>
+<span class="kn">from</span> <span class="nn">jsonschema.exceptions</span> <span class="kn">import</span> <span class="n">ValidationError</span>
+<span class="kn">from</span> <span class="nn">yggdrasil</span> <span class="kn">import</span> <span class="n">yamlfile</span>
+<span class="kn">from</span> <span class="nn">yggdrasil.tests</span> <span class="kn">import</span> <span class="n">YggTestClass</span><span class="p">,</span> <span class="n">assert_raises</span><span class="p">,</span> <span class="n">assert_equal</span>
+<span class="kn">from</span> <span class="nn">yaml.constructor</span> <span class="kn">import</span> <span class="n">ConstructorError</span>
 <span class="n">_yaml_env</span> <span class="o">=</span> <span class="s1">&#39;TEST_YAML_FILE&#39;</span>
 
 
@@ -224,9 +232,9 @@
 
 <div class="viewcode-block" id="test_parse_component_error"><a class="viewcode-back" href="../../../yggdrasil.tests.html#yggdrasil.tests.test_yamlfile.test_parse_component_error">[docs]</a><span class="k">def</span> <span class="nf">test_parse_component_error</span><span class="p">():</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test errors in parse_component.&quot;&quot;&quot;</span>
-    <span class="n">assert_raises</span><span class="p">(</span><span class="ne">TypeError</span><span class="p">,</span> <span class="n">yamlfile</span><span class="o">.</span><span class="n">parse_component</span><span class="p">,</span>
+    <span class="n">assert_raises</span><span class="p">(</span><span class="n">yamlfile</span><span class="o">.</span><span class="n">YAMLSpecificationError</span><span class="p">,</span> <span class="n">yamlfile</span><span class="o">.</span><span class="n">parse_component</span><span class="p">,</span>
                   <span class="mi">1</span><span class="p">,</span> <span class="s1">&#39;invalid&#39;</span><span class="p">,</span> <span class="s1">&#39;invalid&#39;</span><span class="p">)</span>
-    <span class="n">assert_raises</span><span class="p">(</span><span class="ne">ValueError</span><span class="p">,</span> <span class="n">yamlfile</span><span class="o">.</span><span class="n">parse_component</span><span class="p">,</span>
+    <span class="n">assert_raises</span><span class="p">(</span><span class="n">yamlfile</span><span class="o">.</span><span class="n">YAMLSpecificationError</span><span class="p">,</span> <span class="n">yamlfile</span><span class="o">.</span><span class="n">parse_component</span><span class="p">,</span>
                   <span class="p">{},</span> <span class="s1">&#39;invalid&#39;</span><span class="p">,</span> <span class="s1">&#39;invalid&#39;</span><span class="p">)</span></div>
 
 
@@ -246,7 +254,7 @@
     <span class="n">_include</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">()</span>
     <span class="n">_use_json</span> <span class="o">=</span> <span class="kc">False</span>
 
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">YamlTestBase</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">files</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">include_files</span> <span class="o">=</span> <span class="p">[]</span>
@@ -359,7 +367,9 @@
                  <span class="p">[</span><span class="s1">&#39;models:&#39;</span><span class="p">,</span>
                   <span class="s1">&#39;  name: modelD&#39;</span><span class="p">,</span>
                   <span class="s1">&#39;  driver: GCCModelDriver&#39;</span><span class="p">,</span>
-                  <span class="s1">&#39;  args: ./src/modelD.c&#39;</span><span class="p">],</span> <span class="p">)</span></div>
+                  <span class="s1">&#39;  args: ./src/modelD.c&#39;</span><span class="p">,</span>
+                  <span class="s1">&#39;  env:&#39;</span><span class="p">,</span>
+                  <span class="s1">&#39;    TEST_VAR: 1&#39;</span><span class="p">],</span> <span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="TestYamlServerClient"><a class="viewcode-back" href="../../../yggdrasil.tests.html#yggdrasil.tests.test_yamlfile.TestYamlServerClient">[docs]</a><span class="k">class</span> <span class="nc">TestYamlServerClient</span><span class="p">(</span><span class="n">YamlTestBase</span><span class="p">):</span>
@@ -766,15 +776,115 @@
                   <span class="s1">&#39;    write_meth: obj&#39;</span><span class="p">],</span> <span class="p">)</span></div>
 
 
+<div class="viewcode-block" id="TestYamlServerNoClient"><a class="viewcode-back" href="../../../yggdrasil.tests.html#yggdrasil.tests.test_yamlfile.TestYamlServerNoClient">[docs]</a><span class="k">class</span> <span class="nc">TestYamlServerNoClient</span><span class="p">(</span><span class="n">YamlTestBaseError</span><span class="p">):</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test error when is_server is set but there arn&#39;t any clients.&quot;&quot;&quot;</span>
+    <span class="n">_error</span> <span class="o">=</span> <span class="n">yamlfile</span><span class="o">.</span><span class="n">YAMLSpecificationError</span>
+    <span class="n">_contents</span> <span class="o">=</span> <span class="p">([</span><span class="s1">&#39;models:&#39;</span><span class="p">,</span>
+                  <span class="s1">&#39;  - name: modelA&#39;</span><span class="p">,</span>
+                  <span class="s1">&#39;    driver: GCCModelDriver&#39;</span><span class="p">,</span>
+                  <span class="s1">&#39;    args: ./src/modelA.c&#39;</span><span class="p">,</span>
+                  <span class="s1">&#39;    is_server: True&#39;</span><span class="p">],)</span></div>
+
+
+<div class="viewcode-block" id="TestYamlClientNoServer"><a class="viewcode-back" href="../../../yggdrasil.tests.html#yggdrasil.tests.test_yamlfile.TestYamlClientNoServer">[docs]</a><span class="k">class</span> <span class="nc">TestYamlClientNoServer</span><span class="p">(</span><span class="n">YamlTestBaseError</span><span class="p">):</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test error when client_of is set but there arn&#39;t any servers by that name.&quot;&quot;&quot;</span>
+    <span class="n">_error</span> <span class="o">=</span> <span class="n">yamlfile</span><span class="o">.</span><span class="n">YAMLSpecificationError</span>
+    <span class="n">_contents</span> <span class="o">=</span> <span class="p">([</span><span class="s1">&#39;models:&#39;</span><span class="p">,</span>
+                  <span class="s1">&#39;  - name: modelA&#39;</span><span class="p">,</span>
+                  <span class="s1">&#39;    driver: GCCModelDriver&#39;</span><span class="p">,</span>
+                  <span class="s1">&#39;    args: ./src/modelA.c&#39;</span><span class="p">,</span>
+                  <span class="s1">&#39;    client_of: modelB&#39;</span><span class="p">],)</span></div>
+
+
+<div class="viewcode-block" id="TestYamlServerFunction"><a class="viewcode-back" href="../../../yggdrasil.tests.html#yggdrasil.tests.test_yamlfile.TestYamlServerFunction">[docs]</a><span class="k">class</span> <span class="nc">TestYamlServerFunction</span><span class="p">(</span><span class="n">YamlTestBaseError</span><span class="p">):</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test error raised when both is_server and function are set, but</span>
+<span class="sd">    there is more than one input/output.&quot;&quot;&quot;</span>
+    <span class="n">_error</span> <span class="o">=</span> <span class="n">yamlfile</span><span class="o">.</span><span class="n">YAMLSpecificationError</span>
+    <span class="n">_contents</span> <span class="o">=</span> <span class="p">([</span><span class="s1">&#39;models:&#39;</span><span class="p">,</span>
+                  <span class="s1">&#39;  - name: modelA&#39;</span><span class="p">,</span>
+                  <span class="s1">&#39;    driver: GCCModelDriver&#39;</span><span class="p">,</span>
+                  <span class="s1">&#39;    args: ./src/modelA.c&#39;</span><span class="p">,</span>
+                  <span class="s1">&#39;    function: fake&#39;</span><span class="p">,</span>
+                  <span class="s1">&#39;    is_server: True&#39;</span><span class="p">,</span>
+                  <span class="s1">&#39;    inputs: [inputA, inputB]&#39;</span><span class="p">],</span>
+                 <span class="p">[</span><span class="s1">&#39;model:&#39;</span><span class="p">,</span>
+                  <span class="s1">&#39;  - name: modelB&#39;</span><span class="p">,</span>
+                  <span class="s1">&#39;    driver: GCCModelDriver&#39;</span><span class="p">,</span>
+                  <span class="s1">&#39;    args: ./src/modelB.c&#39;</span><span class="p">,</span>
+                  <span class="s1">&#39;    client_of: modelA&#39;</span><span class="p">],)</span></div>
+
+
+<div class="viewcode-block" id="TestYamlServerDictNoInput"><a class="viewcode-back" href="../../../yggdrasil.tests.html#yggdrasil.tests.test_yamlfile.TestYamlServerDictNoInput">[docs]</a><span class="k">class</span> <span class="nc">TestYamlServerDictNoInput</span><span class="p">(</span><span class="n">YamlTestBaseError</span><span class="p">):</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test error raised when is_server is a dictionary but the referenced</span>
+<span class="sd">    input channel cannot be located.&quot;&quot;&quot;</span>
+    <span class="n">_error</span> <span class="o">=</span> <span class="n">yamlfile</span><span class="o">.</span><span class="n">YAMLSpecificationError</span>
+    <span class="n">_contents</span> <span class="o">=</span> <span class="p">([</span><span class="s1">&#39;models:&#39;</span><span class="p">,</span>
+                  <span class="s1">&#39;  - name: modelA&#39;</span><span class="p">,</span>
+                  <span class="s1">&#39;    driver: GCCModelDriver&#39;</span><span class="p">,</span>
+                  <span class="s1">&#39;    args: ./src/modelA.c&#39;</span><span class="p">,</span>
+                  <span class="s1">&#39;    function: fake&#39;</span><span class="p">,</span>
+                  <span class="s1">&#39;    is_server:&#39;</span><span class="p">,</span>
+                  <span class="s1">&#39;      input: A&#39;</span><span class="p">,</span>
+                  <span class="s1">&#39;      output: B&#39;</span><span class="p">,</span>
+                  <span class="s1">&#39;    outputs: B&#39;</span><span class="p">],</span>
+                 <span class="p">[</span><span class="s1">&#39;model:&#39;</span><span class="p">,</span>
+                  <span class="s1">&#39;  - name: modelB&#39;</span><span class="p">,</span>
+                  <span class="s1">&#39;    driver: GCCModelDriver&#39;</span><span class="p">,</span>
+                  <span class="s1">&#39;    args: ./src/modelB.c&#39;</span><span class="p">,</span>
+                  <span class="s1">&#39;    client_of: modelA&#39;</span><span class="p">],)</span></div>
+
+
+<div class="viewcode-block" id="TestYamlServerDictNoOutput"><a class="viewcode-back" href="../../../yggdrasil.tests.html#yggdrasil.tests.test_yamlfile.TestYamlServerDictNoOutput">[docs]</a><span class="k">class</span> <span class="nc">TestYamlServerDictNoOutput</span><span class="p">(</span><span class="n">YamlTestBaseError</span><span class="p">):</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test error raised when is_server is a dictionary but the referenced</span>
+<span class="sd">    output channel cannot be located.&quot;&quot;&quot;</span>
+    <span class="n">_error</span> <span class="o">=</span> <span class="n">yamlfile</span><span class="o">.</span><span class="n">YAMLSpecificationError</span>
+    <span class="n">_contents</span> <span class="o">=</span> <span class="p">([</span><span class="s1">&#39;models:&#39;</span><span class="p">,</span>
+                  <span class="s1">&#39;  - name: modelA&#39;</span><span class="p">,</span>
+                  <span class="s1">&#39;    driver: GCCModelDriver&#39;</span><span class="p">,</span>
+                  <span class="s1">&#39;    args: ./src/modelA.c&#39;</span><span class="p">,</span>
+                  <span class="s1">&#39;    function: fake&#39;</span><span class="p">,</span>
+                  <span class="s1">&#39;    is_server:&#39;</span><span class="p">,</span>
+                  <span class="s1">&#39;      input: A&#39;</span><span class="p">,</span>
+                  <span class="s1">&#39;      output: B&#39;</span><span class="p">,</span>
+                  <span class="s1">&#39;    inputs: A&#39;</span><span class="p">],</span>
+                 <span class="p">[</span><span class="s1">&#39;model:&#39;</span><span class="p">,</span>
+                  <span class="s1">&#39;  - name: modelB&#39;</span><span class="p">,</span>
+                  <span class="s1">&#39;    driver: GCCModelDriver&#39;</span><span class="p">,</span>
+                  <span class="s1">&#39;    args: ./src/modelB.c&#39;</span><span class="p">,</span>
+                  <span class="s1">&#39;    client_of: modelA&#39;</span><span class="p">],)</span></div>
+
+
 <div class="viewcode-block" id="TestYamlComponentError"><a class="viewcode-back" href="../../../yggdrasil.tests.html#yggdrasil.tests.test_yamlfile.TestYamlComponentError">[docs]</a><span class="k">class</span> <span class="nc">TestYamlComponentError</span><span class="p">(</span><span class="n">YamlTestBaseError</span><span class="p">):</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test error for non-dictionary component.&quot;&quot;&quot;</span>
     <span class="n">_error</span> <span class="o">=</span> <span class="n">ValidationError</span>
     <span class="n">_contents</span> <span class="o">=</span> <span class="p">([</span><span class="s1">&#39;models: error&#39;</span><span class="p">],)</span></div>
 
 
+<div class="viewcode-block" id="TestYamlDuplicateKeyError"><a class="viewcode-back" href="../../../yggdrasil.tests.html#yggdrasil.tests.test_yamlfile.TestYamlDuplicateKeyError">[docs]</a><span class="k">class</span> <span class="nc">TestYamlDuplicateKeyError</span><span class="p">(</span><span class="n">YamlTestBaseError</span><span class="p">):</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test error when there are duplicates of the same key in a map.&quot;&quot;&quot;</span>
+    <span class="n">_error</span> <span class="o">=</span> <span class="n">ConstructorError</span>
+    <span class="n">_contents</span> <span class="o">=</span> <span class="p">([</span><span class="s1">&#39;model:&#39;</span><span class="p">,</span>
+                  <span class="s1">&#39;  name: modelA&#39;</span><span class="p">,</span>
+                  <span class="s1">&#39;  driver: GCCModelDriver&#39;</span><span class="p">,</span>
+                  <span class="s1">&#39;  args: ./src/modelA.c&#39;</span><span class="p">,</span>
+                  <span class="s1">&#39;  inputs:&#39;</span><span class="p">,</span>
+                  <span class="s1">&#39;    - inputA&#39;</span><span class="p">,</span>
+                  <span class="s1">&#39;&#39;</span><span class="p">,</span>
+                  <span class="s1">&#39;connections:&#39;</span><span class="p">,</span>
+                  <span class="s1">&#39;  - input: outputB&#39;</span><span class="p">,</span>
+                  <span class="s1">&#39;    output: inputA&#39;</span><span class="p">,</span>
+                  <span class="s1">&#39;&#39;</span><span class="p">,</span>
+                  <span class="s1">&#39;model:&#39;</span><span class="p">,</span>
+                  <span class="s1">&#39;  name: modelB&#39;</span><span class="p">,</span>
+                  <span class="s1">&#39;  driver: GCCModelDriver&#39;</span><span class="p">,</span>
+                  <span class="s1">&#39;  args: ./src/modelB.c&#39;</span><span class="p">,</span>
+                  <span class="s1">&#39;  outputs:&#39;</span><span class="p">,</span>
+                  <span class="s1">&#39;    - outputB&#39;</span><span class="p">],)</span></div>
+
+
 <div class="viewcode-block" id="TestYamlDuplicateError"><a class="viewcode-back" href="../../../yggdrasil.tests.html#yggdrasil.tests.test_yamlfile.TestYamlDuplicateError">[docs]</a><span class="k">class</span> <span class="nc">TestYamlDuplicateError</span><span class="p">(</span><span class="n">YamlTestBaseError</span><span class="p">):</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test error when there are two components with the same name.&quot;&quot;&quot;</span>
-    <span class="n">_error</span> <span class="o">=</span> <span class="ne">ValueError</span>
+    <span class="n">_error</span> <span class="o">=</span> <span class="n">yamlfile</span><span class="o">.</span><span class="n">YAMLSpecificationError</span>
     <span class="n">_contents</span> <span class="o">=</span> <span class="p">([</span><span class="s1">&#39;models:&#39;</span><span class="p">,</span>
                   <span class="s1">&#39;  - name: modelA&#39;</span><span class="p">,</span>
                   <span class="s1">&#39;    driver: GCCModelDriver&#39;</span><span class="p">,</span>
@@ -786,7 +896,7 @@
 
 <div class="viewcode-block" id="TestYamlConnectionError"><a class="viewcode-back" href="../../../yggdrasil.tests.html#yggdrasil.tests.test_yamlfile.TestYamlConnectionError">[docs]</a><span class="k">class</span> <span class="nc">TestYamlConnectionError</span><span class="p">(</span><span class="n">YamlTestBaseError</span><span class="p">):</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test error when there is not connection for a model I/O channel.&quot;&quot;&quot;</span>
-    <span class="n">_error</span> <span class="o">=</span> <span class="ne">RuntimeError</span>
+    <span class="n">_error</span> <span class="o">=</span> <span class="n">yamlfile</span><span class="o">.</span><span class="n">YAMLSpecificationError</span>
     <span class="n">_contents</span> <span class="o">=</span> <span class="p">([</span><span class="s1">&#39;models:&#39;</span><span class="p">,</span>
                   <span class="s1">&#39;  - name: modelA&#39;</span><span class="p">,</span>
                   <span class="s1">&#39;    driver: GCCModelDriver&#39;</span><span class="p">,</span>
@@ -797,7 +907,7 @@
 
 <div class="viewcode-block" id="TestYamlConnectionError_forkin"><a class="viewcode-back" href="../../../yggdrasil.tests.html#yggdrasil.tests.test_yamlfile.TestYamlConnectionError_forkin">[docs]</a><span class="k">class</span> <span class="nc">TestYamlConnectionError_forkin</span><span class="p">(</span><span class="n">YamlTestBaseError</span><span class="p">):</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test error when there is not connection for a fork input channel.&quot;&quot;&quot;</span>
-    <span class="n">_error</span> <span class="o">=</span> <span class="ne">RuntimeError</span>
+    <span class="n">_error</span> <span class="o">=</span> <span class="n">yamlfile</span><span class="o">.</span><span class="n">YAMLSpecificationError</span>
     <span class="n">_contents</span> <span class="o">=</span> <span class="p">([</span><span class="s1">&#39;models:&#39;</span><span class="p">,</span>
                   <span class="s1">&#39;  - name: modelA&#39;</span><span class="p">,</span>
                   <span class="s1">&#39;    driver: GCCModelDriver&#39;</span><span class="p">,</span>
@@ -1020,20 +1130,25 @@
            
           </div>
           <footer>
-  
 
   <hr/>
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2017, Meagan Lang, David Raila
+        &#169; Copyright 2017, Meagan Lang, David Raila.
 
     </p>
   </div>
-  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+    
+    
+    
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
 
 </footer>
-
         </div>
       </div>
 
@@ -1041,7 +1156,6 @@
 
   </div>
   
-
 
   <script type="text/javascript">
       jQuery(function () {

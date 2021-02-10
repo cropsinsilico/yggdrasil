@@ -1,39 +1,42 @@
 
 
 <!DOCTYPE html>
-<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
-<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<html class="writer-html5" lang="en" >
 <head>
-  <meta charset="utf-8">
+  <meta charset="utf-8" />
   
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>yggdrasil.drivers.tests.test_CMakeModelDriver &mdash; yggdrasil 1.1.1+410.g95af39b2 documentation</title>
+  <title>yggdrasil.drivers.tests.test_CMakeModelDriver &mdash; yggdrasil v1.5.0 documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../../../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../../../_static/theme_overrides.css" type="text/css" />
+
+  
   
 
   
   
-  
+
   
 
   
-  <script type="text/javascript" src="../../../../_static/js/modernizr.min.js"></script>
+  <!--[if lt IE 9]>
+    <script src="../../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
   
     
       <script type="text/javascript" id="documentation_options" data-url_root="../../../../" src="../../../../_static/documentation_options.js"></script>
         <script src="../../../../_static/jquery.js"></script>
         <script src="../../../../_static/underscore.js"></script>
         <script src="../../../../_static/doctools.js"></script>
-        <script src="../../../../_static/language_data.js"></script>
     
     <script type="text/javascript" src="../../../../_static/js/theme.js"></script>
 
     
-
-  
-  <link rel="stylesheet" href="../../../../_static/css/theme.css" type="text/css" />
-  <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
-  <link rel="stylesheet" href="../../../../_static/theme_overrides.css" type="text/css" />
     <link rel="index" title="Index" href="../../../../genindex.html" />
     <link rel="search" title="Search" href="../../../../search.html" /> 
 </head>
@@ -59,7 +62,7 @@
             
             
               <div class="version">
-                1.1.1
+                v1.5.0
               </div>
             
           
@@ -76,6 +79,7 @@
           
         </div>
 
+        
         <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
           
             
@@ -111,6 +115,7 @@
             
           
         </div>
+        
       </div>
     </nav>
 
@@ -145,15 +150,19 @@
 
 
 
+
+
 <div role="navigation" aria-label="breadcrumbs navigation">
 
   <ul class="wy-breadcrumbs">
     
-      <li><a href="../../../../index.html">Docs</a> &raquo;</li>
+      <li><a href="../../../../index.html" class="icon icon-home"></a> &raquo;</li>
         
           <li><a href="../../../index.html">Module code</a> &raquo;</li>
         
           <li><a href="../../drivers.html">yggdrasil.drivers</a> &raquo;</li>
+        
+          <li><a href="../tests.html">yggdrasil.drivers.tests</a> &raquo;</li>
         
       <li>yggdrasil.drivers.tests.test_CMakeModelDriver</li>
     
@@ -175,12 +184,14 @@
 <span class="kn">import</span> <span class="nn">re</span>
 <span class="kn">import</span> <span class="nn">pprint</span>
 <span class="kn">import</span> <span class="nn">tempfile</span>
-<span class="kn">from</span> <span class="nn">yggdrasil</span> <span class="k">import</span> <span class="n">platform</span>
-<span class="kn">from</span> <span class="nn">yggdrasil.tests</span> <span class="k">import</span> <span class="p">(</span>
+<span class="kn">import</span> <span class="nn">unittest</span>
+<span class="kn">from</span> <span class="nn">yggdrasil</span> <span class="kn">import</span> <span class="n">platform</span>
+<span class="kn">from</span> <span class="nn">yggdrasil.tests</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">scripts</span><span class="p">,</span> <span class="n">assert_raises</span><span class="p">,</span> <span class="n">assert_equal</span><span class="p">,</span> <span class="n">requires_language</span><span class="p">)</span>
 <span class="kn">import</span> <span class="nn">yggdrasil.drivers.tests.test_CompiledModelDriver</span> <span class="k">as</span> <span class="nn">parent</span>
-<span class="kn">from</span> <span class="nn">yggdrasil.drivers.CMakeModelDriver</span> <span class="k">import</span> <span class="p">(</span>
+<span class="kn">from</span> <span class="nn">yggdrasil.drivers.CMakeModelDriver</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">CMakeModelDriver</span><span class="p">,</span> <span class="n">CMakeConfigure</span><span class="p">,</span> <span class="n">CMakeBuilder</span><span class="p">)</span>
+<span class="kn">from</span> <span class="nn">yggdrasil.drivers.CModelDriver</span> <span class="kn">import</span> <span class="n">GCCCompiler</span>
 
 
 <div class="viewcode-block" id="test_CMakeConfigure"><a class="viewcode-back" href="../../../../yggdrasil.drivers.tests.html#yggdrasil.drivers.tests.test_CMakeModelDriver.test_CMakeConfigure">[docs]</a><span class="nd">@requires_language</span><span class="p">(</span><span class="s1">&#39;cmake&#39;</span><span class="p">,</span> <span class="n">installed</span><span class="o">=</span><span class="s1">&#39;any&#39;</span><span class="p">)</span>
@@ -246,17 +257,16 @@
         <span class="n">testlist</span> <span class="o">+=</span> <span class="p">[([],</span> <span class="p">[</span><span class="n">fname_dll</span><span class="p">],</span> <span class="p">[</span><span class="s1">&#39;ADD_LIBRARY(test SHARED IMPORTED)&#39;</span><span class="p">]),</span>
                      <span class="p">([],</span> <span class="p">[</span><span class="n">fname_lib</span><span class="p">],</span> <span class="p">[</span><span class="s1">&#39;ADD_LIBRARY(test STATIC IMPORTED)&#39;</span><span class="p">])]</span>
     <span class="k">else</span><span class="p">:</span>
+        <span class="n">tempdir_cp</span> <span class="o">=</span> <span class="n">tempdir</span>
         <span class="k">if</span> <span class="n">platform</span><span class="o">.</span><span class="n">_is_win</span><span class="p">:</span>  <span class="c1"># pragma: windows</span>
             <span class="n">tempdir_cp</span> <span class="o">=</span> <span class="n">tempdir</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\\</span><span class="s1">&#39;</span><span class="p">,</span> <span class="n">re</span><span class="o">.</span><span class="n">escape</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\\</span><span class="s1">&#39;</span><span class="p">))</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="n">tempdir_cp</span> <span class="o">=</span> <span class="n">tempdir</span>
         <span class="n">testlist</span> <span class="o">+=</span> <span class="p">[([],</span> <span class="p">[</span><span class="n">fname_dll</span><span class="p">],</span> <span class="p">[(</span><span class="s1">&#39;FIND_LIBRARY(TEST_LIBRARY NAMES </span><span class="si">%s</span><span class="s1"> &#39;</span>
                                          <span class="s1">&#39;test HINTS </span><span class="si">%s</span><span class="s1">)&#39;</span><span class="p">)</span>
                                         <span class="o">%</span> <span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">basename</span><span class="p">(</span><span class="n">fname_dll</span><span class="p">),</span> <span class="n">tempdir_cp</span><span class="p">)]),</span>
                      <span class="p">([],</span> <span class="p">[</span><span class="n">fname_lib</span><span class="p">],</span> <span class="p">[(</span><span class="s1">&#39;FIND_LIBRARY(TEST_LIBRARY NAMES </span><span class="si">%s</span><span class="s1"> &#39;</span>
                                          <span class="s1">&#39;test HINTS </span><span class="si">%s</span><span class="s1">)&#39;</span><span class="p">)</span>
                                         <span class="o">%</span> <span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">basename</span><span class="p">(</span><span class="n">fname_lib</span><span class="p">),</span> <span class="n">tempdir_cp</span><span class="p">)])]</span>
-    <span class="kn">from</span> <span class="nn">yggdrasil.drivers.CModelDriver</span> <span class="k">import</span> <span class="n">CModelDriver</span>
+    <span class="kn">from</span> <span class="nn">yggdrasil.drivers.CModelDriver</span> <span class="kn">import</span> <span class="n">CModelDriver</span>
     <span class="n">CModelDriver</span><span class="o">.</span><span class="n">compile_dependencies</span><span class="p">()</span>
     <span class="n">CMakeModelDriver</span><span class="o">.</span><span class="n">compile_dependencies</span><span class="p">()</span>
     <span class="k">for</span> <span class="n">c</span><span class="p">,</span> <span class="n">l</span><span class="p">,</span> <span class="n">lines</span> <span class="ow">in</span> <span class="n">testlist</span><span class="p">:</span>
@@ -315,41 +325,54 @@
 
     <span class="n">driver</span> <span class="o">=</span> <span class="s1">&#39;CMakeModelDriver&#39;</span>
     
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">TestCMakeModelParam</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">attr_list</span> <span class="o">+=</span> <span class="p">[</span><span class="s1">&#39;target&#39;</span><span class="p">,</span> <span class="s1">&#39;sourcedir&#39;</span><span class="p">,</span> <span class="s1">&#39;builddir&#39;</span><span class="p">]</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">sourcedir</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">target</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">scripts</span><span class="p">[</span><span class="s1">&#39;cmake&#39;</span><span class="p">])</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">builddir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sourcedir</span><span class="p">,</span> <span class="s1">&#39;build&#39;</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">args</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">target</span><span class="p">]</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_inst_kwargs</span><span class="p">[</span><span class="s1">&#39;yml&#39;</span><span class="p">][</span><span class="s1">&#39;working_dir&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sourcedir</span>
-
-<div class="viewcode-block" id="TestCMakeModelParam.test_sbdir"><a class="viewcode-back" href="../../../../yggdrasil.drivers.tests.html#yggdrasil.drivers.tests.test_CMakeModelDriver.TestCMakeModelParam.test_sbdir">[docs]</a>    <span class="k">def</span> <span class="nf">test_sbdir</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test that source/build directories set correctly.&quot;&quot;&quot;</span>
-        <span class="n">assert_equal</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="o">.</span><span class="n">sourcedir</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">sourcedir</span><span class="p">)</span>
-        <span class="n">assert_equal</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="o">.</span><span class="n">builddir</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">builddir</span><span class="p">)</span></div></div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_inst_kwargs</span><span class="p">[</span><span class="s1">&#39;yml&#39;</span><span class="p">][</span><span class="s1">&#39;working_dir&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sourcedir</span></div>
         
 
 <div class="viewcode-block" id="TestCMakeModelDriverNoInit"><a class="viewcode-back" href="../../../../yggdrasil.drivers.tests.html#yggdrasil.drivers.tests.test_CMakeModelDriver.TestCMakeModelDriverNoInit">[docs]</a><span class="k">class</span> <span class="nc">TestCMakeModelDriverNoInit</span><span class="p">(</span><span class="n">TestCMakeModelParam</span><span class="p">,</span>
                                  <span class="n">parent</span><span class="o">.</span><span class="n">TestCompiledModelDriverNoInit</span><span class="p">):</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test runner for CMakeModelDriver without init.&quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">TestCMakeModelDriverNoInit</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_inst_kwargs</span><span class="p">[</span><span class="s1">&#39;skip_compile&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
+
+<div class="viewcode-block" id="TestCMakeModelDriverNoInit.test_build"><a class="viewcode-back" href="../../../../yggdrasil.drivers.tests.html#yggdrasil.drivers.tests.test_CMakeModelDriver.TestCMakeModelDriverNoInit.test_build">[docs]</a>    <span class="nd">@unittest</span><span class="o">.</span><span class="n">skip</span><span class="p">(</span><span class="s2">&quot;Redundant since called by C driver.&quot;</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">test_build</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>  <span class="c1"># pragma: no cover</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test building libraries as a shared/static library or object files.&quot;&quot;&quot;</span>
+        <span class="k">pass</span></div>
     
-<div class="viewcode-block" id="TestCMakeModelDriverNoInit.test_sbdir"><a class="viewcode-back" href="../../../../yggdrasil.drivers.tests.html#yggdrasil.drivers.tests.test_CMakeModelDriver.TestCMakeModelDriverNoInit.test_sbdir">[docs]</a>    <span class="k">def</span> <span class="nf">test_sbdir</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test that source/build directories set correctly.&quot;&quot;&quot;</span>
-        <span class="k">pass</span></div></div>
+<div class="viewcode-block" id="TestCMakeModelDriverNoInit.run_model_instance"><a class="viewcode-back" href="../../../../yggdrasil.drivers.tests.html#yggdrasil.drivers.tests.test_CMakeModelDriver.TestCMakeModelDriverNoInit.run_model_instance">[docs]</a>    <span class="k">def</span> <span class="nf">run_model_instance</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Create a driver for a model and run it.&quot;&quot;&quot;</span>
+        <span class="n">kwargs</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s1">&#39;skip_compile&#39;</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>
+        <span class="k">return</span> <span class="nb">super</span><span class="p">(</span><span class="n">TestCMakeModelDriverNoInit</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">run_model_instance</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
+        
+<div class="viewcode-block" id="TestCMakeModelDriverNoInit.test_run_model_gcc"><a class="viewcode-back" href="../../../../yggdrasil.drivers.tests.html#yggdrasil.drivers.tests.test_CMakeModelDriver.TestCMakeModelDriverNoInit.test_run_model_gcc">[docs]</a>    <span class="nd">@unittest</span><span class="o">.</span><span class="n">skipIf</span><span class="p">(</span><span class="ow">not</span> <span class="n">platform</span><span class="o">.</span><span class="n">_is_win</span><span class="p">,</span> <span class="s2">&quot;Windows only.&quot;</span><span class="p">)</span>
+    <span class="nd">@unittest</span><span class="o">.</span><span class="n">skipIf</span><span class="p">(</span><span class="ow">not</span> <span class="n">GCCCompiler</span><span class="o">.</span><span class="n">is_installed</span><span class="p">(),</span>
+                     <span class="s2">&quot;GNU compiler not installed.&quot;</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">test_run_model_gcc</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test compiling/running test model with gcc.&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">run_model_instance</span><span class="p">(</span><span class="n">target_compiler</span><span class="o">=</span><span class="s1">&#39;gcc&#39;</span><span class="p">)</span></div></div>
     
     
 <div class="viewcode-block" id="TestCMakeModelDriverNoStart"><a class="viewcode-back" href="../../../../yggdrasil.drivers.tests.html#yggdrasil.drivers.tests.test_CMakeModelDriver.TestCMakeModelDriverNoStart">[docs]</a><span class="k">class</span> <span class="nc">TestCMakeModelDriverNoStart</span><span class="p">(</span><span class="n">TestCMakeModelParam</span><span class="p">,</span>
                                   <span class="n">parent</span><span class="o">.</span><span class="n">TestCompiledModelDriverNoStart</span><span class="p">):</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test runner for CMakeModelDriver without start.&quot;&quot;&quot;</span>
     
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">TestCMakeModelDriverNoStart</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
         <span class="c1"># Version specifying sourcedir via working_dir</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_inst_kwargs</span><span class="p">[</span><span class="s1">&#39;yml&#39;</span><span class="p">][</span><span class="s1">&#39;working_dir&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sourcedir</span>
         <span class="c1"># Relative paths</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_inst_kwargs</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">sourcedir</span><span class="o">=</span><span class="s1">&#39;.&#39;</span><span class="p">,</span>
                                  <span class="n">builddir</span><span class="o">=</span><span class="s1">&#39;build&#39;</span><span class="p">,</span>
-                                 <span class="n">compiler_flags</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;-Wdev&#39;</span><span class="p">])</span>
+                                 <span class="n">compiler_flags</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;-Wdev&#39;</span><span class="p">],</span>
+                                 <span class="n">skip_compiler</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 
 <div class="viewcode-block" id="TestCMakeModelDriverNoStart.test_call_compiler"><a class="viewcode-back" href="../../../../yggdrasil.drivers.tests.html#yggdrasil.drivers.tests.test_CMakeModelDriver.TestCMakeModelDriverNoStart.test_call_compiler">[docs]</a>    <span class="k">def</span> <span class="nf">test_call_compiler</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test call_compiler without full path.&quot;&quot;&quot;</span>
@@ -368,6 +391,11 @@
 <div class="viewcode-block" id="TestCMakeModelDriver"><a class="viewcode-back" href="../../../../yggdrasil.drivers.tests.html#yggdrasil.drivers.tests.test_CMakeModelDriver.TestCMakeModelDriver">[docs]</a><span class="k">class</span> <span class="nc">TestCMakeModelDriver</span><span class="p">(</span><span class="n">TestCMakeModelParam</span><span class="p">,</span> <span class="n">parent</span><span class="o">.</span><span class="n">TestCompiledModelDriver</span><span class="p">):</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test runner for CMakeModelDriver.&quot;&quot;&quot;</span>
 
+<div class="viewcode-block" id="TestCMakeModelDriver.test_sbdir"><a class="viewcode-back" href="../../../../yggdrasil.drivers.tests.html#yggdrasil.drivers.tests.test_CMakeModelDriver.TestCMakeModelDriver.test_sbdir">[docs]</a>    <span class="k">def</span> <span class="nf">test_sbdir</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test that source/build directories set correctly.&quot;&quot;&quot;</span>
+        <span class="n">assert_equal</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="o">.</span><span class="n">sourcedir</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">sourcedir</span><span class="p">)</span>
+        <span class="n">assert_equal</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="o">.</span><span class="n">builddir</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">builddir</span><span class="p">)</span></div>
+
 <div class="viewcode-block" id="TestCMakeModelDriver.test_write_wrappers"><a class="viewcode-back" href="../../../../yggdrasil.drivers.tests.html#yggdrasil.drivers.tests.test_CMakeModelDriver.TestCMakeModelDriver.test_write_wrappers">[docs]</a>    <span class="k">def</span> <span class="nf">test_write_wrappers</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test write_wrappers method with verbosity and existing</span>
 <span class="sd">        include file.&quot;&quot;&quot;</span>
@@ -378,20 +406,25 @@
            
           </div>
           <footer>
-  
 
   <hr/>
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2017, Meagan Lang, David Raila
+        &#169; Copyright 2017, Meagan Lang, David Raila.
 
     </p>
   </div>
-  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+    
+    
+    
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
 
 </footer>
-
         </div>
       </div>
 
@@ -399,7 +432,6 @@
 
   </div>
   
-
 
   <script type="text/javascript">
       jQuery(function () {

@@ -1,39 +1,42 @@
 
 
 <!DOCTYPE html>
-<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
-<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<html class="writer-html5" lang="en" >
 <head>
-  <meta charset="utf-8">
+  <meta charset="utf-8" />
   
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>&lt;no title&gt; &mdash; yggdrasil 1.1.1+410.g95af39b2 documentation</title>
+  <title>&lt;no title&gt; &mdash; yggdrasil v1.5.0 documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/theme_overrides.css" type="text/css" />
+
+  
   
 
   
   
-  
+
   
 
   
-  <script type="text/javascript" src="../_static/js/modernizr.min.js"></script>
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
   
     
       <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
         <script src="../_static/jquery.js"></script>
         <script src="../_static/underscore.js"></script>
         <script src="../_static/doctools.js"></script>
-        <script src="../_static/language_data.js"></script>
     
     <script type="text/javascript" src="../_static/js/theme.js"></script>
 
     
-
-  
-  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
-  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
-  <link rel="stylesheet" href="../_static/theme_overrides.css" type="text/css" />
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" /> 
 </head>
@@ -59,7 +62,7 @@
             
             
               <div class="version">
-                1.1.1
+                v1.5.0
               </div>
             
           
@@ -76,6 +79,7 @@
           
         </div>
 
+        
         <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
           
             
@@ -111,6 +115,7 @@
             
           
         </div>
+        
       </div>
     </nav>
 
@@ -145,18 +150,20 @@
 
 
 
+
+
 <div role="navigation" aria-label="breadcrumbs navigation">
 
   <ul class="wy-breadcrumbs">
     
-      <li><a href="../index.html">Docs</a> &raquo;</li>
+      <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
         
       <li>&lt;no title&gt;</li>
     
     
       <li class="wy-breadcrumbs-aside">
         
-            
+          
             <a href="../_sources/tables/schema_table_model_general.rst.txt" rel="nofollow"> View page source</a>
           
         
@@ -225,7 +232,13 @@ for each server the model is a client of. Defaults to empty list. Use of
 <td></td>
 <td><p>[DEPRECATED] Name of driver class that should be used.</p></td>
 </tr>
-<tr class="row-even"><td><p>function</p></td>
+<tr class="row-even"><td><p>env</p></td>
+<td><p>object</p></td>
+<td></td>
+<td><p>Dictionary of environment variables that should be set when the driver starts.
+Defaults to {}.</p></td>
+</tr>
+<tr class="row-odd"><td><p>function</p></td>
 <td><p>string</p></td>
 <td></td>
 <td><p>If provided, an integrated model is created by wrapping the function named here.
@@ -233,7 +246,7 @@ The function must be located within the file specified by the source file listed
 in the first argument. If not provided, the model must contain it’s own calls to
 the yggdrasil interface.</p></td>
 </tr>
-<tr class="row-odd"><td><p>inputs</p></td>
+<tr class="row-even"><td><p>inputs</p></td>
 <td><p>array</p></td>
 <td></td>
 <td><p>A mapping object containing the entry for a model input channel or a list of
@@ -241,14 +254,25 @@ input channel entries. If the model does not get input from another model, this
 may be ommitted. A full description of channel entries and the options available
 for channels can be found <a class="reference internal" href="../yaml.html#yaml-comm-options"><span class="std std-ref">here</span></a>.</p></td>
 </tr>
-<tr class="row-even"><td><p>is_server</p></td>
-<td><p>boolean</p></td>
+<tr class="row-odd"><td><p>is_server</p></td>
+<td></td>
 <td></td>
 <td><p>If <cite>True</cite>, the model is assumed to be a server for one or more client models and
 an instance of <a class="reference internal" href="../yggdrasil.drivers.html#module-yggdrasil.drivers.ServerDriver" title="yggdrasil.drivers.ServerDriver"><code class="xref py py-class docutils literal notranslate"><span class="pre">yggdrasil.drivers.ServerDriver</span></code></a> is started. The
 corresponding channel that should be passed to the yggdrasil API will be the
-name of the model. Defaults to False. Use of <cite>is_server</cite> with <cite>function</cite> is not
-currently supported.</p></td>
+name of the model. If is_server is a dictionary, it should contain an ‘input’
+key and an ‘output’ key. These are required to be the names of existing input
+and output channels in the model that will be co-opted by the server. (Note:
+This requires that the co-opted output channel’s send method is called once for
+each time the co-opted input channel’s recv method is called. If used with the
+<cite>function</cite> parameter, <cite>is_server</cite> must be a dictionary. Defaults to False.</p></td>
+</tr>
+<tr class="row-even"><td><p>logging_level</p></td>
+<td><p>string</p></td>
+<td></td>
+<td><p>The level of logging messages that should be displayed by the model. Defaults to
+the logging level as determined by the configuration file and environment
+variables.</p></td>
 </tr>
 <tr class="row-odd"><td><p>outputs</p></td>
 <td><p>array</p></td>
@@ -335,20 +359,25 @@ Defaults to False.</p></td>
            
           </div>
           <footer>
-  
 
   <hr/>
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2017, Meagan Lang, David Raila
+        &#169; Copyright 2017, Meagan Lang, David Raila.
 
     </p>
   </div>
-  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+    
+    
+    
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
 
 </footer>
-
         </div>
       </div>
 
@@ -356,7 +385,6 @@ Defaults to False.</p></td>
 
   </div>
   
-
 
   <script type="text/javascript">
       jQuery(function () {

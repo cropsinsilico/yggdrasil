@@ -12,7 +12,6 @@ yggdrasil.communication.transforms.tests.test\_TransformBase module
    :undoc-members:
    :show-inheritance:
 
-
 Module contents
 ---------------
 

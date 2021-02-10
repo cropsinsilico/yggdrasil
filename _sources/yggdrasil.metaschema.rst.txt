@@ -30,7 +30,6 @@ yggdrasil.metaschema.normalizer module
    :undoc-members:
    :show-inheritance:
 
-
 Module contents
 ---------------
 

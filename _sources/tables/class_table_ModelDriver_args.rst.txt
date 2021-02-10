@@ -19,11 +19,18 @@ function            If provided, an integrated model is created by wrapping the 
                     The function must be located within the file specified by the source file listed                         
                     in the first argument. If not provided, the model must contain it's own calls to                         
                     the |yggdrasil| interface.                                                                               
-is_server           If `True`, the model is assumed to be a server for one or more client models and              bool       
+is_server           If `True`, the model is assumed to be a server for one or more client models and              bool, dict 
                     an instance of :class:`yggdrasil.drivers.ServerDriver` is started. The                                   
                     corresponding channel that should be passed to the yggdrasil API will be the                             
-                    name of the model. Defaults to False. Use of `is_server` with `function` is not                          
-                    currently supported.                                                                                     
+                    name of the model. If is_server is a dictionary, it should contain an 'input'                            
+                    key and an 'output' key. These are required to be the names of existing input                            
+                    and output channels in the model that will be co-opted by the server. (Note:                             
+                    This requires that the co-opted output channel's send method is called once for                          
+                    each time the co-opted input channel's recv method is called. If used with the                           
+                    `function` parameter, `is_server` must be a dictionary. Defaults to False.                               
+logging_level       The level of logging messages that should be displayed by the model. Defaults to              str        
+                    the logging level as determined by the configuration file and environment                                
+                    variables.                                                                                               
 model_index         Index of model in list of models being run. Defaults to 0.                                    int        
 outputs_in_inputs   If True, outputs from wrapped model functions are passed by pointer as inputs                 bool       
                     for modification and the return value will be a flag. If False, outputs are                              

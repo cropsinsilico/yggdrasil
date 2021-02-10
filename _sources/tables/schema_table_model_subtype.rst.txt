@@ -1,18 +1,19 @@
 .. _schema_table_model_subtype_rst:
 
-==========   ================================================================================   =======
-Language     Description                                                                        Aliases
-==========   ================================================================================   =======
-R            Model is written in R.                                                             ['r']  
-c            Model is written in C.                                                                    
-c++          Model is written in C++.                                                           ['cpp']
-cmake        Model is written in C/C++ and has a CMake build system.                                   
-executable   [DEFAULT] Model is an executable.                                                         
-fortran      Model is written in Fortran.                                                              
-lpy          Model is an LPy system.                                                                   
-make         Model is written in C/C++ and has a Makefile for compilation.                             
-matlab       Model is written in Matlab.                                                               
-python       Model is written in Python.                                                               
-sbml         Model is an SBML model.                                                                   
-timesync     Model is dedicated to synchronizingtimesteps between other models.                        
-==========   ================================================================================   =======
+==========   ================================================================================   ==============
+Language     Description                                                                        Aliases       
+==========   ================================================================================   ==============
+R            Model is written in R.                                                             ['r']         
+c            Model is written in C.                                                                           
+c++          Model is written in C++.                                                           ['cpp', 'cxx']
+cmake        Model is written in C/C++ and has a CMake build system.                                          
+executable   [DEFAULT] Model is an executable.                                                                
+fortran      Model is written in Fortran.                                                                     
+lpy          Model is an LPy system.                                                                          
+make         Model is written in C/C++ and has a Makefile for compilation.                                    
+matlab       Model is written in Matlab.                                                                      
+osr          Model is an OSR model.                                                                           
+python       Model is written in Python.                                                                      
+sbml         Model is an SBML model.                                                                          
+timesync     Model is dedicated to synchronizingtimesteps between other models.                               
+==========   ================================================================================   ==============

@@ -76,7 +76,6 @@ yggdrasil.communication.transforms.TransformBase module
    :undoc-members:
    :show-inheritance:
 
-
 Module contents
 ---------------
 

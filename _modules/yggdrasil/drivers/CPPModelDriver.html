@@ -1,39 +1,42 @@
 
 
 <!DOCTYPE html>
-<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
-<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<html class="writer-html5" lang="en" >
 <head>
-  <meta charset="utf-8">
+  <meta charset="utf-8" />
   
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>yggdrasil.drivers.CPPModelDriver &mdash; yggdrasil 1.1.1+410.g95af39b2 documentation</title>
+  <title>yggdrasil.drivers.CPPModelDriver &mdash; yggdrasil v1.5.0 documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/theme_overrides.css" type="text/css" />
+
+  
   
 
   
   
-  
+
   
 
   
-  <script type="text/javascript" src="../../../_static/js/modernizr.min.js"></script>
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
   
     
       <script type="text/javascript" id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
         <script src="../../../_static/jquery.js"></script>
         <script src="../../../_static/underscore.js"></script>
         <script src="../../../_static/doctools.js"></script>
-        <script src="../../../_static/language_data.js"></script>
     
     <script type="text/javascript" src="../../../_static/js/theme.js"></script>
 
     
-
-  
-  <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
-  <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
-  <link rel="stylesheet" href="../../../_static/theme_overrides.css" type="text/css" />
     <link rel="index" title="Index" href="../../../genindex.html" />
     <link rel="search" title="Search" href="../../../search.html" /> 
 </head>
@@ -59,7 +62,7 @@
             
             
               <div class="version">
-                1.1.1
+                v1.5.0
               </div>
             
           
@@ -76,6 +79,7 @@
           
         </div>
 
+        
         <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
           
             
@@ -111,6 +115,7 @@
             
           
         </div>
+        
       </div>
     </nav>
 
@@ -145,11 +150,13 @@
 
 
 
+
+
 <div role="navigation" aria-label="breadcrumbs navigation">
 
   <ul class="wy-breadcrumbs">
     
-      <li><a href="../../../index.html">Docs</a> &raquo;</li>
+      <li><a href="../../../index.html" class="icon icon-home"></a> &raquo;</li>
         
           <li><a href="../../index.html">Module code</a> &raquo;</li>
         
@@ -173,8 +180,8 @@
   <h1>Source code for yggdrasil.drivers.CPPModelDriver</h1><div class="highlight"><pre>
 <span></span><span class="kn">import</span> <span class="nn">os</span>
 <span class="kn">import</span> <span class="nn">copy</span>
-<span class="kn">from</span> <span class="nn">yggdrasil</span> <span class="k">import</span> <span class="n">platform</span>
-<span class="kn">from</span> <span class="nn">yggdrasil.drivers.CModelDriver</span> <span class="k">import</span> <span class="p">(</span>
+<span class="kn">from</span> <span class="nn">yggdrasil</span> <span class="kn">import</span> <span class="n">platform</span>
+<span class="kn">from</span> <span class="nn">yggdrasil.drivers.CModelDriver</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">CCompilerBase</span><span class="p">,</span> <span class="n">CModelDriver</span><span class="p">,</span> <span class="n">GCCCompiler</span><span class="p">,</span> <span class="n">ClangCompiler</span><span class="p">,</span>
     <span class="n">ClangLinker</span><span class="p">)</span>
 
@@ -218,7 +225,8 @@
 
 <div class="viewcode-block" id="GPPCompiler"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.CPPModelDriver.GPPCompiler">[docs]</a><span class="k">class</span> <span class="nc">GPPCompiler</span><span class="p">(</span><span class="n">CPPCompilerBase</span><span class="p">,</span> <span class="n">GCCCompiler</span><span class="p">):</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Interface class for G++ compiler/linker.&quot;&quot;&quot;</span>
-    <span class="n">toolname</span> <span class="o">=</span> <span class="s1">&#39;g++&#39;</span></div>
+    <span class="n">toolname</span> <span class="o">=</span> <span class="s1">&#39;g++&#39;</span>
+    <span class="n">aliases</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;gnu-c++&#39;</span><span class="p">]</span></div>
 
 
 <div class="viewcode-block" id="ClangPPCompiler"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.CPPModelDriver.ClangPPCompiler">[docs]</a><span class="k">class</span> <span class="nc">ClangPPCompiler</span><span class="p">(</span><span class="n">CPPCompilerBase</span><span class="p">,</span> <span class="n">ClangCompiler</span><span class="p">):</span>
@@ -280,7 +288,7 @@
     <span class="n">language</span> <span class="o">=</span> <span class="s1">&#39;c++&#39;</span>
     <span class="n">language_ext</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;.cpp&#39;</span><span class="p">,</span> <span class="s1">&#39;.CPP&#39;</span><span class="p">,</span> <span class="s1">&#39;.cxx&#39;</span><span class="p">,</span> <span class="s1">&#39;.C&#39;</span><span class="p">,</span> <span class="s1">&#39;.c++&#39;</span><span class="p">,</span> <span class="s1">&#39;.cc&#39;</span><span class="p">,</span> <span class="s1">&#39;.cp&#39;</span><span class="p">,</span> <span class="s1">&#39;.tcc&#39;</span><span class="p">,</span>
                     <span class="s1">&#39;.hpp&#39;</span><span class="p">,</span> <span class="s1">&#39;.HPP&#39;</span><span class="p">,</span> <span class="s1">&#39;.hxx&#39;</span><span class="p">,</span> <span class="s1">&#39;.H&#39;</span><span class="p">,</span> <span class="s1">&#39;.h++&#39;</span><span class="p">,</span> <span class="s1">&#39;.hh&#39;</span><span class="p">,</span> <span class="s1">&#39;.hp&#39;</span><span class="p">,</span> <span class="s1">&#39;.h&#39;</span><span class="p">]</span>
-    <span class="n">language_aliases</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;cpp&#39;</span><span class="p">]</span>
+    <span class="n">language_aliases</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;cpp&#39;</span><span class="p">,</span> <span class="s1">&#39;cxx&#39;</span><span class="p">]</span>
     <span class="n">base_languages</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;c&#39;</span><span class="p">]</span>
     <span class="n">interface_library</span> <span class="o">=</span> <span class="s1">&#39;ygg++&#39;</span>
     <span class="c1"># To prevent inheritance</span>
@@ -303,16 +311,17 @@
         <span class="n">try_except</span><span class="o">=</span><span class="s1">&#39;}} catch (</span><span class="si">{error_type}</span><span class="s1"> </span><span class="si">{error_var}</span><span class="s1">) {{&#39;</span><span class="p">,</span>
         <span class="n">function_def_regex</span><span class="o">=</span><span class="p">(</span>
             <span class="sa">r</span><span class="s1">&#39;(?P&lt;flag_type&gt;.+?)\s*</span><span class="si">{function_name}</span><span class="s1">\s*&#39;</span>
-            <span class="sa">r</span><span class="s1">&#39;\((?P&lt;inputs&gt;(?:[^{{&amp;])*?)&#39;</span>
+            <span class="sa">r</span><span class="s1">&#39;\((?P&lt;inputs&gt;(?:[^{{\&amp;])*?)&#39;</span>
             <span class="sa">r</span><span class="s1">&#39;(?:,\s*(?P&lt;outputs&gt;&#39;</span>
-            <span class="sa">r</span><span class="s1">&#39;(?:\s*(?:[^\s])+(?:\s+)(?:\()?&amp;(?:[^{{])+)+&#39;</span>
-            <span class="sa">r</span><span class="s1">&#39;))?\)\s*\{{&#39;</span>
+            <span class="sa">r</span><span class="s1">&#39;(?:\s*(?:[^\s\&amp;]+)&#39;</span>
+            <span class="sa">r</span><span class="s1">&#39;(?:(?:\&amp;\s+)|(?:\s+(?:\()?\&amp;))&#39;</span>
+            <span class="sa">r</span><span class="s1">&#39;(?:[^{{])+)+))?\)\s*\{{&#39;</span>
             <span class="sa">r</span><span class="s1">&#39;(?P&lt;body&gt;(?:.*?\n?)*?)&#39;</span>
             <span class="sa">r</span><span class="s1">&#39;(?:(?:return +(?P&lt;flag_var&gt;.+?)?;(?:.*?\n?)*?\}})&#39;</span>
             <span class="sa">r</span><span class="s1">&#39;|(?:\}}))&#39;</span><span class="p">),</span>
         <span class="n">outputs_def_regex</span><span class="o">=</span><span class="p">(</span>
             <span class="sa">r</span><span class="s1">&#39;\s*(?P&lt;native_type&gt;(?:[^\s])+)(\s+)?&#39;</span>
-            <span class="sa">r</span><span class="s1">&#39;(\()?(?P&lt;ref&gt;&amp;)(?(1)(?:\s*)|(?:\s+))&#39;</span>
+            <span class="sa">r</span><span class="s1">&#39;(\()?(?P&lt;ref&gt;\&amp;)(?(1)(?:\s*)|(?:\s+))&#39;</span>
             <span class="sa">r</span><span class="s1">&#39;(?P&lt;name&gt;.+?)(?(2)(?:\)|(?:)))(?P&lt;shape&gt;(?:\[.+?\])+)?\s*(?:,|$)(?:\n)?&#39;</span><span class="p">))</span>
     <span class="n">include_arg_count</span> <span class="o">=</span> <span class="kc">True</span>
     <span class="n">include_channel_obj</span> <span class="o">=</span> <span class="kc">False</span>
@@ -343,6 +352,7 @@
             <span class="o">+</span> <span class="bp">cls</span><span class="o">.</span><span class="n">language_ext</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
         <span class="n">internal_libs</span><span class="p">[</span><span class="bp">cls</span><span class="o">.</span><span class="n">interface_library</span><span class="p">][</span><span class="s1">&#39;include_dirs&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
             <span class="bp">cls</span><span class="o">.</span><span class="n">get_language_dir</span><span class="p">())</span>
+        <span class="n">internal_libs</span><span class="p">[</span><span class="bp">cls</span><span class="o">.</span><span class="n">interface_library</span><span class="p">][</span><span class="s1">&#39;language&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">language</span>
         <span class="bp">cls</span><span class="o">.</span><span class="n">internal_libraries</span> <span class="o">=</span> <span class="n">internal_libs</span></div>
 
 <div class="viewcode-block" id="CPPModelDriver.set_env_class"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.CPPModelDriver.CPPModelDriver.set_env_class">[docs]</a>    <span class="nd">@classmethod</span>
@@ -429,20 +439,25 @@
            
           </div>
           <footer>
-  
 
   <hr/>
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2017, Meagan Lang, David Raila
+        &#169; Copyright 2017, Meagan Lang, David Raila.
 
     </p>
   </div>
-  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+    
+    
+    
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
 
 </footer>
-
         </div>
       </div>
 
@@ -450,7 +465,6 @@
 
   </div>
   
-
 
   <script type="text/javascript">
       jQuery(function () {

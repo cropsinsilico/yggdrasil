@@ -1,39 +1,42 @@
 
 
 <!DOCTYPE html>
-<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
-<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<html class="writer-html5" lang="en" >
 <head>
-  <meta charset="utf-8">
+  <meta charset="utf-8" />
   
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>yggdrasil.tests.test_config &mdash; yggdrasil 1.1.1+410.g95af39b2 documentation</title>
+  <title>yggdrasil.tests.test_config &mdash; yggdrasil v1.5.0 documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/theme_overrides.css" type="text/css" />
+
+  
   
 
   
   
-  
+
   
 
   
-  <script type="text/javascript" src="../../../_static/js/modernizr.min.js"></script>
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
   
     
       <script type="text/javascript" id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
         <script src="../../../_static/jquery.js"></script>
         <script src="../../../_static/underscore.js"></script>
         <script src="../../../_static/doctools.js"></script>
-        <script src="../../../_static/language_data.js"></script>
     
     <script type="text/javascript" src="../../../_static/js/theme.js"></script>
 
     
-
-  
-  <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
-  <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
-  <link rel="stylesheet" href="../../../_static/theme_overrides.css" type="text/css" />
     <link rel="index" title="Index" href="../../../genindex.html" />
     <link rel="search" title="Search" href="../../../search.html" /> 
 </head>
@@ -59,7 +62,7 @@
             
             
               <div class="version">
-                1.1.1
+                v1.5.0
               </div>
             
           
@@ -76,6 +79,7 @@
           
         </div>
 
+        
         <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
           
             
@@ -111,6 +115,7 @@
             
           
         </div>
+        
       </div>
     </nav>
 
@@ -145,11 +150,13 @@
 
 
 
+
+
 <div role="navigation" aria-label="breadcrumbs navigation">
 
   <ul class="wy-breadcrumbs">
     
-      <li><a href="../../../index.html">Docs</a> &raquo;</li>
+      <li><a href="../../../index.html" class="icon icon-home"></a> &raquo;</li>
         
           <li><a href="../../index.html">Module code</a> &raquo;</li>
         
@@ -172,8 +179,10 @@
             
   <h1>Source code for yggdrasil.tests.test_config</h1><div class="highlight"><pre>
 <span></span><span class="kn">import</span> <span class="nn">os</span>
-<span class="kn">from</span> <span class="nn">yggdrasil.tests</span> <span class="k">import</span> <span class="n">assert_equal</span><span class="p">,</span> <span class="n">assert_raises</span>
-<span class="kn">from</span> <span class="nn">yggdrasil</span> <span class="k">import</span> <span class="n">config</span><span class="p">,</span> <span class="n">tools</span>
+<span class="kn">import</span> <span class="nn">json</span>
+<span class="kn">import</span> <span class="nn">shutil</span>
+<span class="kn">from</span> <span class="nn">yggdrasil.tests</span> <span class="kn">import</span> <span class="n">assert_equal</span><span class="p">,</span> <span class="n">assert_raises</span>
+<span class="kn">from</span> <span class="nn">yggdrasil</span> <span class="kn">import</span> <span class="n">config</span><span class="p">,</span> <span class="n">tools</span>
 
 
 <div class="viewcode-block" id="test_YggConfigParser"><a class="viewcode-back" href="../../../yggdrasil.tests.html#yggdrasil.tests.test_config.test_YggConfigParser">[docs]</a><span class="k">def</span> <span class="nf">test_YggConfigParser</span><span class="p">():</span>
@@ -193,16 +202,33 @@
 <div class="viewcode-block" id="test_update_language_config"><a class="viewcode-back" href="../../../yggdrasil.tests.html#yggdrasil.tests.test_config.test_update_language_config">[docs]</a><span class="k">def</span> <span class="nf">test_update_language_config</span><span class="p">():</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test updating configuration for installed languages.&quot;&quot;&quot;</span>
     <span class="n">languages</span> <span class="o">=</span> <span class="n">tools</span><span class="o">.</span><span class="n">get_supported_lang</span><span class="p">()</span>
-    <span class="n">config</span><span class="o">.</span><span class="n">update_language_config</span><span class="p">(</span><span class="n">overwrite</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">cfg_orig</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">ygg_cfg_usr</span><span class="o">.</span><span class="n">file_to_update</span>
+    <span class="n">cfg_copy</span> <span class="o">=</span> <span class="s1">&#39;_copy&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">splitext</span><span class="p">(</span><span class="n">cfg_orig</span><span class="p">))</span>
+    <span class="n">shutil</span><span class="o">.</span><span class="n">copy2</span><span class="p">(</span><span class="n">cfg_orig</span><span class="p">,</span> <span class="n">cfg_copy</span><span class="p">)</span>
     <span class="k">try</span><span class="p">:</span>
-        <span class="n">config</span><span class="o">.</span><span class="n">update_language_config</span><span class="p">(</span>
-            <span class="n">languages</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">disable_languages</span><span class="o">=</span><span class="p">[</span><span class="n">languages</span><span class="p">[</span><span class="mi">0</span><span class="p">]])</span>
-        <span class="n">config</span><span class="o">.</span><span class="n">update_language_config</span><span class="p">(</span>
-            <span class="n">languages</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">disable_languages</span><span class="o">=</span><span class="p">[</span><span class="n">languages</span><span class="p">[</span><span class="mi">0</span><span class="p">]],</span>
-            <span class="n">enable_languages</span><span class="o">=</span><span class="p">[</span><span class="n">languages</span><span class="p">[</span><span class="mi">0</span><span class="p">]])</span>
+        <span class="k">if</span> <span class="n">config</span><span class="o">.</span><span class="n">ygg_cfg_usr</span><span class="o">.</span><span class="n">has_option</span><span class="p">(</span><span class="s1">&#39;c&#39;</span><span class="p">,</span> <span class="s1">&#39;vcpkg_dir&#39;</span><span class="p">):</span>
+            <span class="n">config</span><span class="o">.</span><span class="n">update_language_config</span><span class="p">(</span>
+                <span class="s1">&#39;c&#39;</span><span class="p">,</span> <span class="n">lang_kwargs</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;c&#39;</span><span class="p">:</span> <span class="p">{</span>
+                    <span class="s1">&#39;vcpkg_dir&#39;</span><span class="p">:</span> <span class="n">config</span><span class="o">.</span><span class="n">ygg_cfg_usr</span><span class="o">.</span><span class="n">get</span><span class="p">(</span>
+                        <span class="s1">&#39;c&#39;</span><span class="p">,</span> <span class="s1">&#39;vcpkg_dir&#39;</span><span class="p">)}})</span>
+        <span class="n">config</span><span class="o">.</span><span class="n">update_language_config</span><span class="p">(</span><span class="n">overwrite</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">languages</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">config</span><span class="o">.</span><span class="n">ygg_cfg_usr</span><span class="o">.</span><span class="n">remove_section</span><span class="p">(</span><span class="n">languages</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+            <span class="n">config</span><span class="o">.</span><span class="n">update_language_config</span><span class="p">(</span>
+                <span class="n">languages</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">disable_languages</span><span class="o">=</span><span class="p">[</span><span class="n">languages</span><span class="p">[</span><span class="mi">0</span><span class="p">]])</span>
+            <span class="n">config</span><span class="o">.</span><span class="n">update_language_config</span><span class="p">(</span>
+                <span class="n">languages</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">disable_languages</span><span class="o">=</span><span class="p">[</span><span class="n">languages</span><span class="p">[</span><span class="mi">0</span><span class="p">]],</span>
+                <span class="n">enable_languages</span><span class="o">=</span><span class="p">[</span><span class="n">languages</span><span class="p">[</span><span class="mi">0</span><span class="p">]])</span>
+            <span class="n">config</span><span class="o">.</span><span class="n">update_language_config</span><span class="p">(</span>
+                <span class="n">languages</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">enable_languages</span><span class="o">=</span><span class="p">[</span><span class="n">languages</span><span class="p">[</span><span class="mi">0</span><span class="p">]])</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">languages</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="n">config</span><span class="o">.</span><span class="n">ygg_cfg_usr</span><span class="o">.</span><span class="n">remove_section</span><span class="p">(</span><span class="n">languages</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+            <span class="n">config</span><span class="o">.</span><span class="n">update_language_config</span><span class="p">(</span>
+                <span class="n">languages</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">enable_languages</span><span class="o">=</span><span class="p">[</span><span class="n">languages</span><span class="p">[</span><span class="mi">1</span><span class="p">]])</span>
     <span class="k">finally</span><span class="p">:</span>
-        <span class="n">config</span><span class="o">.</span><span class="n">update_language_config</span><span class="p">(</span>
-            <span class="n">languages</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">enable_languages</span><span class="o">=</span><span class="p">[</span><span class="n">languages</span><span class="p">[</span><span class="mi">0</span><span class="p">]])</span></div>
+        <span class="n">shutil</span><span class="o">.</span><span class="n">move</span><span class="p">(</span><span class="n">cfg_copy</span><span class="p">,</span> <span class="n">cfg_orig</span><span class="p">)</span>
+        <span class="n">config</span><span class="o">.</span><span class="n">ygg_cfg_usr</span><span class="o">.</span><span class="n">reload</span><span class="p">()</span>
+        <span class="n">config</span><span class="o">.</span><span class="n">ygg_cfg</span><span class="o">.</span><span class="n">reload</span><span class="p">()</span></div>
 
 
 <div class="viewcode-block" id="test_cfg_logging"><a class="viewcode-back" href="../../../yggdrasil.tests.html#yggdrasil.tests.test_config.test_cfg_logging">[docs]</a><span class="k">def</span> <span class="nf">test_cfg_logging</span><span class="p">():</span>
@@ -214,26 +240,80 @@
     <span class="n">config</span><span class="o">.</span><span class="n">set_ygg_loglevel</span><span class="p">(</span><span class="n">lvl</span><span class="p">)</span>
     <span class="n">config</span><span class="o">.</span><span class="n">cfg_logging</span><span class="p">()</span>
     <span class="k">del</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s1">&#39;YGG_SUBPROCESS&#39;</span><span class="p">]</span></div>
+
+
+<div class="viewcode-block" id="test_parser_config"><a class="viewcode-back" href="../../../yggdrasil.tests.html#yggdrasil.tests.test_config.test_parser_config">[docs]</a><span class="k">def</span> <span class="nf">test_parser_config</span><span class="p">():</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test parser_config.&quot;&quot;&quot;</span>
+    <span class="n">config</span><span class="o">.</span><span class="n">get_config_parser</span><span class="p">(</span><span class="n">description</span><span class="o">=</span><span class="s2">&quot;test&quot;</span><span class="p">,</span> <span class="n">skip_sections</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;testing&#39;</span><span class="p">])</span>
+    <span class="n">parser</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">get_config_parser</span><span class="p">(</span><span class="n">description</span><span class="o">=</span><span class="s2">&quot;test&quot;</span><span class="p">)</span>
+    <span class="n">assert_raises</span><span class="p">(</span><span class="ne">ValueError</span><span class="p">,</span> <span class="n">config</span><span class="o">.</span><span class="n">resolve_config_parser</span><span class="p">,</span>
+                  <span class="n">parser</span><span class="o">.</span><span class="n">parse_args</span><span class="p">([</span><span class="s1">&#39;--production-run&#39;</span><span class="p">,</span> <span class="s1">&#39;--debug&#39;</span><span class="p">]))</span>
+    <span class="n">args1</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">resolve_config_parser</span><span class="p">(</span>
+        <span class="n">parser</span><span class="o">.</span><span class="n">parse_args</span><span class="p">([</span><span class="s1">&#39;--languages&#39;</span><span class="p">,</span> <span class="s1">&#39;c&#39;</span><span class="p">,</span> <span class="s1">&#39;cpp&#39;</span><span class="p">,</span> <span class="s1">&#39;--production-run&#39;</span><span class="p">]))</span>
+    <span class="n">args2</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">resolve_config_parser</span><span class="p">(</span>
+        <span class="n">parser</span><span class="o">.</span><span class="n">parse_args</span><span class="p">([</span><span class="s1">&#39;--skip-languages&#39;</span><span class="p">,</span> <span class="s1">&#39;R&#39;</span><span class="p">,</span> <span class="s1">&#39;--debug&#39;</span><span class="p">]))</span>
+    <span class="n">args3</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">resolve_config_parser</span><span class="p">(</span>
+        <span class="n">parser</span><span class="o">.</span><span class="n">parse_args</span><span class="p">([</span><span class="s1">&#39;--validate-messages=True&#39;</span><span class="p">]))</span>
+    <span class="n">assert_equal</span><span class="p">(</span><span class="n">args3</span><span class="o">.</span><span class="n">validate_messages</span><span class="p">,</span> <span class="kc">True</span><span class="p">)</span>
+    <span class="n">old_var</span> <span class="o">=</span> <span class="p">{</span><span class="n">k</span><span class="p">:</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span>
+               <span class="p">[</span><span class="s1">&#39;YGG_TEST_LANGUAGE&#39;</span><span class="p">,</span> <span class="s1">&#39;YGG_TEST_SKIP_LANGUAGE&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;YGG_VALIDATE_COMPONENTS&#39;</span><span class="p">,</span> <span class="s1">&#39;YGG_VALIDATE_MESSAGES&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;YGG_DEBUG&#39;</span><span class="p">,</span> <span class="s1">&#39;YGG_CLIENT_DEBUG&#39;</span><span class="p">]}</span>
+    <span class="n">args1</span><span class="o">.</span><span class="n">validate_messages</span> <span class="o">=</span> <span class="s1">&#39;False&#39;</span>
+    <span class="n">args2</span><span class="o">.</span><span class="n">validate_messages</span> <span class="o">=</span> <span class="s1">&#39;True&#39;</span>
+    <span class="k">with</span> <span class="n">config</span><span class="o">.</span><span class="n">parser_config</span><span class="p">(</span><span class="n">args1</span><span class="p">):</span>
+        <span class="n">assert_equal</span><span class="p">(</span><span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;YGG_TEST_LANGUAGE&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">)),</span>
+                     <span class="p">[</span><span class="s1">&#39;c&#39;</span><span class="p">,</span> <span class="s1">&#39;c++&#39;</span><span class="p">])</span>
+        <span class="n">assert_equal</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;YGG_VALIDATE_COMPONENTS&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">),</span> <span class="s1">&#39;false&#39;</span><span class="p">)</span>
+        <span class="n">assert_equal</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;YGG_VALIDATE_MESSAGES&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">),</span> <span class="s1">&#39;false&#39;</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">old_var</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+        <span class="n">assert_equal</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="kc">None</span><span class="p">),</span> <span class="n">v</span><span class="p">)</span>
+    <span class="k">with</span> <span class="n">config</span><span class="o">.</span><span class="n">parser_config</span><span class="p">(</span><span class="n">args2</span><span class="p">):</span>
+        <span class="n">assert_equal</span><span class="p">(</span><span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;YGG_TEST_SKIP_LANGUAGE&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">)),</span>
+                     <span class="p">[</span><span class="s1">&#39;R&#39;</span><span class="p">])</span>
+        <span class="n">assert_equal</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;YGG_DEBUG&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">),</span> <span class="s1">&#39;DEBUG&#39;</span><span class="p">)</span>
+        <span class="n">assert_equal</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;YGG_CLIENT_DEBUG&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">),</span> <span class="s1">&#39;DEBUG&#39;</span><span class="p">)</span>
+        <span class="n">assert_equal</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;YGG_VALIDATE_COMPONENTS&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">),</span> <span class="s1">&#39;true&#39;</span><span class="p">)</span>
+        <span class="n">assert_equal</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;YGG_VALIDATE_MESSAGES&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">),</span> <span class="s1">&#39;true&#39;</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">old_var</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+        <span class="n">assert_equal</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="kc">None</span><span class="p">),</span> <span class="n">v</span><span class="p">)</span>
+    <span class="n">assert_raises</span><span class="p">(</span><span class="ne">ValueError</span><span class="p">,</span> <span class="n">config</span><span class="o">.</span><span class="n">acquire_env</span><span class="p">,</span>
+                  <span class="nb">dict</span><span class="p">(</span><span class="n">production_run</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">debug</span><span class="o">=</span><span class="kc">True</span><span class="p">))</span>
+    <span class="k">with</span> <span class="n">config</span><span class="o">.</span><span class="n">temp_config</span><span class="p">(</span><span class="n">production_run</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+        <span class="n">assert_equal</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;YGG_VALIDATE_COMPONENTS&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">),</span> <span class="s1">&#39;false&#39;</span><span class="p">)</span>
+        <span class="n">assert_equal</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;YGG_VALIDATE_MESSAGES&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">),</span> <span class="s1">&#39;false&#39;</span><span class="p">)</span>
+    <span class="k">with</span> <span class="n">config</span><span class="o">.</span><span class="n">temp_config</span><span class="p">(</span><span class="n">debug</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+        <span class="n">assert_equal</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;YGG_DEBUG&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">),</span> <span class="s1">&#39;DEBUG&#39;</span><span class="p">)</span>
+        <span class="n">assert_equal</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;YGG_CLIENT_DEBUG&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">),</span> <span class="s1">&#39;DEBUG&#39;</span><span class="p">)</span>
+        <span class="n">assert_equal</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;YGG_VALIDATE_COMPONENTS&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">),</span> <span class="s1">&#39;true&#39;</span><span class="p">)</span>
+        <span class="n">assert_equal</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;YGG_VALIDATE_MESSAGES&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">),</span> <span class="s1">&#39;true&#39;</span><span class="p">)</span>
+    <span class="k">with</span> <span class="n">config</span><span class="o">.</span><span class="n">temp_config</span><span class="p">(</span><span class="n">validate_messages</span><span class="o">=</span><span class="s1">&#39;True&#39;</span><span class="p">):</span>
+        <span class="n">assert_equal</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;YGG_VALIDATE_MESSAGES&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">),</span> <span class="s1">&#39;true&#39;</span><span class="p">)</span></div>
 </pre></div>
 
            </div>
            
           </div>
           <footer>
-  
 
   <hr/>
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2017, Meagan Lang, David Raila
+        &#169; Copyright 2017, Meagan Lang, David Raila.
 
     </p>
   </div>
-  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+    
+    
+    
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
 
 </footer>
-
         </div>
       </div>
 
@@ -241,7 +321,6 @@
 
   </div>
   
-
 
   <script type="text/javascript">
       jQuery(function () {

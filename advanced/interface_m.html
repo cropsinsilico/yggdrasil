@@ -1,39 +1,42 @@
 
 
 <!DOCTYPE html>
-<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
-<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<html class="writer-html5" lang="en" >
 <head>
-  <meta charset="utf-8">
+  <meta charset="utf-8" />
   
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>Matlab Interface &mdash; yggdrasil 1.1.1+410.g95af39b2 documentation</title>
+  <title>Matlab Interface &mdash; yggdrasil v1.5.0 documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/theme_overrides.css" type="text/css" />
+
+  
   
 
   
   
-  
+
   
 
   
-  <script type="text/javascript" src="../_static/js/modernizr.min.js"></script>
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
   
     
       <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
         <script src="../_static/jquery.js"></script>
         <script src="../_static/underscore.js"></script>
         <script src="../_static/doctools.js"></script>
-        <script src="../_static/language_data.js"></script>
     
     <script type="text/javascript" src="../_static/js/theme.js"></script>
 
     
-
-  
-  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
-  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
-  <link rel="stylesheet" href="../_static/theme_overrides.css" type="text/css" />
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="Code" href="code.html" />
@@ -61,7 +64,7 @@
             
             
               <div class="version">
-                1.1.1
+                v1.5.0
               </div>
             
           
@@ -78,6 +81,7 @@
           
         </div>
 
+        
         <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
           
             
@@ -129,6 +133,7 @@
             
           
         </div>
+        
       </div>
     </nav>
 
@@ -163,11 +168,13 @@
 
 
 
+
+
 <div role="navigation" aria-label="breadcrumbs navigation">
 
   <ul class="wy-breadcrumbs">
     
-      <li><a href="../index.html">Docs</a> &raquo;</li>
+      <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
         
           <li><a href="index.html">Advanced</a> &raquo;</li>
         
@@ -178,7 +185,7 @@
     
       <li class="wy-breadcrumbs-aside">
         
-            
+          
             <a href="../_sources/advanced/interface_m.rst.txt" rel="nofollow"> View page source</a>
           
         
@@ -198,6 +205,26 @@
 <p class="breathe-sectiondef-title rubric">Functions</p>
 <dl class="cpp function">
 <dt>
+<span class="target" id="_ygg_interface_8m_1ac74d0897ff75d18de42c8774f0bd756d"></span><code class="sig-name descname">while (i&lt;=length(varargin))</code></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt>
+<span class="target" id="_ygg_interface_8m_1a22940ca16c8276f5830e24beb7e85cf6"></span><code class="sig-name descname">if (ischar(varargin{i}))</code></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt>
+<span class="target" id="_ygg_interface_8m_1ae38c6bd6372a322614305597f4820e1e"></span><code class="sig-name descname">if any (strcmp(varargin{i}, keyword_names))</code></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt>
+<span class="target" id="_ygg_interface_8m_1af099cbc0b677453c94a08ca6742dabd2"></span><code class="sig-name descname">kwargs (varargin{i})</code></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt>
 <span class="target" id="_ygg_interface_8m_1a7028523a410a9bca4d61edf8582f8d82"></span><code class="sig-name descname">if (nargin &gt; 1)</code></dt>
 <dd></dd></dl>
 
@@ -206,12 +233,22 @@
 <p class="breathe-sectiondef-title rubric">Variables</p>
 <dl class="cpp var">
 <dt>
-<span class="target" id="_ygg_interface_8m_1ac20f542425d23d5b71774e61a30c7884"></span><code class="sig-name descname">pyobj   = YggInterface.YggInit(type, py.list(varargin))</code></dt>
+<span class="target" id="_ygg_interface_8m_1ae67dfd822a094c7d9337aec92be9935c"></span><code class="sig-name descname">keyword_names  = {'global_scope', 'format_str', 'infmt', 'outfmt', ...		   'as_array', 'fmt'}</code></dt>
 <dd></dd></dl>
 
 <dl class="cpp var">
 <dt>
-<span class="target" id="_ygg_interface_8m_1a2a89187d8e8e8fba509ef9ab5f815d88"></span><code class="sig-name descname">out   = YggInterfaceClass(pyobj)</code></dt>
+<span class="target" id="_ygg_interface_8m_1a8187411843a6284ffb964ef3fb9fcab3"></span><code class="sig-name descname">args   = {}</code></dt>
+<dd></dd></dl>
+
+<dl class="cpp var">
+<dt>
+<span class="target" id="_ygg_interface_8m_1aca174a4ca5cbfb3d1b2873c5e38f50aa"></span><code class="sig-name descname">kwargs   = containers.Map()</code></dt>
+<dd></dd></dl>
+
+<dl class="cpp var">
+<dt>
+<span class="target" id="_ygg_interface_8m_1a6f6ccfcf58b31cb6412107d9d5281426"></span><code class="sig-name descname">i   = 1</code></dt>
 <dd></dd></dl>
 
 <dl class="cpp var">
@@ -224,6 +261,16 @@
 <span class="target" id="_ygg_interface_8m_1afb358f48b1646c750fb9da6c6585be2b"></span><code class="sig-name descname">end</code></dt>
 <dd></dd></dl>
 
+<dl class="cpp var">
+<dt>
+<span class="target" id="_ygg_interface_8m_1ac20f542425d23d5b71774e61a30c7884"></span><code class="sig-name descname">pyobj  = YggInterface.YggInit(type, matlab2python(args), ...			       matlab2python(kwargs))</code></dt>
+<dd></dd></dl>
+
+<dl class="cpp var">
+<dt>
+<span class="target" id="_ygg_interface_8m_1a2a89187d8e8e8fba509ef9ab5f815d88"></span><code class="sig-name descname">out   = YggInterfaceClass(pyobj)</code></dt>
+<dd></dd></dl>
+
 </div>
 </div>
 
@@ -232,29 +279,29 @@
            
           </div>
           <footer>
-  
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
-      
-        <a href="code.html" class="btn btn-neutral float-right" title="Code" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
-      
-      
-        <a href="interface_cpp.html" class="btn btn-neutral float-left" title="C++ Interface" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
-      
+        <a href="code.html" class="btn btn-neutral float-right" title="Code" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="interface_cpp.html" class="btn btn-neutral float-left" title="C++ Interface" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
     </div>
-  
 
   <hr/>
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2017, Meagan Lang, David Raila
+        &#169; Copyright 2017, Meagan Lang, David Raila.
 
     </p>
   </div>
-  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+    
+    
+    
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
 
 </footer>
-
         </div>
       </div>
 
@@ -262,7 +309,6 @@
 
   </div>
   
-
 
   <script type="text/javascript">
       jQuery(function () {

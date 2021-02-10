@@ -1,39 +1,42 @@
 
 
 <!DOCTYPE html>
-<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
-<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<html class="writer-html5" lang="en" >
 <head>
-  <meta charset="utf-8">
+  <meta charset="utf-8" />
   
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>yggdrasil.drivers.FortranModelDriver &mdash; yggdrasil 1.1.1+410.g95af39b2 documentation</title>
+  <title>yggdrasil.drivers.FortranModelDriver &mdash; yggdrasil v1.5.0 documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/theme_overrides.css" type="text/css" />
+
+  
   
 
   
   
-  
+
   
 
   
-  <script type="text/javascript" src="../../../_static/js/modernizr.min.js"></script>
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
   
     
       <script type="text/javascript" id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
         <script src="../../../_static/jquery.js"></script>
         <script src="../../../_static/underscore.js"></script>
         <script src="../../../_static/doctools.js"></script>
-        <script src="../../../_static/language_data.js"></script>
     
     <script type="text/javascript" src="../../../_static/js/theme.js"></script>
 
     
-
-  
-  <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
-  <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
-  <link rel="stylesheet" href="../../../_static/theme_overrides.css" type="text/css" />
     <link rel="index" title="Index" href="../../../genindex.html" />
     <link rel="search" title="Search" href="../../../search.html" /> 
 </head>
@@ -59,7 +62,7 @@
             
             
               <div class="version">
-                1.1.1
+                v1.5.0
               </div>
             
           
@@ -76,6 +79,7 @@
           
         </div>
 
+        
         <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
           
             
@@ -111,6 +115,7 @@
             
           
         </div>
+        
       </div>
     </nav>
 
@@ -145,11 +150,13 @@
 
 
 
+
+
 <div role="navigation" aria-label="breadcrumbs navigation">
 
   <ul class="wy-breadcrumbs">
     
-      <li><a href="../../../index.html">Docs</a> &raquo;</li>
+      <li><a href="../../../index.html" class="icon icon-home"></a> &raquo;</li>
         
           <li><a href="../../index.html">Module code</a> &raquo;</li>
         
@@ -175,13 +182,13 @@
 <span class="kn">import</span> <span class="nn">re</span>
 <span class="kn">import</span> <span class="nn">copy</span>
 <span class="kn">import</span> <span class="nn">logging</span>
-<span class="kn">from</span> <span class="nn">collections</span> <span class="k">import</span> <span class="n">OrderedDict</span>
-<span class="kn">from</span> <span class="nn">yggdrasil</span> <span class="k">import</span> <span class="n">platform</span><span class="p">,</span> <span class="n">tools</span>
-<span class="kn">from</span> <span class="nn">yggdrasil.languages</span> <span class="k">import</span> <span class="n">get_language_dir</span>
-<span class="kn">from</span> <span class="nn">yggdrasil.drivers</span> <span class="k">import</span> <span class="n">CModelDriver</span>
-<span class="kn">from</span> <span class="nn">yggdrasil.drivers.CompiledModelDriver</span> <span class="k">import</span> <span class="p">(</span>
+<span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">OrderedDict</span>
+<span class="kn">from</span> <span class="nn">yggdrasil</span> <span class="kn">import</span> <span class="n">platform</span><span class="p">,</span> <span class="n">tools</span>
+<span class="kn">from</span> <span class="nn">yggdrasil.languages</span> <span class="kn">import</span> <span class="n">get_language_dir</span>
+<span class="kn">from</span> <span class="nn">yggdrasil.drivers</span> <span class="kn">import</span> <span class="n">CModelDriver</span>
+<span class="kn">from</span> <span class="nn">yggdrasil.drivers.CompiledModelDriver</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">CompilerBase</span><span class="p">,</span> <span class="n">CompiledModelDriver</span><span class="p">,</span> <span class="n">get_compilation_tool</span><span class="p">)</span>
-<span class="kn">from</span> <span class="nn">yggdrasil.metaschema.properties.ScalarMetaschemaProperties</span> <span class="k">import</span> <span class="p">(</span>
+<span class="kn">from</span> <span class="nn">yggdrasil.metaschema.properties.ScalarMetaschemaProperties</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">_valid_types</span><span class="p">)</span>
 
 
@@ -196,9 +203,9 @@
 <div class="viewcode-block" id="FortranCompilerBase"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.FortranModelDriver.FortranCompilerBase">[docs]</a><span class="k">class</span> <span class="nc">FortranCompilerBase</span><span class="p">(</span><span class="n">CompilerBase</span><span class="p">):</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Base class for Fortran compilers.&quot;&quot;&quot;</span>
     <span class="n">languages</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;fortran&#39;</span><span class="p">]</span>
-    <span class="n">default_executable_env</span> <span class="o">=</span> <span class="s1">&#39;FF&#39;</span>
+    <span class="n">default_executable_env</span> <span class="o">=</span> <span class="s1">&#39;FC&#39;</span>
     <span class="n">default_flags_env</span> <span class="o">=</span> <span class="s1">&#39;FFLAGS&#39;</span>
-    <span class="n">default_flags</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;-g&#39;</span><span class="p">,</span> <span class="s1">&#39;-Wall&#39;</span><span class="p">,</span> <span class="s1">&#39;-cpp&#39;</span><span class="p">,</span> <span class="s1">&#39;-pedantic-errors&#39;</span><span class="p">]</span>
+    <span class="n">default_flags</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;-g&#39;</span><span class="p">,</span> <span class="s1">&#39;-Wall&#39;</span><span class="p">,</span> <span class="s1">&#39;-cpp&#39;</span><span class="p">,</span> <span class="s1">&#39;-pedantic-errors&#39;</span><span class="p">,</span> <span class="s1">&#39;-ffree-line-length-0&#39;</span><span class="p">]</span>
     <span class="n">linker_attributes</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;default_flags_env&#39;</span><span class="p">:</span> <span class="s1">&#39;LFLAGS&#39;</span><span class="p">,</span>
                          <span class="s1">&#39;search_path_envvar&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;LIBRARY_PATH&#39;</span><span class="p">,</span> <span class="s1">&#39;LD_LIBRARY_PATH&#39;</span><span class="p">]}</span>
     <span class="n">search_path_envvar</span> <span class="o">=</span> <span class="p">[]</span>
@@ -225,7 +232,7 @@
             <span class="n">kwargs</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s1">&#39;module-search-path&#39;</span><span class="p">,</span> <span class="n">_top_lang_dir</span><span class="p">)</span>
         <span class="n">kwargs</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s1">&#39;include_dirs&#39;</span><span class="p">,</span> <span class="bp">cls</span><span class="o">.</span><span class="n">get_search_path</span><span class="p">())</span>
         <span class="n">out</span> <span class="o">=</span> <span class="nb">super</span><span class="p">(</span><span class="n">FortranCompilerBase</span><span class="p">,</span> <span class="bp">cls</span><span class="p">)</span><span class="o">.</span><span class="n">get_flags</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
-        <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;-O&#39;</span><span class="p">,</span> <span class="s1">&#39;-O2&#39;</span><span class="p">,</span> <span class="s1">&#39;-O3&#39;</span><span class="p">,</span> <span class="s1">&#39;Os&#39;</span><span class="p">,</span> <span class="s1">&#39;Ofast&#39;</span><span class="p">]:</span>
+        <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;-O&#39;</span><span class="p">,</span> <span class="s1">&#39;-O2&#39;</span><span class="p">,</span> <span class="s1">&#39;-O3&#39;</span><span class="p">,</span> <span class="s1">&#39;Os&#39;</span><span class="p">,</span> <span class="s1">&#39;Ofast&#39;</span><span class="p">]:</span>  <span class="c1"># pragma: debug</span>
             <span class="k">if</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">out</span><span class="p">:</span>
                 <span class="n">out</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">out</span></div>
@@ -377,7 +384,7 @@
         <span class="s1">&#39;any&#39;</span><span class="p">:</span> <span class="s1">&#39;ygggeneric&#39;</span><span class="p">}</span>
     <span class="n">function_param</span> <span class="o">=</span> <span class="p">{</span>
         <span class="s1">&#39;import_nofile&#39;</span><span class="p">:</span> <span class="s1">&#39;use </span><span class="si">{function}</span><span class="s1">&#39;</span><span class="p">,</span>
-        <span class="s1">&#39;import&#39;</span><span class="p">:</span> <span class="s1">&#39;include &quot;</span><span class="si">{filename}</span><span class="s1">&quot;&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;import&#39;</span><span class="p">:</span> <span class="s1">&#39;#include &quot;</span><span class="si">{filename}</span><span class="s1">&quot;&#39;</span><span class="p">,</span>
         <span class="s1">&#39;index&#39;</span><span class="p">:</span> <span class="s1">&#39;</span><span class="si">{variable}</span><span class="s1">(</span><span class="si">{index}</span><span class="s1">)&#39;</span><span class="p">,</span>
         <span class="s1">&#39;interface&#39;</span><span class="p">:</span> <span class="s1">&#39;use fygg&#39;</span><span class="p">,</span>
         <span class="s1">&#39;input&#39;</span><span class="p">:</span> <span class="p">(</span><span class="s1">&#39;</span><span class="si">{channel}</span><span class="s1"> = ygg_input_type(&#39;</span>
@@ -514,7 +521,8 @@
             <span class="sa">r</span><span class="s1">&#39;(?:len\s*=\s*(?:(?P&lt;length&gt;(?:\d+))|&#39;</span>
             <span class="sa">r</span><span class="s1">&#39;(?P&lt;length_var&gt;.+?)))?&#39;</span>
             <span class="sa">r</span><span class="s1">&#39;\))?&#39;</span>
-            <span class="sa">r</span><span class="s1">&#39;(?:\s*,\s*dimension\((?:(?P&lt;shape&gt;\d+(?:,\s*\d+)*?)&#39;</span>
+            <span class="sa">r</span><span class="s1">&#39;(?:\s*,\s*dimension\((?:(?P&lt;shape&gt;(?:\d)+&#39;</span>
+            <span class="sa">r</span><span class="s1">&#39;(?:,\s*(?:\d)+)*?)&#39;</span>
             <span class="sa">r</span><span class="s1">&#39;|(?P&lt;shape_var&gt;.+?(?:,\s*.+)*?))\))?&#39;</span>
             <span class="sa">r</span><span class="s1">&#39;(?:\s*,\s*(?P&lt;pointer&gt;pointer))?&#39;</span>
             <span class="sa">r</span><span class="s1">&#39;(?:\s*,\s*(?P&lt;target&gt;target))?&#39;</span>
@@ -527,10 +535,10 @@
     <span class="n">is_typed</span> <span class="o">=</span> <span class="kc">True</span>
     <span class="n">types_in_funcdef</span> <span class="o">=</span> <span class="kc">False</span>
     <span class="n">interface_inside_exec</span> <span class="o">=</span> <span class="kc">True</span>
-    <span class="n">import_after_exec</span> <span class="o">=</span> <span class="kc">False</span>
-    <span class="n">declare_functions_as_var</span> <span class="o">=</span> <span class="kc">False</span>
     <span class="n">zero_based</span> <span class="o">=</span> <span class="kc">False</span>
     <span class="n">max_line_width</span> <span class="o">=</span> <span class="mi">72</span>
+    <span class="n">global_scope_macro</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;#define WITH_GLOBAL_SCOPE(COMM) call &#39;</span>
+                          <span class="s1">&#39;set_global_comm(); COMM; call unset_global_comm()&#39;</span><span class="p">)</span>
     
 <div class="viewcode-block" id="FortranModelDriver.before_registration"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.FortranModelDriver.FortranModelDriver.before_registration">[docs]</a>    <span class="nd">@staticmethod</span>
     <span class="k">def</span> <span class="nf">before_registration</span><span class="p">(</span><span class="bp">cls</span><span class="p">):</span>
@@ -553,16 +561,19 @@
             <span class="k">if</span> <span class="n">cxx_lib</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">cls</span><span class="o">.</span><span class="n">external_libraries</span><span class="p">:</span>
                 <span class="bp">cls</span><span class="o">.</span><span class="n">external_libraries</span><span class="p">[</span><span class="n">cxx_lib</span><span class="p">]</span> <span class="o">=</span> <span class="n">cxx_orig</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
                 <span class="bp">cls</span><span class="o">.</span><span class="n">internal_libraries</span><span class="p">[</span><span class="s1">&#39;fygg&#39;</span><span class="p">][</span><span class="s1">&#39;external_dependencies&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">cxx_lib</span><span class="p">)</span>
+                <span class="c1"># if platform._is_win:  # pragma: windows</span>
+                <span class="c1">#     cls.external_libraries[cxx_lib][&#39;libtype&#39;] = &#39;windows_import&#39;</span>
         <span class="k">if</span> <span class="n">platform</span><span class="o">.</span><span class="n">_is_win</span><span class="p">:</span>  <span class="c1"># pragma: windows</span>
             <span class="n">cl_compiler</span> <span class="o">=</span> <span class="n">get_compilation_tool</span><span class="p">(</span><span class="s1">&#39;compiler&#39;</span><span class="p">,</span> <span class="s1">&#39;cl&#39;</span><span class="p">)</span>
             <span class="k">if</span> <span class="ow">not</span> <span class="n">cl_compiler</span><span class="o">.</span><span class="n">is_installed</span><span class="p">():</span>  <span class="c1"># pragma: debug</span>
-                <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;The MSVC compiler could not be located. The Python C API &quot;</span>
-                            <span class="s2">&quot;assumes the MSVC CRT will be used on windows so there may &quot;</span>
-                            <span class="s2">&quot;be errors when accessing some behavior of the Python C API.&quot;</span>
-                            <span class="s2">&quot;In particular, segfaults are known to occur when trying to &quot;</span>
-                            <span class="s2">&quot;call display_python due to differences in the internal &quot;</span>
-                            <span class="s2">&quot;structure of FILE* objects between MSVC and other &quot;</span>
-                            <span class="s2">&quot;standards.&quot;</span><span class="p">)</span></div>
+                <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
+                    <span class="s2">&quot;The MSVC compiler could not be located. The Python C API &quot;</span>
+                    <span class="s2">&quot;assumes the MSVC CRT will be used on windows so there may &quot;</span>
+                    <span class="s2">&quot;be errors when accessing some behavior of the Python C API. &quot;</span>
+                    <span class="s2">&quot;In particular, segfaults are known to occur when trying to &quot;</span>
+                    <span class="s2">&quot;call display_python due to differences in the internal &quot;</span>
+                    <span class="s2">&quot;structure of FILE* objects between MSVC and other &quot;</span>
+                    <span class="s2">&quot;standards.&quot;</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="FortranModelDriver.set_env_class"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.FortranModelDriver.FortranModelDriver.set_env_class">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">set_env_class</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
@@ -621,6 +632,18 @@
         <span class="n">out</span> <span class="o">+=</span> <span class="s1">&#39;_</span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">commtype</span><span class="p">[:</span><span class="mi">3</span><span class="p">]</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
         <span class="k">return</span> <span class="n">out</span></div>
 
+<div class="viewcode-block" id="FortranModelDriver.get_inverse_type_map"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.FortranModelDriver.FortranModelDriver.get_inverse_type_map">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">get_inverse_type_map</span><span class="p">(</span><span class="bp">cls</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Get the inverse type map.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            dict: Mapping from native type to JSON type.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">out</span> <span class="o">=</span> <span class="nb">super</span><span class="p">(</span><span class="n">FortranModelDriver</span><span class="p">,</span> <span class="bp">cls</span><span class="p">)</span><span class="o">.</span><span class="n">get_inverse_type_map</span><span class="p">()</span>
+        <span class="n">out</span><span class="p">[</span><span class="s1">&#39;yggchar_r&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;bytes&#39;</span>
+        <span class="k">return</span> <span class="n">out</span></div>
+        
 <div class="viewcode-block" id="FortranModelDriver.get_native_type"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.FortranModelDriver.FortranModelDriver.get_native_type">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">get_native_type</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Get the native type.</span>
@@ -642,12 +665,12 @@
         <span class="n">type_match</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="bp">cls</span><span class="o">.</span><span class="n">function_param</span><span class="p">[</span><span class="s1">&#39;type_regex&#39;</span><span class="p">],</span> <span class="n">out</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">type_match</span><span class="p">:</span>
             <span class="n">type_match</span> <span class="o">=</span> <span class="n">type_match</span><span class="o">.</span><span class="n">groupdict</span><span class="p">()</span>
-            <span class="k">if</span> <span class="n">type_match</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;shape_var&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">type_match</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;shape_var&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">):</span>  <span class="c1"># pragma: debug</span>
                 <span class="k">if</span> <span class="p">(</span><span class="s1">&#39;pointer&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">out</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="s1">&#39;allocatable&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">out</span><span class="p">):</span>
                     <span class="n">out</span> <span class="o">+=</span> <span class="s1">&#39;, allocatable&#39;</span>
                 <span class="k">if</span> <span class="n">type_match</span><span class="p">[</span><span class="s1">&#39;shape_var&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;*&#39;</span><span class="p">:</span>
                     <span class="n">out</span> <span class="o">=</span> <span class="n">out</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;*&#39;</span><span class="p">,</span> <span class="s1">&#39;:&#39;</span><span class="p">)</span>
-                <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s2">&quot;Used default native_type, but need alias&quot;</span><span class="p">)</span>
+                <span class="c1"># raise Exception(&quot;Used default native_type, but need alias&quot;)</span>
             <span class="k">elif</span> <span class="n">type_match</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;length_var&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">):</span>
                 <span class="k">if</span> <span class="p">(((</span><span class="s1">&#39;pointer&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">out</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="s1">&#39;allocatable&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">out</span><span class="p">)</span>
                      <span class="ow">and</span> <span class="p">(</span><span class="n">type_match</span><span class="p">[</span><span class="s1">&#39;length_var&#39;</span><span class="p">]</span> <span class="o">!=</span> <span class="s1">&#39;X&#39;</span><span class="p">))):</span>
@@ -658,11 +681,11 @@
             <span class="k">if</span> <span class="n">out</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;ygg&#39;</span><span class="p">):</span>
                 <span class="n">out</span> <span class="o">=</span> <span class="s1">&#39;type(</span><span class="si">%s</span><span class="s1">)&#39;</span> <span class="o">%</span> <span class="n">out</span>
             <span class="k">return</span> <span class="n">out</span>
-        <span class="kn">from</span> <span class="nn">yggdrasil.metaschema.datatypes</span> <span class="k">import</span> <span class="n">get_type_class</span>
+        <span class="kn">from</span> <span class="nn">yggdrasil.metaschema.datatypes</span> <span class="kn">import</span> <span class="n">get_type_class</span>
         <span class="n">json_type</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;datatype&#39;</span><span class="p">,</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;type&#39;</span><span class="p">,</span> <span class="s1">&#39;bytes&#39;</span><span class="p">))</span>
-        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">json_type</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">json_type</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>  <span class="c1"># pragma: no cover</span>
             <span class="n">json_type</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="n">json_type</span><span class="p">}</span>
-        <span class="k">if</span> <span class="s1">&#39;type&#39;</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="p">:</span>
+        <span class="k">if</span> <span class="s1">&#39;type&#39;</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="p">:</span>  <span class="c1"># pragma: no cover</span>
             <span class="n">json_type</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">kwargs</span><span class="p">)</span>
         <span class="k">assert</span><span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">json_type</span><span class="p">,</span> <span class="nb">dict</span><span class="p">))</span>
         <span class="n">json_type</span> <span class="o">=</span> <span class="n">get_type_class</span><span class="p">(</span><span class="n">json_type</span><span class="p">[</span><span class="s1">&#39;type&#39;</span><span class="p">])</span><span class="o">.</span><span class="n">normalize_definition</span><span class="p">(</span>
@@ -681,8 +704,9 @@
             <span class="n">out</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">get_native_type</span><span class="p">(</span><span class="n">datatype</span><span class="o">=</span><span class="n">json_subtype</span><span class="p">)</span> <span class="o">+</span> <span class="n">dim_str</span>
             <span class="k">if</span> <span class="ow">not</span> <span class="n">dim_str</span><span class="p">:</span>
                 <span class="n">json_subtype</span><span class="p">[</span><span class="s1">&#39;type&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">out</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;(&#39;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
-                <span class="k">if</span> <span class="n">json_subtype</span><span class="p">[</span><span class="s1">&#39;type&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;character&#39;</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">json_subtype</span><span class="p">[</span><span class="s1">&#39;type&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;character&#39;</span><span class="p">:</span>  <span class="c1"># pragma: debug</span>
                     <span class="n">json_subtype</span><span class="p">[</span><span class="s1">&#39;precision&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+                    <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">&quot;Character array requires precision.&quot;</span><span class="p">)</span>
                 <span class="k">else</span><span class="p">:</span>
                     <span class="n">json_subtype</span><span class="p">[</span><span class="s1">&#39;precision&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">json_subtype</span><span class="p">[</span><span class="s1">&#39;precision&#39;</span><span class="p">]</span> <span class="o">/</span> <span class="mi">8</span><span class="p">)</span>
                 <span class="n">json_subtype</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s1">&#39;ndim&#39;</span><span class="p">,</span> <span class="s1">&#39;n&#39;</span><span class="p">)</span>
@@ -754,17 +778,20 @@
                     <span class="n">grp</span><span class="p">[</span><span class="s1">&#39;type&#39;</span><span class="p">]</span> <span class="o">+</span> <span class="s1">&#39;(kind = X)&#39;</span><span class="p">)</span>
             <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>  <span class="c1"># pragma: debug</span>
                 <span class="k">raise</span> <span class="n">e</span>
+        <span class="k">if</span> <span class="n">grp</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;shape_var&#39;</span><span class="p">,</span> <span class="kc">False</span><span class="p">):</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">grp</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;shape&#39;</span><span class="p">,</span> <span class="kc">False</span><span class="p">):</span>
+                <span class="n">grp</span><span class="p">[</span><span class="s1">&#39;shape&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">grp</span><span class="p">[</span><span class="s1">&#39;shape_var&#39;</span><span class="p">]</span>
         <span class="k">if</span> <span class="n">grp</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;shape&#39;</span><span class="p">,</span> <span class="kc">False</span><span class="p">):</span>
             <span class="n">shape</span> <span class="o">=</span> <span class="n">grp</span><span class="p">[</span><span class="s1">&#39;shape&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;,&#39;</span><span class="p">)</span>
             <span class="n">ndim</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">shape</span><span class="p">)</span>
             <span class="n">out</span><span class="p">[</span><span class="s1">&#39;subtype&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">out</span><span class="p">[</span><span class="s1">&#39;type&#39;</span><span class="p">]</span>
             <span class="k">if</span> <span class="n">ndim</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
                 <span class="n">out</span><span class="p">[</span><span class="s1">&#39;type&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;1darray&#39;</span>
-                <span class="k">if</span> <span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">!=</span> <span class="s1">&#39;:&#39;</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="ow">not</span> <span class="ow">in</span> <span class="s1">&#39;*:&#39;</span><span class="p">:</span>
                     <span class="n">out</span><span class="p">[</span><span class="s1">&#39;length&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="n">out</span><span class="p">[</span><span class="s1">&#39;type&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;ndarray&#39;</span>
-                <span class="k">if</span> <span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">!=</span> <span class="s1">&#39;:&#39;</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="ow">not</span> <span class="ow">in</span> <span class="s1">&#39;*:&#39;</span><span class="p">:</span>
                     <span class="n">out</span><span class="p">[</span><span class="s1">&#39;shape&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="nb">int</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">shape</span><span class="p">]</span>
         <span class="k">if</span> <span class="n">out</span><span class="p">[</span><span class="s1">&#39;type&#39;</span><span class="p">]</span> <span class="ow">in</span> <span class="n">_valid_types</span><span class="p">:</span>
             <span class="n">out</span><span class="p">[</span><span class="s1">&#39;subtype&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">out</span><span class="p">[</span><span class="s1">&#39;type&#39;</span><span class="p">]</span>
@@ -855,10 +882,11 @@
         <span class="k">if</span> <span class="n">for_yggdrasil</span><span class="p">:</span>
             <span class="n">new_vars_list</span> <span class="o">=</span> <span class="p">[]</span>
             <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">vars_list</span><span class="p">:</span>
-                <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
-                    <span class="n">v</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="p">(</span><span class="s1">&#39;yggarg(</span><span class="si">%s</span><span class="s1">)&#39;</span> <span class="o">%</span> <span class="n">v</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">]))</span>
-                <span class="k">else</span><span class="p">:</span>
-                    <span class="n">v</span> <span class="o">=</span> <span class="s1">&#39;yggarg(</span><span class="si">%s</span><span class="s1">)&#39;</span> <span class="o">%</span> <span class="n">v</span>
+                <span class="k">assert</span><span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="nb">dict</span><span class="p">))</span>
+                <span class="c1"># if isinstance(v, dict):</span>
+                <span class="n">v</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="p">(</span><span class="s1">&#39;yggarg(</span><span class="si">%s</span><span class="s1">)&#39;</span> <span class="o">%</span> <span class="n">v</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">]))</span>
+                <span class="c1"># else:</span>
+                <span class="c1">#     v = &#39;yggarg(%s)&#39; % v</span>
                 <span class="n">new_vars_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">v</span><span class="p">)</span>
         <span class="n">out</span> <span class="o">=</span> <span class="nb">super</span><span class="p">(</span><span class="n">FortranModelDriver</span><span class="p">,</span> <span class="bp">cls</span><span class="p">)</span><span class="o">.</span><span class="n">prepare_variables</span><span class="p">(</span>
             <span class="n">new_vars_list</span><span class="p">,</span> <span class="n">for_yggdrasil</span><span class="o">=</span><span class="n">for_yggdrasil</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
@@ -883,13 +911,29 @@
 <span class="sd"> </span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="s1">&#39;filename&#39;</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="p">:</span>
+            <span class="k">if</span> <span class="p">(</span><span class="ow">not</span> <span class="n">module</span><span class="p">)</span> <span class="ow">and</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;filename&#39;</span><span class="p">]):</span>
+                <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;filename&#39;</span><span class="p">],</span> <span class="s1">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">fd</span><span class="p">:</span>
+                    <span class="n">contents</span> <span class="o">=</span> <span class="n">fd</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
+                    <span class="k">if</span> <span class="s1">&#39;contains&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">contents</span><span class="o">.</span><span class="n">lower</span><span class="p">():</span>  <span class="c1"># pragma: debug</span>
+                        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Could not locate &#39;contains&#39; keyword &quot;</span>
+                                         <span class="s2">&quot;in user defined module.&quot;</span><span class="p">)</span>
+                    <span class="n">idx</span> <span class="o">=</span> <span class="n">contents</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="s1">&#39;contains&#39;</span><span class="p">)</span>
+                    <span class="k">return</span> <span class="p">(</span><span class="n">contents</span><span class="p">[:</span><span class="n">idx</span><span class="p">]</span>
+                            <span class="o">+</span> <span class="s1">&#39;  use </span><span class="si">%s</span><span class="se">\n</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="bp">cls</span><span class="o">.</span><span class="n">interface_library</span>
+                            <span class="o">+</span> <span class="bp">cls</span><span class="o">.</span><span class="n">global_scope_macro</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span>
+                            <span class="o">+</span> <span class="n">contents</span><span class="p">[</span><span class="n">idx</span><span class="p">:])</span><span class="o">.</span><span class="n">splitlines</span><span class="p">()</span>
             <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;filename&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">basename</span><span class="p">(</span><span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;filename&#39;</span><span class="p">])</span>
         <span class="n">out</span> <span class="o">=</span> <span class="nb">super</span><span class="p">(</span><span class="n">FortranModelDriver</span><span class="p">,</span> <span class="bp">cls</span><span class="p">)</span><span class="o">.</span><span class="n">write_executable_import</span><span class="p">(</span>
             <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">module</span><span class="p">:</span>
             <span class="n">out</span> <span class="o">=</span> <span class="p">([</span><span class="s1">&#39;module </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">module</span><span class="p">,</span>
+                    <span class="s1">&#39;  use </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="bp">cls</span><span class="o">.</span><span class="n">interface_library</span><span class="p">,</span>
+                    <span class="bp">cls</span><span class="o">.</span><span class="n">global_scope_macro</span><span class="p">,</span>
                     <span class="s1">&#39;contains&#39;</span><span class="p">]</span>
-                   <span class="o">+</span> <span class="p">[</span><span class="bp">cls</span><span class="o">.</span><span class="n">function_param</span><span class="p">[</span><span class="s1">&#39;indent&#39;</span><span class="p">]</span> <span class="o">+</span> <span class="n">x</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">out</span><span class="p">]</span>
+                   <span class="c1"># Use output directly when import uses directive #include</span>
+                   <span class="o">+</span> <span class="n">out</span>
+                   <span class="c1"># Indent when import uses include statement</span>
+                   <span class="c1"># + [cls.function_param[&#39;indent&#39;] + x for x in out]</span>
                    <span class="o">+</span> <span class="p">[</span><span class="s1">&#39;end module </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">module</span><span class="p">])</span>
         <span class="k">return</span> <span class="n">out</span></div>
         
@@ -923,12 +967,12 @@
                 <span class="k">if</span> <span class="p">(</span><span class="s1">&#39;filename&#39;</span> <span class="ow">in</span> <span class="n">kws</span><span class="p">)</span> <span class="ow">and</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">kws</span><span class="p">[</span><span class="s1">&#39;filename&#39;</span><span class="p">]):</span>
                     <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">kws</span><span class="p">[</span><span class="s1">&#39;filename&#39;</span><span class="p">],</span> <span class="s1">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">fd</span><span class="p">:</span>
                         <span class="n">contents</span> <span class="o">=</span> <span class="n">fd</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
-                    <span class="n">regex_module</span> <span class="o">=</span> <span class="p">(</span><span class="sa">r</span><span class="s1">&#39;(?i)\s*module\s+(?P&lt;module&gt;.*?)&#39;</span>
+                    <span class="n">regex_module</span> <span class="o">=</span> <span class="p">(</span><span class="sa">r</span><span class="s1">&#39;(?i)\s*module\s+(?P&lt;module&gt;.+)\n&#39;</span>
                                     <span class="sa">r</span><span class="s1">&#39;(?:.*?\n)*?&#39;</span>
                                     <span class="sa">r</span><span class="s1">&#39;\s*end\s+module\s+(?P=module)&#39;</span><span class="p">)</span>
                     <span class="n">match_module</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="n">regex_module</span><span class="p">,</span> <span class="n">contents</span><span class="p">)</span>
                     <span class="k">if</span> <span class="n">match_module</span><span class="p">:</span>
-                        <span class="n">module</span> <span class="o">=</span> <span class="n">match_module</span><span class="o">.</span><span class="n">groupdict</span><span class="p">(</span><span class="s1">&#39;module&#39;</span><span class="p">)</span>
+                        <span class="n">module</span> <span class="o">=</span> <span class="n">match_module</span><span class="o">.</span><span class="n">groupdict</span><span class="p">()[</span><span class="s1">&#39;module&#39;</span><span class="p">]</span>
                     <span class="k">else</span><span class="p">:</span>
                         <span class="n">module</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="si">%s</span><span class="s1">_module&#39;</span> <span class="o">%</span> <span class="n">kws</span><span class="p">[</span><span class="s1">&#39;function&#39;</span><span class="p">]</span>
                         <span class="n">kws</span><span class="p">[</span><span class="s1">&#39;module&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">module</span>
@@ -994,8 +1038,11 @@
 <span class="sd">            list: Set of lines resulting from spliting the provided line.</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">if</span> <span class="n">line</span><span class="o">.</span><span class="n">lstrip</span><span class="p">()</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;include&quot;</span><span class="p">):</span>
-            <span class="n">force_split</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="k">if</span> <span class="n">line</span><span class="o">.</span><span class="n">startswith</span><span class="p">((</span><span class="s1">&#39;#if&#39;</span><span class="p">,</span> <span class="s1">&#39;#endif&#39;</span><span class="p">,</span> <span class="s1">&#39;#define&#39;</span><span class="p">,</span> <span class="s1">&#39;#else&#39;</span><span class="p">,</span> <span class="s1">&#39;#ifdef&#39;</span><span class="p">,</span>
+                            <span class="s1">&#39;#ifndef&#39;</span><span class="p">)):</span>
+            <span class="k">return</span> <span class="p">[</span><span class="n">line</span><span class="p">]</span>
+        <span class="c1"># if line.lstrip().lower().startswith(&quot;include&quot;):</span>
+        <span class="c1">#     force_split = True</span>
         <span class="k">return</span> <span class="nb">super</span><span class="p">(</span><span class="n">FortranModelDriver</span><span class="p">,</span> <span class="bp">cls</span><span class="p">)</span><span class="o">.</span><span class="n">split_line</span><span class="p">(</span>
             <span class="n">line</span><span class="p">,</span> <span class="n">length</span><span class="o">=</span><span class="n">length</span><span class="p">,</span> <span class="n">force_split</span><span class="o">=</span><span class="n">force_split</span><span class="p">)</span></div>
 
@@ -1081,11 +1128,12 @@
             <span class="n">recv_var_par</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">channels2vars</span><span class="p">(</span><span class="n">recv_var</span><span class="p">)</span>
             <span class="n">allows_realloc</span> <span class="o">=</span> <span class="p">[</span><span class="bp">cls</span><span class="o">.</span><span class="n">allows_realloc</span><span class="p">(</span><span class="n">v</span><span class="p">)</span>
                               <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">recv_var_par</span><span class="p">]</span>
-            <span class="k">if</span> <span class="nb">all</span><span class="p">(</span><span class="n">allows_realloc</span><span class="p">):</span>
+            <span class="k">if</span> <span class="nb">any</span><span class="p">(</span><span class="n">allows_realloc</span><span class="p">):</span>
                 <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;alt_recv_function&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">function_param</span><span class="p">[</span><span class="s1">&#39;recv_heap&#39;</span><span class="p">]</span>
                 <span class="n">new_recv_var_par</span> <span class="o">=</span> <span class="p">[]</span>
-                <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">recv_var_par</span><span class="p">:</span>
-                    <span class="k">if</span> <span class="ow">not</span> <span class="bp">cls</span><span class="o">.</span><span class="n">allows_realloc</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="n">from_native_type</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+                <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">recv_var_par</span><span class="p">):</span>
+                    <span class="k">if</span> <span class="p">(((</span><span class="ow">not</span> <span class="bp">cls</span><span class="o">.</span><span class="n">allows_realloc</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="n">from_native_type</span><span class="o">=</span><span class="kc">True</span><span class="p">))</span>
+                         <span class="ow">and</span> <span class="n">allows_realloc</span><span class="p">[</span><span class="n">i</span><span class="p">])):</span>
                         <span class="n">out_after</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;call yggassign(</span><span class="si">%s</span><span class="s1">_realloc, </span><span class="si">%s</span><span class="s1">)&#39;</span>
                                          <span class="o">%</span> <span class="p">(</span><span class="n">v</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">],</span> <span class="n">v</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">]))</span>
                         <span class="n">v</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">%s</span><span class="s1">_realloc&#39;</span> <span class="o">%</span> <span class="n">v</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">]))</span>
@@ -1100,6 +1148,43 @@
             <span class="n">channel</span><span class="p">,</span> <span class="n">recv_var_str</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">out</span> <span class="o">+</span> <span class="n">out_after</span></div>
 
+<div class="viewcode-block" id="FortranModelDriver.write_model_send"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.FortranModelDriver.FortranModelDriver.write_model_send">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">write_model_send</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">channel</span><span class="p">,</span> <span class="n">send_var</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Write a model send call include checking the return flag.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            channel (str): Name of variable that the channel being sent to</span>
+<span class="sd">                was stored in.</span>
+<span class="sd">            send_var (dict, list): Information on one or more variables</span>
+<span class="sd">                containing information that will be sent.</span>
+<span class="sd">            flag_var (str, optional): Name of flag variable that the flag should</span>
+<span class="sd">                be stored in. Defaults to &#39;flag&#39;,</span>
+<span class="sd">            allow_failure (bool, optional): If True, the returned lines will</span>
+<span class="sd">                call a break if the flag is False. Otherwise, the returned</span>
+<span class="sd">                lines will issue an error. Defaults to False.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            list: Lines required to carry out a send call in this language.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">send_var_str</span> <span class="o">=</span> <span class="n">send_var</span>
+        <span class="n">out_before</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">send_var</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+            <span class="n">send_var_par</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="bp">cls</span><span class="o">.</span><span class="n">channels2vars</span><span class="p">(</span><span class="n">send_var</span><span class="p">):</span>
+                <span class="k">if</span> <span class="p">(((</span><span class="ow">not</span> <span class="bp">cls</span><span class="o">.</span><span class="n">allows_realloc</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="n">from_native_type</span><span class="o">=</span><span class="kc">True</span><span class="p">))</span>
+                     <span class="ow">and</span> <span class="bp">cls</span><span class="o">.</span><span class="n">allows_realloc</span><span class="p">(</span><span class="n">v</span><span class="p">))):</span>
+                    <span class="k">if</span> <span class="n">v</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;datatype&#39;</span><span class="p">,</span> <span class="n">v</span><span class="p">)</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;type&#39;</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;1darray&#39;</span><span class="p">]:</span>
+                        <span class="n">out_before</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;call yggassign(</span><span class="si">%s</span><span class="s1">, </span><span class="si">%s</span><span class="s1">_realloc)&#39;</span>
+                                          <span class="o">%</span> <span class="p">(</span><span class="n">v</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">],</span> <span class="n">v</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">]))</span>
+                        <span class="n">v</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">%s</span><span class="s1">_realloc&#39;</span> <span class="o">%</span> <span class="n">v</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">]))</span>
+                <span class="n">send_var_par</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">v</span><span class="p">)</span>
+            <span class="n">send_var_str</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">prepare_input_variables</span><span class="p">(</span>
+                <span class="n">send_var_par</span><span class="p">,</span> <span class="n">for_yggdrasil</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="n">out</span> <span class="o">=</span> <span class="nb">super</span><span class="p">(</span><span class="n">FortranModelDriver</span><span class="p">,</span> <span class="bp">cls</span><span class="p">)</span><span class="o">.</span><span class="n">write_model_send</span><span class="p">(</span>
+            <span class="n">channel</span><span class="p">,</span> <span class="n">send_var_str</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">out_before</span> <span class="o">+</span> <span class="n">out</span></div>
+    
 <div class="viewcode-block" id="FortranModelDriver.write_print_var"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.FortranModelDriver.FortranModelDriver.write_print_var">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">write_print_var</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">var</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Get the lines necessary to print a variable in this language.</span>
@@ -1186,20 +1271,25 @@
            
           </div>
           <footer>
-  
 
   <hr/>
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2017, Meagan Lang, David Raila
+        &#169; Copyright 2017, Meagan Lang, David Raila.
 
     </p>
   </div>
-  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+    
+    
+    
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
 
 </footer>
-
         </div>
       </div>
 
@@ -1207,7 +1297,6 @@
 
   </div>
   
-
 
   <script type="text/javascript">
       jQuery(function () {

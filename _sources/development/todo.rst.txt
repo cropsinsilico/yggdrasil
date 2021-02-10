@@ -16,12 +16,15 @@ Documentation
 * Add papers section for listing publication using yggdrasil
 * Expand development section into contributing guide
 * Add section on command line utilities
+* Add model API documentation for R & Fortran to Hackathon 2018 docs?
+* Mark hackathon 2019 docs as deprecated since the UI is no longer live
   
 Performance
 -----------
 
 * Streamline normalization to speed it up
 * improve speed of validation
+* Wrap C API for serializing/deserializing obj/ply
   
 Refactor
 --------
@@ -58,6 +61,7 @@ New feature/example
 * Allow users to select from list of multiple possiblities when locating libraries to avoid conflict
 * Write C/C++ as extension to rapidjson and wrap in Python
 * Add alias key to schema that is then translated into valid JSON schema
+* Add 'shell' option for executable models on Windows to allow calling different shell types.
 
 Deprecation
 -----------

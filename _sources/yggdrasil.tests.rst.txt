@@ -108,7 +108,6 @@ yggdrasil.tests.test\_yamlfile module
    :undoc-members:
    :show-inheritance:
 
-
 Module contents
 ---------------
 

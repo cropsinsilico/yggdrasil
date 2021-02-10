@@ -12,7 +12,6 @@ yggdrasil.communication.filters.tests.test\_FilterBase module
    :undoc-members:
    :show-inheritance:
 
-
 Module contents
 ---------------
 

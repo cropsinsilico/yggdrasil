@@ -1,39 +1,42 @@
 
 
 <!DOCTYPE html>
-<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
-<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<html class="writer-html5" lang="en" >
 <head>
-  <meta charset="utf-8">
+  <meta charset="utf-8" />
   
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>formatted_io8 Example &mdash; yggdrasil 1.1.1+410.g95af39b2 documentation</title>
+  <title>formatted_io8 Example &mdash; yggdrasil v1.5.0 documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/theme_overrides.css" type="text/css" />
+
+  
   
 
   
   
-  
+
   
 
   
-  <script type="text/javascript" src="../_static/js/modernizr.min.js"></script>
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
   
     
       <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
         <script src="../_static/jquery.js"></script>
         <script src="../_static/underscore.js"></script>
         <script src="../_static/doctools.js"></script>
-        <script src="../_static/language_data.js"></script>
     
     <script type="text/javascript" src="../_static/js/theme.js"></script>
 
     
-
-  
-  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
-  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
-  <link rel="stylesheet" href="../_static/theme_overrides.css" type="text/css" />
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="formatted_io9 Example" href="formatted_io9.html" />
@@ -61,7 +64,7 @@
             
             
               <div class="version">
-                1.1.1
+                v1.5.0
               </div>
             
           
@@ -78,6 +81,7 @@
           
         </div>
 
+        
         <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
           
             
@@ -127,6 +131,7 @@
 <li class="toctree-l2"><a class="reference internal" href="formatted_io9.html">formatted_io9 Example</a></li>
 <li class="toctree-l2"><a class="reference internal" href="rpc_lesson1.html">rpc_lesson1 Example</a></li>
 <li class="toctree-l2"><a class="reference internal" href="rpc_lesson2.html">rpc_lesson2 Example</a></li>
+<li class="toctree-l2"><a class="reference internal" href="rpc_lesson3.html">rpc_lesson3 Example</a></li>
 <li class="toctree-l2"><a class="reference internal" href="model_function.html">model_function Example</a></li>
 <li class="toctree-l2"><a class="reference internal" href="conditional_io.html">conditional_io Example</a></li>
 <li class="toctree-l2"><a class="reference internal" href="transformed_io.html">transformed_io Example</a></li>
@@ -144,6 +149,7 @@
             
           
         </div>
+        
       </div>
     </nav>
 
@@ -178,11 +184,13 @@
 
 
 
+
+
 <div role="navigation" aria-label="breadcrumbs navigation">
 
   <ul class="wy-breadcrumbs">
     
-      <li><a href="../index.html">Docs</a> &raquo;</li>
+      <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
         
           <li><a href="examples_toc.html">Examples</a> &raquo;</li>
         
@@ -191,7 +199,7 @@
     
       <li class="wy-breadcrumbs-aside">
         
-            
+          
             <a href="../_sources/examples/formatted_io8.rst.txt" rel="nofollow"> View page source</a>
           
         
@@ -967,7 +975,7 @@ end program main
 <span class="n">in_channel</span> <span class="p">=</span> <span class="n">YggInterface</span><span class="p">(</span><span class="s">&#39;YggInput&#39;</span><span class="p">,</span> <span class="s">&#39;inputA&#39;</span><span class="p">);</span>
 <span class="n">out_channel</span> <span class="p">=</span> <span class="n">YggInterface</span><span class="p">(</span><span class="s">&#39;YggOutput&#39;</span><span class="p">,</span> <span class="s">&#39;outputA&#39;</span><span class="p">);</span>
 
-<span class="n">flag</span> <span class="p">=</span> <span class="n">true</span><span class="p">;</span>
+<span class="n">flag</span> <span class="p">=</span> <span class="nb">true</span><span class="p">;</span>
 
 <span class="c">% Loop until there is no longer input or the queues are closed</span>
 <span class="k">while</span> <span class="n">flag</span>
@@ -1028,7 +1036,7 @@ end program main
 <span class="n">in_channel</span> <span class="p">=</span> <span class="n">YggInterface</span><span class="p">(</span><span class="s">&#39;YggInput&#39;</span><span class="p">,</span> <span class="s">&#39;inputB&#39;</span><span class="p">);</span>
 <span class="n">out_channel</span> <span class="p">=</span> <span class="n">YggInterface</span><span class="p">(</span><span class="s">&#39;YggOutput&#39;</span><span class="p">,</span> <span class="s">&#39;outputB&#39;</span><span class="p">);</span>
 
-<span class="n">flag</span> <span class="p">=</span> <span class="n">true</span><span class="p">;</span>
+<span class="n">flag</span> <span class="p">=</span> <span class="nb">true</span><span class="p">;</span>
 
 <span class="c">% Loop until there is no longer input or the queues are closed</span>
 <span class="k">while</span> <span class="n">flag</span>
@@ -1154,17 +1162,17 @@ end program main
 <span class="n">out_channel</span> <span class="o">=</span> <span class="n">YggOutput</span><span class="p">(</span><span class="s1">&#39;outputA&#39;</span><span class="p">)</span>
 
 <span class="c1"># Loop until there is no longer input or the queues are closed</span>
-<span class="k">while</span> <span class="bp">True</span><span class="p">:</span>
+<span class="k">while</span> <span class="kc">True</span><span class="p">:</span>
 
     <span class="c1"># Receive input from input channel</span>
     <span class="c1"># If there is an error, the flag will be False</span>
     <span class="n">flag</span><span class="p">,</span> <span class="n">obj</span> <span class="o">=</span> <span class="n">in_channel</span><span class="o">.</span><span class="n">recv</span><span class="p">()</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="n">flag</span><span class="p">:</span>
-        <span class="k">print</span><span class="p">(</span><span class="s2">&quot;Model A: No more input.&quot;</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Model A: No more input.&quot;</span><span class="p">)</span>
         <span class="k">break</span>
 
     <span class="c1"># Print received message</span>
-    <span class="k">print</span><span class="p">(</span><span class="s1">&#39;Model A: </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="nb">str</span><span class="p">(</span><span class="n">obj</span><span class="p">))</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Model A: </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="nb">str</span><span class="p">(</span><span class="n">obj</span><span class="p">))</span>
 
     <span class="c1"># Send output to output channel</span>
     <span class="c1"># If there is an error, the flag will be False</span>
@@ -1205,17 +1213,17 @@ end program main
 <span class="n">out_channel</span> <span class="o">=</span> <span class="n">YggOutput</span><span class="p">(</span><span class="s1">&#39;outputB&#39;</span><span class="p">)</span>
 
 <span class="c1"># Loop until there is no longer input or the queues are closed</span>
-<span class="k">while</span> <span class="bp">True</span><span class="p">:</span>
+<span class="k">while</span> <span class="kc">True</span><span class="p">:</span>
 
     <span class="c1"># Receive input from input channel</span>
     <span class="c1"># If there is an error, the flag will be False</span>
     <span class="n">flag</span><span class="p">,</span> <span class="n">obj</span> <span class="o">=</span> <span class="n">in_channel</span><span class="o">.</span><span class="n">recv</span><span class="p">()</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="n">flag</span><span class="p">:</span>
-        <span class="k">print</span><span class="p">(</span><span class="s2">&quot;Model B: No more input.&quot;</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Model B: No more input.&quot;</span><span class="p">)</span>
         <span class="k">break</span>
 
     <span class="c1"># Print received message</span>
-    <span class="k">print</span><span class="p">(</span><span class="s1">&#39;Model B: </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="nb">str</span><span class="p">(</span><span class="n">obj</span><span class="p">))</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Model B: </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="nb">str</span><span class="p">(</span><span class="n">obj</span><span class="p">))</span>
 
     <span class="c1"># Send output to output channel</span>
     <span class="c1"># If there is an error, the flag will be False</span>
@@ -1482,29 +1490,29 @@ while(TRUE) {
            
           </div>
           <footer>
-  
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
-      
-        <a href="formatted_io9.html" class="btn btn-neutral float-right" title="formatted_io9 Example" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
-      
-      
-        <a href="formatted_io7.html" class="btn btn-neutral float-left" title="formatted_io7 Example" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
-      
+        <a href="formatted_io9.html" class="btn btn-neutral float-right" title="formatted_io9 Example" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="formatted_io7.html" class="btn btn-neutral float-left" title="formatted_io7 Example" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
     </div>
-  
 
   <hr/>
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2017, Meagan Lang, David Raila
+        &#169; Copyright 2017, Meagan Lang, David Raila.
 
     </p>
   </div>
-  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+    
+    
+    
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
 
 </footer>
-
         </div>
       </div>
 
@@ -1512,7 +1520,6 @@ while(TRUE) {
 
   </div>
   
-
 
   <script type="text/javascript">
       jQuery(function () {

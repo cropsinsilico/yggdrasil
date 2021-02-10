@@ -1,8 +1,0 @@
-.. _class_table_InterpretedModelDriver_attr_rst:
-
-=================   ================================================================================   ========   ====
-Option              Description                                                                        Required   Type
-=================   ================================================================================   ========   ====
-interpreter         Name or path to the interpreter that will be used.                                            str 
-interpreter_flags   Flags that will be passed to the interpreter when running a model.                            list
-=================   ================================================================================   ========   ====

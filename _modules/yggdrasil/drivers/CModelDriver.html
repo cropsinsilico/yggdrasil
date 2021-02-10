@@ -1,39 +1,42 @@
 
 
 <!DOCTYPE html>
-<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
-<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<html class="writer-html5" lang="en" >
 <head>
-  <meta charset="utf-8">
+  <meta charset="utf-8" />
   
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>yggdrasil.drivers.CModelDriver &mdash; yggdrasil 1.1.1+410.g95af39b2 documentation</title>
+  <title>yggdrasil.drivers.CModelDriver &mdash; yggdrasil v1.5.0 documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/theme_overrides.css" type="text/css" />
+
+  
   
 
   
   
-  
+
   
 
   
-  <script type="text/javascript" src="../../../_static/js/modernizr.min.js"></script>
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
   
     
       <script type="text/javascript" id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
         <script src="../../../_static/jquery.js"></script>
         <script src="../../../_static/underscore.js"></script>
         <script src="../../../_static/doctools.js"></script>
-        <script src="../../../_static/language_data.js"></script>
     
     <script type="text/javascript" src="../../../_static/js/theme.js"></script>
 
     
-
-  
-  <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
-  <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
-  <link rel="stylesheet" href="../../../_static/theme_overrides.css" type="text/css" />
     <link rel="index" title="Index" href="../../../genindex.html" />
     <link rel="search" title="Search" href="../../../search.html" /> 
 </head>
@@ -59,7 +62,7 @@
             
             
               <div class="version">
-                1.1.1
+                v1.5.0
               </div>
             
           
@@ -76,6 +79,7 @@
           
         </div>
 
+        
         <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
           
             
@@ -111,6 +115,7 @@
             
           
         </div>
+        
       </div>
     </nav>
 
@@ -145,11 +150,13 @@
 
 
 
+
+
 <div role="navigation" aria-label="breadcrumbs navigation">
 
   <ul class="wy-breadcrumbs">
     
-      <li><a href="../../../index.html">Docs</a> &raquo;</li>
+      <li><a href="../../../index.html" class="icon icon-home"></a> &raquo;</li>
         
           <li><a href="../../index.html">Module code</a> &raquo;</li>
         
@@ -179,16 +186,16 @@
 <span class="kn">import</span> <span class="nn">subprocess</span>
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="kn">import</span> <span class="nn">sysconfig</span>
-<span class="kn">from</span> <span class="nn">collections</span> <span class="k">import</span> <span class="n">OrderedDict</span>
-<span class="kn">from</span> <span class="nn">yggdrasil</span> <span class="k">import</span> <span class="n">platform</span><span class="p">,</span> <span class="n">tools</span>
-<span class="kn">from</span> <span class="nn">yggdrasil.drivers.CompiledModelDriver</span> <span class="k">import</span> <span class="p">(</span>
+<span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">OrderedDict</span>
+<span class="kn">from</span> <span class="nn">yggdrasil</span> <span class="kn">import</span> <span class="n">platform</span><span class="p">,</span> <span class="n">tools</span>
+<span class="kn">from</span> <span class="nn">yggdrasil.drivers.CompiledModelDriver</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">CompiledModelDriver</span><span class="p">,</span> <span class="n">CompilerBase</span><span class="p">,</span> <span class="n">LinkerBase</span><span class="p">,</span> <span class="n">ArchiverBase</span><span class="p">,</span>
     <span class="n">get_compilation_tool</span><span class="p">)</span>
-<span class="kn">from</span> <span class="nn">yggdrasil.metaschema.properties.ScalarMetaschemaProperties</span> <span class="k">import</span> <span class="p">(</span>
+<span class="kn">from</span> <span class="nn">yggdrasil.metaschema.properties.ScalarMetaschemaProperties</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">_valid_types</span><span class="p">)</span>
-<span class="kn">from</span> <span class="nn">yggdrasil.languages</span> <span class="k">import</span> <span class="n">get_language_dir</span>
-<span class="kn">from</span> <span class="nn">yggdrasil.config</span> <span class="k">import</span> <span class="n">ygg_cfg</span>
-<span class="kn">from</span> <span class="nn">numpy</span> <span class="k">import</span> <span class="n">distutils</span> <span class="k">as</span> <span class="n">numpy_distutils</span>
+<span class="kn">from</span> <span class="nn">yggdrasil.languages</span> <span class="kn">import</span> <span class="n">get_language_dir</span>
+<span class="kn">from</span> <span class="nn">yggdrasil.config</span> <span class="kn">import</span> <span class="n">ygg_cfg</span>
+<span class="kn">from</span> <span class="nn">numpy</span> <span class="kn">import</span> <span class="n">distutils</span> <span class="k">as</span> <span class="n">numpy_distutils</span>
 
 
 <span class="n">_default_internal_libtype</span> <span class="o">=</span> <span class="s1">&#39;object&#39;</span>
@@ -320,13 +327,16 @@
 <span class="sd">            list: List of paths that the tools will search.</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">cfg</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;cfg&#39;</span><span class="p">,</span> <span class="n">ygg_cfg</span><span class="p">)</span>
+        <span class="n">libtype</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;libtype&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
         <span class="n">out</span> <span class="o">=</span> <span class="nb">super</span><span class="p">(</span><span class="n">CompilerBase</span><span class="p">,</span> <span class="bp">cls</span><span class="p">)</span><span class="o">.</span><span class="n">get_search_path</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
-        <span class="k">if</span> <span class="n">platform</span><span class="o">.</span><span class="n">_is_mac</span> <span class="ow">and</span> <span class="p">(</span><span class="n">_osx_sysroot</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">):</span>
-            <span class="n">base_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">_osx_sysroot</span><span class="p">,</span> <span class="s1">&#39;usr&#39;</span><span class="p">)</span>
-            <span class="k">if</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;libtype&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span> <span class="o">==</span> <span class="s1">&#39;include&#39;</span><span class="p">:</span>
-                <span class="n">out</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">base_path</span><span class="p">,</span> <span class="s1">&#39;include&#39;</span><span class="p">))</span>
-            <span class="k">else</span><span class="p">:</span>
-                <span class="n">out</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">base_path</span><span class="p">,</span> <span class="s1">&#39;lib&#39;</span><span class="p">))</span>
+        <span class="n">macos_sdkroot</span> <span class="o">=</span> <span class="n">cfg</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;c&#39;</span><span class="p">,</span> <span class="s1">&#39;macos_sdkroot&#39;</span><span class="p">,</span> <span class="n">_osx_sysroot</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">platform</span><span class="o">.</span><span class="n">_is_mac</span> <span class="ow">and</span> <span class="p">(</span><span class="n">macos_sdkroot</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">):</span>
+            <span class="n">base_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">macos_sdkroot</span><span class="p">,</span> <span class="s1">&#39;usr&#39;</span><span class="p">)</span>
+            <span class="k">assert</span><span class="p">(</span><span class="n">libtype</span> <span class="o">==</span> <span class="s1">&#39;include&#39;</span><span class="p">)</span>
+            <span class="n">new</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">base_path</span><span class="p">,</span> <span class="s1">&#39;include&#39;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">new</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">out</span><span class="p">:</span>
+                <span class="n">out</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">new</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">out</span></div></div>
 
 
@@ -342,6 +352,7 @@
             <span class="o">+</span> <span class="nb">list</span><span class="p">(</span><span class="n">CCompilerBase</span><span class="o">.</span><span class="n">linker_attributes</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;flag_options&#39;</span><span class="p">,</span> <span class="p">{})</span><span class="o">.</span><span class="n">items</span><span class="p">())</span>
             <span class="o">+</span> <span class="p">[(</span><span class="s1">&#39;library_rpath&#39;</span><span class="p">,</span> <span class="s1">&#39;-Wl,-rpath&#39;</span><span class="p">)]))</span>
     <span class="n">toolset</span> <span class="o">=</span> <span class="s1">&#39;gnu&#39;</span>
+    <span class="n">aliases</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;gnu-cc&#39;</span><span class="p">]</span>
 
 <div class="viewcode-block" id="GCCCompiler.is_installed"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.CModelDriver.GCCCompiler.is_installed">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">is_installed</span><span class="p">(</span><span class="bp">cls</span><span class="p">):</span>
@@ -352,7 +363,7 @@
 
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">out</span> <span class="o">=</span> <span class="nb">super</span><span class="p">(</span><span class="n">GCCCompiler</span><span class="p">,</span> <span class="bp">cls</span><span class="p">)</span><span class="o">.</span><span class="n">is_installed</span><span class="p">()</span>
-        <span class="k">if</span> <span class="n">out</span> <span class="ow">and</span> <span class="n">platform</span><span class="o">.</span><span class="n">_is_mac</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">out</span> <span class="ow">and</span> <span class="n">platform</span><span class="o">.</span><span class="n">_is_mac</span><span class="p">:</span>  <span class="c1"># pragma: debug</span>
             <span class="n">ver</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">call</span><span class="p">(</span><span class="bp">cls</span><span class="o">.</span><span class="n">version_flags</span><span class="p">,</span> <span class="n">skip_flags</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">allow_error</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
             <span class="k">if</span> <span class="s1">&#39;clang&#39;</span> <span class="ow">in</span> <span class="n">ver</span><span class="p">:</span>
                 <span class="n">out</span> <span class="o">=</span> <span class="kc">False</span>  <span class="c1"># Disable gcc when it is an alias for clang</span>
@@ -386,13 +397,12 @@
         <span class="k">if</span> <span class="p">(</span><span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">dst</span><span class="p">))</span> <span class="ow">or</span> <span class="n">overwrite</span><span class="p">:</span>
             <span class="n">gendef</span> <span class="o">=</span> <span class="n">shutil</span><span class="o">.</span><span class="n">which</span><span class="p">(</span><span class="s2">&quot;gendef&quot;</span><span class="p">)</span>
             <span class="n">dlltool</span> <span class="o">=</span> <span class="n">shutil</span><span class="o">.</span><span class="n">which</span><span class="p">(</span><span class="s2">&quot;dlltool&quot;</span><span class="p">)</span>
-            <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span><span class="n">gendef</span> <span class="ow">and</span> <span class="n">dlltool</span><span class="p">):</span>
-                <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Could not locate gendef (</span><span class="si">%s</span><span class="s2">) and dlltool (</span><span class="si">%s</span><span class="s2">).&quot;</span>
-                      <span class="o">%</span> <span class="p">(</span><span class="n">gendef</span><span class="p">,</span> <span class="n">dlltool</span><span class="p">))</span>
-                <span class="k">return</span> <span class="n">dll</span>
-            <span class="n">subprocess</span><span class="o">.</span><span class="n">check_call</span><span class="p">([</span><span class="n">gendef</span><span class="p">,</span> <span class="n">dll</span><span class="p">])</span>
-            <span class="n">subprocess</span><span class="o">.</span><span class="n">check_call</span><span class="p">(</span>
-                <span class="p">[</span><span class="n">dlltool</span><span class="p">,</span> <span class="s1">&#39;-D&#39;</span><span class="p">,</span> <span class="n">dll</span><span class="p">,</span> <span class="s1">&#39;-d&#39;</span><span class="p">,</span> <span class="s1">&#39;</span><span class="si">%s</span><span class="s1">.def&#39;</span> <span class="o">%</span> <span class="n">base</span><span class="p">,</span> <span class="s1">&#39;-l&#39;</span><span class="p">,</span> <span class="n">dst</span><span class="p">])</span>
+            <span class="k">if</span> <span class="n">gendef</span> <span class="ow">and</span> <span class="n">dlltool</span><span class="p">:</span>
+                <span class="n">subprocess</span><span class="o">.</span><span class="n">check_call</span><span class="p">([</span><span class="n">gendef</span><span class="p">,</span> <span class="n">dll</span><span class="p">])</span>
+                <span class="n">subprocess</span><span class="o">.</span><span class="n">check_call</span><span class="p">(</span>
+                    <span class="p">[</span><span class="n">dlltool</span><span class="p">,</span> <span class="s1">&#39;-D&#39;</span><span class="p">,</span> <span class="n">dll</span><span class="p">,</span> <span class="s1">&#39;-d&#39;</span><span class="p">,</span> <span class="s1">&#39;</span><span class="si">%s</span><span class="s1">.def&#39;</span> <span class="o">%</span> <span class="n">base</span><span class="p">,</span> <span class="s1">&#39;-l&#39;</span><span class="p">,</span> <span class="n">dst</span><span class="p">])</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">dst</span> <span class="o">=</span> <span class="n">dll</span>
         <span class="k">assert</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">dst</span><span class="p">))</span>
         <span class="k">return</span> <span class="n">dst</span></div></div>
 
@@ -438,7 +448,7 @@
     <span class="n">default_linker</span> <span class="o">=</span> <span class="s1">&#39;LINK&#39;</span>
     <span class="n">default_archiver</span> <span class="o">=</span> <span class="s1">&#39;LIB&#39;</span>
     <span class="n">linker_switch</span> <span class="o">=</span> <span class="s1">&#39;/link&#39;</span>
-    <span class="n">search_path_envvar</span> <span class="o">=</span> <span class="s1">&#39;INCLUDE&#39;</span>
+    <span class="n">search_path_envvar</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;INCLUDE&#39;</span><span class="p">]</span>
     <span class="n">search_path_flags</span> <span class="o">=</span> <span class="kc">None</span>
     <span class="n">version_flags</span> <span class="o">=</span> <span class="p">[]</span>
     <span class="n">product_exts</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;.dir&#39;</span><span class="p">,</span> <span class="s1">&#39;.ilk&#39;</span><span class="p">,</span> <span class="s1">&#39;.pdb&#39;</span><span class="p">,</span> <span class="s1">&#39;.sln&#39;</span><span class="p">,</span> <span class="s1">&#39;.vcxproj&#39;</span><span class="p">,</span> <span class="s1">&#39;.vcxproj.filters&#39;</span><span class="p">,</span>
@@ -456,10 +466,27 @@
                                   <span class="p">(</span><span class="s1">&#39;library_libs_nonstd&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">),</span>
                                   <span class="p">(</span><span class="s1">&#39;library_dirs&#39;</span><span class="p">,</span> <span class="s1">&#39;/LIBPATH:</span><span class="si">%s</span><span class="s1">&#39;</span><span class="p">)]),</span>
                              <span class="n">shared_library_flag</span><span class="o">=</span><span class="s1">&#39;/DLL&#39;</span><span class="p">,</span>
-                             <span class="n">search_path_envvar</span><span class="o">=</span><span class="s1">&#39;LIB&#39;</span><span class="p">,</span>
+                             <span class="n">search_path_envvar</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;LIB&#39;</span><span class="p">],</span>
                              <span class="n">search_path_flags</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
     <span class="n">toolset</span> <span class="o">=</span> <span class="s1">&#39;msvc&#39;</span>
     
+<div class="viewcode-block" id="MSVCCompiler.before_registration"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.CModelDriver.MSVCCompiler.before_registration">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">before_registration</span><span class="p">(</span><span class="bp">cls</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Operations that should be performed to modify class attributes prior</span>
+<span class="sd">        to registration including things like platform dependent properties and</span>
+<span class="sd">        checking environment variables for default settings.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">compiler_path</span> <span class="o">=</span> <span class="n">shutil</span><span class="o">.</span><span class="n">which</span><span class="p">(</span><span class="s1">&#39;cl.exe&#39;</span><span class="p">)</span>
+        <span class="n">linker_path</span> <span class="o">=</span> <span class="n">shutil</span><span class="o">.</span><span class="n">which</span><span class="p">(</span><span class="s1">&#39;link.exe&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="p">(((</span><span class="n">compiler_path</span> <span class="ow">and</span> <span class="n">linker_path</span><span class="p">)</span>
+             <span class="ow">and</span> <span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">compiler_path</span><span class="p">)</span>
+                  <span class="o">!=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">linker_path</span><span class="p">)))):</span>
+            <span class="bp">cls</span><span class="o">.</span><span class="n">linker_attributes</span><span class="p">[</span><span class="s1">&#39;default_executable&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
+                <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">compiler_path</span><span class="p">),</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">basename</span><span class="p">(</span><span class="n">linker_path</span><span class="p">))</span>
+            <span class="k">assert</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span>
+                <span class="bp">cls</span><span class="o">.</span><span class="n">linker_attributes</span><span class="p">[</span><span class="s1">&#39;default_executable&#39;</span><span class="p">]))</span>
+        <span class="n">CCompilerBase</span><span class="o">.</span><span class="n">before_registration</span><span class="p">(</span><span class="bp">cls</span><span class="p">)</span></div>
+        
 <div class="viewcode-block" id="MSVCCompiler.tool_version"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.CModelDriver.MSVCCompiler.tool_version">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">tool_version</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>  <span class="c1"># pragma: windows</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Determine the version of this tool.</span>
@@ -559,7 +586,11 @@
         <span class="n">match</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="n">regex</span><span class="p">,</span> <span class="n">out</span><span class="p">)</span>
         <span class="k">if</span> <span class="p">(</span><span class="n">match</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">match</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="s1">&#39;version&#39;</span><span class="p">))</span> <span class="o">&gt;=</span> <span class="mi">10</span><span class="p">):</span>
             <span class="n">ld_version</span> <span class="o">=</span> <span class="n">LDLinker</span><span class="o">.</span><span class="n">tool_version</span><span class="p">()</span>
-            <span class="k">if</span> <span class="nb">float</span><span class="p">(</span><span class="n">ld_version</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">520</span><span class="p">:</span>
+            <span class="k">if</span> <span class="nb">float</span><span class="p">(</span><span class="n">ld_version</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;.&#39;</span><span class="p">)[</span><span class="mi">0</span><span class="p">])</span> <span class="o">&lt;</span> <span class="mi">520</span><span class="p">:</span>  <span class="c1"># pragma: version</span>
+                <span class="c1"># No longer covered as the default conda</span>
+                <span class="c1"># install no longer causes this configuration</span>
+                <span class="c1"># to occur, but this will not be deprecated</span>
+                <span class="c1"># as existing installs still have this mismatch</span>
                 <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;linker-version&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">ld_version</span>
         <span class="n">out</span> <span class="o">=</span> <span class="nb">super</span><span class="p">(</span><span class="n">ClangLinker</span><span class="p">,</span> <span class="bp">cls</span><span class="p">)</span><span class="o">.</span><span class="n">get_flags</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
         <span class="k">if</span> <span class="s1">&#39;-lstdc++&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">out</span><span class="p">:</span>
@@ -579,7 +610,7 @@
     <span class="n">output_first_library</span> <span class="o">=</span> <span class="kc">True</span>
     <span class="n">toolset</span> <span class="o">=</span> <span class="s1">&#39;gnu&#39;</span>
     <span class="n">compatible_toolsets</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;llvm&#39;</span><span class="p">]</span>
-    <span class="n">search_path_envvar</span> <span class="o">=</span> <span class="s1">&#39;LIBRARY_PATH&#39;</span></div>
+    <span class="n">search_path_envvar</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;LIBRARY_PATH&#39;</span><span class="p">]</span></div>
 
 
 <div class="viewcode-block" id="LibtoolArchiver"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.CModelDriver.LibtoolArchiver">[docs]</a><span class="k">class</span> <span class="nc">LibtoolArchiver</span><span class="p">(</span><span class="n">ArchiverBase</span><span class="p">):</span>
@@ -589,7 +620,7 @@
     <span class="n">default_executable_env</span> <span class="o">=</span> <span class="s1">&#39;LIBTOOL&#39;</span>
     <span class="n">static_library_flag</span> <span class="o">=</span> <span class="s1">&#39;-static&#39;</span>  <span class="c1"># This is the default</span>
     <span class="n">toolset</span> <span class="o">=</span> <span class="s1">&#39;clang&#39;</span>
-    <span class="n">search_path_envvar</span> <span class="o">=</span> <span class="s1">&#39;LIBRARY_PATH&#39;</span></div>
+    <span class="n">search_path_envvar</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;LIBRARY_PATH&#39;</span><span class="p">]</span></div>
     
 
 <div class="viewcode-block" id="MSVCArchiver"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.CModelDriver.MSVCArchiver">[docs]</a><span class="k">class</span> <span class="nc">MSVCArchiver</span><span class="p">(</span><span class="n">ArchiverBase</span><span class="p">):</span>
@@ -601,28 +632,28 @@
     <span class="n">output_key</span> <span class="o">=</span> <span class="s1">&#39;/OUT:</span><span class="si">%s</span><span class="s1">&#39;</span>
     <span class="n">toolset</span> <span class="o">=</span> <span class="s1">&#39;msvc&#39;</span>
     <span class="n">compatible_toolsets</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;llvm&#39;</span><span class="p">]</span>
-    <span class="n">search_path_envvar</span> <span class="o">=</span> <span class="s1">&#39;LIB&#39;</span>
+    <span class="n">search_path_envvar</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;LIB&#39;</span><span class="p">]</span></div>
     
-<div class="viewcode-block" id="MSVCArchiver.is_import_lib"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.CModelDriver.MSVCArchiver.is_import_lib">[docs]</a>    <span class="nd">@classmethod</span>
-    <span class="k">def</span> <span class="nf">is_import_lib</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">libpath</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Determine if a library is an import library or a static</span>
-<span class="sd">        library.</span>
-<span class="sd">        </span>
-<span class="sd">        Args:</span>
-<span class="sd">            libpath (str): Full path to library.</span>
+    <span class="c1"># @classmethod</span>
+    <span class="c1"># def is_import_lib(cls, libpath):</span>
+    <span class="c1">#     r&quot;&quot;&quot;Determine if a library is an import library or a static</span>
+    <span class="c1">#     library.</span>
+        
+    <span class="c1">#     Args:</span>
+    <span class="c1">#         libpath (str): Full path to library.</span>
 
-<span class="sd">        Returns:</span>
-<span class="sd">            bool: True if the library is an import library, False otherwise.</span>
+    <span class="c1">#     Returns:</span>
+    <span class="c1">#         bool: True if the library is an import library, False otherwise.</span>
 
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">if</span> <span class="p">(</span><span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">libpath</span><span class="p">))</span> <span class="ow">or</span> <span class="p">(</span><span class="ow">not</span> <span class="n">libpath</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s1">&#39;.lib&#39;</span><span class="p">)):</span>
-            <span class="k">return</span> <span class="kc">False</span>
-        <span class="n">out</span> <span class="o">=</span> <span class="n">subprocess</span><span class="o">.</span><span class="n">check_output</span><span class="p">([</span><span class="bp">cls</span><span class="o">.</span><span class="n">get_executable</span><span class="p">(</span><span class="n">full_path</span><span class="o">=</span><span class="kc">True</span><span class="p">),</span>
-                                       <span class="s1">&#39;/list&#39;</span><span class="p">,</span> <span class="n">libpath</span><span class="p">])</span>
-        <span class="n">files</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">out</span><span class="o">.</span><span class="n">splitlines</span><span class="p">())</span>
-        <span class="k">if</span> <span class="nb">any</span><span class="p">([</span><span class="n">f</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s1">&#39;.obj&#39;</span><span class="p">)</span> <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">files</span><span class="p">]):</span>
-            <span class="k">return</span> <span class="kc">False</span>
-        <span class="k">return</span> <span class="kc">True</span></div></div>
+    <span class="c1">#     &quot;&quot;&quot;</span>
+    <span class="c1">#     if (not os.path.isfile(libpath)) or (not libpath.endswith(&#39;.lib&#39;)):</span>
+    <span class="c1">#         return False</span>
+    <span class="c1">#     out = subprocess.check_output([cls.get_executable(full_path=True),</span>
+    <span class="c1">#                                    &#39;/list&#39;, libpath])</span>
+    <span class="c1">#     files = set(out.splitlines())</span>
+    <span class="c1">#     if any([f.endswith(&#39;.obj&#39;) for f in files]):</span>
+    <span class="c1">#         return False</span>
+    <span class="c1">#     return True</span>
 
     
 <span class="n">_incl_interface</span> <span class="o">=</span> <span class="n">_top_lang_dir</span>
@@ -643,8 +674,8 @@
     <span class="k">if</span> <span class="p">(</span><span class="n">_python_lib</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">or</span> <span class="p">(</span><span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">_python_lib</span><span class="p">)):</span>  <span class="c1"># pragma: no cover</span>
         <span class="n">_python_lib</span> <span class="o">=</span> <span class="n">tools</span><span class="o">.</span><span class="n">get_python_c_library</span><span class="p">(</span>
             <span class="n">allow_failure</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">libtype</span><span class="o">=</span><span class="n">libtype_order</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
-<span class="k">except</span> <span class="ne">BaseException</span><span class="p">:</span>  <span class="c1"># pragma: debug</span>
-    <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s2">&quot;ERROR LOCATING PYTHON LIBRARY&quot;</span><span class="p">)</span>
+<span class="k">except</span> <span class="ne">BaseException</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>  <span class="c1"># pragma: debug</span>
+    <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s2">&quot;ERROR LOCATING PYTHON LIBRARY: </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">e</span><span class="p">)</span>
     <span class="n">_python_lib</span> <span class="o">=</span> <span class="kc">None</span>
 <span class="n">_numpy_inc</span> <span class="o">=</span> <span class="n">numpy_distutils</span><span class="o">.</span><span class="n">misc_util</span><span class="o">.</span><span class="n">get_numpy_include_dirs</span><span class="p">()</span>
 <span class="n">_numpy_lib</span> <span class="o">=</span> <span class="kc">None</span>  <span class="c1"># os.path.join(os.path.dirname(_numpy_inc[0]), &#39;lib&#39;, &#39;npymath.lib&#39;)</span>
@@ -928,7 +959,7 @@
                     <span class="bp">cls</span><span class="o">.</span><span class="n">internal_libraries</span><span class="p">[</span><span class="n">x</span><span class="p">][</span><span class="s1">&#39;compiler_flags&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;-fPIC&#39;</span><span class="p">)</span></div>
         
 <div class="viewcode-block" id="CModelDriver.configure"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.CModelDriver.CModelDriver.configure">[docs]</a>    <span class="nd">@classmethod</span>
-    <span class="k">def</span> <span class="nf">configure</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">cfg</span><span class="p">,</span> <span class="n">macos_sdkroot</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">configure</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">cfg</span><span class="p">,</span> <span class="n">macos_sdkroot</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">vcpkg_dir</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Add configuration options for this language. This includes locating</span>
 <span class="sd">        any required external libraries and setting option defaults.</span>
 
@@ -937,12 +968,35 @@
 <span class="sd">            macos_sdkroot (str, optional): Full path to the root directory for</span>
 <span class="sd">                the MacOS SDK that should be used. Defaults to None and is</span>
 <span class="sd">                ignored.</span>
+<span class="sd">            vcpkg_dir (str, optional): Full path to the root directory containing</span>
+<span class="sd">                a vcpkg installation. This should be the directory that contains</span>
+<span class="sd">                the vcpkg executable and any packages installed by vcpkg (in</span>
+<span class="sd">                subdirectories). Defaults to None and is ignored.</span>
 
 <span class="sd">        Returns:</span>
 <span class="sd">            list: Section, option, description tuples for options that could not</span>
 <span class="sd">                be set.</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># Set vcpkg_dir &amp; macos_sdkroot before calling parent so that it can be</span>
+        <span class="c1"># used in get_search_path when searching for dependencies</span>
+        <span class="k">if</span> <span class="p">(</span><span class="bp">cls</span><span class="o">.</span><span class="n">language</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="ow">not</span> <span class="n">cfg</span><span class="o">.</span><span class="n">has_section</span><span class="p">(</span><span class="bp">cls</span><span class="o">.</span><span class="n">language</span><span class="p">)):</span>
+            <span class="n">cfg</span><span class="o">.</span><span class="n">add_section</span><span class="p">(</span><span class="bp">cls</span><span class="o">.</span><span class="n">language</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">vcpkg_dir</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">vcpkg_dir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;VCPKG_ROOT&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">vcpkg_dir</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">vcpkg_dir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="n">vcpkg_dir</span><span class="p">)</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isdir</span><span class="p">(</span><span class="n">vcpkg_dir</span><span class="p">):</span>  <span class="c1"># pragma: debug</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Path to vcpkg root directory &quot;</span>
+                                 <span class="s2">&quot;does not exist: </span><span class="si">%s</span><span class="s2">.&quot;</span> <span class="o">%</span> <span class="n">vcpkg_dir</span><span class="p">)</span>
+            <span class="n">cfg</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="bp">cls</span><span class="o">.</span><span class="n">_language</span><span class="p">,</span> <span class="s1">&#39;vcpkg_dir&#39;</span><span class="p">,</span> <span class="n">vcpkg_dir</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">macos_sdkroot</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">macos_sdkroot</span> <span class="o">=</span> <span class="n">_osx_sysroot</span>
+        <span class="k">if</span> <span class="n">macos_sdkroot</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isdir</span><span class="p">(</span><span class="n">macos_sdkroot</span><span class="p">):</span>  <span class="c1"># pragma: debug</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Path to MacOS SDK root directory &quot;</span>
+                                 <span class="s2">&quot;does not exist: </span><span class="si">%s</span><span class="s2">.&quot;</span> <span class="o">%</span> <span class="n">macos_sdkroot</span><span class="p">)</span>
+            <span class="n">cfg</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="bp">cls</span><span class="o">.</span><span class="n">_language</span><span class="p">,</span> <span class="s1">&#39;macos_sdkroot&#39;</span><span class="p">,</span> <span class="n">macos_sdkroot</span><span class="p">)</span>
         <span class="c1"># Call __func__ to avoid direct invoking of class which dosn&#39;t exist</span>
         <span class="c1"># in after_registration where this is called</span>
         <span class="n">out</span> <span class="o">=</span> <span class="n">CompiledModelDriver</span><span class="o">.</span><span class="n">configure</span><span class="o">.</span><span class="vm">__func__</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">cfg</span><span class="p">)</span>
@@ -955,13 +1009,6 @@
         <span class="k">if</span> <span class="p">(</span><span class="n">nplib</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">and</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">nplib</span><span class="p">):</span>
             <span class="n">cfg</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="bp">cls</span><span class="o">.</span><span class="n">_language</span><span class="p">,</span> <span class="s1">&#39;numpy_include&#39;</span><span class="p">,</span>
                     <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">nplib</span><span class="p">)))</span>
-        <span class="k">if</span> <span class="n">macos_sdkroot</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">macos_sdkroot</span> <span class="o">=</span> <span class="n">_osx_sysroot</span>
-        <span class="k">if</span> <span class="n">macos_sdkroot</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isdir</span><span class="p">(</span><span class="n">macos_sdkroot</span><span class="p">):</span>  <span class="c1"># pragma: debug</span>
-                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Path to MacOS SDK root directory &quot;</span>
-                                 <span class="s2">&quot;does not exist: </span><span class="si">%s</span><span class="s2">.&quot;</span> <span class="o">%</span> <span class="n">macos_sdkroot</span><span class="p">)</span>
-            <span class="n">cfg</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="bp">cls</span><span class="o">.</span><span class="n">_language</span><span class="p">,</span> <span class="s1">&#39;macos_sdkroot&#39;</span><span class="p">,</span> <span class="n">macos_sdkroot</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">out</span></div>
 
 <div class="viewcode-block" id="CModelDriver.get_dependency_info"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.CModelDriver.CModelDriver.get_dependency_info">[docs]</a>    <span class="nd">@classmethod</span>
@@ -1025,7 +1072,7 @@
 <div class="viewcode-block" id="CModelDriver.update_ld_library_path"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.CModelDriver.CModelDriver.update_ld_library_path">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">update_ld_library_path</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">env</span><span class="p">,</span> <span class="n">paths_to_add</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
                                <span class="n">add_to_front</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">add_libpython_dir</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
-                               <span class="n">toolname</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+                               <span class="n">toolname</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">env_var</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Update provided dictionary of environment variables so that</span>
 <span class="sd">        LD_LIBRARY_PATH includes the interface directory containing the interface</span>
 <span class="sd">        libraries.</span>
@@ -1042,6 +1089,9 @@
 <span class="sd">            toolname (str, optional): Name of compiler tool that should be used.</span>
 <span class="sd">                Defaults to None and the default compiler for the language will</span>
 <span class="sd">                be used.</span>
+<span class="sd">            env_var (str, optional): Environment variable where the paths</span>
+<span class="sd">                should be added. Defaults to None and is only set for</span>
+<span class="sd">                linux (LD_LIBRARY_PATH) and windows (PATH).</span>
 <span class="sd">            **kwargs: Additional keyword arguments are ignored.</span>
 
 <span class="sd">        Returns:</span>
@@ -1054,11 +1104,19 @@
         <span class="k">if</span> <span class="n">add_libpython_dir</span><span class="p">:</span>
             <span class="n">paths_to_add</span> <span class="o">=</span> <span class="n">paths_to_add</span> <span class="o">+</span> <span class="p">[</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span>
                 <span class="bp">cls</span><span class="o">.</span><span class="n">get_dependency_library</span><span class="p">(</span><span class="s1">&#39;python&#39;</span><span class="p">,</span> <span class="n">toolname</span><span class="o">=</span><span class="n">toolname</span><span class="p">))]</span>
-        <span class="n">env_var</span> <span class="o">=</span> <span class="kc">None</span>
-        <span class="k">if</span> <span class="n">platform</span><span class="o">.</span><span class="n">_is_linux</span><span class="p">:</span>
-            <span class="n">env_var</span> <span class="o">=</span> <span class="s1">&#39;LD_LIBRARY_PATH&#39;</span>
-        <span class="k">elif</span> <span class="n">platform</span><span class="o">.</span><span class="n">_is_win</span><span class="p">:</span>
-            <span class="n">env_var</span> <span class="o">=</span> <span class="s1">&#39;PATH&#39;</span>
+        <span class="k">if</span> <span class="n">platform</span><span class="o">.</span><span class="n">_is_win</span> <span class="ow">and</span> <span class="n">ygg_cfg</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;c&#39;</span><span class="p">,</span> <span class="s1">&#39;vcpkg_dir&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">platform</span><span class="o">.</span><span class="n">_is_64bit</span><span class="p">:</span>
+                <span class="n">arch</span> <span class="o">=</span> <span class="s1">&#39;x64-windows&#39;</span>
+            <span class="k">else</span><span class="p">:</span>  <span class="c1"># pragma: debug</span>
+                <span class="n">arch</span> <span class="o">=</span> <span class="s1">&#39;x86-windows&#39;</span>
+                <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;Not yet tested on 32bit Python&quot;</span><span class="p">)</span>
+            <span class="n">paths_to_add</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">ygg_cfg</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;c&#39;</span><span class="p">,</span> <span class="s1">&#39;vcpkg_dir&#39;</span><span class="p">),</span>
+                                             <span class="s1">&#39;installed&#39;</span><span class="p">,</span> <span class="n">arch</span><span class="p">,</span> <span class="s1">&#39;bin&#39;</span><span class="p">))</span>
+        <span class="k">if</span> <span class="n">env_var</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">platform</span><span class="o">.</span><span class="n">_is_linux</span><span class="p">:</span>
+                <span class="n">env_var</span> <span class="o">=</span> <span class="s1">&#39;LD_LIBRARY_PATH&#39;</span>
+            <span class="k">elif</span> <span class="n">platform</span><span class="o">.</span><span class="n">_is_win</span><span class="p">:</span>
+                <span class="n">env_var</span> <span class="o">=</span> <span class="s1">&#39;PATH&#39;</span>
         <span class="k">if</span> <span class="n">env_var</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">path_list</span> <span class="o">=</span> <span class="p">[]</span>
             <span class="n">prev_path</span> <span class="o">=</span> <span class="n">env</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="n">env_var</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">)</span>
@@ -1388,12 +1446,12 @@
         <span class="n">out</span> <span class="o">=</span> <span class="nb">super</span><span class="p">(</span><span class="n">CModelDriver</span><span class="p">,</span> <span class="bp">cls</span><span class="p">)</span><span class="o">.</span><span class="n">get_native_type</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="p">((</span><span class="n">out</span> <span class="o">==</span> <span class="s1">&#39;*&#39;</span><span class="p">)</span> <span class="ow">or</span> <span class="p">(</span><span class="s1">&#39;X&#39;</span> <span class="ow">in</span> <span class="n">out</span><span class="p">)</span> <span class="ow">or</span> <span class="p">(</span><span class="n">out</span> <span class="o">==</span> <span class="s1">&#39;double&#39;</span><span class="p">)):</span>
             <span class="k">return</span> <span class="n">out</span>
-        <span class="kn">from</span> <span class="nn">yggdrasil.metaschema.datatypes</span> <span class="k">import</span> <span class="n">get_type_class</span>
+        <span class="kn">from</span> <span class="nn">yggdrasil.metaschema.datatypes</span> <span class="kn">import</span> <span class="n">get_type_class</span>
         <span class="n">json_type</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;datatype&#39;</span><span class="p">,</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;type&#39;</span><span class="p">,</span> <span class="s1">&#39;bytes&#39;</span><span class="p">))</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">json_type</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
             <span class="n">json_type</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="n">json_type</span><span class="p">}</span>
-        <span class="k">if</span> <span class="s1">&#39;type&#39;</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="p">:</span>
-            <span class="n">json_type</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="c1"># if &#39;type&#39; in kwargs:</span>
+        <span class="c1">#     json_type.update(kwargs)</span>
         <span class="k">assert</span><span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">json_type</span><span class="p">,</span> <span class="nb">dict</span><span class="p">))</span>
         <span class="n">json_type</span> <span class="o">=</span> <span class="n">get_type_class</span><span class="p">(</span><span class="n">json_type</span><span class="p">[</span><span class="s1">&#39;type&#39;</span><span class="p">])</span><span class="o">.</span><span class="n">normalize_definition</span><span class="p">(</span>
             <span class="n">json_type</span><span class="p">)</span>
@@ -1637,7 +1695,7 @@
 
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">out</span> <span class="o">=</span> <span class="p">[]</span>
-        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">var</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">var</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>  <span class="c1"># pragma: no cover</span>
             <span class="n">var</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="n">var</span><span class="p">}</span>
         <span class="k">if</span> <span class="p">((</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">var</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;datatype&#39;</span><span class="p">,</span> <span class="kc">False</span><span class="p">),</span> <span class="nb">dict</span><span class="p">)</span>
              <span class="ow">and</span> <span class="p">((</span><span class="s1">&#39;free_</span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">var</span><span class="p">[</span><span class="s1">&#39;datatype&#39;</span><span class="p">][</span><span class="s1">&#39;type&#39;</span><span class="p">])</span>
@@ -2046,20 +2104,25 @@
            
           </div>
           <footer>
-  
 
   <hr/>
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2017, Meagan Lang, David Raila
+        &#169; Copyright 2017, Meagan Lang, David Raila.
 
     </p>
   </div>
-  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+    
+    
+    
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
 
 </footer>
-
         </div>
       </div>
 
@@ -2067,7 +2130,6 @@
 
   </div>
   
-
 
   <script type="text/javascript">
       jQuery(function () {

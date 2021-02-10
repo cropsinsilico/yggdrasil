@@ -1,39 +1,42 @@
 
 
 <!DOCTYPE html>
-<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
-<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<html class="writer-html5" lang="en" >
 <head>
-  <meta charset="utf-8">
+  <meta charset="utf-8" />
   
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>C Interface &mdash; yggdrasil 1.1.1+410.g95af39b2 documentation</title>
+  <title>C Interface &mdash; yggdrasil v1.5.0 documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/theme_overrides.css" type="text/css" />
+
+  
   
 
   
   
-  
+
   
 
   
-  <script type="text/javascript" src="../_static/js/modernizr.min.js"></script>
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
   
     
       <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
         <script src="../_static/jquery.js"></script>
         <script src="../_static/underscore.js"></script>
         <script src="../_static/doctools.js"></script>
-        <script src="../_static/language_data.js"></script>
     
     <script type="text/javascript" src="../_static/js/theme.js"></script>
 
     
-
-  
-  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
-  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
-  <link rel="stylesheet" href="../_static/theme_overrides.css" type="text/css" />
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="C++ Interface" href="interface_cpp.html" />
@@ -61,7 +64,7 @@
             
             
               <div class="version">
-                1.1.1
+                v1.5.0
               </div>
             
           
@@ -78,6 +81,7 @@
           
         </div>
 
+        
         <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
           
             
@@ -129,6 +133,7 @@
             
           
         </div>
+        
       </div>
     </nav>
 
@@ -163,11 +168,13 @@
 
 
 
+
+
 <div role="navigation" aria-label="breadcrumbs navigation">
 
   <ul class="wy-breadcrumbs">
     
-      <li><a href="../index.html">Docs</a> &raquo;</li>
+      <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
         
           <li><a href="index.html">Advanced</a> &raquo;</li>
         
@@ -178,7 +185,7 @@
     
       <li class="wy-breadcrumbs-aside">
         
-            
+          
             <a href="../_sources/advanced/interface_c.rst.txt" rel="nofollow"> View page source</a>
           
         
@@ -537,6 +544,23 @@
 <div class="breathe-sectiondef docutils container">
 <p class="breathe-sectiondef-title rubric">Functions</p>
 <dl class="cpp function">
+<dt id="_CPPv423yggRpcServerType_globalPKcP7dtype_tP7dtype_t">
+<span id="_CPPv323yggRpcServerType_globalPKcP7dtype_tP7dtype_t"></span><span id="_CPPv223yggRpcServerType_globalPKcP7dtype_tP7dtype_t"></span><span id="yggRpcServerType_global__cCP.dtype_tP.dtype_tP"></span><span class="target" id="_ygg_interface_8h_1a7fda09a77a6932dbcc8365d4e7b58da2"></span>comm_t *<code class="sig-name descname">yggRpcServerType_global</code><span class="sig-paren">(</span><em class="property">const</em> char *<em>name</em>, <a class="reference internal" href="datatypes_cpp.html#_CPPv47dtype_t" title="dtype_t">dtype_t</a> *<em>inType</em>, <a class="reference internal" href="datatypes_cpp.html#_CPPv47dtype_t" title="dtype_t">dtype_t</a> *<em>outType</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv423yggRpcServerType_globalPKcP7dtype_tP7dtype_t" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Constructor for server side RPC structure w/ explicit type info. Creates an instance of yggRpc_t with provided information after first checking for a pre-existing global comm of the same name. If one doesn’t exist, one is created. </p>
+<p><dl class="simple">
+<dt><strong>Return</strong></dt><dd><p>yggRpc_t structure with provided info. </p>
+</dd>
+<dt><strong>Parameters</strong></dt><dd><ul class="breatheparameterlist simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">[in]</span> <span class="pre">name</span></code>: constant character pointer to name for queues. </p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">[in]</span> <span class="pre">inType</span></code>: Pointer to a <a class="reference internal" href="datatypes_cpp.html#structdtype__t"><span class="std std-ref">dtype_t</span></a> data structure containing type info for data that will be received by the server. </p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">[in]</span> <span class="pre">outType</span></code>: Pointer to a <a class="reference internal" href="datatypes_cpp.html#structdtype__t"><span class="std std-ref">dtype_t</span></a> data structure containing type info for data that will be sent by the server. </p></li>
+</ul>
+</dd>
+</dl>
+</p>
+</dd></dl>
+
+<dl class="cpp function">
 <dt id="_CPPv413yggOutputTypePKcP7dtype_t">
 <span id="_CPPv313yggOutputTypePKcP7dtype_t"></span><span id="_CPPv213yggOutputTypePKcP7dtype_t"></span><span id="yggOutputType__cCP.dtype_tP"></span><span class="target" id="_ygg_interface_8h_1aef76ff3c5ce6b09f3fc5b2cd14d3d403"></span>yggOutput_t <code class="sig-name descname">yggOutputType</code><span class="sig-paren">(</span><em class="property">const</em> char *<em>name</em>, <a class="reference internal" href="datatypes_cpp.html#_CPPv47dtype_t" title="dtype_t">dtype_t</a> *<em>datatype</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv413yggOutputTypePKcP7dtype_t" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Constructor for yggOutput_t structure with explicit data type. Create a yggOutput_t structure based on a provided name that is used to locate a particular comm address stored in the environment variable name and a structure definining the datatype of outgoing messages for the queue. </p>
@@ -769,6 +793,40 @@
 <li><p><code class="docutils literal notranslate"><span class="pre">[in]</span> <span class="pre">name</span></code>: constant character pointer to name for queues. </p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">[in]</span> <span class="pre">inFormat</span></code>: character pointer to format that should be used for parsing input. </p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">[in]</span> <span class="pre">outFormat</span></code>: character pointer to format that should be used for formatting output. </p></li>
+</ul>
+</dd>
+</dl>
+</p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt id="_CPPv416yggRpcClientTypePKcP7dtype_tP7dtype_t">
+<span id="_CPPv316yggRpcClientTypePKcP7dtype_tP7dtype_t"></span><span id="_CPPv216yggRpcClientTypePKcP7dtype_tP7dtype_t"></span><span id="yggRpcClientType__cCP.dtype_tP.dtype_tP"></span><span class="target" id="_ygg_interface_8h_1a4438b57ec2f7bfb1b447b5ac3453e866"></span>comm_t *<code class="sig-name descname">yggRpcClientType</code><span class="sig-paren">(</span><em class="property">const</em> char *<em>name</em>, <a class="reference internal" href="datatypes_cpp.html#_CPPv47dtype_t" title="dtype_t">dtype_t</a> *<em>outType</em>, <a class="reference internal" href="datatypes_cpp.html#_CPPv47dtype_t" title="dtype_t">dtype_t</a> *<em>inType</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv416yggRpcClientTypePKcP7dtype_tP7dtype_t" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Constructor for client side RPC structure w/ explicit type info. Creates an instance of yggRpc_t with provided information. </p>
+<p><dl class="simple">
+<dt><strong>Return</strong></dt><dd><p>yggRpc_t structure with provided info. </p>
+</dd>
+<dt><strong>Parameters</strong></dt><dd><ul class="breatheparameterlist simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">[in]</span> <span class="pre">name</span></code>: constant character pointer to name for queues. </p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">[in]</span> <span class="pre">outType</span></code>: Pointer to a <a class="reference internal" href="datatypes_cpp.html#structdtype__t"><span class="std std-ref">dtype_t</span></a> data structure containing type info for data that will be sent by the client. </p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">[in]</span> <span class="pre">inType</span></code>: Pointer to a <a class="reference internal" href="datatypes_cpp.html#structdtype__t"><span class="std std-ref">dtype_t</span></a> data structure containing type info for data that will be received by the client. </p></li>
+</ul>
+</dd>
+</dl>
+</p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt id="_CPPv416yggRpcServerTypePKcP7dtype_tP7dtype_t">
+<span id="_CPPv316yggRpcServerTypePKcP7dtype_tP7dtype_t"></span><span id="_CPPv216yggRpcServerTypePKcP7dtype_tP7dtype_t"></span><span id="yggRpcServerType__cCP.dtype_tP.dtype_tP"></span><span class="target" id="_ygg_interface_8h_1a28c8849b12d3b4edce79c90baf061e06"></span>comm_t *<code class="sig-name descname">yggRpcServerType</code><span class="sig-paren">(</span><em class="property">const</em> char *<em>name</em>, <a class="reference internal" href="datatypes_cpp.html#_CPPv47dtype_t" title="dtype_t">dtype_t</a> *<em>inType</em>, <a class="reference internal" href="datatypes_cpp.html#_CPPv47dtype_t" title="dtype_t">dtype_t</a> *<em>outType</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv416yggRpcServerTypePKcP7dtype_tP7dtype_t" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Constructor for server side RPC structure w/ explicit type info. Creates an instance of yggRpc_t with provided information. </p>
+<p><dl class="simple">
+<dt><strong>Return</strong></dt><dd><p>yggRpc_t structure with provided info. </p>
+</dd>
+<dt><strong>Parameters</strong></dt><dd><ul class="breatheparameterlist simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">[in]</span> <span class="pre">name</span></code>: constant character pointer to name for queues. </p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">[in]</span> <span class="pre">inType</span></code>: Pointer to a <a class="reference internal" href="datatypes_cpp.html#structdtype__t"><span class="std std-ref">dtype_t</span></a> data structure containing type info for data that will be received by the server. </p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">[in]</span> <span class="pre">outType</span></code>: Pointer to a <a class="reference internal" href="datatypes_cpp.html#structdtype__t"><span class="std std-ref">dtype_t</span></a> data structure containing type info for data that will be sent by the server. </p></li>
 </ul>
 </dd>
 </dl>
@@ -1159,29 +1217,29 @@
            
           </div>
           <footer>
-  
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
-      
-        <a href="interface_cpp.html" class="btn btn-neutral float-right" title="C++ Interface" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
-      
-      
-        <a href="interface_py.html" class="btn btn-neutral float-left" title="Python Interface" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
-      
+        <a href="interface_cpp.html" class="btn btn-neutral float-right" title="C++ Interface" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="interface_py.html" class="btn btn-neutral float-left" title="Python Interface" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
     </div>
-  
 
   <hr/>
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2017, Meagan Lang, David Raila
+        &#169; Copyright 2017, Meagan Lang, David Raila.
 
     </p>
   </div>
-  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+    
+    
+    
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
 
 </footer>
-
         </div>
       </div>
 
@@ -1189,7 +1247,6 @@
 
   </div>
   
-
 
   <script type="text/javascript">
       jQuery(function () {

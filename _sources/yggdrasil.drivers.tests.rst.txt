@@ -140,6 +140,14 @@ yggdrasil.drivers.tests.test\_ModelDriver module
    :undoc-members:
    :show-inheritance:
 
+yggdrasil.drivers.tests.test\_OSRModelDriver module
+---------------------------------------------------
+
+.. automodule:: yggdrasil.drivers.tests.test_OSRModelDriver
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 yggdrasil.drivers.tests.test\_PythonModelDriver module
 ------------------------------------------------------
 
@@ -211,7 +219,6 @@ yggdrasil.drivers.tests.test\_ServerResponseDriver module
    :members:
    :undoc-members:
    :show-inheritance:
-
 
 Module contents
 ---------------

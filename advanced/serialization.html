@@ -1,39 +1,42 @@
 
 
 <!DOCTYPE html>
-<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
-<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<html class="writer-html5" lang="en" >
 <head>
-  <meta charset="utf-8">
+  <meta charset="utf-8" />
   
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>Serialization &mdash; yggdrasil 1.1.1+410.g95af39b2 documentation</title>
+  <title>Serialization &mdash; yggdrasil v1.5.0 documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/theme_overrides.css" type="text/css" />
+
+  
   
 
   
   
-  
+
   
 
   
-  <script type="text/javascript" src="../_static/js/modernizr.min.js"></script>
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
   
     
       <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
         <script src="../_static/jquery.js"></script>
         <script src="../_static/underscore.js"></script>
         <script src="../_static/doctools.js"></script>
-        <script src="../_static/language_data.js"></script>
     
     <script type="text/javascript" src="../_static/js/theme.js"></script>
 
     
-
-  
-  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
-  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
-  <link rel="stylesheet" href="../_static/theme_overrides.css" type="text/css" />
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="JSON Metaschema" href="metaschema.html" />
@@ -61,7 +64,7 @@
             
             
               <div class="version">
-                1.1.1
+                v1.5.0
               </div>
             
           
@@ -78,6 +81,7 @@
           
         </div>
 
+        
         <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
           
             
@@ -134,6 +138,7 @@
             
           
         </div>
+        
       </div>
     </nav>
 
@@ -168,11 +173,13 @@
 
 
 
+
+
 <div role="navigation" aria-label="breadcrumbs navigation">
 
   <ul class="wy-breadcrumbs">
     
-      <li><a href="../index.html">Docs</a> &raquo;</li>
+      <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
         
           <li><a href="index.html">Advanced</a> &raquo;</li>
         
@@ -181,7 +188,7 @@
     
       <li class="wy-breadcrumbs-aside">
         
-            
+          
             <a href="../_sources/advanced/serialization.rst.txt" rel="nofollow"> View page source</a>
           
         
@@ -214,19 +221,21 @@ expansion type to the core set of JSON types.</p>
 <table class="docutils align-default" id="datatype-mapping-table-rst">
 <colgroup>
 <col style="width: 3%" />
-<col style="width: 14%" />
+<col style="width: 13%" />
 <col style="width: 8%" />
 <col style="width: 8%" />
-<col style="width: 30%" />
-<col style="width: 9%" />
-<col style="width: 9%" />
-<col style="width: 19%" />
+<col style="width: 8%" />
+<col style="width: 28%" />
+<col style="width: 8%" />
+<col style="width: 8%" />
+<col style="width: 18%" />
 </colgroup>
 <thead>
 <tr class="row-odd"><th class="head"><p>Schema</p></th>
 <th class="head"><p>R</p></th>
 <th class="head"><p>C</p></th>
 <th class="head"><p>C++</p></th>
+<th class="head"><p>Cxx</p></th>
 <th class="head"><p>Fortran</p></th>
 <th class="head"><p>Matlab</p></th>
 <th class="head"><p>Python</p></th>
@@ -239,12 +248,14 @@ expansion type to the core set of JSON types.</p>
 <td><p><code class="docutils literal notranslate"><span class="pre">*</span></code></p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">*</span></code></p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">*</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">*</span></code></p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">mat</span></code></p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">numpy.ndarray</span></code></p></td>
 <td></td>
 </tr>
 <tr class="row-odd"><td><p>array</p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">list</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">json_array_t</span></code></p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">json_array_t</span></code></p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">json_array_t</span></code></p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">yggarr</span></code></p></td>
@@ -257,6 +268,7 @@ still under development.</p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">logical</span></code></p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">bool</span></code></p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">bool</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">bool</span></code></p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">logical(kind</span> <span class="pre">=</span> <span class="pre">X)</span></code></p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">logical</span></code></p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">bool</span></code></p></td>
@@ -264,6 +276,7 @@ still under development.</p></td>
 </tr>
 <tr class="row-odd"><td><p>bytes</p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">char</span> <span class="pre">(utf-8)</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">char*</span></code></p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">char*</span></code></p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">char*</span></code></p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">character(len</span> <span class="pre">=</span> <span class="pre">X)</span></code></p></td>
@@ -275,12 +288,14 @@ still under development.</p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">complex</span></code></p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">complex_X</span></code></p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">complex_X</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">complex_X</span></code></p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">complex(kind</span> <span class="pre">=</span> <span class="pre">X)</span></code></p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">complex</span></code></p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">numpy.complexX</span></code></p></td>
 <td><p>Precision X is preserved.</p></td>
 </tr>
 <tr class="row-odd"><td><p>float</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">double</span></code></p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">double</span></code></p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">double</span></code></p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">double</span></code></p></td>
@@ -293,6 +308,7 @@ still under development.</p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">integer,</span> <span class="pre">bit64::integer64</span></code></p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">intX_t</span></code></p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">intX_t</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">intX_t</span></code></p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">integer(kind</span> <span class="pre">=</span> <span class="pre">X)</span></code></p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">intX</span></code></p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">numpy.intX</span></code></p></td>
@@ -303,12 +319,14 @@ still under development.</p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">*</span></code></p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">*</span></code></p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">*</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">*</span></code></p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">mat</span></code></p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">numpy.ndarray</span></code></p></td>
 <td></td>
 </tr>
 <tr class="row-even"><td><p>null</p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">NA</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">void*</span></code></p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">void*</span></code></p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">void*</span></code></p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">yggnull</span></code></p></td>
@@ -323,11 +341,13 @@ still under development.</p></td>
 <td></td>
 <td></td>
 <td></td>
+<td></td>
 <td><p>This covers the JSON default for
 floating point or integer values.</p></td>
 </tr>
 <tr class="row-even"><td><p>obj</p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">ObjDict</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">obj_t</span></code></p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">obj_t</span></code></p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">obj_t</span></code></p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">yggobj</span></code></p></td>
@@ -339,6 +359,7 @@ floating point or integer values.</p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">list</span></code></p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">json_object_t</span></code></p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">json_object_t</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">json_object_t</span></code></p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">yggmap</span></code></p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">containers.Map</span></code></p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">dict</span></code></p></td>
@@ -347,6 +368,7 @@ still under development.</p></td>
 </tr>
 <tr class="row-even"><td><p>ply</p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">PlyDict</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">ply_t</span></code></p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">ply_t</span></code></p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">ply_t</span></code></p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">yggply</span></code></p></td>
@@ -361,12 +383,14 @@ still under development.</p></td>
 <td></td>
 <td></td>
 <td></td>
+<td></td>
 <td><p>yggdrasil defines scalars as an
 umbrella type encompassing int, uint,
 float, bytes, and unicode.</p></td>
 </tr>
 <tr class="row-even"><td><p>schema</p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">list</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">schema_t</span></code></p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">schema_t</span></code></p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">schema_t</span></code></p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">yggschema</span></code></p></td>
@@ -378,6 +402,7 @@ float, bytes, and unicode.</p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">character</span></code></p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">string_t</span></code></p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">string_t</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">string_t</span></code></p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">character(len</span> <span class="pre">=</span> <span class="pre">X)</span></code></p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">char</span></code></p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">str</span></code></p></td>
@@ -387,6 +412,7 @@ float, bytes, and unicode.</p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">integer</span></code></p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">uintX_t</span></code></p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">uintX_t</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">uintX_t</span></code></p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">ygguintX</span></code></p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">uintX</span></code></p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">numpy.uintX</span></code></p></td>
@@ -394,6 +420,7 @@ float, bytes, and unicode.</p></td>
 </tr>
 <tr class="row-odd"><td><p>unicode</p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">char</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">unicode_t</span></code></p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">unicode_t</span></code></p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">unicode_t</span></code></p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">character(kind</span> <span class="pre">=</span> <span class="pre">selected_char_kind('ISO_10646'),</span> <span class="pre">len</span> <span class="pre">=</span> <span class="pre">X)</span></code></p></td>
@@ -541,29 +568,29 @@ Obj file standards during pre-encoding.</p>
            
           </div>
           <footer>
-  
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
-      
-        <a href="metaschema.html" class="btn btn-neutral float-right" title="JSON Metaschema" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
-      
-      
-        <a href="index.html" class="btn btn-neutral float-left" title="Advanced" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
-      
+        <a href="metaschema.html" class="btn btn-neutral float-right" title="JSON Metaschema" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="index.html" class="btn btn-neutral float-left" title="Advanced" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
     </div>
-  
 
   <hr/>
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2017, Meagan Lang, David Raila
+        &#169; Copyright 2017, Meagan Lang, David Raila.
 
     </p>
   </div>
-  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+    
+    
+    
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
 
 </footer>
-
         </div>
       </div>
 
@@ -571,7 +598,6 @@ Obj file standards during pre-encoding.</p>
 
   </div>
   
-
 
   <script type="text/javascript">
       jQuery(function () {

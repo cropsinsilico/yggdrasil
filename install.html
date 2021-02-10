@@ -1,39 +1,42 @@
 
 
 <!DOCTYPE html>
-<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
-<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<html class="writer-html5" lang="en" >
 <head>
-  <meta charset="utf-8">
+  <meta charset="utf-8" />
   
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>Installation &mdash; yggdrasil 1.1.1+410.g95af39b2 documentation</title>
+  <title>Installation &mdash; yggdrasil v1.5.0 documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="_static/theme_overrides.css" type="text/css" />
+
+  
   
 
   
   
-  
+
   
 
   
-  <script type="text/javascript" src="_static/js/modernizr.min.js"></script>
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
   
     
       <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
         <script src="_static/jquery.js"></script>
         <script src="_static/underscore.js"></script>
         <script src="_static/doctools.js"></script>
-        <script src="_static/language_data.js"></script>
     
     <script type="text/javascript" src="_static/js/theme.js"></script>
 
     
-
-  
-  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
-  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
-  <link rel="stylesheet" href="_static/theme_overrides.css" type="text/css" />
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="Getting started" href="getting_started.html" />
@@ -61,7 +64,7 @@
             
             
               <div class="version">
-                1.1.1
+                v1.5.0
               </div>
             
           
@@ -78,6 +81,7 @@
           
         </div>
 
+        
         <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
           
             
@@ -93,9 +97,14 @@
 <li class="toctree-l2"><a class="reference internal" href="#development-installation">Development Installation</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#manual-installation">Manual Installation</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#user-defined-rapidjson">User Defined rapidjson</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#additional-steps-on-windows">Additional Steps on Windows</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#additional-steps-on-windows">Additional Steps on Windows</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#installing-via-vcpkg">Installing via vcpkg</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#building-from-source">Building from Source</a></li>
+</ul>
+</li>
 <li class="toctree-l2"><a class="reference internal" href="#additional-steps-for-matlab-models">Additional Steps for Matlab Models</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#additional-steps-for-r-models">Additional Steps for R Models</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#rtools-windows-only">Rtools (Windows only)</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#r-interpreter">R Interpreter</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="#mac">Mac</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#linux">Linux</a></li>
@@ -106,6 +115,7 @@
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="#additional-steps-for-rabbitmq-message-passing">Additional Steps for RabbitMQ Message Passing</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#additional-steps-for-opensimroot">Additional Steps for OpenSimRoot</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="getting_started.html">Getting started</a></li>
@@ -132,6 +142,7 @@
             
           
         </div>
+        
       </div>
     </nav>
 
@@ -166,18 +177,20 @@
 
 
 
+
+
 <div role="navigation" aria-label="breadcrumbs navigation">
 
   <ul class="wy-breadcrumbs">
     
-      <li><a href="index.html">Docs</a> &raquo;</li>
+      <li><a href="index.html" class="icon icon-home"></a> &raquo;</li>
         
       <li>Installation</li>
     
     
       <li class="wy-breadcrumbs-aside">
         
-            
+          
             <a href="_sources/install.rst.txt" rel="nofollow"> View page source</a>
           
         
@@ -196,17 +209,22 @@
 <div class="admonition note">
 <p class="admonition-title">Note</p>
 <p><strong>Windows Users</strong></p>
-<p>If you will be running C/C++ models on a Windows operatoring system, you will first need to install Microsoft Visual Studio, regardless of the installation method you end up using. Visual Studio Community can be downloaded for free from <a class="reference external" href="https://visualstudio.microsoft.com/vs/community/">here</a>. During installation, we recommend selecting the components below. If you forget to add something during the initial download, you can always modify the installation via the “Visual Studio Installer” program.</p>
+<p>If you will be running C/C++/Fortran models on a Windows operatoring system, you will first need to install Microsoft Visual Studio, regardless of the installation method you end up using. Visual Studio Community can be downloaded for free from <a class="reference external" href="https://visualstudio.microsoft.com/vs/community/">here</a>. During installation, we recommend selecting the components below. If you forget to add something during the initial download, you can always modify the installation via the “Visual Studio Installer” program.</p>
 <blockquote>
 <div><ul class="simple">
 <li><p>“Desktop development with C++” - Workload under “Windows” section</p></li>
 <li><p>“MSVC v140 - VS 2015 C++ build tools (v14.00)” - Individual component under “Compilers, build tools, and runtimes” section.</p></li>
 </ul>
 </div></blockquote>
-<p>If you <em>do not use conda</em> to install yggdrasil, you will also need to initialize the command line build tools in any prompt you will be calling yggdrasil from. This can be done by calling yggdrasil from a developer prompt, or by locating the <code class="docutils literal notranslate"><span class="pre">vsvarsall.bat</span></code> script that comes with Visual Studio. Information on the developer prompt and how to locate the <code class="docutils literal notranslate"><span class="pre">vsvarsall.bat</span></code> script can be found <a class="reference external" href="https://docs.microsoft.com/en-us/cpp/build/building-on-the-command-line?view=vs-2019">here</a>. The script used must be the one associated with Visual Studio 2015 build tools, which can be installed from within Visual Studio 2019. On a 64bit Windows machine, the command to initialize these tools within a prompt will probably look something like this:</p>
+<p>If you <em>do not use conda</em> to install yggdrasil, you will also need to initialize the command line build tools in any prompt you will be calling yggdrasil from. This can be done by calling yggdrasil from a “VS2015 x64 Native Tools Developer Command Prompt”, or by locating the <code class="docutils literal notranslate"><span class="pre">vsvarsall.bat</span></code> script that comes with Visual Studio. Information on the developer prompt and how to locate the <code class="docutils literal notranslate"><span class="pre">vsvarsall.bat</span></code> script can be found <a class="reference external" href="https://docs.microsoft.com/en-us/cpp/build/building-on-the-command-line?view=vs-2019">here</a>. The prompt/script used must enable the Visual Studio 2015 build tools (the specific year) to be compatible with the Python C library (see the discussion <a class="reference external" href="https://wiki.python.org/moin/WindowsCompilers">here</a>). The VS 2015 tools prompt/script will be installed from within Visual Studio 2019 by selecting the components indicated above. On a 64bit Windows machine (assuming you will be using 64 bit Python), the command to initialize these tools within a regular command prompt will look something like this, but the exact path will vary with your particular installation:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ call &quot;C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\vcvarsall.bat&quot; amd64
 </pre></div>
 </div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p><strong>Mac Users</strong></p>
+<p>If you will be running C/C++/Fortran models, you will need to install the command line developer tools on Mac which provides several utilities for compilation and code management (e.g. clang, gcc, make, git). <a class="reference external" href="https://cloudtechpoint.medium.com/how-to-install-command-line-tools-homebrew-in-macos-without-xcode-1b910742d923">This</a> article outlines how to check if they are installed and install them if they are not. It also describes how to install the Homebrew package manager, which will be useful for installing non-Python dependencies if you do not plan on using conda to install yggdrasil.</p>
 </div>
 <div class="section" id="conda-installation-recommended">
 <h2>Conda Installation (recommended)<a class="headerlink" href="#conda-installation-recommended" title="Permalink to this headline">¶</a></h2>
@@ -260,9 +278,37 @@ the terminal (or Anaconda Prompt on Windows).:</p>
 should manually install the non-Python dependencies, particularly the
 ZeroMQ C and C++ libraries and R packages (see below).</p>
 </div>
-<p>If you do not want to use conda, yggdrasil can also be installed
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p><strong>Windows Users</strong> Be warned that there is 260 character limit to the size of the <code class="docutils literal notranslate"><span class="pre">PATH</span></code> environment variable (see note <a class="reference external" href="https://docs.microsoft.com/en-us/windows/win32/fileio/naming-a-file#maximum-path-length-limitation">here</a>). If you modify the path (e.g. to add Python or the Python scripts directory), be sure that you do not exceed this limit. If you do, Windows will not report an error, but the characters past the limit will be ignored and so those directories will not be availble on the command prompt.</p>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p><strong>Windows Users</strong> If you do not use conda to install dependencies, we highly recommend installing two package managers, Chocolatey and vcpkg, to handle the installation of the non-Python dependencies. Instructions for installing Chocolatey can be found <a class="reference external" href="https://chocolatey.org/install">here</a> and instructions for installing vcpkg can be found <a class="reference external" href="https://github.com/microsoft/vcpkg">here</a>.</p>
+</div>
+<p>If you do not want to use conda, you can install Python yourself and then install
+yggdrasil via <code class="docutils literal notranslate"><span class="pre">pip</span></code> or from the source code (See below). Python can be installed
+in a number of ways, but be sure that you get Python&gt;=3.5. Installation methods include:</p>
+<ul class="simple">
+<li><p>Executable installer from the <a class="reference external" href="https://www.python.org/downloads/">Python Software Foundaction</a> (Recommended for Windows)</p></li>
+<li><p>Package manager, e.g.
+* <code class="docutils literal notranslate"><span class="pre">brew</span> <span class="pre">install</span> <span class="pre">python3</span></code> on Mac (be sure to include the 3)
+* <code class="docutils literal notranslate"><span class="pre">apt-get</span> <span class="pre">install</span> <span class="pre">python</span></code> on Linux
+* <code class="docutils literal notranslate"><span class="pre">choco</span> <span class="pre">install</span> <span class="pre">python3</span></code> on Windows</p></li>
+<li><p><a class="reference external" href="https://visualstudio.microsoft.com/vs/features/python/">Microsoft Visual Studio</a></p></li>
+<li><p><a class="reference external" href="https://www.microsoft.com/en-us/p/python-38/9mssztt1n39l?activetab=pivot:overviewtab">Microsoft Store</a> (Windows only; we do not recommend this method as it can be difficult to get working correctly as it requires tracking down the Scripts direcotry modifying the path yourself, see discussion <a class="reference external" href="https://dev.to/naruaika/why-i-didn-t-install-python-from-the-microsoft-store-5cbd">here</a>)</p></li>
+</ul>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p><strong>Mac Users</strong> Python 2 is included on Mac as the default Python (as <code class="docutils literal notranslate"><span class="pre">python</span></code>), but <code class="docutils literal notranslate"><span class="pre">python3</span></code> is what you will want to use (Python 2 has been deprecated). If you have Mac OS Catalina, you will already have Python 3, but you may need to enable developer tools to use it. You can check to see if Python 3 is installed (or prompt the developer tool <a class="reference external" href="https://apple.stackexchange.com/questions/376077/is-usr-bin-python3-provided-with-macos-catalina">installation</a>) by running <code class="docutils literal notranslate"><span class="pre">python3</span> <span class="pre">--version</span></code> and <code class="docutils literal notranslate"><span class="pre">python</span> <span class="pre">--version</span></code>. If these commands do not return the same version, you will need to be sure to always use <code class="docutils literal notranslate"><span class="pre">python3</span></code> and <code class="docutils literal notranslate"><span class="pre">pip3</span></code> during installation (as opposed to the versions of the executables without the <code class="docutils literal notranslate"><span class="pre">3</span></code>), or set Python 3 to be the default version of Python (see <a class="reference external" href="https://opensource.com/article/19/5/python-3-default-mac">this article</a>).</p>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p><strong>Windows Users</strong> If you install Python, but your prompt cannot locate Python (i.e. <code class="docutils literal notranslate"><span class="pre">where</span> <span class="pre">python</span></code> fails), you may need to add the directory containing the Python executable (and the <code class="docutils literal notranslate"><span class="pre">Scripts</span></code> directory inside that as discussed below) to you <code class="docutils literal notranslate"><span class="pre">PATH</span></code> environment variable (e.g. <code class="docutils literal notranslate"><span class="pre">set</span> <span class="pre">path=%path%;C:\path\to\Python\directory</span></code> or <code class="docutils literal notranslate"><span class="pre">setx</span> <span class="pre">path=%path%;C:\path\to\Python\directory</span></code> to make the change for new prompts). For more information on setting the path, including instruction on seting in via the GUI, see <a class="reference external" href="https://datatofish.com/add-python-to-windows-path/">this article</a>.</p>
+</div>
+<p>Once Python is installed, yggdrasil can be installed from the command line/prompt
 from either <a class="reference external" href="https://pypi.org/project/yggdrasil-framework/">PyPI</a>
-using <code class="docutils literal notranslate"><span class="pre">pip</span></code>:</p>
+using <code class="docutils literal notranslate"><span class="pre">pip</span></code></p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ pip install yggdrasil-framework
 </pre></div>
 </div>
@@ -292,22 +338,26 @@ yggdrasil command line tools (e.g. <code class="docutils literal notranslate"><s
 their full path. Usually, this directory can be found using the following
 Python commands:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">os</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">distutils.sysconfig</span> <span class="k">import</span> <span class="n">get_python_lib</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">realpath</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">get_python_lib</span><span class="p">(),</span> <span class="s1">&#39;../../../bin/&#39;</span><span class="p">))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">distutils.sysconfig</span> <span class="kn">import</span> <span class="n">get_python_lib</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">realpath</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">get_python_lib</span><span class="p">(),</span> <span class="s1">&#39;..&#39;</span><span class="p">,</span> <span class="s1">&#39;..&#39;</span><span class="p">,</span> <span class="s1">&#39;..&#39;</span><span class="p">,</span> <span class="s1">&#39;bin&#39;</span><span class="p">))</span>
 </pre></div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p><em>Windows Users</em> If you used the Windows store to install Python, the above commands will not yield the correct scripts directory. It will be something along the lines of <code class="docutils literal notranslate"><span class="pre">%userprofile%\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.9_qbz5n2kfra8p0\LocalCache\local-packages\Python39\Scripts</span></code></p>
 </div>
 <p>The displayed path can then be added either on the command link or in a startup
 script (e.g. <code class="docutils literal notranslate"><span class="pre">.bashrc</span></code> or <code class="docutils literal notranslate"><span class="pre">.bash_profile</span></code>), using one of the following:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ export PATH=$PATH:&lt;scripts_dir&gt;  # (linux/osx, bash)
 $ setenv PATH $PATH:&lt;scripts_dir&gt;  # (linux/osx, tcsh)
-$ set PATH &quot;%PATH%:&lt;scripts_dir&gt;   # (windows)
+$ set PATH=%PATH%:&lt;scripts_dir&gt;   # (windows)
 </pre></div>
 </div>
 <p>These commands will only add the directory to your path for the current
 session. For the change to be permanent on Linux/MacOS, the appropriate command
 from above can be added to your <code class="docutils literal notranslate"><span class="pre">.bashrc</span></code> or <code class="docutils literal notranslate"><span class="pre">.bash_profile</span></code>. On
 Windows (&gt;=7), the following command will permanently modify your path:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ setx PATH &quot;%PATH%:&lt;scripts_dir&gt;
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ setx PATH=%PATH%:&lt;scripts_dir&gt;
 </pre></div>
 </div>
 <p>The changes will take affect the next time you open the terminal.</p>
@@ -328,6 +378,43 @@ in C or C++ will require installing the ZeroMQ libraries for C and C++.
 If you install yggdrasil using conda, these will be installed
 automatically as dependencies. If you are not using conda, you will need to
 install them yourself.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Although not required, the ZeroMQ libraries are also recommended for message
+passing on Linux and MacOS operating systems as the IPC V message queues
+have default upper limits of 2048 bytes on some operating systems and will
+have to send larger messages piecemeal, adding to the message passing
+overhead. We recommend installing zeromq &amp; czmq via apt on Linux
+(<code class="docutils literal notranslate"><span class="pre">apt-get</span> <span class="pre">libczmq-dev</span> <span class="pre">libzmq3-dev</span></code>) or Homebrew
+on Mac (<code class="docutils literal notranslate"><span class="pre">brew</span> <span class="pre">install</span> <span class="pre">czmq</span> <span class="pre">zmq</span></code>) if you do not use conda.</p>
+</div>
+<div class="section" id="installing-via-vcpkg">
+<h3>Installing via vcpkg<a class="headerlink" href="#installing-via-vcpkg" title="Permalink to this headline">¶</a></h3>
+<p>You can install the ZeroMQ C and C++ libraries via vcpkg (instructions for
+installing vcpkg found <a class="reference external" href="https://github.com/microsoft/vcpkg">here</a>. To
+do so run the following from your “VS2015 x64 Native Tools Developer Command Prompt”:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">&gt;</span> <span class="n">vcpkg</span> <span class="n">install</span> <span class="n">czmq</span> <span class="n">zeromq</span> <span class="o">--</span><span class="n">triplet</span> <span class="n">x64</span><span class="o">-</span><span class="n">windows</span>
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>The <code class="docutils literal notranslate"><span class="pre">--triplet</span> <span class="pre">x64-windows</span></code> flag indicates a 64 bit version of Windows
+(the most common). If you have a 32 bit Windows installation or are using a
+32 bit version of Python, omit the flag.</p>
+</div>
+<p>When you run <code class="docutils literal notranslate"><span class="pre">yggconfig</span></code> following installation of yggdrasil
+If you did not set the <code class="docutils literal notranslate"><span class="pre">VCPKG_ROOT</span></code> environment variable before installing vcpkg,
+you will need to add a flag indicating the location of the vcpkg installation when
+running <code class="docutils literal notranslate"><span class="pre">yggconfig</span></code> following installation of yggdrasil. e.g.:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">&gt;</span> <span class="n">yggconfig</span> <span class="o">--</span><span class="n">vcpkg</span><span class="o">-</span><span class="nb">dir</span><span class="o">=</span><span class="n">C</span><span class="p">:</span>\<span class="n">path</span>\<span class="n">to</span>\<span class="n">vcpkg</span>\<span class="n">root</span>\<span class="n">directory</span>
+</pre></div>
+</div>
+<p>If you do not do this, you will need to manually add the paths to the czmq and
+zeromq libraries/headers to your yggdrasil configuration file (See
+<a class="reference internal" href="config.html#config-rst"><span class="std std-ref">Configuration Options</span></a>).</p>
+</div>
+<div class="section" id="building-from-source">
+<h3>Building from Source<a class="headerlink" href="#building-from-source" title="Permalink to this headline">¶</a></h3>
 <p>Instructions for installing the ZeroMQ C and C++ libraries can be found
 <a class="reference external" href="https://github.com/zeromq/czmq#building-and-installing">here</a>
 At install (and any time <code class="docutils literal notranslate"><span class="pre">yggconfig</span></code> is called), yggdrasil will attempt
@@ -338,13 +425,6 @@ that it cannot find these libraries, you can manually set them in your
 If you install these libraries after installing yggdrasil you can re-configure
 yggdrasil and have it search for the libraries again by calling <code class="docutils literal notranslate"><span class="pre">yggconfig</span></code>
 from the command line or by setting the appropriate config options manually.</p>
-<div class="admonition note">
-<p class="admonition-title">Note</p>
-<p>Although not required, the ZeroMQ libraries are also recommended for message
-passing on Linux and MacOS operating systems as the IPC V message queues
-have default upper limits of 2048 bytes on some operating systems and will
-have to send larger messages piecemeal, adding to the message passing
-overhead.</p>
 </div>
 </div>
 <div class="section" id="additional-steps-for-matlab-models">
@@ -404,6 +484,10 @@ line.</p>
 </div>
 <div class="section" id="additional-steps-for-r-models">
 <span id="install-r-rst"></span><h2>Additional Steps for R Models<a class="headerlink" href="#additional-steps-for-r-models" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="rtools-windows-only">
+<h3>Rtools (Windows only)<a class="headerlink" href="#rtools-windows-only" title="Permalink to this headline">¶</a></h3>
+<p>On Windows, if you do not install the R dependencies via conda, you will also need to install Rtools so that the R dependencies with C/C++/Fortran components can be compiled if they need to be installed from source. The Rtools installer and instructions for installing Rtools for R&lt;4.0.0 can be found <a class="reference external" href="https://cran.r-project.org/bin/windows/Rtools/history.html">here</a>. For R&gt;=4.0.0, you will need to install Rtools40 instead (installer/instructions <a class="reference external" href="https://cran.r-project.org/bin/windows/Rtools/">here</a>).</p>
+</div>
 <div class="section" id="r-interpreter">
 <h3>R Interpreter<a class="headerlink" href="#r-interpreter" title="Permalink to this headline">¶</a></h3>
 <p>To run R models, you will need to install the
@@ -460,6 +544,10 @@ $ sudo apt-get install libudunits2-dev
 </pre></div>
 </div>
 <p>from your terminal (Linux/Mac) or Anaconda prompt (Windows).</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>If you see errors along the lines of <code class="docutils literal notranslate"><span class="pre">'lib</span> <span class="pre">=</span> <span class="pre">&quot;/usr/local/lib/R/site-library&quot;'</span> <span class="pre">is</span> <span class="pre">not</span> <span class="pre">writable</span></code> when running <code class="docutils literal notranslate"><span class="pre">ygginstall</span> <span class="pre">R</span></code>, it is likely that the directory R is attempting to install in requires staff privileges to edit. On Unix systems (Linux/Mac), if you have <code class="docutils literal notranslate"><span class="pre">sudo</span></code> access you can either add yourself to the staff group (e.g. <code class="docutils literal notranslate"><span class="pre">sudo</span> <span class="pre">usermod</span> <span class="pre">-a</span> <span class="pre">-G</span> <span class="pre">staff</span> <span class="pre">your_user_name</span></code>; then log off and back on) or add the <code class="docutils literal notranslate"><span class="pre">--sudoR</span></code> flag to the installation call (i.e. <code class="docutils literal notranslate"><span class="pre">ygginstall</span> <span class="pre">R</span> <span class="pre">--sudoR</span></code>). On windows, you can open R from an administrator prompt and install the dependencies from CRAN directly as shown above. If you do not have administrator access, you can pick a directory that you have write access to and add it to the list of paths checked by R for R libraries in your .Rprofile file (i.e. add <code class="docutils literal notranslate"><span class="pre">.libPaths(</span> <span class="pre">c(</span> <span class="pre">&quot;~/userLibrary&quot;</span> <span class="pre">,</span> <span class="pre">.libPaths()</span> <span class="pre">)</span> <span class="pre">)</span></code>). <a class="reference external" href="https://support.rstudio.com/hc/en-us/articles/360047157094-Managing-R-with-Rprofile-Renviron-Rprofile-site-Renviron-site-rsession-conf-and-repos-conf">This article</a> describes what the .Rprofile file is and how to locate it. <a class="reference external" href="https://www.accelebrate.com/library/how-to-articles/r-rstudio-library">This article</a> discusses this in the context of Rstudio and how to make these changes via the Rstudio GUI on Windows.</p>
+</div>
 </div>
 </div>
 <div class="section" id="additional-steps-for-rabbitmq-message-passing">
@@ -478,6 +566,15 @@ downloading, installing, and starting a RabbitMQ server can be found
 for RabbitMQ related properties in the config file are set to the defaults
 for starting a RabbitMQ server.</p>
 </div>
+<div class="section" id="additional-steps-for-opensimroot">
+<h2>Additional Steps for OpenSimRoot<a class="headerlink" href="#additional-steps-for-opensimroot" title="Permalink to this headline">¶</a></h2>
+<p>If you would like to use OpenSimRoot, you will need to install GNU make. If you are on Linux/Mac or used conda to install yggdrasil it is likely that it will already be installed (you can run <code class="docutils literal notranslate"><span class="pre">make</span> <span class="pre">--version</span></code> to check). If it is not installed, and you are using a Mac OS, you can install XCode and the command line developer tools to get make and several other GNU tools (see relavent section of <a class="reference external" href="https://cloudtechpoint.medium.com/how-to-install-command-line-tools-homebrew-in-macos-without-xcode-1b910742d923">this article</a>). If you are not on Mac, we recommend installing it via a package manager, e.g.</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">brew</span> <span class="pre">install</span> <span class="pre">make</span></code> on Mac</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">apt-get</span> <span class="pre">install</span> <span class="pre">make</span></code> on Linux</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">choco</span> <span class="pre">install</span> <span class="pre">make</span></code> on Windows</p></li>
+</ul>
+</div>
 </div>
 
 
@@ -485,29 +582,29 @@ for starting a RabbitMQ server.</p>
            
           </div>
           <footer>
-  
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
-      
-        <a href="getting_started.html" class="btn btn-neutral float-right" title="Getting started" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
-      
-      
-        <a href="includeme.html" class="btn btn-neutral float-left" title="Overview" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
-      
+        <a href="getting_started.html" class="btn btn-neutral float-right" title="Getting started" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="includeme.html" class="btn btn-neutral float-left" title="Overview" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
     </div>
-  
 
   <hr/>
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2017, Meagan Lang, David Raila
+        &#169; Copyright 2017, Meagan Lang, David Raila.
 
     </p>
   </div>
-  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+    
+    
+    
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
 
 </footer>
-
         </div>
       </div>
 
@@ -515,7 +612,6 @@ for starting a RabbitMQ server.</p>
 
   </div>
   
-
 
   <script type="text/javascript">
       jQuery(function () {

@@ -1,42 +1,45 @@
 
 
 <!DOCTYPE html>
-<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
-<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<html class="writer-html5" lang="en" >
 <head>
-  <meta charset="utf-8">
+  <meta charset="utf-8" />
   
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>rpc_lesson2 Example &mdash; yggdrasil 1.1.1+410.g95af39b2 documentation</title>
+  <title>rpc_lesson2 Example &mdash; yggdrasil v1.5.0 documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/theme_overrides.css" type="text/css" />
+
+  
   
 
   
   
-  
+
   
 
   
-  <script type="text/javascript" src="../_static/js/modernizr.min.js"></script>
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
   
     
       <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
         <script src="../_static/jquery.js"></script>
         <script src="../_static/underscore.js"></script>
         <script src="../_static/doctools.js"></script>
-        <script src="../_static/language_data.js"></script>
     
     <script type="text/javascript" src="../_static/js/theme.js"></script>
 
     
-
-  
-  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
-  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
-  <link rel="stylesheet" href="../_static/theme_overrides.css" type="text/css" />
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="model_function Example" href="model_function.html" />
+    <link rel="next" title="rpc_lesson3 Example" href="rpc_lesson3.html" />
     <link rel="prev" title="rpc_lesson1 Example" href="rpc_lesson1.html" /> 
 </head>
 
@@ -61,7 +64,7 @@
             
             
               <div class="version">
-                1.1.1
+                v1.5.0
               </div>
             
           
@@ -78,6 +81,7 @@
           
         </div>
 
+        
         <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
           
             
@@ -127,6 +131,7 @@
 <li class="toctree-l3"><a class="reference internal" href="#r-version">R Version</a></li>
 </ul>
 </li>
+<li class="toctree-l2"><a class="reference internal" href="rpc_lesson3.html">rpc_lesson3 Example</a></li>
 <li class="toctree-l2"><a class="reference internal" href="model_function.html">model_function Example</a></li>
 <li class="toctree-l2"><a class="reference internal" href="conditional_io.html">conditional_io Example</a></li>
 <li class="toctree-l2"><a class="reference internal" href="transformed_io.html">transformed_io Example</a></li>
@@ -144,6 +149,7 @@
             
           
         </div>
+        
       </div>
     </nav>
 
@@ -178,11 +184,13 @@
 
 
 
+
+
 <div role="navigation" aria-label="breadcrumbs navigation">
 
   <ul class="wy-breadcrumbs">
     
-      <li><a href="../index.html">Docs</a> &raquo;</li>
+      <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
         
           <li><a href="examples_toc.html">Examples</a> &raquo;</li>
         
@@ -191,7 +199,7 @@
     
       <li class="wy-breadcrumbs-aside">
         
-            
+          
             <a href="../_sources/examples/rpc_lesson2.rst.txt" rel="nofollow"> View page source</a>
           
         
@@ -269,7 +277,7 @@
 57
 58
 59
-60</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
+60</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="kn">from</span> <span class="nn">yggdrasil.interface.YggInterface</span> <span class="kn">import</span> <span class="n">YggRpcServer</span>
 
 
@@ -299,32 +307,32 @@
 <span class="k">def</span> <span class="nf">main</span><span class="p">():</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Function to execute server communication and computation in a loop.&quot;&quot;&quot;</span>
 
-    <span class="k">print</span><span class="p">(</span><span class="s1">&#39;Hello from Python server!&#39;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Hello from Python server!&#39;</span><span class="p">)</span>
 
     <span class="c1"># Create server-side rpc conneciton using model name</span>
     <span class="n">rpc</span> <span class="o">=</span> <span class="n">YggRpcServer</span><span class="p">(</span><span class="s2">&quot;server&quot;</span><span class="p">,</span> <span class="s2">&quot;</span><span class="si">%d</span><span class="s2">&quot;</span><span class="p">,</span> <span class="s2">&quot;</span><span class="si">%d</span><span class="s2">&quot;</span><span class="p">)</span>
 
     <span class="c1"># Continue receiving requests until the connection is closed when all</span>
     <span class="c1"># clients have disconnected.</span>
-    <span class="k">while</span> <span class="bp">True</span><span class="p">:</span>
-        <span class="k">print</span><span class="p">(</span><span class="s1">&#39;server: receiving...&#39;</span><span class="p">)</span>
+    <span class="k">while</span> <span class="kc">True</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;server: receiving...&#39;</span><span class="p">)</span>
         <span class="n">retval</span><span class="p">,</span> <span class="n">rpc_in</span> <span class="o">=</span> <span class="n">rpc</span><span class="o">.</span><span class="n">recv</span><span class="p">()</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">retval</span><span class="p">:</span>
-            <span class="k">print</span><span class="p">(</span><span class="s1">&#39;server: end of input&#39;</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;server: end of input&#39;</span><span class="p">)</span>
             <span class="k">break</span>
 
         <span class="c1"># Compute fibonacci number</span>
         <span class="n">n</span> <span class="o">=</span> <span class="n">rpc_in</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
-        <span class="k">print</span><span class="p">(</span><span class="s1">&#39;server: Received request for Fibonacci number </span><span class="si">%d</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">n</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;server: Received request for Fibonacci number </span><span class="si">%d</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">n</span><span class="p">)</span>
         <span class="n">result</span> <span class="o">=</span> <span class="n">get_fibonacci</span><span class="p">(</span><span class="n">n</span><span class="p">)</span>
-        <span class="k">print</span><span class="p">(</span><span class="s1">&#39;server: Sending response for Fibonacci number </span><span class="si">%d</span><span class="s1">: </span><span class="si">%d</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="n">result</span><span class="p">))</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;server: Sending response for Fibonacci number </span><span class="si">%d</span><span class="s1">: </span><span class="si">%d</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="n">result</span><span class="p">))</span>
 
         <span class="c1"># Send response back</span>
         <span class="n">flag</span> <span class="o">=</span> <span class="n">rpc</span><span class="o">.</span><span class="n">send</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">int32</span><span class="p">(</span><span class="n">result</span><span class="p">))</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">flag</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s1">&#39;server: ERROR sending&#39;</span><span class="p">)</span>
 
-    <span class="k">print</span><span class="p">(</span><span class="s1">&#39;Goodbye from Python server&#39;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Goodbye from Python server&#39;</span><span class="p">)</span>
 
     
 <span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s1">&#39;__main__&#39;</span><span class="p">:</span>
@@ -406,7 +414,7 @@
 
   <span class="c1">// Initialize variables</span>
   <span class="kt">int</span> <span class="n">ret</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
-  <span class="kt">int</span> <span class="n">fib</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span><span class="p">;</span>
+  <span class="kt">int</span> <span class="n">fib</span> <span class="o">=</span> <span class="mi">-1</span><span class="p">;</span>
   <span class="kt">int</span> <span class="n">i</span><span class="p">;</span>
 
   <span class="c1">// Iterate over Fibonacci sequence</span>
@@ -417,7 +425,7 @@
     <span class="n">ret</span> <span class="o">=</span> <span class="n">rpcCall</span><span class="p">(</span><span class="n">rpc</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">fib</span><span class="p">);</span>
     <span class="k">if</span> <span class="p">(</span><span class="n">ret</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
       <span class="n">printf</span><span class="p">(</span><span class="s">&quot;client%d(C): RPC CALL ERROR</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span> <span class="n">client_index</span><span class="p">);</span>
-      <span class="n">exit_code</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span><span class="p">;</span>
+      <span class="n">exit_code</span> <span class="o">=</span> <span class="mi">-1</span><span class="p">;</span>
       <span class="k">break</span><span class="p">;</span>
     <span class="p">}</span>
     <span class="n">printf</span><span class="p">(</span><span class="s">&quot;client%d(C): Response fib(%d) = %d</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span> <span class="n">client_index</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="n">fib</span><span class="p">);</span>
@@ -426,7 +434,7 @@
     <span class="n">ret</span> <span class="o">=</span> <span class="n">yggSend</span><span class="p">(</span><span class="n">log</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="n">fib</span><span class="p">);</span>
     <span class="k">if</span> <span class="p">(</span><span class="n">ret</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
       <span class="n">printf</span><span class="p">(</span><span class="s">&quot;client%d(C): SEND ERROR</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span> <span class="n">client_index</span><span class="p">);</span>
-      <span class="n">exit_code</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span><span class="p">;</span>
+      <span class="n">exit_code</span> <span class="o">=</span> <span class="mi">-1</span><span class="p">;</span>
       <span class="k">break</span><span class="p">;</span>
     <span class="p">}</span>
   <span class="p">}</span>
@@ -572,7 +580,7 @@
 57
 58
 59
-60</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
+60</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="kn">from</span> <span class="nn">yggdrasil.interface.YggInterface</span> <span class="kn">import</span> <span class="n">YggRpcServer</span>
 
 
@@ -602,32 +610,32 @@
 <span class="k">def</span> <span class="nf">main</span><span class="p">():</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Function to execute server communication and computation in a loop.&quot;&quot;&quot;</span>
 
-    <span class="k">print</span><span class="p">(</span><span class="s1">&#39;Hello from Python server!&#39;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Hello from Python server!&#39;</span><span class="p">)</span>
 
     <span class="c1"># Create server-side rpc conneciton using model name</span>
     <span class="n">rpc</span> <span class="o">=</span> <span class="n">YggRpcServer</span><span class="p">(</span><span class="s2">&quot;server&quot;</span><span class="p">,</span> <span class="s2">&quot;</span><span class="si">%d</span><span class="s2">&quot;</span><span class="p">,</span> <span class="s2">&quot;</span><span class="si">%d</span><span class="s2">&quot;</span><span class="p">)</span>
 
     <span class="c1"># Continue receiving requests until the connection is closed when all</span>
     <span class="c1"># clients have disconnected.</span>
-    <span class="k">while</span> <span class="bp">True</span><span class="p">:</span>
-        <span class="k">print</span><span class="p">(</span><span class="s1">&#39;server: receiving...&#39;</span><span class="p">)</span>
+    <span class="k">while</span> <span class="kc">True</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;server: receiving...&#39;</span><span class="p">)</span>
         <span class="n">retval</span><span class="p">,</span> <span class="n">rpc_in</span> <span class="o">=</span> <span class="n">rpc</span><span class="o">.</span><span class="n">recv</span><span class="p">()</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">retval</span><span class="p">:</span>
-            <span class="k">print</span><span class="p">(</span><span class="s1">&#39;server: end of input&#39;</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;server: end of input&#39;</span><span class="p">)</span>
             <span class="k">break</span>
 
         <span class="c1"># Compute fibonacci number</span>
         <span class="n">n</span> <span class="o">=</span> <span class="n">rpc_in</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
-        <span class="k">print</span><span class="p">(</span><span class="s1">&#39;server: Received request for Fibonacci number </span><span class="si">%d</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">n</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;server: Received request for Fibonacci number </span><span class="si">%d</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">n</span><span class="p">)</span>
         <span class="n">result</span> <span class="o">=</span> <span class="n">get_fibonacci</span><span class="p">(</span><span class="n">n</span><span class="p">)</span>
-        <span class="k">print</span><span class="p">(</span><span class="s1">&#39;server: Sending response for Fibonacci number </span><span class="si">%d</span><span class="s1">: </span><span class="si">%d</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="n">result</span><span class="p">))</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;server: Sending response for Fibonacci number </span><span class="si">%d</span><span class="s1">: </span><span class="si">%d</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="n">result</span><span class="p">))</span>
 
         <span class="c1"># Send response back</span>
         <span class="n">flag</span> <span class="o">=</span> <span class="n">rpc</span><span class="o">.</span><span class="n">send</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">int32</span><span class="p">(</span><span class="n">result</span><span class="p">))</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">flag</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s1">&#39;server: ERROR sending&#39;</span><span class="p">)</span>
 
-    <span class="k">print</span><span class="p">(</span><span class="s1">&#39;Goodbye from Python server&#39;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Goodbye from Python server&#39;</span><span class="p">)</span>
 
     
 <span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s1">&#39;__main__&#39;</span><span class="p">:</span>
@@ -709,7 +717,7 @@
   
   <span class="c1">// Initialize variables</span>
   <span class="kt">int</span> <span class="n">ret</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
-  <span class="kt">int</span> <span class="n">fib</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span><span class="p">;</span>
+  <span class="kt">int</span> <span class="n">fib</span> <span class="o">=</span> <span class="mi">-1</span><span class="p">;</span>
   <span class="kt">char</span> <span class="o">*</span><span class="n">logmsg</span> <span class="o">=</span> <span class="p">(</span><span class="kt">char</span><span class="o">*</span><span class="p">)</span><span class="n">malloc</span><span class="p">(</span><span class="n">YGG_MSG_MAX</span><span class="o">*</span><span class="k">sizeof</span><span class="p">(</span><span class="kt">char</span><span class="p">));</span>
   <span class="kt">int</span> <span class="n">i</span><span class="p">;</span>
 
@@ -721,7 +729,7 @@
     <span class="n">ret</span> <span class="o">=</span> <span class="n">rpc</span><span class="p">.</span><span class="n">call</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">fib</span><span class="p">);</span>
     <span class="k">if</span> <span class="p">(</span><span class="n">ret</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
       <span class="n">printf</span><span class="p">(</span><span class="s">&quot;client%d(C++): RPC CALL ERROR</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span> <span class="n">client_index</span><span class="p">);</span>
-      <span class="n">exit_code</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span><span class="p">;</span>
+      <span class="n">exit_code</span> <span class="o">=</span> <span class="mi">-1</span><span class="p">;</span>
       <span class="k">break</span><span class="p">;</span>
     <span class="p">}</span>
     <span class="n">printf</span><span class="p">(</span><span class="s">&quot;client%d(C++): Response fib(%d) = %d</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span> <span class="n">client_index</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="n">fib</span><span class="p">);</span>
@@ -730,7 +738,7 @@
     <span class="n">ret</span> <span class="o">=</span> <span class="n">log</span><span class="p">.</span><span class="n">send</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="n">fib</span><span class="p">);</span>
     <span class="k">if</span> <span class="p">(</span><span class="n">ret</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
       <span class="n">printf</span><span class="p">(</span><span class="s">&quot;client%d(C++): SEND ERROR</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span> <span class="n">client_index</span><span class="p">);</span>
-      <span class="n">exit_code</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span><span class="p">;</span>
+      <span class="n">exit_code</span> <span class="o">=</span> <span class="mi">-1</span><span class="p">;</span>
       <span class="k">break</span><span class="p">;</span>
     <span class="p">}</span>
   <span class="p">}</span>
@@ -875,7 +883,7 @@
 57
 58
 59
-60</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
+60</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="kn">from</span> <span class="nn">yggdrasil.interface.YggInterface</span> <span class="kn">import</span> <span class="n">YggRpcServer</span>
 
 
@@ -905,32 +913,32 @@
 <span class="k">def</span> <span class="nf">main</span><span class="p">():</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Function to execute server communication and computation in a loop.&quot;&quot;&quot;</span>
 
-    <span class="k">print</span><span class="p">(</span><span class="s1">&#39;Hello from Python server!&#39;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Hello from Python server!&#39;</span><span class="p">)</span>
 
     <span class="c1"># Create server-side rpc conneciton using model name</span>
     <span class="n">rpc</span> <span class="o">=</span> <span class="n">YggRpcServer</span><span class="p">(</span><span class="s2">&quot;server&quot;</span><span class="p">,</span> <span class="s2">&quot;</span><span class="si">%d</span><span class="s2">&quot;</span><span class="p">,</span> <span class="s2">&quot;</span><span class="si">%d</span><span class="s2">&quot;</span><span class="p">)</span>
 
     <span class="c1"># Continue receiving requests until the connection is closed when all</span>
     <span class="c1"># clients have disconnected.</span>
-    <span class="k">while</span> <span class="bp">True</span><span class="p">:</span>
-        <span class="k">print</span><span class="p">(</span><span class="s1">&#39;server: receiving...&#39;</span><span class="p">)</span>
+    <span class="k">while</span> <span class="kc">True</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;server: receiving...&#39;</span><span class="p">)</span>
         <span class="n">retval</span><span class="p">,</span> <span class="n">rpc_in</span> <span class="o">=</span> <span class="n">rpc</span><span class="o">.</span><span class="n">recv</span><span class="p">()</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">retval</span><span class="p">:</span>
-            <span class="k">print</span><span class="p">(</span><span class="s1">&#39;server: end of input&#39;</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;server: end of input&#39;</span><span class="p">)</span>
             <span class="k">break</span>
 
         <span class="c1"># Compute fibonacci number</span>
         <span class="n">n</span> <span class="o">=</span> <span class="n">rpc_in</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
-        <span class="k">print</span><span class="p">(</span><span class="s1">&#39;server: Received request for Fibonacci number </span><span class="si">%d</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">n</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;server: Received request for Fibonacci number </span><span class="si">%d</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">n</span><span class="p">)</span>
         <span class="n">result</span> <span class="o">=</span> <span class="n">get_fibonacci</span><span class="p">(</span><span class="n">n</span><span class="p">)</span>
-        <span class="k">print</span><span class="p">(</span><span class="s1">&#39;server: Sending response for Fibonacci number </span><span class="si">%d</span><span class="s1">: </span><span class="si">%d</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="n">result</span><span class="p">))</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;server: Sending response for Fibonacci number </span><span class="si">%d</span><span class="s1">: </span><span class="si">%d</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="n">result</span><span class="p">))</span>
 
         <span class="c1"># Send response back</span>
         <span class="n">flag</span> <span class="o">=</span> <span class="n">rpc</span><span class="o">.</span><span class="n">send</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">int32</span><span class="p">(</span><span class="n">result</span><span class="p">))</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">flag</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s1">&#39;server: ERROR sending&#39;</span><span class="p">)</span>
 
-    <span class="k">print</span><span class="p">(</span><span class="s1">&#39;Goodbye from Python server&#39;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Goodbye from Python server&#39;</span><span class="p">)</span>
 
     
 <span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s1">&#39;__main__&#39;</span><span class="p">:</span>
@@ -1196,7 +1204,7 @@ end program main
 57
 58
 59
-60</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
+60</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="kn">from</span> <span class="nn">yggdrasil.interface.YggInterface</span> <span class="kn">import</span> <span class="n">YggRpcServer</span>
 
 
@@ -1226,32 +1234,32 @@ end program main
 <span class="k">def</span> <span class="nf">main</span><span class="p">():</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Function to execute server communication and computation in a loop.&quot;&quot;&quot;</span>
 
-    <span class="k">print</span><span class="p">(</span><span class="s1">&#39;Hello from Python server!&#39;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Hello from Python server!&#39;</span><span class="p">)</span>
 
     <span class="c1"># Create server-side rpc conneciton using model name</span>
     <span class="n">rpc</span> <span class="o">=</span> <span class="n">YggRpcServer</span><span class="p">(</span><span class="s2">&quot;server&quot;</span><span class="p">,</span> <span class="s2">&quot;</span><span class="si">%d</span><span class="s2">&quot;</span><span class="p">,</span> <span class="s2">&quot;</span><span class="si">%d</span><span class="s2">&quot;</span><span class="p">)</span>
 
     <span class="c1"># Continue receiving requests until the connection is closed when all</span>
     <span class="c1"># clients have disconnected.</span>
-    <span class="k">while</span> <span class="bp">True</span><span class="p">:</span>
-        <span class="k">print</span><span class="p">(</span><span class="s1">&#39;server: receiving...&#39;</span><span class="p">)</span>
+    <span class="k">while</span> <span class="kc">True</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;server: receiving...&#39;</span><span class="p">)</span>
         <span class="n">retval</span><span class="p">,</span> <span class="n">rpc_in</span> <span class="o">=</span> <span class="n">rpc</span><span class="o">.</span><span class="n">recv</span><span class="p">()</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">retval</span><span class="p">:</span>
-            <span class="k">print</span><span class="p">(</span><span class="s1">&#39;server: end of input&#39;</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;server: end of input&#39;</span><span class="p">)</span>
             <span class="k">break</span>
 
         <span class="c1"># Compute fibonacci number</span>
         <span class="n">n</span> <span class="o">=</span> <span class="n">rpc_in</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
-        <span class="k">print</span><span class="p">(</span><span class="s1">&#39;server: Received request for Fibonacci number </span><span class="si">%d</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">n</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;server: Received request for Fibonacci number </span><span class="si">%d</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">n</span><span class="p">)</span>
         <span class="n">result</span> <span class="o">=</span> <span class="n">get_fibonacci</span><span class="p">(</span><span class="n">n</span><span class="p">)</span>
-        <span class="k">print</span><span class="p">(</span><span class="s1">&#39;server: Sending response for Fibonacci number </span><span class="si">%d</span><span class="s1">: </span><span class="si">%d</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="n">result</span><span class="p">))</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;server: Sending response for Fibonacci number </span><span class="si">%d</span><span class="s1">: </span><span class="si">%d</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="n">result</span><span class="p">))</span>
 
         <span class="c1"># Send response back</span>
         <span class="n">flag</span> <span class="o">=</span> <span class="n">rpc</span><span class="o">.</span><span class="n">send</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">int32</span><span class="p">(</span><span class="n">result</span><span class="p">))</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">flag</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s1">&#39;server: ERROR sending&#39;</span><span class="p">)</span>
 
-    <span class="k">print</span><span class="p">(</span><span class="s1">&#39;Goodbye from Python server&#39;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Goodbye from Python server&#39;</span><span class="p">)</span>
 
     
 <span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s1">&#39;__main__&#39;</span><span class="p">:</span>
@@ -1298,7 +1306,7 @@ end program main
 <span class="w">  </span>
 <span class="w">  </span><span class="n">iterations</span> <span class="p">=</span> <span class="n">str2num</span><span class="p">(</span><span class="n">iterations</span><span class="p">);</span>
   <span class="n">client_index</span> <span class="p">=</span> <span class="n">str2num</span><span class="p">(</span><span class="n">client_index</span><span class="p">);</span>
-  <span class="n">fprintf</span><span class="p">(</span><span class="s">&#39;Hello from Matlab client%d: iterations = %d\n&#39;</span><span class="p">,</span> <span class="c">...</span>
+  <span class="n">fprintf</span><span class="p">(</span><span class="s">&#39;Hello from Matlab client%d: iterations = %d\n&#39;</span><span class="p">,</span> <span class="k">...</span>
           <span class="n">client_index</span><span class="p">,</span> <span class="n">iterations</span><span class="p">);</span>
 
   <span class="c">% Set up connections matching yaml</span>
@@ -1309,7 +1317,7 @@ end program main
   <span class="nb">log</span> <span class="p">=</span> <span class="n">YggInterface</span><span class="p">(</span><span class="s">&#39;YggOutput&#39;</span><span class="p">,</span> <span class="n">log_name</span><span class="p">,</span> <span class="s">&#39;fib(%-2d) = %-2d\n&#39;</span><span class="p">);</span>
 
   <span class="c">% Iterate over Fibonacci sequence</span>
-  <span class="k">for</span> <span class="nb">i</span> <span class="p">=</span> <span class="mi">1</span><span class="p">:</span><span class="n">iterations</span>
+  <span class="n">for</span> <span class="s">i</span> <span class="p">=</span> <span class="mi">1</span><span class="p">:</span><span class="n">iterations</span>
     
     <span class="c">% Call the server and receive response</span>
     <span class="n">fprintf</span><span class="p">(</span><span class="s">&#39;client%d(Matlab): Calling fib(%d)\n&#39;</span><span class="p">,</span> <span class="n">client_index</span><span class="p">,</span> <span class="nb">i</span><span class="p">);</span>
@@ -1318,7 +1326,7 @@ end program main
       <span class="n">error</span><span class="p">(</span><span class="n">sprintf</span><span class="p">(</span><span class="s">&#39;client%d(Matlab): RPC CALL ERROR\n&#39;</span><span class="p">,</span> <span class="n">client_index</span><span class="p">));</span>
     <span class="k">end</span><span class="p">;</span>
     <span class="n">fib</span> <span class="p">=</span> <span class="n">result</span><span class="p">{</span><span class="mi">1</span><span class="p">};</span>
-    <span class="n">fprintf</span><span class="p">(</span><span class="s">&#39;client%d(Matlab): Response fib(%d) = %d\n&#39;</span><span class="p">,</span> <span class="n">client_index</span><span class="p">,</span> <span class="c">...</span>
+    <span class="n">fprintf</span><span class="p">(</span><span class="s">&#39;client%d(Matlab): Response fib(%d) = %d\n&#39;</span><span class="p">,</span> <span class="n">client_index</span><span class="p">,</span> <span class="k">...</span>
             <span class="nb">i</span><span class="p">,</span> <span class="n">fib</span><span class="p">);</span>
 
     <span class="c">% Log result by sending it to the log connection</span>
@@ -1330,7 +1338,7 @@ end program main
 
   <span class="n">fprintf</span><span class="p">(</span><span class="s">&#39;Goodbye from Matlab client%d\n&#39;</span><span class="p">,</span> <span class="n">client_index</span><span class="p">);</span>
   
-<span class="k">end</span>
+<span class="n">end</span>
 </pre></div>
 </td></tr></table></div>
 <p>Model YAML:</p>
@@ -1467,7 +1475,7 @@ end program main
 57
 58
 59
-60</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
+60</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="kn">from</span> <span class="nn">yggdrasil.interface.YggInterface</span> <span class="kn">import</span> <span class="n">YggRpcServer</span>
 
 
@@ -1497,32 +1505,32 @@ end program main
 <span class="k">def</span> <span class="nf">main</span><span class="p">():</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Function to execute server communication and computation in a loop.&quot;&quot;&quot;</span>
 
-    <span class="k">print</span><span class="p">(</span><span class="s1">&#39;Hello from Python server!&#39;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Hello from Python server!&#39;</span><span class="p">)</span>
 
     <span class="c1"># Create server-side rpc conneciton using model name</span>
     <span class="n">rpc</span> <span class="o">=</span> <span class="n">YggRpcServer</span><span class="p">(</span><span class="s2">&quot;server&quot;</span><span class="p">,</span> <span class="s2">&quot;</span><span class="si">%d</span><span class="s2">&quot;</span><span class="p">,</span> <span class="s2">&quot;</span><span class="si">%d</span><span class="s2">&quot;</span><span class="p">)</span>
 
     <span class="c1"># Continue receiving requests until the connection is closed when all</span>
     <span class="c1"># clients have disconnected.</span>
-    <span class="k">while</span> <span class="bp">True</span><span class="p">:</span>
-        <span class="k">print</span><span class="p">(</span><span class="s1">&#39;server: receiving...&#39;</span><span class="p">)</span>
+    <span class="k">while</span> <span class="kc">True</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;server: receiving...&#39;</span><span class="p">)</span>
         <span class="n">retval</span><span class="p">,</span> <span class="n">rpc_in</span> <span class="o">=</span> <span class="n">rpc</span><span class="o">.</span><span class="n">recv</span><span class="p">()</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">retval</span><span class="p">:</span>
-            <span class="k">print</span><span class="p">(</span><span class="s1">&#39;server: end of input&#39;</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;server: end of input&#39;</span><span class="p">)</span>
             <span class="k">break</span>
 
         <span class="c1"># Compute fibonacci number</span>
         <span class="n">n</span> <span class="o">=</span> <span class="n">rpc_in</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
-        <span class="k">print</span><span class="p">(</span><span class="s1">&#39;server: Received request for Fibonacci number </span><span class="si">%d</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">n</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;server: Received request for Fibonacci number </span><span class="si">%d</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">n</span><span class="p">)</span>
         <span class="n">result</span> <span class="o">=</span> <span class="n">get_fibonacci</span><span class="p">(</span><span class="n">n</span><span class="p">)</span>
-        <span class="k">print</span><span class="p">(</span><span class="s1">&#39;server: Sending response for Fibonacci number </span><span class="si">%d</span><span class="s1">: </span><span class="si">%d</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="n">result</span><span class="p">))</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;server: Sending response for Fibonacci number </span><span class="si">%d</span><span class="s1">: </span><span class="si">%d</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="n">result</span><span class="p">))</span>
 
         <span class="c1"># Send response back</span>
         <span class="n">flag</span> <span class="o">=</span> <span class="n">rpc</span><span class="o">.</span><span class="n">send</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">int32</span><span class="p">(</span><span class="n">result</span><span class="p">))</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">flag</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s1">&#39;server: ERROR sending&#39;</span><span class="p">)</span>
 
-    <span class="k">print</span><span class="p">(</span><span class="s1">&#39;Goodbye from Python server&#39;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Goodbye from Python server&#39;</span><span class="p">)</span>
 
     
 <span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s1">&#39;__main__&#39;</span><span class="p">:</span>
@@ -1576,7 +1584,7 @@ end program main
 45
 46
 47</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">sys</span>
-<span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="kn">from</span> <span class="nn">yggdrasil.interface.YggInterface</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">YggRpcClient</span><span class="p">,</span> <span class="n">YggOutput</span><span class="p">)</span>
 
@@ -1591,7 +1599,7 @@ end program main
 
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="k">print</span><span class="p">(</span><span class="s1">&#39;Hello from Python client</span><span class="si">%d</span><span class="s1">: iterations = </span><span class="si">%d</span><span class="s1"> &#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">client_index</span><span class="p">,</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Hello from Python client</span><span class="si">%d</span><span class="s1">: iterations = </span><span class="si">%d</span><span class="s1"> &#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">client_index</span><span class="p">,</span>
                                                             <span class="n">iterations</span><span class="p">))</span>
 
     <span class="c1"># Set up connections matching yaml</span>
@@ -1603,19 +1611,19 @@ end program main
     <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">iterations</span> <span class="o">+</span> <span class="mi">1</span><span class="p">):</span>
         
         <span class="c1"># Call the server and receive response</span>
-        <span class="k">print</span><span class="p">(</span><span class="s1">&#39;client</span><span class="si">%d</span><span class="s1">(Python): Calling fib(</span><span class="si">%d</span><span class="s1">)&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">client_index</span><span class="p">,</span> <span class="n">i</span><span class="p">))</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;client</span><span class="si">%d</span><span class="s1">(Python): Calling fib(</span><span class="si">%d</span><span class="s1">)&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">client_index</span><span class="p">,</span> <span class="n">i</span><span class="p">))</span>
         <span class="n">ret</span><span class="p">,</span> <span class="n">result</span> <span class="o">=</span> <span class="n">rpc</span><span class="o">.</span><span class="n">call</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">int32</span><span class="p">(</span><span class="n">i</span><span class="p">))</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">ret</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s1">&#39;client</span><span class="si">%d</span><span class="s1">(Python): RPC CALL ERROR&#39;</span> <span class="o">%</span> <span class="n">client_index</span><span class="p">)</span>
         <span class="n">fib</span> <span class="o">=</span> <span class="n">result</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
-        <span class="k">print</span><span class="p">(</span><span class="s1">&#39;client</span><span class="si">%d</span><span class="s1">(Python): Response fib(</span><span class="si">%d</span><span class="s1">) = </span><span class="si">%d</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">client_index</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="n">fib</span><span class="p">))</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;client</span><span class="si">%d</span><span class="s1">(Python): Response fib(</span><span class="si">%d</span><span class="s1">) = </span><span class="si">%d</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">client_index</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="n">fib</span><span class="p">))</span>
 
         <span class="c1"># Log result by sending it to the log connection</span>
         <span class="n">ret</span> <span class="o">=</span> <span class="n">log</span><span class="o">.</span><span class="n">send</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">int32</span><span class="p">(</span><span class="n">i</span><span class="p">),</span> <span class="n">fib</span><span class="p">)</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">ret</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s1">&#39;client</span><span class="si">%d</span><span class="s1">(Python): SEND ERROR&#39;</span> <span class="o">%</span> <span class="n">client_index</span><span class="p">)</span>
 
-    <span class="k">print</span><span class="p">(</span><span class="s1">&#39;Goodbye from Python client</span><span class="si">%d</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">client_index</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Goodbye from Python client</span><span class="si">%d</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">client_index</span><span class="p">)</span>
 
     
 <span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s1">&#39;__main__&#39;</span><span class="p">:</span>
@@ -1758,7 +1766,7 @@ end program main
 57
 58
 59
-60</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
+60</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="kn">from</span> <span class="nn">yggdrasil.interface.YggInterface</span> <span class="kn">import</span> <span class="n">YggRpcServer</span>
 
 
@@ -1788,32 +1796,32 @@ end program main
 <span class="k">def</span> <span class="nf">main</span><span class="p">():</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Function to execute server communication and computation in a loop.&quot;&quot;&quot;</span>
 
-    <span class="k">print</span><span class="p">(</span><span class="s1">&#39;Hello from Python server!&#39;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Hello from Python server!&#39;</span><span class="p">)</span>
 
     <span class="c1"># Create server-side rpc conneciton using model name</span>
     <span class="n">rpc</span> <span class="o">=</span> <span class="n">YggRpcServer</span><span class="p">(</span><span class="s2">&quot;server&quot;</span><span class="p">,</span> <span class="s2">&quot;</span><span class="si">%d</span><span class="s2">&quot;</span><span class="p">,</span> <span class="s2">&quot;</span><span class="si">%d</span><span class="s2">&quot;</span><span class="p">)</span>
 
     <span class="c1"># Continue receiving requests until the connection is closed when all</span>
     <span class="c1"># clients have disconnected.</span>
-    <span class="k">while</span> <span class="bp">True</span><span class="p">:</span>
-        <span class="k">print</span><span class="p">(</span><span class="s1">&#39;server: receiving...&#39;</span><span class="p">)</span>
+    <span class="k">while</span> <span class="kc">True</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;server: receiving...&#39;</span><span class="p">)</span>
         <span class="n">retval</span><span class="p">,</span> <span class="n">rpc_in</span> <span class="o">=</span> <span class="n">rpc</span><span class="o">.</span><span class="n">recv</span><span class="p">()</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">retval</span><span class="p">:</span>
-            <span class="k">print</span><span class="p">(</span><span class="s1">&#39;server: end of input&#39;</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;server: end of input&#39;</span><span class="p">)</span>
             <span class="k">break</span>
 
         <span class="c1"># Compute fibonacci number</span>
         <span class="n">n</span> <span class="o">=</span> <span class="n">rpc_in</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
-        <span class="k">print</span><span class="p">(</span><span class="s1">&#39;server: Received request for Fibonacci number </span><span class="si">%d</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">n</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;server: Received request for Fibonacci number </span><span class="si">%d</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">n</span><span class="p">)</span>
         <span class="n">result</span> <span class="o">=</span> <span class="n">get_fibonacci</span><span class="p">(</span><span class="n">n</span><span class="p">)</span>
-        <span class="k">print</span><span class="p">(</span><span class="s1">&#39;server: Sending response for Fibonacci number </span><span class="si">%d</span><span class="s1">: </span><span class="si">%d</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="n">result</span><span class="p">))</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;server: Sending response for Fibonacci number </span><span class="si">%d</span><span class="s1">: </span><span class="si">%d</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="n">result</span><span class="p">))</span>
 
         <span class="c1"># Send response back</span>
         <span class="n">flag</span> <span class="o">=</span> <span class="n">rpc</span><span class="o">.</span><span class="n">send</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">int32</span><span class="p">(</span><span class="n">result</span><span class="p">))</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">flag</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s1">&#39;server: ERROR sending&#39;</span><span class="p">)</span>
 
-    <span class="k">print</span><span class="p">(</span><span class="s1">&#39;Goodbye from Python server&#39;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Goodbye from Python server&#39;</span><span class="p">)</span>
 
     
 <span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s1">&#39;__main__&#39;</span><span class="p">:</span>
@@ -1978,29 +1986,29 @@ main(strtoi(args[[1]]), strtoi(args[[2]]))
            
           </div>
           <footer>
-  
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
-      
-        <a href="model_function.html" class="btn btn-neutral float-right" title="model_function Example" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
-      
-      
-        <a href="rpc_lesson1.html" class="btn btn-neutral float-left" title="rpc_lesson1 Example" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
-      
+        <a href="rpc_lesson3.html" class="btn btn-neutral float-right" title="rpc_lesson3 Example" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="rpc_lesson1.html" class="btn btn-neutral float-left" title="rpc_lesson1 Example" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
     </div>
-  
 
   <hr/>
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2017, Meagan Lang, David Raila
+        &#169; Copyright 2017, Meagan Lang, David Raila.
 
     </p>
   </div>
-  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+    
+    
+    
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
 
 </footer>
-
         </div>
       </div>
 
@@ -2008,7 +2016,6 @@ main(strtoi(args[[1]]), strtoi(args[[2]]))
 
   </div>
   
-
 
   <script type="text/javascript">
       jQuery(function () {

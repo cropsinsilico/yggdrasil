@@ -180,6 +180,14 @@ yggdrasil.drivers.ModelDriver module
    :undoc-members:
    :show-inheritance:
 
+yggdrasil.drivers.OSRModelDriver module
+---------------------------------------
+
+.. automodule:: yggdrasil.drivers.OSRModelDriver
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 yggdrasil.drivers.OutputDriver module
 -------------------------------------
 
@@ -275,7 +283,6 @@ yggdrasil.drivers.TimeSyncModelDriver module
    :members:
    :undoc-members:
    :show-inheritance:
-
 
 Module contents
 ---------------

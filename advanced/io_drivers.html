@@ -1,39 +1,42 @@
 
 
 <!DOCTYPE html>
-<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
-<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<html class="writer-html5" lang="en" >
 <head>
-  <meta charset="utf-8">
+  <meta charset="utf-8" />
   
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>Input/Output Drivers &mdash; yggdrasil 1.1.1+410.g95af39b2 documentation</title>
+  <title>Input/Output Drivers &mdash; yggdrasil v1.5.0 documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/theme_overrides.css" type="text/css" />
+
+  
   
 
   
   
-  
+
   
 
   
-  <script type="text/javascript" src="../_static/js/modernizr.min.js"></script>
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
   
     
       <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
         <script src="../_static/jquery.js"></script>
         <script src="../_static/underscore.js"></script>
         <script src="../_static/doctools.js"></script>
-        <script src="../_static/language_data.js"></script>
     
     <script type="text/javascript" src="../_static/js/theme.js"></script>
 
     
-
-  
-  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
-  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
-  <link rel="stylesheet" href="../_static/theme_overrides.css" type="text/css" />
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="Model Drivers" href="model_drivers.html" />
@@ -61,7 +64,7 @@
             
             
               <div class="version">
-                1.1.1
+                v1.5.0
               </div>
             
           
@@ -78,6 +81,7 @@
           
         </div>
 
+        
         <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
           
             
@@ -130,6 +134,7 @@
             
           
         </div>
+        
       </div>
     </nav>
 
@@ -164,11 +169,13 @@
 
 
 
+
+
 <div role="navigation" aria-label="breadcrumbs navigation">
 
   <ul class="wy-breadcrumbs">
     
-      <li><a href="../index.html">Docs</a> &raquo;</li>
+      <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
         
           <li><a href="index.html">Advanced</a> &raquo;</li>
         
@@ -177,7 +184,7 @@
     
       <li class="wy-breadcrumbs-aside">
         
-            
+          
             <a href="../_sources/advanced/io_drivers.rst.txt" rel="nofollow"> View page source</a>
           
         
@@ -197,13 +204,13 @@
 <h2>File Input Drivers<a class="headerlink" href="#file-input-drivers" title="Permalink to this headline">¶</a></h2>
 <dl class="py class">
 <dt id="yggdrasil.drivers.FileInputDriver.FileInputDriver">
-<em class="property">class </em><code class="sig-prename descclassname">yggdrasil.drivers.FileInputDriver.</code><code class="sig-name descname">FileInputDriver</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">name</span></em>, <em class="sig-param"><span class="n">args</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/yggdrasil/drivers/FileInputDriver.html#FileInputDriver"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.drivers.FileInputDriver.FileInputDriver" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">yggdrasil.drivers.FileInputDriver.</code><code class="sig-name descname">FileInputDriver</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">*</span><span class="n">args</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/yggdrasil/drivers/FileInputDriver.html#FileInputDriver"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.drivers.FileInputDriver.FileInputDriver" title="Permalink to this definition">¶</a></dt>
 <dd><p>Class that sends messages read from a file.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) – Name of the queue that messages should be sent to.</p></li>
-<li><p><strong>args</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) – Path to the file that messages should be read from.</p></li>
+<li><p><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a>) – Name of the queue that messages should be sent to.</p></li>
+<li><p><strong>args</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a>) – Path to the file that messages should be read from.</p></li>
 <li><p><strong>**kwargs</strong> – Additional keyword arguments are passed to the parent class.</p></li>
 </ul>
 </dd>
@@ -215,13 +222,13 @@
 <h2>File Output Drivers<a class="headerlink" href="#file-output-drivers" title="Permalink to this headline">¶</a></h2>
 <dl class="py class">
 <dt id="yggdrasil.drivers.FileOutputDriver.FileOutputDriver">
-<em class="property">class </em><code class="sig-prename descclassname">yggdrasil.drivers.FileOutputDriver.</code><code class="sig-name descname">FileOutputDriver</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">name</span></em>, <em class="sig-param"><span class="n">args</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/yggdrasil/drivers/FileOutputDriver.html#FileOutputDriver"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.drivers.FileOutputDriver.FileOutputDriver" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">yggdrasil.drivers.FileOutputDriver.</code><code class="sig-name descname">FileOutputDriver</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">*</span><span class="n">args</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/yggdrasil/drivers/FileOutputDriver.html#FileOutputDriver"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.drivers.FileOutputDriver.FileOutputDriver" title="Permalink to this definition">¶</a></dt>
 <dd><p>Class to handle output of received messages to a file.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) – Name of the output queue to receive messages from.</p></li>
-<li><p><strong>args</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) – Path to the file that messages should be written to.</p></li>
+<li><p><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a>) – Name of the output queue to receive messages from.</p></li>
+<li><p><strong>args</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a>) – Path to the file that messages should be written to.</p></li>
 <li><p><strong>**kwargs</strong> – Additional keyword arguments are passed to the parent class.</p></li>
 </ul>
 </dd>
@@ -233,14 +240,14 @@
 <h2>General Input Drivers<a class="headerlink" href="#general-input-drivers" title="Permalink to this headline">¶</a></h2>
 <dl class="py class">
 <dt id="yggdrasil.drivers.InputDriver.InputDriver">
-<em class="property">class </em><code class="sig-prename descclassname">yggdrasil.drivers.InputDriver.</code><code class="sig-name descname">InputDriver</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">name</span></em>, <em class="sig-param"><span class="n">args</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/yggdrasil/drivers/InputDriver.html#InputDriver"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.drivers.InputDriver.InputDriver" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">yggdrasil.drivers.InputDriver.</code><code class="sig-name descname">InputDriver</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">*</span><span class="n">args</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/yggdrasil/drivers/InputDriver.html#InputDriver"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.drivers.InputDriver.InputDriver" title="Permalink to this definition">¶</a></dt>
 <dd><p>Driver for receiving input from another model’s comm via a local comm.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) – The name of the local message comm that the driver should
+<li><p><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a>) – The name of the local message comm that the driver should
 connect to.</p></li>
-<li><p><strong>args</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) – The name of the other message comm that the driver should
+<li><p><strong>args</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a>) – The name of the other message comm that the driver should
 connect to.</p></li>
 <li><p><strong>**kwargs</strong> – Additional keyword arguments are passed to parent class.</p></li>
 </ul>
@@ -253,14 +260,14 @@ connect to.</p></li>
 <h2>General Output Drivers<a class="headerlink" href="#general-output-drivers" title="Permalink to this headline">¶</a></h2>
 <dl class="py class">
 <dt id="yggdrasil.drivers.OutputDriver.OutputDriver">
-<em class="property">class </em><code class="sig-prename descclassname">yggdrasil.drivers.OutputDriver.</code><code class="sig-name descname">OutputDriver</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">name</span></em>, <em class="sig-param"><span class="n">args</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/yggdrasil/drivers/OutputDriver.html#OutputDriver"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.drivers.OutputDriver.OutputDriver" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">yggdrasil.drivers.OutputDriver.</code><code class="sig-name descname">OutputDriver</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">*</span><span class="n">args</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/yggdrasil/drivers/OutputDriver.html#OutputDriver"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.drivers.OutputDriver.OutputDriver" title="Permalink to this definition">¶</a></dt>
 <dd><p>Driver for sending output to another model’s comm via a local comm.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) – The name of the local message comm that the driver should
+<li><p><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a>) – The name of the local message comm that the driver should
 connect to.</p></li>
-<li><p><strong>args</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) – The name of the other message comme that the driver should
+<li><p><strong>args</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a>) – The name of the other message comme that the driver should
 connect to.</p></li>
 <li><p><strong>**kwargs</strong> – Additional keyword arguments are passed to parent class.</p></li>
 </ul>
@@ -273,13 +280,13 @@ connect to.</p></li>
 <h2>RPC Drivers<a class="headerlink" href="#rpc-drivers" title="Permalink to this headline">¶</a></h2>
 <dl class="py class">
 <dt id="yggdrasil.drivers.ClientDriver.ClientDriver">
-<em class="property">class </em><code class="sig-prename descclassname">yggdrasil.drivers.ClientDriver.</code><code class="sig-name descname">ClientDriver</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">model_request_name</span></em>, <em class="sig-param"><span class="n">request_name</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">comm</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">comm_address</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/yggdrasil/drivers/ClientDriver.html#ClientDriver"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.drivers.ClientDriver.ClientDriver" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">yggdrasil.drivers.ClientDriver.</code><code class="sig-name descname">ClientDriver</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">*</span><span class="n">args</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/yggdrasil/drivers/ClientDriver.html#ClientDriver"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.drivers.ClientDriver.ClientDriver" title="Permalink to this definition">¶</a></dt>
 <dd><p>Alias for ClientRequestDriver.</p>
 </dd></dl>
 
 <dl class="py class">
 <dt id="yggdrasil.drivers.ServerDriver.ServerDriver">
-<em class="property">class </em><code class="sig-prename descclassname">yggdrasil.drivers.ServerDriver.</code><code class="sig-name descname">ServerDriver</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">model_request_name</span></em>, <em class="sig-param"><span class="n">request_name</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">comm</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">comm_address</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/yggdrasil/drivers/ServerDriver.html#ServerDriver"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.drivers.ServerDriver.ServerDriver" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">yggdrasil.drivers.ServerDriver.</code><code class="sig-name descname">ServerDriver</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">*</span><span class="n">args</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/yggdrasil/drivers/ServerDriver.html#ServerDriver"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.drivers.ServerDriver.ServerDriver" title="Permalink to this definition">¶</a></dt>
 <dd><p>Alias for ServerRequestDriver.</p>
 </dd></dl>
 
@@ -319,29 +326,29 @@ connect to.</p></li>
            
           </div>
           <footer>
-  
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
-      
-        <a href="model_drivers.html" class="btn btn-neutral float-right" title="Model Drivers" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
-      
-      
-        <a href="schema.html" class="btn btn-neutral float-left" title="YAML Validation Schema" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
-      
+        <a href="model_drivers.html" class="btn btn-neutral float-right" title="Model Drivers" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="schema.html" class="btn btn-neutral float-left" title="YAML Validation Schema" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
     </div>
-  
 
   <hr/>
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2017, Meagan Lang, David Raila
+        &#169; Copyright 2017, Meagan Lang, David Raila.
 
     </p>
   </div>
-  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+    
+    
+    
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
 
 </footer>
-
         </div>
       </div>
 
@@ -349,7 +356,6 @@ connect to.</p></li>
 
   </div>
   
-
 
   <script type="text/javascript">
       jQuery(function () {

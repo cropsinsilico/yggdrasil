@@ -1,39 +1,42 @@
 
 
 <!DOCTYPE html>
-<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
-<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<html class="writer-html5" lang="en" >
 <head>
-  <meta charset="utf-8">
+  <meta charset="utf-8" />
   
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>C++ Interface &mdash; yggdrasil 1.1.1+410.g95af39b2 documentation</title>
+  <title>C++ Interface &mdash; yggdrasil v1.5.0 documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/theme_overrides.css" type="text/css" />
+
+  
   
 
   
   
-  
+
   
 
   
-  <script type="text/javascript" src="../_static/js/modernizr.min.js"></script>
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
   
     
       <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
         <script src="../_static/jquery.js"></script>
         <script src="../_static/underscore.js"></script>
         <script src="../_static/doctools.js"></script>
-        <script src="../_static/language_data.js"></script>
     
     <script type="text/javascript" src="../_static/js/theme.js"></script>
 
     
-
-  
-  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
-  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
-  <link rel="stylesheet" href="../_static/theme_overrides.css" type="text/css" />
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="Matlab Interface" href="interface_m.html" />
@@ -61,7 +64,7 @@
             
             
               <div class="version">
-                1.1.1
+                v1.5.0
               </div>
             
           
@@ -78,6 +81,7 @@
           
         </div>
 
+        
         <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
           
             
@@ -129,6 +133,7 @@
             
           
         </div>
+        
       </div>
     </nav>
 
@@ -163,11 +168,13 @@
 
 
 
+
+
 <div role="navigation" aria-label="breadcrumbs navigation">
 
   <ul class="wy-breadcrumbs">
     
-      <li><a href="../index.html">Docs</a> &raquo;</li>
+      <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
         
           <li><a href="index.html">Advanced</a> &raquo;</li>
         
@@ -178,7 +185,7 @@
     
       <li class="wy-breadcrumbs-aside">
         
-            
+          
             <a href="../_sources/advanced/interface_cpp.rst.txt" rel="nofollow"> View page source</a>
           
         
@@ -217,6 +224,19 @@
 </dd></dl>
 
 <dl class="cpp function">
+<dt id="_CPPv4N8YggInput8YggInputEKNSt6stringE">
+<span id="_CPPv3N8YggInput8YggInputEKNSt6stringE"></span><span id="_CPPv2N8YggInput8YggInputEKNSt6stringE"></span><span id="YggInput::YggInput__ssC"></span><span class="target" id="class_ygg_input_1a0f72f542fd32105e6dc847e7a2d395e2"></span><code class="sig-name descname">YggInput</code><span class="sig-paren">(</span><em class="property">const</em> std::string <em>name</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N8YggInput8YggInputEKNSt6stringE" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Constructor for <a class="reference internal" href="#class_ygg_input"><span class="std std-ref">YggInput</span></a> w/ C++ std::string. </p>
+<p><dl class="simple">
+<dt><strong>Parameters</strong></dt><dd><ul class="breatheparameterlist simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">[in]</span> <span class="pre">name</span></code>: const std::string Name of input queue. This should be the argument to an input driver in the yaml specification file. </p></li>
+</ul>
+</dd>
+</dl>
+</p>
+</dd></dl>
+
+<dl class="cpp function">
 <dt id="_CPPv4N8YggInput8YggInputE10yggInput_t">
 <span id="_CPPv3N8YggInput8YggInputE10yggInput_t"></span><span id="_CPPv2N8YggInput8YggInputE10yggInput_t"></span><span id="YggInput::YggInput__yggInput_t"></span><span class="target" id="class_ygg_input_1a653d084427c00c558330f3feed0d9df4"></span><code class="sig-name descname">YggInput</code><span class="sig-paren">(</span>yggInput_t <em>x</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N8YggInput8YggInputE10yggInput_t" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Empty constructor for inheritance. </p>
@@ -237,12 +257,40 @@
 </dd></dl>
 
 <dl class="cpp function">
+<dt id="_CPPv4N8YggInput8YggInputEKNSt6stringEKNSt6stringE">
+<span id="_CPPv3N8YggInput8YggInputEKNSt6stringEKNSt6stringE"></span><span id="_CPPv2N8YggInput8YggInputEKNSt6stringEKNSt6stringE"></span><span id="YggInput::YggInput__ssC.ssC"></span><span class="target" id="class_ygg_input_1a029acfa98a88b2722925e3b8c7e28d95"></span><code class="sig-name descname">YggInput</code><span class="sig-paren">(</span><em class="property">const</em> std::string <em>name</em>, <em class="property">const</em> std::string <em>fmt</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N8YggInput8YggInputEKNSt6stringEKNSt6stringE" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Constructor for <a class="reference internal" href="#class_ygg_input"><span class="std std-ref">YggInput</span></a> with format. </p>
+<p><dl class="simple">
+<dt><strong>Parameters</strong></dt><dd><ul class="breatheparameterlist simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">[in]</span> <span class="pre">name</span></code>: const std::string Name of input queue. This should be the argument to an input driver in the yaml specification file. </p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">[in]</span> <span class="pre">fmt</span></code>: const std::string Format string for parsing messages. </p></li>
+</ul>
+</dd>
+</dl>
+</p>
+</dd></dl>
+
+<dl class="cpp function">
 <dt id="_CPPv4N8YggInput8YggInputEPKcP7dtype_t">
 <span id="_CPPv3N8YggInput8YggInputEPKcP7dtype_t"></span><span id="_CPPv2N8YggInput8YggInputEPKcP7dtype_t"></span><span id="YggInput::YggInput__cCP.dtype_tP"></span><span class="target" id="class_ygg_input_1abbe2d7834803896167c977b7489b3302"></span><code class="sig-name descname">YggInput</code><span class="sig-paren">(</span><em class="property">const</em> char *<em>name</em>, <a class="reference internal" href="datatypes_cpp.html#_CPPv47dtype_t" title="dtype_t">dtype_t</a> *<em>datatype</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N8YggInput8YggInputEPKcP7dtype_t" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Constructor for YggIntput with explicit datatype. </p>
 <p><dl class="simple">
 <dt><strong>Parameters</strong></dt><dd><ul class="breatheparameterlist simple">
 <li><p><code class="docutils literal notranslate"><span class="pre">[in]</span> <span class="pre">name</span></code>: constant character pointer to name of input queue. This should be the argument to an input driver in the yaml specification file. </p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">[in]</span> <span class="pre">datatype</span></code>: Pointer to a <a class="reference internal" href="datatypes_cpp.html#structdtype__t"><span class="std std-ref">dtype_t</span></a> data structure containing type informaiton. containing type information. </p></li>
+</ul>
+</dd>
+</dl>
+</p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt id="_CPPv4N8YggInput8YggInputEKNSt6stringEP7dtype_t">
+<span id="_CPPv3N8YggInput8YggInputEKNSt6stringEP7dtype_t"></span><span id="_CPPv2N8YggInput8YggInputEKNSt6stringEP7dtype_t"></span><span id="YggInput::YggInput__ssC.dtype_tP"></span><span class="target" id="class_ygg_input_1ab9d33891400732ed2e89b69045a08ee7"></span><code class="sig-name descname">YggInput</code><span class="sig-paren">(</span><em class="property">const</em> std::string <em>name</em>, <a class="reference internal" href="datatypes_cpp.html#_CPPv47dtype_t" title="dtype_t">dtype_t</a> *<em>datatype</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N8YggInput8YggInputEKNSt6stringEP7dtype_t" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Constructor for YggIntput with explicit datatype. </p>
+<p><dl class="simple">
+<dt><strong>Parameters</strong></dt><dd><ul class="breatheparameterlist simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">[in]</span> <span class="pre">name</span></code>: const std::string Name of input queue. This should be the argument to an input driver in the yaml specification file. </p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">[in]</span> <span class="pre">datatype</span></code>: Pointer to a <a class="reference internal" href="datatypes_cpp.html#structdtype__t"><span class="std std-ref">dtype_t</span></a> data structure containing type informaiton. containing type information. </p></li>
 </ul>
 </dd>
@@ -386,6 +434,19 @@
 </dd></dl>
 
 <dl class="cpp function">
+<dt id="_CPPv4N9YggOutput9YggOutputEKNSt6stringE">
+<span id="_CPPv3N9YggOutput9YggOutputEKNSt6stringE"></span><span id="_CPPv2N9YggOutput9YggOutputEKNSt6stringE"></span><span id="YggOutput::YggOutput__ssC"></span><span class="target" id="class_ygg_output_1a136a57e7c5a5b5ba1a18cf8ee539b528"></span><code class="sig-name descname">YggOutput</code><span class="sig-paren">(</span><em class="property">const</em> std::string <em>name</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N9YggOutput9YggOutputEKNSt6stringE" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Constructor for <a class="reference internal" href="#class_ygg_output"><span class="std std-ref">YggOutput</span></a>. </p>
+<p><dl class="simple">
+<dt><strong>Parameters</strong></dt><dd><ul class="breatheparameterlist simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">[in]</span> <span class="pre">name</span></code>: const std::string name of output queue. This should be the argument to an output driver in the yaml specification file. </p></li>
+</ul>
+</dd>
+</dl>
+</p>
+</dd></dl>
+
+<dl class="cpp function">
 <dt id="_CPPv4N9YggOutput9YggOutputEPKcPKc">
 <span id="_CPPv3N9YggOutput9YggOutputEPKcPKc"></span><span id="_CPPv2N9YggOutput9YggOutputEPKcPKc"></span><span id="YggOutput::YggOutput__cCP.cCP"></span><span class="target" id="class_ygg_output_1ac731249ebab6b5de86909960cdf2ac46"></span><code class="sig-name descname">YggOutput</code><span class="sig-paren">(</span><em class="property">const</em> char *<em>name</em>, <em class="property">const</em> char *<em>fmt</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N9YggOutput9YggOutputEPKcPKc" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Constructor for <a class="reference internal" href="#class_ygg_output"><span class="std std-ref">YggOutput</span></a> with format. </p>
@@ -400,12 +461,40 @@
 </dd></dl>
 
 <dl class="cpp function">
+<dt id="_CPPv4N9YggOutput9YggOutputEKNSt6stringEKNSt6stringE">
+<span id="_CPPv3N9YggOutput9YggOutputEKNSt6stringEKNSt6stringE"></span><span id="_CPPv2N9YggOutput9YggOutputEKNSt6stringEKNSt6stringE"></span><span id="YggOutput::YggOutput__ssC.ssC"></span><span class="target" id="class_ygg_output_1aa4d817e109c18517b98c3084784d5d58"></span><code class="sig-name descname">YggOutput</code><span class="sig-paren">(</span><em class="property">const</em> std::string <em>name</em>, <em class="property">const</em> std::string <em>fmt</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N9YggOutput9YggOutputEKNSt6stringEKNSt6stringE" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Constructor for <a class="reference internal" href="#class_ygg_output"><span class="std std-ref">YggOutput</span></a> with format. </p>
+<p><dl class="simple">
+<dt><strong>Parameters</strong></dt><dd><ul class="breatheparameterlist simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">[in]</span> <span class="pre">name</span></code>: const std::string name of output queue. This should be the argument to an output driver in the yaml specification file. </p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">[in]</span> <span class="pre">fmt</span></code>: const std::string format string for formatting variables. </p></li>
+</ul>
+</dd>
+</dl>
+</p>
+</dd></dl>
+
+<dl class="cpp function">
 <dt id="_CPPv4N9YggOutput9YggOutputEPKcP7dtype_t">
 <span id="_CPPv3N9YggOutput9YggOutputEPKcP7dtype_t"></span><span id="_CPPv2N9YggOutput9YggOutputEPKcP7dtype_t"></span><span id="YggOutput::YggOutput__cCP.dtype_tP"></span><span class="target" id="class_ygg_output_1a0fb4628536eac0775a73e2d6a0a52d81"></span><code class="sig-name descname">YggOutput</code><span class="sig-paren">(</span><em class="property">const</em> char *<em>name</em>, <a class="reference internal" href="datatypes_cpp.html#_CPPv47dtype_t" title="dtype_t">dtype_t</a> *<em>datatype</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N9YggOutput9YggOutputEPKcP7dtype_t" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Constructor for <a class="reference internal" href="#class_ygg_output"><span class="std std-ref">YggOutput</span></a> with explicit datatype. </p>
 <p><dl class="simple">
 <dt><strong>Parameters</strong></dt><dd><ul class="breatheparameterlist simple">
 <li><p><code class="docutils literal notranslate"><span class="pre">[in]</span> <span class="pre">name</span></code>: constant character pointer to name of output queue. This should be the argument to an output driver in the yaml specification file. </p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">[in]</span> <span class="pre">datatype</span></code>: Pointer to a <a class="reference internal" href="datatypes_cpp.html#structdtype__t"><span class="std std-ref">dtype_t</span></a> data structure containing type informaiton. </p></li>
+</ul>
+</dd>
+</dl>
+</p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt id="_CPPv4N9YggOutput9YggOutputEKNSt6stringEP7dtype_t">
+<span id="_CPPv3N9YggOutput9YggOutputEKNSt6stringEP7dtype_t"></span><span id="_CPPv2N9YggOutput9YggOutputEKNSt6stringEP7dtype_t"></span><span id="YggOutput::YggOutput__ssC.dtype_tP"></span><span class="target" id="class_ygg_output_1aef16c78409a2d133d2d33d580ede6243"></span><code class="sig-name descname">YggOutput</code><span class="sig-paren">(</span><em class="property">const</em> std::string <em>name</em>, <a class="reference internal" href="datatypes_cpp.html#_CPPv47dtype_t" title="dtype_t">dtype_t</a> *<em>datatype</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N9YggOutput9YggOutputEKNSt6stringEP7dtype_t" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Constructor for <a class="reference internal" href="#class_ygg_output"><span class="std std-ref">YggOutput</span></a> with explicit datatype. </p>
+<p><dl class="simple">
+<dt><strong>Parameters</strong></dt><dd><ul class="breatheparameterlist simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">[in]</span> <span class="pre">name</span></code>: const std::string name of output queue. This should be the argument to an output driver in the yaml specification file. </p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">[in]</span> <span class="pre">datatype</span></code>: Pointer to a <a class="reference internal" href="datatypes_cpp.html#structdtype__t"><span class="std std-ref">dtype_t</span></a> data structure containing type informaiton. </p></li>
 </ul>
 </dd>
@@ -646,9 +735,33 @@
 </dd></dl>
 
 <dl class="cpp function">
-<dt id="_CPPv4N12YggRpcServerD0Ev">
-<span id="_CPPv3N12YggRpcServerD0Ev"></span><span id="_CPPv2N12YggRpcServerD0Ev"></span><span id="YggRpcServer::~YggRpcServer"></span><span class="target" id="class_ygg_rpc_server_1aa02d158a203c98c845368c0f317632de"></span><code class="sig-name descname">~YggRpcServer</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N12YggRpcServerD0Ev" title="Permalink to this definition">¶</a><br /></dt>
-<dd><p>Destructor for <a class="reference internal" href="#class_ygg_rpc_server"><span class="std std-ref">YggRpcServer</span></a>. See ygg_free in YggInterface.h for details. </p>
+<dt id="_CPPv4N12YggRpcServer12YggRpcServerEKNSt6stringEKNSt6stringEKNSt6stringE">
+<span id="_CPPv3N12YggRpcServer12YggRpcServerEKNSt6stringEKNSt6stringEKNSt6stringE"></span><span id="_CPPv2N12YggRpcServer12YggRpcServerEKNSt6stringEKNSt6stringEKNSt6stringE"></span><span id="YggRpcServer::YggRpcServer__ssC.ssC.ssC"></span><span class="target" id="class_ygg_rpc_server_1a1c9108f613eb9db937f93e09edbe47da"></span><code class="sig-name descname">YggRpcServer</code><span class="sig-paren">(</span><em class="property">const</em> std::string <em>name</em>, <em class="property">const</em> std::string <em>inFormat</em>, <em class="property">const</em> std::string <em>outFormat</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N12YggRpcServer12YggRpcServerEKNSt6stringEKNSt6stringEKNSt6stringE" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Constructor for <a class="reference internal" href="#class_ygg_rpc_server"><span class="std std-ref">YggRpcServer</span></a>. </p>
+<p><dl class="simple">
+<dt><strong>Parameters</strong></dt><dd><ul class="breatheparameterlist simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">[in]</span> <span class="pre">name</span></code>: constant std::string name used for input and output queues. </p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">[in]</span> <span class="pre">inFormat</span></code>: const std::string format that should be used for parsing input. </p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">[in]</span> <span class="pre">outFormat</span></code>: const std::string format that should be used for formatting output. </p></li>
+</ul>
+</dd>
+</dl>
+</p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt id="_CPPv4N12YggRpcServer12YggRpcServerEKNSt6stringEP7dtype_tP7dtype_t">
+<span id="_CPPv3N12YggRpcServer12YggRpcServerEKNSt6stringEP7dtype_tP7dtype_t"></span><span id="_CPPv2N12YggRpcServer12YggRpcServerEKNSt6stringEP7dtype_tP7dtype_t"></span><span id="YggRpcServer::YggRpcServer__ssC.dtype_tP.dtype_tP"></span><span class="target" id="class_ygg_rpc_server_1a705cc9e1a535de27171bccd45008e3d5"></span><code class="sig-name descname">YggRpcServer</code><span class="sig-paren">(</span><em class="property">const</em> std::string <em>name</em>, <a class="reference internal" href="datatypes_cpp.html#_CPPv47dtype_t" title="dtype_t">dtype_t</a> *<em>inType</em>, <a class="reference internal" href="datatypes_cpp.html#_CPPv47dtype_t" title="dtype_t">dtype_t</a> *<em>outType</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N12YggRpcServer12YggRpcServerEKNSt6stringEP7dtype_tP7dtype_t" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Constructor for <a class="reference internal" href="#class_ygg_rpc_server"><span class="std std-ref">YggRpcServer</span></a> with explicit datatype. </p>
+<p><dl class="simple">
+<dt><strong>Parameters</strong></dt><dd><ul class="breatheparameterlist simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">[in]</span> <span class="pre">name</span></code>: constant std::string name used for input and output queues. </p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">[in]</span> <span class="pre">inType</span></code>: Pointer to a <a class="reference internal" href="datatypes_cpp.html#structdtype__t"><span class="std std-ref">dtype_t</span></a> data structure containing type info for data that will be received by the server </p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">[in]</span> <span class="pre">outType</span></code>: Pointer to a <a class="reference internal" href="datatypes_cpp.html#structdtype__t"><span class="std std-ref">dtype_t</span></a> data structure containing type info for data that will be sent by the server. </p></li>
+</ul>
+</dd>
+</dl>
+</p>
 </dd></dl>
 
 </div>
@@ -683,9 +796,33 @@
 </dd></dl>
 
 <dl class="cpp function">
-<dt id="_CPPv4N12YggRpcClientD0Ev">
-<span id="_CPPv3N12YggRpcClientD0Ev"></span><span id="_CPPv2N12YggRpcClientD0Ev"></span><span id="YggRpcClient::~YggRpcClient"></span><span class="target" id="class_ygg_rpc_client_1a312d2ac88acfbfbdca6ac6fdecb948ae"></span><code class="sig-name descname">~YggRpcClient</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N12YggRpcClientD0Ev" title="Permalink to this definition">¶</a><br /></dt>
-<dd><p>Destructor for <a class="reference internal" href="#class_ygg_rpc_client"><span class="std std-ref">YggRpcClient</span></a>. See ygg_free in YggInterface.h for details. </p>
+<dt id="_CPPv4N12YggRpcClient12YggRpcClientEKNSt6stringEKNSt6stringEKNSt6stringE">
+<span id="_CPPv3N12YggRpcClient12YggRpcClientEKNSt6stringEKNSt6stringEKNSt6stringE"></span><span id="_CPPv2N12YggRpcClient12YggRpcClientEKNSt6stringEKNSt6stringEKNSt6stringE"></span><span id="YggRpcClient::YggRpcClient__ssC.ssC.ssC"></span><span class="target" id="class_ygg_rpc_client_1a4cbe97d0da08652966ffbfaaadec25db"></span><code class="sig-name descname">YggRpcClient</code><span class="sig-paren">(</span><em class="property">const</em> std::string <em>name</em>, <em class="property">const</em> std::string <em>outFormat</em>, <em class="property">const</em> std::string <em>inFormat</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N12YggRpcClient12YggRpcClientEKNSt6stringEKNSt6stringEKNSt6stringE" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Constructor for <a class="reference internal" href="#class_ygg_rpc_client"><span class="std std-ref">YggRpcClient</span></a>. </p>
+<p><dl class="simple">
+<dt><strong>Parameters</strong></dt><dd><ul class="breatheparameterlist simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">[in]</span> <span class="pre">name</span></code>: constant std::string name used for input and output queues. </p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">[in]</span> <span class="pre">outFormat</span></code>: const std::string format that should be used for formatting output. </p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">[in]</span> <span class="pre">inFormat</span></code>: const std::string format that should be used for parsing input. </p></li>
+</ul>
+</dd>
+</dl>
+</p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt id="_CPPv4N12YggRpcClient12YggRpcClientEKNSt6stringEP7dtype_tP7dtype_t">
+<span id="_CPPv3N12YggRpcClient12YggRpcClientEKNSt6stringEP7dtype_tP7dtype_t"></span><span id="_CPPv2N12YggRpcClient12YggRpcClientEKNSt6stringEP7dtype_tP7dtype_t"></span><span id="YggRpcClient::YggRpcClient__ssC.dtype_tP.dtype_tP"></span><span class="target" id="class_ygg_rpc_client_1a6f4d2d4e2a2ad421d590a8f5f30c53e9"></span><code class="sig-name descname">YggRpcClient</code><span class="sig-paren">(</span><em class="property">const</em> std::string <em>name</em>, <a class="reference internal" href="datatypes_cpp.html#_CPPv47dtype_t" title="dtype_t">dtype_t</a> *<em>outType</em>, <a class="reference internal" href="datatypes_cpp.html#_CPPv47dtype_t" title="dtype_t">dtype_t</a> *<em>inType</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N12YggRpcClient12YggRpcClientEKNSt6stringEP7dtype_tP7dtype_t" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Constructor for <a class="reference internal" href="#class_ygg_rpc_client"><span class="std std-ref">YggRpcClient</span></a> with explicit datatype. </p>
+<p><dl class="simple">
+<dt><strong>Parameters</strong></dt><dd><ul class="breatheparameterlist simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">[in]</span> <span class="pre">name</span></code>: constant std::string name used for input and output queues. </p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">[in]</span> <span class="pre">outType</span></code>: Pointer to a <a class="reference internal" href="datatypes_cpp.html#structdtype__t"><span class="std std-ref">dtype_t</span></a> data structure containing type info for data that will be sent by the client. </p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">[in]</span> <span class="pre">inType</span></code>: Pointer to a <a class="reference internal" href="datatypes_cpp.html#structdtype__t"><span class="std std-ref">dtype_t</span></a> data structure containing type info for data that will be received by the client </p></li>
+</ul>
+</dd>
+</dl>
+</p>
 </dd></dl>
 
 <dl class="cpp function">
@@ -743,6 +880,20 @@
 </p>
 </dd></dl>
 
+<dl class="cpp function">
+<dt id="_CPPv4N11YggTimesync11YggTimesyncEKNSt6stringEKNSt6stringE">
+<span id="_CPPv3N11YggTimesync11YggTimesyncEKNSt6stringEKNSt6stringE"></span><span id="_CPPv2N11YggTimesync11YggTimesyncEKNSt6stringEKNSt6stringE"></span><span id="YggTimesync::YggTimesync__ssC.ssC"></span><span class="target" id="class_ygg_timesync_1a647be82b8ab939533b7d7d18a39949d3"></span><code class="sig-name descname">YggTimesync</code><span class="sig-paren">(</span><em class="property">const</em> std::string <em>name</em> = &quot;timesync&quot;, <em class="property">const</em> std::string <em>t_units</em> = &quot;&quot;<span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N11YggTimesync11YggTimesyncEKNSt6stringEKNSt6stringE" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Constructor for <a class="reference internal" href="#class_ygg_timesync"><span class="std std-ref">YggTimesync</span></a>. </p>
+<p><dl class="simple">
+<dt><strong>Parameters</strong></dt><dd><ul class="breatheparameterlist simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">[in]</span> <span class="pre">name</span></code>: const std::string name used for input and output queues. </p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">[in]</span> <span class="pre">t_units</span></code>: const std::string Units that should be used for the timestep. “” indicates no units. </p></li>
+</ul>
+</dd>
+</dl>
+</p>
+</dd></dl>
+
 </div>
 </dd></dl>
 
@@ -760,6 +911,19 @@
 <p><dl class="simple">
 <dt><strong>Parameters</strong></dt><dd><ul class="breatheparameterlist simple">
 <li><p><code class="docutils literal notranslate"><span class="pre">[in]</span> <span class="pre">name</span></code>: constant character pointer to the name of an output channel. </p></li>
+</ul>
+</dd>
+</dl>
+</p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt id="_CPPv4N18YggAsciiFileOutput18YggAsciiFileOutputEKNSt6stringE">
+<span id="_CPPv3N18YggAsciiFileOutput18YggAsciiFileOutputEKNSt6stringE"></span><span id="_CPPv2N18YggAsciiFileOutput18YggAsciiFileOutputEKNSt6stringE"></span><span id="YggAsciiFileOutput::YggAsciiFileOutput__ssC"></span><span class="target" id="class_ygg_ascii_file_output_1ac42c78d2a253bfe07c0a723e58719f76"></span><code class="sig-name descname">YggAsciiFileOutput</code><span class="sig-paren">(</span><em class="property">const</em> std::string <em>name</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N18YggAsciiFileOutput18YggAsciiFileOutputEKNSt6stringE" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Constructor for <a class="reference internal" href="#class_ygg_ascii_file_output"><span class="std std-ref">YggAsciiFileOutput</span></a>. </p>
+<p><dl class="simple">
+<dt><strong>Parameters</strong></dt><dd><ul class="breatheparameterlist simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">[in]</span> <span class="pre">name</span></code>: constant std::string the name of an output channel. </p></li>
 </ul>
 </dd>
 </dl>
@@ -804,6 +968,19 @@
 <p><dl class="simple">
 <dt><strong>Parameters</strong></dt><dd><ul class="breatheparameterlist simple">
 <li><p><code class="docutils literal notranslate"><span class="pre">[in]</span> <span class="pre">name</span></code>: constant character pointer to the name of an input channel. </p></li>
+</ul>
+</dd>
+</dl>
+</p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt id="_CPPv4N17YggAsciiFileInput17YggAsciiFileInputEKNSt6stringE">
+<span id="_CPPv3N17YggAsciiFileInput17YggAsciiFileInputEKNSt6stringE"></span><span id="_CPPv2N17YggAsciiFileInput17YggAsciiFileInputEKNSt6stringE"></span><span id="YggAsciiFileInput::YggAsciiFileInput__ssC"></span><span class="target" id="class_ygg_ascii_file_input_1a530010a4c044f659a357bef146678ade"></span><code class="sig-name descname">YggAsciiFileInput</code><span class="sig-paren">(</span><em class="property">const</em> std::string <em>name</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N17YggAsciiFileInput17YggAsciiFileInputEKNSt6stringE" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Constructor for <a class="reference internal" href="#class_ygg_ascii_file_input"><span class="std std-ref">YggAsciiFileInput</span></a>. </p>
+<p><dl class="simple">
+<dt><strong>Parameters</strong></dt><dd><ul class="breatheparameterlist simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">[in]</span> <span class="pre">name</span></code>: constant std::string the name of an input channel. </p></li>
 </ul>
 </dd>
 </dl>
@@ -856,6 +1033,20 @@
 </p>
 </dd></dl>
 
+<dl class="cpp function">
+<dt id="_CPPv4N19YggAsciiTableOutput19YggAsciiTableOutputEKNSt6stringEKNSt6stringE">
+<span id="_CPPv3N19YggAsciiTableOutput19YggAsciiTableOutputEKNSt6stringEKNSt6stringE"></span><span id="_CPPv2N19YggAsciiTableOutput19YggAsciiTableOutputEKNSt6stringEKNSt6stringE"></span><span id="YggAsciiTableOutput::YggAsciiTableOutput__ssC.ssC"></span><span class="target" id="class_ygg_ascii_table_output_1a2e5184a7b1e45c6f626476cd5793e9b8"></span><code class="sig-name descname">YggAsciiTableOutput</code><span class="sig-paren">(</span><em class="property">const</em> std::string <em>name</em>, <em class="property">const</em> std::string <em>format_str</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N19YggAsciiTableOutput19YggAsciiTableOutputEKNSt6stringEKNSt6stringE" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Constructor for <a class="reference internal" href="#class_ygg_ascii_table_output"><span class="std std-ref">YggAsciiTableOutput</span></a>. </p>
+<p><dl class="simple">
+<dt><strong>Parameters</strong></dt><dd><ul class="breatheparameterlist simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">[in]</span> <span class="pre">name</span></code>: constant std::string the name of an output channel. </p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">[in]</span> <span class="pre">format_str</span></code>: const std::string format string that should be used to format rows into table lines. </p></li>
+</ul>
+</dd>
+</dl>
+</p>
+</dd></dl>
+
 </div>
 </dd></dl>
 
@@ -874,6 +1065,20 @@
 <dt><strong>Parameters</strong></dt><dd><ul class="breatheparameterlist simple">
 <li><p><code class="docutils literal notranslate"><span class="pre">[in]</span> <span class="pre">name</span></code>: constant character pointer to the name of an output channel. </p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">[in]</span> <span class="pre">format_str</span></code>: character pointer to format string that should be used to format arrays into a table. </p></li>
+</ul>
+</dd>
+</dl>
+</p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt id="_CPPv4N19YggAsciiArrayOutput19YggAsciiArrayOutputEKNSt6stringEKNSt6stringE">
+<span id="_CPPv3N19YggAsciiArrayOutput19YggAsciiArrayOutputEKNSt6stringEKNSt6stringE"></span><span id="_CPPv2N19YggAsciiArrayOutput19YggAsciiArrayOutputEKNSt6stringEKNSt6stringE"></span><span id="YggAsciiArrayOutput::YggAsciiArrayOutput__ssC.ssC"></span><span class="target" id="class_ygg_ascii_array_output_1a688566fde6dad057859c3cb50fd18ae0"></span><code class="sig-name descname">YggAsciiArrayOutput</code><span class="sig-paren">(</span><em class="property">const</em> std::string <em>name</em>, <em class="property">const</em> std::string <em>format_str</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N19YggAsciiArrayOutput19YggAsciiArrayOutputEKNSt6stringEKNSt6stringE" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Constructor for <a class="reference internal" href="#class_ygg_ascii_array_output"><span class="std std-ref">YggAsciiArrayOutput</span></a>. </p>
+<p><dl class="simple">
+<dt><strong>Parameters</strong></dt><dd><ul class="breatheparameterlist simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">[in]</span> <span class="pre">name</span></code>: constant std::string the name of an output channel. </p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">[in]</span> <span class="pre">format_str</span></code>: const std::string format string that should be used to format arrays into a table. </p></li>
 </ul>
 </dd>
 </dl>
@@ -903,6 +1108,19 @@
 </p>
 </dd></dl>
 
+<dl class="cpp function">
+<dt id="_CPPv4N18YggAsciiTableInput18YggAsciiTableInputEKNSt6stringE">
+<span id="_CPPv3N18YggAsciiTableInput18YggAsciiTableInputEKNSt6stringE"></span><span id="_CPPv2N18YggAsciiTableInput18YggAsciiTableInputEKNSt6stringE"></span><span id="YggAsciiTableInput::YggAsciiTableInput__ssC"></span><span class="target" id="class_ygg_ascii_table_input_1a8bf8df289b4ca5491d23846fd7de07c3"></span><code class="sig-name descname">YggAsciiTableInput</code><span class="sig-paren">(</span><em class="property">const</em> std::string <em>name</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N18YggAsciiTableInput18YggAsciiTableInputEKNSt6stringE" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Constructor for <a class="reference internal" href="#class_ygg_ascii_table_input"><span class="std std-ref">YggAsciiTableInput</span></a>. Due to issues with the C++ version of vsscanf, flags and precision indicators for floating point format specifiers (e.g. e, f), must be removed so that table input can be properly parsed. </p>
+<p><dl class="simple">
+<dt><strong>Parameters</strong></dt><dd><ul class="breatheparameterlist simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">[in]</span> <span class="pre">name</span></code>: constant std::string the name of an input channel. </p></li>
+</ul>
+</dd>
+</dl>
+</p>
+</dd></dl>
+
 </div>
 </dd></dl>
 
@@ -926,6 +1144,19 @@
 </p>
 </dd></dl>
 
+<dl class="cpp function">
+<dt id="_CPPv4N18YggAsciiArrayInput18YggAsciiArrayInputEKNSt6stringE">
+<span id="_CPPv3N18YggAsciiArrayInput18YggAsciiArrayInputEKNSt6stringE"></span><span id="_CPPv2N18YggAsciiArrayInput18YggAsciiArrayInputEKNSt6stringE"></span><span id="YggAsciiArrayInput::YggAsciiArrayInput__ssC"></span><span class="target" id="class_ygg_ascii_array_input_1a2d439a0ded0a3241ac06e65d69a31324"></span><code class="sig-name descname">YggAsciiArrayInput</code><span class="sig-paren">(</span><em class="property">const</em> std::string <em>name</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N18YggAsciiArrayInput18YggAsciiArrayInputEKNSt6stringE" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Constructor for <a class="reference internal" href="#class_ygg_ascii_array_input"><span class="std std-ref">YggAsciiArrayInput</span></a>. Due to issues with the C++ version of vsscanf, flags and precision indicators for floating point format specifiers (e.g. e, f), must be removed so that table input can be properly parsed. </p>
+<p><dl class="simple">
+<dt><strong>Parameters</strong></dt><dd><ul class="breatheparameterlist simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">[in]</span> <span class="pre">name</span></code>: constant std::string the name of an input channel. </p></li>
+</ul>
+</dd>
+</dl>
+</p>
+</dd></dl>
+
 </div>
 </dd></dl>
 
@@ -942,6 +1173,19 @@
 <p><dl class="simple">
 <dt><strong>Parameters</strong></dt><dd><ul class="breatheparameterlist simple">
 <li><p><code class="docutils literal notranslate"><span class="pre">[in]</span> <span class="pre">name</span></code>: constant character pointer to the name of an output channel. </p></li>
+</ul>
+</dd>
+</dl>
+</p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt id="_CPPv4N12YggPlyOutput12YggPlyOutputEKNSt6stringE">
+<span id="_CPPv3N12YggPlyOutput12YggPlyOutputEKNSt6stringE"></span><span id="_CPPv2N12YggPlyOutput12YggPlyOutputEKNSt6stringE"></span><span id="YggPlyOutput::YggPlyOutput__ssC"></span><span class="target" id="class_ygg_ply_output_1a5686defd48cd16d40c1a354077b461a9"></span><code class="sig-name descname">YggPlyOutput</code><span class="sig-paren">(</span><em class="property">const</em> std::string <em>name</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N12YggPlyOutput12YggPlyOutputEKNSt6stringE" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Constructor for <a class="reference internal" href="#class_ygg_ply_output"><span class="std std-ref">YggPlyOutput</span></a>. </p>
+<p><dl class="simple">
+<dt><strong>Parameters</strong></dt><dd><ul class="breatheparameterlist simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">[in]</span> <span class="pre">name</span></code>: constant std::string the name of an output channel. </p></li>
 </ul>
 </dd>
 </dl>
@@ -977,6 +1221,19 @@
 </dd></dl>
 
 <dl class="cpp function">
+<dt id="_CPPv4N11YggPlyInput11YggPlyInputEKNSt6stringE">
+<span id="_CPPv3N11YggPlyInput11YggPlyInputEKNSt6stringE"></span><span id="_CPPv2N11YggPlyInput11YggPlyInputEKNSt6stringE"></span><span id="YggPlyInput::YggPlyInput__ssC"></span><span class="target" id="class_ygg_ply_input_1ae286df0fd7275d7e6c1b1b77ec2c47ad"></span><code class="sig-name descname">YggPlyInput</code><span class="sig-paren">(</span><em class="property">const</em> std::string <em>name</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N11YggPlyInput11YggPlyInputEKNSt6stringE" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Constructor for <a class="reference internal" href="#class_ygg_ply_input"><span class="std std-ref">YggPlyInput</span></a>. </p>
+<p><dl class="simple">
+<dt><strong>Parameters</strong></dt><dd><ul class="breatheparameterlist simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">[in]</span> <span class="pre">name</span></code>: constant std::string the name of an input channel. </p></li>
+</ul>
+</dd>
+</dl>
+</p>
+</dd></dl>
+
+<dl class="cpp function">
 <dt id="_CPPv4N11YggPlyInput11YggPlyInputE10yggInput_t">
 <span id="_CPPv3N11YggPlyInput11YggPlyInputE10yggInput_t"></span><span id="_CPPv2N11YggPlyInput11YggPlyInputE10yggInput_t"></span><span id="YggPlyInput::YggPlyInput__yggInput_t"></span><span class="target" id="class_ygg_ply_input_1abaada850efddd682de8a31a301f05373"></span><code class="sig-name descname">YggPlyInput</code><span class="sig-paren">(</span>yggInput_t <em>x</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N11YggPlyInput11YggPlyInputE10yggInput_t" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Empty constructor for inheritance. </p>
@@ -998,6 +1255,19 @@
 <p><dl class="simple">
 <dt><strong>Parameters</strong></dt><dd><ul class="breatheparameterlist simple">
 <li><p><code class="docutils literal notranslate"><span class="pre">[in]</span> <span class="pre">name</span></code>: constant character pointer to the name of an output channel. </p></li>
+</ul>
+</dd>
+</dl>
+</p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt id="_CPPv4N12YggObjOutput12YggObjOutputEKNSt6stringE">
+<span id="_CPPv3N12YggObjOutput12YggObjOutputEKNSt6stringE"></span><span id="_CPPv2N12YggObjOutput12YggObjOutputEKNSt6stringE"></span><span id="YggObjOutput::YggObjOutput__ssC"></span><span class="target" id="class_ygg_obj_output_1a2d1d58351559d030f7bd544b4ac3d3d2"></span><code class="sig-name descname">YggObjOutput</code><span class="sig-paren">(</span><em class="property">const</em> std::string <em>name</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N12YggObjOutput12YggObjOutputEKNSt6stringE" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Constructor for <a class="reference internal" href="#class_ygg_obj_output"><span class="std std-ref">YggObjOutput</span></a>. </p>
+<p><dl class="simple">
+<dt><strong>Parameters</strong></dt><dd><ul class="breatheparameterlist simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">[in]</span> <span class="pre">name</span></code>: constant std::string the name of an output channel. </p></li>
 </ul>
 </dd>
 </dl>
@@ -1033,6 +1303,19 @@
 </dd></dl>
 
 <dl class="cpp function">
+<dt id="_CPPv4N11YggObjInput11YggObjInputEKNSt6stringE">
+<span id="_CPPv3N11YggObjInput11YggObjInputEKNSt6stringE"></span><span id="_CPPv2N11YggObjInput11YggObjInputEKNSt6stringE"></span><span id="YggObjInput::YggObjInput__ssC"></span><span class="target" id="class_ygg_obj_input_1aeec33f6dbb852a51d49139d6b7373459"></span><code class="sig-name descname">YggObjInput</code><span class="sig-paren">(</span><em class="property">const</em> std::string <em>name</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N11YggObjInput11YggObjInputEKNSt6stringE" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Constructor for <a class="reference internal" href="#class_ygg_obj_input"><span class="std std-ref">YggObjInput</span></a>. </p>
+<p><dl class="simple">
+<dt><strong>Parameters</strong></dt><dd><ul class="breatheparameterlist simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">[in]</span> <span class="pre">name</span></code>: constant std::string the name of an input channel. </p></li>
+</ul>
+</dd>
+</dl>
+</p>
+</dd></dl>
+
+<dl class="cpp function">
 <dt id="_CPPv4N11YggObjInput11YggObjInputE10yggInput_t">
 <span id="_CPPv3N11YggObjInput11YggObjInputE10yggInput_t"></span><span id="_CPPv2N11YggObjInput11YggObjInputE10yggInput_t"></span><span id="YggObjInput::YggObjInput__yggInput_t"></span><span class="target" id="class_ygg_obj_input_1a303b39acf282878baa14eeaa7cc93ad7"></span><code class="sig-name descname">YggObjInput</code><span class="sig-paren">(</span>yggInput_t <em>x</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N11YggObjInput11YggObjInputE10yggInput_t" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Empty constructor for inheritance. </p>
@@ -1054,6 +1337,19 @@
 <p><dl class="simple">
 <dt><strong>Parameters</strong></dt><dd><ul class="breatheparameterlist simple">
 <li><p><code class="docutils literal notranslate"><span class="pre">[in]</span> <span class="pre">name</span></code>: constant character pointer to the name of an output channel. </p></li>
+</ul>
+</dd>
+</dl>
+</p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt id="_CPPv4N16YggGenericOutput16YggGenericOutputEKNSt6stringE">
+<span id="_CPPv3N16YggGenericOutput16YggGenericOutputEKNSt6stringE"></span><span id="_CPPv2N16YggGenericOutput16YggGenericOutputEKNSt6stringE"></span><span id="YggGenericOutput::YggGenericOutput__ssC"></span><span class="target" id="class_ygg_generic_output_1aad8817d32094157f8a6826f2d434ec32"></span><code class="sig-name descname">YggGenericOutput</code><span class="sig-paren">(</span><em class="property">const</em> std::string <em>name</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N16YggGenericOutput16YggGenericOutputEKNSt6stringE" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Constructor for <a class="reference internal" href="#class_ygg_generic_output"><span class="std std-ref">YggGenericOutput</span></a>. </p>
+<p><dl class="simple">
+<dt><strong>Parameters</strong></dt><dd><ul class="breatheparameterlist simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">[in]</span> <span class="pre">name</span></code>: constant std::string the name of an output channel. </p></li>
 </ul>
 </dd>
 </dl>
@@ -1089,6 +1385,19 @@
 </dd></dl>
 
 <dl class="cpp function">
+<dt id="_CPPv4N15YggGenericInput15YggGenericInputEKNSt6stringE">
+<span id="_CPPv3N15YggGenericInput15YggGenericInputEKNSt6stringE"></span><span id="_CPPv2N15YggGenericInput15YggGenericInputEKNSt6stringE"></span><span id="YggGenericInput::YggGenericInput__ssC"></span><span class="target" id="class_ygg_generic_input_1aabc650f8c2f1ae21ad2e7761a1d58bcc"></span><code class="sig-name descname">YggGenericInput</code><span class="sig-paren">(</span><em class="property">const</em> std::string <em>name</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N15YggGenericInput15YggGenericInputEKNSt6stringE" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Constructor for <a class="reference internal" href="#class_ygg_generic_input"><span class="std std-ref">YggGenericInput</span></a>. </p>
+<p><dl class="simple">
+<dt><strong>Parameters</strong></dt><dd><ul class="breatheparameterlist simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">[in]</span> <span class="pre">name</span></code>: constant std::string the name of an input channel. </p></li>
+</ul>
+</dd>
+</dl>
+</p>
+</dd></dl>
+
+<dl class="cpp function">
 <dt id="_CPPv4N15YggGenericInput15YggGenericInputE10yggInput_t">
 <span id="_CPPv3N15YggGenericInput15YggGenericInputE10yggInput_t"></span><span id="_CPPv2N15YggGenericInput15YggGenericInputE10yggInput_t"></span><span id="YggGenericInput::YggGenericInput__yggInput_t"></span><span class="target" id="class_ygg_generic_input_1a0b6a5311aa1f48f88224247c7238dedc"></span><code class="sig-name descname">YggGenericInput</code><span class="sig-paren">(</span>yggInput_t <em>x</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N15YggGenericInput15YggGenericInputE10yggInput_t" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Empty constructor for inheritance. </p>
@@ -1110,6 +1419,19 @@
 <p><dl class="simple">
 <dt><strong>Parameters</strong></dt><dd><ul class="breatheparameterlist simple">
 <li><p><code class="docutils literal notranslate"><span class="pre">[in]</span> <span class="pre">name</span></code>: constant character pointer to the name of an output channel. </p></li>
+</ul>
+</dd>
+</dl>
+</p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt id="_CPPv4N12YggAnyOutput12YggAnyOutputEKNSt6stringE">
+<span id="_CPPv3N12YggAnyOutput12YggAnyOutputEKNSt6stringE"></span><span id="_CPPv2N12YggAnyOutput12YggAnyOutputEKNSt6stringE"></span><span id="YggAnyOutput::YggAnyOutput__ssC"></span><span class="target" id="class_ygg_any_output_1a27da1b2c59636aa9b6dd1723b05f7d1a"></span><code class="sig-name descname">YggAnyOutput</code><span class="sig-paren">(</span><em class="property">const</em> std::string <em>name</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N12YggAnyOutput12YggAnyOutputEKNSt6stringE" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Constructor for <a class="reference internal" href="#class_ygg_any_output"><span class="std std-ref">YggAnyOutput</span></a>. </p>
+<p><dl class="simple">
+<dt><strong>Parameters</strong></dt><dd><ul class="breatheparameterlist simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">[in]</span> <span class="pre">name</span></code>: constant std::string the name of an output channel. </p></li>
 </ul>
 </dd>
 </dl>
@@ -1145,6 +1467,19 @@
 </dd></dl>
 
 <dl class="cpp function">
+<dt id="_CPPv4N11YggAnyInput11YggAnyInputEKNSt6stringE">
+<span id="_CPPv3N11YggAnyInput11YggAnyInputEKNSt6stringE"></span><span id="_CPPv2N11YggAnyInput11YggAnyInputEKNSt6stringE"></span><span id="YggAnyInput::YggAnyInput__ssC"></span><span class="target" id="class_ygg_any_input_1ae955b09f3038c8ae8ff3b3e1486a26d1"></span><code class="sig-name descname">YggAnyInput</code><span class="sig-paren">(</span><em class="property">const</em> std::string <em>name</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N11YggAnyInput11YggAnyInputEKNSt6stringE" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Constructor for <a class="reference internal" href="#class_ygg_any_input"><span class="std std-ref">YggAnyInput</span></a>. </p>
+<p><dl class="simple">
+<dt><strong>Parameters</strong></dt><dd><ul class="breatheparameterlist simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">[in]</span> <span class="pre">name</span></code>: constant std::string the name of an input channel. </p></li>
+</ul>
+</dd>
+</dl>
+</p>
+</dd></dl>
+
+<dl class="cpp function">
 <dt id="_CPPv4N11YggAnyInput11YggAnyInputE10yggInput_t">
 <span id="_CPPv3N11YggAnyInput11YggAnyInputE10yggInput_t"></span><span id="_CPPv2N11YggAnyInput11YggAnyInputE10yggInput_t"></span><span id="YggAnyInput::YggAnyInput__yggInput_t"></span><span class="target" id="class_ygg_any_input_1a4870df02c8a0f4d4c1a74ed284401193"></span><code class="sig-name descname">YggAnyInput</code><span class="sig-paren">(</span>yggInput_t <em>x</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N11YggAnyInput11YggAnyInputE10yggInput_t" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Empty constructor for inheritance. </p>
@@ -1166,6 +1501,19 @@
 <p><dl class="simple">
 <dt><strong>Parameters</strong></dt><dd><ul class="breatheparameterlist simple">
 <li><p><code class="docutils literal notranslate"><span class="pre">[in]</span> <span class="pre">name</span></code>: constant character pointer to the name of an output channel. </p></li>
+</ul>
+</dd>
+</dl>
+</p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt id="_CPPv4N18YggJSONArrayOutput18YggJSONArrayOutputEKNSt6stringE">
+<span id="_CPPv3N18YggJSONArrayOutput18YggJSONArrayOutputEKNSt6stringE"></span><span id="_CPPv2N18YggJSONArrayOutput18YggJSONArrayOutputEKNSt6stringE"></span><span id="YggJSONArrayOutput::YggJSONArrayOutput__ssC"></span><span class="target" id="class_ygg_j_s_o_n_array_output_1a4313c953e15225e07462d0c1bc894ea5"></span><code class="sig-name descname">YggJSONArrayOutput</code><span class="sig-paren">(</span><em class="property">const</em> std::string <em>name</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N18YggJSONArrayOutput18YggJSONArrayOutputEKNSt6stringE" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Constructor for <a class="reference internal" href="#class_ygg_j_s_o_n_array_output"><span class="std std-ref">YggJSONArrayOutput</span></a>. </p>
+<p><dl class="simple">
+<dt><strong>Parameters</strong></dt><dd><ul class="breatheparameterlist simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">[in]</span> <span class="pre">name</span></code>: constant std::string the name of an output channel. </p></li>
 </ul>
 </dd>
 </dl>
@@ -1201,6 +1549,19 @@
 </dd></dl>
 
 <dl class="cpp function">
+<dt id="_CPPv4N17YggJSONArrayInput17YggJSONArrayInputEKNSt6stringE">
+<span id="_CPPv3N17YggJSONArrayInput17YggJSONArrayInputEKNSt6stringE"></span><span id="_CPPv2N17YggJSONArrayInput17YggJSONArrayInputEKNSt6stringE"></span><span id="YggJSONArrayInput::YggJSONArrayInput__ssC"></span><span class="target" id="class_ygg_j_s_o_n_array_input_1ad5095fa61ce1af33ea776ba8d453988b"></span><code class="sig-name descname">YggJSONArrayInput</code><span class="sig-paren">(</span><em class="property">const</em> std::string <em>name</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N17YggJSONArrayInput17YggJSONArrayInputEKNSt6stringE" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Constructor for <a class="reference internal" href="#class_ygg_j_s_o_n_array_input"><span class="std std-ref">YggJSONArrayInput</span></a>. </p>
+<p><dl class="simple">
+<dt><strong>Parameters</strong></dt><dd><ul class="breatheparameterlist simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">[in]</span> <span class="pre">name</span></code>: constant std::string the name of an input channel. </p></li>
+</ul>
+</dd>
+</dl>
+</p>
+</dd></dl>
+
+<dl class="cpp function">
 <dt id="_CPPv4N17YggJSONArrayInput17YggJSONArrayInputE10yggInput_t">
 <span id="_CPPv3N17YggJSONArrayInput17YggJSONArrayInputE10yggInput_t"></span><span id="_CPPv2N17YggJSONArrayInput17YggJSONArrayInputE10yggInput_t"></span><span id="YggJSONArrayInput::YggJSONArrayInput__yggInput_t"></span><span class="target" id="class_ygg_j_s_o_n_array_input_1a4a62695c50d9dfbe356bfb55d82bef83"></span><code class="sig-name descname">YggJSONArrayInput</code><span class="sig-paren">(</span>yggInput_t <em>x</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N17YggJSONArrayInput17YggJSONArrayInputE10yggInput_t" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Empty constructor for inheritance. </p>
@@ -1222,6 +1583,19 @@
 <p><dl class="simple">
 <dt><strong>Parameters</strong></dt><dd><ul class="breatheparameterlist simple">
 <li><p><code class="docutils literal notranslate"><span class="pre">[in]</span> <span class="pre">name</span></code>: constant character pointer to the name of an output channel. </p></li>
+</ul>
+</dd>
+</dl>
+</p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt id="_CPPv4N19YggJSONObjectOutput19YggJSONObjectOutputEKNSt6stringE">
+<span id="_CPPv3N19YggJSONObjectOutput19YggJSONObjectOutputEKNSt6stringE"></span><span id="_CPPv2N19YggJSONObjectOutput19YggJSONObjectOutputEKNSt6stringE"></span><span id="YggJSONObjectOutput::YggJSONObjectOutput__ssC"></span><span class="target" id="class_ygg_j_s_o_n_object_output_1ad67cf15f1a09b7fd70dadb5e8a963c36"></span><code class="sig-name descname">YggJSONObjectOutput</code><span class="sig-paren">(</span><em class="property">const</em> std::string <em>name</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N19YggJSONObjectOutput19YggJSONObjectOutputEKNSt6stringE" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Constructor for <a class="reference internal" href="#class_ygg_j_s_o_n_object_output"><span class="std std-ref">YggJSONObjectOutput</span></a>. </p>
+<p><dl class="simple">
+<dt><strong>Parameters</strong></dt><dd><ul class="breatheparameterlist simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">[in]</span> <span class="pre">name</span></code>: constant std::string the name of an output channel. </p></li>
 </ul>
 </dd>
 </dl>
@@ -1257,6 +1631,19 @@
 </dd></dl>
 
 <dl class="cpp function">
+<dt id="_CPPv4N18YggJSONObjectInput18YggJSONObjectInputEKNSt6stringE">
+<span id="_CPPv3N18YggJSONObjectInput18YggJSONObjectInputEKNSt6stringE"></span><span id="_CPPv2N18YggJSONObjectInput18YggJSONObjectInputEKNSt6stringE"></span><span id="YggJSONObjectInput::YggJSONObjectInput__ssC"></span><span class="target" id="class_ygg_j_s_o_n_object_input_1a4193ab059c81a87dd9b740cf35b2e14b"></span><code class="sig-name descname">YggJSONObjectInput</code><span class="sig-paren">(</span><em class="property">const</em> std::string <em>name</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N18YggJSONObjectInput18YggJSONObjectInputEKNSt6stringE" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Constructor for <a class="reference internal" href="#class_ygg_j_s_o_n_object_input"><span class="std std-ref">YggJSONObjectInput</span></a>. </p>
+<p><dl class="simple">
+<dt><strong>Parameters</strong></dt><dd><ul class="breatheparameterlist simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">[in]</span> <span class="pre">name</span></code>: constant std::string the name of an input channel. </p></li>
+</ul>
+</dd>
+</dl>
+</p>
+</dd></dl>
+
+<dl class="cpp function">
 <dt id="_CPPv4N18YggJSONObjectInput18YggJSONObjectInputE10yggInput_t">
 <span id="_CPPv3N18YggJSONObjectInput18YggJSONObjectInputE10yggInput_t"></span><span id="_CPPv2N18YggJSONObjectInput18YggJSONObjectInputE10yggInput_t"></span><span id="YggJSONObjectInput::YggJSONObjectInput__yggInput_t"></span><span class="target" id="class_ygg_j_s_o_n_object_input_1ab542635200144aa8b9ddc8739ec2b144"></span><code class="sig-name descname">YggJSONObjectInput</code><span class="sig-paren">(</span>yggInput_t <em>x</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N18YggJSONObjectInput18YggJSONObjectInputE10yggInput_t" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Empty constructor for inheritance. </p>
@@ -1272,29 +1659,29 @@
            
           </div>
           <footer>
-  
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
-      
-        <a href="interface_m.html" class="btn btn-neutral float-right" title="Matlab Interface" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
-      
-      
-        <a href="interface_c.html" class="btn btn-neutral float-left" title="C Interface" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
-      
+        <a href="interface_m.html" class="btn btn-neutral float-right" title="Matlab Interface" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="interface_c.html" class="btn btn-neutral float-left" title="C Interface" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
     </div>
-  
 
   <hr/>
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2017, Meagan Lang, David Raila
+        &#169; Copyright 2017, Meagan Lang, David Raila.
 
     </p>
   </div>
-  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+    
+    
+    
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
 
 </footer>
-
         </div>
       </div>
 
@@ -1302,7 +1689,6 @@
 
   </div>
   
-
 
   <script type="text/javascript">
       jQuery(function () {

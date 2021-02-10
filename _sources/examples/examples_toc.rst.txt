@@ -19,6 +19,7 @@ Examples
    formatted_io9
    rpc_lesson1
    rpc_lesson2
+   rpc_lesson3
    model_function
    conditional_io
    transformed_io

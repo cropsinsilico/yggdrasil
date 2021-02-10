@@ -1,39 +1,42 @@
 
 
 <!DOCTYPE html>
-<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
-<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<html class="writer-html5" lang="en" >
 <head>
-  <meta charset="utf-8">
+  <meta charset="utf-8" />
   
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>timesync1 Example &mdash; yggdrasil 1.1.1+410.g95af39b2 documentation</title>
+  <title>timesync1 Example &mdash; yggdrasil v1.5.0 documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/theme_overrides.css" type="text/css" />
+
+  
   
 
   
   
-  
+
   
 
   
-  <script type="text/javascript" src="../_static/js/modernizr.min.js"></script>
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
   
     
       <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
         <script src="../_static/jquery.js"></script>
         <script src="../_static/underscore.js"></script>
         <script src="../_static/doctools.js"></script>
-        <script src="../_static/language_data.js"></script>
     
     <script type="text/javascript" src="../_static/js/theme.js"></script>
 
     
-
-  
-  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
-  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
-  <link rel="stylesheet" href="../_static/theme_overrides.css" type="text/css" />
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="timesync2 Example" href="timesync2.html" />
@@ -61,7 +64,7 @@
             
             
               <div class="version">
-                1.1.1
+                v1.5.0
               </div>
             
           
@@ -78,6 +81,7 @@
           
         </div>
 
+        
         <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
           
             
@@ -119,6 +123,7 @@
 <li class="toctree-l2"><a class="reference internal" href="formatted_io9.html">formatted_io9 Example</a></li>
 <li class="toctree-l2"><a class="reference internal" href="rpc_lesson1.html">rpc_lesson1 Example</a></li>
 <li class="toctree-l2"><a class="reference internal" href="rpc_lesson2.html">rpc_lesson2 Example</a></li>
+<li class="toctree-l2"><a class="reference internal" href="rpc_lesson3.html">rpc_lesson3 Example</a></li>
 <li class="toctree-l2"><a class="reference internal" href="model_function.html">model_function Example</a></li>
 <li class="toctree-l2"><a class="reference internal" href="conditional_io.html">conditional_io Example</a></li>
 <li class="toctree-l2"><a class="reference internal" href="transformed_io.html">transformed_io Example</a></li>
@@ -144,6 +149,7 @@
             
           
         </div>
+        
       </div>
     </nav>
 
@@ -178,11 +184,13 @@
 
 
 
+
+
 <div role="navigation" aria-label="breadcrumbs navigation">
 
   <ul class="wy-breadcrumbs">
     
-      <li><a href="../index.html">Docs</a> &raquo;</li>
+      <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
         
           <li><a href="examples_toc.html">Examples</a> &raquo;</li>
         
@@ -191,7 +199,7 @@
     
       <li class="wy-breadcrumbs-aside">
         
-            
+          
             <a href="../_sources/examples/timesync1.rst.txt" rel="nofollow"> View page source</a>
           
         
@@ -348,7 +356,7 @@
     <span class="n">y_period</span> <span class="o">=</span> <span class="n">y_period</span> <span class="o">*</span> <span class="mf">24.0</span><span class="p">;</span>
   <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
     <span class="n">printf</span><span class="p">(</span><span class="s">&quot;timestep_calc: Unsupported unit &#39;%s&#39;</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span> <span class="n">t_units</span><span class="p">);</span>
-    <span class="n">ret</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span><span class="p">;</span>
+    <span class="n">ret</span> <span class="o">=</span> <span class="mi">-1</span><span class="p">;</span>
   <span class="p">}</span>
   <span class="k">if</span> <span class="p">(</span><span class="n">ret</span> <span class="o">&gt;=</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
     <span class="n">x</span> <span class="o">=</span> <span class="n">sin</span><span class="p">(</span><span class="mf">2.0</span> <span class="o">*</span> <span class="n">M_PI</span> <span class="o">*</span> <span class="n">t</span> <span class="o">/</span> <span class="n">x_period</span><span class="p">);</span>
@@ -376,7 +384,7 @@
   <span class="n">ret</span> <span class="o">=</span> <span class="n">timestep_calc</span><span class="p">(</span><span class="n">t_start</span><span class="p">,</span> <span class="n">t_units</span><span class="p">,</span> <span class="n">state</span><span class="p">);</span>
   <span class="k">if</span> <span class="p">(</span><span class="n">ret</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
     <span class="n">printf</span><span class="p">(</span><span class="s">&quot;timesync(C): Error in initial timestep calculation.&quot;</span><span class="p">);</span>
-    <span class="k">return</span> <span class="o">-</span><span class="mi">1</span><span class="p">;</span>
+    <span class="k">return</span> <span class="mi">-1</span><span class="p">;</span>
   <span class="p">}</span>
 
   <span class="c1">// Set up connections matching yaml</span>
@@ -390,7 +398,7 @@
   <span class="n">ret</span> <span class="o">=</span> <span class="n">rpcCall</span><span class="p">(</span><span class="n">timesync</span><span class="p">,</span> <span class="n">t</span><span class="p">,</span> <span class="n">state</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">state</span><span class="p">);</span>
   <span class="k">if</span> <span class="p">(</span><span class="n">ret</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
     <span class="n">printf</span><span class="p">(</span><span class="s">&quot;timesync(C): Initial sync failed.</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">);</span>
-    <span class="k">return</span> <span class="o">-</span><span class="mi">1</span><span class="p">;</span>
+    <span class="k">return</span> <span class="mi">-1</span><span class="p">;</span>
   <span class="p">}</span>
   <span class="n">printf</span><span class="p">(</span><span class="s">&quot;timesync(C): t = %5.1f %-3s, x = %+ 5.2f, y = %+ 5.2f</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span>
 	 <span class="n">t</span><span class="p">,</span> <span class="n">t_units</span><span class="p">,</span> <span class="n">generic_map_get_double</span><span class="p">(</span><span class="n">state</span><span class="p">,</span> <span class="s">&quot;x&quot;</span><span class="p">),</span>
@@ -401,12 +409,12 @@
   <span class="n">ret</span> <span class="o">=</span> <span class="n">generic_map_set_double</span><span class="p">(</span><span class="n">msg</span><span class="p">,</span> <span class="s">&quot;time&quot;</span><span class="p">,</span> <span class="n">t</span><span class="p">,</span> <span class="n">t_units</span><span class="p">);</span>
   <span class="k">if</span> <span class="p">(</span><span class="n">ret</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
     <span class="n">printf</span><span class="p">(</span><span class="s">&quot;timesync(C): Failed to set time in initial output map.</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">);</span>
-    <span class="k">return</span> <span class="o">-</span><span class="mi">1</span><span class="p">;</span>
+    <span class="k">return</span> <span class="mi">-1</span><span class="p">;</span>
   <span class="p">}</span>
   <span class="n">ret</span> <span class="o">=</span> <span class="n">yggSend</span><span class="p">(</span><span class="n">out</span><span class="p">,</span> <span class="n">msg</span><span class="p">);</span>
   <span class="k">if</span> <span class="p">(</span><span class="n">ret</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
     <span class="n">printf</span><span class="p">(</span><span class="s">&quot;timesync(C): Failed to send initial output for t=%f.</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span> <span class="n">t</span><span class="p">);</span>
-    <span class="k">return</span> <span class="o">-</span><span class="mi">1</span><span class="p">;</span>
+    <span class="k">return</span> <span class="mi">-1</span><span class="p">;</span>
   <span class="p">}</span>
   <span class="n">destroy_generic</span><span class="p">(</span><span class="o">&amp;</span><span class="n">msg</span><span class="p">);</span>
 
@@ -418,14 +426,14 @@
     <span class="n">ret</span> <span class="o">=</span> <span class="n">timestep_calc</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">t_units</span><span class="p">,</span> <span class="n">state</span><span class="p">);</span>
     <span class="k">if</span> <span class="p">(</span><span class="n">ret</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
       <span class="n">printf</span><span class="p">(</span><span class="s">&quot;timesync(C): Error in timestep calculation for t = %f.</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span> <span class="n">t</span><span class="p">);</span>
-      <span class="k">return</span> <span class="o">-</span><span class="mi">1</span><span class="p">;</span>
+      <span class="k">return</span> <span class="mi">-1</span><span class="p">;</span>
     <span class="p">}</span>
 
     <span class="c1">// Synchronize the state</span>
     <span class="n">ret</span> <span class="o">=</span> <span class="n">rpcCall</span><span class="p">(</span><span class="n">timesync</span><span class="p">,</span> <span class="n">t</span><span class="p">,</span> <span class="n">state</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">state</span><span class="p">);</span>
     <span class="k">if</span> <span class="p">(</span><span class="n">ret</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
       <span class="n">printf</span><span class="p">(</span><span class="s">&quot;timesync(C): sync for t=%f failed.</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span> <span class="n">t</span><span class="p">);</span>
-      <span class="k">return</span> <span class="o">-</span><span class="mi">1</span><span class="p">;</span>
+      <span class="k">return</span> <span class="mi">-1</span><span class="p">;</span>
     <span class="p">}</span>
     <span class="n">printf</span><span class="p">(</span><span class="s">&quot;timesync(C): t = %5.1f %-3s, x = %+ 5.2f, y = %+ 5.2f</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span>
 	   <span class="n">t</span><span class="p">,</span> <span class="n">t_units</span><span class="p">,</span> <span class="n">generic_map_get_double</span><span class="p">(</span><span class="n">state</span><span class="p">,</span> <span class="s">&quot;x&quot;</span><span class="p">),</span>
@@ -436,12 +444,12 @@
     <span class="n">ret</span> <span class="o">=</span> <span class="n">generic_map_set_double</span><span class="p">(</span><span class="n">msg</span><span class="p">,</span> <span class="s">&quot;time&quot;</span><span class="p">,</span> <span class="n">t</span><span class="p">,</span> <span class="n">t_units</span><span class="p">);</span>
     <span class="k">if</span> <span class="p">(</span><span class="n">ret</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
       <span class="n">printf</span><span class="p">(</span><span class="s">&quot;timesync(C): Failed to set time in output map.</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">);</span>
-      <span class="k">return</span> <span class="o">-</span><span class="mi">1</span><span class="p">;</span>
+      <span class="k">return</span> <span class="mi">-1</span><span class="p">;</span>
     <span class="p">}</span>
     <span class="n">ret</span> <span class="o">=</span> <span class="n">yggSend</span><span class="p">(</span><span class="n">out</span><span class="p">,</span> <span class="n">msg</span><span class="p">);</span>
     <span class="k">if</span> <span class="p">(</span><span class="n">ret</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
       <span class="n">printf</span><span class="p">(</span><span class="s">&quot;timesync(C): Failed to send output for t=%f.</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span> <span class="n">t</span><span class="p">);</span>
-      <span class="k">return</span> <span class="o">-</span><span class="mi">1</span><span class="p">;</span>
+      <span class="k">return</span> <span class="mi">-1</span><span class="p">;</span>
     <span class="p">}</span>
     <span class="n">destroy_generic</span><span class="p">(</span><span class="o">&amp;</span><span class="n">msg</span><span class="p">);</span>
   <span class="p">}</span>
@@ -655,7 +663,7 @@
     <span class="n">y_period</span> <span class="o">=</span> <span class="n">y_period</span> <span class="o">*</span> <span class="mf">24.0</span><span class="p">;</span>
   <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
     <span class="n">printf</span><span class="p">(</span><span class="s">&quot;timestep_calc: Unsupported unit &#39;%s&#39;</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span> <span class="n">t_units</span><span class="p">);</span>
-    <span class="n">ret</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span><span class="p">;</span>
+    <span class="n">ret</span> <span class="o">=</span> <span class="mi">-1</span><span class="p">;</span>
   <span class="p">}</span>
   <span class="k">if</span> <span class="p">(</span><span class="n">ret</span> <span class="o">&gt;=</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
     <span class="n">x</span> <span class="o">=</span> <span class="n">sin</span><span class="p">(</span><span class="mf">2.0</span> <span class="o">*</span> <span class="n">M_PI</span> <span class="o">*</span> <span class="n">t</span> <span class="o">/</span> <span class="n">x_period</span><span class="p">);</span>
@@ -683,7 +691,7 @@
   <span class="n">ret</span> <span class="o">=</span> <span class="n">timestep_calc</span><span class="p">(</span><span class="n">t_start</span><span class="p">,</span> <span class="n">t_units</span><span class="p">,</span> <span class="n">state</span><span class="p">);</span>
   <span class="k">if</span> <span class="p">(</span><span class="n">ret</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
     <span class="n">printf</span><span class="p">(</span><span class="s">&quot;timesync(C++): Error in initial timestep calculation.&quot;</span><span class="p">);</span>
-    <span class="k">return</span> <span class="o">-</span><span class="mi">1</span><span class="p">;</span>
+    <span class="k">return</span> <span class="mi">-1</span><span class="p">;</span>
   <span class="p">}</span>
 
   <span class="c1">// Set up connections matching yaml</span>
@@ -697,7 +705,7 @@
   <span class="n">ret</span> <span class="o">=</span> <span class="n">timesync</span><span class="p">.</span><span class="n">call</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="n">t</span><span class="p">,</span> <span class="n">state</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">state</span><span class="p">);</span>
   <span class="k">if</span> <span class="p">(</span><span class="n">ret</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
     <span class="n">printf</span><span class="p">(</span><span class="s">&quot;timesync(C++): Initial sync failed.</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">);</span>
-    <span class="k">return</span> <span class="o">-</span><span class="mi">1</span><span class="p">;</span>
+    <span class="k">return</span> <span class="mi">-1</span><span class="p">;</span>
   <span class="p">}</span>
   <span class="n">printf</span><span class="p">(</span><span class="s">&quot;timesync(C++): t = %5.1f %-3s, x = %+ 5.2f, y = %+ 5.2f</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span>
 	 <span class="n">t</span><span class="p">,</span> <span class="n">t_units</span><span class="p">,</span> <span class="n">generic_map_get_double</span><span class="p">(</span><span class="n">state</span><span class="p">,</span> <span class="s">&quot;x&quot;</span><span class="p">),</span>
@@ -708,12 +716,12 @@
   <span class="n">ret</span> <span class="o">=</span> <span class="n">generic_map_set_double</span><span class="p">(</span><span class="n">msg</span><span class="p">,</span> <span class="s">&quot;time&quot;</span><span class="p">,</span> <span class="n">t</span><span class="p">,</span> <span class="n">t_units</span><span class="p">);</span>
   <span class="k">if</span> <span class="p">(</span><span class="n">ret</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
     <span class="n">printf</span><span class="p">(</span><span class="s">&quot;timesync(C++): Failed to set time in initial output map.</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">);</span>
-    <span class="k">return</span> <span class="o">-</span><span class="mi">1</span><span class="p">;</span>
+    <span class="k">return</span> <span class="mi">-1</span><span class="p">;</span>
   <span class="p">}</span>
   <span class="n">ret</span> <span class="o">=</span> <span class="n">out</span><span class="p">.</span><span class="n">send</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">msg</span><span class="p">);</span>
   <span class="k">if</span> <span class="p">(</span><span class="n">ret</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
     <span class="n">printf</span><span class="p">(</span><span class="s">&quot;timesync(C++): Failed to send initial output for t=%f.</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span> <span class="n">t</span><span class="p">);</span>
-    <span class="k">return</span> <span class="o">-</span><span class="mi">1</span><span class="p">;</span>
+    <span class="k">return</span> <span class="mi">-1</span><span class="p">;</span>
   <span class="p">}</span>
   <span class="n">destroy_generic</span><span class="p">(</span><span class="o">&amp;</span><span class="n">msg</span><span class="p">);</span>
 
@@ -725,14 +733,14 @@
     <span class="n">ret</span> <span class="o">=</span> <span class="n">timestep_calc</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">t_units</span><span class="p">,</span> <span class="n">state</span><span class="p">);</span>
     <span class="k">if</span> <span class="p">(</span><span class="n">ret</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
       <span class="n">printf</span><span class="p">(</span><span class="s">&quot;timesync(C++): Error in timestep calculation for t = %f.</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span> <span class="n">t</span><span class="p">);</span>
-      <span class="k">return</span> <span class="o">-</span><span class="mi">1</span><span class="p">;</span>
+      <span class="k">return</span> <span class="mi">-1</span><span class="p">;</span>
     <span class="p">}</span>
 
     <span class="c1">// Synchronize the state</span>
     <span class="n">ret</span> <span class="o">=</span> <span class="n">timesync</span><span class="p">.</span><span class="n">call</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="n">t</span><span class="p">,</span> <span class="n">state</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">state</span><span class="p">);</span>
     <span class="k">if</span> <span class="p">(</span><span class="n">ret</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
       <span class="n">printf</span><span class="p">(</span><span class="s">&quot;timesync(C++): sync for t=%f failed.</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span> <span class="n">t</span><span class="p">);</span>
-      <span class="k">return</span> <span class="o">-</span><span class="mi">1</span><span class="p">;</span>
+      <span class="k">return</span> <span class="mi">-1</span><span class="p">;</span>
     <span class="p">}</span>
     <span class="n">printf</span><span class="p">(</span><span class="s">&quot;timesync(C++): t = %5.1f %-3s, x = %+ 5.2f, y = %+ 5.2f</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span>
 	   <span class="n">t</span><span class="p">,</span> <span class="n">t_units</span><span class="p">,</span> <span class="n">generic_map_get_double</span><span class="p">(</span><span class="n">state</span><span class="p">,</span> <span class="s">&quot;x&quot;</span><span class="p">),</span>
@@ -743,12 +751,12 @@
     <span class="n">ret</span> <span class="o">=</span> <span class="n">generic_map_set_double</span><span class="p">(</span><span class="n">msg</span><span class="p">,</span> <span class="s">&quot;time&quot;</span><span class="p">,</span> <span class="n">t</span><span class="p">,</span> <span class="n">t_units</span><span class="p">);</span>
     <span class="k">if</span> <span class="p">(</span><span class="n">ret</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
       <span class="n">printf</span><span class="p">(</span><span class="s">&quot;timesync(C++): Failed to set time in output map.</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">);</span>
-      <span class="k">return</span> <span class="o">-</span><span class="mi">1</span><span class="p">;</span>
+      <span class="k">return</span> <span class="mi">-1</span><span class="p">;</span>
     <span class="p">}</span>
     <span class="n">ret</span> <span class="o">=</span> <span class="n">out</span><span class="p">.</span><span class="n">send</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">msg</span><span class="p">);</span>
     <span class="k">if</span> <span class="p">(</span><span class="n">ret</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
       <span class="n">printf</span><span class="p">(</span><span class="s">&quot;timesync(C++): Failed to send output for t=%f.</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span> <span class="n">t</span><span class="p">);</span>
-      <span class="k">return</span> <span class="o">-</span><span class="mi">1</span><span class="p">;</span>
+      <span class="k">return</span> <span class="mi">-1</span><span class="p">;</span>
     <span class="p">}</span>
     <span class="n">destroy_generic</span><span class="p">(</span><span class="o">&amp;</span><span class="n">msg</span><span class="p">);</span>
   <span class="p">}</span>
@@ -1225,16 +1233,14 @@ end function timestep_calc
 64
 65
 66
-67
-68
-69</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="k">function</span><span class="w"> </span><span class="nf">timesync</span><span class="p">(</span>t_step, t_units<span class="p">)</span><span class="w"></span>
+67</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="k">function</span><span class="w"> </span><span class="nf">timesync</span><span class="p">(</span>t_step, t_units<span class="p">)</span><span class="w"></span>
 
 <span class="w">  </span><span class="n">t_step</span> <span class="p">=</span> <span class="n">str2num</span><span class="p">(</span><span class="n">t_step</span><span class="p">);</span>
   <span class="n">fprintf</span><span class="p">(</span><span class="s">&#39;Hello from Matlab timesync: timestep = %f %s\n&#39;</span><span class="p">,</span> <span class="n">t_step</span><span class="p">,</span> <span class="n">t_units</span><span class="p">);</span>
   <span class="n">t_step</span> <span class="p">=</span> <span class="n">t_step</span> <span class="o">*</span> <span class="n">str2symunit</span><span class="p">(</span><span class="n">t_units</span><span class="p">);</span>
   <span class="n">t_start</span> <span class="p">=</span> <span class="mf">0.0000000000000001</span> <span class="o">*</span> <span class="n">str2symunit</span><span class="p">(</span><span class="n">t_units</span><span class="p">);</span>
   <span class="n">t_end</span> <span class="p">=</span> <span class="mf">5.0</span> <span class="o">*</span> <span class="n">str2symunit</span><span class="p">(</span><span class="s">&#39;day&#39;</span><span class="p">);</span>
-  <span class="n">state</span> <span class="p">=</span> <span class="n">containers</span><span class="p">.</span><span class="n">Map</span><span class="p">(</span><span class="s">&#39;UniformValues&#39;</span><span class="p">,</span> <span class="n">false</span><span class="p">,</span> <span class="s">&#39;ValueType&#39;</span><span class="p">,</span> <span class="s">&#39;any&#39;</span><span class="p">);</span>
+  <span class="n">state</span> <span class="p">=</span> <span class="n">containers</span><span class="p">.</span><span class="n">Map</span><span class="p">(</span><span class="s">&#39;UniformValues&#39;</span><span class="p">,</span> <span class="nb">false</span><span class="p">,</span> <span class="s">&#39;ValueType&#39;</span><span class="p">,</span> <span class="s">&#39;any&#39;</span><span class="p">);</span>
   <span class="n">state</span><span class="p">(</span><span class="s">&#39;x&#39;</span><span class="p">)</span> <span class="p">=</span> <span class="nb">sin</span><span class="p">(</span><span class="mf">2.0</span> <span class="o">*</span> <span class="nb">pi</span> <span class="o">*</span> <span class="n">t_start</span> <span class="o">/</span> <span class="p">(</span><span class="mf">10.0</span> <span class="o">*</span> <span class="n">str2symunit</span><span class="p">(</span><span class="s">&#39;day&#39;</span><span class="p">)));</span>
   <span class="n">state</span><span class="p">(</span><span class="s">&#39;y&#39;</span><span class="p">)</span> <span class="p">=</span> <span class="nb">cos</span><span class="p">(</span><span class="mf">2.0</span> <span class="o">*</span> <span class="nb">pi</span> <span class="o">*</span> <span class="n">t_start</span> <span class="o">/</span> <span class="p">(</span><span class="mf">5.0</span> <span class="o">*</span> <span class="n">str2symunit</span><span class="p">(</span><span class="s">&#39;day&#39;</span><span class="p">)));</span>
 
@@ -1245,13 +1251,12 @@ end function timestep_calc
 
   <span class="c">% Initialize state and synchronize with other models</span>
   <span class="n">t</span> <span class="p">=</span> <span class="n">t_start</span><span class="p">;</span>
-  <span class="p">[</span><span class="n">ret</span><span class="p">,</span> <span class="n">result</span><span class="p">]</span> <span class="p">=</span> <span class="n">timesync</span><span class="p">.</span><span class="n">call</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">state</span><span class="p">);</span>
+  <span class="p">[</span><span class="n">ret</span><span class="p">,</span> <span class="n">state</span><span class="p">]</span> <span class="p">=</span> <span class="n">timesync</span><span class="p">.</span><span class="n">call</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">state</span><span class="p">);</span>
   <span class="k">if</span> <span class="p">(</span><span class="o">~</span><span class="n">ret</span><span class="p">);</span>
     <span class="n">error</span><span class="p">(</span><span class="s">&#39;timesync(Matlab): Initial sync failed.&#39;</span><span class="p">);</span>
   <span class="k">end</span><span class="p">;</span>
-  <span class="n">state</span> <span class="p">=</span> <span class="n">result</span><span class="p">{</span><span class="mi">1</span><span class="p">};</span>
   <span class="p">[</span><span class="n">t_data</span><span class="p">,</span> <span class="n">t_unit</span><span class="p">]</span> <span class="p">=</span> <span class="n">separateUnits</span><span class="p">(</span><span class="n">t</span><span class="p">);</span>
-  <span class="n">fprintf</span><span class="p">(</span><span class="s">&#39;timesync(Matlab): t = %5.1f %-1s, x = %+ 5.2f, y = %+ 5.2f\n&#39;</span><span class="p">,</span> <span class="c">...</span>
+  <span class="n">fprintf</span><span class="p">(</span><span class="s">&#39;timesync(Matlab): t = %5.1f %-1s, x = %+ 5.2f, y = %+ 5.2f\n&#39;</span><span class="p">,</span> <span class="k">...</span>
 	  <span class="n">t_data</span><span class="p">,</span> <span class="n">symunit2str</span><span class="p">(</span><span class="n">t_unit</span><span class="p">),</span> <span class="n">state</span><span class="p">(</span><span class="s">&#39;x&#39;</span><span class="p">),</span> <span class="n">state</span><span class="p">(</span><span class="s">&#39;y&#39;</span><span class="p">));</span>
 
   <span class="c">% Send initial state to output</span>
@@ -1259,7 +1264,7 @@ end function timestep_calc
   <span class="n">msg_keys</span><span class="p">{</span><span class="nb">length</span><span class="p">(</span><span class="n">msg_keys</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span><span class="p">}</span> <span class="p">=</span> <span class="s">&#39;time&#39;</span><span class="p">;</span>
   <span class="n">msg_vals</span> <span class="p">=</span> <span class="n">values</span><span class="p">(</span><span class="n">state</span><span class="p">);</span>
   <span class="n">msg_vals</span><span class="p">{</span><span class="nb">length</span><span class="p">(</span><span class="n">msg_vals</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span><span class="p">}</span> <span class="p">=</span> <span class="n">t</span><span class="p">;</span>
-  <span class="n">msg</span> <span class="p">=</span> <span class="n">containers</span><span class="p">.</span><span class="n">Map</span><span class="p">(</span><span class="n">msg_keys</span><span class="p">,</span> <span class="n">msg_vals</span><span class="p">,</span> <span class="s">&#39;UniformValues&#39;</span><span class="p">,</span> <span class="n">false</span><span class="p">);</span>
+  <span class="n">msg</span> <span class="p">=</span> <span class="n">containers</span><span class="p">.</span><span class="n">Map</span><span class="p">(</span><span class="n">msg_keys</span><span class="p">,</span> <span class="n">msg_vals</span><span class="p">,</span> <span class="s">&#39;UniformValues&#39;</span><span class="p">,</span> <span class="nb">false</span><span class="p">);</span>
   <span class="n">flag</span> <span class="p">=</span> <span class="n">out</span><span class="p">.</span><span class="n">send</span><span class="p">(</span><span class="n">msg</span><span class="p">);</span>
 
   <span class="c">% Iterate until end</span>
@@ -1267,18 +1272,17 @@ end function timestep_calc
 
     <span class="c">% Perform calculations to update the state</span>
     <span class="n">t</span> <span class="p">=</span> <span class="n">t</span> <span class="o">+</span> <span class="n">t_step</span><span class="p">;</span>
-    <span class="n">state</span> <span class="p">=</span> <span class="n">containers</span><span class="p">.</span><span class="n">Map</span><span class="p">(</span><span class="s">&#39;UniformValues&#39;</span><span class="p">,</span> <span class="n">false</span><span class="p">,</span> <span class="s">&#39;ValueType&#39;</span><span class="p">,</span> <span class="s">&#39;any&#39;</span><span class="p">);</span>
+    <span class="n">state</span> <span class="p">=</span> <span class="n">containers</span><span class="p">.</span><span class="n">Map</span><span class="p">(</span><span class="s">&#39;UniformValues&#39;</span><span class="p">,</span> <span class="nb">false</span><span class="p">,</span> <span class="s">&#39;ValueType&#39;</span><span class="p">,</span> <span class="s">&#39;any&#39;</span><span class="p">);</span>
     <span class="n">state</span><span class="p">(</span><span class="s">&#39;x&#39;</span><span class="p">)</span> <span class="p">=</span> <span class="nb">sin</span><span class="p">(</span><span class="mf">2.0</span> <span class="o">*</span> <span class="nb">pi</span> <span class="o">*</span> <span class="n">t</span> <span class="o">/</span> <span class="p">(</span><span class="mf">10.0</span> <span class="o">*</span> <span class="n">str2symunit</span><span class="p">(</span><span class="s">&#39;day&#39;</span><span class="p">)));</span>
     <span class="n">state</span><span class="p">(</span><span class="s">&#39;y&#39;</span><span class="p">)</span> <span class="p">=</span> <span class="nb">cos</span><span class="p">(</span><span class="mf">2.0</span> <span class="o">*</span> <span class="nb">pi</span> <span class="o">*</span> <span class="n">t</span> <span class="o">/</span> <span class="p">(</span><span class="mf">5.0</span> <span class="o">*</span> <span class="n">str2symunit</span><span class="p">(</span><span class="s">&#39;day&#39;</span><span class="p">)));</span>
 
     <span class="c">% Synchronize the state</span>
-    <span class="p">[</span><span class="n">ret</span><span class="p">,</span> <span class="n">result</span><span class="p">]</span> <span class="p">=</span> <span class="n">timesync</span><span class="p">.</span><span class="n">call</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">state</span><span class="p">);</span>
+    <span class="p">[</span><span class="n">ret</span><span class="p">,</span> <span class="n">state</span><span class="p">]</span> <span class="p">=</span> <span class="n">timesync</span><span class="p">.</span><span class="n">call</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">state</span><span class="p">);</span>
     <span class="k">if</span> <span class="p">(</span><span class="o">~</span><span class="n">ret</span><span class="p">);</span>
       <span class="n">error</span><span class="p">(</span><span class="n">sprintf</span><span class="p">(</span><span class="s">&#39;timesync(Matlab): sync for t=%f failed.\n&#39;</span><span class="p">,</span> <span class="n">t</span><span class="p">));</span>
     <span class="k">end</span><span class="p">;</span>
-    <span class="n">state</span> <span class="p">=</span> <span class="n">result</span><span class="p">{</span><span class="mi">1</span><span class="p">};</span>
     <span class="p">[</span><span class="n">t_data</span><span class="p">,</span> <span class="n">t_unit</span><span class="p">]</span> <span class="p">=</span> <span class="n">separateUnits</span><span class="p">(</span><span class="n">t</span><span class="p">);</span>
-    <span class="n">fprintf</span><span class="p">(</span><span class="s">&#39;timesync(Matlab): t = %5.1f %-1s, x = %+ 5.2f, y = %+ 5.2f\n&#39;</span><span class="p">,</span> <span class="c">...</span>
+    <span class="n">fprintf</span><span class="p">(</span><span class="s">&#39;timesync(Matlab): t = %5.1f %-1s, x = %+ 5.2f, y = %+ 5.2f\n&#39;</span><span class="p">,</span> <span class="k">...</span>
   	    <span class="n">t_data</span><span class="p">,</span> <span class="n">symunit2str</span><span class="p">(</span><span class="n">t_unit</span><span class="p">),</span> <span class="n">state</span><span class="p">(</span><span class="s">&#39;x&#39;</span><span class="p">),</span> <span class="n">state</span><span class="p">(</span><span class="s">&#39;y&#39;</span><span class="p">));</span>
 
     <span class="c">% Send output</span>
@@ -1286,7 +1290,7 @@ end function timestep_calc
     <span class="n">msg_keys</span><span class="p">{</span><span class="nb">length</span><span class="p">(</span><span class="n">msg_keys</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span><span class="p">}</span> <span class="p">=</span> <span class="s">&#39;time&#39;</span><span class="p">;</span>
     <span class="n">msg_vals</span> <span class="p">=</span> <span class="n">values</span><span class="p">(</span><span class="n">state</span><span class="p">);</span>
     <span class="n">msg_vals</span><span class="p">{</span><span class="nb">length</span><span class="p">(</span><span class="n">msg_vals</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span><span class="p">}</span> <span class="p">=</span> <span class="n">t</span><span class="p">;</span>
-    <span class="n">msg</span> <span class="p">=</span> <span class="n">containers</span><span class="p">.</span><span class="n">Map</span><span class="p">(</span><span class="n">msg_keys</span><span class="p">,</span> <span class="n">msg_vals</span><span class="p">,</span> <span class="s">&#39;UniformValues&#39;</span><span class="p">,</span> <span class="n">false</span><span class="p">);</span>
+    <span class="n">msg</span> <span class="p">=</span> <span class="n">containers</span><span class="p">.</span><span class="n">Map</span><span class="p">(</span><span class="n">msg_keys</span><span class="p">,</span> <span class="n">msg_vals</span><span class="p">,</span> <span class="s">&#39;UniformValues&#39;</span><span class="p">,</span> <span class="nb">false</span><span class="p">);</span>
     <span class="n">flag</span> <span class="p">=</span> <span class="n">out</span><span class="p">.</span><span class="n">send</span><span class="p">(</span><span class="n">msg</span><span class="p">);</span>
     <span class="k">if</span> <span class="p">(</span><span class="o">~</span><span class="n">flag</span><span class="p">);</span>
       <span class="n">error</span><span class="p">(</span><span class="n">sprintf</span><span class="p">(</span><span class="s">&#39;timesync(Matlab): Failed to send output for t=%s.\n&#39;</span><span class="p">,</span> <span class="n">t</span><span class="p">));</span>
@@ -1295,7 +1299,7 @@ end function timestep_calc
 
   <span class="nb">disp</span><span class="p">(</span><span class="s">&#39;Goodbye from Matlab timesync&#39;</span><span class="p">);</span>
   
-<span class="k">end</span>
+<span class="n">end</span>
 </pre></div>
 </td></tr></table></div>
 <p>Model YAML:</p>
@@ -1447,10 +1451,8 @@ end function timestep_calc
 79
 80
 81
-82
-83
-84</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">sys</span>
-<span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
+82</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">sys</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="kn">from</span> <span class="nn">yggdrasil</span> <span class="kn">import</span> <span class="n">units</span>
 <span class="kn">from</span> <span class="nn">yggdrasil.interface.YggInterface</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">YggTimesync</span><span class="p">,</span> <span class="n">YggOutput</span><span class="p">)</span>
@@ -1481,7 +1483,7 @@ end function timestep_calc
 <span class="sd">        t_units (str): Units of the time step.</span>
 
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">print</span><span class="p">(</span><span class="s1">&#39;Hello from Python timesync: timestep = </span><span class="si">%s</span><span class="s1"> </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">t_step</span><span class="p">,</span> <span class="n">t_units</span><span class="p">))</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Hello from Python timesync: timestep = </span><span class="si">%s</span><span class="s1"> </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">t_step</span><span class="p">,</span> <span class="n">t_units</span><span class="p">))</span>
     <span class="n">t_step</span> <span class="o">=</span> <span class="n">units</span><span class="o">.</span><span class="n">add_units</span><span class="p">(</span><span class="n">t_step</span><span class="p">,</span> <span class="n">t_units</span><span class="p">)</span>
     <span class="n">t_start</span> <span class="o">=</span> <span class="n">units</span><span class="o">.</span><span class="n">add_units</span><span class="p">(</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">t_units</span><span class="p">)</span>
     <span class="n">t_end</span> <span class="o">=</span> <span class="n">units</span><span class="o">.</span><span class="n">add_units</span><span class="p">(</span><span class="mf">5.0</span><span class="p">,</span> <span class="s1">&#39;day&#39;</span><span class="p">)</span>
@@ -1494,11 +1496,10 @@ end function timestep_calc
 
     <span class="c1"># Initialize state and synchronize with other models</span>
     <span class="n">t</span> <span class="o">=</span> <span class="n">t_start</span>
-    <span class="n">ret</span><span class="p">,</span> <span class="n">result</span> <span class="o">=</span> <span class="n">timesync</span><span class="o">.</span><span class="n">call</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">state</span><span class="p">)</span>
+    <span class="n">ret</span><span class="p">,</span> <span class="n">state</span> <span class="o">=</span> <span class="n">timesync</span><span class="o">.</span><span class="n">call</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">state</span><span class="p">)</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="n">ret</span><span class="p">:</span>
         <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">&quot;timesync(Python): Initial sync failed.&quot;</span><span class="p">)</span>
-    <span class="n">state</span> <span class="o">=</span> <span class="n">result</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
-    <span class="k">print</span><span class="p">(</span><span class="s1">&#39;timesync(Python): t = </span><span class="si">% 8s</span><span class="s1">, x = </span><span class="si">%+ 5.2f</span><span class="s1">, y = </span><span class="si">%+ 5.2f</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;timesync(Python): t = </span><span class="si">% 8s</span><span class="s1">, x = </span><span class="si">%+ 5.2f</span><span class="s1">, y = </span><span class="si">%+ 5.2f</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span>
         <span class="n">t</span><span class="p">,</span> <span class="n">state</span><span class="p">[</span><span class="s1">&#39;x&#39;</span><span class="p">],</span> <span class="n">state</span><span class="p">[</span><span class="s1">&#39;y&#39;</span><span class="p">]))</span>
 
     <span class="c1"># Send initial state to output</span>
@@ -1515,11 +1516,10 @@ end function timestep_calc
         <span class="n">state</span> <span class="o">=</span> <span class="n">timestep_calc</span><span class="p">(</span><span class="n">t</span><span class="p">)</span>
 
         <span class="c1"># Synchronize the state</span>
-        <span class="n">ret</span><span class="p">,</span> <span class="n">result</span> <span class="o">=</span> <span class="n">timesync</span><span class="o">.</span><span class="n">call</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">state</span><span class="p">)</span>
+        <span class="n">ret</span><span class="p">,</span> <span class="n">state</span> <span class="o">=</span> <span class="n">timesync</span><span class="o">.</span><span class="n">call</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">state</span><span class="p">)</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">ret</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">&quot;timesync(Python): sync for t=</span><span class="si">%f</span><span class="s2"> failed.&quot;</span> <span class="o">%</span> <span class="n">t</span><span class="p">)</span>
-        <span class="n">state</span> <span class="o">=</span> <span class="n">result</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
-        <span class="k">print</span><span class="p">(</span><span class="s1">&#39;timesync(Python): t = </span><span class="si">% 8s</span><span class="s1">, x = </span><span class="si">%+ 5.2f</span><span class="s1">, y = </span><span class="si">%+ 5.2f</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;timesync(Python): t = </span><span class="si">% 8s</span><span class="s1">, x = </span><span class="si">%+ 5.2f</span><span class="s1">, y = </span><span class="si">%+ 5.2f</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span>
             <span class="n">t</span><span class="p">,</span> <span class="n">state</span><span class="p">[</span><span class="s1">&#39;x&#39;</span><span class="p">],</span> <span class="n">state</span><span class="p">[</span><span class="s1">&#39;y&#39;</span><span class="p">]))</span>
 
         <span class="c1"># Send output</span>
@@ -1527,7 +1527,7 @@ end function timestep_calc
         <span class="k">if</span> <span class="ow">not</span> <span class="n">flag</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">&quot;timesync(Python): Failed to send output for t=</span><span class="si">%s</span><span class="s2">.&quot;</span> <span class="o">%</span> <span class="n">t</span><span class="p">)</span>
 
-    <span class="k">print</span><span class="p">(</span><span class="s1">&#39;Goodbye from Python timesync&#39;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Goodbye from Python timesync&#39;</span><span class="p">)</span>
 
 
 <span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s1">&#39;__main__&#39;</span><span class="p">:</span>
@@ -1670,9 +1670,7 @@ end function timestep_calc
 69
 70
 71
-72
-73
-74</pre></div></td><td class="code"><div class="highlight"><pre><span></span>library(yggdrasil)
+72</pre></div></td><td class="code"><div class="highlight"><pre><span></span>library(yggdrasil)
 
 
 timestep_calc &lt;- function(t) {
@@ -1696,11 +1694,10 @@ main &lt;- function(t_step, t_units) {
 
   # Initialize state and synchronize with other models
   t &lt;- t_start
-  c(ret, result) %&lt;-% timesync$call(t, state)
+  c(ret, state) %&lt;-% timesync$call(t, state)
   if (!ret) {
     stop(&#39;timesync(R): Initial sync failed.&#39;)
   }
-  state &lt;- result[[1]]
   fprintf(&#39;timesync(R): t = %5.1f %-1s, x = %+ 5.2f, y = %+ 5.2f\n&#39;,
           units::drop_units(t), units::deparse_unit(t),
 	  state[[&#39;x&#39;]], state[[&#39;y&#39;]])
@@ -1721,11 +1718,10 @@ main &lt;- function(t_step, t_units) {
     state &lt;- timestep_calc(t)
 
     # Synchronize the state
-    c(ret, result) %&lt;-% timesync$call(t, state)
+    c(ret, state) %&lt;-% timesync$call(t, state)
     if (!ret) {
       stop(sprintf(&#39;timesync(R): sync for t=%f failed.&#39;, t))
     }
-    state &lt;- result[[1]]
     fprintf(&#39;timesync(R): t = %5.1f %-1s, x = %+ 5.2f, y = %+ 5.2f\n&#39;,
             units::drop_units(t), units::deparse_unit(t),
   	    state[[&#39;x&#39;]], state[[&#39;y&#39;]])
@@ -1816,29 +1812,29 @@ main(as.double(args[[1]]), args[[2]])
            
           </div>
           <footer>
-  
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
-      
-        <a href="timesync2.html" class="btn btn-neutral float-right" title="timesync2 Example" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
-      
-      
-        <a href="transformed_io.html" class="btn btn-neutral float-left" title="transformed_io Example" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
-      
+        <a href="timesync2.html" class="btn btn-neutral float-right" title="timesync2 Example" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="transformed_io.html" class="btn btn-neutral float-left" title="transformed_io Example" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
     </div>
-  
 
   <hr/>
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2017, Meagan Lang, David Raila
+        &#169; Copyright 2017, Meagan Lang, David Raila.
 
     </p>
   </div>
-  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+    
+    
+    
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
 
 </footer>
-
         </div>
       </div>
 
@@ -1846,7 +1842,6 @@ main(as.double(args[[1]]), args[[2]])
 
   </div>
   
-
 
   <script type="text/javascript">
       jQuery(function () {

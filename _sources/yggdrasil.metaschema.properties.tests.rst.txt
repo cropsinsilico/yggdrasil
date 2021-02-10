@@ -84,7 +84,6 @@ yggdrasil.metaschema.properties.tests.test\_TypeMetaschemaProperty module
    :undoc-members:
    :show-inheritance:
 
-
 Module contents
 ---------------
 

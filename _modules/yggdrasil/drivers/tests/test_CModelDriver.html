@@ -1,39 +1,42 @@
 
 
 <!DOCTYPE html>
-<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
-<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<html class="writer-html5" lang="en" >
 <head>
-  <meta charset="utf-8">
+  <meta charset="utf-8" />
   
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>yggdrasil.drivers.tests.test_CModelDriver &mdash; yggdrasil 1.1.1+410.g95af39b2 documentation</title>
+  <title>yggdrasil.drivers.tests.test_CModelDriver &mdash; yggdrasil v1.5.0 documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../../../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../../../_static/theme_overrides.css" type="text/css" />
+
+  
   
 
   
   
-  
+
   
 
   
-  <script type="text/javascript" src="../../../../_static/js/modernizr.min.js"></script>
+  <!--[if lt IE 9]>
+    <script src="../../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
   
     
       <script type="text/javascript" id="documentation_options" data-url_root="../../../../" src="../../../../_static/documentation_options.js"></script>
         <script src="../../../../_static/jquery.js"></script>
         <script src="../../../../_static/underscore.js"></script>
         <script src="../../../../_static/doctools.js"></script>
-        <script src="../../../../_static/language_data.js"></script>
     
     <script type="text/javascript" src="../../../../_static/js/theme.js"></script>
 
     
-
-  
-  <link rel="stylesheet" href="../../../../_static/css/theme.css" type="text/css" />
-  <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
-  <link rel="stylesheet" href="../../../../_static/theme_overrides.css" type="text/css" />
     <link rel="index" title="Index" href="../../../../genindex.html" />
     <link rel="search" title="Search" href="../../../../search.html" /> 
 </head>
@@ -59,7 +62,7 @@
             
             
               <div class="version">
-                1.1.1
+                v1.5.0
               </div>
             
           
@@ -76,6 +79,7 @@
           
         </div>
 
+        
         <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
           
             
@@ -111,6 +115,7 @@
             
           
         </div>
+        
       </div>
     </nav>
 
@@ -145,15 +150,19 @@
 
 
 
+
+
 <div role="navigation" aria-label="breadcrumbs navigation">
 
   <ul class="wy-breadcrumbs">
     
-      <li><a href="../../../../index.html">Docs</a> &raquo;</li>
+      <li><a href="../../../../index.html" class="icon icon-home"></a> &raquo;</li>
         
           <li><a href="../../../index.html">Module code</a> &raquo;</li>
         
           <li><a href="../../drivers.html">yggdrasil.drivers</a> &raquo;</li>
+        
+          <li><a href="../tests.html">yggdrasil.drivers.tests</a> &raquo;</li>
         
       <li>yggdrasil.drivers.tests.test_CModelDriver</li>
     
@@ -173,15 +182,17 @@
   <h1>Source code for yggdrasil.drivers.tests.test_CModelDriver</h1><div class="highlight"><pre>
 <span></span><span class="kn">import</span> <span class="nn">os</span>
 <span class="kn">import</span> <span class="nn">unittest</span>
-<span class="kn">from</span> <span class="nn">yggdrasil</span> <span class="k">import</span> <span class="n">platform</span>
+<span class="kn">from</span> <span class="nn">yggdrasil</span> <span class="kn">import</span> <span class="n">platform</span>
 <span class="kn">import</span> <span class="nn">yggdrasil.drivers.tests.test_CompiledModelDriver</span> <span class="k">as</span> <span class="nn">parent</span>
-<span class="kn">from</span> <span class="nn">yggdrasil.drivers.CModelDriver</span> <span class="k">import</span> <span class="n">CModelDriver</span><span class="p">,</span> <span class="n">LDLinker</span>
+<span class="kn">from</span> <span class="nn">yggdrasil.drivers.CModelDriver</span> <span class="kn">import</span> <span class="n">CModelDriver</span><span class="p">,</span> <span class="n">LDLinker</span>
 
 
 <div class="viewcode-block" id="test_LDLinker_tool_version"><a class="viewcode-back" href="../../../../yggdrasil.drivers.tests.html#yggdrasil.drivers.tests.test_CModelDriver.test_LDLinker_tool_version">[docs]</a><span class="k">def</span> <span class="nf">test_LDLinker_tool_version</span><span class="p">():</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test the tool_version method of the LDLinker class.&quot;&quot;&quot;</span>
     <span class="k">if</span> <span class="n">LDLinker</span><span class="o">.</span><span class="n">is_installed</span><span class="p">():</span>
-        <span class="n">LDLinker</span><span class="o">.</span><span class="n">tool_version</span><span class="p">()</span></div>
+        <span class="n">LDLinker</span><span class="o">.</span><span class="n">tool_version</span><span class="p">()</span>
+        <span class="n">LDLinker</span><span class="o">.</span><span class="n">get_search_path</span><span class="p">()</span>
+        <span class="n">LDLinker</span><span class="o">.</span><span class="n">get_env_flags</span><span class="p">()</span></div>
 
 
 <div class="viewcode-block" id="TestCModelParam"><a class="viewcode-back" href="../../../../yggdrasil.drivers.tests.html#yggdrasil.drivers.tests.test_CModelDriver.TestCModelParam">[docs]</a><span class="k">class</span> <span class="nc">TestCModelParam</span><span class="p">(</span><span class="n">parent</span><span class="o">.</span><span class="n">TestCompiledModelParam</span><span class="p">):</span>
@@ -189,7 +200,7 @@
 
     <span class="n">driver</span> <span class="o">=</span> <span class="s1">&#39;CModelDriver&#39;</span>
     
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">TestCModelParam</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
         <span class="n">script_dir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">src</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">args</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="s1">&#39;1&#39;</span><span class="p">]</span>
@@ -289,9 +300,23 @@
                                  <span class="s1">&#39;precision&#39;</span><span class="p">:</span> <span class="mi">64</span><span class="p">},</span>
                     <span class="s1">&#39;is_length_var&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">}]</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">test_write_function_def</span><span class="p">(</span><span class="n">inputs</span><span class="o">=</span><span class="n">inputs</span><span class="p">,</span> <span class="n">outputs</span><span class="o">=</span><span class="n">outputs</span><span class="p">,</span>
-                                     <span class="n">dont_add_lengths</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span></div></div>
+                                     <span class="n">dont_add_lengths</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span></div>
         
-    
+<div class="viewcode-block" id="TestCModelDriverNoInit.test_GCCCompiler_dll2a"><a class="viewcode-back" href="../../../../yggdrasil.drivers.tests.html#yggdrasil.drivers.tests.test_CModelDriver.TestCModelDriverNoInit.test_GCCCompiler_dll2a">[docs]</a>    <span class="k">def</span> <span class="nf">test_GCCCompiler_dll2a</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test the dll2a method of the GCCCompiler class.&quot;&quot;&quot;</span>
+        <span class="n">gcc</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">import_cls</span><span class="o">.</span><span class="n">get_tool</span><span class="p">(</span><span class="s1">&#39;compiler&#39;</span><span class="p">,</span> <span class="n">toolname</span><span class="o">=</span><span class="s1">&#39;gcc&#39;</span><span class="p">,</span>
+                                       <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">gcc</span><span class="p">:</span>
+            <span class="n">kws</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;toolname&#39;</span><span class="p">:</span> <span class="s1">&#39;gcc&#39;</span><span class="p">}</span>
+            <span class="k">if</span> <span class="n">platform</span><span class="o">.</span><span class="n">_is_win</span><span class="p">:</span>
+                <span class="n">kws</span><span class="p">[</span><span class="s1">&#39;libtype&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;shared&#39;</span>
+            <span class="n">dll</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">import_cls</span><span class="o">.</span><span class="n">get_dependency_library</span><span class="p">(</span><span class="s1">&#39;python&#39;</span><span class="p">,</span> <span class="o">**</span><span class="n">kws</span><span class="p">)</span>
+            <span class="n">gcc</span><span class="o">.</span><span class="n">dll2a</span><span class="p">(</span><span class="n">dll</span><span class="p">,</span> <span class="n">overwrite</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">assert_raises</span><span class="p">(</span><span class="ne">ValueError</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">import_cls</span><span class="o">.</span><span class="n">get_tool</span><span class="p">,</span>
+                               <span class="s1">&#39;compiler&#39;</span><span class="p">,</span> <span class="n">toolname</span><span class="o">=</span><span class="s1">&#39;gcc&#39;</span><span class="p">)</span></div></div>
+
+
 <div class="viewcode-block" id="TestCModelDriverNoStart"><a class="viewcode-back" href="../../../../yggdrasil.drivers.tests.html#yggdrasil.drivers.tests.test_CModelDriver.TestCModelDriverNoStart">[docs]</a><span class="k">class</span> <span class="nc">TestCModelDriverNoStart</span><span class="p">(</span><span class="n">TestCModelParam</span><span class="p">,</span>
                               <span class="n">parent</span><span class="o">.</span><span class="n">TestCompiledModelDriverNoStart</span><span class="p">):</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test runner for CModelDriver without start.&quot;&quot;&quot;</span>
@@ -321,20 +346,25 @@
            
           </div>
           <footer>
-  
 
   <hr/>
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2017, Meagan Lang, David Raila
+        &#169; Copyright 2017, Meagan Lang, David Raila.
 
     </p>
   </div>
-  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+    
+    
+    
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
 
 </footer>
-
         </div>
       </div>
 
@@ -342,7 +372,6 @@
 
   </div>
   
-
 
   <script type="text/javascript">
       jQuery(function () {

@@ -8,7 +8,7 @@ C Version
 
 Model Code:
 
-.. literalinclude:: /../../yggdrasil/examples/timesync2/src/timesync.c
+.. literalinclude:: /../../../../../../../opt/hostedtoolcache/Python/3.8.7/x64/lib/python3.8/site-packages/yggdrasil/examples/timesync2/src/timesync.c
    :language: c
    :linenos:
 
@@ -26,7 +26,7 @@ C++ Version
 
 Model Code:
 
-.. literalinclude:: /../../yggdrasil/examples/timesync2/src/timesync.cpp
+.. literalinclude:: /../../../../../../../opt/hostedtoolcache/Python/3.8.7/x64/lib/python3.8/site-packages/yggdrasil/examples/timesync2/src/timesync.cpp
    :language: c++
    :linenos:
 
@@ -44,7 +44,7 @@ Fortran Version
 
 Model Code:
 
-.. literalinclude:: /../../yggdrasil/examples/timesync2/src/timesync.f90
+.. literalinclude:: /../../../../../../../opt/hostedtoolcache/Python/3.8.7/x64/lib/python3.8/site-packages/yggdrasil/examples/timesync2/src/timesync.f90
    :language: python
    :linenos:
 
@@ -62,7 +62,7 @@ Matlab Version
 
 Model Code:
 
-.. literalinclude:: /../../yggdrasil/examples/timesync2/src/timesync.m
+.. literalinclude:: /../../../../../../../opt/hostedtoolcache/Python/3.8.7/x64/lib/python3.8/site-packages/yggdrasil/examples/timesync2/src/timesync.m
    :language: matlab
    :linenos:
 
@@ -80,7 +80,7 @@ Python Version
 
 Model Code:
 
-.. literalinclude:: /../../yggdrasil/examples/timesync2/src/timesync.py
+.. literalinclude:: /../../../../../../../opt/hostedtoolcache/Python/3.8.7/x64/lib/python3.8/site-packages/yggdrasil/examples/timesync2/src/timesync.py
    :language: python
    :linenos:
 
@@ -98,7 +98,7 @@ R Version
 
 Model Code:
 
-.. literalinclude:: /../../yggdrasil/examples/timesync2/src/timesync.R
+.. literalinclude:: /../../../../../../../opt/hostedtoolcache/Python/3.8.7/x64/lib/python3.8/site-packages/yggdrasil/examples/timesync2/src/timesync.R
    :language: python
    :linenos:
 

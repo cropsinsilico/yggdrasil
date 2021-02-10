@@ -1,0 +1,601 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+  <title>yggdrasil.drivers.OSRModelDriver &mdash; yggdrasil v1.5.0 documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/theme_overrides.css" type="text/css" />
+
+  
+  
+
+  
+  
+
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/underscore.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+    
+    <script type="text/javascript" src="../../../_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../../index.html" class="icon icon-home"> yggdrasil
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                v1.5.0
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../includeme.html">Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../install.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../getting_started.html">Getting started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../formatted_io.html">Formatted I/O</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../server_client_io.html">Server/Client I/O</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../autowrap.html">Autowrapping Model Functions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../autowrap.html#notes-on-autowrapping-c-c-model-functions">Notes on Autowrapping C/C++ Model Functions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../conditional_io.html">Conditional I/O</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../transformed_io.html">Transformed I/O</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../timesync_io.html">Timestep Synchronization</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../yaml.html">YAML Files</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../config.html">Configuration Files</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../units.html">Units</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../c_format_strings.html">C-Style Format Strings</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../debugging.html">Debugging</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../examples/examples_toc.html">Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../advanced/index.html">Advanced</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../development/index.html">Development</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../publications.html">Publications</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../hackathon2018/index.html">Welcome to the 2018 Crops in Silico Hackathon!</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../hackathon2019/index.html">Welcome to the 2019 Crops in Silico Hackathon!</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">yggdrasil</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../../index.html" class="icon icon-home"></a> &raquo;</li>
+        
+          <li><a href="../../index.html">Module code</a> &raquo;</li>
+        
+          <li><a href="../drivers.html">yggdrasil.drivers</a> &raquo;</li>
+        
+      <li>yggdrasil.drivers.OSRModelDriver</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for yggdrasil.drivers.OSRModelDriver</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">git</span>
+<span class="kn">import</span> <span class="nn">copy</span>
+<span class="kn">import</span> <span class="nn">shutil</span>
+<span class="kn">import</span> <span class="nn">subprocess</span>
+<span class="kn">import</span> <span class="nn">tempfile</span>
+<span class="kn">import</span> <span class="nn">logging</span>
+<span class="kn">import</span> <span class="nn">pystache</span>
+<span class="kn">import</span> <span class="nn">io</span> <span class="k">as</span> <span class="nn">sio</span>
+<span class="kn">import</span> <span class="nn">warnings</span>
+<span class="kn">import</span> <span class="nn">xml.etree.ElementTree</span> <span class="k">as</span> <span class="nn">ET</span>
+<span class="kn">from</span> <span class="nn">yggdrasil</span> <span class="kn">import</span> <span class="n">tools</span><span class="p">,</span> <span class="n">platform</span>
+<span class="kn">from</span> <span class="nn">yggdrasil.components</span> <span class="kn">import</span> <span class="n">import_component</span>
+<span class="kn">from</span> <span class="nn">yggdrasil.drivers.ExecutableModelDriver</span> <span class="kn">import</span> <span class="n">ExecutableModelDriver</span>
+<span class="kn">from</span> <span class="nn">yggdrasil.drivers.CPPModelDriver</span> <span class="kn">import</span> <span class="n">CPPModelDriver</span>
+
+
+<span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="OSRModelDriver"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.OSRModelDriver.OSRModelDriver">[docs]</a><span class="k">class</span> <span class="nc">OSRModelDriver</span><span class="p">(</span><span class="n">ExecutableModelDriver</span><span class="p">):</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Class for running OpenSimRoot model.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        sync_vars_in (list, optional): Variables that should be synchronized</span>
+<span class="sd">            from other models. Defaults to [].</span>
+<span class="sd">        sync_vars_out (list, optional): Variables that should be synchronized</span>
+<span class="sd">            to other models. Defaults to [].</span>
+<span class="sd">        copy_xml_to_osr (bool, optional): If True, the XML file(s) will</span>
+<span class="sd">            be copied to the OSR repository InputFiles direcitory before</span>
+<span class="sd">            running. This is necessary if the XML file(s) use any of the</span>
+<span class="sd">            files located there since OSR always assumes the included</span>
+<span class="sd">            file paths are relative. Defaults to False.</span>
+<span class="sd">        update_interval (float, optional): Max simulation interval at which</span>
+<span class="sd">            synchronization should occur (in days). Defaults to 1.0 if not</span>
+<span class="sd">            provided. If the XML input file loads additional export modules</span>
+<span class="sd">            that output at a shorter rate, the existing table of values will</span>
+<span class="sd">            be extrapolated.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">_schema_subtype_description</span> <span class="o">=</span> <span class="s1">&#39;Model is an OSR model.&#39;</span>
+    <span class="n">_schema_properties</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s1">&#39;sync_vars_in&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;array&#39;</span><span class="p">,</span> <span class="s1">&#39;items&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;string&#39;</span><span class="p">},</span>
+                         <span class="s1">&#39;default&#39;</span><span class="p">:</span> <span class="p">[]},</span>
+        <span class="s1">&#39;sync_vars_out&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;array&#39;</span><span class="p">,</span> <span class="s1">&#39;items&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;string&#39;</span><span class="p">},</span>
+                          <span class="s1">&#39;default&#39;</span><span class="p">:</span> <span class="p">[]},</span>
+        <span class="s1">&#39;copy_xml_to_osr&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;boolean&#39;</span><span class="p">,</span> <span class="s1">&#39;default&#39;</span><span class="p">:</span> <span class="kc">False</span><span class="p">},</span>
+        <span class="s1">&#39;update_interval&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;object&#39;</span><span class="p">,</span>
+                            <span class="s1">&#39;additionalProperties&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;float&#39;</span><span class="p">},</span>
+                            <span class="s1">&#39;default&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;timesync&#39;</span><span class="p">:</span> <span class="mf">1.0</span><span class="p">}}}</span>
+    <span class="n">language</span> <span class="o">=</span> <span class="s1">&#39;osr&#39;</span>
+    <span class="n">language_ext</span> <span class="o">=</span> <span class="s1">&#39;.xml&#39;</span>
+    <span class="n">base_languages</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;cpp&#39;</span><span class="p">]</span>
+    <span class="n">interface_dependencies</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;make&#39;</span><span class="p">]</span>
+    <span class="n">repository</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">executable_path</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">repository_url</span> <span class="o">=</span> <span class="s2">&quot;https://gitlab.com/langmm/OpenSimRoot.git&quot;</span>
+    <span class="n">repository_branch</span> <span class="o">=</span> <span class="s2">&quot;volatile_active&quot;</span>
+    <span class="n">_config_keys</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;repository&#39;</span><span class="p">]</span>
+    <span class="n">_config_attr_map</span> <span class="o">=</span> <span class="p">[{</span><span class="s1">&#39;attr&#39;</span><span class="p">:</span> <span class="s1">&#39;repository&#39;</span><span class="p">,</span>
+                         <span class="s1">&#39;key&#39;</span><span class="p">:</span> <span class="s1">&#39;repository&#39;</span><span class="p">}]</span>
+
+<div class="viewcode-block" id="OSRModelDriver.after_registration"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.OSRModelDriver.OSRModelDriver.after_registration">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">after_registration</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Operations that should be performed to modify class attributes after</span>
+<span class="sd">        registration.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">ExecutableModelDriver</span><span class="o">.</span><span class="n">after_registration</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">cls</span><span class="o">.</span><span class="n">repository</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">platform</span><span class="o">.</span><span class="n">_is_win</span><span class="p">:</span>  <span class="c1"># pragma: windows</span>
+                <span class="bp">cls</span><span class="o">.</span><span class="n">executable_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
+                    <span class="bp">cls</span><span class="o">.</span><span class="n">repository</span><span class="p">,</span> <span class="s1">&#39;OpenSimRoot&#39;</span><span class="p">,</span>
+                    <span class="s1">&#39;StaticBuild_win64&#39;</span><span class="p">,</span> <span class="s1">&#39;OpenSimRootYgg&#39;</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39;.exe&#39;</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="bp">cls</span><span class="o">.</span><span class="n">executable_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
+                    <span class="bp">cls</span><span class="o">.</span><span class="n">repository</span><span class="p">,</span> <span class="s1">&#39;OpenSimRoot&#39;</span><span class="p">,</span>
+                    <span class="s1">&#39;StaticBuild&#39;</span><span class="p">,</span> <span class="s1">&#39;OpenSimRootYgg&#39;</span><span class="p">)</span></div>
+        
+<div class="viewcode-block" id="OSRModelDriver.parse_arguments"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.OSRModelDriver.OSRModelDriver.parse_arguments">[docs]</a>    <span class="k">def</span> <span class="nf">parse_arguments</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Sort model arguments to determine which one is the executable</span>
+<span class="sd">        and which ones are arguments.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            *args: Additional arguments are passed to the parent class&#39;s method.</span>
+<span class="sd">            **kwargs: Additional keyword arguments are passed to the parent</span>
+<span class="sd">                class&#39;s method.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">OSRModelDriver</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">parse_arguments</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">model_file_orig</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">model_file</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">model_file</span> <span class="o">=</span> <span class="s1">&#39;_copy&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">splitext</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">model_file_orig</span><span class="p">))</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">copy_xml_to_osr</span> <span class="ow">and</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">repository</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">model_file</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">repository</span><span class="p">,</span> <span class="s1">&#39;OpenSimRoot&#39;</span><span class="p">,</span> <span class="s1">&#39;InputFiles&#39;</span><span class="p">,</span>
+                <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">basename</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">model_file</span><span class="p">))</span>
+        <span class="c1"># if not (isinstance(self.executable_path, str)</span>
+        <span class="c1">#         and os.path.isfile(self.executable_path)):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">compile_dependencies</span><span class="p">()</span>
+        <span class="k">assert</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">executable_path</span><span class="p">))</span></div>
+
+<div class="viewcode-block" id="OSRModelDriver.is_library_installed"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.OSRModelDriver.OSRModelDriver.is_library_installed">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">is_library_installed</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">lib</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Determine if a dependency is installed.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            lib (str): Name of the library that should be checked.</span>
+<span class="sd">            **kwargs: Additional keyword arguments are ignored.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            bool: True if the library is installed, False otherwise.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># Need to treat gnu make as dependency since OSR Makefile is not</span>
+        <span class="c1"># compatible with nmake</span>
+        <span class="k">if</span> <span class="n">lib</span> <span class="o">==</span> <span class="s1">&#39;make&#39;</span><span class="p">:</span>
+            <span class="k">return</span> <span class="nb">bool</span><span class="p">(</span><span class="n">shutil</span><span class="o">.</span><span class="n">which</span><span class="p">(</span><span class="s1">&#39;make&#39;</span><span class="p">))</span>
+        <span class="k">return</span> <span class="nb">super</span><span class="p">(</span><span class="n">OSRModelDriver</span><span class="p">,</span> <span class="bp">cls</span><span class="p">)</span><span class="o">.</span><span class="n">is_library_installed</span><span class="p">(</span>
+            <span class="n">lib</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>  <span class="c1"># pragma: debug</span></div>
+
+<div class="viewcode-block" id="OSRModelDriver.compile_dependencies"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.OSRModelDriver.OSRModelDriver.compile_dependencies">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">compile_dependencies</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">target</span><span class="o">=</span><span class="s1">&#39;OpenSimRootYgg&#39;</span><span class="p">,</span> <span class="n">toolname</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Compile the OpenSimRoot executable with the yggdrasil flag set.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            target (str, optional): Make target that should be build. Defaults to</span>
+<span class="sd">                &#39;OpenSimRootYgg&#39; (the yggdrasil-instrumented version of the</span>
+<span class="sd">                OSR executable).</span>
+<span class="sd">            toolname (str, optional): C++ compiler that should be used. Forced</span>
+<span class="sd">                to be &#39;cl.exe&#39; on windows. Otherwise the default C++ compiler will</span>
+<span class="sd">                be used.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="p">(</span><span class="bp">cls</span><span class="o">.</span><span class="n">repository</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">and</span> <span class="n">CPPModelDriver</span><span class="o">.</span><span class="n">is_installed</span><span class="p">():</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isdir</span><span class="p">(</span><span class="bp">cls</span><span class="o">.</span><span class="n">repository</span><span class="p">):</span>  <span class="c1"># pragma: debug</span>
+                <span class="c1"># This will only need to be called if the tempdir was cleaned up</span>
+                <span class="bp">cls</span><span class="o">.</span><span class="n">clone_repository</span><span class="p">(</span><span class="bp">cls</span><span class="o">.</span><span class="n">repository</span><span class="p">)</span>
+            <span class="c1"># toolname = CPPModelDriver.get_tool(&#39;compiler&#39;,</span>
+            <span class="c1">#                                    return_prop=&#39;name&#39;,</span>
+            <span class="c1">#                                    default=None)</span>
+            <span class="n">cwd</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">cls</span><span class="o">.</span><span class="n">repository</span><span class="p">,</span> <span class="s1">&#39;OpenSimRoot&#39;</span><span class="p">)</span>
+            <span class="n">flags</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;-j4&#39;</span><span class="p">]</span>
+            <span class="n">env</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">platform</span><span class="o">.</span><span class="n">_is_win</span><span class="p">:</span>  <span class="c1"># pragma: windows</span>
+                <span class="n">toolname</span> <span class="o">=</span> <span class="s1">&#39;cl&#39;</span>
+                <span class="n">env</span><span class="p">[</span><span class="s1">&#39;YGG_OSR_TOOL&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">toolname</span>
+                <span class="k">if</span> <span class="n">toolname</span> <span class="o">==</span> <span class="s1">&#39;cl&#39;</span><span class="p">:</span>
+                    <span class="n">cl_path</span> <span class="o">=</span> <span class="n">shutil</span><span class="o">.</span><span class="n">which</span><span class="p">(</span><span class="n">toolname</span> <span class="o">+</span> <span class="s1">&#39;.exe&#39;</span><span class="p">)</span>
+                    <span class="k">if</span> <span class="n">cl_path</span><span class="p">:</span>
+                        <span class="n">msvc_bin</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">cl_path</span><span class="p">)</span>
+                        <span class="n">env</span><span class="p">[</span><span class="s1">&#39;YGG_OSR_CXX&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">cl_path</span>
+                        <span class="n">env</span><span class="p">[</span><span class="s1">&#39;YGG_OSR_LINK&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">msvc_bin</span><span class="p">,</span> <span class="s1">&#39;link.exe&#39;</span><span class="p">)</span>
+                        <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;CL&#39;</span><span class="p">,</span> <span class="s1">&#39;_CL_&#39;</span><span class="p">]:</span>
+                            <span class="n">v</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+                            <span class="k">if</span> <span class="n">v</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>  <span class="c1"># pragma: appveyor</span>
+                                <span class="n">env</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">v</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;/&#39;</span><span class="p">,</span> <span class="s1">&#39;-&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\\</span><span class="s1">&#39;</span><span class="p">,</span> <span class="s1">&#39;/&#39;</span><span class="p">)</span>
+                    <span class="k">else</span><span class="p">:</span>  <span class="c1"># pragma: debug</span>
+                        <span class="n">env</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;YGG_OSR_TOOL&#39;</span><span class="p">)</span>
+                        <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
+                            <span class="s2">&quot;The MSVC compiler is not installed. Be aware &quot;</span>
+                            <span class="s2">&quot;that the GNU compiler takes a *very* long time &quot;</span>
+                            <span class="s2">&quot;to compile OpenSimRoot against yggdrasil on &quot;</span>
+                            <span class="s2">&quot;Windows (&gt; 1 hr).&quot;</span><span class="p">)</span>
+                <span class="n">cwd</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">cwd</span><span class="p">,</span> <span class="s1">&#39;StaticBuild_win64&#39;</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">cwd</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">cwd</span><span class="p">,</span> <span class="s1">&#39;StaticBuild&#39;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">target</span> <span class="o">!=</span> <span class="s1">&#39;cleanygg&#39;</span><span class="p">:</span>
+                <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="bp">cls</span><span class="o">.</span><span class="n">base_languages</span><span class="p">:</span>
+                    <span class="n">base_cls</span> <span class="o">=</span> <span class="n">import_component</span><span class="p">(</span><span class="s1">&#39;model&#39;</span><span class="p">,</span> <span class="n">x</span><span class="p">)</span>
+                    <span class="n">base_cls</span><span class="o">.</span><span class="n">compile_dependencies</span><span class="p">(</span><span class="n">toolname</span><span class="o">=</span><span class="n">toolname</span><span class="p">)</span>
+            <span class="k">elif</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="bp">cls</span><span class="o">.</span><span class="n">executable_path</span><span class="p">):</span>
+                <span class="k">return</span>
+            <span class="n">cmd</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;make&#39;</span><span class="p">,</span> <span class="n">target</span><span class="p">]</span> <span class="o">+</span> <span class="n">flags</span>
+            <span class="n">subprocess</span><span class="o">.</span><span class="n">check_call</span><span class="p">(</span><span class="n">cmd</span><span class="p">,</span> <span class="n">cwd</span><span class="o">=</span><span class="n">cwd</span><span class="p">,</span> <span class="n">env</span><span class="o">=</span><span class="n">env</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="OSRModelDriver.write_wrappers"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.OSRModelDriver.OSRModelDriver.write_wrappers">[docs]</a>    <span class="k">def</span> <span class="nf">write_wrappers</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Write any wrappers needed to compile and/or run a model.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            **kwargs: Keyword arguments are passed to the parent class&#39;s</span>
+<span class="sd">                method.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            list: Full paths to any created wrappers.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">out</span> <span class="o">=</span> <span class="nb">super</span><span class="p">(</span><span class="n">OSRModelDriver</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">write_wrappers</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="n">out</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">wrap_xml</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">model_file_orig</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">model_file</span><span class="p">))</span>
+        <span class="k">return</span> <span class="n">out</span></div>
+
+<div class="viewcode-block" id="OSRModelDriver.wrap_xml"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.OSRModelDriver.OSRModelDriver.wrap_xml">[docs]</a>    <span class="k">def</span> <span class="nf">wrap_xml</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">src</span><span class="p">,</span> <span class="n">dst</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Wrap the input XML, adding tags for the inputs/outputs specified for</span>
+<span class="sd">        this model.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            src (str): Full path to the XML file that should be wrapped.</span>
+<span class="sd">            dst (str): Full path to the location where the updated XML should</span>
+<span class="sd">                be saved.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            str: Full path to XML file produced.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">src</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">fd</span><span class="p">:</span>
+            <span class="n">src_contents</span> <span class="o">=</span> <span class="n">fd</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
+        <span class="n">src_contents</span> <span class="o">=</span> <span class="n">pystache</span><span class="o">.</span><span class="n">render</span><span class="p">(</span>
+            <span class="n">sio</span><span class="o">.</span><span class="n">StringIO</span><span class="p">(</span><span class="n">src_contents</span><span class="p">)</span><span class="o">.</span><span class="n">getvalue</span><span class="p">(),</span> <span class="bp">self</span><span class="o">.</span><span class="n">set_env</span><span class="p">())</span>
+        <span class="n">root</span> <span class="o">=</span> <span class="n">ET</span><span class="o">.</span><span class="n">fromstring</span><span class="p">(</span><span class="n">src_contents</span><span class="p">)</span>
+        <span class="n">timesync</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">timesync</span>
+        <span class="k">assert</span><span class="p">(</span><span class="n">timesync</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">timesync</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
+            <span class="n">timesync</span> <span class="o">=</span> <span class="p">[</span><span class="n">timesync</span><span class="p">]</span>
+        <span class="k">for</span> <span class="n">tsync</span> <span class="ow">in</span> <span class="nb">reversed</span><span class="p">(</span><span class="n">timesync</span><span class="p">):</span>
+            <span class="n">ivars</span> <span class="o">=</span> <span class="n">tsync</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;inputs&#39;</span><span class="p">,</span> <span class="p">[])</span>
+            <span class="n">ovars</span> <span class="o">=</span> <span class="n">tsync</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;outputs&#39;</span><span class="p">,</span> <span class="p">[])</span>
+            <span class="k">assert</span><span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">ivars</span><span class="p">,</span> <span class="nb">list</span><span class="p">))</span>
+            <span class="k">assert</span><span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">ovars</span><span class="p">,</span> <span class="nb">list</span><span class="p">))</span>
+            <span class="n">ivars</span> <span class="o">=</span> <span class="s1">&#39; &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">ivars</span><span class="p">)</span>
+            <span class="n">ovars</span> <span class="o">=</span> <span class="s1">&#39; &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">ovars</span><span class="p">)</span>
+            <span class="n">tupdate</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">update_interval</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">tsync</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">],</span> <span class="mf">1.0</span><span class="p">)</span>
+            <span class="n">cask</span> <span class="o">=</span> <span class="n">ET</span><span class="o">.</span><span class="n">Element</span><span class="p">(</span><span class="s1">&#39;SimulaCask&#39;</span><span class="p">,</span>
+                              <span class="n">attrib</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="n">tsync</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">],</span>
+                                      <span class="s1">&#39;interval&#39;</span><span class="p">:</span> <span class="nb">str</span><span class="p">(</span><span class="n">tupdate</span><span class="p">)})</span>
+            <span class="k">if</span> <span class="n">ivars</span><span class="p">:</span>
+                <span class="n">icask</span> <span class="o">=</span> <span class="n">ET</span><span class="o">.</span><span class="n">Element</span><span class="p">(</span><span class="s1">&#39;SimulaCaskInputs&#39;</span><span class="p">)</span>
+                <span class="n">icask</span><span class="o">.</span><span class="n">text</span> <span class="o">=</span> <span class="n">ivars</span>
+                <span class="n">cask</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="n">icask</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">ovars</span><span class="p">:</span>
+                <span class="n">ocask</span> <span class="o">=</span> <span class="n">ET</span><span class="o">.</span><span class="n">Element</span><span class="p">(</span><span class="s1">&#39;SimulaCaskOutputs&#39;</span><span class="p">)</span>
+                <span class="n">ocask</span><span class="o">.</span><span class="n">text</span> <span class="o">=</span> <span class="n">ovars</span>
+                <span class="n">cask</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="n">ocask</span><span class="p">)</span>
+            <span class="n">probe</span> <span class="o">=</span> <span class="n">ET</span><span class="o">.</span><span class="n">Element</span><span class="p">(</span><span class="s2">&quot;SimulaBase&quot;</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;probeCaskObjects&quot;</span><span class="p">)</span>
+            <span class="n">probe_vals</span> <span class="o">=</span> <span class="p">[</span><span class="n">ET</span><span class="o">.</span><span class="n">Element</span><span class="p">(</span><span class="s2">&quot;SimulaConstant&quot;</span><span class="p">,</span>
+                                     <span class="n">name</span><span class="o">=</span><span class="s2">&quot;run&quot;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="s2">&quot;bool&quot;</span><span class="p">),</span>
+                          <span class="n">ET</span><span class="o">.</span><span class="n">Element</span><span class="p">(</span><span class="s2">&quot;SimulaConstant&quot;</span><span class="p">,</span>
+                                     <span class="n">name</span><span class="o">=</span><span class="s2">&quot;timeInterval&quot;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="s2">&quot;time&quot;</span><span class="p">),</span>
+                          <span class="n">ET</span><span class="o">.</span><span class="n">Element</span><span class="p">(</span><span class="s2">&quot;SimulaConstant&quot;</span><span class="p">,</span>
+                                     <span class="n">name</span><span class="o">=</span><span class="s2">&quot;requestedVariables&quot;</span><span class="p">,</span>
+                                     <span class="nb">type</span><span class="o">=</span><span class="s2">&quot;string&quot;</span><span class="p">)]</span>
+            <span class="n">probe_vals</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">text</span> <span class="o">=</span> <span class="s1">&#39;1&#39;</span>
+            <span class="n">probe_vals</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">text</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">tupdate</span><span class="p">)</span>
+            <span class="n">probe_vals</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">text</span> <span class="o">=</span> <span class="s1">&#39;, &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">ivars</span><span class="o">.</span><span class="n">split</span><span class="p">())</span>
+            <span class="n">probe</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">probe_vals</span><span class="p">)</span>
+            <span class="n">probe_directive</span> <span class="o">=</span> <span class="n">ET</span><span class="o">.</span><span class="n">Element</span><span class="p">(</span>
+                <span class="s1">&#39;SimulaDirective&#39;</span><span class="p">,</span>
+                <span class="n">attrib</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;path&#39;</span><span class="p">:</span> <span class="s2">&quot;/simulationControls/outputParameters&quot;</span><span class="p">})</span>
+            <span class="n">probe_directive</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">probe</span><span class="p">)</span>
+            <span class="n">root</span><span class="o">.</span><span class="n">extend</span><span class="p">([</span><span class="n">cask</span><span class="p">,</span> <span class="n">probe_directive</span><span class="p">])</span>
+        <span class="n">tree</span> <span class="o">=</span> <span class="n">ET</span><span class="o">.</span><span class="n">ElementTree</span><span class="p">(</span><span class="n">root</span><span class="p">)</span>
+        <span class="n">tree</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">dst</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">dst</span></div>
+
+<div class="viewcode-block" id="OSRModelDriver.is_language_installed"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.OSRModelDriver.OSRModelDriver.is_language_installed">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">is_language_installed</span><span class="p">(</span><span class="bp">cls</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Determine if the interpreter/compiler for the associated programming</span>
+<span class="sd">        language is installed.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            bool: True if the language interpreter/compiler is installed.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="p">(</span><span class="bp">cls</span><span class="o">.</span><span class="n">repository</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="OSRModelDriver.clone_repository"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.OSRModelDriver.OSRModelDriver.clone_repository">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">clone_repository</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">dest</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Clone the OpenSimRoot repository.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            dest (str, optional): Full path to location where the repository should</span>
+<span class="sd">                be cloned. Defaults to &#39;$TEMP/OpenSimRoot&#39;.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            str: Full path to location where the repository was cloned.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">dest</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">dest</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">tempfile</span><span class="o">.</span><span class="n">gettempdir</span><span class="p">(),</span> <span class="s1">&#39;OpenSimRoot&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isdir</span><span class="p">(</span><span class="n">dest</span><span class="p">):</span>  <span class="c1"># pragma: config</span>
+            <span class="n">git</span><span class="o">.</span><span class="n">Repo</span><span class="o">.</span><span class="n">clone_from</span><span class="p">(</span><span class="bp">cls</span><span class="o">.</span><span class="n">repository_url</span><span class="p">,</span> <span class="n">dest</span><span class="p">,</span>
+                                <span class="n">branch</span><span class="o">=</span><span class="bp">cls</span><span class="o">.</span><span class="n">repository_branch</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">dest</span></div>
+        
+<div class="viewcode-block" id="OSRModelDriver.configure_executable_type"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.OSRModelDriver.OSRModelDriver.configure_executable_type">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">configure_executable_type</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">cfg</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Add configuration options specific in the executable type</span>
+<span class="sd">        before the libraries are configured.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            cfg (CisConfigParser): Config class that options should be set for.</span>
+<span class="sd">        </span>
+<span class="sd">        Returns:</span>
+<span class="sd">            list: Section, option, description tuples for options that could not</span>
+<span class="sd">                be set.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># TODO: Move clone + compile to install</span>
+        <span class="n">out</span> <span class="o">=</span> <span class="nb">super</span><span class="p">(</span><span class="n">OSRModelDriver</span><span class="p">,</span> <span class="bp">cls</span><span class="p">)</span><span class="o">.</span><span class="n">configure_executable_type</span><span class="p">(</span><span class="n">cfg</span><span class="p">)</span>
+        <span class="n">opt</span> <span class="o">=</span> <span class="s1">&#39;repository&#39;</span>
+        <span class="n">desc</span> <span class="o">=</span> <span class="s1">&#39;The full path to the OpenSimRoot repository.&#39;</span>
+        <span class="c1"># if platform._is_win:  # pragma: windows</span>
+        <span class="c1">#     out.append((cls.language, opt, desc))</span>
+        <span class="c1">#     return out</span>
+        <span class="k">if</span> <span class="p">(((</span><span class="ow">not</span> <span class="n">cfg</span><span class="o">.</span><span class="n">has_option</span><span class="p">(</span><span class="bp">cls</span><span class="o">.</span><span class="n">language</span><span class="p">,</span> <span class="n">opt</span><span class="p">))</span>
+             <span class="ow">or</span> <span class="p">(</span><span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isdir</span><span class="p">(</span><span class="n">cfg</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="bp">cls</span><span class="o">.</span><span class="n">language</span><span class="p">,</span> <span class="n">opt</span><span class="p">))))):</span>
+            <span class="n">fname</span> <span class="o">=</span> <span class="s1">&#39;OpenSimRoot&#39;</span>
+            <span class="n">fpath</span> <span class="o">=</span> <span class="n">tools</span><span class="o">.</span><span class="n">locate_file</span><span class="p">(</span><span class="n">fname</span><span class="p">)</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">fpath</span><span class="p">:</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Could not locate </span><span class="si">%s</span><span class="s1">, attempting to clone&#39;</span> <span class="o">%</span> <span class="n">fname</span><span class="p">)</span>
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="n">fpath</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">clone_repository</span><span class="p">()</span>
+                <span class="k">except</span> <span class="ne">BaseException</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>  <span class="c1"># pragma: debug</span>
+                    <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Failed to clone from </span><span class="si">%s</span><span class="s1">. error = </span><span class="si">%s</span><span class="s1">&#39;</span>
+                                <span class="o">%</span> <span class="p">(</span><span class="bp">cls</span><span class="o">.</span><span class="n">repository_url</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">)))</span>
+                    <span class="n">out</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="bp">cls</span><span class="o">.</span><span class="n">language</span><span class="p">,</span> <span class="n">opt</span><span class="p">,</span> <span class="n">desc</span><span class="p">))</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Located </span><span class="si">%s</span><span class="s1">: </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">fname</span><span class="p">,</span> <span class="n">fpath</span><span class="p">))</span>
+            <span class="n">cfg</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="bp">cls</span><span class="o">.</span><span class="n">language</span><span class="p">,</span> <span class="n">opt</span><span class="p">,</span> <span class="n">fpath</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">out</span></div>
+        
+<div class="viewcode-block" id="OSRModelDriver.set_env_class"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.OSRModelDriver.OSRModelDriver.set_env_class">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">set_env_class</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Set environment variables that are instance independent.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            **kwargs: Additional keyword arguments are passed to the</span>
+<span class="sd">                parent class&#39;s method.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            dict: Environment variables for the model process.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">out</span> <span class="o">=</span> <span class="nb">super</span><span class="p">(</span><span class="n">OSRModelDriver</span><span class="p">,</span> <span class="bp">cls</span><span class="p">)</span><span class="o">.</span><span class="n">set_env_class</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">cls</span><span class="o">.</span><span class="n">repository</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">out</span><span class="p">[</span><span class="s1">&#39;OSR_REPOSITORY&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">repository</span>
+        <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;existing&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">out</span>
+        <span class="n">out</span> <span class="o">=</span> <span class="n">CPPModelDriver</span><span class="o">.</span><span class="n">set_env_class</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">out</span></div>
+        
+<div class="viewcode-block" id="OSRModelDriver.language_executable"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.OSRModelDriver.OSRModelDriver.language_executable">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">language_executable</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Command required to compile/run a model written in this language</span>
+<span class="sd">        from the command line.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            str: Name of (or path to) compiler/interpreter executable required</span>
+<span class="sd">                to run the compiler/interpreter from the command line.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">cls</span><span class="o">.</span><span class="n">executable_path</span></div>
+        
+<div class="viewcode-block" id="OSRModelDriver.executable_command"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.OSRModelDriver.OSRModelDriver.executable_command">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">executable_command</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Compose a command for running a program using the exectuable for</span>
+<span class="sd">        this language (compiler/interpreter) with the provided arguments.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            args (list): The program that returned command should run and any</span>
+<span class="sd">                arguments that should be provided to it.</span>
+<span class="sd">            unused_kwargs (dict, optional): Existing dictionary that unused</span>
+<span class="sd">                keyword arguments should be added to. Defaults to None and is</span>
+<span class="sd">                ignored.</span>
+<span class="sd">            **kwargs: Additional keyword arguments are passed to the parent</span>
+<span class="sd">                class.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            list: Arguments composing the command required to run the program</span>
+<span class="sd">                from the command line using the executable for this language.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">args</span> <span class="o">=</span> <span class="p">[</span><span class="bp">cls</span><span class="o">.</span><span class="n">language_executable</span><span class="p">()]</span> <span class="o">+</span> <span class="n">args</span>
+        <span class="k">return</span> <span class="nb">super</span><span class="p">(</span><span class="n">OSRModelDriver</span><span class="p">,</span> <span class="bp">cls</span><span class="p">)</span><span class="o">.</span><span class="n">executable_command</span><span class="p">(</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="OSRModelDriver.cleanup_dependencies"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.OSRModelDriver.OSRModelDriver.cleanup_dependencies">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">cleanup_dependencies</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Cleanup dependencies.&quot;&quot;&quot;</span>
+        <span class="bp">cls</span><span class="o">.</span><span class="n">compile_dependencies</span><span class="p">(</span><span class="n">target</span><span class="o">=</span><span class="s1">&#39;cleanygg&#39;</span><span class="p">)</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">OSRModelDriver</span><span class="p">,</span> <span class="bp">cls</span><span class="p">)</span><span class="o">.</span><span class="n">cleanup_dependencies</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div></div>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &#169; Copyright 2017, Meagan Lang, David Raila.
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

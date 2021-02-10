@@ -1,39 +1,42 @@
 
 
 <!DOCTYPE html>
-<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
-<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<html class="writer-html5" lang="en" >
 <head>
-  <meta charset="utf-8">
+  <meta charset="utf-8" />
   
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>yggdrasil.drivers.PythonModelDriver &mdash; yggdrasil 1.1.1+410.g95af39b2 documentation</title>
+  <title>yggdrasil.drivers.PythonModelDriver &mdash; yggdrasil v1.5.0 documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/theme_overrides.css" type="text/css" />
+
+  
   
 
   
   
-  
+
   
 
   
-  <script type="text/javascript" src="../../../_static/js/modernizr.min.js"></script>
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
   
     
       <script type="text/javascript" id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
         <script src="../../../_static/jquery.js"></script>
         <script src="../../../_static/underscore.js"></script>
         <script src="../../../_static/doctools.js"></script>
-        <script src="../../../_static/language_data.js"></script>
     
     <script type="text/javascript" src="../../../_static/js/theme.js"></script>
 
     
-
-  
-  <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
-  <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
-  <link rel="stylesheet" href="../../../_static/theme_overrides.css" type="text/css" />
     <link rel="index" title="Index" href="../../../genindex.html" />
     <link rel="search" title="Search" href="../../../search.html" /> 
 </head>
@@ -59,7 +62,7 @@
             
             
               <div class="version">
-                1.1.1
+                v1.5.0
               </div>
             
           
@@ -76,6 +79,7 @@
           
         </div>
 
+        
         <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
           
             
@@ -111,6 +115,7 @@
             
           
         </div>
+        
       </div>
     </nav>
 
@@ -145,11 +150,13 @@
 
 
 
+
+
 <div role="navigation" aria-label="breadcrumbs navigation">
 
   <ul class="wy-breadcrumbs">
     
-      <li><a href="../../../index.html">Docs</a> &raquo;</li>
+      <li><a href="../../../index.html" class="icon icon-home"></a> &raquo;</li>
         
           <li><a href="../../index.html">Module code</a> &raquo;</li>
         
@@ -174,8 +181,8 @@
 <span></span><span class="kn">import</span> <span class="nn">os</span>
 <span class="kn">import</span> <span class="nn">sys</span>
 <span class="kn">import</span> <span class="nn">importlib</span>
-<span class="kn">from</span> <span class="nn">yggdrasil</span> <span class="k">import</span> <span class="n">tools</span>
-<span class="kn">from</span> <span class="nn">yggdrasil.drivers.InterpretedModelDriver</span> <span class="k">import</span> <span class="n">InterpretedModelDriver</span>
+<span class="kn">from</span> <span class="nn">yggdrasil</span> <span class="kn">import</span> <span class="n">tools</span>
+<span class="kn">from</span> <span class="nn">yggdrasil.drivers.InterpretedModelDriver</span> <span class="kn">import</span> <span class="n">InterpretedModelDriver</span>
 
 
 <div class="viewcode-block" id="PythonModelDriver"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.PythonModelDriver.PythonModelDriver">[docs]</a><span class="k">class</span> <span class="nc">PythonModelDriver</span><span class="p">(</span><span class="n">InterpretedModelDriver</span><span class="p">):</span>
@@ -231,7 +238,8 @@
         <span class="s1">&#39;and&#39;</span><span class="p">:</span> <span class="s1">&#39;and&#39;</span><span class="p">,</span>
         <span class="s1">&#39;indent&#39;</span><span class="p">:</span> <span class="mi">4</span> <span class="o">*</span> <span class="s1">&#39; &#39;</span><span class="p">,</span>
         <span class="s1">&#39;quote&#39;</span><span class="p">:</span> <span class="s1">&#39;</span><span class="se">\&quot;</span><span class="s1">&#39;</span><span class="p">,</span>
-        <span class="s1">&#39;print_generic&#39;</span><span class="p">:</span> <span class="s1">&#39;print(</span><span class="si">{object}</span><span class="s1">)&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;print_generic&#39;</span><span class="p">:</span> <span class="p">(</span><span class="s1">&#39;from yggdrasil.tools import print_encoded; &#39;</span>
+                          <span class="s1">&#39;print_encoded(</span><span class="si">{object}</span><span class="s1">)&#39;</span><span class="p">),</span>
         <span class="s1">&#39;print&#39;</span><span class="p">:</span> <span class="s1">&#39;print(</span><span class="se">\&quot;</span><span class="si">{message}</span><span class="se">\&quot;</span><span class="s1">)&#39;</span><span class="p">,</span>
         <span class="s1">&#39;fprintf&#39;</span><span class="p">:</span> <span class="s1">&#39;print(</span><span class="se">\&quot;</span><span class="si">{message}</span><span class="se">\&quot;</span><span class="s1"> % (</span><span class="si">{variables}</span><span class="s1">))&#39;</span><span class="p">,</span>
         <span class="s1">&#39;error&#39;</span><span class="p">:</span> <span class="s1">&#39;raise Exception(&quot;</span><span class="si">{error_msg}</span><span class="s1">&quot;)&#39;</span><span class="p">,</span>
@@ -298,29 +306,6 @@
             <span class="k">return</span> <span class="kc">False</span>
         <span class="k">return</span> <span class="kc">True</span></div>
 
-<div class="viewcode-block" id="PythonModelDriver.is_comm_installed"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.PythonModelDriver.PythonModelDriver.is_comm_installed">[docs]</a>    <span class="nd">@classmethod</span>
-    <span class="k">def</span> <span class="nf">is_comm_installed</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Determine if a comm is installed for the associated programming</span>
-<span class="sd">        language.</span>
-
-<span class="sd">        Args:</span>
-<span class="sd">            **kwargs: Additional keyword arguments are passed to the parent</span>
-<span class="sd">                class&#39;s method.</span>
-
-<span class="sd">        Returns:</span>
-<span class="sd">            bool: True if a comm is installed for this language.</span>
-
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="c1"># Call __func__ to avoid direct invoking of class which dosn&#39;t exist</span>
-        <span class="c1"># in after_registration where this is called</span>
-        <span class="n">out</span> <span class="o">=</span> <span class="n">InterpretedModelDriver</span><span class="o">.</span><span class="n">is_comm_installed</span><span class="o">.</span><span class="vm">__func__</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;skip_config&#39;</span><span class="p">):</span>
-            <span class="k">return</span> <span class="n">out</span>
-        <span class="k">if</span> <span class="n">out</span> <span class="ow">and</span> <span class="p">(</span><span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;commtype&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;rmq&#39;</span><span class="p">,</span> <span class="s1">&#39;rmq_async&#39;</span><span class="p">]):</span>
-            <span class="kn">from</span> <span class="nn">yggdrasil.communication.RMQComm</span> <span class="k">import</span> <span class="n">check_rmq_server</span>
-            <span class="n">out</span> <span class="o">=</span> <span class="n">check_rmq_server</span><span class="p">()</span>
-        <span class="k">return</span> <span class="n">out</span></div>
-
 <div class="viewcode-block" id="PythonModelDriver.format_function_param"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.PythonModelDriver.PythonModelDriver.format_function_param">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">format_function_param</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Return the formatted version of the specified key.</span>
@@ -353,20 +338,25 @@
            
           </div>
           <footer>
-  
 
   <hr/>
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2017, Meagan Lang, David Raila
+        &#169; Copyright 2017, Meagan Lang, David Raila.
 
     </p>
   </div>
-  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+    
+    
+    
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
 
 </footer>
-
         </div>
       </div>
 
@@ -374,7 +364,6 @@
 
   </div>
   
-
 
   <script type="text/javascript">
       jQuery(function () {

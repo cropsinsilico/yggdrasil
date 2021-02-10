@@ -1,39 +1,42 @@
 
 
 <!DOCTYPE html>
-<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
-<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<html class="writer-html5" lang="en" >
 <head>
-  <meta charset="utf-8">
+  <meta charset="utf-8" />
   
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>yggdrasil.drivers.tests.test_CompiledModelDriver &mdash; yggdrasil 1.1.1+410.g95af39b2 documentation</title>
+  <title>yggdrasil.drivers.tests.test_CompiledModelDriver &mdash; yggdrasil v1.5.0 documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../../../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../../../_static/theme_overrides.css" type="text/css" />
+
+  
   
 
   
   
-  
+
   
 
   
-  <script type="text/javascript" src="../../../../_static/js/modernizr.min.js"></script>
+  <!--[if lt IE 9]>
+    <script src="../../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
   
     
       <script type="text/javascript" id="documentation_options" data-url_root="../../../../" src="../../../../_static/documentation_options.js"></script>
         <script src="../../../../_static/jquery.js"></script>
         <script src="../../../../_static/underscore.js"></script>
         <script src="../../../../_static/doctools.js"></script>
-        <script src="../../../../_static/language_data.js"></script>
     
     <script type="text/javascript" src="../../../../_static/js/theme.js"></script>
 
     
-
-  
-  <link rel="stylesheet" href="../../../../_static/css/theme.css" type="text/css" />
-  <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
-  <link rel="stylesheet" href="../../../../_static/theme_overrides.css" type="text/css" />
     <link rel="index" title="Index" href="../../../../genindex.html" />
     <link rel="search" title="Search" href="../../../../search.html" /> 
 </head>
@@ -59,7 +62,7 @@
             
             
               <div class="version">
-                1.1.1
+                v1.5.0
               </div>
             
           
@@ -76,6 +79,7 @@
           
         </div>
 
+        
         <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
           
             
@@ -111,6 +115,7 @@
             
           
         </div>
+        
       </div>
     </nav>
 
@@ -145,15 +150,19 @@
 
 
 
+
+
 <div role="navigation" aria-label="breadcrumbs navigation">
 
   <ul class="wy-breadcrumbs">
     
-      <li><a href="../../../../index.html">Docs</a> &raquo;</li>
+      <li><a href="../../../../index.html" class="icon icon-home"></a> &raquo;</li>
         
           <li><a href="../../../index.html">Module code</a> &raquo;</li>
         
           <li><a href="../../drivers.html">yggdrasil.drivers</a> &raquo;</li>
+        
+          <li><a href="../tests.html">yggdrasil.drivers.tests</a> &raquo;</li>
         
       <li>yggdrasil.drivers.tests.test_CompiledModelDriver</li>
     
@@ -172,10 +181,11 @@
             
   <h1>Source code for yggdrasil.drivers.tests.test_CompiledModelDriver</h1><div class="highlight"><pre>
 <span></span><span class="kn">import</span> <span class="nn">os</span>
-<span class="kn">from</span> <span class="nn">yggdrasil.config</span> <span class="k">import</span> <span class="n">ygg_cfg</span>
-<span class="kn">from</span> <span class="nn">yggdrasil.tests</span> <span class="k">import</span> <span class="n">assert_equal</span><span class="p">,</span> <span class="n">assert_raises</span><span class="p">,</span> <span class="n">YggTestClass</span>
-<span class="kn">from</span> <span class="nn">yggdrasil.drivers</span> <span class="k">import</span> <span class="n">CompiledModelDriver</span>
+<span class="kn">from</span> <span class="nn">yggdrasil.config</span> <span class="kn">import</span> <span class="n">ygg_cfg</span>
+<span class="kn">from</span> <span class="nn">yggdrasil.tests</span> <span class="kn">import</span> <span class="n">assert_equal</span><span class="p">,</span> <span class="n">assert_raises</span><span class="p">,</span> <span class="n">YggTestClass</span>
+<span class="kn">from</span> <span class="nn">yggdrasil.drivers</span> <span class="kn">import</span> <span class="n">CompiledModelDriver</span>
 <span class="kn">import</span> <span class="nn">yggdrasil.drivers.tests.test_ModelDriver</span> <span class="k">as</span> <span class="nn">parent</span>
+<span class="kn">from</span> <span class="nn">yggdrasil.components</span> <span class="kn">import</span> <span class="n">import_component</span>
 
 
 <div class="viewcode-block" id="test_get_compilation_tool_registry"><a class="viewcode-back" href="../../../../yggdrasil.drivers.tests.html#yggdrasil.drivers.tests.test_CompiledModelDriver.test_get_compilation_tool_registry">[docs]</a><span class="k">def</span> <span class="nf">test_get_compilation_tool_registry</span><span class="p">():</span>
@@ -188,11 +198,18 @@
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test errors raised by find_compilation_tool.&quot;&quot;&quot;</span>
     <span class="n">assert_raises</span><span class="p">(</span><span class="ne">RuntimeError</span><span class="p">,</span> <span class="n">CompiledModelDriver</span><span class="o">.</span><span class="n">find_compilation_tool</span><span class="p">,</span>
                   <span class="s1">&#39;archiver&#39;</span><span class="p">,</span> <span class="s1">&#39;cmake&#39;</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="test_get_alternate_class"><a class="viewcode-back" href="../../../../yggdrasil.drivers.tests.html#yggdrasil.drivers.tests.test_CompiledModelDriver.test_get_alternate_class">[docs]</a><span class="k">def</span> <span class="nf">test_get_alternate_class</span><span class="p">():</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test get_alternate_class.&quot;&quot;&quot;</span>
+    <span class="n">import_component</span><span class="p">(</span><span class="s1">&#39;model&#39;</span><span class="p">,</span> <span class="n">subtype</span><span class="o">=</span><span class="s1">&#39;c&#39;</span><span class="p">)</span>
+    <span class="n">gcc</span> <span class="o">=</span> <span class="n">CompiledModelDriver</span><span class="o">.</span><span class="n">get_compilation_tool</span><span class="p">(</span><span class="s1">&#39;compiler&#39;</span><span class="p">,</span> <span class="s1">&#39;gcc&#39;</span><span class="p">)</span>
+    <span class="n">gcc</span><span class="o">.</span><span class="n">get_alternate_class</span><span class="p">(</span><span class="n">toolname</span><span class="o">=</span><span class="s1">&#39;clang&#39;</span><span class="p">)</span></div>
     
 
 <div class="viewcode-block" id="test_get_compilation_tool"><a class="viewcode-back" href="../../../../yggdrasil.drivers.tests.html#yggdrasil.drivers.tests.test_CompiledModelDriver.test_get_compilation_tool">[docs]</a><span class="k">def</span> <span class="nf">test_get_compilation_tool</span><span class="p">():</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test get_compilation_tool for different name variations.&quot;&quot;&quot;</span>
-    <span class="kn">from</span> <span class="nn">yggdrasil.drivers.CModelDriver</span> <span class="k">import</span> <span class="n">CModelDriver</span>
+    <span class="kn">from</span> <span class="nn">yggdrasil.drivers.CModelDriver</span> <span class="kn">import</span> <span class="n">CModelDriver</span>
     <span class="k">if</span> <span class="n">CModelDriver</span><span class="o">.</span><span class="n">is_language_installed</span><span class="p">():</span>
         <span class="n">tooltype</span> <span class="o">=</span> <span class="s1">&#39;compiler&#39;</span>
         <span class="n">out</span> <span class="o">=</span> <span class="n">CModelDriver</span><span class="o">.</span><span class="n">get_tool</span><span class="p">(</span><span class="s1">&#39;compiler&#39;</span><span class="p">)</span><span class="o">.</span><span class="vm">__class__</span>
@@ -223,7 +240,7 @@
     <span class="n">_dont_register</span> <span class="o">=</span> <span class="kc">True</span>
     <span class="n">toolname</span> <span class="o">=</span> <span class="s1">&#39;dummy&#39;</span>
     <span class="n">languages</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;dummy&#39;</span><span class="p">]</span>
-    <span class="n">search_path_envvar</span> <span class="o">=</span> <span class="s1">&#39;PATH&#39;</span>
+    <span class="n">search_path_envvar</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;PATH&#39;</span><span class="p">]</span>
     <span class="n">_language_ext</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;.c&#39;</span><span class="p">]</span>
     <span class="n">default_linker</span> <span class="o">=</span> <span class="kc">False</span>
     <span class="n">default_archiver</span> <span class="o">=</span> <span class="kc">None</span>
@@ -275,7 +292,9 @@
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cls</span> <span class="o">==</span> <span class="s1">&#39;CompilationToolBase&#39;</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">assert_raises</span><span class="p">(</span><span class="ne">NotImplementedError</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">import_cls</span><span class="o">.</span><span class="n">get_search_path</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">import_cls</span><span class="o">.</span><span class="n">get_search_path</span><span class="p">()</span></div>
+            <span class="bp">self</span><span class="o">.</span><span class="n">import_cls</span><span class="o">.</span><span class="n">get_search_path</span><span class="p">(</span><span class="n">libtype</span><span class="o">=</span><span class="s1">&#39;include&#39;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">import_cls</span><span class="o">.</span><span class="n">get_search_path</span><span class="p">(</span><span class="n">libtype</span><span class="o">=</span><span class="s1">&#39;shared&#39;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">import_cls</span><span class="o">.</span><span class="n">get_search_path</span><span class="p">(</span><span class="n">libtype</span><span class="o">=</span><span class="s1">&#39;static&#39;</span><span class="p">)</span></div>
             
 <div class="viewcode-block" id="TestCompilationTool.test_get_executable_command"><a class="viewcode-back" href="../../../../yggdrasil.drivers.tests.html#yggdrasil.drivers.tests.test_CompiledModelDriver.TestCompilationTool.test_get_executable_command">[docs]</a>    <span class="k">def</span> <span class="nf">test_get_executable_command</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test get_executable_command.&quot;&quot;&quot;</span>
@@ -290,7 +309,7 @@
     <span class="n">_mod</span> <span class="o">=</span> <span class="s1">&#39;yggdrasil.drivers.tests.test_CompiledModelDriver&#39;</span>
     <span class="n">_cls</span> <span class="o">=</span> <span class="s1">&#39;DummyCompiler&#39;</span>
 
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">TestDummyCompiler</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_inst_kwargs</span><span class="p">[</span><span class="s1">&#39;linker&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">False</span>
 
@@ -322,7 +341,7 @@
 
     <span class="n">driver</span> <span class="o">=</span> <span class="s1">&#39;CompiledModelDriver&#39;</span>
     
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">TestCompiledModelParam</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">attr_list</span> <span class="o">+=</span> <span class="p">[</span><span class="s1">&#39;source_files&#39;</span><span class="p">]</span>
         <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;compiler&#39;</span><span class="p">,</span> <span class="s1">&#39;linker&#39;</span><span class="p">,</span> <span class="s1">&#39;archiver&#39;</span><span class="p">]:</span>
@@ -354,10 +373,25 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">assert_raises</span><span class="p">(</span><span class="ne">ValueError</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">import_cls</span><span class="o">.</span><span class="n">get_tool</span><span class="p">,</span> <span class="s1">&#39;compiler&#39;</span><span class="p">,</span>
                            <span class="n">return_prop</span><span class="o">=</span><span class="s1">&#39;invalid&#39;</span><span class="p">)</span></div>
 
+<div class="viewcode-block" id="TestCompiledModelDriverNoInit.test_get_dependency_info"><a class="viewcode-back" href="../../../../yggdrasil.drivers.tests.html#yggdrasil.drivers.tests.test_CompiledModelDriver.TestCompiledModelDriverNoInit.test_get_dependency_info">[docs]</a>    <span class="k">def</span> <span class="nf">test_get_dependency_info</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test get_dependency_info.&quot;&quot;&quot;</span>
+        <span class="n">dep_list</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">import_cls</span><span class="o">.</span><span class="n">get_dependency_order</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">import_cls</span><span class="o">.</span><span class="n">interface_library</span><span class="p">)</span>
+            <span class="o">+</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">import_cls</span><span class="o">.</span><span class="n">external_libraries</span><span class="o">.</span><span class="n">keys</span><span class="p">()))</span>
+        <span class="k">for</span> <span class="n">dep</span> <span class="ow">in</span> <span class="n">dep_list</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">import_cls</span><span class="o">.</span><span class="n">get_dependency_info</span><span class="p">(</span><span class="n">dep</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="s1">&#39;default&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assert_raises</span><span class="p">(</span><span class="ne">KeyError</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">import_cls</span><span class="o">.</span><span class="n">get_dependency_info</span><span class="p">,</span>
+                           <span class="s1">&#39;invalid&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assert_equal</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">import_cls</span><span class="o">.</span><span class="n">get_dependency_info</span><span class="p">(</span>
+            <span class="s1">&#39;invalid&#39;</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="s1">&#39;default&#39;</span><span class="p">),</span> <span class="s1">&#39;default&#39;</span><span class="p">)</span></div>
+
 <div class="viewcode-block" id="TestCompiledModelDriverNoInit.test_get_dependency_source"><a class="viewcode-back" href="../../../../yggdrasil.drivers.tests.html#yggdrasil.drivers.tests.test_CompiledModelDriver.TestCompiledModelDriverNoInit.test_get_dependency_source">[docs]</a>    <span class="k">def</span> <span class="nf">test_get_dependency_source</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test get_dependency_source.&quot;&quot;&quot;</span>
-        <span class="n">dep_list</span> <span class="o">=</span> <span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">import_cls</span><span class="o">.</span><span class="n">external_libraries</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
-                    <span class="o">+</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">import_cls</span><span class="o">.</span><span class="n">internal_libraries</span><span class="o">.</span><span class="n">keys</span><span class="p">()))</span>
+        <span class="n">dep_list</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">import_cls</span><span class="o">.</span><span class="n">get_dependency_order</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">import_cls</span><span class="o">.</span><span class="n">interface_library</span><span class="p">)</span>
+            <span class="o">+</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">import_cls</span><span class="o">.</span><span class="n">external_libraries</span><span class="o">.</span><span class="n">keys</span><span class="p">()))</span>
         <span class="k">for</span> <span class="n">dep</span> <span class="ow">in</span> <span class="n">dep_list</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">import_cls</span><span class="o">.</span><span class="n">get_dependency_source</span><span class="p">(</span><span class="n">dep</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="s1">&#39;default&#39;</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">assert_raises</span><span class="p">(</span><span class="ne">ValueError</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">import_cls</span><span class="o">.</span><span class="n">get_dependency_source</span><span class="p">,</span>
@@ -365,6 +399,21 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">assert_equal</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">import_cls</span><span class="o">.</span><span class="n">get_dependency_source</span><span class="p">(</span><span class="vm">__file__</span><span class="p">),</span>
                           <span class="vm">__file__</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">assert_equal</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">import_cls</span><span class="o">.</span><span class="n">get_dependency_source</span><span class="p">(</span>
+            <span class="s1">&#39;invalid&#39;</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="s1">&#39;default&#39;</span><span class="p">),</span> <span class="s1">&#39;default&#39;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="TestCompiledModelDriverNoInit.test_get_dependency_object"><a class="viewcode-back" href="../../../../yggdrasil.drivers.tests.html#yggdrasil.drivers.tests.test_CompiledModelDriver.TestCompiledModelDriverNoInit.test_get_dependency_object">[docs]</a>    <span class="k">def</span> <span class="nf">test_get_dependency_object</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test get_dependency_object.&quot;&quot;&quot;</span>
+        <span class="n">dep_list</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">import_cls</span><span class="o">.</span><span class="n">get_dependency_order</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">import_cls</span><span class="o">.</span><span class="n">interface_library</span><span class="p">)</span>
+            <span class="o">+</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">import_cls</span><span class="o">.</span><span class="n">external_libraries</span><span class="o">.</span><span class="n">keys</span><span class="p">()))</span>
+        <span class="k">for</span> <span class="n">dep</span> <span class="ow">in</span> <span class="n">dep_list</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">import_cls</span><span class="o">.</span><span class="n">get_dependency_object</span><span class="p">(</span><span class="n">dep</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="s1">&#39;default&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assert_raises</span><span class="p">(</span><span class="ne">ValueError</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">import_cls</span><span class="o">.</span><span class="n">get_dependency_object</span><span class="p">,</span>
+                           <span class="s1">&#39;invalid&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assert_equal</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">import_cls</span><span class="o">.</span><span class="n">get_dependency_object</span><span class="p">(</span><span class="vm">__file__</span><span class="p">),</span>
+                          <span class="vm">__file__</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assert_equal</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">import_cls</span><span class="o">.</span><span class="n">get_dependency_object</span><span class="p">(</span>
             <span class="s1">&#39;invalid&#39;</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="s1">&#39;default&#39;</span><span class="p">),</span> <span class="s1">&#39;default&#39;</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="TestCompiledModelDriverNoInit.test_get_dependency_library"><a class="viewcode-back" href="../../../../yggdrasil.drivers.tests.html#yggdrasil.drivers.tests.test_CompiledModelDriver.TestCompiledModelDriverNoInit.test_get_dependency_library">[docs]</a>    <span class="k">def</span> <span class="nf">test_get_dependency_library</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -535,20 +584,25 @@
            
           </div>
           <footer>
-  
 
   <hr/>
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2017, Meagan Lang, David Raila
+        &#169; Copyright 2017, Meagan Lang, David Raila.
 
     </p>
   </div>
-  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+    
+    
+    
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
 
 </footer>
-
         </div>
       </div>
 
@@ -556,7 +610,6 @@
 
   </div>
   
-
 
   <script type="text/javascript">
       jQuery(function () {

@@ -9,14 +9,20 @@ Installation
 
    **Windows Users**
 
-   If you will be running C/C++ models on a Windows operatoring system, you will first need to install Microsoft Visual Studio, regardless of the installation method you end up using. Visual Studio Community can be downloaded for free from `here <https://visualstudio.microsoft.com/vs/community/>`_. During installation, we recommend selecting the components below. If you forget to add something during the initial download, you can always modify the installation via the "Visual Studio Installer" program.
+   If you will be running C/C++/Fortran models on a Windows operatoring system, you will first need to install Microsoft Visual Studio, regardless of the installation method you end up using. Visual Studio Community can be downloaded for free from `here <https://visualstudio.microsoft.com/vs/community/>`_. During installation, we recommend selecting the components below. If you forget to add something during the initial download, you can always modify the installation via the "Visual Studio Installer" program.
 
     * "Desktop development with C++" - Workload under "Windows" section
     * "MSVC v140 - VS 2015 C++ build tools (v14.00)" - Individual component under "Compilers, build tools, and runtimes" section.
 
-   If you *do not use conda* to install |yggdrasil|, you will also need to initialize the command line build tools in any prompt you will be calling |yggdrasil| from. This can be done by calling |yggdrasil| from a developer prompt, or by locating the ``vsvarsall.bat`` script that comes with Visual Studio. Information on the developer prompt and how to locate the ``vsvarsall.bat`` script can be found `here <https://docs.microsoft.com/en-us/cpp/build/building-on-the-command-line?view=vs-2019>`_. The script used must be the one associated with Visual Studio 2015 build tools, which can be installed from within Visual Studio 2019. On a 64bit Windows machine, the command to initialize these tools within a prompt will probably look something like this::
+   If you *do not use conda* to install |yggdrasil|, you will also need to initialize the command line build tools in any prompt you will be calling |yggdrasil| from. This can be done by calling |yggdrasil| from a "VS2015 x64 Native Tools Developer Command Prompt", or by locating the ``vsvarsall.bat`` script that comes with Visual Studio. Information on the developer prompt and how to locate the ``vsvarsall.bat`` script can be found `here <https://docs.microsoft.com/en-us/cpp/build/building-on-the-command-line?view=vs-2019>`_. The prompt/script used must enable the Visual Studio 2015 build tools (the specific year) to be compatible with the Python C library (see the discussion `here <https://wiki.python.org/moin/WindowsCompilers>`_). The VS 2015 tools prompt/script will be installed from within Visual Studio 2019 by selecting the components indicated above. On a 64bit Windows machine (assuming you will be using 64 bit Python), the command to initialize these tools within a regular command prompt will look something like this, but the exact path will vary with your particular installation::
 
      $ call "C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\vcvarsall.bat" amd64
+
+.. note::
+
+   **Mac Users**
+
+   If you will be running C/C++/Fortran models, you will need to install the command line developer tools on Mac which provides several utilities for compilation and code management (e.g. clang, gcc, make, git). `This <https://cloudtechpoint.medium.com/how-to-install-command-line-tools-homebrew-in-macos-without-xcode-1b910742d923>`_ article outlines how to check if they are installed and install them if they are not. It also describes how to install the Homebrew package manager, which will be useful for installing non-Python dependencies if you do not plan on using conda to install |yggdrasil|.
 
 
 Conda Installation (recommended)
@@ -74,9 +80,34 @@ Manual Installation
    should manually install the non-Python dependencies, particularly the
    ZeroMQ C and C++ libraries and R packages (see below).
 
-If you do not want to use conda, |yggdrasil| can also be installed 
+.. warning::
+   **Windows Users** Be warned that there is 260 character limit to the size of the ``PATH`` environment variable (see note `here <https://docs.microsoft.com/en-us/windows/win32/fileio/naming-a-file#maximum-path-length-limitation>`_). If you modify the path (e.g. to add Python or the Python scripts directory), be sure that you do not exceed this limit. If you do, Windows will not report an error, but the characters past the limit will be ignored and so those directories will not be availble on the command prompt.
+
+.. note::
+
+   **Windows Users** If you do not use conda to install dependencies, we highly recommend installing two package managers, Chocolatey and vcpkg, to handle the installation of the non-Python dependencies. Instructions for installing Chocolatey can be found `here <https://chocolatey.org/install>`_ and instructions for installing vcpkg can be found `here <https://github.com/microsoft/vcpkg>`_.
+
+If you do not want to use conda, you can install Python yourself and then install 
+|yggdrasil| via ``pip`` or from the source code (See below). Python can be installed 
+in a number of ways, but be sure that you get Python>=3.5. Installation methods include:
+
+* Executable installer from the `Python Software Foundaction <https://www.python.org/downloads/>`_ (Recommended for Windows)
+* Package manager, e.g.
+  * ``brew install python3`` on Mac (be sure to include the 3)
+  * ``apt-get install python`` on Linux
+  * ``choco install python3`` on Windows
+* `Microsoft Visual Studio <https://visualstudio.microsoft.com/vs/features/python/>`_
+* `Microsoft Store <https://www.microsoft.com/en-us/p/python-38/9mssztt1n39l?activetab=pivot:overviewtab>`_ (Windows only; we do not recommend this method as it can be difficult to get working correctly as it requires tracking down the Scripts direcotry modifying the path yourself, see discussion `here <https://dev.to/naruaika/why-i-didn-t-install-python-from-the-microsoft-store-5cbd>`_)
+
+.. note::
+   **Mac Users** Python 2 is included on Mac as the default Python (as ``python``), but ``python3`` is what you will want to use (Python 2 has been deprecated). If you have Mac OS Catalina, you will already have Python 3, but you may need to enable developer tools to use it. You can check to see if Python 3 is installed (or prompt the developer tool `installation <https://apple.stackexchange.com/questions/376077/is-usr-bin-python3-provided-with-macos-catalina>`_) by running ``python3 --version`` and ``python --version``. If these commands do not return the same version, you will need to be sure to always use ``python3`` and ``pip3`` during installation (as opposed to the versions of the executables without the ``3``), or set Python 3 to be the default version of Python (see `this article <https://opensource.com/article/19/5/python-3-default-mac>`_).
+
+.. note::
+   **Windows Users** If you install Python, but your prompt cannot locate Python (i.e. ``where python`` fails), you may need to add the directory containing the Python executable (and the ``Scripts`` directory inside that as discussed below) to you ``PATH`` environment variable (e.g. ``set path=%path%;C:\path\to\Python\directory`` or ``setx path=%path%;C:\path\to\Python\directory`` to make the change for new prompts). For more information on setting the path, including instruction on seting in via the GUI, see `this article <https://datatofish.com/add-python-to-windows-path/>`_. 
+
+Once Python is installed, |yggdrasil| can be installed from the command line/prompt 
 from either `PyPI <https://pypi.org/project/yggdrasil-framework/>`_ 
-using ``pip``::
+using ``pip`` ::
 
   $ pip install yggdrasil-framework
 
@@ -108,21 +139,24 @@ Python commands::
 
   >>> import os
   >>> from distutils.sysconfig import get_python_lib
-  >>> os.path.realpath(os.path.join(get_python_lib(), '../../../bin/'))
+  >>> os.path.realpath(os.path.join(get_python_lib(), '..', '..', '..', 'bin'))
+
+.. note::
+   *Windows Users* If you used the Windows store to install Python, the above commands will not yield the correct scripts directory. It will be something along the lines of ``%userprofile%\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.9_qbz5n2kfra8p0\LocalCache\local-packages\Python39\Scripts``
 
 The displayed path can then be added either on the command link or in a startup
 script (e.g. ``.bashrc`` or ``.bash_profile``), using one of the following::
 
   $ export PATH=$PATH:<scripts_dir>  # (linux/osx, bash)
   $ setenv PATH $PATH:<scripts_dir>  # (linux/osx, tcsh)
-  $ set PATH "%PATH%:<scripts_dir>   # (windows)
+  $ set PATH=%PATH%:<scripts_dir>   # (windows)
 
 These commands will only add the directory to your path for the current 
 session. For the change to be permanent on Linux/MacOS, the appropriate command 
 from above can be added to your ``.bashrc`` or ``.bash_profile``. On 
 Windows (>=7), the following command will permanently modify your path::
 
-  $ setx PATH "%PATH%:<scripts_dir>
+  $ setx PATH=%PATH%:<scripts_dir>
 
 The changes will take affect the next time you open the terminal.
 
@@ -147,6 +181,44 @@ If you install |yggdrasil| using conda, these will be installed
 automatically as dependencies. If you are not using conda, you will need to 
 install them yourself.
 
+.. note::
+   Although not required, the ZeroMQ libraries are also recommended for message 
+   passing on Linux and MacOS operating systems as the IPC V message queues 
+   have default upper limits of 2048 bytes on some operating systems and will 
+   have to send larger messages piecemeal, adding to the message passing 
+   overhead. We recommend installing zeromq & czmq via apt on Linux 
+   (``apt-get libczmq-dev libzmq3-dev``) or Homebrew 
+   on Mac (``brew install czmq zmq``) if you do not use conda.
+
+Installing via vcpkg
+~~~~~~~~~~~~~~~~~~~~
+
+You can install the ZeroMQ C and C++ libraries via vcpkg (instructions for 
+installing vcpkg found `here <https://github.com/microsoft/vcpkg>`_. To 
+do so run the following from your "VS2015 x64 Native Tools Developer Command Prompt"::
+
+  > vcpkg install czmq zeromq --triplet x64-windows
+
+.. note::
+   The ``--triplet x64-windows`` flag indicates a 64 bit version of Windows 
+   (the most common). If you have a 32 bit Windows installation or are using a 
+   32 bit version of Python, omit the flag.
+
+When you run ``yggconfig`` following installation of yggdrasil
+If you did not set the ``VCPKG_ROOT`` environment variable before installing vcpkg, 
+you will need to add a flag indicating the location of the vcpkg installation when 
+running ``yggconfig`` following installation of yggdrasil. e.g.::
+
+  > yggconfig --vcpkg-dir=C:\path\to\vcpkg\root\directory
+
+If you do not do this, you will need to manually add the paths to the czmq and 
+zeromq libraries/headers to your |yggdrasil| configuration file (See 
+:ref:`Configuration Options <config_rst>`).
+
+
+Building from Source
+~~~~~~~~~~~~~~~~~~~~
+
 Instructions for installing the ZeroMQ C and C++ libraries can be found 
 `here <https://github.com/zeromq/czmq#building-and-installing>`_ 
 At install (and any time ``yggconfig`` is called), |yggdrasil| will attempt 
@@ -157,13 +229,6 @@ that it cannot find these libraries, you can manually set them in your
 If you install these libraries after installing |yggdrasil| you can re-configure
 |yggdrasil| and have it search for the libraries again by calling ``yggconfig``
 from the command line or by setting the appropriate config options manually.
-
-.. note::
-   Although not required, the ZeroMQ libraries are also recommended for message 
-   passing on Linux and MacOS operating systems as the IPC V message queues 
-   have default upper limits of 2048 bytes on some operating systems and will 
-   have to send larger messages piecemeal, adding to the message passing 
-   overhead.
 
 
 Additional Steps for Matlab Models
@@ -213,6 +278,11 @@ R2017b            2.7, 3.3, 3.4, 3.5, 3.6
 
 Additional Steps for R Models
 -----------------------------
+
+Rtools (Windows only)
+~~~~~~~~~~~~~~~~~~~~~
+
+On Windows, if you do not install the R dependencies via conda, you will also need to install Rtools so that the R dependencies with C/C++/Fortran components can be compiled if they need to be installed from source. The Rtools installer and instructions for installing Rtools for R<4.0.0 can be found `here <https://cran.r-project.org/bin/windows/Rtools/history.html>`_. For R>=4.0.0, you will need to install Rtools40 instead (installer/instructions `here <https://cran.r-project.org/bin/windows/Rtools/>`_).
 
 R Interpreter
 ~~~~~~~~~~~~~
@@ -273,6 +343,10 @@ If you install R and/or the R dependencies after installing |yggdrasil|, you can
   $ ygginstall R
 
 from your terminal (Linux/Mac) or Anaconda prompt (Windows).
+
+.. note::
+   If you see errors along the lines of ``'lib = "/usr/local/lib/R/site-library"' is not writable`` when running ``ygginstall R``, it is likely that the directory R is attempting to install in requires staff privileges to edit. On Unix systems (Linux/Mac), if you have ``sudo`` access you can either add yourself to the staff group (e.g. ``sudo usermod -a -G staff your_user_name``; then log off and back on) or add the ``--sudoR`` flag to the installation call (i.e. ``ygginstall R --sudoR``). On windows, you can open R from an administrator prompt and install the dependencies from CRAN directly as shown above. If you do not have administrator access, you can pick a directory that you have write access to and add it to the list of paths checked by R for R libraries in your .Rprofile file (i.e. add ``.libPaths( c( "~/userLibrary" , .libPaths() ) )``). `This article <https://support.rstudio.com/hc/en-us/articles/360047157094-Managing-R-with-Rprofile-Renviron-Rprofile-site-Renviron-site-rsession-conf-and-repos-conf>`_ describes what the .Rprofile file is and how to locate it. `This article <https://www.accelebrate.com/library/how-to-articles/r-rstudio-library>`_ discusses this in the context of Rstudio and how to make these changes via the Rstudio GUI on Windows.
+
    
 Additional Steps for RabbitMQ Message Passing
 ---------------------------------------------
@@ -291,3 +365,12 @@ downloading, installing, and starting a RabbitMQ server can be found
 `here <https://www.rabbitmq.com/download.html>`_. The default values
 for RabbitMQ related properties in the config file are set to the defaults
 for starting a RabbitMQ server.
+
+Additional Steps for OpenSimRoot
+--------------------------------
+
+If you would like to use OpenSimRoot, you will need to install GNU make. If you are on Linux/Mac or used conda to install |yggdrasil| it is likely that it will already be installed (you can run ``make --version`` to check). If it is not installed, and you are using a Mac OS, you can install XCode and the command line developer tools to get make and several other GNU tools (see relavent section of `this article <https://cloudtechpoint.medium.com/how-to-install-command-line-tools-homebrew-in-macos-without-xcode-1b910742d923>`_). If you are not on Mac, we recommend installing it via a package manager, e.g.
+
+* ``brew install make`` on Mac
+* ``apt-get install make`` on Linux
+* ``choco install make`` on Windows

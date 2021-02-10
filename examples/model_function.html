@@ -1,43 +1,46 @@
 
 
 <!DOCTYPE html>
-<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
-<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<html class="writer-html5" lang="en" >
 <head>
-  <meta charset="utf-8">
+  <meta charset="utf-8" />
   
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>model_function Example &mdash; yggdrasil 1.1.1+410.g95af39b2 documentation</title>
+  <title>model_function Example &mdash; yggdrasil v1.5.0 documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/theme_overrides.css" type="text/css" />
+
+  
   
 
   
   
-  
+
   
 
   
-  <script type="text/javascript" src="../_static/js/modernizr.min.js"></script>
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
   
     
       <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
         <script src="../_static/jquery.js"></script>
         <script src="../_static/underscore.js"></script>
         <script src="../_static/doctools.js"></script>
-        <script src="../_static/language_data.js"></script>
     
     <script type="text/javascript" src="../_static/js/theme.js"></script>
 
     
-
-  
-  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
-  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
-  <link rel="stylesheet" href="../_static/theme_overrides.css" type="text/css" />
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="conditional_io Example" href="conditional_io.html" />
-    <link rel="prev" title="rpc_lesson2 Example" href="rpc_lesson2.html" /> 
+    <link rel="prev" title="rpc_lesson3 Example" href="rpc_lesson3.html" /> 
 </head>
 
 <body class="wy-body-for-nav">
@@ -61,7 +64,7 @@
             
             
               <div class="version">
-                1.1.1
+                v1.5.0
               </div>
             
           
@@ -78,6 +81,7 @@
           
         </div>
 
+        
         <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
           
             
@@ -119,6 +123,7 @@
 <li class="toctree-l2"><a class="reference internal" href="formatted_io9.html">formatted_io9 Example</a></li>
 <li class="toctree-l2"><a class="reference internal" href="rpc_lesson1.html">rpc_lesson1 Example</a></li>
 <li class="toctree-l2"><a class="reference internal" href="rpc_lesson2.html">rpc_lesson2 Example</a></li>
+<li class="toctree-l2"><a class="reference internal" href="rpc_lesson3.html">rpc_lesson3 Example</a></li>
 <li class="toctree-l2 current"><a class="current reference internal" href="#">model_function Example</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#c-version">C Version</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#id1">C++ Version</a></li>
@@ -144,6 +149,7 @@
             
           
         </div>
+        
       </div>
     </nav>
 
@@ -178,11 +184,13 @@
 
 
 
+
+
 <div role="navigation" aria-label="breadcrumbs navigation">
 
   <ul class="wy-breadcrumbs">
     
-      <li><a href="../index.html">Docs</a> &raquo;</li>
+      <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
         
           <li><a href="examples_toc.html">Examples</a> &raquo;</li>
         
@@ -191,7 +199,7 @@
     
       <li class="wy-breadcrumbs-aside">
         
-            
+          
             <a href="../_sources/examples/model_function.rst.txt" rel="nofollow"> View page source</a>
           
         
@@ -437,23 +445,29 @@
 <span class="n">end</span> <span class="n">function</span> <span class="n">model_function</span>
 </pre></div>
 </td></tr></table></div>
-<div class="highlight-python notranslate"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
-2
-3
-4
-5
-6
-7
-8
-9</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="n">function</span> <span class="n">model_function</span><span class="p">(</span><span class="n">inputB</span><span class="p">,</span> <span class="n">outputB</span><span class="p">)</span> <span class="n">result</span><span class="p">(</span><span class="n">out</span><span class="p">)</span>
-  <span class="n">character</span><span class="p">(</span><span class="nb">len</span><span class="o">=*</span><span class="p">),</span> <span class="n">intent</span><span class="p">(</span><span class="ow">in</span><span class="p">)</span> <span class="p">::</span> <span class="n">inputB</span>
-  <span class="n">character</span><span class="p">(</span><span class="nb">len</span><span class="o">=</span><span class="p">:),</span> <span class="n">pointer</span> <span class="p">::</span> <span class="n">outputB</span>
-  <span class="n">logical</span> <span class="p">::</span> <span class="n">out</span>
-  <span class="n">out</span> <span class="o">=</span> <span class="o">.</span><span class="n">true</span><span class="o">.</span>
-  <span class="n">allocate</span><span class="p">(</span><span class="n">character</span><span class="p">(</span><span class="nb">len</span><span class="o">=</span><span class="nb">len</span><span class="p">(</span><span class="n">inputB</span><span class="p">))</span> <span class="p">::</span> <span class="n">outputB</span><span class="p">)</span>
-  <span class="n">outputB</span> <span class="o">=</span> <span class="n">inputB</span>
-  <span class="n">write</span><span class="p">(</span><span class="o">*</span><span class="p">,</span> <span class="s1">&#39;(&quot;Model B: &quot;,A,&quot; (length = &quot;,I3,&quot;)&quot;)&#39;</span><span class="p">)</span> <span class="n">outputB</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">outputB</span><span class="p">)</span>
-<span class="n">end</span> <span class="n">function</span> <span class="n">model_function</span>
+<div class="highlight-python notranslate"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="n">module</span> <span class="n">example_module</span>
+<span class="n">contains</span>
+  <span class="n">function</span> <span class="n">model_function</span><span class="p">(</span><span class="n">inputB</span><span class="p">,</span> <span class="n">outputB</span><span class="p">)</span> <span class="n">result</span><span class="p">(</span><span class="n">out</span><span class="p">)</span>
+    <span class="n">character</span><span class="p">(</span><span class="nb">len</span><span class="o">=*</span><span class="p">),</span> <span class="n">intent</span><span class="p">(</span><span class="ow">in</span><span class="p">)</span> <span class="p">::</span> <span class="n">inputB</span>
+    <span class="n">character</span><span class="p">(</span><span class="nb">len</span><span class="o">=</span><span class="p">:),</span> <span class="n">pointer</span> <span class="p">::</span> <span class="n">outputB</span>
+    <span class="n">logical</span> <span class="p">::</span> <span class="n">out</span>
+    <span class="n">out</span> <span class="o">=</span> <span class="o">.</span><span class="n">true</span><span class="o">.</span>
+    <span class="n">allocate</span><span class="p">(</span><span class="n">character</span><span class="p">(</span><span class="nb">len</span><span class="o">=</span><span class="nb">len</span><span class="p">(</span><span class="n">inputB</span><span class="p">))</span> <span class="p">::</span> <span class="n">outputB</span><span class="p">)</span>
+    <span class="n">outputB</span> <span class="o">=</span> <span class="n">inputB</span>
+    <span class="n">write</span><span class="p">(</span><span class="o">*</span><span class="p">,</span> <span class="s1">&#39;(&quot;Model B: &quot;,A,&quot; (length = &quot;,I3,&quot;)&quot;)&#39;</span><span class="p">)</span> <span class="n">outputB</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">outputB</span><span class="p">)</span>
+  <span class="n">end</span> <span class="n">function</span> <span class="n">model_function</span>
+<span class="n">end</span> <span class="n">module</span> <span class="n">example_module</span>
 </pre></div>
 </td></tr></table></div>
 <p>Model YAML:</p>
@@ -509,19 +523,19 @@
 <div class="highlight-matlab notranslate"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
 2
 3
-4</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="k">function</span><span class="w"> </span>out_buf <span class="p">=</span><span class="w"> </span><span class="nf">model_function_modelA</span><span class="p">(</span>in_buf<span class="p">)</span><span class="w"></span>
+4</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="k">function</span><span class="w"> </span>out_buf<span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="nf">model_function_modelA</span><span class="p">(</span>in_buf<span class="p">)</span><span class="w"></span>
 <span class="w">  </span><span class="nb">disp</span><span class="p">(</span><span class="n">sprintf</span><span class="p">(</span><span class="s">&#39;Model A: %s&#39;</span><span class="p">,</span> <span class="n">in_buf</span><span class="p">));</span>
   <span class="n">out_buf</span> <span class="p">=</span> <span class="n">in_buf</span><span class="p">;</span>
-<span class="k">end</span>
+<span class="n">end</span>
 </pre></div>
 </td></tr></table></div>
 <div class="highlight-matlab notranslate"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
 2
 3
-4</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="k">function</span><span class="w"> </span>out_buf <span class="p">=</span><span class="w"> </span><span class="nf">model_function_modelB</span><span class="p">(</span>in_buf<span class="p">)</span><span class="w"></span>
+4</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="k">function</span><span class="w"> </span>out_buf<span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="nf">model_function_modelB</span><span class="p">(</span>in_buf<span class="p">)</span><span class="w"></span>
 <span class="w">  </span><span class="nb">disp</span><span class="p">(</span><span class="n">sprintf</span><span class="p">(</span><span class="s">&#39;Model B: %s&#39;</span><span class="p">,</span> <span class="n">in_buf</span><span class="p">));</span>
   <span class="n">out_buf</span> <span class="p">=</span> <span class="n">in_buf</span><span class="p">;</span>
-<span class="k">end</span>
+<span class="n">end</span>
 </pre></div>
 </td></tr></table></div>
 <p>Model YAML:</p>
@@ -578,7 +592,7 @@
 2
 3
 4</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">model_function</span><span class="p">(</span><span class="n">in_buf</span><span class="p">):</span>
-    <span class="k">print</span><span class="p">(</span><span class="s2">&quot;Model A: </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">in_buf</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Model A: </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">in_buf</span><span class="p">)</span>
     <span class="n">out_buf</span> <span class="o">=</span> <span class="n">in_buf</span>
     <span class="k">return</span> <span class="n">out_buf</span>
 </pre></div>
@@ -587,7 +601,7 @@
 2
 3
 4</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">model_function</span><span class="p">(</span><span class="n">in_buf</span><span class="p">):</span>
-    <span class="k">print</span><span class="p">(</span><span class="s2">&quot;Model B: </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">in_buf</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Model B: </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">in_buf</span><span class="p">)</span>
     <span class="n">out_buf</span> <span class="o">=</span> <span class="n">in_buf</span>
     <span class="k">return</span> <span class="n">out_buf</span>
 </pre></div>
@@ -647,7 +661,7 @@
 3
 4
 5</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="n">model_function</span> <span class="o">&lt;-</span> <span class="n">function</span><span class="p">(</span><span class="n">in_buf</span><span class="p">)</span> <span class="p">{</span>
-  <span class="k">print</span><span class="p">(</span><span class="n">sprintf</span><span class="p">(</span><span class="s2">&quot;Model A: </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">in_buf</span><span class="p">))</span>
+  <span class="nb">print</span><span class="p">(</span><span class="n">sprintf</span><span class="p">(</span><span class="s2">&quot;Model A: </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">in_buf</span><span class="p">))</span>
   <span class="n">out_buf</span> <span class="o">&lt;-</span> <span class="n">in_buf</span>
   <span class="k">return</span><span class="p">(</span><span class="n">out_buf</span><span class="p">)</span>
 <span class="p">}</span>
@@ -658,7 +672,7 @@
 3
 4
 5</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="n">model_function</span> <span class="o">&lt;-</span> <span class="n">function</span><span class="p">(</span><span class="n">in_buf</span><span class="p">)</span> <span class="p">{</span>
-  <span class="k">print</span><span class="p">(</span><span class="n">sprintf</span><span class="p">(</span><span class="s2">&quot;Model B: </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">in_buf</span><span class="p">))</span>
+  <span class="nb">print</span><span class="p">(</span><span class="n">sprintf</span><span class="p">(</span><span class="s2">&quot;Model B: </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">in_buf</span><span class="p">))</span>
   <span class="n">out_buf</span> <span class="o">&lt;-</span> <span class="n">in_buf</span>
   <span class="k">return</span><span class="p">(</span><span class="n">out_buf</span><span class="p">)</span>
 <span class="p">}</span>
@@ -718,29 +732,29 @@
            
           </div>
           <footer>
-  
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
-      
-        <a href="conditional_io.html" class="btn btn-neutral float-right" title="conditional_io Example" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
-      
-      
-        <a href="rpc_lesson2.html" class="btn btn-neutral float-left" title="rpc_lesson2 Example" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
-      
+        <a href="conditional_io.html" class="btn btn-neutral float-right" title="conditional_io Example" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="rpc_lesson3.html" class="btn btn-neutral float-left" title="rpc_lesson3 Example" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
     </div>
-  
 
   <hr/>
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2017, Meagan Lang, David Raila
+        &#169; Copyright 2017, Meagan Lang, David Raila.
 
     </p>
   </div>
-  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+    
+    
+    
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
 
 </footer>
-
         </div>
       </div>
 
@@ -748,7 +762,6 @@
 
   </div>
   
-
 
   <script type="text/javascript">
       jQuery(function () {

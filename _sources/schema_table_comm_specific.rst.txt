@@ -1,5 +1,0 @@
-.. _schema_table_comm_specific_rst:
-
-
-
-

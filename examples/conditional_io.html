@@ -1,39 +1,42 @@
 
 
 <!DOCTYPE html>
-<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
-<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<html class="writer-html5" lang="en" >
 <head>
-  <meta charset="utf-8">
+  <meta charset="utf-8" />
   
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>conditional_io Example &mdash; yggdrasil 1.1.1+410.g95af39b2 documentation</title>
+  <title>conditional_io Example &mdash; yggdrasil v1.5.0 documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/theme_overrides.css" type="text/css" />
+
+  
   
 
   
   
-  
+
   
 
   
-  <script type="text/javascript" src="../_static/js/modernizr.min.js"></script>
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
   
     
       <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
         <script src="../_static/jquery.js"></script>
         <script src="../_static/underscore.js"></script>
         <script src="../_static/doctools.js"></script>
-        <script src="../_static/language_data.js"></script>
     
     <script type="text/javascript" src="../_static/js/theme.js"></script>
 
     
-
-  
-  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
-  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
-  <link rel="stylesheet" href="../_static/theme_overrides.css" type="text/css" />
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="transformed_io Example" href="transformed_io.html" />
@@ -61,7 +64,7 @@
             
             
               <div class="version">
-                1.1.1
+                v1.5.0
               </div>
             
           
@@ -78,6 +81,7 @@
           
         </div>
 
+        
         <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
           
             
@@ -119,6 +123,7 @@
 <li class="toctree-l2"><a class="reference internal" href="formatted_io9.html">formatted_io9 Example</a></li>
 <li class="toctree-l2"><a class="reference internal" href="rpc_lesson1.html">rpc_lesson1 Example</a></li>
 <li class="toctree-l2"><a class="reference internal" href="rpc_lesson2.html">rpc_lesson2 Example</a></li>
+<li class="toctree-l2"><a class="reference internal" href="rpc_lesson3.html">rpc_lesson3 Example</a></li>
 <li class="toctree-l2"><a class="reference internal" href="model_function.html">model_function Example</a></li>
 <li class="toctree-l2 current"><a class="current reference internal" href="#">conditional_io Example</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#c-version">C Version</a></li>
@@ -144,6 +149,7 @@
             
           
         </div>
+        
       </div>
     </nav>
 
@@ -178,11 +184,13 @@
 
 
 
+
+
 <div role="navigation" aria-label="breadcrumbs navigation">
 
   <ul class="wy-breadcrumbs">
     
-      <li><a href="../index.html">Docs</a> &raquo;</li>
+      <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
         
           <li><a href="examples_toc.html">Examples</a> &raquo;</li>
         
@@ -191,7 +199,7 @@
     
       <li class="wy-breadcrumbs-aside">
         
-            
+          
             <a href="../_sources/examples/conditional_io.rst.txt" rel="nofollow"> View page source</a>
           
         
@@ -517,7 +525,7 @@
   <span class="n">real</span><span class="p">,</span> <span class="n">intent</span><span class="p">(</span><span class="ow">in</span><span class="p">)</span> <span class="p">::</span> <span class="n">in_val</span>
   <span class="n">real</span><span class="p">,</span> <span class="n">intent</span><span class="p">(</span><span class="n">out</span><span class="p">)</span> <span class="p">::</span> <span class="n">out_val</span>
   <span class="n">out_val</span> <span class="o">=</span> <span class="n">in_val</span>
-  <span class="k">print</span> <span class="o">*</span><span class="p">,</span> <span class="s2">&quot;modelA_function(&quot;</span><span class="p">,</span> <span class="n">in_val</span><span class="p">,</span> <span class="s2">&quot;) = &quot;</span><span class="p">,</span> <span class="n">out_val</span>
+  <span class="nb">print</span> <span class="o">*</span><span class="p">,</span> <span class="s2">&quot;modelA_function(&quot;</span><span class="p">,</span> <span class="n">in_val</span><span class="p">,</span> <span class="s2">&quot;) = &quot;</span><span class="p">,</span> <span class="n">out_val</span>
 <span class="n">end</span> <span class="n">subroutine</span> <span class="n">modelA_function</span>
 </pre></div>
 </td></tr></table></div>
@@ -668,32 +676,32 @@ end subroutine modelB_function2
 <div class="highlight-matlab notranslate"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
 2
 3
-4</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="k">function</span><span class="w"> </span>out_val <span class="p">=</span><span class="w"> </span><span class="nf">conditional_io_modelA</span><span class="p">(</span>in_val<span class="p">)</span><span class="w"></span>
+4</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="k">function</span><span class="w"> </span>out_val<span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="nf">conditional_io_modelA</span><span class="p">(</span>in_val<span class="p">)</span><span class="w"></span>
 <span class="w">  </span><span class="n">out_val</span> <span class="p">=</span> <span class="n">in_val</span><span class="p">;</span>
   <span class="nb">disp</span><span class="p">(</span><span class="n">sprintf</span><span class="p">(</span><span class="s">&#39;modelA_function(%f) = %f&#39;</span><span class="p">,</span> <span class="n">separateUnits</span><span class="p">(</span><span class="n">in_val</span><span class="p">),</span> <span class="n">separateUnits</span><span class="p">(</span><span class="n">out_val</span><span class="p">)));</span>
-<span class="k">end</span>
+<span class="n">end</span>
 </pre></div>
 </td></tr></table></div>
 <div class="highlight-matlab notranslate"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
 2
 3
 4
-5</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="k">function</span><span class="w"> </span>[in_val, out_val] <span class="p">=</span><span class="w"> </span><span class="nf">conditional_io_modelB1</span><span class="p">(</span>in_val<span class="p">)</span><span class="w"></span>
+5</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="k">function</span><span class="w"> </span><span class="nf">[in_val, out_val] = conditional_io_modelB1</span><span class="p">(</span>in_val<span class="p">)</span><span class="w"></span>
 <span class="w">  </span><span class="c">% Only valid if in_val &lt;= 2</span>
   <span class="n">out_val</span> <span class="p">=</span> <span class="n">in_val</span>^<span class="mi">2</span><span class="p">;</span>
   <span class="nb">disp</span><span class="p">(</span><span class="n">sprintf</span><span class="p">(</span><span class="s">&#39;modelB_function1(%f) = %f&#39;</span><span class="p">,</span> <span class="n">separateUnits</span><span class="p">(</span><span class="n">in_val</span><span class="p">),</span> <span class="n">separateUnits</span><span class="p">(</span><span class="n">out_val</span><span class="p">)));</span>
-<span class="k">end</span>
+<span class="n">end</span>
 </pre></div>
 </td></tr></table></div>
 <div class="highlight-matlab notranslate"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
 2
 3
 4
-5</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="k">function</span><span class="w"> </span>[in_val, out_val] <span class="p">=</span><span class="w"> </span><span class="nf">conditional_io_modelB2</span><span class="p">(</span>in_val<span class="p">)</span><span class="w"></span>
+5</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="k">function</span><span class="w"> </span><span class="nf">[in_val, out_val] = conditional_io_modelB2</span><span class="p">(</span>in_val<span class="p">)</span><span class="w"></span>
 <span class="w">  </span><span class="c">% Only valid if in_val &gt; 2</span>
   <span class="n">out_val</span> <span class="p">=</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">in_val</span>^<span class="mi">2</span><span class="p">;</span>
   <span class="nb">disp</span><span class="p">(</span><span class="n">sprintf</span><span class="p">(</span><span class="s">&#39;modelB_function2(%f) = %f&#39;</span><span class="p">,</span> <span class="n">separateUnits</span><span class="p">(</span><span class="n">in_val</span><span class="p">),</span> <span class="n">separateUnits</span><span class="p">(</span><span class="n">out_val</span><span class="p">)));</span>
-<span class="k">end</span>
+<span class="n">end</span>
 </pre></div>
 </td></tr></table></div>
 <p>Model YAML:</p>
@@ -785,7 +793,7 @@ end subroutine modelB_function2
 3
 4</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">modelA_function</span><span class="p">(</span><span class="n">in_val</span><span class="p">):</span>
     <span class="n">out_val</span> <span class="o">=</span> <span class="n">in_val</span>
-    <span class="k">print</span><span class="p">(</span><span class="s2">&quot;modelA_function(</span><span class="si">%s</span><span class="s2">) = </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">in_val</span><span class="p">,</span> <span class="n">out_val</span><span class="p">))</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;modelA_function(</span><span class="si">%s</span><span class="s2">) = </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">in_val</span><span class="p">,</span> <span class="n">out_val</span><span class="p">))</span>
     <span class="k">return</span> <span class="n">out_val</span>
 </pre></div>
 </td></tr></table></div>
@@ -796,7 +804,7 @@ end subroutine modelB_function2
 5</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">modelB_function1</span><span class="p">(</span><span class="n">in_val</span><span class="p">):</span>
     <span class="c1"># Only valid if in_val &lt;= 2</span>
     <span class="n">out_val</span> <span class="o">=</span> <span class="n">in_val</span><span class="o">**</span><span class="mi">2</span>
-    <span class="k">print</span><span class="p">(</span><span class="s2">&quot;modelB_function1(</span><span class="si">%s</span><span class="s2">) = </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">in_val</span><span class="p">,</span> <span class="n">out_val</span><span class="p">))</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;modelB_function1(</span><span class="si">%s</span><span class="s2">) = </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">in_val</span><span class="p">,</span> <span class="n">out_val</span><span class="p">))</span>
     <span class="k">return</span> <span class="n">in_val</span><span class="p">,</span> <span class="n">out_val</span>
 </pre></div>
 </td></tr></table></div>
@@ -811,7 +819,7 @@ end subroutine modelB_function2
 9</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">modelB_function2</span><span class="p">(</span><span class="n">in_val</span><span class="p">):</span>
     <span class="c1"># Only valid if in_val &gt; 2</span>
     <span class="n">out_val</span> <span class="o">=</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">in_val</span><span class="o">**</span><span class="mi">2</span>
-    <span class="k">print</span><span class="p">(</span><span class="s2">&quot;modelB_function2(</span><span class="si">%s</span><span class="s2">) = </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">in_val</span><span class="p">,</span> <span class="n">out_val</span><span class="p">))</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;modelB_function2(</span><span class="si">%s</span><span class="s2">) = </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">in_val</span><span class="p">,</span> <span class="n">out_val</span><span class="p">))</span>
     <span class="k">return</span> <span class="n">in_val</span><span class="p">,</span> <span class="n">out_val</span>
 
 
@@ -903,7 +911,7 @@ end subroutine modelB_function2
 4
 5</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="n">modelA_function</span> <span class="o">&lt;-</span> <span class="n">function</span><span class="p">(</span><span class="n">in_val</span><span class="p">)</span> <span class="p">{</span>
   <span class="n">out_val</span> <span class="o">&lt;-</span> <span class="n">in_val</span>
-  <span class="k">print</span><span class="p">(</span><span class="n">sprintf</span><span class="p">(</span><span class="s2">&quot;modelA_function(</span><span class="si">%f</span><span class="s2">) = </span><span class="si">%f</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">in_val</span><span class="p">,</span> <span class="n">out_val</span><span class="p">))</span>
+  <span class="nb">print</span><span class="p">(</span><span class="n">sprintf</span><span class="p">(</span><span class="s2">&quot;modelA_function(</span><span class="si">%f</span><span class="s2">) = </span><span class="si">%f</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">in_val</span><span class="p">,</span> <span class="n">out_val</span><span class="p">))</span>
   <span class="k">return</span><span class="p">(</span><span class="n">out_val</span><span class="p">)</span>
 <span class="p">}</span>
 </pre></div>
@@ -916,7 +924,7 @@ end subroutine modelB_function2
 6</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="n">modelB_function1</span> <span class="o">&lt;-</span> <span class="n">function</span><span class="p">(</span><span class="n">in_val</span><span class="p">)</span> <span class="p">{</span>
   <span class="c1"># Only valid if in_val &lt;= 2</span>
   <span class="n">out_val</span> <span class="o">&lt;-</span> <span class="n">in_val</span><span class="o">^</span><span class="mi">2</span>
-  <span class="k">print</span><span class="p">(</span><span class="n">sprintf</span><span class="p">(</span><span class="s2">&quot;modelB_function1(</span><span class="si">%f</span><span class="s2">) = </span><span class="si">%f</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">in_val</span><span class="p">,</span> <span class="n">out_val</span><span class="p">))</span>
+  <span class="nb">print</span><span class="p">(</span><span class="n">sprintf</span><span class="p">(</span><span class="s2">&quot;modelB_function1(</span><span class="si">%f</span><span class="s2">) = </span><span class="si">%f</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">in_val</span><span class="p">,</span> <span class="n">out_val</span><span class="p">))</span>
   <span class="k">return</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">in_val</span><span class="p">,</span> <span class="n">out_val</span><span class="p">))</span>
 <span class="p">}</span>
 </pre></div>
@@ -929,7 +937,7 @@ end subroutine modelB_function2
 6</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="n">modelB_function2</span> <span class="o">&lt;-</span> <span class="n">function</span><span class="p">(</span><span class="n">in_val</span><span class="p">)</span> <span class="p">{</span>
   <span class="c1"># Only valid if in_val &gt; 2</span>
   <span class="n">out_val</span> <span class="o">&lt;-</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">in_val</span><span class="o">^</span><span class="mi">2</span>
-  <span class="k">print</span><span class="p">(</span><span class="n">sprintf</span><span class="p">(</span><span class="s2">&quot;modelB_function2(</span><span class="si">%f</span><span class="s2">) = </span><span class="si">%f</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">in_val</span><span class="p">,</span> <span class="n">out_val</span><span class="p">))</span>
+  <span class="nb">print</span><span class="p">(</span><span class="n">sprintf</span><span class="p">(</span><span class="s2">&quot;modelB_function2(</span><span class="si">%f</span><span class="s2">) = </span><span class="si">%f</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">in_val</span><span class="p">,</span> <span class="n">out_val</span><span class="p">))</span>
   <span class="k">return</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">in_val</span><span class="p">,</span> <span class="n">out_val</span><span class="p">))</span>
 <span class="p">}</span>
 </pre></div>
@@ -1016,29 +1024,29 @@ end subroutine modelB_function2
            
           </div>
           <footer>
-  
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
-      
-        <a href="transformed_io.html" class="btn btn-neutral float-right" title="transformed_io Example" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
-      
-      
-        <a href="model_function.html" class="btn btn-neutral float-left" title="model_function Example" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
-      
+        <a href="transformed_io.html" class="btn btn-neutral float-right" title="transformed_io Example" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="model_function.html" class="btn btn-neutral float-left" title="model_function Example" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
     </div>
-  
 
   <hr/>
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2017, Meagan Lang, David Raila
+        &#169; Copyright 2017, Meagan Lang, David Raila.
 
     </p>
   </div>
-  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+    
+    
+    
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
 
 </footer>
-
         </div>
       </div>
 
@@ -1046,7 +1054,6 @@ end subroutine modelB_function2
 
   </div>
   
-
 
   <script type="text/javascript">
       jQuery(function () {

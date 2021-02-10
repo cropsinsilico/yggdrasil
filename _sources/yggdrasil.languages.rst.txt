@@ -22,7 +22,6 @@ yggdrasil.languages.install\_languages module
    :undoc-members:
    :show-inheritance:
 
-
 Module contents
 ---------------
 

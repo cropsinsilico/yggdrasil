@@ -1,8 +1,0 @@
-Model YAML:
-
-.. literalinclude:: /../../cis_interface/examples/formatted_io7/formatted_io7_python.yml
-   :language: yaml
-   :linenos:
-
-
-(`Example in other languages <examples/formatted_io7.html>`__)

@@ -1,39 +1,42 @@
 
 
 <!DOCTYPE html>
-<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
-<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<html class="writer-html5" lang="en" >
 <head>
-  <meta charset="utf-8">
+  <meta charset="utf-8" />
   
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>yggdrasil.serialize package &mdash; yggdrasil 1.1.1+410.g95af39b2 documentation</title>
+  <title>yggdrasil.serialize package &mdash; yggdrasil v1.5.0 documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="_static/theme_overrides.css" type="text/css" />
+
+  
   
 
   
   
-  
+
   
 
   
-  <script type="text/javascript" src="_static/js/modernizr.min.js"></script>
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
   
     
       <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
         <script src="_static/jquery.js"></script>
         <script src="_static/underscore.js"></script>
         <script src="_static/doctools.js"></script>
-        <script src="_static/language_data.js"></script>
     
     <script type="text/javascript" src="_static/js/theme.js"></script>
 
     
-
-  
-  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
-  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
-  <link rel="stylesheet" href="_static/theme_overrides.css" type="text/css" />
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" /> 
 </head>
@@ -59,7 +62,7 @@
             
             
               <div class="version">
-                1.1.1
+                v1.5.0
               </div>
             
           
@@ -76,6 +79,7 @@
           
         </div>
 
+        
         <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
           
             
@@ -111,6 +115,7 @@
             
           
         </div>
+        
       </div>
     </nav>
 
@@ -145,18 +150,20 @@
 
 
 
+
+
 <div role="navigation" aria-label="breadcrumbs navigation">
 
   <ul class="wy-breadcrumbs">
     
-      <li><a href="index.html">Docs</a> &raquo;</li>
+      <li><a href="index.html" class="icon icon-home"></a> &raquo;</li>
         
       <li>yggdrasil.serialize package</li>
     
     
       <li class="wy-breadcrumbs-aside">
         
-            
+          
             <a href="_sources/yggdrasil.serialize.rst.txt" rel="nofollow"> View page source</a>
           
         
@@ -200,12 +207,12 @@
 <span id="yggdrasil-serialize-asciimapserialize-module"></span><h2>yggdrasil.serialize.AsciiMapSerialize module<a class="headerlink" href="#module-yggdrasil.serialize.AsciiMapSerialize" title="Permalink to this headline">¶</a></h2>
 <dl class="py class">
 <dt id="yggdrasil.serialize.AsciiMapSerialize.AsciiMapSerialize">
-<em class="property">class </em><code class="sig-prename descclassname">yggdrasil.serialize.AsciiMapSerialize.</code><code class="sig-name descname">AsciiMapSerialize</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/serialize/AsciiMapSerialize.html#AsciiMapSerialize"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.serialize.AsciiMapSerialize.AsciiMapSerialize" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">yggdrasil.serialize.AsciiMapSerialize.</code><code class="sig-name descname">AsciiMapSerialize</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">*</span><span class="n">args</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/serialize/AsciiMapSerialize.html#AsciiMapSerialize"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.serialize.AsciiMapSerialize.AsciiMapSerialize" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#yggdrasil.serialize.SerializeBase.SerializeBase" title="yggdrasil.serialize.SerializeBase.SerializeBase"><code class="xref py py-class docutils literal notranslate"><span class="pre">yggdrasil.serialize.SerializeBase.SerializeBase</span></code></a></p>
 <p>Class for serializing/deserializing name/value mapping.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>delimiter</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a><em>, </em><em>optional</em>) – Delimiter that should be used to
+<dd class="field-odd"><p><strong>delimiter</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a><em>, </em><em>optional</em>) – Delimiter that should be used to
 separate name/value pairs in the map. Defaults to t.</p>
 </dd>
 </dl>
@@ -217,7 +224,7 @@ the concatenated serialization were deserialized.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>objects</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.8)"><em>list</em></a>) – Objects to be concatenated.</p></li>
+<li><p><strong>objects</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.9)"><em>list</em></a>) – Objects to be concatenated.</p></li>
 <li><p><strong>**kwargs</strong> – Additional keyword arguments are ignored.</p></li>
 </ul>
 </dd>
@@ -225,7 +232,7 @@ the concatenated serialization were deserialized.</p>
 <dd class="field-even"><p>Set of objects that results from concatenating those provided.</p>
 </dd>
 <dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.8)">list</a></p>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.9)">list</a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -246,13 +253,13 @@ the concatenated serialization were deserialized.</p>
 <dd><p>Deserialize a message.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>msg</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#bytes" title="(in Python v3.8)"><em>bytes</em></a>) – Message to be deserialized.</p>
+<dd class="field-odd"><p><strong>msg</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#bytes" title="(in Python v3.9)"><em>bytes</em></a>) – Message to be deserialized.</p>
 </dd>
 <dt class="field-even">Returns</dt>
 <dd class="field-even"><p>Deserialized Python dictionary.</p>
 </dd>
 <dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.8)">dict</a></p>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.9)">dict</a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -263,13 +270,13 @@ the concatenated serialization were deserialized.</p>
 <dd><p>Serialize a message.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>args</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.8)"><em>dict</em></a>) – Python dictionary to be serialized.</p>
+<dd class="field-odd"><p><strong>args</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.9)"><em>dict</em></a>) – Python dictionary to be serialized.</p>
 </dd>
 <dt class="field-even">Returns</dt>
 <dd class="field-even"><p>Serialized message.</p>
 </dd>
 <dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#bytes" title="(in Python v3.8)">bytes</a>, <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)">str</a></p>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#bytes" title="(in Python v3.9)">bytes</a>, <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)">str</a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -283,7 +290,7 @@ the concatenated serialization were deserialized.</p>
 <dd class="field-odd"><p>Dictionary of variables to use for testing.</p>
 </dd>
 <dt class="field-even">Return type</dt>
-<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.8)">dict</a></p>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.9)">dict</a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -295,29 +302,29 @@ the concatenated serialization were deserialized.</p>
 <span id="yggdrasil-serialize-asciitableserialize-module"></span><h2>yggdrasil.serialize.AsciiTableSerialize module<a class="headerlink" href="#module-yggdrasil.serialize.AsciiTableSerialize" title="Permalink to this headline">¶</a></h2>
 <dl class="py class">
 <dt id="yggdrasil.serialize.AsciiTableSerialize.AsciiTableSerialize">
-<em class="property">class </em><code class="sig-prename descclassname">yggdrasil.serialize.AsciiTableSerialize.</code><code class="sig-name descname">AsciiTableSerialize</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/serialize/AsciiTableSerialize.html#AsciiTableSerialize"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.serialize.AsciiTableSerialize.AsciiTableSerialize" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">yggdrasil.serialize.AsciiTableSerialize.</code><code class="sig-name descname">AsciiTableSerialize</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">*</span><span class="n">args</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/serialize/AsciiTableSerialize.html#AsciiTableSerialize"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.serialize.AsciiTableSerialize.AsciiTableSerialize" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#yggdrasil.serialize.DefaultSerialize.DefaultSerialize" title="yggdrasil.serialize.DefaultSerialize.DefaultSerialize"><code class="xref py py-class docutils literal notranslate"><span class="pre">yggdrasil.serialize.DefaultSerialize.DefaultSerialize</span></code></a></p>
 <p>Class for serialize table output into bytes messages comprising a
 formatted ASCII table.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>format_str</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a><em>, </em><em>optional</em>) – If provided, this string will be used to
+<li><p><strong>format_str</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a><em>, </em><em>optional</em>) – If provided, this string will be used to
 format messages from a list of arguments and parse messages to
 get a list of arguments in C printf/scanf style. Defaults to
 None and messages are assumed to already be bytes.</p></li>
-<li><p><strong>field_names</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.8)"><em>list</em></a><em>, </em><em>optional</em>) – The names of fields in the format string.
+<li><p><strong>field_names</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.9)"><em>list</em></a><em>, </em><em>optional</em>) – The names of fields in the format string.
 If not provided, names are set based on the order of the fields in
 the format string.</p></li>
-<li><p><strong>field_units</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.8)"><em>list</em></a><em>, </em><em>optional</em>) – The units of fields in the format string.
+<li><p><strong>field_units</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.9)"><em>list</em></a><em>, </em><em>optional</em>) – The units of fields in the format string.
 If not provided, all fields are assumed to be dimensionless.</p></li>
-<li><p><strong>as_array</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.8)"><em>bool</em></a><em>, </em><em>optional</em>) – If True, each of the arguments being
+<li><p><strong>as_array</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)"><em>bool</em></a><em>, </em><em>optional</em>) – If True, each of the arguments being
 serialized/deserialized will be arrays that are converted to/from
 bytes in column major (‘F’) order. Otherwise, each argument should
 be a scalar. Defaults to False.</p></li>
-<li><p><strong>delimiter</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a><em>, </em><em>optional</em>) – Character(s) that should be used to separate
+<li><p><strong>delimiter</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a><em>, </em><em>optional</em>) – Character(s) that should be used to separate
 columns. Defaults to ‘t’.</p></li>
-<li><p><strong>use_astropy</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.8)"><em>bool</em></a><em>, </em><em>optional</em>) – If True, the astropy package will be used
+<li><p><strong>use_astropy</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)"><em>bool</em></a><em>, </em><em>optional</em>) – If True, the astropy package will be used
 to serialize/deserialize table. Defaults to False.</p></li>
 <li><p><strong>**kwargs</strong> – Additional keyword args are processed as part of the type
 definition.</p></li>
@@ -331,7 +338,7 @@ definition.</p></li>
 from/to a list of arguments in C printf/scanf style.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)">str</a></p>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)">str</a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -342,7 +349,7 @@ from/to a list of arguments in C printf/scanf style.</p>
 <dd><p>The names of fields in the format string.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.8)">list</a></p>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.9)">list</a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -353,7 +360,7 @@ from/to a list of arguments in C printf/scanf style.</p>
 <dd><p>The units of fields in the format string.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.8)">list</a></p>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.9)">list</a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -365,7 +372,7 @@ from/to a list of arguments in C printf/scanf style.</p>
 python objects will be arrays or scalars.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.8)">bool</a></p>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)">bool</a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -376,7 +383,7 @@ python objects will be arrays or scalars.</p>
 <dd><p>Character(s) that should be used to separate columns.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)">str</a></p>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)">str</a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -388,7 +395,7 @@ python objects will be arrays or scalars.</p>
 serialize/deserialize table.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.8)">bool</a></p>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)">bool</a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -445,7 +452,7 @@ serialized.</p>
 <dd class="field-even"><p>Serialized message.</p>
 </dd>
 <dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#bytes" title="(in Python v3.8)">bytes</a>, <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)">str</a></p>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#bytes" title="(in Python v3.9)">bytes</a>, <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)">str</a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -462,7 +469,7 @@ serialized.</p>
 <dd class="field-even"><p>Dictionary of variables to use for testing.</p>
 </dd>
 <dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.8)">dict</a></p>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.9)">dict</a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -478,7 +485,7 @@ serialized.</p>
 <dd><p>Method that should be used to read data for deserialization.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)">str</a></p>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)">str</a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -493,7 +500,7 @@ to files serialized using this class.</p>
 <dd class="field-odd"><p>Header string that should be written to the file.</p>
 </dd>
 <dt class="field-even">Return type</dt>
-<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#bytes" title="(in Python v3.8)">bytes</a></p>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#bytes" title="(in Python v3.9)">bytes</a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -538,7 +545,7 @@ method.</p></li>
 <span id="yggdrasil-serialize-defaultserialize-module"></span><h2>yggdrasil.serialize.DefaultSerialize module<a class="headerlink" href="#module-yggdrasil.serialize.DefaultSerialize" title="Permalink to this headline">¶</a></h2>
 <dl class="py class">
 <dt id="yggdrasil.serialize.DefaultSerialize.DefaultSerialize">
-<em class="property">class </em><code class="sig-prename descclassname">yggdrasil.serialize.DefaultSerialize.</code><code class="sig-name descname">DefaultSerialize</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/serialize/DefaultSerialize.html#DefaultSerialize"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.serialize.DefaultSerialize.DefaultSerialize" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">yggdrasil.serialize.DefaultSerialize.</code><code class="sig-name descname">DefaultSerialize</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">*</span><span class="n">args</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/serialize/DefaultSerialize.html#DefaultSerialize"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.serialize.DefaultSerialize.DefaultSerialize" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#yggdrasil.serialize.SerializeBase.SerializeBase" title="yggdrasil.serialize.SerializeBase.SerializeBase"><code class="xref py py-class docutils literal notranslate"><span class="pre">yggdrasil.serialize.SerializeBase.SerializeBase</span></code></a></p>
 <p>Default class for serializing/deserializing a python object into/from
 a bytes message.</p>
@@ -555,8 +562,8 @@ the concatenated serialization were deserialized.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>objects</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.8)"><em>list</em></a>) – Objects to be concatenated.</p></li>
-<li><p><strong>as_array</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.8)"><em>bool</em></a><em>, </em><em>optional</em>) – If True, the objects in the list
+<li><p><strong>objects</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.9)"><em>list</em></a>) – Objects to be concatenated.</p></li>
+<li><p><strong>as_array</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)"><em>bool</em></a><em>, </em><em>optional</em>) – If True, the objects in the list
 are complete columns in a table and as_format is set to True.
 Defaults to False.</p></li>
 <li><p><strong>**kwargs</strong> – Additional keyword arguments are ignored.</p></li>
@@ -566,7 +573,7 @@ Defaults to False.</p></li>
 <dd class="field-even"><p>Set of objects that results from concatenating those provided.</p>
 </dd>
 <dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.8)">list</a></p>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.9)">list</a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -594,12 +601,12 @@ Defaults to False.</p></li>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>obj</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.8)"><em>object</em></a>) – Object that would be serialized by this class and
+<li><p><strong>obj</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.9)"><em>object</em></a>) – Object that would be serialized by this class and
 should be returned in an array form.</p></li>
-<li><p><strong>as_array</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.8)"><em>bool</em></a><em>, </em><em>optional</em>) – If True, the objects in the list
+<li><p><strong>as_array</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)"><em>bool</em></a><em>, </em><em>optional</em>) – If True, the objects in the list
 are complete columns in a table and as_format is set to True.
 Defaults to False.</p></li>
-<li><p><strong>field_names</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.8)"><em>list</em></a><em>, </em><em>optional</em>) – The field names associated with a
+<li><p><strong>field_names</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.9)"><em>list</em></a><em>, </em><em>optional</em>) – The field names associated with a
 table-like data type. Defaults to None. This keyword must be
 provided if as_array is True.</p></li>
 <li><p><strong>**kwargs</strong> – Additional keyword arguments are ignored.</p></li>
@@ -621,12 +628,12 @@ provided if as_array is True.</p></li>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>obj</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.8)"><em>object</em></a>) – Object that would be serialized by this class and
+<li><p><strong>obj</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.9)"><em>object</em></a>) – Object that would be serialized by this class and
 should be returned in a dictionary form.</p></li>
-<li><p><strong>as_array</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.8)"><em>bool</em></a><em>, </em><em>optional</em>) – If True, the objects in the list
+<li><p><strong>as_array</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)"><em>bool</em></a><em>, </em><em>optional</em>) – If True, the objects in the list
 are complete columns in a table and as_format is set to True.
 Defaults to False.</p></li>
-<li><p><strong>field_names</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.8)"><em>list</em></a><em>, </em><em>optional</em>) – The field names associated with a
+<li><p><strong>field_names</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.9)"><em>list</em></a><em>, </em><em>optional</em>) – The field names associated with a
 table-like data type. Defaults to None. This keyword must be
 provided if as_array is True.</p></li>
 <li><p><strong>**kwargs</strong> – Additional keyword arguments are ignored.</p></li>
@@ -636,7 +643,7 @@ provided if as_array is True.</p></li>
 <dd class="field-even"><p>Dictionary version of the provided object.</p>
 </dd>
 <dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.8)">dict</a></p>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.9)">dict</a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -663,7 +670,7 @@ method.</p></li>
 <span id="yggdrasil-serialize-directserialize-module"></span><h2>yggdrasil.serialize.DirectSerialize module<a class="headerlink" href="#module-yggdrasil.serialize.DirectSerialize" title="Permalink to this headline">¶</a></h2>
 <dl class="py class">
 <dt id="yggdrasil.serialize.DirectSerialize.DirectSerialize">
-<em class="property">class </em><code class="sig-prename descclassname">yggdrasil.serialize.DirectSerialize.</code><code class="sig-name descname">DirectSerialize</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/serialize/DirectSerialize.html#DirectSerialize"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.serialize.DirectSerialize.DirectSerialize" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">yggdrasil.serialize.DirectSerialize.</code><code class="sig-name descname">DirectSerialize</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">*</span><span class="n">args</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/serialize/DirectSerialize.html#DirectSerialize"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.serialize.DirectSerialize.DirectSerialize" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#yggdrasil.serialize.SerializeBase.SerializeBase" title="yggdrasil.serialize.SerializeBase.SerializeBase"><code class="xref py py-class docutils literal notranslate"><span class="pre">yggdrasil.serialize.SerializeBase.SerializeBase</span></code></a></p>
 <p>Class for directly serializing bytes.</p>
 <dl class="py method">
@@ -674,7 +681,7 @@ the concatenated serialization were deserialized.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>objects</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.8)"><em>list</em></a>) – Objects to be concatenated.</p></li>
+<li><p><strong>objects</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.9)"><em>list</em></a>) – Objects to be concatenated.</p></li>
 <li><p><strong>**kwargs</strong> – Additional keyword arguments are ignored.</p></li>
 </ul>
 </dd>
@@ -682,7 +689,7 @@ the concatenated serialization were deserialized.</p>
 <dd class="field-even"><p>Set of objects that results from concatenating those provided.</p>
 </dd>
 <dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.8)">list</a></p>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.9)">list</a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -722,7 +729,7 @@ serialized.</p>
 <dd class="field-even"><p>Serialized message.</p>
 </dd>
 <dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#bytes" title="(in Python v3.8)">bytes</a>, <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)">str</a></p>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#bytes" title="(in Python v3.9)">bytes</a>, <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)">str</a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -756,7 +763,7 @@ extra_kwargs (dict): Extra keyword arguments not used to</p>
 </p>
 </dd>
 <dt class="field-even">Return type</dt>
-<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.8)">dict</a></p>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.9)">dict</a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -768,7 +775,7 @@ extra_kwargs (dict): Extra keyword arguments not used to</p>
 <span id="yggdrasil-serialize-functionalserialize-module"></span><h2>yggdrasil.serialize.FunctionalSerialize module<a class="headerlink" href="#module-yggdrasil.serialize.FunctionalSerialize" title="Permalink to this headline">¶</a></h2>
 <dl class="py class">
 <dt id="yggdrasil.serialize.FunctionalSerialize.FunctionalSerialize">
-<em class="property">class </em><code class="sig-prename descclassname">yggdrasil.serialize.FunctionalSerialize.</code><code class="sig-name descname">FunctionalSerialize</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/serialize/FunctionalSerialize.html#FunctionalSerialize"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.serialize.FunctionalSerialize.FunctionalSerialize" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">yggdrasil.serialize.FunctionalSerialize.</code><code class="sig-name descname">FunctionalSerialize</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">*</span><span class="n">args</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/serialize/FunctionalSerialize.html#FunctionalSerialize"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.serialize.FunctionalSerialize.FunctionalSerialize" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#yggdrasil.serialize.SerializeBase.SerializeBase" title="yggdrasil.serialize.SerializeBase.SerializeBase"><code class="xref py py-class docutils literal notranslate"><span class="pre">yggdrasil.serialize.SerializeBase.SerializeBase</span></code></a></p>
 <p>Class for serializing/deserializing a Python object into/from a bytes
 message using defined functions.</p>
@@ -820,7 +827,7 @@ constructor.</p></li>
 <dd><p>Serializer info.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.8)">dict</a></p>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.9)">dict</a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -832,16 +839,16 @@ constructor.</p></li>
 <span id="yggdrasil-serialize-jsonserialize-module"></span><h2>yggdrasil.serialize.JSONSerialize module<a class="headerlink" href="#module-yggdrasil.serialize.JSONSerialize" title="Permalink to this headline">¶</a></h2>
 <dl class="py class">
 <dt id="yggdrasil.serialize.JSONSerialize.JSONSerialize">
-<em class="property">class </em><code class="sig-prename descclassname">yggdrasil.serialize.JSONSerialize.</code><code class="sig-name descname">JSONSerialize</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/serialize/JSONSerialize.html#JSONSerialize"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.serialize.JSONSerialize.JSONSerialize" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">yggdrasil.serialize.JSONSerialize.</code><code class="sig-name descname">JSONSerialize</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">*</span><span class="n">args</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/serialize/JSONSerialize.html#JSONSerialize"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.serialize.JSONSerialize.JSONSerialize" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#yggdrasil.serialize.SerializeBase.SerializeBase" title="yggdrasil.serialize.SerializeBase.SerializeBase"><code class="xref py py-class docutils literal notranslate"><span class="pre">yggdrasil.serialize.SerializeBase.SerializeBase</span></code></a></p>
 <p>Class for serializing a python object into a bytes message using JSON.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>indent</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a><em>, </em><em>optional</em>) – String or number of spaces that should be
+<li><p><strong>indent</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><em>int</em></a><em>, </em><em>optional</em>) – String or number of spaces that should be
 used to indent each level within the seiralized structure. Defaults
 to ‘t’.</p></li>
-<li><p><strong>sort_keys</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.8)"><em>bool</em></a><em>, </em><em>optional</em>) – If True, the serialization of dictionaries
+<li><p><strong>sort_keys</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)"><em>bool</em></a><em>, </em><em>optional</em>) – If True, the serialization of dictionaries
 will be in key sorted order. Defaults to True.</p></li>
 </ul>
 </dd>
@@ -854,7 +861,7 @@ the concatenated serialization were deserialized.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>objects</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.8)"><em>list</em></a>) – Objects to be concatenated.</p></li>
+<li><p><strong>objects</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.9)"><em>list</em></a>) – Objects to be concatenated.</p></li>
 <li><p><strong>**kwargs</strong> – Additional keyword arguments are ignored.</p></li>
 </ul>
 </dd>
@@ -862,7 +869,7 @@ the concatenated serialization were deserialized.</p>
 <dd class="field-even"><p>Set of objects that results from concatenating those provided.</p>
 </dd>
 <dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.8)">list</a></p>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.9)">list</a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -883,7 +890,7 @@ the concatenated serialization were deserialized.</p>
 <dd><p>Deserialize a message.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>msg</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#bytes" title="(in Python v3.8)"><em>bytes</em></a>) – Message to be deserialized.</p>
+<dd class="field-odd"><p><strong>msg</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#bytes" title="(in Python v3.9)"><em>bytes</em></a>) – Message to be deserialized.</p>
 </dd>
 <dt class="field-even">Returns</dt>
 <dd class="field-even"><p>Deserialized Python object.</p>
@@ -906,7 +913,7 @@ the concatenated serialization were deserialized.</p>
 <dd class="field-even"><p>Serialized message.</p>
 </dd>
 <dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#bytes" title="(in Python v3.8)">bytes</a>, <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)">str</a></p>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#bytes" title="(in Python v3.9)">bytes</a>, <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)">str</a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -920,7 +927,7 @@ the concatenated serialization were deserialized.</p>
 <dd class="field-odd"><p>Dictionary of variables to use for testing.</p>
 </dd>
 <dt class="field-even">Return type</dt>
-<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.8)">dict</a></p>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.9)">dict</a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -932,7 +939,7 @@ the concatenated serialization were deserialized.</p>
 <span id="yggdrasil-serialize-matserialize-module"></span><h2>yggdrasil.serialize.MatSerialize module<a class="headerlink" href="#module-yggdrasil.serialize.MatSerialize" title="Permalink to this headline">¶</a></h2>
 <dl class="py class">
 <dt id="yggdrasil.serialize.MatSerialize.MatSerialize">
-<em class="property">class </em><code class="sig-prename descclassname">yggdrasil.serialize.MatSerialize.</code><code class="sig-name descname">MatSerialize</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/serialize/MatSerialize.html#MatSerialize"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.serialize.MatSerialize.MatSerialize" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">yggdrasil.serialize.MatSerialize.</code><code class="sig-name descname">MatSerialize</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">*</span><span class="n">args</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/serialize/MatSerialize.html#MatSerialize"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.serialize.MatSerialize.MatSerialize" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#yggdrasil.serialize.SerializeBase.SerializeBase" title="yggdrasil.serialize.SerializeBase.SerializeBase"><code class="xref py py-class docutils literal notranslate"><span class="pre">yggdrasil.serialize.SerializeBase.SerializeBase</span></code></a></p>
 <p>Class for serializing a python object into a bytes message using the
 Matlab .mat format.</p>
@@ -944,7 +951,7 @@ the concatenated serialization were deserialized.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>objects</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.8)"><em>list</em></a>) – Objects to be concatenated.</p></li>
+<li><p><strong>objects</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.9)"><em>list</em></a>) – Objects to be concatenated.</p></li>
 <li><p><strong>**kwargs</strong> – Additional keyword arguments are ignored.</p></li>
 </ul>
 </dd>
@@ -952,7 +959,7 @@ the concatenated serialization were deserialized.</p>
 <dd class="field-even"><p>Set of objects that results from concatenating those provided.</p>
 </dd>
 <dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.8)">list</a></p>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.9)">list</a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -973,7 +980,7 @@ the concatenated serialization were deserialized.</p>
 <dd><p>Deserialize a message.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>msg</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#bytes" title="(in Python v3.8)"><em>bytes</em></a>) – Message to be deserialized.</p>
+<dd class="field-odd"><p><strong>msg</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#bytes" title="(in Python v3.9)"><em>bytes</em></a>) – Message to be deserialized.</p>
 </dd>
 <dt class="field-even">Returns</dt>
 <dd class="field-even"><p>Deserialized Python object.</p>
@@ -996,10 +1003,10 @@ the concatenated serialization were deserialized.</p>
 <dd class="field-even"><p>Serialized message.</p>
 </dd>
 <dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#bytes" title="(in Python v3.8)">bytes</a>, <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)">str</a></p>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#bytes" title="(in Python v3.9)">bytes</a>, <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)">str</a></p>
 </dd>
 <dt class="field-even">Raises</dt>
-<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#TypeError" title="(in Python v3.8)"><strong>TypeError</strong></a> – If args is not a dictionary.</p>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#TypeError" title="(in Python v3.9)"><strong>TypeError</strong></a> – If args is not a dictionary.</p>
 </dd>
 </dl>
 </dd></dl>
@@ -1013,7 +1020,7 @@ the concatenated serialization were deserialized.</p>
 <dd class="field-odd"><p>Dictionary of variables to use for testing.</p>
 </dd>
 <dt class="field-even">Return type</dt>
-<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.8)">dict</a></p>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.9)">dict</a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -1040,7 +1047,7 @@ adapted from <a class="reference external" href="https://www.pygame.org/wiki/OBJ
 <dd><p>Deserialize a message.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>msg</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#bytes" title="(in Python v3.8)"><em>bytes</em></a>) – Message to be deserialized.</p>
+<dd class="field-odd"><p><strong>msg</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#bytes" title="(in Python v3.9)"><em>bytes</em></a>) – Message to be deserialized.</p>
 </dd>
 <dt class="field-even">Returns</dt>
 <dd class="field-even"><p>Deserialized message.</p>
@@ -1064,7 +1071,7 @@ serialized.</p>
 <dd class="field-even"><p>Serialized message.</p>
 </dd>
 <dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#bytes" title="(in Python v3.8)">bytes</a></p>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#bytes" title="(in Python v3.9)">bytes</a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -1078,7 +1085,7 @@ serialized.</p>
 <dd class="field-odd"><p>Dictionary of variables to use for testing.</p>
 </dd>
 <dt class="field-even">Return type</dt>
-<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.8)">dict</a></p>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.9)">dict</a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -1096,9 +1103,9 @@ serialized.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>no_header</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.8)"><em>bool</em></a><em>, </em><em>optional</em>) – If True, headers will not be read or
+<li><p><strong>no_header</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)"><em>bool</em></a><em>, </em><em>optional</em>) – If True, headers will not be read or
 serialized from/to tables. Defaults to False.</p></li>
-<li><p><strong>str_as_bytes</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.8)"><em>bool</em></a><em>, </em><em>optional</em>) – If True, strings in columns are
+<li><p><strong>str_as_bytes</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)"><em>bool</em></a><em>, </em><em>optional</em>) – If True, strings in columns are
 read as bytes. Defaults to False.</p></li>
 </ul>
 </dd>
@@ -1115,7 +1122,7 @@ is a partial overlap, an error is raised.</p>
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>frame</strong> (<em>pandas.DataFrame</em>) – Frame to apply field names to as columns.</p></li>
-<li><p><strong>field_names</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.8)"><em>list</em></a><em>, </em><em>optional</em>) – New field names that should be applied.
+<li><p><strong>field_names</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.9)"><em>list</em></a><em>, </em><em>optional</em>) – New field names that should be applied.
 If not provided, the original frame will be returned unaltered.</p></li>
 </ul>
 </dd>
@@ -1126,7 +1133,7 @@ If not provided, the original frame will be returned unaltered.</p></li>
 <dd class="field-odd"><p>pandas.DataFrame</p>
 </dd>
 <dt class="field-even">Raises</dt>
-<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#RuntimeError" title="(in Python v3.8)"><strong>RuntimeError</strong></a> – If there is a partial overlap between the field names
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#RuntimeError" title="(in Python v3.9)"><strong>RuntimeError</strong></a> – If there is a partial overlap between the field names
     and columns.</p>
 </dd>
 </dl>
@@ -1165,7 +1172,7 @@ the concatenated serialization were deserialized.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>objects</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.8)"><em>list</em></a>) – Objects to be concatenated.</p></li>
+<li><p><strong>objects</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.9)"><em>list</em></a>) – Objects to be concatenated.</p></li>
 <li><p><strong>**kwargs</strong> – Additional keyword arguments are ignored.</p></li>
 </ul>
 </dd>
@@ -1173,7 +1180,7 @@ the concatenated serialization were deserialized.</p>
 <dd class="field-even"><p>Set of objects that results from concatenating those provided.</p>
 </dd>
 <dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.8)">list</a></p>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.9)">list</a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -1189,7 +1196,7 @@ the concatenated serialization were deserialized.</p>
 <dd><p>Consolidate message into a structure numpy array if possible.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>out</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.8)"><em>list</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.8)"><em>tuple</em></a><em>, </em><em>np.ndarray</em>) – Object to consolidate into a
+<dd class="field-odd"><p><strong>out</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.9)"><em>list</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.9)"><em>tuple</em></a><em>, </em><em>np.ndarray</em>) – Object to consolidate into a
 structured numpy array.</p>
 </dd>
 <dt class="field-even">Returns</dt>
@@ -1199,7 +1206,7 @@ structured numpy array.</p>
 <dd class="field-odd"><p>np.ndarray</p>
 </dd>
 <dt class="field-even">Raises</dt>
-<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#ValueError" title="(in Python v3.8)"><strong>ValueError</strong></a> – If the array cannot be consolidated.</p>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#ValueError" title="(in Python v3.9)"><strong>ValueError</strong></a> – If the array cannot be consolidated.</p>
 </dd>
 </dl>
 </dd></dl>
@@ -1252,7 +1259,7 @@ the serializations.</p>
 <dd><p>Deserialize a message.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>msg</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#bytes" title="(in Python v3.8)"><em>bytes</em></a>) – Message to be deserialized.</p>
+<dd class="field-odd"><p><strong>msg</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#bytes" title="(in Python v3.9)"><em>bytes</em></a>) – Message to be deserialized.</p>
 </dd>
 <dt class="field-even">Returns</dt>
 <dd class="field-even"><p>Deserialized Python object.</p>
@@ -1275,7 +1282,7 @@ the serializations.</p>
 <dd class="field-even"><p>Serialized message.</p>
 </dd>
 <dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#bytes" title="(in Python v3.8)">bytes</a>, <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)">str</a></p>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#bytes" title="(in Python v3.9)">bytes</a>, <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)">str</a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -1296,7 +1303,7 @@ method.</p></li>
 <dd class="field-even"><p>Names for each field in the data type.</p>
 </dd>
 <dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.8)">list</a></p>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.9)">list</a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -1308,12 +1315,12 @@ method.</p></li>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>not_as_frames</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.8)"><em>bool</em></a><em>, </em><em>optional</em>) – If True, the returned example
+<li><p><strong>not_as_frames</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)"><em>bool</em></a><em>, </em><em>optional</em>) – If True, the returned example
 includes data that is not in a pandas data frame. Defaults to
 False.</p></li>
-<li><p><strong>no_names</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.8)"><em>bool</em></a><em>, </em><em>optional</em>) – If True, an example is returned where the
+<li><p><strong>no_names</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)"><em>bool</em></a><em>, </em><em>optional</em>) – If True, an example is returned where the
 names are not provided to the deserializer. Defaults to False.</p></li>
-<li><p><strong>no_header</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.8)"><em>bool</em></a><em>, </em><em>optional</em>) – If True, an example is returned</p></li>
+<li><p><strong>no_header</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)"><em>bool</em></a><em>, </em><em>optional</em>) – If True, an example is returned</p></li>
 <li><p><strong>a header is not included. Defaults to False.</strong> (<em>where</em>) – </p></li>
 </ul>
 </dd>
@@ -1321,7 +1328,7 @@ names are not provided to the deserializer. Defaults to False.</p></li>
 <dd class="field-even"><p>Dictionary of variables to use for testing.</p>
 </dd>
 <dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.8)">dict</a></p>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.9)">dict</a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -1333,7 +1340,7 @@ names are not provided to the deserializer. Defaults to False.</p></li>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>obj</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.8)"><em>object</em></a>) – Object that would be serialized by this class and
+<li><p><strong>obj</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.9)"><em>object</em></a>) – Object that would be serialized by this class and
 should be returned in an array form.</p></li>
 <li><p><strong>**kwargs</strong> – Additional keyword arguments are ignored.</p></li>
 </ul>
@@ -1354,7 +1361,7 @@ should be returned in an array form.</p></li>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>obj</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.8)"><em>object</em></a>) – Object that would be serialized by this class and
+<li><p><strong>obj</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.9)"><em>object</em></a>) – Object that would be serialized by this class and
 should be returned in a dictionary form.</p></li>
 <li><p><strong>**kwargs</strong> – Additional keyword arguments are ignored.</p></li>
 </ul>
@@ -1363,7 +1370,7 @@ should be returned in a dictionary form.</p></li>
 <dd class="field-even"><p>Dictionary version of the provided object.</p>
 </dd>
 <dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.8)">dict</a></p>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.9)">dict</a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -1383,7 +1390,7 @@ to files serialized using this class.</p>
 <dd class="field-odd"><p>Header string that should be written to the file.</p>
 </dd>
 <dt class="field-even">Return type</dt>
-<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#bytes" title="(in Python v3.8)">bytes</a></p>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#bytes" title="(in Python v3.9)">bytes</a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -1395,7 +1402,7 @@ to files serialized using this class.</p>
 <span id="yggdrasil-serialize-pickleserialize-module"></span><h2>yggdrasil.serialize.PickleSerialize module<a class="headerlink" href="#module-yggdrasil.serialize.PickleSerialize" title="Permalink to this headline">¶</a></h2>
 <dl class="py class">
 <dt id="yggdrasil.serialize.PickleSerialize.PickleSerialize">
-<em class="property">class </em><code class="sig-prename descclassname">yggdrasil.serialize.PickleSerialize.</code><code class="sig-name descname">PickleSerialize</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/serialize/PickleSerialize.html#PickleSerialize"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.serialize.PickleSerialize.PickleSerialize" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">yggdrasil.serialize.PickleSerialize.</code><code class="sig-name descname">PickleSerialize</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">*</span><span class="n">args</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/serialize/PickleSerialize.html#PickleSerialize"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.serialize.PickleSerialize.PickleSerialize" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#yggdrasil.serialize.DefaultSerialize.DefaultSerialize" title="yggdrasil.serialize.DefaultSerialize.DefaultSerialize"><code class="xref py py-class docutils literal notranslate"><span class="pre">yggdrasil.serialize.DefaultSerialize.DefaultSerialize</span></code></a></p>
 <p>Class for serializing a python object into a bytes message by pickling.</p>
 <dl class="py method">
@@ -1406,7 +1413,7 @@ the concatenated serialization were deserialized.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>objects</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.8)"><em>list</em></a>) – Objects to be concatenated.</p></li>
+<li><p><strong>objects</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.9)"><em>list</em></a>) – Objects to be concatenated.</p></li>
 <li><p><strong>**kwargs</strong> – Additional keyword arguments are ignored.</p></li>
 </ul>
 </dd>
@@ -1414,7 +1421,7 @@ the concatenated serialization were deserialized.</p>
 <dd class="field-even"><p>Set of objects that results from concatenating those provided.</p>
 </dd>
 <dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.8)">list</a></p>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.9)">list</a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -1425,7 +1432,7 @@ the concatenated serialization were deserialized.</p>
 <dd><p>Deserialize a message.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>msg</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#bytes" title="(in Python v3.8)"><em>bytes</em></a>) – Message to be deserialized.</p>
+<dd class="field-odd"><p><strong>msg</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#bytes" title="(in Python v3.9)"><em>bytes</em></a>) – Message to be deserialized.</p>
 </dd>
 <dt class="field-even">Returns</dt>
 <dd class="field-even"><p>Deserialized Python object.</p>
@@ -1448,7 +1455,7 @@ the concatenated serialization were deserialized.</p>
 <dd class="field-even"><p>Serialized message.</p>
 </dd>
 <dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#bytes" title="(in Python v3.8)">bytes</a>, <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)">str</a></p>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#bytes" title="(in Python v3.9)">bytes</a>, <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)">str</a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -1460,7 +1467,7 @@ the concatenated serialization were deserialized.</p>
 or more frames.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>msg</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#bytes" title="(in Python v3.8)"><em>bytes</em></a>) – Message containing one or more frames.</p>
+<dd class="field-odd"><p><strong>msg</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#bytes" title="(in Python v3.9)"><em>bytes</em></a>) – Message containing one or more frames.</p>
 </dd>
 <dt class="field-even">Returns</dt>
 <dd class="field-even"><p><dl class="simple">
@@ -1470,7 +1477,7 @@ or more frames.</p>
 </p>
 </dd>
 <dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#bytes" title="(in Python v3.8)">bytes</a></p>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#bytes" title="(in Python v3.9)">bytes</a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -1484,7 +1491,7 @@ or more frames.</p>
 <dd class="field-odd"><p>Dictionary of variables to use for testing.</p>
 </dd>
 <dt class="field-even">Return type</dt>
-<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.8)">dict</a></p>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.9)">dict</a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -1507,9 +1514,9 @@ or more frames.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>write_header</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.8)"><em>bool</em></a><em>, </em><em>optional</em>) – If True, headers will be added to
+<li><p><strong>write_header</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)"><em>bool</em></a><em>, </em><em>optional</em>) – If True, headers will be added to
 serialized output. Defaults to True.</p></li>
-<li><p><strong>newline</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a><em>, </em><em>optional</em>) – String that should be used for new lines.
+<li><p><strong>newline</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a><em>, </em><em>optional</em>) – String that should be used for new lines.
 Defaults to ‘n’.</p></li>
 </ul>
 </dd>
@@ -1521,7 +1528,7 @@ Defaults to ‘n’.</p></li>
 output.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.8)">bool</a></p>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)">bool</a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -1532,7 +1539,7 @@ output.</p>
 <dd><p>String that should be used for new lines.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)">str</a></p>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)">str</a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -1544,7 +1551,7 @@ output.</p>
 missing colors.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.8)">list</a></p>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.9)">list</a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -1557,7 +1564,7 @@ the concatenated serialization were deserialized.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>objects</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.8)"><em>list</em></a>) – Objects to be concatenated.</p></li>
+<li><p><strong>objects</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.9)"><em>list</em></a>) – Objects to be concatenated.</p></li>
 <li><p><strong>**kwargs</strong> – Additional keyword arguments are ignored.</p></li>
 </ul>
 </dd>
@@ -1565,7 +1572,7 @@ the concatenated serialization were deserialized.</p>
 <dd class="field-even"><p>Set of objects that results from concatenating those provided.</p>
 </dd>
 <dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.8)">list</a></p>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.9)">list</a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -1586,7 +1593,7 @@ the concatenated serialization were deserialized.</p>
 <dd><p>Deserialize a message.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>msg</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#bytes" title="(in Python v3.8)"><em>bytes</em></a>) – Message to be deserialized.</p>
+<dd class="field-odd"><p><strong>msg</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#bytes" title="(in Python v3.9)"><em>bytes</em></a>) – Message to be deserialized.</p>
 </dd>
 <dt class="field-even">Returns</dt>
 <dd class="field-even"><p>Deserialized message.</p>
@@ -1610,7 +1617,7 @@ serialized.</p>
 <dd class="field-even"><p>Serialized message.</p>
 </dd>
 <dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#bytes" title="(in Python v3.8)">bytes</a></p>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#bytes" title="(in Python v3.9)">bytes</a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -1624,7 +1631,7 @@ serialized.</p>
 <dd class="field-odd"><p>Dictionary of variables to use for testing.</p>
 </dd>
 <dt class="field-even">Return type</dt>
-<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.8)">dict</a></p>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.9)">dict</a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -1636,16 +1643,16 @@ serialized.</p>
 <span id="yggdrasil-serialize-serializebase-module"></span><h2>yggdrasil.serialize.SerializeBase module<a class="headerlink" href="#module-yggdrasil.serialize.SerializeBase" title="Permalink to this headline">¶</a></h2>
 <dl class="py class">
 <dt id="yggdrasil.serialize.SerializeBase.SerializeBase">
-<em class="property">class </em><code class="sig-prename descclassname">yggdrasil.serialize.SerializeBase.</code><code class="sig-name descname">SerializeBase</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/serialize/SerializeBase.html#SerializeBase"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.serialize.SerializeBase.SerializeBase" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">yggdrasil.serialize.SerializeBase.</code><code class="sig-name descname">SerializeBase</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">*</span><span class="n">args</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/serialize/SerializeBase.html#SerializeBase"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.serialize.SerializeBase.SerializeBase" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">yggdrasil.tools.YggClass</span></code></p>
 <p>Base class for serializing/deserializing a Python object into/from a
 bytes message.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>newline</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a><em>, </em><em>optional</em>) – One or more characters indicating a newline.
+<li><p><strong>newline</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a><em>, </em><em>optional</em>) – One or more characters indicating a newline.
 Defaults to ‘n’.</p></li>
-<li><p><strong>comment</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a><em>, </em><em>optional</em>) – One or more characters indicating a comment.
+<li><p><strong>comment</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a><em>, </em><em>optional</em>) – One or more characters indicating a comment.
 Defaults to ‘# ‘.</p></li>
 <li><p><strong>datatype</strong> (<em>schema</em><em>, </em><em>optional</em>) – JSON schema defining the type of object
 that the serializer will be used to serialize/deserialize. Defaults
@@ -1663,7 +1670,7 @@ by input arguments specifying the type or by infering the type from
 a processed message.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.8)">bool</a></p>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)">bool</a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -1720,7 +1727,7 @@ the concatenated serialization were deserialized.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>objects</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.8)"><em>list</em></a>) – Objects to be concatenated.</p></li>
+<li><p><strong>objects</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.9)"><em>list</em></a>) – Objects to be concatenated.</p></li>
 <li><p><strong>**kwargs</strong> – Additional keyword arguments are ignored.</p></li>
 </ul>
 </dd>
@@ -1728,7 +1735,7 @@ the concatenated serialization were deserialized.</p>
 <dd class="field-even"><p>Set of objects that results from concatenating those provided.</p>
 </dd>
 <dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.8)">list</a></p>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.9)">list</a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -1744,7 +1751,7 @@ the concatenated serialization were deserialized.</p>
 <dd><p>Consolidate message into a structure numpy array if possible.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>out</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.8)"><em>list</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.8)"><em>tuple</em></a><em>, </em><em>np.ndarray</em>) – Object to consolidate into a
+<dd class="field-odd"><p><strong>out</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.9)"><em>list</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.9)"><em>tuple</em></a><em>, </em><em>np.ndarray</em>) – Object to consolidate into a
 structured numpy array.</p>
 </dd>
 <dt class="field-even">Returns</dt>
@@ -1754,7 +1761,7 @@ structured numpy array.</p>
 <dd class="field-odd"><p>np.ndarray</p>
 </dd>
 <dt class="field-even">Raises</dt>
-<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#ValueError" title="(in Python v3.8)"><strong>ValueError</strong></a> – If the array cannot be consolidated.</p>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#ValueError" title="(in Python v3.9)"><strong>ValueError</strong></a> – If the array cannot be consolidated.</p>
 </dd>
 </dl>
 </dd></dl>
@@ -1781,7 +1788,7 @@ structured numpy array.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>msg</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#bytes" title="(in Python v3.8)"><em>bytes</em></a>) – Message to be deserialized.</p></li>
+<li><p><strong>msg</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#bytes" title="(in Python v3.9)"><em>bytes</em></a>) – Message to be deserialized.</p></li>
 <li><p><strong>**kwargs</strong> – Additional keyword arguments are passed to the deserialize
 method of the datatype class.</p></li>
 </ul>
@@ -1790,10 +1797,10 @@ method of the datatype class.</p></li>
 <dd class="field-even"><p>Deserialized message and header information.</p>
 </dd>
 <dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.8)">tuple</a>(obj, <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.8)">dict</a>)</p>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.9)">tuple</a>(obj, <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.9)">dict</a>)</p>
 </dd>
 <dt class="field-even">Raises</dt>
-<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#TypeError" title="(in Python v3.8)"><strong>TypeError</strong></a> – If msg is not bytes type (str on Python 2).</p>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#TypeError" title="(in Python v3.9)"><strong>TypeError</strong></a> – If msg is not bytes type (str on Python 2).</p>
 </dd>
 </dl>
 </dd></dl>
@@ -1841,7 +1848,7 @@ the serializations.</p>
 <dd><p>Type definition for encoded data objects.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.8)">dict</a></p>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.9)">dict</a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -1876,7 +1883,7 @@ serialized.</p>
 <dd class="field-even"><p>Serialized message.</p>
 </dd>
 <dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#bytes" title="(in Python v3.8)">bytes</a>, <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)">str</a></p>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#bytes" title="(in Python v3.9)">bytes</a>, <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)">str</a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -1887,7 +1894,7 @@ serialized.</p>
 <dd><p>Get the field names for an array of fields.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>as_bytes</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.8)"><em>bool</em></a><em>, </em><em>optional</em>) – If True, the field names will be returned
+<dd class="field-odd"><p><strong>as_bytes</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)"><em>bool</em></a><em>, </em><em>optional</em>) – If True, the field names will be returned
 as bytes. If False the field names will be returned as unicode.
 Defaults to False.</p>
 </dd>
@@ -1895,7 +1902,7 @@ Defaults to False.</p>
 <dd class="field-even"><p>Names for each field in the data type.</p>
 </dd>
 <dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.8)">list</a></p>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.9)">list</a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -1906,7 +1913,7 @@ Defaults to False.</p>
 <dd><p>Get the field units for an array of fields.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>as_bytes</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.8)"><em>bool</em></a><em>, </em><em>optional</em>) – If True, the field units will be returned
+<dd class="field-odd"><p><strong>as_bytes</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)"><em>bool</em></a><em>, </em><em>optional</em>) – If True, the field units will be returned
 as bytes. If False the field units will be returned as unicode.
 Defaults to False.</p>
 </dd>
@@ -1914,7 +1921,7 @@ Defaults to False.</p>
 <dd class="field-even"><p>Units for each field in the data type.</p>
 </dd>
 <dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.8)">list</a></p>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.9)">list</a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -1926,17 +1933,17 @@ Defaults to False.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>table_example</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.8)"><em>bool</em></a><em>, </em><em>optional</em>) – If True, the returned options will
+<li><p><strong>table_example</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)"><em>bool</em></a><em>, </em><em>optional</em>) – If True, the returned options will
 be for an array of elements representing a table-like structure.
 Defaults to False.</p></li>
-<li><p><strong>array_columns</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.8)"><em>bool</em></a><em>, </em><em>optional</em>) – If True, table_example is set to
+<li><p><strong>array_columns</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)"><em>bool</em></a><em>, </em><em>optional</em>) – If True, table_example is set to
 True and the returned options will be for an array data type
 where each element is an array representing a column Defaults to
 False.</p></li>
-<li><p><strong>include_oldkws</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.8)"><em>bool</em></a><em>, </em><em>optional</em>) – If True, old-style keywords will be
+<li><p><strong>include_oldkws</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)"><em>bool</em></a><em>, </em><em>optional</em>) – If True, old-style keywords will be
 added to the returned options. This will only have an effect if
 table_example is True. Defaults to False.</p></li>
-<li><p><strong>table_string_type</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a><em>, </em><em>optional</em>) – Type that should be used
+<li><p><strong>table_string_type</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a><em>, </em><em>optional</em>) – Type that should be used
 for the string column in the table. Defaults to ‘bytes’.</p></li>
 </ul>
 </dd>
@@ -1962,7 +1969,7 @@ from contents.</p></li>
 </p>
 </dd>
 <dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.8)">dict</a></p>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.9)">dict</a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -1979,7 +1986,7 @@ from contents.</p></li>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>msg</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.8)"><em>object</em></a>) – Message that serializer should be initialized from.</p></li>
+<li><p><strong>msg</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.9)"><em>object</em></a>) – Message that serializer should be initialized from.</p></li>
 <li><p><strong>**kwargs</strong> – Additional keyword arguments are treated as metadata that
 may contain additional information for initializing the serializer.</p></li>
 </ul>
@@ -1995,9 +2002,9 @@ exit early if the serializer has already been intialized.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>metadata</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.8)"><em>dict</em></a>) – Header information including type info that should be
+<li><p><strong>metadata</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.9)"><em>dict</em></a>) – Header information including type info that should be
 used to initialize the serializer class.</p></li>
-<li><p><strong>extract</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.8)"><em>bool</em></a><em>, </em><em>optional</em>) – If True, the type will be defined using a
+<li><p><strong>extract</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)"><em>bool</em></a><em>, </em><em>optional</em>) – If True, the type will be defined using a
 subset of the type information in metadata. If False, all of the
 type information will be used. Defaults to False.</p></li>
 </ul>
@@ -2011,7 +2018,7 @@ type information will be used. Defaults to False.</p></li>
 <dd><p>Get the input keyword arguments used to create this class.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.8)">dict</a></p>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.9)">dict</a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -2035,7 +2042,7 @@ current datatype against the default for the class.</p>
 </p>
 </dd>
 <dt class="field-even">Return type</dt>
-<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.8)">bool</a></p>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)">bool</a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -2059,7 +2066,7 @@ type is an array of 1darrays.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>obj</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.8)"><em>object</em></a>) – Object that would be serialized by this class and
+<li><p><strong>obj</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.9)"><em>object</em></a>) – Object that would be serialized by this class and
 should be returned in an array form.</p></li>
 <li><p><strong>**kwargs</strong> – Additional keyword arguments are ignored.</p></li>
 </ul>
@@ -2084,7 +2091,7 @@ should be returned in an array form.</p></li>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>obj</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.8)"><em>object</em></a>) – Object that would be serialized by this class and
+<li><p><strong>obj</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.9)"><em>object</em></a>) – Object that would be serialized by this class and
 should be returned in a dictionary form.</p></li>
 <li><p><strong>**kwargs</strong> – Additional keyword arguments are ignored.</p></li>
 </ul>
@@ -2093,7 +2100,7 @@ should be returned in a dictionary form.</p></li>
 <dd class="field-even"><p>Dictionary version of the provided object.</p>
 </dd>
 <dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.8)">dict</a></p>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.9)">dict</a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -2104,13 +2111,13 @@ should be returned in a dictionary form.</p></li>
 <dd><p>Extract header info from a message.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>msg</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) – Message to extract header from.</p>
+<dd class="field-odd"><p><strong>msg</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a>) – Message to extract header from.</p>
 </dd>
 <dt class="field-even">Returns</dt>
 <dd class="field-even"><p>Message properties.</p>
 </dd>
 <dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.8)">dict</a></p>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.9)">dict</a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -2121,7 +2128,7 @@ should be returned in a dictionary form.</p></li>
 <dd><p>Method that should be used to read data for deserialization.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)">str</a></p>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)">str</a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -2140,13 +2147,13 @@ should be returned in a dictionary form.</p></li>
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>args</strong> (<em>obj</em>) – List of arguments to be formatted or a ready made message.</p></li>
-<li><p><strong>header_kwargs</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.8)"><em>dict</em></a><em>, </em><em>optional</em>) – Keyword arguments that should be
+<li><p><strong>header_kwargs</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.9)"><em>dict</em></a><em>, </em><em>optional</em>) – Keyword arguments that should be
 added to the header. Defaults to None and no header is added.</p></li>
-<li><p><strong>add_serializer_info</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.8)"><em>bool</em></a><em>, </em><em>optional</em>) – If True, serializer information
+<li><p><strong>add_serializer_info</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)"><em>bool</em></a><em>, </em><em>optional</em>) – If True, serializer information
 will be added to the metadata. Defaults to False.</p></li>
-<li><p><strong>no_metadata</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.8)"><em>bool</em></a><em>, </em><em>optional</em>) – If True, no metadata will be added to
+<li><p><strong>no_metadata</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)"><em>bool</em></a><em>, </em><em>optional</em>) – If True, no metadata will be added to
 the serialized message. Defaults to False.</p></li>
-<li><p><strong>max_header_size</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a><em>, </em><em>optional</em>) – Maximum size that header
+<li><p><strong>max_header_size</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><em>int</em></a><em>, </em><em>optional</em>) – Maximum size that header
 should occupy in order to be sent in a single message.
 A value of 0 indicates that any size header is valid.
 Defaults to 0.</p></li>
@@ -2156,10 +2163,10 @@ Defaults to 0.</p></li>
 <dd class="field-even"><p>Serialized message.</p>
 </dd>
 <dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#bytes" title="(in Python v3.8)">bytes</a>, <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)">str</a></p>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#bytes" title="(in Python v3.9)">bytes</a>, <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)">str</a></p>
 </dd>
 <dt class="field-even">Raises</dt>
-<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#TypeError" title="(in Python v3.8)"><strong>TypeError</strong></a> – If returned msg is not bytes type (str on Python 2).</p>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#TypeError" title="(in Python v3.9)"><strong>TypeError</strong></a> – If returned msg is not bytes type (str on Python 2).</p>
 </dd>
 </dl>
 </dd></dl>
@@ -2174,7 +2181,7 @@ to files serialized using this class.</p>
 <dd class="field-odd"><p>Header string that should be written to the file.</p>
 </dd>
 <dt class="field-even">Return type</dt>
-<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#bytes" title="(in Python v3.8)">bytes</a></p>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#bytes" title="(in Python v3.9)">bytes</a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -2185,7 +2192,7 @@ to files serialized using this class.</p>
 <dd><p>Serializer info.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.8)">dict</a></p>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.9)">dict</a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -2196,7 +2203,7 @@ to files serialized using this class.</p>
 <dd><p>Type definition.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.8)">dict</a></p>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.9)">dict</a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -2208,18 +2215,18 @@ to files serialized using this class.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>extract</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.8)"><em>bool</em></a><em>, </em><em>optional</em>) – If True, the updated typedef will be
+<li><p><strong>extract</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)"><em>bool</em></a><em>, </em><em>optional</em>) – If True, the updated typedef will be
 the bare minimum as extracted from total set of provided
 keywords, otherwise the entire set will be sued. Defaults to
 False.</p></li>
-<li><p><strong>skip_type</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.8)"><em>bool</em></a><em>, </em><em>optional</em>) – If True, everything is updated except
+<li><p><strong>skip_type</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)"><em>bool</em></a><em>, </em><em>optional</em>) – If True, everything is updated except
 the data type. Defaults to False.</p></li>
 <li><p><strong>**kwargs</strong> – Additional keyword arguments are processed as part of
 they type definition and are parsed for old-style keywords.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Raises</dt>
-<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#RuntimeError" title="(in Python v3.8)"><strong>RuntimeError</strong></a> – If there are keywords that are not valid typedef
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#RuntimeError" title="(in Python v3.9)"><strong>RuntimeError</strong></a> – If there are keywords that are not valid typedef
     keywords (currect or old-style).</p>
 </dd>
 </dl>
@@ -2233,13 +2240,13 @@ Existing typedef values are not overwritten and warnings are raised if the
 provided serialization spec is not compatible with the type definition.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>typedef</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.8)"><em>dict</em></a>) – Type definition to update.</p>
+<dd class="field-odd"><p><strong>typedef</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.9)"><em>dict</em></a>) – Type definition to update.</p>
 </dd>
 <dt class="field-even">Returns</dt>
 <dd class="field-even"><p>Updated typedef.</p>
 </dd>
 <dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.8)">dict</a></p>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.9)">dict</a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -2251,7 +2258,7 @@ provided serialization spec is not compatible with the type definition.</p>
 <span id="yggdrasil-serialize-wofostparamserialize-module"></span><h2>yggdrasil.serialize.WOFOSTParamSerialize module<a class="headerlink" href="#module-yggdrasil.serialize.WOFOSTParamSerialize" title="Permalink to this headline">¶</a></h2>
 <dl class="py class">
 <dt id="yggdrasil.serialize.WOFOSTParamSerialize.WOFOSTParamSerialize">
-<em class="property">class </em><code class="sig-prename descclassname">yggdrasil.serialize.WOFOSTParamSerialize.</code><code class="sig-name descname">WOFOSTParamSerialize</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/serialize/WOFOSTParamSerialize.html#WOFOSTParamSerialize"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.serialize.WOFOSTParamSerialize.WOFOSTParamSerialize" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">yggdrasil.serialize.WOFOSTParamSerialize.</code><code class="sig-name descname">WOFOSTParamSerialize</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">*</span><span class="n">args</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/serialize/WOFOSTParamSerialize.html#WOFOSTParamSerialize"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.serialize.WOFOSTParamSerialize.WOFOSTParamSerialize" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#yggdrasil.serialize.AsciiMapSerialize.AsciiMapSerialize" title="yggdrasil.serialize.AsciiMapSerialize.AsciiMapSerialize"><code class="xref py py-class docutils literal notranslate"><span class="pre">yggdrasil.serialize.AsciiMapSerialize.AsciiMapSerialize</span></code></a></p>
 <p>Class for serializing/deserializing WOFOST parameter files.</p>
 <dl class="py method">
@@ -2262,7 +2269,7 @@ the concatenated serialization were deserialized.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>objects</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.8)"><em>list</em></a>) – Objects to be concatenated.</p></li>
+<li><p><strong>objects</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.9)"><em>list</em></a>) – Objects to be concatenated.</p></li>
 <li><p><strong>**kwargs</strong> – Additional keyword arguments are ignored.</p></li>
 </ul>
 </dd>
@@ -2270,7 +2277,7 @@ the concatenated serialization were deserialized.</p>
 <dd class="field-even"><p>Set of objects that results from concatenating those provided.</p>
 </dd>
 <dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.8)">list</a></p>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.9)">list</a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -2291,13 +2298,13 @@ the concatenated serialization were deserialized.</p>
 <dd><p>Deserialize a message.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>msg</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#bytes" title="(in Python v3.8)"><em>bytes</em></a>) – Message to be deserialized.</p>
+<dd class="field-odd"><p><strong>msg</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#bytes" title="(in Python v3.9)"><em>bytes</em></a>) – Message to be deserialized.</p>
 </dd>
 <dt class="field-even">Returns</dt>
 <dd class="field-even"><p>Deserialized Python dictionary.</p>
 </dd>
 <dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.8)">dict</a></p>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.9)">dict</a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -2308,13 +2315,13 @@ the concatenated serialization were deserialized.</p>
 <dd><p>Serialize a message.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>args</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.8)"><em>dict</em></a>) – Python dictionary to be serialized.</p>
+<dd class="field-odd"><p><strong>args</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.9)"><em>dict</em></a>) – Python dictionary to be serialized.</p>
 </dd>
 <dt class="field-even">Returns</dt>
 <dd class="field-even"><p>Serialized message.</p>
 </dd>
 <dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#bytes" title="(in Python v3.8)">bytes</a>, <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)">str</a></p>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#bytes" title="(in Python v3.9)">bytes</a>, <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)">str</a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -2328,7 +2335,7 @@ the concatenated serialization were deserialized.</p>
 <dd class="field-odd"><p>Dictionary of variables to use for testing.</p>
 </dd>
 <dt class="field-even">Return type</dt>
-<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.8)">dict</a></p>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.9)">dict</a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -2339,13 +2346,13 @@ the concatenated serialization were deserialized.</p>
 <dd><p>Parse units.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>x</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) – Unit string.</p>
+<dd class="field-odd"><p><strong>x</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a>) – Unit string.</p>
 </dd>
 <dt class="field-even">Returns</dt>
 <dd class="field-even"><p>Propertly formatted units.</p>
 </dd>
 <dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)">str</a></p>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)">str</a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -2357,18 +2364,18 @@ the concatenated serialization were deserialized.</p>
 <span id="yggdrasil-serialize-yamlserialize-module"></span><h2>yggdrasil.serialize.YAMLSerialize module<a class="headerlink" href="#module-yggdrasil.serialize.YAMLSerialize" title="Permalink to this headline">¶</a></h2>
 <dl class="py class">
 <dt id="yggdrasil.serialize.YAMLSerialize.YAMLSerialize">
-<em class="property">class </em><code class="sig-prename descclassname">yggdrasil.serialize.YAMLSerialize.</code><code class="sig-name descname">YAMLSerialize</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/serialize/YAMLSerialize.html#YAMLSerialize"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.serialize.YAMLSerialize.YAMLSerialize" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">yggdrasil.serialize.YAMLSerialize.</code><code class="sig-name descname">YAMLSerialize</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">*</span><span class="n">args</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/serialize/YAMLSerialize.html#YAMLSerialize"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.serialize.YAMLSerialize.YAMLSerialize" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#yggdrasil.serialize.JSONSerialize.JSONSerialize" title="yggdrasil.serialize.JSONSerialize.JSONSerialize"><code class="xref py py-class docutils literal notranslate"><span class="pre">yggdrasil.serialize.JSONSerialize.JSONSerialize</span></code></a></p>
 <p>Class for serializing a python object into a bytes message using YAML.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>indent</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a><em>, </em><em>optional</em>) – String or number of spaces that should be
+<li><p><strong>indent</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><em>int</em></a><em>, </em><em>optional</em>) – String or number of spaces that should be
 used to indent each level within the seiralized structure. Defaults
 to ‘t’.</p></li>
-<li><p><strong>encoding</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a><em>, </em><em>optional</em>) – Encoding that should be used to serialize the
+<li><p><strong>encoding</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a><em>, </em><em>optional</em>) – Encoding that should be used to serialize the
 object. Defaults to ‘utf-8’.</p></li>
-<li><p><strong>default_flow_style</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.8)"><em>bool</em></a><em>, </em><em>optional</em>) – If True, nested collections will
+<li><p><strong>default_flow_style</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)"><em>bool</em></a><em>, </em><em>optional</em>) – If True, nested collections will
 be serialized in the block style. If False, they will always be
 serialized in the flow style. See
 <a class="reference external" href="https://pyyaml.org/wiki/PyYAMLDocumentation">PyYAML Documentation</a>.</p></li>
@@ -2381,7 +2388,7 @@ serialized in the flow style. See
 <dd><p>Deserialize a message.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>msg</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#bytes" title="(in Python v3.8)"><em>bytes</em></a>) – Message to be deserialized.</p>
+<dd class="field-odd"><p><strong>msg</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#bytes" title="(in Python v3.9)"><em>bytes</em></a>) – Message to be deserialized.</p>
 </dd>
 <dt class="field-even">Returns</dt>
 <dd class="field-even"><p>Deserialized Python object.</p>
@@ -2404,7 +2411,7 @@ serialized in the flow style. See
 <dd class="field-even"><p>Serialized message.</p>
 </dd>
 <dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#bytes" title="(in Python v3.8)">bytes</a>, <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)">str</a></p>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#bytes" title="(in Python v3.9)">bytes</a>, <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)">str</a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -2418,7 +2425,7 @@ serialized in the flow style. See
 <dd class="field-odd"><p>Dictionary of variables to use for testing.</p>
 </dd>
 <dt class="field-even">Return type</dt>
-<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.8)">dict</a></p>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.9)">dict</a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -2428,6 +2435,761 @@ serialized in the flow style. See
 </div>
 <div class="section" id="module-yggdrasil.serialize">
 <span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-yggdrasil.serialize" title="Permalink to this headline">¶</a></h2>
+<dl class="py function">
+<dt id="yggdrasil.serialize.array_to_bytes">
+<code class="sig-prename descclassname">yggdrasil.serialize.</code><code class="sig-name descname">array_to_bytes</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">arrs</span></em>, <em class="sig-param"><span class="n">dtype</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">order</span><span class="o">=</span><span class="default_value">'C'</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/serialize.html#array_to_bytes"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.serialize.array_to_bytes" title="Permalink to this definition">¶</a></dt>
+<dd><p>Serialize an array to bytes.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>arrs</strong> (<em>np.ndarray</em><em>, </em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.9)"><em>list</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.9)"><em>tuple</em></a>) – Structured array or list/tuple of
+arrays that should be serialized. If ‘arrs’ is not a numpy
+structured array, a structured array will first be constructed
+from the provided data.</p></li>
+<li><p><strong>dtype</strong> (<em>np.dtype</em><em>, </em><em>optional</em>) – Structured data type that array should
+be converted to prior to serialization. If not provided, it
+will be determined from the array data.</p></li>
+<li><p><strong>order</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a><em>, </em><em>optional</em>) – Order that array should be serialized in.
+‘C’ for row first, ‘F’ for column/field first. Defaults to ‘C’.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Serialized array.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#bytes" title="(in Python v3.9)">bytes</a>, <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)">str</a></p>
+</dd>
+</dl>
+<p>Raises:</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="yggdrasil.serialize.array_to_table">
+<code class="sig-prename descclassname">yggdrasil.serialize.</code><code class="sig-name descname">array_to_table</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">arrs</span></em>, <em class="sig-param"><span class="n">fmt_str</span></em>, <em class="sig-param"><span class="n">use_astropy</span><span class="o">=</span><span class="default_value">False</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/serialize.html#array_to_table"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.serialize.array_to_table" title="Permalink to this definition">¶</a></dt>
+<dd><p>Serialize an array as an ASCII table.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>arrs</strong> (<em>np.ndarray</em><em>, </em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.9)"><em>list</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.9)"><em>tuple</em></a>) – Structured array or list/tuple of
+arrays that contain table information.</p></li>
+<li><p><strong>fmt_str</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#bytes" title="(in Python v3.9)"><em>bytes</em></a>) – Format string that should be used to structure
+the ASCII array.</p></li>
+<li><p><strong>use_astropy</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)"><em>bool</em></a><em>, </em><em>optional</em>) – If True, astropy will be used to format
+the table if it is installed. Defaults to False.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>ASCII table.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#bytes" title="(in Python v3.9)">bytes</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="yggdrasil.serialize.bytes_to_array">
+<code class="sig-prename descclassname">yggdrasil.serialize.</code><code class="sig-name descname">bytes_to_array</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">data</span></em>, <em class="sig-param"><span class="n">dtype</span></em>, <em class="sig-param"><span class="n">order</span><span class="o">=</span><span class="default_value">'C'</span></em>, <em class="sig-param"><span class="n">shape</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/serialize.html#bytes_to_array"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.serialize.bytes_to_array" title="Permalink to this definition">¶</a></dt>
+<dd><p>Deserialize an array from bytes data.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>data</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#bytes" title="(in Python v3.9)"><em>bytes</em></a>) – Serialized array data.</p></li>
+<li><p><strong>dtype</strong> (<em>np.dtype</em><em>, </em><em>optional</em>) – Structured data type of the serialized array.</p></li>
+<li><p><strong>order</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a><em>, </em><em>optional</em>) – Order that array was serialized in.
+‘C’ for row first, ‘F’ for column/field first. Defaults to ‘C’.</p></li>
+<li><p><strong>shape</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.9)"><em>tuple</em></a><em>, </em><em>optional</em>) – Shape that array should be reshaped to
+after being deserialized. Defaults to a flat array if not provided.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Deserialized array.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>np.ndarray</p>
+</dd>
+</dl>
+<p>Raises:</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="yggdrasil.serialize.cformat2nptype">
+<code class="sig-prename descclassname">yggdrasil.serialize.</code><code class="sig-name descname">cformat2nptype</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">cfmt</span></em>, <em class="sig-param"><span class="n">names</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/serialize.html#cformat2nptype"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.serialize.cformat2nptype" title="Permalink to this definition">¶</a></dt>
+<dd><p>Convert a c format string to a numpy data type.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>cfmt</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#bytes" title="(in Python v3.9)"><em>bytes</em></a>) – c format that should be translated.</p></li>
+<li><p><strong>names</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.9)"><em>list</em></a><em>, </em><em>optional</em>) – Names that should be assigned to fields in the
+format string if there is more than one. If not provided, names
+are generated based on the order of the format codes.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Corresponding numpy data type.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>np.dtype</p>
+</dd>
+<dt class="field-even">Raises</dt>
+<dd class="field-even"><ul class="simple">
+<li><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#TypeError" title="(in Python v3.9)"><strong>TypeError</strong></a> – if cfmt is not a string.</p></li>
+<li><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#ValueError" title="(in Python v3.9)"><strong>ValueError</strong></a> – If the c format does not begin with ‘%’.</p></li>
+<li><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#ValueError" title="(in Python v3.9)"><strong>ValueError</strong></a> – If the c format does not contain type info.</p></li>
+<li><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#ValueError" title="(in Python v3.9)"><strong>ValueError</strong></a> – If the c format cannot be translated to a numpy datatype.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="yggdrasil.serialize.cformat2pyscanf">
+<code class="sig-prename descclassname">yggdrasil.serialize.</code><code class="sig-name descname">cformat2pyscanf</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">cfmt</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/serialize.html#cformat2pyscanf"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.serialize.cformat2pyscanf" title="Permalink to this definition">¶</a></dt>
+<dd><p>Convert a c format specification string to a version that the
+python scanf module can use.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>cfmt</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#bytes" title="(in Python v3.9)"><em>bytes</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.9)"><em>list</em></a>) – C format specification string or list of format
+strings.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><dl class="simple">
+<dt>Version of cfmt or list of cfmts that can be parsed by</dt><dd><p>scanf.</p>
+</dd>
+</dl>
+</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)">str</a>, <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#bytes" title="(in Python v3.9)">bytes</a>, <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.9)">list</a></p>
+</dd>
+<dt class="field-even">Raises</dt>
+<dd class="field-even"><ul class="simple">
+<li><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#TypeError" title="(in Python v3.9)"><strong>TypeError</strong></a> – If cfmt is not a bytes/str/list.</p></li>
+<li><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#ValueError" title="(in Python v3.9)"><strong>ValueError</strong></a> – If there are not an format codes in the format string.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="yggdrasil.serialize.combine_eles">
+<code class="sig-prename descclassname">yggdrasil.serialize.</code><code class="sig-name descname">combine_eles</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">arrs</span></em>, <em class="sig-param"><span class="n">dtype</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/serialize.html#combine_eles"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.serialize.combine_eles" title="Permalink to this definition">¶</a></dt>
+<dd><p>Combine arrays as elements in a structure numpy array.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>arrs</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.9)"><em>list</em></a>) – List of numpy arrays or lists specifying the values of
+fields in elements of a structured numpy array.</p></li>
+<li><p><strong>dtype</strong> (<em>np.dtype</em><em>, </em><em>optional</em>) – Data type that the resulting array should
+have. If not provided, it is determined from the provided arrays.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><dl class="simple">
+<dt>Structured numpy array with information from the provided</dt><dd><p>arrays/lists as elements.</p>
+</dd>
+</dl>
+</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>np.ndarray</p>
+</dd>
+<dt class="field-even">Raises</dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#ValueError" title="(in Python v3.9)"><strong>ValueError</strong></a> – If the number of fields in any of the provided arrays/lists
+    does not match the number of fields in the provided/created dtype.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="yggdrasil.serialize.combine_flds">
+<code class="sig-prename descclassname">yggdrasil.serialize.</code><code class="sig-name descname">combine_flds</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">arrs</span></em>, <em class="sig-param"><span class="n">dtype</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/serialize.html#combine_flds"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.serialize.combine_flds" title="Permalink to this definition">¶</a></dt>
+<dd><p>Combine a list of arrays as fields in a structured array.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>arrs</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.9)"><em>list</em></a>) – List of arrays, one for each field in a structured array.</p></li>
+<li><p><strong>dtype</strong> (<em>np.dtype</em><em>, </em><em>optional</em>) – Data type that resulting array should have.
+If not provided, it is determined from the types of the input arrays.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><dl class="simple">
+<dt>Structured numpy array with fields assigned from the</dt><dd><p>provided arrays.</p>
+</dd>
+</dl>
+</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>np.ndarray</p>
+</dd>
+<dt class="field-even">Raises</dt>
+<dd class="field-even"><ul class="simple">
+<li><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#ValueError" title="(in Python v3.9)"><strong>ValueError</strong></a> – If the number of arrays does not match the number of fields
+    in the provided data type.</p></li>
+<li><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#ValueError" title="(in Python v3.9)"><strong>ValueError</strong></a> – If any of the provided arrays does not have the same number
+    of elements as the first array.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="yggdrasil.serialize.consolidate_array">
+<code class="sig-prename descclassname">yggdrasil.serialize.</code><code class="sig-name descname">consolidate_array</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">arrs</span></em>, <em class="sig-param"><span class="n">dtype</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/serialize.html#consolidate_array"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.serialize.consolidate_array" title="Permalink to this definition">¶</a></dt>
+<dd><p>Consolidate arrays either as fields or elements in a structured array.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>arrs</strong> (<em>np.ndarray</em><em>, </em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.9)"><em>list</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.9)"><em>tuple</em></a>) – Array or list of arrays that should be
+reformatted/consolidated as a structured array.</p></li>
+<li><p><strong>dtype</strong> (<em>np.dtype</em><em>, </em><em>optional</em>) – Data type that the resulting array should
+have. If not provided, it is determined from the input.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><dl class="simple">
+<dt>Structured array of the specified type with values taken</dt><dd><p>from the provided array(s).</p>
+</dd>
+</dl>
+</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>np.ndarray</p>
+</dd>
+<dt class="field-even">Raises</dt>
+<dd class="field-even"><ul class="simple">
+<li><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#ValueError" title="(in Python v3.9)"><strong>ValueError</strong></a> – If an unstructured array is provided, but the last dimension
+    of the array does not have the proper size to fill the fields in
+    the specified data type.</p></li>
+<li><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#ValueError" title="(in Python v3.9)"><strong>ValueError</strong></a> – If a structured array is provided, but it does not have a
+    data type compatible with the specified data type.</p></li>
+<li><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#TypeError" title="(in Python v3.9)"><strong>TypeError</strong></a> – If ‘arrs’ is not a numpy array, list, or tuple.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="yggdrasil.serialize.dict2list">
+<code class="sig-prename descclassname">yggdrasil.serialize.</code><code class="sig-name descname">dict2list</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">d</span></em>, <em class="sig-param"><span class="n">order</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/serialize.html#dict2list"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.serialize.dict2list" title="Permalink to this definition">¶</a></dt>
+<dd><p>Covert a dictionary of arrays to a list of arrays.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>d</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.9)"><em>dict</em></a>) – Dictionary of arrays.</p></li>
+<li><p><strong>order</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.9)"><em>list</em></a><em>, </em><em>optional</em>) – Key order in which values from the dictionary
+should be add to the list.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>List with contents from the input array.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.9)">list</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="yggdrasil.serialize.dict2numpy">
+<code class="sig-prename descclassname">yggdrasil.serialize.</code><code class="sig-name descname">dict2numpy</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">d</span></em>, <em class="sig-param"><span class="n">order</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/serialize.html#dict2numpy"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.serialize.dict2numpy" title="Permalink to this definition">¶</a></dt>
+<dd><p>Convert a dictionary of arrays to a numpy structured array.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>d</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.9)"><em>dict</em></a>) – Dictionary of arrays.</p></li>
+<li><p><strong>order</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.9)"><em>list</em></a><em>, </em><em>optional</em>) – Order that keys should be in array.
+Defaults to None and will be sorted keys.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Structured numpy array.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>np.ndarray</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="yggdrasil.serialize.dict2pandas">
+<code class="sig-prename descclassname">yggdrasil.serialize.</code><code class="sig-name descname">dict2pandas</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">d</span></em>, <em class="sig-param"><span class="n">order</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/serialize.html#dict2pandas"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.serialize.dict2pandas" title="Permalink to this definition">¶</a></dt>
+<dd><p>Convert a dictionary of arrays to a Pandas DataFrame.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>d</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.9)"><em>dict</em></a>) – Dictionary of arrays.</p></li>
+<li><p><strong>order</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.9)"><em>list</em></a><em>, </em><em>optional</em>) – Order that keys should be in array.
+Defaults to None and will be sorted keys.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Pandas data frame with contents from the input dict.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>pandas.DataFrame</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="yggdrasil.serialize.discover_header">
+<code class="sig-prename descclassname">yggdrasil.serialize.</code><code class="sig-name descname">discover_header</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">fd</span></em>, <em class="sig-param"><span class="n">serializer</span></em>, <em class="sig-param"><span class="n">newline</span><span class="o">=</span><span class="default_value">b'\n'</span></em>, <em class="sig-param"><span class="n">comment</span><span class="o">=</span><span class="default_value">b'# '</span></em>, <em class="sig-param"><span class="n">delimiter</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">lineno_format</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">lineno_names</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">lineno_units</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">use_astropy</span><span class="o">=</span><span class="default_value">False</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/serialize.html#discover_header"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.serialize.discover_header" title="Permalink to this definition">¶</a></dt>
+<dd><p>Discover ASCII table header info from a file.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>fd</strong> (<em>file</em>) – File object containing the table.</p></li>
+<li><p><strong>serializer</strong> (<a class="reference internal" href="#yggdrasil.serialize.DefaultSerialize.DefaultSerialize" title="yggdrasil.serialize.DefaultSerialize.DefaultSerialize"><em>DefaultSerialize</em></a>) – Serializer that should be updated with
+header information.</p></li>
+<li><p><strong>newline</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a><em>, </em><em>optional</em>) – Newline character that should be used to split
+header if it is not already a list. Defaults to _default_newline.</p></li>
+<li><p><strong>comment</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#bytes" title="(in Python v3.9)"><em>bytes</em></a><em>, </em><em>optional</em>) – String that should be used to mark the
+header lines. If not provided and not in format_str, defaults to
+_default_comment.</p></li>
+<li><p><strong>delimiter</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#bytes" title="(in Python v3.9)"><em>bytes</em></a><em>, </em><em>optional</em>) – String that should be used to separate
+columns. If not provided and not in format_str, defaults to
+_default_delimiter.</p></li>
+<li><p><strong>lineno_format</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><em>int</em></a><em>, </em><em>optional</em>) – Line number where formats are located.
+If not provided, an attempt will be made to locate one.</p></li>
+<li><p><strong>lineno_names</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><em>int</em></a><em>, </em><em>optional</em>) – Line number where field names are located.
+If not provided, an attempt will be made to locate one.</p></li>
+<li><p><strong>lineno_units</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><em>int</em></a><em>, </em><em>optional</em>) – Line number where field units are located.
+If not provided, an attempt will be made to locate one.</p></li>
+<li><p><strong>use_astropy</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)"><em>bool</em></a><em>, </em><em>optional</em>) – If True, astropy will be used to parse
+the table if it is installed. Defaults to False.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="yggdrasil.serialize.extract_formats">
+<code class="sig-prename descclassname">yggdrasil.serialize.</code><code class="sig-name descname">extract_formats</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">fmt_str</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/serialize.html#extract_formats"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.serialize.extract_formats" title="Permalink to this definition">¶</a></dt>
+<dd><p>Locate format codes within a format string.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>fmt_str</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#bytes" title="(in Python v3.9)"><em>bytes</em></a>) – Format string.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>List of identified format codes.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.9)">list</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="yggdrasil.serialize.format2table">
+<code class="sig-prename descclassname">yggdrasil.serialize.</code><code class="sig-name descname">format2table</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">fmt_str</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/serialize.html#format2table"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.serialize.format2table" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get table information from the table format string.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>fmt_str</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#bytes" title="(in Python v3.9)"><em>bytes</em></a>) – Format string that describes how the table
+columns are formatted.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Table information parameters.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.9)">dict</a></p>
+</dd>
+<dt class="field-even">Raises</dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#RuntimeError" title="(in Python v3.9)"><strong>RuntimeError</strong></a> – If the column separator is not the same between all
+    of the format codes.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="yggdrasil.serialize.format_header">
+<code class="sig-prename descclassname">yggdrasil.serialize.</code><code class="sig-name descname">format_header</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">format_str</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">dtype</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">comment</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">delimiter</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">newline</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">field_names</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">field_units</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/serialize.html#format_header"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.serialize.format_header" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get header lines for a table based on table information.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>format_str</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#bytes" title="(in Python v3.9)"><em>bytes</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a><em>, </em><em>optional</em>) – Format string describing how the
+table should be formatted. If not provided, information on the
+formats is extracted from dtype.</p></li>
+<li><p><strong>dtype</strong> (<em>np.dtype</em><em>, </em><em>optional</em>) – Structured data type specifying the types
+of fields in the table. If not provided and format_str not
+specified, the formats will not be part of the header.</p></li>
+<li><p><strong>comment</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#bytes" title="(in Python v3.9)"><em>bytes</em></a><em>, </em><em>optional</em>) – String that should be used to comment the
+header lines. If not provided and not in format_str, defaults to
+_default_comment.</p></li>
+<li><p><strong>delimiter</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#bytes" title="(in Python v3.9)"><em>bytes</em></a><em>, </em><em>optional</em>) – String that should be used to separate
+columns. If not provided and not in format_str, defaults to
+_default_delimiter.</p></li>
+<li><p><strong>newline</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#bytes" title="(in Python v3.9)"><em>bytes</em></a><em>, </em><em>optional</em>) – String that should be used to end lines in
+the table. If not provided and not in format_str, defaults to
+_default_newline.</p></li>
+<li><p><strong>field_names</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.9)"><em>list</em></a><em>, </em><em>optional</em>) – List of field names that should be
+included in the header. If not provided and dtype is None, names
+will not be included in the header.</p></li>
+<li><p><strong>field_units</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.9)"><em>list</em></a><em>, </em><em>optional</em>) – List of field units that should be
+included in the header. If not provided, units will not be
+included.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Bytes lines comprising a table header.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#bytes" title="(in Python v3.9)">bytes</a></p>
+</dd>
+<dt class="field-even">Raises</dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#ValueError" title="(in Python v3.9)"><strong>ValueError</strong></a> – If there are not any format, names or units specified.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="yggdrasil.serialize.format_message">
+<code class="sig-prename descclassname">yggdrasil.serialize.</code><code class="sig-name descname">format_message</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">args</span></em>, <em class="sig-param"><span class="n">fmt_str</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/serialize.html#format_message"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.serialize.format_message" title="Permalink to this definition">¶</a></dt>
+<dd><p>Format a message from a list of arguments and a format string.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>args</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.9)"><em>list</em></a><em>, </em><em>obj</em>) – List of arguments or single argument that should be
+formatted using the format string.</p></li>
+<li><p><strong>fmt_str</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#bytes" title="(in Python v3.9)"><em>bytes</em></a>) – Format string that should be used to format the
+arguments.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><dl class="simple">
+<dt>Formatted message. The type will match the type of the</dt><dd><p>fmt_str.</p>
+</dd>
+</dl>
+</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)">str</a>, <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#bytes" title="(in Python v3.9)">bytes</a></p>
+</dd>
+<dt class="field-even">Raises</dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#RuntimeError" title="(in Python v3.9)"><strong>RuntimeError</strong></a> – If the number of arguments does not match the number of
+    format fields.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="yggdrasil.serialize.list2dict">
+<code class="sig-prename descclassname">yggdrasil.serialize.</code><code class="sig-name descname">list2dict</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">arrays</span></em>, <em class="sig-param"><span class="n">names</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/serialize.html#list2dict"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.serialize.list2dict" title="Permalink to this definition">¶</a></dt>
+<dd><p>Convert a list of arrays to a dictionary of arrays.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>arrays</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.9)"><em>list</em></a>) – List of arrays.</p></li>
+<li><p><strong>names</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.9)"><em>list</em></a><em>, </em><em>optional</em>) – Names to give to the new fields. Defaults to
+names based on order (e.g. ‘f0’, ‘f1’).</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Dictionary of arrays.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.9)">dict</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="yggdrasil.serialize.list2numpy">
+<code class="sig-prename descclassname">yggdrasil.serialize.</code><code class="sig-name descname">list2numpy</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">arrays</span></em>, <em class="sig-param"><span class="n">names</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/serialize.html#list2numpy"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.serialize.list2numpy" title="Permalink to this definition">¶</a></dt>
+<dd><p>Convert a list of arrays to a numpy structured array.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>arrays</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.9)"><em>list</em></a>) – List of arrays.</p></li>
+<li><p><strong>names</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.9)"><em>list</em></a><em>, </em><em>optional</em>) – Names to give to the new fields. Defaults to
+names based on order.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Structured numpy array.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>np.ndarray</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="yggdrasil.serialize.list2pandas">
+<code class="sig-prename descclassname">yggdrasil.serialize.</code><code class="sig-name descname">list2pandas</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">arrays</span></em>, <em class="sig-param"><span class="n">names</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/serialize.html#list2pandas"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.serialize.list2pandas" title="Permalink to this definition">¶</a></dt>
+<dd><p>Convert a list of arrays to a Pandas DataFrame.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>arrays</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.9)"><em>list</em></a>) – List of arrays.</p></li>
+<li><p><strong>names</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.9)"><em>list</em></a><em>, </em><em>optional</em>) – Names to give to the new fields. Defaults to
+names based on order (e.g. ‘f0’, ‘f1’).</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Pandas data frame with contents from the input list.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>pandas.DataFrame</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="yggdrasil.serialize.nptype2cformat">
+<code class="sig-prename descclassname">yggdrasil.serialize.</code><code class="sig-name descname">nptype2cformat</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">nptype</span></em>, <em class="sig-param"><span class="n">asbytes</span><span class="o">=</span><span class="default_value">False</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/serialize.html#nptype2cformat"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.serialize.nptype2cformat" title="Permalink to this definition">¶</a></dt>
+<dd><p>Convert a numpy data type to a c format string.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>nptype</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a><em> or </em><em>numpy.dtype</em>) – Numpy data type that should be converted.</p></li>
+<li><p><strong>asbytes</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)"><em>bool</em></a><em>, </em><em>optional</em>) – If True, the returned format codes will be
+in bytes format (str for Python 2, bytes for Python 3). Defaults to
+False.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><dl class="simple">
+<dt>Corresponding c format specification string or list of</dt><dd><p>format strings for complex types..</p>
+</dd>
+</dl>
+</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)">str</a>, <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.9)">list</a></p>
+</dd>
+<dt class="field-even">Raises</dt>
+<dd class="field-even"><ul class="simple">
+<li><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#TypeError" title="(in Python v3.9)"><strong>TypeError</strong></a> – If nptype is not a string or numpy.dtype.</p></li>
+<li><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#ValueError" title="(in Python v3.9)"><strong>ValueError</strong></a> – If a matching format string cannot be determined.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="yggdrasil.serialize.numpy2dict">
+<code class="sig-prename descclassname">yggdrasil.serialize.</code><code class="sig-name descname">numpy2dict</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">arr</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/serialize.html#numpy2dict"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.serialize.numpy2dict" title="Permalink to this definition">¶</a></dt>
+<dd><p>Covert a numpy structured array to a dictionary of arrays.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>arr</strong> (<em>np.ndarray</em>) – Array to convert.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Dictionary with contents from the input array.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.9)">dict</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="yggdrasil.serialize.numpy2list">
+<code class="sig-prename descclassname">yggdrasil.serialize.</code><code class="sig-name descname">numpy2list</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">arr</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/serialize.html#numpy2list"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.serialize.numpy2list" title="Permalink to this definition">¶</a></dt>
+<dd><p>Covert a numpy structured array to a list of arrays.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>arr</strong> (<em>np.ndarray</em>) – Array to convert.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>List with contents from the input array.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.9)">list</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="yggdrasil.serialize.numpy2pandas">
+<code class="sig-prename descclassname">yggdrasil.serialize.</code><code class="sig-name descname">numpy2pandas</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">arr</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/serialize.html#numpy2pandas"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.serialize.numpy2pandas" title="Permalink to this definition">¶</a></dt>
+<dd><p>Covert a numpy structured array to a Pandas DataFrame.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>arr</strong> (<em>np.ndarray</em>) – Array to convert.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Pandas data frame with contents from the input array.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>pandas.DataFrame</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="yggdrasil.serialize.pandas2dict">
+<code class="sig-prename descclassname">yggdrasil.serialize.</code><code class="sig-name descname">pandas2dict</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">frame</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/serialize.html#pandas2dict"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.serialize.pandas2dict" title="Permalink to this definition">¶</a></dt>
+<dd><p>Convert a Pandas DataFrame to a numpy structured array.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>frame</strong> (<em>pandas.DataFrame</em>) – Frame to convert.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Dictionary with contents from the input frame.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.9)">dict</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="yggdrasil.serialize.pandas2list">
+<code class="sig-prename descclassname">yggdrasil.serialize.</code><code class="sig-name descname">pandas2list</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">frame</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/serialize.html#pandas2list"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.serialize.pandas2list" title="Permalink to this definition">¶</a></dt>
+<dd><p>Convert a Pandas DataFrame to a list of arrays.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>frame</strong> (<em>pandas.DataFrame</em>) – Frame to convert.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>List with contents from the input frame.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.9)">list</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="yggdrasil.serialize.pandas2numpy">
+<code class="sig-prename descclassname">yggdrasil.serialize.</code><code class="sig-name descname">pandas2numpy</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">frame</span></em>, <em class="sig-param"><span class="n">index</span><span class="o">=</span><span class="default_value">False</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/serialize.html#pandas2numpy"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.serialize.pandas2numpy" title="Permalink to this definition">¶</a></dt>
+<dd><p>Convert a Pandas DataFrame to a numpy structured array.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>frame</strong> (<em>pandas.DataFrame</em>) – Frame to convert.</p></li>
+<li><p><strong>index</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)"><em>bool</em></a><em>, </em><em>optional</em>) – If True, the index will be included as a field
+in the array. Defaults to False.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Structured numpy array.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>np.ndarray</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="yggdrasil.serialize.parse_header">
+<code class="sig-prename descclassname">yggdrasil.serialize.</code><code class="sig-name descname">parse_header</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">header</span></em>, <em class="sig-param"><span class="n">newline</span><span class="o">=</span><span class="default_value">b'\n'</span></em>, <em class="sig-param"><span class="n">lineno_format</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">lineno_names</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">lineno_units</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/serialize.html#parse_header"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.serialize.parse_header" title="Permalink to this definition">¶</a></dt>
+<dd><p>Parse an ASCII table header to get information about the table.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>header</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.9)"><em>list</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a>) – Header lines that should be parsed.</p></li>
+<li><p><strong>newline</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a><em>, </em><em>optional</em>) – Newline character that should be used to split
+header if it is not already a list. Defaults to _default_newline.</p></li>
+<li><p><strong>lineno_format</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><em>int</em></a><em>, </em><em>optional</em>) – Line number where formats are located.
+If not provided, an attempt will be made to locate one.</p></li>
+<li><p><strong>lineno_names</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><em>int</em></a><em>, </em><em>optional</em>) – Line number where field names are located.
+If not provided, an attempt will be made to locate one.</p></li>
+<li><p><strong>lineno_units</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><em>int</em></a><em>, </em><em>optional</em>) – Line number where field units are located.
+If not provided, an attempt will be made to locate one.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Parameters describing the information determined from the header.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.9)">dict</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="yggdrasil.serialize.process_message">
+<code class="sig-prename descclassname">yggdrasil.serialize.</code><code class="sig-name descname">process_message</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">msg</span></em>, <em class="sig-param"><span class="n">fmt_str</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/serialize.html#process_message"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.serialize.process_message" title="Permalink to this definition">¶</a></dt>
+<dd><p>Extract python objects from a message using a format string.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>msg</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#bytes" title="(in Python v3.9)"><em>bytes</em></a>) – Message that should be parsed.</p></li>
+<li><p><strong>fmt_str</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#bytes" title="(in Python v3.9)"><em>bytes</em></a>) – Format string that should be used to parse the
+message using scanf.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Variables extracted from the message.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.9)">tuple</a></p>
+</dd>
+<dt class="field-even">Raises</dt>
+<dd class="field-even"><ul class="simple">
+<li><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#TypeError" title="(in Python v3.9)"><strong>TypeError</strong></a> – If the message is not a string or bytes string type.</p></li>
+<li><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#ValueError" title="(in Python v3.9)"><strong>ValueError</strong></a> – If the expected number of variables cannot be extracted
+    from the message.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="yggdrasil.serialize.table2format">
+<code class="sig-prename descclassname">yggdrasil.serialize.</code><code class="sig-name descname">table2format</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">fmts</span><span class="o">=</span><span class="default_value">[]</span></em>, <em class="sig-param"><span class="n">delimiter</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">newline</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">comment</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/serialize.html#table2format"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.serialize.table2format" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create a format string from table information.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>fmts</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.9)"><em>list</em></a><em>, </em><em>optional</em>) – List of format codes for each column. Defaults to
+[].</p></li>
+<li><p><strong>delimiter</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#bytes" title="(in Python v3.9)"><em>bytes</em></a><em>, </em><em>optional</em>) – String used to separate columns. Defaults
+to _default_delimiter.</p></li>
+<li><p><strong>newline</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#bytes" title="(in Python v3.9)"><em>bytes</em></a><em>, </em><em>optional</em>) – String used to indicate the end of a table
+line. Defaults to _default_newline.</p></li>
+<li><p><strong>comment</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#bytes" title="(in Python v3.9)"><em>bytes</em></a><em>, </em><em>optional</em>) – String that should be prepended to the format
+string to indicate a comment. Defaults to _default_comment.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Table format string.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)">str</a>, <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#bytes" title="(in Python v3.9)">bytes</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="yggdrasil.serialize.table_to_array">
+<code class="sig-prename descclassname">yggdrasil.serialize.</code><code class="sig-name descname">table_to_array</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">msg</span></em>, <em class="sig-param"><span class="n">fmt_str</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">use_astropy</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">names</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">delimiter</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">comment</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">encoding</span><span class="o">=</span><span class="default_value">'utf-8'</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/serialize.html#table_to_array"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.serialize.table_to_array" title="Permalink to this definition">¶</a></dt>
+<dd><p>Extract information from an ASCII table as an array.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>msg</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#bytes" title="(in Python v3.9)"><em>bytes</em></a>) – ASCII table as bytes string.</p></li>
+<li><p><strong>fmt_str</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#bytes" title="(in Python v3.9)"><em>bytes</em></a>) – Format string that should be used to parse the table.
+If not provided, this will attempt to determine the types of columns
+based on their contents.</p></li>
+<li><p><strong>use_astropy</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)"><em>bool</em></a><em>, </em><em>optional</em>) – If True, astropy will be used to parse
+the table if it is installed. Defaults to False.</p></li>
+<li><p><strong>names</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.9)"><em>list</em></a><em>, </em><em>optional</em>) – Field names that should be used for the
+structured data type of the output array. If not provided, names
+are generated based on the order of the fields in the table.</p></li>
+<li><p><strong>delimiter</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a><em>, </em><em>optional</em>) – String used to separate columns. Defaults to
+None and is not used. This is only used if fmt_str is not provided.</p></li>
+<li><p><strong>comment</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a><em>, </em><em>optional</em>) – String used to denote comments. Defaults to
+None and is not used. This is only used if fmt_str is not provided.</p></li>
+<li><p><strong>encoding</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a><em>, </em><em>optional</em>) – Encoding that should be used in Python 3 or
+higher to extract information from the message. Defaults to ‘utf-8’.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Table contents as an array.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>np.ndarray</p>
+</dd>
+</dl>
+</dd></dl>
+
 </div>
 </div>
 
@@ -2436,20 +3198,25 @@ serialized in the flow style. See
            
           </div>
           <footer>
-  
 
   <hr/>
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2017, Meagan Lang, David Raila
+        &#169; Copyright 2017, Meagan Lang, David Raila.
 
     </p>
   </div>
-  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+    
+    
+    
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
 
 </footer>
-
         </div>
       </div>
 
@@ -2457,7 +3224,6 @@ serialized in the flow style. See
 
   </div>
   
-
 
   <script type="text/javascript">
       jQuery(function () {

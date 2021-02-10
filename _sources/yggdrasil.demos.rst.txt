@@ -1,0 +1,18 @@
+yggdrasil.demos package
+=======================
+
+Subpackages
+-----------
+
+.. toctree::
+   :maxdepth: 4
+
+   yggdrasil.demos.tests
+
+Module contents
+---------------
+
+.. automodule:: yggdrasil.demos
+   :members:
+   :undoc-members:
+   :show-inheritance:

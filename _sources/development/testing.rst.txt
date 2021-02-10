@@ -1,2 +1,0 @@
-.. _testing_rst:
-

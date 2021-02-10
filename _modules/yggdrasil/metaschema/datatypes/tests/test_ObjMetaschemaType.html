@@ -1,39 +1,42 @@
 
 
 <!DOCTYPE html>
-<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
-<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<html class="writer-html5" lang="en" >
 <head>
-  <meta charset="utf-8">
+  <meta charset="utf-8" />
   
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>yggdrasil.metaschema.datatypes.tests.test_ObjMetaschemaType &mdash; yggdrasil 1.1.1+410.g95af39b2 documentation</title>
+  <title>yggdrasil.metaschema.datatypes.tests.test_ObjMetaschemaType &mdash; yggdrasil v1.5.0 documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../../../../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../../../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../../../../_static/theme_overrides.css" type="text/css" />
+
+  
   
 
   
   
-  
+
   
 
   
-  <script type="text/javascript" src="../../../../../_static/js/modernizr.min.js"></script>
+  <!--[if lt IE 9]>
+    <script src="../../../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
   
     
       <script type="text/javascript" id="documentation_options" data-url_root="../../../../../" src="../../../../../_static/documentation_options.js"></script>
         <script src="../../../../../_static/jquery.js"></script>
         <script src="../../../../../_static/underscore.js"></script>
         <script src="../../../../../_static/doctools.js"></script>
-        <script src="../../../../../_static/language_data.js"></script>
     
     <script type="text/javascript" src="../../../../../_static/js/theme.js"></script>
 
     
-
-  
-  <link rel="stylesheet" href="../../../../../_static/css/theme.css" type="text/css" />
-  <link rel="stylesheet" href="../../../../../_static/pygments.css" type="text/css" />
-  <link rel="stylesheet" href="../../../../../_static/theme_overrides.css" type="text/css" />
     <link rel="index" title="Index" href="../../../../../genindex.html" />
     <link rel="search" title="Search" href="../../../../../search.html" /> 
 </head>
@@ -59,7 +62,7 @@
             
             
               <div class="version">
-                1.1.1
+                v1.5.0
               </div>
             
           
@@ -76,6 +79,7 @@
           
         </div>
 
+        
         <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
           
             
@@ -111,6 +115,7 @@
             
           
         </div>
+        
       </div>
     </nav>
 
@@ -145,11 +150,13 @@
 
 
 
+
+
 <div role="navigation" aria-label="breadcrumbs navigation">
 
   <ul class="wy-breadcrumbs">
     
-      <li><a href="../../../../../index.html">Docs</a> &raquo;</li>
+      <li><a href="../../../../../index.html" class="icon icon-home"></a> &raquo;</li>
         
           <li><a href="../../../../index.html">Module code</a> &raquo;</li>
         
@@ -180,11 +187,11 @@
 <span class="kn">import</span> <span class="nn">shutil</span>
 <span class="kn">import</span> <span class="nn">tempfile</span>
 <span class="kn">import</span> <span class="nn">unittest</span>
-<span class="kn">from</span> <span class="nn">yggdrasil.tests</span> <span class="k">import</span> <span class="n">assert_raises</span><span class="p">,</span> <span class="n">assert_equal</span>
-<span class="kn">from</span> <span class="nn">yggdrasil.metaschema.datatypes.tests</span> <span class="k">import</span> <span class="p">(</span>
+<span class="kn">from</span> <span class="nn">yggdrasil.tests</span> <span class="kn">import</span> <span class="n">assert_raises</span><span class="p">,</span> <span class="n">assert_equal</span>
+<span class="kn">from</span> <span class="nn">yggdrasil.metaschema.datatypes.tests</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">test_PlyMetaschemaType</span> <span class="k">as</span> <span class="n">parent</span><span class="p">)</span>
-<span class="kn">from</span> <span class="nn">yggdrasil.metaschema.datatypes</span> <span class="k">import</span> <span class="n">ObjMetaschemaType</span>
-<span class="kn">from</span> <span class="nn">yggdrasil.drivers.LPyModelDriver</span> <span class="k">import</span> <span class="n">LPyModelDriver</span>
+<span class="kn">from</span> <span class="nn">yggdrasil.metaschema.datatypes</span> <span class="kn">import</span> <span class="n">ObjMetaschemaType</span>
+<span class="kn">from</span> <span class="nn">yggdrasil.drivers.LPyModelDriver</span> <span class="kn">import</span> <span class="n">LPyModelDriver</span>
 
 
 <span class="n">old_value</span> <span class="o">=</span> <span class="n">parent</span><span class="o">.</span><span class="n">_test_value</span>
@@ -265,6 +272,13 @@
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;dict: Keyword arguments for creating a class instance.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="n">_test_value</span>
 
+<div class="viewcode-block" id="TestObjDict.remove_hd_faces"><a class="viewcode-back" href="../../../../../yggdrasil.metaschema.datatypes.tests.html#yggdrasil.metaschema.datatypes.tests.test_ObjMetaschemaType.TestObjDict.remove_hd_faces">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">remove_hd_faces</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">obj</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Remove higher dimension faces (&gt;3 verts).&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="s1">&#39;faces&#39;</span> <span class="ow">in</span> <span class="n">obj</span><span class="p">:</span>
+            <span class="n">obj</span><span class="p">[</span><span class="s1">&#39;faces&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">f</span><span class="p">[:</span><span class="mi">3</span><span class="p">]</span> <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">obj</span><span class="p">[</span><span class="s1">&#39;faces&#39;</span><span class="p">]]</span>
+        <span class="k">return</span> <span class="n">obj</span></div>
+
 <div class="viewcode-block" id="TestObjDict.test_apply_scalar_map"><a class="viewcode-back" href="../../../../../yggdrasil.metaschema.datatypes.tests.html#yggdrasil.metaschema.datatypes.tests.test_ObjMetaschemaType.TestObjDict.test_apply_scalar_map">[docs]</a>    <span class="k">def</span> <span class="nf">test_apply_scalar_map</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test applying a scalar colormap.&quot;&quot;&quot;</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">TestObjDict</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">test_apply_scalar_map</span><span class="p">(</span><span class="n">_as_obj</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span></div>
@@ -274,6 +288,50 @@
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test conversion to/from PlantGL scene.&quot;&quot;&quot;</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">TestObjDict</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">test_to_from_scene</span><span class="p">(</span><span class="n">_as_obj</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">data</span><span class="p">)</span></div>
 
+<div class="viewcode-block" id="TestObjDict.test_vertex_normals"><a class="viewcode-back" href="../../../../../yggdrasil.metaschema.datatypes.tests.html#yggdrasil.metaschema.datatypes.tests.test_ObjMetaschemaType.TestObjDict.test_vertex_normals">[docs]</a>    <span class="k">def</span> <span class="nf">test_vertex_normals</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test vertex_normals.&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="o">.</span><span class="n">vertex_normals</span></div>
+
+<div class="viewcode-block" id="TestObjDict.test_to_from_array_dict"><a class="viewcode-back" href="../../../../../yggdrasil.metaschema.datatypes.tests.html#yggdrasil.metaschema.datatypes.tests.test_ObjMetaschemaType.TestObjDict.test_to_from_array_dict">[docs]</a>    <span class="k">def</span> <span class="nf">test_to_from_array_dict</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">test_objs</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test transformation to/from dict of arrays.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">test_objs</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">orig</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="p">)</span>
+            <span class="n">orig_edges</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">orig_edges</span><span class="p">[</span><span class="s1">&#39;texcoords&#39;</span><span class="p">]:</span>
+                <span class="n">v</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;w&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+            <span class="n">orig_nocolor</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">orig_nocolor</span><span class="p">[</span><span class="s1">&#39;vertices&#39;</span><span class="p">]:</span>
+                <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;red&#39;</span><span class="p">,</span> <span class="s1">&#39;green&#39;</span><span class="p">,</span> <span class="s1">&#39;blue&#39;</span><span class="p">]:</span>
+                    <span class="n">v</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">orig_nocolor</span><span class="p">[</span><span class="s1">&#39;params&#39;</span><span class="p">]:</span>
+                <span class="n">v</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;w&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">orig_nocolor</span><span class="p">[</span><span class="s1">&#39;texcoords&#39;</span><span class="p">]:</span>
+                <span class="n">v</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;v&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+                <span class="n">v</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;w&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">surf</span> <span class="ow">in</span> <span class="n">orig_nocolor</span><span class="p">[</span><span class="s1">&#39;surfaces&#39;</span><span class="p">]:</span>
+                <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">surf</span><span class="p">[</span><span class="s1">&#39;vertex_indices&#39;</span><span class="p">]:</span>
+                    <span class="n">v</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;texcoord_index&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+                    <span class="n">v</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;normal_index&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+            <span class="n">test_objs</span> <span class="o">=</span> <span class="p">[</span><span class="n">orig</span><span class="p">,</span> <span class="n">orig_edges</span><span class="p">,</span> <span class="n">orig_nocolor</span><span class="p">]</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">TestObjDict</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">test_to_from_array_dict</span><span class="p">(</span><span class="n">test_objs</span><span class="o">=</span><span class="n">test_objs</span><span class="p">)</span></div>
+            
+<div class="viewcode-block" id="TestObjDict.test_to_from_trimesh"><a class="viewcode-back" href="../../../../../yggdrasil.metaschema.datatypes.tests.html#yggdrasil.metaschema.datatypes.tests.test_ObjMetaschemaType.TestObjDict.test_to_from_trimesh">[docs]</a>    <span class="k">def</span> <span class="nf">test_to_from_trimesh</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">test_objs</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test transformation to/from trimesh class.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">test_objs</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">orig</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;material&#39;</span><span class="p">,</span> <span class="s1">&#39;params&#39;</span><span class="p">,</span> <span class="s1">&#39;points&#39;</span><span class="p">,</span> <span class="s1">&#39;surfaces&#39;</span><span class="p">,</span> <span class="s1">&#39;texcoords&#39;</span><span class="p">,</span>
+                      <span class="s1">&#39;curves&#39;</span><span class="p">,</span> <span class="s1">&#39;curve2Ds&#39;</span><span class="p">,</span> <span class="s1">&#39;lines&#39;</span><span class="p">,</span> <span class="s1">&#39;edges&#39;</span><span class="p">,</span> <span class="s1">&#39;normals&#39;</span><span class="p">]:</span>
+                <span class="n">orig</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">vlist</span> <span class="ow">in</span> <span class="n">orig</span><span class="p">[</span><span class="s1">&#39;faces&#39;</span><span class="p">]:</span>
+                <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">vlist</span><span class="p">:</span>
+                    <span class="n">v</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;texcoord_index&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+                    <span class="n">v</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;normal_index&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">orig</span><span class="p">[</span><span class="s1">&#39;vertices&#39;</span><span class="p">]:</span>
+                <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;w&#39;</span><span class="p">]:</span>  <span class="c1"># , &#39;red&#39;, &#39;blue&#39;, &#39;green&#39;]:</span>
+                    <span class="n">v</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+            <span class="n">test_objs</span> <span class="o">=</span> <span class="p">[</span><span class="n">orig</span><span class="p">]</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">TestObjDict</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">test_to_from_trimesh</span><span class="p">(</span><span class="n">test_objs</span><span class="o">=</span><span class="n">test_objs</span><span class="p">)</span></div>
+            
 <div class="viewcode-block" id="TestObjDict.test_to_from_scene_incomplete"><a class="viewcode-back" href="../../../../../yggdrasil.metaschema.datatypes.tests.html#yggdrasil.metaschema.datatypes.tests.test_ObjMetaschemaType.TestObjDict.test_to_from_scene_incomplete">[docs]</a>    <span class="nd">@unittest</span><span class="o">.</span><span class="n">skipIf</span><span class="p">(</span><span class="ow">not</span> <span class="n">LPyModelDriver</span><span class="o">.</span><span class="n">is_installed</span><span class="p">(),</span> <span class="s2">&quot;LPy library not installed.&quot;</span><span class="p">)</span>
     <span class="k">def</span> <span class="nf">test_to_from_scene_incomplete</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>  <span class="c1"># pragma: lpy</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test conversion to/from PlantGL scene with faces missing</span>
@@ -306,6 +364,9 @@
                                <span class="s1">&#39;faces&#39;</span><span class="p">:</span> <span class="p">[[{</span><span class="s1">&#39;vertex_index&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">},</span>
                                           <span class="p">{</span><span class="s1">&#39;vertex_index&#39;</span><span class="p">:</span> <span class="mi">1</span><span class="p">},</span>
                                           <span class="p">{</span><span class="s1">&#39;vertex_index&#39;</span><span class="p">:</span> <span class="mi">2</span><span class="p">}]]}]</span>
+        <span class="k">if</span> <span class="n">ObjMetaschemaType</span><span class="o">.</span><span class="n">trimesh</span><span class="p">:</span>
+            <span class="bp">cls</span><span class="o">.</span><span class="n">_valid_decoded</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                <span class="n">ObjMetaschemaType</span><span class="o">.</span><span class="n">ObjDict</span><span class="p">(</span><span class="o">**</span><span class="n">_test_value</span><span class="p">)</span><span class="o">.</span><span class="n">as_trimesh</span><span class="p">())</span>
         <span class="c1"># TODO: Add tests for faces with just texcoord or normal?</span>
         <span class="bp">cls</span><span class="o">.</span><span class="n">_invalid_encoded</span> <span class="o">=</span> <span class="p">[{}]</span>
         <span class="bp">cls</span><span class="o">.</span><span class="n">_invalid_decoded</span> <span class="o">=</span> <span class="p">[{</span><span class="s1">&#39;vertices&#39;</span><span class="p">:</span> <span class="p">[{</span><span class="n">k</span><span class="p">:</span> <span class="mf">0.0</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="s1">&#39;xyz&#39;</span><span class="p">}],</span>
@@ -324,27 +385,40 @@
                                             <span class="p">{</span><span class="s1">&#39;vertex_index&#39;</span><span class="p">:</span> <span class="mi">1</span><span class="p">},</span>
                                             <span class="p">{</span><span class="s1">&#39;vertex_index&#39;</span><span class="p">:</span> <span class="mi">2</span><span class="p">}]]},</span>
                                 <span class="kc">None</span><span class="p">]</span>
-        <span class="bp">cls</span><span class="o">.</span><span class="n">_compatible_objects</span> <span class="o">=</span> <span class="p">[(</span><span class="bp">cls</span><span class="o">.</span><span class="n">_value</span><span class="p">,</span> <span class="bp">cls</span><span class="o">.</span><span class="n">_value</span><span class="p">,</span> <span class="kc">None</span><span class="p">)]</span></div></div>
+        <span class="bp">cls</span><span class="o">.</span><span class="n">_compatible_objects</span> <span class="o">=</span> <span class="p">[(</span><span class="bp">cls</span><span class="o">.</span><span class="n">_value</span><span class="p">,</span> <span class="bp">cls</span><span class="o">.</span><span class="n">_value</span><span class="p">,</span> <span class="kc">None</span><span class="p">)]</span></div>
+
+<div class="viewcode-block" id="TestObjMetaschemaType.assert_result_equal"><a class="viewcode-back" href="../../../../../yggdrasil.metaschema.datatypes.tests.html#yggdrasil.metaschema.datatypes.tests.test_ObjMetaschemaType.TestObjMetaschemaType.assert_result_equal">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">assert_result_equal</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Assert that serialized/deserialized objects equal.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">ObjMetaschemaType</span><span class="o">.</span><span class="n">trimesh</span><span class="p">:</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">ObjMetaschemaType</span><span class="o">.</span><span class="n">trimesh</span><span class="o">.</span><span class="n">base</span><span class="o">.</span><span class="n">Trimesh</span><span class="p">):</span>
+                <span class="n">y</span> <span class="o">=</span> <span class="n">ObjMetaschemaType</span><span class="o">.</span><span class="n">ObjDict</span><span class="o">.</span><span class="n">from_trimesh</span><span class="p">(</span><span class="n">y</span><span class="p">)</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">TestObjMetaschemaType</span><span class="p">,</span> <span class="bp">cls</span><span class="p">)</span><span class="o">.</span><span class="n">assert_result_equal</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span></div></div>
 </pre></div>
 
            </div>
            
           </div>
           <footer>
-  
 
   <hr/>
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2017, Meagan Lang, David Raila
+        &#169; Copyright 2017, Meagan Lang, David Raila.
 
     </p>
   </div>
-  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+    
+    
+    
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
 
 </footer>
-
         </div>
       </div>
 
@@ -352,7 +426,6 @@
 
   </div>
   
-
 
   <script type="text/javascript">
       jQuery(function () {

@@ -132,7 +132,6 @@ yggdrasil.metaschema.datatypes.tests.test\_conversions module
    :undoc-members:
    :show-inheritance:
 
-
 Module contents
 ---------------
 

@@ -1,39 +1,42 @@
 
 
 <!DOCTYPE html>
-<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
-<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<html class="writer-html5" lang="en" >
 <head>
-  <meta charset="utf-8">
+  <meta charset="utf-8" />
   
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>YAML Validation Schema &mdash; yggdrasil 1.1.1+410.g95af39b2 documentation</title>
+  <title>YAML Validation Schema &mdash; yggdrasil v1.5.0 documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/theme_overrides.css" type="text/css" />
+
+  
   
 
   
   
-  
+
   
 
   
-  <script type="text/javascript" src="../_static/js/modernizr.min.js"></script>
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
   
     
       <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
         <script src="../_static/jquery.js"></script>
         <script src="../_static/underscore.js"></script>
         <script src="../_static/doctools.js"></script>
-        <script src="../_static/language_data.js"></script>
     
     <script type="text/javascript" src="../_static/js/theme.js"></script>
 
     
-
-  
-  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
-  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
-  <link rel="stylesheet" href="../_static/theme_overrides.css" type="text/css" />
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="Input/Output Drivers" href="io_drivers.html" />
@@ -61,7 +64,7 @@
             
             
               <div class="version">
-                1.1.1
+                v1.5.0
               </div>
             
           
@@ -78,6 +81,7 @@
           
         </div>
 
+        
         <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
           
             
@@ -123,6 +127,7 @@
             
           
         </div>
+        
       </div>
     </nav>
 
@@ -157,11 +162,13 @@
 
 
 
+
+
 <div role="navigation" aria-label="breadcrumbs navigation">
 
   <ul class="wy-breadcrumbs">
     
-      <li><a href="../index.html">Docs</a> &raquo;</li>
+      <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
         
           <li><a href="index.html">Advanced</a> &raquo;</li>
         
@@ -170,7 +177,7 @@
     
       <li class="wy-breadcrumbs-aside">
         
-            
+          
             <a href="../_sources/advanced/schema.rst.txt" rel="nofollow"> View page source</a>
           
         
@@ -3038,7 +3045,134 @@ defining a run.</p>
 2845
 2846
 2847
-2848</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="nt">additionalProperties</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">false</span>
+2848
+2849
+2850
+2851
+2852
+2853
+2854
+2855
+2856
+2857
+2858
+2859
+2860
+2861
+2862
+2863
+2864
+2865
+2866
+2867
+2868
+2869
+2870
+2871
+2872
+2873
+2874
+2875
+2876
+2877
+2878
+2879
+2880
+2881
+2882
+2883
+2884
+2885
+2886
+2887
+2888
+2889
+2890
+2891
+2892
+2893
+2894
+2895
+2896
+2897
+2898
+2899
+2900
+2901
+2902
+2903
+2904
+2905
+2906
+2907
+2908
+2909
+2910
+2911
+2912
+2913
+2914
+2915
+2916
+2917
+2918
+2919
+2920
+2921
+2922
+2923
+2924
+2925
+2926
+2927
+2928
+2929
+2930
+2931
+2932
+2933
+2934
+2935
+2936
+2937
+2938
+2939
+2940
+2941
+2942
+2943
+2944
+2945
+2946
+2947
+2948
+2949
+2950
+2951
+2952
+2953
+2954
+2955
+2956
+2957
+2958
+2959
+2960
+2961
+2962
+2963
+2964
+2965
+2966
+2967
+2968
+2969
+2970
+2971
+2972
+2973
+2974
+2975</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="nt">additionalProperties</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">false</span>
 <span class="nt">definitions</span><span class="p">:</span>
   <span class="nt">comm</span><span class="p">:</span>
     <span class="nt">allOf</span><span class="p">:</span>
@@ -3165,9 +3299,9 @@ defining a run.</p>
             <span class="nt">type</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">string</span>
           <span class="nt">type</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">array</span>
       <span class="nt">required</span><span class="p">:</span>
+      <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">name</span>
       <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">datatype</span>
       <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">commtype</span>
-      <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">name</span>
       <span class="nt">title</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">comm_base</span>
       <span class="nt">type</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">object</span>
     <span class="p p-Indicator">-</span> <span class="nt">anyOf</span><span class="p">:</span>
@@ -3257,7 +3391,6 @@ defining a run.</p>
           <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">file_input</span>
           <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">file_output</span>
           <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">input</span>
-          <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">io</span>
           <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">output</span>
           <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">rmq_async_client</span>
           <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">rmq_async_server</span>
@@ -3416,16 +3549,6 @@ defining a run.</p>
             <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">rmq_server</span>
             <span class="nt">type</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">string</span>
         <span class="nt">title</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">RMQServerDriver</span>
-        <span class="nt">type</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">object</span>
-      <span class="p p-Indicator">-</span> <span class="nt">additionalProperties</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">true</span>
-        <span class="nt">description</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">Schema for connection component [&#39;io&#39;] subtype.</span>
-        <span class="nt">properties</span><span class="p">:</span>
-          <span class="nt">connection_type</span><span class="p">:</span>
-            <span class="nt">description</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">Connection between two models.</span>
-            <span class="nt">enum</span><span class="p">:</span>
-            <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">io</span>
-            <span class="nt">type</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">string</span>
-        <span class="nt">title</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">IODriver</span>
         <span class="nt">type</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">object</span>
       <span class="p p-Indicator">-</span> <span class="nt">additionalProperties</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">true</span>
         <span class="nt">description</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">Schema for connection component [&#39;rmq_async_client&#39;] subtype.</span>
@@ -3680,9 +3803,9 @@ defining a run.</p>
             <span class="l l-Scalar l-Scalar-Plain">is used.</span>
           <span class="nt">type</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">string</span>
       <span class="nt">required</span><span class="p">:</span>
+      <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">working_dir</span>
       <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">name</span>
       <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">filetype</span>
-      <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">working_dir</span>
       <span class="nt">title</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">file_base</span>
       <span class="nt">type</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">object</span>
     <span class="p p-Indicator">-</span> <span class="nt">anyOf</span><span class="p">:</span>
@@ -4290,9 +4413,23 @@ defining a run.</p>
           <span class="nt">description</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">Build type/configuration that should be built. Defaults to</span>
             <span class="l l-Scalar l-Scalar-Plain">&#39;Release&#39;.</span>
           <span class="nt">type</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">string</span>
+        <span class="nt">copy_xml_to_osr</span><span class="p">:</span>
+          <span class="nt">default</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">false</span>
+          <span class="nt">description</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">If True, the XML file(s) will be copied to the OSR repository</span>
+            <span class="l l-Scalar l-Scalar-Plain">InputFiles direcitory before running. This is necessary if the XML file(s)</span>
+            <span class="l l-Scalar l-Scalar-Plain">use any of the files located there since OSR always assumes the included</span>
+            <span class="l l-Scalar l-Scalar-Plain">file paths are relative. Defaults to False.</span>
+          <span class="nt">type</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">boolean</span>
         <span class="nt">driver</span><span class="p">:</span>
           <span class="nt">description</span><span class="p">:</span> <span class="s">&#39;[DEPRECATED]</span><span class="nv"> </span><span class="s">Name</span><span class="nv"> </span><span class="s">of</span><span class="nv"> </span><span class="s">driver</span><span class="nv"> </span><span class="s">class</span><span class="nv"> </span><span class="s">that</span><span class="nv"> </span><span class="s">should</span><span class="nv"> </span><span class="s">be</span><span class="nv"> </span><span class="s">used.&#39;</span>
           <span class="nt">type</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">string</span>
+        <span class="nt">env</span><span class="p">:</span>
+          <span class="nt">additional_properties</span><span class="p">:</span>
+            <span class="nt">type</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">string</span>
+          <span class="nt">default</span><span class="p">:</span> <span class="p p-Indicator">{}</span>
+          <span class="nt">description</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">Dictionary of environment variables that should be set when</span>
+            <span class="l l-Scalar l-Scalar-Plain">the driver starts. Defaults to {}.</span>
+          <span class="nt">type</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">object</span>
         <span class="nt">env_compiler</span><span class="p">:</span>
           <span class="nt">default</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">CC</span>
           <span class="nt">description</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">Environment variable where the compiler executable should be</span>
@@ -4322,8 +4459,7 @@ defining a run.</p>
             <span class="l l-Scalar l-Scalar-Plain">model must contain it&#39;s own calls to the |yggdrasil| interface.</span>
           <span class="nt">type</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">string</span>
         <span class="nt">inputs</span><span class="p">:</span>
-          <span class="nt">default</span><span class="p">:</span>
-          <span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">default</span>
+          <span class="nt">default</span><span class="p">:</span> <span class="p p-Indicator">[]</span>
           <span class="nt">description</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">A mapping object containing the entry for a model input channel</span>
             <span class="l l-Scalar l-Scalar-Plain">or a list of input channel entries. If the model does not get input from</span>
             <span class="l l-Scalar l-Scalar-Plain">another model, this may be ommitted. A full description of channel entries</span>
@@ -4381,13 +4517,26 @@ defining a run.</p>
             <span class="nt">type</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">string</span>
           <span class="nt">type</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">array</span>
         <span class="nt">is_server</span><span class="p">:</span>
+          <span class="nt">anyOf</span><span class="p">:</span>
+          <span class="p p-Indicator">-</span> <span class="nt">type</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">boolean</span>
+          <span class="p p-Indicator">-</span> <span class="nt">additionalProperties</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">false</span>
+            <span class="nt">properties</span><span class="p">:</span>
+              <span class="nt">input</span><span class="p">:</span>
+                <span class="nt">type</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">string</span>
+              <span class="nt">output</span><span class="p">:</span>
+                <span class="nt">type</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">string</span>
+            <span class="nt">type</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">object</span>
           <span class="nt">default</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">false</span>
-          <span class="nt">description</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">If `True`, the model is assumed to be a server for one or more</span>
-            <span class="l l-Scalar l-Scalar-Plain">client models and an instance of :class:`yggdrasil.drivers.ServerDriver`</span>
-            <span class="l l-Scalar l-Scalar-Plain">is started. The corresponding channel that should be passed to the yggdrasil</span>
-            <span class="l l-Scalar l-Scalar-Plain">API will be the name of the model. Defaults to False. Use of `is_server`</span>
-            <span class="l l-Scalar l-Scalar-Plain">with `function` is not currently supported.</span>
-          <span class="nt">type</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">boolean</span>
+          <span class="nt">description</span><span class="p">:</span> <span class="s">&#39;If</span><span class="nv"> </span><span class="s">`True`,</span><span class="nv"> </span><span class="s">the</span><span class="nv"> </span><span class="s">model</span><span class="nv"> </span><span class="s">is</span><span class="nv"> </span><span class="s">assumed</span><span class="nv"> </span><span class="s">to</span><span class="nv"> </span><span class="s">be</span><span class="nv"> </span><span class="s">a</span><span class="nv"> </span><span class="s">server</span><span class="nv"> </span><span class="s">for</span><span class="nv"> </span><span class="s">one</span><span class="nv"> </span><span class="s">or</span>
+            <span class="s">more</span><span class="nv"> </span><span class="s">client</span><span class="nv"> </span><span class="s">models</span><span class="nv"> </span><span class="s">and</span><span class="nv"> </span><span class="s">an</span><span class="nv"> </span><span class="s">instance</span><span class="nv"> </span><span class="s">of</span><span class="nv"> </span><span class="s">:class:`yggdrasil.drivers.ServerDriver`</span>
+            <span class="s">is</span><span class="nv"> </span><span class="s">started.</span><span class="nv"> </span><span class="s">The</span><span class="nv"> </span><span class="s">corresponding</span><span class="nv"> </span><span class="s">channel</span><span class="nv"> </span><span class="s">that</span><span class="nv"> </span><span class="s">should</span><span class="nv"> </span><span class="s">be</span><span class="nv"> </span><span class="s">passed</span><span class="nv"> </span><span class="s">to</span><span class="nv"> </span><span class="s">the</span><span class="nv"> </span><span class="s">yggdrasil</span>
+            <span class="s">API</span><span class="nv"> </span><span class="s">will</span><span class="nv"> </span><span class="s">be</span><span class="nv"> </span><span class="s">the</span><span class="nv"> </span><span class="s">name</span><span class="nv"> </span><span class="s">of</span><span class="nv"> </span><span class="s">the</span><span class="nv"> </span><span class="s">model.</span><span class="nv"> </span><span class="s">If</span><span class="nv"> </span><span class="s">is_server</span><span class="nv"> </span><span class="s">is</span><span class="nv"> </span><span class="s">a</span><span class="nv"> </span><span class="s">dictionary,</span><span class="nv"> </span><span class="s">it</span><span class="nv"> </span><span class="s">should</span>
+            <span class="s">contain</span><span class="nv"> </span><span class="s">an</span><span class="nv"> </span><span class="se">&#39;&#39;</span><span class="s">input</span><span class="se">&#39;&#39;</span><span class="nv"> </span><span class="s">key</span><span class="nv"> </span><span class="s">and</span><span class="nv"> </span><span class="s">an</span><span class="nv"> </span><span class="se">&#39;&#39;</span><span class="s">output</span><span class="se">&#39;&#39;</span><span class="nv"> </span><span class="s">key.</span><span class="nv"> </span><span class="s">These</span><span class="nv"> </span><span class="s">are</span><span class="nv"> </span><span class="s">required</span><span class="nv"> </span><span class="s">to</span>
+            <span class="s">be</span><span class="nv"> </span><span class="s">the</span><span class="nv"> </span><span class="s">names</span><span class="nv"> </span><span class="s">of</span><span class="nv"> </span><span class="s">existing</span><span class="nv"> </span><span class="s">input</span><span class="nv"> </span><span class="s">and</span><span class="nv"> </span><span class="s">output</span><span class="nv"> </span><span class="s">channels</span><span class="nv"> </span><span class="s">in</span><span class="nv"> </span><span class="s">the</span><span class="nv"> </span><span class="s">model</span><span class="nv"> </span><span class="s">that</span><span class="nv"> </span><span class="s">will</span>
+            <span class="s">be</span><span class="nv"> </span><span class="s">co-opted</span><span class="nv"> </span><span class="s">by</span><span class="nv"> </span><span class="s">the</span><span class="nv"> </span><span class="s">server.</span><span class="nv"> </span><span class="s">(Note:</span><span class="nv"> </span><span class="s">This</span><span class="nv"> </span><span class="s">requires</span><span class="nv"> </span><span class="s">that</span><span class="nv"> </span><span class="s">the</span><span class="nv"> </span><span class="s">co-opted</span><span class="nv"> </span><span class="s">output</span>
+            <span class="s">channel</span><span class="se">&#39;&#39;</span><span class="s">s</span><span class="nv"> </span><span class="s">send</span><span class="nv"> </span><span class="s">method</span><span class="nv"> </span><span class="s">is</span><span class="nv"> </span><span class="s">called</span><span class="nv"> </span><span class="s">once</span><span class="nv"> </span><span class="s">for</span><span class="nv"> </span><span class="s">each</span><span class="nv"> </span><span class="s">time</span><span class="nv"> </span><span class="s">the</span><span class="nv"> </span><span class="s">co-opted</span><span class="nv"> </span><span class="s">input</span>
+            <span class="s">channel</span><span class="se">&#39;&#39;</span><span class="s">s</span><span class="nv"> </span><span class="s">recv</span><span class="nv"> </span><span class="s">method</span><span class="nv"> </span><span class="s">is</span><span class="nv"> </span><span class="s">called.</span><span class="nv"> </span><span class="s">If</span><span class="nv"> </span><span class="s">used</span><span class="nv"> </span><span class="s">with</span><span class="nv"> </span><span class="s">the</span><span class="nv"> </span><span class="s">`function`</span><span class="nv"> </span><span class="s">parameter,</span>
+            <span class="s">`is_server`</span><span class="nv"> </span><span class="s">must</span><span class="nv"> </span><span class="s">be</span><span class="nv"> </span><span class="s">a</span><span class="nv"> </span><span class="s">dictionary.</span><span class="nv"> </span><span class="s">Defaults</span><span class="nv"> </span><span class="s">to</span><span class="nv"> </span><span class="s">False.&#39;</span>
         <span class="nt">language</span><span class="p">:</span>
           <span class="nt">default</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">executable</span>
           <span class="nt">description</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">The programming language that the model is written in. A list</span>
@@ -4398,11 +4547,13 @@ defining a run.</p>
           <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">c++</span>
           <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">cmake</span>
           <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">cpp</span>
+          <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">cxx</span>
           <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">executable</span>
           <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">fortran</span>
           <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">lpy</span>
           <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">make</span>
           <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">matlab</span>
+          <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">osr</span>
           <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">python</span>
           <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">r</span>
           <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">sbml</span>
@@ -4423,6 +4574,12 @@ defining a run.</p>
           <span class="nt">items</span><span class="p">:</span>
             <span class="nt">type</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">string</span>
           <span class="nt">type</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">array</span>
+        <span class="nt">logging_level</span><span class="p">:</span>
+          <span class="nt">default</span><span class="p">:</span> <span class="s">&#39;&#39;</span>
+          <span class="nt">description</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">The level of logging messages that should be displayed by the</span>
+            <span class="l l-Scalar l-Scalar-Plain">model. Defaults to the logging level as determined by the configuration</span>
+            <span class="l l-Scalar l-Scalar-Plain">file and environment variables.</span>
+          <span class="nt">type</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">string</span>
         <span class="nt">makedir</span><span class="p">:</span>
           <span class="nt">description</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">Directory where make should be invoked from if it is not the</span>
             <span class="l l-Scalar l-Scalar-Plain">same as the directory containing the makefile. Defaults to directory containing</span>
@@ -4441,8 +4598,7 @@ defining a run.</p>
           <span class="nt">description</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">If True, only the final timestep is output. Defaults to False.</span>
           <span class="nt">type</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">boolean</span>
         <span class="nt">outputs</span><span class="p">:</span>
-          <span class="nt">default</span><span class="p">:</span>
-          <span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">default</span>
+          <span class="nt">default</span><span class="p">:</span> <span class="p p-Indicator">[]</span>
           <span class="nt">description</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">A mapping object containing the entry for a model output channel</span>
             <span class="l l-Scalar l-Scalar-Plain">or a list of output channel entries. If the model does not output to another</span>
             <span class="l l-Scalar l-Scalar-Plain">model, this may be ommitted. A full description of channel entries and</span>
@@ -4553,6 +4709,20 @@ defining a run.</p>
           <span class="nt">items</span><span class="p">:</span>
             <span class="nt">type</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">string</span>
           <span class="nt">type</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">array</span>
+        <span class="nt">sync_vars_in</span><span class="p">:</span>
+          <span class="nt">default</span><span class="p">:</span> <span class="p p-Indicator">[]</span>
+          <span class="nt">description</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">Variables that should be synchronized from other models. Defaults</span>
+            <span class="l l-Scalar l-Scalar-Plain">to [].</span>
+          <span class="nt">items</span><span class="p">:</span>
+            <span class="nt">type</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">string</span>
+          <span class="nt">type</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">array</span>
+        <span class="nt">sync_vars_out</span><span class="p">:</span>
+          <span class="nt">default</span><span class="p">:</span> <span class="p p-Indicator">[]</span>
+          <span class="nt">description</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">Variables that should be synchronized to other models. Defaults</span>
+            <span class="l l-Scalar l-Scalar-Plain">to [].</span>
+          <span class="nt">items</span><span class="p">:</span>
+            <span class="nt">type</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">string</span>
+          <span class="nt">type</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">array</span>
         <span class="nt">synonyms</span><span class="p">:</span>
           <span class="nt">additionalProperties</span><span class="p">:</span>
             <span class="nt">additionalProperties</span><span class="p">:</span>
@@ -4599,6 +4769,44 @@ defining a run.</p>
           <span class="nt">anyOf</span><span class="p">:</span>
           <span class="p p-Indicator">-</span> <span class="nt">type</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">boolean</span>
           <span class="p p-Indicator">-</span> <span class="nt">type</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">string</span>
+          <span class="p p-Indicator">-</span> <span class="nt">properties</span><span class="p">:</span>
+              <span class="nt">inputs</span><span class="p">:</span>
+                <span class="nt">anyOf</span><span class="p">:</span>
+                <span class="p p-Indicator">-</span> <span class="nt">type</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">string</span>
+                <span class="p p-Indicator">-</span> <span class="nt">items</span><span class="p">:</span>
+                    <span class="nt">type</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">string</span>
+                  <span class="nt">type</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">array</span>
+              <span class="nt">name</span><span class="p">:</span>
+                <span class="nt">default</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">timesync</span>
+                <span class="nt">type</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">string</span>
+              <span class="nt">outputs</span><span class="p">:</span>
+                <span class="nt">anyOf</span><span class="p">:</span>
+                <span class="p p-Indicator">-</span> <span class="nt">type</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">string</span>
+                <span class="p p-Indicator">-</span> <span class="nt">items</span><span class="p">:</span>
+                    <span class="nt">type</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">string</span>
+                  <span class="nt">type</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">array</span>
+            <span class="nt">type</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">object</span>
+          <span class="p p-Indicator">-</span> <span class="nt">items</span><span class="p">:</span>
+              <span class="nt">anyOf</span><span class="p">:</span>
+              <span class="p p-Indicator">-</span> <span class="nt">type</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">string</span>
+              <span class="p p-Indicator">-</span> <span class="nt">properties</span><span class="p">:</span>
+                  <span class="nt">inputs</span><span class="p">:</span>
+                    <span class="nt">anyOf</span><span class="p">:</span>
+                    <span class="p p-Indicator">-</span> <span class="nt">type</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">string</span>
+                    <span class="p p-Indicator">-</span> <span class="nt">items</span><span class="p">:</span>
+                        <span class="nt">type</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">string</span>
+                      <span class="nt">type</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">array</span>
+                  <span class="nt">name</span><span class="p">:</span>
+                    <span class="nt">default</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">timesync</span>
+                    <span class="nt">type</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">string</span>
+                  <span class="nt">outputs</span><span class="p">:</span>
+                    <span class="nt">anyOf</span><span class="p">:</span>
+                    <span class="p p-Indicator">-</span> <span class="nt">type</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">string</span>
+                    <span class="p p-Indicator">-</span> <span class="nt">items</span><span class="p">:</span>
+                        <span class="nt">type</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">string</span>
+                      <span class="nt">type</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">array</span>
+                <span class="nt">type</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">object</span>
+            <span class="nt">type</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">array</span>
           <span class="nt">default</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">false</span>
           <span class="nt">description</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">If set, the model is assumed to call a send then receive of</span>
             <span class="l l-Scalar l-Scalar-Plain">the state at each timestep for syncronization with other models that are</span>
@@ -4606,6 +4814,16 @@ defining a run.</p>
             <span class="l l-Scalar l-Scalar-Plain">the name of the server that will handle timestep synchronization. If a</span>
             <span class="l l-Scalar l-Scalar-Plain">boolean is provided, the name of the server will be assumed to be &#39;timestep&#39;.</span>
             <span class="l l-Scalar l-Scalar-Plain">Defaults to False.</span>
+        <span class="nt">update_interval</span><span class="p">:</span>
+          <span class="nt">additionalProperties</span><span class="p">:</span>
+            <span class="nt">type</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">float</span>
+          <span class="nt">default</span><span class="p">:</span>
+            <span class="nt">timesync</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">1.0</span>
+          <span class="nt">description</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">Max simulation interval at which synchronization should occur</span>
+            <span class="l l-Scalar l-Scalar-Plain">(in days). Defaults to 1.0 if not provided. If the XML input file loads</span>
+            <span class="l l-Scalar l-Scalar-Plain">additional export modules that output at a shorter rate, the existing</span>
+            <span class="l l-Scalar l-Scalar-Plain">table of values will be extrapolated.</span>
+          <span class="nt">type</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">object</span>
         <span class="nt">use_symunit</span><span class="p">:</span>
           <span class="nt">default</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">false</span>
           <span class="nt">description</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">If True, input/output variables with units will be represented</span>
@@ -4798,41 +5016,15 @@ defining a run.</p>
         <span class="nt">title</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">LPyModelDriver</span>
         <span class="nt">type</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">object</span>
       <span class="p p-Indicator">-</span> <span class="nt">additionalProperties</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">true</span>
-        <span class="nt">description</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">Schema for model component [&#39;matlab&#39;] subtype.</span>
+        <span class="nt">description</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">Schema for model component [&#39;executable&#39;] subtype.</span>
         <span class="nt">properties</span><span class="p">:</span>
-          <span class="nt">interpreter</span><span class="p">:</span>
-            <span class="nt">description</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">Name or path of interpreter executable that should be used</span>
-              <span class="l l-Scalar l-Scalar-Plain">to run the model. If not provided, the interpreter will be determined</span>
-              <span class="l l-Scalar l-Scalar-Plain">based on configuration options for the language (if present) and the</span>
-              <span class="l l-Scalar l-Scalar-Plain">default_interpreter class attribute.</span>
-            <span class="nt">type</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">string</span>
-          <span class="nt">interpreter_flags</span><span class="p">:</span>
-            <span class="nt">default</span><span class="p">:</span> <span class="p p-Indicator">[]</span>
-            <span class="nt">description</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">Flags that should be passed to the interpreter when running</span>
-              <span class="l l-Scalar l-Scalar-Plain">the model. If not provided, the flags are determined based on configuration</span>
-              <span class="l l-Scalar l-Scalar-Plain">options for the language (if present) and the default_interpreter_flags</span>
-              <span class="l l-Scalar l-Scalar-Plain">class attribute.</span>
-            <span class="nt">items</span><span class="p">:</span>
-              <span class="nt">type</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">string</span>
-            <span class="nt">type</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">array</span>
           <span class="nt">language</span><span class="p">:</span>
             <span class="nt">default</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">executable</span>
-            <span class="nt">description</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">Model is written in Matlab.</span>
+            <span class="nt">description</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">Model is an executable.</span>
             <span class="nt">enum</span><span class="p">:</span>
-            <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">matlab</span>
+            <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">executable</span>
             <span class="nt">type</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">string</span>
-          <span class="nt">skip_interpreter</span><span class="p">:</span>
-            <span class="nt">default</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">false</span>
-            <span class="nt">description</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">If True, no interpreter will be added to the arguments. This</span>
-              <span class="l l-Scalar l-Scalar-Plain">should only be used for subclasses that will not be invoking the model</span>
-              <span class="l l-Scalar l-Scalar-Plain">via the command line. Defaults to False.</span>
-            <span class="nt">type</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">boolean</span>
-          <span class="nt">use_symunit</span><span class="p">:</span>
-            <span class="nt">default</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">false</span>
-            <span class="nt">description</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">If True, input/output variables with units will be represented</span>
-              <span class="l l-Scalar l-Scalar-Plain">in Matlab using symunit. Defaults to False.</span>
-            <span class="nt">type</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">boolean</span>
-        <span class="nt">title</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">MatlabModelDriver</span>
+        <span class="nt">title</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">ExecutableModelDriver</span>
         <span class="nt">type</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">object</span>
       <span class="p p-Indicator">-</span> <span class="nt">additionalProperties</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">true</span>
         <span class="nt">description</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">Schema for model component [&#39;c&#39;] subtype.</span>
@@ -4884,7 +5076,7 @@ defining a run.</p>
         <span class="nt">title</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">CModelDriver</span>
         <span class="nt">type</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">object</span>
       <span class="p p-Indicator">-</span> <span class="nt">additionalProperties</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">true</span>
-        <span class="nt">description</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">Schema for model component [&#39;c++&#39;, &#39;cpp&#39;] subtype.</span>
+        <span class="nt">description</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">Schema for model component [&#39;c++&#39;, &#39;cpp&#39;, &#39;cxx&#39;] subtype.</span>
         <span class="nt">properties</span><span class="p">:</span>
           <span class="nt">compiler</span><span class="p">:</span>
             <span class="nt">description</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">Command or path to executable that should be used to compile</span>
@@ -4907,6 +5099,7 @@ defining a run.</p>
             <span class="nt">enum</span><span class="p">:</span>
             <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">c++</span>
             <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">cpp</span>
+            <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">cxx</span>
             <span class="nt">type</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">string</span>
           <span class="nt">linker</span><span class="p">:</span>
             <span class="nt">description</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">Command or path to executable that should be used to link</span>
@@ -4932,6 +5125,85 @@ defining a run.</p>
               <span class="nt">type</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">string</span>
             <span class="nt">type</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">array</span>
         <span class="nt">title</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">CPPModelDriver</span>
+        <span class="nt">type</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">object</span>
+      <span class="p p-Indicator">-</span> <span class="nt">additionalProperties</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">true</span>
+        <span class="nt">description</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">Schema for model component [&#39;osr&#39;] subtype.</span>
+        <span class="nt">properties</span><span class="p">:</span>
+          <span class="nt">copy_xml_to_osr</span><span class="p">:</span>
+            <span class="nt">default</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">false</span>
+            <span class="nt">description</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">If True, the XML file(s) will be copied to the OSR repository</span>
+              <span class="l l-Scalar l-Scalar-Plain">InputFiles direcitory before running. This is necessary if the XML file(s)</span>
+              <span class="l l-Scalar l-Scalar-Plain">use any of the files located there since OSR always assumes the included</span>
+              <span class="l l-Scalar l-Scalar-Plain">file paths are relative. Defaults to False.</span>
+            <span class="nt">type</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">boolean</span>
+          <span class="nt">language</span><span class="p">:</span>
+            <span class="nt">default</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">executable</span>
+            <span class="nt">description</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">Model is an OSR model.</span>
+            <span class="nt">enum</span><span class="p">:</span>
+            <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">osr</span>
+            <span class="nt">type</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">string</span>
+          <span class="nt">sync_vars_in</span><span class="p">:</span>
+            <span class="nt">default</span><span class="p">:</span> <span class="p p-Indicator">[]</span>
+            <span class="nt">description</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">Variables that should be synchronized from other models.</span>
+              <span class="l l-Scalar l-Scalar-Plain">Defaults to [].</span>
+            <span class="nt">items</span><span class="p">:</span>
+              <span class="nt">type</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">string</span>
+            <span class="nt">type</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">array</span>
+          <span class="nt">sync_vars_out</span><span class="p">:</span>
+            <span class="nt">default</span><span class="p">:</span> <span class="p p-Indicator">[]</span>
+            <span class="nt">description</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">Variables that should be synchronized to other models. Defaults</span>
+              <span class="l l-Scalar l-Scalar-Plain">to [].</span>
+            <span class="nt">items</span><span class="p">:</span>
+              <span class="nt">type</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">string</span>
+            <span class="nt">type</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">array</span>
+          <span class="nt">update_interval</span><span class="p">:</span>
+            <span class="nt">additionalProperties</span><span class="p">:</span>
+              <span class="nt">type</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">float</span>
+            <span class="nt">default</span><span class="p">:</span>
+              <span class="nt">timesync</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">1.0</span>
+            <span class="nt">description</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">Max simulation interval at which synchronization should occur</span>
+              <span class="l l-Scalar l-Scalar-Plain">(in days). Defaults to 1.0 if not provided. If the XML input file loads</span>
+              <span class="l l-Scalar l-Scalar-Plain">additional export modules that output at a shorter rate, the existing</span>
+              <span class="l l-Scalar l-Scalar-Plain">table of values will be extrapolated.</span>
+            <span class="nt">type</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">object</span>
+        <span class="nt">title</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">OSRModelDriver</span>
+        <span class="nt">type</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">object</span>
+      <span class="p p-Indicator">-</span> <span class="nt">additionalProperties</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">true</span>
+        <span class="nt">description</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">Schema for model component [&#39;matlab&#39;] subtype.</span>
+        <span class="nt">properties</span><span class="p">:</span>
+          <span class="nt">interpreter</span><span class="p">:</span>
+            <span class="nt">description</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">Name or path of interpreter executable that should be used</span>
+              <span class="l l-Scalar l-Scalar-Plain">to run the model. If not provided, the interpreter will be determined</span>
+              <span class="l l-Scalar l-Scalar-Plain">based on configuration options for the language (if present) and the</span>
+              <span class="l l-Scalar l-Scalar-Plain">default_interpreter class attribute.</span>
+            <span class="nt">type</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">string</span>
+          <span class="nt">interpreter_flags</span><span class="p">:</span>
+            <span class="nt">default</span><span class="p">:</span> <span class="p p-Indicator">[]</span>
+            <span class="nt">description</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">Flags that should be passed to the interpreter when running</span>
+              <span class="l l-Scalar l-Scalar-Plain">the model. If not provided, the flags are determined based on configuration</span>
+              <span class="l l-Scalar l-Scalar-Plain">options for the language (if present) and the default_interpreter_flags</span>
+              <span class="l l-Scalar l-Scalar-Plain">class attribute.</span>
+            <span class="nt">items</span><span class="p">:</span>
+              <span class="nt">type</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">string</span>
+            <span class="nt">type</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">array</span>
+          <span class="nt">language</span><span class="p">:</span>
+            <span class="nt">default</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">executable</span>
+            <span class="nt">description</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">Model is written in Matlab.</span>
+            <span class="nt">enum</span><span class="p">:</span>
+            <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">matlab</span>
+            <span class="nt">type</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">string</span>
+          <span class="nt">skip_interpreter</span><span class="p">:</span>
+            <span class="nt">default</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">false</span>
+            <span class="nt">description</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">If True, no interpreter will be added to the arguments. This</span>
+              <span class="l l-Scalar l-Scalar-Plain">should only be used for subclasses that will not be invoking the model</span>
+              <span class="l l-Scalar l-Scalar-Plain">via the command line. Defaults to False.</span>
+            <span class="nt">type</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">boolean</span>
+          <span class="nt">use_symunit</span><span class="p">:</span>
+            <span class="nt">default</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">false</span>
+            <span class="nt">description</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">If True, input/output variables with units will be represented</span>
+              <span class="l l-Scalar l-Scalar-Plain">in Matlab using symunit. Defaults to False.</span>
+            <span class="nt">type</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">boolean</span>
+        <span class="nt">title</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">MatlabModelDriver</span>
         <span class="nt">type</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">object</span>
       <span class="p p-Indicator">-</span> <span class="nt">additionalProperties</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">true</span>
         <span class="nt">description</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">Schema for model component [&#39;R&#39;, &#39;r&#39;] subtype.</span>
@@ -5275,17 +5547,6 @@ defining a run.</p>
             <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">f2008</span>
             <span class="nt">type</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">string</span>
         <span class="nt">title</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">FortranModelDriver</span>
-        <span class="nt">type</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">object</span>
-      <span class="p p-Indicator">-</span> <span class="nt">additionalProperties</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">true</span>
-        <span class="nt">description</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">Schema for model component [&#39;executable&#39;] subtype.</span>
-        <span class="nt">properties</span><span class="p">:</span>
-          <span class="nt">language</span><span class="p">:</span>
-            <span class="nt">default</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">executable</span>
-            <span class="nt">description</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">Model is an executable.</span>
-            <span class="nt">enum</span><span class="p">:</span>
-            <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">executable</span>
-            <span class="nt">type</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">string</span>
-        <span class="nt">title</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">ExecutableModelDriver</span>
         <span class="nt">type</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">object</span>
     <span class="nt">description</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">Schema for model components.</span>
     <span class="nt">title</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">model</span>
@@ -5895,29 +6156,29 @@ defining a run.</p>
            
           </div>
           <footer>
-  
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
-      
-        <a href="io_drivers.html" class="btn btn-neutral float-right" title="Input/Output Drivers" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
-      
-      
-        <a href="metaschema.html" class="btn btn-neutral float-left" title="JSON Metaschema" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
-      
+        <a href="io_drivers.html" class="btn btn-neutral float-right" title="Input/Output Drivers" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="metaschema.html" class="btn btn-neutral float-left" title="JSON Metaschema" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
     </div>
-  
 
   <hr/>
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2017, Meagan Lang, David Raila
+        &#169; Copyright 2017, Meagan Lang, David Raila.
 
     </p>
   </div>
-  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+    
+    
+    
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
 
 </footer>
-
         </div>
       </div>
 
@@ -5925,7 +6186,6 @@ defining a run.</p>
 
   </div>
   
-
 
   <script type="text/javascript">
       jQuery(function () {

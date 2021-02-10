@@ -108,7 +108,6 @@ yggdrasil.communication.tests.test\_ZMQComm module
    :undoc-members:
    :show-inheritance:
 
-
 Module contents
 ---------------
 

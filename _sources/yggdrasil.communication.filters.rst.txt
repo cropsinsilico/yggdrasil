@@ -44,7 +44,6 @@ yggdrasil.communication.filters.StatementFilter module
    :undoc-members:
    :show-inheritance:
 
-
 Module contents
 ---------------
 
