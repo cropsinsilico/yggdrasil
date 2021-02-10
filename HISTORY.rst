@@ -2,7 +2,7 @@
 History
 =======
 
-1.4.1 (2021-02-10)
+1.5.0 (2021-02-10) Migrate to GHA, refactor CLI, & bug fixes
 ------------------
 
 * Move continuous integration for testing and deployment to Github actions
