@@ -72,6 +72,7 @@ def get_comm_list():
         raise Exception(("Timings cannot be performed if there is not at least "
                          "one valid communication mechanism. len(valid_comms) "
                          "= %d") % len(_comm_list))
+    _comm_list.remove('value')
     return _comm_list
 
 
