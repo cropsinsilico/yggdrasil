@@ -151,7 +151,7 @@ class ExampleTstBase(YggTestBase, tools.YggClass):
     iter_skip = []
     iter_flaky = []
     iter_list_language = None
-    iter_list_comm = tools.get_supported_comm()
+    iter_list_comm = tools.get_supported_comm(dont_include_value=True)
     iter_list_datatype = tools.get_supported_type()
 
     def __init__(self, *args, **kwargs):

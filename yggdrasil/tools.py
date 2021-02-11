@@ -694,17 +694,24 @@ def get_supported_type():
     return list(get_registered_types().keys())
 
 
-def get_supported_comm():
+def get_supported_comm(dont_include_value=False):
     r"""Get a list of the communication mechanisms supported by yggdrasil.
+
+    Args:
+        dont_include_value (bool, optional): If True, don't include the
+            ValueComm in the list returned. Defaults to False.
 
     Returns:
         list: The names of communication mechanisms supported by yggdrasil.
 
     """
     from yggdrasil import schema
+    excl_list = ['CommBase', 'DefaultComm', 'default']
+    if dont_include_value:
+        excl_list += ['ValueComm', 'value']
     s = schema.get_schema()
     out = s['comm'].subtypes
-    for k in ['CommBase', 'DefaultComm', 'default']:
+    for k in excl_list:
         if k in out:
             out.remove(k)
     return list(set(out))
@@ -762,7 +769,7 @@ def get_installed_lang():
     return out
 
 
-def get_installed_comm(language=None):
+def get_installed_comm(language=None, dont_include_value=False):
     r"""Get a list of the communication channel types that are supported by
     yggdrasil on the current machine. This checks the operating system,
     supporting libraries, and broker credentials. The order indicates the
@@ -772,6 +779,9 @@ def get_installed_comm(language=None):
         language (str, optional): Specific programming language that installed
             comms should be located for. Defaults to None and all languages
             supported on the current platform will be checked.
+        dont_include_value (bool, optional): If True, don't include the
+            ValueComm in the list returned. Defaults to False.
+
 
     Returns:
         list: The names of the the communication channel types supported on
@@ -779,7 +789,7 @@ def get_installed_comm(language=None):
 
     """
     out = []
-    all_comm = get_supported_comm()
+    all_comm = get_supported_comm(dont_include_value=dont_include_value)
     for k in all_comm:
         if is_comm_installed(k, language=language):
             out.append(k)
@@ -807,7 +817,7 @@ def get_default_comm():
         else:  # pragma: windows
             # Locate comm that maximizes languages that can be run
             tally = {}
-            for c in get_supported_comm():
+            for c in get_supported_comm(dont_include_value=True):
                 tally[c] = 0
                 for lang in get_supported_lang():
                     if is_comm_installed(c, language=lang):
