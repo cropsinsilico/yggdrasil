@@ -625,6 +625,17 @@ class TestYamlModelFunction(YamlTestBase):
         super(TestYamlModelFunction, self).test_parse_yaml(*args, **kwargs)
 
 
+class TestYamlConnectionDefaultValue(YamlTestBase):
+    r"""Test use of default_value parameter."""
+    _contents = (['models:',
+                  '  - name: modelA',
+                  '    driver: GCCModelDriver',
+                  '    args: ./src/modelA.c',
+                  '    inputs:',
+                  '      - name: inputA',
+                  '        default_value: test'],)
+
+
 class TestYamlServerNoClient(YamlTestBaseError):
     r"""Test error when is_server is set but there arn't any clients."""
     _error = yamlfile.YAMLSpecificationError

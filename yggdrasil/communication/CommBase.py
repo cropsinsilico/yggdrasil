@@ -306,6 +306,9 @@ class CommBase(tools.YggClass):
             or that output should be sent to (for output comms) in
             the event that a yaml does not pair the comm with another
             model comm or a file.
+        default_value (object, optional): Value that should be returned in
+            the event that a yaml does not pair the comm with another
+            model comm or a file.
         **kwargs: Additional keywords arguments are passed to parent class.
 
     Class Attributes:
@@ -401,7 +404,8 @@ class CommBase(tools.YggClass):
                           'is_default': {'type': 'boolean', 'default': False},
                           'outside_loop': {'type': 'boolean',
                                            'default': False},
-                          'default_file': {'$ref': '#/definitions/file'}}
+                          'default_file': {'$ref': '#/definitions/file'},
+                          'default_value': {'type': 'any'}}
     _schema_excluded_from_class = ['name']
     _default_serializer = 'default'
     _default_serializer_class = None
@@ -410,7 +414,8 @@ class CommBase(tools.YggClass):
     _maxMsgSize = 0
     address_description = None
     no_serialization = False
-    _model_schema_prop = ['is_default', 'outside_loop', 'default_file']
+    _model_schema_prop = ['is_default', 'outside_loop', 'default_file',
+                          'default_value']
     _disconnect_attr = (tools.YggClass._disconnect_attr
                         + ['_closing_event', '_closing_thread',
                            '_eof_recv', '_eof_sent'])

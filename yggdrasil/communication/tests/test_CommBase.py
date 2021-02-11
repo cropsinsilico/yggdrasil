@@ -249,7 +249,7 @@ class TestCommBase(YggTestClassInfo):
                             self.send_instance.maxMsgSize,
                             self.recv_instance.maxMsgSize)
         self.instance.opp_comm_kwargs()
-        if self.import_cls.is_file:
+        if self.import_cls.is_file or (self.comm == 'ValueComm'):
             assert(self.import_cls.is_installed(language='invalid'))
         else:
             assert(not self.import_cls.is_installed(language='invalid'))

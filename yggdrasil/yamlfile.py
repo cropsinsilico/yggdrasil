@@ -266,6 +266,17 @@ def parse_yaml(files, as_function=False):
                                 opp_map[io] + 's': [v]}
                     existing = parse_component(new_conn, 'connection',
                                                existing=existing)
+                elif (io == 'input') and ('default_value' in v):
+                    # TODO: The keys moved should be automated based on schema
+                    # if the ValueComm has anymore parameters added
+                    vdef = {'name': v['name'],
+                            'default_value': v.pop('default_value'),
+                            'count': v.pop('count', 1),
+                            'commtype': 'value'}
+                    new_conn = {'inputs': [vdef],
+                                'outputs': [v]}
+                    existing = parse_component(new_conn, 'connection',
+                                               existing=existing)
                 else:
                     raise YAMLSpecificationError(
                         "No driver established for %s channel %s" % (io, k))
@@ -505,6 +516,8 @@ def parse_connection(yml, existing):
                     ("Input '%s' not found in any of the registered "
                      + "model outputs and is not a file.") % x['name'])
             x['address'] = fname
+        elif 'default_value' in x:
+            x['address'] = x['default_value']
         else:
             iname_list.append(x['name'])
     # File output
@@ -533,7 +546,7 @@ def parse_connection(yml, existing):
     xx = {'src_models': [], 'dst_models': [],
           'inputs': [], 'outputs': []}
     for i, y in enumerate(yml['inputs']):
-        if is_file['inputs'][i]:
+        if is_file['inputs'][i] or ('default_value' in y):
             xx['inputs'].append(y)
         else:
             new = existing['output'][y['name']]

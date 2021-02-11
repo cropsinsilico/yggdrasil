@@ -26,8 +26,12 @@ definitions:
           - ipc
           - rmq
           - rmq_async
+          - value
           - zmq
           type: string
+        count:
+          default: 1
+          type: integer
         datatype:
           default:
             type: bytes
@@ -38,6 +42,8 @@ definitions:
           type: schema
         default_file:
           $ref: '#/definitions/file'
+        default_value:
+          type: any
         driver:
           description: '[DEPRECATED] Name of driver class that should be used.'
           type: string
@@ -125,9 +131,9 @@ definitions:
             type: string
           type: array
       required:
-      - datatype
-      - name
       - commtype
+      - name
+      - datatype
       title: comm_base
       type: object
     - anyOf:
@@ -152,6 +158,20 @@ definitions:
             - buffer
             type: string
         title: BufferComm
+        type: object
+      - additionalProperties: true
+        description: Schema for comm component ['value'] subtype.
+        properties:
+          commtype:
+            default: default
+            description: Constant value.
+            enum:
+            - value
+            type: string
+          count:
+            default: 1
+            type: integer
+        title: ValueComm
         type: object
       - additionalProperties: true
         description: Schema for comm component ['rmq_async'] subtype.
@@ -586,8 +606,8 @@ definitions:
           type: string
       required:
       - filetype
-      - working_dir
       - name
+      - working_dir
       title: file_base
       type: object
     - anyOf:
@@ -1634,10 +1654,10 @@ definitions:
             is used.
           type: string
       required:
-      - args
       - language
-      - working_dir
       - name
+      - args
+      - working_dir
       title: model_base
       type: object
     - anyOf:

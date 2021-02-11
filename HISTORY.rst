@@ -5,17 +5,18 @@ History
 1.5.0 (XXXX-XX-XX)
 ------------------
 
-* Make async comm more generic so it can be used to wrap any comm type and is more robust
-* Change communication pattern so that a single connection driver is used by default to limit unnecessary message passing
-* Change connection to use ‘inputs’/‘outputs’ instead of ‘icomm_kws’/‘ocomm_kws’ to provide simpler mapping form the yaml to inputs
-* Migrate away from use of ‘comm’ to ‘commtype’/‘comm_list’ keyword in comms for clarity
-* Migrate away from use of comm_class to using commtype
-* Use specialized error classes to catch specific issues (timeouts, no message waiting, etc)
-* Specialize comm registration on the comm class
-* Generalize the RPC client/server drivers
+* Made the asynchronous comm class more generic so it can be used to wrap any comm type and is more robust
+* Changed the communication pattern so that a single connection driver is used by default to limit unnecessary message passing
+* Changed the connection to use ‘inputs’/‘outputs’ instead of ‘icomm_kws’/‘ocomm_kws’ to provide simpler mapping form the yaml to inputs
+* Migrated away from use of ‘comm’ to ‘commtype’/‘comm_list’ keyword in comms for clarity
+* Migrated away from use of comm_class to using commtype
+* Added specialized error classes for catching specific issues during communication (timeouts, no message waiting, etc)
+* Specialized comm registration on the comm classes
+* Generalized the RPC client/server drivers in name
 * Added support for importing models as functions
-* Modify the RPC pattern so that client/server one-to-many send operation occurs at the interface between the connection and the server
-* Add model information to message headers
+* Modified the RPC pattern so that client/server one-to-many send operation occurs at the interface between the connection and the server
+* Added model information to message headers
+* Added a ValueComm communication object for returning a constant value set in the yaml via the 'default_value' option
 
 TODO
 ~~~~
