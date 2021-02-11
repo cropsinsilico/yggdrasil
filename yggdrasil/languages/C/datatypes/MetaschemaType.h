@@ -1726,6 +1726,22 @@ size_t YggGeneric::get_data_map_size() const {
   }
   return map->size();
 };
+bool YggGeneric::has_data_map_key(char* key) const {
+  size_t i;
+  if (type->type_code() != T_OBJECT) {
+    ygglog_throw_error("YggGeneric::get_data_map_keys: Object is not a map.");
+  }
+  YggGenericMap* map = (YggGenericMap*)get_data();
+  if (map == NULL) {
+    ygglog_throw_error("YggGeneric::get_data_map_keys: Map is NULL.");
+  }
+  YggGenericMap::iterator it = map->find(key);
+  if (it != map->end()) {
+    return true;
+  } else {
+    return false;
+  }
+};
 
 size_t YggGeneric::get_data_map_keys(char*** keys) const {
   size_t i;

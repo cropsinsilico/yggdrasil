@@ -397,6 +397,13 @@ size_t generic_array_get_ndarray_unicode(generic_t x, const size_t index, char**
  */
 size_t generic_map_get_size(generic_t x);
 /*!
+  @brief Determine if a map object has a certain key.
+  @param[in] x generic_t Generic object that is presumed to contain a map.
+  @param[in] key char* Key to check for.
+  @returns int 1 if the key is present, 0 otherwise.
+ */
+int generic_map_has_key(generic_t x, char* key);
+/*!
   @brief Get the keys in a map object.
   @param[in] x generic_t Generic object that is presumed to contain a map.
   @param[out] keys char*** Pointer to memory where array of keys should be stored.

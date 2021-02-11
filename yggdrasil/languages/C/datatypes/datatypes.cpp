@@ -1357,6 +1357,24 @@ extern "C" {
     }
     return out;
   }
+  int generic_map_has_key(generic_t x, char* key) {
+    int out = 0;
+    try {
+      if (!(is_generic_init(x))) {
+	ygglog_throw_error("generic_map_get_keys: Object not initialized.");
+      }
+      YggGeneric* x_obj = (YggGeneric*)(x.obj);
+      if (x_obj == NULL) {
+	ygglog_throw_error("generic_map_get_keys: Object is NULL.");
+      }
+      if (x_obj->has_data_map_key(key)) {
+	out = 1;
+      }
+    } catch (...) {
+      ygglog_error("generic_map_get_keys: C++ exception thrown.");
+    }
+    return out;
+  }
   size_t generic_map_get_keys(generic_t x, char*** keys) {
     size_t out = 0;
     try {
