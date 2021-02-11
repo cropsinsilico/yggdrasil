@@ -147,6 +147,8 @@ class ConnectionDriver(Driver):
         onexit (str, optional): Class method that should be called when a
             model that the connection interacts with exits, but before the
             connection driver is shut down. Defaults to None.
+        iterate_over_input (bool, optional): If True, the input message is iterated
+            over, sending each element to the output comm. Defaults to False.
         **kwargs: Additonal keyword arguments are passed to the parent class.
 
     Attributes:
@@ -167,6 +169,8 @@ class ConnectionDriver(Driver):
             loop.
         onexit (str): Class method that should be called when the corresponding
             model exits, but before the driver is shut down.
+        iterate_over_input (bool): If True, the input message is iterated over,
+            sending each element to the output comm.
 
     """
 
@@ -209,7 +213,8 @@ class ConnectionDriver(Driver):
                        'items': {'oneOf': [
                            {'type': 'function'},
                            {'$ref': '#/definitions/transform'}]}},
-        'onexit': {'type': 'string'}}
+        'onexit': {'type': 'string'},
+        'iterate_over_input': {'type': 'boolean', 'default': False}}
     _schema_excluded_from_class_validation = ['inputs', 'outputs']
     _disconnect_attr = Driver._disconnect_attr + [
         '_comm_closed', '_skip_after_loop', 'shared', 'task_thread']
@@ -854,6 +859,21 @@ class ConnectionDriver(Driver):
             if isinstance_component(t, 'transform'):
                 t.set_original_datatype(stype)
                 stype = t.transformed_datatype
+        if self.iterate_over_input:
+            if stype['type'] == 'array':
+                stype = stype['items']
+                if isinstance(stype, list):
+                    if all([stype[i] == stype[0] for i in range(1, len(stype))]):
+                        stype = stype[0]
+                    else:
+                        stype = {'type': 'any'}
+            elif stype['type'] in ['1darray', 'ndarray']:
+                stype = dict(stype, type='scalar')
+                stype.pop('length', None)
+                stype.pop('ndim', None)
+                stype.pop('shape', None)
+            else:
+                raise TypeError('Input type is not iterable: %s' % stype)
         for t in self.ocomm.transform:
             t.set_original_datatype(stype)
             stype = t.transformed_datatype
@@ -960,10 +980,21 @@ class ConnectionDriver(Driver):
         kwargs.pop('is_eof', False)
         with self.lock:
             self._used = True
-        if self._first_send_done:
-            flag = self._send_message(*args, **kwargs)
+        if self.iterate_over_input and (not self.ocomm.is_eof(args[0])):
+            msg = args[0]
+            args = args[1:]
+            for imsg in msg:
+                if self._first_send_done:
+                    flag = self._send_message(imsg, *args, **kwargs)
+                else:
+                    flag = self._send_1st_message(imsg, *args, **kwargs)
+                if not flag:  # pragma: debug
+                    break
         else:
-            flag = self._send_1st_message(*args, **kwargs)
+            if self._first_send_done:
+                flag = self._send_message(*args, **kwargs)
+            else:
+                flag = self._send_1st_message(*args, **kwargs)
         # if self.single_use:
         #     with self.lock:
         #         self.debug('Used')
@@ -1044,7 +1075,11 @@ class ConnectionDriver(Driver):
             self.set_break_flag()
             self.set_close_state('processing')
             return
-        elif self.ocomm.is_empty_send(msg):
+        elif self.iterate_over_input:
+            empty_flag = self.ocomm.is_empty_send(msg[0])
+        else:
+            empty_flag = self.ocomm.is_empty_send(msg)
+        if empty_flag:
             self.debug('Message skipped.')
             self.nskip += 1
             return

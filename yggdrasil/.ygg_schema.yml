@@ -255,6 +255,11 @@ definitions:
             - $ref: '#/definitions/file'
           minItems: 1
           type: array
+        iterate_over_input:
+          default: false
+          description: If True, the input message is iterated over, sending each element
+            to the output comm. Defaults to False.
+          type: boolean
         onexit:
           description: Class method that should be called when a model that the connection
             interacts with exits, but before the connection driver is shut down. Defaults
@@ -606,8 +611,8 @@ definitions:
           type: string
       required:
       - filetype
-      - name
       - working_dir
+      - name
       title: file_base
       type: object
     - anyOf:
@@ -1654,10 +1659,10 @@ definitions:
             is used.
           type: string
       required:
-      - language
-      - name
-      - args
       - working_dir
+      - language
+      - args
+      - name
       title: model_base
       type: object
     - anyOf:

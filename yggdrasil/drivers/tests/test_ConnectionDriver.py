@@ -1,5 +1,6 @@
 import unittest
 import pytest
+import numpy as np
 from yggdrasil import tools, platform
 from yggdrasil.tests import MagicTestError, assert_raises
 from yggdrasil.schema import get_schema
@@ -421,6 +422,8 @@ invalid_translate = True
 class TestConnectionDriverTranslate(TestConnectionDriver):
     r"""Test class for the ConnectionDriver class with translator."""
 
+    test_send_recv_nolimit = None
+
     @property
     def inst_kwargs(self):
         r"""dict: Keyword arguments for tested class."""
@@ -436,14 +439,64 @@ class TestConnectionDriverTranslate(TestConnectionDriver):
         r"""str: Test message that should be used for any send/recv tests."""
         return {'a': int(1), 'b': float(2)}
 
-    def test_send_recv_nolimit(self):
-        r"""Test sending/receiving large message."""
-        pass
-    
     def map_sent2recv(self, obj):
         r"""Convert a sent object into a received one."""
         return obj['a']
     
+
+class TestConnectionDriverIterate(TestConnectionDriver):
+    r"""Test class for the ConnectionDriver class with iteration."""
+
+    test_send_recv_nolimit = None
+
+    @property
+    def inst_kwargs(self):
+        r"""dict: Keyword arguments for tested class."""
+        out = super(TestConnectionDriverIterate, self).inst_kwargs
+        out['iterate_over_input'] = True
+        out['onexit'] = 'printStatus'
+        return out
+
+    @property
+    def test_msg(self):
+        r"""str: Test message that should be used for any send/recv tests."""
+        return list(range(5))
+
+    def do_send_recv_iter(self, msg=None, **kwargs):
+        if msg is None:
+            msg = self.test_msg
+        flag = self.send_comm.send(msg, **kwargs)
+        assert(flag)
+        for imsg in msg:
+            flag, msg_recv = self.recv_comm.recv(self.timeout)
+            assert(flag)
+            self.assert_msg_equal(msg_recv, imsg)
+        self.assert_equal(self.instance.n_msg, 0)
+
+    @pytest.mark.timeout(timeout=600)
+    def test_send_recv(self):
+        r"""Test sending/receiving small message."""
+        self.do_send_recv_iter()
+    
+    @pytest.mark.timeout(timeout=600)
+    def test_send_recv_mixed(self):
+        r"""Test sending/receiving mixed list."""
+        self.do_send_recv_iter(['hello', 1.0])
+    
+    @pytest.mark.timeout(timeout=600)
+    def test_send_recv_noiter(self):
+        r"""Test error on sending non-iteratable object."""
+        flag = self.send_comm.send(None)
+        assert(flag)
+        flag, msg_recv = self.recv_comm.recv(self.timeout)
+        assert(not flag)
+        self.instance.terminate()
+
+    @pytest.mark.timeout(timeout=600)
+    def test_send_recv_array(self):
+        r"""Test sending/receiving array as iteration."""
+        self.do_send_recv_iter(np.arange(3, dtype='float32'))
+
 
 class TestConnectionDriverProcess(TestConnectionDriver):
     r"""Test class for the TestConnectionDriver using process."""
