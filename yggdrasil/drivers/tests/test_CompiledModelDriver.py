@@ -147,7 +147,8 @@ class TestDummyCompiler(TestCompilationTool):
     def test_get_flags(self):
         r"""Test get_flags."""
         self.assert_equal(self.import_cls.get_flags(flags='hello',
-                                                    libtype='object'), ['hello'])
+                                                    libtype='object'),
+                          ['hello', '-DWITH_YGGDRASIL'])
         
     def test_get_executable_command(self):
         r"""Test get_executable_command."""

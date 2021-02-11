@@ -100,7 +100,7 @@ class TestRPCRequestDriver(TestRPCRequestParam,
 s = get_schema()
 comm_types = list(s['comm'].schema_subtypes.keys())
 for k in comm_types:
-    if k == _default_comm:  # pragma: debug
+    if k in [_default_comm, 'ValueComm', 'value']:  # pragma: debug
         continue
     tcls = type('Test%sRPCRequestDriver' % k,
                 (TestRPCRequestDriver, ), {'ocomm_name': k,
@@ -109,16 +109,16 @@ for k in comm_types:
                                            'args': 'test'})
     # Flags
     flag_func = None
-    if k in ['RMQComm', 'RMQAsyncComm']:
+    if k in ['RMQComm', 'RMQAsyncComm', 'rmq', 'rmq_async']:
         flag_func = unittest.skipIf(not _rmq_installed,
                                     "RMQ Server not running")
-    elif k in ['ZMQComm']:
+    elif k in ['ZMQComm', 'zmq']:
         flag_func = unittest.skipIf(not _zmq_installed,
                                     "ZMQ library not installed")
-    elif k in ['IPCComm']:
+    elif k in ['IPCComm', 'ipc']:
         flag_func = unittest.skipIf(not _ipc_installed,
                                     "IPC library not installed")
-    elif k in ['BufferComm']:
+    elif k in ['BufferComm', 'buffer']:
         flag_func = unittest.skip("Buffer cannot be sent via header.")
     if flag_func is not None:
         tcls = flag_func(tcls)

@@ -42,7 +42,10 @@ class TestValueComm(parent.TestCommBase):
         r"""Test send/recv of a small message."""
         n_recv = self.testing_options['kwargs']['count']
         msg_recv = self.test_msg
-        self.assert_equal(self.recv_instance.n_msg_recv, n_recv)
+        if self.use_async:
+            assert(self.recv_instance.n_msg_recv > 0)
+        else:
+            self.assert_equal(self.recv_instance.n_msg_recv, n_recv)
         # Wait for messages to be received
         for i in range(n_recv):
             flag, msg_recv0 = self.recv_instance.recv(self.timeout)
@@ -68,7 +71,8 @@ class TestValueComm(parent.TestCommBase):
         self.recv_instance.close()
         assert(self.recv_instance.is_closed)
         flag, msg_recv = self.recv_instance.recv()
-        assert(not flag)
+        if not self.use_async:
+            assert(not flag)
         self.assert_raises(RuntimeError, self.recv_instance.send, None)
 
     def test_purge(self, nrecv=1):

@@ -151,7 +151,10 @@ class TestConnectionParam(parent.TestParam):
     @property
     def send_comm_kwargs(self):
         r"""dict: Keyword arguments for send comm."""
-        return self.instance.icomm.opp_comm_kwargs()
+        out = self.instance.icomm.opp_comm_kwargs()
+        if self.icomm_name == 'value':
+            out['direction'] = 'recv'
+        return out
 
     @property
     def recv_comm_kwargs(self):
@@ -260,19 +263,24 @@ class TestConnectionDriverNoStart(TestConnectionParam, parent.TestDriverNoStart)
         flag = self.instance.send_message()
         assert(not flag)
         flag = self.instance.recv_message()
-        assert(not flag)
+        if self.instance.icomm._commtype != 'value':
+            assert(not flag)
         # Short
-        flag = self.send_comm.send(self.test_msg)
-        assert(not flag)
+        if self.instance.icomm._commtype != 'value':
+            flag = self.send_comm.send(self.test_msg)
+            assert(not flag)
         flag, ret = self.recv_comm.recv()
-        assert(not flag)
-        self.assert_equal(ret, None)
+        if self.instance.icomm._commtype != 'value':
+            assert(not flag)
+            self.assert_equal(ret, None)
         # Long
-        flag = self.send_comm.send_nolimit(self.test_msg)
-        assert(not flag)
+        if self.instance.icomm._commtype != 'value':
+            flag = self.send_comm.send_nolimit(self.test_msg)
+            assert(not flag)
         flag, ret = self.recv_comm.recv_nolimit()
-        assert(not flag)
-        self.assert_equal(ret, None)
+        if self.instance.icomm._commtype != 'value':
+            assert(not flag)
+            self.assert_equal(ret, None)
 
         
 class TestConnectionDriverNoInit(TestConnectionParam):
@@ -339,6 +347,8 @@ class TestConnectionDriver(TestConnectionParam, parent.TestDriver):
         if (self.recv_comm._commtype is not None):
             assert(self.recv_comm.is_open)
         self.nmsg_recv = 1
+        if self.instance.icomm._commtype == 'value':
+            self.nmsg_recv = self.get_options()['kwargs']['count']
 
     def test_init_del(self):
         r"""Test driver creation and deletion."""
@@ -353,9 +363,10 @@ class TestConnectionDriver(TestConnectionParam, parent.TestDriver):
     @pytest.mark.timeout(timeout=600)
     def test_send_recv(self):
         r"""Test sending/receiving small message."""
-        flag = self.send_comm.send(self.test_msg)
-        if self.comm_name != 'CommBase':
-            assert(flag)
+        if self.instance.icomm._commtype != 'value':
+            flag = self.send_comm.send(self.test_msg)
+            if self.comm_name != 'CommBase':
+                assert(flag)
         # self.instance.sleep()
         # if self.comm_name != 'CommBase':
         #     self.assert_equal(self.recv_comm.n_msg, 1)
@@ -364,16 +375,17 @@ class TestConnectionDriver(TestConnectionParam, parent.TestDriver):
             if self.comm_name != 'CommBase':
                 assert(flag)
                 self.assert_msg_equal(msg_recv, self.test_msg)
-        if self.comm_name != 'CommBase':
+        if (self.comm_name != 'CommBase') and (self.icomm_name != 'value'):
             self.assert_equal(self.instance.n_msg, 0)
 
     @pytest.mark.timeout(timeout=600)
     def test_send_recv_nolimit(self):
         r"""Test sending/receiving large message."""
-        assert(len(self.msg_long) > self.maxMsgSize)
-        flag = self.send_comm.send_nolimit(self.msg_long)
-        if self.comm_name != 'CommBase':
-            assert(flag)
+        if self.instance.icomm._commtype != 'value':
+            assert(len(self.msg_long) > self.maxMsgSize)
+            flag = self.send_comm.send_nolimit(self.msg_long)
+            if self.comm_name != 'CommBase':
+                assert(flag)
         for i in range(self.nmsg_recv):
             flag, msg_recv = self.recv_comm.recv_nolimit(self.timeout)
             if self.comm_name != 'CommBase':
@@ -555,6 +567,7 @@ for k in comm_types:
         ocls = flag_func(ocls)
         icls = flag_func(icls)
     # Add class to globals
-    globals()[ocls.__name__] = ocls
+    if k != 'value':
+        globals()[ocls.__name__] = ocls
     globals()[icls.__name__] = icls
     del ocls, icls
