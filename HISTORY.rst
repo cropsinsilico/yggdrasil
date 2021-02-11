@@ -17,6 +17,8 @@ History
 * Modified the RPC pattern so that client/server one-to-many send operation occurs at the interface between the connection and the server
 * Added model information to message headers
 * Added a ValueComm communication object for returning a constant value set in the yaml via the 'default_value' option
+* Added C method for checking if a key exists in a generic wrapped map object
+* Added a definition to the default compilation flags to indicate that yggdrasil is being compiled against which can be checked by the pre-compiler (e.g. #ifdef WITH_YGGDRASIL)
 
 TODO
 ~~~~
