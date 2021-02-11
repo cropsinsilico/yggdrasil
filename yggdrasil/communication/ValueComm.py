@@ -22,15 +22,18 @@ class ValueComm(CommBase):
         Args:
             language (str, optional): Specific language that should be checked
                 for compatibility. Defaults to None and all languages supported
-                on the current platform will be checked.
+                on the current platform will be checked. If set to 'any', the
+                result will be True if this comm is installed for any of the
+                supported languages.
 
         Returns:
             bool: Is the comm installed.
 
         """
-        # Value is implied
-        return True
-
+        if language == 'python':
+            return True
+        return False
+        
     def open(self):
         r"""Open the connection."""
         super(ValueComm, self).open()

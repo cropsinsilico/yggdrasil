@@ -202,15 +202,18 @@ class FileComm(CommBase.CommBase):
         Args:
             language (str, optional): Specific language that should be checked
                 for compatibility. Defaults to None and all languages supported
-                on the current platform will be checked.
+                on the current platform will be checked. If set to 'any', the
+                result will be True if this comm is installed for any of the
+                supported languages.
 
         Returns:
             bool: Is the comm installed.
 
         """
-        # Filesystem is implied
-        return True
-
+        if language == 'python':
+            return True
+        return False
+        
     @classmethod
     def underlying_comm_class(cls):
         r"""str: Name of underlying communication class."""

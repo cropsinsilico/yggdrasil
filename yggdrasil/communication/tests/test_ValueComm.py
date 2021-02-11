@@ -53,7 +53,7 @@ class TestValueComm(parent.TestCommBase):
             self.assert_msg_equal(msg_recv0, msg_recv)
         # Receive after empty
         assert(self.recv_instance.is_open)
-        flag, msg_recv0 = self.recv_instance.recv(0.0)
+        flag, msg_recv0 = self.recv_instance.recv(self.timeout)
         assert(not flag)
         assert(self.recv_instance.is_eof(msg_recv0))
         # assert(flag)
