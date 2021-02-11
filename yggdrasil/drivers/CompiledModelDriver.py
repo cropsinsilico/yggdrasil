@@ -1335,6 +1335,10 @@ class CompilerBase(CompilationToolBase):
                 dont_link = True
             else:
                 dont_link = False
+        # Add flag that model is yggdrasil
+        if not cls.is_build_tool:
+            kwargs.setdefault('definitions', [])
+            kwargs['definitions'].append('WITH_YGGDRASIL')
         # Add logging level as a definition
         if logging_level is not None:
             kwargs.setdefault('definitions', [])
