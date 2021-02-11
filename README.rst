@@ -44,7 +44,7 @@ If you use yggdrasil in your research, please cite the accompanying paper:
    :target: https://travis-ci.org/cropsinsilico/yggdrasil
 .. |Appveyor Build status| image:: https://img.shields.io/appveyor/ci/langmm/yggdrasil.svg?style=flat-square
    :target: https://ci.appveyor.com/project/langmm/yggdrasil/branch/master
-.. |GHA Build Status| image:: https://img.shields.io/github/workflow/status/cropsinsilico/yggdrasil/test-install?style=flat-square
+.. |GHA Build Status| image:: https://img.shields.io/github/workflow/status/cropsinsilico/yggdrasil/Test%20of%20package%20installation%20&%20execution?style=flat-square   :alt: GitHub Workflow Status
    :target: https://github.com/cropsinsilico/yggdrasil/actions?query=workflow%3A%22Test+of+package+installation+%26+execution%22
 ..
    .. |Coverage Status| image:: https://coveralls.io/repos/github/cropsinsilico/yggdrasil/badge.svg?branch=master
