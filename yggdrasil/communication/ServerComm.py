@@ -247,6 +247,7 @@ class ServerComm(CommBase.CommBase):
         #     self.debug("send(): Connection closed.")
         #     return False
         out = self.ocomm[request_id].send(*args, **kwargs)
+        self.errors += self.ocomm[request_id].errors
         self.remove_response_comm(request_id)
         return out
         
@@ -307,6 +308,7 @@ class ServerComm(CommBase.CommBase):
         return_header = kwargs.pop('return_header', False)
         kwargs['return_header'] = True
         flag, msg, header = self.icomm.recv(*args, **kwargs)
+        self.errors += self.icomm.errors
         if flag:
             if isinstance(msg, bytes) and (msg == YGG_CLIENT_EOF):
                 self.debug("Client signed off: %s",
@@ -335,6 +337,7 @@ class ServerComm(CommBase.CommBase):
         r"""Sleep while waiting for messages to be drained."""
         if direction == 'recv':
             self.icomm.drain_messages(direction='recv', **kwargs)
+            self.errors += self.icomm.errors
 
     def purge(self):
         r"""Purge input and output comms."""

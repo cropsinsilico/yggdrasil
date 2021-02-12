@@ -482,6 +482,11 @@ class YggRunner(YggClass):
                     self.error('Error in model %s', drv['name'])
                     self.error_flag = True
                     break
+                elif d.io_errors:  # pragma: debug
+                    self.error('Error in input/output driver for model %s'
+                               % drv['name'])
+                    self.error_flag = True
+                    break
                 d.join(1)
                 if not d.is_alive():
                     if not d.errors:

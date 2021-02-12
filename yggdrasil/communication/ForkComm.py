@@ -296,6 +296,7 @@ class ForkComm(CommBase.CommBase):
         """
         for x in self.comm_list:
             out = x.send(*args, **kwargs)
+            self.errors += x.errors
             if not out:
                 return out
             self.on_send(x)
@@ -329,6 +330,7 @@ class ForkComm(CommBase.CommBase):
                 x = self.curr_comm
                 if x.is_open:
                     flag, msg, header = x.recv(*args, **kwargs)
+                    self.errors += x.errors
                     if x.is_eof(msg):
                         self.eof_recv[self.curr_comm_index % len(self)] = 1
                         if sum(self.eof_recv) == len(self):

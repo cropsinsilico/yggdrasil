@@ -792,6 +792,7 @@ class ConnectionDriver(Driver):
             if self.icomm.is_closed:
                 return False
             flag, msg, header = self.icomm.recv(return_header=True, **kwargs)
+            self.errors += self.icomm.errors
         if self.icomm.is_eof(msg):
             self._last_header = header
             return self.on_eof()
@@ -895,6 +896,7 @@ class ConnectionDriver(Driver):
             if self.ocomm.is_closed:
                 return False
             flag = self.ocomm.send(*args, **kwargs)
+            self.errors += self.ocomm.errors
             return flag
         
     def _send_1st_message(self, *args, **kwargs):

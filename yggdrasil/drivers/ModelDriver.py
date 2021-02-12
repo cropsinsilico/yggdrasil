@@ -1293,6 +1293,15 @@ class ModelDriver(Driver):
                                           errors=self.errors)
 
     @property
+    def io_errors(self):
+        errors = []
+        for drv in self.yml.get('input_drivers', []):
+            errors += drv['instance'].errors
+        for drv in self.yml.get('output_drivers', []):
+            errors += drv['instance'].errors
+        return errors
+
+    @property
     def model_process_complete(self):
         r"""bool: Has the process finished or not. Returns True if the process
         has not started."""
