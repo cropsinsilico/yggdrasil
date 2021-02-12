@@ -6,6 +6,7 @@ import logging
 import types
 import time
 import collections
+import numpy as np
 from yggdrasil import tools, multitasking
 from yggdrasil.tools import YGG_MSG_EOF
 from yggdrasil.communication import (
@@ -2216,7 +2217,8 @@ class CommBase(tools.YggClass):
         if flag:
             if self.transform:
                 dtype = type2numpy(self.transform[-1].transformed_datatype)
-                out = consolidate_array(out, dtype=dtype)
+                if dtype and isinstance(out, (list, tuple, np.ndarray)):
+                    out = consolidate_array(out, dtype=dtype)
             else:
                 out = self.serializer.consolidate_array(out)
         return flag, out
