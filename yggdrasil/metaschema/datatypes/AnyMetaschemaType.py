@@ -33,12 +33,14 @@ class AnyMetaschemaType(MetaschemaType):
         return True
     
     @classmethod
-    def get_temptype(cls, typedef):
+    def get_temptype(cls, typedef, return_none=False):
         r"""Extract temporary type from type definition.
         
         Args:
             typedef (dict): Type definition containing temporary type under the
                 temptype key.
+            return_none (bool, optional): If True, None will be returned if there
+                is not a temptype in the provided typedef. Defaults to False.
 
         Returns:
             dict: Temporary type definition or None if not present.
@@ -47,6 +49,8 @@ class AnyMetaschemaType(MetaschemaType):
         out = None
         if isinstance(typedef, dict):
             out = typedef.get('temptype', None)
+            if (out is None) and (not return_none):
+                out = typedef
         return out
         
     @classmethod
@@ -108,7 +112,7 @@ class AnyMetaschemaType(MetaschemaType):
             object: Transformed object.
 
         """
-        return transform_type(obj, cls.get_temptype(typedef))
+        return transform_type(obj, cls.get_temptype(typedef, return_none=True))
 
     @classmethod
     def _generate_data(cls, typedef):
