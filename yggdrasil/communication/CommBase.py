@@ -1173,7 +1173,7 @@ class CommBase(tools.YggClass):
         out = (isinstance(msg, bytes) and (msg == self.eof_msg))
         return out
 
-    def apply_transform(self, msg_in, for_empty=False, header_kwargs=None):
+    def apply_transform(self, msg_in, for_empty=False, header_kwargs=False):
         r"""Evaluate the transform to alter the emssage being sent/received.
 
         Args:
@@ -1182,7 +1182,7 @@ class CommBase(tools.YggClass):
                 to check for an empty message and errors will be caught. Defaults
                 to False.
             header_kwargs (dict, optional): Header keyword arguments associated
-                with a message. Defaults to None and is ignored.
+                with a message. Defaults to False and is ignored.
 
         Returns:
             object: Transformed message.
@@ -1213,9 +1213,11 @@ class CommBase(tools.YggClass):
             if for_empty:
                 return None
             raise
-        if (((self.direction == 'send') and header_kwargs
+        if (((self.direction == 'send') and (header_kwargs is not False)
              and iconv and iconv.transformed_datatype
              and (not self.serializer.initialized))):
+            if not header_kwargs:
+                header_kwargs = {}
             metadata = dict(header_kwargs,
                             datatype=iconv.transformed_datatype)
             self.serializer.initialize_serializer(metadata, extract=True)
