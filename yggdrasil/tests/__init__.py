@@ -244,7 +244,10 @@ class WrappedTestCase(unittest.TestCase):  # pragma: no cover
         except ValueError:
             if dont_nest:
                 raise
-            self.assertEqualNested(first, second, msg=msg)
+            if isinstance(first, (np.ndarray, pd.DataFrame)):
+                self.assertArrayEqual(first, second, msg=msg)
+            else:
+                self.assertEqualNested(first, second, msg=msg)
 
     def assertEqualNested(self, first, second, msg=None):
         r"""Fail if the two objects are unequal as determined by descending

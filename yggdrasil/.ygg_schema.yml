@@ -131,9 +131,9 @@ definitions:
             type: string
           type: array
       required:
+      - datatype
       - commtype
       - name
-      - datatype
       title: comm_base
       type: object
     - anyOf:
@@ -255,11 +255,6 @@ definitions:
             - $ref: '#/definitions/file'
           minItems: 1
           type: array
-        iterate_over_input:
-          default: false
-          description: If True, the input message is iterated over, sending each element
-            to the output comm. Defaults to False.
-          type: boolean
         onexit:
           description: Class method that should be called when a model that the connection
             interacts with exits, but before the connection driver is shut down. Defaults
@@ -290,8 +285,8 @@ definitions:
             - $ref: '#/definitions/transform'
           type: array
       required:
-      - inputs
       - outputs
+      - inputs
       title: connection_base
       type: object
     - anyOf:
@@ -610,8 +605,8 @@ definitions:
             is used.
           type: string
       required:
-      - filetype
       - working_dir
+      - filetype
       - name
       title: file_base
       type: object
@@ -1660,8 +1655,8 @@ definitions:
           type: string
       required:
       - working_dir
-      - language
       - args
+      - language
       - name
       title: model_base
       type: object
@@ -2856,6 +2851,7 @@ definitions:
           - array
           - direct
           - function
+          - iterate
           - map_fields
           - pandas
           - select_fields
@@ -2912,6 +2908,14 @@ definitions:
         required:
         - selected
         title: SelectFieldsTransform
+        type: object
+      - additionalProperties: true
+        description: Schema for transform component ['iterate'] subtype.
+        properties:
+          transformtype:
+            enum:
+            - iterate
+        title: IterateTransform
         type: object
       - additionalProperties: true
         description: Schema for transform component ['function'] subtype.

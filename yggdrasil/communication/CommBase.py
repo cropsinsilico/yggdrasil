@@ -5,15 +5,17 @@ import atexit
 import logging
 import types
 import time
+import collections
 from yggdrasil import tools, multitasking
 from yggdrasil.tools import YGG_MSG_EOF
 from yggdrasil.communication import (
     new_comm, get_comm, determine_suffix, TemporaryCommunicationError,
     import_comm)
 from yggdrasil.components import import_component, create_component
-from yggdrasil.metaschema.datatypes import MetaschemaTypeError
+from yggdrasil.metaschema.datatypes import MetaschemaTypeError, type2numpy
 from yggdrasil.metaschema.datatypes.MetaschemaType import MetaschemaType
 from yggdrasil.communication.transforms.TransformBase import TransformBase
+from yggdrasil.serialize import consolidate_array
 
 
 logger = logging.getLogger(__name__)
@@ -519,6 +521,7 @@ class CommBase(tools.YggClass):
             name=self.name + '.ClosingTask')
         self._eof_recv = multitasking.Event()
         self._eof_sent = multitasking.Event()
+        self._iterator_backlog = None
         self._field_backlog = dict()
         if self.single_use:
             self._eof_recv.set()
@@ -1169,11 +1172,16 @@ class CommBase(tools.YggClass):
         out = (isinstance(msg, bytes) and (msg == self.eof_msg))
         return out
 
-    def apply_transform(self, msg_in):
+    def apply_transform(self, msg_in, for_empty=False, header_kwargs=None):
         r"""Evaluate the transform to alter the emssage being sent/received.
 
         Args:
             msg_in (object): Message being transformed.
+            for_empty (bool, optional): If True, the transformation is being used
+                to check for an empty message and errors will be caught. Defaults
+                to False.
+            header_kwargs (dict, optional): Header keyword arguments associated
+                with a message. Defaults to None and is ignored.
 
         Returns:
             object: Transformed message.
@@ -1195,10 +1203,21 @@ class CommBase(tools.YggClass):
                 typedef = iconv.transformed_datatype
         # Actual conversion
         msg_out = msg_in
-        no_init = ((self.direction == 'recv')
-                   and (not self.serializer.initialized))
-        for iconv in self.transform:
-            msg_out = iconv(msg_out, no_init=no_init)
+        no_init = (for_empty or ((self.direction == 'recv')
+                                 and (not self.serializer.initialized)))
+        try:
+            for iconv in self.transform:
+                msg_out = iconv(msg_out, no_init=no_init)
+        except BaseException:
+            if for_empty:
+                return None
+            raise
+        if (((self.direction == 'send') and header_kwargs
+             and iconv and iconv.transformed_datatype
+             and (not self.serializer.initialized))):
+            metadata = dict(header_kwargs,
+                            datatype=iconv.transformed_datatype)
+            self.serializer.initialize_serializer(metadata, extract=True)
         return msg_out
 
     def evaluate_filter(self, *msg_in):
@@ -1223,7 +1242,7 @@ class CommBase(tools.YggClass):
     @property
     def empty_obj_recv(self):
         r"""obj: Empty message object."""
-        return self.apply_transform(self.serializer.empty_msg)
+        return self.apply_transform(self.serializer.empty_msg, for_empty=True)
 
     def is_empty(self, msg, emsg):
         r"""Check that a message matches an empty message object.
@@ -1268,7 +1287,7 @@ class CommBase(tools.YggClass):
             bool: True if the object is empty, False otherwise.
 
         """
-        smsg = self.apply_transform(msg)
+        smsg = self.apply_transform(msg, for_empty=True)
         emsg, _ = self.deserialize(self.empty_bytes_msg)
         return self.is_empty(smsg, emsg)
         
@@ -1660,8 +1679,11 @@ class CommBase(tools.YggClass):
         if self.is_closed:
             self.debug('Comm closed')
             return False, self.empty_bytes_msg, work_comm
-        if len(msg) == 1:
-            msg = msg[0]
+        try:
+            if len(msg) == 1:
+                msg = msg[0]
+        except TypeError:
+            pass
         if self.model_name:
             if header_kwargs is None:
                 header_kwargs = {}
@@ -1671,7 +1693,14 @@ class CommBase(tools.YggClass):
         else:
             flag = True
             # Covert object
-            msg_ = self.apply_transform(msg)
+            if self._iterator_backlog:
+                msg_ = msg
+            else:
+                msg_ = self.apply_transform(msg, header_kwargs=header_kwargs)
+            if isinstance(msg_, collections.abc.Iterator):
+                assert(not self._iterator_backlog)
+                self._iterator_backlog = msg_
+                msg_ = self._iterator_backlog.__next__()
             # Serialize
             add_sinfo = (self._send_serializer and (not self.is_file))
             msg_s = self.serialize(msg_, header_kwargs=header_kwargs,
@@ -1786,6 +1815,12 @@ class CommBase(tools.YggClass):
             self.debug('Sent %d bytes to %s', msg_len, self.address)
         else:  # pragma: debug
             self.special_debug('Failed to send %d bytes', msg_len)
+            self._iterator_backlog = None
+        if flag and self._iterator_backlog:
+            for msg in self._iterator_backlog:
+                if not self.send_multipart(msg, header_kwargs=header_kwargs, **kwargs):
+                    return False
+            self._iterator_backlog = None
         return flag
 
     def send_nolimit(self, *args, **kwargs):
@@ -2179,5 +2214,9 @@ class CommBase(tools.YggClass):
         r"""Alias for recv."""
         flag, out = self.recv(*args, **kwargs)
         if flag:
-            out = self.serializer.consolidate_array(out)
+            if self.transform:
+                dtype = type2numpy(self.transform[-1].transformed_datatype)
+                out = consolidate_array(out, dtype=dtype)
+            else:
+                out = self.serializer.consolidate_array(out)
         return flag, out

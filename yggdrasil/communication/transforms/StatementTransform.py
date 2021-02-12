@@ -57,7 +57,7 @@ class StatementTransform(TransformBase):
                {'kwargs': {'statement': '%x% * array([1, 1, 1])'},
                 'in/out': [(1, np.ones(3, int)), (2, 2 * np.ones(3, int))]},
                {'kwargs': {'statement': '%x% * '
-                           + repr(units.add_units(1, 'cm'))},
-                'in/out': [(1, units.add_units(1, 'cm')),
-                           (2, units.add_units(2, 'cm'))]}]
+                           + repr(units.add_units(1.0, 'cm'))},
+                'in/out': [(1.0, units.add_units(1.0, 'cm')),
+                           (2.0, units.add_units(2.0, 'cm'))]}]
         return out

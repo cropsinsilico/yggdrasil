@@ -1,3 +1,4 @@
+import collections
 from yggdrasil.components import ComponentBase
 from yggdrasil.metaschema.datatypes import encode_type, generate_data
 
@@ -109,7 +110,11 @@ class TransformBase(ComponentBase):
             self.set_original_datatype(encode_type(x))
         if isinstance(x, bytes) and (len(x) == 0) and no_init:
             return b''
-        out = self.evaluate_transform(x, no_copy=no_copy)
+        if isinstance(x, collections.abc.Iterator):
+            out = iter([self.evaluate_transform(xx, no_copy=no_copy)
+                        for xx in x])
+        else:
+            out = self.evaluate_transform(x, no_copy=no_copy)
         return out
 
     @classmethod

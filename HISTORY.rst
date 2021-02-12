@@ -19,7 +19,9 @@ History
 * Added a ValueComm communication object for returning a constant value set in the yaml via the 'default_value' option
 * Added C method for checking if a key exists in a generic wrapped map object
 * Added a definition to the default compilation flags to indicate that yggdrasil is being compiled against which can be checked by the pre-compiler (e.g. #ifdef WITH_YGGDRASIL)
-* Added a connection parameter, 'interate_over_input' that allows messages to be split up and sent as individual elements
+* Added an iteration transformation that can be used to expand an iteratable object (currently lists, dicts, and arrays) into its elements
+* Added new tests for transformations as part of comms and fixed bugs that those tests showed in how empty messages are transformed
+* Modify comm class such that the type is updated based on the transformed datatype when receiving *and* sending
 
 TODO
 ~~~~
