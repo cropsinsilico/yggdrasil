@@ -1742,6 +1742,6 @@ class YggClass(ComponentBase):
                 self.debug("Timeout for %s at %5.2f/%5.2f s" % (
                     key, t.elapsed, t.max_time))
             else:
-                self.error("Timeout for %s at %5.2f/%5.2f s" % (
+                self.info("Timeout for %s at %5.2f/%5.2f s" % (
                     key, t.elapsed, t.max_time))
         del self._timeouts[key]
