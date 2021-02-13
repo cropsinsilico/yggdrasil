@@ -283,7 +283,8 @@ def get_language_order(drivers):
 
 def update_language_config(languages=None, skip_warnings=False,
                            disable_languages=None, enable_languages=None,
-                           lang_kwargs=None, overwrite=False, verbose=False):
+                           allow_multiple_omp=None, lang_kwargs=None,
+                           overwrite=False, verbose=False):
     r"""Update configuration options for a language driver.
 
     Args:
@@ -296,6 +297,10 @@ def update_language_config(languages=None, skip_warnings=False,
             disabled. Defaults to an empty list.
         enable_languages (list, optional): List of languages that should be
             enabled. Defaults to an empty list.
+        allow_multiple_omp (bool, optional): Set the allow_multiple_omp config
+            option controlling whether or not the KMP_DUPLICATE_LIB_OK environment
+            variable is set for model environments. Defaults to None and is
+            ignored.
         overwrite (bool, optional): If True, the existing file will be overwritten.
             Defaults to False.
         verbose (bool, optional): If True, information about the config file
@@ -326,6 +331,10 @@ def update_language_config(languages=None, skip_warnings=False,
     if overwrite:
         shutil.copy(def_config_file, usr_config_file)
         ygg_cfg_usr.reload()
+    if allow_multiple_omp is not None:
+        if not ygg_cfg_usr.has_section('general'):
+            ygg_cfg_usr.add_section('general')
+        ygg_cfg_usr.set('general', 'allow_multiple_omp', allow_multiple_omp)
     drivers = OrderedDict([(lang, import_component('model', lang))
                            for lang in languages])
     drv = list(get_language_order(drivers).values())

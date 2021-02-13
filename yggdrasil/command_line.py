@@ -876,7 +876,21 @@ class update_config(SubCommand):
           'help': 'One or more languages that should be enabled.'}),
         (('--quiet', '-q'),
          {'action': 'store_true',
-          'help': 'Suppress output.'})]
+          'help': 'Suppress output.'}),
+        (('--allow-multiple-omp', ),
+         {'action': 'store_true',
+          'help': ('Have yggdrasil set the environment variable '
+                   'KMP_DUPLICATE_LIB_OK to \'True\' during model runs '
+                   'to disable errors resembling '
+                   '"OMP: Error #15: Initializing libomp.dylib..." '
+                   'that result from having multiple versions of OpenMP '
+                   'loaded during runtime.')}),
+        (('--dont-allow-multiple-omp', ),
+         {'action': 'store_false',
+          'dest': 'allow_multiple_omp',
+          'help': ('Don\'t set the KMP_DUPLICATE_LIB_OK environment variable '
+                   'when running models (see help for \'--allow-multiple-omp\' '
+                   'for more information).')})]
     # TODO: Move these into the language directories?
     language_arguments = {
         'c': [
@@ -893,7 +907,28 @@ class update_config(SubCommand):
             (('--disable-matlab-engine-for-python', ),
              {'action': 'store_true',
               'dest': 'disable_engine',
-              'help': 'Disable use of the Matlab engine for Python.'})]}
+              'help': 'Disable use of the Matlab engine for Python.'}),
+            (('--enable-matlab-engine-for-python', ),
+             {'action': 'store_false',
+              'dest': 'disable_engine',
+              'help': 'Enable use of the Matlab engine for Python.'}),
+            (('--hide-matlab-libiomp', ),
+             {'action': 'store_true',
+              'help': ('Hide the version of libiomp installed by Matlab '
+                       'by slightly changing the filename so that the '
+                       'conda version of libomp is used instead. This '
+                       'helps to solve the error "'
+                       'OMP: Error #15: Initializing libomp.dylib..." '
+                       'that can occur when using a conda environment. '
+                       'The hidden file location will be set in the '
+                       'configuration file and can be restored via the '
+                       '\'--restore-matlab-libiomp\' option.')}),
+            (('--restore-matlab-libiomp', ),
+             {'action': 'store_false',
+              'dest': 'hide_matlab_libiomp',
+              'help': ('Restore the version of libiomp installed by Matlab. '
+                       '(See help for \'--hide-matlab-libiomp\')')}),
+        ]}
         
     @classmethod
     def add_arguments(cls, parser, **kwargs):
@@ -938,6 +973,7 @@ class update_config(SubCommand):
             verbose=(not args.quiet),
             disable_languages=args.disable_languages,
             enable_languages=args.enable_languages,
+            allow_multiple_omp=args.allow_multiple_omp,
             lang_kwargs=lang_kwargs)
 
 

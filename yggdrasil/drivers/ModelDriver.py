@@ -1169,6 +1169,7 @@ class ModelDriver(Driver):
             dict: Environment variables for the model process.
 
         """
+        from yggdrasil.config import ygg_cfg
         if existing is None:
             existing = {}
         existing.update(copy.deepcopy(self.env))
@@ -1188,6 +1189,8 @@ class ModelDriver(Driver):
         replace = [k for k in env.keys() if ':' in k]
         for k in replace:
             env[k.replace(':', '__COLON__')] = env.pop(k)
+        if ygg_cfg.get('general', 'allow_multiple_omp', False):
+            env['KMP_DUPLICATE_LIB_OK'] = 'True'
         return env
 
     def before_start(self, no_queue_thread=False, **kwargs):

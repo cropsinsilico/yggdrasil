@@ -7,6 +7,7 @@ import glob
 import psutil
 import warnings
 import weakref
+import shutil
 import io as sio
 from yggdrasil import tools, platform, serialize
 from yggdrasil.languages import get_language_dir
@@ -763,7 +764,7 @@ class MatlabModelDriver(InterpretedModelDriver):  # pragma: matlab
         return super(MatlabModelDriver, cls).executable_command(args, **kwargs)
     
     @classmethod
-    def configure(cls, cfg, disable_engine=None):
+    def configure(cls, cfg, disable_engine=None, hide_matlab_libiomp=None):
         r"""Add configuration options for this language. This includes locating
         any required external libraries and setting option defaults.
 
@@ -771,6 +772,10 @@ class MatlabModelDriver(InterpretedModelDriver):  # pragma: matlab
             cfg (YggConfigParser): Config class that options should be set for.
             disable_engine (bool, optional): Disable the use of the
                 Python engine for Matlab. If not provided, this
+                argument will be ignored.
+            hide_matlab_libiomp (bool, optional): Hide the Matlab version of
+                libiomp by moving it and recording the name of the file. If False,
+                the file will be restored if it exists. If not provided, this
                 argument will be ignored.
 
         Returns:
@@ -800,6 +805,37 @@ class MatlabModelDriver(InterpretedModelDriver):  # pragma: matlab
                     out.append((cls.language, k, opts[k][0]))
         if disable_engine is not None:
             cfg.set(cls._language, 'disable_engine', str(disable_engine))
+        if hide_matlab_libiomp is not None:
+            matlab_root = cfg.get('matlab', 'matlabroot', None)
+            if matlab_root is None:
+                logger.warning("matlabroot not set so we cannot locate the "
+                               "matlab version of libiomp to hide/restore it.")
+                out.append((cls.language, 'hidden_matlab_libiomp',
+                            'The hidden copy of libiomp installed by Matlab'))
+            else:
+                if hide_matlab_libiomp:
+                    if not cfg.get(cls._language, 'hidden_matlab_libiomp', None):
+                        origlib = glob.glob(os.path.join(matlab_root, 'sys', 'os', '*',
+                                                         'libiomp*'))
+                        if len(origlib) == 1:
+                            origlib = origlib[0]
+                            copylib = os.path.join(os.path.dirname(origlib),
+                                                   '_' + os.path.basename(origlib))
+                            cfg.set(cls._language, 'hidden_matlab_libiomp', copylib)
+                            shutil.move(origlib, copylib)
+                        elif len(origlib) == 0:  # pragma: debug
+                            logger.warning("Could not locate the version of libiomp "
+                                           "installed by matlab.")
+                        else:
+                            logger.warning("More than one version of libiomp located "
+                                           "in the Matlab installation: %s" % origlib)
+                else:
+                    copylib = cfg.get(cls._language, 'hidden_matlab_libiomp', None)
+                    if copylib:
+                        origlib = os.path.join(os.path.dirname(copylib),
+                                               os.path.basename(copylib)[1:])
+                        cfg.set(cls._language, 'hidden_matlab_libiomp', '')
+                        shutil.move(copylib, origlib)
         return out
 
     @classmethod
