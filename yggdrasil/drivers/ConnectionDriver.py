@@ -4,9 +4,8 @@ import copy
 import numpy as np
 import functools
 import queue
-import collections
 from yggdrasil import multitasking
-from yggdrasil.communication import new_comm
+from yggdrasil.communication import new_comm, CommBase
 from yggdrasil.drivers.Driver import Driver
 from yggdrasil.components import create_component, isinstance_component
 
@@ -226,7 +225,6 @@ class ConnectionDriver(Driver):
                            _comm_closed=multitasking.DummyEvent(),
                            _skip_after_loop=multitasking.DummyEvent())
         # Attributes used by process
-        self._last_header = None
         self._eof_sent = False
         self._first_send_done = False
         self._used = False
@@ -783,7 +781,7 @@ class ConnectionDriver(Driver):
                 recv method.
 
         Returns:
-            str, bool: False if no more messages, message otherwise.
+            CommMessage, bool: False if no more messages, message otherwise.
 
         """
         assert(self.in_process)
@@ -791,22 +789,23 @@ class ConnectionDriver(Driver):
         with self.lock:
             if self.icomm.is_closed:
                 return False
-            flag, msg, header = self.icomm.recv(return_header=True, **kwargs)
+            msg = self.icomm.recv(return_message_object=True, **kwargs)
             self.errors += self.icomm.errors
-        if self.icomm.is_eof(msg):
-            self._last_header = header
-            return self.on_eof()
-        if flag:
-            self._last_header = header
+        if msg.flag == CommBase.FLAG_EOF:
+            return self.on_eof(msg)
+        if msg.flag == CommBase.FLAG_SUCCESS:
             return msg
         else:
-            return flag
+            return bool(msg.flag)
 
-    def on_eof(self):
+    def on_eof(self, msg):
         r"""Actions to take when EOF received.
 
+        Args:
+            msg (CommMessage): Message object that provided the EOF.
+
         Returns:
-            str, bool: Value that should be returned by recv_message on EOF.
+            CommMessage, bool: Value that should be returned by recv_message on EOF.
 
         """
         with self.lock:
@@ -830,21 +829,11 @@ class ConnectionDriver(Driver):
         if (self.ocomm._send_serializer) and self.icomm.serializer.initialized:
             self.update_serializer(msg)
         for t in self.translator:
-            msg = t(msg)
+            msg.args = t(msg.args)
         return msg
 
     def update_serializer(self, msg):
         r"""Update the serializer for the output comm based on input."""
-        sinfo_keys = ['format_str', 'field_names', 'field_units']
-        stype = self.icomm.serializer.typedef
-        sinfo = self.icomm.serializer.serializer_info
-        for k in sinfo_keys:
-            if k in sinfo:
-                stype[k] = sinfo[k]
-        for t in self.icomm.transform:
-            t.set_original_datatype(stype)
-            stype = t.transformed_datatype
-        sinfo.pop('seritype', None)
         self.debug('Before update:\n'
                    + '  icomm:\n    sinfo:\n%s\n    typedef:\n%s\n'
                    + '  ocomm:\n    sinfo:\n%s\n    typedef:\n%s',
@@ -854,21 +843,14 @@ class ConnectionDriver(Driver):
                    self.pprint(self.ocomm.serializer.typedef, 2))
         for t in self.translator:
             if isinstance_component(t, 'transform'):
-                t.set_original_datatype(stype)
-                stype = t.transformed_datatype
-        for t in self.ocomm.transform:
-            t.set_original_datatype(stype)
-            stype = t.transformed_datatype
-        for k in sinfo_keys:
-            if k in stype:
-                sinfo[k] = stype.pop(k)
-        sinfo['datatype'] = stype
-        self.ocomm.serializer.initialize_serializer(sinfo)
-        self.ocomm.serializer.update_serializer(skip_type=True,
-                                                **self._last_header)
-        if (((stype['type'] == 'array')
+                t.set_original_datatype(msg.stype)
+                msg.stype = t.transformed_datatype
+        # This can be removed if send_message is set up to update and send the
+        # received message rather than create a new one by sending msg.args
+        self.ocomm.update_serializer_from_message(msg)
+        if (((msg.stype['type'] == 'array')
              and (self.ocomm.serializer.typedef['type'] != 'array')
-             and (len(stype['items']) == 1))):
+             and (len(msg.stype['items']) == 1))):
             # if (((self.icomm.serializer.typedef['type'] == 'array')
             #      and (self.ocomm.serializer.typedef['type'] != 'array')
             #      and (len(self.icomm.serializer.typedef['items']) == 1))):
@@ -895,9 +877,7 @@ class ConnectionDriver(Driver):
         with self.lock:
             if self.ocomm.is_closed:
                 return False
-            flag = self.ocomm.send(*args, **kwargs)
-            self.errors += self.ocomm.errors
-            return flag
+            return self.ocomm.send(*args, **kwargs)
         
     def _send_1st_message(self, *args, **kwargs):
         r"""Send the first message, trying multiple times.
@@ -910,25 +890,21 @@ class ConnectionDriver(Driver):
             bool: Success or failure of send.
 
         """
-        args0 = None
-        if args and isinstance(args[0], collections.abc.Iterator):
-            args0 = list(args)
-            args = iter(args0)
+        kws_prepare = {k: kwargs.pop(k) for k in self.ocomm._prepare_message_kws
+                       if k in kwargs}
+        msg = self.ocomm.prepare_message(*args, **kws_prepare)
         self.ocomm._multiple_first_send = False
         T = self.start_timeout(self.timeout_send_1st,
                                key_suffix='.1st_send')
-        flag = self._send_message(*args, **kwargs)
+        flag = self._send_message(msg, **kwargs)
         self.ocomm.suppress_special_debug = True
         if (not flag) and (not self.ocomm._type_errors):
             self.debug("1st send failed, will keep trying for %f s in silence.",
                        float(self.timeout_send_1st))
             while ((not T.is_out) and (not flag)
                    and self.ocomm.is_open):  # pragma: debug
-                flag = self._send_message(*args, **kwargs)
+                flag = self._send_message(msg, **kwargs)
                 if not flag:
-                    if args0:
-                        # Reset required to ensure the first element is not lost
-                        args = iter(args0)
                     self.sleep()
         self.stop_timeout(key_suffix='.1st_send')
         self.ocomm.suppress_special_debug = False
@@ -952,13 +928,15 @@ class ConnectionDriver(Driver):
                 return False
             self._eof_sent = True
         self.debug('Sent EOF')
-        return self.send_message(self.ocomm.eof_msg, is_eof=True)
+        msg = CommBase.CommMessage(flag=CommBase.FLAG_EOF,
+                                   args=self.ocomm.eof_msg)
+        return self.send_message(msg)
 
-    def send_message(self, *args, **kwargs):
+    def send_message(self, msg, **kwargs):
         r"""Send a single message.
 
         Args:
-            *args: Arguments are passed to the output comm send method.
+            msg (CommMessage): Message being sent.
             *kwargs: Keyword arguments are passed to the output comm send method.
 
         Returns:
@@ -967,18 +945,18 @@ class ConnectionDriver(Driver):
         """
         assert(self.in_process)
         self.debug('')
-        kwargs.pop('is_eof', False)
         with self.lock:
             self._used = True
         if self._first_send_done:
-            flag = self._send_message(*args, **kwargs)
+            flag = self._send_message(msg.args, **kwargs)
         else:
-            flag = self._send_1st_message(*args, **kwargs)
+            flag = self._send_1st_message(msg.args, **kwargs)
         # if self.single_use:
         #     with self.lock:
         #         self.debug('Used')
         #         self.icomm.drain_messages()
         #         self.icomm.close()
+        self.errors += self.ocomm.errors
         return flag
 
     def set_close_state(self, state):
@@ -1030,22 +1008,23 @@ class ConnectionDriver(Driver):
             self.set_break_flag()
             self.set_close_state('receiving')
             return
-        if (self._last_header is None) or self._last_header['is_empty']:
+        if (msg is True) or (isinstance(msg, CommBase.CommMessage)
+                             and (msg.flag != CommBase.FLAG_SUCCESS)):
             self.state = 'waiting'
             self.verbose_debug(':run: Waiting for next message.')
             self.sleep()
             return
         self.nrecv += 1
         self.state = 'received'
-        if isinstance(msg, bytes):
+        if isinstance(msg.args, bytes):
             self.debug('Received message that is %d bytes from %s.',
-                       len(msg), self.icomm.address)
-        elif isinstance(msg, np.ndarray):
+                       len(msg.args), self.icomm.address)
+        elif isinstance(msg.args, np.ndarray):
             self.debug('Received array with shape %s and data type %s from %s',
-                       msg.shape, msg.dtype, self.icomm.address)
+                       msg.args.shape, msg.args.dtype, self.icomm.address)
         else:
             self.debug('Received message of type %s from %s',
-                       type(msg), self.icomm.address)
+                       type(msg.args), self.icomm.address)
         # Process message
         self.state = 'processing'
         msg = self.on_message(msg)
@@ -1054,7 +1033,7 @@ class ConnectionDriver(Driver):
             self.set_break_flag()
             self.set_close_state('processing')
             return
-        elif self.ocomm.is_empty_send(msg):
+        elif self.ocomm.is_empty_send(msg.args):
             self.debug('Message skipped.')
             self.nskip += 1
             return

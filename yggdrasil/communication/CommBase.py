@@ -24,12 +24,118 @@ _registered_servers = multitasking.LockedDict(task_method='thread')
 _registered_comms = multitasking.LockedDict(task_method='thread')
 
 
+FLAG_FAILURE = 0
+FLAG_SUCCESS = 1
+FLAG_TRYAGAIN = 2
+FLAG_SKIP = 3
+FLAG_EOF = 4
+FLAG_INCOMPLETE = 5
+FLAG_EMPTY = 6
+
+
 class NeverMatch(Exception):
     'An exception class that is never raised by any code anywhere'
 
 
 class IncompleteBaseComm(Exception):
     r"""An exception class for methods that are incomplete for base classes."""
+
+
+class CommMessage(object):
+    r"""Class for passing messages around with additional information required
+    to send/receive them.
+
+    Attributes:
+        msg (bytes): The serialized message including the header.
+        length (int): The size of the message.
+        flag (int): Indicates the result of processing the message. Values are:
+            FLAG_FAILURE: Processing was unsuccessful.
+            FLAG_SUCCESS: Processing was successful.
+            FLAG_SKIP:    The message should be skipped.
+            FLAG_EOF:     The message indicates that there will be no more messages.
+        args (object): The unserialized message (post-transformation).
+        header (dict): Parameters sent in the header of the message.
+        additional_messages (list): Messages that should be sent along with this
+            message as in the case that the message was an iterator.
+        worker (CommBase): Worker communicator that should be used to send
+            worker messages in the case that the original message had to be split.
+        worker_messages (list): Messages that should be sent via the worker comm
+            comm as the original message had to be split due to its size.
+        sent (bool): True if the message has been sent, False otherwise.
+        singular (bool): True if there was only one argument.
+
+    """
+
+    __slots__ = ['msg', 'length', 'flag', 'args', 'header',
+                 'additional_messages', 'worker', 'worker_messages',
+                 'sent', 'finalized', 'singular', 'stype', 'sinfo']
+
+    def __init__(self, msg=None, length=0, flag=None, args=None, header=None):
+        self.msg = msg
+        self.length = length
+        self.flag = flag
+        self.args = args
+        self.header = header
+        self.additional_messages = []
+        self.worker_messages = []
+        self.worker = None
+        self.sent = False
+        self.finalized = False
+        self.singular = False
+        self.stype = None
+        self.sinfo = None
+
+    def __str__(self):
+        return 'CommMessage(flag=%s, %.100s..., sent=%s)' % (
+            self.flag, str(self.msg), self.sent)
+
+    @property
+    def tuple_args(self):
+        r"""tuple: Form that arguments were originally supplied."""
+        if self.singular:
+            return (self.args, )
+        return self.args
+
+    def add_message(self, *args, **kwargs):
+        r"""Add a message to the list of additional messages that should be sent
+        following this one.
+
+        Args:
+            *args: Arguments are passed to the CommMessage constructor.
+            *kwargs: Keyword arguments are passed to the CommMessage constructor.
+
+        """
+        kwargs.setdefault('flag', FLAG_SUCCESS)
+        self.additional_messages.append(CommMessage(*args, **kwargs))
+
+    def add_worker_message(self, *args, **kwargs):
+        r"""Add a message to the list of messages that should be sent via work
+        comm following this one.
+
+        Args:
+            *args: Arguments are passed to the CommMessage constructor.
+            *kwargs: Keyword arguments are passed to the CommMessage constructor.
+
+        """
+        kwargs.setdefault('flag', FLAG_SUCCESS)
+        self.worker_messages.append(CommMessage(*args, **kwargs))
+
+    def send_worker_messages(self, **kwargs):
+        r"""Send the worker messages via the worker comm.
+
+        Args:
+            **kwargs: Keyword arguments are passed to the send_message
+                 method of the worker comm for each message.
+
+        Returns:
+            bool: Success of the send operations.
+
+        """
+        if self.worker is not None:
+            for x in self.worker_messages:
+                if not self.worker.send_message(x, **kwargs):
+                    return False
+        return True
 
 
 def is_registered(commtype, key):
@@ -422,6 +528,10 @@ class CommBase(tools.YggClass):
     _disconnect_attr = (tools.YggClass._disconnect_attr
                         + ['_closing_event', '_closing_thread',
                            '_eof_recv', '_eof_sent'])
+    _prepare_message_kws = ['header_kwargs', 'skip_serialization',
+                            'skip_processing', 'skip_language2python',
+                            'after_prepare_message']
+    _finalize_message_kws = ['skip_python2language', 'after_finalize_message']
 
     def __init__(self, name, address=None, direction='send', dont_open=False,
                  is_interface=None, language=None,
@@ -520,12 +630,10 @@ class CommBase(tools.YggClass):
         self._closing_thread = multitasking.YggTask(
             target=self.linger_close,
             name=self.name + '.ClosingTask')
-        self._eof_recv = multitasking.Event()
         self._eof_sent = multitasking.Event()
         self._iterator_backlog = None
         self._field_backlog = dict()
         if self.single_use:
-            self._eof_recv.set()
             self._eof_sent.set()
         if self.is_response_client or self.is_response_server:
             self._eof_sent.set()  # Don't send EOF, these are single use
@@ -1007,7 +1115,7 @@ class CommBase(tools.YggClass):
         self.debug('')
         if self.direction == 'recv':
             while self.is_open and (self.n_msg_recv_drain > 0):  # pragma: debug
-                self.recv(timeout=0)
+                self.recv_message(timeout=0, skip_deserialization=True)
             self.wait_for_confirm(timeout=self._timeout_drain,
                                   active_confirm=active_confirm)
         else:
@@ -1173,7 +1281,56 @@ class CommBase(tools.YggClass):
         out = (isinstance(msg, bytes) and (msg == self.eof_msg))
         return out
 
-    def apply_transform(self, msg_in, for_empty=False, header_kwargs=False):
+    def update_message_from_serializer(self, msg):
+        r"""Update a message with information about the serializer.
+
+        Args:
+            msg (CommMessage): Incoming message.
+
+        """
+        if self.serializer.initialized:
+            msg.stype = self.serializer.typedef
+            msg.sinfo = self.serializer.serializer_info
+            for k in ['format_str', 'field_names', 'field_units']:
+                if k in msg.sinfo:
+                    msg.stype[k] = msg.sinfo[k]
+
+    def update_serializer_from_message(self, msg):
+        r"""Update the serializer based on information stored in a message.
+
+        Args:
+            msg (CommMessage): Outgoing message.
+
+        """
+        if msg.sinfo is None:
+            return
+        assert(msg.stype is not None)
+        msg.stype = self.apply_transform_to_type(msg.stype)
+        msg.sinfo.pop('seritype')
+        for k in ['format_str', 'field_names', 'field_units']:
+            if k in msg.stype:
+                msg.sinfo[k] = msg.stype.pop(k)
+        msg.sinfo['datatype'] = msg.stype
+        self.serializer.initialize_serializer(msg.sinfo)
+        self.serializer.update_serializer(skip_type=True, **msg.header)
+
+    def apply_transform_to_type(self, typedef):
+        r"""Evaluate the transform to alter the type definition.
+
+        Args:
+            typedef (dict): Type definition to transform.
+
+        Returns:
+            dict: Transformed type definition.
+
+        """
+        for iconv in self.transform:
+            if not iconv.original_datatype:
+                iconv.set_original_datatype(typedef)
+            typedef = iconv.transformed_datatype
+        return typedef
+
+    def apply_transform(self, msg_in, for_empty=False, header=False):
         r"""Evaluate the transform to alter the emssage being sent/received.
 
         Args:
@@ -1181,8 +1338,10 @@ class CommBase(tools.YggClass):
             for_empty (bool, optional): If True, the transformation is being used
                 to check for an empty message and errors will be caught. Defaults
                 to False.
-            header_kwargs (dict, optional): Header keyword arguments associated
+            header (dict, optional): Header keyword arguments associated
                 with a message. Defaults to False and is ignored.
+            typedef (dict, optiona): Type to transform. Default to None and will
+                be determined by the serializer if receiving.
 
         Returns:
             object: Transformed message.
@@ -1194,14 +1353,16 @@ class CommBase(tools.YggClass):
                    % self.direction)
         # If receiving, update the expected datatypes to use information
         # about the received datatype that was recorded by the serializer
-        if (((self.direction == 'recv')
-             and self.serializer.initialized
-             and (not self.transform[0].original_datatype))):
-            typedef = self.serializer.typedef
-            for iconv in self.transform:
-                if not iconv.original_datatype:
-                    iconv.set_original_datatype(typedef)
-                typedef = iconv.transformed_datatype
+        if (self.direction == 'recv') and self.serializer.initialized:
+            assert(self.transform[0].original_datatype)
+        # if (((self.direction == 'recv')
+        #      and self.serializer.initialized
+        #      and (not self.transform[0].original_datatype))):
+        #     typedef = self.serializer.typedef
+        #     for iconv in self.transform:
+        #         if not iconv.original_datatype:
+        #             iconv.set_original_datatype(typedef)
+        #         typedef = iconv.transformed_datatype
         # Actual conversion
         msg_out = msg_in
         no_init = (for_empty or ((self.direction == 'recv')
@@ -1213,12 +1374,12 @@ class CommBase(tools.YggClass):
             if for_empty:
                 return None
             raise
-        if (((self.direction == 'send') and (header_kwargs is not False)
+        if (((self.direction == 'send') and (header is not False)
              and iconv and iconv.transformed_datatype
              and (not self.serializer.initialized))):
-            if not header_kwargs:
-                header_kwargs = {}
-            metadata = dict(header_kwargs,
+            if not header:
+                header = {}
+            metadata = dict(header,
                             datatype=iconv.transformed_datatype)
             self.serializer.initialize_serializer(metadata, extract=True)
         return msg_out
@@ -1384,10 +1545,15 @@ class CommBase(tools.YggClass):
             raise IncompleteBaseComm(
                 "Base comm class '%s' cannot create work comm."
                 % self.__class__.__name__)
-        return dict(commtype=self._commtype, direction='recv',
-                    recv_timeout=self.recv_timeout,
-                    is_interface=self.is_interface,
-                    single_use=True)
+        out = dict(commtype=self._commtype, direction='recv',
+                   recv_timeout=self.recv_timeout,
+                   is_interface=self.is_interface,
+                   use_async=self.is_async,
+                   single_use=True)
+        if out.get('use_async', False):
+            out['async_recv_method'] = 'recv_message'
+            out['async_recv_kwargs'] = {'skip_deserialization': True}
+        return out
 
     @property
     def create_work_comm_kwargs(self):
@@ -1399,6 +1565,7 @@ class CommBase(tools.YggClass):
         return dict(commtype=self._commtype, direction='send',
                     recv_timeout=self.recv_timeout,
                     is_interface=self.is_interface,
+                    use_async=self.is_async,
                     uuid=str(uuid.uuid4()), single_use=True)
 
     def get_work_comm(self, header, **kwargs):
@@ -1491,10 +1658,10 @@ class CommBase(tools.YggClass):
             dict: Header information that will be sent with a message.
 
         """
-        header_kwargs = kwargs
-        header_kwargs['address'] = work_comm.address
-        header_kwargs['id'] = work_comm.uuid
-        return header_kwargs
+        header = kwargs
+        header['address'] = work_comm.address
+        header['id'] = work_comm.uuid
+        return header
 
     def header2workcomm(self, header, work_comm_name=None, **kwargs):
         r"""Get a work comm based on header info.
@@ -1528,6 +1695,8 @@ class CommBase(tools.YggClass):
         r"""Serialize a message using the associated serializer."""
         # Don't send metadata for files
         # kwargs.setdefault('dont_encode', self.is_file)
+        kwargs.setdefault('add_serializer_info',
+                          (self._send_serializer and (not self.is_file)))
         kwargs.setdefault('no_metadata', self.is_file)
         kwargs.setdefault('max_header_size', self.maxMsgSize)
         return self.serializer.serialize(*args, **kwargs)
@@ -1565,7 +1734,7 @@ class CommBase(tools.YggClass):
                 self.special_debug("TemporaryCommunicationError: %s" % e)
             self.sleep()
         self.stop_timeout(key_suffix='._safe_send')
-        if error and self.is_async:
+        if (not out) and error and self.is_async:
             raise TemporaryCommunicationError(error)
         if send_1st:
             self.suppress_special_debug = False
@@ -1578,192 +1747,73 @@ class CommBase(tools.YggClass):
         r"""Raw send. Should be overridden by inheriting class."""
         raise IncompleteBaseComm("_send method needs implemented.")
 
-    def _send_multipart(self, msg, **kwargs):
-        r"""Send a message larger than maxMsgSize in multiple parts.
+    def send_message(self, msg, skip_safe_send=False, **kwargs):
+        r"""Send a message encapsulated in a CommMessage object.
 
         Args:
-            msg (str): Message to send.
-            **kwargs: Additional keyword arguments are apssed to _send.
-
-        Returns:
-            bool: Success or failure of sending the message.
-
-        """
-        nsent = 0
-        ret = True
-        for imsg in self.chunk_message(msg):
-            if self.is_closed:  # pragma: debug
-                self.error("._send_multipart(): Connection closed.")
-                return False
-            ret = self._safe_send(imsg, **kwargs)
-            if not ret:  # pragma: debug
-                self.debug("Send interupted at %d of %d bytes.",
-                           nsent, len(msg))
-                break
-            nsent += len(imsg)
-            self.debug("%d of %d bytes sent", nsent, len(msg))
-        if ret and len(msg) > 0:
-            self.debug("%d bytes completed", len(msg))
-        return ret
-
-    def _send_multipart_worker(self, msg, info, **kwargs):
-        r"""Send multipart message to the worker comm identified.
-
-        Args:
-            msg (str): Message to be sent.
-            info (dict): Information about the outgoing message.
-            **kwargs: Additional keyword arguments are passed to the
-                workcomm _send_multipart method.
-
-        Returns:
-            bool: Success or failure of sending the message.
-
-        """
-        workcomm = self.get_work_comm(info)
-        # TODO: _send_multipart will need to be modified to
-        # use the async 'send' method instead of '_safe_send'
-        # in order for it to be async which will include
-        # changing the wrapped method (inside the async 'send')
-        # from 'send' to '_safe_send' or moving serialization
-        # outside of the send/recv
-        if self.is_async:
-            return workcomm._send_multipart(msg, **kwargs)
-        else:
-            workcomm.task_timer = self.sched_task(
-                0, workcomm._send_multipart,
-                args=[msg], kwargs=kwargs,
-                name=(workcomm.name + '.task'))
-            return True
-            
-    def on_send_eof(self, header_kwargs=None):
-        r"""Actions to perform when EOF being sent.
-
-        Args:
-            header_kwargs (dict, optional): Keyword arguments that should be
-                added to the header.
-
-        Returns:
-            bool: True if EOF message should be sent, False otherwise.
-
-        """
-        self.debug('')
-        if header_kwargs:
-            msg_s = self.serialize(self.eof_msg,
-                                   header_kwargs=header_kwargs)
-        else:
-            msg_s = self.eof_msg
-        msg_len = len(msg_s)
-        if (msg_len > self.maxMsgSize) and (self.maxMsgSize != 0):  # pragma: debug
-            raise NotImplementedError(("EOF message with header (%d) "
-                                       "exceeds max message size (%d).")
-                                      % (msg_len, self.maxMsgSize))
-        with self._closing_thread.lock:
-            if not self._eof_sent.is_set():
-                self._eof_sent.set()
-            else:  # pragma: debug
-                return False, msg_s
-        return True, msg_s
-
-    def on_send(self, msg, header_kwargs=None):
-        r"""Process message to be sent including handling serializing
-        message and handling EOF.
-
-        Args:
-            msg (obj): Message to be sent
-            header_kwargs (dict, optional): Keyword arguments that should be
-                added to the header.
-
-        Returns:
-            tuple (bool, str, dict): Truth of if message should be sent, raw
-                bytes message to send, and header info contained in the message.
-
-        """
-        work_comm = None
-        if self.is_closed:
-            self.debug('Comm closed')
-            return False, self.empty_bytes_msg, work_comm
-        try:
-            if len(msg) == 1:
-                msg = msg[0]
-        except TypeError:
-            pass
-        if self.model_name:
-            if header_kwargs is None:
-                header_kwargs = {}
-            header_kwargs.setdefault('model', self.model_name)
-        if self.is_eof(msg):
-            flag, msg_s = self.on_send_eof(header_kwargs=header_kwargs)
-        else:
-            flag = True
-            # Covert object
-            if self._iterator_backlog:
-                msg_ = msg
-            else:
-                msg_ = self.apply_transform(msg, header_kwargs=header_kwargs)
-            if isinstance(msg_, collections.abc.Iterator):
-                assert(not self._iterator_backlog)
-                self._iterator_backlog = msg_
-                msg_ = self._iterator_backlog.__next__()
-            # Serialize
-            add_sinfo = (self._send_serializer and (not self.is_file))
-            msg_s = self.serialize(msg_, header_kwargs=header_kwargs,
-                                   add_serializer_info=add_sinfo)
-            if self.no_serialization:
-                msg_len = 1
-            else:
-                msg_len = len(msg_s)
-            # Create work comm if message too large to be sent all at once
-            if (msg_len > self.maxMsgSize) and (self.maxMsgSize != 0):
-                if header_kwargs is None:
-                    header_kwargs = dict()
-                work_comm = self.create_work_comm()
-                # if 'address' not in header_kwargs:
-                #     work_comm = self.create_work_comm()
-                # else:
-                #     work_comm = self.get_work_comm(header_kwargs)
-                header_kwargs = self.workcomm2header(work_comm, **header_kwargs)
-                msg_s = self.serialize(msg_, header_kwargs=header_kwargs)
-        return flag, msg_s, header_kwargs
-
-    def send(self, *args, **kwargs):
-        r"""Send a message.
-
-        Args:
-            *args: All arguments are assumed to be part of the message.
-            **kwargs: All keywords arguments are passed to comm _send method.
+            msg (CommMessage): Message to be sent.
+            skip_safe_send (bool, optional): If True, no actual send will take
+                place. Defaults to False.
+            **kwargs: Additional keyword arguments are passed to _safe_send.
 
         Returns:
             bool: Success or failure of send.
-
+        
         """
-        self.precheck('send')
-        args = self.language_driver.language2python(args)
         if self.is_closed:
             self.debug('Comm closed')
             return False
-        if not self.evaluate_filter(*args):
-            # Return True to indicate success because nothing should be done
-            self.debug("Sent message skipped based on filter: %.100s", str(args))
+        if msg.flag == FLAG_SKIP:
             return True
+        elif msg.flag == FLAG_FAILURE:
+            return False
+        elif msg.flag == FLAG_EOF:
+            with self._closing_thread.lock:
+                if not self._eof_sent.is_set():
+                    self._eof_sent.set()
+                else:  # pragma: debug
+                    return False
+        elif msg.flag == FLAG_SUCCESS:
+            pass
+        else:  # pragma: debug
+            raise Exception("Unrecognized message flag: %s" % msg.flag)
+        self.special_debug('Sending %d bytes to %s', msg.length, self.address)
+        if self.maxMsgSize != 0:
+            assert(msg.length <= self.maxMsgSize)
         try:
-            ret = self.send_multipart(args, **kwargs)
-            if ret:
-                self._used = True
-                if self.serializer.initialized:
-                    self._send_serializer = False
-            if self.single_use and self._used:
-                self.debug('Closing single use send comm [DISABLED]')
-                # self.linger_close()
-                # self.close_in_thread(no_wait=True)
-            elif ret and self._eof_sent.is_set() and self.close_on_eof_send:
+            if skip_safe_send:
+                pass
+            elif not msg.sent:
+                if not self._safe_send(msg.msg, **kwargs):  # pragma: debug
+                    self.special_debug('Failed to send %d bytes', msg.length)
+                    return False
+                msg.sent = True
+                self.debug('Sent %d bytes to %s', msg.length, self.address)
+            if msg.worker is not None:
+                if msg.worker.is_async:
+                    if not msg.send_worker_messages(**kwargs):  # pragma: debug
+                        self.error("Error sending message chunk")
+                        return False
+                else:
+                    msg.worker.task_timer = self.sched_task(
+                        0, msg.send_worker_messages, kwargs=kwargs,
+                        name=(msg.worker.name + '.task'))
+            for x in msg.additional_messages:
+                if not self.send_message(x, **kwargs):  # pragma: debug
+                    self.error("Error sending message iteration")
+                    return False
+            self._used = True
+            if self.serializer.initialized:
+                self._send_serializer = False
+            if (msg.flag == FLAG_EOF) and self.close_on_eof_send:
                 self.debug('Close on send EOF')
                 self.linger_close()
                 # self.close_in_thread(no_wait=True, timeout=False)
-            return ret
+            return True
         except MetaschemaTypeError as e:  # pragma: debug
             self._type_errors.append(e)
             try:
-                self.exception('Failed to send: %.100s.', str(args))
+                self.exception('Failed to send: %.100s.', str(msg.args))
             except ValueError:  # pragma: debug
                 self.exception('Failed to send (unyt array in message)')
         except TemporaryCommunicationError if self.is_async else NeverMatch:
@@ -1771,60 +1821,154 @@ class CommBase(tools.YggClass):
         except BaseException:
             # Handle error caused by calling repr on unyt array that isn't float64
             try:
-                self.exception('Failed to send: %.100s.', str(args))
+                self.exception('Failed to send: %.100s.', str(msg.args))
             except ValueError:  # pragma: debug
                 self.exception('Failed to send (unyt array in message)')
         return False
 
-    def send_multipart(self, msg, header_kwargs=None, **kwargs):
-        r"""Send a multipart message. If the message is smaller than maxMsgSize,
-        it is sent using _send, otherwise it is sent to a worker comm using
-        _send_multipart_worker.
+    def prepare_message(self, *args, header_kwargs=None, skip_serialization=False,
+                        skip_processing=False, skip_language2python=False,
+                        after_prepare_message=None):
+        r"""Perform actions preparing to send a message. The order of steps is
+
+            1. Convert the message based on the language
+            2. Isolate the message if there is only one
+            3. Check if the message is EOF
+            4. Check if the message should be filtered
+            5. Transform the message
+            6. Apply after_prepare_message functions
+            7. Serialize the message
+            8. Create a work comm if the message is too large to be sent all at once
 
         Args:
-            msg (obj): Message to be sent.
-            header_kwargs (dict, optional): Keyword arguments that should be
-                added to the header.
-            **kwargs: Additional keyword arguments are passed to _send or
-                _send_multipart_worker.
+            *args: Components of the outgoing message.
+            header_kwargs (dict, optional): Header options that should be set.
+            skip_serialization (bool, optional): If True, serialization will not
+                be performed. Defaults to False.
+            skip_processing (bool, optional): If True, filters, transformations, and
+                after_prepare_message function applications will not be performed.
+                Defaults to False.
+            skip_language2python (bool, optional): If True, language2python will be
+                skipped. Defaults to False.
+            after_prepare_message (list, optional): Functions that should be applied
+                after transformation, but before serialization. Defaults to None
+                and is ignored.
+
+        Returns:
+            CommMessage: Serialized and annotated message.
+
+        """
+        if (len(args) == 1) and isinstance(args[0], CommMessage):
+            msg = args[0]
+            if header_kwargs:
+                if msg.header is None:
+                    msg.header = header_kwargs
+                else:
+                    msg.header = copy.deepcopy(msg.header)
+                    msg.header.update(header_kwargs)
+        else:
+            if self.model_name:
+                if header_kwargs is None:
+                    header_kwargs = {}
+                header_kwargs.setdefault('model', self.model_name)
+            msg = CommMessage(args=args, header=header_kwargs,
+                              flag=FLAG_SUCCESS)
+            # 1. Convert the message based on the language
+            if not skip_language2python:
+                msg.args = self.language_driver.language2python(msg.args)
+            # 2. Isolate the message if there is only one
+            if len(msg.args) == 1:
+                msg.args = msg.args[0]
+                msg.singular = True
+            # 3. Check if the message is EOF
+            if self.is_eof(msg.args):
+                msg.flag = FLAG_EOF
+        if not skip_processing:
+            # 4. Check if the message should be filtered
+            if msg.flag not in [FLAG_SKIP, FLAG_EOF]:
+                if not self.evaluate_filter(*msg.tuple_args):
+                    self.debug("Sent message skipped based on filter: %.100s",
+                               str(msg.args))
+                    msg.flag = FLAG_SKIP
+                    return msg
+            # 5. Transform the message
+            if msg.flag not in [FLAG_SKIP, FLAG_EOF]:
+                args = self.apply_transform(msg.args, header=msg.header)
+                if isinstance(args, collections.abc.Iterator):
+                    try:
+                        msg.args = args.__next__()
+                    except StopIteration:
+                        msg.args = None
+                        msg.flag = FLAG_SKIP
+                        return msg
+                    for iarg in args:
+                        msg.add_message(args=iarg,
+                                        header=copy.deepcopy(msg.header))
+                else:
+                    msg.args = args
+                self.update_serializer_from_message(msg)
+            # 6. Apply after_prepare_message function
+            if after_prepare_message:
+                for x in after_prepare_message:
+                    msg = x(msg)
+        # Looping over all messages (allowing for transform to produce iterator)
+        if (msg.flag not in [FLAG_SKIP]) and (not skip_serialization):
+            for x in [msg] + msg.additional_messages:
+                # 7. Serialize the message
+                if self.no_serialization:
+                    x.msg = x.args
+                    x.length = 1
+                    x.flag = FLAG_SUCCESS
+                else:
+                    if x.flag == FLAG_EOF:
+                        if x.header:
+                            x.msg = self.serialize(x.args, header_kwargs=x.header,
+                                                   add_serializer_info=True)
+                        else:
+                            x.msg = x.args
+                    else:
+                        x.msg = self.serialize(x.args, header_kwargs=x.header)
+                        x.flag = FLAG_SUCCESS
+                    x.length = len(x.msg)
+                # 8. Create a work comm if the message is too large to be sent all
+                #    at once and re-serialize the message w/ the work comm info in it
+                if (x.length > self.maxMsgSize) and (self.maxMsgSize != 0):
+                    if x.flag == FLAG_EOF:  # pragma: debug
+                        raise NotImplementedError(("EOF message with header (%d) "
+                                                   "exceeds max message size (%d).")
+                                                  % (msg.length, self.maxMsgSize))
+                    if x.header is None:
+                        x.header = dict()
+                    x.worker = self.create_work_comm()
+                    # if 'address' not in x.header:
+                    #     x.worker = self.create_work_comm()
+                    # else:
+                    #     x.worker = self.get_work_comm(x.header)
+                    x.header = self.workcomm2header(x.worker, **x.header)
+                    total = self.serialize(x.args, header_kwargs=x.header)
+                    x.msg = total[:self.maxMsgSize]
+                    x.length = len(x.msg)
+                    for imsg in self.chunk_message(total[self.maxMsgSize:]):
+                        x.add_worker_message(msg=imsg, length=len(imsg))
+        return msg
+
+    def send(self, *args, **kwargs):
+        r"""Send a message.
+
+        Args:
+            *args: All arguments are assumed to be part of the message.
+            **kwargs: All keywords arguments are passed to prepare_message or
+                send_message.
 
         Returns:
             bool: Success or failure of send.
-        
+
         """
-        # Create serialized message that should be sent
-        flag, msg_s, header = self.on_send(msg, header_kwargs=header_kwargs)
-        if not flag:
-            return flag
-        if self.no_serialization:
-            msg_len = 1
-        else:
-            msg_len = len(msg_s)
-        # Sent first part of message which includes the header describing the
-        # work comm
-        self.special_debug('Sending %d bytes to %s', msg_len, self.address)
-        if (msg_len < self.maxMsgSize) or (self.maxMsgSize == 0):
-            flag = self._safe_send(msg_s, **kwargs)
-        else:
-            self.special_debug('Message will be split.')
-            flag = self._safe_send(msg_s[:self.maxMsgSize])
-            if flag:
-                # Send remainder of message using work comm
-                flag = self._send_multipart_worker(msg_s[self.maxMsgSize:],
-                                                   header, **kwargs)
-            else:  # pragma: debug
-                self.special_debug("Sending message header failed.")
-        if flag:
-            self.debug('Sent %d bytes to %s', msg_len, self.address)
-        else:  # pragma: debug
-            self.special_debug('Failed to send %d bytes', msg_len)
-            self._iterator_backlog = None
-        if flag and self._iterator_backlog:
-            for msg in self._iterator_backlog:
-                if not self.send_multipart(msg, header_kwargs=header_kwargs, **kwargs):
-                    return False
-            self._iterator_backlog = None
-        return flag
+        self.precheck('send')
+        kws_prepare = {k: kwargs.pop(k) for k in self._prepare_message_kws
+                       if k in kwargs}
+        msg = self.prepare_message(*args, **kws_prepare)
+        return self.send_message(msg, **kwargs)
 
     def send_nolimit(self, *args, **kwargs):
         r"""Alias for send."""
@@ -1882,190 +2026,178 @@ class CommBase(tools.YggClass):
         r"""Raw recv. Should be overridden by inheriting class."""
         raise IncompleteBaseComm("_recv method needs implemented.")
 
-    def _recv_multipart(self, data, leng_exp, **kwargs):
-        r"""Receive a message larger than YGG_MSG_MAX that is sent in multiple
-        parts.
-
-        Args:
-            data (str): Initial data received.
-            leng_exp (int): Size of message expected.
-            **kwargs: All keyword arguments are passed to _recv.
-
-        Returns:
-            tuple (bool, str): The success or failure of receiving a message
-                and the complete message received.
-
-        """
-        ret = True
-        while len(data) < leng_exp:
-            payload = self._safe_recv(**kwargs)
-            if not payload[0]:  # pragma: debug
-                self.debug("Read interupted at %d of %d bytes.",
-                           len(data), leng_exp)
-                ret = False
-                break
-            data = data + payload[1]
-            # if len(payload[1]) == 0:
-            #     self.sleep()
-        payload = (ret, data)
-        self.debug("Read %d/%d bytes", len(data), leng_exp)
-        return payload
-
-    def _recv_multipart_worker(self, info, **kwargs):
-        r"""Receive a message in multiple parts from a worker comm.
-
-        Args:
-            info (dict): Information about the incoming message.
-            **kwargs: Additional keyword arguments are passed to the
-                workcomm _recv_multipart method.
-
-        Returns:
-            tuple (bool, str): The success or failure of receiving a message
-                and the complete message received.
-
-        """
-        workcomm = self.get_work_comm(info)
-        out = workcomm._recv_multipart(info['body'], info['size'], **kwargs)
-        # self.remove_work_comm(info['id'], linger=True)
-        return out
-        
-    def on_recv_eof(self):
-        r"""Actions to perform when EOF received.
-
-        Returns:
-            bool: Flag that should be returned for EOF.
-
-        """
-        self.debug("Received EOF")
-        self._eof_recv.set()
-        if self.close_on_eof_recv:
-            self.debug("Lingering close on EOF Received")
-            self.linger_close()
-            return False
-        else:
-            return True
-
-    def on_recv(self, s_msg, previous_header=None):
-        r"""Process raw received message including handling deserializing
-        message and handling EOF.
-
-        Args:
-            s_msg (bytes, str): Raw bytes message.
-            previous_header (dict, optional): If not None, this is the header
-                for the message. Defaults to None.
-
-        Returns:
-            tuple (bool, str, dict): Success or failure, processed message, and
-                header information.
-
-        """
-        flag = True
-        metadata = previous_header
-        msg_, header = self.deserialize(s_msg, metadata=metadata)
-        if self.is_eof(msg_):
-            flag = self.on_recv_eof()
-            msg = msg_
-        elif not header.get('incomplete', False):
-            msg = self.apply_transform(msg_)
-        else:
-            msg = msg_
-        header['is_empty'] = self.is_empty_recv(msg)
-        if not (self.is_empty(s_msg, self.empty_bytes_msg)
-                or header.get('incomplete', False)):
-            # if not self._used:
-            #     self.serializer = serialize.get_serializer(**header)
-            #     msg, _ = self.deserialize(s_msg)
-            self._used = True
-        return flag, msg, header
-
-    def recv(self, *args, **kwargs):
+    def recv(self, *args, return_message_object=False, **kwargs):
         r"""Receive a message.
 
         Args:
             *args: All arguments are passed to comm _recv method.
+            return_message_object (bool, optional): If True, the full wrapped
+                CommMessage message object is returned instead of the tuple.
+                Defaults to False.
             **kwargs: All keywords arguments are passed to comm _recv method.
 
         Returns:
             tuple (bool, obj): Success or failure of receive and received
-                message.
+                message. If return_message_object is True, the CommMessage object
+                will be returned instead.
 
         """
         self.precheck('recv')
-        return_header = kwargs.pop('return_header', False)
-        if return_header:
-            out_error = (False, None, None)
+        kws_finalize = {k: kwargs.pop(k) for k in self._finalize_message_kws
+                        if k in kwargs}
+        msg = self.recv_message(*args, **kwargs)
+        msg = self.finalize_message(msg, **kws_finalize)
+        if msg.flag == FLAG_SKIP:
+            kwargs['return_message_object'] = return_message_object
+            kwargs.update(kws_finalize)
+            return self.recv(*args, **kwargs)
+        if return_message_object:
+            out = msg
         else:
-            out_error = (False, None)
+            out = (bool(msg.flag), msg.args)
+        return out
+
+    def recv_message(self, *args, skip_deserialization=False, **kwargs):
+        r"""Receive a message.
+
+        Args:
+            *args: Arguments are passed to _safe_recv.
+            skip_deserialization (bool, optional): If True, deserialization is not
+                performed. Defaults to False.
+            **kwargs: Additional keyword arguments are passed to _safe_recv.
+
+        Returns:
+            CommMessage: Received message.
+
+        """
+        no_serialization = (skip_deserialization or self.no_serialization)
         if self.is_closed:
             self.debug('Comm closed')
-            return out_error
+            return CommMessage(flag=FLAG_FAILURE)
         try:
-            flag, msg, header = self.recv_multipart(*args, **kwargs)
-            if flag and (not self.evaluate_filter(msg)):
-                assert(not self.single_use)
-                self.debug("Received message skipped based on "
-                           "filter: %.100s", str(msg))
-                kwargs['return_header'] = return_header
-                return self.recv(*args, **kwargs)
-            if self.single_use and self._used:
-                self.debug('Linger close on single use')
-                self.linger_close(active_confirm=self.is_async)
-            if return_header:
-                out = (flag, msg, header)
+            self.periodic_debug("recv_message", period=1000)(
+                "Receiving message from %s" % self.address)
+            flag, s_msg = self._safe_recv(*args, **kwargs)
+            msg = CommMessage(msg=s_msg)
+            if not flag:
+                msg.flag = FLAG_FAILURE
+                return msg
+            if no_serialization:
+                msg.args = msg.msg
+                msg.header = {}
+                if isinstance(msg.msg, bytes):
+                    msg.header['size'] = len(msg.msg)
             else:
-                out = (flag, msg)
-            out = self.language_driver.python2language(out)
-            return out
+                msg.args, msg.header = self.deserialize(msg.msg)
+            msg.flag = FLAG_SUCCESS
+            if msg.header.get('incomplete', False):
+                msg.msg = msg.args
+                msg.worker = self.get_work_comm(msg.header)
+                msg.flag = FLAG_INCOMPLETE
+                while len(msg.msg) < msg.header['size']:
+                    imsg = msg.worker.recv_message(skip_deserialization=True, **kwargs)
+                    if imsg.flag in [FLAG_EOF, FLAG_FAILURE]:
+                        self.error("Receive interupted at %d of %d bytes.",
+                                   len(msg.msg), msg.header['size'])
+                        msg.flag = FLAG_FAILURE
+                        break
+                    if imsg.flag == FLAG_SUCCESS:
+                        msg.msg += imsg.msg
+                self.debug("Received %d/%d bytes", len(msg.msg), msg.header['size'])
+                if msg.flag in [FLAG_INCOMPLETE, FLAG_SUCCESS]:
+                    if no_serialization or msg.header.get('raw', False):
+                        msg.args = msg.msg
+                    else:
+                        msg.args, msg.header = self.deserialize(msg.msg,
+                                                                metadata=msg.header)
+                    msg.flag = FLAG_SUCCESS
+                msg.worker.linger_close()
+            if not no_serialization:
+                self.update_message_from_serializer(msg)
         except TemporaryCommunicationError if self.is_async else NeverMatch:
             raise
         except BaseException:
             self.exception('Failed to recv.')
             self.close()
-            return out_error
+            return CommMessage(flag=FLAG_FAILURE)
+        if isinstance(msg.msg, bytes):
+            msg.length = len(msg.msg)
+        else:
+            msg.length = 1
+        if msg.length == 0:
+            msg.flag = FLAG_EMPTY
+        if msg.flag == FLAG_SUCCESS:
+            self.debug('%d bytes received from %s', msg.length, self.address)
+        if self.is_eof(msg.args):
+            msg.flag = FLAG_EOF
+        msg.header['commtype'] = self._commtype
+        return msg
 
-    def recv_multipart(self, *args, **kwargs):
-        r"""Receive a multipart message. If a message is received without a
-        header, it assumed to be complete. Otherwise, the message is received
-        in parts from a worker comm initialized by the sender.
+    def finalize_message(self, msg, skip_processing=False,
+                         skip_python2language=False, after_finalize_message=None):
+        r"""Perform actions to decipher a message. The order of steps is
+
+            1. Transform the message
+            2. Filter
+            3. python2language
+            4. Close comm on EOF if close_on_eof_recv set
+            5. Check for empty recv after processing
+            6. Mark comm as used and close if single use
+            7. Apply after_finalize_message functions
 
         Args:
-            *args: All arguments are passed to comm _recv method.
-            **kwargs: All keywords arguments are passed to comm _recv method.
+            msg (CommMessage): Initial message object to be finalized.
+            skip_processing (bool, optional): If True, filters, transformations,
+                and after_finalize_message funciton applications will not be
+                performed. Defaults to False.
+            skip_python2language (bool, optional): If True, python2language will
+                not be applied. Defaults to False.
+            after_finalize_message (list, optional): A set of function that should
+                be applied to received CommMessage objects following the standard
+                finalization. Defaults to None and is ignored.
 
         Returns:
-            tuple (bool, str): Success or failure of receive and received
-                message.
+            CommMessage: Deserialized and annotated message.
 
         """
-        self.special_debug("Receiving message from %s", self.address)
-        header = None
-        # Receive first part of message
-        flag, s_msg = self._safe_recv(*args, **kwargs)
-        if not flag:
-            return flag, s_msg, header
-        # Parse message
-        flag, msg, header = self.on_recv(s_msg)
-        if not flag:
-            if not header.get('raw', False):  # pragma: debug
-                self.debug("Failed to receive message header.")
-            return flag, msg, header
-        # Receive remainder of message that was not received
-        if header.get('incomplete', False):
-            header['body'] = msg
-            flag, s_msg = self._recv_multipart_worker(header, **kwargs)
-            if not flag:  # pragma: debug
-                return flag, s_msg, header
-            # Parse complete message
-            flag, msg, header2 = self.on_recv(s_msg, previous_header=header)
-        if isinstance(s_msg, bytes):
-            msg_len = len(s_msg)
-        else:
-            msg_len = 1
-        if flag and (msg_len > 0):
-            self.debug('%d bytes received from %s', msg_len, self.address)
-        header['commtype'] = self._commtype
-        return flag, msg, header
-        
+        if msg.finalized:
+            return msg
+        if not skip_processing:
+            # 1. Transform the message
+            if msg.flag == FLAG_SUCCESS:
+                if msg.stype is not None:
+                    msg.stype = self.apply_transform_to_type(msg.stype)
+                msg.args = self.apply_transform(msg.args)
+            # 2. Filter
+            if (msg.flag == FLAG_SUCCESS) and (not self.evaluate_filter(msg.args)):
+                msg.flag = FLAG_SKIP
+            # 3. Perform python2language
+            if (msg.flag in [FLAG_EOF, FLAG_SUCCESS]) and (not skip_python2language):
+                msg.args = self.language_driver.python2language(msg.args)
+        # 4. Close the comm on EOF
+        if msg.flag == FLAG_EOF:
+            self.debug("Received EOF")
+            if self.close_on_eof_recv:
+                self.debug("Lingering close on EOF Received")
+                self.linger_close()
+                msg.flag = FLAG_FAILURE
+        # 5. Check for empty receive
+        if (msg.flag == FLAG_SUCCESS) and (self.is_empty_recv(msg.args)):
+            msg.flag = FLAG_EMPTY
+        # if not (self.is_empty(msg.msg, self.empty_bytes_msg)
+        #         or msg.header.get('incomplete', False)):
+        # 6. Mark comm as used and close if single use
+        if msg.flag in [FLAG_EOF, FLAG_SUCCESS]:
+            self._used = True
+        if self.single_use and self._used:
+            self.debug('Linger close on single use')
+            self.linger_close(active_confirm=self.is_async)
+        # 7. Apply after_finalize_message functions
+        if after_finalize_message:
+            for x in after_finalize_message:
+                msg = x(msg)
+        return msg
+
     def recv_nolimit(self, *args, **kwargs):
         r"""Alias for recv."""
         return self.recv(*args, **kwargs)
@@ -2097,7 +2229,7 @@ class CommBase(tools.YggClass):
         r"""Purge all messages from the comm."""
         if self.direction == 'recv':
             while self.n_msg_recv > 0:  # pragma: debug
-                self.recv()
+                self.recv(skip_deserialization=True)
         self._n_sent = 0
         self._n_recv = 0
         self._last_send = None
@@ -2158,22 +2290,27 @@ class CommBase(tools.YggClass):
         if 'field_order' in kwargs:
             kwargs.setdefault('key_order', kwargs.pop('field_order'))
         key_order = kwargs.pop('key_order', None)
-        kwargs['return_header'] = True
-        flag, msg, header = self.recv(*args, **kwargs)
-        if flag and (not self.is_eof(msg)):
+        return_message_object = kwargs.pop('return_message_object', False)
+        kwargs['return_message_object'] = True
+        msg = self.recv(*args, **kwargs)
+        if msg.flag == FLAG_SUCCESS:
             if self.serializer.typedef['type'] == 'array':
-                metadata = copy.deepcopy(header)
+                metadata = copy.deepcopy(msg.header)
                 # if metadata is None:
                 #     metadata = {}
                 if key_order is not None:
                     metadata['key_order'] = key_order
                 metadata.setdefault('key_order', self.serializer.get_field_names())
-                msg_dict = JSONObjectMetaschemaType.coerce_type(msg, **metadata)
+                msg_dict = JSONObjectMetaschemaType.coerce_type(msg.args, **metadata)
             else:
-                msg_dict = {'f0': msg}
+                msg_dict = {'f0': msg.args}
         else:
-            msg_dict = msg
-        return flag, msg_dict
+            msg_dict = msg.args
+        out = copy.deepcopy(msg)
+        out.args = msg_dict
+        if not return_message_object:
+            out = (bool(out.flag), out.args)
+        return out
 
     # SEND/RECV FIELDS
     # def recv_field(self, field, *args, **kwargs):

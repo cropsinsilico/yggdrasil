@@ -86,7 +86,7 @@ class TestRPCRequestDriver(TestRPCRequestParam,
         assert_equal(srv_msg, msg_send)
         flag = self.recv_comm.send(srv_msg)
         assert(flag)
-        # Receive response on server side
+        # Receive response on client side
         flag, cli_msg = self.send_comm.recv(timeout=self.route_timeout)
         assert(flag)
         assert_equal(cli_msg, msg_send)
@@ -100,7 +100,8 @@ class TestRPCRequestDriver(TestRPCRequestParam,
 s = get_schema()
 comm_types = list(s['comm'].schema_subtypes.keys())
 for k in comm_types:
-    if k in [_default_comm, 'ValueComm', 'value']:  # pragma: debug
+    if k in [_default_comm, 'ValueComm', 'value',
+             'BufferComm', 'buffer']:  # pragma: debug
         continue
     tcls = type('Test%sRPCRequestDriver' % k,
                 (TestRPCRequestDriver, ), {'ocomm_name': k,
@@ -118,8 +119,6 @@ for k in comm_types:
     elif k in ['IPCComm', 'ipc']:
         flag_func = unittest.skipIf(not _ipc_installed,
                                     "IPC library not installed")
-    elif k in ['BufferComm', 'buffer']:
-        flag_func = unittest.skip("Buffer cannot be sent via header.")
     if flag_func is not None:
         tcls = flag_func(tcls)
     # Add class to globals

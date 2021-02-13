@@ -110,6 +110,13 @@ class TestTransformBase(YggTestClass):
                         self.assert_equal_msg(msg_recv, imsg_out,
                                               original=msg_in)
                     msg_recv = msg_out
+                elif ((self.transform in ['filter', 'FilterTransform'])
+                      and isinstance(msg_out, collections.abc.Iterator)):
+                    assert(recv_comm.n_msg_recv == 0)
+                    flag, msg_recv = recv_comm.recv(timeout=0.0)
+                    assert(flag)
+                    self.assert_equal_msg(msg_recv, b'', original=msg_in)
+                    msg_recv = msg_out
                 elif ((self.transform in ['map', 'MapFieldsTransform',
                                           'select_fields', 'SelectFieldsTransform'])
                       and isinstance(msg_out, np.ndarray)):

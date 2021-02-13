@@ -596,33 +596,39 @@ class FileComm(CommBase.CommBase):
                 out = 0
             return out
 
-    def on_send_eof(self, *args, **kwargs):
-        r"""Close file when EOF to be sent.
+    def prepare_message(self, *args, **kwargs):
+        r"""Perform actions preparing to send a message.
+
+        Args:
+            *args: Components of the outgoing message.
+            **kwargs: Keyword arguments are passed to the parent class's method.
 
         Returns:
-            bool: False so that message not sent.
+            CommMessage: Serialized and annotated message.
 
         """
-        flag, msg_s = super(FileComm, self).on_send_eof(*args, **kwargs)
-        try:
-            self.file_flush()
-        except (AttributeError, ValueError):  # pragma: debug
-            if self.is_open:
-                raise
-        # self.close()
-        return flag, msg_s
-
+        msg = super(FileComm, self).prepare_message(*args, **kwargs)
+        if msg.flag == CommBase.FLAG_EOF:
+            try:
+                self.file_flush()
+            except (AttributeError, ValueError):  # pragma: debug
+                if self.is_open:
+                    raise
+            # self.close()
+        return msg
+        
     def serialize(self, obj, **kwargs):
         r"""Serialize a message using the associated serializer."""
-        if (not self.concats_as_str) and (self.file_tell() != 0):
-            new_obj = obj
-            with open(self.current_address, 'rb') as fd:
-                old_obj = self.deserialize(fd.read())[0]
-            obj = self.serializer.concatenate([old_obj, new_obj])
-            assert(len(obj) == 1)
-            obj = obj[0]
-            # Reset file so that header will be written
-            self.reset_position(truncate=True)
+        with self._closing_thread.lock:
+            if (not self.concats_as_str) and self.is_open and (self.file_tell() != 0):
+                new_obj = obj
+                with open(self.current_address, 'rb') as fd:
+                    old_obj = self.deserialize(fd.read())[0]
+                obj = self.serializer.concatenate([old_obj, new_obj])
+                assert(len(obj) == 1)
+                obj = obj[0]
+                # Reset file so that header will be written
+                self.reset_position(truncate=True)
         return super(FileComm, self).serialize(obj, **kwargs)
 
     def _file_send(self, msg):

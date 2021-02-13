@@ -38,6 +38,8 @@ class ServerComm(CommBase.CommBase):
                             commtype=request_commtype)
         icomm_kwargs.setdefault('is_server', True)
         icomm_kwargs.setdefault('use_async', is_async)
+        if icomm_kwargs.get('use_async', False):
+            icomm_kwargs.setdefault('async_recv_method', 'recv_message')
         self.response_kwargs = response_kwargs
         self.icomm = get_comm(icomm_name, **icomm_kwargs)
         self.ocomm = OrderedDict()
@@ -205,37 +207,38 @@ class ServerComm(CommBase.CommBase):
         comm_kwargs = dict(address=header['response_address'],
                            direction='send', is_response_server=True,
                            single_use=True, **self.response_kwargs)
-        request_id = header['request_id']
-        while request_id in self.ocomm:  # pragma: debug
-            request_id += str(uuid.uuid4())
-        header['response_id'] = request_id
-        self.ocomm[request_id] = get_comm(
-            self.name + '.server_response_comm.' + request_id,
+        response_id = header['request_id']
+        while response_id in self.ocomm:  # pragma: debug
+            response_id += str(uuid.uuid4())
+        header['response_id'] = response_id
+        self.ocomm[response_id] = get_comm(
+            self.name + '.server_response_comm.' + response_id,
             **comm_kwargs)
         client_model = header.get('model', '')
-        self.ocomm[request_id].client_model = client_model
+        self.ocomm[response_id].client_model = client_model
+        self.ocomm[response_id].request_id = header['request_id']
         if client_model and (client_model not in self.clients):
             self.clients.append(client_model)
 
-    def remove_response_comm(self, request_id):
+    def remove_response_comm(self, response_id):
         r"""Remove response comm.
 
         Args:
-            request_id (str): The ID used to register the response
+            response_id (str): The ID used to register the response
                 comm that should be removed.
 
         """
-        ocomm = self.ocomm.pop(request_id, None)
+        ocomm = self.ocomm.pop(response_id, None)
         if ocomm is not None:
             ocomm.close_in_thread(no_wait=True)
             self._used_response_comms[ocomm.name] = ocomm
 
     # SEND METHODS
-    def send_to(self, request_id, *args, **kwargs):
+    def send_to(self, response_id, *args, **kwargs):
         r"""Send a message to a specific response comm.
 
         Args:
-            request_id (str): ID used to register the response comm.
+            response_id (str): ID used to register the response comm.
             *args: Arguments are passed to output comm send method.
             **kwargs: Keyword arguments are passed to output comm send method.
     
@@ -243,34 +246,57 @@ class ServerComm(CommBase.CommBase):
             obj: Output from output comm send method.
 
         """
-        # if self.is_closed:
-        #     self.debug("send(): Connection closed.")
-        #     return False
-        out = self.ocomm[request_id].send(*args, **kwargs)
-        self.errors += self.ocomm[request_id].errors
-        self.remove_response_comm(request_id)
-        return out
+        kwargs.setdefault('header_kwargs', {})
+        kwargs['header_kwargs']['response_id'] = response_id
+        return self.send(*args, **kwargs)
         
-    def send(self, *args, **kwargs):
-        r"""Send a message to the output comm.
+    def prepare_message(self, *args, **kwargs):
+        r"""Perform actions preparing to send a message.
 
         Args:
-            *args: Arguments are passed to output comm send method.
-            **kwargs: Keyword arguments are passed to output comm send method.
+            *args: Components of the outgoing message.
+            **kwargs: Keyword arguments are passed to the request comm's
+                prepare_message method.
 
         Returns:
-            obj: Output from output comm send method.
+            CommMessage: Serialized and annotated message.
 
         """
         if len(self.ocomm) == 0:  # pragma: debug
             raise RuntimeError("There is no registered response comm.")
-        return self.send_to(next(iter(self.ocomm.keys())),
-                            *args, **kwargs)
+        kwargs.setdefault('header_kwargs', {})
+        response_id = kwargs['header_kwargs'].get('response_id', None)
+        if response_id is None:
+            response_id = next(iter(self.ocomm.keys()))
+            kwargs['header_kwargs']['response_id'] = response_id
+        kwargs['header_kwargs']['request_id'] = self.ocomm[response_id].request_id
+        return self.ocomm[response_id].prepare_message(*args, **kwargs)
+        
+    def send_message(self, msg, **kwargs):
+        r"""Send a message encapsulated in a CommMessage object.
 
+        Args:
+            msg (CommMessage): Message to be sent.
+            **kwargs: Additional keyword arguments are passed to the response
+                comm's send_message method.
+
+        Returns:
+            bool: Success or failure of send.
+        
+        """
+        response_id = msg.header['response_id']
+        out = self.ocomm[response_id].send_message(msg, **kwargs)
+        self.errors += self.ocomm[response_id].errors
+        if out:
+            # Don't close here on failure which will allow send to be called
+            # again in async or driver loop
+            self.remove_response_comm(response_id)
+        return out
+                                                  
     # RECV METHODS
     def recv_from(self, *args, **kwargs):
         r"""Receive a message from the input comm and open a new response comm
-        for output using address from the header, returning the request_id.
+        for output using address from the header, returning the response_id.
 
         Args:
             *args: Arguments are passed to input comm recv method.
@@ -278,52 +304,60 @@ class ServerComm(CommBase.CommBase):
 
         Returns:
             tuple(bool, obj, str): Success or failure of recv call,
-                output from input comm recv method, and request_id that
+                output from input comm recv method, and response_id that
                 response should be sent to.
 
         """
-        kwargs['return_header'] = True
-        request_id = None
-        flag, msg, header = self.recv(*args, **kwargs)
-        if ((flag and (not self.icomm.is_eof(msg))
-             and (not self.icomm.is_empty_recv(msg)))):
-            request_id = header['response_id']
-        return flag, msg, request_id
+        return_message_object = kwargs.pop('return_message_object', False)
+        kwargs['return_message_object'] = True
+        response_id = None
+        out = self.recv(*args, **kwargs)
+        if not return_message_object:
+            if out.flag == CommBase.FLAG_SUCCESS:
+                response_id = out.header['response_id']
+            out = (bool(out.flag), out.args, response_id)
+        return out
     
-    def recv(self, *args, **kwargs):
-        r"""Receive a message from the input comm and open a new response comm
-        for output using address from the header.
+    def recv_message(self, *args, **kwargs):
+        r"""Receive a message.
 
         Args:
-            *args: Arguments are passed to input comm recv method.
-            **kwargs: Keyword arguments are passed to input comm recv method.
+            *args: Arguments are passed to the request comm's recv_message method.
+            **kwargs: Keyword arguments are passed to the request comm's recv_message
+                method.
 
         Returns:
-            obj: Output from input comm recv method.
+            CommMessage: Received message.
 
         """
-        # if self.is_closed:
-        #     self.debug("recv(): Connection closed.")
-        #     return (False, None)
-        return_header = kwargs.pop('return_header', False)
-        kwargs['return_header'] = True
-        flag, msg, header = self.icomm.recv(*args, **kwargs)
+        out = self.icomm.recv_message(*args, **kwargs)
         self.errors += self.icomm.errors
-        if flag:
-            if isinstance(msg, bytes) and (msg == YGG_CLIENT_EOF):
-                self.debug("Client signed off: %s",
-                           header['model'])
-                self.closed_clients.append(header['model'])
-                kwargs['return_header'] = return_header
-                return self.recv(*args, **kwargs)
-            elif not (self.icomm.is_eof(msg) or self.icomm.is_empty_recv(msg)):
-                self.create_response_comm(header)
-        if return_header:
-            out = (flag, msg, header)
-        else:
-            out = (flag, msg)
         return out
+        
+    def finalize_message(self, msg, **kwargs):
+        r"""Perform actions to decipher a message.
 
+        Args:
+            msg (CommMessage): Initial message object to be finalized.
+            **kwargs: Keyword arguments are passed to the request comm's
+                finalize_message method.
+
+        Returns:
+            CommMessage: Deserialized and annotated message.
+
+        """
+        def check_for_client_info(msg):
+            if msg.flag == CommBase.FLAG_SUCCESS:
+                if isinstance(msg.args, bytes) and (msg.args == YGG_CLIENT_EOF):
+                    self.debug("Client signed off: %s", msg.header['model'])
+                    self.closed_clients.append(msg.header['model'])
+                    msg.flag = CommBase.FLAG_SKIP
+                else:
+                    self.create_response_comm(msg.header)
+            return msg
+        out = self.icomm.finalize_message(msg, **kwargs)
+        return check_for_client_info(out)
+        
     # OLD STYLE ALIASES
     def rpcSend(self, *args, **kwargs):
         r"""Alias for RPCComm.send"""

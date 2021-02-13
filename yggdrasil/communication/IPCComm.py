@@ -30,7 +30,10 @@ def get_queue(qid=None):
         kwargs = dict(max_message_size=tools.get_YGG_MSG_MAX())
         if qid is None:
             kwargs['flags'] = sysv_ipc.IPC_CREX
-        mq = sysv_ipc.MessageQueue(qid, **kwargs)
+        try:
+            mq = sysv_ipc.MessageQueue(qid, **kwargs)
+        except sysv_ipc.ExistentialError as e:  # pragma: debug
+            raise sysv_ipc.ExistentialError("%s: %s" % (e, qid))
         key = str(mq.key)
         IPCComm.register_comm(key, mq)
         return mq

@@ -12,6 +12,11 @@ class NoMessages(TemporaryCommunicationError):
     pass
 
 
+class FatalCommunicationError(Exception):
+    r"""Raised when the comm cannot recover."""
+    pass
+
+
 def import_comm(commtype=None):
     r"""Import a comm class from its component subtype.
 
@@ -99,13 +104,18 @@ def new_comm(name, commtype=None, use_async=False, **kwargs):
     comm_cls = import_comm(commtype)
     if kwargs.get('is_interface', False):
         use_async = False
+    async_kws = {}
+    if use_async:
+        from yggdrasil.communication.AsyncComm import AsyncComm
+        async_kws = {k: kwargs.pop(k) for k in AsyncComm._async_kws
+                     if k in kwargs}
     if use_async:
         kwargs['is_async'] = True
     out = comm_cls.new_comm(name, **kwargs)
     if use_async and (out._commtype not in [None, 'client',
                                             'server', 'fork']):
         from yggdrasil.communication.AsyncComm import AsyncComm
-        out = AsyncComm(out)
+        out = AsyncComm(out, **async_kws)
     return out
 
 

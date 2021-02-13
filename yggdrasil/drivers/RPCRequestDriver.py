@@ -1,5 +1,6 @@
 from yggdrasil.drivers.ConnectionDriver import ConnectionDriver, run_remotely
 from yggdrasil.drivers.RPCResponseDriver import RPCResponseDriver
+from yggdrasil.communication import CommBase
 
 # ----
 # Client sends resquest to local client output comm
@@ -81,33 +82,6 @@ class RPCRequestDriver(ConnectionDriver):
             out[k]['YGG_IS_SERVER'] = 'True'
         return out
         
-    @property
-    def last_header(self):
-        r"""dict: Information contained in the header of the last message
-        received from the client model."""
-        if self._last_header is None:
-            raise AttributeError("No new requests have been received, so there "
-                                 + "does not yet exist information required for "
-                                 + "creating a response comm and fowarding the "
-                                 + "request.")
-        return self._last_header
-
-    @property
-    def request_id(self):
-        r"""str: Unique ID for the last message."""
-        return self.last_header['request_id']
-
-    @property
-    def response_address(self):
-        r"""str: The address of the channel used by the server response driver
-        to send responses."""
-        return self.last_header['response_address']
-
-    @property
-    def client_model(self):
-        r"""str: Name of the client model."""
-        return self.last_header.get('model', '')
-
     def close_response_drivers(self):
         r"""Close response driver."""
         with self.lock:
@@ -144,7 +118,8 @@ class RPCRequestDriver(ConnectionDriver):
         with self.lock:
             if (direction == "input") and (name in self.clients):
                 super(RPCRequestDriver, self).send_message(
-                    YGG_CLIENT_EOF,
+                    CommBase.CommMessage(args=YGG_CLIENT_EOF,
+                                         flag=CommBase.FLAG_SUCCESS),
                     header_kwargs={'raw': True, 'model': name})
             out = super(RPCRequestDriver, self).remove_model(
                 direction, name)
@@ -152,27 +127,36 @@ class RPCRequestDriver(ConnectionDriver):
                 self.send_eof()
             return out
         
-    def on_eof(self):
+    def on_eof(self, msg):
         r"""On EOF, decrement number of clients. Only send EOF if the number
-        of clients drops to 0."""
+        of clients drops to 0.
+
+        Args:
+            msg (CommMessage): Message object that provided the EOF.
+
+        Returns:
+            CommMessage, bool: Value that should be returned by recv_message on EOF.
+
+        """
         with self.lock:
-            self.remove_model('input', self.client_model)
+            self.remove_model('input', msg.header.get('model', ''))
             if self.nclients == 0:
                 self.debug("All clients have signed off (EOF).")
-                return super(RPCRequestDriver, self).on_eof()
-        return self.icomm.empty_obj_recv
+                return super(RPCRequestDriver, self).on_eof(msg)
+        return CommBase.CommMessage(flag=CommBase.FLAG_EMPTY,
+                                    args=self.icomm.empty_obj_recv)
 
     def before_loop(self):
         r"""Send client sign on to server response driver."""
         super(RPCRequestDriver, self).before_loop()
         self.ocomm._send_serializer = True
 
-    def send_message(self, *args, **kwargs):
+    def send_message(self, msg, **kwargs):
         r"""Start a response driver for a request message and send message with
         header.
 
         Args:
-            *args: Arguments are passed to parent class send_message.
+            msg (CommMessage): Message being sent.
             **kwargs: Keyword arguments are passed to parent class send_message.
 
         Returns:
@@ -182,26 +166,25 @@ class RPCRequestDriver(ConnectionDriver):
         if self.ocomm.is_closed:
             return False
         # Start response driver
-        is_eof = kwargs.get('is_eof', False)
-        if not is_eof:
+        if msg.flag != CommBase.FLAG_EOF:
             with self.lock:
                 if (not self.is_comm_open) or self._block_response:  # pragma: debug
                     self.debug("Comm closed, not creating response driver.")
                     return False
-                drv_args = [self.response_address]
+                drv_args = [msg.header['response_address']]
                 drv_kwargs = dict(
-                    msg_id=self.request_id,
+                    msg_id=msg.header['request_id'],
                     request_name=self.name,
                     inputs=[{'commtype': self.ocomm._commtype}],
-                    outputs=[{'commtype': self.last_header["commtype"]}])
+                    outputs=[{'commtype': msg.header["commtype"]}])
                 self.debug("Creating response comm: address = %s, request_id = %s",
-                           self.response_address, self.request_id)
+                           msg.header['response_address'], msg.header['request_id'])
                 try:
                     response_driver = RPCResponseDriver(*drv_args, **drv_kwargs)
                     self.response_drivers.append(response_driver)
                     response_driver.start()
                     self.debug("Started response comm: address = %s, request_id = %s",
-                               self.response_address, self.request_id)
+                               msg.header['response_address'], msg.header['request_id'])
                 except BaseException:  # pragma: debug
                     self.exception("Could not create/start response driver.")
                     return False
@@ -209,9 +192,9 @@ class RPCRequestDriver(ConnectionDriver):
             kwargs.setdefault('header_kwargs', {})
             kwargs['header_kwargs'].setdefault(
                 'response_address', response_driver.response_address)
-            kwargs['header_kwargs'].setdefault('request_id', self.request_id)
-            kwargs['header_kwargs'].setdefault('model', self.client_model)
-        return super(RPCRequestDriver, self).send_message(*args, **kwargs)
+            kwargs['header_kwargs'].setdefault('request_id', msg.header['request_id'])
+            kwargs['header_kwargs'].setdefault('model', msg.header.get('model', ''))
+        return super(RPCRequestDriver, self).send_message(msg, **kwargs)
 
     def run_loop(self):
         r"""Run the driver. Continue looping over messages until there are not

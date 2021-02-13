@@ -10,6 +10,9 @@ class TestForkComm(parent.TestCommBase):
     attr_list = (copy.deepcopy(parent.TestCommBase.attr_list)
                  + ['comm_list', 'curr_comm_index'])
     ncomm = 2
+    test_error_send = None
+    test_error_recv = None
+    test_work_comm = None
 
     @property
     def cleanup_comm_classes(self):
@@ -26,18 +29,6 @@ class TestForkComm(parent.TestCommBase):
     def test_error_name(self):
         r"""Test error on missing address."""
         self.assert_raises(RuntimeError, self.import_cls, 'test%s' % uuid.uuid4())
-
-    def test_error_send(self):
-        r"""Disabled: Test error on send."""
-        pass
-
-    def test_error_recv(self):
-        r"""Disabled: Test error on recv."""
-        pass
-
-    def test_work_comm(self):
-        r"""Disabled: Test creating/removing a work comm."""
-        pass
 
     def do_send_recv(self, *args, **kwargs):
         r"""Generic send/recv of a message."""

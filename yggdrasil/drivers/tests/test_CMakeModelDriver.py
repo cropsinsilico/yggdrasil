@@ -156,15 +156,12 @@ class TestCMakeModelDriverNoInit(TestCMakeModelParam,
                                  parent.TestCompiledModelDriverNoInit):
     r"""Test runner for CMakeModelDriver without init."""
 
+    test_build = None
+
     def __init__(self, *args, **kwargs):
         super(TestCMakeModelDriverNoInit, self).__init__(*args, **kwargs)
         self._inst_kwargs['skip_compile'] = True
 
-    @unittest.skip("Redundant since called by C driver.")
-    def test_build(self):  # pragma: no cover
-        r"""Test building libraries as a shared/static library or object files."""
-        pass
-    
     def run_model_instance(self, **kwargs):
         r"""Create a driver for a model and run it."""
         kwargs.setdefault('skip_compile', False)

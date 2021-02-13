@@ -7,6 +7,7 @@ class ValueComm(CommBase):
     _schema_subtype_description = ('Constant value.')
     _schema_properties = {
         'count': {'type': 'integer', 'default': 1}}
+    no_serialization = True
 
     def __init__(self, *args, **kwargs):
         self._is_open = False

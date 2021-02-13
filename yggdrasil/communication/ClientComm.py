@@ -185,6 +185,8 @@ class ClientComm(CommBase.CommBase):
         r"""Create a response comm based on information from the last header."""
         comm_kwargs = dict(direction='recv', is_response_client=True,
                            single_use=True, **self.response_kwargs)
+        if comm_kwargs.get('use_async', False):
+            comm_kwargs['async_recv_method'] = 'recv_message'
         header = dict(request_id=str(uuid.uuid4()))
         while header['request_id'] in self.icomm:  # pragma: debug
             header['request_id'] += str(uuid.uuid4())
@@ -201,58 +203,82 @@ class ClientComm(CommBase.CommBase):
         icomm.close()
 
     # SEND METHODS
-    def send(self, *args, **kwargs):
-        r"""Create a response comm and then send a message to the output comm
-        with the response address in the header.
+    def prepare_message(self, *args, **kwargs):
+        r"""Perform actions preparing to send a message.
 
         Args:
-            *args: Arguments are passed to output comm send method.
-            **kwargs: Keyword arguments are passed to output comm send method.
+            *args: Components of the outgoing message.
+            **kwargs: Keyword arguments are passed to the request comm's
+                prepare_message method.
 
         Returns:
-            obj: Output from output comm send method.
+            CommMessage: Serialized and annotated message.
 
         """
-        msg = args
-        if len(args) == 1:
-            msg = args[0]
-        # if self.is_closed:
-        #     self.debug("send(): Connection closed.")
-        #     return False
-        created_response = False
-        # Setting header_kwargs to empty dict ensures that the model
-        # name will be added even when messages is EOF
-        kwargs.setdefault('header_kwargs', {})
-        if (not self.is_eof(msg)) and self.ocomm.evaluate_filter(msg):
-            kwargs['header_kwargs'].update(self.create_response_comm())
-            created_response = True
-        out = self.ocomm.send(*args, **kwargs)
-        if (not out) and created_response:
-            self.remove_response_comm()
+        def add_response_address(msg):
+            if msg.flag == CommBase.FLAG_SUCCESS:
+                if msg.header is None:
+                    msg.header = {}
+                msg.header.update(self.create_response_comm())
+            return msg
+        kwargs.setdefault('after_prepare_message', [])
+        kwargs['after_prepare_message'].append(add_response_address)
+        return self.ocomm.prepare_message(*args, **kwargs)
+        
+    def send_message(self, msg, **kwargs):
+        r"""Send a message encapsulated in a CommMessage object.
+
+        Args:
+            msg (CommMessage): Message to be sent.
+            **kwargs: Additional keyword arguments are passed to the request
+                comm's send_message method.
+
+        Returns:
+            bool: Success or failure of send.
+        
+        """
+        out = self.ocomm.send_message(msg, **kwargs)
+        self.errors += self.ocomm.errors
         return out
-
+        
     # RECV METHODS
-    def recv(self, *args, **kwargs):
-        r"""Receive a message from the input comm and open a new response comm
-        for output using address from the header.
+    def recv_message(self, *args, **kwargs):
+        r"""Receive a message.
 
         Args:
-            *args: Arguments are passed to input comm recv method.
-            **kwargs: Keyword arguments are passed to input comm recv method.
+            *args: Arguments are passed to the response comm's recv_message method.
+            **kwargs: Keyword arguments are passed to the response comm's recv_message
+                method.
 
         Returns:
-            obj: Output from input comm recv method.
+            CommMessage: Received message.
 
         """
-        # if self.is_closed:
-        #     self.debug("recv(): Connection closed.")
-        #     return (False, None)
         if len(self.icomm) == 0:  # pragma: debug
             raise RuntimeError("There are not any registered response comms.")
-        out = self.icomm[self.icomm_order[0]].recv(*args, **kwargs)
-        self.remove_response_comm()
+        out = self.icomm[self.icomm_order[0]].recv_message(*args, **kwargs)
+        self.errors += self.icomm[self.icomm_order[0]].errors
         return out
 
+    def finalize_message(self, msg, **kwargs):
+        r"""Perform actions to decipher a message.
+
+        Args:
+            msg (CommMessage): Initial message object to be finalized.
+            **kwargs: Keyword arguments are passed to the response comm's
+                finalize_message method.
+
+        Returns:
+            CommMessage: Deserialized and annotated message.
+
+        """
+        if len(self.icomm) == 0:  # pragma: debug
+            raise RuntimeError("There are not any registered response comms.")
+        msg = self.icomm[self.icomm_order[0]].finalize_message(msg, **kwargs)
+        if msg.flag in [CommBase.FLAG_SUCCESS, CommBase.FLAG_FAILURE]:
+            self.remove_response_comm()
+        return msg
+        
     # CALL
     def call(self, *args, **kwargs):
         r"""Do RPC call. The request message is sent to the output comm and the

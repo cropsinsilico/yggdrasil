@@ -376,34 +376,6 @@ class RMQComm(CommBase.CommBase):
         out['exchange'] = self.exchange
         return out
 
-    # def _send_multipart_worker(self, msg, header, **kwargs):
-    #     r"""Send multipart message to the worker comm identified.
-
-    #     Args:
-    #         msg (str): Message to be sent.
-    #         header (dict): Message info including work comm address.
-
-    #     Returns:
-    #         bool: Success or failure of sending the message.
-
-    #     """
-    #     self.sched_task(0.0, super(RMQComm, self)._send_multipart_worker,
-    #                     args=[msg, header], kwargs=kwargs, store_output=True)
-    #     T = self.start_timeout()
-    #     while (not T.is_out) and (self.sched_out is None):  # pragma: debug
-    #         self.sleep()
-    #     self.stop_timeout()
-    #     out = self.sched_out
-    #     self.sched_out = None
-    #     # workcomm = self.get_work_comm(header)
-    #     # args = [msg]
-    #     # self.sched_task(self.sleeptime, workcomm._send_multipart,
-    #     #                 args=args, kwargs=kwargs)
-    #     # self.sched_task(1, self.remove_work_comm,
-    #     #                 args=[header['id']], kwargs=dict(dont_close=True))
-    #     # self.remove_work_comm(header['id'], dont_close=True)
-    #     return out
-    
     def _send(self, msg, exchange=None, routing_key=None, **kwargs):
         r"""Send a message.
 

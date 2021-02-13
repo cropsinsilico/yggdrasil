@@ -193,7 +193,7 @@ class TestCommBase(YggTestClassInfo):
         r"""Test error on send."""
         send_inst, recv_inst = self.get_fresh_error_instance()
         send_inst._first_send_done = True
-        send_inst.error_replace('send_multipart')
+        send_inst.error_replace('_safe_send')
         flag = send_inst.send(self.test_msg)
         assert(not flag)
         send_inst.restore_all()
@@ -205,7 +205,7 @@ class TestCommBase(YggTestClassInfo):
         self.fd_count
         send_inst, recv_inst = self.get_fresh_error_instance(recv=True)
         self.fd_count
-        recv_inst.error_replace('recv_multipart')
+        recv_inst.error_replace('_safe_recv')
         if recv_inst.is_async:
             nloop = max(1, recv_inst.backlog_thread.loop_count + 1)
             recv_inst.backlog_thread.wait_for_loop(timeout=10.0,
@@ -271,6 +271,7 @@ class TestCommBase(YggTestClassInfo):
         # Create recv instance in way that tests new_comm
         header_recv = dict(id=self.uuid + '1', address=wc_send.address)
         recv_kwargs = self.instance.get_work_comm_kwargs
+        recv_kwargs.pop('async_recv_kwargs', None)
         recv_kwargs['work_comm_name'] = 'test_worker_%s' % header_recv['id']
         recv_kwargs['commtype'] = wc_send._commtype
         if isinstance(wc_send.opp_address, str):
@@ -351,7 +352,7 @@ class TestCommBase(YggTestClassInfo):
                      close_on_send_eof=None, close_on_recv_eof=None,
                      no_recv=False, recv_timeout=None):
         r"""Generic send/recv of a message."""
-        tkey = 'do_send_recv'
+        tkey = '.do_send_recv'
         is_eof_send = (('eof' in send_meth) or self.send_instance.is_eof(msg_send))
         is_eof_recv = (is_eof_send or self.recv_instance.is_eof(msg_recv))
         if recv_timeout is None:

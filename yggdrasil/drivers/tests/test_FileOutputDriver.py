@@ -1,5 +1,4 @@
 import os
-import unittest
 from yggdrasil.schema import get_schema
 import yggdrasil.drivers.tests.test_ConnectionDriver as parent
 
@@ -78,6 +77,9 @@ class TestFileOutputDriverNoInit(TestFileOutputParam,
 class TestFileOutputDriver(TestFileOutputParam, parent.TestConnectionDriver):
     r"""Test runner for FileOutputDriver."""
 
+    test_send_recv = None
+    test_send_recv_nolimit = None
+
     def send_file_contents(self):
         r"""Send file contents to driver."""
         for x in self.testing_options['send']:
@@ -124,16 +126,6 @@ class TestFileOutputDriver(TestFileOutputParam, parent.TestConnectionDriver):
         r"""Commands to run while the instance is running, before terminate."""
         # Don't send any messages to the file
         pass
-    
-    @unittest.skipIf(True, 'File driver')
-    def test_send_recv(self):
-        r"""Disabled: Test sending/receiving small message."""
-        pass  # pragma: no cover
-
-    @unittest.skipIf(True, 'File driver')
-    def test_send_recv_nolimit(self):
-        r"""Disabled: Test sending/receiving large message."""
-        pass  # pragma: no cover
 
 
 # Dynamically create tests based on registered file classes

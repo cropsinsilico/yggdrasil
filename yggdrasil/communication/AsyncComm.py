@@ -17,6 +17,14 @@ class AsyncComm(ProxyObject, ComponentBaseUnregistered):
 
     Args:
         name (str): The name of the message queue.
+        async_recv_method (str, optional): The method that should be used
+            to receive message into the backlog. Defaults to 'recv'.
+        async_send_method (str, optional): The method that should be used
+            to send message in the backlog. Defaults to 'send_message'.
+        async_recv_kwargs (dict, optional): Keyword arguments to pass to calls
+            receiving messages into the backlog. Defaults to {}.
+        async_send_method (dict, optional): Keyword arguments to pass to calls
+            sending message from the backlog. Defaults to {}.
         **kwargs: Additional keyword arguments are passed to CommBase.
         
     Attributes:
@@ -27,11 +35,17 @@ class AsyncComm(ProxyObject, ComponentBaseUnregistered):
 
     __slots__ = ['_backlog_buffer', '_backlog_thread',
                  'backlog_ready', '_used_direct', 'close_on_eof_recv',
-                 '_used', '_closed']
+                 '_used', '_closed',
+                 'async_recv_method', 'async_send_method',
+                 'async_recv_kwargs', 'async_send_kwargs']
     __overrides__ = ['_input_args', '_input_kwargs']
     _disconnect_attr = ['backlog_ready', '_backlog_thread', '_wrapped']
+    _async_kws = ['async_recv_method', 'async_send_method',
+                  'async_recv_kwargs', 'async_send_kwargs']
 
-    def __init__(self, wrapped):
+    def __init__(self, wrapped,
+                 async_recv_method='recv', async_send_method='send_message',
+                 async_recv_kwargs=None, async_send_kwargs=None):
         self._backlog_buffer = []
         self._backlog_thread = None
         self.backlog_ready = multitasking.Event()
@@ -39,6 +53,14 @@ class AsyncComm(ProxyObject, ComponentBaseUnregistered):
         self.close_on_eof_recv = wrapped.close_on_eof_recv
         self._used = False
         self._closed = False
+        self.async_recv_method = async_recv_method
+        self.async_send_method = async_send_method
+        if async_recv_kwargs is None:
+            async_recv_kwargs = {}
+        if async_send_kwargs is None:
+            async_send_kwargs = {}
+        self.async_recv_kwargs = async_recv_kwargs
+        self.async_send_kwargs = async_send_kwargs
         wrapped.close_on_eof_recv = False
         wrapped.is_async = True
         super(AsyncComm, self).__init__(wrapped)
@@ -293,9 +315,10 @@ class AsyncComm(ProxyObject, ComponentBaseUnregistered):
         self.periodic_debug("send_direct", period=1000)(
             "Sending message to %s", self.address)
         self.suppress_special_debug = True
+        kwargs.update(self.async_send_kwargs)
         try:
             kwargs.setdefault('timeout', 0)
-            if self._wrapped.send(*args, **kwargs):
+            if getattr(self._wrapped, self.async_send_method)(*args, **kwargs):
                 async_flag = FLAG_SUCCESS
                 self._used_direct = True
             else:
@@ -305,32 +328,34 @@ class AsyncComm(ProxyObject, ComponentBaseUnregistered):
         self.suppress_special_debug = False
         return async_flag
 
-    def recv_direct(self, **kwargs):
+    def recv_direct(self):
         r"""Receive a message directly from the underlying comm."""
         self.periodic_debug("recv_direct", period=1000)(
             "Receiving message from %s", self.address)
         self.suppress_special_debug = True
-        data = None
-        header = None
+        msg = None
+        kwargs = self.async_recv_kwargs
         try:
             kwargs.setdefault('timeout', 0)
-            kwargs['return_header'] = True
-            flag, data, header = self._wrapped.recv(**kwargs)
-            if flag:
-                if self._wrapped.is_empty_recv(data):
-                    async_flag = FLAG_TRYAGAIN
-                else:
-                    async_flag = FLAG_SUCCESS
-                    self._used_direct = True
-            else:
-                if self.is_eof(data):
+            if self.async_recv_method != 'recv_message':
+                kwargs['return_message_object'] = True
+            msg = getattr(self._wrapped, self.async_recv_method)(**kwargs)
+            if msg.flag in [CommBase.FLAG_EMPTY, CommBase.FLAG_SKIP]:
+                async_flag = FLAG_TRYAGAIN
+            elif msg.flag in [CommBase.FLAG_SUCCESS, CommBase.FLAG_EOF]:
+                async_flag = FLAG_SUCCESS
+                self._used_direct = True
+            elif msg.flag == CommBase.FLAG_FAILURE:
+                if self.is_eof(msg.args):
                     async_flag = FLAG_SUCCESS
                 else:
                     async_flag = FLAG_FAILURE
+            else:  # pragma: debug
+                raise Exception("Unsupport flag: %s" % msg.flag)
         except TemporaryCommunicationError:
             async_flag = FLAG_TRYAGAIN
         self.suppress_special_debug = False
-        return async_flag, data, header
+        return async_flag, msg
 
     def send_backlog(self):
         r"""Send a message from the send backlog to the queue."""
@@ -351,13 +376,28 @@ class AsyncComm(ProxyObject, ComponentBaseUnregistered):
         if not self.is_open_direct:
             flag = False
         else:
-            async_flag, data, header = self.recv_direct()
+            async_flag, msg = self.recv_direct()
             flag = bool(async_flag)
             if async_flag == FLAG_SUCCESS:
-                self.add_backlog((data, header))
+                self.add_backlog(msg)
         self.confirm_recv()
         return flag
 
+    def send_message(self, msg, **kwargs):
+        r"""Send a message encapsulated in a CommMessage object.
+
+        Args:
+            msg (CommMessage): Message to be sent.
+            **kwargs: Additional keyword arguments are passed to _safe_send.
+
+        Returns:
+            bool: Success or failure of send.
+        
+        """
+        # This is required so that call to send_message for work comms
+        # in CommBase.send_message will put the messages in the backlog
+        return self.send(msg, **kwargs)
+        
     def send(self, *args, **kwargs):
         r"""Send a message to the backlog.
 
@@ -370,13 +410,19 @@ class AsyncComm(ProxyObject, ComponentBaseUnregistered):
 
         """
         self.precheck('send')
+        kws_prepare = {k: kwargs.pop(k) for k in self._prepare_message_kws
+                       if k in kwargs}
         if not self.is_open_direct:  # pragma: debug
             return False
+        if (len(args) == 1) and isinstance(args[0], CommBase.CommMessage):
+            msg = args[0]
+        else:
+            msg = self._wrapped.prepare_message(*args, **kws_prepare)
         if not self.backlog_ready.is_set():
-            async_flag = self.send_direct(*args, **kwargs)
+            async_flag = self.send_direct(msg, **kwargs)
             if async_flag != FLAG_TRYAGAIN:
                 return bool(async_flag)
-        self.add_backlog((args, kwargs))
+        self.add_backlog(((msg, ), kwargs))
         self._used = True
         return True
 
@@ -393,11 +439,36 @@ class AsyncComm(ProxyObject, ComponentBaseUnregistered):
         """
         return self.send(self.eof_msg, *args, **kwargs)
 
-    def recv(self, timeout=None, return_header=False, **kwargs):
+    def recv_message(self, *args, **kwargs):
+        r"""Receive a message.
+
+        Args:
+            *args: Arguments are passed to the response comm's recv_message method.
+            **kwargs: Keyword arguments are passed to the response comm's recv_message
+                method.
+
+        Returns:
+            CommMessage: Received message.
+
+        """
+        # This is required so that call to recv_message for work comms
+        # in CommBase.recv_message will retrieve messages from the backlog
+        kwargs['return_message_object'] = True
+        kwargs['dont_finalize'] = True
+        return self.recv(*args, **kwargs)
+        
+    def recv(self, timeout=None, return_message_object=False, dont_finalize=False,
+             **kwargs):
         r"""Receive a message.
 
         Args:
             *args: All arguments are passed to comm _recv method.
+            return_message_object (bool, optional): If True, the full wrapped
+                CommMessage message object is returned instead of the tuple.
+                Defaults to False.
+            dont_finalize (bool, optional): If True, finalize_message will not
+                be called even if async_recv_method is 'recv_message'. Defaults
+                to False.
             **kwargs: All keywords arguments are passed to comm _recv method.
 
         Returns:
@@ -426,21 +497,24 @@ class AsyncComm(ProxyObject, ComponentBaseUnregistered):
                 if self.backlog_thread.was_break:
                     self.info("Break stack:\n%s",
                               self.backlog_thread.break_stack)
-                out = (False, None, None)
+                out = CommBase.CommMessage(flag=CommBase.FLAG_FAILURE)
             else:
-                out = (True, self.empty_obj_recv, None)
+                out = CommBase.CommMessage(flag=CommBase.FLAG_EMPTY,
+                                           args=self.empty_obj_recv)
         # Return backlogged message
         else:
             self.debug('Returning backlogged received message')
-            msg, header = self.pop_backlog()
-            flag = True
-            if self.is_eof(msg) and self.close_on_eof_recv:
-                flag = False
-                self.close()
-            self._used = True
-            out = (flag, msg, header)
-        if not return_header:
-            out = (out[0], out[1])
+            out = self.pop_backlog()
+            if not dont_finalize:
+                # if self.is_eof(out.args) and self.close_on_eof_recv:
+                if (out.flag == CommBase.FLAG_EOF) and self.close_on_eof_recv:
+                    self.close()
+                    out.flag = CommBase.FLAG_FAILURE
+                self._used = True
+        if (not dont_finalize) and (self.async_recv_method == 'recv_message'):
+            out = self._wrapped.finalize_message(out)
+        if not return_message_object:
+            out = (bool(out.flag), out.args)
         return out
 
     def purge(self):

@@ -7,7 +7,7 @@ from yggdrasil.components import import_component
 from yggdrasil.drivers.tests import test_Driver as parent
 from yggdrasil.drivers.ConnectionDriver import ConnectionDriver
 from yggdrasil.communication import (
-    new_comm, ZMQComm, IPCComm, RMQComm)
+    new_comm, CommBase, ZMQComm, IPCComm, RMQComm)
 
 
 _default_comm = tools.get_default_comm()
@@ -259,7 +259,7 @@ class TestConnectionDriverNoStart(TestConnectionParam, parent.TestDriverNoStart)
         assert(self.instance.is_comm_closed)
         assert(self.send_comm.is_closed)
         assert(self.recv_comm.is_closed)
-        flag = self.instance.send_message()
+        flag = self.instance.send_message(CommBase.CommMessage(args=self.test_msg))
         assert(not flag)
         flag = self.instance.recv_message()
         if self.instance.icomm._commtype != 'value':
@@ -362,39 +362,52 @@ class TestConnectionDriver(TestConnectionParam, parent.TestDriver):
     @pytest.mark.timeout(timeout=600)
     def test_send_recv(self):
         r"""Test sending/receiving small message."""
-        if self.instance.icomm._commtype != 'value':
-            flag = self.send_comm.send(self.test_msg)
-            if self.comm_name != 'CommBase':
-                assert(flag)
-        # self.instance.sleep()
-        # if self.comm_name != 'CommBase':
-        #     self.assert_equal(self.recv_comm.n_msg, 1)
-        for i in range(self.nmsg_recv):
-            flag, msg_recv = self.recv_comm.recv(self.timeout)
-            if self.comm_name != 'CommBase':
-                assert(flag)
-                self.assert_msg_equal(msg_recv, self.test_msg)
-        if (self.comm_name != 'CommBase') and (self.icomm_name != 'value'):
-            self.assert_equal(self.instance.n_msg, 0)
+        try:
+            if self.instance.icomm._commtype != 'value':
+                flag = self.send_comm.send(self.test_msg)
+                if self.comm_name != 'CommBase':
+                    assert(flag)
+            # self.instance.sleep()
+            # if self.comm_name != 'CommBase':
+            #     self.assert_equal(self.recv_comm.n_msg, 1)
+            for i in range(self.nmsg_recv):
+                flag, msg_recv = self.recv_comm.recv(timeout=self.timeout)
+                if self.comm_name != 'CommBase':
+                    assert(flag)
+                    self.assert_msg_equal(msg_recv, self.test_msg)
+            if (self.comm_name != 'CommBase') and (self.icomm_name != 'value'):
+                self.assert_equal(self.instance.n_msg, 0)
+        except BaseException:  # pragma: debug
+            self.send_comm.printStatus()
+            self.instance.printStatus(verbose=True)
+            self.recv_comm.printStatus()
+            raise
 
     @pytest.mark.timeout(timeout=600)
     def test_send_recv_nolimit(self):
         r"""Test sending/receiving large message."""
-        if self.instance.icomm._commtype != 'value':
-            assert(len(self.msg_long) > self.maxMsgSize)
-            flag = self.send_comm.send_nolimit(self.msg_long)
-            if self.comm_name != 'CommBase':
-                assert(flag)
-        for i in range(self.nmsg_recv):
-            flag, msg_recv = self.recv_comm.recv_nolimit(self.timeout)
-            if self.comm_name != 'CommBase':
-                assert(flag)
-                self.assert_msg_equal(msg_recv, self.msg_long)
+        try:
+            if self.instance.icomm._commtype != 'value':
+                assert(len(self.msg_long) > self.maxMsgSize)
+                flag = self.send_comm.send_nolimit(self.msg_long)
+                if self.comm_name != 'CommBase':
+                    assert(flag)
+            for i in range(self.nmsg_recv):
+                flag, msg_recv = self.recv_comm.recv_nolimit(timeout=self.timeout)
+                if self.comm_name != 'CommBase':
+                    assert(flag)
+                    self.assert_msg_equal(msg_recv, self.msg_long)
+        except BaseException:  # pragma: debug
+            self.send_comm.printStatus()
+            self.instance.printStatus(verbose=True)
+            self.recv_comm.printStatus()
+            raise
 
     def assert_before_stop(self, check_open=True):
         r"""Assertions to make before stopping the driver instance."""
         super(TestConnectionDriver, self).assert_before_stop()
-        if self.comm_name != 'CommBase' and check_open:
+        if (((self.comm_name != 'CommBase') and (self.icomm_name != 'value')
+             and check_open)):
             assert(self.instance.is_comm_open)
 
     def run_before_terminate(self):

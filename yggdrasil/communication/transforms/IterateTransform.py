@@ -7,11 +7,6 @@ class IterateTransform(TransformBase):
     r"""Class for iterating over message elements."""
     _transformtype = 'iterate'
 
-    def __init__(self, *args, **kwargs):
-        self.current_message = None
-        self.index = None
-        super(IterateTransform, self).__init__(*args, **kwargs)
-
     def validate_datatype(self, datatype):
         r"""Assert that the provided datatype is valid for this transformation.
         
@@ -69,9 +64,6 @@ class IterateTransform(TransformBase):
             dict: Transformed datatype.
 
         """
-        idx = self.index
-        if idx is None:
-            idx = 0
         elements = self.get_elements(datatype)
         if all(elements[0] == x for x in elements[1:]):
             datatype = copy.deepcopy(elements[0])

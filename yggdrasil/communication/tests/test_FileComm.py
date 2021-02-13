@@ -1,6 +1,5 @@
 import os
 import copy
-import unittest
 import jsonschema
 from yggdrasil.tests import assert_equal
 from yggdrasil.communication import new_comm
@@ -48,6 +47,8 @@ class TestFileComm(parent.TestCommBase):
                  + ['fd', 'read_meth', 'append', 'in_temp',
                     'is_series', 'wait_for_creation', 'serializer',
                     'platform_newline'])
+    test_send_recv_nolimit = None
+    test_work_comm = None
     
     @property
     def commtype(self):
@@ -80,16 +81,6 @@ class TestFileComm(parent.TestCommBase):
         kwargs.setdefault('msg_recv', self.recv_instance.eof_msg)
         super(TestFileComm, self).test_send_recv_filter_recv_filter(**kwargs)
         
-    @unittest.skipIf(True, 'File comm')
-    def test_send_recv_nolimit(self):
-        r"""Disabled: Test send/recv of a large message."""
-        pass  # pragma: no cover
-
-    @unittest.skipIf(True, 'File comm')
-    def test_work_comm(self):
-        r"""Disabled: Test creating/removing a work comm."""
-        pass  # pragma: no cover
-
     def test_invalid_read_meth(self):
         r"""Test raise of error on invalid read_meth."""
         if self.comm == 'FileComm':

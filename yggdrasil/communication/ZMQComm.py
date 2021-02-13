@@ -967,26 +967,21 @@ class ZMQComm(CommBase.CommBase):
         c = super(ZMQComm, self).header2workcomm(header, **kwargs)
         return c
     
-    def on_send(self, msg, header_kwargs=None):
-        r"""Process message to be sent including handling serializing
-        message and handling EOF.
+    def prepare_message(self, *args, **kwargs):
+        r"""Perform actions preparing to send a message.
 
         Args:
-            msg (obj): Message to be sent
-            header_kwargs (dict, optional): Keyword arguments that should be
-                added to the header.
+            *args: Components of the outgoing message.
+            **kwargs: Keyword arguments are passed to the parent class's method.
 
         Returns:
-            tuple (bool, str, dict): Truth of if message should be sent, raw
-                bytes message to send, and header info contained in the message.
+            CommMessage: Serialized and annotated message.
 
         """
-        if self.direction == 'send':
-            if header_kwargs is None:
-                header_kwargs = dict()
-            header_kwargs['zmq_reply'] = self.set_reply_socket_send()
-        return super(ZMQComm, self).on_send(msg, header_kwargs=header_kwargs)
-
+        kwargs.setdefault('header_kwargs', {})
+        kwargs['header_kwargs']['zmq_reply'] = self.set_reply_socket_send()
+        return super(ZMQComm, self).prepare_message(*args, **kwargs)
+        
     def send(self, *args, **kwargs):
         r"""Send a message."""
         # Ensure that filter is not being used with REQ or REP socket
@@ -1039,8 +1034,10 @@ class ZMQComm(CommBase.CommBase):
         with self.socket_lock:
             try:
                 if self.socket_type_name == 'ROUTER':
-                    self.socket.send_multipart([identity, total_msg],
-                                               **kwargs)
+                    kwargs['flags'] |= zmq.SNDMORE
+                    self.socket.send(identity, **kwargs)
+                    # self.socket.send_multipart([identity, total_msg],
+                    #                            **kwargs)
                 else:
                     self.socket.send(total_msg, **kwargs)
             except zmq.ZMQError as e:  # pragma: debug
@@ -1049,6 +1046,12 @@ class ZMQComm(CommBase.CommBase):
                         "Socket not yet available.")
                 self.special_debug("Socket could not send. (errno=%d)", e.errno)
                 raise
+        if self.socket_type_name == 'ROUTER':
+            # TODO: Need to wait here to prevent sending messages twice when
+            # TemporaryCommunicationError is raised due to failure to send
+            # total_msg after successfully sending identity
+            kwargs['flags'] = 0
+            self.socket.send(total_msg, **kwargs)
         self._n_zmq_sent += 1
         return True
 
