@@ -21,14 +21,18 @@ extern "C" {
 static void **vcomms2clean = NULL;
 static size_t ncomms2clean = 0;
 static size_t clean_registered = 0;
+static size_t clean_in_progress = 0;
 static size_t clean_called = 0;
 
 /*! @brief Memory to keep track of global scope comms. */
-static size_t global_scope_comm = 0;
 #ifdef _OPENMP
+static size_t global_scope_comm = 1;
+#define WITH_GLOBAL_SCOPE(COMM) global_scope_comm = 1; COMM
 #pragma omp threadprivate(global_scope_comm)
-#endif
+#else
+static size_t global_scope_comm = 0;
 #define WITH_GLOBAL_SCOPE(COMM) global_scope_comm = 1; COMM; global_scope_comm = 0
+#endif
 
 
 /*!
@@ -91,6 +95,22 @@ int is_comm_format_array_type(const comm_t *x) {
   return is_dtype_format_array(datatype);
 };
 
+
+/*!
+  @brief Determine if the current thread can use a comm registered by another.
+  @param[in] int Thread that created the comm.
+  @returns int 1 if the current thread can use the comm, 0 otherwise.
+ */
+static
+int thread_can_use(int thread_id) {
+  int current_thread_id = get_thread_id();
+  if ((clean_in_progress) && (current_thread_id == 0))
+    return 1;
+  if (thread_id == current_thread_id)
+    return 1;
+  return 0;
+};
+
   
 /*!
   @brief Perform deallocation for type specific communicator.
@@ -101,7 +121,7 @@ static
 int free_comm_type(comm_t *x) {
   comm_type t = x->type;
   int ret = 1;
-  if (x->thread_id != get_thread_id()) {
+  if (!(thread_can_use(x->thread_id))) {
     ygglog_error("free_comm_type: Thread is attempting to use a comm it did not initialize");
     return ret;
   }
@@ -133,6 +153,7 @@ int free_comm(comm_t *x) {
   int ret = 0;
   if (x == NULL)
     return ret;
+  ygglog_debug("free_comm0(%s)", x->name);
 #ifdef _OPENMP
 #pragma omp critical (comms)
   {
@@ -174,22 +195,24 @@ int free_comm(comm_t *x) {
 static
 void clean_comms(void) {
   size_t i;
-#ifdef _OPENMP
-#pragma omp critical (comms)
-  {
-#endif
   if (!(clean_called)) {
+    clean_in_progress = 1;
     ygglog_debug("atexit begin");
     for (i = 0; i < ncomms2clean; i++) {
       if (vcomms2clean[i] != NULL) {
 	free_comm((comm_t*)(vcomms2clean[i]));
       }
     }
+#ifdef _OPENMP
+#pragma omp critical (comms)
+    {
+#endif
     if (vcomms2clean != NULL) {
       free(vcomms2clean);
       vcomms2clean = NULL;
     }
     ncomms2clean = 0;
+    ygglog_debug("atexit finished cleaning comms, in final shutdown");
 #if defined(ZMQINSTALLED)
     // #if defined(_MSC_VER) && defined(ZMQINSTALLED)
     ygg_zsys_shutdown();
@@ -199,10 +222,10 @@ void clean_comms(void) {
     }
   /* printf(""); */
     clean_called = 1;
-  }
 #ifdef _OPENMP
-  }
+    }
 #endif
+  }
   ygglog_debug("atexit done");
   if (_ygg_error_flag != 0) {
     _exit(_ygg_error_flag);
@@ -521,7 +544,7 @@ int comm_send_single(const comm_t *x, const char *data, const size_t len) {
     ygglog_error("comm_send_single: Invalid comm");
     return ret;
   }
-  if (x->thread_id != get_thread_id()) {
+  if (!(thread_can_use(x->thread_id))) {
     ygglog_error("comm_send_single: Thread is attempting to use a comm it did not initialize");
     return ret;
   }
@@ -872,7 +895,7 @@ int comm_recv_single(comm_t *x, char **data, const size_t len,
     ygglog_error("comm_recv_single: Invalid comm");
     return ret;
   }
-  if (x->thread_id != get_thread_id()) {
+  if (!(thread_can_use(x->thread_id))) {
     ygglog_error("comm_recv_single: Thread is attempting to use a comm it did not initialize");
     return ret;
   }

@@ -285,8 +285,8 @@ definitions:
             - $ref: '#/definitions/transform'
           type: array
       required:
-      - outputs
       - inputs
+      - outputs
       title: connection_base
       type: object
     - anyOf:
@@ -605,9 +605,9 @@ definitions:
             is used.
           type: string
       required:
-      - working_dir
       - name
       - filetype
+      - working_dir
       title: file_base
       type: object
     - anyOf:
@@ -1171,6 +1171,10 @@ definitions:
               - type: string
             type: object
           default: mean
+        allow_threading:
+          description: If True, comm connections will be set up so that the model-side
+            comms can be used by more than one thread. Defaults to False.
+          type: boolean
         args:
           description: The full path to the file containing the model program that
             will be run by the driver or a list starting with the program file and
@@ -1654,10 +1658,10 @@ definitions:
             is used.
           type: string
       required:
-      - working_dir
-      - name
       - language
+      - name
       - args
+      - working_dir
       title: model_base
       type: object
     - anyOf:

@@ -474,6 +474,8 @@ def parse_model(yml, existing):
     yml['model_index'] = len(existing['model'])
     for io in ['inputs', 'outputs']:
         for x in yml[io]:
+            if yml.get('allow_threading', False):
+                x['allow_multiple_comms'] = True
             x['model_driver'] = [yml['name']]
             x['partner_model'] = yml['name']
             x['partner_language'] = language

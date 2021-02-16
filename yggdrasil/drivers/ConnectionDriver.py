@@ -877,7 +877,7 @@ class ConnectionDriver(Driver):
         with self.lock:
             if self.ocomm.is_closed:
                 return False
-            return self.ocomm.send(*args, **kwargs)
+            return self.ocomm.send_message(*args, **kwargs)
         
     def _send_1st_message(self, *args, **kwargs):
         r"""Send the first message, trying multiple times.
@@ -890,20 +890,17 @@ class ConnectionDriver(Driver):
             bool: Success or failure of send.
 
         """
-        kws_prepare = {k: kwargs.pop(k) for k in self.ocomm._prepare_message_kws
-                       if k in kwargs}
-        msg = self.ocomm.prepare_message(*args, **kws_prepare)
         self.ocomm._multiple_first_send = False
         T = self.start_timeout(self.timeout_send_1st,
                                key_suffix='.1st_send')
-        flag = self._send_message(msg, **kwargs)
+        flag = self._send_message(*args, **kwargs)
         self.ocomm.suppress_special_debug = True
         if (not flag) and (not self.ocomm._type_errors):
             self.debug("1st send failed, will keep trying for %f s in silence.",
                        float(self.timeout_send_1st))
             while ((not T.is_out) and (not flag)
                    and self.ocomm.is_open):  # pragma: debug
-                flag = self._send_message(msg, **kwargs)
+                flag = self._send_message(*args, **kwargs)
                 if not flag:
                     self.sleep()
         self.stop_timeout(key_suffix='.1st_send')
@@ -947,10 +944,13 @@ class ConnectionDriver(Driver):
         self.debug('')
         with self.lock:
             self._used = True
+        kws_prepare = {k: kwargs.pop(k) for k in self.ocomm._prepare_message_kws
+                       if k in kwargs}
+        msg_out = self.ocomm.prepare_message(msg.args, **kws_prepare)
         if self._first_send_done:
-            flag = self._send_message(msg.args, **kwargs)
+            flag = self._send_message(msg_out, **kwargs)
         else:
-            flag = self._send_1st_message(msg.args, **kwargs)
+            flag = self._send_1st_message(msg_out, **kwargs)
         # if self.single_use:
         #     with self.lock:
         #         self.debug('Used')

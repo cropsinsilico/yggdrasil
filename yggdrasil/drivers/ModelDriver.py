@@ -157,6 +157,9 @@ class ModelDriver(Driver):
         logging_level (str, optional): The level of logging messages that should
             be displayed by the model. Defaults to the logging level as
             determined by the configuration file and environment variables.
+        allow_threading (bool, optional): If True, comm connections will be set up
+            so that the model-side comms can be used by more than one thread.
+            Defaults to False.
         **kwargs: Additional keyword arguments are passed to parent class.
 
     Class Attributes:
@@ -250,6 +253,8 @@ class ModelDriver(Driver):
         model_index (int): Index of model in list of models being run.
         modified_files (list): List of pairs of originals and copies of files
             that should be restored during cleanup.
+        allow_threading (bool): If True, comm connections will be set up so that
+            the model-side comms can be used by more than one thread.
 
     Raises:
         RuntimeError: If both with_strace and with_valgrind are True.
@@ -350,7 +355,8 @@ class ModelDriver(Driver):
                                        '--show-leak-kinds=all'],  # '-v'
                            'items': {'type': 'string'}},
         'outputs_in_inputs': {'type': 'boolean'},
-        'logging_level': {'type': 'string', 'default': ''}}
+        'logging_level': {'type': 'string', 'default': ''},
+        'allow_threading': {'type': 'boolean'}}
     _schema_excluded_from_class = ['name', 'language', 'args', 'working_dir']
     _schema_excluded_from_class_validation = ['inputs', 'outputs']
     
@@ -1181,6 +1187,8 @@ class ModelDriver(Driver):
         env['YGG_PYTHON_EXEC'] = sys.executable
         env['YGG_DEFAULT_COMM'] = tools.get_default_comm()
         env['YGG_NCLIENTS'] = str(len(self.clients))
+        if self.allow_threading:
+            env['YGG_THREADING'] = '1'
         if isinstance(self.is_server, dict):
             env['YGG_SERVER_INPUT'] = self.is_server['input']
             env['YGG_SERVER_OUTPUT'] = self.is_server['output']

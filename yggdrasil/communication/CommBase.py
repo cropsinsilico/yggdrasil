@@ -286,6 +286,7 @@ class CommServer(multitasking.YggTaskLoop):
     def __init__(self, srv_address, cli_address=None, **kwargs):
         global _registered_servers
         self.cli_count = 0
+        self.srv_count = 0
         if cli_address is None:
             cli_address = srv_address
         self.srv_address = srv_address
@@ -293,12 +294,28 @@ class CommServer(multitasking.YggTaskLoop):
         super(CommServer, self).__init__('CommServer.%s' % srv_address, **kwargs)
         _registered_servers[self.srv_address] = self
 
+    def add_server(self):
+        r"""Increment the server count."""
+        global _registered_servers
+        _registered_servers[self.srv_address].srv_count += 1
+        self.debug("Added server to server: nservers = %d", self.srv_count)
+
     def add_client(self):
         r"""Increment the client count."""
         global _registered_servers
         _registered_servers[self.srv_address].cli_count += 1
         self.debug("Added client to server: nclients = %d", self.cli_count)
 
+    def remove_server(self):
+        r"""Decrement the client count, closing the server if all clients done."""
+        global _registered_servers
+        self.debug("Removing server from server")
+        _registered_servers[self.srv_address].srv_count -= 1
+        if _registered_servers[self.srv_address].srv_count <= 0:
+            self.debug("Shutting down server")
+            self.terminate()
+            _registered_servers.pop(self.srv_address)
+            
     def remove_client(self):
         r"""Decrement the client count, closing the server if all clients done."""
         global _registered_servers
@@ -374,6 +391,9 @@ class CommBase(tools.YggClass):
             with be reversed. Defaults to False.
         no_suffix (bool, optional): If True, no directional suffix will be added
             to the comm name. Defaults to False.
+        allow_multiple_comms (bool, optional): If True, initialize the comm
+            such that mulitiple comms can connect to the same address. Defaults
+            to False.
         is_client (bool, optional): If True, the comm is one of many potential
             clients that will be sending messages to one or more servers.
             Defaults to False.
@@ -446,6 +466,8 @@ class CommBase(tools.YggClass):
             sends an end-of-file messages. Otherwise, it will remain open.
         single_use (bool): If True, the comm will only be used to send/recv a
             single message.
+        allow_multiple_comms (bool): If True, initialize the comm such that
+            mulitiple comms can connect to the same address.
         is_client (bool): If True, the comm is one of many potential clients
             that will be sending messages to one or more servers.
         is_response_client (bool): If True, the comm is a client-side response
@@ -538,6 +560,7 @@ class CommBase(tools.YggClass):
                  partner_model=None, partner_language='python',
                  recv_timeout=0.0, close_on_eof_recv=True, close_on_eof_send=False,
                  single_use=False, reverse_names=False, no_suffix=False,
+                 allow_multiple_comms=False,
                  is_client=False, is_response_client=False,
                  is_server=False, is_response_server=False,
                  is_async=False, **kwargs):
@@ -594,6 +617,9 @@ class CommBase(tools.YggClass):
                 'model', self.partner_language)
         self.language_driver = import_component('model', self.language)
         self.touches_model = (self.partner_model is not None)
+        self.allow_multiple_comms = allow_multiple_comms
+        if self.is_interface and (os.environ.get('YGG_THREADING', False)):
+            self.allow_multiple_comms = True
         self.is_client = is_client
         self.is_server = is_server
         self.is_async = is_async
@@ -1022,7 +1048,8 @@ class CommBase(tools.YggClass):
             dict: Keyword arguments for opposite comm object.
 
         """
-        kwargs = {'commtype': self._commtype, 'use_async': self.is_async}
+        kwargs = {'commtype': self._commtype, 'use_async': self.is_async,
+                  'allow_multiple_comms': self.allow_multiple_comms}
         kwargs['address'] = self.opp_address
         kwargs['serializer'] = self.serializer
         if self.direction == 'send':
@@ -1034,7 +1061,7 @@ class CommBase(tools.YggClass):
 
     def bind(self):
         r"""Bind in place of open."""
-        if self.is_client:
+        if self.is_client or self.allow_multiple_comms and (not self.is_interface):
             self.signon_to_server()
 
     def open(self):
@@ -1067,7 +1094,7 @@ class CommBase(tools.YggClass):
             self._close(linger=linger)
             self._n_sent = 0
             self._n_recv = 0
-            if self.is_client:
+            if (self.is_client or self.allow_multiple_comms) and (not self.is_interface):
                 self.debug("Signing off from server")
                 self.signoff_from_server()
             if len(self._work_comms) > 0:
@@ -1306,7 +1333,7 @@ class CommBase(tools.YggClass):
             return
         assert(msg.stype is not None)
         msg.stype = self.apply_transform_to_type(msg.stype)
-        msg.sinfo.pop('seritype')
+        msg.sinfo.pop('seritype', None)
         for k in ['format_str', 'field_names', 'field_units']:
             if k in msg.stype:
                 msg.sinfo[k] = msg.stype.pop(k)
@@ -1525,8 +1552,12 @@ class CommBase(tools.YggClass):
                     self._server.start()
                 else:
                     self._server = _registered_servers[self.address]
-                self._server.add_client()
-                self.address = self._server.cli_address
+                if self.direction == 'send':
+                    self._server.add_client()
+                    self.address = self._server.cli_address
+                else:
+                    self._server.add_server()
+                    self.address = self._server.srv_address
 
     def signoff_from_server(self):
         r"""Remove a client from the server."""
@@ -1534,7 +1565,10 @@ class CommBase(tools.YggClass):
         with _registered_servers.lock:
             if self._server is not None:
                 self.debug("Signing off")
-                self._server.remove_client()
+                if self.direction == 'send':
+                    self._server.remove_client()
+                else:
+                    self._server.remove_server()
                 self._server = None
 
     # TEMP COMMS

@@ -686,7 +686,8 @@ int init_zmq_comm(comm_t *comm) {
     return ret;
   comm->msgBufSize = 100;
   zsock_t *s;
-  if (comm->is_rpc) {
+  char *allow_threading = getenv("YGG_THREADING");
+  if ((comm->is_rpc) || ((allow_threading != NULL) && (strcmp(allow_threading, "1") == 0))) {
     s = ygg_zsock_new(ZMQ_DEALER);
   } else {
     s = ygg_zsock_new(ZMQ_PAIR);

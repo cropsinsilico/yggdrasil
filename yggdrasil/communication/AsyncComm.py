@@ -396,9 +396,10 @@ class AsyncComm(ProxyObject, ComponentBaseUnregistered):
         """
         # This is required so that call to send_message for work comms
         # in CommBase.send_message will put the messages in the backlog
+        kwargs['dont_prepare'] = True
         return self.send(msg, **kwargs)
         
-    def send(self, *args, **kwargs):
+    def send(self, *args, dont_prepare=False, **kwargs):
         r"""Send a message to the backlog.
 
         Args:
@@ -414,7 +415,8 @@ class AsyncComm(ProxyObject, ComponentBaseUnregistered):
                        if k in kwargs}
         if not self.is_open_direct:  # pragma: debug
             return False
-        if (len(args) == 1) and isinstance(args[0], CommBase.CommMessage):
+        if dont_prepare:
+            assert((len(args) == 1) and isinstance(args[0], CommBase.CommMessage))
             msg = args[0]
         else:
             msg = self._wrapped.prepare_message(*args, **kws_prepare)

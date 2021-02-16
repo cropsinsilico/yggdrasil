@@ -377,6 +377,9 @@ class ZMQComm(CommBase.CommBase):
         self.socket_lock = multitasking.RLock()
         self._reply_thread = None
         # Client/Server things
+        if self.allow_multiple_comms:
+            socket_type = 'DEALER'
+            socket_action = 'connect'
         if self.is_client:
             socket_type = 'DEALER'
             socket_action = 'connect'
@@ -391,7 +394,7 @@ class ZMQComm(CommBase.CommBase):
                 socket_type = _socket_recv_types[_default_socket_type]
             elif self.direction == 'send':
                 socket_type = _socket_send_types[_default_socket_type]
-        if not (self.is_client or self.is_server):
+        if not (self.allow_multiple_comms or self.is_client or self.is_server):
             if socket_type in ['PULL', 'SUB', 'REP', 'DEALER']:
                 self.direction = 'recv'
             elif socket_type in ['PUSH', 'PUB', 'REQ', 'ROUTER']:
@@ -571,6 +574,11 @@ class ZMQComm(CommBase.CommBase):
             if self._server is None:  # pragma: debug
                 raise Exception("The client proxy does not yet have an address.")
             return self._server.srv_address
+        elif self.allow_multiple_comms:
+            if self.direction == 'send':
+                return self._server.srv_address
+            else:
+                return self._server.cli_address
         else:
             return self.address
 
@@ -588,6 +596,8 @@ class ZMQComm(CommBase.CommBase):
             kwargs['is_server'] = True
         elif self.is_server:
             kwargs['is_client'] = True
+        if self.allow_multiple_comms:
+            kwargs['allow_multiple_comms'] = True
         if kwargs['socket_type'] in ['DEALER', 'ROUTER']:
             kwargs['dealer_identity'] = self.dealer_identity
         kwargs['context'] = self.context
