@@ -71,25 +71,31 @@ class TestRPCRequestDriver(TestRPCRequestParam,
         
     def test_send_recv(self, msg_send=None):
         r"""Test routing of a short message between client and server."""
-        if msg_send is None:
-            msg_send = self.test_msg
-        T = self.instance.start_timeout()
-        while ((not T.is_out) and (not self.instance.is_valid)):
-            self.instance.sleep()  # pragma: debug
-        self.instance.stop_timeout()
-        # Send a message to local output
-        flag = self.send_comm.send(msg_send)
-        assert(flag)
-        # Receive on server side, then send back
-        flag, srv_msg = self.recv_comm.recv(timeout=self.route_timeout)
-        assert(flag)
-        assert_equal(srv_msg, msg_send)
-        flag = self.recv_comm.send(srv_msg)
-        assert(flag)
-        # Receive response on client side
-        flag, cli_msg = self.send_comm.recv(timeout=self.route_timeout)
-        assert(flag)
-        assert_equal(cli_msg, msg_send)
+        try:
+            if msg_send is None:
+                msg_send = self.test_msg
+            T = self.instance.start_timeout()
+            while ((not T.is_out) and (not self.instance.is_valid)):
+                self.instance.sleep()  # pragma: debug
+            self.instance.stop_timeout()
+            # Send a message to local output
+            flag = self.send_comm.send(msg_send)
+            assert(flag)
+            # Receive on server side, then send back
+            flag, srv_msg = self.recv_comm.recv(timeout=self.route_timeout)
+            assert(flag)
+            assert_equal(srv_msg, msg_send)
+            flag = self.recv_comm.send(srv_msg)
+            assert(flag)
+            # Receive response on client side
+            flag, cli_msg = self.send_comm.recv(timeout=self.route_timeout)
+            assert(flag)
+            assert_equal(cli_msg, msg_send)
+        except BaseException:  # pragma: debug
+            self.send_comm.printStatus()
+            self.instance.printStatus(verbose=True)
+            self.recv_comm.printStatus()
+            raise
 
     def test_send_recv_nolimit(self):
         r"""Test routing of a large message between client and server."""
