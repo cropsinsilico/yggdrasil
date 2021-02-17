@@ -1,7 +1,6 @@
 import unittest
-import pytest
 from yggdrasil import tools, platform
-from yggdrasil.tests import MagicTestError, assert_raises
+from yggdrasil.tests import MagicTestError, assert_raises, timeout
 from yggdrasil.schema import get_schema
 from yggdrasil.components import import_component
 from yggdrasil.drivers.tests import test_Driver as parent
@@ -359,7 +358,7 @@ class TestConnectionDriver(TestConnectionParam, parent.TestDriver):
         self.instance.open_comm()
         assert(self.instance.is_comm_closed)
 
-    @pytest.mark.timeout(timeout=600)
+    @timeout(timeout=600)
     def test_send_recv(self):
         r"""Test sending/receiving small message."""
         try:
@@ -383,7 +382,7 @@ class TestConnectionDriver(TestConnectionParam, parent.TestDriver):
             self.recv_comm.printStatus()
             raise
 
-    @pytest.mark.timeout(timeout=600)
+    @timeout(timeout=600)
     def test_send_recv_nolimit(self):
         r"""Test sending/receiving large message."""
         try:
@@ -488,7 +487,7 @@ class TestConnectionDriverIterate(TestConnectionDriver):
         r"""str: Test message that should be used for any send/recv tests."""
         return {'a': int(1), 'b': 'hello', 'c': float(2)}
 
-    @pytest.mark.timeout(timeout=600)
+    @timeout(timeout=600)
     def test_send_recv(self):
         r"""Test sending/receiving small message."""
         msg = self.test_msg

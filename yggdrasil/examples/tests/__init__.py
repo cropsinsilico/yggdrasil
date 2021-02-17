@@ -6,13 +6,13 @@ import tempfile
 import shutil
 import itertools
 import flaky
-import pytest
 from yggdrasil.components import ComponentMeta, import_component
 from yggdrasil import runner, tools, platform
 from yggdrasil.examples import (
     get_example_yaml, get_example_source, get_example_languages,
     ext_map, display_example)
 from yggdrasil.tests import YggTestBase, check_enabled_languages, assert_raises
+from yggdrasil.tests import timeout as timeout_dec
 
 
 _ext2lang = {v: k for k, v in ext_map.items()}
@@ -128,7 +128,7 @@ class ExampleMeta(ComponentMeta):
                            zip(iter_keys, x)})
                     itest_func.__name__ = itest_name
                     if timeout is not None:
-                        itest_func = pytest.mark.timeout(timeout=timeout)(
+                        itest_func = timeout_dec(timeout=timeout)(
                             itest_func)
                     dct[itest_name] = itest_func
         out = super(ExampleMeta, cls).__new__(cls, name, bases, dct)

@@ -1,7 +1,7 @@
 import unittest
 import copy
 import flaky
-from yggdrasil.tests import assert_raises
+from yggdrasil.tests import assert_raises, timeout
 from yggdrasil.communication import new_comm
 from yggdrasil.communication.RMQComm import RMQComm
 from yggdrasil.communication.tests import test_RMQComm as parent
@@ -12,6 +12,7 @@ _rmq_installed = RMQComm.is_installed(language='python')
 
 @unittest.skipIf(not _rmq_installed, "RMQ Server not running")
 @flaky.flaky
+@timeout(timeout=600)
 class TestRMQAsyncComm(parent.TestRMQComm):
     r"""Test for RMQAsyncComm communication class."""
 

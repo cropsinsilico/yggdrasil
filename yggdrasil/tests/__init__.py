@@ -1,5 +1,6 @@
 """Testing things."""
 import os
+import sys
 import shutil
 import uuid
 import difflib
@@ -15,6 +16,10 @@ import pprint
 import types
 import warnings
 import json
+import functools
+import pytest
+import subprocess
+import inspect
 from pandas.testing import assert_frame_equal
 from yggdrasil.config import ygg_cfg, cfg_logging
 from yggdrasil import tools, platform, units
@@ -484,6 +489,66 @@ def assert_not_equal(x, y):
 
     """
     ut.assertNotEqual(x, y)
+
+
+def timeout(*args, allow_arguments=False, **kwargs):
+    r"""Patch for pytest timeout on windows to allow pytest to cache.
+
+    Args:
+        *args: Arguments are passed on to the pytest.mark.timeout decorator.
+        **kwargs: Keyword arguments are passed on to the pytest.mark.timeout
+            decorator.
+        allow_arguments (bool, optional): If True, decoration with the timeout
+            decorator will allow arguments to be passed to the test function.
+            Defaults to False.
+
+    Source:
+        https://stackoverflow.com/questions/21827874/timeout-a-function-windows/
+            48980413#48980413
+
+
+    """
+    env_flag = 'YGG_IN_TIMEOUT_PROCESS'
+    if platform._is_win:
+        kwargs['method'] = 'thread'
+    method = kwargs.get('method', 'signal')
+    pytest_deco = pytest.mark.timeout(*args, **kwargs)
+    if (((method == 'thread') and (not os.environ.get(env_flag, False))
+         and (not allow_arguments))):
+        frame = inspect.stack()[1]
+        module = inspect.getmodule(frame[0])
+        classname = frame[3]
+        filename = module.__file__
+        testargs = list([v for v in sys.argv if not os.path.isfile(v)])
+        if '--cov-append' not in testargs:
+            testargs.append('--cov-append')
+        if '--clear-cache' in testargs:
+            testargs.remove('--clear-cache')
+        
+        def deco(func):
+            @functools.wraps(func)
+            def wrapper(*args, **kwargs):
+                if classname == '<module>':
+                    testname = '%s::%s' % (filename, func.__name__)
+                    if args or kwargs:
+                        raise Exception("Arguments not compatible with forked "
+                                        "timeout, add 'allow_arguments=True' to "
+                                        "the decorator")
+                else:
+                    if (len(args) > 1) or kwargs:
+                        # return pytest_deco(func)(*args, **kwargs)
+                        raise Exception("Arguments not compatible with forked "
+                                        "timeout, add 'allow_arguments=True' to "
+                                        "the decorator")
+                    testname = '%s::%s::%s' % (filename, classname, func.__name__)
+                env = copy.deepcopy(os.environ)
+                env[env_flag] = '1'
+                subprocess.run(['pytest'] + testargs + [testname],
+                               env=env, check=True)
+            return wrapper
+        return deco
+    else:
+        return pytest_deco
         
 
 class YggTestBase(unittest.TestCase):
