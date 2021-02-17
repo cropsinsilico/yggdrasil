@@ -1,0 +1,112 @@
+from yggdrasil.drivers import create_driver
+from yggdrasil.drivers.Driver import Driver
+        
+
+class DuplicatedModelDriver(Driver):
+    r"""Base class for Model drivers and for running executable based models.
+
+    Args:
+        name (str): Unique name used to identify the model. This will
+            be used to report errors associated with the model.
+        *args: Additional arguments are passed to the models in the set.
+        **kwargs: Additional keyword arguments are passed to the models in
+            the set.
+
+    Attributes:
+
+    Raises:
+        RuntimeError: If both with_strace and with_valgrind are True.
+
+    """
+
+    name_format = "%s_copy%d"
+
+    def __init__(self, yml, **kwargs):
+        kwargs.update(yml)
+        self.copies = []
+        for i in range(yml['copies']):
+            ikws = kwargs.copy()
+            iyml = yml.copy()
+            iyml['name'] = self.name_format % (yml['name'], i)
+            # Update environment to reflect addition of suffix
+            iyml['env'] = yml['env'].copy()
+            iyml['env']['YGG_MANY2MANY'] = '1'
+            for k, v in list(iyml['env'].items()):
+                if yml['name'] in k:
+                    iyml['env'][k.replace(yml['name'], iyml['name'])] = iyml['env'].pop(k)
+            ikws.update(iyml)
+            self.copies.append(create_driver(yml=iyml, **ikws))
+        super(DuplicatedModelDriver, self).__init__(**kwargs)
+
+    def cleanup_products(self, *args, **kwargs):
+        r"""Remove products created in order to run the model."""
+        for x in self.copies:
+            x.cleanup_products(*args, **kwargs)
+        
+    def cleanup(self, *args, **kwargs):
+        r"""Actions to perform to clean up the thread after it has stopped."""
+        for x in self.copies:
+            x.cleanup(*args, **kwargs)
+        super(DuplicatedModelDriver, self).cleanup(*args, **kwargs)
+
+    def start(self, *args, **kwargs):
+        r"""Start thread/process and print info."""
+        for x in self.copies:
+            x.start(*args, **kwargs)
+        super(DuplicatedModelDriver, self).start(*args, **kwargs)
+
+    def stop(self, *args, **kwargs):
+        r"""Stop the driver."""
+        for x in self.copies:
+            x.stop(*args, **kwargs)
+        super(DuplicatedModelDriver, self).stop(*args, **kwargs)
+        
+    def graceful_stop(self, *args, **kwargs):
+        r"""Gracefully stop the driver."""
+        for x in self.copies:
+            x.graceful_stop(*args, **kwargs)
+        super(DuplicatedModelDriver, self).graceful_stop(*args, **kwargs)
+        
+    def kill(self, *args, **kwargs):
+        r"""Kill the process."""
+        for x in self.copies:
+            x.kill(*args, **kwargs)
+        super(DuplicatedModelDriver, self).kill(*args, **kwargs)
+        
+    def terminate(self, *args, **kwargs):
+        r"""Set the terminate event and wait for the thread/process to stop."""
+        for x in self.copies:
+            x.terminate(*args, **kwargs)
+        super(DuplicatedModelDriver, self).terminate(*args, **kwargs)
+        
+    def run_loop(self):
+        r"""Loop to check if model is still running and forward output."""
+        # TODO: Stop if there is an error on one?
+        if any([x.is_alive() for x in self.copies]):
+            self.sleep()
+            return
+        else:
+            self.set_break_flag()
+
+    def after_loop(self, *args, **kwargs):
+        r"""Actions to perform after run_loop has finished."""
+        for x in self.copies:
+            x.terminate()
+        super(DuplicatedModelDriver, self).after_loop(*args, **kwargs)
+
+    def printStatus(self, *args, **kwargs):
+        r"""Print the class status."""
+        for x in self.copies:
+            x.printStatus(*args, **kwargs)
+        super(DuplicatedModelDriver, self).printStatus(*args, **kwargs)
+
+    @property
+    def errors(self):
+        out = []
+        for x in self.copies:
+            out += x.errors
+        return out
+
+    @errors.setter
+    def errors(self, val):
+        pass

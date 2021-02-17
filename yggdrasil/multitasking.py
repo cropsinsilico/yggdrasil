@@ -1105,11 +1105,10 @@ class YggTaskLoop(YggTask):
 
     def set_break_flag(self, value=True, break_stack=None):
         r"""Set the break flag for the thread/process to True."""
-        self.set_flag_attr('break_flag', value=value)
-        if break_stack is None:
+        if self.break_stack is None:
             import traceback
-            break_stack = ''.join(traceback.format_stack())
-        self.break_stack = break_stack
+            self.break_stack = ''.join(traceback.format_stack())
+        self.set_flag_attr('break_flag', value=value)
 
     @property
     def was_break(self):
