@@ -100,12 +100,32 @@ class TestZMQComm(test_CommBase.TestCommBase):
 class TestZMQComm_client(TestZMQComm):
     r"""Test for ZMQComm communication class for client/server."""
 
+    test_drain_messages = None
+
+    def setup(self, *args, **kwargs):
+        r"""Initialize comm object pair."""
+        super(TestZMQComm_client, self).setup(*args, **kwargs)
+        T = self.recv_instance.start_timeout()
+        while ((not T.is_out) and (self.recv_instance.n_msg == 0)):  # pragma: debug
+            self.recv_instance.sleep()
+        self.recv_instance.stop_timeout()
+        
     @property
     def send_inst_kwargs(self):
         r"""Keyword arguments for send instance."""
         out = super(TestZMQComm_client, self).send_inst_kwargs
         out['is_client'] = True
         return out
+
+    def do_send_recv(self, *args, **kwargs):
+        r"""Generic send/recv of a message."""
+        kwargs['n_recv_init'] = 1  # for the client sign-on message
+        super(TestZMQComm_client, self).do_send_recv(*args, **kwargs)
+        
+    def test_purge(self, *args, **kwargs):
+        r"""Test purging messages from the comm."""
+        kwargs['nrecv_init'] = 1
+        super(TestZMQComm_client, self).test_purge(*args, **kwargs)
 
     
 # Tests for all the supported protocols
