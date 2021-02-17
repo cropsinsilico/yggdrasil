@@ -113,14 +113,6 @@ class BufferComm(CommBase.CommBase):
         if self.address.closed and (self.address._base is not None):
             self.address._closed.clear()
         
-    def serialize(self, args, **kwargs):
-        r"""Serialize a message using the associated serializer."""
-        return args
-        
-    def deserialize(self, args, **kwargs):
-        r"""Deserialize a message using the associated deserializer."""
-        return args, {}
-    
     @property
     def is_open(self):
         r"""bool: True if the connection is open."""
