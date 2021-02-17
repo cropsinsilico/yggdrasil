@@ -519,7 +519,7 @@ def install_deps(method, return_commands=False, verbose=False, for_development=F
         if _is_linux:
             os_pkgs.append('libomp-dev')
         elif _is_osx:
-            os_pkgs.append('libomp')
+            os_pkgs += ['libomp', 'llvm']
         elif _is_win:
             pass
     if install_opts['fortran'] and (not fallback_to_conda):
