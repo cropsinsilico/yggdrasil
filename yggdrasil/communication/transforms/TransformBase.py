@@ -106,14 +106,17 @@ class TransformBase(ComponentBase):
             object: The transformed message.
 
         """
-        if (not self.original_datatype) and (not no_init):
-            self.set_original_datatype(encode_type(x))
         if isinstance(x, bytes) and (len(x) == 0) and no_init:
             return b''
         if isinstance(x, collections.abc.Iterator):
+            xlist = list(x)
+            if (not self.original_datatype) and (not no_init) and xlist:
+                self.set_original_datatype(encode_type(xlist[0]))
             out = iter([self.evaluate_transform(xx, no_copy=no_copy)
-                        for xx in x])
+                        for xx in xlist])
         else:
+            if (not self.original_datatype) and (not no_init):
+                self.set_original_datatype(encode_type(x))
             out = self.evaluate_transform(x, no_copy=no_copy)
         return out
 
