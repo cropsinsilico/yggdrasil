@@ -126,6 +126,16 @@ class TestZMQComm_client(TestZMQComm):
         out['is_client'] = True
         return out
 
+    def do_send_recv(self, *args, **kwargs):
+        r"""Generic send/recv of a message."""
+        kwargs['n_recv_init'] = 1  # for the client sign-on message
+        super(TestZMQComm_client, self).do_send_recv(*args, **kwargs)
+        
+    def test_purge(self, *args, **kwargs):
+        r"""Test purging messages from the comm."""
+        kwargs['nrecv_init'] = 1
+        super(TestZMQComm_client, self).test_purge(*args, **kwargs)
+
     
 # Tests for all the supported protocols
 class TestZMQCommINPROC(TestZMQComm):

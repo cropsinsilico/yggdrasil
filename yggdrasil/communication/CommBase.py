@@ -691,6 +691,8 @@ class CommBase(tools.YggClass):
             self._eof_sent.set()  # Don't send EOF, these are single use
         if self.is_interface:
             atexit.register(self.atexit)
+        if ((self.model_copies > 1) or (self.partner_copies > 1)):
+            self.allow_multiple_comms = True
         self._init_before_open(**kwargs)
         if dont_open:
             self.bind()
