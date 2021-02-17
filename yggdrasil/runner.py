@@ -11,7 +11,7 @@ import socket
 from yggdrasil.tools import YggClass
 from yggdrasil.config import ygg_cfg, cfg_environment, temp_config
 from yggdrasil import platform, yamlfile
-from yggdrasil.drivers import create_driver
+from yggdrasil.drivers import create_driver, DuplicatedModelDriver
 
 
 COLOR_TRACE = '\033[30;43;22m'
@@ -368,8 +368,12 @@ class YggRunner(YggClass):
         if 'working_dir' in yml:
             os.chdir(yml['working_dir'])
         try:
-            instance = create_driver(yml=yml, namespace=self.namespace,
-                                     rank=self.rank, **yml)
+            if yml.get('copies', 1) > 1:
+                instance = DuplicatedModelDriver.DuplicatedModelDriver(
+                    yml, namespace=self.namespace, rank=self.rank)
+            else:
+                instance = create_driver(yml=yml, namespace=self.namespace,
+                                         rank=self.rank, **yml)
             yml['instance'] = instance
         finally:
             os.chdir(curpath)
@@ -400,14 +404,13 @@ class YggRunner(YggClass):
             object: An instance of the specified driver.
 
         """
-        yml['models'] = []
         yml['task_method'] = self.connection_task_method
         drv = self.create_driver(yml)
+        # Transfer connection addresses to model via env
+        # TODO: Change to server that tracks connections
         for model, env in drv.model_env.items():
             self.modeldrivers[model].setdefault('env', {})
             self.modeldrivers[model]['env'].update(env)
-            yml['models'].append(model)
-        yml['models'] = list(set(yml['models']))
         return drv
         
     def loadDrivers(self):

@@ -474,10 +474,13 @@ def parse_model(yml, existing):
     yml['model_index'] = len(existing['model'])
     for io in ['inputs', 'outputs']:
         for x in yml[io]:
-            if yml.get('allow_threading', False):
+            if yml.get('allow_threading', False) or (yml.get('copies', 1) > 1):
                 x['allow_multiple_comms'] = True
+            # TODO: Replace model_driver with partner_model?
             x['model_driver'] = [yml['name']]
             x['partner_model'] = yml['name']
+            if yml.get('copies', 1) > 1:
+                x['partner_copies'] = yml['copies']
             x['partner_language'] = language
             existing = parse_component(x, io[:-1], existing=existing)
     for k in yml.get('env', {}).keys():

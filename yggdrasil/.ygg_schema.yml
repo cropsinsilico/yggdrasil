@@ -131,8 +131,8 @@ definitions:
             type: string
           type: array
       required:
-      - name
       - commtype
+      - name
       - datatype
       title: comm_base
       type: object
@@ -1219,6 +1219,12 @@ definitions:
           description: Build type/configuration that should be built. Defaults to
             'Release'.
           type: string
+        copies:
+          default: 1
+          description: The number of copies of the model that should be created. Defaults
+            to 1.
+          minimum: 1
+          type: integer
         copy_xml_to_osr:
           default: false
           description: If True, the XML file(s) will be copied to the OSR repository
@@ -1658,8 +1664,8 @@ definitions:
             is used.
           type: string
       required:
-      - language
       - name
+      - language
       - args
       - working_dir
       title: model_base

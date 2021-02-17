@@ -77,7 +77,7 @@ def remove_products(products, source_products, timer_class=None):
         remove_product(p, timer_class=timer_class)
     for p in products:
         remove_product(p, timer_class=timer_class, check_for_source=True)
-        
+
 
 class ModelDriver(Driver):
     r"""Base class for Model drivers and for running executable based models.
@@ -160,6 +160,8 @@ class ModelDriver(Driver):
         allow_threading (bool, optional): If True, comm connections will be set up
             so that the model-side comms can be used by more than one thread.
             Defaults to False.
+        copies (int, optional): The number of copies of the model that should be
+            created. Defaults to 1.
         **kwargs: Additional keyword arguments are passed to parent class.
 
     Class Attributes:
@@ -255,6 +257,7 @@ class ModelDriver(Driver):
             that should be restored during cleanup.
         allow_threading (bool): If True, comm connections will be set up so that
             the model-side comms can be used by more than one thread.
+        copies (int): The number of copies of the model that should be created.
 
     Raises:
         RuntimeError: If both with_strace and with_valgrind are True.
@@ -356,7 +359,8 @@ class ModelDriver(Driver):
                            'items': {'type': 'string'}},
         'outputs_in_inputs': {'type': 'boolean'},
         'logging_level': {'type': 'string', 'default': ''},
-        'allow_threading': {'type': 'boolean'}}
+        'allow_threading': {'type': 'boolean'},
+        'copies': {'type': 'integer', 'default': 1, 'minimum': 1}}
     _schema_excluded_from_class = ['name', 'language', 'args', 'working_dir']
     _schema_excluded_from_class_validation = ['inputs', 'outputs']
     
@@ -1184,10 +1188,11 @@ class ModelDriver(Driver):
         env['YGG_MODEL_INDEX'] = str(self.model_index)
         env['YGG_MODEL_LANGUAGE'] = self.language
         env['YGG_MODEL_NAME'] = self.name
+        env['YGG_MODEL_COPIES'] = str(self.copies)
         env['YGG_PYTHON_EXEC'] = sys.executable
         env['YGG_DEFAULT_COMM'] = tools.get_default_comm()
         env['YGG_NCLIENTS'] = str(len(self.clients))
-        if self.allow_threading:
+        if self.allow_threading or self.copies:
             env['YGG_THREADING'] = '1'
         if isinstance(self.is_server, dict):
             env['YGG_SERVER_INPUT'] = self.is_server['input']

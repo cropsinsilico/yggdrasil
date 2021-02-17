@@ -137,6 +137,17 @@ class CommMessage(object):
                     return False
         return True
 
+    def apply_function(self, x):
+        r"""Apply a function to the message.
+
+        Args:
+            x (function): Function to apply.
+
+        """
+        out = x(self)
+        out.additional_messages = [x(imsg) for imsg in out.additional_messages]
+        return out
+
 
 def is_registered(commtype, key):
     r"""Determine if a comm object has been registered under the specified key.
@@ -557,7 +568,7 @@ class CommBase(tools.YggClass):
     _finalize_message_kws = ['skip_python2language', 'after_finalize_message']
 
     def __init__(self, name, address=None, direction='send', dont_open=False,
-                 is_interface=None, language=None,
+                 is_interface=None, language=None, partner_copies=0,
                  partner_model=None, partner_language='python',
                  recv_timeout=0.0, close_on_eof_recv=True, close_on_eof_send=False,
                  single_use=False, reverse_names=False, no_suffix=False,
@@ -606,11 +617,13 @@ class CommBase(tools.YggClass):
             # All models connect to python connection drivers
             partner_model = None
             partner_language = 'python'
+            partner_copies = 1
             recv_timeout = False
         if language is None:
             language = 'python'
         self.language = language
         self.partner_model = partner_model
+        self.partner_copies = partner_copies
         self.partner_language = partner_language
         self.partner_language_driver = None
         if self.partner_language:
@@ -666,6 +679,8 @@ class CommBase(tools.YggClass):
             self._eof_sent.set()  # Don't send EOF, these are single use
         if self.is_interface:
             atexit.register(self.atexit)
+        if ((self.model_copies > 1) or (self.partner_copies > 1)):
+            self.allow_multiple_comms = True
         self._init_before_open(**kwargs)
         if dont_open:
             self.bind()
@@ -937,6 +952,11 @@ class CommBase(tools.YggClass):
         r"""str: Name of the model using the comm."""
         return os.environ.get('YGG_MODEL_NAME', '')
 
+    @property
+    def model_copies(self):
+        r"""int: Number of copies of the model using the comm."""
+        return int(os.environ.get('YGG_MODEL_COPIES', '1'))
+
     @classmethod
     def underlying_comm_class(cls):
         r"""str: Name of underlying communication class."""
@@ -1053,6 +1073,7 @@ class CommBase(tools.YggClass):
                   'allow_multiple_comms': self.allow_multiple_comms}
         kwargs['address'] = self.opp_address
         kwargs['serializer'] = self.serializer
+        # TODO: Pass copies/partner_copies in kwargs?
         if self.direction == 'send':
             kwargs['direction'] = 'recv'
         else:
@@ -1806,7 +1827,10 @@ class CommBase(tools.YggClass):
         elif msg.flag == FLAG_EOF:
             with self._closing_thread.lock:
                 if not self._eof_sent.is_set():
-                    self._eof_sent.set()
+                    if self.partner_copies == 1:
+                        self._eof_sent.set()
+                    else:
+                        self.partner_copies -= 1
                 else:  # pragma: debug
                     return False
         elif msg.flag == FLAG_SUCCESS:
@@ -1919,6 +1943,10 @@ class CommBase(tools.YggClass):
             # 3. Check if the message is EOF
             if self.is_eof(msg.args):
                 msg.flag = FLAG_EOF
+                if self.partner_copies > 1:
+                    for i in range(self.partner_copies - 1):
+                        msg.add_message(args=msg.args,
+                                        header=copy.deepcopy(msg.header))
         if not skip_processing:
             # 4. Check if the message should be filtered
             if msg.flag not in [FLAG_SKIP, FLAG_EOF]:
@@ -1946,7 +1974,7 @@ class CommBase(tools.YggClass):
             # 6. Apply after_prepare_message function
             if after_prepare_message:
                 for x in after_prepare_message:
-                    msg = x(msg)
+                    msg = msg.apply_function(x)
         # Looping over all messages (allowing for transform to produce iterator)
         if (msg.flag not in [FLAG_SKIP]) and (not skip_serialization):
             for x in [msg] + msg.additional_messages:
@@ -2231,7 +2259,7 @@ class CommBase(tools.YggClass):
         # 7. Apply after_finalize_message functions
         if after_finalize_message:
             for x in after_finalize_message:
-                msg = x(msg)
+                msg = msg.apply_function(x)
         return msg
 
     def recv_nolimit(self, *args, **kwargs):

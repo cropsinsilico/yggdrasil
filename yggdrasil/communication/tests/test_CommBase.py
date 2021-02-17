@@ -350,7 +350,8 @@ class TestCommBase(YggTestClassInfo):
                      reverse_comms=False, send_kwargs=None, recv_kwargs=None,
                      n_send=1, n_recv=1, print_status=False,
                      close_on_send_eof=None, close_on_recv_eof=None,
-                     no_recv=False, recv_timeout=None):
+                     no_recv=False, recv_timeout=None,
+                     n_send_init=0, n_recv_init=0):
         r"""Generic send/recv of a message."""
         tkey = '.do_send_recv'
         is_eof_send = (('eof' in send_meth) or self.send_instance.is_eof(msg_send))
@@ -372,8 +373,8 @@ class TestCommBase(YggTestClassInfo):
             send_args = tuple()
         else:
             send_args = (msg_send,)
-        self.assert_equal(getattr(self.send_instance, n_msg_send_meth), 0)
-        self.assert_equal(getattr(self.recv_instance, n_msg_recv_meth), 0)
+        self.assert_equal(getattr(self.send_instance, n_msg_send_meth), n_send_init)
+        self.assert_equal(getattr(self.recv_instance, n_msg_recv_meth), n_recv_init)
         if reverse_comms:
             send_instance = self.recv_instance
             recv_instance = self.send_instance
@@ -635,10 +636,10 @@ class TestCommBase(YggTestClassInfo):
         r"""Test send/recv of EOF message with no close."""
         self.do_send_recv(send_meth='send_eof', close_on_recv_eof=False)
 
-    def test_purge(self, nrecv=1):
+    def test_purge(self, nrecv=1, nrecv_init=0, nsend_init=0):
         r"""Test purging messages from the comm."""
-        self.assert_equal(self.send_instance.n_msg, 0)
-        self.assert_equal(self.recv_instance.n_msg, 0)
+        self.assert_equal(self.send_instance.n_msg, nsend_init)
+        self.assert_equal(self.recv_instance.n_msg, nrecv_init)
         # Purge recv while open
         if self.comm not in ['CommBase', 'AsyncComm']:
             flag = self.send_instance.send(self.test_msg)
