@@ -283,7 +283,7 @@ class CommServer(multitasking.YggTaskLoop):
         cli_count (int): Number of clients that have connected to this server.
 
     """
-    def __init__(self, srv_address, cli_address=None, **kwargs):
+    def __init__(self, srv_address, cli_address=None, name=None, **kwargs):
         global _registered_servers
         self.cli_count = 0
         self.srv_count = 0
@@ -291,7 +291,8 @@ class CommServer(multitasking.YggTaskLoop):
             cli_address = srv_address
         self.srv_address = srv_address
         self.cli_address = cli_address
-        super(CommServer, self).__init__('CommServer.%s' % srv_address, **kwargs)
+        super(CommServer, self).__init__('CommServer(%s).%s.to.%s' % (
+            name, cli_address, srv_address), **kwargs)
         _registered_servers[self.srv_address] = self
 
     def add_server(self):
@@ -1061,7 +1062,7 @@ class CommBase(tools.YggClass):
 
     def bind(self):
         r"""Bind in place of open."""
-        if self.is_client or self.allow_multiple_comms and (not self.is_interface):
+        if (self.is_client or self.allow_multiple_comms) and (not self.is_interface):
             self.signon_to_server()
 
     def open(self):
@@ -1509,13 +1510,13 @@ class CommBase(tools.YggClass):
         """
         if (((self._commtype not in ['server', 'client'])
              and (self.direction != direction))):
-            raise RuntimeError("This comm (%s) is designated to %s and "
-                               "therefore cannot %s."
-                               % (self.address, self.direction, direction))
+            raise RuntimeError(("This comm (%s, %s) is designated to %s and "
+                                "therefore cannot %s.")
+                               % (self.name, self.address, self.direction, direction))
         if self.single_use and self._used:
-            raise RuntimeError("This comm (%s) is single use and it "
+            raise RuntimeError("This comm (%s, %s) is single use and it "
                                "was already used."
-                               % self.address)
+                               % (self.name, self.address))
 
     # CLIENT/SERVER METHODS
     def server_exists(self, srv_address):
@@ -1539,7 +1540,8 @@ class CommBase(tools.YggClass):
             srv_address (str): Address of server comm.
 
         """
-        return self._server_class(srv_address, **self._server_kwargs)
+        return self._server_class(srv_address, name=self.name,
+                                  **self._server_kwargs)
 
     def signon_to_server(self):
         r"""Add a client to an existing server or create one."""

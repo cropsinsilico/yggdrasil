@@ -241,7 +241,7 @@ class ZMQProxy(CommBase.CommServer):
         self.reply_socket = None
         # Set name
         super(ZMQProxy, self).__init__(self.srv_address, self.cli_address, **kwargs)
-        self._name = 'ZMQProxy.%s' % srv_address
+        self._name = 'ZMQProxy.%s.to.%s' % (cli_address, srv_address)
 
     def client_recv(self):
         r"""Receive single message from the client."""
