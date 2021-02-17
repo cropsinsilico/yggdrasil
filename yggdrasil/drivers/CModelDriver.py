@@ -244,6 +244,16 @@ class ClangCompiler(CCompilerBase):
     is_linker = False
     toolset = 'llvm'
 
+    @classmethod
+    def get_flags(cls, *args, **kwargs):
+        r"""Get a list of compiler flags."""
+        out = super(ClangCompiler, cls).get_flags(*args, **kwargs)
+        if '-fopenmp' in out:
+            idx = out.index('-fopenmp')
+            if (idx > 0) and (out[idx - 1] != '-Xpreprocessor'):
+                out.insert(idx, '-Xpreprocessor')
+        return out
+        
 
 class MSVCCompiler(CCompilerBase):
     r"""Microsoft Visual Studio C Compiler."""
@@ -415,6 +425,8 @@ class ClangLinker(LDLinker):
         out = super(ClangLinker, cls).get_flags(*args, **kwargs)
         if '-lstdc++' not in out:
             out.append('-lstdc++')
+        if '-fopenmp' in out:
+            out[out.index('-fopenmp')] = '-lomp'
         return out
 
 
