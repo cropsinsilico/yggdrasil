@@ -524,7 +524,7 @@ def get_timeout_args(args0=None):
             args.append(v)
             i += 1
             args.append(args0[i])
-        elif os.path.isfile(v):
+        elif os.path.isfile(v) or os.path.isdir(v):
             pass
         else:
             if v.startswith('--rootdir='):
