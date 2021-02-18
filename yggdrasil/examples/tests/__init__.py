@@ -87,6 +87,50 @@ def make_iter_test(is_flaky=False, **kwargs):
     return itest
 
 
+def example_decorator(name, x, iter_over, timeout):
+    r"""Consolidate decorator based on iteration values.
+
+    Args:
+        name (str): Example name.
+        x (list): Iteration parameters.
+        iter_over (list): Iteration dimensions.
+        timeout (float): Test timeout.
+
+    Returns:
+        function: Decorator.
+
+    """
+
+    def deco(func):
+        deco_list = [
+            timeout_dec(timeout=timeout),
+            unittest.skipIf(
+                (not tools.check_environ_bool('YGG_ENABLE_EXAMPLE_TESTS')),
+                "Example tests not enabled."),
+        ]
+        for i, k in enumerate(iter_over):
+            v = x[i]
+            flag = None
+            msg = None
+            if k == 'comm':
+                flag = tools.is_comm_installed(v)
+            elif k == 'language':
+                flag = True
+                for vv in get_example_languages(name, language=v):
+                    if not tools.is_lang_installed(vv):
+                        flag = False
+                        break
+            if flag is not None:
+                if msg is None:
+                    msg = "%s %s not installed." % (k.title(), v)
+                deco_list.append(unittest.skipIf(not flag, msg))
+        for v in deco_list:
+            func = v(func)
+        return func
+
+    return deco
+
+
 class ExampleMeta(ComponentMeta):
 
     def __new__(cls, name, bases, dct):
@@ -128,8 +172,8 @@ class ExampleMeta(ComponentMeta):
                            zip(iter_keys, x)})
                     itest_func.__name__ = itest_name
                     if timeout is not None:
-                        itest_func = timeout_dec(timeout=timeout)(
-                            itest_func)
+                        itest_func = example_decorator(
+                            dct['example_name'], x, iter_over, timeout)(itest_func)
                     dct[itest_name] = itest_func
         out = super(ExampleMeta, cls).__new__(cls, name, bases, dct)
         if out.example_name is not None:
