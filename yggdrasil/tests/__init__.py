@@ -19,7 +19,6 @@ import json
 import functools
 import pytest
 import subprocess
-import inspect
 from pandas.testing import assert_frame_equal
 from yggdrasil.config import ygg_cfg, cfg_logging
 from yggdrasil import tools, platform, units
@@ -515,10 +514,6 @@ def timeout(*args, allow_arguments=False, **kwargs):
     pytest_deco = pytest.mark.timeout(*args, **kwargs)
     if (((method == 'thread') and (not os.environ.get(env_flag, False))
          and (not allow_arguments))):
-        frame = inspect.stack()[1]
-        module = inspect.getmodule(frame[0])
-        classname = frame[3]
-        filename = module.__file__
         testargs = list([v for v in sys.argv if not os.path.isfile(v)])
         if '--cov-append' not in testargs:
             testargs.append('--cov-append')
@@ -528,19 +523,12 @@ def timeout(*args, allow_arguments=False, **kwargs):
         def deco(func):
             @functools.wraps(func)
             def wrapper(*args, **kwargs):
-                if classname == '<module>':
-                    testname = '%s::%s' % (filename, func.__name__)
-                    if args or kwargs:
-                        raise Exception("Arguments not compatible with forked "
-                                        "timeout, add 'allow_arguments=True' to "
-                                        "the decorator")
-                else:
-                    if (len(args) > 1) or kwargs:
-                        # return pytest_deco(func)(*args, **kwargs)
-                        raise Exception("Arguments not compatible with forked "
-                                        "timeout, add 'allow_arguments=True' to "
-                                        "the decorator")
-                    testname = '%s::%s::%s' % (filename, classname, func.__name__)
+                testname = os.environ['PYTEST_CURRENT_TEST'].split()[0]
+                max_args = testname.count('::') - 1
+                if (len(args) > max_args) or kwargs:  # pragma: debug
+                    raise Exception("Arguments not compatible with forked "
+                                    "timeout, add 'allow_arguments=True' to "
+                                    "the decorator")
                 env = copy.deepcopy(os.environ)
                 env[env_flag] = '1'
                 subprocess.run(['pytest'] + testargs + [testname],
