@@ -521,6 +521,17 @@ def timeout(*args, allow_arguments=False, **kwargs):
             testargs.remove('--clear-cache')
         
         def deco(func):
+            if getattr(func, '_timeout_wrapped', False):
+                return func
+            if isinstance(func, type):
+                for k in dir(func):
+                    v = getattr(func, k)
+                    if k.startswith('test_') and isinstance(v,
+                                                            types.MethodType):
+                        setattr(func, k, deco(v))
+                func._timeout_wrapped = True
+                return func
+
             @functools.wraps(func)
             def wrapper(*args, **kwargs):
                 testname = os.environ['PYTEST_CURRENT_TEST'].split()[0]
@@ -533,6 +544,7 @@ def timeout(*args, allow_arguments=False, **kwargs):
                 env[env_flag] = '1'
                 subprocess.run(['pytest'] + testargs + [testname],
                                env=env, check=True)
+            wrapper._timeout_wrapped = True
             return wrapper
         return deco
     else:
