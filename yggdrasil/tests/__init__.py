@@ -505,7 +505,9 @@ def get_timeout_args(args0=None):
     args_preserve_path = ['-c']
     args_remove = ['--clear-cache']
     args_remove_value = []
-    args_add = ['--cov-append', '--import-mode=importlib']
+    args_add = ['--cov-append']
+    if int(pytest.__version__.split('.')[0]) >= 6:
+        args_add.append('--import-mode=importlib')
     args_remove_value_match = tuple([k + '=' for k in args_remove_value])
     out = {'args': [], 'rootdir': None}
     args = out['args']
