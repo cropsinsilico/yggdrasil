@@ -211,6 +211,11 @@ jobs:
 
         '
     - name: Run tests (1st)
+      if: matrix.os == 'macos-latest'
+      id: test1
+      run: yggtest --ci --nocapture --cov-append ${{ matrix.test-flags1 }}
+    - name: Run tests (1st)
+      if: matrix.os != 'macos-latest'
       id: test1
       run: yggtest --ci --cov-append ${{ matrix.test-flags1 }}
     - name: Re-run test failures (1st)
@@ -460,6 +465,11 @@ jobs:
 
         '
     - name: Run tests (1st)
+      if: matrix.os == 'macos-latest'
+      id: test1
+      run: yggtest --ci --nocapture --cov-append ${{ matrix.test-flags1 }}
+    - name: Run tests (1st)
+      if: matrix.os != 'macos-latest'
       id: test1
       run: yggtest --ci --cov-append ${{ matrix.test-flags1 }}
     - name: Re-run test failures (1st)
@@ -689,6 +699,11 @@ jobs:
 
         '
     - name: Run tests (1st)
+      if: matrix.os == 'macos-latest'
+      id: test1
+      run: yggtest --ci --nocapture --cov-append ${{ matrix.test-flags1 }}
+    - name: Run tests (1st)
+      if: matrix.os != 'macos-latest'
       id: test1
       run: yggtest --ci --cov-append ${{ matrix.test-flags1 }}
     - name: Re-run test failures (1st)
@@ -920,6 +935,11 @@ jobs:
 
         '
     - name: Run tests (1st)
+      if: matrix.os == 'macos-latest'
+      id: test1
+      run: yggtest --ci --nocapture --cov-append ${{ matrix.test-flags1 }}
+    - name: Run tests (1st)
+      if: matrix.os != 'macos-latest'
       id: test1
       run: yggtest --ci --cov-append ${{ matrix.test-flags1 }}
     - name: Re-run test failures (1st)
@@ -1149,6 +1169,11 @@ jobs:
 
         '
     - name: Run tests (1st)
+      if: matrix.os == 'macos-latest'
+      id: test1
+      run: yggtest --ci --nocapture --cov-append ${{ matrix.test-flags1 }}
+    - name: Run tests (1st)
+      if: matrix.os != 'macos-latest'
       id: test1
       run: yggtest --ci --cov-append ${{ matrix.test-flags1 }}
     - name: Re-run test failures (1st)

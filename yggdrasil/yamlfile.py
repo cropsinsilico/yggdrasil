@@ -317,12 +317,12 @@ def add_model_function(existing):
     dir2opp = {'input': 'output', 'output': 'input'}
     for io in dir2opp.keys():
         miss[io] = [k for k in existing[io].keys()]
-    for conn in existing['connection'].values():
-        for io1, io2 in dir2opp.items():
-            if ((io1 + 's') in conn):
-                for x in conn[io1 + 's']:
-                    if x in miss[io2]:
-                        miss[io2].remove(x)
+    # for conn in existing['connection'].values():
+    #     for io1, io2 in dir2opp.items():
+    #         if ((io1 + 's') in conn):
+    #             for x in conn[io1 + 's']:
+    #                 if x in miss[io2]:
+    #                     miss[io2].remove(x)
     # Create connections to function model
     for io1, io2 in dir2opp.items():
         for i in miss[io1]:
@@ -360,7 +360,7 @@ def parse_component(yml, ctype, existing=None):
         dict: All components identified.
 
     """
-    s = get_schema()
+    # s = get_schema()
     if not isinstance(yml, dict):
         raise YAMLSpecificationError("Component entry in yml must be a dictionary.")
     ctype_list = ['input', 'output', 'model', 'connection', 'server']
@@ -373,16 +373,16 @@ def parse_component(yml, ctype, existing=None):
         existing = parse_model(yml, existing)
     elif ctype == 'connection':
         existing = parse_connection(yml, existing)
-    elif ctype in ['input', 'output']:
-        for k in ['inputs', 'outputs']:
-            if k not in yml:
-                continue
-            for x in yml[k]:
-                if 'commtype' not in x:
-                    if 'filetype' in x:
-                        x['commtype'] = s['file'].subtype2class[x['filetype']]
-                    elif 'commtype' in x:
-                        x['commtype'] = s['comm'].subtype2class[x['commtype']]
+    # elif ctype in ['input', 'output']:
+    #     for k in ['inputs', 'outputs']:
+    #         if k not in yml:
+    #             continue
+    #         for x in yml[k]:
+    #             if 'commtype' not in x:
+    #                 if 'filetype' in x:
+    #                     x['commtype'] = s['file'].subtype2class[x['filetype']]
+    #                 elif 'commtype' in x:
+    #                     x['commtype'] = s['comm'].subtype2class[x['commtype']]
     # Ensure component dosn't already exist
     if yml['name'] in existing[ctype]:
         pprint.pprint(existing)
@@ -593,12 +593,4 @@ def link_model_io(existing):
             existing['model'][m]['output_drivers'].append(io)
         for m in io['dst_models']:
             existing['model'][m]['input_drivers'].append(io)
-    # Add input drivers
-    for io in existing['input'].values():
-        for m in io['model_driver']:
-            existing['model'][m]['input_drivers'].append(io)
-    # Add output drivers
-    for io in existing['output'].values():
-        for m in io['model_driver']:
-            existing['model'][m]['output_drivers'].append(io)
     return existing
