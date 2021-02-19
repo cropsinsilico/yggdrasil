@@ -1238,7 +1238,7 @@ class ModelDriver(Driver):
             self.queue_thread.set_break_flag()
             try:
                 self.queue.put(self._exit_line)
-            except multitasking.AliasDisconnectError:
+            except multitasking.AliasDisconnectError:  # pragma: debug
                 self.error("Queue disconnected")
             self.debug("End of model output")
             try:
@@ -1266,7 +1266,7 @@ class ModelDriver(Driver):
             # This sleep is necessary to allow changes in queue without lock
             self.sleep()
             return
-        except multitasking.AliasDisconnectError:
+        except multitasking.AliasDisconnectError:  # pragma: debug
             self.error("Queue disconnected")
             self.set_break_flag()
         else:

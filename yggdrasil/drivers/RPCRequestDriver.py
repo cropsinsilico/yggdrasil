@@ -171,9 +171,9 @@ class RPCRequestDriver(ConnectionDriver):
                 if (not self.is_comm_open) or self._block_response:  # pragma: debug
                     self.debug("Comm closed, not creating response driver.")
                     return False
-                drv_args = [msg.header['response_address']]
+                drv_args = [msg.header['response_address'],
+                            msg.header['request_id']]
                 drv_kwargs = dict(
-                    msg_id=msg.header['request_id'],
                     request_name=self.name,
                     inputs=[{'commtype': self.ocomm._commtype}],
                     outputs=[{'commtype': msg.header["commtype"]}])

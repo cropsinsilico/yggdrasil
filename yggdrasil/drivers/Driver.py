@@ -100,7 +100,3 @@ class Driver(multitasking.YggTaskLoop):
         self.debug('')
         super(Driver, self).terminate()
         self.debug('Returning')
-
-    def on_model_exit(self):
-        r"""Processes that should be run when an associated model exits."""
-        self.debug('')

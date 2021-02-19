@@ -421,7 +421,7 @@ class ForkComm(CommBase.CommBase):
         return super(ForkComm, self).finalize_message(msg, **kwargs)
         
     @property
-    def _multiple_first_send(self):
+    def _multiple_first_send(self):  # pragma: debug
         return self.last_comm._multiple_first_send
 
     @_multiple_first_send.setter
@@ -439,7 +439,7 @@ class ForkComm(CommBase.CommBase):
             x.suppress_special_debug = value
 
     @property
-    def _type_errors(self):
+    def _type_errors(self):  # pragma: debug
         return self.last_comm._type_errors
 
     @_type_errors.setter

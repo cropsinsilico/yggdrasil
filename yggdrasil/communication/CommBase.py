@@ -134,7 +134,7 @@ class CommMessage(object):
         if self.worker is not None:
             for x in self.worker_messages:
                 if not self.worker.send_message(x, **kwargs):
-                    return False
+                    return False  # pragma: debug
         return True
 
 
@@ -1802,7 +1802,7 @@ class CommBase(tools.YggClass):
         if msg.flag == FLAG_SKIP:
             return True
         elif msg.flag == FLAG_FAILURE:
-            return False
+            return False  # pragma: debug
         elif msg.flag == FLAG_EOF:
             with self._closing_thread.lock:
                 if not self._eof_sent.is_set():
@@ -2132,7 +2132,7 @@ class CommBase(tools.YggClass):
                 msg.flag = FLAG_INCOMPLETE
                 while len(msg.msg) < msg.header['size']:
                     imsg = msg.worker.recv_message(skip_deserialization=True, **kwargs)
-                    if imsg.flag in [FLAG_EOF, FLAG_FAILURE]:
+                    if imsg.flag in [FLAG_EOF, FLAG_FAILURE]:  # pragma: debug
                         self.error("Receive interupted at %d of %d bytes.",
                                    len(msg.msg), msg.header['size'])
                         msg.flag = FLAG_FAILURE

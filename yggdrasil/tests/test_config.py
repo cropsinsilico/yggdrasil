@@ -31,7 +31,8 @@ def test_update_language_config():
                 'c', lang_kwargs={'c': {
                     'vcpkg_dir': config.ygg_cfg_usr.get(
                         'c', 'vcpkg_dir')}})
-        config.update_language_config(overwrite=True, verbose=True)
+        config.update_language_config(overwrite=True, verbose=True,
+                                      allow_multiple_omp=True)
         if len(languages) > 0:
             config.ygg_cfg_usr.remove_section(languages[0])
             config.update_language_config(

@@ -389,9 +389,9 @@ class ExampleTstBase(YggTestBase, tools.YggClass):
     def setup_iteration_comm(self, comm=None):
         r"""Perform setup associated with a comm iteration."""
         assert(comm is not None)
-        if not tools.is_comm_installed(comm):
-            raise unittest.SkipTest("%s library not installed."
-                                    % comm)
+        # if not tools.is_comm_installed(comm):
+        #     raise unittest.SkipTest("%s library not installed."
+        #                             % comm)
         self.set_default_comm(default_comm=comm)
         return comm
 

@@ -753,8 +753,9 @@ class ZMQComm(CommBase.CommBase):
             str: Messages with reply address removed if present.
 
         """
-        if self.direction == 'send':
-            return msg, None
+        assert(self.direction != 'send')
+        # if self.direction == 'send':
+        #     return msg, None
         header = self.serializer.parse_header(msg.split(_flag_zmq_filter)[-1])
         address = header.get('zmq_reply', None)
         if (address is None):
@@ -996,7 +997,7 @@ class ZMQComm(CommBase.CommBase):
         r"""Send a message."""
         # Ensure that filter is not being used with REQ or REP socket
         # which cannot drop messages
-        if self.filter and (self.socket_type_name in ['REQ', 'REP']):
+        if self.filter and (self.socket_type_name in ['REQ', 'REP']):  # pragma: debug
             raise RuntimeError("Cannot use filters with REQ or REP "
                                "sockets since dropping messages "
                                "would break the requirement of "
@@ -1007,7 +1008,7 @@ class ZMQComm(CommBase.CommBase):
         r"""Receive a message."""
         # Ensure that filter is not being used with REQ or REP socket
         # which cannot drop messages
-        if self.filter and (self.socket_type_name in ['REQ', 'REP']):
+        if self.filter and (self.socket_type_name in ['REQ', 'REP']):  # pragma: debug
             raise RuntimeError("Cannot use filters with REQ or REP "
                                "sockets since dropping messages "
                                "would break the requirement of "
@@ -1088,12 +1089,13 @@ class ZMQComm(CommBase.CommBase):
                 else:
                     total_msg = self.socket.recv(**kwargs)
             except zmq.ZMQError as e:
-                if e.errno == zmq.ETIMEDOUT:
+                if e.errno == zmq.ETIMEDOUT:  # pragma: debug
                     raise NoMessages("No messages in socket.")
                 elif e.errno == zmq.EAGAIN:
                     raise TemporaryCommunicationError(
                         "Socket not yet available.")
-                self.special_debug("Socket could not receive. (errno=%d)", e.errno)
+                self.special_debug(("Socket could not receive. "
+                                    "(errno=%d)"), e.errno)  # pragma: debug
                 raise
         # Interpret headers
         total_msg, k = self.check_reply_socket_recv(total_msg)
@@ -1113,7 +1115,7 @@ class ZMQComm(CommBase.CommBase):
         r"""Confirm that sent message was received."""
         if noblock:
             if self.is_open and (self._n_zmq_sent != self._n_reply_sent):
-                self._n_reply_sent = self._n_zmq_sent
+                self._n_reply_sent = self._n_zmq_sent  # pragma: debug
             return True
         flag = True
         if self.is_open and (self._n_zmq_sent != self._n_reply_sent):
@@ -1136,7 +1138,7 @@ class ZMQComm(CommBase.CommBase):
         if noblock:
             for k in keys:
                 if self.is_open and (self._n_zmq_recv[k] != self._n_reply_recv[k]):
-                    self._n_reply_recv[k] = self._n_zmq_recv[k]
+                    self._n_reply_recv[k] = self._n_zmq_recv[k]  # pragma: debug
             return True
         flag = True
         for k in keys:

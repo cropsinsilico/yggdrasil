@@ -215,14 +215,14 @@ class AsyncComm(ProxyObject, ComponentBaseUnregistered):
         r"""int: Number of messages in the receive backlog."""
         if self.direction == 'recv':
             return self.n_msg_backlog
-        return 0
+        return 0  # pragma: debug
 
     @property
     def n_msg_backlog_send(self):
         r"""int: Number of messages in the send backlog."""
         if self.direction == 'send':
             return self.n_msg_backlog
-        return 0
+        return 0  # pragma: debug
 
     @property
     def n_msg_backlog(self):

@@ -527,7 +527,7 @@ class Task(ContextObject):
             name = self._base.name
             exitcode = self._base.exitcode
             daemon = self._base.daemon
-        except AttributeError:
+        except AttributeError:  # pragma: debug
             pass
         return DummyTask(name=name, exitcode=exitcode, daemon=daemon)
         

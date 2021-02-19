@@ -21,6 +21,6 @@ class OutputDriver(ConnectionDriver):
     def __init__(self, name, args, **kwargs):
         kwargs.setdefault('outputs', [{}])
         kwargs['outputs'][0]['name'] = args
-        if kwargs['outputs'][0].get('commtype', self._ocomm_type) == 'RMQComm':
+        if kwargs['outputs'][0].get('commtype', self._ocomm_type) in ['rmq', 'RMQComm']:
             kwargs['outputs'][0]['queue'] = args
         super(OutputDriver, self).__init__(name, **kwargs)

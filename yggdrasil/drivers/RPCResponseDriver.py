@@ -1,4 +1,3 @@
-import uuid
 from yggdrasil.drivers.ConnectionDriver import ConnectionDriver
 
 
@@ -8,8 +7,8 @@ class RPCResponseDriver(ConnectionDriver):
     Args:
         model_response_address (str): The address of the channel used by the
             client model to receive responses.
-        msg_id (str, optional): ID associate with the request message this
-            driver was created to respond to. Defaults to new unique ID.
+        msg_id (str): ID associate with the request message this driver was
+            created to respond to.
         **kwargs: Additional keyword arguments are passed to parent class.
 
     Attributes:
@@ -21,9 +20,7 @@ class RPCResponseDriver(ConnectionDriver):
 
     _connection_type = 'rpc_response'
 
-    def __init__(self, model_response_address, msg_id=None, **kwargs):
-        if msg_id is None:
-            msg_id = str(uuid.uuid4())
+    def __init__(self, model_response_address, msg_id, **kwargs):
         # Input communicator
         inputs = kwargs.get('inputs', [{}])
         inputs[0]['name'] = 'server_model_response.' + msg_id

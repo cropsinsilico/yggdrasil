@@ -45,11 +45,6 @@ class TestConnectionParam(parent.TestParam):
                    self.instance.ocomm.maxMsgSize)
 
     @property
-    def is_input(self):
-        r"""bool: True if the connection is for input."""
-        return (self.icomm_name != self.comm_name)
-
-    @property
     def is_output(self):
         r"""bool: True if the connection is for output."""
         return (self.ocomm_name != self.comm_name)
@@ -217,8 +212,6 @@ class TestConnectionParam(parent.TestParam):
         if kwargs is None:
             kwargs = self.inst_kwargs
         # Adjust kwargs
-        if 'comm_address' in kwargs:
-            del kwargs['comm_address']
         if comm in ['ocomm', 'both']:
             for x in kwargs['outputs']:
                 x.update(base_commtype=self.ocomm_name,
@@ -279,6 +272,7 @@ class TestConnectionDriverNoStart(TestConnectionParam, parent.TestDriverNoStart)
         if self.instance.icomm._commtype != 'value':
             assert(not flag)
             self.assert_equal(ret, None)
+        self.instance.confirm_output(timeout=1.0)
 
         
 class TestConnectionDriverNoInit(TestConnectionParam):
