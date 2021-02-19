@@ -212,7 +212,7 @@ jobs:
         '
     - name: Run tests (1st)
       if: matrix.os == 'macos-latest'
-      id: test1
+      id: test1_mac
       run: yggtest --ci --nocapture --cov-append ${{ matrix.test-flags1 }}
     - name: Run tests (1st)
       if: matrix.os != 'macos-latest'
@@ -466,7 +466,7 @@ jobs:
         '
     - name: Run tests (1st)
       if: matrix.os == 'macos-latest'
-      id: test1
+      id: test1_mac
       run: yggtest --ci --nocapture --cov-append ${{ matrix.test-flags1 }}
     - name: Run tests (1st)
       if: matrix.os != 'macos-latest'
@@ -700,7 +700,7 @@ jobs:
         '
     - name: Run tests (1st)
       if: matrix.os == 'macos-latest'
-      id: test1
+      id: test1_mac
       run: yggtest --ci --nocapture --cov-append ${{ matrix.test-flags1 }}
     - name: Run tests (1st)
       if: matrix.os != 'macos-latest'
@@ -936,7 +936,7 @@ jobs:
         '
     - name: Run tests (1st)
       if: matrix.os == 'macos-latest'
-      id: test1
+      id: test1_mac
       run: yggtest --ci --nocapture --cov-append ${{ matrix.test-flags1 }}
     - name: Run tests (1st)
       if: matrix.os != 'macos-latest'
@@ -1170,7 +1170,7 @@ jobs:
         '
     - name: Run tests (1st)
       if: matrix.os == 'macos-latest'
-      id: test1
+      id: test1_mac
       run: yggtest --ci --nocapture --cov-append ${{ matrix.test-flags1 }}
     - name: Run tests (1st)
       if: matrix.os != 'macos-latest'
