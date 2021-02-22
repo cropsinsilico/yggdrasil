@@ -114,10 +114,10 @@ jobs:
         python-version: ${{ matrix.python-version }}
     - name: (PIP) Set up Virtual Env
       if: env.USEVIRTUALENV == 1 && matrix.install-method == 'pip'
-      uses: syphar/restore-virtualenv@v1
-      # run: |
-      #   python utils/setup_test_env.py env virtualenv ${{ matrix.python-version }} --env-name=test
-      #   source test/bin/activate
+      # uses: syphar/restore-virtualenv@v1
+      run: |
+        python utils/setup_test_env.py env virtualenv ${{ matrix.python-version }} --env-name=test
+        source test/bin/activate
     - name: (PIP) Install dependencies & package
       if: matrix.install-method == 'pip'
       run: python utils/setup_test_env.py install ${{ matrix.install-method }}
