@@ -131,6 +131,12 @@ jobs:
 
         source test/bin/activate
 
+        echo "$VIRTUAL_ENV"
+
+        echo "VIRTUAL_ENV=$VIRTUAL_ENV" >> $GITHUB_ENV
+
+        echo "PATH=$VIRTUAL_ENV/bin:$PATH" >> $GITHUB_ENV
+
         '
     - name: (PIP) Install dependencies & package
       if: matrix.install-method == 'pip'
@@ -390,6 +396,12 @@ jobs:
 
         source test/bin/activate
 
+        echo "$VIRTUAL_ENV"
+
+        echo "VIRTUAL_ENV=$VIRTUAL_ENV" >> $GITHUB_ENV
+
+        echo "PATH=$VIRTUAL_ENV/bin:$PATH" >> $GITHUB_ENV
+
         '
     - name: (PIP) Install dependencies & package
       if: matrix.install-method == 'pip'
@@ -628,6 +640,12 @@ jobs:
         }} --env-name=test
 
         source test/bin/activate
+
+        echo "$VIRTUAL_ENV"
+
+        echo "VIRTUAL_ENV=$VIRTUAL_ENV" >> $GITHUB_ENV
+
+        echo "PATH=$VIRTUAL_ENV/bin:$PATH" >> $GITHUB_ENV
 
         '
     - name: (PIP) Install dependencies & package
@@ -870,6 +888,12 @@ jobs:
 
         source test/bin/activate
 
+        echo "$VIRTUAL_ENV"
+
+        echo "VIRTUAL_ENV=$VIRTUAL_ENV" >> $GITHUB_ENV
+
+        echo "PATH=$VIRTUAL_ENV/bin:$PATH" >> $GITHUB_ENV
+
         '
     - name: (PIP) Install dependencies & package
       if: matrix.install-method == 'pip'
@@ -1108,6 +1132,12 @@ jobs:
         }} --env-name=test
 
         source test/bin/activate
+
+        echo "$VIRTUAL_ENV"
+
+        echo "VIRTUAL_ENV=$VIRTUAL_ENV" >> $GITHUB_ENV
+
+        echo "PATH=$VIRTUAL_ENV/bin:$PATH" >> $GITHUB_ENV
 
         '
     - name: (PIP) Install dependencies & package

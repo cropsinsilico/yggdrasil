@@ -118,6 +118,9 @@ jobs:
       run: |
         python utils/setup_test_env.py env virtualenv ${{ matrix.python-version }} --env-name=test
         source test/bin/activate
+        echo "$VIRTUAL_ENV"
+        echo "VIRTUAL_ENV=$VIRTUAL_ENV" >> $GITHUB_ENV
+        echo "PATH=$VIRTUAL_ENV/bin:$PATH" >> $GITHUB_ENV
     - name: (PIP) Install dependencies & package
       if: matrix.install-method == 'pip'
       run: python utils/setup_test_env.py install ${{ matrix.install-method }}
