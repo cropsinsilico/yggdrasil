@@ -1755,6 +1755,7 @@ class CommBase(tools.YggClass):
         out = False
         error = None
         while (not Tout.is_out):
+            error = None
             try:
                 with self._closing_thread.lock:
                     if self.is_open:
@@ -1770,7 +1771,7 @@ class CommBase(tools.YggClass):
                 self.special_debug("TemporaryCommunicationError: %s" % e)
             self.sleep()
         self.stop_timeout(key_suffix='._safe_send')
-        if (not out) and error and self.is_async:
+        if error and self.is_async:
             raise TemporaryCommunicationError(error)
         if send_1st:
             self.suppress_special_debug = False
@@ -1808,6 +1809,7 @@ class CommBase(tools.YggClass):
                 if not self._eof_sent.is_set():
                     self._eof_sent.set()
                 else:  # pragma: debug
+                    self.error("EOF SENT TWICE")
                     return False
         elif msg.flag == FLAG_SUCCESS:
             pass
@@ -1853,6 +1855,9 @@ class CommBase(tools.YggClass):
             except ValueError:  # pragma: debug
                 self.exception('Failed to send (unyt array in message)')
         except TemporaryCommunicationError if self.is_async else NeverMatch:
+            if msg.flag == FLAG_EOF:
+                with self._closing_thread.lock:
+                    self._eof_sent.clear()
             raise
         except BaseException:
             # Handle error caused by calling repr on unyt array that isn't float64
@@ -2022,11 +2027,6 @@ class CommBase(tools.YggClass):
 
         """
         return self.send(self.eof_msg, *args, **kwargs)
-        # with self._closing_thread.lock:
-        #     if not self._eof_sent.is_set():
-        #         self._eof_sent.set()
-        #         return self.send(self.eof_msg, *args, **kwargs)
-        # return False
 
     # RECV METHODS
     def _safe_recv(self, timeout=None, **kwargs):
@@ -2037,6 +2037,7 @@ class CommBase(tools.YggClass):
         out = (True, self.empty_bytes_msg)
         error = None
         while (not Tout.is_out):
+            error = None
             try:
                 with self._closing_thread.lock:
                     if self.is_open:

@@ -351,7 +351,7 @@ class AsyncComm(ProxyObject, ComponentBaseUnregistered):
                 else:
                     async_flag = FLAG_FAILURE
             else:  # pragma: debug
-                raise Exception("Unsupport flag: %s" % msg.flag)
+                raise Exception("Unsupported flag: %s" % msg.flag)
         except TemporaryCommunicationError:
             async_flag = FLAG_TRYAGAIN
         self.suppress_special_debug = False

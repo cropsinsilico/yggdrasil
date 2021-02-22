@@ -87,7 +87,9 @@ class TestConnectionParam(parent.TestParam):
         """
         flag = True
         msg_list = []
-        while flag:
+        timeout = 10.0
+        Tout = self.instance.start_timeout(timeout, key_suffix='.stoptest')
+        while flag and (not Tout.is_out):
             flag, msg_recv = recv_inst.recv(self.timeout)
             if flag:
                 if break_on_empty and recv_inst.is_empty_recv(msg_recv):
@@ -95,6 +97,7 @@ class TestConnectionParam(parent.TestParam):
                 msg_list.append(msg_recv)
             else:
                 self.assert_equal(msg_recv, recv_inst.eof_msg)
+        self.instance.stop_timeout(key_suffix='.stoptest')
         if expected_result is not None:
             self.assert_msg_lists_equal(msg_list, expected_result)
         return msg_list
