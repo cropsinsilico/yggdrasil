@@ -1086,6 +1086,8 @@ class CompilationToolBase(object):
         try:
             if (not skip_flags) and ('env' not in unused_kwargs):
                 unused_kwargs['env'] = cls.set_env()
+            if cls.toolname == 'dummy':
+                logger.info('Command: "%s"' % ' '.join(cmd))
             logger.debug('Command: "%s"' % ' '.join(cmd))
             proc = tools.popen_nobuffer(cmd, **unused_kwargs)
             output, err = proc.communicate()
@@ -1094,6 +1096,8 @@ class CompilationToolBase(object):
                 raise RuntimeError("Command '%s' failed with code %d:\n%s."
                                    % (' '.join(cmd), proc.returncode, output))
             try:
+                if cls.toolname == 'dummy':
+                    logger.info(' '.join(cmd) + '\n' + output)
                 logger.debug(' '.join(cmd) + '\n' + output)
             except UnicodeDecodeError:  # pragma: debug
                 tools.print_encoded(output)
@@ -1101,6 +1105,10 @@ class CompilationToolBase(object):
             if not allow_error:
                 raise RuntimeError("Could not call command '%s': %s"
                                    % (' '.join(cmd), e))
+        except BaseException as e:
+            print("Unexpected call error: %s" % e)
+            print(e, type(e))
+            raise
         # Check for output
         if (not skip_flags):
             if (out != 'clean'):
