@@ -131,9 +131,9 @@ definitions:
             type: string
           type: array
       required:
+      - datatype
       - name
       - commtype
-      - datatype
       title: comm_base
       type: object
     - anyOf:
@@ -605,8 +605,8 @@ definitions:
             is used.
           type: string
       required:
-      - name
       - filetype
+      - name
       - working_dir
       title: file_base
       type: object
@@ -1420,7 +1420,6 @@ definitions:
             of the class attribute outputs_in_inputs.
           type: boolean
         overwrite:
-          default: true
           description: If True, any existing model products (compilation products,
             wrapper scripts, etc.) are removed prior to the run. If False, the products
             are not removed. Defaults to True. Setting this to False can improve the
@@ -1659,8 +1658,8 @@ definitions:
           type: string
       required:
       - language
-      - name
       - args
+      - name
       - working_dir
       title: model_base
       type: object

@@ -160,7 +160,7 @@ int free_comm(comm_t *x) {
 #endif
   ygglog_debug("free_comm(%s)", x->name);
   // Send EOF for output comms and then wait for messages to be recv'd
-  if ((is_send(x->direction)) && (x->valid)) {
+  if ((is_send(x->direction)) && (x->valid) && (clean_in_progress) && (x->thread_id==0)) {
     if (_ygg_error_flag == 0) {
       ygglog_debug("free_comm(%s): Sending EOF", x->name);
       comm_send_eof(x);
@@ -421,6 +421,7 @@ comm_t* init_comm(const char *name, const char *direction,
 #endif
   comm_t *ret = get_global_scope_comm(name);
   if (ret != NULL) {
+    destroy_dtype(&datatype);
     return ret;
   }
   if ((datatype == NULL) && (strcmp(direction, "send") == 0)) {
@@ -442,11 +443,13 @@ comm_t* init_comm(const char *name, const char *direction,
       ret->valid = 0;
     }
   }
-  if (global_scope_comm) {
-    ret->is_global = 1;
-    ygglog_debug("init_comm(%s): Global comm!", name);
+  if (ret->valid) {
+    if (global_scope_comm) {
+      ret->is_global = 1;
+      ygglog_debug("init_comm(%s): Global comm!", name);
+    }
+    ygglog_debug("init_comm(%s): Initialized comm.", name);
   }
-  ygglog_debug("init_comm(%s): Initialized comm.", name);
   return ret;
 };
 
@@ -948,6 +951,7 @@ int comm_recv_multipart(comm_t *x, char **data, const size_t len,
     if (is_eof(*data)) {
       ygglog_debug("comm_recv_multipart(%s): EOF received.", x->name);
       x->recv_eof[0] = 1;
+      destroy_header(&head);
       return -2;
     }
     // Get datatype information from header on first recv
@@ -964,12 +968,14 @@ int comm_recv_multipart(comm_t *x, char **data, const size_t len,
       ret = update_dtype(updtype, head.dtype);
       if (ret != 0) {
 	ygglog_error("comm_recv_multipart(%s): Error updating datatype.", x->name);
+	destroy_header(&head);
 	return -1;
       }
     } else if ((x->is_file == 0) && (head.dtype != NULL)) {
       ret = update_dtype(updtype, head.dtype);
       if (ret != 0) {
 	ygglog_error("comm_recv_multipart(%s): Error updating existing datatype.", x->name);
+	destroy_header(&head);
 	return -1;
       }
     }
@@ -977,12 +983,14 @@ int comm_recv_multipart(comm_t *x, char **data, const size_t len,
       // Return early if header contained entire message
       if (head.size == head.bodysiz) {
         x->used[0] = 1;
+	destroy_header(&head);
 	return (int)(head.bodysiz);
       }
       // Get address for new comm
       comm_t* xmulti = new_comm(head.address, "recv", x->type, NULL);
       if ((xmulti == NULL) || (!(xmulti->valid))) {
 	ygglog_error("comm_recv_multipart: Failed to initialize a new comm.");
+	destroy_header(&head);
 	return -1;
       }
       xmulti->sent_eof[0] = 1;
@@ -992,6 +1000,7 @@ int comm_recv_multipart(comm_t *x, char **data, const size_t len,
 	int reply_socket = set_reply_recv(xmulti, head.zmq_reply_worker);
 	if (reply_socket < 0) {
 	  ygglog_error("comm_recv_multipart: Failed to set worker reply address.");
+	  destroy_header(&head);
 	  return -1;
 	}
       }
@@ -1007,6 +1016,7 @@ int comm_recv_multipart(comm_t *x, char **data, const size_t len,
 			 x->name);
 	    free(*data);
 	    free_comm(xmulti);
+	    destroy_header(&head);
 	    return -1;
 	  }
 	  *data = t_data;
@@ -1014,6 +1024,7 @@ int comm_recv_multipart(comm_t *x, char **data, const size_t len,
 	  ygglog_error("comm_recv_multipart(%s): buffer is not large enough",
 		       x->name);
 	  free_comm(xmulti);
+	  destroy_header(&head);
 	  return -1;
 	}
       }
@@ -1040,6 +1051,7 @@ int comm_recv_multipart(comm_t *x, char **data, const size_t len,
 	  ret = update_dtype(updtype, head.dtype);
 	  if (ret != 0) {
 	    ygglog_error("comm_recv_multipart(%s): Error updating existing datatype.", x->name);
+	    destroy_header(&head);
 	    return -1;
 	  } else {
 	    ret = (int)prev;
@@ -1057,6 +1069,7 @@ int comm_recv_multipart(comm_t *x, char **data, const size_t len,
   }
   if (ret >= 0)
     x->used[0] = 1;
+  destroy_header(&head);
   return ret;
 };
 

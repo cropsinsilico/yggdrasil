@@ -570,8 +570,10 @@ int check_reply_recv(const comm_t *comm, char *data, const size_t len) {
   } else {
     ygglog_error("check_reply_recv(%s): Error parsing reply header in '%s'",
 		 comm->name, data);
+    destroy_header(&head);
     return -1;
   }
+  destroy_header(&head);
   address[address_len] = '\0';
   // Match address and create if it dosn't exist
   int isock = set_reply_recv(comm, address);

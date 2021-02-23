@@ -303,7 +303,7 @@ class ModelDriver(Driver):
         'source_products': {'type': 'array', 'default': [],
                             'items': {'type': 'string'}},
         'working_dir': {'type': 'string'},
-        'overwrite': {'type': 'boolean', 'default': True},
+        'overwrite': {'type': 'boolean'},
         'preserve_cache': {'type': 'boolean', 'default': False},
         'function': {'type': 'string'},
         'is_server': {'anyOf': [{'type': 'boolean'},
@@ -407,6 +407,8 @@ class ModelDriver(Driver):
                  **kwargs):
         self.model_outputs_in_inputs = kwargs.pop('outputs_in_inputs', None)
         super(ModelDriver, self).__init__(name, **kwargs)
+        if self.overwrite is None:
+            self.overwrite = (not self.preserve_cache)
         # Setup process things
         self.model_process = None
         self.queue = multitasking.Queue()
@@ -1394,7 +1396,7 @@ class ModelDriver(Driver):
 
     def cleanup_products(self):
         r"""Remove products created in order to run the model."""
-        if self.overwrite:
+        if self.overwrite and (not self.preserve_cache):
             self.remove_products()
         if ((self.function and isinstance(self.model_src, str)
              and os.path.isfile(self.model_src))):

@@ -2054,7 +2054,6 @@ class CompiledModelDriver(ModelDriver):
                          'type': list}]
 
     def __init__(self, name, args, skip_compile=False, **kwargs):
-        kwargs.setdefault('overwrite', (not kwargs.pop('preserve_cache', False)))
         super(CompiledModelDriver, self).__init__(name, args, **kwargs)
         # Compile
         if not skip_compile:

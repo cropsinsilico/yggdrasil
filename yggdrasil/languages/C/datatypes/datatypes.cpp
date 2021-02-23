@@ -352,6 +352,10 @@ JSONArrayMetaschemaType* create_dtype_format_class(const char *format_str,
     beg = end;
   }
   out->update_items(items, true);
+  for (size_t i = 0; i < items.size(); i++) {
+    delete items[i];
+    items[i] = NULL;
+  }
   return out;
 };
 
@@ -1582,6 +1586,7 @@ extern "C" {
       delete item_type;
     } catch (...) {
       ygglog_error("generic_map_get_scalar: C++ exception thrown.");
+      out = NULL;
     }
     return out;
   }
@@ -3194,6 +3199,7 @@ extern "C" {
 	free(head);
 	return out;
       }
+      free(head);
       return out;
     } catch(...) {
       ygglog_error("parse_comm_header: C++ exception thrown.");
