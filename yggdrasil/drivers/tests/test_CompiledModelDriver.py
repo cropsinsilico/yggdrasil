@@ -1,4 +1,5 @@
 import os
+import shutil
 from yggdrasil.config import ygg_cfg
 from yggdrasil.tests import assert_equal, assert_raises, YggTestClass
 from yggdrasil.drivers import CompiledModelDriver
@@ -56,7 +57,7 @@ def test_CompilationToolBase():
 class DummyCompiler(CompiledModelDriver.CompilerBase):
     r"""Dummy test class."""
     _dont_register = True
-    toolname = 'dummy'
+    toolname = 'dummy12345'
     languages = ['dummy']
     search_path_envvar = ['PATH']
     _language_ext = ['.c']
@@ -133,6 +134,7 @@ class TestDummyCompiler(TestCompilationTool):
 
     def test_call(self):
         r"""Test call."""
+        assert(not shutil.which(self.import_cls.toolname))
         self.assert_raises(RuntimeError, self.import_cls.call, 'args',
                            out='test', dont_link=True)
 
