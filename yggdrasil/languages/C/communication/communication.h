@@ -160,7 +160,7 @@ int free_comm(comm_t *x) {
 #endif
   ygglog_debug("free_comm(%s)", x->name);
   // Send EOF for output comms and then wait for messages to be recv'd
-  if ((is_send(x->direction)) && (x->valid) && (clean_in_progress) && (x->thread_id==0)) {
+  if ((is_send(x->direction)) && (x->valid) && (x->thread_id==0)) {
     if (_ygg_error_flag == 0) {
       ygglog_debug("free_comm(%s): Sending EOF", x->name);
       comm_send_eof(x);

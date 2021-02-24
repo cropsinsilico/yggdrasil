@@ -574,8 +574,8 @@ class ConnectionDriver(Driver):
             if direction == 'output':
                 T = self.start_timeout(60, key_suffix='.model_exit')
                 while (not T.is_out) and self.models['input']:
-                    self.info("remaining models: %s",
-                              self.models['input'])
+                    self.debug("remaining input models: %s",
+                               self.models['input'])
                     self.sleep(10 * self.sleeptime)
                 self.stop_timeout(key_suffix='.model_exit')
             self.drain_input(timeout=self.timeout)

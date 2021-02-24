@@ -2722,9 +2722,17 @@ extern "C" {
     if (dtype->obj == NULL) {
       return 1;
     }
-    MetaschemaType *obj = dtype2class(dtype);
-    if (obj->is_empty())
+    if (strlen(dtype->type) == 0) {
       return 1;
+    }
+    try {
+      MetaschemaType *obj = dtype2class(dtype);
+      if (obj->is_empty())
+	return 1;
+    } catch(...) {
+      ygglog_error("is_empty_dtype: C++ exception thrown.");
+      return 1;
+    }
     return 0;
   }
   
