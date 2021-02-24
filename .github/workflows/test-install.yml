@@ -239,6 +239,12 @@ jobs:
     - name: Re-run test failures (2nd)
       if: ${{ failure() && steps.test2.outcome == 'failure' }}
       run: yggtest --ci --cov-append ${{ matrix.test-flags2 }} --last-failed --last-failed-no-failures=none
+    - name: Start SSH session
+      uses: luchihoratiu/debug-via-ssh@main
+      if: ${{ failure() && env.USEVIRTUALENV == 1 }}
+      with:
+        NGROK_AUTH_TOKEN: ${{ secrets.NGROK_AUTH_TOKEN }}
+        SSH_PASS: ${{ secrets.SSH_PASS }}
     - name: Combine coverage reports
       continue-on-error: true
       run: 'ls .*
@@ -504,6 +510,12 @@ jobs:
     - name: Re-run test failures (2nd)
       if: ${{ failure() && steps.test2.outcome == 'failure' }}
       run: yggtest --ci --cov-append ${{ matrix.test-flags2 }} --last-failed --last-failed-no-failures=none
+    - name: Start SSH session
+      uses: luchihoratiu/debug-via-ssh@main
+      if: ${{ failure() && env.USEVIRTUALENV == 1 }}
+      with:
+        NGROK_AUTH_TOKEN: ${{ secrets.NGROK_AUTH_TOKEN }}
+        SSH_PASS: ${{ secrets.SSH_PASS }}
     - name: Combine coverage reports
       continue-on-error: true
       run: 'ls .*
@@ -749,6 +761,12 @@ jobs:
     - name: Re-run test failures (2nd)
       if: ${{ failure() && steps.test2.outcome == 'failure' }}
       run: yggtest --ci --cov-append ${{ matrix.test-flags2 }} --last-failed --last-failed-no-failures=none
+    - name: Start SSH session
+      uses: luchihoratiu/debug-via-ssh@main
+      if: ${{ failure() && env.USEVIRTUALENV == 1 }}
+      with:
+        NGROK_AUTH_TOKEN: ${{ secrets.NGROK_AUTH_TOKEN }}
+        SSH_PASS: ${{ secrets.SSH_PASS }}
     - name: Combine coverage reports
       continue-on-error: true
       run: 'ls .*
@@ -996,6 +1014,12 @@ jobs:
     - name: Re-run test failures (2nd)
       if: ${{ failure() && steps.test2.outcome == 'failure' }}
       run: yggtest --ci --cov-append ${{ matrix.test-flags2 }} --last-failed --last-failed-no-failures=none
+    - name: Start SSH session
+      uses: luchihoratiu/debug-via-ssh@main
+      if: ${{ failure() && env.USEVIRTUALENV == 1 }}
+      with:
+        NGROK_AUTH_TOKEN: ${{ secrets.NGROK_AUTH_TOKEN }}
+        SSH_PASS: ${{ secrets.SSH_PASS }}
     - name: Combine coverage reports
       continue-on-error: true
       run: 'ls .*
@@ -1241,6 +1265,12 @@ jobs:
     - name: Re-run test failures (2nd)
       if: ${{ failure() && steps.test2.outcome == 'failure' }}
       run: yggtest --ci --cov-append ${{ matrix.test-flags2 }} --last-failed --last-failed-no-failures=none
+    - name: Start SSH session
+      uses: luchihoratiu/debug-via-ssh@main
+      if: ${{ failure() && env.USEVIRTUALENV == 1 }}
+      with:
+        NGROK_AUTH_TOKEN: ${{ secrets.NGROK_AUTH_TOKEN }}
+        SSH_PASS: ${{ secrets.SSH_PASS }}
     - name: Combine coverage reports
       continue-on-error: true
       run: 'ls .*
