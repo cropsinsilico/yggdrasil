@@ -146,24 +146,28 @@ def get_compilation_tool(tooltype, name, default=False):
         ValueError: If a tool with the provided name cannot be located.
 
     """
+    names_to_try = [name, name.lower(), os.path.basename(name),
+                    os.path.splitext(os.path.basename(name))[0],
+                    os.path.splitext(os.path.basename(name))[0].lower()]
+    out = None
     reg = get_compilation_tool_registry(tooltype)
-    if name in reg:
-        return reg[name]
-    # Try variations before raising an error
-    if name.lower() in reg:
-        return reg[name.lower()]
-    name = os.path.basename(name)
-    if name in reg:
-        return reg[name]
-    name = os.path.splitext(name)[0]
-    if name in reg:
-        return reg[name]
-    if name.lower() in reg:
-        return reg[name.lower()]
-    if default is False:
-        raise ValueError("Could not locate a %s tool with name '%s'"
-                         % (tooltype, name))
-    return default
+    for x in names_to_try:
+        if x in reg:
+            out = reg[x]
+            break
+    if out is None:
+        for k in reg.keys():
+            if k in name:
+                out = reg[k]
+                break
+    if out is None:
+        if default is False:
+            raise ValueError("Could not locate a %s tool with name '%s'"
+                             % (tooltype, name))
+        out = default
+    if isinstance(out, CompilationToolMeta):
+        out.executable = name
+    return out
 
 
 # TODO: Cannot currently make compilation tools components because
@@ -437,6 +441,13 @@ class CompilationToolBase(object):
         if existing is None:
             existing = {}
             existing.update(os.environ)
+        if not cls.env_matches_tool():
+            env = getattr(cls, 'default_flags_env', None)
+            if env is not None:
+                if not isinstance(env, list):
+                    env = [env]
+                for ienv in env:
+                    existing.pop(ienv, [])
         return existing
 
     @classmethod
@@ -629,14 +640,25 @@ class CompilationToolBase(object):
         if isinstance(cls.toolname, str):
             tool_base.append(cls.toolname)
         if isinstance(cls.default_executable_env, str):
-            envi_base = os.environ.get(cls.default_executable_env, '')
+            envi_base = os.path.basename(
+                os.environ.get(cls.default_executable_env, ''))
         if os.environ.get('PATHEXT', ''):
             tool_base = [x.split(os.environ['PATHEXT'])[0]
                          for x in tool_base]
             envi_base = envi_base.split(os.environ['PATHEXT'])[0]
         out = False
+        regex_literal = '-+*$%#@!^&(){}[]<>,.;:'
+        regex_pathsep = r'(?:[\-\_\.0-9])'
         if tool_base and envi_base:
-            out = envi_base.endswith(tuple(tool_base))
+            for x in tool_base:
+                for k in regex_literal:
+                    x = x.replace(k, '\\' + k)
+                regex = r'(?:(?:^)|%s)%s(?:(?:$)|%s)' % (regex_pathsep, x,
+                                                         regex_pathsep)
+                if re.search(regex, envi_base):
+                    out = True
+                    break
+            # out = envi_base.endswith(tuple(tool_base))
         return out
 
     @classmethod
