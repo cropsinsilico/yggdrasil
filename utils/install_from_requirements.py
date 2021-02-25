@@ -73,7 +73,8 @@ def get_pip_dependency_version(pkg, dep):
 
 def prune(fname_in, fname_out=None, excl_method=None, incl_method=None,
           install_opts=None, additional_packages=[], skip_packages=[],
-          verbose=False):
+          verbose=False, return_list=False, dont_evaluate_markers=False,
+          environment=None):
     r"""Prune a requirements.txt file to remove/select dependencies that are
     dependent on the current environment.
 
@@ -98,6 +99,14 @@ def prune(fname_in, fname_out=None, excl_method=None, incl_method=None,
             be added to the pruned list. Defaults to an empty list.
         verbose (bool, optional): If True, setup steps are run with verbosity
             turned up. Defaults to False.
+        return_list (bool, optional): If True, return the list of requirements
+            rather than writing it to a file. Defaults to False.
+        dont_evaluate_markers (bool, optional): If True, don't check the pip-
+            style markers when pruning (only those based on install_opts).
+            Defaults to False.
+        environment (dict, optional): Environment properties that should be
+            used to evaluate pip-style markers. Defaults to None and the
+            current environment will be used.
 
     Returns:
         str: Full path to created file.
@@ -162,14 +171,20 @@ def prune(fname_in, fname_out=None, excl_method=None, incl_method=None,
                 skip_line = True
             if skip_line:
                 continue
+            if dont_evaluate_markers:
+                new_lines.append(req_name.strip())
+                continue
             try:
                 req = Requirement(req_name.strip())
-                if req.marker and (not req.marker.evaluate()):
+                if ((req.marker
+                     and (not req.marker.evaluate(environment=environment)))):
                     continue
                 new_lines.append(req.name + str(req.specifier))
             except InvalidRequirement as e:
                 print(e)
                 continue
+    if return_list:
+        return new_lines
     # Write file
     if fname_out is None:
         fname_out = ('_pruned%s' % str(uuid.uuid4())).join(os.path.splitext(fname_in[0]))
