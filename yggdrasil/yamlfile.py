@@ -221,13 +221,21 @@ def parse_yaml(files, as_function=False):
         for yml in yml_norm[k]:
             existing = parse_component(yml, k[:-1], existing=existing)
     # Create server/client connections
-    for srv, clients in existing['server'].items():
+    for srv, srv_info in existing['server'].items():
+        clients = srv_info['clients']
         if srv not in existing['input']:
             continue
         yml = {'inputs': [{'name': x} for x in clients],
                'outputs': [{'name': srv}],
                'driver': 'RPCRequestDriver',
                'name': existing['input'][srv]['model_driver'][0]}
+        if srv_info.get('replaces', None):
+            yml['outputs'][0].update({
+                k: v for k, v in srv_info['replaces']['input'].items()
+                if k not in ['name']})
+            yml['response_kwargs'] = {
+                k: v for k, v in srv_info['replaces']['output'].items()
+                if k not in ['name']}
         existing = parse_component(yml, 'connection', existing=existing)
         existing['model'][yml['dst_models'][0]]['clients'] = yml['src_models']
     existing.pop('server')
@@ -430,6 +438,7 @@ def parse_model(yml, existing):
                     "/sent from/to clients. e.g. \n"
                     "\t-input: input_variable\n"
                     "\t-output: output_variables\n" % yml['name'])
+        replaces = None
         if isinstance(yml['is_server'], dict):
             replaces = {}
             for io in ['input', 'output']:
@@ -451,7 +460,9 @@ def parse_model(yml, existing):
         else:
             yml['inputs'].append(srv)
         yml['clients'] = []
-        existing['server'].setdefault(srv['name'], [])
+        existing['server'].setdefault(srv['name'], {'clients': []})
+        if replaces:
+            existing['server'][srv['name']]['replaces'] = replaces
     # Mark timesync clients
     timesync = yml.pop('timesync_client_of', [])
     if timesync:
@@ -468,8 +479,8 @@ def parse_model(yml, existing):
             cli = {'name': cli_name,
                    'working_dir': yml['working_dir']}
             yml['outputs'].append(cli)
-            existing['server'].setdefault(srv_name, [])
-            existing['server'][srv_name].append(cli_name)
+            existing['server'].setdefault(srv_name, {'clients': []})
+            existing['server'][srv_name]['clients'].append(cli_name)
     # Model index and I/O channels
     yml['model_index'] = len(existing['model'])
     for io in ['inputs', 'outputs']:

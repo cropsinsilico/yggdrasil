@@ -165,7 +165,7 @@ def get_compilation_tool(tooltype, name, default=False):
             raise ValueError("Could not locate a %s tool with name '%s'"
                              % (tooltype, name))
         out = default
-    if isinstance(out, CompilationToolMeta):
+    if isinstance(out, CompilationToolMeta) and (out.toolname != name):
         out.executable = name
     return out
 
@@ -1108,7 +1108,7 @@ class CompilationToolBase(object):
         try:
             if (not skip_flags) and ('env' not in unused_kwargs):
                 unused_kwargs['env'] = cls.set_env()
-            if cls.toolname == 'dummy':
+            if cls.toolname == 'dummy12345':
                 logger.info('Command: "%s"' % ' '.join(cmd))
             logger.debug('Command: "%s"' % ' '.join(cmd))
             proc = tools.popen_nobuffer(cmd, **unused_kwargs)
@@ -1118,7 +1118,7 @@ class CompilationToolBase(object):
                 raise RuntimeError("Command '%s' failed with code %d:\n%s."
                                    % (' '.join(cmd), proc.returncode, output))
             try:
-                if cls.toolname == 'dummy':
+                if cls.toolname == 'dummy12345':
                     logger.info(' '.join(cmd) + '\n' + output)
                 logger.debug(' '.join(cmd) + '\n' + output)
             except UnicodeDecodeError:  # pragma: debug
@@ -2328,7 +2328,7 @@ class CompiledModelDriver(ModelDriver):
                 if return_prop == 'flags':
                     return tool_flags
                 # Get tool
-                kwargs = {'executable': toolname, 'flags': tool_flags}
+                kwargs = {'flags': tool_flags}
                 if tooltype == 'compiler':
                     kwargs.update(
                         linker=cls.get_tool(
@@ -2341,6 +2341,8 @@ class CompiledModelDriver(ModelDriver):
                             'archiver', return_prop='flags', default=None))
                 out = get_compatible_tool(toolname, tooltype, cls.language,
                                           default=default)
+                if toolname != out.toolname:
+                    kwargs['executable'] = toolname
                 if isinstance(out, type):
                     out = out(**kwargs)
                 else:
@@ -2349,8 +2351,9 @@ class CompiledModelDriver(ModelDriver):
                 out_tool = cls.get_tool('compiler', toolname=toolname, default=None)
                 if out_tool is None:  # pragma: debug
                     if default is False:
-                        raise NotImplementedError("%s not set for language '%s'."
-                                                  % (tooltype.title(), cls.language))
+                        raise NotImplementedError(
+                            "%s not set for language '%s' (toolname=%s)."
+                            % (tooltype.title(), cls.language, toolname))
                     return default
                 try:
                     out = getattr(out_tool, tooltype)()
