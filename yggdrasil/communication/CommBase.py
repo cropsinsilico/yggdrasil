@@ -1381,7 +1381,8 @@ class CommBase(tools.YggClass):
                    % self.direction)
         # If receiving, update the expected datatypes to use information
         # about the received datatype that was recorded by the serializer
-        if (self.direction == 'recv') and self.serializer.initialized:
+        if (((self.direction == 'recv') and self.serializer.initialized
+             and (not for_empty))):
             assert(self.transform[0].original_datatype)
         # if (((self.direction == 'recv')
         #      and self.serializer.initialized

@@ -124,7 +124,8 @@ class RPCRequestDriver(ConnectionDriver):
                 super(RPCRequestDriver, self).send_message(
                     CommBase.CommMessage(args=YGG_CLIENT_EOF,
                                          flag=CommBase.FLAG_SUCCESS),
-                    header_kwargs={'raw': True, 'model': name})
+                    header_kwargs={'raw': True, 'model': name},
+                    skip_processing=True)
             out = super(RPCRequestDriver, self).remove_model(
                 direction, name)
             if out:

@@ -107,6 +107,20 @@ class AsyncComm(ProxyObject, ComponentBaseUnregistered):
                     self, target=self.run_backlog_recv, suffix='RecvBacklog')
         return self._backlog_thread
 
+    @property
+    def errors(self):
+        r"""list: Errors raised by the wrapped comm or async thread."""
+        out = self._wrapped.errors
+        if self._backlog_thread:
+            if self._backlog_thread.errors:
+                out += self._backlog_thread.errors
+                self._backlog_thread.errors = []
+        return out
+
+    @errors.setter
+    def errors(self, value):
+        self._wrapped.errors = value
+
     def atexit(self):
         r"""Close operations."""
         if (self.direction == 'send') and self.is_open_backlog:
