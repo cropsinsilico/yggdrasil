@@ -187,7 +187,11 @@ def prune(fname_in, fname_out=None, excl_method=None, incl_method=None,
         return new_lines
     # Write file
     if fname_out is None:
-        fname_out = ('_pruned%s' % str(uuid.uuid4())).join(os.path.splitext(fname_in[0]))
+        if fname_in:
+            fname_out = ('_pruned%s' % str(uuid.uuid4())).join(
+                os.path.splitext(fname_in[0]))
+        else:
+            fname_out = ('pruned%s.txt' % str(uuid.uuid4()))
     if new_lines:
         with open(fname_out, 'w') as fd:
             fd.write('\n'.join(new_lines))
