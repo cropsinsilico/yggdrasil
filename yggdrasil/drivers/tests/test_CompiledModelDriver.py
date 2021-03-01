@@ -65,6 +65,7 @@ class DummyCompiler(CompiledModelDriver.CompilerBase):
     default_archiver = None
     combine_with_linker = True
     compile_only_flag = None
+    linker_attributes = {'_dont_register': True}
 
 
 class TestCompilationTool(YggTestClass):
@@ -166,6 +167,7 @@ class TestCompiledModelParam(parent.TestModelParam):
     
     def __init__(self, *args, **kwargs):
         super(TestCompiledModelParam, self).__init__(*args, **kwargs)
+        self._inst_kwargs['skip_compile'] = (self.skip_init or self.skip_start)
         self.attr_list += ['source_files']
         for k in ['compiler', 'linker', 'archiver']:
             self.attr_list += [k, '%s_flags' % k, '%s_tool' % k]
@@ -179,6 +181,11 @@ class TestCompiledModelDriverNoInit(TestCompiledModelParam,
                                     parent.TestModelDriverNoInit):
     r"""Test runner for CompiledModelDriver without creating an instance."""
     
+    def run_model_instance(self, **kwargs):
+        r"""Create a driver for a model and run it."""
+        kwargs['skip_compile'] = False
+        return super(TestCompiledModelDriverNoInit, self).run_model_instance(**kwargs)
+        
     def test_build(self):
         r"""Test building libraries as a shared/static library or object files."""
         for libtype in ['shared', 'object', 'static']:

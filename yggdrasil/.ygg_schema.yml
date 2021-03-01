@@ -131,9 +131,9 @@ definitions:
             type: string
           type: array
       required:
-      - datatype
       - name
       - commtype
+      - datatype
       title: comm_base
       type: object
     - anyOf:
@@ -605,8 +605,8 @@ definitions:
             is used.
           type: string
       required:
-      - filetype
       - name
+      - filetype
       - working_dir
       title: file_base
       type: object
@@ -1183,8 +1183,8 @@ definitions:
             type: string
           type: array
         builddir:
-          description: Directory where the build should be saved. Defaults to <sourcedir>/build.
-            It can be relative to working_dir or absolute.
+          type: string
+        buildfile:
           type: string
         client_of:
           default: []
@@ -1237,26 +1237,24 @@ definitions:
             the driver starts. Defaults to {}.
           type: object
         env_compiler:
-          default: CC
           description: Environment variable where the compiler executable should be
-            stored for use within the Makefile. Defaults to 'CC'.
+            stored for use within the Makefile. If not provided, this will be determined
+            by the target language driver.
           type: string
         env_compiler_flags:
-          default: CFLAGS
           description: Environment variable where the compiler flags should be stored
             (including those required to compile against the |yggdrasil| interface).
-            Defaults to 'CFLAGS'.
+            If not provided, this will be determined by the target language driver.
           type: string
         env_linker:
-          default: CC
           description: Environment variable where the linker executable should be
-            stored for use within the Makefile. Defaults to 'CC'.
+            stored for use within the Makefile. If not provided, this will be determined
+            by the target language driver.
           type: string
         env_linker_flags:
-          default: LDFLAGS
           description: Environment variable where the linker flags should be stored
             (including those required to link against the |yggdrasil| interface).
-            Defaults to 'LDFLAGS'.
+            If not provided, this will be determined by the target language driver.
           type: string
         function:
           description: If provided, an integrated model is created by wrapping the
@@ -1564,13 +1562,30 @@ definitions:
             Defaults to None.
           type: string
         target_compiler:
-          description: Compilation tool that should be used for the target language.
-            Defaults to None and will be set based on the selected language driver.
+          description: Compilation tool that should be used to compile the target
+            language. Defaults to None and will be set based on the selected language
+            driver.
           type: string
+        target_compiler_flags:
+          description: Compilation flags that should be passed to the target language
+            compiler. Defaults to [].
+          items:
+            type: string
+          type: array
         target_language:
           description: Language that the target is written in. Defaults to None and
             will be set based on the source files provided.
           type: string
+        target_linker:
+          description: Compilation tool that should be used to link the target language.
+            Defaults to None and will be set based on the selected language driver.
+          type: string
+        target_linker_flags:
+          description: Linking flags that should be passed to the target language
+            linker. Defaults to [].
+          items:
+            type: string
+          type: array
         timesync:
           anyOf:
           - type: boolean
@@ -1657,10 +1672,10 @@ definitions:
             is used.
           type: string
       required:
-      - language
-      - args
       - name
+      - args
       - working_dir
+      - language
       title: model_base
       type: object
     - anyOf:
@@ -1700,6 +1715,10 @@ definitions:
       - additionalProperties: true
         description: Schema for model component ['make'] subtype.
         properties:
+          builddir:
+            type: string
+          buildfile:
+            type: string
           compiler:
             description: Command or path to executable that should be used to compile
               the model. If not provided, the compiler will be determined based on
@@ -1716,26 +1735,24 @@ definitions:
               type: string
             type: array
           env_compiler:
-            default: CC
             description: Environment variable where the compiler executable should
-              be stored for use within the Makefile. Defaults to 'CC'.
+              be stored for use within the Makefile. If not provided, this will be
+              determined by the target language driver.
             type: string
           env_compiler_flags:
-            default: CFLAGS
             description: Environment variable where the compiler flags should be stored
               (including those required to compile against the |yggdrasil| interface).
-              Defaults to 'CFLAGS'.
+              If not provided, this will be determined by the target language driver.
             type: string
           env_linker:
-            default: CC
             description: Environment variable where the linker executable should be
-              stored for use within the Makefile. Defaults to 'CC'.
+              stored for use within the Makefile. If not provided, this will be determined
+              by the target language driver.
             type: string
           env_linker_flags:
-            default: LDFLAGS
             description: Environment variable where the linker flags should be stored
               (including those required to link against the |yggdrasil| interface).
-              Defaults to 'LDFLAGS'.
+              If not provided, this will be determined by the target language driver.
             type: string
           language:
             default: executable
@@ -1781,13 +1798,30 @@ definitions:
               Defaults to None.
             type: string
           target_compiler:
-            description: Compilation tool that should be used for the target language.
-              Defaults to None and will be set based on the selected language driver.
+            description: Compilation tool that should be used to compile the target
+              language. Defaults to None and will be set based on the selected language
+              driver.
             type: string
+          target_compiler_flags:
+            description: Compilation flags that should be passed to the target language
+              compiler. Defaults to [].
+            items:
+              type: string
+            type: array
           target_language:
             description: Language that the target is written in. Defaults to None
               and will be set based on the source files provided.
             type: string
+          target_linker:
+            description: Compilation tool that should be used to link the target language.
+              Defaults to None and will be set based on the selected language driver.
+            type: string
+          target_linker_flags:
+            description: Linking flags that should be passed to the target language
+              linker. Defaults to [].
+            items:
+              type: string
+            type: array
         title: MakeModelDriver
         type: object
       - additionalProperties: true
@@ -2263,6 +2297,8 @@ definitions:
             description: Directory where the build should be saved. Defaults to <sourcedir>/build.
               It can be relative to working_dir or absolute.
             type: string
+          buildfile:
+            type: string
           compiler:
             description: Command or path to executable that should be used to compile
               the model. If not provided, the compiler will be determined based on
@@ -2282,6 +2318,26 @@ definitions:
             default: Release
             description: Build type/configuration that should be built. Defaults to
               'Release'.
+            type: string
+          env_compiler:
+            description: Environment variable where the compiler executable should
+              be stored for use within the Makefile. If not provided, this will be
+              determined by the target language driver.
+            type: string
+          env_compiler_flags:
+            description: Environment variable where the compiler flags should be stored
+              (including those required to compile against the |yggdrasil| interface).
+              If not provided, this will be determined by the target language driver.
+            type: string
+          env_linker:
+            description: Environment variable where the linker executable should be
+              stored for use within the Makefile. If not provided, this will be determined
+              by the target language driver.
+            type: string
+          env_linker_flags:
+            description: Environment variable where the linker flags should be stored
+              (including those required to link against the |yggdrasil| interface).
+              If not provided, this will be determined by the target language driver.
             type: string
           language:
             default: executable
@@ -2322,13 +2378,30 @@ definitions:
               Defaults to None.
             type: string
           target_compiler:
-            description: Compilation tool that should be used for the target language.
-              Defaults to None and will be set based on the selected language driver.
+            description: Compilation tool that should be used to compile the target
+              language. Defaults to None and will be set based on the selected language
+              driver.
             type: string
+          target_compiler_flags:
+            description: Compilation flags that should be passed to the target language
+              compiler. Defaults to [].
+            items:
+              type: string
+            type: array
           target_language:
             description: Language that the target is written in. Defaults to None
               and will be set based on the source files provided.
             type: string
+          target_linker:
+            description: Compilation tool that should be used to link the target language.
+              Defaults to None and will be set based on the selected language driver.
+            type: string
+          target_linker_flags:
+            description: Linking flags that should be passed to the target language
+              linker. Defaults to [].
+            items:
+              type: string
+            type: array
         title: CMakeModelDriver
         type: object
       - additionalProperties: true

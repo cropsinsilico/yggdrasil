@@ -764,7 +764,14 @@ class CompilationToolBase(object):
             str: Name of (or path to) the tool executable.
 
         """
-        out = getattr(cls, 'executable', cls.default_executable)
+        out = getattr(cls, 'executable', None)
+        if out is None:
+            from yggdrasil.config import ygg_cfg
+            out = cls.default_executable
+            if cls.languages:
+                out = ygg_cfg.get(cls.languages[0],
+                                  '%s_executable' % cls.toolname,
+                                  cls.default_executable)
         if out is None:
             raise NotImplementedError("Executable not set for %s '%s'."
                                       % (cls.tooltype, cls.toolname))
@@ -2329,6 +2336,9 @@ class CompiledModelDriver(ModelDriver):
                     return tool_flags
                 # Get tool
                 kwargs = {'flags': tool_flags}
+                kwargs['executable'] = cls.cfg.get(cls.language,
+                                                   '%s_executable' % toolname,
+                                                   toolname)
                 if tooltype == 'compiler':
                     kwargs.update(
                         linker=cls.get_tool(
@@ -2341,8 +2351,6 @@ class CompiledModelDriver(ModelDriver):
                             'archiver', return_prop='flags', default=None))
                 out = get_compatible_tool(toolname, tooltype, cls.language,
                                           default=default)
-                if toolname != out.toolname:
-                    kwargs['executable'] = toolname
                 if isinstance(out, type):
                     out = out(**kwargs)
                 else:

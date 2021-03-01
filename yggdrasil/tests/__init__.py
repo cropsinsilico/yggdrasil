@@ -160,10 +160,10 @@ def requires_language(language, installed=True):
         skips = []
         if installed is True:
             skips.append(unittest.skipIf(not drv.is_installed(),
-                                         "%s not installed"))
+                                         "%s not installed" % language))
         elif installed is False:
             skips.append(unittest.skipIf(drv.is_installed(),
-                                         "%s installed"))
+                                         "%s installed" % language))
         skips += check_enabled_languages(language, return_decorators=True)
         for s in skips:
             function = s(function)

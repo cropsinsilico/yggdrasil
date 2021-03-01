@@ -454,21 +454,22 @@ class ModelDriver(Driver):
                                  % self.model_function_file)
             model_dir, model_base = os.path.split(self.model_function_file)
             model_base = os.path.splitext(model_base)[0]
-            self.model_function_info = self.parse_function_definition(
-                self.model_function_file, self.function)
-            # Write file
             args[0] = os.path.join(model_dir, 'ygg_' + model_base
                                    + self.language_ext[0])
-            client_comms = ['%s:%s_%s' % (self.name, x, self.name)
-                            for x in self.client_of]
-            lines = self.write_model_wrapper(
-                self.model_function_file, self.function,
-                inputs=copy.deepcopy(self.inputs),
-                outputs=copy.deepcopy(self.outputs),
-                outputs_in_inputs=self.model_outputs_in_inputs,
-                client_comms=client_comms)
-            with open(args[0], 'w') as fd:
-                fd.write('\n'.join(lines))
+            # Write file
+            if (not os.path.isfile(args[0])) or self.overwrite:
+                self.model_function_info = self.parse_function_definition(
+                    self.model_function_file, self.function)
+                client_comms = ['%s:%s_%s' % (self.name, x, self.name)
+                                for x in self.client_of]
+                lines = self.write_model_wrapper(
+                    self.model_function_file, self.function,
+                    inputs=copy.deepcopy(self.inputs),
+                    outputs=copy.deepcopy(self.outputs),
+                    outputs_in_inputs=self.model_outputs_in_inputs,
+                    client_comms=client_comms)
+                with open(args[0], 'w') as fd:
+                    fd.write('\n'.join(lines))
         # Parse arguments
         self.debug(str(args))
         self.parse_arguments(args)
@@ -477,6 +478,8 @@ class ModelDriver(Driver):
         if self.overwrite:
             self.remove_products()
         # Write wrapper
+        if self.function:
+            self.wrapper_products.append(args[0])
         self.wrapper_products += self.write_wrappers()
 
     @staticmethod
@@ -547,7 +550,8 @@ class ModelDriver(Driver):
         return cls.inverse_type_map
 
     @classmethod
-    def get_language_for_source(cls, fname, languages=None, early_exit=False):
+    def get_language_for_source(cls, fname, languages=None, early_exit=False,
+                                **kwargs):
         r"""Determine the language that can be used with the provided source
         file(s). If more than one language applies to a set of multiple files,
         the language that applies to the most files is returned.
@@ -559,6 +563,7 @@ class ModelDriver(Driver):
                 Defaults to None and any language will be acceptable.
             early_exit (bool, optional): If True, the first language identified
                 will be returned if fname is a list of files. Defaults to False.
+            **kwargs: Additional keyword arguments are passed to recursive calls.
 
         Returns:
             str: The language that can operate on the specified file.
@@ -568,7 +573,8 @@ class ModelDriver(Driver):
             lang_dict = {}
             for f in fname:
                 try:
-                    ilang = cls.get_language_for_source(f, languages=languages)
+                    ilang = cls.get_language_for_source(f, languages=languages,
+                                                        **kwargs)
                     if early_exit:
                         return ilang
                 except ValueError:
@@ -1398,10 +1404,6 @@ class ModelDriver(Driver):
         r"""Remove products created in order to run the model."""
         if self.overwrite and (not self.preserve_cache):
             self.remove_products()
-        if ((self.function and isinstance(self.model_src, str)
-             and os.path.isfile(self.model_src))):
-            assert(os.path.basename(self.model_src).startswith('ygg_'))
-            os.remove(self.model_src)
         self.restore_files()
 
     def cleanup(self):

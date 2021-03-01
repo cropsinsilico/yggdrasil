@@ -14,23 +14,29 @@ LANG2EXT = {'python': '.py',
 EXT2LANG = {v: k for k, v in LANG2EXT.items()}
 LANGUAGES = {
     'compiled': [
-        'c', 'c++', 'fortran', 'osr', 'cmake', 'make'],
+        'c', 'c++', 'fortran', 'osr'],
     'interpreted': [
         'python', 'matlab', 'r', 'sbml', 'lpy'],
+    'build': [
+        'cmake', 'make'],
     'other': [
         'executable', 'timesync']}
 LANGUAGES['all'] = (
     LANGUAGES['compiled']
     + LANGUAGES['interpreted']
+    + LANGUAGES['build']
     + LANGUAGES['other'])
 LANGUAGES_WITH_ALIASES = {
     'compiled': [
-        'c', 'c++', 'cpp', 'cxx', 'fortran', 'osr', 'cmake', 'make'],
+        'c', 'c++', 'cpp', 'cxx', 'fortran', 'osr'],
     'interpreted': [
         'python', 'matlab', 'r', 'R', 'sbml', 'lpy'],
+    'build': [
+        'cmake', 'make'],
     'other': [
         'executable', 'timesync']}
 LANGUAGES_WITH_ALIASES['all'] = (
     LANGUAGES_WITH_ALIASES['compiled']
     + LANGUAGES_WITH_ALIASES['interpreted']
+    + LANGUAGES_WITH_ALIASES['build']
     + LANGUAGES_WITH_ALIASES['other'])
