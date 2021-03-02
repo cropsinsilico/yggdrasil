@@ -479,7 +479,8 @@ class BuildModelDriver(CompiledModelDriver):
                 if k in kwargs:
                     kws[k] = kwargs[k]
             if not (('target_language_driver' in kws) or ('target_language' in kws)):
-                kws['target_language'] = cls.get_language_for_source(src)
+                if src:
+                    kws['target_language'] = cls.get_language_for_source(src)
             language_info = cls.get_target_language_info(**kws)
             kwargs['env'] = cls.set_env_compiler(language_info=language_info)
         return super(BuildModelDriver, cls).call_compiler(src, **kwargs)
