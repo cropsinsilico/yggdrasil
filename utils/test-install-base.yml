@@ -135,17 +135,17 @@ jobs:
     # ========================================================
     # Conda specific installation steps
     # ========================================================
-    - name: (CONDA) Cache conda
-      uses: actions/cache@v1
-      if: matrix.install-method == 'conda'
-      env:
-        # Increase this value to reset cache if file not changed
-        CACHE_NUMBER: 0
-      with:
-        path: ~/conda_pkgs_dir
-        key:
-          ${{ runner.os }}-conda-${{ env.CACHE_NUMBER }}-${{
-          hashFiles('recipe/meta.yaml') }}
+    # - name: (CONDA) Cache conda
+    #   uses: actions/cache@v1
+    #   if: matrix.install-method == 'conda'
+    #   env:
+    #     # Increase this value to reset cache if file not changed
+    #     CACHE_NUMBER: 0
+    #   with:
+    #     path: ~/conda_pkgs_dir
+    #     key:
+    #       ${{ runner.os }}-conda-${{ env.CACHE_NUMBER }}-${{
+    #       hashFiles('recipe/meta.yaml') }}
     - name: (WINDOWS,CONDA) Set up miniconda base environment
       uses: conda-incubator/setup-miniconda@v2
       if: matrix.install-method == 'conda' && matrix.os == 'windows-latest'

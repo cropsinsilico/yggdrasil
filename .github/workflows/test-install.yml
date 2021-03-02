@@ -149,15 +149,6 @@ jobs:
       if: matrix.os == 'windows-latest' && matrix.install-method == 'pip' && env.INSTALLR
         == 1
       run: ygginstall R --update-r-requirements
-    - name: (CONDA) Cache conda
-      uses: actions/cache@v1
-      if: matrix.install-method == 'conda'
-      env:
-        CACHE_NUMBER: 0
-      with:
-        path: ~/conda_pkgs_dir
-        key: ${{ runner.os }}-conda-${{ env.CACHE_NUMBER }}-${{ hashFiles('recipe/meta.yaml')
-          }}
     - name: (WINDOWS,CONDA) Set up miniconda base environment
       uses: conda-incubator/setup-miniconda@v2
       if: matrix.install-method == 'conda' && matrix.os == 'windows-latest'
@@ -421,15 +412,6 @@ jobs:
       if: matrix.os == 'windows-latest' && matrix.install-method == 'pip' && env.INSTALLR
         == 1
       run: ygginstall R --update-r-requirements
-    - name: (CONDA) Cache conda
-      uses: actions/cache@v1
-      if: matrix.install-method == 'conda'
-      env:
-        CACHE_NUMBER: 0
-      with:
-        path: ~/conda_pkgs_dir
-        key: ${{ runner.os }}-conda-${{ env.CACHE_NUMBER }}-${{ hashFiles('recipe/meta.yaml')
-          }}
     - name: (WINDOWS,CONDA) Set up miniconda base environment
       uses: conda-incubator/setup-miniconda@v2
       if: matrix.install-method == 'conda' && matrix.os == 'windows-latest'
@@ -673,15 +655,6 @@ jobs:
       if: matrix.os == 'windows-latest' && matrix.install-method == 'pip' && env.INSTALLR
         == 1
       run: ygginstall R --update-r-requirements
-    - name: (CONDA) Cache conda
-      uses: actions/cache@v1
-      if: matrix.install-method == 'conda'
-      env:
-        CACHE_NUMBER: 0
-      with:
-        path: ~/conda_pkgs_dir
-        key: ${{ runner.os }}-conda-${{ env.CACHE_NUMBER }}-${{ hashFiles('recipe/meta.yaml')
-          }}
     - name: (WINDOWS,CONDA) Set up miniconda base environment
       uses: conda-incubator/setup-miniconda@v2
       if: matrix.install-method == 'conda' && matrix.os == 'windows-latest'
@@ -927,15 +900,6 @@ jobs:
       if: matrix.os == 'windows-latest' && matrix.install-method == 'pip' && env.INSTALLR
         == 1
       run: ygginstall R --update-r-requirements
-    - name: (CONDA) Cache conda
-      uses: actions/cache@v1
-      if: matrix.install-method == 'conda'
-      env:
-        CACHE_NUMBER: 0
-      with:
-        path: ~/conda_pkgs_dir
-        key: ${{ runner.os }}-conda-${{ env.CACHE_NUMBER }}-${{ hashFiles('recipe/meta.yaml')
-          }}
     - name: (WINDOWS,CONDA) Set up miniconda base environment
       uses: conda-incubator/setup-miniconda@v2
       if: matrix.install-method == 'conda' && matrix.os == 'windows-latest'
@@ -1179,15 +1143,6 @@ jobs:
       if: matrix.os == 'windows-latest' && matrix.install-method == 'pip' && env.INSTALLR
         == 1
       run: ygginstall R --update-r-requirements
-    - name: (CONDA) Cache conda
-      uses: actions/cache@v1
-      if: matrix.install-method == 'conda'
-      env:
-        CACHE_NUMBER: 0
-      with:
-        path: ~/conda_pkgs_dir
-        key: ${{ runner.os }}-conda-${{ env.CACHE_NUMBER }}-${{ hashFiles('recipe/meta.yaml')
-          }}
     - name: (WINDOWS,CONDA) Set up miniconda base environment
       uses: conda-incubator/setup-miniconda@v2
       if: matrix.install-method == 'conda' && matrix.os == 'windows-latest'
