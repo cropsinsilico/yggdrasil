@@ -31,12 +31,7 @@ class BuildToolBase(CompilerBase):
             str: Name of the default target language.
 
         """
-        build_language = cls.build_language
-        for x in cls.languages:
-            if x != build_language:
-                return x
-        raise ValueError("Could not determine a default target language "
-                         "for build tool '%s'" % cls.toolname)  # pragma: debug
+        return 'c'
 
     @classmethod
     def get_tool_suffix(cls):
@@ -135,7 +130,7 @@ class BuildModelDriver(CompiledModelDriver):
         'env_compiler_flags': {'type': 'string'},
         'env_linker': {'type': 'string'},
         'env_linker_flags': {'type': 'string'}}
-    base_languages = ['c', 'c++', 'fortran']
+    base_languages = ['c']
     built_where_called = False
     sourcedir_as_sourcefile = False
     full_language = False
@@ -426,10 +421,7 @@ class BuildModelDriver(CompiledModelDriver):
             bool: True if the provided file is a source file, False otherwise.
 
         """
-        compiler = cls.get_tool('compiler')
-        for lang in compiler.languages:
-            if lang == cls.language:
-                continue
+        for lang in constants.LANGUAGES['compiled']:
             drv = components.import_component('model', lang)
             if drv.is_source_file(fname):
                 return True

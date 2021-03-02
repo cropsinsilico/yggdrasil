@@ -147,6 +147,7 @@ def get_compilation_tool(tooltype, name, default=False):
 
     """
     names_to_try = [name, name.lower(), os.path.basename(name),
+                    os.path.basename(name).lower(),
                     os.path.splitext(os.path.basename(name))[0],
                     os.path.splitext(os.path.basename(name))[0].lower()]
     out = None
@@ -3501,7 +3502,10 @@ class CompiledModelDriver(ModelDriver):
         if compiler is not None:
             suffix = cls.get_internal_suffix(commtype=kwargs.get('commtype', None))
             suffix += compiler.get_tool_suffix()
-            cls.compile_dependencies(products=products, **kwargs)
+            try:
+                cls.compile_dependencies(products=products, **kwargs)
+            except NotImplementedError:  # pragma: debug
+                pass
             new_products = []
             for i in range(len(products)):
                 if suffix in products[i]:

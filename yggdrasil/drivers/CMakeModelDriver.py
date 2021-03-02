@@ -19,7 +19,7 @@ logger = logging.getLogger(__name__)
 class CMakeConfigure(BuildToolBase):
     r"""CMake configuration tool."""
     toolname = 'cmake'
-    languages = ['cmake', 'c', 'c++']
+    languages = ['cmake']
     is_linker = False
     default_flags = []  # '-H']
     flag_options = OrderedDict([('definitions', '-D%s'),
@@ -567,7 +567,7 @@ class CMakeConfigure(BuildToolBase):
 class CMakeBuilder(LinkerBase):
     r"""CMake build tool."""
     toolname = 'cmake'
-    languages = ['cmake', 'c', 'c++']
+    languages = ['cmake']
     default_flags = []  # '--clean-first']
     output_key = None
     flag_options = OrderedDict([('builddir', {'key': '--build',
@@ -754,7 +754,6 @@ class CMakeModelDriver(BuildModelDriver):
                           'configuration': {'type': 'string',
                                             'default': 'Release'}}
     language = 'cmake'
-    base_languages = ['c', 'c++']
     add_libraries = CMakeConfigure.add_libraries
     sourcedir_as_sourcefile = True
     # isolate_library_flags = True

@@ -19,7 +19,7 @@ class MakeCompiler(BuildToolBase):
 
     """
     toolname = 'make'
-    languages = ['make', 'c', 'c++']
+    languages = ['make']
     platforms = ['MacOS', 'Linux']
     default_flags = ['--always-make']  # Always overwrite
     flag_options = OrderedDict([('makefile', {'key': '-f', 'position': 0})])
@@ -190,7 +190,6 @@ class MakeModelDriver(BuildModelDriver):
         'makefile': {'type': 'string', 'default': 'Makefile'},
         'makedir': {'type': 'string'}}  # default will depend on makefile
     language = 'make'
-    base_languages = ['c', 'c++']
     built_where_called = True
 
     @staticmethod
