@@ -502,13 +502,17 @@ class BuildModelDriver(CompiledModelDriver):
         assert(language_info is not None)
         kwargs['compiler'] = language_info['compiler']
         out = super(BuildModelDriver, cls).set_env_compiler(**kwargs)
-        out[language_info['compiler_env']] = language_info['compiler_executable']
-        out[language_info['linker_env']] = language_info['linker_executable']
+        if language_info['compiler_env'] and language_info['compiler_executable']:
+            out[language_info['compiler_env']] = language_info['compiler_executable']
+        if language_info['linker_env'] and language_info['linker_executable']:
+            out[language_info['linker_env']] = language_info['linker_executable']
         if cls.use_env_vars:
-            out[language_info['compiler_flags_env']] = ' '.join(
-                language_info['compiler_flags'])
-            out[language_info['linker_flags_env']] = ' '.join(
-                language_info['linker_flags'])
+            if language_info['compiler_flags_env']:
+                out[language_info['compiler_flags_env']] = ' '.join(
+                    language_info['compiler_flags'])
+            if language_info['linker_flags_env']:
+                out[language_info['linker_flags_env']] = ' '.join(
+                    language_info['linker_flags'])
         return out
     
     def set_env(self, **kwargs):
