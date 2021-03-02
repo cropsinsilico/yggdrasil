@@ -27,7 +27,9 @@ LANGUAGES = {
         'executable', 'timesync']}
 LANGUAGES['all'] = (
     LANGUAGES['compiled']
+    + LANGUAGES['compiled_dsl']
     + LANGUAGES['interpreted']
+    + LANGUAGES['interpreted_dsl']
     + LANGUAGES['build']
     + LANGUAGES['other'])
 LANGUAGES_WITH_ALIASES = {
@@ -45,7 +47,9 @@ LANGUAGES_WITH_ALIASES = {
         'executable', 'timesync']}
 LANGUAGES_WITH_ALIASES['all'] = (
     LANGUAGES_WITH_ALIASES['compiled']
+    + LANGUAGES_WITH_ALIASES['compiled_dsl']
     + LANGUAGES_WITH_ALIASES['interpreted']
+    + LANGUAGES_WITH_ALIASES['interpreted_dsl']
     + LANGUAGES_WITH_ALIASES['build']
     + LANGUAGES_WITH_ALIASES['other'])
 COMPILER_ENV_VARS = {
