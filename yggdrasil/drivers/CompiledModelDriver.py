@@ -2082,6 +2082,7 @@ class CompiledModelDriver(ModelDriver):
                         {'attr': 'default_archiver_flags',
                          'key': 'archiver_flags',
                          'type': list}]
+    is_build_tool = False
 
     def __init__(self, name, args, skip_compile=False, **kwargs):
         super(CompiledModelDriver, self).__init__(name, args, **kwargs)
@@ -2145,8 +2146,9 @@ class CompiledModelDriver(ModelDriver):
                     setattr(self, k, getattr(self, 'default_%s' % k))
         # Set tools so that they are cached
         for k in ['compiler', 'linker', 'archiver']:
+            if self.is_build_tool and (k == 'archiver'):
+                continue
             setattr(self, '%s_tool' % k, self.get_tool_instance(k))
-            self.get_tool_instance(k)
         super(CompiledModelDriver, self).parse_arguments(args, **kwargs)
         # Handle case where provided argument is source and not executable
         # and case where provided argument is executable, but source files are
@@ -2274,7 +2276,7 @@ class CompiledModelDriver(ModelDriver):
     @staticmethod
     def get_tool_static(cls, tooltype, toolname=None,
                         return_prop='tool', default=False,
-                        language=None):
+                        language=None, compiler_toolname=None):
         r"""Get the class associated with the specified compilation tool for
         this language.
 
@@ -2313,63 +2315,60 @@ class CompiledModelDriver(ModelDriver):
         if (out is None) or ((toolname is not None) and (toolname != out.toolname)):
             # Associate linker & archiver with compiler so that it can be
             # used to retrieve them
-            if (tooltype == 'compiler') or (return_prop in ['name', 'flags']):
-                # Get tool name by checking:
-                #   1. The tooltype attribute
-                #   2. The default tooltype attribute
-                #   3. The default argument (if one is provided).
-                if toolname is None:
-                    toolname = getattr(cls, tooltype, None)
-                if toolname is None:
-                    toolname = getattr(cls, 'default_%s' % tooltype, None)
-                if toolname is None:
-                    if default is False:
-                        raise NotImplementedError("%s not set for language '%s'."
-                                                  % (tooltype.title(), cls.language))
-                    return default
-                if return_prop == 'name':
-                    return toolname
-                # Get flags
-                tool_flags = getattr(cls, '%s_flags' % tooltype, None)
-                if tool_flags is None:
-                    tool_flags = getattr(cls, 'default_%s_flags' % tooltype, None)
-                if return_prop == 'flags':
-                    return tool_flags
-                # Get tool
-                kwargs = {'flags': tool_flags}
-                kwargs['executable'] = cls.cfg.get(cls.language,
-                                                   '%s_executable' % toolname,
-                                                   toolname)
-                if tooltype == 'compiler':
-                    kwargs.update(
-                        linker=cls.get_tool(
-                            'linker', return_prop='name', default=None),
-                        linker_flags=cls.get_tool(
-                            'linker', return_prop='flags', default=None),
-                        archiver=cls.get_tool(
-                            'archiver', return_prop='name', default=None),
-                        archiver_flags=cls.get_tool(
-                            'archiver', return_prop='flags', default=None))
-                out = get_compatible_tool(toolname, tooltype, cls.language,
-                                          default=default)
-                if isinstance(out, type):
-                    out = out(**kwargs)
-                else:
-                    return out
-            else:
-                out_tool = cls.get_tool('compiler', toolname=toolname, default=None)
-                if out_tool is None:  # pragma: debug
-                    if default is False:
-                        raise NotImplementedError(
-                            "%s not set for language '%s' (toolname=%s)."
-                            % (tooltype.title(), cls.language, toolname))
-                    return default
-                try:
-                    out = getattr(out_tool, tooltype)()
-                except BaseException:  # pragma: debug
-                    if default is False:
-                        raise
-                    return default
+            # Get tool name by checking:
+            #   1. The tooltype attribute
+            #   2. The default tooltype attribute
+            #   3. The default argument (if one is provided).
+            if toolname is None:
+                toolname = getattr(cls, tooltype, None)
+            if toolname is None:
+                toolname = getattr(cls, 'default_%s' % tooltype, None)
+            if toolname is None:
+                if default is False:
+                    raise NotImplementedError("%s not set for language '%s'."
+                                              % (tooltype.title(), cls.language))
+                return default
+            if return_prop == 'name':
+                return toolname
+            # Get flags
+            tool_flags = getattr(cls, '%s_flags' % tooltype, None)
+            if tool_flags is None:
+                tool_flags = getattr(cls, 'default_%s_flags' % tooltype, None)
+            if return_prop == 'flags':
+                return tool_flags
+            # Get tool
+            kwargs = {'flags': tool_flags}
+            kwargs['executable'] = cls.cfg.get(cls.language,
+                                               '%s_executable' % toolname,
+                                               toolname)
+            if tooltype == 'compiler':
+                kwargs.update(
+                    linker=cls.get_tool(
+                        'linker', return_prop='name', default=None),
+                    linker_flags=cls.get_tool(
+                        'linker', return_prop='flags', default=None),
+                    archiver=cls.get_tool(
+                        'archiver', return_prop='name', default=None),
+                    archiver_flags=cls.get_tool(
+                        'archiver', return_prop='flags', default=None))
+            out = get_compatible_tool(toolname, tooltype, cls.language,
+                                      default=None)
+            if (out is None) and (tooltype != 'compiler'):
+                out_comp = cls.get_tool('compiler', toolname=toolname,
+                                        default=None)
+                if out_comp is not None:
+                    try:
+                        out = getattr(out_comp, tooltype)()
+                    except BaseException:  # pragma: debug
+                        out = None
+            if out is None:
+                if default is False:
+                    raise NotImplementedError(
+                        "%s not set for language '%s' (toolname=%s)."
+                        % (tooltype.title(), cls.language, toolname))
+                out = default
+            if isinstance(out, type):
+                out = out(**kwargs)
         # Returns correct property given the tool
         if return_prop == 'tool':
             return out
@@ -3228,6 +3227,8 @@ class CompiledModelDriver(ModelDriver):
         """
         out = super(CompiledModelDriver, cls).is_language_installed()
         for k in ['compiler', 'archiver', 'linker']:
+            if cls.is_build_tool and (k != 'compiler'):
+                continue
             if not out:  # pragma: no cover
                 break
             out = (cls.get_tool(k, default=None) is not None)
