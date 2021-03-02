@@ -3482,6 +3482,10 @@ class CompiledModelDriver(ModelDriver):
                 logging_level=self.numeric_logging_level,
                 **compile_kwargs)
         return out
+
+    def compile_dependencies_instance(self, *args, **kwargs):
+        r"""Compile dependencies specifically for this instance."""
+        return self.compile_dependencies(*args, **kwargs)
         
     @classmethod
     def compile_dependencies(cls, toolname=None, dep=None, **kwargs):
@@ -3566,12 +3570,15 @@ class CompiledModelDriver(ModelDriver):
             default_kwargs.update(linker_flags=self.linker_flags)
         for k, v in default_kwargs.items():
             kwargs.setdefault(k, v)
+        if os.path.isfile(kwargs['out']) and (not kwargs['overwrite']):
+            self.debug("Result already exists: %s", kwargs['out'])
+            return
         if 'env' not in kwargs:
             kwargs['env'] = self.set_env(for_compile=True,
                                          toolname=kwargs['toolname'])
         try:
             if not kwargs.get('dry_run', False):
-                self.compile_dependencies(toolname=kwargs['toolname'])
+                self.compile_dependencies_instance(toolname=kwargs['toolname'])
             return self.call_compiler(source_files, **kwargs)
         except BaseException:
             self.cleanup_products()

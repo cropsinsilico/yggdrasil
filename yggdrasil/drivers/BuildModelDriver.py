@@ -437,6 +437,13 @@ class BuildModelDriver(CompiledModelDriver):
                 return True
         return False
 
+    def compile_dependencies_instance(self, *args, **kwargs):
+        r"""Compile dependencies specifically for this instance."""
+        if (((self.target_language_driver is not None)
+             and (not kwargs.get('dry_run', False)))):
+            self.target_language_driver.compile_dependencies(
+                toolname=self.target_compiler)
+        
     def compile_model(self, **kwargs):
         r"""Compile model executable(s).
 
@@ -445,10 +452,6 @@ class BuildModelDriver(CompiledModelDriver):
                 method.
 
         """
-        if (((self.target_language_driver is not None)
-             and (not kwargs.get('dry_run', False)))):
-            self.target_language_driver.compile_dependencies(
-                toolname=self.target_compiler)
         kwargs['working_dir'] = self.compile_working_dir
         kwargs['target_compiler'] = self.target_compiler
         return super(BuildModelDriver, self).compile_model(**kwargs)
@@ -517,13 +520,17 @@ class BuildModelDriver(CompiledModelDriver):
                     language_info['linker_flags'])
         else:
             if language_info['compiler_flags_env']:
-                print("ENV COMPILER FLAGS",
-                      out.get(language_info['compiler_flags_env'], None))
                 out.pop(language_info['compiler_flags_env'], None)
             if language_info['linker_flags_env']:
-                print("ENV LINKER FLAGS",
-                      out.get(language_info['linker_flags_env'], None))
                 out.pop(language_info['linker_flags_env'], None)
+        if language_info['compiler_flags_env']:
+            print("ENV COMPILER FLAGS",
+                  language_info['compiler_flags_env'],
+                  out.get(language_info['compiler_flags_env'], None))
+        if language_info['linker_flags_env']:
+            print("ENV LINKER FLAGS",
+                  language_info['linker_flags_env'],
+                  out.get(language_info['linker_flags_env'], None))
         return out
     
     def set_env(self, **kwargs):

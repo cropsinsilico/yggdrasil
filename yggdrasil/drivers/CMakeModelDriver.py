@@ -739,7 +739,7 @@ class CMakeModelDriver(BuildModelDriver):
     language = 'cmake'
     add_libraries = CMakeConfigure.add_libraries
     sourcedir_as_sourcefile = True
-    use_env_vars = False
+    use_env_vars = True  # False
 
     def parse_arguments(self, args, **kwargs):
         r"""Sort arguments based on their syntax to determine if an argument
@@ -796,7 +796,8 @@ class CMakeModelDriver(BuildModelDriver):
                    linker=self.target_language_info['linker'],
                    configuration=self.configuration,
                    verbose=kwargs.get('verbose', False))
-        if not self.use_env_vars:
+        # if not self.use_env_vars:
+        if True:
             kws.update(
                 compiler_flags=self.target_language_info['compiler_flags'],
                 linker_flags=self.target_language_info['linker_flags'],

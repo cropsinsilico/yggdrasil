@@ -10,6 +10,7 @@ import yggdrasil.drivers.tests.test_BuildModelDriver as parent
 from yggdrasil.drivers.CMakeModelDriver import (
     CMakeModelDriver, CMakeConfigure, CMakeBuilder)
 from yggdrasil.drivers.CModelDriver import GCCCompiler
+from yggdrasil.drivers.CPPModelDriver import CPPModelDriver
 
 
 @requires_language('cmake', installed='any')
@@ -183,6 +184,7 @@ class TestCMakeModelDriverNoStart(TestCMakeModelParam,
     def test_call_compiler(self):
         r"""Test call_compiler without full path."""
         # self.instance.cleanup()
+        CPPModelDriver.compile_dependencies()
         self.import_cls.call_compiler(self.instance.source_files,
                                       builddir='build',
                                       working_dir=self.instance.working_dir,
