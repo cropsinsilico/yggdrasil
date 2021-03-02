@@ -707,6 +707,7 @@ def install_deps(method, return_commands=False, verbose=False,
     # Get list of packages
     pkgs = itemize_deps(method, fallback_to_conda=fallback_to_conda,
                         install_opts=install_opts, **kwargs)
+    pprint.pprint(pkgs)
     # Uninstall default numpy and matplotlib to allow installation
     # of specific versions
     cmds = ["%s -m pip uninstall -y numpy matplotlib" % python_cmd]
@@ -792,10 +793,10 @@ def install_deps(method, return_commands=False, verbose=False,
     install_from_requirements(method, pkgs['requirements'],
                               additional_packages=pkgs['default'],
                               **req_kwargs)
-    install_from_requirements(method, pkgs['requirements_conda'],
+    install_from_requirements('conda', pkgs['requirements_conda'],
                               additional_packages=pkgs['conda'],
                               unique_to_method=True, **req_kwargs)
-    install_from_requirements(method, pkgs['requirements_pip'],
+    install_from_requirements('pip', pkgs['requirements_pip'],
                               additional_packages=pkgs['pip'],
                               unique_to_method=True, **req_kwargs)
     if 'libroadrunner' in pkgs['skip']:
