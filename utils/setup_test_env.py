@@ -793,9 +793,10 @@ def install_deps(method, return_commands=False, verbose=False,
     install_from_requirements(method, pkgs['requirements'],
                               additional_packages=pkgs['default'],
                               **req_kwargs)
-    install_from_requirements('conda', pkgs['requirements_conda'],
-                              additional_packages=pkgs['conda'],
-                              unique_to_method=True, **req_kwargs)
+    if fallback_to_conda:
+        install_from_requirements('conda', pkgs['requirements_conda'],
+                                  additional_packages=pkgs['conda'],
+                                  unique_to_method=True, **req_kwargs)
     install_from_requirements('pip', pkgs['requirements_pip'],
                               additional_packages=pkgs['pip'],
                               unique_to_method=True, **req_kwargs)
