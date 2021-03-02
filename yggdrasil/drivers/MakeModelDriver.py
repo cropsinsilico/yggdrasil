@@ -1,5 +1,6 @@
+import os
 from collections import OrderedDict
-from yggdrasil import platform
+from yggdrasil import platform, constants, components
 from yggdrasil.drivers.BuildModelDriver import (
     BuildModelDriver, BuildToolBase)
 
@@ -217,6 +218,53 @@ class MakeModelDriver(BuildModelDriver):
         self.compile_working_dir = self.makedir
         super(MakeModelDriver, self).parse_arguments(args, **kwargs)
 
+    @classmethod
+    def get_language_for_source(cls, fname=None, buildfile=None,
+                                call_base=False, target=None, **kwargs):
+                                
+        r"""Determine the language that can be used with the provided source
+        file(s). If more than one language applies to a set of multiple files,
+        the language that applies to the most files is returned.
+
+        Args:
+            fname (str, list): The full path to one or more files. If more than
+                one is provided, they are iterated over.
+            buildfile (str, optional): Full path to the Makefile file.
+                Defaults to None and will be searched for.
+            target (str, optional): The build target. Defaults to None.
+            call_base (bool, optional): If True, the base class's method is
+                called directly. Defaults to False.
+            **kwargs: Additional keyword arguments are passed to the parent
+                class's method.
+
+        Returns:
+            str: The language that can operate on the specified file.
+
+        """
+        if not (call_base or isinstance(fname, list)):
+            if (buildfile is None) and isinstance(fname, str):
+                source_dir = cls.get_source_dir(
+                    fname, source_dir=kwargs.get('source_dir', None))
+                buildfile = os.path.join(source_dir, 'Makefile')
+            if os.path.isfile(buildfile):
+                with open(buildfile, 'r') as fd:
+                    lines = fd.read()
+                ext_present = []
+                for lang in constants.LANGUAGES['compiled']:
+                    drv = components.import_component('model', lang)
+                    if any(x in lines for x in drv.language_ext):
+                        ext_present.append(lang)
+                if ('c' in ext_present) and ('c++' in ext_present):
+                    ext_present.remove('c')
+                if len(ext_present) == 1:
+                    return ext_present[0]
+                elif len(ext_present) > 1:
+                    raise RuntimeError("More than one extension found in "
+                                       "'%s'" % buildfile)
+        return super(MakeModelDriver, cls).get_language_for_source(
+            fname, call_base=call_base, buildfile=buildfile,
+            target=target, **kwargs)
+        
     def compile_model(self, target=None, **kwargs):
         r"""Compile model executable(s).
 
