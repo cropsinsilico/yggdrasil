@@ -357,7 +357,12 @@ class BuildModelDriver(CompiledModelDriver):
             dont_skip_env_defaults=True, for_model=True, dry_run=True,
             dont_link=True, logging_level=logging_level)
         linker_kws = dict(
-            toolname=linker.toolname, skip_defaults=True,
+            # TODO: Linker cannot be passed directly as toolname or
+            # get_linker_flags fails when it tries to find a compiler
+            # with the provided toolname (dosn't work for windows where
+            # the compiler has a different name than the linker)
+            # toolname=linker.toolname
+            toolname=compiler.toolname, skip_defaults=True,
             flags=target_linker_flags,
             dont_skip_env_defaults=True, for_model=True, dry_run=True)
         if cls.isolate_library_flags:

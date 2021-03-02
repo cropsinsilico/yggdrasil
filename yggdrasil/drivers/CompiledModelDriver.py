@@ -48,6 +48,8 @@ def get_compatible_tool(tool, tooltype, language, default=False):
     """
     if isinstance(tool, str):
         tool = get_compilation_tool(tooltype, tool)
+    if isinstance(tool, bool):
+        return tool
     if (tool.tooltype == tooltype) and (language in tool.languages):
         return tool
     reg = get_compilation_tool_registry(tooltype)['by_toolset']
@@ -2147,8 +2149,9 @@ class CompiledModelDriver(ModelDriver):
         # Set tools so that they are cached
         for k in ['compiler', 'linker', 'archiver']:
             if self.is_build_tool and (k == 'archiver'):
-                continue
-            setattr(self, '%s_tool' % k, self.get_tool_instance(k))
+                setattr(self, '%s_tool' % k, False)
+            else:
+                setattr(self, '%s_tool' % k, self.get_tool_instance(k))
         super(CompiledModelDriver, self).parse_arguments(args, **kwargs)
         # Handle case where provided argument is source and not executable
         # and case where provided argument is executable, but source files are

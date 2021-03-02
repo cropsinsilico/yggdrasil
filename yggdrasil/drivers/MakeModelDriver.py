@@ -252,7 +252,7 @@ class MakeModelDriver(BuildModelDriver):
                 ext_present = []
                 for lang in constants.LANGUAGES['compiled']:
                     drv = components.import_component('model', lang)
-                    if any(x in lines for x in drv.language_ext):
+                    if any(x in lines for x in drv.language_ext if (x != '.h')):
                         ext_present.append(lang)
                 if ('c' in ext_present) and ('c++' in ext_present):
                     ext_present.remove('c')
@@ -260,7 +260,7 @@ class MakeModelDriver(BuildModelDriver):
                     return ext_present[0]
                 elif len(ext_present) > 1:
                     raise RuntimeError("More than one extension found in "
-                                       "'%s'" % buildfile)
+                                       "'%s': %s" % (buildfile, ext_present))
         return super(MakeModelDriver, cls).get_language_for_source(
             fname, call_base=call_base, buildfile=buildfile,
             target=target, **kwargs)

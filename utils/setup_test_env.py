@@ -523,6 +523,7 @@ def itemize_deps(method, for_development=False,
                              or ((install_opts['os'] == 'win')
                                  and _on_appveyor)
                              or install_opts['lpy'])
+    print('ITEMIZE_DEPS', fallback_to_conda)
     if method == 'conda':
         out['default'] = out['conda']
     elif method == 'pip':
@@ -704,6 +705,7 @@ def install_deps(method, return_commands=False, verbose=False,
         fallback_to_conda = ((method == 'conda')
                              or (_is_win and _on_appveyor)
                              or install_opts['lpy'])
+    print('INSTALL_DEPS', method, fallback_to_conda)
     # Get list of packages
     pkgs = itemize_deps(method, fallback_to_conda=fallback_to_conda,
                         install_opts=install_opts, **kwargs)
@@ -830,7 +832,7 @@ def install_pkg(method, python=None, without_build=False,
                 without_deps=False, verbose=False,
                 skip_test_deps=False, include_dev_deps=False, include_doc_deps=False,
                 windows_package_manager='vcpkg', install_opts=None, conda_env=None,
-                always_yes=False, only_python=False, fallback_to_conda=False):
+                always_yes=False, only_python=False, fallback_to_conda=None):
     r"""Build and install the package and its dependencies on a CI
     resource.
 
