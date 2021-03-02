@@ -960,7 +960,8 @@ def install_pkg(method, python=None, without_build=False,
     cmds = SUMMARY_CMDS + cmds + SUMMARY_CMDS
     call_script(cmds)
     if method.endswith('-dev'):
-        print(call_conda_command([python_cmd, 'setup.py', 'develop'],
+        print(call_conda_command([python_cmd, '-m', 'pip', 'install',
+                                  '--editable', '.'],
                                  cwd=_pkg_dir))
     # Follow up if on Unix as R installation may require sudo
     if install_opts['R'] and _is_unix:

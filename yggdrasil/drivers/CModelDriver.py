@@ -94,9 +94,9 @@ class CCompilerBase(CompilerBase):
             cls.linker_attributes = dict(cls.linker_attributes,
                                          search_path_flags=['-Xlinker', '--verbose'],
                                          search_regex=[r'SEARCH_DIR\("=([^"]+)"\);'])
-        elif platform._is_win and (cls.toolname not in [None, 'cl', 'msvc']):
-            cls.default_executable_env = None
-            cls.default_flags_env = None
+        # elif platform._is_win and (cls.toolname not in [None, 'cl', 'msvc']):
+        #     cls.default_executable_env = None
+        #     cls.default_flags_env = None
         CompilerBase.before_registration(cls)
 
     @classmethod
@@ -286,8 +286,8 @@ class MSVCCompiler(CCompilerBase):
     combine_with_linker = True  # Must be explicit; linker is separate .exe
     linker_attributes = dict(GCCCompiler.linker_attributes,
                              default_executable=None,
-                             default_executable_env=None,
-                             default_flags_env=None,
+                             # default_executable_env=None,
+                             # default_flags_env=None,
                              output_key='/OUT:%s',
                              output_first=True,
                              output_first_library=False,

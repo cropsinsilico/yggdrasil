@@ -264,6 +264,14 @@ class CMakeConfigure(BuildToolBase):
                                                              cls.default_builddir))
                 else:
                     builddir = outfile
+        if CModelDriver._osx_sysroot is not None:
+            kwargs.setdefault('definitions', [])
+            kwargs['definitions'].append(
+                'CMAKE_OSX_SYSROOT=%s' % CModelDriver._osx_sysroot)
+            if os.environ.get('MACOSX_DEPLOYMENT_TARGET', None):
+                kwargs['definitions'].append(
+                    'CMAKE_OSX_DEPLOYMENT_TARGET=%s'
+                    % os.environ['MACOSX_DEPLOYMENT_TARGET'])
         # Pop target (used for build stage file name, but not for any other
         # part of the build stage)
         kwargs.pop('target', None)
@@ -348,9 +356,8 @@ class CMakeConfigure(BuildToolBase):
         
     @classmethod
     def create_include(cls, fname, target,
-                       compiler=None, linker=None,
-                       # driver=None, toolname=None,
-                       compiler_flags=None, linker_flags=None,
+                       compiler=None, compiler_flags=None,
+                       linker=None, linker_flags=None,
                        library_flags=None, internal_library_flags=None,
                        configuration='Release', verbose=False, **kwargs):
         r"""Create CMakeList include file with necessary includes,
@@ -359,15 +366,18 @@ class CMakeConfigure(BuildToolBase):
         Args:
             fname (str): File where the include file should be saved.
             target (str): Target that links should be added to.
-            driver (CompiledModelDriver): The CompiledModelDriver that
-                should be used to get compiler/linker flags.
-            toolname (str, optional): Name of compiler tool that should be used.
-                Defaults to None and the default compiler for the language will
-                be used.
+            compiler (CompilerBase): Compiler that should be used to generate the
+                list of compilation flags.
             compile_flags (list, optional): Additional compile flags that
                 should be set. Defaults to [].
+            linker (LinkerBase): Linker that should be used to generate the
+                list of compilation flags.
             linker_flags (list, optional): Additional linker flags that
                 should be set. Defaults to [].
+            library_flags (list, optional): List of library flags to add.
+                Defaults to [].
+            internal_library_flags (list, optional): List of library flags
+                associated with yggdrasil libraries. Defaults to [].
             configuration (str, optional): Build type/configuration that should
                 be built. Defaults to 'Release'. Only used on Windows to
                 determin the standard library.
@@ -395,33 +405,13 @@ class CMakeConfigure(BuildToolBase):
             internal_library_flags = []
         assert(compiler is not None)
         assert(linker is not None)
-        # assert(driver is not None)
-        # use_library_path = True  # platform._is_win
-        # library_flags = []
-        # external_library_flags = []
-        # internal_library_flags = []
-        # compile_flags = driver.get_compiler_flags(
-        #     toolname=toolname, skip_defaults=True, skip_sysroot=True,
-        #     flags=compile_flags, use_library_path=use_library_path,
-        #     dont_link=True, for_model=True, dry_run=True,
-        #     logging_level=logging_level)
-        # linker_flags = driver.get_linker_flags(
-        #     toolname=toolname, skip_defaults=True,
-        #     flags=linker_flags, for_model=True, dry_run=True,
-        #     use_library_path='external_library_flags',
-        #     external_library_flags=external_library_flags,
-        #     use_library_path_internal='internal_library_flags',
-        #     internal_library_flags=internal_library_flags,
-        #     skip_library_libs=True, library_flags=library_flags)
         lines = []
         pretarget_lines = []
         preamble_lines = []
-        # library_flags += internal_library_flags + external_library_flags
         # Suppress warnings on windows about the security of strcpy etc.
         # and target x64 if the current platform is 64bit
         is_gnu = True
         if platform._is_win:  # pragma: windows
-            # compiler = driver.get_tool('compiler', toolname=toolname)
             is_gnu = compiler.is_gnu
             new_flags = compiler.default_flags
             def_flags = compiler.get_env_flags()
@@ -499,7 +489,6 @@ class CMakeConfigure(BuildToolBase):
             xd, xf = os.path.split(x)
             xl, xe = os.path.splitext(xf)
             xl = linker.libpath2libname(xf)
-            # xl = driver.get_tool('linker').libpath2libname(xf)
             x = cls.fix_path(x, is_gnu=is_gnu)
             xd = cls.fix_path(xd, is_gnu=is_gnu)
             xn = os.path.splitext(xl)[0]
@@ -507,7 +496,6 @@ class CMakeConfigure(BuildToolBase):
             if new_dir not in preamble_lines:
                 pretarget_lines.append(new_dir)
             if cls.add_libraries or (xorig in internal_library_flags):
-                # if cls.add_libraries:  # pragma: no cover
                 # Version adding library
                 lines.append('if (NOT TARGET %s)' % xl)
                 if xe.lower() in ['.so', '.dll', '.dylib']:
@@ -557,11 +545,6 @@ class CMakeConfigure(BuildToolBase):
             with open(fname, 'w') as fd:
                 fd.write('\n'.join(lines))
             return pretarget_lines
-
-    @classmethod
-    def set_env(cls, *args, **kwargs):
-        kwargs['skip_flags'] = True
-        return super(CMakeConfigure, cls).set_env(*args, **kwargs)
 
     
 class CMakeBuilder(LinkerBase):
@@ -756,10 +739,7 @@ class CMakeModelDriver(BuildModelDriver):
     language = 'cmake'
     add_libraries = CMakeConfigure.add_libraries
     sourcedir_as_sourcefile = True
-    isolate_library_flags = True
     use_env_vars = False
-    # isolate_library_flags = False
-    # use_env_vars = True
 
     def parse_arguments(self, args, **kwargs):
         r"""Sort arguments based on their syntax to determine if an argument
@@ -917,6 +897,56 @@ class CMakeModelDriver(BuildModelDriver):
         return super(CMakeModelDriver, cls).get_language_for_source(
             fname, call_base=call_base, buildfile=buildfile,
             target=target, **kwargs)
+
+    @classmethod
+    def get_target_language_info(cls, compiler_flag_kwargs=None,
+                                 linker_flag_kwargs=None, **kwargs):
+        r"""Get a dictionary of information about language compilation tools.
+
+        Args:
+            compiler_flag_kwargs (dict, optional): Keyword arguments to pass
+                to the get_compiler_flags method. Defaults to None.
+            linker_flag_kwargs (dict, optional): Keyword arguments to pass
+                to the get_linker_flags method. Defaults to None.
+            **kwargs: Keyword arguments are passed to the parent class's
+                method.
+        
+        Returns:
+            dict: Information about language compilers and linkers.
+
+        """
+        if compiler_flag_kwargs is None:
+            compiler_flag_kwargs = {}
+        if linker_flag_kwargs is None:
+            linker_flag_kwargs = {}
+        compiler_flag_kwargs.setdefault('skip_sysroot', True)
+        compiler_flag_kwargs.setdefault('use_library_path', True)
+        compiler_flag_kwargs.setdefault('dont_skip_env_defaults', False)
+        linker_flag_kwargs.setdefault('library_flags', [])
+        linker_flag_kwargs.setdefault('use_library_path',
+                                      'external_library_flags')
+        linker_flag_kwargs.setdefault(
+            linker_flag_kwargs['use_library_path'], [])
+        external_library_flags = linker_flag_kwargs[
+            linker_flag_kwargs['use_library_path']]
+        linker_flag_kwargs.setdefault('use_library_path_internal',
+                                      'internal_library_flags')
+        linker_flag_kwargs.setdefault(
+            linker_flag_kwargs['use_library_path_internal'], [])
+        internal_library_flags = linker_flag_kwargs[
+            linker_flag_kwargs['use_library_path_internal']]
+        linker_flag_kwargs.setdefault('skip_library_libs', True)
+        linker_flag_kwargs.setdefault('dont_skip_env_defaults', False)
+        out = super(CMakeModelDriver, cls).get_target_language_info(
+            compiler_flag_kwargs=compiler_flag_kwargs,
+            linker_flag_kwargs=linker_flag_kwargs, **kwargs)
+        out.update(
+            library_flags=(linker_flag_kwargs['library_flags']
+                           + external_library_flags
+                           + internal_library_flags),
+            external_library_flags=external_library_flags,
+            internal_library_flags=internal_library_flags)
+        return out
         
     def compile_model(self, target=None, **kwargs):
         r"""Compile model executable(s) and appends any products produced by
@@ -1022,12 +1052,12 @@ class CMakeModelDriver(BuildModelDriver):
         out = super(CMakeModelDriver, cls).update_compiler_kwargs(**kwargs)
         out.setdefault('definitions', [])
         out['definitions'].append('PYTHON_EXECUTABLE=%s' % sys.executable)
-        if CModelDriver._osx_sysroot is not None:
-            out.setdefault('definitions', [])
-            out['definitions'].append(
-                'CMAKE_OSX_SYSROOT=%s' % CModelDriver._osx_sysroot)
-            if os.environ.get('MACOSX_DEPLOYMENT_TARGET', None):
-                out['definitions'].append(
-                    'CMAKE_OSX_DEPLOYMENT_TARGET=%s'
-                    % os.environ['MACOSX_DEPLOYMENT_TARGET'])
+        # if CModelDriver._osx_sysroot is not None:
+        #     out.setdefault('definitions', [])
+        #     out['definitions'].append(
+        #         'CMAKE_OSX_SYSROOT=%s' % CModelDriver._osx_sysroot)
+        #     if os.environ.get('MACOSX_DEPLOYMENT_TARGET', None):
+        #         out['definitions'].append(
+        #             'CMAKE_OSX_DEPLOYMENT_TARGET=%s'
+        #             % os.environ['MACOSX_DEPLOYMENT_TARGET'])
         return out

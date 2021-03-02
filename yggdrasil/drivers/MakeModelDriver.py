@@ -1,6 +1,6 @@
 import os
 from collections import OrderedDict
-from yggdrasil import platform, constants, components
+from yggdrasil import platform, constants
 from yggdrasil.drivers.BuildModelDriver import (
     BuildModelDriver, BuildToolBase)
 
@@ -250,9 +250,8 @@ class MakeModelDriver(BuildModelDriver):
                 with open(buildfile, 'r') as fd:
                     lines = fd.read()
                 ext_present = []
-                for lang in constants.LANGUAGES['compiled']:
-                    drv = components.import_component('model', lang)
-                    if any(x in lines for x in drv.language_ext if (x != '.h')):
+                for lang, info in constants.COMPILER_ENV_VARS.items():
+                    if info['exec'] in lines:
                         ext_present.append(lang)
                 if ('c' in ext_present) and ('c++' in ext_present):
                     ext_present.remove('c')

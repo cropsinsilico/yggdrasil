@@ -136,7 +136,6 @@ class BuildModelDriver(CompiledModelDriver):
     full_language = False
     is_build_tool = True
     use_env_vars = True
-    isolate_library_flags = False
 
     def __init__(self, *args, **kwargs):
         self.target_language_driver = None
@@ -315,7 +314,8 @@ class BuildModelDriver(CompiledModelDriver):
                                  target_language='c',
                                  target_compiler=None, target_compiler_flags=None,
                                  target_linker=None, target_linker_flags=None,
-                                 logging_level=None, **kwargs):
+                                 logging_level=None, compiler_flag_kwargs=None,
+                                 linker_flag_kwargs=None, **kwargs):
         r"""Get a dictionary of information about language compilation tools.
 
         Args:
@@ -324,6 +324,24 @@ class BuildModelDriver(CompiledModelDriver):
                 based on 'target_language'.
             target_language (str, optional): Language to get info for.
                 Defaults to 'c'.
+            target_compiler (str, optional): Compilation tool that should be
+                used to compile the target language. Defaults to None and will
+                be set based on the selected language driver.
+            target_linker (str, optional): Compilation tool that should be
+                used to link the target language. Defaults to None and will
+                be set based on the selected language driver.
+            target_compiler_flags (list, optional): Compilation flags that
+                should be passed to the target language compiler. Defaults
+                to [].
+            target_linker_flags (list, optional): Linking flags that should
+                be passed to the target language linker. Defaults to [].
+            logging_level (int, optional): The numeric logging level that
+                should be passed as a definition. Defaults to None and is
+                ignored.
+            compiler_flag_kwargs (dict, optional): Keyword arguments to pass
+                to the get_compiler_flags method. Defaults to None.
+            linker_flag_kwargs (dict, optional): Keyword arguments to pass
+                to the get_linker_flags method. Defaults to None.
             **kwargs: Additional keyword arguments are added to the output
                 dictionary.
 
@@ -341,6 +359,10 @@ class BuildModelDriver(CompiledModelDriver):
         else:
             linker = target_language_driver.get_tool(
                 'linker', toolname=target_linker)
+        if compiler_flag_kwargs is None:
+            compiler_flag_kwargs = {}
+        if linker_flag_kwargs is None:
+            linker_flag_kwargs = {}
         out = {
             'compiler': compiler,
             'compiler_executable': compiler.get_executable(),
@@ -351,45 +373,28 @@ class BuildModelDriver(CompiledModelDriver):
             'linker_env': linker.default_executable_env,
             'linker_flags_env': linker.default_flags_env,
         }
-        compiler_kws = dict(
+        default_compiler_kws = dict(
             toolname=compiler.toolname, skip_defaults=True,
             flags=target_compiler_flags,
             dont_skip_env_defaults=True, for_model=True, dry_run=True,
             dont_link=True, logging_level=logging_level)
-        linker_kws = dict(
-            # TODO: Linker cannot be passed directly as toolname or
-            # get_linker_flags fails when it tries to find a compiler
-            # with the provided toolname (dosn't work for windows where
-            # the compiler has a different name than the linker)
+        default_linker_kws = dict(
             toolname=linker.toolname, skip_defaults=True,
-            # toolname=compiler.toolname, skip_defaults=True,
             flags=target_linker_flags,
             dont_skip_env_defaults=True, for_model=True, dry_run=True)
-        if cls.isolate_library_flags:
-            out.update(library_flags=[],
-                       external_library_flags=[],
-                       internal_library_flags=[])
-            compiler_kws.update(skip_sysroot=True,
-                                dont_skip_env_defaults=False,
-                                use_library_path=True)
-            linker_kws.update(
-                skip_library_libs=True,
-                library_flags=out['library_flags'],
-                dont_skip_env_defaults=False,
-                use_library_path='external_library_flags',
-                use_library_path_internal='internal_library_flags',
-                external_library_flags=out['external_library_flags'],
-                internal_library_flags=out['internal_library_flags'])
+        for k, v in default_compiler_kws.items():
+            compiler_flag_kwargs.setdefault(k, v)
+        for k, v in default_linker_kws.items():
+            linker_flag_kwargs.setdefault(k, v)
         out.update(
-            compiler_flags=target_language_driver.get_compiler_flags(**compiler_kws),
-            linker_flags=target_language_driver.get_linker_flags(**linker_kws))
+            compiler_flags=target_language_driver.get_compiler_flags(
+                **compiler_flag_kwargs),
+            linker_flags=target_language_driver.get_linker_flags(
+                **linker_flag_kwargs))
         # yggdrasil requires that linking be done in C++
         if (((compiler.languages[0].lower() == 'c')
              and ('-lstdc++' not in out['linker_flags']))):
             out['linker_flags'].append('-lstdc++')
-        if cls.isolate_library_flags:
-            out['library_flags'] += (out['external_library_flags']
-                                     + out['internal_library_flags'])
         out.update(**kwargs)
         return out
         
@@ -510,6 +515,15 @@ class BuildModelDriver(CompiledModelDriver):
             if language_info['linker_flags_env']:
                 out[language_info['linker_flags_env']] = ' '.join(
                     language_info['linker_flags'])
+        else:
+            if language_info['compiler_flags_env']:
+                print("ENV COMPILER FLAGS",
+                      out.get(language_info['compiler_flags_env'], None))
+                out.pop(language_info['compiler_flags_env'], None)
+            if language_info['linker_flags_env']:
+                print("ENV LINKER FLAGS",
+                      out.get(language_info['linker_flags_env'], None))
+                out.pop(language_info['linker_flags_env'], None)
         return out
     
     def set_env(self, **kwargs):

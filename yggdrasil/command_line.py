@@ -685,7 +685,8 @@ class yggcompile(SubCommand):
     arguments = [
         (('language', ),
          {'nargs': '*', 'default': ['all'],
-          # 'choices': ['all'] + LANGUAGES_WITH_ALIASES['compiled'],
+          # 'choices': (['all'] + LANGUAGES_WITH_ALIASES['compiled']
+          #             + LANGUAGES_WITH_ALIASES['compiled_dsl']),
           'help': ("One or more languages to compile dependencies "
                    "for.")}),
         (('--toolname', ),

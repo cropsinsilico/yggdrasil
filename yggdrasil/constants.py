@@ -14,9 +14,13 @@ LANG2EXT = {'python': '.py',
 EXT2LANG = {v: k for k, v in LANG2EXT.items()}
 LANGUAGES = {
     'compiled': [
-        'c', 'c++', 'fortran', 'osr'],
+        'c', 'c++', 'fortran'],
+    'compiled_dsl': [
+        'osr'],
     'interpreted': [
-        'python', 'matlab', 'r', 'sbml', 'lpy'],
+        'python', 'matlab', 'r'],
+    'interpreted_dsl': [
+        'sbml', 'lpy'],
     'build': [
         'cmake', 'make'],
     'other': [
@@ -28,9 +32,13 @@ LANGUAGES['all'] = (
     + LANGUAGES['other'])
 LANGUAGES_WITH_ALIASES = {
     'compiled': [
-        'c', 'c++', 'cpp', 'cxx', 'fortran', 'osr'],
+        'c', 'c++', 'cpp', 'cxx', 'fortran'],
+    'compiled_dsl': [
+        'osr'],
     'interpreted': [
-        'python', 'matlab', 'r', 'R', 'sbml', 'lpy'],
+        'python', 'matlab', 'r', 'R'],
+    'interpreted_dsl': [
+        'sbml', 'lpy'],
     'build': [
         'cmake', 'make'],
     'other': [
@@ -40,3 +48,21 @@ LANGUAGES_WITH_ALIASES['all'] = (
     + LANGUAGES_WITH_ALIASES['interpreted']
     + LANGUAGES_WITH_ALIASES['build']
     + LANGUAGES_WITH_ALIASES['other'])
+COMPILER_ENV_VARS = {
+    'c': {
+        'exec': 'CC',
+        'flags': 'CFLAGS'},
+    'c++': {
+        'exec': 'CXX',
+        'flags': 'CXXFLAGS'},
+    'fortran': {
+        'exec': 'FC',
+        'flags': 'FFLAGS'}}
+COMPILATION_TOOL_VARS = {
+    'ld': {
+        'exec': 'LD',
+        'flags': 'LDFLAGS'},
+    'ar': {
+        'exec': 'AR'},
+    'libtool': {
+        'exec': 'LIBTOOL'}}
