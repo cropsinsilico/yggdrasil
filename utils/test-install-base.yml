@@ -192,7 +192,7 @@ jobs:
       if: matrix.install-method == 'conda'
       with:
         # TODO: Move autoupdate into script?
-        # auto-update-conda: true
+        auto-update-conda: true
         python-version: ${{ matrix.python-version }}
         channels: conda-forge
         use-only-tar-bz2: true
