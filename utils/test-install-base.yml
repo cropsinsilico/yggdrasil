@@ -117,6 +117,7 @@ jobs:
       # uses: syphar/restore-virtualenv@v1
       run: |
         python utils/setup_test_env.py env virtualenv ${{ matrix.python-version }} --env-name=test
+        echo "source activate ygg" > ~/.bashrc
         source test/bin/activate
         echo "$VIRTUAL_ENV"
         echo "VIRTUAL_ENV=$VIRTUAL_ENV" >> $GITHUB_ENV

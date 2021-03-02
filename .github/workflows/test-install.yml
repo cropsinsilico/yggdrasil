@@ -129,6 +129,8 @@ jobs:
       run: 'python utils/setup_test_env.py env virtualenv ${{ matrix.python-version
         }} --env-name=test
 
+        echo "source activate ygg" > ~/.bashrc
+
         source test/bin/activate
 
         echo "$VIRTUAL_ENV"
@@ -386,6 +388,8 @@ jobs:
       run: 'python utils/setup_test_env.py env virtualenv ${{ matrix.python-version
         }} --env-name=test
 
+        echo "source activate ygg" > ~/.bashrc
+
         source test/bin/activate
 
         echo "$VIRTUAL_ENV"
@@ -622,6 +626,8 @@ jobs:
       if: env.USEVIRTUALENV == 1 && matrix.install-method == 'pip'
       run: 'python utils/setup_test_env.py env virtualenv ${{ matrix.python-version
         }} --env-name=test
+
+        echo "source activate ygg" > ~/.bashrc
 
         source test/bin/activate
 
@@ -862,6 +868,8 @@ jobs:
       run: 'python utils/setup_test_env.py env virtualenv ${{ matrix.python-version
         }} --env-name=test
 
+        echo "source activate ygg" > ~/.bashrc
+
         source test/bin/activate
 
         echo "$VIRTUAL_ENV"
@@ -1098,6 +1106,8 @@ jobs:
       if: env.USEVIRTUALENV == 1 && matrix.install-method == 'pip'
       run: 'python utils/setup_test_env.py env virtualenv ${{ matrix.python-version
         }} --env-name=test
+
+        echo "source activate ygg" > ~/.bashrc
 
         source test/bin/activate
 

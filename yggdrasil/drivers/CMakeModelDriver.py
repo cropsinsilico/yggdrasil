@@ -756,10 +756,10 @@ class CMakeModelDriver(BuildModelDriver):
     language = 'cmake'
     add_libraries = CMakeConfigure.add_libraries
     sourcedir_as_sourcefile = True
-    # isolate_library_flags = True
-    # use_env_vars = False
-    isolate_library_flags = False
-    use_env_vars = True
+    isolate_library_flags = True
+    use_env_vars = False
+    # isolate_library_flags = False
+    # use_env_vars = True
 
     def parse_arguments(self, args, **kwargs):
         r"""Sort arguments based on their syntax to determine if an argument

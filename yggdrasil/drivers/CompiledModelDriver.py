@@ -47,7 +47,21 @@ def get_compatible_tool(tool, tooltype, language, default=False):
 
     """
     if isinstance(tool, str):
-        tool = get_compilation_tool(tooltype, tool)
+        out = get_compilation_tool(tooltype, tool, default=None)
+        if out is None:
+            for k in ['compiler', 'linker', 'archiver']:
+                if k == tooltype:
+                    continue
+                out = get_compilation_tool(k, tool, default=None)
+                if out is not None:
+                    break
+        if out is None:
+            if default is not False:
+                return default
+            raise ValueError(("Could not locate %s for %s language "
+                              "associated with a tool named %s")
+                             % (tooltype, language, tool))
+        tool = out
     if isinstance(tool, bool):
         return tool
     if (tool.tooltype == tooltype) and (language in tool.languages):
@@ -2279,7 +2293,7 @@ class CompiledModelDriver(ModelDriver):
     @staticmethod
     def get_tool_static(cls, tooltype, toolname=None,
                         return_prop='tool', default=False,
-                        language=None, compiler_toolname=None):
+                        language=None):
         r"""Get the class associated with the specified compilation tool for
         this language.
 
