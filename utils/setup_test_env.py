@@ -767,8 +767,9 @@ def install_deps(method, return_commands=False, verbose=False,
                 cmds += ["brew reinstall gcc"]
                 pkgs['brew'].remove('gcc')
             if 'valgrind' in pkgs['brew']:
-                cmds += ["brew tap LouisBrunner/valgrind",
-                         "brew install --HEAD LouisBrunner/valgrind/valgrind"]
+                # There seems to be a bug with this installation on GHA
+                # cmds += ["brew tap LouisBrunner/valgrind",
+                #          "brew install --HEAD LouisBrunner/valgrind/valgrind"]
                 pkgs['brew'].remove('valgrind')
             pkgs_from_src = []
             if _on_travis:
