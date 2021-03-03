@@ -115,7 +115,8 @@ def get_compilation_tool_registry(tooltype):
     return reg
 
 
-def find_compilation_tool(tooltype, language, allow_failure=False):
+def find_compilation_tool(tooltype, language, allow_failure=False,
+                          dont_check_installation=False):
     r"""Return the prioritized class for a compilation tool of a certain type
     that can handle the specified language.
 
@@ -125,6 +126,9 @@ def find_compilation_tool(tooltype, language, allow_failure=False):
         allow_failure (bool, optional): If True and a tool cannot be located,
             None will be returned. Otherwise, an error will be raised if a tool
             cannot be located. Defaults to False.
+        dont_check_installation (bool, optional): If True, the first tool
+            in the registry will be returned even if it is not installed.
+            Defaults to False.
 
     Returns:
         str: Name of the determined tool type.
@@ -137,8 +141,10 @@ def find_compilation_tool(tooltype, language, allow_failure=False):
     out = None
     reg = get_compilation_tool_registry(tooltype).get('by_language', {})
     for kname, v in reg.get(language, {}).items():
-        if (platform._platform in v.platforms) and v.is_installed():
+        if ((dont_check_installation
+             or ((platform._platform in v.platforms) and v.is_installed()))):
             out = kname
+            break
     if (out is None) and (not allow_failure):
         raise RuntimeError("Could not locate a %s tool." % tooltype)
     return out

@@ -10,7 +10,7 @@ class FunctionModelDriver(InterpretedModelDriver):
     Attributes:
 
     """
-
+    executable_type = 'other'
     language = 'function'
     full_language = False
     base_languages = ['python']

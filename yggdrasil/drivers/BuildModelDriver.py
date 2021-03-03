@@ -130,6 +130,7 @@ class BuildModelDriver(CompiledModelDriver):
         'env_compiler_flags': {'type': 'string'},
         'env_linker': {'type': 'string'},
         'env_linker_flags': {'type': 'string'}}
+    executable_type = 'build'
     base_languages = ['c']
     built_where_called = False
     sourcedir_as_sourcefile = False
@@ -314,7 +315,8 @@ class BuildModelDriver(CompiledModelDriver):
                                  target_language='c',
                                  target_compiler=None, target_compiler_flags=None,
                                  target_linker=None, target_linker_flags=None,
-                                 logging_level=None, compiler_flag_kwargs=None,
+                                 logging_level=None, without_wrapper=False,
+                                 compiler_flag_kwargs=None,
                                  linker_flag_kwargs=None, **kwargs):
         r"""Get a dictionary of information about language compilation tools.
 
@@ -338,6 +340,9 @@ class BuildModelDriver(CompiledModelDriver):
             logging_level (int, optional): The numeric logging level that
                 should be passed as a definition. Defaults to None and is
                 ignored.
+            without_wrapper (bool, optional): If True, the returned info
+                will be updated for compilation when a build wrapper was
+                not created. Defaults to False.
             compiler_flag_kwargs (dict, optional): Keyword arguments to pass
                 to the get_compiler_flags method. Defaults to None.
             linker_flag_kwargs (dict, optional): Keyword arguments to pass
@@ -364,6 +369,7 @@ class BuildModelDriver(CompiledModelDriver):
         if linker_flag_kwargs is None:
             linker_flag_kwargs = {}
         out = {
+            'driver': target_language_driver,
             'compiler': compiler,
             'compiler_executable': compiler.get_executable(),
             'compiler_env': compiler.default_executable_env,
@@ -372,8 +378,8 @@ class BuildModelDriver(CompiledModelDriver):
             'linker_executable': linker.get_executable(),
             'linker_env': linker.default_executable_env,
             'linker_flags_env': linker.default_flags_env,
+            'env': {},
         }
-        
         if ((out['compiler_flags_env']
              and (not isinstance(out['compiler_flags_env'], list)))):
             out['compiler_flags_env'] = [out['compiler_flags_env']]
@@ -493,7 +499,8 @@ class BuildModelDriver(CompiledModelDriver):
             if not (('target_language_driver' in kws) or ('target_language' in kws)):
                 if src:
                     kws['target_language'] = cls.get_language_for_source(src)
-            language_info = cls.get_target_language_info(**kws)
+            language_info = cls.get_target_language_info(
+                without_wrapper=True, **kws)
             kwargs['env'] = cls.set_env_compiler(language_info=language_info)
         return super(BuildModelDriver, cls).call_compiler(src, **kwargs)
         
@@ -540,6 +547,7 @@ class BuildModelDriver(CompiledModelDriver):
             print("ENV LINKER FLAGS",
                   language_info['linker_flags_env'],
                   [out.get(x, None) for x in language_info['linker_flags_env']])
+        out.update(language_info['env'])
         return out
     
     def set_env(self, **kwargs):

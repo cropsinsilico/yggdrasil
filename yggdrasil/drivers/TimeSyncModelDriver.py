@@ -99,6 +99,7 @@ class TimeSyncModelDriver(DSLModelDriver):
                                      'items': {'type': 'string'}},
             'default': {}}}
     language = 'timesync'
+    executable_type = 'other'
 
     def __init__(self, name, *args, **kwargs):
         super(TimeSyncModelDriver, self).__init__(name, *args, **kwargs)

@@ -2,7 +2,7 @@ import os
 import copy
 from yggdrasil import platform
 from yggdrasil.drivers.CModelDriver import (
-    CCompilerBase, CModelDriver, GCCCompiler, ClangCompiler,
+    CCompilerBase, CModelDriver, GCCCompiler, ClangCompiler, MSVCCompiler,
     ClangLinker)
 
 
@@ -90,6 +90,12 @@ class ClangPPCompiler(CPPCompilerBase, ClangCompiler):
                     kwargs['skip_standard_flag'] = True
                     break
         return super(ClangPPCompiler, cls).get_executable_command(args, **kwargs)
+
+
+class MSVCPPCompiler(CPPCompilerBase, MSVCCompiler):
+    r"""Inteface class for MSVC compiler when compiling C++."""
+    toolname = 'cl++'
+    default_executable = MSVCCompiler.default_executable
 
 
 class ClangPPLinker(ClangLinker):

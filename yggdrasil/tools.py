@@ -671,13 +671,12 @@ def get_supported_lang():
         list: The names of programming languages supported by yggdrasil.
     
     """
-    from yggdrasil import schema
-    s = schema.get_schema()
-    out = s['model'].subtypes
+    # from yggdrasil import schema
+    # s = schema.get_schema()
+    # out = s['model'].subtypes
+    out = constants.LANGUAGES['all'].copy()
     if 'c++' in out:
         out[out.index('c++')] = 'cpp'
-    # if 'R' in out:
-    #     out[out.index('R')] = 'r'
     if 'r' in out:
         out[out.index('r')] = 'R'
     return list(set(out))

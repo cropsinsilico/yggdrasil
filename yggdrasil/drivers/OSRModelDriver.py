@@ -48,6 +48,7 @@ class OSRModelDriver(ExecutableModelDriver):
         'update_interval': {'type': 'object',
                             'additionalProperties': {'type': 'float'},
                             'default': {'timesync': 1.0}}}
+    executable_type = 'dsl'
     language = 'osr'
     language_ext = '.xml'
     base_languages = ['cpp']

@@ -10,7 +10,7 @@ class LPyModelDriver(PythonModelDriver):  # pragma: lpy
     r"""Class for running LPy models."""
 
     _schema_subtype_description = ('Model is an LPy system.')
-    
+    executable_type = 'dsl'
     language = 'lpy'
     language_ext = '.lpy'
     # base_languages = ['python']  # Uncomment if PythonModelDriver not parent

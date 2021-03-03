@@ -1007,14 +1007,21 @@ class regen_schema(SubCommand):
 
     name = "schema"
     help = "Regenerate the yggdrasil schema."
+    arguments = [
+        (('--only-constants', ),
+         {'action': 'store_true',
+          'help': ('Only update the constants.py file without updating '
+                   'the schema.')})]
 
     @classmethod
     def func(cls, args):
         from yggdrasil import schema
-        if os.path.isfile(schema._schema_fname):
-            os.remove(schema._schema_fname)
-        schema.clear_schema()
-        schema.init_schema()
+        if not args.only_constants:
+            if os.path.isfile(schema._schema_fname):
+                os.remove(schema._schema_fname)
+            schema.clear_schema()
+            schema.init_schema()
+        schema.update_constants()
 
 
 class yggmodelform(SubCommand):

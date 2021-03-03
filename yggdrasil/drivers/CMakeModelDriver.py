@@ -5,7 +5,7 @@ import shutil
 import logging
 import sysconfig
 from collections import OrderedDict
-from yggdrasil import platform
+from yggdrasil import platform, constants
 from yggdrasil.drivers.CompiledModelDriver import (
     LinkerBase, get_compilation_tool, get_compatible_tool)
 from yggdrasil.drivers.BuildModelDriver import (
@@ -264,6 +264,8 @@ class CMakeConfigure(BuildToolBase):
                                                              cls.default_builddir))
                 else:
                     builddir = outfile
+        kwargs.setdefault('definitions', [])
+        kwargs['definitions'].append('CMAKE_VERBOSE_MAKEFILE:BOOL=ON')
         if CModelDriver._osx_sysroot is not None:
             kwargs.setdefault('definitions', [])
             kwargs['definitions'].append(
@@ -292,24 +294,24 @@ class CMakeConfigure(BuildToolBase):
                  and (not generator.endswith(('Win64', 'ARM')))
                  and platform._is_64bit)):
                 out.append('-DCMAKE_GENERATOR_PLATFORM=x64')
-        if target_compiler is not None:
-            compiler = get_compilation_tool('compiler', target_compiler)
-            cmake_vars = {'c_compiler': 'CMAKE_C_COMPILER',
-                          'c_flags': 'CMAKE_C_FLAGS',
-                          'c++_compiler': 'CMAKE_CXX_COMPILER',
-                          'c++_flags': 'CMAKE_CXX_FLAGS',
-                          'fortran_compiler': 'CMAKE_Fortran_COMPILER',
-                          'fortran_flags': 'CMAKE_Fortran_FLAGS'}
-            for k in ['c', 'c++', 'fortran']:
-                try:
-                    itool = get_compatible_tool(compiler, 'compiler', k)
-                except ValueError:
-                    continue
-                if itool.default_executable_env is None:
-                    out.append('-D%s=%s' % (cmake_vars['%s_compiler' % k],
-                                            itool.toolname))
-                if itool.default_flags_env is None:
-                    out.append('-D%s=%s' % (cmake_vars['%s_flags' % k], ''))
+        # if target_compiler is not None:
+        #     compiler = get_compilation_tool('compiler', target_compiler)
+        #     cmake_vars = {'c_compiler': 'CMAKE_C_COMPILER',
+        #                   'c_flags': 'CMAKE_C_FLAGS',
+        #                   'c++_compiler': 'CMAKE_CXX_COMPILER',
+        #                   'c++_flags': 'CMAKE_CXX_FLAGS',
+        #                   'fortran_compiler': 'CMAKE_Fortran_COMPILER',
+        #                   'fortran_flags': 'CMAKE_Fortran_FLAGS'}
+        #     for k in constants.LANGUAGES['compiled']:
+        #         try:
+        #             itool = get_compatible_tool(compiler, 'compiler', k)
+        #         except ValueError:
+        #             continue
+        #         if itool.default_executable_env is None:
+        #             out.append('-D%s=%s' % (cmake_vars['%s_compiler' % k],
+        #                                     itool.get_executable()))
+        #         if itool.default_flags_env is None:
+        #             out.append('-D%s=%s' % (cmake_vars['%s_flags' % k], ''))
         return out
 
     @classmethod
@@ -434,11 +436,11 @@ class CMakeConfigure(BuildToolBase):
         # preamble_lines.append('INCLUDE_DIRECTORIES(${PYTHON_INCLUDE_DIRS})')
         # lines.append('TARGET_LINK_LIBRARIES(%s ${PYTHON_LIBRARIES})'
         #              % target)
-        python_flags = sysconfig.get_config_var('LIBS')
-        if python_flags:
-            for x in python_flags.split():
-                if x.startswith(('-L', '-l')) and (x not in linker_flags):
-                    linker_flags.append(x)
+        # python_flags = sysconfig.get_config_var('LIBS')
+        # if python_flags:
+        #     for x in python_flags.split():
+        #         if x.startswith(('-L', '-l')) and (x not in linker_flags):
+        #             linker_flags.append(x)
         # Compilation flags
         for x in compiler_flags:
             if x.startswith('-D'):
@@ -522,9 +524,9 @@ class CMakeConfigure(BuildToolBase):
         # clobbers the default paths.
         # https://stackoverflow.com/questions/54068035/linking-not-working-in
         # -homebrews-cmake-since-mojave
-        if platform._is_mac:
-            pretarget_lines.append('LINK_DIRECTORIES(/usr/lib)')
-            pretarget_lines.append('LINK_DIRECTORIES(/usr/local/lib)')
+        # if platform._is_mac:
+        #     pretarget_lines.append('LINK_DIRECTORIES(/usr/lib)')
+        #     pretarget_lines.append('LINK_DIRECTORIES(/usr/local/lib)')
         lines = preamble_lines + lines
         log_msg = (
             'CMake compiler flags:\n\t%s\n'
@@ -739,7 +741,7 @@ class CMakeModelDriver(BuildModelDriver):
     language = 'cmake'
     add_libraries = CMakeConfigure.add_libraries
     sourcedir_as_sourcefile = True
-    use_env_vars = True  # False
+    use_env_vars = False
 
     def parse_arguments(self, args, **kwargs):
         r"""Sort arguments based on their syntax to determine if an argument
@@ -796,8 +798,7 @@ class CMakeModelDriver(BuildModelDriver):
                    linker=self.target_language_info['linker'],
                    configuration=self.configuration,
                    verbose=kwargs.get('verbose', False))
-        # if not self.use_env_vars:
-        if True:
+        if not self.use_env_vars:
             kws.update(
                 compiler_flags=self.target_language_info['compiler_flags'],
                 linker_flags=self.target_language_info['linker_flags'],
@@ -901,7 +902,8 @@ class CMakeModelDriver(BuildModelDriver):
 
     @classmethod
     def get_target_language_info(cls, compiler_flag_kwargs=None,
-                                 linker_flag_kwargs=None, **kwargs):
+                                 linker_flag_kwargs=None,
+                                 without_wrapper=False, **kwargs):
         r"""Get a dictionary of information about language compilation tools.
 
         Args:
@@ -921,32 +923,65 @@ class CMakeModelDriver(BuildModelDriver):
         if linker_flag_kwargs is None:
             linker_flag_kwargs = {}
         compiler_flag_kwargs.setdefault('skip_sysroot', True)
-        compiler_flag_kwargs.setdefault('use_library_path', True)
         compiler_flag_kwargs.setdefault('dont_skip_env_defaults', False)
-        linker_flag_kwargs.setdefault('library_flags', [])
-        linker_flag_kwargs.setdefault('use_library_path',
-                                      'external_library_flags')
-        linker_flag_kwargs.setdefault(
-            linker_flag_kwargs['use_library_path'], [])
-        external_library_flags = linker_flag_kwargs[
-            linker_flag_kwargs['use_library_path']]
-        linker_flag_kwargs.setdefault('use_library_path_internal',
-                                      'internal_library_flags')
-        linker_flag_kwargs.setdefault(
-            linker_flag_kwargs['use_library_path_internal'], [])
-        internal_library_flags = linker_flag_kwargs[
-            linker_flag_kwargs['use_library_path_internal']]
-        linker_flag_kwargs.setdefault('skip_library_libs', True)
         linker_flag_kwargs.setdefault('dont_skip_env_defaults', False)
+        if not (cls.use_env_vars or without_wrapper):
+            compiler_flag_kwargs.setdefault('use_library_path', True)
+            linker_flag_kwargs.setdefault('library_flags', [])
+            linker_flag_kwargs.setdefault('use_library_path',
+                                          'external_library_flags')
+            linker_flag_kwargs.setdefault(
+                linker_flag_kwargs['use_library_path'], [])
+            external_library_flags = linker_flag_kwargs[
+                linker_flag_kwargs['use_library_path']]
+            linker_flag_kwargs.setdefault('use_library_path_internal',
+                                          'internal_library_flags')
+            linker_flag_kwargs.setdefault(
+                linker_flag_kwargs['use_library_path_internal'], [])
+            internal_library_flags = linker_flag_kwargs[
+                linker_flag_kwargs['use_library_path_internal']]
+            linker_flag_kwargs.setdefault('skip_library_libs', True)
         out = super(CMakeModelDriver, cls).get_target_language_info(
             compiler_flag_kwargs=compiler_flag_kwargs,
-            linker_flag_kwargs=linker_flag_kwargs, **kwargs)
-        out.update(
-            library_flags=(linker_flag_kwargs['library_flags']
-                           + external_library_flags
-                           + internal_library_flags),
-            external_library_flags=external_library_flags,
-            internal_library_flags=internal_library_flags)
+            linker_flag_kwargs=linker_flag_kwargs,
+            without_wrapper=without_wrapper, **kwargs)
+        if not (cls.use_env_vars or without_wrapper):
+            out.update(
+                library_flags=(linker_flag_kwargs['library_flags']
+                               + external_library_flags
+                               + internal_library_flags),
+                external_library_flags=external_library_flags,
+                internal_library_flags=internal_library_flags)
+        python_flags = sysconfig.get_config_var('LIBS')
+        if python_flags:
+            for x in python_flags.split():
+                if x.startswith(('-L', '-l')) and (x not in out['linker_flags']):
+                    out['linker_flags'].append(x)
+        # Link local lib on MacOS because on Mac >=10.14 setting sysroot
+        # clobbers the default paths.
+        # https://stackoverflow.com/questions/54068035/linking-not-working-in
+        # -homebrews-cmake-since-mojave
+        if platform._is_mac:
+            out['linker_flags'] += ['-L/usr/lib', '-L/usr/local/lib']
+        for k in constants.LANGUAGES['compiled']:
+            if k == out['driver'].language:
+                continue
+            try:
+                itool = get_compatible_tool(out['compiler'], 'compiler', k)
+            except ValueError:
+                continue
+            if itool.default_executable_env:
+                out['env'][itool.default_executable_env] = itool.get_executable()
+            if itool.default_flags_env:
+                # TODO: Getting the flags is slower, but may be necessary
+                # for projects that include more than one language. In
+                # such cases it may be necessary to allow multiple values
+                # for target_language or to add flags for all compiled
+                # languages.
+                # drv = import_component('model', k)
+                # out['env'][itool.default_flags_env] = drv.get_compiler_flags(
+                #     toolname=itool.toolname, **compiler_flag_kwargs)
+                out['env'][itool.default_flags_env] = ''
         return out
         
     def compile_model(self, target=None, **kwargs):
