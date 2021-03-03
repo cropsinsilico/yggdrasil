@@ -3572,7 +3572,7 @@ class CompiledModelDriver(ModelDriver):
             kwargs.setdefault(k, v)
         if os.path.isfile(kwargs['out']) and (not kwargs['overwrite']):
             self.debug("Result already exists: %s", kwargs['out'])
-            return
+            return kwargs['out']
         if 'env' not in kwargs:
             kwargs['env'] = self.set_env(for_compile=True,
                                          toolname=kwargs['toolname'])

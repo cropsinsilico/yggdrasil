@@ -373,6 +373,13 @@ class BuildModelDriver(CompiledModelDriver):
             'linker_env': linker.default_executable_env,
             'linker_flags_env': linker.default_flags_env,
         }
+        
+        if ((out['compiler_flags_env']
+             and (not isinstance(out['compiler_flags_env'], list)))):
+            out['compiler_flags_env'] = [out['compiler_flags_env']]
+        if ((out['linker_flags_env']
+             and (not isinstance(out['linker_flags_env'], list)))):
+            out['linker_flags_env'] = [out['linker_flags_env']]
         default_compiler_kws = dict(
             toolname=compiler.toolname, skip_defaults=True,
             flags=target_compiler_flags,
@@ -513,24 +520,26 @@ class BuildModelDriver(CompiledModelDriver):
             out[language_info['linker_env']] = language_info['linker_executable']
         if cls.use_env_vars:
             if language_info['compiler_flags_env']:
-                out[language_info['compiler_flags_env']] = ' '.join(
-                    language_info['compiler_flags'])
+                for x in language_info['compiler_flags_env']:
+                    out[x] = ' '.join(language_info['compiler_flags'])
             if language_info['linker_flags_env']:
-                out[language_info['linker_flags_env']] = ' '.join(
-                    language_info['linker_flags'])
+                for x in language_info['linker_flags_env']:
+                    out[x] = ' '.join(language_info['linker_flags'])
         else:
             if language_info['compiler_flags_env']:
-                out.pop(language_info['compiler_flags_env'], None)
+                for x in language_info['compiler_flags_env']:
+                    out.pop(x, None)
             if language_info['linker_flags_env']:
-                out.pop(language_info['linker_flags_env'], None)
+                for x in language_info['linker_flags_env']:
+                    out.pop(x, None)
         if language_info['compiler_flags_env']:
             print("ENV COMPILER FLAGS",
                   language_info['compiler_flags_env'],
-                  out.get(language_info['compiler_flags_env'], None))
+                  [out.get(x, None) for x in language_info['compiler_flags_env']])
         if language_info['linker_flags_env']:
             print("ENV LINKER FLAGS",
                   language_info['linker_flags_env'],
-                  out.get(language_info['linker_flags_env'], None))
+                  [out.get(x, None) for x in language_info['linker_flags_env']])
         return out
     
     def set_env(self, **kwargs):
