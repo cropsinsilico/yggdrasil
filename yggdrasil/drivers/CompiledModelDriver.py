@@ -3570,7 +3570,8 @@ class CompiledModelDriver(ModelDriver):
             default_kwargs.update(linker_flags=self.linker_flags)
         for k, v in default_kwargs.items():
             kwargs.setdefault(k, v)
-        if os.path.isfile(kwargs['out']) and (not kwargs['overwrite']):
+        if ((isinstance(kwargs['out'], str) and os.path.isfile(kwargs['out'])
+             and (not kwargs['overwrite']))):
             self.debug("Result already exists: %s", kwargs['out'])
             return kwargs['out']
         if 'env' not in kwargs:

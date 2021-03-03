@@ -190,10 +190,10 @@ class TestCMakeModelDriverNoStart(TestCMakeModelParam,
                                       working_dir=self.instance.working_dir,
                                       dont_build=True)
         out = self.instance.model_file
-        if platform._is_win:
-            out = os.path.join(os.path.dirname(out),
-                               'Debug',
-                               os.path.basename(out))
+        # if platform._is_win:
+        #     out = os.path.join(os.path.dirname(out),
+        #                        'Debug',
+        #                        os.path.basename(out))
         self.import_cls.call_compiler(self.instance.source_files,
                                       out=out,
                                       builddir='build',
