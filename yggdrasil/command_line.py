@@ -409,6 +409,14 @@ class ygginfo(SubCommand):
                     vardict.append(
                         (curr_prefix + "Language Installed",
                          drv.is_language_installed()))
+                    if (((drv.executable_type == 'compiler')
+                         and (not drv.is_build_tool))):
+                        curr_prefix += prefix
+                        vardict += [
+                            (curr_prefix + "%s Installed" % x.title(),
+                             drv.is_tool_installed(x))
+                            for x in ['compiler', 'linker', 'archiver']]
+                        curr_prefix = curr_prefix.rsplit(prefix, 1)[0]
                     vardict.append(
                         (curr_prefix + "Base Languages Installed",
                          drv.are_base_languages_installed()))

@@ -3232,6 +3232,23 @@ class CompiledModelDriver(ModelDriver):
                 break
             out = cls.is_library_installed(k)
         return out
+
+    @classmethod
+    def is_tool_installed(cls, tooltype):
+        r"""Determine if a compilation tool of a certain is installed for
+        this language.
+
+        Args:
+            tooltype (str): Type of tool to check for. Supported values include
+                'compiler', 'linker', & 'archiver'.
+
+        Returns:
+            bool: True if a tool of the specified type is installed.
+
+        """
+        if cls.is_build_tool and (tooltype != 'compiler'):
+            return True
+        return (cls.get_tool(tooltype, default=None) is not None)
             
     @classmethod
     def is_language_installed(cls):
@@ -3244,11 +3261,9 @@ class CompiledModelDriver(ModelDriver):
         """
         out = super(CompiledModelDriver, cls).is_language_installed()
         for k in ['compiler', 'archiver', 'linker']:
-            if cls.is_build_tool and (k != 'compiler'):
-                continue
             if not out:  # pragma: no cover
                 break
-            out = (cls.get_tool(k, default=None) is not None)
+            out = cls.is_tool_installed(k)
         return out
 
     @classmethod
