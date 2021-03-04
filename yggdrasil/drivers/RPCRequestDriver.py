@@ -214,6 +214,7 @@ class RPCRequestDriver(ConnectionDriver):
         with self.lock:
             remove_idx = []
             for i, x in enumerate(self.response_drivers):
+                self.errors += x.errors
                 if (((not x.is_alive())
                      and x.icomm.is_confirmed_recv
                      and x.ocomm.is_confirmed_send)):

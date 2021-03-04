@@ -1196,7 +1196,7 @@ class ModelDriver(Driver):
         env['YGG_SUBPROCESS'] = "True"
         env['YGG_MODEL_INDEX'] = str(self.model_index)
         env['YGG_MODEL_LANGUAGE'] = self.language
-        if self.copies:
+        if self.copies > 1:
             env['YGG_MODEL_NAME'] = self.name.split('_copy')[0]
         else:
             env['YGG_MODEL_NAME'] = self.name
@@ -1204,7 +1204,7 @@ class ModelDriver(Driver):
         env['YGG_PYTHON_EXEC'] = sys.executable
         env['YGG_DEFAULT_COMM'] = tools.get_default_comm()
         env['YGG_NCLIENTS'] = str(len(self.clients))
-        if self.allow_threading or self.copies:
+        if self.allow_threading or (self.copies > 1):
             env['YGG_THREADING'] = '1'
         if isinstance(self.is_server, dict):
             env['YGG_SERVER_INPUT'] = self.is_server['input']

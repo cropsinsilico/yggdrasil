@@ -222,6 +222,7 @@ class ZMQProxy(CommBase.CommServer):
                                        nretry=nretry,
                                        retry_timeout=retry_timeout)
         self.cli_socket.setsockopt(zmq.LINGER, 0)
+        self.nsignon = 0
         ZMQComm.register_comm('ROUTER_server_' + self.cli_address,
                               self.cli_socket)
         # Bind backend
@@ -258,13 +259,15 @@ class ZMQProxy(CommBase.CommServer):
                 return self.backlog.pop(0)
             msg = self.cli_socket.recv_multipart()
             if msg[1].startswith(self.server_signon_msg):
-                self.debug("A server has signed on, activating proxy.")
+                self.debug(("A server has signed on after %d attempts, "
+                            "activating proxy.") % self.nsignon)
                 self.server_active = True
                 return None
             if msg[1].startswith(self.server_signoff_msg):
                 self.sleep(1.0)
                 return None
             if not self.server_active:
+                self.debug("Backlogging message")
                 self.backlog.append(msg)
                 return None
             return msg
@@ -301,6 +304,7 @@ class ZMQProxy(CommBase.CommServer):
                            len(message[1]), message[0])
                 self.server_send(message[1])
         if (not self.server_active):
+            self.nsignon += 1
             self.server_send(self.server_signon_msg + self.cli_address.encode('utf-8'))
             self.sleep()
 
@@ -407,17 +411,27 @@ class ZMQComm(CommBase.CommBase):
             socket_type = 'DEALER'
             socket_action = 'connect'
             self.direction = 'send'
-        if self.is_server:
+        elif self.is_server:
             socket_type = 'DEALER'
             socket_action = 'connect'
             self.direction = 'recv'
+        elif self.is_response_client and (self.direction == 'recv'):
+            socket_type = 'ROUTER'
+            socket_action = 'bind'
+        elif self.is_response_client and (self.direction == 'send'):
+            # The would be the RPCResponseDriver output comm that
+            # partners with the ClientComm response comm that is set
+            # to use a ROUTER socket type as defined above
+            socket_type = 'DEALER'
+            socket_action = 'connect'
         # Set defaults
         if socket_type is None:
             if self.direction == 'recv':
                 socket_type = _socket_recv_types[_default_socket_type]
             elif self.direction == 'send':
                 socket_type = _socket_send_types[_default_socket_type]
-        if not (self.allow_multiple_comms or self.is_client or self.is_server):
+        if not (self.allow_multiple_comms or self.is_client or self.is_server
+                or self.is_response_client):
             if socket_type in ['PULL', 'SUB', 'REP', 'DEALER']:
                 self.direction = 'recv'
             elif socket_type in ['PUSH', 'PUB', 'REQ', 'ROUTER']:
