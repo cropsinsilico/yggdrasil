@@ -2148,10 +2148,11 @@ class CompiledModelDriver(ModelDriver):
                                                     default=None)
                 if (((default_tool is None)
                      or (not default_tool.is_installed()))):  # pragma: debug
-                    if not tools.is_subprocess():
-                        logger.debug(('Default %s for %s (%s) not installed. '
-                                      'Attempting to locate an alternative .')
-                                     % (k, cls.language, default_tool_name))
+                    # if not tools.is_subprocess():
+                    # DEBUG HERE
+                    logger.info(('Default %s for %s (%s) not installed. '
+                                 'Attempting to locate an alternative .')
+                                % (k, cls.language, default_tool_name))
                     setattr(cls, 'default_%s' % k, None)
 
     def parse_arguments(self, args, **kwargs):
@@ -2350,6 +2351,9 @@ class CompiledModelDriver(ModelDriver):
                 toolname = getattr(cls, tooltype, None)
             if toolname is None:
                 toolname = getattr(cls, 'default_%s' % tooltype, None)
+            if toolname is None:
+                toolname = find_compilation_tool(tooltype, cls.language,
+                                                 allow_failure=True)
             if toolname is None:
                 if default is False:
                     raise NotImplementedError("%s not set for language '%s'."
