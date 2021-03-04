@@ -648,7 +648,8 @@ class CompilationToolBase(object):
         """
         exec_path = shutil.which(cls.get_executable())
         if (cls.toolname == 'clang'):
-            logger.info("CLANG INSTALLED?", cls.get_executable(), exec_path)
+            logger.info("CLANG INSTALLED?: %s, %s",
+                        cls.get_executable(), exec_path)
         return (exec_path is not None)
 
     @classmethod

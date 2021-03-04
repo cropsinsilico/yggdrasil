@@ -314,7 +314,8 @@ class CMakeConfigure(BuildToolBase):
                     out.append('-D%s:FILEPATH=%s' % (
                         cmake_vars['%s_compiler' % k],
                         cls.fix_path(
-                            itool.get_executable(full_path=True), is_gnu=True)))
+                            itool.get_executable(full_path=True),
+                            is_gnu=False, for_path=True)))
                     # if itool.default_flags_env is None:
                     out.append('-D%s=%s' % (
                         cmake_vars['%s_flags' % k], ''))
@@ -352,16 +353,19 @@ class CMakeConfigure(BuildToolBase):
         return super(CMakeConfigure, cls).get_executable_command(new_args, **kwargs)
     
     @classmethod
-    def fix_path(cls, x, is_gnu=False):
+    def fix_path(cls, x, is_gnu=False, for_path=False):
         r"""Fix paths so that they conform to the format expected by the OS
         and/or build tool."""
         if platform._is_win:  # pragma: windows
             if is_gnu:
-                for a, b in [('\\', '/'), (' ', '\\ '), ('(', '\\('),
-                             (')', '\\)')]:
-                    x = x.replace(a, b)
+                x = x.replace('\\', re.escape('/'))
             else:
                 x = x.replace('\\', re.escape('\\'))
+            if for_path:
+                pass
+                # for a, b in [('\\', '/'), (' ', '\\ '), ('(', '\\('),
+                #              (')', '\\)')]:
+                #     x = x.replace(a, b)
         return x
         
     @classmethod
@@ -1094,12 +1098,14 @@ class CMakeModelDriver(BuildModelDriver):
                 flags.
 
         """
+        is_gnu = False
         if platform._is_win and (kwargs.get('target_compiler', None)
                                  in ['gcc', 'g++', 'gfortran']):  # pragma: windows
             gcc = get_compilation_tool('compiler',
                                        kwargs['target_compiler'],
                                        None)
             if gcc:
+                is_gnu = True
                 path = cls.prune_sh_gcc(
                     kwargs['env']['PATH'],
                     gcc.get_executable(full_path=True))
@@ -1117,7 +1123,8 @@ class CMakeModelDriver(BuildModelDriver):
         out.setdefault('definitions', [])
         out['definitions'].append(
             'PYTHON_EXECUTABLE:FILEPATH=%s'
-            % CMakeConfigure.fix_path(sys.executable, is_gnu=True))
+            % CMakeConfigure.fix_path(sys.executable, is_gnu=is_gnu,
+                                      for_path=True))
         # if CModelDriver._osx_sysroot is not None:
         #     out.setdefault('definitions', [])
         #     out['definitions'].append(
