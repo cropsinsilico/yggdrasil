@@ -106,6 +106,7 @@ class DuplicatedModelDriver(Driver):
         
     @property
     def errors(self):
+        r"""list: Errors returned by model copies."""
         out = []
         for x in self.copies:
             out += x.errors
