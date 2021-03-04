@@ -118,7 +118,6 @@ class ClangPPLinker(ClangLinker):
     toolname = ClangPPCompiler.toolname
     languages = ClangPPCompiler.languages
     default_executable = ClangPPCompiler.default_executable
-    default_executable_env = ClangPPCompiler.default_executable_env
     toolset = ClangPPCompiler.toolset
 
 

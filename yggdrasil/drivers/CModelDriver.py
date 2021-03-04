@@ -373,7 +373,6 @@ class ClangLinker(LDLinker):
     languages = ClangCompiler.languages
     platforms = ClangCompiler.platforms
     default_executable = ClangCompiler.default_executable
-    default_executable_env = ClangCompiler.default_executable_env
     toolset = ClangCompiler.toolset
     search_path_flags = ['-Xlinker', '-v']
     search_regex = [r'\t([^\t\n]+)\n']
