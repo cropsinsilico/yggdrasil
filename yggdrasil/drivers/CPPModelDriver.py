@@ -96,6 +96,21 @@ class MSVCPPCompiler(CPPCompilerBase, MSVCCompiler):
     r"""Inteface class for MSVC compiler when compiling C++."""
     toolname = 'cl++'
     default_executable = MSVCCompiler.default_executable
+    
+    @classmethod
+    def get_flags(cls, **kwargs):
+        r"""Get a list of compiler flags.
+
+        Args:
+            **kwargs: Additional keyword arguments are passed to the parent
+                class's method.
+
+        Returns:
+            list: Compiler flags.
+
+        """
+        kwargs['skip_standard_flag'] = True
+        return super(MSVCPPCompiler, cls).get_flags(**kwargs)
 
 
 class ClangPPLinker(ClangLinker):
