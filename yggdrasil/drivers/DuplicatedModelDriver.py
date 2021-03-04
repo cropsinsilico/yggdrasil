@@ -30,10 +30,6 @@ class DuplicatedModelDriver(Driver):
             iyml['name'] = self.name_format % (yml['name'], i)
             # Update environment to reflect addition of suffix
             iyml['env'] = yml['env'].copy()
-            iyml['env']['YGG_MANY2MANY'] = '1'
-            for k, v in list(iyml['env'].items()):
-                if yml['name'] in k:
-                    iyml['env'][k.replace(yml['name'], iyml['name'])] = iyml['env'].pop(k)
             ikws.update(iyml)
             self.copies.append(create_driver(yml=iyml, **ikws))
         super(DuplicatedModelDriver, self).__init__(**kwargs)
@@ -100,6 +96,14 @@ class DuplicatedModelDriver(Driver):
             x.printStatus(*args, **kwargs)
         super(DuplicatedModelDriver, self).printStatus(*args, **kwargs)
 
+    @property
+    def io_errors(self):
+        r"""list: Errors produced by input/output drivers to this model."""
+        errors = []
+        for x in self.copies:
+            errors += x.io_errors
+        return errors
+        
     @property
     def errors(self):
         out = []
