@@ -188,7 +188,8 @@ def get_compilation_tool(tooltype, name, default=False):
             raise ValueError("Could not locate a %s tool with name '%s'"
                              % (tooltype, name))
         out = default
-    if isinstance(out, CompilationToolMeta) and (out.toolname != name):
+    if ((isinstance(out, CompilationToolMeta) and (out.toolname != name)
+         and (os.path.isfile(name) or shutil.which(name)))):
         out.executable = name
     return out
 

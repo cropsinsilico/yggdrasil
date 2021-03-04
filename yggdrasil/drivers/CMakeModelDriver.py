@@ -358,7 +358,7 @@ class CMakeConfigure(BuildToolBase):
         and/or build tool."""
         if platform._is_win:  # pragma: windows
             if for_path:
-                x = x.replace('\\', re.escape('/'))
+                x = x.replace('\\', '/')
                 # for a, b in [('\\', '/'), (' ', '\\ '), ('(', '\\('),
                 #              (')', '\\)')]:
                 #     x = x.replace(a, b)
