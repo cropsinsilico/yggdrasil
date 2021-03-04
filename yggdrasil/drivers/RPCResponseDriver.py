@@ -24,11 +24,12 @@ class RPCResponseDriver(ConnectionDriver):
         # Input communicator
         inputs = kwargs.get('inputs', [{}])
         inputs[0]['name'] = 'server_model_response.' + msg_id
-        inputs[0]['is_response_client'] = True
+        inputs[0]['is_response_server'] = True
         kwargs['inputs'] = inputs
         # Output communicator
         outputs = kwargs.get('outputs', [{}])
         outputs[0]['name'] = 'client_model_response.' + msg_id
+        outputs[0]['is_response_client'] = True
         if model_response_address is not None:
             outputs[0]['address'] = model_response_address
         kwargs['outputs'] = outputs

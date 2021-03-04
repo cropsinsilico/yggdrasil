@@ -619,6 +619,8 @@ def acquire_env(new_env):
         if not isinstance(v, str):
             v = json.dumps(v)
         os.environ[k_env] = v
+    if new_env.get('loglevel', False):
+        set_ygg_loglevel(new_env['loglevel'])
     return old_env
 
 

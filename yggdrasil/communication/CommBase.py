@@ -631,9 +631,6 @@ class CommBase(tools.YggClass):
                 'model', self.partner_language)
         self.language_driver = import_component('model', self.language)
         self.touches_model = (self.partner_model is not None)
-        self.allow_multiple_comms = allow_multiple_comms
-        if self.is_interface and (os.environ.get('YGG_THREADING', False)):
-            self.allow_multiple_comms = True
         self.is_client = is_client
         self.is_server = is_server
         self.is_async = is_async
@@ -657,6 +654,10 @@ class CommBase(tools.YggClass):
         self._server_class = CommServer
         self._server_kwargs = {}
         self._send_serializer = True
+        self.allow_multiple_comms = allow_multiple_comms
+        if ((self.is_interface and (os.environ.get('YGG_THREADING', False))
+             and (not self.single_use))):
+            self.allow_multiple_comms = True
         if self.single_use and (not self.is_response_server):
             self._send_serializer = False
         # Add interface tag
@@ -679,7 +680,8 @@ class CommBase(tools.YggClass):
             self._eof_sent.set()  # Don't send EOF, these are single use
         if self.is_interface:
             atexit.register(self.atexit)
-        if ((self.model_copies > 1) or (self.partner_copies > 1)):
+        if ((((self.model_copies > 1) or (self.partner_copies > 1))
+             and (not self.single_use))):
             self.allow_multiple_comms = True
         self._init_before_open(**kwargs)
         if dont_open:
