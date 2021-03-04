@@ -258,6 +258,7 @@ class ZMQProxy(CommBase.CommServer):
                 return self.backlog.pop(0)
             msg = self.cli_socket.recv_multipart()
             if msg[1].startswith(self.server_signon_msg):
+                self.debug("A server has signed on, activating proxy.")
                 self.server_active = True
                 return None
             if msg[1].startswith(self.server_signoff_msg):
@@ -466,6 +467,7 @@ class ZMQComm(CommBase.CommBase):
         self._server_kwargs = dict(zmq_context=self.context,
                                    nretry=4, retry_timeout=2.0 * self.sleeptime)
         self.cli_address = None
+        self.cli_socket = None
         super(ZMQComm, self)._init_before_open(**kwargs)
 
     def __getstate__(self):
@@ -697,6 +699,8 @@ class ZMQComm(CommBase.CommBase):
 
     def disconnect(self, dont_close=False):
         r"""Disconnect from address."""
+        if not hasattr(self, 'socket_lock'):
+            return
         with self.socket_lock:
             if self._connected:
                 self.debug('Disconnecting from %s' % self.address)
@@ -901,6 +905,10 @@ class ZMQComm(CommBase.CommBase):
             if back_messages:
                 self._send_client_msg(back_messages)
         super(ZMQComm, self)._close(linger=linger)
+        if self.cli_socket is not None:
+            self.cli_socket.disconnect(self.cli_address)
+            self.cli_socket.close()
+            self.cli_socket = None
 
     def server_exists(self, srv_address):
         r"""Determine if a server exists.
@@ -920,15 +928,16 @@ class ZMQComm(CommBase.CommBase):
 
     def _send_client_msg(self, msg):
         if self.cli_address is not None:
-            cli_socket = self.context.socket(zmq.DEALER)
-            cli_socket.connect(self.cli_address)
+            if self.cli_socket is None:
+                self.cli_socket = self.context.socket(zmq.DEALER)
+                self.cli_socket.connect(self.cli_address)
             if isinstance(msg, list):
                 for imsg in msg:
-                    cli_socket.send(imsg)
+                    self.cli_socket.send(imsg)
             else:
-                cli_socket.send(msg)
-            cli_socket.disconnect(self.cli_address)
-            cli_socket.close()
+                self.cli_socket.send(msg)
+            # cli_socket.disconnect(self.cli_address)
+            # cli_socket.close()
 
     @property
     def is_open(self):
