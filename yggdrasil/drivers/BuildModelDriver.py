@@ -136,7 +136,6 @@ class BuildModelDriver(CompiledModelDriver):
     sourcedir_as_sourcefile = False
     full_language = False
     is_build_tool = True
-    use_env_vars = True
 
     def __init__(self, *args, **kwargs):
         self.target_language_driver = None
@@ -525,20 +524,18 @@ class BuildModelDriver(CompiledModelDriver):
             out[language_info['compiler_env']] = language_info['compiler_executable']
         if language_info['linker_env'] and language_info['linker_executable']:
             out[language_info['linker_env']] = language_info['linker_executable']
-        if cls.use_env_vars:
-            if language_info['compiler_flags_env']:
-                for x in language_info['compiler_flags_env']:
-                    out[x] = ' '.join(language_info['compiler_flags'])
-            if language_info['linker_flags_env']:
-                for x in language_info['linker_flags_env']:
-                    out[x] = ' '.join(language_info['linker_flags'])
-        else:
-            if language_info['compiler_flags_env']:
-                for x in language_info['compiler_flags_env']:
-                    out.pop(x, None)
-            if language_info['linker_flags_env']:
-                for x in language_info['linker_flags_env']:
-                    out.pop(x, None)
+        if language_info['compiler_flags_env']:
+            for x in language_info['compiler_flags_env']:
+                out[x] = ' '.join(language_info['compiler_flags'])
+        if language_info['linker_flags_env']:
+            for x in language_info['linker_flags_env']:
+                out[x] = ' '.join(language_info['linker_flags'])
+        # if language_info['compiler_flags_env']:
+        #     for x in language_info['compiler_flags_env']:
+        #         out.pop(x, None)
+        # if language_info['linker_flags_env']:
+        #     for x in language_info['linker_flags_env']:
+        #         out.pop(x, None)
         if language_info['compiler_flags_env']:
             print("ENV COMPILER FLAGS",
                   language_info['compiler_flags_env'],

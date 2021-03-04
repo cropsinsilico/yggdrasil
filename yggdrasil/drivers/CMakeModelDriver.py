@@ -310,7 +310,7 @@ class CMakeConfigure(BuildToolBase):
                 if itool.toolname == 'cl':
                     # if itool.default_executable_env is None:
                     out.append('-D%s=%s' % (cmake_vars['%s_compiler' % k],
-                                            itool.get_executable()))
+                                            itool.get_executable(full_path=True)))
                     # if itool.default_flags_env is None:
                     out.append('-D%s=%s' % (cmake_vars['%s_flags' % k], ''))
         return out
@@ -978,6 +978,10 @@ class CMakeModelDriver(BuildModelDriver):
                                + internal_library_flags),
                 external_library_flags=external_library_flags,
                 internal_library_flags=internal_library_flags)
+        else:
+            out.update(
+                compiler_flags_env=None,
+                linker_flags_env=None)
         for k in constants.LANGUAGES['compiled']:
             if k == out['driver'].language:
                 continue
