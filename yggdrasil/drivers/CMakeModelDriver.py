@@ -309,10 +309,13 @@ class CMakeConfigure(BuildToolBase):
                     continue
                 if itool.toolname == 'cl':
                     # if itool.default_executable_env is None:
-                    out.append('-D%s=%s' % (cmake_vars['%s_compiler' % k],
-                                            itool.get_executable(full_path=True)))
+                    out.append('-D%s=%s' % (
+                        cmake_vars['%s_compiler' % k],
+                        CMakeModelDriver.fix_path(
+                            itool.get_executable(full_path=True), is_gnu=True)))
                     # if itool.default_flags_env is None:
-                    out.append('-D%s=%s' % (cmake_vars['%s_flags' % k], ''))
+                    out.append('-D%s=%s' % (
+                        cmake_vars['%s_flags' % k], ''))
         return out
 
     @classmethod
