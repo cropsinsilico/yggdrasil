@@ -1,11 +1,13 @@
 import os
 import re
 import sys
+import copy
 import shutil
 import logging
 import sysconfig
 from collections import OrderedDict
 from yggdrasil import platform, constants
+from yggdrasil.components import import_component
 from yggdrasil.drivers.CompiledModelDriver import (
     LinkerBase, get_compilation_tool, get_compatible_tool)
 from yggdrasil.drivers.BuildModelDriver import (
@@ -311,7 +313,7 @@ class CMakeConfigure(BuildToolBase):
                     # if itool.default_executable_env is None:
                     out.append('-D%s=%s' % (
                         cmake_vars['%s_compiler' % k],
-                        CMakeModelDriver.fix_path(
+                        cls.fix_path(
                             itool.get_executable(full_path=True), is_gnu=True)))
                     # if itool.default_flags_env is None:
                     out.append('-D%s=%s' % (
@@ -1000,10 +1002,14 @@ class CMakeModelDriver(BuildModelDriver):
                 # such cases it may be necessary to allow multiple values
                 # for target_language or to add flags for all compiled
                 # languages.
-                # drv = import_component('model', k)
-                # out['env'][itool.default_flags_env] = drv.get_compiler_flags(
-                #     toolname=itool.toolname, **compiler_flag_kwargs)
-                out['env'][itool.default_flags_env] = ''
+                drv_kws = copy.deepcopy(compiler_flag_kwargs)
+                drv_kws['toolname'] = itool.toolname
+                drv = import_component('model', k)
+                out['env'][itool.default_flags_env] = ' '.join(
+                    drv.get_compiler_flags(**drv_kws))
+                # out['env'][itool.default_flags_env] = ''
+        import pprint
+        pprint.pprint(out)
         return out
         
     def compile_model(self, target=None, **kwargs):
