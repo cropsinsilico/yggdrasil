@@ -309,7 +309,7 @@ class CMakeConfigure(BuildToolBase):
                     itool = get_compatible_tool(compiler, 'compiler', k)
                 except ValueError:
                     continue
-                if itool.toolname == 'cl':
+                if itool.toolname in ['cl', 'cl++']:
                     # if itool.default_executable_env is None:
                     out.append('-D%s=%s' % (
                         cmake_vars['%s_compiler' % k],
