@@ -311,7 +311,7 @@ class CMakeConfigure(BuildToolBase):
                     continue
                 if itool.toolname in ['cl', 'cl++']:
                     # if itool.default_executable_env is None:
-                    out.append('-D%s="%s"' % (
+                    out.append('-D"%s=%s"' % (
                         cmake_vars['%s_compiler' % k],
                         cls.fix_path(
                             itool.get_executable(full_path=True), is_gnu=True)))
@@ -358,7 +358,7 @@ class CMakeConfigure(BuildToolBase):
         if platform._is_win:  # pragma: windows
             if is_gnu:
                 x = x.replace('\\', '/')
-                x = x.replace(' ', '\\ ')
+                # x = x.replace(' ', '\\ ')
             else:
                 x = x.replace('\\', re.escape('\\'))
         return x
@@ -1114,7 +1114,7 @@ class CMakeModelDriver(BuildModelDriver):
         out = super(CMakeModelDriver, cls).update_compiler_kwargs(**kwargs)
         out.setdefault('definitions', [])
         out['definitions'].append(
-            'PYTHON_EXECUTABLE="%s"'
+            '"PYTHON_EXECUTABLE=%s"'
             % CMakeConfigure.fix_path(sys.executable, is_gnu=True))
         # if CModelDriver._osx_sysroot is not None:
         #     out.setdefault('definitions', [])
