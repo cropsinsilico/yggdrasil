@@ -2350,6 +2350,8 @@ class CompiledModelDriver(ModelDriver):
                 if default is False:
                     raise NotImplementedError("%s not set for language '%s'."
                                               % (tooltype.title(), cls.language))
+                logger.info("%s not set for language '%s'."
+                            % (tooltype.title(), cls.language))
                 return default
             if return_prop == 'name':
                 return toolname
@@ -2389,6 +2391,8 @@ class CompiledModelDriver(ModelDriver):
                     raise NotImplementedError(
                         "%s not set for language '%s' (toolname=%s)."
                         % (tooltype.title(), cls.language, toolname))
+                logger.info("%s not set for language '%s' (toolname=%s)."
+                            % (tooltype.title(), cls.language, toolname))
                 out = default
             if isinstance(out, type):
                 out = out(**kwargs)
