@@ -1196,7 +1196,10 @@ class ModelDriver(Driver):
         env['YGG_SUBPROCESS'] = "True"
         env['YGG_MODEL_INDEX'] = str(self.model_index)
         env['YGG_MODEL_LANGUAGE'] = self.language
-        env['YGG_MODEL_NAME'] = self.name
+        if self.copies:
+            env['YGG_MODEL_NAME'] = self.name.split('_copy')[0]
+        else:
+            env['YGG_MODEL_NAME'] = self.name
         env['YGG_MODEL_COPIES'] = str(self.copies)
         env['YGG_PYTHON_EXEC'] = sys.executable
         env['YGG_DEFAULT_COMM'] = tools.get_default_comm()
@@ -1319,6 +1322,7 @@ class ModelDriver(Driver):
 
     @property
     def io_errors(self):
+        r"""list: Errors produced by input/output drivers to this model."""
         errors = []
         for drv in self.yml.get('input_drivers', []):
             errors += drv['instance'].errors
