@@ -357,15 +357,15 @@ class CMakeConfigure(BuildToolBase):
         r"""Fix paths so that they conform to the format expected by the OS
         and/or build tool."""
         if platform._is_win:  # pragma: windows
-            if is_gnu:
-                x = x.replace('\\', re.escape('/'))
-            else:
-                x = x.replace('\\', re.escape('\\'))
             if for_path:
-                pass
+                x = x.replace('\\', re.escape('/'))
                 # for a, b in [('\\', '/'), (' ', '\\ '), ('(', '\\('),
                 #              (')', '\\)')]:
                 #     x = x.replace(a, b)
+            elif is_gnu:
+                x = x.replace('\\', re.escape('/'))
+            else:
+                x = x.replace('\\', re.escape('\\'))
         return x
         
     @classmethod
