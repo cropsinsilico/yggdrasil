@@ -294,24 +294,25 @@ class CMakeConfigure(BuildToolBase):
                  and (not generator.endswith(('Win64', 'ARM')))
                  and platform._is_64bit)):
                 out.append('-DCMAKE_GENERATOR_PLATFORM=x64')
-        # if target_compiler is not None:
-        #     compiler = get_compilation_tool('compiler', target_compiler)
-        #     cmake_vars = {'c_compiler': 'CMAKE_C_COMPILER',
-        #                   'c_flags': 'CMAKE_C_FLAGS',
-        #                   'c++_compiler': 'CMAKE_CXX_COMPILER',
-        #                   'c++_flags': 'CMAKE_CXX_FLAGS',
-        #                   'fortran_compiler': 'CMAKE_Fortran_COMPILER',
-        #                   'fortran_flags': 'CMAKE_Fortran_FLAGS'}
-        #     for k in constants.LANGUAGES['compiled']:
-        #         try:
-        #             itool = get_compatible_tool(compiler, 'compiler', k)
-        #         except ValueError:
-        #             continue
-        #         if itool.default_executable_env is None:
-        #             out.append('-D%s=%s' % (cmake_vars['%s_compiler' % k],
-        #                                     itool.get_executable()))
-        #         if itool.default_flags_env is None:
-        #             out.append('-D%s=%s' % (cmake_vars['%s_flags' % k], ''))
+        if target_compiler == 'cl':
+            compiler = get_compilation_tool('compiler', target_compiler)
+            cmake_vars = {'c_compiler': 'CMAKE_C_COMPILER',
+                          'c_flags': 'CMAKE_C_FLAGS',
+                          'c++_compiler': 'CMAKE_CXX_COMPILER',
+                          'c++_flags': 'CMAKE_CXX_FLAGS',
+                          'fortran_compiler': 'CMAKE_Fortran_COMPILER',
+                          'fortran_flags': 'CMAKE_Fortran_FLAGS'}
+            for k in constants.LANGUAGES['compiled']:
+                try:
+                    itool = get_compatible_tool(compiler, 'compiler', k)
+                except ValueError:
+                    continue
+                if itool.toolname == 'cl':
+                    # if itool.default_executable_env is None:
+                    out.append('-D%s=%s' % (cmake_vars['%s_compiler' % k],
+                                            itool.get_executable()))
+                    # if itool.default_flags_env is None:
+                    out.append('-D%s=%s' % (cmake_vars['%s_flags' % k], ''))
         return out
 
     @classmethod
@@ -901,12 +902,19 @@ class CMakeModelDriver(BuildModelDriver):
             target=target, **kwargs)
 
     @classmethod
-    def get_target_language_info(cls, compiler_flag_kwargs=None,
+    def get_target_language_info(cls, target_compiler_flags=None,
+                                 target_linker_flags=None,
+                                 compiler_flag_kwargs=None,
                                  linker_flag_kwargs=None,
                                  without_wrapper=False, **kwargs):
         r"""Get a dictionary of information about language compilation tools.
 
         Args:
+            target_compiler_flags (list, optional): Compilation flags that
+                should be passed to the target language compiler. Defaults
+                to [].
+            target_linker_flags (list, optional): Linking flags that should
+                be passed to the target language linker. Defaults to [].
             compiler_flag_kwargs (dict, optional): Keyword arguments to pass
                 to the get_compiler_flags method. Defaults to None.
             linker_flag_kwargs (dict, optional): Keyword arguments to pass
@@ -918,15 +926,20 @@ class CMakeModelDriver(BuildModelDriver):
             dict: Information about language compilers and linkers.
 
         """
+        if target_compiler_flags is None:
+            target_compiler_flags = []
+        if target_linker_flags is None:
+            target_linker_flags = []
         if compiler_flag_kwargs is None:
             compiler_flag_kwargs = {}
         if linker_flag_kwargs is None:
             linker_flag_kwargs = {}
-        compiler_flag_kwargs.setdefault('skip_sysroot', True)
-        compiler_flag_kwargs.setdefault('dont_skip_env_defaults', False)
-        linker_flag_kwargs.setdefault('dont_skip_env_defaults', False)
         if not (cls.use_env_vars or without_wrapper):
+            compiler_flag_kwargs.setdefault('dont_skip_env_defaults', False)
+            compiler_flag_kwargs.setdefault('skip_sysroot', True)
             compiler_flag_kwargs.setdefault('use_library_path', True)
+            linker_flag_kwargs.setdefault('dont_skip_env_defaults', False)
+            linker_flag_kwargs.setdefault('skip_library_libs', True)
             linker_flag_kwargs.setdefault('library_flags', [])
             linker_flag_kwargs.setdefault('use_library_path',
                                           'external_library_flags')
@@ -940,8 +953,21 @@ class CMakeModelDriver(BuildModelDriver):
                 linker_flag_kwargs['use_library_path_internal'], [])
             internal_library_flags = linker_flag_kwargs[
                 linker_flag_kwargs['use_library_path_internal']]
-            linker_flag_kwargs.setdefault('skip_library_libs', True)
+        # Add python flags
+        python_flags = sysconfig.get_config_var('LIBS')
+        if python_flags:
+            for x in python_flags.split():
+                if x.startswith(('-L', '-l')) and (x not in target_linker_flags):
+                    target_linker_flags.append(x)
+        # Link local lib on MacOS because on Mac >=10.14 setting sysroot
+        # clobbers the default paths.
+        # https://stackoverflow.com/questions/54068035/linking-not-working-in
+        # -homebrews-cmake-since-mojave
+        if platform._is_mac:
+            target_linker_flags += ['-L/usr/lib', '-L/usr/local/lib']
         out = super(CMakeModelDriver, cls).get_target_language_info(
+            target_compiler_flags=target_compiler_flags,
+            target_linker_flags=target_linker_flags,
             compiler_flag_kwargs=compiler_flag_kwargs,
             linker_flag_kwargs=linker_flag_kwargs,
             without_wrapper=without_wrapper, **kwargs)
@@ -952,17 +978,6 @@ class CMakeModelDriver(BuildModelDriver):
                                + internal_library_flags),
                 external_library_flags=external_library_flags,
                 internal_library_flags=internal_library_flags)
-        python_flags = sysconfig.get_config_var('LIBS')
-        if python_flags:
-            for x in python_flags.split():
-                if x.startswith(('-L', '-l')) and (x not in out['linker_flags']):
-                    out['linker_flags'].append(x)
-        # Link local lib on MacOS because on Mac >=10.14 setting sysroot
-        # clobbers the default paths.
-        # https://stackoverflow.com/questions/54068035/linking-not-working-in
-        # -homebrews-cmake-since-mojave
-        if platform._is_mac:
-            out['linker_flags'] += ['-L/usr/lib', '-L/usr/local/lib']
         for k in constants.LANGUAGES['compiled']:
             if k == out['driver'].language:
                 continue
