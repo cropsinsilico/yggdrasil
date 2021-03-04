@@ -33,7 +33,11 @@ public:
   YggInput(const std::string name) : _pi(yggInput(name.c_str())) {}
 
   /*! @brief Empty constructor for inheritance. */
-  YggInput(yggInput_t x) : _pi(x) {}
+  YggInput(yggInput_t x) : _pi(x) {
+    if (!(_pi->valid)) {
+      throw "Error initializing the comm";
+    }
+  }
 
   /*!
     @brief Constructor for YggInput with format.
@@ -235,7 +239,11 @@ public:
   YggOutput(const std::string name, dtype_t *datatype) : _pi(yggOutputType(name.c_str(), datatype)) {}
 
   /*! @brief Empty constructor for inheritance. */
-  YggOutput(yggOutput_t x) : _pi(x) {}
+  YggOutput(yggOutput_t x) : _pi(x) {
+    if (!(_pi->valid)) {
+      throw "Error initializing the comm";
+    }
+  }
   
   /*!
     @brief Alias to allow freeing of underlying C struct at the class level.
@@ -337,7 +345,11 @@ class YggRpc {
 public:
 
   /*! @brief Empty constructor for inheritance. */
-  YggRpc(yggRpc_t x) : _pi(x) {}
+  YggRpc(yggRpc_t x) : _pi(x) {
+    if (!(_pi->valid)) {
+      throw "Error initializing the comm";
+    }
+  }
   
   /*!
     @brief Alias to allow freeing of underlying C struct at the class level.

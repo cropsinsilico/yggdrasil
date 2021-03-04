@@ -83,17 +83,17 @@ class YggFunction(YggClass):
         for k, v in self.outputs.items():
             self.returns += v['vars']
 
-    def widget_function(self, *args, **kwargs):
-        # import matplotlib.pyplot as plt
-        # ncols = min(3, len(arguments))
-        # nrows = int(ceil(float(len(arguments))/float(ncols)))
-        # plt.show()
-        out = self(*args, **kwargs)
-        return out
+    # def widget_function(self, *args, **kwargs):
+    #     # import matplotlib.pyplot as plt
+    #     # ncols = min(3, len(arguments))
+    #     # nrows = int(ceil(float(len(arguments))/float(ncols)))
+    #     # plt.show()
+    #     out = self(*args, **kwargs)
+    #     return out
 
-    def widget(self, *args, **kwargs):
-        from ipywidgets import interact_manual
-        return interact_manual(self.widget_function, *args, **kwargs)
+    # def widget(self, *args, **kwargs):
+    #     from ipywidgets import interact_manual
+    #     return interact_manual(self.widget_function, *args, **kwargs)
         
     def __call__(self, **kwargs):
         r"""Call the model as a function by sending variables.
@@ -113,18 +113,18 @@ class YggFunction(YggClass):
         """
         # Check for arguments
         for a in self.arguments:
-            if a not in kwargs:
+            if a not in kwargs:  # pragma: debug
                 raise RuntimeError("Required argument %s not provided." % a)
         # Send
         for k, v in self.inputs.items():
             flag = v['comm'].send([kwargs[a] for a in v['vars']])
-            if not flag:
+            if not flag:  # pragma: debug
                 raise RuntimeError("Failed to send %s" % k)
         # Receive
         out = {}
         for k, v in self.outputs.items():
             flag, data = v['comm'].recv(timeout=60.0)
-            if not flag:
+            if not flag:  # pragma: debug
                 raise RuntimeError("Failed to receive variable %s" % v)
             ivars = v['vars']
             if isinstance(data, (list, tuple)):

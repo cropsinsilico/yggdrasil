@@ -1,7 +1,7 @@
 import os
 from yggdrasil.tests import (
     scripts, assert_raises, assert_equal, requires_language)
-import yggdrasil.drivers.tests.test_CompiledModelDriver as parent
+import yggdrasil.drivers.tests.test_BuildModelDriver as parent
 from yggdrasil.drivers.MakeModelDriver import MakeModelDriver, MakeCompiler
 
 
@@ -32,7 +32,7 @@ def test_MakeModelDriver_error_nofile():
     assert_raises(RuntimeError, MakeModelDriver, 'test', 'invalid')
 
 
-class TestMakeModelParam(parent.TestCompiledModelParam):
+class TestMakeModelParam(parent.TestBuildModelParam):
     r"""Test parameters for MakeModelDriver."""
 
     driver = 'MakeModelDriver'
@@ -49,13 +49,13 @@ class TestMakeModelParam(parent.TestCompiledModelParam):
         
 
 class TestMakeModelDriverNoInit(TestMakeModelParam,
-                                parent.TestCompiledModelDriverNoInit):
+                                parent.TestBuildModelDriverNoInit):
     r"""Test runner for MakeModelDriver without init."""
     pass
 
 
 class TestMakeModelDriverNoStart(TestMakeModelParam,
-                                 parent.TestCompiledModelDriverNoStart):
+                                 parent.TestBuildModelDriverNoStart):
     r"""Test runner for MakeModelDriver without start."""
     
     def __init__(self, *args, **kwargs):
@@ -73,7 +73,7 @@ class TestMakeModelDriverNoStart(TestMakeModelParam,
                            source_files=src, target=self.target + 'invalid')
         
 
-class TestMakeModelDriver(TestMakeModelParam, parent.TestCompiledModelDriver):
+class TestMakeModelDriver(TestMakeModelParam, parent.TestBuildModelDriver):
     r"""Test runner for MakeModelDriver."""
 
     def __init__(self, *args, **kwargs):

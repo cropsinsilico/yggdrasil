@@ -48,6 +48,7 @@ class OSRModelDriver(ExecutableModelDriver):
         'update_interval': {'type': 'object',
                             'additionalProperties': {'type': 'float'},
                             'default': {'timesync': 1.0}}}
+    executable_type = 'dsl'
     language = 'osr'
     language_ext = '.xml'
     base_languages = ['cpp']
@@ -311,8 +312,9 @@ class OSRModelDriver(ExecutableModelDriver):
                     logger.info('Failed to clone from %s. error = %s'
                                 % (cls.repository_url, str(e)))
                     out.append((cls.language, opt, desc))
-            logger.info('Located %s: %s' % (fname, fpath))
-            cfg.set(cls.language, opt, fpath)
+            if fpath:
+                logger.info('Located %s: %s' % (fname, fpath))
+                cfg.set(cls.language, opt, fpath)
         return out
         
     @classmethod

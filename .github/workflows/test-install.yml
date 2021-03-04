@@ -126,7 +126,20 @@ jobs:
         python-version: ${{ matrix.python-version }}
     - name: (PIP) Set up Virtual Env
       if: env.USEVIRTUALENV == 1 && matrix.install-method == 'pip'
-      uses: syphar/restore-virtualenv@v1
+      run: 'python utils/setup_test_env.py env virtualenv ${{ matrix.python-version
+        }} --env-name=test
+
+        echo "source activate ygg" > ~/.bashrc
+
+        source test/bin/activate
+
+        echo "$VIRTUAL_ENV"
+
+        echo "VIRTUAL_ENV=$VIRTUAL_ENV" >> $GITHUB_ENV
+
+        echo "PATH=$VIRTUAL_ENV/bin:$PATH" >> $GITHUB_ENV
+
+        '
     - name: (PIP) Install dependencies & package
       if: matrix.install-method == 'pip'
       run: python utils/setup_test_env.py install ${{ matrix.install-method }}
@@ -138,15 +151,6 @@ jobs:
       if: matrix.os == 'windows-latest' && matrix.install-method == 'pip' && env.INSTALLR
         == 1
       run: ygginstall R --update-r-requirements
-    - name: (CONDA) Cache conda
-      uses: actions/cache@v1
-      if: matrix.install-method == 'conda'
-      env:
-        CACHE_NUMBER: 0
-      with:
-        path: ~/conda_pkgs_dir
-        key: ${{ runner.os }}-conda-${{ env.CACHE_NUMBER }}-${{ hashFiles('recipe/meta.yaml')
-          }}
     - name: (WINDOWS,CONDA) Set up miniconda base environment
       uses: conda-incubator/setup-miniconda@v2
       if: matrix.install-method == 'conda' && matrix.os == 'windows-latest'
@@ -187,6 +191,7 @@ jobs:
       uses: conda-incubator/setup-miniconda@v2
       if: matrix.install-method == 'conda'
       with:
+        auto-update-conda: true
         python-version: ${{ matrix.python-version }}
         channels: conda-forge
         use-only-tar-bz2: true
@@ -211,6 +216,11 @@ jobs:
 
         '
     - name: Run tests (1st)
+      if: env.USEVIRTUALENV == 1
+      id: test1_venv
+      run: yggtest --ci --nocapture --cov-append ${{ matrix.test-flags1 }}
+    - name: Run tests (1st)
+      if: env.USEVIRTUALENV != 1
       id: test1
       run: yggtest --ci --cov-append ${{ matrix.test-flags1 }}
     - name: Re-run test failures (1st)
@@ -375,7 +385,20 @@ jobs:
         python-version: ${{ matrix.python-version }}
     - name: (PIP) Set up Virtual Env
       if: env.USEVIRTUALENV == 1 && matrix.install-method == 'pip'
-      uses: syphar/restore-virtualenv@v1
+      run: 'python utils/setup_test_env.py env virtualenv ${{ matrix.python-version
+        }} --env-name=test
+
+        echo "source activate ygg" > ~/.bashrc
+
+        source test/bin/activate
+
+        echo "$VIRTUAL_ENV"
+
+        echo "VIRTUAL_ENV=$VIRTUAL_ENV" >> $GITHUB_ENV
+
+        echo "PATH=$VIRTUAL_ENV/bin:$PATH" >> $GITHUB_ENV
+
+        '
     - name: (PIP) Install dependencies & package
       if: matrix.install-method == 'pip'
       run: python utils/setup_test_env.py install ${{ matrix.install-method }}
@@ -387,15 +410,6 @@ jobs:
       if: matrix.os == 'windows-latest' && matrix.install-method == 'pip' && env.INSTALLR
         == 1
       run: ygginstall R --update-r-requirements
-    - name: (CONDA) Cache conda
-      uses: actions/cache@v1
-      if: matrix.install-method == 'conda'
-      env:
-        CACHE_NUMBER: 0
-      with:
-        path: ~/conda_pkgs_dir
-        key: ${{ runner.os }}-conda-${{ env.CACHE_NUMBER }}-${{ hashFiles('recipe/meta.yaml')
-          }}
     - name: (WINDOWS,CONDA) Set up miniconda base environment
       uses: conda-incubator/setup-miniconda@v2
       if: matrix.install-method == 'conda' && matrix.os == 'windows-latest'
@@ -436,6 +450,7 @@ jobs:
       uses: conda-incubator/setup-miniconda@v2
       if: matrix.install-method == 'conda'
       with:
+        auto-update-conda: true
         python-version: ${{ matrix.python-version }}
         channels: conda-forge
         use-only-tar-bz2: true
@@ -460,6 +475,11 @@ jobs:
 
         '
     - name: Run tests (1st)
+      if: env.USEVIRTUALENV == 1
+      id: test1_venv
+      run: yggtest --ci --nocapture --cov-append ${{ matrix.test-flags1 }}
+    - name: Run tests (1st)
+      if: env.USEVIRTUALENV != 1
       id: test1
       run: yggtest --ci --cov-append ${{ matrix.test-flags1 }}
     - name: Re-run test failures (1st)
@@ -604,7 +624,20 @@ jobs:
         python-version: ${{ matrix.python-version }}
     - name: (PIP) Set up Virtual Env
       if: env.USEVIRTUALENV == 1 && matrix.install-method == 'pip'
-      uses: syphar/restore-virtualenv@v1
+      run: 'python utils/setup_test_env.py env virtualenv ${{ matrix.python-version
+        }} --env-name=test
+
+        echo "source activate ygg" > ~/.bashrc
+
+        source test/bin/activate
+
+        echo "$VIRTUAL_ENV"
+
+        echo "VIRTUAL_ENV=$VIRTUAL_ENV" >> $GITHUB_ENV
+
+        echo "PATH=$VIRTUAL_ENV/bin:$PATH" >> $GITHUB_ENV
+
+        '
     - name: (PIP) Install dependencies & package
       if: matrix.install-method == 'pip'
       run: python utils/setup_test_env.py install ${{ matrix.install-method }}
@@ -616,15 +649,6 @@ jobs:
       if: matrix.os == 'windows-latest' && matrix.install-method == 'pip' && env.INSTALLR
         == 1
       run: ygginstall R --update-r-requirements
-    - name: (CONDA) Cache conda
-      uses: actions/cache@v1
-      if: matrix.install-method == 'conda'
-      env:
-        CACHE_NUMBER: 0
-      with:
-        path: ~/conda_pkgs_dir
-        key: ${{ runner.os }}-conda-${{ env.CACHE_NUMBER }}-${{ hashFiles('recipe/meta.yaml')
-          }}
     - name: (WINDOWS,CONDA) Set up miniconda base environment
       uses: conda-incubator/setup-miniconda@v2
       if: matrix.install-method == 'conda' && matrix.os == 'windows-latest'
@@ -665,6 +689,7 @@ jobs:
       uses: conda-incubator/setup-miniconda@v2
       if: matrix.install-method == 'conda'
       with:
+        auto-update-conda: true
         python-version: ${{ matrix.python-version }}
         channels: conda-forge
         use-only-tar-bz2: true
@@ -689,6 +714,11 @@ jobs:
 
         '
     - name: Run tests (1st)
+      if: env.USEVIRTUALENV == 1
+      id: test1_venv
+      run: yggtest --ci --nocapture --cov-append ${{ matrix.test-flags1 }}
+    - name: Run tests (1st)
+      if: env.USEVIRTUALENV != 1
       id: test1
       run: yggtest --ci --cov-append ${{ matrix.test-flags1 }}
     - name: Re-run test failures (1st)
@@ -835,7 +865,20 @@ jobs:
         python-version: ${{ matrix.python-version }}
     - name: (PIP) Set up Virtual Env
       if: env.USEVIRTUALENV == 1 && matrix.install-method == 'pip'
-      uses: syphar/restore-virtualenv@v1
+      run: 'python utils/setup_test_env.py env virtualenv ${{ matrix.python-version
+        }} --env-name=test
+
+        echo "source activate ygg" > ~/.bashrc
+
+        source test/bin/activate
+
+        echo "$VIRTUAL_ENV"
+
+        echo "VIRTUAL_ENV=$VIRTUAL_ENV" >> $GITHUB_ENV
+
+        echo "PATH=$VIRTUAL_ENV/bin:$PATH" >> $GITHUB_ENV
+
+        '
     - name: (PIP) Install dependencies & package
       if: matrix.install-method == 'pip'
       run: python utils/setup_test_env.py install ${{ matrix.install-method }}
@@ -847,15 +890,6 @@ jobs:
       if: matrix.os == 'windows-latest' && matrix.install-method == 'pip' && env.INSTALLR
         == 1
       run: ygginstall R --update-r-requirements
-    - name: (CONDA) Cache conda
-      uses: actions/cache@v1
-      if: matrix.install-method == 'conda'
-      env:
-        CACHE_NUMBER: 0
-      with:
-        path: ~/conda_pkgs_dir
-        key: ${{ runner.os }}-conda-${{ env.CACHE_NUMBER }}-${{ hashFiles('recipe/meta.yaml')
-          }}
     - name: (WINDOWS,CONDA) Set up miniconda base environment
       uses: conda-incubator/setup-miniconda@v2
       if: matrix.install-method == 'conda' && matrix.os == 'windows-latest'
@@ -896,6 +930,7 @@ jobs:
       uses: conda-incubator/setup-miniconda@v2
       if: matrix.install-method == 'conda'
       with:
+        auto-update-conda: true
         python-version: ${{ matrix.python-version }}
         channels: conda-forge
         use-only-tar-bz2: true
@@ -920,6 +955,11 @@ jobs:
 
         '
     - name: Run tests (1st)
+      if: env.USEVIRTUALENV == 1
+      id: test1_venv
+      run: yggtest --ci --nocapture --cov-append ${{ matrix.test-flags1 }}
+    - name: Run tests (1st)
+      if: env.USEVIRTUALENV != 1
       id: test1
       run: yggtest --ci --cov-append ${{ matrix.test-flags1 }}
     - name: Re-run test failures (1st)
@@ -1064,7 +1104,20 @@ jobs:
         python-version: ${{ matrix.python-version }}
     - name: (PIP) Set up Virtual Env
       if: env.USEVIRTUALENV == 1 && matrix.install-method == 'pip'
-      uses: syphar/restore-virtualenv@v1
+      run: 'python utils/setup_test_env.py env virtualenv ${{ matrix.python-version
+        }} --env-name=test
+
+        echo "source activate ygg" > ~/.bashrc
+
+        source test/bin/activate
+
+        echo "$VIRTUAL_ENV"
+
+        echo "VIRTUAL_ENV=$VIRTUAL_ENV" >> $GITHUB_ENV
+
+        echo "PATH=$VIRTUAL_ENV/bin:$PATH" >> $GITHUB_ENV
+
+        '
     - name: (PIP) Install dependencies & package
       if: matrix.install-method == 'pip'
       run: python utils/setup_test_env.py install ${{ matrix.install-method }}
@@ -1076,15 +1129,6 @@ jobs:
       if: matrix.os == 'windows-latest' && matrix.install-method == 'pip' && env.INSTALLR
         == 1
       run: ygginstall R --update-r-requirements
-    - name: (CONDA) Cache conda
-      uses: actions/cache@v1
-      if: matrix.install-method == 'conda'
-      env:
-        CACHE_NUMBER: 0
-      with:
-        path: ~/conda_pkgs_dir
-        key: ${{ runner.os }}-conda-${{ env.CACHE_NUMBER }}-${{ hashFiles('recipe/meta.yaml')
-          }}
     - name: (WINDOWS,CONDA) Set up miniconda base environment
       uses: conda-incubator/setup-miniconda@v2
       if: matrix.install-method == 'conda' && matrix.os == 'windows-latest'
@@ -1125,6 +1169,7 @@ jobs:
       uses: conda-incubator/setup-miniconda@v2
       if: matrix.install-method == 'conda'
       with:
+        auto-update-conda: true
         python-version: ${{ matrix.python-version }}
         channels: conda-forge
         use-only-tar-bz2: true
@@ -1149,6 +1194,11 @@ jobs:
 
         '
     - name: Run tests (1st)
+      if: env.USEVIRTUALENV == 1
+      id: test1_venv
+      run: yggtest --ci --nocapture --cov-append ${{ matrix.test-flags1 }}
+    - name: Run tests (1st)
+      if: env.USEVIRTUALENV != 1
       id: test1
       run: yggtest --ci --cov-append ${{ matrix.test-flags1 }}
     - name: Re-run test failures (1st)

@@ -134,7 +134,7 @@ class CommMessage(object):
         if self.worker is not None:
             for x in self.worker_messages:
                 if not self.worker.send_message(x, **kwargs):
-                    return False
+                    return False  # pragma: debug
         return True
 
     def apply_function(self, x):
@@ -1402,7 +1402,8 @@ class CommBase(tools.YggClass):
                    % self.direction)
         # If receiving, update the expected datatypes to use information
         # about the received datatype that was recorded by the serializer
-        if (self.direction == 'recv') and self.serializer.initialized:
+        if (((self.direction == 'recv') and self.serializer.initialized
+             and (not for_empty))):
             assert(self.transform[0].original_datatype)
         # if (((self.direction == 'recv')
         #      and self.serializer.initialized
@@ -1776,6 +1777,7 @@ class CommBase(tools.YggClass):
         out = False
         error = None
         while (not Tout.is_out):
+            error = None
             try:
                 with self._closing_thread.lock:
                     if self.is_open:
@@ -1791,7 +1793,7 @@ class CommBase(tools.YggClass):
                 self.special_debug("TemporaryCommunicationError: %s" % e)
             self.sleep()
         self.stop_timeout(key_suffix='._safe_send')
-        if (not out) and error and self.is_async:
+        if error and self.is_async:
             raise TemporaryCommunicationError(error)
         if send_1st:
             self.suppress_special_debug = False
@@ -1823,7 +1825,7 @@ class CommBase(tools.YggClass):
         if msg.flag == FLAG_SKIP:
             return True
         elif msg.flag == FLAG_FAILURE:
-            return False
+            return False  # pragma: debug
         elif msg.flag == FLAG_EOF:
             with self._closing_thread.lock:
                 if not self._eof_sent.is_set():
@@ -1832,6 +1834,7 @@ class CommBase(tools.YggClass):
                     else:
                         self.partner_copies -= 1
                 else:  # pragma: debug
+                    self.error("EOF SENT TWICE")
                     return False
         elif msg.flag == FLAG_SUCCESS:
             pass
@@ -1877,6 +1880,9 @@ class CommBase(tools.YggClass):
             except ValueError:  # pragma: debug
                 self.exception('Failed to send (unyt array in message)')
         except TemporaryCommunicationError if self.is_async else NeverMatch:
+            if msg.flag == FLAG_EOF:
+                with self._closing_thread.lock:
+                    self._eof_sent.clear()
             raise
         except BaseException:
             # Handle error caused by calling repr on unyt array that isn't float64
@@ -2050,11 +2056,6 @@ class CommBase(tools.YggClass):
 
         """
         return self.send(self.eof_msg, *args, **kwargs)
-        # with self._closing_thread.lock:
-        #     if not self._eof_sent.is_set():
-        #         self._eof_sent.set()
-        #         return self.send(self.eof_msg, *args, **kwargs)
-        # return False
 
     # RECV METHODS
     def _safe_recv(self, timeout=None, **kwargs):
@@ -2065,6 +2066,7 @@ class CommBase(tools.YggClass):
         out = (True, self.empty_bytes_msg)
         error = None
         while (not Tout.is_out):
+            error = None
             try:
                 with self._closing_thread.lock:
                     if self.is_open:
@@ -2160,7 +2162,7 @@ class CommBase(tools.YggClass):
                 msg.flag = FLAG_INCOMPLETE
                 while len(msg.msg) < msg.header['size']:
                     imsg = msg.worker.recv_message(skip_deserialization=True, **kwargs)
-                    if imsg.flag in [FLAG_EOF, FLAG_FAILURE]:
+                    if imsg.flag in [FLAG_EOF, FLAG_FAILURE]:  # pragma: debug
                         self.error("Receive interupted at %d of %d bytes.",
                                    len(msg.msg), msg.header['size'])
                         msg.flag = FLAG_FAILURE

@@ -231,7 +231,8 @@ static inline
 int get_thread_id() {
   int out = 0;
 #ifdef _OPENMP
-  out = omp_get_thread_num();
+  if (omp_in_parallel())
+    out = omp_get_thread_num();
 /* #elif defined pthread_self */
 /*   // TODO: Finalize/test support for pthread */
 /*   out = pthread_self(); */

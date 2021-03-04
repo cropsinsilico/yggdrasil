@@ -59,5 +59,7 @@ class StatementTransform(TransformBase):
                {'kwargs': {'statement': '%x% * '
                            + repr(units.add_units(1.0, 'cm'))},
                 'in/out': [(1.0, units.add_units(1.0, 'cm')),
-                           (2.0, units.add_units(2.0, 'cm'))]}]
+                           (2.0, units.add_units(2.0, 'cm'))]},
+               {'kwargs': {'statement': '%x%**3'},
+                'in/out': [(iter([1, 2]), iter([1, 8]))]}]
         return out

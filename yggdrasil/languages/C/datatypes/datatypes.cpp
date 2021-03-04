@@ -352,6 +352,10 @@ JSONArrayMetaschemaType* create_dtype_format_class(const char *format_str,
     beg = end;
   }
   out->update_items(items, true);
+  for (size_t i = 0; i < items.size(); i++) {
+    delete items[i];
+    items[i] = NULL;
+  }
   return out;
 };
 
@@ -1582,6 +1586,7 @@ extern "C" {
       delete item_type;
     } catch (...) {
       ygglog_error("generic_map_get_scalar: C++ exception thrown.");
+      out = NULL;
     }
     return out;
   }
@@ -2717,9 +2722,17 @@ extern "C" {
     if (dtype->obj == NULL) {
       return 1;
     }
-    MetaschemaType *obj = dtype2class(dtype);
-    if (obj->is_empty())
+    if (strlen(dtype->type) == 0) {
       return 1;
+    }
+    try {
+      MetaschemaType *obj = dtype2class(dtype);
+      if (obj->is_empty())
+	return 1;
+    } catch(...) {
+      ygglog_error("is_empty_dtype: C++ exception thrown.");
+      return 1;
+    }
     return 0;
   }
   
@@ -3194,6 +3207,7 @@ extern "C" {
 	free(head);
 	return out;
       }
+      free(head);
       return out;
     } catch(...) {
       ygglog_error("parse_comm_header: C++ exception thrown.");

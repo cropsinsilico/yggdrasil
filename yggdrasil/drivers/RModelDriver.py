@@ -157,15 +157,30 @@ class RModelDriver(InterpretedModelDriver):  # pragma: R
         kwargs.setdefault('skip_interpreter_flags', True)
         return super(RModelDriver, cls).language_version(**kwargs)
 
-    # @property
-    # def debug_flags(self):
-    #     r"""list: Flags that should be prepended to an executable command to
-    #     enable debugging."""
-    #     if self.with_valgrind:
-    #         interp = 'R'.join(self.get_interpreter().rsplit('Rscript', 1))
-    #         return [interp, '-d', '"valgrind %s"'
-    #                 % ' '.join(self.valgrind_flags), '--vanilla', '-f']
-    #     return super(RModelDriver, self).debug_flags
+    def run_model(self, *args, **kwargs):
+        r"""Run the model. Unless overridden, the model will be run using
+        run_executable.
+
+        Args:
+            *args: Arguments are passed to the parent class's method.
+            **kwargs: Keyword arguments are passed to the parent class's
+                method.
+
+        """
+        if self.with_valgrind:
+            interp = kwargs.pop('interpreter', self.get_interpreter())
+            interp_flags = kwargs.pop('interpreter_flags', [])
+            if 'Rscript' in interp:
+                interp = 'R'.join(interp.rsplit('Rscript', 1))
+                interp_flags = []
+                kwargs['skip_interpreter_flags'] = True
+            interp_flags += [
+                '--vanilla', '-d', 'valgrind %s'
+                % ' '.join(self.valgrind_flags), '-f']
+            kwargs['interpreter'] = interp
+            kwargs['interpreter_flags'] = interp_flags
+            kwargs['debug_flags'] = []
+        return super(RModelDriver, self).run_model(*args, **kwargs)
         
     def set_env(self, **kwargs):
         r"""Get environment variables that should be set for the model process.

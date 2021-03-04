@@ -55,18 +55,6 @@ class ValueComm(CommBase):
         r"""int: The number of incoming messages in the connection."""
         return self.remaining
 
-    def serialize(self, msg, **kwargs):
-        r"""Serialize a message using the associated serializer."""
-        return msg
-        
-    def deserialize(self, msg, metadata=None):
-        r"""Deserialize a message using the associated deserializer."""
-        header = dict(size=1, incomplete=False)
-        if metadata is not None:  # pragma: debug
-            header.update(metadata)
-            raise RuntimeError("Unexpected metadata: %s" % metadata)
-        return msg, header
-
     def send(self, *args, **kwargs):
         r"""Send a message."""
         raise RuntimeError("Cannot send to a ValueComm.")

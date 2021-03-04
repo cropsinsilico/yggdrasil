@@ -527,7 +527,7 @@ class Task(ContextObject):
             name = self._base.name
             exitcode = self._base.exitcode
             daemon = self._base.daemon
-        except AttributeError:
+        except AttributeError:  # pragma: debug
             pass
         return DummyTask(name=name, exitcode=exitcode, daemon=daemon)
         
@@ -1058,6 +1058,15 @@ class YggTask(YggClass):
 class BreakLoopException(BaseException):
     r"""Special exception that can be raised by the target function
     for a loop in order to break the loop."""
+
+    def __init__(self, *args, **kwargs):
+        import traceback
+        self.break_stack = ''.join(traceback.format_stack())
+        super(BreakLoopException, self).__init__(*args, **kwargs)
+
+
+class BreakLoopError(BreakLoopException):
+    r"""Version of BreakLoopException that sets an error message."""
     pass
         
 
@@ -1094,11 +1103,13 @@ class YggTaskLoop(YggTask):
             self.debug("on_main_terminated")
             self.set_break_flag()
 
-    def set_break_flag(self, value=True):
+    def set_break_flag(self, value=True, break_stack=None):
         r"""Set the break flag for the thread/process to True."""
         if self.break_stack is None:
-            import traceback
-            self.break_stack = ''.join(traceback.format_stack())
+            if break_stack is None:
+                import traceback
+                break_stack = ''.join(traceback.format_stack())
+            self.break_stack = break_stack
         self.set_flag_attr('break_flag', value=value)
 
     @property
@@ -1156,10 +1167,14 @@ class YggTaskLoop(YggTask):
             else:
                 try:
                     self.run_loop()
+                except BreakLoopError as e:
+                    self.error("BreakLoopError: %s", e)
+                    self.set_break_flag(break_stack=e.break_stack)
                 except BreakLoopException as e:
-                    self.debug("BreakLoopException: %s", e)
-                    self.set_break_flag()
-        self.set_break_flag()
+                    self.info("BreakLoopException: %s", e)
+                    self.set_break_flag(break_stack=e.break_stack)
+        if not self.break_stack:
+            self.set_break_flag()
         
     def run_loop(self, *args, **kwargs):
         r"""Actions performed on each loop iteration."""

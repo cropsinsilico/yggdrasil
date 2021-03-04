@@ -142,7 +142,8 @@ class TestModelDriverNoInit(TestModelParam, parent.TestDriverNoInit):
         r"""Test running script used without debug."""
         self.run_model_instance(**kwargs)
 
-    @unittest.skip("temp")
+    # @unittest.skip("temp")
+    @unittest.skipIf(platform._is_mac, "Valgrind slow on Mac")
     @unittest.skipIf(platform._is_win, "No valgrind on windows")
     @unittest.skipIf(shutil.which('valgrind') is None,
                      "Valgrind not installed.")

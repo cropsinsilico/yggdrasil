@@ -409,6 +409,16 @@ class ygginfo(SubCommand):
                     vardict.append(
                         (curr_prefix + "Language Installed",
                          drv.is_language_installed()))
+                    if drv.executable_type == 'compiler':
+                        curr_prefix += prefix
+                        vardict += [
+                            (curr_prefix
+                             + ("%s Installed (%s)"
+                                % (x.title(),
+                                   getattr(drv, 'default_%s' % x, None))),
+                             drv.is_tool_installed(x))
+                            for x in ['compiler', 'linker', 'archiver']]
+                        curr_prefix = curr_prefix.rsplit(prefix, 1)[0]
                     vardict.append(
                         (curr_prefix + "Base Languages Installed",
                          drv.are_base_languages_installed()))
@@ -685,7 +695,8 @@ class yggcompile(SubCommand):
     arguments = [
         (('language', ),
          {'nargs': '*', 'default': ['all'],
-          # 'choices': ['all'] + LANGUAGES_WITH_ALIASES['compiled'],
+          # 'choices': (['all'] + LANGUAGES_WITH_ALIASES['compiled']
+          #             + LANGUAGES_WITH_ALIASES['compiled_dsl']),
           'help': ("One or more languages to compile dependencies "
                    "for.")}),
         (('--toolname', ),
@@ -998,14 +1009,21 @@ class regen_schema(SubCommand):
 
     name = "schema"
     help = "Regenerate the yggdrasil schema."
+    arguments = [
+        (('--only-constants', ),
+         {'action': 'store_true',
+          'help': ('Only update the constants.py file without updating '
+                   'the schema.')})]
 
     @classmethod
     def func(cls, args):
         from yggdrasil import schema
-        if os.path.isfile(schema._schema_fname):
-            os.remove(schema._schema_fname)
-        schema.clear_schema()
-        schema.init_schema()
+        if not args.only_constants:
+            if os.path.isfile(schema._schema_fname):
+                os.remove(schema._schema_fname)
+            schema.clear_schema()
+            schema.init_schema()
+        schema.update_constants()
 
 
 class yggmodelform(SubCommand):

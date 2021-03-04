@@ -44,7 +44,7 @@ class RPCRequestDriver(ConnectionDriver):
 
     _connection_type = 'rpc_request'
 
-    def __init__(self, model_request_name, **kwargs):
+    def __init__(self, model_request_name, response_kwargs=None, **kwargs):
         # Input communicator
         inputs = kwargs.get('inputs', [{}])
         # inputs[0]['name'] = model_request_name + '.client_model_request'
@@ -55,8 +55,12 @@ class RPCRequestDriver(ConnectionDriver):
         outputs[0]['is_client'] = True
         outputs[0]['close_on_eof_send'] = False
         kwargs['outputs'] = outputs
+        if response_kwargs is None:
+            response_kwargs = {}
+        self.response_kwargs = response_kwargs
         # Parent and attributes
         super(RPCRequestDriver, self).__init__(model_request_name, **kwargs)
+        self.response_kwargs.setdefault('commtype', self.ocomm._commtype)
         self.response_drivers = []
         self._block_response = False
 
@@ -120,7 +124,8 @@ class RPCRequestDriver(ConnectionDriver):
                 super(RPCRequestDriver, self).send_message(
                     CommBase.CommMessage(args=YGG_CLIENT_EOF,
                                          flag=CommBase.FLAG_SUCCESS),
-                    header_kwargs={'raw': True, 'model': name})
+                    header_kwargs={'raw': True, 'model': name},
+                    skip_processing=True)
             out = super(RPCRequestDriver, self).remove_model(
                 direction, name)
             if out:
@@ -171,11 +176,11 @@ class RPCRequestDriver(ConnectionDriver):
                 if (not self.is_comm_open) or self._block_response:  # pragma: debug
                     self.debug("Comm closed, not creating response driver.")
                     return False
-                drv_args = [msg.header['response_address']]
+                drv_args = [msg.header['response_address'],
+                            msg.header['request_id']]
                 drv_kwargs = dict(
-                    msg_id=msg.header['request_id'],
                     request_name=self.name,
-                    inputs=[{'commtype': self.ocomm._commtype}],
+                    inputs=[self.response_kwargs.copy()],
                     outputs=[{'commtype': msg.header["commtype"]}])
                 self.debug("Creating response comm: address = %s, request_id = %s",
                            msg.header['response_address'], msg.header['request_id'])

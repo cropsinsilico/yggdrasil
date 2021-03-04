@@ -382,9 +382,12 @@ int regex_replace_sub(char *buf, const size_t len_buf,
 	printf("regex_replace_sub: Error replacing substring $%d.\n", (int)i);
 	free(m);
 	regfree(&r);
+	free(refs);
 	return -1;
       }
     }
+    free(refs);
+    refs = NULL;
     // Ensure replacement will not exceed buffer
     len_rp = ret;
     len_m = m[0].rm_eo - m[0].rm_so;

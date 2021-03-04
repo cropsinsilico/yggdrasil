@@ -85,6 +85,7 @@ class TestRPCRequestDriver(TestRPCRequestParam,
             flag, srv_msg = self.recv_comm.recv(timeout=self.route_timeout)
             assert(flag)
             assert_equal(srv_msg, msg_send)
+            self.instance.printStatus()
             flag = self.recv_comm.send(srv_msg)
             assert(flag)
             # Receive response on client side

@@ -157,7 +157,6 @@ class ConnectionDriver(Driver):
         nrecv (int): Number of messages received.
         nproc (int): Number of messages processed.
         nsent (int): Number of messages sent.
-        nskip (int): Number of messages skipped.
         state (str): Descriptor of last action taken.
         translator (func): Function that will be used to translate messages from
             the input communicator before passing them to the output communicator.
@@ -220,7 +219,7 @@ class ConnectionDriver(Driver):
         # Shared attributes (set once or synced using events)
         self.single_use = single_use
         self.shared = self.context.Dict()
-        self.shared.update(nrecv=0, nproc=0, nsent=0, nskip=0,
+        self.shared.update(nrecv=0, nproc=0, nsent=0,
                            state='started', close_state='',
                            _comm_closed=multitasking.DummyEvent(),
                            _skip_after_loop=multitasking.DummyEvent())
@@ -266,6 +265,7 @@ class ConnectionDriver(Driver):
         self.debug("Creating %s comm", io)
         comm_kws = dict()
         assert(isinstance(comm_list, list))
+        assert(comm_list)
         if io == 'input':
             direction = 'recv'
             attr_comm = 'icomm'
@@ -280,16 +280,11 @@ class ConnectionDriver(Driver):
         comm_kws['reverse_names'] = True
         comm_kws['use_async'] = True
         comm_kws['name'] = self.name
-        if not comm_list:
-            comm_list.append({'commtype': comm_type})
         for i, x in enumerate(comm_list):
             if x is None:
                 comm_list[i] = dict()
-            elif not isinstance(x, dict):
-                if not isinstance(x, str):  # pragma: debug
-                    self.info('%s, %s', x, type(x))
-                    assert(isinstance(x, str))
-                comm_list[i] = dict(commtype=x)
+            else:
+                assert(isinstance(x, dict))
             if 'filetype' not in comm_list[i]:
                 comm_list[i].setdefault('commtype', comm_type)
             if self.as_process:
@@ -369,15 +364,6 @@ class ConnectionDriver(Driver):
         self.shared['nsent'] = x
 
     @property
-    def nskip(self):
-        r"""int: Number of messages skipped."""
-        return self.shared['nskip']
-
-    @nskip.setter
-    def nskip(self, x):
-        self.shared['nskip'] = x
-
-    @property
     def nproc(self):
         r"""int: Number of messages processed."""
         return self.shared['nproc']
@@ -416,10 +402,10 @@ class ConnectionDriver(Driver):
         r"""Wait until messages have been routed."""
         T = self.start_timeout(timeout, key_suffix='.route')
         while ((not T.is_out)
-               and (self.nrecv != (self.nsent + self.nskip))):  # pragma: debug
+               and (self.nrecv != self.nsent)):  # pragma: debug
             self.sleep()
         self.stop_timeout(key_suffix='.route')
-        return (self.nrecv == (self.nsent + self.nskip))
+        return (self.nrecv == self.nsent)
 
     @property
     @run_remotely
@@ -588,8 +574,8 @@ class ConnectionDriver(Driver):
             if direction == 'output':
                 T = self.start_timeout(60, key_suffix='.model_exit')
                 while (not T.is_out) and self.models['input']:
-                    self.info("remaining models: %s",
-                              self.models['input'])
+                    self.debug("remaining input models: %s",
+                               self.models['input'])
                     self.sleep(10 * self.sleeptime)
                 self.stop_timeout(key_suffix='.model_exit')
             self.drain_input(timeout=self.timeout)
@@ -651,7 +637,6 @@ class ConnectionDriver(Driver):
                                                  self.ocomm.is_open))
         msg += '%-15s' % (str(self.nrecv) + ' received, ')
         msg += '%-15s' % (str(self.nproc) + ' processed, ')
-        msg += '%-15s' % (str(self.nskip) + ' skipped, ')
         msg += '%-15s' % (str(self.nsent) + ' sent, ')
         msg += '%-20s' % (str(self.icomm.n_msg) + ' ready to recv')
         msg += '%-20s' % (str(self.ocomm.n_msg) + ' ready to send')
@@ -1032,10 +1017,6 @@ class ConnectionDriver(Driver):
             self.error('Could not process message.')
             self.set_break_flag()
             self.set_close_state('processing')
-            return
-        elif self.ocomm.is_empty_send(msg.args):
-            self.debug('Message skipped.')
-            self.nskip += 1
             return
         self.nproc += 1
         self.state = 'processed'

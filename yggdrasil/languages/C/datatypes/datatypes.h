@@ -1279,6 +1279,21 @@ comm_head_t init_header(const size_t size, const char *address, const char *id) 
 
 
 /*!
+  @brief Destroy a header object.
+  @param[in] x comm_head_t* Pointer to the header that should be destroyed.
+  @returns int 0 if successful, -1 otherwise.
+*/
+static inline
+int destroy_header(comm_head_t* x) {
+  int ret = 0;
+  if (x->dtype != NULL) {
+    ret = destroy_dtype(&(x->dtype));
+  }
+  return ret;
+};
+
+
+/*!
   @brief Split header and body of message.
   @param[in] buf const char* Message that should be split.
   @param[in] buf_siz size_t Size of buf.

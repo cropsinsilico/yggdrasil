@@ -328,6 +328,22 @@ int do_reply_send(const comm_t *comm) {
   }
   ygglog_debug("do_reply_send(%s): address=%s, end", comm->name,
 	       zrep->addresses[0]);
+#if defined(__cplusplus) && defined(_WIN32)
+  // TODO: There seems to be an error in the poller when using it in C++
+#else
+  if (ret >= 0) {
+    poller = zpoller_new(s, NULL);
+    if (!(poller)) {
+      ygglog_error("do_reply_send(%s): Could not create poller", comm->name);
+      return -1;
+    }
+    assert(poller);
+    ygglog_debug("do_reply_send(%s): waiting on poller...", comm->name);
+    p = zpoller_wait(poller, 10);
+    ygglog_debug("do_reply_send(%s): poller returned", comm->name); 
+    zpoller_destroy(&poller);
+  }
+#endif
   return ret;
 };
 
@@ -570,8 +586,10 @@ int check_reply_recv(const comm_t *comm, char *data, const size_t len) {
   } else {
     ygglog_error("check_reply_recv(%s): Error parsing reply header in '%s'",
 		 comm->name, data);
+    destroy_header(&head);
     return -1;
   }
+  destroy_header(&head);
   address[address_len] = '\0';
   // Match address and create if it dosn't exist
   int isock = set_reply_recv(comm, address);

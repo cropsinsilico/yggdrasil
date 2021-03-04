@@ -1,7 +1,6 @@
 import unittest
-import pytest
 from yggdrasil import tools, platform
-from yggdrasil.tests import MagicTestError, assert_raises
+from yggdrasil.tests import MagicTestError, assert_raises, timeout
 from yggdrasil.schema import get_schema
 from yggdrasil.components import import_component
 from yggdrasil.drivers.tests import test_Driver as parent
@@ -46,11 +45,6 @@ class TestConnectionParam(parent.TestParam):
                    self.instance.ocomm.maxMsgSize)
 
     @property
-    def is_input(self):
-        r"""bool: True if the connection is for input."""
-        return (self.icomm_name != self.comm_name)
-
-    @property
     def is_output(self):
         r"""bool: True if the connection is for output."""
         return (self.ocomm_name != self.comm_name)
@@ -93,7 +87,9 @@ class TestConnectionParam(parent.TestParam):
         """
         flag = True
         msg_list = []
-        while flag:
+        timeout = 10.0
+        Tout = self.instance.start_timeout(timeout, key_suffix='.stoptest')
+        while flag and (not Tout.is_out):
             flag, msg_recv = recv_inst.recv(self.timeout)
             if flag:
                 if break_on_empty and recv_inst.is_empty_recv(msg_recv):
@@ -101,6 +97,7 @@ class TestConnectionParam(parent.TestParam):
                 msg_list.append(msg_recv)
             else:
                 self.assert_equal(msg_recv, recv_inst.eof_msg)
+        self.instance.stop_timeout(key_suffix='.stoptest')
         if expected_result is not None:
             self.assert_msg_lists_equal(msg_list, expected_result)
         return msg_list
@@ -218,8 +215,6 @@ class TestConnectionParam(parent.TestParam):
         if kwargs is None:
             kwargs = self.inst_kwargs
         # Adjust kwargs
-        if 'comm_address' in kwargs:
-            del kwargs['comm_address']
         if comm in ['ocomm', 'both']:
             for x in kwargs['outputs']:
                 x.update(base_commtype=self.ocomm_name,
@@ -280,6 +275,7 @@ class TestConnectionDriverNoStart(TestConnectionParam, parent.TestDriverNoStart)
         if self.instance.icomm._commtype != 'value':
             assert(not flag)
             self.assert_equal(ret, None)
+        self.instance.confirm_output(timeout=1.0)
 
         
 class TestConnectionDriverNoInit(TestConnectionParam):
@@ -359,7 +355,7 @@ class TestConnectionDriver(TestConnectionParam, parent.TestDriver):
         self.instance.open_comm()
         assert(self.instance.is_comm_closed)
 
-    @pytest.mark.timeout(timeout=600)
+    @timeout(timeout=600)
     def test_send_recv(self):
         r"""Test sending/receiving small message."""
         try:
@@ -383,7 +379,7 @@ class TestConnectionDriver(TestConnectionParam, parent.TestDriver):
             self.recv_comm.printStatus()
             raise
 
-    @pytest.mark.timeout(timeout=600)
+    @timeout(timeout=600)
     def test_send_recv_nolimit(self):
         r"""Test sending/receiving large message."""
         try:
@@ -488,7 +484,7 @@ class TestConnectionDriverIterate(TestConnectionDriver):
         r"""str: Test message that should be used for any send/recv tests."""
         return {'a': int(1), 'b': 'hello', 'c': float(2)}
 
-    @pytest.mark.timeout(timeout=600)
+    @timeout(timeout=600)
     def test_send_recv(self):
         r"""Test sending/receiving small message."""
         msg = self.test_msg

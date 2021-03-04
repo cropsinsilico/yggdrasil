@@ -785,8 +785,9 @@ class ZMQComm(CommBase.CommBase):
             str: Messages with reply address removed if present.
 
         """
-        if self.direction == 'send':
-            return msg, None
+        assert(self.direction != 'send')
+        # if self.direction == 'send':
+        #     return msg, None
         header = self.serializer.parse_header(msg.split(_flag_zmq_filter)[-1])
         address = header.get('zmq_reply', None)
         if (address is None):
@@ -816,6 +817,8 @@ class ZMQComm(CommBase.CommBase):
             return msg
         self.reply_socket_send.send(msg, flags=zmq.NOBLOCK)
         self._n_reply_sent += 1
+        self.reply_socket_send.poll(timeout=self.zmq_sleeptime,
+                                    flags=zmq.POLLIN)
         return msg
 
     def _reply_handshake_recv(self, msg_send, key):
@@ -823,7 +826,7 @@ class ZMQComm(CommBase.CommBase):
         try:
             socket = self.reply_socket_recv.get(key, None)
             if socket is None or socket.closed:  # pragma: debug
-                raise multitasking.BreakLoopException("SOCKET CLOSED")
+                raise multitasking.BreakLoopError("SOCKET CLOSED: %s" % key)
             out = socket.poll(timeout=1, flags=zmq.POLLOUT)
             if out == 0:  # pragma: debug
                 self.periodic_debug('_reply_handshake_recv', period=1000)(
@@ -833,7 +836,7 @@ class ZMQComm(CommBase.CommBase):
             if self.is_eof(msg_send):  # pragma: debug
                 self.error("REPLY EOF SENT")
                 return True
-            tries = 10
+            tries = 100
             out = 0
             while (out == 0) and (tries > 0):
                 out = socket.poll(timeout=self.zmq_sleeptime,
@@ -843,14 +846,13 @@ class ZMQComm(CommBase.CommBase):
                         ("No response waiting (address=%s). "
                          "%d tries left."), key, tries)
                     tries -= 1
-            if out == 0:
-                raise multitasking.BreakLoopException('No response received.')
             msg_recv = socket.recv(flags=zmq.NOBLOCK)
             assert(msg_recv == msg_send)
             self._n_reply_recv[key] += 1
             return True
         except zmq.ZMQError as e:  # pragma: debug
-            raise multitasking.BreakLoopException("ZMQ Error: %s" % e)
+            raise multitasking.BreakLoopError("ZMQ Error(%s): %s"
+                                              % (key, e))
 
     def _close_backlog(self, wait=False):
         r"""Close the backlog thread and the reply sockets."""
@@ -1048,7 +1050,7 @@ class ZMQComm(CommBase.CommBase):
         r"""Send a message."""
         # Ensure that filter is not being used with REQ or REP socket
         # which cannot drop messages
-        if self.filter and (self.socket_type_name in ['REQ', 'REP']):
+        if self.filter and (self.socket_type_name in ['REQ', 'REP']):  # pragma: debug
             raise RuntimeError("Cannot use filters with REQ or REP "
                                "sockets since dropping messages "
                                "would break the requirement of "
@@ -1059,7 +1061,7 @@ class ZMQComm(CommBase.CommBase):
         r"""Receive a message."""
         # Ensure that filter is not being used with REQ or REP socket
         # which cannot drop messages
-        if self.filter and (self.socket_type_name in ['REQ', 'REP']):
+        if self.filter and (self.socket_type_name in ['REQ', 'REP']):  # pragma: debug
             raise RuntimeError("Cannot use filters with REQ or REP "
                                "sockets since dropping messages "
                                "would break the requirement of "
@@ -1177,7 +1179,7 @@ class ZMQComm(CommBase.CommBase):
         r"""Confirm that sent message was received."""
         if noblock:
             if self.is_open and (self._n_zmq_sent != self._n_reply_sent):
-                self._n_reply_sent = self._n_zmq_sent
+                self._n_reply_sent = self._n_zmq_sent  # pragma: debug
             return True
         flag = True
         if self.is_open and (self._n_zmq_sent != self._n_reply_sent):
@@ -1198,7 +1200,7 @@ class ZMQComm(CommBase.CommBase):
         if noblock:
             for k in keys:
                 if self.is_open and (self._n_zmq_recv[k] != self._n_reply_recv[k]):
-                    self._n_reply_recv[k] = self._n_zmq_recv[k]
+                    self._n_reply_recv[k] = self._n_zmq_recv[k]  # pragma: debug
             return True
         flag = True
         for k in keys:

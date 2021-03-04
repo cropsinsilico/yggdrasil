@@ -671,13 +671,12 @@ def get_supported_lang():
         list: The names of programming languages supported by yggdrasil.
     
     """
-    from yggdrasil import schema
-    s = schema.get_schema()
-    out = s['model'].subtypes
+    # from yggdrasil import schema
+    # s = schema.get_schema()
+    # out = s['model'].subtypes
+    out = constants.LANGUAGES['all'].copy()
     if 'c++' in out:
         out[out.index('c++')] = 'cpp'
-    # if 'R' in out:
-    #     out[out.index('R')] = 'r'
     if 'r' in out:
         out[out.index('r')] = 'R'
     return list(set(out))
@@ -994,7 +993,7 @@ class ProxyMeta(type):
         '__repr__', '__reversed__', '__rfloorfiv__', '__rlshift__', '__rmod__',
         '__rmul__', '__ror__', '__rpow__', '__rrshift__', '__rshift__', '__rsub__',
         '__rtruediv__', '__rxor__', '__setitem__', '__setslice__', '__sub__',
-        '__truediv__', '__xor__', 'next',
+        '__truediv__', '__xor__', 'next', '__hash__'
     ]
     
     def __new__(cls, classname, bases, attrs):
@@ -1004,8 +1003,7 @@ class ProxyMeta(type):
                          ['__overrides__'])
         for base in bases:
             overrides.extend(getattr(base, '__overrides__', []))
-        if '_wrapped' not in overrides:
-            overrides.append('_wrapped')
+        assert('_wrapped' in overrides)
         attrs['__overrides__'] = overrides
         
         def make_method(name):
@@ -1054,7 +1052,7 @@ class ProxyObject(metaclass=ProxyMeta):
         return object.__getattribute__(self, "__reduce__")()
     
     # Special cases
-    def __nonzero__(self):
+    def __bool__(self):
         return bool(object.__getattribute__(self, "_wrapped"))
     
     def __str__(self):
@@ -1065,9 +1063,6 @@ class ProxyObject(metaclass=ProxyMeta):
     
     def __repr__(self):
         return repr(object.__getattribute__(self, "_wrapped"))
-    
-    def __hash__(self):
-        return hash(object.__getattribute__(self, "_wrapped"))
 
 
 class YggPopen(subprocess.Popen):

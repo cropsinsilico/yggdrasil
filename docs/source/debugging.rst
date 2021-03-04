@@ -66,6 +66,13 @@ MacOS Errors
     You will need to set the ``CONDA_BUILD_SYSROOT`` environment variable in every process in which you will be running |yggdrasil|. Alternatively, you can permanently add it to your |yggdrasil| configuration file using the following command::
 
       $ yggconfig --macos-sdkroot <path to sdk>
+
+- When compiling a model using CMake you get ``ld: library not found for -lintl``
+  **Possible Causes:**
+  
+  #. The ``libintl`` cannot be found because it is not installed.
+#. The ``-lintl`` library is linked via the ``LDFLAGS`` environment variable, but the directory containing the library is not added to the list of paths searched for libraries (typically ``/usr/lib`` or ``/usr/local/lib``).
+  **Solution:** Verify that ``libintl`` is installed and install it if it is not (it can be installed via ``brew reinstall gettext``). If you still get the error, report it via an issue on the `yggdrasil Github repository<https://github.com/cropsinsilico/yggdrasil/issues>`_ as yggdrasil should be able to add the appropriate paths that CMake misses. In the meantime, you can manually add the path via the environment variable (e.g. ``LDFLAGS="$LDFLAGS -L/path/to/directory/containing/libintl"``).
       
 Matlab Errors
 -------------

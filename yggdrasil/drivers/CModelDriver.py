@@ -70,7 +70,8 @@ class CCompilerBase(CompilerBase):
     default_flags_env = 'CFLAGS'
     default_flags = ['-g', '-Wall']
     # GCC & CLANG have similar call patterns
-    linker_attributes = {'default_flags_env': 'LDFLAGS',
+    linker_attributes = {'default_executable_env': 'LD',
+                         'default_flags_env': 'LDFLAGS',
                          'search_path_envvar': ['LIBRARY_PATH', 'LD_LIBRARY_PATH']}
     search_path_envvar = ['C_INCLUDE_PATH']
     search_path_flags = ['-E', '-v', '-xc', '/dev/null']
@@ -94,9 +95,6 @@ class CCompilerBase(CompilerBase):
             cls.linker_attributes = dict(cls.linker_attributes,
                                          search_path_flags=['-Xlinker', '--verbose'],
                                          search_regex=[r'SEARCH_DIR\("=([^"]+)"\);'])
-        elif platform._is_win and (cls.toolname not in [None, 'cl', 'msvc']):
-            cls.default_executable_env = None
-            cls.default_flags_env = None
         CompilerBase.before_registration(cls)
 
     @classmethod
@@ -258,9 +256,7 @@ class ClangCompiler(CCompilerBase):
 class MSVCCompiler(CCompilerBase):
     r"""Microsoft Visual Studio C Compiler."""
     toolname = 'cl'
-    languages = ['c', 'c++']
     platforms = ['Windows']
-    default_flags_env = ['CFLAGS', 'CXXFLAGS']
     # TODO: Currently everything compiled as C++ on windows to allow use
     # of complex types. Use '/TC' instead of '/TP' for strictly C
     default_flags = ['/W4',      # Display all errors
@@ -275,6 +271,7 @@ class MSVCCompiler(CCompilerBase):
                      "-D_CRT_SECURE_NO_WARNINGS"]
     output_key = '/Fo%s'
     output_first = True
+    default_executable_env = 'LINK'
     default_linker = 'LINK'
     default_archiver = 'LIB'
     linker_switch = '/link'
@@ -286,8 +283,6 @@ class MSVCCompiler(CCompilerBase):
     combine_with_linker = True  # Must be explicit; linker is separate .exe
     linker_attributes = dict(GCCCompiler.linker_attributes,
                              default_executable=None,
-                             default_executable_env=None,
-                             default_flags_env=None,
                              output_key='/OUT:%s',
                              output_first=True,
                              output_first_library=False,
@@ -379,7 +374,6 @@ class ClangLinker(LDLinker):
     languages = ClangCompiler.languages
     platforms = ClangCompiler.platforms
     default_executable = ClangCompiler.default_executable
-    default_executable_env = ClangCompiler.default_executable_env
     toolset = ClangCompiler.toolset
     search_path_flags = ['-Xlinker', '-v']
     search_regex = [r'\t([^\t\n]+)\n']

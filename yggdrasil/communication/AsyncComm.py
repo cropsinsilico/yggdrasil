@@ -107,6 +107,20 @@ class AsyncComm(ProxyObject, ComponentBaseUnregistered):
                     self, target=self.run_backlog_recv, suffix='RecvBacklog')
         return self._backlog_thread
 
+    @property
+    def errors(self):
+        r"""list: Errors raised by the wrapped comm or async thread."""
+        out = self._wrapped.errors
+        if self._backlog_thread:
+            if self._backlog_thread.errors:
+                out += self._backlog_thread.errors
+                self._backlog_thread.errors = []
+        return out
+
+    @errors.setter
+    def errors(self, value):
+        self._wrapped.errors = value
+
     def atexit(self):
         r"""Close operations."""
         if (self.direction == 'send') and self.is_open_backlog:
@@ -224,14 +238,14 @@ class AsyncComm(ProxyObject, ComponentBaseUnregistered):
         r"""int: Number of messages in the receive backlog."""
         if self.direction == 'recv':
             return self.n_msg_backlog
-        return 0
+        return 0  # pragma: debug
 
     @property
     def n_msg_backlog_send(self):
         r"""int: Number of messages in the send backlog."""
         if self.direction == 'send':
             return self.n_msg_backlog
-        return 0
+        return 0  # pragma: debug
 
     @property
     def n_msg_backlog(self):
@@ -360,7 +374,7 @@ class AsyncComm(ProxyObject, ComponentBaseUnregistered):
                 else:
                     async_flag = FLAG_FAILURE
             else:  # pragma: debug
-                raise Exception("Unsupport flag: %s" % msg.flag)
+                raise Exception("Unsupported flag: %s" % msg.flag)
         except TemporaryCommunicationError:
             async_flag = FLAG_TRYAGAIN
         self.suppress_special_debug = False
