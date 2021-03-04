@@ -1101,15 +1101,15 @@ class ModelDriver(Driver):
         # Locate executable
         if (((not cls.is_language_installed())
              and (cls.executable_type is not None))):  # pragma: debug
-            exec_file = cls.language_executable()
-            if exec_file is not None:
-                try:
+            try:
+                exec_file = cls.language_executable()
+                if exec_file is not None:
                     fpath = tools.locate_file(
                         exec_file, directory_list=cls._executable_search_dirs)
                     if fpath:
                         cfg.set(cls.language, cls.executable_type, fpath)
-                except NotImplementedError:
-                    pass
+            except NotImplementedError:
+                pass
         # Configure libraries
         out += cls.configure_libraries(cfg)
         # Only do additional configuration if no base languages
