@@ -358,6 +358,7 @@ class CMakeConfigure(BuildToolBase):
         if platform._is_win:  # pragma: windows
             if is_gnu:
                 x = x.replace('\\', '/')
+                x = x.replace(' ', '\\ ')
             else:
                 x = x.replace('\\', re.escape('\\'))
         return x
