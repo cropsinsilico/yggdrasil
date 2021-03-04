@@ -70,7 +70,8 @@ class CCompilerBase(CompilerBase):
     default_flags_env = 'CFLAGS'
     default_flags = ['-g', '-Wall']
     # GCC & CLANG have similar call patterns
-    linker_attributes = {'default_flags_env': 'LDFLAGS',
+    linker_attributes = {'default_executable_env': 'LD',
+                         'default_flags_env': 'LDFLAGS',
                          'search_path_envvar': ['LIBRARY_PATH', 'LD_LIBRARY_PATH']}
     search_path_envvar = ['C_INCLUDE_PATH']
     search_path_flags = ['-E', '-v', '-xc', '/dev/null']
