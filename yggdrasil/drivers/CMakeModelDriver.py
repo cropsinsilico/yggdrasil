@@ -983,10 +983,6 @@ class CMakeModelDriver(BuildModelDriver):
                                + internal_library_flags),
                 external_library_flags=external_library_flags,
                 internal_library_flags=internal_library_flags)
-        else:
-            out.update(
-                compiler_flags_env=None,
-                linker_flags_env=None)
         for k in constants.LANGUAGES['compiled']:
             if k == out['driver'].language:
                 continue
@@ -1009,6 +1005,7 @@ class CMakeModelDriver(BuildModelDriver):
                     drv.get_compiler_flags(**drv_kws))
                 # out['env'][itool.default_flags_env] = ''
         import pprint
+        print('WITHOUT_WRAPPER', without_wrapper)
         pprint.pprint(out)
         return out
         
