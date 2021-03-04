@@ -647,6 +647,8 @@ class CompilationToolBase(object):
 
         """
         exec_path = shutil.which(cls.get_executable())
+        if (cls.toolname == 'clang'):
+            logger.info("CLANG INSTALLED?", cls.get_executable(), exec_path)
         return (exec_path is not None)
 
     @classmethod
@@ -794,7 +796,7 @@ class CompilationToolBase(object):
             if cls.languages:
                 out = ygg_cfg.get(cls.languages[0],
                                   '%s_executable' % cls.toolname,
-                                  cls.default_executable)
+                                  out)
         if out is None:
             raise NotImplementedError("Executable not set for %s '%s'."
                                       % (cls.tooltype, cls.toolname))
@@ -1138,6 +1140,7 @@ class CompilationToolBase(object):
         try:
             if (not skip_flags) and ('env' not in unused_kwargs):
                 unused_kwargs['env'] = cls.set_env()
+            # DEBUG HERE
             if cls.toolname == 'dummy12345':
                 logger.info('Command: "%s"' % ' '.join(cmd))
             logger.debug('Command: "%s"' % ' '.join(cmd))
@@ -1148,6 +1151,7 @@ class CompilationToolBase(object):
                 raise RuntimeError("Command '%s' failed with code %d:\n%s."
                                    % (' '.join(cmd), proc.returncode, output))
             try:
+                # DEBUG HERE
                 if cls.toolname == 'dummy12345':
                     logger.info(' '.join(cmd) + '\n' + output)
                 logger.debug(' '.join(cmd) + '\n' + output)
@@ -3304,9 +3308,10 @@ class CompiledModelDriver(ModelDriver):
             if default_tool_name:
                 default_tool = get_compilation_tool(k, default_tool_name)
                 if not default_tool.is_installed():  # pragma: debug
-                    logger.debug(('Default %s for %s (%s) not installed. '
-                                  'Attempting to locate an alternative .')
-                                 % (k, cls.language, default_tool_name))
+                    # DEBUG HERE
+                    logger.info(('Default %s for %s (%s) not installed. '
+                                 'Attempting to locate an alternative .')
+                                % (k, cls.language, default_tool_name))
                     default_tool_name = None
             # Determine compilation tools based on language/platform
             if default_tool_name is None:  # pragma: no cover

@@ -530,12 +530,7 @@ class BuildModelDriver(CompiledModelDriver):
         if language_info['linker_flags_env']:
             for x in language_info['linker_flags_env']:
                 out[x] = ' '.join(language_info['linker_flags'])
-        # if language_info['compiler_flags_env']:
-        #     for x in language_info['compiler_flags_env']:
-        #         out.pop(x, None)
-        # if language_info['linker_flags_env']:
-        #     for x in language_info['linker_flags_env']:
-        #         out.pop(x, None)
+        # DEBUG HERE
         if language_info['compiler_flags_env']:
             print("ENV COMPILER FLAGS",
                   language_info['compiler_flags_env'],
