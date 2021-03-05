@@ -138,8 +138,6 @@ class TestDummyCompiler(TestCompilationTool):
         out = 'test123'
         assert(not shutil.which(self.import_cls.toolname))
         assert(not (os.path.isfile(out) or os.path.isdir(out)))
-        if os.environ.get('USEVIRTUALENV', '0') == '1':
-            self.import_cls.call('args', out=out, dont_link=True)
         self.assert_raises(RuntimeError, self.import_cls.call, 'args',
                            out=out, dont_link=True)
 
