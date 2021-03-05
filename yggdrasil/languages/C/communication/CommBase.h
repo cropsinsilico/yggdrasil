@@ -59,6 +59,7 @@ typedef struct comm_t {
   time_t *last_send; //!< Clock output at time of last send.
   void *reply; //!< Reply information.
   int thread_id; //!< ID for the thread that created the comm.
+  int is_response_client; //!< Flag specifying if comm is used for receiving responses to a client request
 } comm_t;
 
 
@@ -122,6 +123,7 @@ comm_t empty_comm_base() {
   ret.last_send = NULL;
   ret.reply = NULL;
   ret.thread_id = 0;
+  ret.is_response_client = 0;
   return ret;
 };
 
