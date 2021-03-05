@@ -979,6 +979,8 @@ class CMakeModelDriver(BuildModelDriver):
                 itool = get_compatible_tool(out['compiler'], 'compiler', k)
             except ValueError:
                 continue
+            if not itool.is_installed():
+                continue
             if itool.default_executable_env:
                 out['env'][itool.default_executable_env] = (
                     itool.get_executable(full_path=True))
