@@ -1547,7 +1547,7 @@ class CompilerBase(CompilationToolBase):
                 dont_link = False
         # Get appropriate tool
         tool = None
-        if not dont_link:
+        if not (dont_link or skip_flags):
             tool = cls.get_library_tool(libtype=libtype, **kwargs)
         # Handle list of sources
         if (not skip_flags) and isinstance(args, list) and (len(args) > 1):
