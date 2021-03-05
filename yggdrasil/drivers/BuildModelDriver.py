@@ -370,11 +370,11 @@ class BuildModelDriver(CompiledModelDriver):
         out = {
             'driver': target_language_driver,
             'compiler': compiler,
-            'compiler_executable': compiler.get_executable(),
+            'compiler_executable': compiler.get_executable(full_path=True),
             'compiler_env': compiler.default_executable_env,
             'compiler_flags_env': compiler.default_flags_env,
             'linker': linker,
-            'linker_executable': linker.get_executable(),
+            'linker_executable': linker.get_executable(full_path=True),
             'linker_env': linker.default_executable_env,
             'linker_flags_env': linker.default_flags_env,
             'env': {},
@@ -530,12 +530,7 @@ class BuildModelDriver(CompiledModelDriver):
         if language_info['linker_flags_env']:
             for x in language_info['linker_flags_env']:
                 out[x] = ' '.join(language_info['linker_flags'])
-        # if language_info['compiler_flags_env']:
-        #     for x in language_info['compiler_flags_env']:
-        #         out.pop(x, None)
-        # if language_info['linker_flags_env']:
-        #     for x in language_info['linker_flags_env']:
-        #         out.pop(x, None)
+        # DEBUG HERE
         if language_info['compiler_flags_env']:
             print("ENV COMPILER FLAGS",
                   language_info['compiler_flags_env'],

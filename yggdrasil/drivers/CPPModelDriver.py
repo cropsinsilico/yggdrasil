@@ -96,6 +96,9 @@ class MSVCPPCompiler(CPPCompilerBase, MSVCCompiler):
     r"""Inteface class for MSVC compiler when compiling C++."""
     toolname = 'cl++'
     default_executable = MSVCCompiler.default_executable
+    default_linker = 'LINK'
+    default_archiver = 'LIB'
+    search_path_flags = None
     
     @classmethod
     def get_flags(cls, **kwargs):
@@ -111,6 +114,14 @@ class MSVCPPCompiler(CPPCompilerBase, MSVCCompiler):
         """
         kwargs['skip_standard_flag'] = True
         return super(MSVCPPCompiler, cls).get_flags(**kwargs)
+
+    @staticmethod
+    def before_registration(cls):
+        r"""Operations that should be performed to modify class attributes prior
+        to registration including things like platform dependent properties and
+        checking environment variables for default settings.
+        """
+        return MSVCCompiler.before_registration(cls)
 
 
 class ClangPPLinker(ClangLinker):

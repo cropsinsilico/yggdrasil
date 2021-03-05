@@ -135,11 +135,11 @@ class TestDummyCompiler(TestCompilationTool):
 
     def test_call(self):
         r"""Test call."""
+        out = 'test123'
         assert(not shutil.which(self.import_cls.toolname))
-        if os.environ.get('USEVIRTUALENV', '0') == '1':
-            self.import_cls.call('args', out='test', dont_link=True)
+        assert(not (os.path.isfile(out) or os.path.isdir(out)))
         self.assert_raises(RuntimeError, self.import_cls.call, 'args',
-                           out='test', dont_link=True)
+                           out=out, dont_link=True)
 
     def test_linker(self):
         r"""Test linker."""

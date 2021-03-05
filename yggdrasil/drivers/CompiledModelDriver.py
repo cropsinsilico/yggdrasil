@@ -188,7 +188,8 @@ def get_compilation_tool(tooltype, name, default=False):
             raise ValueError("Could not locate a %s tool with name '%s'"
                              % (tooltype, name))
         out = default
-    if isinstance(out, CompilationToolMeta) and (out.toolname != name):
+    if ((isinstance(out, CompilationToolMeta) and (out.toolname != name)
+         and (os.path.isfile(name) or shutil.which(name)))):
         out.executable = name
     return out
 
@@ -794,7 +795,7 @@ class CompilationToolBase(object):
             if cls.languages:
                 out = ygg_cfg.get(cls.languages[0],
                                   '%s_executable' % cls.toolname,
-                                  cls.default_executable)
+                                  out)
         if out is None:
             raise NotImplementedError("Executable not set for %s '%s'."
                                       % (cls.tooltype, cls.toolname))
@@ -1138,8 +1139,6 @@ class CompilationToolBase(object):
         try:
             if (not skip_flags) and ('env' not in unused_kwargs):
                 unused_kwargs['env'] = cls.set_env()
-            if cls.toolname == 'dummy12345':
-                logger.info('Command: "%s"' % ' '.join(cmd))
             logger.debug('Command: "%s"' % ' '.join(cmd))
             proc = tools.popen_nobuffer(cmd, **unused_kwargs)
             output, err = proc.communicate()
@@ -1148,8 +1147,6 @@ class CompilationToolBase(object):
                 raise RuntimeError("Command '%s' failed with code %d:\n%s."
                                    % (' '.join(cmd), proc.returncode, output))
             try:
-                if cls.toolname == 'dummy12345':
-                    logger.info(' '.join(cmd) + '\n' + output)
                 logger.debug(' '.join(cmd) + '\n' + output)
             except UnicodeDecodeError:  # pragma: debug
                 tools.print_encoded(output)
@@ -2346,6 +2343,9 @@ class CompiledModelDriver(ModelDriver):
                 toolname = getattr(cls, tooltype, None)
             if toolname is None:
                 toolname = getattr(cls, 'default_%s' % tooltype, None)
+            if toolname is None:
+                toolname = find_compilation_tool(tooltype, cls.language,
+                                                 allow_failure=True)
             if toolname is None:
                 if default is False:
                     raise NotImplementedError("%s not set for language '%s'."
