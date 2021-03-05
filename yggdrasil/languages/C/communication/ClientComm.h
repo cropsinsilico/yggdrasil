@@ -216,6 +216,7 @@ comm_head_t client_response_header(const comm_t* x, comm_head_t head) {
   }
   dtype_t * dtype_copy = copy_dtype(x->datatype);
   res_comm[0][ncomm] = new_comm_base(NULL, "recv", _default_comm, dtype_copy);
+  res_comm[0][ncomm]->is_response_client = 1;
   int ret = new_default_address(res_comm[0][ncomm]);
   if (ret < 0) {
     ygglog_error("client_response_header(%s): could not create response comm", x->name);
