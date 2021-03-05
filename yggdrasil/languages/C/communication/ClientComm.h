@@ -78,6 +78,7 @@ int init_client_comm(comm_t *comm) {
   } else {
     handle = init_comm_base(comm->name, "send", _default_comm, dtype_out);
   }
+  handle->flags = handle->flags | COMM_FLAG_CLIENT;
   ret = init_default_comm(handle);
   strcpy(comm->address, handle->address);
   comm->handle = (void*)handle;
@@ -90,7 +91,7 @@ int init_client_comm(comm_t *comm) {
   ncomm[0] = 0;
   handle->info = (void*)ncomm;
   strcpy(comm->direction, "send");
-  comm->always_send_header = 1;
+  comm->flags = comm->flags | COMM_ALWAYS_SEND_HEADER;
   comm_t ***info = (comm_t***)malloc(sizeof(comm_t**));
   if (info == NULL) {
     ygglog_error("init_client_comm: Failed to malloc info.");
@@ -211,20 +212,19 @@ comm_head_t client_response_header(const comm_t* x, comm_head_t head) {
   res_comm[0] = (comm_t**)realloc(res_comm[0], sizeof(comm_t*)*(ncomm + 1));
   if (res_comm[0] == NULL) {
     ygglog_error("client_response_header: Failed to realloc response comm.");
-    head.valid = 0;
+    head.flags = head.flags & ~COMM_FLAG_VALID;
     return head;
   }
   dtype_t * dtype_copy = copy_dtype(x->datatype);
   res_comm[0][ncomm] = new_comm_base(NULL, "recv", _default_comm, dtype_copy);
-  res_comm[0][ncomm]->is_response_client = 1;
+  res_comm[0][ncomm]->flags = res_comm[0][ncomm]->flags | COMM_FLAG_CLIENT_RESPONSE;
   int ret = new_default_address(res_comm[0][ncomm]);
   if (ret < 0) {
     ygglog_error("client_response_header(%s): could not create response comm", x->name);
-    head.valid = 0;
+    head.flags = head.flags & ~COMM_FLAG_VALID;
     return head;
   }
-  res_comm[0][ncomm]->sent_eof[0] = 1;
-  res_comm[0][ncomm]->recv_eof[0] = 1;
+  res_comm[0][ncomm]->const_flags[0] = res_comm[0][ncomm]->const_flags[0] | COMM_EOF_SENT | COMM_EOF_RECV;
   inc_client_response_count(x);
   ncomm = get_client_response_count(x);
   ygglog_debug("client_response_header(%s): Created response comm number %d",
@@ -255,7 +255,7 @@ int client_comm_send(const comm_t* x, const char *data, const size_t len) {
   comm_t *req_comm = (comm_t*)(x->handle);
   ret = default_comm_send(req_comm, data, len);
   if (is_eof(data)) {
-    req_comm->sent_eof[0] = 1;
+    req_comm->const_flags[0] = req_comm->const_flags[0] | COMM_EOF_SENT;
   }
   return ret;
 };
