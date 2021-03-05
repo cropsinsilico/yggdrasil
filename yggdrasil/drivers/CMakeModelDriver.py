@@ -313,9 +313,10 @@ class CMakeConfigure(BuildToolBase):
                     # if itool.default_executable_env is None:
                     out.append('-D%s:FILEPATH=%s' % (
                         cmake_vars['%s_compiler' % k],
-                        cls.fix_path(
-                            itool.get_executable(full_path=True),
-                            is_gnu=False, for_path=True)))
+                        itool.get_executable(full_path=True)))
+                    # cls.fix_path(
+                    #     itool.get_executable(full_path=True),
+                    #     is_gnu=False, for_path=True)))
                     # if itool.default_flags_env is None:
                     out.append('-D%s=%s' % (
                         cmake_vars['%s_flags' % k], ''))
@@ -358,7 +359,7 @@ class CMakeConfigure(BuildToolBase):
         and/or build tool."""
         if platform._is_win:  # pragma: windows
             if for_path:
-                x = x.replace('\\', '/')
+                x = x.replace('\\', '\\\\\\\\')
                 # for a, b in [('\\', '/'), (' ', '\\ '), ('(', '\\('),
                 #              (')', '\\)')]:
                 #     x = x.replace(a, b)
@@ -448,11 +449,6 @@ class CMakeConfigure(BuildToolBase):
         # preamble_lines.append('INCLUDE_DIRECTORIES(${PYTHON_INCLUDE_DIRS})')
         # lines.append('TARGET_LINK_LIBRARIES(%s ${PYTHON_LIBRARIES})'
         #              % target)
-        # python_flags = sysconfig.get_config_var('LIBS')
-        # if python_flags:
-        #     for x in python_flags.split():
-        #         if x.startswith(('-L', '-l')) and (x not in linker_flags):
-        #             linker_flags.append(x)
         # Compilation flags
         for x in compiler_flags:
             if x.startswith('-D'):
@@ -532,13 +528,6 @@ class CMakeConfigure(BuildToolBase):
                              % (xn.upper(), xf, xn, xd))
                 lines.append('TARGET_LINK_LIBRARIES(%s ${%s_LIBRARY})'
                              % (target, xn.upper()))
-        # Link local lib on MacOS because on Mac >=10.14 setting sysroot
-        # clobbers the default paths.
-        # https://stackoverflow.com/questions/54068035/linking-not-working-in
-        # -homebrews-cmake-since-mojave
-        # if platform._is_mac:
-        #     pretarget_lines.append('LINK_DIRECTORIES(/usr/lib)')
-        #     pretarget_lines.append('LINK_DIRECTORIES(/usr/local/lib)')
         lines = preamble_lines + lines
         log_msg = (
             'CMake compiler flags:\n\t%s\n'
@@ -997,7 +986,8 @@ class CMakeModelDriver(BuildModelDriver):
             except ValueError:
                 continue
             if itool.default_executable_env:
-                out['env'][itool.default_executable_env] = itool.get_executable()
+                out['env'][itool.default_executable_env] = (
+                    itool.get_executable(full_path=True))
             if itool.default_flags_env:
                 # TODO: Getting the flags is slower, but may be necessary
                 # for projects that include more than one language. In
@@ -1048,6 +1038,7 @@ class CMakeModelDriver(BuildModelDriver):
             finally:
                 if os.path.isfile(self.buildfile_orig):
                     shutil.copy2(self.buildfile_orig, self.buildfile)
+                    os.remove(self.buildfile_orig)
             return out
 
     @classmethod
@@ -1098,14 +1089,12 @@ class CMakeModelDriver(BuildModelDriver):
                 flags.
 
         """
-        is_gnu = False
         if platform._is_win and (kwargs.get('target_compiler', None)
                                  in ['gcc', 'g++', 'gfortran']):  # pragma: windows
             gcc = get_compilation_tool('compiler',
                                        kwargs['target_compiler'],
                                        None)
             if gcc:
-                is_gnu = True
                 path = cls.prune_sh_gcc(
                     kwargs['env']['PATH'],
                     gcc.get_executable(full_path=True))
@@ -1121,16 +1110,5 @@ class CMakeModelDriver(BuildModelDriver):
                 #     kwargs.setdefault('generator', 'MSYS Makefiles')
         out = super(CMakeModelDriver, cls).update_compiler_kwargs(**kwargs)
         out.setdefault('definitions', [])
-        out['definitions'].append(
-            'PYTHON_EXECUTABLE:FILEPATH=%s'
-            % CMakeConfigure.fix_path(sys.executable, is_gnu=is_gnu,
-                                      for_path=True))
-        # if CModelDriver._osx_sysroot is not None:
-        #     out.setdefault('definitions', [])
-        #     out['definitions'].append(
-        #         'CMAKE_OSX_SYSROOT=%s' % CModelDriver._osx_sysroot)
-        #     if os.environ.get('MACOSX_DEPLOYMENT_TARGET', None):
-        #         out['definitions'].append(
-        #             'CMAKE_OSX_DEPLOYMENT_TARGET=%s'
-        #             % os.environ['MACOSX_DEPLOYMENT_TARGET'])
+        out['definitions'].append('PYTHON_EXECUTABLE=%s' % sys.executable)
         return out

@@ -370,11 +370,11 @@ class BuildModelDriver(CompiledModelDriver):
         out = {
             'driver': target_language_driver,
             'compiler': compiler,
-            'compiler_executable': compiler.get_executable(),
+            'compiler_executable': compiler.get_executable(full_path=True),
             'compiler_env': compiler.default_executable_env,
             'compiler_flags_env': compiler.default_flags_env,
             'linker': linker,
-            'linker_executable': linker.get_executable(),
+            'linker_executable': linker.get_executable(full_path=True),
             'linker_env': linker.default_executable_env,
             'linker_flags_env': linker.default_flags_env,
             'env': {},
