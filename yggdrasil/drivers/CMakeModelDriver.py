@@ -314,9 +314,6 @@ class CMakeConfigure(BuildToolBase):
                     out.append('-D%s:FILEPATH=%s' % (
                         cmake_vars['%s_compiler' % k],
                         itool.get_executable(full_path=True)))
-                    # cls.fix_path(
-                    #     itool.get_executable(full_path=True),
-                    #     is_gnu=False, for_path=True)))
                     # if itool.default_flags_env is None:
                     out.append('-D%s=%s' % (
                         cmake_vars['%s_flags' % k], ''))
@@ -358,12 +355,9 @@ class CMakeConfigure(BuildToolBase):
         r"""Fix paths so that they conform to the format expected by the OS
         and/or build tool."""
         if platform._is_win:  # pragma: windows
-            if for_path:
-                x = x.replace('\\', '\\\\\\\\')
-                # for a, b in [('\\', '/'), (' ', '\\ '), ('(', '\\('),
-                #              (')', '\\)')]:
-                #     x = x.replace(a, b)
-            elif is_gnu:
+            if ' ' in x:
+                x = "%s" % x
+            if is_gnu:
                 x = x.replace('\\', re.escape('/'))
             else:
                 x = x.replace('\\', re.escape('\\'))
