@@ -501,6 +501,8 @@ class BuildModelDriver(CompiledModelDriver):
             language_info = cls.get_target_language_info(
                 without_wrapper=True, **kws)
             kwargs['env'] = cls.set_env_compiler(language_info=language_info)
+            if not kwargs.get('target_compiler', None):
+                kwargs['target_compiler'] = language_info['compiler'].toolname
         return super(BuildModelDriver, cls).call_compiler(src, **kwargs)
         
     @classmethod

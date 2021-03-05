@@ -309,6 +309,8 @@ class CMakeConfigure(BuildToolBase):
                     itool = get_compatible_tool(compiler, 'compiler', k)
                 except ValueError:
                     continue
+                if not itool.is_installed():
+                    continue
                 if itool.toolname in ['cl', 'cl++']:
                     # if itool.default_executable_env is None:
                     out.append('-D%s:FILEPATH=%s' % (
@@ -317,6 +319,8 @@ class CMakeConfigure(BuildToolBase):
                     # if itool.default_flags_env is None:
                     out.append('-D%s=%s' % (
                         cmake_vars['%s_flags' % k], ''))
+            # linker = compiler.linker()
+            # out.append('-D
         return out
 
     @classmethod
@@ -778,6 +782,8 @@ class CMakeModelDriver(BuildModelDriver):
             list: Full paths to any created wrappers.
 
         """
+        # HERE DEBUG
+        kwargs['verbose'] = True
         out = super(CMakeModelDriver, self).write_wrappers(**kwargs)
         # Create cmake files that can be included
         if self.target is None:
