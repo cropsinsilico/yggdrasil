@@ -660,7 +660,12 @@ int new_zmq_address(comm_t *comm) {
     /* strcat(address, ":!"); // For random port */
   }
   // Bind
-  zsock_t *s = ygg_zsock_new(ZMQ_PAIR);
+  zsock_t *s = NULL;
+  if (comm->is_response_client) {
+    s = ygg_zsock_new(ZMQ_ROUTER);
+  } else {
+    s = ygg_zsock_new(ZMQ_PAIR);
+  }
   if (s == NULL) {
     ygglog_error("new_zmq_address: Could not initialize empty socket.");
     return -1;
@@ -914,7 +919,17 @@ int zmq_comm_recv(const comm_t* x, char **data, const size_t len,
       usleep(YGG_SLEEP_TIME);
     }
   }
-  zframe_t *out = zframe_recv(s);
+  zframe_t *out = NULL;
+  if (x->is_response_client) {
+    out = zframe_recv(s);
+    if (out == NULL) {
+      ygglog_debug("zmq_comm_recv(%s): did not receive identity", x->name);
+      return ret;
+    }
+    zframe_destroy(&out);
+    out = NULL;
+  }
+  out = zframe_recv(s);
   if (out == NULL) {
     ygglog_debug("zmq_comm_recv(%s): did not receive", x->name);
     return ret;
