@@ -271,7 +271,6 @@ class MSVCCompiler(CCompilerBase):
                      "-D_CRT_SECURE_NO_WARNINGS"]
     output_key = '/Fo%s'
     output_first = True
-    default_executable_env = 'LINK'
     default_linker = 'LINK'
     default_archiver = 'LIB'
     linker_switch = '/link'
@@ -283,6 +282,7 @@ class MSVCCompiler(CCompilerBase):
     combine_with_linker = True  # Must be explicit; linker is separate .exe
     linker_attributes = dict(GCCCompiler.linker_attributes,
                              default_executable=None,
+                             default_executable_env='LINK',
                              output_key='/OUT:%s',
                              output_first=True,
                              output_first_library=False,
