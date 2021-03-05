@@ -96,8 +96,6 @@ class MSVCPPCompiler(CPPCompilerBase, MSVCCompiler):
     r"""Inteface class for MSVC compiler when compiling C++."""
     toolname = 'cl++'
     default_executable = MSVCCompiler.default_executable
-    default_linker = 'LINK'
-    default_archiver = 'LIB'
     search_path_flags = None
     
     @classmethod
