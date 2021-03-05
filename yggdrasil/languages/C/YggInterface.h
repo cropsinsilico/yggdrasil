@@ -116,7 +116,7 @@ yggOutput_t yggOutputFmt(const char *name, const char *fmtString){
   if ((fmtString != NULL) && (datatype == NULL)) {
     ygglog_error("yggOutputFmt: Failed to create tyep from format_str.");
     if (out != NULL) {
-      out->valid = 0;
+      out->flags = out->flags & ~COMM_FLAG_VALID;
     }
   }
   return out;
@@ -138,7 +138,7 @@ yggInput_t yggInputFmt(const char *name, const char *fmtString){
   if ((fmtString != NULL) && (datatype == NULL)) {
     ygglog_error("yggInputFmt: Failed to create tyep from format_str.");
     if (out != NULL) {
-      out->valid = 0;
+      out->flags = out->flags & ~COMM_FLAG_VALID;
     }
   }
   return out;
@@ -444,7 +444,7 @@ comm_t* yggRpcClientType(const char *name, dtype_t *outType, dtype_t *inType) {
     inType = create_dtype_empty(true);
   }
   comm_t* out = init_comm(name, "%s", CLIENT_COMM, inType);
-  if ((out != NULL) && (out->valid)) {
+  if ((out != NULL) && (out->flags & COMM_FLAG_VALID)) {
     comm_t* handle = (comm_t*)(out->handle);
     destroy_dtype(&(handle->datatype));
     handle->datatype = outType;
@@ -911,8 +911,8 @@ comm_t* yggAsciiArrayInput(const char *name) {
 static inline
 comm_t* yggPlyOutput(const char *name) {
   comm_t* out = init_comm(name, "send", _default_comm, create_dtype_ply(false));
-  if ((out->valid) && (out->datatype->obj == NULL)) {
-    out->valid = 0;
+  if ((out->flags & COMM_FLAG_VALID) && (out->datatype->obj == NULL)) {
+    out->flags = out->flags & ~COMM_FLAG_VALID;
   }
   return out;
 };
@@ -973,8 +973,8 @@ comm_t* yggPlyInput(const char *name) {
 static inline
 comm_t* yggObjOutput(const char *name) {
   comm_t* out = init_comm(name, "send", _default_comm, create_dtype_obj(false));
-  if ((out->valid) && (out->datatype->obj == NULL)) {
-    out->valid = 0;
+  if ((out->flags & COMM_FLAG_VALID) && (out->datatype->obj == NULL)) {
+    out->flags = out->flags & ~COMM_FLAG_VALID;
   }
   return out;
 };
@@ -1083,8 +1083,8 @@ comm_t* yggGenericInput(const char *name) {
 static inline
 comm_t* yggAnyOutput(const char *name) {
   comm_t* out = init_comm(name, "send", _default_comm, create_dtype_any(true));
-  if ((out->valid) && (out->datatype->obj == NULL)) {
-    out->valid = 0;
+  if ((out->flags & COMM_FLAG_VALID) && (out->datatype->obj == NULL)) {
+    out->flags = out->flags & ~COMM_FLAG_VALID;
   }
   return out;
 };
@@ -1097,8 +1097,8 @@ comm_t* yggAnyOutput(const char *name) {
 static inline
 comm_t* yggAnyInput(const char *name) {
   comm_t* out = init_comm(name, "recv", _default_comm, create_dtype_any(true));
-  if ((out->valid) && (out->datatype->obj == NULL)) {
-    out->valid = 0;
+  if ((out->flags & COMM_FLAG_VALID) && (out->datatype->obj == NULL)) {
+    out->flags = out->flags & ~COMM_FLAG_VALID;
   }
   return out;
 };
@@ -1144,8 +1144,8 @@ comm_t* yggAnyInput(const char *name) {
 static inline
 comm_t* yggJSONArrayOutput(const char *name) {
   comm_t* out = init_comm(name, "send", _default_comm, create_dtype_json_array(0, NULL, true));
-  if ((out->valid) && (out->datatype->obj == NULL)) {
-    out->valid = 0;
+  if ((out->flags & COMM_FLAG_VALID) && (out->datatype->obj == NULL)) {
+    out->flags = out->flags & ~COMM_FLAG_VALID;
   }
   return out;
 };
@@ -1158,8 +1158,8 @@ comm_t* yggJSONArrayOutput(const char *name) {
 static inline
 comm_t* yggJSONArrayInput(const char *name) {
   comm_t* out = init_comm(name, "recv", _default_comm, create_dtype_json_array(0, NULL, true));
-  if ((out->valid) && (out->datatype->obj == NULL)) {
-    out->valid = 0;
+  if ((out->flags & COMM_FLAG_VALID) && (out->datatype->obj == NULL)) {
+    out->flags = out->flags & ~COMM_FLAG_VALID;
   }
   return out;
 };
@@ -1208,8 +1208,8 @@ comm_t* yggJSONArrayInput(const char *name) {
 static inline
 comm_t* yggJSONObjectOutput(const char *name) {
   comm_t* out = init_comm(name, "send", _default_comm, create_dtype_json_object(0, NULL, NULL, true));
-  if ((out->valid) && (out->datatype->obj == NULL)) {
-    out->valid = 0;
+  if ((out->flags & COMM_FLAG_VALID) && (out->datatype->obj == NULL)) {
+    out->flags = out->flags & ~COMM_FLAG_VALID;
   }
   return out;
 };
@@ -1222,8 +1222,8 @@ comm_t* yggJSONObjectOutput(const char *name) {
 static inline
 comm_t* yggJSONObjectInput(const char *name) {
   comm_t* out = init_comm(name, "recv", _default_comm, create_dtype_json_object(0, NULL, NULL, true));
-  if ((out->valid) && (out->datatype->obj == NULL)) {
-    out->valid = 0;
+  if ((out->flags & COMM_FLAG_VALID) && (out->datatype->obj == NULL)) {
+    out->flags = out->flags & ~COMM_FLAG_VALID;
   }
   return out;
 };

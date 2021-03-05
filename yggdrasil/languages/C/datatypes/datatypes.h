@@ -18,6 +18,12 @@ extern "C" {
 #endif
 
 static char prefix_char = '#';
+  
+/*! @brief Bit flags. */
+#define HEAD_FLAG_VALID      0x00000001  //!< Set if the header is valid.
+#define HEAD_FLAG_MULTIPART  0x00000002  //!< Set if the header is for a multipart message
+#define HEAD_TYPE_IN_DATA    0x00000004  //!< Set if the type is stored with the data during serialization
+#define HEAD_AS_ARRAY        0x00000008  //!< Set if messages will be serialized arrays
 
 
 /*! @brief C-friendly definition of MetaschemaType. */
@@ -61,10 +67,9 @@ typedef char* bytes_t;
   
 /*! @brief Header information passed by comms for multipart messages. */
 typedef struct comm_head_t {
-  int multipart; //!< 1 if message is multipart, 0 if it is not.
   size_t bodysiz; //!< Size of body.
   size_t bodybeg; //!< Start of body in header.
-  int valid; //!< 1 if the header is valid, 0 otherwise.
+  int flags; //!< Bit flags encoding the status of the header.
   int nargs_populated; //!< Number of arguments populated during deserialization.
   //
   size_t size; //!< Size of incoming message.
@@ -75,13 +80,11 @@ typedef struct comm_head_t {
   char zmq_reply[COMMBUFFSIZ]; //!< Reply address for ZMQ sockets.
   char zmq_reply_worker[COMMBUFFSIZ]; //!< Reply address for worker socket.
   char model[COMMBUFFSIZ]; //!< Name of model that sent the header.
-  int type_in_data; //!< 1 if type is stored with the data during serialization.
   // These should be removed once JSON fully implemented
   int serializer_type; //!< Code indicating the type of serializer.
   char format_str[COMMBUFFSIZ]; //!< Format string for serializer.
   char field_names[COMMBUFFSIZ]; //!< String containing field names.
   char field_units[COMMBUFFSIZ]; //!< String containing field units.
-  int as_array; //!< 1 if messages will be serialized arrays.
   //
   dtype_t* dtype; //!< Type structure.
 } comm_head_t;
@@ -1247,12 +1250,10 @@ static inline
 comm_head_t init_header(const size_t size, const char *address, const char *id) {
   comm_head_t out;
   // Parameters set during read
-  out.multipart = 0;
   out.bodysiz = 0;
   out.bodybeg = 0;
-  out.valid = 1;
+  out.flags = HEAD_FLAG_VALID;
   out.nargs_populated = 0;
-  out.type_in_data = 0;
   // Parameters sent in header
   out.size = size;
   if (address == NULL)
@@ -1271,7 +1272,6 @@ comm_head_t init_header(const size_t size, const char *address, const char *id) 
   // Parameters that will be removed
   out.serializer_type = -1;
   out.format_str[0] = '\0';
-  out.as_array = 0;
   // Parameters used for type
   out.dtype = NULL;
   return out;

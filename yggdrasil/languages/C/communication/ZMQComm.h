@@ -571,13 +571,13 @@ int check_reply_recv(const comm_t *comm, char *data, const size_t len) {
   zrep->n_msg++;
   // Extract address
   comm_head_t head = parse_comm_header(data, len);
-  if (head.valid == 0) {
+  if (!(head.flags & COMM_FLAG_VALID)) {
     ygglog_error("check_reply_recv(%s): Invalid header.", comm->name);
     return -1;
   }
   char address[100];
   size_t address_len;
-  if ((comm->is_work_comm == 1) && (zrep->nsockets == 1)) {
+  if ((comm->flags & COMM_FLAG_WORKER) && (zrep->nsockets == 1)) {
     address_len = strlen(zrep->addresses[0]);
     memcpy(address, zrep->addresses[0], address_len);
   } else if (strlen(head.zmq_reply) > 0) {
@@ -658,7 +658,7 @@ int new_zmq_address(comm_t *comm) {
   }
   // Bind
   zsock_t *s = NULL;
-  if (comm->is_response_client) {
+  if (comm->flags & COMM_FLAG_CLIENT_RESPONSE) {
     s = ygg_zsock_new(ZMQ_ROUTER);
   } else {
     s = ygg_zsock_new(ZMQ_PAIR);
@@ -705,12 +705,12 @@ int new_zmq_address(comm_t *comm) {
 static inline
 int init_zmq_comm(comm_t *comm) {
   int ret = -1;
-  if (comm->valid == 0)
+  if (!(comm->flags & COMM_FLAG_VALID))
     return ret;
   comm->msgBufSize = 100;
   zsock_t *s;
   char *allow_threading = getenv("YGG_THREADING");
-  if ((comm->is_rpc) || ((allow_threading != NULL) && (strcmp(allow_threading, "1") == 0))) {
+  if ((comm->flags & COMM_FLAG_SERVER) || ((allow_threading != NULL) && (strcmp(allow_threading, "1") == 0))) {
     s = ygg_zsock_new(ZMQ_DEALER);
   } else {
     s = ygg_zsock_new(ZMQ_PAIR);
@@ -733,7 +733,7 @@ int init_zmq_comm(comm_t *comm) {
   // Asign to void pointer
   comm->handle = (void*)s;
   ret = init_zmq_reply(comm);
-  comm->always_send_header = 1;
+  comm->flags = comm->flags | COMM_ALWAYS_SEND_HEADER;
   return ret;
 };
 
@@ -748,7 +748,7 @@ int free_zmq_comm(comm_t *x) {
   if (x == NULL)
     return ret;
   // Drain input
-  if ((is_recv(x->direction)) && (x->valid == 1)) {
+  if ((is_recv(x->direction)) && (x->flags & COMM_FLAG_VALID)) {
     if (_ygg_error_flag == 0) {
       size_t data_len = 100;
       char *data = (char*)malloc(data_len);
@@ -756,7 +756,7 @@ int free_zmq_comm(comm_t *x) {
         ret = zmq_comm_recv(x, &data, data_len, 1);
         if (ret < 0) {
           if (ret == -2) {
-            x->recv_eof[0] = 1;
+	    x->const_flags[0] = x->const_flags[0] | COMM_EOF_RECV;
             break;
           }
         }
@@ -917,7 +917,7 @@ int zmq_comm_recv(const comm_t* x, char **data, const size_t len,
     }
   }
   zframe_t *out = NULL;
-  if (x->is_response_client) {
+  if (x->flags & COMM_FLAG_CLIENT_RESPONSE) {
     out = zframe_recv(s);
     if (out == NULL) {
       ygglog_debug("zmq_comm_recv(%s): did not receive identity", x->name);
