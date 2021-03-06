@@ -1265,7 +1265,7 @@ class CompilerBase(CompilationToolBase):
         if cls.no_separate_linking:
             cls.is_linker = True
             cls.compile_only_flag = None
-        if cls.is_linker:
+        if cls.is_linker and (not getattr(cls, 'dont_create_linker', False)):
             if cls.default_linker is None:
                 cls.default_linker = cls.toolname
             copy_attr = ['toolname', 'aliases', 'languages', 'platforms',
@@ -1305,8 +1305,6 @@ class CompilerBase(CompilationToolBase):
             out = get_compilation_tool('linker', linker)(flags=linker_flags,
                                                          executable=linker)
             assert(out.is_installed())
-            # if not out.is_installed():
-            #     out = get_compatible_tool(cls, 'linker', language=cls.languages[0])
         else:
             out = linker
         return out
