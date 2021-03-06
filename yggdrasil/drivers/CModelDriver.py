@@ -304,8 +304,8 @@ class MSVCCompiler(CCompilerBase):
         compiler_path = shutil.which('cl.exe')
         linker_path = shutil.which('link.exe')
         if (((compiler_path and linker_path)
-             and (os.path.dirname(compiler_path)
-                  != os.path.dirname(linker_path)))):
+             and (os.path.dirname(compiler_path).lower()
+                  != os.path.dirname(linker_path).lower()))):
             cls.linker_attributes['default_executable'] = os.path.join(
                 os.path.dirname(compiler_path), os.path.basename(linker_path))
             assert(os.path.isfile(

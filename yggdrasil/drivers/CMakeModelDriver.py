@@ -319,8 +319,8 @@ class CMakeConfigure(BuildToolBase):
                     # if itool.default_flags_env is None:
                     out.append('-D%s=%s' % (
                         cmake_vars['%s_flags' % k], ''))
-            # linker = compiler.linker()
-            # out.append('-D
+            linker = compiler.linker()
+            out.append('-DCMAKE_LINKER=%s' % linker.get_executable(full_path=True))
         return out
 
     @classmethod
@@ -355,12 +355,12 @@ class CMakeConfigure(BuildToolBase):
         return super(CMakeConfigure, cls).get_executable_command(new_args, **kwargs)
     
     @classmethod
-    def fix_path(cls, x, is_gnu=False, for_path=False):
+    def fix_path(cls, x, is_gnu=False):
         r"""Fix paths so that they conform to the format expected by the OS
         and/or build tool."""
         if platform._is_win:  # pragma: windows
-            if ' ' in x:
-                x = "%s" % x
+            # if ' ' in x:
+            #     x = "%s" % x
             if is_gnu:
                 x = x.replace('\\', re.escape('/'))
             else:
@@ -568,6 +568,9 @@ class CMakeBuilder(LinkerBase):
             return super(CMakeBuilder, cls).call(*args, **kwargs)
         except BaseException:  # pragma: debug
             cache = 'CMakeCache.txt'
+            if ((isinstance(kwargs.get('builddir', None), str)
+                 and os.path.isdir(kwargs['builddir']))):
+                cache = os.path.join(kwargs['builddir'], cache)
             if kwargs.get('working_dir', None):
                 cache = os.path.join(kwargs['working_dir'], cache)
             if os.path.isfile(cache):
@@ -990,6 +993,10 @@ class CMakeModelDriver(BuildModelDriver):
             if itool.default_executable_env:
                 out['env'][itool.default_executable_env] = (
                     itool.get_executable(full_path=True))
+                if platform._is_win:  # pragma: windows
+                    # out['env'][itool.default_executable_env] = CMakeConfigure.fix_path(
+                    #     out['env'][itool.default_executable_env], for_env=True)
+                    out['env'][itool.default_executable_env] = ''
             if itool.default_flags_env:
                 # TODO: Getting the flags is slower, but may be necessary
                 # for projects that include more than one language. In
@@ -1001,7 +1008,18 @@ class CMakeModelDriver(BuildModelDriver):
                 drv = import_component('model', k)
                 out['env'][itool.default_flags_env] = ' '.join(
                     drv.get_compiler_flags(**drv_kws))
+
                 # out['env'][itool.default_flags_env] = ''
+        if platform._is_win:  # pragma: windows
+            # On windows, these paths are not parsed correctly as env
+            # variables so they must be passed via the command line
+            # out['env'][out['compiler_env']] = CMakeConfigure.fix_path(
+            #     out['compiler_executable'], for_env=True)
+            # out['env'][out['linker_env']] = CMakeConfigure.fix_path(
+            #     out['linker_executable'], for_env=True)
+            out['env'][out['compiler_env']] = ''
+            out['env'][out['linker_env']] = ''
+
         # DEBUG HERE
         import pprint
         print('WITHOUT_WRAPPER', without_wrapper)
