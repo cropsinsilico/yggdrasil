@@ -242,22 +242,18 @@ class MakeModelDriver(BuildModelDriver):
 
         """
         if not (call_base or isinstance(fname, list)):
-            if (buildfile is None) and isinstance(fname, str):
-                source_dir = cls.get_source_dir(
-                    fname, source_dir=kwargs.get('source_dir', None))
-                buildfile = os.path.join(source_dir, 'Makefile')
-            if os.path.isfile(buildfile):
+            if (buildfile is not None) and os.path.isfile(buildfile):
                 with open(buildfile, 'r') as fd:
                     lines = fd.read()
                 ext_present = []
                 for lang, info in constants.COMPILER_ENV_VARS.items():
                     if info['exec'] in lines:
                         ext_present.append(lang)
-                if ('c' in ext_present) and ('c++' in ext_present):
+                if ('c' in ext_present) and ('c++' in ext_present):  # pragma: debug
                     ext_present.remove('c')
                 if len(ext_present) == 1:
                     return ext_present[0]
-                elif len(ext_present) > 1:
+                elif len(ext_present) > 1:  # pragma: debug
                     raise RuntimeError("More than one extension found in "
                                        "'%s': %s" % (buildfile, ext_present))
         return super(MakeModelDriver, cls).get_language_for_source(
