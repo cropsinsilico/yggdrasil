@@ -674,11 +674,11 @@ def get_supported_lang():
     # from yggdrasil import schema
     # s = schema.get_schema()
     # out = s['model'].subtypes
+    # if 'r' in out:
+    #     out[out.index('r')] = 'R'
     out = constants.LANGUAGES['all'].copy()
     if 'c++' in out:
         out[out.index('c++')] = 'cpp'
-    if 'r' in out:
-        out[out.index('r')] = 'R'
     return list(set(out))
 
 
@@ -1355,41 +1355,29 @@ class YggClass(ComponentBase):
     def __getstate__(self):
         state = super(YggClass, self).__getstate__()
         del state['logger']
-        thread_attr = {}
+        # thread_attr = {}
         for k, v in list(state.items()):
-            if isinstance(v, (threading._CRLock, threading._RLock)):
-                thread_attr.setdefault('threading.RLock', [])
-                thread_attr['threading.RLock'].append((k, (), {}))
-            elif isinstance(v, threading.Event):
-                thread_attr.setdefault('threading.Event', [])
-                thread_attr['threading.Event'].append((k, (), {}))
-            # elif isinstance(v, multiprocessing.synchronize.RLock):
-            #     thread_attr.setdefault('multiprocessing.RLock', [])
-            #     thread_attr['multiprocessing.RLock'].append((k, (), {}))
-            # elif isinstance(v, multiprocessing.synchronize.Event):
-            #     thread_attr.setdefault('multiprocessing.Event', [])
-            #     thread_attr['multiprocessing.Event'].append((k, (), {}))
-            # elif isinstance(v, YggThreadLoop):
+            if isinstance(v, (threading._CRLock, threading._RLock,
+                              threading.Event, threading.Thread)):  # pragma: debug
+                self.warning("Special treatment of threading objects "
+                             "currently disabled.")
+            # if isinstance(v, (threading._CRLock, threading._RLock)):
+            #     thread_attr.setdefault('threading.RLock', [])
+            #     thread_attr['threading.RLock'].append((k, (), {}))
+            # elif isinstance(v, threading.Event):
+            #     thread_attr.setdefault('threading.Event', [])
+            #     thread_attr['threading.Event'].append((k, (), {}))
+            # elif isinstance(v, threading.Thread):
             #     assert(not v.is_alive())
-            #     thread_attr.setdefault('YggThreadLoop', [])
-            #     thread_attr['YggThreadLoop'].append(
-            #         (k, v._input_args, v._input_kwargs))
-            # elif isinstance(v, YggThread):
-            #     assert(not v.is_alive())
-            #     thread_attr.setdefault('YggThread', [])
-            #     thread_attr['YggThread'].append(
-            #         (k, v._input_args, v._input_kwargs))
-            elif isinstance(v, threading.Thread):
-                assert(not v.is_alive())
-                attr = {'name': v._name, 'group': None,
-                        'daemon': v.daemon, 'target': v._target,
-                        'args': v._args, 'kwargs': v._kwargs}
-                thread_attr.setdefault('threading.Thread', [])
-                thread_attr['threading.Thread'].append((k, (), attr))
-        for attr_list in thread_attr.values():
-            for k in attr_list:
-                state.pop(k[0])
-        state['thread_attr'] = thread_attr
+            #     attr = {'name': v._name, 'group': None,
+            #             'daemon': v.daemon, 'target': v._target,
+            #             'args': v._args, 'kwargs': v._kwargs}
+            #     thread_attr.setdefault('threading.Thread', [])
+            #     thread_attr['threading.Thread'].append((k, (), attr))
+        # for attr_list in thread_attr.values():
+        #     for k in attr_list:
+        #         state.pop(k[0])
+        # state['thread_attr'] = thread_attr
         return state
 
     def __setstate__(self, state):
