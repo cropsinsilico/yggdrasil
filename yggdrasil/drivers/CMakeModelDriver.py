@@ -1054,16 +1054,11 @@ class CMakeModelDriver(BuildModelDriver):
             default_kwargs['configuration'] = self.configuration
             for k, v in default_kwargs.items():
                 kwargs.setdefault(k, v)
-            try:
-                if (not kwargs.get('dry_run', False)) and os.path.isfile(self.buildfile):
-                    shutil.copy2(self.buildfile, self.buildfile_orig)
-                    shutil.copy2(self.buildfile_ygg, self.buildfile)
-                out = super(CMakeModelDriver, self).compile_model(**kwargs)
-            finally:
-                if os.path.isfile(self.buildfile_orig):
-                    shutil.copy2(self.buildfile_orig, self.buildfile)
-                    os.remove(self.buildfile_orig)
-            return out
+            if (not kwargs.get('dry_run', False)) and os.path.isfile(self.buildfile):
+                shutil.copy2(self.buildfile, self.buildfile_orig)
+                shutil.copy2(self.buildfile_ygg, self.buildfile)
+                self.modified_files.append((self.buildfile_orig, self.buildfile))
+            return super(CMakeModelDriver, self).compile_model(**kwargs)
 
     @classmethod
     def prune_sh_gcc(cls, path, gcc):  # pragma: appveyor

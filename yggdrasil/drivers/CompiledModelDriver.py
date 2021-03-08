@@ -3608,6 +3608,8 @@ class CompiledModelDriver(ModelDriver):
         except BaseException:
             self.cleanup_products()
             raise
+        finally:
+            self.restore_files()
 
     @classmethod
     def get_internal_suffix(cls, commtype=None):
