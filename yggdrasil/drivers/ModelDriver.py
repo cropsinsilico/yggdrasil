@@ -579,10 +579,8 @@ class ModelDriver(Driver):
                         return ilang
                 except ValueError:
                     continue
-                if ilang in lang_dict:
-                    lang_dict[ilang] += 1
-                else:
-                    lang_dict[ilang] = 1
+                lang_dict.setdefault(ilang, 0)
+                lang_dict[ilang] += 1
             if lang_dict:
                 return max(lang_dict, key=lang_dict.get)
         else:
