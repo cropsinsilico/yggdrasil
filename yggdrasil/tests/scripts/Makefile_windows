@@ -10,22 +10,22 @@ LIBS = $(LDFLAGS)
 
 DEPS = $(IDIR)\hellofunc.h
 
-OBJ = $(ODIR)\gcc_model.o $(ODIR)\hellofunc.o
+OBJ = $(ODIR)\gcc_model.obj $(ODIR)\hellofunc.obj
 
 .PHONY: all
 all: gcc_model
 
 gcc_model: $(OBJ)
-	$(CC) /OUT:$@.exe $** /link $(LIBS)
+	$(CC) $** /link /OUT:$@.exe $(LIBS)
 
-{$(SDIR)}.c{$(ODIR)}.o:
+{$(SDIR)}.c{$(ODIR)}.obj:
 	@echo $(OBJ)
 	$(CC) /c $< -Fo$@ $(CFLAGSZ)
 
-{$(SDIR)}.cpp{$(ODIR)}.o:
+{$(SDIR)}.cpp{$(ODIR)}.obj:
 	$(CC) /c $< -Fo$@ $(CFLAGSZ)
 
 ($OBJ) :
 
 clean:
-	del $(ODIR)\*.o *~ gcc_model.exe $(IDIR)\*~ 
+	del $(ODIR)\*.obj *~ gcc_model.exe $(IDIR)\*~ 

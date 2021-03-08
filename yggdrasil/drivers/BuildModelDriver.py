@@ -504,6 +504,21 @@ class BuildModelDriver(CompiledModelDriver):
             if not kwargs.get('target_compiler', None):
                 kwargs['target_compiler'] = language_info['compiler'].toolname
         return super(BuildModelDriver, cls).call_compiler(src, **kwargs)
+
+    @classmethod
+    def fix_path(cls, path, for_env=False):
+        r"""Update a path.
+
+        Args:
+            path (str): Path that should be formatted.
+            for_env (bool, optional): If True, the path is formatted for use in
+                and environment variable. Defaults to False.
+
+        Returns:
+            str: Updated path.
+
+        """
+        return path
         
     @classmethod
     def set_env_compiler(cls, language_info=None, **kwargs):
@@ -523,9 +538,11 @@ class BuildModelDriver(CompiledModelDriver):
         kwargs['compiler'] = language_info['compiler']
         out = super(BuildModelDriver, cls).set_env_compiler(**kwargs)
         if language_info['compiler_env'] and language_info['compiler_executable']:
-            out[language_info['compiler_env']] = language_info['compiler_executable']
+            out[language_info['compiler_env']] = cls.fix_path(
+                language_info['compiler_executable'], for_env=True)
         if language_info['linker_env'] and language_info['linker_executable']:
-            out[language_info['linker_env']] = language_info['linker_executable']
+            out[language_info['linker_env']] = cls.fix_path(
+                language_info['linker_executable'], for_env=True)
         if language_info['compiler_flags_env']:
             for x in language_info['compiler_flags_env']:
                 out[x] = ' '.join(language_info['compiler_flags'])

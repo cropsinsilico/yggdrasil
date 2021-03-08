@@ -291,3 +291,43 @@ class MakeModelDriver(BuildModelDriver):
             for k, v in default_kwargs.items():
                 kwargs.setdefault(k, v)
             return super(MakeModelDriver, self).compile_model(**kwargs)
+
+    @classmethod
+    def fix_path(cls, path, for_env=False, **kwargs):
+        r"""Update a path.
+
+        Args:
+            path (str): Path that should be formatted.
+            for_env (bool, optional): If True, the path is formatted for use in
+                and environment variable. Defaults to False.
+            **kwargs: Additional keyword arguments are passed to the parent
+                class's method.
+
+        Returns:
+            str: Updated path.
+
+        """
+        out = super(MakeModelDriver, cls).fix_path(path, for_env=for_env,
+                                                   **kwargs)
+        if platform._is_win and for_env:
+            out = '"%s"' % out
+        return out
+
+    @classmethod
+    def get_target_language_info(cls, *args, **kwargs):
+        r"""Get a dictionary of information about language compilation tools.
+
+        Args:
+            *args: Arguments are passed to the parent class's method.
+            **kwargs: Keyword arguments are passed to the parent class's method.
+
+        Returns:
+            dict: Information about language compilers and linkers.
+
+        """
+        out = super(MakeModelDriver, cls).get_target_language_info(*args, **kwargs)
+        if (((cls.get_tool('compiler', return_prop='name') == 'nmake')
+             and platform._is_win and ('-lstdc++' in out['linker_flags']))):
+            out['linker_flags'].remove('-lstdc++')
+            out['linker_env'] = ''
+        return out

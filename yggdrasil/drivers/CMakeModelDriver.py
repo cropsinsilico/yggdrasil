@@ -905,6 +905,27 @@ class CMakeModelDriver(BuildModelDriver):
             target=target, **kwargs)
 
     @classmethod
+    def fix_path(cls, path, for_env=False, **kwargs):
+        r"""Update a path.
+
+        Args:
+            path (str): Path that should be formatted.
+            for_env (bool, optional): If True, the path is formatted for use in
+                and environment variable. Defaults to False.
+            **kwargs: Additional keyword arguments are passed to the parent
+                class's method.
+
+        Returns:
+            str: Updated path.
+
+        """
+        out = super(CMakeModelDriver, cls).fix_path(path, for_env=for_env,
+                                                    **kwargs)
+        if platform._is_win and for_env:
+            out = ''
+        return out
+
+    @classmethod
     def get_target_language_info(cls, target_compiler_flags=None,
                                  target_linker_flags=None,
                                  compiler_flag_kwargs=None,
@@ -994,9 +1015,8 @@ class CMakeModelDriver(BuildModelDriver):
                 out['env'][itool.default_executable_env] = (
                     itool.get_executable(full_path=True))
                 if platform._is_win:  # pragma: windows
-                    # out['env'][itool.default_executable_env] = CMakeConfigure.fix_path(
-                    #     out['env'][itool.default_executable_env], for_env=True)
-                    out['env'][itool.default_executable_env] = ''
+                    out['env'][itool.default_executable_env] = cls.fix_path(
+                        out['env'][itool.default_executable_env], for_env=True)
             if itool.default_flags_env:
                 # TODO: Getting the flags is slower, but may be necessary
                 # for projects that include more than one language. In
@@ -1008,22 +1028,6 @@ class CMakeModelDriver(BuildModelDriver):
                 drv = import_component('model', k)
                 out['env'][itool.default_flags_env] = ' '.join(
                     drv.get_compiler_flags(**drv_kws))
-
-                # out['env'][itool.default_flags_env] = ''
-        if platform._is_win:  # pragma: windows
-            # On windows, these paths are not parsed correctly as env
-            # variables so they must be passed via the command line
-            # out['env'][out['compiler_env']] = CMakeConfigure.fix_path(
-            #     out['compiler_executable'], for_env=True)
-            # out['env'][out['linker_env']] = CMakeConfigure.fix_path(
-            #     out['linker_executable'], for_env=True)
-            out['env'][out['compiler_env']] = ''
-            out['env'][out['linker_env']] = ''
-
-        # DEBUG HERE
-        import pprint
-        print('WITHOUT_WRAPPER', without_wrapper)
-        pprint.pprint(out)
         return out
         
     def compile_model(self, target=None, **kwargs):

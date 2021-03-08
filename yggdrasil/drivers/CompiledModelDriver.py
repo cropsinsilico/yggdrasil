@@ -663,6 +663,8 @@ class CompilationToolBase(object):
         envi_base = ''
         if isinstance(cls.toolname, str):
             tool_base.append(cls.toolname)
+        if isinstance(cls.default_executable, str):
+            tool_base.append(cls.default_executable)
         if isinstance(cls.default_executable_env, str):
             envi_base = os.path.basename(
                 os.environ.get(cls.default_executable_env, ''))
@@ -875,7 +877,6 @@ class CompilationToolBase(object):
         if platform._is_win:  # pragma: windows
             base_paths = []
             vcpkg_dir = cfg.get('c', 'vcpkg_dir', None)
-            logger.info("vcpkg_dir = '%s'" % vcpkg_dir)
             if vcpkg_dir is not None:
                 if not os.path.isdir(vcpkg_dir):  # pragma: debug
                     raise RuntimeError("vcpkg_dir is not valid: '%s'"
@@ -2348,8 +2349,8 @@ class CompiledModelDriver(ModelDriver):
                 if default is False:
                     raise NotImplementedError("%s not set for language '%s'."
                                               % (tooltype.title(), cls.language))
-                logger.info("%s not set for language '%s'."
-                            % (tooltype.title(), cls.language))
+                logger.debug("%s not set for language '%s'."
+                             % (tooltype.title(), cls.language))
                 return default
             if return_prop == 'name':
                 return toolname
@@ -2389,8 +2390,8 @@ class CompiledModelDriver(ModelDriver):
                     raise NotImplementedError(
                         "%s not set for language '%s' (toolname=%s)."
                         % (tooltype.title(), cls.language, toolname))
-                logger.info("%s not set for language '%s' (toolname=%s)."
-                            % (tooltype.title(), cls.language, toolname))
+                logger.debug("%s not set for language '%s' (toolname=%s)."
+                             % (tooltype.title(), cls.language, toolname))
                 out = default
             if isinstance(out, type):
                 out = out(**kwargs)
