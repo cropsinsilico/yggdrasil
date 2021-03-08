@@ -309,7 +309,7 @@ class CMakeConfigure(BuildToolBase):
                     itool = get_compatible_tool(compiler, 'compiler', k)
                 except ValueError:
                     continue
-                if not itool.is_installed():
+                if not itool.is_installed():  # pragma: debug
                     continue
                 if itool.toolname in ['cl', 'cl++']:
                     # if itool.default_executable_env is None:
@@ -785,8 +785,6 @@ class CMakeModelDriver(BuildModelDriver):
             list: Full paths to any created wrappers.
 
         """
-        # HERE DEBUG
-        kwargs['verbose'] = True
         out = super(CMakeModelDriver, self).write_wrappers(**kwargs)
         # Create cmake files that can be included
         if self.target is None:

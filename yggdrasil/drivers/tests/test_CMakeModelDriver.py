@@ -212,4 +212,9 @@ class TestCMakeModelDriver(TestCMakeModelParam, parent.TestBuildModelDriver):
     def test_write_wrappers(self):
         r"""Test write_wrappers method with verbosity and existing
         include file."""
-        self.instance.write_wrappers(verbose=True)
+        try:
+            self.instance.overwrite = False
+            self.instance.write_wrappers(verbose=True)
+            self.instance.write_wrappers(verbose=True)
+        finally:
+            self.instance.overwrite = True

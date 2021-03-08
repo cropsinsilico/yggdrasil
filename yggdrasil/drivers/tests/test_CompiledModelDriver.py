@@ -408,6 +408,9 @@ class TestCompiledModelDriverNoStart(TestCompiledModelParam,
                            out=os.path.basename(fname),
                            working_dir=os.path.dirname(fname),
                            overwrite=True)
+        if not self.instance.is_build_tool:
+            self.instance.compile_model(out=self.instance.model_file,
+                                        overwrite=False)
         
     # Done in driver, but driver not started
     def teardown(self):

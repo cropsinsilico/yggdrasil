@@ -20,18 +20,6 @@ class BuildToolBase(CompilerBase):
         CompilerBase.before_registration(cls)
         if cls.build_language is None:
             cls.build_language = cls.toolname
-        
-    @classmethod
-    def get_default_target_language(cls):
-        r"""Determine the default target language for the build tool.
-        Unless otherwise specified, this will be the first language in
-        the 'languages' attribute that is not the build tool.
-
-        Returns:
-            str: Name of the default target language.
-
-        """
-        return 'c'
 
     @classmethod
     def get_tool_suffix(cls):
