@@ -428,7 +428,7 @@ class CMakeConfigure(BuildToolBase):
             is_gnu = compiler.is_gnu
             new_flags = compiler.default_flags
             def_flags = compiler.get_env_flags()
-            if (((compiler.toolname in ['cl', 'msvc'])
+            if (((compiler.toolname in ['cl', 'msvc', 'cl++'])
                  and (not (('/MD' in def_flags) or ('-MD' in def_flags))))):
                 if configuration.lower() == 'debug':  # pragma: debug
                     new_flags.append("/MTd")

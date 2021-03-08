@@ -188,6 +188,10 @@ class TestCompiledModelDriverNoInit(TestCompiledModelParam,
         
     def test_build(self):
         r"""Test building libraries as a shared/static library or object files."""
+        # Finish on the default libtype
+        order = ['shared', 'object', 'static']
+        order.remove(CompiledModelDriver._default_libtype)
+        order.append(CompiledModelDriver._default_libtype)
         for libtype in ['shared', 'object', 'static']:
             self.import_cls.compile_dependencies(
                 libtype=libtype, overwrite=True)
