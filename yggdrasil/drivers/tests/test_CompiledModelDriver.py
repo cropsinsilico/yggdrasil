@@ -7,6 +7,14 @@ import yggdrasil.drivers.tests.test_ModelDriver as parent
 from yggdrasil.components import import_component
 
 
+def test_get_compatible_tool():
+    r"""Test get_compatible_tool when default provided."""
+    assert_raises(ValueError, CompiledModelDriver.get_compatible_tool,
+                  'invalid', 'compiler', 'c')
+    assert_equal(CompiledModelDriver.get_compatible_tool(
+        'invalid', 'compiler', 'c', default=None), None)
+
+
 def test_get_compilation_tool_registry():
     r"""Test errors raised by get_compilation_tool_registry."""
     assert_raises(ValueError, CompiledModelDriver.get_compilation_tool_registry,
