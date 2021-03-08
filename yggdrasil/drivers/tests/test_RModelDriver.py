@@ -9,6 +9,13 @@ class TestRModelParam(parent.TestInterpretedModelParam):
 
     driver = "RModelDriver"
 
+    @property
+    def inst_kwargs(self):
+        r"""dict: Keyword arguments for creating a class instance."""
+        out = super(TestRModelParam, self).inst_kwargs
+        out.setdefault('interpreter_flags', ['--vanilla'])
+        return out
+
 
 class TestRModelDriverNoInit(TestRModelParam,
                              parent.TestInterpretedModelDriverNoInit):
