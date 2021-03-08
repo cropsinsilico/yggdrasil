@@ -954,25 +954,6 @@ class ConnectionDriver(Driver):
                 out = True
         return out
 
-    def wait_close_state(self, state, timeout=None):
-        r"""Set the close state after waiting for specified time for the
-        close state to be set by another method.
-
-        Args:
-            state (str): Close state that should be set after timeout.
-            timeout (float, optional): Time that should be waited before
-                setting the timeout. Defaults to self.timeout.
-
-        """
-        T = self.start_timeout(timeout, key_suffix='.wait_close')
-        while (not T.is_out):  # pragma: debug
-            with self.lock:
-                if self.close_state:
-                    break
-            self.sleep(2 * self.sleeptime)
-        self.stop_timeout(key_suffix='.wait_close')
-        self.set_close_state(state)
-
     def run_loop(self):
         r"""Run the driver. Continue looping over messages until there are not
         any left or the communication channel is closed.
