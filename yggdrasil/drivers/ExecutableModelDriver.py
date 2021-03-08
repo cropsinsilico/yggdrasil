@@ -26,7 +26,8 @@ class ExecutableModelDriver(ModelDriver):
         to registration including things like platform dependent properties and
         checking environment variables for default settings.
         """
-        if platform._is_win:  # pragma: windows
+        if ((platform._is_win
+             and (not getattr(cls, 'language_ext', None)))):  # pragma: windows
             cls.language_ext = '.exe'
         ModelDriver.before_registration(cls)
         

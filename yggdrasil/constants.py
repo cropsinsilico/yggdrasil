@@ -14,6 +14,7 @@ LANG2EXT = {
     'c++': '.cpp',
     'cpp': '.cpp',
     'cxx': '.cpp',
+    'executable': '.exe',
     'fortran': '.f90',
     'lpy': '.lpy',
     'matlab': '.m',
@@ -82,7 +83,7 @@ COMPILATION_TOOL_VARS = {
         'flags': 'CFLAGS',
     },
     'cl': {
-        'exec': 'LINK',
+        'exec': 'CC',
         'flags': 'CFLAGS',
     },
     'g++': {
