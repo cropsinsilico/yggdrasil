@@ -179,11 +179,6 @@ def get_compilation_tool(tooltype, name, default=False):
             out = reg[x]
             break
     if out is None:
-        for k in reg.keys():
-            if k in name:
-                out = reg[k]
-                break
-    if out is None:
         if default is False:
             raise ValueError("Could not locate a %s tool with name '%s'"
                              % (tooltype, name))
