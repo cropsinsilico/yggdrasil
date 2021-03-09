@@ -655,11 +655,15 @@ class CommBase(tools.YggClass):
         self._server_kwargs = {}
         self._send_serializer = True
         self.allow_multiple_comms = allow_multiple_comms
-        if ((self.is_interface and (os.environ.get('YGG_THREADING', False))
-             and (not self.single_use))):
+        if (((not self.single_use)
+             and ((self.is_interface and os.environ.get('YGG_THREADING', False))
+                  or (self.model_copies > 1) or (self.partner_copies > 1)))):
             self.allow_multiple_comms = True
         if self.single_use and (not self.is_response_server):
             self._send_serializer = False
+        self.create_proxy = ((self.is_client or self.allow_multiple_comms)
+                             and (not self.is_interface)
+                             and (self.direction != 'recv'))
         # Add interface tag
         if self.is_interface:
             self._name += '_I'
@@ -680,9 +684,6 @@ class CommBase(tools.YggClass):
             self._eof_sent.set()  # Don't send EOF, these are single use
         if self.is_interface:
             atexit.register(self.atexit)
-        if ((((self.model_copies > 1) or (self.partner_copies > 1))
-             and (not self.single_use))):
-            self.allow_multiple_comms = True
         self._init_before_open(**kwargs)
         if dont_open:
             self.bind()
@@ -1085,7 +1086,7 @@ class CommBase(tools.YggClass):
 
     def bind(self):
         r"""Bind in place of open."""
-        if (self.is_client or self.allow_multiple_comms) and (not self.is_interface):
+        if self.create_proxy:
             self.signon_to_server()
 
     def open(self):
@@ -1118,7 +1119,7 @@ class CommBase(tools.YggClass):
             self._close(linger=linger)
             self._n_sent = 0
             self._n_recv = 0
-            if (self.is_client or self.allow_multiple_comms) and (not self.is_interface):
+            if self.create_proxy:
                 self.debug("Signing off from server")
                 self.signoff_from_server()
             if len(self._work_comms) > 0:
