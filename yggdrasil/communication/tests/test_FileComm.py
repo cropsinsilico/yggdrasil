@@ -49,6 +49,7 @@ class TestFileComm(parent.TestCommBase):
                     'platform_newline'])
     test_send_recv_nolimit = None
     test_work_comm = None
+    test_send_recv_raw = None
     
     @property
     def commtype(self):

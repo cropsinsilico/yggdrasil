@@ -20,18 +20,6 @@ class BuildToolBase(CompilerBase):
         CompilerBase.before_registration(cls)
         if cls.build_language is None:
             cls.build_language = cls.toolname
-        
-    @classmethod
-    def get_default_target_language(cls):
-        r"""Determine the default target language for the build tool.
-        Unless otherwise specified, this will be the first language in
-        the 'languages' attribute that is not the build tool.
-
-        Returns:
-            str: Name of the default target language.
-
-        """
-        return 'c'
 
     @classmethod
     def get_tool_suffix(cls):
@@ -44,6 +32,22 @@ class BuildToolBase(CompilerBase):
 
         """
         return ""
+
+    @classmethod
+    def get_flags(cls, **kwargs):
+        r"""Get compilation flags, replacing outfile with target.
+
+        Args:
+            **kwargs: Additional keyword arguments are passed to the parent
+                class's method.
+
+        Returns:
+            list: Compiler flags.
+
+        """
+        kwargs.pop('target_compiler', None)
+        kwargs.pop('target_linker', None)
+        return super(BuildToolBase, cls).get_flags(**kwargs)
 
 
 class BuildModelDriver(CompiledModelDriver):
@@ -136,6 +140,7 @@ class BuildModelDriver(CompiledModelDriver):
     sourcedir_as_sourcefile = False
     full_language = False
     is_build_tool = True
+    buildfile_base = None
 
     def __init__(self, *args, **kwargs):
         self.target_language_driver = None
@@ -238,7 +243,20 @@ class BuildModelDriver(CompiledModelDriver):
         return source_dir
 
     @classmethod
-    def get_language_for_source(cls, fname=None, languages=None,
+    def get_language_for_buildfile(cls, buildfile, target=None):
+        r"""Determine the target language based on the contents of a build
+        file.
+
+        Args:
+            buildfile (str): Full path to the build configuration file.
+            target (str, optional): Target that will be built. Defaults to None
+                and the default target in the build file will be used.
+
+        """
+        raise ValueError("Could not determine source from the buildfile")
+
+    @classmethod
+    def get_language_for_source(cls, fname=None, buildfile=None, languages=None,
                                 early_exit=False, call_base=False, **kwargs):
                                 
         r"""Determine the language that can be used with the provided source
@@ -248,6 +266,8 @@ class BuildModelDriver(CompiledModelDriver):
         Args:
             fname (str, list): The full path to one or more files. If more than
                 one is provided, they are iterated over.
+            buildfile (str, optional): Full path to the build configuration file.
+                Defaults to None and will be searched for.
             languages (list, optional): The list of languages that are acceptable.
                 Defaults to None and any language will be acceptable.
             early_exit (bool, optional): If True, the first language identified
@@ -255,7 +275,7 @@ class BuildModelDriver(CompiledModelDriver):
             source_dir (str, optional): Full path to the directory containing
                 the source files. Defaults to None and is determiend from
                 fname.
-            buildfile (str, optional): Full path to the CMakeLists.txt file.
+            buildfile (str, optional): Full path to the build configuration file.
                 Defaults to None and will be searched for.
             target (str, optional): The build target. Defaults to None.
             call_base (bool, optional): If True, the base class's method is
@@ -272,6 +292,14 @@ class BuildModelDriver(CompiledModelDriver):
                 fname, source_dir=kwargs.get('source_dir', None))
             if source_dir == fname:
                 fname = None
+            if (buildfile is None) and cls.buildfile_base:
+                buildfile = os.path.join(source_dir, cls.buildfile_base)
+            if isinstance(buildfile, str) and os.path.isfile(buildfile):
+                try:
+                    return cls.get_language_for_buildfile(
+                        buildfile, target=kwargs.get('target', None))
+                except ValueError:  # pragma: debug
+                    pass
             try_list = sorted(list(glob.glob(os.path.join(source_dir, '*'))))
             if fname is not None:
                 try_list = [fname, try_list]
@@ -282,8 +310,8 @@ class BuildModelDriver(CompiledModelDriver):
         if languages is None:
             languages = constants.LANGUAGES['compiled']
         return super(BuildModelDriver, cls).get_language_for_source(
-            try_list, early_exit=early_exit, languages=languages,
-            call_base=call_base, **kwargs)
+            try_list, early_exit=early_exit, buildfile=buildfile,
+            languages=languages, call_base=call_base, **kwargs)
 
     def set_target_language(self):
         r"""Set the language of the target being compiled (usually the same
@@ -501,7 +529,24 @@ class BuildModelDriver(CompiledModelDriver):
             language_info = cls.get_target_language_info(
                 without_wrapper=True, **kws)
             kwargs['env'] = cls.set_env_compiler(language_info=language_info)
+            if not kwargs.get('target_compiler', None):
+                kwargs['target_compiler'] = language_info['compiler'].toolname
         return super(BuildModelDriver, cls).call_compiler(src, **kwargs)
+
+    @classmethod
+    def fix_path(cls, path, for_env=False):
+        r"""Update a path.
+
+        Args:
+            path (str): Path that should be formatted.
+            for_env (bool, optional): If True, the path is formatted for use in
+                and environment variable. Defaults to False.
+
+        Returns:
+            str: Updated path.
+
+        """
+        return path
         
     @classmethod
     def set_env_compiler(cls, language_info=None, **kwargs):
@@ -521,24 +566,17 @@ class BuildModelDriver(CompiledModelDriver):
         kwargs['compiler'] = language_info['compiler']
         out = super(BuildModelDriver, cls).set_env_compiler(**kwargs)
         if language_info['compiler_env'] and language_info['compiler_executable']:
-            out[language_info['compiler_env']] = language_info['compiler_executable']
+            out[language_info['compiler_env']] = cls.fix_path(
+                language_info['compiler_executable'], for_env=True)
         if language_info['linker_env'] and language_info['linker_executable']:
-            out[language_info['linker_env']] = language_info['linker_executable']
+            out[language_info['linker_env']] = cls.fix_path(
+                language_info['linker_executable'], for_env=True)
         if language_info['compiler_flags_env']:
             for x in language_info['compiler_flags_env']:
                 out[x] = ' '.join(language_info['compiler_flags'])
         if language_info['linker_flags_env']:
             for x in language_info['linker_flags_env']:
                 out[x] = ' '.join(language_info['linker_flags'])
-        # DEBUG HERE
-        if language_info['compiler_flags_env']:
-            print("ENV COMPILER FLAGS",
-                  language_info['compiler_flags_env'],
-                  [out.get(x, None) for x in language_info['compiler_flags_env']])
-        if language_info['linker_flags_env']:
-            print("ENV LINKER FLAGS",
-                  language_info['linker_flags_env'],
-                  [out.get(x, None) for x in language_info['linker_flags_env']])
         out.update(language_info['env'])
         return out
     

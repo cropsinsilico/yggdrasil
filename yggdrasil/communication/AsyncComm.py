@@ -1,5 +1,4 @@
 import uuid
-import atexit
 from yggdrasil import multitasking
 from yggdrasil.tools import ProxyObject
 from yggdrasil.components import ComponentBaseUnregistered
@@ -67,8 +66,9 @@ class AsyncComm(ProxyObject, ComponentBaseUnregistered):
         # Open backlog to match
         if self._wrapped.is_open:
             self.open()
-        if self._wrapped.is_interface:
-            atexit.register(self.atexit)
+        if self._wrapped.is_interface:  # pragma: debug
+            # atexit.register(self.atexit)
+            raise RuntimeError("Use of async comm inside model is untested")
 
     def __reduce__(self):
         rv = list(super(AsyncComm, self).__reduce__())
@@ -112,19 +112,14 @@ class AsyncComm(ProxyObject, ComponentBaseUnregistered):
         r"""list: Errors raised by the wrapped comm or async thread."""
         out = self._wrapped.errors
         if self._backlog_thread:
-            if self._backlog_thread.errors:
-                out += self._backlog_thread.errors
-                self._backlog_thread.errors = []
+            out += self._backlog_thread.errors
+            self._backlog_thread.errors = []
         return out
 
-    @errors.setter
-    def errors(self, value):
-        self._wrapped.errors = value
-
-    def atexit(self):
-        r"""Close operations."""
-        if (self.direction == 'send') and self.is_open_backlog:
-            self.linger()
+    # def atexit(self):
+    #     r"""Close operations."""
+    #     if (self.direction == 'send') and self.is_open_backlog:
+    #         self.linger()
 
     def open(self):
         r"""Open the connection by connecting to the queue."""
@@ -166,10 +161,6 @@ class AsyncComm(ProxyObject, ComponentBaseUnregistered):
             self.backlog_thread.wait(key=str(uuid.uuid4()))
         if hasattr(self._wrapped, '_close_backlog'):
             self._wrapped._close_backlog(wait=wait)
-
-    def stop_backlog(self):
-        r"""Stop the asynchronous backlog, turning this into a direct comm."""
-        self._close_backlog(wait=True)
 
     @property
     def is_open(self):
@@ -364,15 +355,12 @@ class AsyncComm(ProxyObject, ComponentBaseUnregistered):
                 kwargs['return_message_object'] = True
             msg = getattr(self._wrapped, self.async_recv_method)(**kwargs)
             if msg.flag in [CommBase.FLAG_EMPTY, CommBase.FLAG_SKIP]:
-                async_flag = FLAG_TRYAGAIN
+                async_flag = FLAG_TRYAGAIN  # pragma: debug
             elif msg.flag in [CommBase.FLAG_SUCCESS, CommBase.FLAG_EOF]:
                 async_flag = FLAG_SUCCESS
                 self._used_direct = True
             elif msg.flag == CommBase.FLAG_FAILURE:
-                if self.is_eof(msg.args):
-                    async_flag = FLAG_SUCCESS
-                else:
-                    async_flag = FLAG_FAILURE
+                async_flag = FLAG_FAILURE
             else:  # pragma: debug
                 raise Exception("Unsupported flag: %s" % msg.flag)
         except TemporaryCommunicationError:
@@ -536,8 +524,13 @@ class AsyncComm(ProxyObject, ComponentBaseUnregistered):
                     self.close()
                     out.flag = CommBase.FLAG_FAILURE
                 self._used = True
-        if (not dont_finalize) and (self.async_recv_method == 'recv_message'):
-            out = self._wrapped.finalize_message(out)
+        if not dont_finalize:
+            kws_finalize = {k: kwargs.pop(k) for k in self._finalize_message_kws
+                            if k in kwargs}
+            if self.async_recv_method != 'recv_message':
+                out.finalized = False
+                kws_finalize['skip_processing'] = True
+            out = self._wrapped.finalize_message(out, **kws_finalize)
         if not return_message_object:
             out = (bool(out.flag), out.args)
         return out

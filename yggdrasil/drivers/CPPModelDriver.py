@@ -95,8 +95,11 @@ class ClangPPCompiler(CPPCompilerBase, ClangCompiler):
 class MSVCPPCompiler(CPPCompilerBase, MSVCCompiler):
     r"""Inteface class for MSVC compiler when compiling C++."""
     toolname = 'cl++'
+    default_linker = MSVCCompiler.default_linker
+    default_archiver = MSVCCompiler.default_archiver
     default_executable = MSVCCompiler.default_executable
     search_path_flags = None
+    dont_create_linker = True
     
     @classmethod
     def get_flags(cls, **kwargs):

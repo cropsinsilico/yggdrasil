@@ -334,24 +334,14 @@ class YggRunner(YggClass):
         return chain(self.connectiondrivers.values(),
                      self.modeldrivers.values())
 
-    def io_drivers(self, model=None):
-        r"""Return the input and output drivers for one or all models.
-
-        Args:
-            model (str, optional): Name of a model that I/O drivers should be
-                returned for. Defaults to None and all I/O drivers are returned.
+    def io_drivers(self):
+        r"""Return the input and output drivers for all models.
 
         Returns:
             iterator: Access to list of I/O drivers.
 
         """
-        if model is None:
-            out = self.connectiondrivers.values()
-        else:
-            driver = self.modeldrivers[model]
-            out = chain(driver.get('input_drivers', dict()),
-                        driver.get('output_drivers', dict()))
-        return out
+        return self.connectiondrivers.values()
 
     def create_driver(self, yml):
         r"""Create a driver instance from the yaml information.

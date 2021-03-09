@@ -105,10 +105,7 @@ class ForkComm(CommBase.CommBase):
     @property
     def any_files(self):
         r"""bool: True if the comm interfaces with any files."""
-        for x in self.comm_list:
-            if x.is_file:
-                return True
-        return False
+        return any(x.is_file for x in self.comm_list)
 
     @property
     def last_comm(self):
@@ -162,10 +159,8 @@ class ForkComm(CommBase.CommBase):
         for x in self.comm_list:
             iout = x.model_env
             for k, v in iout.items():
-                if k in out:
-                    out[k].update(v)
-                else:
-                    out[k] = v
+                out.setdefault(k, {})
+                out[k].update(v)
         return out
 
     @property
@@ -281,18 +276,6 @@ class ForkComm(CommBase.CommBase):
 
         """
         return self.last_comm.is_empty_recv(msg)
-    
-    def is_empty_send(self, msg):
-        r"""Check if a message object being sent is empty.
-
-        Args:
-            msg (obj): Message object.
-
-        Returns:
-            bool: True if the object is empty, False otherwise.
-
-        """
-        return self.last_comm.is_empty_send(msg)
 
     def update_serializer_from_message(self, msg):
         r"""Update the serializer based on information stored in a message.

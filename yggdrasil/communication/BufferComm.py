@@ -37,7 +37,7 @@ class LockedBuffer(multitasking.Queue):
         r"""Add an element to the queue."""
         self.put_nowait(x)
 
-    def pop(self, index=None, default=None):
+    def pop(self, index=0, default=None):
         r"""Remove the first element from the queue."""
         assert(index == 0)
         # with self.lock:

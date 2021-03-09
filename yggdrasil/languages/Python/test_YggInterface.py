@@ -82,14 +82,14 @@ def do_send_recv(language='python', fmt='%f\\n%d', msg=[float(1.0), int(2)],
     # Create and start drivers to transport messages
     iodrv = ConnectionDriver.ConnectionDriver(
         name,
-        inputs=[{'partner_model': 'model1'}],
-        outputs=[{'partner_model': 'model2'}])
+        inputs=[{'partner_model': 'model1', 'allow_multiple_comms': True}],
+        outputs=[{'partner_model': 'model2', 'allow_multiple_comms': True}])
     iodrv.start()
     os.environ.update(iodrv.icomm.opp_comms)
     os.environ.update(iodrv.ocomm.opp_comms)
     # Connect and utilize interface under disguise as target language
     try:
-        with ModelEnv(language=language):
+        with ModelEnv(language=language, YGG_THREADING='True'):
             # Output
             o = YggInterface.YggInit(output_interface, (name, fmt))
             o.send(*msg)

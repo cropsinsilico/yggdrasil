@@ -7,6 +7,14 @@ import yggdrasil.drivers.tests.test_ModelDriver as parent
 from yggdrasil.components import import_component
 
 
+def test_get_compatible_tool():
+    r"""Test get_compatible_tool when default provided."""
+    assert_raises(ValueError, CompiledModelDriver.get_compatible_tool,
+                  'invalid', 'compiler', 'c')
+    assert_equal(CompiledModelDriver.get_compatible_tool(
+        'invalid', 'compiler', 'c', default=None), None)
+
+
 def test_get_compilation_tool_registry():
     r"""Test errors raised by get_compilation_tool_registry."""
     assert_raises(ValueError, CompiledModelDriver.get_compilation_tool_registry,
@@ -188,6 +196,10 @@ class TestCompiledModelDriverNoInit(TestCompiledModelParam,
         
     def test_build(self):
         r"""Test building libraries as a shared/static library or object files."""
+        # Finish on the default libtype
+        order = ['shared', 'object', 'static']
+        order.remove(CompiledModelDriver._default_libtype)
+        order.append(CompiledModelDriver._default_libtype)
         for libtype in ['shared', 'object', 'static']:
             self.import_cls.compile_dependencies(
                 libtype=libtype, overwrite=True)
@@ -379,8 +391,8 @@ class TestCompiledModelDriverNoStart(TestCompiledModelParam,
             setattr(self.instance, k, [])
         # Compile with each compiler
         for k, v in self.import_cls.get_available_tools('compiler').items():
-            if (not v.is_installed()) or getattr(v, 'is_build_tool', False):
-                continue
+            if not v.is_installed():
+                continue  # pragma: debug
             setattr(self.instance, 'compiler_tool', v)
             setattr(self.instance, 'linker_tool', v.linker())
             setattr(self.instance, 'archiver_tool', v.archiver())
@@ -396,6 +408,9 @@ class TestCompiledModelDriverNoStart(TestCompiledModelParam,
                            out=os.path.basename(fname),
                            working_dir=os.path.dirname(fname),
                            overwrite=True)
+        if not self.instance.is_build_tool:
+            self.instance.compile_model(out=self.instance.model_file,
+                                        overwrite=False)
         
     # Done in driver, but driver not started
     def teardown(self):

@@ -514,11 +514,11 @@ def get_timeout_args(args0=None):
     i = 0
     for i in range(1, len(args0)):
         v = args0[i]
-        if v in args_remove:
+        if v in args_remove:  # pragma: debug
             pass
-        elif v in args_remove_value:
+        elif v in args_remove_value:  # pragma: debug
             i += 1
-        elif v.startswith(args_remove_value_match):
+        elif v.startswith(args_remove_value_match):  # pragma: debug
             pass
         elif v in args_preserve_path:
             args.append(v)
@@ -529,8 +529,9 @@ def get_timeout_args(args0=None):
         else:
             if v.startswith('--rootdir='):
                 out['rootdir'] = v.split('=')[-1]
-            elif v == '--rootdir':
+            elif v == '--rootdir':  # pragma: debug
                 out['rootdir'] = args0[i + 1]
+                i += 1
             args.append(v)
         i += 1
     for v in args_add:
@@ -578,12 +579,12 @@ def timeout(*args, allow_arguments=False, **kwargs):
                     v = getattr(func, k)
                     if k.startswith('test_') and isinstance(v,
                                                             types.MethodType):
-                        setattr(func, k, deco(v))
+                        setattr(func, k, deco(v))  # pragma: testing
                 func._timeout_wrapped = True
                 return func
 
             @functools.wraps(func)
-            def wrapper(*args, **kwargs):
+            def wrapper(*args, **kwargs):  # pragma: testing
                 testname = os.environ['PYTEST_CURRENT_TEST'].split()[0]
                 if rootdir:
                     testname = os.path.join(rootdir, testname)
@@ -1251,7 +1252,7 @@ def generate_component_subtests(comptype, suffix, target_globals,
     """
     from yggdrasil.schema import get_schema
     _schema = get_schema()
-    if new_attr is None:
+    if new_attr is None:  # pragma: debug
         new_attr = {}
     if comptype not in _schema.keys():  # pragma: debug
         raise NotImplementedError("%s is not a component type." % comptype)

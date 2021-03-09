@@ -8,6 +8,7 @@
 
 LANG2EXT = {
     'yaml': '.yml',
+    'executable': '.exe',
     'R': '.R',
     'r': '.R',
     'c': '.c',
@@ -82,7 +83,7 @@ COMPILATION_TOOL_VARS = {
         'flags': 'CFLAGS',
     },
     'cl': {
-        'exec': 'LINK',
+        'exec': 'CC',
         'flags': 'CFLAGS',
     },
     'g++': {

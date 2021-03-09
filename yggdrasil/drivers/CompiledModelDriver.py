@@ -179,11 +179,6 @@ def get_compilation_tool(tooltype, name, default=False):
             out = reg[x]
             break
     if out is None:
-        for k in reg.keys():
-            if k in name:
-                out = reg[k]
-                break
-    if out is None:
         if default is False:
             raise ValueError("Could not locate a %s tool with name '%s'"
                              % (tooltype, name))
@@ -663,6 +658,8 @@ class CompilationToolBase(object):
         envi_base = ''
         if isinstance(cls.toolname, str):
             tool_base.append(cls.toolname)
+        if isinstance(cls.default_executable, str):
+            tool_base.append(cls.default_executable)
         if isinstance(cls.default_executable_env, str):
             envi_base = os.path.basename(
                 os.environ.get(cls.default_executable_env, ''))
@@ -875,7 +872,6 @@ class CompilationToolBase(object):
         if platform._is_win:  # pragma: windows
             base_paths = []
             vcpkg_dir = cfg.get('c', 'vcpkg_dir', None)
-            logger.info("vcpkg_dir = '%s'" % vcpkg_dir)
             if vcpkg_dir is not None:
                 if not os.path.isdir(vcpkg_dir):  # pragma: debug
                     raise RuntimeError("vcpkg_dir is not valid: '%s'"
@@ -1265,7 +1261,7 @@ class CompilerBase(CompilationToolBase):
         if cls.no_separate_linking:
             cls.is_linker = True
             cls.compile_only_flag = None
-        if cls.is_linker:
+        if cls.is_linker and (not getattr(cls, 'dont_create_linker', False)):
             if cls.default_linker is None:
                 cls.default_linker = cls.toolname
             copy_attr = ['toolname', 'aliases', 'languages', 'platforms',
@@ -1305,8 +1301,6 @@ class CompilerBase(CompilationToolBase):
             out = get_compilation_tool('linker', linker)(flags=linker_flags,
                                                          executable=linker)
             assert(out.is_installed())
-            # if not out.is_installed():
-            #     out = get_compatible_tool(cls, 'linker', language=cls.languages[0])
         else:
             out = linker
         return out
@@ -1547,7 +1541,7 @@ class CompilerBase(CompilationToolBase):
                 dont_link = False
         # Get appropriate tool
         tool = None
-        if not dont_link:
+        if not (dont_link or skip_flags):
             tool = cls.get_library_tool(libtype=libtype, **kwargs)
         # Handle list of sources
         if (not skip_flags) and isinstance(args, list) and (len(args) > 1):
@@ -2350,8 +2344,8 @@ class CompiledModelDriver(ModelDriver):
                 if default is False:
                     raise NotImplementedError("%s not set for language '%s'."
                                               % (tooltype.title(), cls.language))
-                logger.info("%s not set for language '%s'."
-                            % (tooltype.title(), cls.language))
+                logger.debug("%s not set for language '%s'."
+                             % (tooltype.title(), cls.language))
                 return default
             if return_prop == 'name':
                 return toolname
@@ -2391,8 +2385,8 @@ class CompiledModelDriver(ModelDriver):
                     raise NotImplementedError(
                         "%s not set for language '%s' (toolname=%s)."
                         % (tooltype.title(), cls.language, toolname))
-                logger.info("%s not set for language '%s' (toolname=%s)."
-                            % (tooltype.title(), cls.language, toolname))
+                logger.debug("%s not set for language '%s' (toolname=%s)."
+                             % (tooltype.title(), cls.language, toolname))
                 out = default
             if isinstance(out, type):
                 out = out(**kwargs)
@@ -3609,6 +3603,8 @@ class CompiledModelDriver(ModelDriver):
         except BaseException:
             self.cleanup_products()
             raise
+        finally:
+            self.restore_files()
 
     @classmethod
     def get_internal_suffix(cls, commtype=None):
