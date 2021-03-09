@@ -639,6 +639,10 @@ class TestCommBase(YggTestClassInfo):
         r"""Test purging messages from the comm."""
         self.assert_equal(self.send_instance.n_msg, 0)
         self.assert_equal(self.recv_instance.n_msg, 0)
+        if self.send_instance.is_async:
+            self.assert_equal(self.send_instance.n_msg_direct, 0)
+        if self.recv_instance.is_async:
+            self.assert_equal(self.recv_instance.n_msg_direct, 0)
         # Purge recv while open
         if self.comm not in ['CommBase', 'AsyncComm']:
             flag = self.send_instance.send(self.test_msg)
