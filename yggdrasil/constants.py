@@ -8,13 +8,13 @@
 
 LANG2EXT = {
     'yaml': '.yml',
+    'executable': '.exe',
     'R': '.R',
     'r': '.R',
     'c': '.c',
     'c++': '.cpp',
     'cpp': '.cpp',
     'cxx': '.cpp',
-    'executable': '.exe',
     'fortran': '.f90',
     'lpy': '.lpy',
     'matlab': '.m',

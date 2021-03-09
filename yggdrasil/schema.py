@@ -246,7 +246,7 @@ def update_constants():
     drivers = {k: import_component('model', k) for k in s['model'].subtypes}
     language_cat = ['compiled', 'interpreted', 'build', 'dsl', 'other']
     typemap = {'compiler': 'compiled', 'interpreter': 'interpreted'}
-    lang2ext = {'yaml': '.yml'}
+    lang2ext = {'yaml': '.yml', 'executable': '.exe'}
     languages = {k: [] for k in language_cat}
     languages_with_aliases = {k: [] for k in language_cat}
     compiler_env_vars = {}
@@ -258,10 +258,11 @@ def update_constants():
         complete.append(drv.language)
         drv_type = typemap.get(drv.executable_type, drv.executable_type)
         if drv.language_ext:
-            if isinstance(drv.language_ext, list):
-                lang2ext[k] = drv.language_ext[0]
-            else:
-                lang2ext[k] = drv.language_ext
+            if k not in lang2ext:
+                if isinstance(drv.language_ext, list):
+                    lang2ext[k] = drv.language_ext[0]
+                else:
+                    lang2ext[k] = drv.language_ext
             for ka in drv.language_aliases:
                 lang2ext[ka] = lang2ext[k]
         languages.setdefault(drv_type, [])
