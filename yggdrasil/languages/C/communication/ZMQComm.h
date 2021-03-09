@@ -934,6 +934,46 @@ int zmq_comm_recv(const comm_t* x, char **data, const size_t len,
     ygglog_debug("zmq_comm_recv(%s): did not receive", x->name);
     return ret;
   }
+  // Check for server signon and respond
+  if (strncmp((char*)zframe_data(out), "ZMQ_SERVER_SIGNING_ON::", 23) == 0) {
+    char* client_address = (char*)zframe_data(out) + 23;
+    // create a DEALER socket and connect to address
+    zsock_t *client_socket = ygg_zsock_new(ZMQ_DEALER);
+    if (client_socket == NULL) {
+      ygglog_error("zmq_comm_recv(%s): Could not initalize the client side of the proxy socket to confirm signon", x->name);
+      zframe_destroy(&out);
+      return ret;
+    }
+    if (zsock_connect(client_socket, "%s", client_address) < 0) {
+      ygglog_error("zmq_comm_recv(%s): Error when connecting to the client proxy socket to respond to signon", x->name);
+      zframe_destroy(&out);
+      ygg_zsock_destroy(&client_socket);
+      return ret;
+    }
+    zframe_t *response = zframe_new(zframe_data(out), zframe_size(out));
+    if (response == NULL) {
+      ygglog_error("zmq_comm_recv(%s): Error creating response message frame.", x->name);
+      zframe_destroy(&out);
+      zframe_destroy(&response);
+      ygg_zsock_destroy(&client_socket);
+      return ret;
+    }
+    if (zframe_send(&response, client_socket, 0) < 0) {
+      ygglog_error("zmq_comm_recv(%s): Error sending response message.", x->name);
+      zframe_destroy(&out);
+      zframe_destroy(&response);
+      ygg_zsock_destroy(&client_socket);
+      return ret;
+    }
+    zframe_destroy(&out);
+    zframe_destroy(&response);
+    ygg_zsock_destroy(&client_socket);
+    out = zframe_recv(s);
+    if (out == NULL) {
+      ygglog_debug("zmq_comm_recv(%s): did not receive", x->name);
+      return ret;
+    }
+  }
   // Realloc and copy data
   size_t len_recv = zframe_size(out) + 1;
   // size_t len_recv = (size_t)ret + 1;

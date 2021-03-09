@@ -12,19 +12,27 @@ class TestServerComm(test_CommBase.TestCommBase):
     attr_list = (copy.deepcopy(test_CommBase.TestCommBase.attr_list)
                  + ['response_kwargs', 'icomm', 'ocomm'])
 
+    def setup(self, *args, **kwargs):
+        r"""Initialize comm object pair."""
+        super(TestServerComm, self).setup(*args, **kwargs)
+        # Wait for signon message
+        T = self.recv_instance.start_timeout(10.0)
+        while ((not T.is_out) and (self.recv_instance.n_msg == 0)):  # pragma: debug
+            self.recv_instance.sleep()
+        self.recv_instance.stop_timeout()
+        # Drain signon messages
+        T = self.recv_instance.start_timeout(10.0)
+        while ((not T.is_out) and (self.recv_instance.n_msg > 0)):  # pragma: debug
+            flag, msg = self.recv_instance.recv(timeout=0)
+            assert(flag)
+            assert(self.recv_instance.is_empty_recv(msg))
+            self.recv_instance.sleep()
+        self.recv_instance.stop_timeout()
+        
     @property
     def send_inst_kwargs(self):
         r"""dict: Keyword arguments for send instance."""
-        return {'commtype': 'client'}
-    
-    @property
-    def inst_kwargs(self):
-        r"""dict: Keyword arguments for tested class."""
-        out = super(TestServerComm, self).inst_kwargs
-        # Required to prevent use of ZMQ DEALER socket when just
-        # testing functionality of server-client interaction
-        out['is_server'] = False
-        return out
+        return {'commtype': 'client', 'direct_connection': True}
     
     @unittest.skipIf(True, 'Server')
     def test_error_send(self):
@@ -125,7 +133,7 @@ class TestServerComm(test_CommBase.TestCommBase):
         self.send_instance.close_in_thread()
         self.recv_instance.close_in_thread()
 
-    def add_filter(self, comm, filter=None):
+    def add_filter(self, comm, filter=None, **kwargs):
         r"""Add a filter to a comm.
 
         Args:
@@ -138,7 +146,8 @@ class TestServerComm(test_CommBase.TestCommBase):
             target = comm.icomm
         elif comm._commtype == 'client':
             target = comm.ocomm
-        return super(TestServerComm, self).add_filter(target, filter=filter)
+        return super(TestServerComm, self).add_filter(target, filter=filter,
+                                                      **kwargs)
         
     # # This dosn't work for comms that are uni-directional
     # def test_purge_recv(self):
