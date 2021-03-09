@@ -1402,7 +1402,7 @@ class CommBase(tools.YggClass):
         except BaseException:
             if for_empty:
                 return None
-            raise
+            raise  # pragma: debug
         if (((self.direction == 'send') and (header is not False)
              and iconv and iconv.transformed_datatype
              and (not self.serializer.initialized))):
@@ -1469,20 +1469,6 @@ class CommBase(tools.YggClass):
         if self.is_eof(msg):
             return False
         return self.is_empty(msg, self.empty_obj_recv)
-    
-    def is_empty_send(self, msg):
-        r"""Check if a message object being sent is empty.
-
-        Args:
-            msg (obj): Message object.
-
-        Returns:
-            bool: True if the object is empty, False otherwise.
-
-        """
-        smsg = self.apply_transform(msg, for_empty=True)
-        emsg, _ = self.deserialize(self.empty_bytes_msg)
-        return self.is_empty(smsg, emsg)
         
     def chunk_message(self, msg):
         r"""Yield chunks of message of size maxMsgSize
@@ -1549,12 +1535,12 @@ class CommBase(tools.YggClass):
         global _registered_servers
         with _registered_servers.lock:
             if self._server is None:
-                if not self.server_exists(self.address):
-                    self.debug("Creating new server")
-                    self._server = self.new_server(self.address)
-                    self._server.start()
-                else:
-                    self._server = _registered_servers[self.address]
+                assert(not self.server_exists(self.address))
+                self.debug("Creating new server")
+                self._server = self.new_server(self.address)
+                self._server.start()
+                # Currently server are only started once per model
+                # self._server = _registered_servers[self.address]
                 if self.direction == 'send':
                     self._server.add_client()
                     self.address = self._server.cli_address
@@ -1618,10 +1604,9 @@ class CommBase(tools.YggClass):
 
         """
         c = self._work_comms.get(header['id'], None)
-        if c is not None:
-            return c
-        c = self.header2workcomm(header, **kwargs)
-        self.add_work_comm(c)
+        if c is None:
+            c = self.header2workcomm(header, **kwargs)
+            self.add_work_comm(c)
         return c
 
     def create_work_comm(self, work_comm_name=None, **kwargs):
@@ -1763,7 +1748,7 @@ class CommBase(tools.YggClass):
                         out = self._send(*args, **kwargs)
                         if out or (not send_1st):
                             break
-                    else:
+                    else:  # pragma: debug
                         self.debug('Comm closed')
                         out = False
                         break
@@ -2227,13 +2212,14 @@ class CommBase(tools.YggClass):
         # 6. Mark comm as used and close if single use
         if msg.flag in [FLAG_EOF, FLAG_SUCCESS]:
             self._used = True
-        if self.single_use and self._used:
+        if self.single_use and self._used and self.is_open:
             self.debug('Linger close on single use')
             self.linger_close(active_confirm=self.is_async)
         # 7. Apply after_finalize_message functions
         if after_finalize_message:
             for x in after_finalize_message:
                 msg = x(msg)
+        msg.finalized = True
         return msg
 
     def recv_nolimit(self, *args, **kwargs):

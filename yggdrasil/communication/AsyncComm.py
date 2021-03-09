@@ -515,8 +515,13 @@ class AsyncComm(ProxyObject, ComponentBaseUnregistered):
                     self.close()
                     out.flag = CommBase.FLAG_FAILURE
                 self._used = True
-        if (not dont_finalize) and (self.async_recv_method == 'recv_message'):
-            out = self._wrapped.finalize_message(out)
+        if not dont_finalize:
+            kws_finalize = {k: kwargs.pop(k) for k in self._finalize_message_kws
+                            if k in kwargs}
+            if self.async_recv_method != 'recv_message':
+                out.finalized = False
+                kws_finalize['skip_processing'] = True
+            out = self._wrapped.finalize_message(out, **kws_finalize)
         if not return_message_object:
             out = (bool(out.flag), out.args)
         return out

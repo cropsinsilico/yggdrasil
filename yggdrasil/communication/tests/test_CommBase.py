@@ -615,6 +615,30 @@ class TestCommBase(YggTestClassInfo):
         r"""Test send/recv of a small message."""
         self.do_send_recv(print_status=True)
 
+    def test_send_recv_raw(self):
+        r"""Test send/recv of a small message."""
+        if self.comm in ['CommBase', 'AsyncComm', 'ValueComm', 'ForkComm',
+                         'ServerComm', 'ClientComm']:
+            return
+
+        def dummy(msg):
+            print(msg)
+            msg.msg = b''
+            msg.args = b''
+            msg.length = 0
+            return msg
+
+        assert(self.send_instance.send(self.test_msg))
+        msg = self.recv_instance.recv(
+            timeout=60.0, skip_deserialization=True,
+            return_message_object=True, after_finalize_message=[dummy])
+        assert(msg.finalized)
+        assert_equal(self.recv_instance.finalize_message(msg), msg)
+        msg.finalized = False
+        assert(self.recv_instance.is_empty_recv(msg.args))
+        msg = self.recv_instance.finalize_message(msg)
+        assert_equal(msg.flag, CommBase.FLAG_EMPTY)
+
     def test_send_recv_nolimit(self):
         r"""Test send/recv of a large message."""
         assert(len(self.msg_long) > self.maxMsgSize)

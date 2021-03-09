@@ -596,8 +596,6 @@ class ZMQComm(CommBase.CommBase):
             kwargs['is_server'] = True
         elif self.is_server:
             kwargs['is_client'] = True
-        if self.allow_multiple_comms:
-            kwargs['allow_multiple_comms'] = True
         if kwargs['socket_type'] in ['DEALER', 'ROUTER']:
             kwargs['dealer_identity'] = self.dealer_identity
         kwargs['context'] = self.context
