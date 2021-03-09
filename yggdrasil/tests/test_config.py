@@ -2,7 +2,7 @@ import os
 import json
 import shutil
 from yggdrasil.tests import assert_equal, assert_raises
-from yggdrasil import config, tools
+from yggdrasil import config, tools, platform
 
 
 def test_YggConfigParser():
@@ -31,6 +31,9 @@ def test_update_language_config():
                 'c', lang_kwargs={'c': {
                     'vcpkg_dir': config.ygg_cfg_usr.get(
                         'c', 'vcpkg_dir')}})
+        if platform._is_mac:
+            config.update_language_config(
+                'c', lang_kwargs={'c': {'compiler': shutil.which('clang')}})
         config.update_language_config(overwrite=True, verbose=True,
                                       allow_multiple_omp=True)
         if len(languages) > 0:

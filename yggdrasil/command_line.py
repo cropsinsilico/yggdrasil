@@ -857,51 +857,64 @@ class update_config(SubCommand):
 
     name = "config"
     help = 'Update the user config file.'
-    arguments = [
-        (('languages', ),
-         {'nargs': '*',
-          # 'choices': ['all'] + LANGUAGES_WITH_ALIASES['all'],
-          'default': [],
-          'help': 'One or more languages that should be configured.'}),
-        (('--languages', ),
-         {'nargs': '+', 'dest': 'languages_flag',
-          # 'choices': ['all'] + LANGUAGES_WITH_ALIASES['all'],
-          'default': [],
-          'help': 'One or more languages that should be configured.'}),
-        (('--show-file', ),
-         {'action': 'store_true',
-          'help': 'Print the path to the config file without updating it.'}),
-        (('--remove-file', ),
-         {'action': 'store_true',
-          'help': 'Remove the existing config file and return.'}),
-        (('--overwrite', ),
-         {'action': 'store_true',
-          'help': 'Overwrite the existing file.'}),
-        (('--disable-languages', ),
-         {'nargs': '+', 'default': [],
-          'choices': LANGUAGES_WITH_ALIASES['all'],
-          'help': 'One or more languages that should be disabled.'}),
-        (('--enable-languages', ),
-         {'nargs': '+', 'default': [],
-          'choices': LANGUAGES_WITH_ALIASES['all'],
-          'help': 'One or more languages that should be enabled.'}),
-        (('--quiet', '-q'),
-         {'action': 'store_true',
-          'help': 'Suppress output.'}),
-        (('--allow-multiple-omp', ),
-         {'action': 'store_true',
-          'help': ('Have yggdrasil set the environment variable '
-                   'KMP_DUPLICATE_LIB_OK to \'True\' during model runs '
-                   'to disable errors resembling '
-                   '"OMP: Error #15: Initializing libomp.dylib..." '
-                   'that result from having multiple versions of OpenMP '
-                   'loaded during runtime.')}),
-        (('--dont-allow-multiple-omp', ),
-         {'action': 'store_false',
-          'dest': 'allow_multiple_omp',
-          'help': ('Don\'t set the KMP_DUPLICATE_LIB_OK environment variable '
-                   'when running models (see help for \'--allow-multiple-omp\' '
-                   'for more information).')})]
+    arguments = (
+        [(('languages', ),
+          {'nargs': '*',
+           # 'choices': ['all'] + LANGUAGES_WITH_ALIASES['all'],
+           'default': [],
+           'help': 'One or more languages that should be configured.'}),
+         (('--languages', ),
+          {'nargs': '+', 'dest': 'languages_flag',
+           # 'choices': ['all'] + LANGUAGES_WITH_ALIASES['all'],
+           'default': [],
+           'help': 'One or more languages that should be configured.'}),
+         (('--show-file', ),
+          {'action': 'store_true',
+           'help': 'Print the path to the config file without updating it.'}),
+         (('--remove-file', ),
+          {'action': 'store_true',
+           'help': 'Remove the existing config file and return.'}),
+         (('--overwrite', ),
+          {'action': 'store_true',
+           'help': 'Overwrite the existing file.'}),
+         (('--disable-languages', ),
+          {'nargs': '+', 'default': [],
+           'choices': LANGUAGES_WITH_ALIASES['all'],
+           'help': 'One or more languages that should be disabled.'}),
+         (('--enable-languages', ),
+          {'nargs': '+', 'default': [],
+           'choices': LANGUAGES_WITH_ALIASES['all'],
+           'help': 'One or more languages that should be enabled.'}),
+         (('--quiet', '-q'),
+          {'action': 'store_true',
+           'help': 'Suppress output.'}),
+         (('--allow-multiple-omp', ),
+          {'action': 'store_true',
+           'help': ('Have yggdrasil set the environment variable '
+                    'KMP_DUPLICATE_LIB_OK to \'True\' during model runs '
+                    'to disable errors resembling '
+                    '"OMP: Error #15: Initializing libomp.dylib..." '
+                    'that result from having multiple versions of OpenMP '
+                    'loaded during runtime.')}),
+         (('--dont-allow-multiple-omp', ),
+          {'action': 'store_false',
+           'dest': 'allow_multiple_omp',
+           'help': ('Don\'t set the KMP_DUPLICATE_LIB_OK environment variable '
+                    'when running models (see help for \'--allow-multiple-omp\' '
+                    'for more information).')})]
+        + [(('--%s-compiler' % k, ),
+            {'help': ('Name or path to compiler that should be used to compile '
+                      'models written in %s.' % k)})
+           for k in LANGUAGES['compiled']]
+        + [(('--%s-linker' % k, ),
+            {'help': ('Name or path to linker that should be used to link '
+                      'models written in %s.' % k)})
+           for k in LANGUAGES['compiled']]
+        + [(('--%s-archiver' % k, ),
+            {'help': ('Name or path to archiver that should be used to create '
+                      'static libraries for models written in %s.' % k)})
+           for k in LANGUAGES['compiled']]
+    )
     # TODO: Move these into the language directories?
     language_arguments = {
         'c': [
@@ -979,6 +992,11 @@ class update_config(SubCommand):
                 if hasattr(args, name):
                     lang_kwargs.setdefault(k, {})
                     lang_kwargs[k][name] = getattr(args, name)
+        for x in ['compiler', 'linker', 'archiver']:
+            for k in LANGUAGES['compiled']:
+                if getattr(args, '%s_%s' % (k, x), None):
+                    lang_kwargs.setdefault(k, {})
+                    lang_kwargs[k][x] = getattr(args, '%s_%s' % (k, x))
         config.update_language_config(
             args.languages, overwrite=args.overwrite,
             verbose=(not args.quiet),

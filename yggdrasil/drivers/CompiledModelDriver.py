@@ -168,10 +168,10 @@ def get_compilation_tool(tooltype, name, default=False):
         ValueError: If a tool with the provided name cannot be located.
 
     """
-    names_to_try = [name, name.lower(), os.path.basename(name),
-                    os.path.basename(name).lower(),
-                    os.path.splitext(os.path.basename(name))[0],
-                    os.path.splitext(os.path.basename(name))[0].lower()]
+    names_to_try = [name, os.path.basename(name),
+                    os.path.splitext(os.path.basename(name))[0]]
+    if platform._is_win:
+        names_to_try += [x.lower() for x in names_to_try.copy()]
     out = None
     reg = get_compilation_tool_registry(tooltype)
     for x in names_to_try:
@@ -3269,6 +3269,43 @@ class CompiledModelDriver(ModelDriver):
             out = cls.is_tool_installed(k)
         return out
 
+    @classmethod
+    def configure(cls, cfg, **kwargs):
+        r"""Add configuration options for this language.
+
+        Args:
+            cfg (CisConfigParser): Config class that options should be set for.
+            **kwargs: Additional keyword arguments are used to set tool
+                configuration options (e.g. 'compiler').
+        
+        Returns:
+            list: Section, option, description tuples for options that could not
+                be set.
+
+        """
+        if (cls.language is not None) and (not cfg.has_section(cls.language)):
+            cfg.add_section(cls.language)
+        for k, v in kwargs.items():
+            if k not in ['compiler', 'linker', 'archiver']:  # pragma: debug
+                raise ValueError("Unexpected configuration option: '%s'" % k)
+            vtool = None
+            try:
+                vtool = get_compilation_tool(k, v)
+            except ValueError:  # pragma: debug
+                reg = get_compilation_tool_registry(k)
+                for kreg, vreg in reg.keys():
+                    if kreg in v:
+                        vtool = vreg
+                        break
+            if not vtool:  # pragma: debug
+                raise ValueError("Could not locate a %s tool '%s'." % (k, v))
+            cfg.set(cls.language, k, vtool.toolname)
+            if os.path.isfile(v):
+                cfg.set(cls.language, '%s_executable' % vtool.toolname, v)
+        # Call __func__ to avoid direct invoking of class which dosn't exist
+        # in after_registration where this is called
+        return ModelDriver.configure.__func__(cls, cfg)
+        
     @classmethod
     def configure_executable_type(cls, cfg):
         r"""Add configuration options specific in the executable type
