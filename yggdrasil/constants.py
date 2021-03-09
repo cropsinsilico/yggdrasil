@@ -7,20 +7,20 @@
 # ======================================================
 
 LANG2EXT = {
-    'yaml': '.yml',
-    'executable': '.exe',
     'R': '.R',
-    'r': '.R',
     'c': '.c',
     'c++': '.cpp',
     'cpp': '.cpp',
     'cxx': '.cpp',
+    'executable': '.exe',
     'fortran': '.f90',
     'lpy': '.lpy',
     'matlab': '.m',
     'osr': '.xml',
     'python': '.py',
+    'r': '.R',
     'sbml': '.xml',
+    'yaml': '.yml',
 }
 EXT2LANG = {v: k for k, v in LANG2EXT.items()}
 LANGUAGES = {
@@ -74,44 +74,56 @@ COMPILER_ENV_VARS = {
     },
 }
 COMPILATION_TOOL_VARS = {
-    'gcc': {
-        'exec': 'CC',
-        'flags': 'CFLAGS',
-    },
-    'clang': {
-        'exec': 'CC',
-        'flags': 'CFLAGS',
-    },
-    'cl': {
-        'exec': 'CC',
-        'flags': 'CFLAGS',
-    },
-    'g++': {
-        'exec': 'CXX',
-        'flags': 'CXXFLAGS',
-    },
-    'clang++': {
-        'exec': 'CXX',
-        'flags': 'CXXFLAGS',
-    },
-    'cl++': {
-        'exec': 'CXX',
-        'flags': 'CXXFLAGS',
-    },
-    'gfortran': {
-        'exec': 'FC',
-        'flags': 'FFLAGS',
+    'LIB': {
+        'exec': None,
+        'flags': None,
     },
     'LINK': {
         'exec': 'LINK',
         'flags': 'LDFLAGS',
     },
+    'ar': {
+        'exec': 'AR',
+        'flags': None,
+    },
+    'cl': {
+        'exec': 'CC',
+        'flags': 'CFLAGS',
+    },
+    'cl++': {
+        'exec': 'CXX',
+        'flags': 'CXXFLAGS',
+    },
+    'clang': {
+        'exec': 'CC',
+        'flags': 'CFLAGS',
+    },
+    'clang++': {
+        'exec': 'CXX',
+        'flags': 'CXXFLAGS',
+    },
+    'cmake': {
+        'exec': None,
+        'flags': None,
+    },
+    'g++': {
+        'exec': 'CXX',
+        'flags': 'CXXFLAGS',
+    },
+    'gcc': {
+        'exec': 'CC',
+        'flags': 'CFLAGS',
+    },
+    'gfortran': {
+        'exec': 'FC',
+        'flags': 'FFLAGS',
+    },
     'ld': {
         'exec': 'LD',
         'flags': 'LDFLAGS',
     },
-    'cmake': {
-        'exec': None,
+    'libtool': {
+        'exec': 'LIBTOOL',
         'flags': None,
     },
     'make': {
@@ -119,18 +131,6 @@ COMPILATION_TOOL_VARS = {
         'flags': None,
     },
     'nmake': {
-        'exec': None,
-        'flags': None,
-    },
-    'ar': {
-        'exec': 'AR',
-        'flags': None,
-    },
-    'libtool': {
-        'exec': 'LIBTOOL',
-        'flags': None,
-    },
-    'LIB': {
         'exec': None,
         'flags': None,
     },
