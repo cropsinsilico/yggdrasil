@@ -15,6 +15,8 @@ class ServerComm(CommBase.CommBase):
             the request comm. Defaults to None.
         response_kwargs (dict, optional): Keyword arguments for the response
             comm. Defaults to empty dict.
+        direct_connection (bool, optional): If True, the comm will be
+            directly connected to a ServerComm. Defaults to False.
         **kwargs: Additional keywords arguments are passed to the input comm.
 
     Attributes:
@@ -28,7 +30,8 @@ class ServerComm(CommBase.CommBase):
     _dont_register = True
     
     def __init__(self, name, request_commtype=None, response_kwargs=None,
-                 dont_open=False, is_async=False, **kwargs):
+                 dont_open=False, is_async=False, direct_connection=False,
+                 **kwargs):
         if response_kwargs is None:
             response_kwargs = dict()
         icomm_name = name
@@ -40,6 +43,7 @@ class ServerComm(CommBase.CommBase):
         icomm_kwargs.setdefault('use_async', is_async)
         if icomm_kwargs.get('use_async', False):
             icomm_kwargs.setdefault('async_recv_method', 'recv_message')
+        self.direct_connection = direct_connection
         self.response_kwargs = response_kwargs
         self.icomm = get_comm(icomm_name, **icomm_kwargs)
         self.ocomm = OrderedDict()
@@ -149,6 +153,7 @@ class ServerComm(CommBase.CommBase):
         kwargs['commtype'] = "client"
         kwargs['request_commtype'] = self.icomm._commtype
         kwargs['response_kwargs'] = self.response_kwargs
+        kwargs['direct_connection'] = self.direct_connection
         return kwargs
         
     def open(self):
@@ -205,8 +210,12 @@ class ServerComm(CommBase.CommBase):
         elif 'response_address' not in header:  # pragma: debug
             raise RuntimeError("Last header does not contain response address.")
         comm_kwargs = dict(address=header['response_address'],
-                           direction='send', is_response_server=True,
+                           direction='send',
                            single_use=True, **self.response_kwargs)
+        if self.direct_connection:
+            comm_kwargs['is_response_client'] = True
+        else:
+            comm_kwargs['is_response_server'] = True
         response_id = header['request_id']
         while response_id in self.ocomm:  # pragma: debug
             response_id += str(uuid.uuid4())
