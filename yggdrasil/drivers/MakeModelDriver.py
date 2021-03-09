@@ -1,4 +1,3 @@
-import os
 from collections import OrderedDict
 from yggdrasil import platform, constants
 from yggdrasil.drivers.BuildModelDriver import (
@@ -94,19 +93,15 @@ class MakeCompiler(BuildToolBase):
         Args:
             target (str, optional): Target that should be built. Defaults to
                 to None and is ignored.
-            **kwargs: Additional keyword arguments are ignored.
+            **kwargs: Additional keyword arguments are passed to the parent
+                class's method.
 
         Returns:
-            list: Linker flags.
+            list: Compiler flags.
 
         """
-        link_kws = ['linker_flags']
-        for k in link_kws:
-            kwargs.pop(k, None)
+        kwargs.pop('linker_flags', None)
         kwargs.pop('outfile', None)
-        kwargs.pop('target_compiler', None)
-        # if (target is None) and (outfile is not None):
-        #     target = cls.file2base(outfile)
         out = super(MakeCompiler, cls).get_flags(outfile=target, **kwargs)
         return out
 
@@ -192,6 +187,7 @@ class MakeModelDriver(BuildModelDriver):
         'makedir': {'type': 'string'}}  # default will depend on makefile
     language = 'make'
     built_where_called = True
+    buildfile_base = 'Makefile'
 
     @staticmethod
     def before_registration(cls):
@@ -219,46 +215,30 @@ class MakeModelDriver(BuildModelDriver):
         super(MakeModelDriver, self).parse_arguments(args, **kwargs)
 
     @classmethod
-    def get_language_for_source(cls, fname=None, buildfile=None,
-                                call_base=False, target=None, **kwargs):
-                                
-        r"""Determine the language that can be used with the provided source
-        file(s). If more than one language applies to a set of multiple files,
-        the language that applies to the most files is returned.
+    def get_language_for_buildfile(cls, buildfile, target=None):
+        r"""Determine the target language based on the contents of a build
+        file.
 
         Args:
-            fname (str, list): The full path to one or more files. If more than
-                one is provided, they are iterated over.
-            buildfile (str, optional): Full path to the Makefile file.
-                Defaults to None and will be searched for.
-            target (str, optional): The build target. Defaults to None.
-            call_base (bool, optional): If True, the base class's method is
-                called directly. Defaults to False.
-            **kwargs: Additional keyword arguments are passed to the parent
-                class's method.
-
-        Returns:
-            str: The language that can operate on the specified file.
+            buildfile (str): Full path to the build configuration file.
+            target (str, optional): Target that will be built. Defaults to None
+                and the default target in the build file will be used.
 
         """
-        if not (call_base or isinstance(fname, list)):
-            if (buildfile is not None) and os.path.isfile(buildfile):
-                with open(buildfile, 'r') as fd:
-                    lines = fd.read()
-                ext_present = []
-                for lang, info in constants.COMPILER_ENV_VARS.items():
-                    if info['exec'] in lines:
-                        ext_present.append(lang)
-                if ('c' in ext_present) and ('c++' in ext_present):  # pragma: debug
-                    ext_present.remove('c')
-                if len(ext_present) == 1:
-                    return ext_present[0]
-                elif len(ext_present) > 1:  # pragma: debug
-                    raise RuntimeError("More than one extension found in "
-                                       "'%s': %s" % (buildfile, ext_present))
-        return super(MakeModelDriver, cls).get_language_for_source(
-            fname, call_base=call_base, buildfile=buildfile,
-            target=target, **kwargs)
+        with open(buildfile, 'r') as fd:
+            lines = fd.read()
+        ext_present = []
+        for lang, info in constants.COMPILER_ENV_VARS.items():
+            if info['exec'] in lines:
+                ext_present.append(lang)
+        if ('c' in ext_present) and ('c++' in ext_present):  # pragma: debug
+            ext_present.remove('c')
+        if len(ext_present) == 1:
+            return ext_present[0]
+        elif len(ext_present) > 1:  # pragma: debug
+            raise RuntimeError("More than one extension found in "
+                               "'%s': %s" % (buildfile, ext_present))
+        return super(MakeModelDriver, cls).get_language_for_buildfile(buildfile)
         
     def compile_model(self, target=None, **kwargs):
         r"""Compile model executable(s).

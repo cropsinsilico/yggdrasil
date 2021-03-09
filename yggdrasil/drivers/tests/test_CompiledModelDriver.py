@@ -391,8 +391,8 @@ class TestCompiledModelDriverNoStart(TestCompiledModelParam,
             setattr(self.instance, k, [])
         # Compile with each compiler
         for k, v in self.import_cls.get_available_tools('compiler').items():
-            if (not v.is_installed()) or getattr(v, 'is_build_tool', False):
-                continue
+            if not v.is_installed():
+                continue  # pragma: debug
             setattr(self.instance, 'compiler_tool', v)
             setattr(self.instance, 'linker_tool', v.linker())
             setattr(self.instance, 'archiver_tool', v.archiver())

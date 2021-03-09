@@ -153,6 +153,8 @@ class TestCMakeModelParam(parent.TestBuildModelParam):
         self.builddir = os.path.join(self.sourcedir, 'build')
         self.args = [self.target]
         self._inst_kwargs['yml']['working_dir'] = self.sourcedir
+        self._inst_kwargs.update(compiler_env='CXX',
+                                 compiler_flags_env='CXXFLAGS')
         
 
 class TestCMakeModelDriverNoInit(TestCMakeModelParam,
@@ -194,11 +196,14 @@ class TestCMakeModelDriverNoStart(TestCMakeModelParam,
             out = os.path.join(os.path.dirname(out),
                                'Debug',
                                os.path.basename(out))
+        compiler = CPPModelDriver.get_tool('compiler')
         self.import_cls.call_compiler(self.instance.source_files,
                                       out=out,
                                       builddir='build',
                                       working_dir=self.instance.working_dir,
-                                      overwrite=True)
+                                      overwrite=True,
+                                      target_compiler=compiler.toolname,
+                                      target_linker=compiler.linker().toolname)
         
 
 class TestCMakeModelDriver(TestCMakeModelParam, parent.TestBuildModelDriver):

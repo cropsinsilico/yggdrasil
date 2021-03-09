@@ -234,7 +234,8 @@ class CMakeConfigure(BuildToolBase):
         return out
 
     @classmethod
-    def get_flags(cls, sourcedir='.', builddir=None, target_compiler=None, **kwargs):
+    def get_flags(cls, sourcedir='.', builddir=None, target_compiler=None,
+                  target_linker=None, **kwargs):
         r"""Get a list of configuration/generation flags.
 
         Args:
@@ -243,7 +244,9 @@ class CMakeConfigure(BuildToolBase):
                 (the current working directory).
             builddir (str, optional): Directory that will contain the build tree.
                 Defaults to '.' (this current working directory).
-            target_compiler(str, optional): Compiler that should be used by cmake.
+            target_compiler (str, optional): Compiler that should be used by cmake.
+                Defaults to None and the default for the target language will be used.
+            target_linker (str, optional): Linker that should be used by cmake.
                 Defaults to None and the default for the target language will be used.
             **kwargs: Additional keyword arguments are passed to the parent
                 class's method.
@@ -298,6 +301,10 @@ class CMakeConfigure(BuildToolBase):
                 out.append('-DCMAKE_GENERATOR_PLATFORM=x64')
         if target_compiler == 'cl':
             compiler = get_compilation_tool('compiler', target_compiler)
+            if target_linker is None:
+                linker = compiler.linker()
+            else:
+                linker = get_compilation_tool('linker', target_linker)
             cmake_vars = {'c_compiler': 'CMAKE_C_COMPILER',
                           'c_flags': 'CMAKE_C_FLAGS',
                           'c++_compiler': 'CMAKE_CXX_COMPILER',
@@ -312,14 +319,11 @@ class CMakeConfigure(BuildToolBase):
                 if not itool.is_installed():  # pragma: debug
                     continue
                 if itool.toolname in ['cl', 'cl++']:
-                    # if itool.default_executable_env is None:
                     out.append('-D%s:FILEPATH=%s' % (
                         cmake_vars['%s_compiler' % k],
                         itool.get_executable(full_path=True)))
-                    # if itool.default_flags_env is None:
                     out.append('-D%s=%s' % (
                         cmake_vars['%s_flags' % k], ''))
-            linker = compiler.linker()
             out.append('-DCMAKE_LINKER=%s' % linker.get_executable(full_path=True))
         return out
 
@@ -744,6 +748,7 @@ class CMakeModelDriver(BuildModelDriver):
     add_libraries = CMakeConfigure.add_libraries
     sourcedir_as_sourcefile = True
     use_env_vars = False
+    buildfile_base = 'CMakeLists.txt'
 
     def parse_arguments(self, args, **kwargs):
         r"""Sort arguments based on their syntax to determine if an argument
@@ -760,7 +765,6 @@ class CMakeModelDriver(BuildModelDriver):
             self.builddir_base = 'build'
         else:
             self.builddir_base = 'build_%s' % self.target
-        self.buildfile_base = 'CMakeLists.txt'
         super(CMakeModelDriver, self).parse_arguments(args, **kwargs)
 
     @property
@@ -858,49 +862,29 @@ class CMakeModelDriver(BuildModelDriver):
         return out
 
     @classmethod
-    def get_language_for_source(cls, fname=None, buildfile=None,
-                                call_base=False, target=None, **kwargs):
-                                
-        r"""Determine the language that can be used with the provided source
-        file(s). If more than one language applies to a set of multiple files,
-        the language that applies to the most files is returned.
+    def get_language_for_buildfile(cls, buildfile, target=None):
+        r"""Determine the target language based on the contents of a build
+        file.
 
         Args:
-            fname (str, list): The full path to one or more files. If more than
-                one is provided, they are iterated over.
-            buildfile (str, optional): Full path to the CMakeLists.txt file.
-                Defaults to None and will be searched for.
-            target (str, optional): The build target. Defaults to None.
-            call_base (bool, optional): If True, the base class's method is
-                called directly. Defaults to False.
-            **kwargs: Additional keyword arguments are passed to the parent
-                class's method.
-
-        Returns:
-            str: The language that can operate on the specified file.
+            buildfile (str): Full path to the build configuration file.
+            target (str, optional): Target that will be built. Defaults to None
+                and the default target in the build file will be used.
 
         """
-        if not (call_base or isinstance(fname, list)):
-            if (buildfile is None) and isinstance(fname, str):
-                source_dir = cls.get_source_dir(
-                    fname, source_dir=kwargs.get('source_dir', None))
-                buildfile = os.path.join(source_dir, 'CMakeLists.txt')
-            if os.path.isfile(buildfile):
-                with open(buildfile, 'r') as fd:
-                    lines = fd.readlines()
-                for x in lines:
-                    if not x.strip().upper().startswith('ADD_EXECUTABLE'):
-                        continue
-                    varlist = x.split('(', 1)[-1].rsplit(')', 1)[0].split()
-                    if (target is None) or (target == varlist[0]):
-                        try:
-                            return cls.get_language_for_source(
-                                varlist[1:], early_exit=True, call_base=True)
-                        except ValueError:  # pragma: debug
-                            pass
-        return super(CMakeModelDriver, cls).get_language_for_source(
-            fname, call_base=call_base, buildfile=buildfile,
-            target=target, **kwargs)
+        with open(buildfile, 'r') as fd:
+            lines = fd.readlines()
+        for x in lines:
+            if not x.strip().upper().startswith('ADD_EXECUTABLE'):
+                continue
+            varlist = x.split('(', 1)[-1].rsplit(')', 1)[0].split()
+            if (target is None) or (target == varlist[0]):
+                try:
+                    return cls.get_language_for_source(
+                        varlist[1:], early_exit=True, call_base=True)
+                except ValueError:  # pragma: debug
+                    pass
+        return super(CMakeModelDriver, cls).get_language_for_buildfile(buildfile)
 
     @classmethod
     def fix_path(cls, path, for_env=False, **kwargs):

@@ -1,3 +1,4 @@
+import os
 import yggdrasil.drivers.tests.test_CompiledModelDriver as parent
 
 
@@ -26,6 +27,11 @@ class TestBuildModelDriverNoStart(TestBuildModelParam,
     r"""Test runner for BuildModelDriver without start."""
 
     test_compilers = None
+
+    def test_get_language_for_source(self):
+        r"""Test the get_language_for_source method."""
+        self.import_cls.get_language_for_source(self.src)
+        self.import_cls.get_language_for_source(os.path.dirname(self.src[0]))
 
 
 class TestBuildModelDriver(TestBuildModelParam,
