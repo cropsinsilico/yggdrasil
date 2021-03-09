@@ -89,7 +89,7 @@ def test_import_as_function():
     fmodel.stop()
 
 
-@requires_language('c', installed='any')
+@requires_language('c')
 def test_import_as_function_C():
     r"""Test import_as_function for C."""
     contents = r"""models:
