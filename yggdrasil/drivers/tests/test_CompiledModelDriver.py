@@ -411,6 +411,11 @@ class TestCompiledModelDriverNoStart(TestCompiledModelParam,
         if not self.instance.is_build_tool:
             self.instance.compile_model(out=self.instance.model_file,
                                         overwrite=False)
+            assert(os.path.isfile(self.instance.model_file))
+            self.instance.compile_model(out=self.instance.model_file,
+                                        overwrite=False)
+            assert(os.path.isfile(self.instance.model_file))
+            os.remove(self.instance.model_file)
         
     # Done in driver, but driver not started
     def teardown(self):

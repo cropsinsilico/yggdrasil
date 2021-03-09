@@ -299,7 +299,7 @@ class CMakeConfigure(BuildToolBase):
                  and (not generator.endswith(('Win64', 'ARM')))
                  and platform._is_64bit)):
                 out.append('-DCMAKE_GENERATOR_PLATFORM=x64')
-        if target_compiler == 'cl':
+        if target_compiler in ['cl', 'cl++']:
             compiler = get_compilation_tool('compiler', target_compiler)
             if target_linker is None:
                 linker = compiler.linker()
@@ -884,7 +884,8 @@ class CMakeModelDriver(BuildModelDriver):
                         varlist[1:], early_exit=True, call_base=True)
                 except ValueError:  # pragma: debug
                     pass
-        return super(CMakeModelDriver, cls).get_language_for_buildfile(buildfile)
+        return super(CMakeModelDriver, cls).get_language_for_buildfile(
+            buildfile)  # pragma: debug
 
     @classmethod
     def fix_path(cls, path, for_env=False, **kwargs):

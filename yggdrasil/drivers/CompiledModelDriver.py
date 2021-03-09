@@ -1317,13 +1317,12 @@ class CompilerBase(CompilationToolBase):
         archiver_flags = getattr(cls, '_archiver_flags', cls.default_archiver_flags)
         if archiver is None:
             archiver = find_compilation_tool('archiver', cls.languages[0])
+        out = archiver
         if archiver:
             out = get_compilation_tool('archiver', archiver)(flags=archiver_flags,
                                                              executable=archiver)
             if not out.is_installed():
                 out = get_compatible_tool(cls, 'archiver', language=cls.languages[0])
-        else:
-            out = archiver
         return out
 
     @classmethod

@@ -514,11 +514,11 @@ def get_timeout_args(args0=None):
     i = 0
     for i in range(1, len(args0)):
         v = args0[i]
-        if v in args_remove:  # pragma: debug
+        if v in args_remove:  # pragma: testing
             pass
-        elif v in args_remove_value:  # pragma: debug
+        elif v in args_remove_value:  # pragma: testing
             i += 1
-        elif v.startswith(args_remove_value_match):  # pragma: debug
+        elif v.startswith(args_remove_value_match):  # pragma: testing
             pass
         elif v in args_preserve_path:
             args.append(v)
@@ -529,7 +529,7 @@ def get_timeout_args(args0=None):
         else:
             if v.startswith('--rootdir='):
                 out['rootdir'] = v.split('=')[-1]
-            elif v == '--rootdir':  # pragma: debug
+            elif v == '--rootdir':  # pragma: testing
                 out['rootdir'] = args0[i + 1]
                 i += 1
             args.append(v)
@@ -538,7 +538,7 @@ def get_timeout_args(args0=None):
         if '=' in v:
             if not any(vv.startswith(v.split('=')[0]) for vv in args):
                 args.append(v)
-        elif v not in args:
+        elif v not in args:  # pragma: testing
             args.append(v)
     return out
 

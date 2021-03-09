@@ -38,7 +38,7 @@ jobs:
         os: [ubuntu-latest, macos-latest, windows-latest]
         python-version: [3.6]
         install-method: [pip]
-        test-flags1: [--long-running --test-suite=timing --test-suite=demos --test-suite=top, --test-suite=examples, --test-suite=types --skip-languages osr]
+        test-flags1: [--long-running --test-suite=timing --test-suite=demos --test-suite=top, --test-suite=examples, --test-suite=types --skip-languages c c++, --test-suite=types --languages c cpp]
         test-flags2: [""]
         install-c: [true]
         include:
@@ -204,6 +204,9 @@ jobs:
     - name: (CONDA) Install dependencies & package from existing build
       if: matrix.install-method == 'conda'
       run: python utils/setup_test_env.py install ${{ matrix.install-method }} --without-build
+    - name: (MACOS,CONDA) Set allow_multiple_omp config
+      if: matrix.install-method == 'conda' && matrix.os == 'macos-latest'
+      run: yggconfig --allow-multiple-omp
     # ========================================================
     
     - name: Verify installation
@@ -217,11 +220,6 @@ jobs:
         cmake -h
         yggtest --ci --nocapture drivers/tests/test_CMakeModelDriver.py
     - name: Run tests (1st)
-      if: env.USEVIRTUALENV == 1
-      id: test1_venv
-      run: yggtest --ci --nocapture --cov-append ${{ matrix.test-flags1 }}
-    - name: Run tests (1st)
-      if: env.USEVIRTUALENV != 1
       id: test1
       run: yggtest --ci --cov-append ${{ matrix.test-flags1 }}
     - name: Re-run test failures (1st)

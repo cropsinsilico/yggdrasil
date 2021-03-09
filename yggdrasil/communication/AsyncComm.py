@@ -116,10 +116,10 @@ class AsyncComm(ProxyObject, ComponentBaseUnregistered):
             self._backlog_thread.errors = []
         return out
 
-    # def atexit(self):
-    #     r"""Close operations."""
-    #     if (self.direction == 'send') and self.is_open_backlog:
-    #         self.linger()
+    def atexit(self):  # pragma: debug
+        r"""Close operations."""
+        if (self.direction == 'send') and self.is_open_backlog:
+            self.linger()
 
     def open(self):
         r"""Open the connection by connecting to the queue."""

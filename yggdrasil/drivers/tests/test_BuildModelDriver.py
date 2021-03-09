@@ -1,4 +1,5 @@
 import os
+import shutil
 import yggdrasil.drivers.tests.test_CompiledModelDriver as parent
 
 
@@ -30,8 +31,20 @@ class TestBuildModelDriverNoStart(TestBuildModelParam,
 
     def test_get_language_for_source(self):
         r"""Test the get_language_for_source method."""
+        buildfile = None
+        if self.import_cls.buildfile_base:
+            buildfile = os.path.join(os.path.dirname(self.src[0]),
+                                     self.import_cls.buildfile_base)
+            buildfile_cache = '_copy'.join(os.path.splitext(buildfile))
         self.import_cls.get_language_for_source(self.src)
         self.import_cls.get_language_for_source(os.path.dirname(self.src[0]))
+        try:
+            if buildfile:
+                shutil.move(buildfile, buildfile_cache)
+            self.import_cls.get_language_for_source(self.src[0])
+        finally:
+            if buildfile:
+                shutil.move(buildfile_cache, buildfile)
 
 
 class TestBuildModelDriver(TestBuildModelParam,

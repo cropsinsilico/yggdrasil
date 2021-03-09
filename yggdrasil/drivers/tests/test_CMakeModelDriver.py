@@ -153,8 +153,8 @@ class TestCMakeModelParam(parent.TestBuildModelParam):
         self.builddir = os.path.join(self.sourcedir, 'build')
         self.args = [self.target]
         self._inst_kwargs['yml']['working_dir'] = self.sourcedir
-        self._inst_kwargs.update(compiler_env='CXX',
-                                 compiler_flags_env='CXXFLAGS')
+        self._inst_kwargs.update(env_compiler='CXX',
+                                 env_compiler_flags='CXXFLAGS')
         
 
 class TestCMakeModelDriverNoInit(TestCMakeModelParam,
@@ -219,7 +219,7 @@ class TestCMakeModelDriver(TestCMakeModelParam, parent.TestBuildModelDriver):
         include file."""
         try:
             self.instance.overwrite = False
-            self.instance.write_wrappers(verbose=True)
+            self.instance.write_wrappers(verbose=False)
             self.instance.write_wrappers(verbose=True)
         finally:
             self.instance.overwrite = True

@@ -262,10 +262,8 @@ def update_constants():
         drv_type = typemap.get(drv.executable_type, drv.executable_type)
         if drv.language_ext:
             if k not in lang2ext:
-                if isinstance(drv.language_ext, list):
-                    lang2ext[k] = drv.language_ext[0]
-                else:
-                    lang2ext[k] = drv.language_ext
+                assert(isinstance(drv.language_ext, list))
+                lang2ext[k] = drv.language_ext[0]
             for ka in drv.language_aliases:
                 lang2ext[ka] = lang2ext[k]
         languages.setdefault(drv_type, [])
