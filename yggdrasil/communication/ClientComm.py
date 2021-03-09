@@ -12,6 +12,8 @@ class ClientComm(CommBase.CommBase):
             the request comm. Defaults to None.
         response_kwargs (dict, optional): Keyword arguments for the response
             comm. Defaults to empty dict.
+        direct_connection (bool, optional): If True, the comm will be
+            directly connected to a ServerComm. Defaults to False.
         **kwargs: Additional keywords arguments are passed to the output comm.
 
     Attributes:
@@ -26,7 +28,8 @@ class ClientComm(CommBase.CommBase):
     _dont_register = True
     
     def __init__(self, name, request_commtype=None, response_kwargs=None,
-                 dont_open=False, is_async=False, **kwargs):
+                 dont_open=False, is_async=False, direct_connection=False,
+                 **kwargs):
         if response_kwargs is None:
             response_kwargs = dict()
         ocomm_name = name
@@ -35,6 +38,9 @@ class ClientComm(CommBase.CommBase):
         ocomm_kwargs['dont_open'] = True
         ocomm_kwargs['commtype'] = request_commtype
         ocomm_kwargs.setdefault('use_async', is_async)
+        if direct_connection:
+            ocomm_kwargs.setdefault('is_client', True)
+        self.direct_connection = direct_connection
         self.response_kwargs = response_kwargs
         self.ocomm = get_comm(ocomm_name, **ocomm_kwargs)
         self.icomm = dict()
@@ -123,6 +129,11 @@ class ClientComm(CommBase.CommBase):
         return args, kwargs
 
     @property
+    def opp_address(self):
+        r"""str: Address for opposite comm."""
+        return self.ocomm.opp_address
+        
+    @property
     def opp_comms(self):
         r"""dict: Name/address pairs for opposite comms."""
         out = super(ClientComm, self).opp_comms
@@ -141,6 +152,7 @@ class ClientComm(CommBase.CommBase):
         kwargs['commtype'] = "server"
         kwargs['request_commtype'] = self.ocomm._commtype
         kwargs['response_kwargs'] = self.response_kwargs
+        kwargs['direct_connection'] = self.direct_connection
         return kwargs
         
     def open(self):
