@@ -617,11 +617,9 @@ class ZMQComm(CommBase.CommBase):
     @property
     def opp_address(self):
         r"""str: Address for opposite comm."""
-        if self.is_client:
+        if self.create_proxy:
             if self._server is None:  # pragma: debug
-                raise Exception("The client proxy does not yet have an address.")
-            return self._server.srv_address
-        elif self.allow_multiple_comms:
+                raise Exception("The proxy does not yet have an address.")
             if self.direction == 'send':
                 return self._server.srv_address
             else:
@@ -1174,7 +1172,9 @@ class ZMQComm(CommBase.CommBase):
                     self.info("zmq error: %s", e)
                     raise
             # Check for server sign-on
-            if self.is_server and (total_msg.startswith(ZMQProxy.server_signon_msg)):
+            if total_msg.startswith(ZMQProxy.server_signon_msg):
+                # if not self.is_server:
+                #     raise Exception("Non-server received a signon message.")
                 if self.cli_address is None:
                     self.debug("Server received signon: %s, msg=%s",
                                self.address, total_msg)

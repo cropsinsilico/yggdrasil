@@ -1,3 +1,4 @@
+import copy
 from yggdrasil.drivers import create_driver
 from yggdrasil.drivers.Driver import Driver
         
@@ -25,8 +26,8 @@ class DuplicatedModelDriver(Driver):
         kwargs.update(yml)
         self.copies = []
         for i in range(yml['copies']):
-            ikws = kwargs.copy()
-            iyml = yml.copy()
+            ikws = copy.deepcopy(kwargs)
+            iyml = copy.deepcopy(yml)
             iyml['name'] = self.name_format % (yml['name'], i)
             # Update environment to reflect addition of suffix
             iyml['env'] = yml['env'].copy()
