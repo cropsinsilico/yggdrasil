@@ -19,6 +19,7 @@ extern "C" {
 #define COMM_FLAG_SERVER  0x00000020  //!< Set if the comm is a server
 #define COMM_FLAG_CLIENT_RESPONSE 0x00000040 //!< Set if the comm is a client response comm
 #define COMM_ALWAYS_SEND_HEADER   0x00000080 //!< Set if the comm should always include a header in messages
+#define COMM_ALLOW_MULTIPLE_COMMS 0x00000100 //!< Set if the comm should connect in a way that allow multiple connections
 
 /*! @brief Bit flags that can be set for const comm */
 #define COMM_FLAGS_USED   0x00000001  //!< Set if the comm has been used
@@ -173,6 +174,10 @@ comm_t* new_comm_base(char *address, const char *direction,
   ret->last_send[0] = 0;
   ret->const_flags[0] = 0;
   ret->thread_id = get_thread_id();
+  char *allow_threading = getenv("YGG_THREADING");
+  if (allow_threading != NULL) {
+    ret->flags = ret->flags | COMM_ALLOW_MULTIPLE_COMMS;
+  }
   return ret;
 };
 
