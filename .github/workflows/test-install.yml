@@ -222,15 +222,17 @@ jobs:
     - name: Run tests (1st)
       id: test1
       run: yggtest --ci --cov-append ${{ matrix.test-flags1 }}
+      continue-on-error: true
     - name: Re-run test failures (1st)
-      if: ${{ failure() && steps.test1.outcome == 'failure' }}
+      if: ${{ steps.test1.outcome == 'failure' }}
       run: yggtest --ci --cov-append ${{ matrix.test-flags1 }} --last-failed --last-failed-no-failures=none
     - name: Run tests (2nd)
       if: matrix.test-flags2 != ''
       id: test2
       run: yggtest --ci --cov-append ${{ matrix.test-flags2 }}
+      continue-on-error: true
     - name: Re-run test failures (2nd)
-      if: ${{ failure() && steps.test2.outcome == 'failure' }}
+      if: ${{ steps.test2.outcome == 'failure' }}
       run: yggtest --ci --cov-append ${{ matrix.test-flags2 }} --last-failed --last-failed-no-failures=none
     - name: Combine coverage reports
       continue-on-error: true
@@ -479,15 +481,17 @@ jobs:
     - name: Run tests (1st)
       id: test1
       run: yggtest --ci --cov-append ${{ matrix.test-flags1 }}
+      continue-on-error: true
     - name: Re-run test failures (1st)
-      if: ${{ failure() && steps.test1.outcome == 'failure' }}
+      if: ${{ steps.test1.outcome == 'failure' }}
       run: yggtest --ci --cov-append ${{ matrix.test-flags1 }} --last-failed --last-failed-no-failures=none
     - name: Run tests (2nd)
       if: matrix.test-flags2 != ''
       id: test2
       run: yggtest --ci --cov-append ${{ matrix.test-flags2 }}
+      continue-on-error: true
     - name: Re-run test failures (2nd)
-      if: ${{ failure() && steps.test2.outcome == 'failure' }}
+      if: ${{ steps.test2.outcome == 'failure' }}
       run: yggtest --ci --cov-append ${{ matrix.test-flags2 }} --last-failed --last-failed-no-failures=none
     - name: Combine coverage reports
       continue-on-error: true
@@ -716,15 +720,17 @@ jobs:
     - name: Run tests (1st)
       id: test1
       run: yggtest --ci --cov-append ${{ matrix.test-flags1 }}
+      continue-on-error: true
     - name: Re-run test failures (1st)
-      if: ${{ failure() && steps.test1.outcome == 'failure' }}
+      if: ${{ steps.test1.outcome == 'failure' }}
       run: yggtest --ci --cov-append ${{ matrix.test-flags1 }} --last-failed --last-failed-no-failures=none
     - name: Run tests (2nd)
       if: matrix.test-flags2 != ''
       id: test2
       run: yggtest --ci --cov-append ${{ matrix.test-flags2 }}
+      continue-on-error: true
     - name: Re-run test failures (2nd)
-      if: ${{ failure() && steps.test2.outcome == 'failure' }}
+      if: ${{ steps.test2.outcome == 'failure' }}
       run: yggtest --ci --cov-append ${{ matrix.test-flags2 }} --last-failed --last-failed-no-failures=none
     - name: Combine coverage reports
       continue-on-error: true
@@ -955,15 +961,17 @@ jobs:
     - name: Run tests (1st)
       id: test1
       run: yggtest --ci --cov-append ${{ matrix.test-flags1 }}
+      continue-on-error: true
     - name: Re-run test failures (1st)
-      if: ${{ failure() && steps.test1.outcome == 'failure' }}
+      if: ${{ steps.test1.outcome == 'failure' }}
       run: yggtest --ci --cov-append ${{ matrix.test-flags1 }} --last-failed --last-failed-no-failures=none
     - name: Run tests (2nd)
       if: matrix.test-flags2 != ''
       id: test2
       run: yggtest --ci --cov-append ${{ matrix.test-flags2 }}
+      continue-on-error: true
     - name: Re-run test failures (2nd)
-      if: ${{ failure() && steps.test2.outcome == 'failure' }}
+      if: ${{ steps.test2.outcome == 'failure' }}
       run: yggtest --ci --cov-append ${{ matrix.test-flags2 }} --last-failed --last-failed-no-failures=none
     - name: Combine coverage reports
       continue-on-error: true
@@ -1192,15 +1200,17 @@ jobs:
     - name: Run tests (1st)
       id: test1
       run: yggtest --ci --cov-append ${{ matrix.test-flags1 }}
+      continue-on-error: true
     - name: Re-run test failures (1st)
-      if: ${{ failure() && steps.test1.outcome == 'failure' }}
+      if: ${{ steps.test1.outcome == 'failure' }}
       run: yggtest --ci --cov-append ${{ matrix.test-flags1 }} --last-failed --last-failed-no-failures=none
     - name: Run tests (2nd)
       if: matrix.test-flags2 != ''
       id: test2
       run: yggtest --ci --cov-append ${{ matrix.test-flags2 }}
+      continue-on-error: true
     - name: Re-run test failures (2nd)
-      if: ${{ failure() && steps.test2.outcome == 'failure' }}
+      if: ${{ steps.test2.outcome == 'failure' }}
       run: yggtest --ci --cov-append ${{ matrix.test-flags2 }} --last-failed --last-failed-no-failures=none
     - name: Combine coverage reports
       continue-on-error: true
