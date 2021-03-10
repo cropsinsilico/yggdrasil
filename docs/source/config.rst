@@ -9,6 +9,23 @@ Many components of the |yggdrasil| framework's behavior can be controlled by opt
 
 Further customization for specific runs can be achieved by creating a local config file called '.yggdrasil.cfg' in the directory where the interface will be run. Any options not found in the local will be filled in with values from the user config file. Any options not found in the user config file will be filled in with default package values.
 
+There are also several options you can provide to the ``yggconfig`` CLI to modify the configuration file. To see the options available, run ``yggconfig -h``.
+
+
+Updating the Compilation Tools
+==============================
+
+To update the compilation tools that |yggdrasil| uses when building models of a certain language against the |yggdrasil| interface, you can use the ``--XXX-compiler``, ``--XXX-linker``, and ``--XXX-archiver`` options (where ``XXX`` is the language). For example, to configure |yggdrasil| to use the clang++ compiler tools for C++ models (if they are not the default), you would run::
+
+  $ yggconfig --c++-compiler=clang++ --c++-linker=clang++ --c++-archiver=libtool
+
+You do not need to specify all three (e.g. you could just specify the compiler) and you can provide just the toolname or the full path to the executable. e.g.::
+
+  $ yggconfig --c-compiler=/full/path/to/gcc
+
+Make sure that the tools you select are compatible with each other or you may get linking errors. You can run ``ygginfo`` to verify that |yggdrasil| is using the specified tools.
+
+
 Debug Options
 =============
 
@@ -70,6 +87,9 @@ archiver          Name of, or full path to, the archiver that should
                   be used for creating static interface libraries.
 archiver_flags    A list of flags that should be used when calling the
                   archiver.
+XXX_executable    Full path to the executable that should be used for
+                  a compilation tool (compiler, linker, or archiver)
+		  with the name XXX.
 ==============    ====================================================
 
 Options available for all interpreted languages include:x

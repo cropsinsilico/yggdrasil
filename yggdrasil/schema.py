@@ -220,11 +220,14 @@ def update_constants():
     from yggdrasil.drivers.CompiledModelDriver import (
         get_compilation_tool_registry)
 
-    def as_lines(x, newline='\n'):
+    def as_lines(x, newline='\n', key_order=None):
         out = ""
         if isinstance(x, dict):
+            if key_order is None:
+                key_order = list(sorted(x.keys()))
             out += "{" + newline
-            for k, v in x.items():
+            for k in key_order:
+                v = x[k]
                 out += "    %s: %s," % (
                     repr(k), as_lines(v, newline=(newline + '    '))) + newline
             out += "}"
@@ -259,10 +262,8 @@ def update_constants():
         drv_type = typemap.get(drv.executable_type, drv.executable_type)
         if drv.language_ext:
             if k not in lang2ext:
-                if isinstance(drv.language_ext, list):
-                    lang2ext[k] = drv.language_ext[0]
-                else:
-                    lang2ext[k] = drv.language_ext
+                assert(isinstance(drv.language_ext, list))
+                lang2ext[k] = drv.language_ext[0]
             for ka in drv.language_aliases:
                 lang2ext[ka] = lang2ext[k]
         languages.setdefault(drv_type, [])
@@ -288,7 +289,7 @@ def update_constants():
     lines += [
         "LANG2EXT = %s" % as_lines(lang2ext),
         "EXT2LANG = {v: k for k, v in LANG2EXT.items()}",
-        "LANGUAGES = %s" % as_lines(languages)]
+        "LANGUAGES = %s" % as_lines(languages, key_order=language_cat)]
     lines.append(
         "LANGUAGES['all'] = (\n    LANGUAGES[%s]"
         % repr(language_cat[0]))
@@ -296,7 +297,8 @@ def update_constants():
               for k in language_cat[1:]]
     lines[-1] += ")"
     lines += [
-        "LANGUAGES_WITH_ALIASES = %s" % as_lines(languages_with_aliases)]
+        "LANGUAGES_WITH_ALIASES = %s" % as_lines(languages_with_aliases,
+                                                 key_order=language_cat)]
     lines.append(
         "LANGUAGES_WITH_ALIASES['all'] = (\n    LANGUAGES_WITH_ALIASES[%s]"
         % repr(language_cat[0]))

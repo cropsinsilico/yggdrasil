@@ -1026,10 +1026,9 @@ class CommBase(tools.YggClass):
         r"""Initialize communication with new queue."""
         dont_create = kwargs.pop('dont_create', False)
         env = kwargs.get('env', {})
-        if name in env:
-            kwargs.setdefault('address', env[name])
-        elif name in os.environ:
-            kwargs.setdefault('address', os.environ[name])
+        for ienv in [env, os.environ]:
+            if name in ienv:
+                kwargs.setdefault('address', ienv[name])
         new_commtype = kwargs.pop('commtype', None)
         if dont_create:
             args = tuple([name] + list(args))
@@ -1239,7 +1238,9 @@ class CommBase(tools.YggClass):
             for x in self._work_comms.values():
                 if hasattr(x, 'task_timer'):
                     flag = (not x.task_timer.is_alive())
-                else:
+                else:  # pragma: completion
+                    # This is currently unused as wait_for_workers is only
+                    # called for non-asynchronous comms
                     flag = (x._used or x.is_closed)
                 if not flag:
                     break
@@ -2159,9 +2160,8 @@ class CommBase(tools.YggClass):
                         msg.msg += imsg.msg
                 self.debug("Received %d/%d bytes", len(msg.msg), msg.header['size'])
                 if msg.flag in [FLAG_INCOMPLETE, FLAG_SUCCESS]:
-                    if no_serialization or msg.header.get('raw', False):
-                        msg.args = msg.msg
-                    else:
+                    msg.args = msg.msg
+                    if not (no_serialization or msg.header.get('raw', False)):
                         msg.args, msg.header = self.deserialize(msg.msg,
                                                                 metadata=msg.header)
                     msg.flag = FLAG_SUCCESS

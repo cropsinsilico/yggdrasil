@@ -1,5 +1,6 @@
 import os
 import shutil
+from yggdrasil import platform
 from yggdrasil.config import ygg_cfg
 from yggdrasil.tests import assert_equal, assert_raises, YggTestClass
 from yggdrasil.drivers import CompiledModelDriver
@@ -43,7 +44,9 @@ def test_get_compilation_tool():
         toolname = out.toolname.lower()
         toolpath = os.path.join('somedir', toolname)
         toolfile = toolpath + '.exe'
-        vals = [toolname.upper(), toolpath, toolfile, toolfile.upper()]
+        vals = [toolpath, toolfile]
+        if platform._is_win:
+            vals += [toolname.upper(), toolfile.upper()]
         for v in vals:
             assert_equal(CompiledModelDriver.get_compilation_tool(tooltype, v), out)
         assert_raises(ValueError, CompiledModelDriver.get_compilation_tool,
@@ -411,6 +414,11 @@ class TestCompiledModelDriverNoStart(TestCompiledModelParam,
         if not self.instance.is_build_tool:
             self.instance.compile_model(out=self.instance.model_file,
                                         overwrite=False)
+            assert(os.path.isfile(self.instance.model_file))
+            self.instance.compile_model(out=self.instance.model_file,
+                                        overwrite=False)
+            assert(os.path.isfile(self.instance.model_file))
+            os.remove(self.instance.model_file)
         
     # Done in driver, but driver not started
     def teardown(self):

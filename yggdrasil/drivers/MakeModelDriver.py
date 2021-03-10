@@ -238,7 +238,8 @@ class MakeModelDriver(BuildModelDriver):
         elif len(ext_present) > 1:  # pragma: debug
             raise RuntimeError("More than one extension found in "
                                "'%s': %s" % (buildfile, ext_present))
-        return super(MakeModelDriver, cls).get_language_for_buildfile(buildfile)
+        return super(MakeModelDriver, cls).get_language_for_buildfile(
+            buildfile)  # pragma: debug
         
     def compile_model(self, target=None, **kwargs):
         r"""Compile model executable(s).

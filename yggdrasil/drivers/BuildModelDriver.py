@@ -243,7 +243,7 @@ class BuildModelDriver(CompiledModelDriver):
         return source_dir
 
     @classmethod
-    def get_language_for_buildfile(cls, buildfile, target=None):
+    def get_language_for_buildfile(cls, buildfile, target=None):  # pragma: debug
         r"""Determine the target language based on the contents of a build
         file.
 

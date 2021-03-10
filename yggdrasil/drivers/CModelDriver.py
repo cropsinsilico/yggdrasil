@@ -785,7 +785,7 @@ class CModelDriver(CompiledModelDriver):
                     cls.internal_libraries[x]['compiler_flags'].append('-fPIC')
         
     @classmethod
-    def configure(cls, cfg, macos_sdkroot=None, vcpkg_dir=None):
+    def configure(cls, cfg, macos_sdkroot=None, vcpkg_dir=None, **kwargs):
         r"""Add configuration options for this language. This includes locating
         any required external libraries and setting option defaults.
 
@@ -798,6 +798,8 @@ class CModelDriver(CompiledModelDriver):
                 a vcpkg installation. This should be the directory that contains
                 the vcpkg executable and any packages installed by vcpkg (in
                 subdirectories). Defaults to None and is ignored.
+            **kwargs: Additional keyword arguments are passed to the parent
+                class's method.
 
         Returns:
             list: Section, option, description tuples for options that could not
@@ -825,7 +827,7 @@ class CModelDriver(CompiledModelDriver):
             cfg.set(cls._language, 'macos_sdkroot', macos_sdkroot)
         # Call __func__ to avoid direct invoking of class which dosn't exist
         # in after_registration where this is called
-        out = CompiledModelDriver.configure.__func__(cls, cfg)
+        out = CompiledModelDriver.configure.__func__(cls, cfg, **kwargs)
         # Change configuration to be directory containing include files
         rjlib = cfg.get(cls._language, 'rapidjson_include', None)
         if (rjlib is not None) and os.path.isfile(rjlib):
