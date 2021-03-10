@@ -221,5 +221,7 @@ class TestCMakeModelDriver(TestCMakeModelParam, parent.TestBuildModelDriver):
             self.instance.overwrite = False
             self.instance.write_wrappers(verbose=False)
             self.instance.write_wrappers(verbose=True)
+            self.instance.overwrite = True
+            self.instance.write_wrappers(verbose=True)
         finally:
             self.instance.overwrite = True
