@@ -311,7 +311,10 @@ class ygginfo(SubCommand):
                 (('--flags', ),
                  {'action': 'store_true',
                   'help': ('Display the flags that yggdrasil will '
-                           ' pass to the tool when it is called.')})],
+                           ' pass to the tool when it is called.')}),
+                (('--fullpath', ),
+                 {'action': 'store_true',
+                  'help': 'Get the full path to the tool exectuable.'})],
             parsers=[
                 ArgumentParser(
                     name='compiler',
@@ -337,9 +340,12 @@ class ygginfo(SubCommand):
                 if args.tool == 'compiler':
                     flags = drv.get_compiler_flags(
                         for_model=True, toolname=args.toolname,
-                        dry_run=True)
-                    if flags[-1] == '/link':  # pragma: windows
-                        flags = flags[:-1]
+                        dry_run=True, dont_link=True)
+                    if '/link' in flags:  # pragma: windows
+                        flags = flags[:flags.index('/link')]
+                    for k in ['-c']:
+                        if k in flags:
+                            flags.remove(k)
                 else:
                     if args.tool == 'archiver':
                         libtype = 'static'
@@ -354,6 +360,8 @@ class ygginfo(SubCommand):
                 if platform._is_win:  # pragma: windows:
                     out = out.replace('/', '-')
                     out = out.replace('\\', '/')
+            elif args.fullpath:
+                out = drv.get_tool(args.tool).get_executable(full_path=True)
             else:
                 out = drv.get_tool(args.tool, return_prop='name')
             if return_str:
@@ -668,22 +676,39 @@ class yggcc(SubCommand):
     arguments = [
         (('source', ),
          {'nargs': '+',
-          'help': "One or more source files."}),
+          'help': ("One or more source files or the directory containing an "
+                   "R package.")}),
         (('--language', ),
          {'default': None,
-          'choices': [None] + LANGUAGES_WITH_ALIASES['compiled'],
+          'choices': [None] + LANGUAGES_WITH_ALIASES['compiled'] + ['R', 'r'],
           'help': ("Language of the source code. If not provided, "
                    "the language will be determined from the "
-                   "source extension.")})]
+                   "source extension.")}),
+        (('--toolname', ),
+         {'help': "Name of compilation tool that should be used"}),
+        (('--flags', ),
+         {'nargs': '*',
+          'help': ("Additional flags that should be added to the compilation "
+                   "command")}),
+        (('--Rpkg-language', ),
+         {'help': ("Language that R package is written in "
+                   "(only used if the specified language is R).")})]
 
     @classmethod
     def func(cls, args):
         from yggdrasil.components import import_component
         from yggdrasil.constants import EXT2LANG
         if args.language is None:
-            args.language = EXT2LANG[os.path.splitext(args.source[0])[-1]]
+            if (((len(args.source) == 1) and os.path.isdir(args.source[0])
+                 and os.path.isdir(os.path.join(args.source[0], 'R')))):
+                args.language = 'R'
+            else:
+                args.language = EXT2LANG[os.path.splitext(args.source[0])[-1]]
         drv = import_component('model', args.language)
-        print("executable: %s" % drv.call_compile(args.source))
+        kws = {'toolname': args.toolname, 'flags': args.flags}
+        if args.language in ['r', 'R']:
+            kws['language'] = args.Rpkg_language
+        print("executable: %s" % drv.call_compile(args.source, **kws))
 
 
 class yggcompile(SubCommand):
@@ -755,7 +780,10 @@ class cc_toolname(SubCommand):
     arguments = [
         (('--cpp', ),
          {'action': 'store_true',
-          'help': 'Get the compiler used for C++ programs.'})]
+          'help': 'Get the compiler used for C++ programs.'}),
+        (('--fullpath', ),
+         {'action': 'store_true',
+          'help': 'Get the full path to the tool exectuable.'})]
 
     @classmethod
     def parse_args(cls, *args, **kwargs):
@@ -782,7 +810,10 @@ class ld_toolname(cc_toolname):
     arguments = [
         (('--cpp', ),
          {'action': 'store_true',
-          'help': 'Get the linker used for C++ programs.'})]
+          'help': 'Get the linker used for C++ programs.'}),
+        (('--fullpath', ),
+         {'action': 'store_true',
+          'help': 'Get the full path to the tool exectuable.'})]
 
     @classmethod
     def parse_args(cls, *args, **kwargs):

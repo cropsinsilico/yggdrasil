@@ -18,7 +18,9 @@ extern "C" {
 #endif
 
 static char prefix_char = '#';
-
+#ifdef _OPENMP
+#pragma omp threadprivate(prefix_char)
+#endif
 
 /*! @brief C-friendly definition of MetaschemaType. */
 typedef struct dtype_t {

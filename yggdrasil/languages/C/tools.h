@@ -188,6 +188,13 @@ static int _ygg_error_flag = 0;
 #endif
 #define UNUSED(arg) ((void)&(arg))
 
+/*! @brief Memory to allow thread association to be set via macro. */
+static int global_thread_id = -1;
+#define ASSOCIATED_WITH_THREAD(COMM, THREAD) global_thread_id = THREAD; COMM; global_thread_id = -1;
+#ifdef _OPENMP
+#pragma omp threadprivate(global_thread_id)
+#endif
+
 /*!
   @brief Get an unsigned long seed from the least significant 32bits of a pointer.
   @param[in] ptr Pointer that should be turned into a seed.
@@ -230,6 +237,8 @@ typedef struct python_t {
 static inline
 int get_thread_id() {
   int out = 0;
+  if (global_thread_id >= 0)
+    return global_thread_id;
 #ifdef _OPENMP
   if (omp_in_parallel())
     out = omp_get_thread_num();
@@ -262,13 +271,21 @@ python_t init_python() {
  */
 static inline
 int init_numpy_API() {
+  int out = 0;
+#ifdef _OPENMP
+#pragma omp critical (numpy)
+  {
+#endif
   if (PyArray_API == NULL) {
     if (_import_array() < 0) {
       PyErr_Print();
-      return -2;
+      out = -2;
     }
   }
-  return 0;
+#ifdef _OPENMP
+  }
+#endif
+  return out;
 };
 
 
@@ -278,22 +295,36 @@ int init_numpy_API() {
  */
 static inline
 int init_python_API() {
+  int out = 0;
+#ifdef _OPENMP
+#pragma omp critical (python)
+  {
+#endif
   if (!(Py_IsInitialized())) {
     char *name = getenv("YGG_PYTHON_EXEC");
     if (name != NULL) {
       wchar_t *wname = Py_DecodeLocale(name, NULL);
       if (wname == NULL) {
 	printf("Error decoding YGG_PYTHON_EXEC\n");
-	return -1;
+	out = -1;
+      } else {
+	Py_SetProgramName(wname);
+	PyMem_RawFree(wname);
       }
-      Py_SetProgramName(wname);
-      PyMem_RawFree(wname);
     }
-    Py_Initialize();
-    if (!(Py_IsInitialized()))
-      return -1;
+    if (out >= 0) {
+      Py_Initialize();
+      if (!(Py_IsInitialized()))
+	out = -1;
+    }
   }
-  return init_numpy_API();
+  if (out >= 0) {
+    out = init_numpy_API();
+  }
+#ifdef _OPENMP
+  }
+#endif
+  return out;
 };
 
 

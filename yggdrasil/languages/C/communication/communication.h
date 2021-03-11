@@ -23,6 +23,9 @@ static size_t ncomms2clean = 0;
 static size_t clean_registered = 0;
 static size_t clean_in_progress = 0;
 static size_t clean_called = 0;
+#ifdef _OPENMP
+#pragma omp threadprivate(clean_in_progress)
+#endif
 
 /*! @brief Memory to keep track of global scope comms. */
 #ifdef _OPENMP
@@ -250,13 +253,19 @@ int free_comm(comm_t *x) {
 */
 static
 void clean_comms(void) {
+#ifdef _OPENMP
+#pragma omp critical (clean)
+    {
+#endif
   size_t i;
   if (!(clean_called)) {
     clean_in_progress = 1;
     ygglog_debug("atexit begin");
-    for (i = 0; i < ncomms2clean; i++) {
-      if (vcomms2clean[i] != NULL) {
-	free_comm((comm_t*)(vcomms2clean[i]));
+    if (vcomms2clean != NULL) {
+      for (i = 0; i < ncomms2clean; i++) {
+	if (vcomms2clean[i] != NULL) {
+	  free_comm((comm_t*)(vcomms2clean[i]));
+	}
       }
     }
 #ifdef _OPENMP
@@ -282,6 +291,9 @@ void clean_comms(void) {
     }
 #endif
   }
+#ifdef _OPENMP
+  }
+#endif
   ygglog_debug("atexit done");
   if (_ygg_error_flag != 0) {
     _exit(_ygg_error_flag);

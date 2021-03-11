@@ -337,6 +337,16 @@ These packages can by installed from CRAN from the R interpreter.::
 
      > install.packages("units", configure.args = c("--with-udunits2-include=/usr/local/opt/udunits/include/", "--with-udunits2-lib=/usr/local/opt/udunits/lib/"))
 
+.. note::
+   [MAC ONLY?] If any ``install.packages`` calls fail with errors that look like those shown below, add the ``--no-multiarch`` install option to those passed (e.g. ``install.packages("R6", INSTALL_opts=c("--no-multiarch"))``).::
+
+     *** arch - R
+     *** arch - R.dSYM
+     ERROR: loading failed for ‘R’, ‘R.dSYM’
+     ...
+     ERROR: sub-architecture 'R' is not installed
+     ERROR: sub-architecture 'R.dSYM' is not installed
+
 
 If you install R and/or the R dependencies after installing |yggdrasil|, you can complete |yggdrasil|'s R installation by running::
 

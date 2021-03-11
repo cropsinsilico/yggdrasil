@@ -19,6 +19,9 @@ Possible Errors
 General Errors
 --------------
 
+- You get errors that look like ``zmq.error.ZMQError: Too many open files`` when running integrations.
+   **Possible Cause:** The limit on the number of file identifiers that can be open is too low (the default on Mac is 256) and |yggdrasil| is trying to use more than this limit (file identifiers are opened for multiprocessing objects, ZeroMQ sockets, files, etc.).
+   **Solution:** Check what the limit is via ``ulimit -n``. If it is of order 100 (as on Mac by default), this is likely the cause and you can fix it by increasing the limit via ``ulimit -n 1024``.
 - You get an error that starts with the line::
     
     OMP: Error #15: Initializing libomp.dylib, but found libiomp5.dylib already initialized.

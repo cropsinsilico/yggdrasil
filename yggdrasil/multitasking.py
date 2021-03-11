@@ -1170,7 +1170,7 @@ class YggTaskLoop(YggTask):
                     self.error("BreakLoopError: %s", e)
                     self.set_break_flag(break_stack=e.break_stack)
                 except BreakLoopException as e:
-                    self.info("BreakLoopException: %s", e)
+                    self.debug("BreakLoopException: %s", e)
                     self.set_break_flag(break_stack=e.break_stack)
         if not self.break_stack:
             self.set_break_flag()

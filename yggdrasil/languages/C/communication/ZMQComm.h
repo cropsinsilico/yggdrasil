@@ -22,6 +22,9 @@ static int _last_port = 49152;
 static char _reply_msg[100] = "YGG_REPLY";
 static char _purge_msg[100] = "YGG_PURGE";
 static int _zmq_sleeptime = 10000;
+#ifdef _OPENMP
+#pragma omp threadprivate(_reply_msg, _purge_msg, _zmq_sleeptime)
+#endif
 static void *ygg_s_process_ctx = NULL;
 
 
@@ -55,7 +58,7 @@ void* ygg_zsys_init() {
       } else {
 	ygglog_error("ygg_zsys_init: Can only initialize the "
 		     "zeromq context on the main thread. Call ygg_init "
-		     "before the threaded porition of your model.");
+		     "before the threaded portion of your model.");
       }
     }
   }
