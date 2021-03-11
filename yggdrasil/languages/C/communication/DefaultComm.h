@@ -26,4 +26,8 @@ static comm_type _default_comm = ZMQ_COMM;
 #define default_comm_recv zmq_comm_recv
 #endif
 
-#endif /*CISDEFAULTCOMM_H_*/
+#ifdef _OPENMP
+#pragma omp threadprivate(_default_comm)
+#endif
+
+#endif /*YGGDEFAULTCOMM_H_*/

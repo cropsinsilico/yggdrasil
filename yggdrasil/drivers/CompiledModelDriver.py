@@ -2833,13 +2833,16 @@ class CompiledModelDriver(ModelDriver):
         return out
 
     @classmethod
-    def get_compiler_flags(cls, toolname=None, **kwargs):
+    def get_compiler_flags(cls, toolname=None, compiler=None, **kwargs):
         r"""Determine the flags required by the current compiler.
 
         Args:
             toolname (str, optional): Name of compiler tool that should be used.
                 Defaults to None and the default compiler for the language will
                 be used.
+            compiler (CompilerBase, optional): Compilation tool class for the
+                compiler that should be used. Defaults to None and is set
+                based on toolname.
             **kwargs: Keyword arguments are passed to cls.update_compiler_kwargs
                 first and then the compiler's get_flags method.
 
@@ -2847,8 +2850,10 @@ class CompiledModelDriver(ModelDriver):
             list: Flags for the compiler.
 
         """
+        if compiler is None:
+            compiler = cls.get_tool('compiler', toolname=toolname)
         kwargs = cls.update_compiler_kwargs(toolname=toolname, **kwargs)
-        return cls.get_tool('compiler', toolname=toolname).get_flags(**kwargs)
+        return compiler.get_flags(**kwargs)
 
     @classmethod
     def get_linker_flags(cls, toolname=None, **kwargs):

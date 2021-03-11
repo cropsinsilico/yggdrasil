@@ -73,11 +73,12 @@ def write_makevars(fname=None):
         match = re.search(regex, out.decode('utf-8'))
         if match:
             ldver = match.group('version')
-    for x in ['CC', 'CFLAGS', 'CXX', 'CXXFLAGS', 'LD', 'LDFLAGS']:
+    for x in ['CC', 'CFLAGS', 'CXX', 'CXXFLAGS', 'FC', 'FFLAGS',
+              'LD', 'LDFLAGS']:
         env = os.environ.get(x, '')
         if not env:
             continue
-        if (x in ['CFLAGS', 'CXXFLAGS', 'LDFLAGS']) and ldver:
+        if (x in ['CFLAGS', 'CXXFLAGS', 'FFLAGS', 'LDFLAGS']) and ldver:
             if '-mlinker-version' not in env:
                 env += ' -mlinker-version=%s' % ldver
         lines.append('%s=%s' % (x, env))
@@ -355,6 +356,7 @@ def install(args=None, with_sudo=None, skip_requirements=None,
         # Install package
         package_name = 'yggdrasil_0.1.tar.gz'
         R_call = ("install.packages(\"%s\", verbose=TRUE,"
+                  "INSTALL_opts=c(\"--no-multiarch\"),"
                   "repos=NULL, type=\"source\")") % package_name
         if not call_R([R_call], **kwargs):
             logger.error("Error installing R interface from the built package.")

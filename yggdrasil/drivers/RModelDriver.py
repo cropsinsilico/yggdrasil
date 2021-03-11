@@ -4,7 +4,7 @@ import numpy as np
 import pandas as pd
 import logging
 from collections import OrderedDict
-from yggdrasil import serialize, platform
+from yggdrasil import serialize, platform, constants
 from yggdrasil.drivers.InterpretedModelDriver import InterpretedModelDriver
 from yggdrasil.drivers.PythonModelDriver import PythonModelDriver
 from yggdrasil.drivers.CModelDriver import CModelDriver
@@ -305,3 +305,94 @@ class RModelDriver(InterpretedModelDriver):  # pragma: R
                 out = new_contents.splitlines()
                 return out
         return super(RModelDriver, cls).write_executable_import(**kwargs)
+
+    # The following is only provided for the yggcc CLI for building R
+    # packages and should not be used directly
+    @classmethod
+    def call_compile(cls, package_dir, toolname=None, flags=None,
+                     language='c++', verbose=False):  # pragma: no cover
+        r"""Build an R package w/ the yggdrasil compilers.
+
+        Args:
+            package_dir (str): Full path to the package directory.
+            toolname (str, optional): Compilation tool that should be used.
+                Defaults to None and the default tools will be used.
+            flags (list, optional): Additional flags that should be passed
+                to the build command. Defaults to [].
+            language (str, optional): Language that the package is written in
+                (e.g. c, fortran). Defautls to 'c++'.
+            verbose (bool, optional): If True, information about the build
+                process will be displayed. Defaults to False.
+
+        """
+        import shutil
+        import subprocess
+        from yggdrasil.components import import_component
+        if flags is None:
+            flags = []
+        if isinstance(package_dir, list):
+            assert(len(package_dir) == 1)
+            package_dir = package_dir[0]
+        cexec_vars = {'c': ['CC', 'CC_FOR_BUILD'],
+                      'c++': ['CXX', 'CPP', 'CXX98', 'CXX11', 'CXX14',
+                              'CXX17', 'CXX_FOR_BUILD'],
+                      'fortran': ['FC', 'F77']}
+        cflag_vars = {'c': ['CFLAGS'],
+                      'c++': ['CXXFLAGS', 'CXX98FLAGS', 'CXX11FLAGS',
+                              'CXX14FLAGS', 'CXX17FLAGS'],
+                      'fortran': ['FFFLAGS', 'FCFLAGS']}
+        env = os.environ.copy()
+        new_env = {}
+        for x in constants.LANGUAGES['compiled']:
+            # for x in [language]:
+            drv = import_component('model', x)
+            compiler = drv.get_tool('compiler', toolname=toolname)
+            # archiver = compiler.archiver()
+            env = drv.set_env_compiler(existing=env, compiler=compiler)
+            cexec = compiler.get_executable(full_path=True)
+            kws = {}
+            if x == 'c++':
+                kws['skip_standard_flag'] = True
+            cflags = drv.get_compiler_flags(for_model=True, toolname=toolname,
+                                            dry_run=True, compiler=compiler,
+                                            dont_link=True, **kws)
+            lflags = drv.get_linker_flags(for_model=True, toolname=toolname,
+                                          dry_run=True, libtype='shared')
+            # Remove flags that are unnecessary
+            cflags = [x for x in cflags if not x.startswith("-std=")]
+            for k in ['-c']:
+                if k in cflags:
+                    cflags.remove(k)
+            for k in ['-shared']:
+                if k in lflags:
+                    lflags.remove(k)
+            for k in cexec_vars[x]:
+                env[k] = cexec
+                new_env[k] = cexec
+            for k in cflag_vars[x]:
+                env[k] = ''
+                new_env[k] = ' '.join(cflags)
+            if language == x:
+                env['LDFLAGS'] = ''
+                new_env['LDFLAGS'] = ' '.join(lflags)
+        cmd = ['R', 'CMD', 'INSTALL', '--no-html', '--no-help', '--no-docs',
+               '--no-demo', '--no-multiarch', package_dir] + flags
+        makevar = os.path.expanduser(os.path.join('~', '.R', 'Makevars'))
+        makevar_copy = makevar + '_copy'
+        try:
+            if os.path.isfile(makevar):
+                shutil.move(makevar, makevar_copy)
+            with open(makevar, 'w') as fd:
+                for k, v in new_env.items():
+                    if k.startswith('PKG_'):
+                        fd.write('%s+=%s\n' % (k, v))
+                    else:
+                        fd.write('%s=%s\n' % (k, v))
+            if verbose:
+                with open(makevar, 'r') as fd:
+                    print(fd.read())
+            subprocess.check_call(cmd, env=env)
+        finally:
+            os.remove(makevar)
+            if os.path.isfile(makevar_copy):
+                shutil.move(makevar_copy, makevar)

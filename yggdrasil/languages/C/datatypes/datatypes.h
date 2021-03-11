@@ -18,13 +18,15 @@ extern "C" {
 #endif
 
 static char prefix_char = '#';
+#ifdef _OPENMP
+#pragma omp threadprivate(prefix_char)
+#endif
   
 /*! @brief Bit flags. */
 #define HEAD_FLAG_VALID      0x00000001  //!< Set if the header is valid.
 #define HEAD_FLAG_MULTIPART  0x00000002  //!< Set if the header is for a multipart message
 #define HEAD_TYPE_IN_DATA    0x00000004  //!< Set if the type is stored with the data during serialization
 #define HEAD_AS_ARRAY        0x00000008  //!< Set if messages will be serialized arrays
-
 
 /*! @brief C-friendly definition of MetaschemaType. */
 typedef struct dtype_t {
