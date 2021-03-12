@@ -12,8 +12,6 @@ class ClientComm(CommBase.CommBase):
             the request comm. Defaults to None.
         response_kwargs (dict, optional): Keyword arguments for the response
             comm. Defaults to empty dict.
-        direct_connection (bool, optional): If True, the comm will be
-            directly connected to a ServerComm. Defaults to False.
         **kwargs: Additional keywords arguments are passed to the output comm.
 
     Attributes:
@@ -28,34 +26,45 @@ class ClientComm(CommBase.CommBase):
     _dont_register = True
     
     def __init__(self, name, request_commtype=None, response_kwargs=None,
-                 dont_open=False, is_async=False, direct_connection=False,
                  **kwargs):
         if response_kwargs is None:
             response_kwargs = dict()
-        ocomm_name = name
-        ocomm_kwargs = kwargs
-        ocomm_kwargs['direction'] = 'send'
-        ocomm_kwargs['dont_open'] = True
-        ocomm_kwargs['commtype'] = request_commtype
-        ocomm_kwargs.setdefault('use_async', is_async)
-        if direct_connection:
-            ocomm_kwargs.setdefault('is_client', True)
-        self.direct_connection = direct_connection
+        self.ocomm_name = name
+        self.ocomm_kwargs = kwargs
+        self.request_commtype = request_commtype
         self.response_kwargs = response_kwargs
-        self.ocomm = get_comm(ocomm_name, **ocomm_kwargs)
+        self.ocomm = None
         self.icomm = dict()
         self.icomm_order = []
+        kwargs_base = {k: kwargs[k] for k in
+                       ['recv_timeout', 'is_interface', 'is_async', 'address',
+                        'direct_connection', 'dont_open', 'no_suffix',
+                        'reverse_names']
+                       if k in kwargs}
+        super(ClientComm, self).__init__(name, direction='send',
+                                         **kwargs_base)
+
+    def _init_before_open(self, **kwargs):
+        r"""Initialization steps that should be performed after base class, but
+        before the comm is opened."""
+        super(ClientComm, self)._init_before_open(**kwargs)
+        if self.direct_connection:
+            self.ocomm_kwargs.setdefault('is_client', True)
+        self.ocomm_kwargs.update(direction='send',
+                                 dont_open=True,
+                                 commtype=self.request_commtype)
+        self.ocomm_kwargs.setdefault('direct_connection',
+                                     self.direct_connection)
+        self.ocomm_kwargs.setdefault('use_async',
+                                     self.ocomm_kwargs.pop('is_async', False))
+        self.ocomm = get_comm(self.ocomm_name, **self.ocomm_kwargs)
         self.response_kwargs.setdefault('commtype', self.ocomm._commtype)
         self.response_kwargs.setdefault('recv_timeout', self.ocomm.recv_timeout)
         self.response_kwargs.setdefault('language', self.ocomm.language)
         self.response_kwargs.setdefault('use_async', self.ocomm.is_async)
-        super(ClientComm, self).__init__(self.ocomm.name, dont_open=dont_open,
-                                         recv_timeout=self.ocomm.recv_timeout,
-                                         is_interface=self.ocomm.is_interface,
-                                         direction='send', no_suffix=True,
-                                         address=self.ocomm.address,
-                                         is_async=self.ocomm.is_async)
-
+        self.response_kwargs.setdefault('direct_connection',
+                                        self.ocomm.direct_connection)
+        
     def get_status_message(self, nindent=0, **kwargs):
         r"""Return lines composing a status message.
         
@@ -189,7 +198,9 @@ class ClientComm(CommBase.CommBase):
 
     def atexit(self):  # pragma: debug
         r"""Close operations."""
-        self.send_eof()
+        if self.ocomm:
+            self.send_eof()
+            self.ocomm.atexit()
         super(ClientComm, self).atexit()
         
     # RESPONSE COMM

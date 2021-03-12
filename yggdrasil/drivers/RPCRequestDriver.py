@@ -82,7 +82,7 @@ class RPCRequestDriver(ConnectionDriver):
         environment variables that need to be provided to the model."""
         out = super(RPCRequestDriver, self).model_env
         # Add is_rpc flag to output model env variables
-        for k in self.ocomm.model_env.keys():
+        for k in self.omodel_env.keys():
             out[k]['YGG_IS_SERVER'] = 'True'
         return out
         

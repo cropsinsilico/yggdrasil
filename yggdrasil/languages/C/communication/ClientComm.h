@@ -79,6 +79,9 @@ int init_client_comm(comm_t *comm) {
     handle = init_comm_base(comm->name, "send", _default_comm, dtype_out);
   }
   handle->flags = handle->flags | COMM_FLAG_CLIENT;
+  if (handle->flags & COMM_FLAG_DIRECT) {
+    comm->flags = comm->flags | COMM_FLAG_DIRECT;
+  }
   ret = init_default_comm(handle);
   strcpy(comm->address, handle->address);
   comm->handle = (void*)handle;
@@ -218,6 +221,9 @@ comm_head_t client_response_header(const comm_t* x, comm_head_t head) {
   dtype_t * dtype_copy = copy_dtype(x->datatype);
   res_comm[0][ncomm] = new_comm_base(NULL, "recv", _default_comm, dtype_copy);
   res_comm[0][ncomm]->flags = res_comm[0][ncomm]->flags | COMM_FLAG_CLIENT_RESPONSE;
+  if (x->flags & COMM_FLAG_DIRECT) {
+    res_comm[0][ncomm]->flags = res_comm[0][ncomm]->flags | COMM_FLAG_DIRECT;
+  }
   int ret = new_default_address(res_comm[0][ncomm]);
   if (ret < 0) {
     ygglog_error("client_response_header(%s): could not create response comm", x->name);

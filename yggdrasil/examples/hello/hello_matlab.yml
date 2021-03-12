@@ -20,3 +20,4 @@ connections:
   - input: helloQueueOut
     output: helloQueueIn
     onexit: printStatus
+    dont_allow_direct: true

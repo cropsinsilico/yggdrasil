@@ -191,7 +191,7 @@ def bind_socket(socket, address, retry_timeout=-1, nretry=1):
             # print(e, e.errno)
             raise e
         else:
-            logger.debug("Retrying bind in %f s", retry_timeout)
+            logger.debug("Retrying bind to %s in %f s", address, retry_timeout)
             tools.sleep(retry_timeout)
             address = bind_socket(socket, address, nretry=nretry - 1,
                                   retry_timeout=retry_timeout)
@@ -449,6 +449,12 @@ class ZMQComm(CommBase.CommBase):
             # to use a ROUTER socket type as defined above
             socket_type = 'DEALER'
             socket_action = 'connect'
+        elif self.is_response_server and (self.direction == 'recv'):
+            socket_type = 'DEALER'
+            socket_action = 'bind'
+        elif self.is_response_server and (self.direction == 'send'):
+            socket_type = 'DEALER'
+            socket_action = 'connect'
         # Set defaults
         if socket_type is None:
             if self.direction == 'recv':
@@ -456,7 +462,7 @@ class ZMQComm(CommBase.CommBase):
             elif self.direction == 'send':
                 socket_type = _socket_send_types[_default_socket_type]
         if not (self.allow_multiple_comms or self.is_client or self.is_server
-                or self.is_response_client):
+                or self.is_response_client or self.is_response_server):
             if socket_type in ['PULL', 'SUB', 'REP', 'DEALER']:
                 self.direction = 'recv'
             elif socket_type in ['PUSH', 'PUB', 'REQ', 'ROUTER']:

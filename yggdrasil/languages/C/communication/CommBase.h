@@ -20,6 +20,7 @@ extern "C" {
 #define COMM_FLAG_CLIENT_RESPONSE 0x00000040 //!< Set if the comm is a client response comm
 #define COMM_ALWAYS_SEND_HEADER   0x00000080 //!< Set if the comm should always include a header in messages
 #define COMM_ALLOW_MULTIPLE_COMMS 0x00000100 //!< Set if the comm should connect in a way that allow multiple connections
+#define COMM_FLAG_DIRECT  0x00000200 //!< Set if the comm is directly connected to another model
 
 /*! @brief Bit flags that can be set for const comm */
 #define COMM_FLAGS_USED   0x00000001  //!< Set if the comm has been used
@@ -197,6 +198,7 @@ static inline
 comm_t* init_comm_base(const char *name, const char *direction,
 		       const comm_type t, dtype_t* datatype) {
   char full_name[COMM_NAME_SIZE];
+  char is_direct_env[COMM_NAME_SIZE];
   char *model_name = NULL;
   char *address = NULL;
   if (name != NULL) {
@@ -216,6 +218,8 @@ comm_t* init_comm_base(const char *name, const char *direction,
 	strcat(prefix, full_name);
 	strcpy(full_name, prefix);
 	address = getenv(full_name);
+	strcpy(is_direct_env, full_name);
+	strcat(is_direct_env, ":DIRECT");
       }
     }
     if (address == NULL) {
@@ -229,6 +233,8 @@ comm_t* init_comm_base(const char *name, const char *direction,
 	}
       }
       address = getenv(temp_name);
+      strcpy(is_direct_env, temp_name);
+      strcat(is_direct_env, "__COLON__DIRECT");
     }
     ygglog_debug("init_comm_base: model_name = %s, full_name = %s, address = %s",
 		 model_name, full_name, address);
@@ -247,6 +253,12 @@ comm_t* init_comm_base(const char *name, const char *direction,
     ygglog_error("init_comm_base: %s not registered as environment variable.\n",
 		 full_name);
     ret->flags = ret->flags & ~COMM_FLAG_VALID;
+  }
+  if ((ret->flags & COMM_FLAG_VALID) && (strlen(is_direct_env) > 0)) {
+    char* is_direct = getenv(is_direct_env);
+    if ((is_direct != NULL) && (strcmp(is_direct, "1") == 0)) {
+      ret->flags = ret->flags | COMM_FLAG_DIRECT | COMM_ALLOW_MULTIPLE_COMMS;
+    }
   }
   ygglog_debug("init_comm_base(%s): Done", ret->name);
   return ret;

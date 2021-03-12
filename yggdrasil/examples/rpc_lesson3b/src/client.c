@@ -5,23 +5,22 @@
 
 int model_function(char* in_buf, uint64_t length_in_buf,
 		   char** out_buf, uint64_t* length_out_buf) {
-  ygg_init();
   int error_code = 0;
+  
+  // Initialize yggdrasil outside the threaded section
+  ygg_init();
+
+  // Get the number of threads from an environment variable set in the yaml
   int nthreads = atoi(getenv("NTHREAD"));
-#ifdef _OPENMP
   omp_set_num_threads(nthreads);
+  
 #pragma omp parallel for shared(error_code)
-#endif
   for (int i = 0; i < nthreads; ++i){
     int flag;
-#ifdef _OPENMP
 #pragma omp critical
     {
-#endif
       flag = error_code;
-#ifdef _OPENMP
     }
-#endif
     if (flag == 0) {
       char* out_temp = NULL;
       uint64_t length_out_temp = 0;
@@ -43,14 +42,10 @@ int model_function(char* in_buf, uint64_t length_in_buf,
 	     i, in_buf, (int)(length_in_buf));
       if (ret < 0) {
 	printf("client(C:%d): RPC CALL ERROR\n", i);
-#ifdef _OPENMP
 #pragma omp critical
 	{
-#endif
 	  error_code = -1;
-#ifdef _OPENMP
 	}
-#endif
       }
       if (i != 0) {
 	free(out_temp);

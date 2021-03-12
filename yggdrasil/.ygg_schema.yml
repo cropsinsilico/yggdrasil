@@ -243,6 +243,13 @@ definitions:
           - rpc_request
           - rpc_response
           type: string
+        dont_allow_direct:
+          default: false
+          description: If True, connections will not be reduced to a single comm when
+            possible. Reducing a connection to a single comm will decrease communication
+            times, but will disable asynchronous message passing (send calls are more
+            likely to block). Defaults to False.
+          type: boolean
         driver:
           description: '[DEPRECATED] Name of driver class that should be used.'
           type: string

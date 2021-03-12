@@ -5,7 +5,7 @@ import numpy as np
 import functools
 import queue
 from yggdrasil import multitasking
-from yggdrasil.communication import new_comm, CommBase
+from yggdrasil.communication import new_comm, CommBase, determine_suffix
 from yggdrasil.drivers.Driver import Driver
 from yggdrasil.components import create_component, isinstance_component
 
@@ -17,6 +17,10 @@ def _translate_list2element(arr):
 
 
 class TaskThreadError(RuntimeError):
+    pass
+
+
+class MergedCommError(RuntimeError):
     pass
 
 
@@ -147,6 +151,12 @@ class ConnectionDriver(Driver):
         onexit (str, optional): Class method that should be called when a
             model that the connection interacts with exits, but before the
             connection driver is shut down. Defaults to None.
+        dont_allow_direct (bool, optional): If True, connections will not be
+            reduced to a single comm when possible. Reducing a connection to
+            a single comm will decrease communication times, but will disable
+            asynchronous message passing (send calls are more likely to block).
+            Defaults to False.
+            
         **kwargs: Additonal keyword arguments are passed to the parent class.
 
     Attributes:
@@ -166,6 +176,10 @@ class ConnectionDriver(Driver):
             loop.
         onexit (str): Class method that should be called when the corresponding
             model exits, but before the driver is shut down.
+        dont_allow_direct (bool): If True, connections will not be reduced to
+            a single comm when possible. Reducing a connection to a single
+            comm will decrease communication times, but will disable
+            asynchronous message passing (send calls are more likely to block).
 
     """
 
@@ -208,7 +222,8 @@ class ConnectionDriver(Driver):
                        'items': {'oneOf': [
                            {'type': 'function'},
                            {'$ref': '#/definitions/transform'}]}},
-        'onexit': {'type': 'string'}}
+        'onexit': {'type': 'string'},
+        'dont_allow_direct': {'type': 'boolean', 'default': False}}
     _schema_excluded_from_class_validation = ['inputs', 'outputs']
     _disconnect_attr = Driver._disconnect_attr + [
         '_comm_closed', '_skip_after_loop', 'shared', 'task_thread']
@@ -229,6 +244,7 @@ class ConnectionDriver(Driver):
         self._used = False
         self.onexit = None
         self.task_thread = None
+        self.is_direct = False
         if self.as_process:
             self.task_thread = RemoteTaskLoop(
                 self, name=('%s.TaskThread' % self.name))
@@ -248,9 +264,15 @@ class ConnectionDriver(Driver):
             raise ValueError("onexit '%s' is not a class method." % onexit)
         self.onexit = onexit
         # Add comms and print debug info
-        self._init_comms(name, **kwargs)
-        self.models = {'input': list(self.icomm.model_env.keys()),
-                       'output': list(self.ocomm.model_env.keys())}
+        try:
+            self._init_merged_comm()
+        except MergedCommError:
+            self._init_comms(name, **kwargs)
+        self.models = {'input': list(self.imodel_env.keys()),
+                       'output': list(self.omodel_env.keys())}
+        if self.icomm.any_files:
+            kwargs.setdefault('timeout_send_1st', 60)
+        self.timeout_send_1st = kwargs.pop('timeout_send_1st', self.timeout)
         # self.debug('    env: %s', str(self.env))
         self.debug(('\n' + 80 * '=' + '\n'
                     + 'class = %s\n'
@@ -260,7 +282,7 @@ class ConnectionDriver(Driver):
                    self.icomm.name, self.icomm.address,
                    self.ocomm.name, self.ocomm.address)
 
-    def _init_single_comm(self, io, comm_list):
+    def _init_single_comm(self, io, comm_list, return_kwargs=False):
         r"""Parse keyword arguments for input/output comm."""
         self.debug("Creating %s comm", io)
         comm_kws = dict()
@@ -303,6 +325,8 @@ class ConnectionDriver(Driver):
                 for k in ForkComm.ForkComm.child_keys:
                     comm_list[i].pop(k, None)
         comm_kws['commtype'] = copy.deepcopy(comm_list)
+        if return_kwargs:
+            return comm_kws
         self.debug('%s comm_kws:\n%s', attr_comm, self.pprint(comm_kws, 1))
         setattr(self, attr_comm, new_comm(**comm_kws))
         setattr(self, '%s_kws' % attr_comm, comm_kws)
@@ -315,10 +339,70 @@ class ConnectionDriver(Driver):
         except BaseException:
             self.icomm.close()
             raise
-        # Apply keywords dependent on comms
-        if self.icomm.any_files:
-            kwargs.setdefault('timeout_send_1st', 60)
-        self.timeout_send_1st = kwargs.pop('timeout_send_1st', self.timeout)
+        self.imodel_env = self.icomm.model_env
+        self.omodel_env = self.ocomm.model_env
+        self.debug('Final env:\n%s', self.pprint(self.env, 1))
+
+    def _init_merged_comm(self):
+        r"""Attempt to merge input/output comms for a direct connection.
+
+        Raises:
+            MergedCommError: If the comms cannot be merged.
+
+        """
+        if ((self.dont_allow_direct
+             or self._connection_type.startswith('file')
+             or (len(self.inputs) > 1) or (len(self.outputs) > 1)
+             or ('filetype' in self.inputs[0])
+             or ('filetype' in self.outputs[0])
+             or self.translator
+             or self.inputs[0].get('transform', None)
+             or self.outputs[0].get('transform', None)
+             or (self._icomm_type != self._ocomm_type)
+             or ((self.outputs[0].get('partner_copies', 0) > 1)
+                 and (not self.outputs[0].get('is_client', False))
+                 and (not self.outputs[0].get('dont_copy', False))))):
+            raise MergedCommError
+        direct_direction = 'send'
+        if direct_direction == 'recv':
+            silent_direction = 'send'
+            used_comm = ('input', self.inputs)
+            skip_comm = ('output', self.outputs)
+        else:
+            silent_direction = 'recv'
+            used_comm = ('output', self.outputs)
+            skip_comm = ('input', self.inputs)
+        comm_kws = self._init_single_comm(*used_comm, return_kwargs=True)
+        comm_kws.update(allow_multiple_comms=True,
+                        use_async=False,
+                        force_proxy=True)
+        if self.outputs[0].get('is_client', False):
+            if used_comm[0] == 'input':
+                comm_kws['is_server'] = True
+            comm_kws['direct_connection'] = True
+        self.debug('direct comm_kws:\n%s', self.pprint(comm_kws, 1))
+        self.mcomm = new_comm(**comm_kws)
+        self.mcomm_kws = comm_kws
+        self.icomm = self.mcomm
+        self.ocomm = self.mcomm
+        env_name = (
+            skip_comm[1][0]['name']
+            + determine_suffix(reverse_names=True,
+                               direction=silent_direction))
+        if 'partner_model' in skip_comm[1][0]:
+            mcomm_env = {
+                skip_comm[1][0]['partner_model']: {
+                    env_name: self.mcomm.address,
+                    (env_name + ':DIRECT'): '1'}}
+        else:
+            mcomm_env = {}
+        if direct_direction == 'send':
+            self.imodel_env = mcomm_env
+            self.omodel_env = self.mcomm.model_env
+        else:
+            self.imodel_env = self.mcomm.model_env
+            self.omodel_env = mcomm_env
+        self.is_direct = True
         self.debug('Final env:\n%s', self.pprint(self.env, 1))
 
     def __setstate__(self, state):
@@ -331,9 +415,8 @@ class ConnectionDriver(Driver):
         r"""dict: Mapping between model name and opposite comm
         environment variables that need to be provided to the model."""
         out = {}
-        for x in [self.icomm, self.ocomm]:
-            iout = x.model_env
-            for k, v in iout.items():
+        for x in [self.imodel_env, self.omodel_env]:
+            for k, v in x.items():
                 if k in out:
                     out[k].update(v)
                 else:
@@ -507,6 +590,7 @@ class ConnectionDriver(Driver):
         self.debug('Started connection process')
         if self.as_process:
             self.wait_flag_attr('loop_flag', timeout=120.0)
+            # TODO: This may cause issues when using a direct comm
             self.icomm.disconnect()
             self.ocomm.disconnect()
 
@@ -595,8 +679,9 @@ class ConnectionDriver(Driver):
         if direction == 'input':
             if not errors:
                 self.wait_for_route(timeout=self.timeout)
-            with self.lock:
-                self.icomm.close()
+            if not self.is_direct:
+                with self.lock:
+                    self.icomm.close()
         elif direction == 'output':
             with self.lock:
                 # self.icomm.close()
@@ -665,6 +750,8 @@ class ConnectionDriver(Driver):
     @run_remotely
     def confirm_input(self, timeout=None):
         r"""Confirm receipt of messages from input comm."""
+        if self.is_direct and (self.mcomm_kws['direction'] == 'send'):
+            return
         T = self.start_timeout(timeout, key_suffix='.confirm_input')
         while not T.is_out:  # pragma: debug
             with self.lock:
@@ -678,6 +765,8 @@ class ConnectionDriver(Driver):
     @run_remotely
     def confirm_output(self, timeout=None):
         r"""Confirm receipt of messages from output comm."""
+        if self.is_direct and (self.mcomm_kws['direction'] == 'recv'):
+            return
         T = self.start_timeout(timeout, key_suffix='.confirm_output')
         while not T.is_out:  # pragma: debug
             with self.lock:
@@ -691,6 +780,8 @@ class ConnectionDriver(Driver):
     @run_remotely
     def drain_input(self, timeout=None):
         r"""Drain messages from input comm."""
+        if self.is_direct and (self.mcomm_kws['direction'] == 'send'):
+            return
         T = self.start_timeout(timeout, key_suffix='.drain_input')
         while not T.is_out:
             with self.lock:
@@ -706,6 +797,8 @@ class ConnectionDriver(Driver):
     @run_remotely
     def drain_output(self, timeout=None, dont_confirm_eof=False):
         r"""Drain messages from output comm."""
+        if self.is_direct and (self.mcomm_kws['direction'] == 'recv'):
+            return
         nwait = 0
         if dont_confirm_eof:
             nwait += 1
@@ -760,7 +853,8 @@ class ConnectionDriver(Driver):
             if self.check_flag_attr('_skip_after_loop'):
                 self.debug("After loop skipped.")
                 return
-            self.icomm.close()
+            if not self.is_direct:
+                self.icomm.close()
         # Send EOF in case the model didn't
         if not self.single_use:
             self.send_eof()
@@ -782,6 +876,8 @@ class ConnectionDriver(Driver):
             CommMessage, bool: False if no more messages, message otherwise.
 
         """
+        if self.is_direct and (self.mcomm_kws['direction'] == 'recv'):
+            return True
         assert(self.in_process)
         kwargs.setdefault('timeout', 0)
         with self.lock:
@@ -938,6 +1034,8 @@ class ConnectionDriver(Driver):
             bool: Success or failure of send.
 
         """
+        if self.is_direct and (self.mcomm_kws['direction'] == 'recv'):
+            return True
         assert(self.in_process)
         self.debug('')
         with self.lock:
@@ -978,6 +1076,16 @@ class ConnectionDriver(Driver):
             self.debug("Breaking loop")
             self.set_close_state('invalid')
             self.set_break_flag()
+            return
+        # Check for direct
+        if self.is_direct:
+            if self.is_valid:
+                self.state = 'waiting'
+                self.sleep()
+            else:
+                self.debug('Direct comm closed')
+                self.set_break_flag()
+                self.set_close_state('looping')
             return
         # Receive a message
         self.state = 'receiving'

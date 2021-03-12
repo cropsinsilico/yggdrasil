@@ -698,10 +698,13 @@ int new_zmq_address(comm_t *comm) {
   zsock_t *s = NULL;
   if (comm->flags & COMM_FLAG_CLIENT_RESPONSE) {
     s = create_zsock(ZMQ_ROUTER);
+    ygglog_debug("new_zmq_address: Using ROUTER socket.");
   } else if (comm->flags & COMM_ALLOW_MULTIPLE_COMMS) {
     s = create_zsock(ZMQ_DEALER);
+    ygglog_debug("new_zmq_address: Using DEALER socket.");
   } else {
     s = create_zsock(ZMQ_PAIR);
+    ygglog_debug("new_zmq_address: Using PAIR socket.");
   }
   if (s == NULL) {
     ygglog_error("new_zmq_address: Could not initialize empty socket.");
@@ -748,10 +751,12 @@ int init_zmq_comm(comm_t *comm) {
     return ret;
   comm->msgBufSize = 100;
   zsock_t *s;
-  if (comm->flags & (COMM_FLAG_SERVER | COMM_ALLOW_MULTIPLE_COMMS)) {
+  if (comm->flags & (COMM_FLAG_SERVER | COMM_ALLOW_MULTIPLE_COMMS | COMM_FLAG_CLIENT_RESPONSE)) {
     s = create_zsock(ZMQ_DEALER);
+    ygglog_debug("init_zmq_address: Using DEALER socket.");
   } else {
     s = create_zsock(ZMQ_PAIR);
+    ygglog_debug("init_zmq_address: Using PAIR socket.");
   }
   if (s == NULL) {
     ygglog_error("init_zmq_address: Could not initialize empty socket.");
@@ -989,24 +994,36 @@ int zmq_comm_recv(const comm_t* x, char **data, const size_t len,
     return ret;
   }
   // Check for server signon and respond
+  char* client_address = NULL;
+  zsock_t *client_socket = NULL;
   while (strncmp((char*)zframe_data(out), "ZMQ_SERVER_SIGNING_ON::", 23) == 0) {
     ygglog_debug("zmq_comm_recv(%s): Received sign-on", x->name);
-    char* client_address = (char*)zframe_data(out) + 23;
-    // create a DEALER socket and connect to address
-    zsock_t *client_socket = create_zsock(ZMQ_DEALER);
-    if (client_socket == NULL) {
-      ygglog_error("zmq_comm_recv(%s): Could not initalize the client side of the proxy socket to confirm signon", x->name);
-      zframe_destroy(&out);
-      return ret;
+    if (client_address == NULL)
+      client_address = (char*)zframe_data(out) + 23;
+    else {
+      if (strcmp(client_address, (char*)zframe_data(out) + 23) != 0) {
+	ygglog_error("zmq_comm_recv(%s): Multiple servers signed on.");
+	zframe_destroy(&out);
+	ygg_zsock_destroy(&client_socket);
+      }
     }
-    zsock_set_sndtimeo(client_socket, _zmq_sleeptime);
-    zsock_set_immediate(client_socket, 1);
-    zsock_set_linger(client_socket, _zmq_sleeptime);
-    if (zsock_connect(client_socket, "%s", client_address) < 0) {
-      ygglog_error("zmq_comm_recv(%s): Error when connecting to the client proxy socket to respond to signon: %s", x->name, client_address);
-      zframe_destroy(&out);
-      ygg_zsock_destroy(&client_socket);
-      return ret;
+    if (client_socket == NULL) {
+      // create a DEALER socket and connect to address
+      client_socket = create_zsock(ZMQ_DEALER);
+      if (client_socket == NULL) {
+	ygglog_error("zmq_comm_recv(%s): Could not initalize the client side of the proxy socket to confirm signon", x->name);
+	zframe_destroy(&out);
+	return ret;
+      }
+      zsock_set_sndtimeo(client_socket, _zmq_sleeptime);
+      zsock_set_immediate(client_socket, 1);
+      zsock_set_linger(client_socket, _zmq_sleeptime);
+      if (zsock_connect(client_socket, "%s", client_address) < 0) {
+	ygglog_error("zmq_comm_recv(%s): Error when connecting to the client proxy socket to respond to signon: %s", x->name, client_address);
+	zframe_destroy(&out);
+	ygg_zsock_destroy(&client_socket);
+	return ret;
+      }
     }
     zframe_t *response = zframe_new(zframe_data(out), zframe_size(out));
     if (response == NULL) {
@@ -1024,13 +1041,17 @@ int zmq_comm_recv(const comm_t* x, char **data, const size_t len,
       return ret;
     }
     zframe_destroy(&response);
-    ygg_zsock_destroy(&client_socket);
     zframe_destroy(&out);
     out = zmq_comm_recv_zframe(x);
     if (out == NULL) {
       ygglog_debug("zmq_comm_recv(%s): did not receive", x->name);
+      ygg_zsock_destroy(&client_socket);
       return ret;
     }
+  }
+  if (client_socket != NULL) {
+    ygg_zsock_destroy(&client_socket);
+    client_socket = NULL;
   }
   // Realloc and copy data
   size_t len_recv = zframe_size(out) + 1;

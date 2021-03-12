@@ -1038,6 +1038,10 @@ contains
 #endif
   
   ! Utilities
+  ! function ygg_init() result(out)
+  !   integer(kind=c_int) :: out
+    
+  ! end function ygg_init
   function init_ygguint1(x) result(y)
     integer(kind=1) :: x
     type(ygguint1) :: y
@@ -1100,6 +1104,17 @@ contains
   ! YggInterface
 
   ! Utilities
+  function ygg_init() result(out)
+    implicit none
+    logical :: out
+    integer(kind=c_int) :: c_out
+    c_out = ygg_init_c()
+    if (c_out.eq.0) then
+       out = .true.
+    else
+       out = .false.
+    end if
+  end function ygg_init
   subroutine ygglog_info(fmt)
     implicit none
     character(len=*), intent(in) :: fmt

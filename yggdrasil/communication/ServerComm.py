@@ -15,8 +15,6 @@ class ServerComm(CommBase.CommBase):
             the request comm. Defaults to None.
         response_kwargs (dict, optional): Keyword arguments for the response
             comm. Defaults to empty dict.
-        direct_connection (bool, optional): If True, the comm will be
-            directly connected to a ServerComm. Defaults to False.
         **kwargs: Additional keywords arguments are passed to the input comm.
 
     Attributes:
@@ -30,38 +28,49 @@ class ServerComm(CommBase.CommBase):
     _dont_register = True
     
     def __init__(self, name, request_commtype=None, response_kwargs=None,
-                 dont_open=False, is_async=False, direct_connection=False,
                  **kwargs):
         if response_kwargs is None:
             response_kwargs = dict()
-        icomm_name = name
-        icomm_kwargs = kwargs
-        icomm_kwargs.update(direction='recv',
-                            dont_open=True,
-                            commtype=request_commtype)
-        icomm_kwargs.setdefault('is_server', True)
-        icomm_kwargs.setdefault('use_async', is_async)
-        if icomm_kwargs.get('use_async', False):
-            icomm_kwargs.setdefault('async_recv_method', 'recv_message')
-        self.direct_connection = direct_connection
+        self.icomm_name = name
+        self.icomm_kwargs = kwargs
         self.response_kwargs = response_kwargs
-        self.icomm = get_comm(icomm_name, **icomm_kwargs)
+        self.request_commtype = request_commtype
+        self.icomm = None
         self.ocomm = OrderedDict()
-        self.response_kwargs.setdefault('commtype', self.icomm._commtype)
-        self.response_kwargs.setdefault('recv_timeout', self.icomm.recv_timeout)
-        self.response_kwargs.setdefault('language', self.icomm.language)
-        self.response_kwargs.setdefault('use_async', self.icomm.is_async)
         self._used_response_comms = dict()
         self.clients = []
         self.closed_clients = []
         self.nclients_expected = int(os.environ.get('YGG_NCLIENTS', 0))
-        super(ServerComm, self).__init__(self.icomm.name, dont_open=dont_open,
-                                         recv_timeout=self.icomm.recv_timeout,
-                                         is_interface=self.icomm.is_interface,
-                                         direction='recv', no_suffix=True,
-                                         address=self.icomm.address,
-                                         is_async=self.icomm.is_async)
+        kwargs_base = {k: kwargs[k] for k in
+                       ['recv_timeout', 'is_interface', 'is_async', 'address',
+                        'direct_connection', 'dont_open', 'no_suffix',
+                        'reverse_names']
+                       if k in kwargs}
+        super(ServerComm, self).__init__(name, direction='recv',
+                                         **kwargs_base)
 
+    def _init_before_open(self, **kwargs):
+        r"""Initialization steps that should be performed after base class, but
+        before the comm is opened."""
+        super(ServerComm, self)._init_before_open(**kwargs)
+        self.icomm_kwargs.update(direction='recv',
+                                 dont_open=True,
+                                 commtype=self.request_commtype)
+        self.icomm_kwargs.setdefault('is_server', True)
+        self.icomm_kwargs.setdefault('direct_connection',
+                                     self.direct_connection)
+        self.icomm_kwargs.setdefault('use_async',
+                                     self.icomm_kwargs.pop('is_async', False))
+        if self.icomm_kwargs.get('use_async', False):
+            self.icomm_kwargs.setdefault('async_recv_method', 'recv_message')
+        self.icomm = get_comm(self.icomm_name, **self.icomm_kwargs)
+        self.response_kwargs.setdefault('commtype', self.icomm._commtype)
+        self.response_kwargs.setdefault('recv_timeout', self.icomm.recv_timeout)
+        self.response_kwargs.setdefault('language', self.icomm.language)
+        self.response_kwargs.setdefault('use_async', self.icomm.is_async)
+        self.response_kwargs.setdefault('direct_connection',
+                                        self.icomm.direct_connection)
+        
     def get_status_message(self, nindent=0, **kwargs):
         r"""Return lines composing a status message.
         

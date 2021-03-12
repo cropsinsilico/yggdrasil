@@ -21,6 +21,7 @@ class RPCResponseDriver(ConnectionDriver):
     _connection_type = 'rpc_response'
 
     def __init__(self, model_response_address, msg_id, **kwargs):
+        kwargs['dont_allow_direct'] = True
         # Input communicator
         inputs = kwargs.get('inputs', [{}])
         inputs[0]['name'] = 'server_model_response.' + msg_id

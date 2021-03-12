@@ -161,6 +161,7 @@ class TestConnectionParam(parent.TestParam):
     def inst_kwargs(self):
         r"""dict: Keyword arguments for tested class."""
         out = super(TestConnectionParam, self).inst_kwargs
+        out['dont_allow_direct'] = True
         out['inputs'] = self.inputs
         out['outputs'] = self.outputs
         return out

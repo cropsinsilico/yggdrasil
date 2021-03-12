@@ -1,5 +1,6 @@
 import subprocess
 import os
+import pprint
 from contextlib import contextmanager
 from yggdrasil.components import import_component
 
@@ -69,6 +70,58 @@ def import_comm(commtype=None):
     if commtype in ['server', 'client', 'fork']:
         commtype = '%sComm' % commtype.title()
     return import_component('comm', commtype)
+
+
+def access_environment_variable(name):
+    r"""Check for an environment variable, substutiting for ':' characters
+    on failure.
+
+    Args:
+        name (str): Environment variable name.
+
+    Returns:
+        str: Contents of environment variable.
+
+    """
+    try:
+        return os.environ[name]
+    except KeyError:
+        try:
+            return os.environ[name.replace(':', '__COLON__')]
+        except KeyError:  # pragma: debug
+            env_str = pprint.pformat(os.environ.copy())
+            raise KeyError('Cannot see %s in env. Env:\n%s' %
+                           (name, env_str))
+
+
+def determine_environment_variable(name, model_name=None):
+    r"""Determine an environment variable associated with a comm.
+
+    Args:
+        name (str): Comm name.
+        model_name (str, optional): Name of the model using the comm. Defaults
+            to None.
+
+    Returns:
+        str: Environment variable containing the address for a comm.
+
+    """
+    try:
+        access_environment_variable(name)
+        return name
+    except KeyError:
+        pass
+    prefix = '%s:' % model_name
+    if model_name and (not name.startswith(prefix)):
+        name = prefix + name
+    try:
+        access_environment_variable(name)
+        return name
+    except KeyError:
+        pass
+    env_str = pprint.pformat(os.environ.copy())
+    raise RuntimeError('Cannot see %s in env (model = %s). Env:\n%s' %
+                       (name, model_name, env_str))
 
 
 def determine_suffix(no_suffix=False, reverse_names=False,

@@ -315,6 +315,7 @@ class CompilationToolBase(object):
         remove_product_exts (list): List of extensions or directories matching
             entries in product_exts and product_files that should be removed
             during cleanup. Be careful when adding files to this list.
+        threading_flags (list): Flags to add when threading is enabled.
 
     """
 
@@ -348,6 +349,7 @@ class CompilationToolBase(object):
     product_files = []
     source_product_exts = []
     remove_product_exts = []
+    threading_flags = ['-fopenmp']
     is_gnu = False
     toolset = None
     compatible_toolsets = []
@@ -712,7 +714,8 @@ class CompilationToolBase(object):
     @classmethod
     def get_flags(cls, flags=None, outfile=None, output_first=None,
                   unused_kwargs=None, skip_defaults=False,
-                  dont_skip_env_defaults=False, remove_flags=None, **kwargs):
+                  dont_skip_env_defaults=False, remove_flags=None,
+                  with_threading=False, **kwargs):
         r"""Get a list of flags for the tool.
 
         Args:
@@ -736,6 +739,8 @@ class CompilationToolBase(object):
                 variable will be added. Defaults to False.
             remove_flags (list, optional): List of flags to remove. Defaults
                 to None and is ignored.
+            with_threading (bool, optional): If True, threading flags are added.
+                Defaults to False.
             **kwargs: Additional keyword arguments are ignored and added to
                 unused_kwargs if provided.
 
@@ -768,6 +773,11 @@ class CompilationToolBase(object):
         for k in cls.flag_options.keys():
             if k in kwargs:
                 cls.append_flags(out, k, kwargs.pop(k))
+        # Add threading flags
+        if with_threading:
+            for k in cls.threading_flags:
+                if k not in out:
+                    out.append(k)
         # Add output file
         if (outfile is not None) and (cls.output_key is not None):
             cls.append_flags(out, cls.output_key, outfile,
@@ -1720,7 +1730,7 @@ class LinkerBase(CompilationToolBase):
                     'libraries', 'library_dirs', 'library_libs',
                     'library_libs_nonstd', 'library_flags']
         kws_both = ['overwrite', 'products', 'allow_error', 'dry_run',
-                    'working_dir', 'env']
+                    'working_dir', 'env', 'with_threading']
         kws_link += add_kws_link
         kws_both += add_kws_both
         kwargs_link = {}
@@ -3636,6 +3646,8 @@ class CompiledModelDriver(ModelDriver):
                                                               return_prop='name'))
         if not kwargs.get('dont_link', False):
             default_kwargs.update(linker_flags=self.linker_flags)
+        if self.allow_threading:
+            default_kwargs['with_threading'] = True
         for k, v in default_kwargs.items():
             kwargs.setdefault(k, v)
         if ((isinstance(kwargs['out'], str) and os.path.isfile(kwargs['out'])

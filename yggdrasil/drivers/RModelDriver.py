@@ -210,7 +210,8 @@ class RModelDriver(InterpretedModelDriver):  # pragma: R
             while comm.recv(timeout=0)[0]:
                 comm.sleep()
         else:
-            comm.send_eof()
+            if not comm._eof_sent.is_set():
+                comm.send_eof()
             comm.linger()
         if not getattr(comm, 'dont_backlog', True):
             comm.linger_close()

@@ -11,7 +11,7 @@ from yggdrasil import tools, multitasking
 from yggdrasil.tools import YGG_MSG_EOF
 from yggdrasil.communication import (
     new_comm, get_comm, determine_suffix, TemporaryCommunicationError,
-    import_comm)
+    import_comm, determine_environment_variable, access_environment_variable)
 from yggdrasil.components import import_component, create_component
 from yggdrasil.metaschema.datatypes import MetaschemaTypeError, type2numpy
 from yggdrasil.metaschema.datatypes.MetaschemaType import MetaschemaType
@@ -455,6 +455,13 @@ class CommBase(tools.YggClass):
         default_value (object, optional): Value that should be returned in
             the event that a yaml does not pair the comm with another
             model comm or a file.
+        is_async (bool, optional): If True, the comm is treated as asynchronous.
+            Defualts to False.
+        force_proxy (bool, optional): If True, a proxy is used reguardless of
+            other checks. Defaults to False.
+        direct_connection (bool, optional): If True, this comm is part of
+            a direct connection between two models. Defaults to None and is
+            set based on the contents of an environment variable.
         **kwargs: Additional keywords arguments are passed to parent class.
 
     Class Attributes:
@@ -497,6 +504,7 @@ class CommBase(tools.YggClass):
         send_converter (func): Converter that should be used on sent objects.
         filter (:class:.FilterBase): Callable class that will be used to determine when
             messages should be sent/received.
+        is_async (bool): If True, the comm is treated as asynchronous.
 
     Raises:
         RuntimeError: If the comm class is not installed.
@@ -582,7 +590,8 @@ class CommBase(tools.YggClass):
                  allow_multiple_comms=False,
                  is_client=False, is_response_client=False,
                  is_server=False, is_response_server=False,
-                 is_async=False, **kwargs):
+                 is_async=False, force_proxy=False, direct_connection=None,
+                 **kwargs):
         if isinstance(kwargs.get('datatype', None), MetaschemaType):
             self.datatype = kwargs.pop('datatype')
         super(CommBase, self).__init__(name, **kwargs)
@@ -597,23 +606,9 @@ class CommBase(tools.YggClass):
         self.suffix = suffix
         self._name = name + suffix
         if address is None:
-            if self.name not in os.environ:
-                model_name = self.model_name
-                prefix = '%s:' % model_name
-                if model_name and (not self.name.startswith(prefix)):
-                    self._name = prefix + self.name
-                if (((self.name not in os.environ)
-                     and (self.name.replace(':', '__COLON__')
-                          not in os.environ))):
-                    import pprint
-                    env_str = pprint.pformat(os.environ.copy())
-                    raise RuntimeError(
-                        'Cannot see %s in env (model = %s). Env:\n%s' %
-                        (self.name, model_name, env_str))
-            try:
-                self.address = os.environ[self.name]
-            except KeyError:
-                self.address = os.environ[self.name.replace(':', '__COLON__')]
+            self._name = determine_environment_variable(
+                self.name, model_name=self.model_name)
+            self.address = access_environment_variable(self.name)
         else:
             self.address = address
         self.direction = direction
@@ -626,6 +621,12 @@ class CommBase(tools.YggClass):
             partner_language = 'python'
             partner_copies = 1
             recv_timeout = False
+            try:
+                direct_connection = bool(int(
+                    access_environment_variable('%s:DIRECT' % self.name)))
+            except KeyError:
+                direct_connection = False
+        self.direct_connection = direct_connection
         if language is None:
             language = 'python'
         self.language = language
@@ -668,11 +669,11 @@ class CommBase(tools.YggClass):
             self.allow_multiple_comms = True
         if self.single_use and (not self.is_response_server):
             self._send_serializer = False
-        self.create_proxy = ((self.is_client or self.allow_multiple_comms)
-                             and (not self.is_interface)
-                             and (self.direction != 'recv'))
+        self.create_proxy = (((self.is_client or self.allow_multiple_comms)
+                              and (not self.is_interface)
+                              and (self.direction != 'recv')) or force_proxy)
         # Add interface tag
-        if self.is_interface:
+        if self.is_interface and (not self._name.endswith('_I')):
             self._name += '_I'
         # if self.is_interface:
         #     self._timeout_drain = False
@@ -1068,7 +1069,10 @@ class CommBase(tools.YggClass):
     @property
     def opp_comms(self):
         r"""dict: Name/address pairs for opposite comms."""
-        return {self.opp_name: self.opp_address}
+        out = {self.opp_name: self.opp_address}
+        if self.direct_connection:
+            out[self.opp_name + ':DIRECT'] = '1'
+        return out
 
     def opp_comm_kwargs(self):
         r"""Get keyword arguments to initialize communication with opposite

@@ -21,3 +21,4 @@ connections:
   - input: outFile
     output: output_hello.txt
     in_temp: True
+    dont_allow_direct: true

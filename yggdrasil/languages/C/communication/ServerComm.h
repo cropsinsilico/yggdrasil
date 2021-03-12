@@ -51,6 +51,9 @@ int init_server_comm(comm_t *comm) {
     handle = init_comm_base(comm->name, "recv", _default_comm, dtype_in);
   }
   handle->flags = handle->flags | COMM_FLAG_SERVER;
+  if (handle->flags & COMM_FLAG_DIRECT) {
+    comm->flags = comm->flags | COMM_FLAG_DIRECT;
+  }
   ret = init_default_comm(handle);
   strcpy(comm->address, handle->address);
   // printf("init_server_comm: name = %s, type=%d, address = %s\n",
@@ -193,6 +196,9 @@ int server_comm_recv(comm_t* x, char **data, const size_t len, const int allow_r
   res_comm[0] = new_comm_base(head.response_address, "send", _default_comm,
 			      dtype_copy);
   /* sprintf(res_comm[0]->name, "server_response.%s", res_comm[0]->address); */
+  if (x->flags & COMM_FLAG_DIRECT) {
+    res_comm[0]->flags = res_comm[0]->flags | COMM_FLAG_DIRECT | COMM_FLAG_CLIENT_RESPONSE;
+  }
   int newret;
   newret = init_default_comm(res_comm[0]);
   if (newret < 0) {

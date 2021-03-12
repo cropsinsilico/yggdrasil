@@ -1,0 +1,19 @@
+model:
+  name: client
+  language: python
+  args: ./src/client.py
+  function: model_function
+  client_of: server
+  allow_threading: true
+  env:
+    NTHREAD: 10
+  inputs:
+    name: in_buf
+    default_file:
+      name: ./Input/input.txt
+      filetype: ascii
+  outputs:
+    name: out_buf
+    default_file:
+      name: ./client_output.txt
+      in_temp: true
