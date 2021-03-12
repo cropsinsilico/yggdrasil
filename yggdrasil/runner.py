@@ -399,8 +399,17 @@ class YggRunner(YggClass):
         # Transfer connection addresses to model via env
         # TODO: Change to server that tracks connections
         for model, env in drv.model_env.items():
-            self.modeldrivers[model].setdefault('env', {})
-            self.modeldrivers[model]['env'].update(env)
+            try:
+                self.modeldrivers[model].setdefault('env', {})
+                self.modeldrivers[model]['env'].update(env)
+            except KeyError:
+                model0 = model.split('_copy')[0]
+                if (((model0 in self.modeldrivers)
+                     and (self.modeldrivers[model0].get('copies', 0) > 1))):
+                    self.modeldrivers[model0].setdefault('env_%s' % model, {})
+                    self.modeldrivers[model0]['env_%s' % model].update(env)
+                else:
+                    raise
         return drv
         
     def loadDrivers(self):
