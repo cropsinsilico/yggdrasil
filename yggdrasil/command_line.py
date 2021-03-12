@@ -586,6 +586,17 @@ class ygginfo(SubCommand):
                                 out.splitlines(False)))))
                     # Reticulate conda_list
                     if os.environ.get('CONDA_PREFIX', ''):
+                        out = tools.bytes2str(
+                            subprocess.check_output(
+                                ['conda', 'info', '--json'],
+                                stderr=subprocess.STDOUT)).strip()
+                        vardict.append(
+                            (curr_prefix
+                             + "conda info --json",
+                             "\n%s%s" % (
+                                 curr_prefix + prefix,
+                                 ("\n" + curr_prefix + prefix).join(
+                                     out.splitlines(False)))))
                         out = Rdrv.run_executable(
                             ["-e", ("library(reticulate); "
                                     "reticulate::conda_list()")],
