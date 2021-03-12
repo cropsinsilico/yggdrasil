@@ -290,7 +290,8 @@ class ConnectionDriver(Driver):
             if self.as_process:
                 comm_list[i]['buffer_task_method'] = 'process'
             if (((comm_list[i].get('partner_copies', 0) > 1)
-                 and (not comm_list[i].get('is_client')) and (direction == 'send')
+                 and (not comm_list[i].get('is_client', False))
+                 and (direction == 'send')
                  and (not comm_list[i].get('dont_copy', False)))):
                 from yggdrasil.communication import ForkComm
                 # TODO: Handle recv?
