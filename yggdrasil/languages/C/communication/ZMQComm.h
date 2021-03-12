@@ -936,7 +936,7 @@ int zmq_comm_recv(const comm_t* x, char **data, const size_t len,
     return ret;
   }
   // Check for server signon and respond
-  if (strncmp((char*)zframe_data(out), "ZMQ_SERVER_SIGNING_ON::", 23) == 0) {
+  while (strncmp((char*)zframe_data(out), "ZMQ_SERVER_SIGNING_ON::", 23) == 0) {
     char* client_address = (char*)zframe_data(out) + 23;
     // create a DEALER socket and connect to address
     zsock_t *client_socket = ygg_zsock_new(ZMQ_DEALER);
