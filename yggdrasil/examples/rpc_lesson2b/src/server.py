@@ -1,3 +1,4 @@
+import os
 import numpy as np
 from yggdrasil.interface.YggInterface import YggRpcServer
 
@@ -36,7 +37,7 @@ def main():
     # Continue receiving requests until the connection is closed when all
     # clients have disconnected.
     while True:
-        print('server: receiving...')
+        print('server%s: receiving...' % os.environ['YGG_MODEL_COPY'])
         retval, rpc_in = rpc.recv()
         if not retval:
             print('server: end of input')
@@ -44,16 +45,19 @@ def main():
 
         # Compute fibonacci number
         n = rpc_in[0]
-        print('server: Received request for Fibonacci number %d' % n)
+        print('server%s: Received request for Fibonacci number %d'
+              % (os.environ['YGG_MODEL_COPY'], n))
         result = get_fibonacci(n)
-        print('server: Sending response for Fibonacci number %d: %d' % (n, result))
+        print('server%s: Sending response for Fibonacci number %d: %d'
+              % (os.environ['YGG_MODEL_COPY'], n, result))
 
         # Send response back
         flag = rpc.send(np.int32(result))
         if not flag:
-            raise RuntimeError('server: ERROR sending')
+            raise RuntimeError('server%s: ERROR sending'
+                               % os.environ['YGG_MODEL_COPY'])
 
-    print('Goodbye from Python server')
+    print('Goodbye from Python server%s' % os.environ['YGG_MODEL_COPY'])
 
     
 if __name__ == '__main__':

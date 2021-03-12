@@ -1196,6 +1196,7 @@ class ModelDriver(Driver):
         env['YGG_MODEL_LANGUAGE'] = self.language
         if self.copies > 1:
             env['YGG_MODEL_NAME'] = self.name.split('_copy')[0]
+            env['YGG_MODEL_COPY'] = self.name.split('_copy')[-1]
         else:
             env['YGG_MODEL_NAME'] = self.name
         env['YGG_MODEL_COPIES'] = str(self.copies)

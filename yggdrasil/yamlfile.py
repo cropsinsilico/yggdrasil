@@ -485,7 +485,11 @@ def parse_model(yml, existing):
     yml['model_index'] = len(existing['model'])
     for io in ['inputs', 'outputs']:
         for x in yml[io]:
-            if yml.get('allow_threading', False) or (yml.get('copies', 1) > 1):
+            if yml.get('function', False) and (not x.get('outside_loop', False)):
+                x.setdefault('dont_copy', True)
+            if yml.get('allow_threading', False) or (
+                    (yml.get('copies', 1) > 1)
+                    and (not x.get('dont_copy', False))):
                 x['allow_multiple_comms'] = True
             # TODO: Replace model_driver with partner_model?
             x['model_driver'] = [yml['name']]
