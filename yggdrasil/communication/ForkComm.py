@@ -37,13 +37,13 @@ class ForkComm(CommBase.CommBase):
 
     _commtype = 'fork'
     _dont_register = True
+    child_keys = ['serializer_class', 'serializer_kwargs',  # 'datatype',
+                  'format_str', 'field_names', 'field_units', 'as_array']
+    noprop_keys = ['send_converter', 'recv_converter', 'filter', 'transform']
     
     def __init__(self, name, comm_list=None, is_async=False, **kwargs):
-        child_keys = ['serializer_class', 'serializer_kwargs',  # 'datatype',
-                      'format_str', 'field_names', 'field_units', 'as_array']
-        noprop_keys = ['send_converter', 'recv_converter', 'filter', 'transform']
-        child_kwargs = {k: kwargs.pop(k) for k in child_keys if k in kwargs}
-        noprop_kwargs = {k: kwargs.pop(k) for k in noprop_keys if k in kwargs}
+        child_kwargs = {k: kwargs.pop(k) for k in self.child_keys if k in kwargs}
+        noprop_kwargs = {k: kwargs.pop(k) for k in self.noprop_keys if k in kwargs}
         self.comm_list = []
         self.curr_comm_index = 0
         self.eof_recv = []

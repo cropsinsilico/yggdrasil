@@ -442,6 +442,11 @@ class CommBase(tools.YggClass):
             input/outputs to/from a model being wrapped. The receive/send
             calls for this comm will be outside the loop for the model.
             Defaults to False.
+        dont_copy (bool, optional): If True, the comm will not be duplicated
+            in the even a model is duplicated via the 'copies' parameter.
+            Defaults to False except for in the case that a model is wrapped
+            and the comm is inside the loop or that a model is a RPC input to
+            a model server.
         default_file (:class:FileComm, optional): Comm information for
             a file that input should be drawn from (for input comms)
             or that output should be sent to (for output comms) in
@@ -505,50 +510,52 @@ class CommBase(tools.YggClass):
     _schema_type = 'comm'
     _schema_subtype_key = 'commtype'
     _schema_required = ['name', 'commtype', 'datatype']
-    _schema_properties = {'name': {'type': 'string'},
-                          'commtype': {'type': 'string', 'default': 'default',
-                                       'description': ('Communication mechanism '
-                                                       'that should be used.')},
-                          'datatype': {'type': 'schema',
-                                       'default': {'type': 'bytes'}},
-                          'recv_converter': {'anyOf': [
-                              {'$ref': '#/definitions/transform'},
-                              {'type': ['function', 'string']},
-                              {'type': 'array',
-                               'items': {'anyOf': [
-                                   {'$ref': '#/definitions/transform'},
-                                   {'type': ['function', 'string']}]}}]},
-                          'send_converter': {'anyOf': [
-                              {'$ref': '#/definitions/transform'},
-                              {'type': ['function', 'string']},
-                              {'type': 'array',
-                               'items': {'anyOf': [
-                                   {'$ref': '#/definitions/transform'},
-                                   {'type': ['function', 'string']}]}}]},
-                          'vars': {'type': 'array',
-                                   'items': {'type': 'string'}},
-                          'length_map': {
-                              'type': 'object',
-                              'additionalProperties': {'type': 'string'}},
-                          'format_str': {'type': 'string'},
-                          'field_names': {'type': 'array',
-                                          'items': {'type': 'string'}},
-                          'field_units': {'type': 'array',
-                                          'items': {'type': 'string'}},
-                          'as_array': {'type': 'boolean', 'default': False},
-                          'filter': {'$ref': '#/definitions/filter'},
-                          'transform': {'anyOf': [
-                              {'$ref': '#/definitions/transform'},
-                              {'type': ['function', 'string']},
-                              {'type': 'array',
-                               'items': {'anyOf': [
-                                   {'$ref': '#/definitions/transform'},
-                                   {'type': ['function', 'string']}]}}]},
-                          'is_default': {'type': 'boolean', 'default': False},
-                          'outside_loop': {'type': 'boolean',
-                                           'default': False},
-                          'default_file': {'$ref': '#/definitions/file'},
-                          'default_value': {'type': 'any'}}
+    _schema_properties = {
+        'name': {'type': 'string'},
+        'commtype': {'type': 'string', 'default': 'default',
+                     'description': ('Communication mechanism '
+                                     'that should be used.')},
+        'datatype': {'type': 'schema',
+                     'default': {'type': 'bytes'}},
+        'recv_converter': {'anyOf': [
+            {'$ref': '#/definitions/transform'},
+            {'type': ['function', 'string']},
+            {'type': 'array',
+             'items': {'anyOf': [
+                 {'$ref': '#/definitions/transform'},
+                 {'type': ['function', 'string']}]}}]},
+        'send_converter': {'anyOf': [
+            {'$ref': '#/definitions/transform'},
+            {'type': ['function', 'string']},
+            {'type': 'array',
+             'items': {'anyOf': [
+                 {'$ref': '#/definitions/transform'},
+                 {'type': ['function', 'string']}]}}]},
+        'vars': {'type': 'array',
+                 'items': {'type': 'string'}},
+        'length_map': {
+            'type': 'object',
+            'additionalProperties': {'type': 'string'}},
+        'format_str': {'type': 'string'},
+        'field_names': {'type': 'array',
+                        'items': {'type': 'string'}},
+        'field_units': {'type': 'array',
+                        'items': {'type': 'string'}},
+        'as_array': {'type': 'boolean', 'default': False},
+        'filter': {'$ref': '#/definitions/filter'},
+        'transform': {'anyOf': [
+            {'$ref': '#/definitions/transform'},
+            {'type': ['function', 'string']},
+            {'type': 'array',
+             'items': {'anyOf': [
+                 {'$ref': '#/definitions/transform'},
+                 {'type': ['function', 'string']}]}}]},
+        'is_default': {'type': 'boolean', 'default': False},
+        'outside_loop': {'type': 'boolean',
+                         'default': False},
+        'dont_copy': {'type': 'boolean', 'default': False},
+        'default_file': {'$ref': '#/definitions/file'},
+        'default_value': {'type': 'any'}}
     _schema_excluded_from_class = ['name']
     _default_serializer = 'default'
     _default_serializer_class = None
@@ -557,8 +564,8 @@ class CommBase(tools.YggClass):
     _maxMsgSize = 0
     address_description = None
     no_serialization = False
-    _model_schema_prop = ['is_default', 'outside_loop', 'default_file',
-                          'default_value']
+    _model_schema_prop = ['is_default', 'outside_loop', 'dont_copy',
+                          'default_file', 'default_value']
     _disconnect_attr = (tools.YggClass._disconnect_attr
                         + ['_closing_event', '_closing_thread',
                            '_eof_recv', '_eof_sent'])
