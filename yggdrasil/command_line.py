@@ -586,10 +586,12 @@ class ygginfo(SubCommand):
                                 out.splitlines(False)))))
                     # Reticulate conda_list
                     if os.environ.get('CONDA_PREFIX', ''):
-                        out = tools.bytes2str(
-                            subprocess.check_output(
-                                ['conda', 'info', '--json'],
-                                stderr=subprocess.STDOUT)).strip()
+                        if platform._is_win:  # pragma: windows
+                            out = tools.bytes2str(subprocess.check_output(
+                                'conda info --json', shell=True)).strip()
+                        else:
+                            out = tools.bytes2str(subprocess.check_output(
+                                ['conda', 'info', '--json'])).strip()
                         vardict.append(
                             (curr_prefix
                              + "conda info --json",
