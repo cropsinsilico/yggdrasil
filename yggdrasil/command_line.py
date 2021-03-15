@@ -599,10 +599,13 @@ class ygginfo(SubCommand):
                                  curr_prefix + prefix,
                                  ("\n" + curr_prefix + prefix).join(
                                      out.splitlines(False)))))
-                        out = Rdrv.run_executable(
-                            ["-e", ("library(reticulate); "
-                                    "reticulate::conda_list()")],
-                            env=env_reticulate).strip()
+                        try:
+                            out = Rdrv.run_executable(
+                                ["-e", ("library(reticulate); "
+                                        "reticulate::conda_list()")],
+                                env=env_reticulate).strip()
+                        except BaseException:  # pragma: debug
+                            out = 'ERROR'
                         vardict.append(
                             (curr_prefix
                              + "R reticulate::conda_list():",
