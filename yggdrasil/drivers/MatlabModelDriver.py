@@ -16,8 +16,10 @@ from yggdrasil.drivers.InterpretedModelDriver import InterpretedModelDriver
 from yggdrasil.tools import TimeOut, sleep
 logger = logging.getLogger(__name__)
 try:  # pragma: matlab
-    disable_engine = ygg_cfg.get('matlab', 'disable_engine', 'False').lower()
-    if platform._is_win or (disable_engine == 'true'):
+    disable_engine = ygg_cfg.get('matlab', 'disable_engine', 'False')
+    if isinstance(disable_engine, str):
+        disable_engine = (disable_engine.lower() == 'true')
+    if platform._is_win or disable_engine:
         _matlab_engine_installed = False
         if not tools.is_subprocess():
             logger.debug("matlab.engine disabled")
