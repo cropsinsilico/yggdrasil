@@ -134,8 +134,8 @@ definitions:
             type: string
           type: array
       required:
-      - commtype
       - name
+      - commtype
       - datatype
       title: comm_base
       type: object
@@ -288,8 +288,8 @@ definitions:
             - $ref: '#/definitions/transform'
           type: array
       required:
-      - outputs
       - inputs
+      - outputs
       title: connection_base
       type: object
     - anyOf:
@@ -608,9 +608,9 @@ definitions:
             is used.
           type: string
       required:
-      - working_dir
       - name
       - filetype
+      - working_dir
       title: file_base
       type: object
     - anyOf:
@@ -1681,10 +1681,10 @@ definitions:
             is used.
           type: string
       required:
-      - args
-      - language
-      - working_dir
       - name
+      - args
+      - working_dir
+      - language
       title: model_base
       type: object
     - anyOf:
