@@ -1,7 +1,7 @@
 import unittest
 import copy
 import flaky
-from yggdrasil.tests import assert_raises
+from yggdrasil.tests import assert_raises, timeout
 from yggdrasil.communication import new_comm
 from yggdrasil.communication.RMQComm import RMQComm
 from yggdrasil.communication.tests import test_RMQComm as parent
@@ -12,6 +12,7 @@ _rmq_installed = RMQComm.is_installed(language='python')
 
 @unittest.skipIf(not _rmq_installed, "RMQ Server not running")
 @flaky.flaky
+@timeout(timeout=600)
 class TestRMQAsyncComm(parent.TestRMQComm):
     r"""Test for RMQAsyncComm communication class."""
 
@@ -27,14 +28,10 @@ class TestRMQAsyncComm(parent.TestRMQComm):
         while (not T.is_out) and (self.recv_instance.times_connected == 1):
             self.instance.sleep()
         self.instance.stop_timeout()
-
-    # def test_send_recv_direct(self):
-    #     r"""Disabled: Test send/recv direct."""
-    #     pass
         
 
 @unittest.skipIf(_rmq_installed, "RMQ Server running")
 def test_not_running():
     r"""Test raise of an error if a RMQ server is not running."""
-    comm_kwargs = dict(comm='RMQAsyncComm', direction='send', reverse_names=True)
+    comm_kwargs = dict(commtype='rmq_async', direction='send', reverse_names=True)
     assert_raises(RuntimeError, new_comm, 'test', **comm_kwargs)

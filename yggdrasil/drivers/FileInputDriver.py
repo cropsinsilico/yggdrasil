@@ -16,7 +16,7 @@ class FileInputDriver(InputDriver):
     _schema_subtype_description = ('Connection between a file and a model.')
 
     def __init__(self, name, args, **kwargs):
-        kwargs.setdefault('icomm_kws', {})
-        kwargs['icomm_kws']['address'] = args
+        kwargs.setdefault('inputs', [{}])
+        kwargs['inputs'][0]['address'] = args
         super(FileInputDriver, self).__init__(name, args, **kwargs)
         self.debug('(%s)', args)

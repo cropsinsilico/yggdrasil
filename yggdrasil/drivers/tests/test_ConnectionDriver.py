@@ -1,13 +1,12 @@
 import unittest
-import pytest
 from yggdrasil import tools, platform
-from yggdrasil.tests import MagicTestError, assert_raises
+from yggdrasil.tests import MagicTestError, assert_raises, timeout
 from yggdrasil.schema import get_schema
 from yggdrasil.components import import_component
 from yggdrasil.drivers.tests import test_Driver as parent
 from yggdrasil.drivers.ConnectionDriver import ConnectionDriver
 from yggdrasil.communication import (
-    new_comm, ZMQComm, IPCComm, RMQComm)
+    new_comm, CommBase, ZMQComm, IPCComm, RMQComm)
 
 
 _default_comm = tools.get_default_comm()
@@ -44,11 +43,6 @@ class TestConnectionParam(parent.TestParam):
         r"""int: Maximum message size."""
         return min(self.instance.icomm.maxMsgSize,
                    self.instance.ocomm.maxMsgSize)
-
-    @property
-    def is_input(self):
-        r"""bool: True if the connection is for input."""
-        return (self.icomm_name != self.comm_name)
 
     @property
     def is_output(self):
@@ -93,7 +87,9 @@ class TestConnectionParam(parent.TestParam):
         """
         flag = True
         msg_list = []
-        while flag:
+        timeout = 10.0
+        Tout = self.instance.start_timeout(timeout, key_suffix='.stoptest')
+        while flag and (not Tout.is_out):
             flag, msg_recv = recv_inst.recv(self.timeout)
             if flag:
                 if break_on_empty and recv_inst.is_empty_recv(msg_recv):
@@ -101,6 +97,7 @@ class TestConnectionParam(parent.TestParam):
                 msg_list.append(msg_recv)
             else:
                 self.assert_equal(msg_recv, recv_inst.eof_msg)
+        self.instance.stop_timeout(key_suffix='.stoptest')
         if expected_result is not None:
             self.assert_msg_lists_equal(msg_list, expected_result)
         return msg_list
@@ -122,19 +119,19 @@ class TestConnectionParam(parent.TestParam):
         return comms
 
     @property
-    def icomm_kws(self):
-        r"""dict: Keyword arguments for connection input comm."""
-        out = {'name': self.icomm_name, 'comm': self.icomm_name}
-        if self.is_input:
-            out.update(self.testing_options['kwargs'])
+    def inputs(self):
+        r"""list: List of keyword arguments for connection input comms."""
+        out = [{'name': self.icomm_name, 'commtype': self.icomm_name}]
+        if not self.is_output:
+            out[0].update(self.testing_options['kwargs'])
         return out
 
     @property
-    def ocomm_kws(self):
-        r"""dict: Keyword arguments for connection output comm."""
-        out = {'name': self.ocomm_name, 'comm': self.ocomm_name}
+    def outputs(self):
+        r"""list: List of keyword arguments for connection output comms."""
+        out = [{'name': self.ocomm_name, 'commtype': self.ocomm_name}]
         if self.is_output:
-            out.update(self.testing_options['kwargs'])
+            out[0].update(self.testing_options['kwargs'])
         return out
 
     @property
@@ -150,7 +147,10 @@ class TestConnectionParam(parent.TestParam):
     @property
     def send_comm_kwargs(self):
         r"""dict: Keyword arguments for send comm."""
-        return self.instance.icomm.opp_comm_kwargs()
+        out = self.instance.icomm.opp_comm_kwargs()
+        if self.icomm_name == 'value':
+            out['direction'] = 'recv'
+        return out
 
     @property
     def recv_comm_kwargs(self):
@@ -161,8 +161,8 @@ class TestConnectionParam(parent.TestParam):
     def inst_kwargs(self):
         r"""dict: Keyword arguments for tested class."""
         out = super(TestConnectionParam, self).inst_kwargs
-        out['icomm_kws'] = self.icomm_kws
-        out['ocomm_kws'] = self.ocomm_kws
+        out['inputs'] = self.inputs
+        out['outputs'] = self.outputs
         return out
 
     @property
@@ -215,16 +215,16 @@ class TestConnectionParam(parent.TestParam):
         if kwargs is None:
             kwargs = self.inst_kwargs
         # Adjust kwargs
-        if 'comm_address' in kwargs:
-            del kwargs['comm_address']
         if comm in ['ocomm', 'both']:
-            kwargs['ocomm_kws'].update(
-                base_comm=self.ocomm_name, new_comm_class='ErrorComm',
-                error_on_init=error_on_init)
+            for x in kwargs['outputs']:
+                x.update(base_commtype=self.ocomm_name,
+                         commtype='ErrorComm',
+                         error_on_init=error_on_init)
         if comm in ['icomm', 'both']:
-            kwargs['icomm_kws'].update(
-                base_comm=self.icomm_name, new_comm_class='ErrorComm',
-                error_on_init=error_on_init)
+            for x in kwargs['inputs']:
+                x.update(base_commtype=self.icomm_name,
+                         commtype='ErrorComm',
+                         error_on_init=error_on_init)
         # Get error class
         if (error_class is None) and (comm in ['ocomm', 'icomm', 'both']):
             error_class = inst_class
@@ -254,22 +254,28 @@ class TestConnectionDriverNoStart(TestConnectionParam, parent.TestDriverNoStart)
         assert(self.instance.is_comm_closed)
         assert(self.send_comm.is_closed)
         assert(self.recv_comm.is_closed)
-        flag = self.instance.send_message()
+        flag = self.instance.send_message(CommBase.CommMessage(args=self.test_msg))
         assert(not flag)
         flag = self.instance.recv_message()
-        assert(not flag)
+        if self.instance.icomm._commtype != 'value':
+            assert(not flag)
         # Short
-        flag = self.send_comm.send(self.test_msg)
-        assert(not flag)
+        if self.instance.icomm._commtype != 'value':
+            flag = self.send_comm.send(self.test_msg)
+            assert(not flag)
         flag, ret = self.recv_comm.recv()
-        assert(not flag)
-        self.assert_equal(ret, None)
+        if self.instance.icomm._commtype != 'value':
+            assert(not flag)
+            self.assert_equal(ret, None)
         # Long
-        flag = self.send_comm.send_nolimit(self.test_msg)
-        assert(not flag)
+        if self.instance.icomm._commtype != 'value':
+            flag = self.send_comm.send_nolimit(self.test_msg)
+            assert(not flag)
         flag, ret = self.recv_comm.recv_nolimit()
-        assert(not flag)
-        self.assert_equal(ret, None)
+        if self.instance.icomm._commtype != 'value':
+            assert(not flag)
+            self.assert_equal(ret, None)
+        self.instance.confirm_output(timeout=1.0)
 
         
 class TestConnectionDriverNoInit(TestConnectionParam):
@@ -331,11 +337,13 @@ class TestConnectionDriver(TestConnectionParam, parent.TestDriver):
         r"""Initialize comm object pair."""
         super(TestConnectionDriver, self).setup(*args, **kwargs)
         # CommBase is dummy class that never opens
-        if (self.send_comm.comm_class != 'CommBase'):
+        if (self.send_comm._commtype is not None):
             assert(self.send_comm.is_open)
-        if (self.recv_comm.comm_class != 'CommBase'):
+        if (self.recv_comm._commtype is not None):
             assert(self.recv_comm.is_open)
         self.nmsg_recv = 1
+        if self.instance.icomm._commtype == 'value':
+            self.nmsg_recv = self.get_options()['kwargs']['count']
 
     def test_init_del(self):
         r"""Test driver creation and deletion."""
@@ -347,40 +355,55 @@ class TestConnectionDriver(TestConnectionParam, parent.TestDriver):
         self.instance.open_comm()
         assert(self.instance.is_comm_closed)
 
-    @pytest.mark.timeout(timeout=600)
+    @timeout(timeout=600)
     def test_send_recv(self):
         r"""Test sending/receiving small message."""
-        flag = self.send_comm.send(self.test_msg)
-        if self.comm_name != 'CommBase':
-            assert(flag)
-        # self.instance.sleep()
-        # if self.comm_name != 'CommBase':
-        #     self.assert_equal(self.recv_comm.n_msg, 1)
-        for i in range(self.nmsg_recv):
-            flag, msg_recv = self.recv_comm.recv(self.timeout)
-            if self.comm_name != 'CommBase':
-                assert(flag)
-                self.assert_msg_equal(msg_recv, self.test_msg)
-        if self.comm_name != 'CommBase':
-            self.assert_equal(self.instance.n_msg, 0)
+        try:
+            if self.instance.icomm._commtype != 'value':
+                flag = self.send_comm.send(self.test_msg)
+                if self.comm_name != 'CommBase':
+                    assert(flag)
+            # self.instance.sleep()
+            # if self.comm_name != 'CommBase':
+            #     self.assert_equal(self.recv_comm.n_msg, 1)
+            for i in range(self.nmsg_recv):
+                flag, msg_recv = self.recv_comm.recv(timeout=self.timeout)
+                if self.comm_name != 'CommBase':
+                    assert(flag)
+                    self.assert_msg_equal(msg_recv, self.test_msg)
+            if (self.comm_name != 'CommBase') and (self.icomm_name != 'value'):
+                self.assert_equal(self.instance.n_msg, 0)
+        except BaseException:  # pragma: debug
+            self.send_comm.printStatus()
+            self.instance.printStatus(verbose=True)
+            self.recv_comm.printStatus()
+            raise
 
-    @pytest.mark.timeout(timeout=600)
+    @timeout(timeout=600)
     def test_send_recv_nolimit(self):
         r"""Test sending/receiving large message."""
-        assert(len(self.msg_long) > self.maxMsgSize)
-        flag = self.send_comm.send_nolimit(self.msg_long)
-        if self.comm_name != 'CommBase':
-            assert(flag)
-        for i in range(self.nmsg_recv):
-            flag, msg_recv = self.recv_comm.recv_nolimit(self.timeout)
-            if self.comm_name != 'CommBase':
-                assert(flag)
-                self.assert_msg_equal(msg_recv, self.msg_long)
+        try:
+            if self.instance.icomm._commtype != 'value':
+                assert(len(self.msg_long) > self.maxMsgSize)
+                flag = self.send_comm.send_nolimit(self.msg_long)
+                if self.comm_name != 'CommBase':
+                    assert(flag)
+            for i in range(self.nmsg_recv):
+                flag, msg_recv = self.recv_comm.recv_nolimit(timeout=self.timeout)
+                if self.comm_name != 'CommBase':
+                    assert(flag)
+                    self.assert_msg_equal(msg_recv, self.msg_long)
+        except BaseException:  # pragma: debug
+            self.send_comm.printStatus()
+            self.instance.printStatus(verbose=True)
+            self.recv_comm.printStatus()
+            raise
 
     def assert_before_stop(self, check_open=True):
         r"""Assertions to make before stopping the driver instance."""
         super(TestConnectionDriver, self).assert_before_stop()
-        if self.comm_name != 'CommBase' and check_open:
+        if (((self.comm_name != 'CommBase') and (self.icomm_name != 'value')
+             and check_open)):
             assert(self.instance.is_comm_open)
 
     def run_before_terminate(self):
@@ -409,7 +432,7 @@ class TestConnectionDriverFork(TestConnectionDriver):
     def inst_kwargs(self):
         r"""dict: Keyword arguments for tested class."""
         out = super(TestConnectionDriverFork, self).inst_kwargs
-        out['icomm_kws']['comm'] = [None for i in range(self.ncomm_input)]
+        out['inputs'] = [None for i in range(self.ncomm_input)]
         return out
 
 
@@ -418,6 +441,8 @@ invalid_translate = True
 
 class TestConnectionDriverTranslate(TestConnectionDriver):
     r"""Test class for the ConnectionDriver class with translator."""
+
+    test_send_recv_nolimit = None
 
     @property
     def inst_kwargs(self):
@@ -434,14 +459,43 @@ class TestConnectionDriverTranslate(TestConnectionDriver):
         r"""str: Test message that should be used for any send/recv tests."""
         return {'a': int(1), 'b': float(2)}
 
-    def test_send_recv_nolimit(self):
-        r"""Test sending/receiving large message."""
-        pass
-    
     def map_sent2recv(self, obj):
         r"""Convert a sent object into a received one."""
         return obj['a']
     
+
+class TestConnectionDriverIterate(TestConnectionDriver):
+    r"""Test class for the ConnectionDriver class with iteration."""
+
+    test_send_recv_nolimit = None
+
+    @property
+    def inst_kwargs(self):
+        r"""dict: Keyword arguments for tested class."""
+        out = super(TestConnectionDriverIterate, self).inst_kwargs
+        out['translator'] = [{'transformtype': 'select_fields',
+                              'selected': ['a', 'b']},
+                             {'transformtype': 'iterate'}]
+        out['onexit'] = 'printStatus'
+        return out
+
+    @property
+    def test_msg(self):
+        r"""str: Test message that should be used for any send/recv tests."""
+        return {'a': int(1), 'b': 'hello', 'c': float(2)}
+
+    @timeout(timeout=600)
+    def test_send_recv(self):
+        r"""Test sending/receiving small message."""
+        msg = self.test_msg
+        flag = self.send_comm.send(msg)
+        assert(flag)
+        for imsg in [v for k, v in msg.items() if k in ['a', 'b']]:
+            flag, msg_recv = self.recv_comm.recv(self.timeout)
+            assert(flag)
+            self.assert_msg_equal(msg_recv, imsg)
+        self.assert_equal(self.instance.n_msg, 0)
+
 
 class TestConnectionDriverProcess(TestConnectionDriver):
     r"""Test class for the TestConnectionDriver using process."""
@@ -469,37 +523,38 @@ def test_ConnectionDriverTranslate_errors():
                   translator=invalid_translate)
 
     
-# Dynamically create tests based on registered file classes
+# Dynamically create tests based on registered comm classes
 s = get_schema()
-comm_types = list(s['comm'].schema_subtypes.keys())
+comm_types = s['comm'].subtypes
 for k in comm_types:
-    if k == _default_comm:  # pragma: debug
+    if k in _default_comm:  # pragma: debug
         continue
     # Output
-    ocls = type('Test%sOutputDriver' % k,
+    ocls = type('Test%sOutputDriver' % k.title(),
                 (TestConnectionDriver, ), {'ocomm_name': k,
                                            'driver': 'OutputDriver',
                                            'args': 'test'})
     # Input
-    icls = type('Test%sInputDriver' % k,
+    icls = type('Test%sInputDriver' % k.title(),
                 (TestConnectionDriver, ), {'icomm_name': k,
                                            'driver': 'InputDriver',
                                            'args': 'test'})
     # Flags
     flag_func = None
-    if k in ['RMQComm', 'RMQAsyncComm']:
+    if k in ['RMQComm', 'RMQAsyncComm', 'rmq', 'rmq_async']:
         flag_func = unittest.skipIf(not _rmq_installed,
                                     "RMQ Server not running")
-    elif k in ['ZMQComm']:
+    elif k in ['ZMQComm', 'zmq']:
         flag_func = unittest.skipIf(not _zmq_installed,
                                     "ZMQ library not installed")
-    elif k in ['IPCComm']:
+    elif k in ['IPCComm', 'ipc']:
         flag_func = unittest.skipIf(not _ipc_installed,
                                     "IPC library not installed")
     if flag_func is not None:
         ocls = flag_func(ocls)
         icls = flag_func(icls)
     # Add class to globals
-    globals()[ocls.__name__] = ocls
+    if k != 'value':
+        globals()[ocls.__name__] = ocls
     globals()[icls.__name__] = icls
     del ocls, icls

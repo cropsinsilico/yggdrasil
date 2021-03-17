@@ -95,6 +95,22 @@ class PythonModelDriver(InterpretedModelDriver):
         cls.supported_comms = tools.get_supported_comm()
         InterpretedModelDriver.finalize_registration(cls)
         
+    def set_env(self, **kwargs):
+        r"""Get environment variables that should be set for the model process.
+
+        Args:
+            **kwargs: Additional keyword arguments are passed to the parent class's
+                method.
+
+        Returns:
+            dict: Environment variables for the model process.
+
+        """
+        out = super(PythonModelDriver, self).set_env(**kwargs)
+        if self.with_valgrind:
+            out['PYTHONMALLOC'] = 'malloc'
+        return out
+        
     @classmethod
     def is_language_installed(self):
         r"""Determine if this model driver is installed on the current

@@ -6,7 +6,7 @@ from yggdrasil.interface import YggInterface
 from yggdrasil.tools import (
     YGG_MSG_EOF, get_YGG_MSG_MAX, YGG_MSG_BUF, is_lang_installed)
 from yggdrasil.components import import_component
-from yggdrasil.drivers import (InputDriver, OutputDriver)
+from yggdrasil.drivers import ConnectionDriver
 from yggdrasil.tests import YggTestClassInfo, assert_equal, assert_raises
 
 
@@ -15,8 +15,8 @@ YGG_MSG_MAX = get_YGG_MSG_MAX()
 
 class ModelEnv(object):
     
-    def __init__(self, language=None):
-        new_kw = {'YGG_SUBPROCESS': 'True'}
+    def __init__(self, language=None, **new_kw):
+        new_kw['YGG_SUBPROCESS'] = 'True'
         if language is not None:
             new_kw['YGG_MODEL_LANGUAGE'] = language
         # Send environment keyword to fake language
@@ -80,33 +80,32 @@ def do_send_recv(language='python', fmt='%f\\n%d', msg=[float(1.0), int(2)],
     ldrv = import_component('model', language)
     converter = ldrv.python2language
     # Create and start drivers to transport messages
-    odrv = OutputDriver.OutputDriver(name, 'link')
-    odrv.start()
-    os.environ.update(odrv.env)
-    idrv = InputDriver.InputDriver(name, 'link', comm_env=odrv.comm_env)
-    idrv.start()
-    os.environ.update(idrv.env)
+    iodrv = ConnectionDriver.ConnectionDriver(
+        name,
+        inputs=[{'partner_model': 'model1', 'allow_multiple_comms': True}],
+        outputs=[{'partner_model': 'model2', 'allow_multiple_comms': True}])
+    iodrv.start()
+    os.environ.update(iodrv.icomm.opp_comms)
+    os.environ.update(iodrv.ocomm.opp_comms)
     # Connect and utilize interface under disguise as target language
     try:
-        with ModelEnv(language=language):
+        with ModelEnv(language=language, YGG_THREADING='True'):
             # Output
             o = YggInterface.YggInit(output_interface, (name, fmt))
             o.send(*msg)
             o.send_eof()
-            o.close()
+            o.close(linger=True)
             # Input
             i = YggInterface.YggInit(input_interface, (name, fmt))
             assert_equal(i.recv(), (True, converter(msg)))
             assert_equal(i.recv(), (False, converter(YGG_MSG_EOF)))
     finally:
-        odrv.terminate()
-        idrv.terminate()
+        iodrv.terminate()
 
 
-def test_YggInit_langauge():
+def test_YggInit_language():
     r"""Test access to YggInit via languages that call the Python interface."""
     for language in ['matlab', 'R']:
-        print(language)
         if not is_lang_installed(language):
             continue
         do_send_recv(language=language)
@@ -136,9 +135,10 @@ class TestBase(YggTestClassInfo):
     def __init__(self, *args, **kwargs):
         super(TestBase, self).__init__(*args, **kwargs)
         self.name = 'test' + self.uuid
+        self.model1 = 'model1'
+        self.model2 = 'model2'
         self.language = None
-        self.idriver = None
-        self.odriver = None
+        self.iodriver = None
         self.test_comm = None
         self.is_file = False
         self.filecomm = None
@@ -152,58 +152,34 @@ class TestBase(YggTestClassInfo):
         self.fmt_str_matlab = b'%5s\\t%d\\t%f\\n'
 
     @property
-    def odriver_class(self):
-        r"""class: Output driver class."""
-        if self.direction is None:
-            return None  # pragma: no cover
-        elif (self.direction == 'output') and self.is_file:
-            return import_component('connection', 'file_output')
-        elif (self.direction == 'input') and self.is_file:
-            return None
-        return import_component('connection', 'output')
-
+    def iodriver_class(self):
+        r"""class: Input/output driver class."""
+        if self.is_file:
+            return import_component('connection',
+                                    'file_' + self.direction)
+        return ConnectionDriver.ConnectionDriver
+        
     @property
-    def idriver_class(self):
-        r"""class: Input driver class."""
-        if self.direction is None:
-            return None  # pragma: no cover
-        elif (self.direction == 'output') and self.is_file:
-            return None
-        elif (self.direction == 'input') and self.is_file:
-            return import_component('connection', 'file_input')
-        return import_component('connection', 'input')
-
-    @property
-    def odriver_args(self):
-        r"""list: Output driver arguments."""
-        if (self.direction == 'output') and self.is_file:
-            filecomm_kwargs = self.testing_options['kwargs']
-            filecomm_kwargs['comm'] = self.filecomm
-            return ([self.name, self.filename],
-                    {'ocomm_kws': filecomm_kwargs})
-        elif (self.direction == 'input') and self.is_file:
-            return None, None  # pragma: no cover
-        elif (self.direction == 'output'):
-            return [self.name, self.name + '_link'], {}
-        elif (self.direction == 'input'):
-            return [self.name + '_odriver', self.name + '_link'], {}
-        raise Exception('Direction was not set. (%s)', self.direction)  # pragma: debug
-
-    @property
-    def idriver_args(self):
-        r"""list: Input driver arguments."""
-        if (self.direction == 'output') and self.is_file:
-            return None, None  # pragma: no cover
-        elif (self.direction == 'input') and self.is_file:
-            filecomm_kwargs = self.testing_options['kwargs']
-            filecomm_kwargs['comm'] = self.filecomm
-            return ([self.name, self.filename],
-                    {'icomm_kws': filecomm_kwargs})
-        elif (self.direction == 'output'):
-            return [self.name + '_idriver', self.name + '_link'], {}
-        elif (self.direction == 'input'):
-            return [self.name, self.name + '_link'], {}
-        raise Exception('Direction was not set. (%s)', self.direction)  # pragma: debug
+    def iodriver_args(self):
+        r"""list: Connection driver arguments."""
+        args = [self.name]
+        kwargs = {'inputs': [{'partner_model': self.model1}],
+                  'outputs': [{'partner_model': self.model2}]}
+        if self.is_file:
+            args += [self.filename]
+            if (self.direction == 'output'):
+                filecomm_kwargs = self.testing_options['kwargs']
+                filecomm_kwargs['filetype'] = self.filecomm
+                return ([self.name, self.filename],
+                        {'inputs': kwargs['inputs'],
+                         'outputs': [filecomm_kwargs]})
+            elif (self.direction == 'input'):
+                filecomm_kwargs = self.testing_options['kwargs']
+                filecomm_kwargs['filetype'] = self.filecomm
+                return ([self.name, self.filename],
+                        {'inputs': [filecomm_kwargs],
+                         'outputs': kwargs['outputs']})
+        return (args, kwargs)
 
     def get_options(self):
         r"""Get testing options."""
@@ -231,36 +207,24 @@ class TestBase(YggTestClassInfo):
         nprev_comm = self.comm_count
         nprev_thread = self.thread_count
         nprev_fd = self.fd_count
-        idriver_class = self.idriver_class
-        odriver_class = self.odriver_class
         # File
         if self.is_file and (self.direction == 'input'):
             with open(self.filename, 'wb') as fd:
                 fd.write(self.testing_options['contents'])
+            assert(os.path.isfile(self.filename))
         # Drivers
-        comm_env = None
-        if idriver_class is not None:
-            args, kwargs = self.idriver_args
-            self.idriver = idriver_class(*args, **kwargs)
-            self.idriver.start()
-            comm_env = self.idriver.comm_env
-        if odriver_class is not None:
-            args, kwargs = self.odriver_args
-            if comm_env is not None:
-                kwargs['comm_env'] = comm_env
-            self.odriver = odriver_class(*args, **kwargs)
-            self.odriver.start()
+        args, kwargs = self.iodriver_args
+        self.iodriver = self.iodriver_class(*args, **kwargs)
+        self.iodriver.start()
+        self.iodriver.wait_for_loop()
         # Test comm
-        if self.direction == 'input':
-            os.environ.update(self.idriver.env)
-            if self.odriver is not None:
-                kws = self.odriver.icomm.opp_comm_kwargs()
+        if not self.is_file:
+            if self.direction == 'input':
+                kws = self.iodriver.icomm.opp_comm_kwargs()
                 kws.update(self.test_comm_kwargs)
                 self.test_comm = get_comm('in', **kws)
-        elif self.direction == 'output':
-            os.environ.update(self.odriver.env)
-            if self.idriver is not None:
-                kws = self.idriver.ocomm.opp_comm_kwargs()
+            elif self.direction == 'output':
+                kws = self.iodriver.ocomm.opp_comm_kwargs()
                 kws.update(self.test_comm_kwargs)
                 self.test_comm = get_comm('out', **kws)
         # Test class
@@ -270,12 +234,9 @@ class TestBase(YggTestClassInfo):
 
     def teardown(self):
         r"""Stop the driver."""
-        if self.odriver is not None:
-            self.odriver.terminate()
-            self.odriver.cleanup()
-        if self.idriver is not None:
-            self.idriver.terminate()
-            self.idriver.cleanup()
+        if self.iodriver is not None:
+            self.iodriver.terminate()
+            self.iodriver.cleanup()
         if self.test_comm is not None:
             self.test_comm.close()
         if self.is_file and os.path.isfile(self.filename):
@@ -285,9 +246,21 @@ class TestBase(YggTestClassInfo):
         super(TestBase, self).teardown()
         self.cleanup_comms()
 
+    @property
+    def model_env(self):
+        r"""Environment variables that should be set for interface."""
+        out = {}
+        if self.direction == 'input':
+            out.update(self.iodriver.ocomm.opp_comms,
+                       YGG_MODEL_NAME=self.model2)
+        elif self.direction == 'output':
+            out.update(self.iodriver.icomm.opp_comms,
+                       YGG_MODEL_NAME=self.model1)
+        return out
+
     def create_instance(self):
         r"""Create a new instance of the class."""
-        with ModelEnv(language=self.language):
+        with ModelEnv(language=self.language, **self.model_env):
             out = super(TestBase, self).create_instance()
         return out
         
@@ -359,7 +332,7 @@ class TestYggOutput(TestBase):
             self.instance.send_eof()
             # Read temp file
             Tout = self.instance.start_timeout()
-            while self.odriver.ocomm.is_open and not Tout.is_out:
+            while self.iodriver.ocomm.is_open and not Tout.is_out:
                 self.instance.sleep()
             self.instance.stop_timeout()
             assert(os.path.isfile(self.filename))
@@ -393,21 +366,27 @@ class TestYggRpcClient(TestYggOutput):
     
     def __init__(self, *args, **kwargs):
         super(TestYggRpcClient, self).__init__(*args, **kwargs)
-        self._inst_args = [self.name, self.fmt_str, self.fmt_str]
-        self.test_comm_kwargs = {'comm': 'ServerComm',
+        self._inst_args = [self.name + '_' + self.model1,
+                           self.fmt_str, self.fmt_str]
+        self.test_comm_kwargs = {'commtype': 'server',
                                  'response_kwargs': {'format_str': self.fmt_str}}
         self._messages = [(b'one', np.int32(1), 1.0)]
         
     @property
-    def odriver_class(self):
-        r"""class: Output driver class."""
-        return import_component('connection', 'client')
+    def iodriver_class(self):
+        r"""class: Input/output driver class."""
+        return import_component('connection', 'rpc_request')
 
     @property
-    def idriver_class(self):
-        r"""class: Input driver class."""
-        return import_component('connection', 'server')
-    
+    def iodriver_args(self):
+        r"""list: Connection driver arguments."""
+        args, kwargs = super(TestYggRpcClient, self).iodriver_args
+        kwargs['inputs'] = [
+            {'name': '%s:%s_%s' % (
+                self.model1, self.name, self.model1),
+             'partner_model': self.model1}]
+        return (args, kwargs)
+        
     def test_msg(self):
         r"""Test sending/receiving message."""
         super(TestYggRpcClient, self).test_msg()
@@ -425,7 +404,8 @@ class TestYggRpcClientMatlab(TestYggRpcClient):
     def __init__(self, *args, **kwargs):
         super(TestYggRpcClientMatlab, self).__init__(*args, **kwargs)
         self.language = 'matlab'
-        self._inst_args = [self.name, self.fmt_str_matlab, self.fmt_str_matlab]
+        self._inst_args = [self.name + '_' + self.model1,
+                           self.fmt_str_matlab, self.fmt_str_matlab]
 
 
 @flaky.flaky
@@ -437,20 +417,32 @@ class TestYggRpcServer(TestYggInput):
     def __init__(self, *args, **kwargs):
         super(TestYggRpcServer, self).__init__(*args, **kwargs)
         self._inst_args = [self.name, self.fmt_str, self.fmt_str]
-        self.test_comm_kwargs = {'comm': 'ClientComm',
+        self.test_comm_kwargs = {'commtype': 'client',
                                  'response_kwargs': {'format_str': self.fmt_str}}
         self._messages = [(b'one', np.int32(1), 1.0)]
         
     @property
-    def odriver_class(self):
+    def iodriver_class(self):
         r"""class: Output driver class."""
-        return import_component('connection', 'client')
+        return import_component('connection', 'rpc_request')
 
     @property
-    def idriver_class(self):
-        r"""class: Input driver class."""
-        return import_component('connection', 'server')
-    
+    def iodriver_args(self):
+        r"""list: Connection driver arguments."""
+        args, kwargs = super(TestYggRpcServer, self).iodriver_args
+        kwargs['inputs'] = [
+            {'name': '%s:%s_%s' % (
+                self.model1, self.name, self.model1),
+             'partner_model': self.model1}]
+        return (args, kwargs)
+
+    @property
+    def model_env(self):
+        r"""Environment variables that should be set for interface."""
+        out = super(TestYggRpcServer, self).model_env
+        out['YGG_NCLIENTS'] = '1'
+        return out
+        
     def test_msg(self):
         r"""Test sending/receiving message."""
         super(TestYggRpcServer, self).test_msg()

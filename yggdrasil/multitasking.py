@@ -520,9 +520,16 @@ class Task(ContextObject):
     @property
     def dummy_copy(self):
         r"""Dummy copy of base."""
-        return DummyTask(name=self._base.name,
-                         exitcode=self._base.exitcode,
-                         daemon=self._base.daemon)
+        name = b'dummy'
+        exitcode = 0
+        daemon = False
+        try:
+            name = self._base.name
+            exitcode = self._base.exitcode
+            daemon = self._base.daemon
+        except AttributeError:  # pragma: debug
+            pass
+        return DummyTask(name=name, exitcode=exitcode, daemon=daemon)
         
     def __getstate__(self):
         state = super(Task, self).__getstate__()
@@ -617,7 +624,7 @@ class Queue(ContextObject):
 
     def __setstate__(self, state):
         if state['_base'] is None:
-            state['_base'] = queue.Queue
+            state['_base'] = queue.Queue()
         super(Queue, self).__setstate__(state)
 
     @property
@@ -1051,6 +1058,15 @@ class YggTask(YggClass):
 class BreakLoopException(BaseException):
     r"""Special exception that can be raised by the target function
     for a loop in order to break the loop."""
+
+    def __init__(self, *args, **kwargs):
+        import traceback
+        self.break_stack = ''.join(traceback.format_stack())
+        super(BreakLoopException, self).__init__(*args, **kwargs)
+
+
+class BreakLoopError(BreakLoopException):
+    r"""Version of BreakLoopException that sets an error message."""
     pass
         
 
@@ -1063,8 +1079,16 @@ class YggTaskLoop(YggTask):
     def __init__(self, *args, **kwargs):
         super(YggTaskLoop, self).__init__(*args, **kwargs)
         self._1st_main_terminated = False
+        self._loop_count = 0
         self.create_flag_attr('break_flag')
         self.create_flag_attr('loop_flag')
+        self.break_stack = None
+
+    @property
+    def loop_count(self):
+        r"""int: Number of loops performed."""
+        with self.lock:
+            return self._loop_count
 
     def on_main_terminated(self, dont_break=False):  # pragma: debug
         r"""Actions performed when 1st main terminated.
@@ -1076,11 +1100,16 @@ class YggTaskLoop(YggTask):
         """
         self._1st_main_terminated = True
         if not dont_break:
+            self.debug("on_main_terminated")
             self.set_break_flag()
 
-    def set_break_flag(self, value=True):
+    def set_break_flag(self, value=True, break_stack=None):
         r"""Set the break flag for the thread/process to True."""
         self.set_flag_attr('break_flag', value=value)
+        if break_stack is None:
+            import traceback
+            break_stack = ''.join(traceback.format_stack())
+        self.break_stack = break_stack
 
     @property
     def was_break(self):
@@ -1096,7 +1125,7 @@ class YggTaskLoop(YggTask):
         r"""bool: True if the thread/process was loop. False otherwise."""
         return self.check_flag_attr('loop_flag')
 
-    def wait_for_loop(self, timeout=None, key=None):
+    def wait_for_loop(self, timeout=None, key=None, nloop=0):
         r"""Wait until thread/process enters loop to return using sleeps rather than
         blocking.
 
@@ -1105,11 +1134,13 @@ class YggTaskLoop(YggTask):
                 the thread/process to enter loop. Defaults to None and is infinite.
             key (str, optional): Key that should be used to register the timeout.
                 Defaults to None and is set based on the stack trace.
+            nloop (int, optional): Number of loops that should be performed
+                before breaking. Defaults to 0.
 
         """
         T = self.start_timeout(timeout, key_level=1, key=key)
-        while (self.is_alive() and (not self.was_loop)
-               and (not T.is_out)):  # pragma: debug
+        while (((not self.was_loop) or (self.loop_count < nloop))
+               and self.is_alive() and (not T.is_out)):  # pragma: debug
             self.verbose_debug('Waiting for thread/process to enter loop...')
             self.sleep()
         self.stop_timeout(key_level=1, key=key)
@@ -1135,9 +1166,14 @@ class YggTaskLoop(YggTask):
             else:
                 try:
                     self.run_loop()
-                except BreakLoopException:
-                    self.set_break_flag()
-        self.set_break_flag()
+                except BreakLoopError as e:
+                    self.error("BreakLoopError: %s", e)
+                    self.set_break_flag(break_stack=e.break_stack)
+                except BreakLoopException as e:
+                    self.debug("BreakLoopException: %s", e)
+                    self.set_break_flag(break_stack=e.break_stack)
+        if not self.break_stack:
+            self.set_break_flag()
         
     def run_loop(self, *args, **kwargs):
         r"""Actions performed on each loop iteration."""
@@ -1145,10 +1181,13 @@ class YggTaskLoop(YggTask):
             self._ygg_target(*self._ygg_args, **self._ygg_kwargs)
         else:
             self.set_break_flag()
+        with self.lock:
+            self._loop_count += 1
 
     def run_error(self):
         r"""Actions to perform on error in try/except wrapping run."""
         super(YggTaskLoop, self).run_error()
+        self.debug("run_error")
         self.set_break_flag()
         
     def run(self, *args, **kwargs):
@@ -1162,5 +1201,6 @@ class YggTaskLoop(YggTask):
 
     def terminate(self, *args, **kwargs):
         r"""Also set break flag."""
+        self.debug("terminate")
         self.set_break_flag()
         super(YggTaskLoop, self).terminate(*args, **kwargs)

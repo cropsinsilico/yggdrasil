@@ -4,6 +4,50 @@ from yggdrasil import tools, platform
 from yggdrasil.tests import YggTestClass, assert_equal, assert_warns
 
 
+class DummyTarget(object):
+    r"""Class to wrap for testing the ProxyObject class."""
+
+    def __init__(self):
+        self.b = 2
+
+    def __call__(self, x):
+        print(x)
+
+    def __bytes__(self):
+        return b'hello'
+
+    def __hash__(self):
+        return 1
+
+    def __eq__(self, other):
+        return True
+
+
+class DummyProxyObject(tools.ProxyObject):
+    r"""Class for testing corner cases of the ProxyObject."""
+
+    __slots__ = ['a']
+
+    def __init__(self, *args, **kwargs):
+        self.a = 1
+        super(DummyProxyObject, self).__init__(*args, **kwargs)
+
+
+def test_ProxyObject():
+    r"""Test corner casses of the ProxyObject class."""
+    x = DummyProxyObject(DummyTarget())
+    repr(x)
+    str(x)
+    bytes(x)
+    bool(x)
+    hash(x)
+    x(1)
+    assert(x == 1)
+    for k in ['a', 'b']:
+        delattr(x, k)
+        assert(not hasattr(x, k))
+
+
 def make_temp(fname_base, count=1):
     r"""Create temporary copies of same file with different extensions."""
     fname_base = fname_base.lower()

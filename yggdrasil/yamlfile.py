@@ -159,12 +159,14 @@ def prep_yaml(files):
     return yml_all
 
 
-def parse_yaml(files):
+def parse_yaml(files, as_function=False):
     r"""Parse list of yaml files.
 
     Args:
         files (str, list): Either the path to a single yaml file or a list of
             yaml files.
+        as_function (bool, optional): If True, the missing input/output channels
+            will be created for using model(s) as a function. Defaults to False.
 
     Raises:
         ValueError: If the yml dictionary is missing a required keyword or has
@@ -218,6 +220,27 @@ def parse_yaml(files):
     for k in ['models', 'connections']:
         for yml in yml_norm[k]:
             existing = parse_component(yml, k[:-1], existing=existing)
+    # Create server/client connections
+    for srv, srv_info in existing['server'].items():
+        clients = srv_info['clients']
+        if srv not in existing['input']:
+            continue
+        yml = {'inputs': [{'name': x} for x in clients],
+               'outputs': [{'name': srv}],
+               'driver': 'RPCRequestDriver',
+               'name': existing['input'][srv]['model_driver'][0]}
+        if srv_info.get('replaces', None):
+            yml['outputs'][0].update({
+                k: v for k, v in srv_info['replaces']['input'].items()
+                if k not in ['name']})
+            yml['response_kwargs'] = {
+                k: v for k, v in srv_info['replaces']['output'].items()
+                if k not in ['name']}
+        existing = parse_component(yml, 'connection', existing=existing)
+        existing['model'][yml['dst_models'][0]]['clients'] = yml['src_models']
+    existing.pop('server')
+    if as_function:
+        existing = add_model_function(existing)
     # Make sure that servers have clients and clients have servers
     for k, v in existing['model'].items():
         if v.get('is_server', False):
@@ -251,6 +274,17 @@ def parse_yaml(files):
                                 opp_map[io] + 's': [v]}
                     existing = parse_component(new_conn, 'connection',
                                                existing=existing)
+                elif (io == 'input') and ('default_value' in v):
+                    # TODO: The keys moved should be automated based on schema
+                    # if the ValueComm has anymore parameters added
+                    vdef = {'name': v['name'],
+                            'default_value': v.pop('default_value'),
+                            'count': v.pop('count', 1),
+                            'commtype': 'value'}
+                    new_conn = {'inputs': [vdef],
+                                'outputs': [v]}
+                    existing = parse_component(new_conn, 'connection',
+                                               existing=existing)
                 else:
                     raise YAMLSpecificationError(
                         "No driver established for %s channel %s" % (io, k))
@@ -266,6 +300,50 @@ def parse_yaml(files):
     existing = link_model_io(existing)
     # print('drivers')
     # pprint.pprint(existing)
+    return existing
+
+
+def add_model_function(existing):
+    r"""Patch input/output channels that are not connected to a function model.
+
+    Args:
+        existing (dict): Dictionary of existing components.
+
+    Returns:
+        dict: Updated dictionary of components.
+
+    """
+    new_model = {'name': 'function_model',
+                 'language': 'function',
+                 'args': 'function',
+                 'working_dir': os.getcwd(),
+                 'inputs': [],
+                 'outputs': []}
+    new_connections = []
+    # Locate unmatched channels
+    miss = {}
+    dir2opp = {'input': 'output', 'output': 'input'}
+    for io in dir2opp.keys():
+        miss[io] = [k for k in existing[io].keys()]
+    # for conn in existing['connection'].values():
+    #     for io1, io2 in dir2opp.items():
+    #         if ((io1 + 's') in conn):
+    #             for x in conn[io1 + 's']:
+    #                 if x in miss[io2]:
+    #                     miss[io2].remove(x)
+    # Create connections to function model
+    for io1, io2 in dir2opp.items():
+        for i in miss[io1]:
+            function_channel = 'function_%s' % i
+            function_comm = copy.deepcopy(existing[io1][i])
+            function_comm['name'] = function_channel
+            new_model[io2 + 's'].append(function_comm)
+            new_connections.append({io1 + 's': [{'name': function_channel}],
+                                    io2 + 's': [{'name': i}]})
+    # Parse new components
+    existing = parse_component(new_model, 'model', existing=existing)
+    for new_conn in new_connections:
+        existing = parse_component(new_conn, 'connection', existing=existing)
     return existing
 
 
@@ -290,11 +368,10 @@ def parse_component(yml, ctype, existing=None):
         dict: All components identified.
 
     """
-    s = get_schema()
+    # s = get_schema()
     if not isinstance(yml, dict):
         raise YAMLSpecificationError("Component entry in yml must be a dictionary.")
-    ctype_list = ['input', 'output', 'model', 'connection',
-                  'model_input', 'model_output']
+    ctype_list = ['input', 'output', 'model', 'connection', 'server']
     if existing is None:
         existing = {k: {} for k in ctype_list}
     if ctype not in ctype_list:
@@ -304,16 +381,16 @@ def parse_component(yml, ctype, existing=None):
         existing = parse_model(yml, existing)
     elif ctype == 'connection':
         existing = parse_connection(yml, existing)
-    elif ctype in ['input', 'output']:
-        for k in ['icomm_kws', 'ocomm_kws']:
-            if k not in yml:
-                continue
-            for x in yml[k]['comm']:
-                if 'comm' not in x:
-                    if 'filetype' in x:
-                        x['comm'] = s['file'].subtype2class[x['filetype']]
-                    elif 'commtype' in x:
-                        x['comm'] = s['comm'].subtype2class[x['commtype']]
+    # elif ctype in ['input', 'output']:
+    #     for k in ['inputs', 'outputs']:
+    #         if k not in yml:
+    #             continue
+    #         for x in yml[k]:
+    #             if 'commtype' not in x:
+    #                 if 'filetype' in x:
+    #                     x['commtype'] = s['file'].subtype2class[x['filetype']]
+    #                 elif 'commtype' in x:
+    #                     x['commtype'] = s['comm'].subtype2class[x['commtype']]
     # Ensure component dosn't already exist
     if yml['name'] in existing[ctype]:
         pprint.pprint(existing)
@@ -338,7 +415,7 @@ def parse_model(yml, existing):
     _lang2driver = get_schema()['model'].subtype2class
     language = yml.pop('language')
     yml['driver'] = _lang2driver[language]
-    # Add server driver
+    # Add server input
     if yml.get('is_server', False):
         srv = {'name': '%s:%s' % (yml['name'], yml['name']),
                'commtype': 'default',
@@ -361,6 +438,7 @@ def parse_model(yml, existing):
                     "/sent from/to clients. e.g. \n"
                     "\t-input: input_variable\n"
                     "\t-output: output_variables\n" % yml['name'])
+        replaces = None
         if isinstance(yml['is_server'], dict):
             replaces = {}
             for io in ['input', 'output']:
@@ -382,30 +460,35 @@ def parse_model(yml, existing):
         else:
             yml['inputs'].append(srv)
         yml['clients'] = []
+        existing['server'].setdefault(srv['name'], {'clients': []})
+        if replaces:
+            existing['server'][srv['name']]['replaces'] = replaces
     # Mark timesync clients
     timesync = yml.pop('timesync_client_of', [])
     if timesync:
         yml.setdefault('client_of', [])
         yml['client_of'] += timesync
-    # Add client driver
+    # Add client output
     if yml.get('client_of', []):
         for srv in yml['client_of']:
+            srv_name = '%s:%s' % (srv, srv)
             if srv in timesync:
                 cli_name = '%s:%s' % (yml['name'], srv)
             else:
                 cli_name = '%s:%s_%s' % (yml['name'], srv, yml['name'])
             cli = {'name': cli_name,
-                   'commtype': 'default',
-                   'datatype': {'type': 'bytes'},
-                   'driver': 'ClientDriver',
-                   'args': srv + '_SERVER',
                    'working_dir': yml['working_dir']}
             yml['outputs'].append(cli)
+            existing['server'].setdefault(srv_name, {'clients': []})
+            existing['server'][srv_name]['clients'].append(cli_name)
     # Model index and I/O channels
     yml['model_index'] = len(existing['model'])
     for io in ['inputs', 'outputs']:
         for x in yml[io]:
+            if yml.get('allow_threading', False):
+                x['allow_multiple_comms'] = True
             x['model_driver'] = [yml['name']]
+            x['partner_model'] = yml['name']
             x['partner_language'] = language
             existing = parse_component(x, io[:-1], existing=existing)
     for k in yml.get('env', {}).keys():
@@ -446,6 +529,8 @@ def parse_connection(yml, existing):
                     ("Input '%s' not found in any of the registered "
                      + "model outputs and is not a file.") % x['name'])
             x['address'] = fname
+        elif 'default_value' in x:
+            x['address'] = x['default_value']
         else:
             iname_list.append(x['name'])
     # File output
@@ -470,73 +555,32 @@ def parse_connection(yml, existing):
     else:
         args = '%s_to_%s' % (iname, oname)
     name = args
-    # TODO: Use RMQ drivers when models are on different machines
-    # ocomm_pair = ('default', 'rmq')
-    # icomm_pair = ('rmq', 'default')
-    # Output driver
-    xo = None
-    if iname:  # empty name results when all of the inputs are files
-        iyml = yml['inputs']
-        xo = {'name': iname, 'model_driver': [],
-              'icomm_kws': {'comm': []},
-              'ocomm_kws': {'comm': []}}
-        for i, y in enumerate(iyml):
-            if not is_file['inputs'][i]:
-                xo['icomm_kws']['comm'].append(existing['output'][y['name']])
-                xo['icomm_kws']['comm'][-1].update(**y)
-                xo['model_driver'] += existing['output'][y['name']]['model_driver']
-                del existing['output'][y['name']]
-        # Add single non-file intermediate output comm if there are any non-file
-        # outputs and an output comm for each file output
-        if (sum(is_file['outputs']) < len(is_file['outputs'])):
-            xo['ocomm_kws']['comm'].append({'name': args, 'no_suffix': True,
-                                            'comm': 'buffer'})
-        for i, y in enumerate(yml['outputs']):
-            if is_file['outputs'][i]:
-                xo['ocomm_kws']['comm'].append(y)
-        existing = parse_component(xo, 'output', existing)
-        xo['args'] = args
-        xo['driver'] = 'OutputDriver'
-    # Input driver
-    xi = None
-    if oname:  # empty name results when all of the outputs are files
-        oyml = yml['outputs']
-        xi = {'name': oname, 'model_driver': [],
-              'icomm_kws': {'comm': []},
-              'ocomm_kws': {'comm': []}}
-        for i, y in enumerate(oyml):
-            if not is_file['outputs'][i]:
-                xi['ocomm_kws']['comm'].append(existing['input'][y['name']])
-                xi['ocomm_kws']['comm'][-1].update(**y)
-                xi['model_driver'] += existing['input'][y['name']]['model_driver']
-                del existing['input'][y['name']]
-        # Add single non-file intermediate input comm if there are any non-file
-        # inputs and an input comm for each file input
-        if (sum(is_file['inputs']) < len(is_file['inputs'])):
-            xi['icomm_kws']['comm'].append({'name': args, 'no_suffix': True,
-                                            'comm': 'buffer'})
-        for i, y in enumerate(yml['inputs']):
-            if is_file['inputs'][i]:
-                xi['icomm_kws']['comm'].append(y)
-        existing = parse_component(xi, 'input', existing)
-        xi['args'] = args
-        xi['driver'] = 'InputDriver'
-
-    # Parse drivers
-
-    # Transfer connection keywords to one connection driver
-    conn_keys_gen = ['inputs', 'outputs']
-    conn_keys = list(set(schema['connection'].properties) - set(conn_keys_gen))
-    yml_conn = {}
-    yml_conn.pop('name', None)
-    for k in conn_keys:
-        if k in yml:
-            yml_conn[k] = yml[k]
-    if xi is None:
-        xo.update(**yml_conn)
-    else:
-        xi.update(**yml_conn)
-    yml['name'] = name
+    # Connection
+    xx = {'src_models': [], 'dst_models': [],
+          'inputs': [], 'outputs': []}
+    for i, y in enumerate(yml['inputs']):
+        if is_file['inputs'][i] or ('default_value' in y):
+            xx['inputs'].append(y)
+        else:
+            new = existing['output'][y['name']]
+            new.update(y)
+            xx['inputs'].append(new)
+            xx['src_models'] += existing['output'][y['name']]['model_driver']
+            del existing['output'][y['name']]
+    for i, y in enumerate(yml['outputs']):
+        if is_file['outputs'][i]:
+            xx['outputs'].append(y)
+        else:
+            new = existing['input'][y['name']]
+            new.update(y)
+            xx['outputs'].append(new)
+            xx['dst_models'] += existing['input'][y['name']]['model_driver']
+            del existing['input'][y['name']]
+    # TODO: Split comms if models are not co-located and the master
+    # process needs access to the message passed
+    yml.update(xx)
+    yml.setdefault('driver', 'ConnectionDriver')
+    yml.setdefault('name', name)
     return existing
 
 
@@ -554,12 +598,10 @@ def link_model_io(existing):
     for m in existing['model'].keys():
         existing['model'][m]['input_drivers'] = []
         existing['model'][m]['output_drivers'] = []
-    # Add input dirvers
-    for io in existing['input'].values():
-        for m in io['model_driver']:
-            existing['model'][m]['input_drivers'].append(io)
-    # Add output dirvers
-    for io in existing['output'].values():
-        for m in io['model_driver']:
+    # Add connections
+    for io in existing['connection'].values():
+        for m in io['src_models']:
             existing['model'][m]['output_drivers'].append(io)
+        for m in io['dst_models']:
+            existing['model'][m]['input_drivers'].append(io)
     return existing

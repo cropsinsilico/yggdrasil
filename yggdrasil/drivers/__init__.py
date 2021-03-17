@@ -35,7 +35,4 @@ __all__ = ['create_driver', 'Driver',
            'CModelDriver', 'CPPModelDriver',
            'MakeModelDriver', 'MatlabModelDriver', 'LPyModelDriver',
            'ConnectionDriver', 'InputDriver', 'OutputDriver',
-           'FileInputDriver', 'FileOutputDriver',
-           'ClientDriver', 'ServerDriver',
-           'RMQInputDriver', 'RMQOutputDriver',
-           'RMQClientDriver', 'RMQServerDriver']
+           'FileInputDriver', 'FileOutputDriver']

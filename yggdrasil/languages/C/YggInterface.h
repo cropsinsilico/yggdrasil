@@ -444,9 +444,11 @@ comm_t* yggRpcClientType(const char *name, dtype_t *outType, dtype_t *inType) {
     inType = create_dtype_empty(true);
   }
   comm_t* out = init_comm(name, "%s", CLIENT_COMM, inType);
-  comm_t* handle = (comm_t*)(out->handle);
-  destroy_dtype(&(handle->datatype));
-  handle->datatype = outType;
+  if ((out != NULL) && (out->valid)) {
+    comm_t* handle = (comm_t*)(out->handle);
+    destroy_dtype(&(handle->datatype));
+    handle->datatype = outType;
+  }
   return out;
 };
 
@@ -527,6 +529,8 @@ comm_t* yggTimesync(const char *name, const char *t_units) {
   comm_t* handle = (comm_t*)(out->handle);
   destroy_dtype(&(handle->datatype));
   handle->datatype = dtype_out;
+  destroy_dtype(&(dtypes_out[0]));
+  destroy_dtype(&(dtypes_out[1]));
   return out;
 };
 

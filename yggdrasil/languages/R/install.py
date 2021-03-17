@@ -73,11 +73,12 @@ def write_makevars(fname=None):
         match = re.search(regex, out.decode('utf-8'))
         if match:
             ldver = match.group('version')
-    for x in ['CC', 'CFLAGS', 'CXX', 'CXXFLAGS', 'LD', 'LDFLAGS']:
+    for x in ['CC', 'CFLAGS', 'CXX', 'CXXFLAGS', 'FC', 'FFLAGS',
+              'LD', 'LDFLAGS']:
         env = os.environ.get(x, '')
         if not env:
             continue
-        if (x in ['CFLAGS', 'CXXFLAGS', 'LDFLAGS']) and ldver:
+        if (x in ['CFLAGS', 'CXXFLAGS', 'FFLAGS', 'LDFLAGS']) and ldver:
             if '-mlinker-version' not in env:
                 env += ' -mlinker-version=%s' % ldver
         lines.append('%s=%s' % (x, env))
@@ -133,6 +134,7 @@ def install_packages(package_list, update=False, repos=None, **kwargs):
         bool: True if call was successful, False otherwise.
 
     """
+    R_cmd = []
     if not isinstance(package_list, list):
         package_list = [package_list]
     regex_ver = (r'(?P<name>.+?)\s*(?:\(\s*(?P<comparison>[=<>]+?)\s*'
@@ -141,51 +143,68 @@ def install_packages(package_list, update=False, repos=None, **kwargs):
     req_nover = []
     for x in package_list:
         out = re.fullmatch(regex_ver, x).groupdict()
+        kws = {}
+        if x.startswith('units') and sys.platform.lower() == 'darwin':
+            # These are the libs associated w/ brew
+            libdir = '/usr/local/opt/udunits/include/'
+            incdir = '/usr/local/opt/udunits/lib/'
+            if ((os.path.isfile(os.path.join(libdir, 'libudunits2.dylib'))
+                 and os.path.isfile(os.path.join(incdir, 'udunits2.h')))):
+                kws['flags'] = (
+                    'configure.args=c('
+                    '\"--with-udunits2-include=%s\",'
+                    '\"--with-udunits2-lib=%s\")') % (incdir, libdir)
         if out['ver'] and ('=' in out['comparison']):
-            req_ver.append((out['name'], out['ver']))
+            kws['ver'] = out['ver']
+        if kws:
+            kws['name'] = out['name']
+            req_ver.append(kws)
         else:
             req_nover.append(out['name'])
     if repos is None:
         repos = 'http://cloud.r-project.org'
-    R_cmd = []
     if req_nover:
         req_list = 'c(%s)' % ', '.join(['\"%s\"' % x for x in req_nover])
         if update:
             # R_cmd = ['install.packages(%s, repos="%s")' % (req_list, repos)]
-            R_cmd = ['req <- %s' % req_list,
-                     'for (x in req) {',
-                     '  if (is.element(x, installed.packages()[,1])) {',
-                     '    remove.packages(x)',
-                     '  }',
-                     '  install.packages(x, dep=TRUE, repos="%s")' % repos,
-                     '}']
+            R_cmd += ['req <- %s' % req_list,
+                      'for (x in req) {',
+                      '  if (is.element(x, installed.packages()[,1])) {',
+                      '    remove.packages(x)',
+                      '  }',
+                      '  install.packages(x, dep=TRUE, repos="%s")' % repos,
+                      '}']
         else:
-            R_cmd = ['req <- %s' % req_list,
-                     'for (x in req) {',
-                     '  if (!is.element(x, installed.packages()[,1])) {',
-                     '    print(sprintf("Installing \'%s\' from CRAN.", x))',
-                     '    install.packages(x, dep=TRUE, repos="%s")' % repos,
-                     '  } else {',
-                     '    print(sprintf("%s already installed.", x))',
-                     '  }',
-                     '}']
+            R_cmd += ['req <- %s' % req_list,
+                      'for (x in req) {',
+                      '  if (!is.element(x, installed.packages()[,1])) {',
+                      '    print(sprintf("Installing \'%s\' from CRAN.", x))',
+                      '    install.packages(x, dep=TRUE, repos="%s")' % repos,
+                      '  } else {',
+                      '    print(sprintf("%s already installed.", x))',
+                      '  }',
+                      '}']
     if req_ver:
         for x in req_ver:
-            R_cmd.append(
-                ('packageurl <- \"http://cran.r-project.org/src/contrib/Archive/%s/'
-                 '%s_%s.tar.gz\"') % (x[0], x[0], x[1]))
+            name = x['name']
+            args = 'repos=NULL, type=\"source\"' + x.get('args', '')
+            if 'ver' in x:
+                R_cmd.append(
+                    ('packageurl <- \"http://cran.r-project.org/src/contrib/Archive/%s/'
+                     '%s_%s.tar.gz\"') % (x['name'], x['name'], x['ver']))
+                name = 'packageurl'
             if update:
                 R_cmd += [
-                    'if (is.element(\"%s\", installed.packages()[,1])) {' % x[0],
-                    '  remove.packages(\"%s\")' % x[0],
+                    'if (is.element(\"%s\", installed.packages()[,1])) {' % x['name'],
+                    '  remove.packages(\"%s\")' % x['name'],
                     '}'
-                    'install.packages(packageurl, repos=NULL, type=\"source\")']
+                    'install.packages(%s, %s)' % (name, args)]
             else:
                 R_cmd += [
-                    'if (!is.element(\"%s\", installed.packages()[,1])) {' % x[0],
-                    '  install.packages(packageurl, repos=NULL, type=\"source\")',
+                    'if (!is.element(\"%s\", installed.packages()[,1])) {' % x['name'],
+                    '  install.packages(%s, %s)' % (name, args),
                     '} else {',
-                    '  print("%s already installed.")' % x[0],
+                    '  print("%s already installed.")' % x['name'],
                     '}']
     if not call_R(R_cmd, **kwargs):
         logger.error("Error installing dependencies: %s" % ', '.join(package_list))
@@ -355,6 +374,7 @@ def install(args=None, with_sudo=None, skip_requirements=None,
         # Install package
         package_name = 'yggdrasil_0.1.tar.gz'
         R_call = ("install.packages(\"%s\", verbose=TRUE,"
+                  "INSTALL_opts=c(\"--no-multiarch\"),"
                   "repos=NULL, type=\"source\")") % package_name
         if not call_R([R_call], **kwargs):
             logger.error("Error installing R interface from the built package.")

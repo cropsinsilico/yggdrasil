@@ -2,7 +2,7 @@ import os
 import copy
 from yggdrasil import platform
 from yggdrasil.drivers.CModelDriver import (
-    CCompilerBase, CModelDriver, GCCCompiler, ClangCompiler,
+    CCompilerBase, CModelDriver, GCCCompiler, ClangCompiler, MSVCCompiler,
     ClangLinker)
 
 
@@ -92,12 +92,44 @@ class ClangPPCompiler(CPPCompilerBase, ClangCompiler):
         return super(ClangPPCompiler, cls).get_executable_command(args, **kwargs)
 
 
+class MSVCPPCompiler(CPPCompilerBase, MSVCCompiler):
+    r"""Inteface class for MSVC compiler when compiling C++."""
+    toolname = 'cl++'
+    default_linker = MSVCCompiler.default_linker
+    default_archiver = MSVCCompiler.default_archiver
+    default_executable = MSVCCompiler.default_executable
+    search_path_flags = None
+    dont_create_linker = True
+    
+    @classmethod
+    def get_flags(cls, **kwargs):
+        r"""Get a list of compiler flags.
+
+        Args:
+            **kwargs: Additional keyword arguments are passed to the parent
+                class's method.
+
+        Returns:
+            list: Compiler flags.
+
+        """
+        kwargs['skip_standard_flag'] = True
+        return super(MSVCPPCompiler, cls).get_flags(**kwargs)
+
+    @staticmethod
+    def before_registration(cls):
+        r"""Operations that should be performed to modify class attributes prior
+        to registration including things like platform dependent properties and
+        checking environment variables for default settings.
+        """
+        return MSVCCompiler.before_registration(cls)
+
+
 class ClangPPLinker(ClangLinker):
     r"""Interface class for clang++ linker (calls to ld)."""
     toolname = ClangPPCompiler.toolname
     languages = ClangPPCompiler.languages
     default_executable = ClangPPCompiler.default_executable
-    default_executable_env = ClangPPCompiler.default_executable_env
     toolset = ClangPPCompiler.toolset
 
 

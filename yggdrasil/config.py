@@ -34,7 +34,7 @@ _cfg_map = {
         'env': 'YGG_DEBUG', 'arg': 'loglevel',
         'help': 'Logging level for yggdrasil operations.'},
     ('debug', 'rmq', 'RMQ_DEBUG'): {
-        'env': 'YGG_CLIENT_DEBUG', 'arg': 'rmq-loglevel',
+        'env': 'YGG_RMQ_DEBUG', 'arg': 'rmq-loglevel',
         'help': 'Logging level for RabbitMQ operations.'},
     ('debug', 'client'): {
         'env': 'YGG_CLIENT_DEBUG', 'arg': 'client-loglevel',
@@ -283,7 +283,8 @@ def get_language_order(drivers):
 
 def update_language_config(languages=None, skip_warnings=False,
                            disable_languages=None, enable_languages=None,
-                           lang_kwargs=None, overwrite=False, verbose=False):
+                           allow_multiple_omp=None, lang_kwargs=None,
+                           overwrite=False, verbose=False):
     r"""Update configuration options for a language driver.
 
     Args:
@@ -296,6 +297,10 @@ def update_language_config(languages=None, skip_warnings=False,
             disabled. Defaults to an empty list.
         enable_languages (list, optional): List of languages that should be
             enabled. Defaults to an empty list.
+        allow_multiple_omp (bool, optional): Set the allow_multiple_omp config
+            option controlling whether or not the KMP_DUPLICATE_LIB_OK environment
+            variable is set for model environments. Defaults to None and is
+            ignored.
         overwrite (bool, optional): If True, the existing file will be overwritten.
             Defaults to False.
         verbose (bool, optional): If True, information about the config file
@@ -326,6 +331,10 @@ def update_language_config(languages=None, skip_warnings=False,
     if overwrite:
         shutil.copy(def_config_file, usr_config_file)
         ygg_cfg_usr.reload()
+    if allow_multiple_omp is not None:
+        if not ygg_cfg_usr.has_section('general'):
+            ygg_cfg_usr.add_section('general')
+        ygg_cfg_usr.set('general', 'allow_multiple_omp', allow_multiple_omp)
     drivers = OrderedDict([(lang, import_component('model', lang))
                            for lang in languages])
     drv = list(get_language_order(drivers).values())
@@ -416,44 +425,47 @@ def cfg_logging(cfg=None):
 
     """
     is_model = tools.is_subprocess()
-    if cfg is None:
-        cfg = ygg_cfg
-    _LOG_FORMAT = "%(levelname)s:%(module)s.%(funcName)s[%(lineno)d]:%(message)s"
-    logging.basicConfig(format=_LOG_FORMAT)
-    logLevelYGG = eval('logging.%s' % cfg.get('debug', 'ygg', 'NOTSET'))
-    logLevelRMQ = eval('logging.%s' % cfg.get('debug', 'rmq', 'INFO'))
-    logLevelCLI = eval('logging.%s' % cfg.get('debug', 'client', 'INFO'))
-    ygg_logger = logging.getLogger("yggdrasil")
-    rmq_logger = logging.getLogger("pika")
-    if is_model:
-        logLevelMOD = os.environ.get('YGG_MODEL_DEBUG', logLevelCLI)
-        ygg_logger.setLevel(level=logLevelMOD)
-    else:
-        ygg_logger.setLevel(level=logLevelYGG)
-    rmq_logger.setLevel(level=logLevelRMQ)
-    to_stdout = False
-    # For models, route the loggs to stdout so that they are displayed by the
-    # model driver.
-    if is_model:
-        to_stdout = True
+    to_stdout = is_model
     try:  # pragma: no cover
         # Direct log messages to stdout in interpreter so that messages
         # are not red in notebooks
         get_ipython  # noqa: F821
-        to_stdout = True
-        ygg_logger.propagate = False
-        rmq_logger.propagate = False
+        in_notebook = True
     except BaseException:
-        pass
+        in_notebook = False
+    to_stdout = (is_model or in_notebook)
+    if cfg is None:
+        cfg = ygg_cfg
+    _LOG_FORMAT = "%(levelname)s:%(module)s.%(funcName)s[%(lineno)d]:%(message)s"
+    logLevelYGG = eval(
+        'logging.%s' % os.environ.get(
+            'YGG_DEBUG', cfg.get('debug', 'ygg', 'NOTSET')))
+    logLevelRMQ = eval(
+        'logging.%s' % os.environ.get(
+            'YGG_RMQ_DEBUG', cfg.get('debug', 'rmq', 'INFO')))
+    logLevelCLI = eval(
+        'logging.%s' % os.environ.get(
+            'YGG_CLIENT_DEBUG', cfg.get('debug', 'client', 'INFO')))
+    if is_model:
+        logLevelYGG = os.environ.get('YGG_MODEL_DEBUG', logLevelCLI)
+    if not to_stdout:
+        logging.basicConfig(format=_LOG_FORMAT)
+    ygg_logger = logging.getLogger("yggdrasil")
+    rmq_logger = logging.getLogger("pika")
+    ygg_logger.setLevel(level=logLevelYGG)
+    rmq_logger.setLevel(level=logLevelRMQ)
+    # For models, route the logs to stdout so that they are
+    # displayed by the model driver.
     if to_stdout:
+        formatter = logging.Formatter(fmt=_LOG_FORMAT)
         handler = logging.StreamHandler(sys.stdout)
-        if is_model:
-            handler.setLevel(logLevelMOD)
-        else:  # pragma: no cover
-            # This is only used for notebooks (and interpreters)
-            handler.setLevel(logLevelYGG)
+        handler.setFormatter(formatter)
+        handler.setLevel(logLevelYGG)
         ygg_logger.handlers = [handler]
         rmq_logger.handlers = [handler]
+        if in_notebook:  # pragma: no cover
+            ygg_logger.propagate = False
+            rmq_logger.propagate = False
         # ygg_logger.addHandler(handler)
         # rmq_logger.addHandler(handler)
 
@@ -556,6 +568,9 @@ def resolve_config_parser(args):
         args.client_loglevel = 'DEBUG'
         args.validate_components = True
         args.validate_messages = True
+    else:
+        args.loglevel = 'INFO'
+        args.client_loglevel = 'INFO'
     if args.validate_messages in ['True', 'False']:
         args.validate_messages = (args.validate_messages == 'True')
     return args

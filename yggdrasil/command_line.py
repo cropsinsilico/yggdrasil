@@ -311,7 +311,10 @@ class ygginfo(SubCommand):
                 (('--flags', ),
                  {'action': 'store_true',
                   'help': ('Display the flags that yggdrasil will '
-                           ' pass to the tool when it is called.')})],
+                           ' pass to the tool when it is called.')}),
+                (('--fullpath', ),
+                 {'action': 'store_true',
+                  'help': 'Get the full path to the tool exectuable.'})],
             parsers=[
                 ArgumentParser(
                     name='compiler',
@@ -337,9 +340,12 @@ class ygginfo(SubCommand):
                 if args.tool == 'compiler':
                     flags = drv.get_compiler_flags(
                         for_model=True, toolname=args.toolname,
-                        dry_run=True)
-                    if flags[-1] == '/link':  # pragma: windows
-                        flags = flags[:-1]
+                        dry_run=True, dont_link=True)
+                    if '/link' in flags:  # pragma: windows
+                        flags = flags[:flags.index('/link')]
+                    for k in ['-c']:
+                        if k in flags:
+                            flags.remove(k)
                 else:
                     if args.tool == 'archiver':
                         libtype = 'static'
@@ -354,6 +360,8 @@ class ygginfo(SubCommand):
                 if platform._is_win:  # pragma: windows:
                     out = out.replace('/', '-')
                     out = out.replace('\\', '/')
+            elif args.fullpath:
+                out = drv.get_tool(args.tool).get_executable(full_path=True)
             else:
                 out = drv.get_tool(args.tool, return_prop='name')
             if return_str:
@@ -409,6 +417,16 @@ class ygginfo(SubCommand):
                     vardict.append(
                         (curr_prefix + "Language Installed",
                          drv.is_language_installed()))
+                    if drv.executable_type == 'compiler':
+                        curr_prefix += prefix
+                        vardict += [
+                            (curr_prefix
+                             + ("%s Installed (%s)"
+                                % (x.title(),
+                                   getattr(drv, 'default_%s' % x, None))),
+                             drv.is_tool_installed(x))
+                            for x in ['compiler', 'linker', 'archiver']]
+                        curr_prefix = curr_prefix.rsplit(prefix, 1)[0]
                     vardict.append(
                         (curr_prefix + "Base Languages Installed",
                          drv.are_base_languages_installed()))
@@ -568,10 +586,26 @@ class ygginfo(SubCommand):
                                 out.splitlines(False)))))
                     # Reticulate conda_list
                     if os.environ.get('CONDA_PREFIX', ''):
-                        out = Rdrv.run_executable(
-                            ["-e", ("library(reticulate); "
-                                    "reticulate::conda_list()")],
-                            env=env_reticulate).strip()
+                        if platform._is_win:  # pragma: windows
+                            out = tools.bytes2str(subprocess.check_output(
+                                'conda info --json', shell=True)).strip()
+                        else:
+                            out = tools.bytes2str(subprocess.check_output(
+                                ['conda', 'info', '--json'])).strip()
+                        vardict.append(
+                            (curr_prefix
+                             + "conda info --json",
+                             "\n%s%s" % (
+                                 curr_prefix + prefix,
+                                 ("\n" + curr_prefix + prefix).join(
+                                     out.splitlines(False)))))
+                        try:
+                            out = Rdrv.run_executable(
+                                ["-e", ("library(reticulate); "
+                                        "reticulate::conda_list()")],
+                                env=env_reticulate).strip()
+                        except BaseException:  # pragma: debug
+                            out = 'ERROR'
                         vardict.append(
                             (curr_prefix
                              + "R reticulate::conda_list():",
@@ -658,22 +692,39 @@ class yggcc(SubCommand):
     arguments = [
         (('source', ),
          {'nargs': '+',
-          'help': "One or more source files."}),
+          'help': ("One or more source files or the directory containing an "
+                   "R package.")}),
         (('--language', ),
          {'default': None,
-          'choices': [None] + LANGUAGES_WITH_ALIASES['compiled'],
+          'choices': [None] + LANGUAGES_WITH_ALIASES['compiled'] + ['R', 'r'],
           'help': ("Language of the source code. If not provided, "
                    "the language will be determined from the "
-                   "source extension.")})]
+                   "source extension.")}),
+        (('--toolname', ),
+         {'help': "Name of compilation tool that should be used"}),
+        (('--flags', ),
+         {'nargs': '*',
+          'help': ("Additional flags that should be added to the compilation "
+                   "command")}),
+        (('--Rpkg-language', ),
+         {'help': ("Language that R package is written in "
+                   "(only used if the specified language is R).")})]
 
     @classmethod
     def func(cls, args):
         from yggdrasil.components import import_component
         from yggdrasil.constants import EXT2LANG
         if args.language is None:
-            args.language = EXT2LANG[os.path.splitext(args.source[0])[-1]]
+            if (((len(args.source) == 1) and os.path.isdir(args.source[0])
+                 and os.path.isdir(os.path.join(args.source[0], 'R')))):
+                args.language = 'R'
+            else:
+                args.language = EXT2LANG[os.path.splitext(args.source[0])[-1]]
         drv = import_component('model', args.language)
-        print("executable: %s" % drv.call_compile(args.source))
+        kws = {'toolname': args.toolname, 'flags': args.flags}
+        if args.language in ['r', 'R']:
+            kws['language'] = args.Rpkg_language
+        print("executable: %s" % drv.call_compile(args.source, **kws))
 
 
 class yggcompile(SubCommand):
@@ -685,7 +736,8 @@ class yggcompile(SubCommand):
     arguments = [
         (('language', ),
          {'nargs': '*', 'default': ['all'],
-          # 'choices': ['all'] + LANGUAGES_WITH_ALIASES['compiled'],
+          # 'choices': (['all'] + LANGUAGES_WITH_ALIASES['compiled']
+          #             + LANGUAGES_WITH_ALIASES['compiled_dsl']),
           'help': ("One or more languages to compile dependencies "
                    "for.")}),
         (('--toolname', ),
@@ -728,8 +780,12 @@ class yggclean(SubCommand):
     def func(cls, args, verbose=True):
         from yggdrasil.components import import_component
         for lang in args.language:
-            import_component('model', lang).cleanup_dependencies(
-                verbose=verbose)
+            if lang in ['ipc', 'ipcs']:
+                from yggdrasil.communication.IPCComm import ipcrm_queues
+                ipcrm_queues()
+            else:
+                import_component('model', lang).cleanup_dependencies(
+                    verbose=verbose)
 
 
 class cc_toolname(SubCommand):
@@ -740,7 +796,10 @@ class cc_toolname(SubCommand):
     arguments = [
         (('--cpp', ),
          {'action': 'store_true',
-          'help': 'Get the compiler used for C++ programs.'})]
+          'help': 'Get the compiler used for C++ programs.'}),
+        (('--fullpath', ),
+         {'action': 'store_true',
+          'help': 'Get the full path to the tool exectuable.'})]
 
     @classmethod
     def parse_args(cls, *args, **kwargs):
@@ -767,7 +826,10 @@ class ld_toolname(cc_toolname):
     arguments = [
         (('--cpp', ),
          {'action': 'store_true',
-          'help': 'Get the linker used for C++ programs.'})]
+          'help': 'Get the linker used for C++ programs.'}),
+        (('--fullpath', ),
+         {'action': 'store_true',
+          'help': 'Get the full path to the tool exectuable.'})]
 
     @classmethod
     def parse_args(cls, *args, **kwargs):
@@ -842,37 +904,64 @@ class update_config(SubCommand):
 
     name = "config"
     help = 'Update the user config file.'
-    arguments = [
-        (('languages', ),
-         {'nargs': '*',
-          # 'choices': ['all'] + LANGUAGES_WITH_ALIASES['all'],
-          'default': [],
-          'help': 'One or more languages that should be configured.'}),
-        (('--languages', ),
-         {'nargs': '+', 'dest': 'languages_flag',
-          # 'choices': ['all'] + LANGUAGES_WITH_ALIASES['all'],
-          'default': [],
-          'help': 'One or more languages that should be configured.'}),
-        (('--show-file', ),
-         {'action': 'store_true',
-          'help': 'Print the path to the config file without updating it.'}),
-        (('--remove-file', ),
-         {'action': 'store_true',
-          'help': 'Remove the existing config file and return.'}),
-        (('--overwrite', ),
-         {'action': 'store_true',
-          'help': 'Overwrite the existing file.'}),
-        (('--disable-languages', ),
-         {'nargs': '+', 'default': [],
-          'choices': LANGUAGES_WITH_ALIASES['all'],
-          'help': 'One or more languages that should be disabled.'}),
-        (('--enable-languages', ),
-         {'nargs': '+', 'default': [],
-          'choices': LANGUAGES_WITH_ALIASES['all'],
-          'help': 'One or more languages that should be enabled.'}),
-        (('--quiet', '-q'),
-         {'action': 'store_true',
-          'help': 'Suppress output.'})]
+    arguments = (
+        [(('languages', ),
+          {'nargs': '*',
+           # 'choices': ['all'] + LANGUAGES_WITH_ALIASES['all'],
+           'default': [],
+           'help': 'One or more languages that should be configured.'}),
+         (('--languages', ),
+          {'nargs': '+', 'dest': 'languages_flag',
+           # 'choices': ['all'] + LANGUAGES_WITH_ALIASES['all'],
+           'default': [],
+           'help': 'One or more languages that should be configured.'}),
+         (('--show-file', ),
+          {'action': 'store_true',
+           'help': 'Print the path to the config file without updating it.'}),
+         (('--remove-file', ),
+          {'action': 'store_true',
+           'help': 'Remove the existing config file and return.'}),
+         (('--overwrite', ),
+          {'action': 'store_true',
+           'help': 'Overwrite the existing file.'}),
+         (('--disable-languages', ),
+          {'nargs': '+', 'default': [],
+           'choices': LANGUAGES_WITH_ALIASES['all'],
+           'help': 'One or more languages that should be disabled.'}),
+         (('--enable-languages', ),
+          {'nargs': '+', 'default': [],
+           'choices': LANGUAGES_WITH_ALIASES['all'],
+           'help': 'One or more languages that should be enabled.'}),
+         (('--quiet', '-q'),
+          {'action': 'store_true',
+           'help': 'Suppress output.'}),
+         (('--allow-multiple-omp', ),
+          {'action': 'store_true',
+           'help': ('Have yggdrasil set the environment variable '
+                    'KMP_DUPLICATE_LIB_OK to \'True\' during model runs '
+                    'to disable errors resembling '
+                    '"OMP: Error #15: Initializing libomp.dylib..." '
+                    'that result from having multiple versions of OpenMP '
+                    'loaded during runtime.')}),
+         (('--dont-allow-multiple-omp', ),
+          {'action': 'store_false',
+           'dest': 'allow_multiple_omp',
+           'help': ('Don\'t set the KMP_DUPLICATE_LIB_OK environment variable '
+                    'when running models (see help for \'--allow-multiple-omp\' '
+                    'for more information).')})]
+        + [(('--%s-compiler' % k, ),
+            {'help': ('Name or path to compiler that should be used to compile '
+                      'models written in %s.' % k)})
+           for k in LANGUAGES['compiled']]
+        + [(('--%s-linker' % k, ),
+            {'help': ('Name or path to linker that should be used to link '
+                      'models written in %s.' % k)})
+           for k in LANGUAGES['compiled']]
+        + [(('--%s-archiver' % k, ),
+            {'help': ('Name or path to archiver that should be used to create '
+                      'static libraries for models written in %s.' % k)})
+           for k in LANGUAGES['compiled']]
+    )
     # TODO: Move these into the language directories?
     language_arguments = {
         'c': [
@@ -889,7 +978,28 @@ class update_config(SubCommand):
             (('--disable-matlab-engine-for-python', ),
              {'action': 'store_true',
               'dest': 'disable_engine',
-              'help': 'Disable use of the Matlab engine for Python.'})]}
+              'help': 'Disable use of the Matlab engine for Python.'}),
+            (('--enable-matlab-engine-for-python', ),
+             {'action': 'store_false',
+              'dest': 'disable_engine',
+              'help': 'Enable use of the Matlab engine for Python.'}),
+            (('--hide-matlab-libiomp', ),
+             {'action': 'store_true',
+              'help': ('Hide the version of libiomp installed by Matlab '
+                       'by slightly changing the filename so that the '
+                       'conda version of libomp is used instead. This '
+                       'helps to solve the error "'
+                       'OMP: Error #15: Initializing libomp.dylib..." '
+                       'that can occur when using a conda environment. '
+                       'The hidden file location will be set in the '
+                       'configuration file and can be restored via the '
+                       '\'--restore-matlab-libiomp\' option.')}),
+            (('--restore-matlab-libiomp', ),
+             {'action': 'store_false',
+              'dest': 'hide_matlab_libiomp',
+              'help': ('Restore the version of libiomp installed by Matlab. '
+                       '(See help for \'--hide-matlab-libiomp\')')}),
+        ]}
         
     @classmethod
     def add_arguments(cls, parser, **kwargs):
@@ -929,11 +1039,17 @@ class update_config(SubCommand):
                 if hasattr(args, name):
                     lang_kwargs.setdefault(k, {})
                     lang_kwargs[k][name] = getattr(args, name)
+        for x in ['compiler', 'linker', 'archiver']:
+            for k in LANGUAGES['compiled']:
+                if getattr(args, '%s_%s' % (k, x), None):
+                    lang_kwargs.setdefault(k, {})
+                    lang_kwargs[k][x] = getattr(args, '%s_%s' % (k, x))
         config.update_language_config(
             args.languages, overwrite=args.overwrite,
             verbose=(not args.quiet),
             disable_languages=args.disable_languages,
             enable_languages=args.enable_languages,
+            allow_multiple_omp=args.allow_multiple_omp,
             lang_kwargs=lang_kwargs)
 
 
@@ -958,14 +1074,21 @@ class regen_schema(SubCommand):
 
     name = "schema"
     help = "Regenerate the yggdrasil schema."
+    arguments = [
+        (('--only-constants', ),
+         {'action': 'store_true',
+          'help': ('Only update the constants.py file without updating '
+                   'the schema.')})]
 
     @classmethod
     def func(cls, args):
         from yggdrasil import schema
-        if os.path.isfile(schema._schema_fname):
-            os.remove(schema._schema_fname)
-        schema.clear_schema()
-        schema.init_schema()
+        if not args.only_constants:
+            if os.path.isfile(schema._schema_fname):
+                os.remove(schema._schema_fname)
+            schema.clear_schema()
+            schema.init_schema()
+        schema.update_constants()
 
 
 class yggmodelform(SubCommand):
@@ -1037,7 +1160,8 @@ class run_tsts(SubCommand):
         (('--test-suite', '--test-suites'),
          {'nargs': '+', 'action': 'extend', 'type': str,
           'choices': ['all', 'top', 'examples', 'examples_part1',
-                      'examples_part2', 'demos', 'types', 'timing'],
+                      'examples_part2', 'demos', 'types', 'timing',
+                      'connections', 'models'],
           'help': 'Test suite(s) that should be run.',
           'dest': 'test_suites'}),
         (('--pytest-config', '-c'),
@@ -1082,7 +1206,8 @@ class run_tsts(SubCommand):
         if args.test_suites:
             if 'all' in args.test_suites:
                 args.test_suites.remove('all')
-                for x in ['top', 'examples', 'demos', 'types', 'timing']:
+                for x in ['top', 'examples', 'demos', 'types', 'timing',
+                          'connections', 'models']:
                     if x not in args.test_suites:
                         args.test_suites.append(x)
             for x in args.test_suites:
@@ -1116,6 +1241,17 @@ class run_tsts(SubCommand):
                     args.long_running = True
                     args.enable_production_runs = True
                     test_paths.append(os.path.join('tests', 'test_timing.py'))
+                elif x == 'connections':
+                    for f in ['test_ConnectionDriver.py',
+                              'test_FileInputDriver.py',
+                              'test_FileOutputDriver.py',
+                              'test_RPCRequestDriver.py']:
+                        test_paths.append(
+                            os.path.join('drivers', 'tests', f))
+                elif x == 'models':
+                    test_paths.append(
+                        os.path.join('drivers', 'tests',
+                                     'test_*ModelDriver.py'))
         if (not test_paths) and all(x.startswith('-') for x in extra):
             test_paths.append(package_dir)
         # Get expanded tests to allow for paths that are relative to
@@ -1126,7 +1262,6 @@ class run_tsts(SubCommand):
         cls.expand_and_add(extra + test_paths, args.extra,
                            [package_dir, os.getcwd()],
                            add_on_nomatch=True)
-            
         return args
 
     @classmethod
@@ -1200,6 +1335,9 @@ class run_tsts(SubCommand):
             argv.append('-v')
         if args.nocapture:
             argv.append('-s')
+            argv += ['-o', 'log_cli=true']
+        if args.nologcapture:
+            argv += ['-o', 'log_cli=true']
         if args.stop:
             argv.append('-x')
         if args.withcoverage:

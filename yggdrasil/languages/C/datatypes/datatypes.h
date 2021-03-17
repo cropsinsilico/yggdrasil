@@ -18,7 +18,9 @@ extern "C" {
 #endif
 
 static char prefix_char = '#';
-
+#ifdef _OPENMP
+#pragma omp threadprivate(prefix_char)
+#endif
 
 /*! @brief C-friendly definition of MetaschemaType. */
 typedef struct dtype_t {
@@ -74,6 +76,7 @@ typedef struct comm_head_t {
   char request_id[COMMBUFFSIZ]; //!< Request id.
   char zmq_reply[COMMBUFFSIZ]; //!< Reply address for ZMQ sockets.
   char zmq_reply_worker[COMMBUFFSIZ]; //!< Reply address for worker socket.
+  char model[COMMBUFFSIZ]; //!< Name of model that sent the header.
   int type_in_data; //!< 1 if type is stored with the data during serialization.
   // These should be removed once JSON fully implemented
   int serializer_type; //!< Code indicating the type of serializer.
@@ -395,6 +398,13 @@ size_t generic_array_get_ndarray_unicode(generic_t x, const size_t index, char**
   @returns size_t Number of elements in map.
  */
 size_t generic_map_get_size(generic_t x);
+/*!
+  @brief Determine if a map object has a certain key.
+  @param[in] x generic_t Generic object that is presumed to contain a map.
+  @param[in] key char* Key to check for.
+  @returns int 1 if the key is present, 0 otherwise.
+ */
+int generic_map_has_key(generic_t x, char* key);
 /*!
   @brief Get the keys in a map object.
   @param[in] x generic_t Generic object that is presumed to contain a map.
@@ -1259,6 +1269,7 @@ comm_head_t init_header(const size_t size, const char *address, const char *id) 
   out.request_id[0] = '\0';
   out.zmq_reply[0] = '\0';
   out.zmq_reply_worker[0] = '\0';
+  out.model[0] = '\0';
   // Parameters that will be removed
   out.serializer_type = -1;
   out.format_str[0] = '\0';
@@ -1266,6 +1277,21 @@ comm_head_t init_header(const size_t size, const char *address, const char *id) 
   // Parameters used for type
   out.dtype = NULL;
   return out;
+};
+
+
+/*!
+  @brief Destroy a header object.
+  @param[in] x comm_head_t* Pointer to the header that should be destroyed.
+  @returns int 0 if successful, -1 otherwise.
+*/
+static inline
+int destroy_header(comm_head_t* x) {
+  int ret = 0;
+  if (x->dtype != NULL) {
+    ret = destroy_dtype(&(x->dtype));
+  }
+  return ret;
 };
 
 

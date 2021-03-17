@@ -671,15 +671,14 @@ def get_supported_lang():
         list: The names of programming languages supported by yggdrasil.
     
     """
-    from yggdrasil import schema
-    s = schema.get_schema()
-    out = s['model'].subtypes
+    # from yggdrasil import schema
+    # s = schema.get_schema()
+    # out = s['model'].subtypes
+    # if 'r' in out:
+    #     out[out.index('r')] = 'R'
+    out = constants.LANGUAGES['all'].copy()
     if 'c++' in out:
         out[out.index('c++')] = 'cpp'
-    # if 'R' in out:
-    #     out[out.index('R')] = 'r'
-    if 'r' in out:
-        out[out.index('r')] = 'R'
     return list(set(out))
 
 
@@ -694,17 +693,24 @@ def get_supported_type():
     return list(get_registered_types().keys())
 
 
-def get_supported_comm():
+def get_supported_comm(dont_include_value=False):
     r"""Get a list of the communication mechanisms supported by yggdrasil.
+
+    Args:
+        dont_include_value (bool, optional): If True, don't include the
+            ValueComm in the list returned. Defaults to False.
 
     Returns:
         list: The names of communication mechanisms supported by yggdrasil.
 
     """
     from yggdrasil import schema
+    excl_list = ['CommBase', 'DefaultComm', 'default']
+    if dont_include_value:
+        excl_list += ['ValueComm', 'value']
     s = schema.get_schema()
     out = s['comm'].subtypes
-    for k in ['CommBase', 'DefaultComm', 'default']:
+    for k in excl_list:
         if k in out:
             out.remove(k)
     return list(set(out))
@@ -762,7 +768,7 @@ def get_installed_lang():
     return out
 
 
-def get_installed_comm(language=None):
+def get_installed_comm(language=None, dont_include_value=False):
     r"""Get a list of the communication channel types that are supported by
     yggdrasil on the current machine. This checks the operating system,
     supporting libraries, and broker credentials. The order indicates the
@@ -772,6 +778,9 @@ def get_installed_comm(language=None):
         language (str, optional): Specific programming language that installed
             comms should be located for. Defaults to None and all languages
             supported on the current platform will be checked.
+        dont_include_value (bool, optional): If True, don't include the
+            ValueComm in the list returned. Defaults to False.
+
 
     Returns:
         list: The names of the the communication channel types supported on
@@ -779,7 +788,7 @@ def get_installed_comm(language=None):
 
     """
     out = []
-    all_comm = get_supported_comm()
+    all_comm = get_supported_comm(dont_include_value=dont_include_value)
     for k in all_comm:
         if is_comm_installed(k, language=language):
             out.append(k)
@@ -807,7 +816,7 @@ def get_default_comm():
         else:  # pragma: windows
             # Locate comm that maximizes languages that can be run
             tally = {}
-            for c in get_supported_comm():
+            for c in get_supported_comm(dont_include_value=True):
                 tally[c] = 0
                 for lang in get_supported_lang():
                     if is_comm_installed(c, language=lang):
@@ -967,6 +976,95 @@ def eval_kwarg(x):
     return x
 
 
+class ProxyMeta(type):
+    r"""Metaclass for handling proxy."""
+
+    _special_names = [
+        '__abs__', '__add__', '__and__', '__call__', '__cmp__', '__coerce__',
+        '__contains__', '__delitem__', '__delslice__', '__div__', '__divmod__',
+        '__eq__', '__float__', '__floordiv__', '__ge__', '__getitem__',
+        '__getslice__', '__gt__', '__hex__', '__iadd__', '__iand__',
+        '__idiv__', '__idivmod__', '__ifloordiv__', '__ilshift__', '__imod__',
+        '__imul__', '__int__', '__invert__', '__ior__', '__ipow__', '__irshift__',
+        '__isub__', '__iter__', '__itruediv__', '__ixor__', '__le__', '__len__',
+        '__long__', '__lshift__', '__lt__', '__mod__', '__mul__', '__ne__',
+        '__neg__', '__oct__', '__or__', '__pos__', '__pow__', '__radd__',
+        '__rand__', '__rdiv__', '__rdivmod__', '__reduce__', '__reduce_ex__',
+        '__repr__', '__reversed__', '__rfloorfiv__', '__rlshift__', '__rmod__',
+        '__rmul__', '__ror__', '__rpow__', '__rrshift__', '__rshift__', '__rsub__',
+        '__rtruediv__', '__rxor__', '__setitem__', '__setslice__', '__sub__',
+        '__truediv__', '__xor__', 'next', '__hash__'
+    ]
+    
+    def __new__(cls, classname, bases, attrs):
+        overrides = attrs.get('__overrides__', [])
+        overrides.extend(attrs.get('__slots__', []))
+        overrides.extend(k for k in attrs.keys() if k not in
+                         ['__overrides__'])
+        for base in bases:
+            overrides.extend(getattr(base, '__overrides__', []))
+        assert('_wrapped' in overrides)
+        attrs['__overrides__'] = overrides
+        
+        def make_method(name):
+            def method(self, *args, **kwargs):
+                mtd = getattr(object.__getattribute__(self, "_wrapped"), name)
+                return mtd(*args, **kwargs)
+            return method
+
+        for name in cls._special_names:
+            if name not in overrides:
+                attrs[name] = make_method(name)
+        return type.__new__(cls, classname, bases, attrs)
+
+
+class ProxyObject(metaclass=ProxyMeta):
+    r"""Proxy for another object."""
+    # http://code.activestate.com/recipes/496741-object-proxying/
+    
+    __slots__ = ["_wrapped", "__weakref__"]
+    
+    def __init__(self, wrapped):
+        object.__setattr__(self, "_wrapped", wrapped)
+
+    def __getattribute__(self, name):
+        if name in object.__getattribute__(self, '__overrides__'):
+            return object.__getattribute__(self, name)
+        return getattr(object.__getattribute__(self, "_wrapped"), name)
+    
+    def __delattr__(self, name):
+        if name in object.__getattribute__(self, '__overrides__'):
+            object.__delattr__(self, name)
+            return
+        delattr(object.__getattribute__(self, "_wrapped"), name)
+        
+    def __setattr__(self, name, value):
+        if name in object.__getattribute__(self, '__overrides__'):
+            object.__setattr__(self, name, value)
+            return
+        setattr(object.__getattribute__(self, "_wrapped"), name, value)
+
+    def __reduce__(self):
+        return (object.__getattribute__(self, "__class__"),
+                (object.__getattribute__(self, "_wrapped"), ))
+
+    def __reduce_ex__(self, proto):
+        return object.__getattribute__(self, "__reduce__")()
+    
+    # Special cases
+    def __bool__(self):
+        return bool(object.__getattribute__(self, "_wrapped"))
+    
+    def __str__(self):
+        return str(object.__getattribute__(self, "_wrapped"))
+    
+    def __bytes__(self):
+        return bytes(object.__getattribute__(self, "_wrapped"))
+    
+    def __repr__(self):
+        return repr(object.__getattribute__(self, "_wrapped"))
+
+
 class YggPopen(subprocess.Popen):
     r"""Uses Popen to open a process without a buffer. If not already set,
     the keyword arguments 'bufsize', 'stdout', and 'stderr' are set to
@@ -1113,6 +1211,7 @@ class TimeOut(object):
         self.max_time = max_time
         self.start_time = time.perf_counter()
         self.key = key
+        self.checked = False
 
     @property
     def elapsed(self):
@@ -1124,7 +1223,12 @@ class TimeOut(object):
         r"""bool: True if there is not any time remaining. False otherwise."""
         if self.max_time is False:
             return False
-        return (self.elapsed > self.max_time)
+        if (not self.checked) and (self.max_time == 0):
+            out = False
+        else:
+            out = (self.elapsed > self.max_time)
+        self.checked = True
+        return out
 
 
 # def single_use_method(func):
@@ -1251,6 +1355,29 @@ class YggClass(ComponentBase):
     def __getstate__(self):
         state = super(YggClass, self).__getstate__()
         del state['logger']
+        # thread_attr = {}
+        for k, v in list(state.items()):
+            if isinstance(v, (threading._CRLock, threading._RLock,
+                              threading.Event, threading.Thread)):  # pragma: debug
+                self.warning("Special treatment of threading objects "
+                             "currently disabled.")
+            # if isinstance(v, (threading._CRLock, threading._RLock)):
+            #     thread_attr.setdefault('threading.RLock', [])
+            #     thread_attr['threading.RLock'].append((k, (), {}))
+            # elif isinstance(v, threading.Event):
+            #     thread_attr.setdefault('threading.Event', [])
+            #     thread_attr['threading.Event'].append((k, (), {}))
+            # elif isinstance(v, threading.Thread):
+            #     assert(not v.is_alive())
+            #     attr = {'name': v._name, 'group': None,
+            #             'daemon': v.daemon, 'target': v._target,
+            #             'args': v._args, 'kwargs': v._kwargs}
+            #     thread_attr.setdefault('threading.Thread', [])
+            #     thread_attr['threading.Thread'].append((k, (), attr))
+        # for attr_list in thread_attr.values():
+        #     for k in attr_list:
+        #         state.pop(k[0])
+        # state['thread_attr'] = thread_attr
         return state
 
     def __setstate__(self, state):
@@ -1427,7 +1554,8 @@ class YggClass(ComponentBase):
     def _task_with_output(self, func, *args, **kwargs):
         self.sched_out = func(*args, **kwargs)
 
-    def sched_task(self, t, func, args=None, kwargs=None, store_output=False):
+    def sched_task(self, t, func, args=None, kwargs=None, store_output=False,
+                   name=None):
         r"""Schedule a task that will be executed after a certain time has
         elapsed.
 
@@ -1442,6 +1570,10 @@ class YggClass(ComponentBase):
             store_output (bool, optional): If True, the output from the
                 scheduled task is stored in self.sched_out. Otherwise, it is not
                 stored. Defaults to False.
+            name (str, optional): Name for the task.
+
+        Returns:
+            threading.Timer: The timer object.
 
         """
         if args is None:
@@ -1453,7 +1585,10 @@ class YggClass(ComponentBase):
             args = [func] + args
             func = self._task_with_output
         tobj = threading.Timer(t, func, args=args, kwargs=kwargs)
+        if name is not None:
+            tobj.name = name
         tobj.start()
+        return tobj
 
     def sleep(self, t=None):
         r"""Have the class sleep for some period of time.
@@ -1590,6 +1725,6 @@ class YggClass(ComponentBase):
                 self.debug("Timeout for %s at %5.2f/%5.2f s" % (
                     key, t.elapsed, t.max_time))
             else:
-                self.error("Timeout for %s at %5.2f/%5.2f s" % (
+                self.info("Timeout for %s at %5.2f/%5.2f s" % (
                     key, t.elapsed, t.max_time))
         del self._timeouts[key]

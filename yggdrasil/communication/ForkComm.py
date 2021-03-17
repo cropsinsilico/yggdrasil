@@ -1,5 +1,5 @@
-from yggdrasil.communication import CommBase, get_comm
-from yggdrasil.components import import_component
+import copy
+from yggdrasil.communication import CommBase, get_comm, import_comm
 
 
 _address_sep = ':YGG_ADD:'
@@ -25,7 +25,7 @@ class ForkComm(CommBase.CommBase):
     Args:
         name (str): The environment variable where communication address is
             stored.
-        comm (list, optional): The list of options for the comms that
+        comm_list (list, optional): The list of options for the comms that
             should be bundled. If not provided, the bundle will be empty.
         **kwargs: Additional keyword arguments are passed to the parent class.
 
@@ -35,40 +35,53 @@ class ForkComm(CommBase.CommBase):
 
     """
 
+    _commtype = 'fork'
     _dont_register = True
     
-    def __init__(self, name, comm=None, **kwargs):
+    def __init__(self, name, comm_list=None, is_async=False, **kwargs):
+        child_keys = ['serializer_class', 'serializer_kwargs',  # 'datatype',
+                      'format_str', 'field_names', 'field_units', 'as_array']
+        noprop_keys = ['send_converter', 'recv_converter', 'filter', 'transform']
+        child_kwargs = {k: kwargs.pop(k) for k in child_keys if k in kwargs}
+        noprop_kwargs = {k: kwargs.pop(k) for k in noprop_keys if k in kwargs}
         self.comm_list = []
         self.curr_comm_index = 0
         self.eof_recv = []
         address = kwargs.pop('address', None)
-        if (comm in [None, 'ForkComm']):
+        if comm_list is None:
             if isinstance(address, list):
                 ncomm = len(address)
             else:
                 ncomm = 0
-            comm = [None for i in range(ncomm)]
-        assert(isinstance(comm, list))
-        ncomm = len(comm)
+            comm_list = [None for i in range(ncomm)]
+        assert(isinstance(comm_list, list))
+        ncomm = len(comm_list)
         for i in range(ncomm):
-            if comm[i] is None:
-                comm[i] = {}
-            if comm[i].get('name', None) is None:
-                comm[i]['name'] = get_comm_name(name, i)
+            if comm_list[i] is None:
+                comm_list[i] = {}
+            if comm_list[i].get('name', None) is None:
+                comm_list[i]['name'] = get_comm_name(name, i)
+            for k in child_kwargs.keys():
+                if k in comm_list[i]:  # pragma: debug
+                    raise ValueError("The keyword '%s' was specified for both the "
+                                     "root ForkComm and a child comm, but can only "
+                                     "be present for one." % k)
         if isinstance(address, list):
             assert(len(address) == ncomm)
             for i in range(ncomm):
-                comm[i]['address'] = address[i]
+                comm_list[i]['address'] = address[i]
         for i in range(ncomm):
-            ikw = dict(**kwargs)
-            ikw.update(**comm[i])
+            ikw = copy.deepcopy(kwargs)
+            ikw.update(child_kwargs)
+            ikw.update(comm_list[i])
+            ikw.setdefault('use_async', is_async)
             iname = ikw.pop('name')
             self.comm_list.append(get_comm(iname, **ikw))
             self.eof_recv.append(0)
         if ncomm > 0:
             kwargs['address'] = [x.address for x in self.comm_list]
-        kwargs['comm'] = 'ForkComm'
-        super(ForkComm, self).__init__(name, **kwargs)
+        kwargs.update(noprop_kwargs)
+        super(ForkComm, self).__init__(name, is_async=is_async, **kwargs)
         assert(not self.single_use)
         assert(not self.is_server)
         assert(not self.is_client)
@@ -79,15 +92,29 @@ class ForkComm(CommBase.CommBase):
             x.disconnect()
         super(ForkComm, self).disconnect()
         
-    def printStatus(self, nindent=0):
+    def printStatus(self, nindent=0, **kwargs):
         r"""Print status of the communicator."""
-        super(ForkComm, self).printStatus(nindent=nindent)
+        super(ForkComm, self).printStatus(nindent=nindent,
+                                          **kwargs)
         for x in self.comm_list:
             x.printStatus(nindent=nindent + 1)
 
     def __len__(self):
         return len(self.comm_list)
 
+    @property
+    def any_files(self):
+        r"""bool: True if the comm interfaces with any files."""
+        return any(x.is_file for x in self.comm_list)
+
+    @property
+    def last_comm(self):
+        r"""CommBase: Last comm that was used."""
+        idx = self.curr_comm_index
+        if idx > 0:
+            idx -= 1
+        return self.comm_list[idx % len(self)]
+    
     @property
     def curr_comm(self):
         r"""CommBase: Current comm."""
@@ -103,26 +130,38 @@ class ForkComm(CommBase.CommBase):
         r"""Get keyword arguments for new comm."""
         if 'address' not in kwargs:
             addresses = []
-            comm = kwargs.get('comm', None)
+            comm_list = kwargs.get('comm_list', None)
             ncomm = kwargs.pop('ncomm', 0)
-            if comm is None:
-                comm = [None for i in range(ncomm)]
-            assert(isinstance(comm, list))
-            ncomm = len(comm)
+            if comm_list is None:
+                comm_list = [None for i in range(ncomm)]
+            assert(isinstance(comm_list, list))
+            ncomm = len(comm_list)
             for i in range(ncomm):
-                x = comm[i]
+                x = comm_list[i]
                 if x is None:
                     x = {}
                 iname = x.pop('name', get_comm_name(name, i))
-                icls = import_component('comm', x.get('comm', None))
+                icls = import_comm(x.get('commtype', None))
                 _, ickw = icls.new_comm_kwargs(iname, **x)
                 ickw['name'] = iname
-                comm[i] = ickw
+                comm_list[i] = ickw
                 addresses.append(ickw['address'])
-            kwargs['comm'] = comm
+            kwargs['comm_list'] = comm_list
             kwargs['address'] = addresses
         args = tuple([name] + list(args))
         return args, kwargs
+
+    @property
+    def model_env(self):
+        r"""dict: Mapping between model name and opposite comm
+        environment variables that need to be provided to the model."""
+        out = {}
+        for x in self.comm_list:
+            iout = x.model_env
+            for k, v in iout.items():
+                out.setdefault(k, {})
+                out[k].update(v)
+        return out
 
     @property
     def opp_comms(self):
@@ -142,9 +181,9 @@ class ForkComm(CommBase.CommBase):
 
         """
         kwargs = super(ForkComm, self).opp_comm_kwargs()
-        kwargs['comm'] = [x.opp_comm_kwargs() for x in self.comm_list]
+        kwargs['comm_list'] = [x.opp_comm_kwargs() for x in self.comm_list]
         # for i, x in enumerate(self.comm_list):
-        #     kwargs['comm'][i]['name'] = x.name
+        #     kwargs['comm_list'][i]['name'] = x.name
         return kwargs
 
     def bind(self):
@@ -226,57 +265,111 @@ class ForkComm(CommBase.CommBase):
         r"""int: The number of outgoing messages in the connection to drain."""
         return sum([x.n_msg_send_drain for x in self.comm_list])
 
-    def send(self, *args, **kwargs):
-        r"""Send a message.
+    def is_empty_recv(self, msg):
+        r"""Check if a received message object is empty.
 
         Args:
-            *args: All arguments are assumed to be part of the message.
-            **kwargs: All keywords arguments are passed to comm _send method.
+            msg (obj): Message object.
+
+        Returns:
+            bool: True if the object is empty, False otherwise.
+
+        """
+        return self.last_comm.is_empty_recv(msg)
+
+    def update_serializer_from_message(self, msg):
+        r"""Update the serializer based on information stored in a message.
+
+        Args:
+            msg (CommMessage): Outgoing message.
+
+        """
+        if msg.stype is not None:
+            msg.stype = self.apply_transform_to_type(msg.stype)
+        for x in self.comm_list:
+            x.update_serializer_from_message(msg)
+        
+    def prepare_message(self, *args, **kwargs):
+        r"""Perform actions preparing to send a message.
+
+        Args:
+            *args: Components of the outgoing message.
+            **kwargs: Additional keyword arguments are passed to the prepare_message
+                methods for the forked comms.
+
+        Returns:
+            CommMessage: Serialized and annotated message.
+
+        """
+        kws_root = {'skip_serialization': True}
+        for k in ['header_kwargs']:
+            if k in kwargs:
+                kws_root[k] = kwargs.pop(k)
+        msg = super(ForkComm, self).prepare_message(*args, **kws_root)
+        out = {i: x.prepare_message(copy.deepcopy(msg), **kwargs)
+               for i, x in enumerate(self.comm_list)}
+        out['orig'] = msg.args
+        msg.args = out
+        return msg
+        
+    def send_message(self, msg, **kwargs):
+        r"""Send a message encapsulated in a CommMessage object.
+
+        Args:
+            msg (CommMessage): Message to be sent.
+            **kwargs: Additional keyword arguments are passed to _safe_send.
 
         Returns:
             bool: Success or failure of send.
-
+        
         """
-        for x in self.comm_list:
-            out = x.send(*args, **kwargs)
+        assert(isinstance(msg.args, dict))
+        for i, x in enumerate(self.comm_list):
+            out = x.send_message(msg.args[i], **kwargs)
+            self.errors += x.errors
             if not out:
                 return out
-        return out
-
-    def recv(self, *args, **kwargs):
+        msg.args = msg.args['orig']
+        msg.additional_messages = []
+        kwargs['skip_safe_send'] = True
+        return super(ForkComm, self).send_message(msg, **kwargs)
+        
+    def recv_message(self, *args, **kwargs):
         r"""Receive a message.
 
         Args:
-            *args: All arguments are passed to comm _recv method.
-            **kwargs: All keywords arguments are passed to comm _recv method.
+            *args: Arguments are passed to the forked comm's recv_message method.
+            **kwargs: Keyword arguments are passed to the forked comm's recv_message
+                method.
 
         Returns:
-            tuple (bool, obj): Success or failure of receive and received
-                message.
+            CommMessage: Received message.
 
         """
-        return_header = kwargs.pop('return_header', False)
         timeout = kwargs.pop('timeout', None)
         if timeout is None:
             timeout = self.recv_timeout
         kwargs['timeout'] = 0
-        kwargs['return_header'] = True
         first_comm = True
         T = self.start_timeout(timeout, key_suffix='recv:forkd')
         out = None
+        i = 0
         while ((not T.is_out) or first_comm) and self.is_open and (out is None):
             for i in range(len(self)):
                 if out is not None:
                     break
                 x = self.curr_comm
                 if x.is_open:
-                    flag, msg, header = x.recv(*args, **kwargs)
-                    if self.is_eof(msg):
+                    msg = x.recv_message(*args, **kwargs)
+                    self.errors += x.errors
+                    if msg.flag == CommBase.FLAG_EOF:
                         self.eof_recv[self.curr_comm_index % len(self)] = 1
                         if sum(self.eof_recv) == len(self):
-                            out = (flag, msg, header)
-                    elif (not self.is_empty_recv(msg)):
-                        out = (flag, msg, header)
+                            out = msg
+                        else:
+                            x.finalize_message(msg)
+                    elif msg.flag not in [CommBase.FLAG_FAILURE, CommBase.FLAG_EMPTY]:
+                        out = msg
                 self.curr_comm_index += 1
             first_comm = False
             if out is None:
@@ -285,13 +378,58 @@ class ForkComm(CommBase.CommBase):
         if out is None:
             if self.is_closed:
                 self.debug('Comm closed')
-                out = (False, None, None)
+                out = CommBase.CommMessage(flag=CommBase.FLAG_FAILURE)
             else:
-                out = (True, self.empty_obj_recv, None)
-        if not return_header:
-            out = (out[0], out[1])
+                out = CommBase.CommMessage(flag=CommBase.FLAG_EMPTY,
+                                           args=self.last_comm.empty_obj_recv)
+        out.args = {i: out.args}
         return out
 
+    def finalize_message(self, msg, **kwargs):
+        r"""Perform actions to decipher a message.
+
+        Args:
+            msg (CommMessage): Initial message object to be finalized.
+            **kwargs: Keyword arguments are passed to the forked comm's
+                finalize_message method.
+
+        Returns:
+            CommMessage: Deserialized and annotated message.
+
+        """
+        assert(isinstance(msg.args, dict) and (len(msg.args) == 1))
+        idx, msg.args = next(iter(msg.args.items()))
+        msg = self.comm_list[idx].finalize_message(msg, skip_python2language=True)
+        msg.finalized = False
+        return super(ForkComm, self).finalize_message(msg, **kwargs)
+        
+    @property
+    def _multiple_first_send(self):  # pragma: debug
+        return self.last_comm._multiple_first_send
+
+    @_multiple_first_send.setter
+    def _multiple_first_send(self, value):
+        for x in self.comm_list:
+            x._multiple_first_send = value
+
+    @property
+    def suppress_special_debug(self):
+        return self.last_comm.suppress_special_debug
+
+    @suppress_special_debug.setter
+    def suppress_special_debug(self, value):
+        for x in self.comm_list:
+            x.suppress_special_debug = value
+
+    @property
+    def _type_errors(self):  # pragma: debug
+        return self.last_comm._type_errors
+
+    @_type_errors.setter
+    def _type_errors(self, value):
+        for x in self.comm_list:
+            x._type_errors = value
+    
     def purge(self):
         r"""Purge all messages from the comm."""
         super(ForkComm, self).purge()

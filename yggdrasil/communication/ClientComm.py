@@ -1,6 +1,5 @@
 import uuid
-from yggdrasil.components import import_component
-from yggdrasil.communication import (CommBase, new_comm, get_comm)
+from yggdrasil.communication import CommBase, new_comm, get_comm, import_comm
 
 
 class ClientComm(CommBase.CommBase):
@@ -9,8 +8,8 @@ class ClientComm(CommBase.CommBase):
     Args:
         name (str): The environment variable where communication address is
             stored.
-        request_comm (str, optional): Comm class that should be used for the
-            request comm. Defaults to None.
+        request_commtype (str, optional): Comm class that should be used for
+            the request comm. Defaults to None.
         response_kwargs (dict, optional): Keyword arguments for the response
             comm. Defaults to empty dict.
         **kwargs: Additional keywords arguments are passed to the output comm.
@@ -23,29 +22,33 @@ class ClientComm(CommBase.CommBase):
 
     """
 
+    _commtype = 'client'
     _dont_register = True
     
-    def __init__(self, name, request_comm=None, response_kwargs=None,
-                 dont_open=False, **kwargs):
+    def __init__(self, name, request_commtype=None, response_kwargs=None,
+                 dont_open=False, is_async=False, **kwargs):
         if response_kwargs is None:
             response_kwargs = dict()
         ocomm_name = name
         ocomm_kwargs = kwargs
         ocomm_kwargs['direction'] = 'send'
         ocomm_kwargs['dont_open'] = True
-        ocomm_kwargs['comm'] = request_comm
+        ocomm_kwargs['commtype'] = request_commtype
+        ocomm_kwargs.setdefault('use_async', is_async)
         self.response_kwargs = response_kwargs
         self.ocomm = get_comm(ocomm_name, **ocomm_kwargs)
         self.icomm = dict()
         self.icomm_order = []
-        self.response_kwargs.setdefault('comm', self.ocomm.comm_class)
+        self.response_kwargs.setdefault('commtype', self.ocomm._commtype)
         self.response_kwargs.setdefault('recv_timeout', self.ocomm.recv_timeout)
         self.response_kwargs.setdefault('language', self.ocomm.language)
+        self.response_kwargs.setdefault('use_async', self.ocomm.is_async)
         super(ClientComm, self).__init__(self.ocomm.name, dont_open=dont_open,
                                          recv_timeout=self.ocomm.recv_timeout,
                                          is_interface=self.ocomm.is_interface,
                                          direction='send', no_suffix=True,
-                                         address=self.ocomm.address)
+                                         address=self.ocomm.address,
+                                         is_async=self.ocomm.is_async)
 
     def get_status_message(self, nindent=0, **kwargs):
         r"""Return lines composing a status message.
@@ -84,7 +87,7 @@ class ClientComm(CommBase.CommBase):
             bool: Is the comm installed.
 
         """
-        return import_component('comm').is_installed(language=language)
+        return import_comm().is_installed(language=language)
 
     @property
     def maxMsgSize(self):
@@ -94,29 +97,29 @@ class ClientComm(CommBase.CommBase):
     @classmethod
     def underlying_comm_class(self):
         r"""str: Name of underlying communication class."""
-        return import_component('comm').underlying_comm_class()
+        return import_comm().underlying_comm_class()
 
     @classmethod
     def comm_count(cls):
         r"""int: Number of communication connections."""
-        return import_component('comm').comm_count()
+        return import_comm().comm_count()
 
     @classmethod
-    def new_comm_kwargs(cls, name, request_comm=None, **kwargs):
+    def new_comm_kwargs(cls, name, request_commtype=None, **kwargs):
         r"""Initialize communication with new comms.
 
         Args:
             name (str): Name for new comm.
-            request_comm (str, optional): Name of class for new output comm.
-                Defaults to None.
+            request_commtype (str, optional): Name of class for new output
+                comm. Defaults to None.
 
         """
         args = [name]
-        ocomm_class = import_component('comm', request_comm)
+        ocomm_class = import_comm(request_commtype)
         kwargs['direction'] = 'send'
         if 'address' not in kwargs:
             oargs, kwargs = ocomm_class.new_comm_kwargs(name, **kwargs)
-        kwargs['request_comm'] = request_comm
+        kwargs['request_commtype'] = request_commtype
         return args, kwargs
 
     @property
@@ -135,8 +138,8 @@ class ClientComm(CommBase.CommBase):
 
         """
         kwargs = super(ClientComm, self).opp_comm_kwargs()
-        kwargs['comm'] = "ServerComm"
-        kwargs['request_comm'] = self.ocomm.comm_class
+        kwargs['commtype'] = "server"
+        kwargs['request_commtype'] = self.ocomm._commtype
         kwargs['response_kwargs'] = self.response_kwargs
         return kwargs
         
@@ -172,17 +175,23 @@ class ClientComm(CommBase.CommBase):
         r"""int: The number of outgoing messages in the connection to drain."""
         return self.ocomm.n_msg_send_drain
 
+    def atexit(self):  # pragma: debug
+        r"""Close operations."""
+        self.send_eof()
+        super(ClientComm, self).atexit()
+        
     # RESPONSE COMM
     def create_response_comm(self):
         r"""Create a response comm based on information from the last header."""
         comm_kwargs = dict(direction='recv', is_response_client=True,
                            single_use=True, **self.response_kwargs)
+        if comm_kwargs.get('use_async', False):
+            comm_kwargs['async_recv_method'] = 'recv_message'
         header = dict(request_id=str(uuid.uuid4()))
         while header['request_id'] in self.icomm:  # pragma: debug
             header['request_id'] += str(uuid.uuid4())
         c = new_comm('client_response_comm.' + header['request_id'], **comm_kwargs)
         header['response_address'] = c.address
-        header['client_model'] = self.model_name
         self.icomm[header['request_id']] = c
         self.icomm_order.append(header['request_id'])
         return header
@@ -194,57 +203,82 @@ class ClientComm(CommBase.CommBase):
         icomm.close()
 
     # SEND METHODS
-    def send(self, *args, **kwargs):
-        r"""Create a response comm and then send a message to the output comm
-        with the response address in the header.
+    def prepare_message(self, *args, **kwargs):
+        r"""Perform actions preparing to send a message.
 
         Args:
-            *args: Arguments are passed to output comm send method.
-            **kwargs: Keyword arguments are passed to output comm send method.
+            *args: Components of the outgoing message.
+            **kwargs: Keyword arguments are passed to the request comm's
+                prepare_message method.
 
         Returns:
-            obj: Output from output comm send method.
+            CommMessage: Serialized and annotated message.
 
         """
-        msg = args
-        if len(args) == 1:
-            msg = args[0]
-        # if self.is_closed:
-        #     self.debug("send(): Connection closed.")
-        #     return False
-        created_response = False
-        kwargs.setdefault('header_kwargs', {})
-        kwargs['header_kwargs'].update(client_model=self.model_name)
-        if (not self.is_eof(msg)) and self.ocomm.evaluate_filter(msg):
-            kwargs['header_kwargs'].update(self.create_response_comm())
-            created_response = True
-        out = self.ocomm.send(*args, **kwargs)
-        if (not out) and created_response:
-            self.remove_response_comm()
+        def add_response_address(msg):
+            if msg.flag == CommBase.FLAG_SUCCESS:
+                if msg.header is None:
+                    msg.header = {}
+                msg.header.update(self.create_response_comm())
+            return msg
+        kwargs.setdefault('after_prepare_message', [])
+        kwargs['after_prepare_message'].append(add_response_address)
+        return self.ocomm.prepare_message(*args, **kwargs)
+        
+    def send_message(self, msg, **kwargs):
+        r"""Send a message encapsulated in a CommMessage object.
+
+        Args:
+            msg (CommMessage): Message to be sent.
+            **kwargs: Additional keyword arguments are passed to the request
+                comm's send_message method.
+
+        Returns:
+            bool: Success or failure of send.
+        
+        """
+        out = self.ocomm.send_message(msg, **kwargs)
+        self.errors += self.ocomm.errors
         return out
-
+        
     # RECV METHODS
-    def recv(self, *args, **kwargs):
-        r"""Receive a message from the input comm and open a new response comm
-        for output using address from the header.
+    def recv_message(self, *args, **kwargs):
+        r"""Receive a message.
 
         Args:
-            *args: Arguments are passed to input comm recv method.
-            **kwargs: Keyword arguments are passed to input comm recv method.
+            *args: Arguments are passed to the response comm's recv_message method.
+            **kwargs: Keyword arguments are passed to the response comm's recv_message
+                method.
 
         Returns:
-            obj: Output from input comm recv method.
+            CommMessage: Received message.
 
         """
-        # if self.is_closed:
-        #     self.debug("recv(): Connection closed.")
-        #     return (False, None)
         if len(self.icomm) == 0:  # pragma: debug
             raise RuntimeError("There are not any registered response comms.")
-        out = self.icomm[self.icomm_order[0]].recv(*args, **kwargs)
-        self.remove_response_comm()
+        out = self.icomm[self.icomm_order[0]].recv_message(*args, **kwargs)
+        self.errors += self.icomm[self.icomm_order[0]].errors
         return out
 
+    def finalize_message(self, msg, **kwargs):
+        r"""Perform actions to decipher a message.
+
+        Args:
+            msg (CommMessage): Initial message object to be finalized.
+            **kwargs: Keyword arguments are passed to the response comm's
+                finalize_message method.
+
+        Returns:
+            CommMessage: Deserialized and annotated message.
+
+        """
+        if len(self.icomm) == 0:  # pragma: debug
+            raise RuntimeError("There are not any registered response comms.")
+        msg = self.icomm[self.icomm_order[0]].finalize_message(msg, **kwargs)
+        if msg.flag in [CommBase.FLAG_SUCCESS, CommBase.FLAG_FAILURE]:
+            self.remove_response_comm()
+        return msg
+        
     # CALL
     def call(self, *args, **kwargs):
         r"""Do RPC call. The request message is sent to the output comm and the

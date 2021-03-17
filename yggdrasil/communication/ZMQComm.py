@@ -4,7 +4,8 @@ import uuid
 import logging
 from yggdrasil import tools
 from yggdrasil import multitasking
-from yggdrasil.communication import CommBase, AsyncComm
+from yggdrasil.communication import (
+    CommBase, TemporaryCommunicationError, NoMessages)
 logger = logging.getLogger(__name__)
 try:
     import zmq
@@ -217,8 +218,8 @@ class ZMQProxy(CommBase.CommServer):
                                        nretry=nretry,
                                        retry_timeout=retry_timeout)
         self.cli_socket.setsockopt(zmq.LINGER, 0)
-        CommBase.register_comm('ZMQComm', 'ROUTER_server_' + self.cli_address,
-                               self.cli_socket)
+        ZMQComm.register_comm('ROUTER_server_' + self.cli_address,
+                              self.cli_socket)
         # Bind backend
         self.srv_socket = zmq_context.socket(zmq.DEALER)
         self.srv_socket.setsockopt(zmq.LINGER, 0)
@@ -232,15 +233,15 @@ class ZMQProxy(CommBase.CommServer):
             CommBase.unregister_comm(
                 'ZMQComm', 'ROUTER_server_' + self.cli_address)
             raise
-        CommBase.register_comm('ZMQComm', 'DEALER_server_' + self.srv_address,
-                               self.srv_socket)
+        ZMQComm.register_comm('DEALER_server_' + self.srv_address,
+                              self.srv_socket)
         # Set up poller
         # self.poller = zmq.Poller()
         # self.poller.register(frontend, zmq.POLLIN)
         self.reply_socket = None
         # Set name
         super(ZMQProxy, self).__init__(self.srv_address, self.cli_address, **kwargs)
-        self._name = 'ZMQProxy.%s' % srv_address
+        self._name = 'ZMQProxy.%s.to.%s' % (cli_address, srv_address)
 
     def client_recv(self):
         r"""Receive single message from the client."""
@@ -299,11 +300,11 @@ class ZMQProxy(CommBase.CommServer):
         if self.srv_socket:
             self.srv_socket.close()
             self.srv_socket = None
-        CommBase.unregister_comm('ZMQComm', 'ROUTER_server_' + self.cli_address)
-        CommBase.unregister_comm('ZMQComm', 'DEALER_server_' + self.srv_address)
+        ZMQComm.unregister_comm('ROUTER_server_' + self.cli_address)
+        ZMQComm.unregister_comm('DEALER_server_' + self.srv_address)
 
 
-class ZMQComm(AsyncComm.AsyncComm):
+class ZMQComm(CommBase.CommBase):
     r"""Class for handling I/O using ZeroMQ sockets.
 
     Args:
@@ -363,8 +364,9 @@ class ZMQComm(AsyncComm.AsyncComm):
                            "address depends on the transport. "
                            "Additional information can be found "
                            "`here <http://api.zeromq.org/3-2:zmq-bind>`_.")
-    _disconnect_attr = (AsyncComm.AsyncComm._disconnect_attr
-                        + ['reply_socket_lock', 'socket_lock'])
+    _disconnect_attr = (CommBase.CommBase._disconnect_attr
+                        + ['reply_socket_lock', 'socket_lock',
+                           '_reply_thread'])
     
     def _init_before_open(self, context=None, socket_type=None,
                           socket_action=None, topic_filter='',
@@ -373,7 +375,11 @@ class ZMQComm(AsyncComm.AsyncComm):
         r"""Initialize defaults for socket type/action based on direction."""
         self.reply_socket_lock = multitasking.RLock()
         self.socket_lock = multitasking.RLock()
+        self._reply_thread = None
         # Client/Server things
+        if self.allow_multiple_comms:
+            socket_type = 'DEALER'
+            socket_action = 'connect'
         if self.is_client:
             socket_type = 'DEALER'
             socket_action = 'connect'
@@ -388,7 +394,7 @@ class ZMQComm(AsyncComm.AsyncComm):
                 socket_type = _socket_recv_types[_default_socket_type]
             elif self.direction == 'send':
                 socket_type = _socket_send_types[_default_socket_type]
-        if not (self.is_client or self.is_server):
+        if not (self.allow_multiple_comms or self.is_client or self.is_server):
             if socket_type in ['PULL', 'SUB', 'REP', 'DEALER']:
                 self.direction = 'recv'
             elif socket_type in ['PUSH', 'PUB', 'REQ', 'ROUTER']:
@@ -460,19 +466,22 @@ class ZMQComm(AsyncComm.AsyncComm):
             self._bound = False
             self.bind()
         
-    def get_status_message(self, nindent=0):
+    def get_status_message(self, nindent=0, **kwargs):
         r"""Return lines composing a status message.
         
         Args:
             nindent (int, optional): Number of tabs that should be used to
                 indent each line. Defaults to 0.
+            **kwargs: Additional keyword arguments are passed to the
+                parent class's method.
                 
         Returns:
             tuple(list, prefix): Lines composing the status message and the
                 prefix string used for the last message.
 
         """
-        lines, prefix = super(ZMQComm, self).get_status_message(nindent=nindent)
+        lines, prefix = super(ZMQComm, self).get_status_message(
+            nindent=nindent, **kwargs)
         lines += ['%s%-15s: %s' % (prefix, 'nsent (zmq)', self._n_zmq_sent),
                   '%s%-15s: %s' % (prefix, 'nsent reply (zmq)', self._n_reply_sent)]
         for k in self._n_zmq_recv.keys():
@@ -481,11 +490,22 @@ class ZMQComm(AsyncComm.AsyncComm):
                                        self._n_reply_recv[k])]
         return lines, prefix
 
-    @classmethod
-    def underlying_comm_class(self):
-        r"""str: Name of underlying communication class."""
-        return 'ZMQComm'
-
+    @property
+    def reply_thread(self):
+        r"""tools.YggTask: Task that will handle sinding or receiving
+        backlogged messages."""
+        if (self._reply_thread is None) and (not self.is_async):
+            def reply_target():
+                if self.is_closed:
+                    raise multitasking.BreakLoopException("Comm closed")
+                if self.direction == 'send':
+                    self.confirm_send(sleep=True)
+                else:
+                    self.confirm_recv(sleep=True)
+            self._reply_thread = CommBase.CommTaskLoop(
+                self, target=reply_target, suffix='Reply')
+        return self._reply_thread
+    
     @classmethod
     def close_registry_entry(cls, value):
         r"""Close a registry entry."""
@@ -554,6 +574,11 @@ class ZMQComm(AsyncComm.AsyncComm):
             if self._server is None:  # pragma: debug
                 raise Exception("The client proxy does not yet have an address.")
             return self._server.srv_address
+        elif self.allow_multiple_comms:
+            if self.direction == 'send':
+                return self._server.srv_address
+            else:
+                return self._server.cli_address
         else:
             return self.address
 
@@ -651,11 +676,11 @@ class ZMQComm(AsyncComm.AsyncComm):
     #         self._connected = False
     #     self.debug('Disconnected socket')
 
-    def _open_direct(self):
+    def open(self):
         r"""Open connection by binding/connect to the specified socket."""
-        super(ZMQComm, self)._open_direct()
+        super(ZMQComm, self).open()
         with self.socket_lock:
-            if not self.is_open_direct:
+            if not self.is_open:
                 # Set dealer identity
                 if self.socket_type_name == 'DEALER':
                     self.socket.setsockopt(zmq.IDENTITY, self.dealer_identity)
@@ -671,6 +696,8 @@ class ZMQComm(AsyncComm.AsyncComm):
                 if self.socket_type_name == 'SUB':
                     self.socket.setsockopt(zmq.SUBSCRIBE, self.topic_filter)
                 self._openned = True
+            if (not self.is_async) and (not self.reply_thread.is_alive()):
+                self.reply_thread.start()
 
     def set_reply_socket_send(self):
         r"""Set the send reply socket if it dosn't exist."""
@@ -724,8 +751,9 @@ class ZMQComm(AsyncComm.AsyncComm):
             str: Messages with reply address removed if present.
 
         """
-        if self.direction == 'send':
-            return msg, None
+        assert(self.direction != 'send')
+        # if self.direction == 'send':
+        #     return msg, None
         header = self.serializer.parse_header(msg.split(_flag_zmq_filter)[-1])
         address = header.get('zmq_reply', None)
         if (address is None):
@@ -734,34 +762,29 @@ class ZMQComm(AsyncComm.AsyncComm):
             self.set_reply_socket_recv(address)
         return msg, address
 
-    # @property
-    # def n_reply_sent(self):
-    #     r"""Number of messages sent which have been confirmed."""
-    #     return self._n_reply_sent
-
-    # @property
-    # def n_reply_recv(self):
-    #     r"""Number of messages received which have been confirmed."""
-    #     return sum(self._n_reply_recv.values())
-
     def _reply_handshake_send(self):
         r"""Do send side of handshake."""
         if (((self.reply_socket_send is None)
              or self.reply_socket_send.closed)):  # pragma: debug
-            self.backlog_thread.set_break_flag()
-            self.debug("SOCKET CLOSED")
-            return False
+            raise multitasking.BreakLoopException("SOCKET CLOSED")
         out = self.reply_socket_send.poll(timeout=1, flags=zmq.POLLIN)
         if out == 0:
             self.periodic_debug('_reply_handshake_send', period=1000)(
                 'No reply handshake waiting')
             return False
-        msg = self.reply_socket_send.recv(flags=zmq.NOBLOCK)
-        if msg == self.eof_msg:  # pragma: debug
+        try:
+            msg = self.reply_socket_send.recv(flags=zmq.NOBLOCK)
+        except zmq.ZMQError:  # pragma: debug
+            self.periodic_debug('_reply_handshake_send', period=1000)(
+                'Error receiving handshake.')
+            return False
+        if self.is_eof(msg):  # pragma: debug
             self.error("REPLY EOF RECV'D")
             return msg
         self.reply_socket_send.send(msg, flags=zmq.NOBLOCK)
         self._n_reply_sent += 1
+        self.reply_socket_send.poll(timeout=self.zmq_sleeptime,
+                                    flags=zmq.POLLIN)
         return msg
 
     def _reply_handshake_recv(self, msg_send, key):
@@ -769,38 +792,45 @@ class ZMQComm(AsyncComm.AsyncComm):
         try:
             socket = self.reply_socket_recv.get(key, None)
             if socket is None or socket.closed:  # pragma: debug
-                self.backlog_thread.set_break_flag()
-                self.debug("SOCKET CLOSED")
-                return False
+                raise multitasking.BreakLoopError("SOCKET CLOSED: %s" % key)
             out = socket.poll(timeout=1, flags=zmq.POLLOUT)
             if out == 0:  # pragma: debug
                 self.periodic_debug('_reply_handshake_recv', period=1000)(
                     'Cannot initiate reply handshake')
                 return False
             socket.send(msg_send, flags=zmq.NOBLOCK)
-            if msg_send == self.eof_msg:  # pragma: debug
+            if self.is_eof(msg_send):  # pragma: debug
                 self.error("REPLY EOF SENT")
                 return True
-            tries = 10
+            tries = 100
             out = 0
             while (out == 0) and (tries > 0):
                 out = socket.poll(timeout=self.zmq_sleeptime,
                                   flags=zmq.POLLIN)
                 if out == 0:
-                    self.debug("No response waiting. %d tries left.", tries)
+                    self.debug(
+                        ("No response waiting (address=%s). "
+                         "%d tries left."), key, tries)
                     tries -= 1
-            if out == 0:
-                self.error('No response received.')
-                return False
             msg_recv = socket.recv(flags=zmq.NOBLOCK)
             assert(msg_recv == msg_send)
             self._n_reply_recv[key] += 1
             return True
         except zmq.ZMQError as e:  # pragma: debug
-            self.error("ZMQ Error: %s", e)
-            return False
+            raise multitasking.BreakLoopError("ZMQ Error(%s): %s"
+                                              % (key, e))
 
-    def _close_direct(self, linger=False):
+    def _close_backlog(self, wait=False):
+        r"""Close the backlog thread and the reply sockets."""
+        with self.reply_socket_lock:
+            if (self.reply_socket_send is not None):
+                self.reply_socket_send.close(linger=0)  # self.zmq_sleeptime)
+                self.unregister_comm("REPLY_SEND_" + self.reply_socket_address)
+            for k, socket in self.reply_socket_recv.items():
+                socket.close(linger=0)
+                self.unregister_comm("REPLY_RECV_" + k)
+
+    def _close(self, linger=False):
         r"""Close the connection.
 
         Args:
@@ -809,6 +839,8 @@ class ZMQComm(AsyncComm.AsyncComm):
 
         """
         self.debug("")
+        if not self.is_async:
+            self._close_backlog(wait=linger)
         with self.socket_lock:
             self.debug("self.socket.closed = %s", str(self.socket.closed))
             if self.socket.closed:
@@ -828,19 +860,7 @@ class ZMQComm(AsyncComm.AsyncComm):
                 #     if os.path.isfile(self.host):
                 #         os.remove(self.host)
             self.unregister_comm(self.registry_key)
-        super(ZMQComm, self)._close_direct(linger=linger)
-
-    def _close_backlog(self, wait=False):
-        r"""Close the backlog thread and the reply sockets."""
-        super(ZMQComm, self)._close_backlog(wait=wait)
-        if self.direction == 'send':
-            if (self.reply_socket_send is not None):
-                self.reply_socket_send.close(linger=0)  # self.zmq_sleeptime)
-                self.unregister_comm("REPLY_SEND_" + self.reply_socket_address)
-        else:
-            for k, socket in self.reply_socket_recv.items():
-                socket.close(linger=0)
-                self.unregister_comm("REPLY_RECV_" + k)
+        super(ZMQComm, self)._close(linger=linger)
 
     def server_exists(self, srv_address):
         r"""Determine if a server exists.
@@ -859,7 +879,7 @@ class ZMQComm(AsyncComm.AsyncComm):
         return super(ZMQComm, self).server_exists(srv_address)
 
     @property
-    def is_open_direct(self):
+    def is_open(self):
         r"""bool: True if the socket is open."""
         with self.socket_lock:
             return (self._openned and not self.socket.closed)
@@ -877,7 +897,7 @@ class ZMQComm(AsyncComm.AsyncComm):
         out = 0
         # with self._closing_thread.lock:
         with self.socket_lock:
-            if self.is_open_direct:
+            if self.is_open:
                 try:
                     out = self.socket.poll(timeout=1, flags=flags)
                 except zmq.ZMQError:  # pragma: debug
@@ -886,34 +906,25 @@ class ZMQComm(AsyncComm.AsyncComm):
         return bool(out)
         
     @property
-    def n_msg_direct_recv(self):
-        r"""int: Number of messages currently being routed from recv."""
-        if self.is_open_direct:
+    def n_msg_recv(self):
+        r"""int: The number of incoming messages in the connection."""
+        if self.is_open and (self.direction == 'recv'):
             return int(self.is_message(zmq.POLLIN))
         return 0
 
     @property
-    def n_msg_direct_send(self):
-        r"""int: Number of messages currently being routed."""
-        if self.is_open_direct and (self.direction == 'send'):
+    def n_msg_send(self):
+        r"""int: The number of outgoing messages in the connection."""
+        if self.is_open and (self.direction == 'send'):
             return (self._n_zmq_sent - self._n_reply_sent)
         return 0
-
-    # @property
-    # def is_confirmed_send(self):
-    #     r"""bool: True if all sent messages have been confirmed."""
-    #     if self.is_open_backlog:
-    #         return (self._n_zmq_sent == self._n_reply_sent)
-    #     return True  # pragma: debug
 
     @property
     def is_confirmed_recv(self):
         r"""bool: True if all received messages have been confirmed."""
-        for v in self._work_comms.values():
-            if (v.direction == 'recv') and not v.is_confirmed_recv:  # pragma: debug
-                self.debug("Work comm not confirmed")
-                return False
-        if self.is_open_backlog:
+        if not super(ZMQComm, self).is_confirmed_recv:
+            return False
+        if self.is_open and (self.direction == 'recv'):
             return (self._n_zmq_recv == self._n_reply_recv)
         return True  # pragma: debug
 
@@ -966,44 +977,44 @@ class ZMQComm(AsyncComm.AsyncComm):
         c = super(ZMQComm, self).header2workcomm(header, **kwargs)
         return c
     
-    def on_send(self, msg, header_kwargs=None):
-        r"""Process message to be sent including handling serializing
-        message and handling EOF.
+    def prepare_message(self, *args, **kwargs):
+        r"""Perform actions preparing to send a message.
 
         Args:
-            msg (obj): Message to be sent
-            header_kwargs (dict, optional): Keyword arguments that should be
-                added to the header.
+            *args: Components of the outgoing message.
+            **kwargs: Keyword arguments are passed to the parent class's method.
 
         Returns:
-            tuple (bool, str, dict): Truth of if message should be sent, raw
-                bytes message to send, and header info contained in the message.
+            CommMessage: Serialized and annotated message.
 
         """
-        if self.direction == 'send':
-            if header_kwargs is None:
-                header_kwargs = dict()
-            header_kwargs['zmq_reply'] = self.set_reply_socket_send()
-        return super(ZMQComm, self).on_send(msg, header_kwargs=header_kwargs)
+        kwargs.setdefault('header_kwargs', {})
+        kwargs['header_kwargs']['zmq_reply'] = self.set_reply_socket_send()
+        return super(ZMQComm, self).prepare_message(*args, **kwargs)
         
-    # This is only needed when base is not asynchronous
-    # def _send_multipart_worker(self, msg, header, **kwargs):
-    #     r"""Send multipart message to the worker comm identified.
-
-    #     Args:
-    #         msg (str): Message to be sent.
-    #         header (dict): Message info including work comm address.
-
-    #     Returns:
-    #         bool: Success or failure of sending the message.
-
-    #     """
-    #     workcomm = self.get_work_comm(header)
-    #     args = [msg]
-    #     self.sched_task(0, workcomm._send_multipart, args=args, kwargs=kwargs)
-    #     return True
-
-    def _send_direct(self, msg, topic='', identity=None, **kwargs):
+    def send(self, *args, **kwargs):
+        r"""Send a message."""
+        # Ensure that filter is not being used with REQ or REP socket
+        # which cannot drop messages
+        if self.filter and (self.socket_type_name in ['REQ', 'REP']):  # pragma: debug
+            raise RuntimeError("Cannot use filters with REQ or REP "
+                               "sockets since dropping messages "
+                               "would break the requirement of "
+                               "alternating send & receives.")
+        return super(ZMQComm, self).send(*args, **kwargs)
+        
+    def recv(self, *args, **kwargs):
+        r"""Receive a message."""
+        # Ensure that filter is not being used with REQ or REP socket
+        # which cannot drop messages
+        if self.filter and (self.socket_type_name in ['REQ', 'REP']):  # pragma: debug
+            raise RuntimeError("Cannot use filters with REQ or REP "
+                               "sockets since dropping messages "
+                               "would break the requirement of "
+                               "alternating send & receives.")
+        return super(ZMQComm, self).recv(*args, **kwargs)
+        
+    def _send(self, msg, topic='', identity=None, **kwargs):
         r"""Send a message.
 
         Args:
@@ -1013,15 +1024,13 @@ class ZMQComm(AsyncComm.AsyncComm):
             identity (str, optional): Identify of identified worker that
                 should be sent for 'ROUTER' sockets. Defaults to
                 self.dealer_identity.
-            **kwargs: Additional keyword arguments are passed to socket send.
+            **kwargs: Additional keyword arguments are passed to the
+                ZeroMQ socket's send method.
 
         Returns:
             bool: Success or failure of send.
 
         """
-        if not self.is_open_direct:  # pragma: debug
-            self.error("Socket closed")
-            return False
         if identity is None:
             identity = self.dealer_identity
         topic = tools.str2bytes(topic)
@@ -1034,24 +1043,29 @@ class ZMQComm(AsyncComm.AsyncComm):
         kwargs.setdefault('flags', zmq.NOBLOCK)
         with self.socket_lock:
             try:
-                if self.socket.closed:  # pragma: debug
-                    self.error("Socket closed")
-                    return False
-                self.special_debug("Sending %d bytes to %s", len(total_msg), self.address)
                 if self.socket_type_name == 'ROUTER':
-                    self.socket.send(identity, zmq.SNDMORE)
-                self.socket.send(total_msg, **kwargs)
-                self.special_debug("Sent %d bytes to %s", len(total_msg), self.address)
-                self._n_zmq_sent += 1
+                    kwargs['flags'] |= zmq.SNDMORE
+                    self.socket.send(identity, **kwargs)
+                    # self.socket.send_multipart([identity, total_msg],
+                    #                            **kwargs)
+                else:
+                    self.socket.send(total_msg, **kwargs)
             except zmq.ZMQError as e:  # pragma: debug
                 if e.errno == zmq.EAGAIN:
-                    raise AsyncComm.AsyncTryAgain("Socket not yet available.")
-                else:
-                    self.special_debug("Socket could not send. (errno=%d)", e.errno)
-                    return False
+                    raise TemporaryCommunicationError(
+                        "Socket not yet available.")
+                self.special_debug("Socket could not send. (errno=%d)", e.errno)
+                raise
+        if self.socket_type_name == 'ROUTER':
+            # TODO: Need to wait here to prevent sending messages twice when
+            # TemporaryCommunicationError is raised due to failure to send
+            # total_msg after successfully sending identity
+            kwargs['flags'] = 0
+            self.socket.send(total_msg, **kwargs)
+        self._n_zmq_sent += 1
         return True
 
-    def _recv_direct(self, **kwargs):
+    def _recv(self, **kwargs):
         r"""Receive a message from the ZMQ socket.
 
         Args:
@@ -1062,36 +1076,26 @@ class ZMQComm(AsyncComm.AsyncComm):
                 message.
 
         """
-        # # Poll until there is a message
-        # if timeout is None:
-        #     timeout = self.recv_timeout
-        # # self.sleep()
-        # if timeout is not False:
-        #     if not self.is_open_direct:  # pragma: debug
-        #         return (False, None)
-        #     ret = self.socket.poll(timeout=max(1, 1000.0 * timeout))
-        #     if ret == 0:
-        #         self.verbose_debug("No messages waiting.")
-        #         return (True, self.empty_bytes_msg)
-        #     flags = zmq.NOBLOCK
-        # else:
-        #     flags = 0
-        flags = zmq.NOBLOCK
-        # Receive message
+        kwargs.setdefault('flags', zmq.NOBLOCK)
         with self.socket_lock:
             try:
                 if self.socket.closed:  # pragma: debug
                     self.error("Socket closed")
                     return (False, self.empty_bytes_msg)
                 if self.socket_type_name == 'ROUTER':
-                    identity = self.socket.recv(flags)
+                    [identity, total_msg] = self.socket.recv_multipart(**kwargs)
                     self._recv_identities.add(identity)
-                kwargs.setdefault('flags', flags)
-                total_msg = self.socket.recv(**kwargs)
-            except zmq.ZMQError:  # pragma: debug
-                self.exception("Error receiving")
-                return (False, self.empty_bytes_msg)
-        self.debug("Recv %d bytes from %s", len(total_msg), self.address)
+                else:
+                    total_msg = self.socket.recv(**kwargs)
+            except zmq.ZMQError as e:
+                if e.errno == zmq.ETIMEDOUT:  # pragma: debug
+                    raise NoMessages("No messages in socket.")
+                elif e.errno == zmq.EAGAIN:
+                    raise TemporaryCommunicationError(
+                        "Socket not yet available.")
+                self.special_debug(("Socket could not receive. "
+                                    "(errno=%d)"), e.errno)  # pragma: debug
+                raise
         # Interpret headers
         total_msg, k = self.check_reply_socket_recv(total_msg)
         if self.socket_type_name == 'SUB':
@@ -1106,66 +1110,46 @@ class ZMQComm(AsyncComm.AsyncComm):
             self.info("No reply address.")
         return (True, msg)
 
-    def confirm_send(self, noblock=False):
+    def confirm_send(self, noblock=False, sleep=False):
         r"""Confirm that sent message was received."""
         if noblock:
             if self.is_open and (self._n_zmq_sent != self._n_reply_sent):
-                self._n_reply_sent = self._n_zmq_sent
+                self._n_reply_sent = self._n_zmq_sent  # pragma: debug
             return True
+        flag = True
         if self.is_open and (self._n_zmq_sent != self._n_reply_sent):
             self.verbose_debug("Confirming %d/%d sent messages",
                                self._n_reply_sent, self._n_zmq_sent)
-            if self._reply_handshake_send():
-                self.debug("Send confirmed (%d/%d)",
-                           self._n_reply_sent, self._n_zmq_sent)
-                return True
-            return False
-        return True
+            while (self._n_zmq_sent != self._n_reply_sent) and flag:
+                with self.reply_socket_lock:
+                    flag = self._reply_handshake_send()
+                if flag:
+                    self.debug("Send confirmed (%d/%d)",
+                               self._n_reply_sent, self._n_zmq_sent)
+        if sleep:
+            self.sleep()
+        return flag
 
-    def confirm_recv(self, noblock=False):
+    def confirm_recv(self, noblock=False, sleep=False):
         r"""Confirm that message was received."""
         with self.reply_socket_lock:
             keys = [k for k in self.reply_socket_recv.keys()]
         if noblock:
             for k in keys:
                 if self.is_open and (self._n_zmq_recv[k] != self._n_reply_recv[k]):
-                    self._n_reply_recv[k] = self._n_zmq_recv[k]
+                    self._n_reply_recv[k] = self._n_zmq_recv[k]  # pragma: debug
             return True
-        flag = None
+        flag = True
         for k in keys:
             if self.is_open and (self._n_zmq_recv[k] != self._n_reply_recv[k]):
                 self.debug("Confirming %d/%d received messages",
                            self._n_reply_recv[k], self._n_zmq_recv[k])
-                if self._reply_handshake_recv(_reply_msg, k):
-                    self.debug("Recv confirmed (%d/%d)",
-                               self._n_reply_recv[k], self._n_zmq_recv[k])
-                    flag = True
-                elif flag is None:
-                    flag = False
-        if flag is None:
-            flag = True
+                while (self._n_zmq_recv[k] != self._n_reply_recv[k]) and flag:
+                    with self.reply_socket_lock:
+                        flag = self._reply_handshake_recv(_reply_msg, k)
+                    if flag:
+                        self.debug("Recv confirmed (%d/%d)",
+                                   self._n_reply_recv[k], self._n_zmq_recv[k])
+        if sleep:
+            self.sleep()
         return flag
-            
-    # def purge(self):
-    #     r"""Purge all messages from the comm."""
-    #     with self._closing_thread.lock:
-    #         # with self._reply_thread.lock:
-    #         if self.direction == 'recv':
-    #             while self.n_msg_recv > 0:
-    #                 msg = self.socket.recv(flags=zmq.NOBLOCK)
-    #                 self.check_reply_socket_recv(msg)
-    #             for k in self.reply_socket_recv.keys():
-    #                 # self._do_reply_recv[k].clear()
-    #                 self._n_reply_recv[k] = 0
-    #                 self._n_zmq_recv[k] = 0
-    #                 # self._n_recv_zmq[k] = 0
-    #                 if self.is_open:
-    #                     flag = self._reply_handshake_recv(_purge_msg, k)
-    #                     assert(flag)
-    #             self._do_reply_recv_master.clear()
-    #         else:
-    #             # Can't purge output on unidirection sockets
-    #             self._do_reply_send.clear()
-    #             self._n_reply_send = 0
-    #             self._n_zmq_sent = 0
-    #     super(ZMQComm, self).purge()

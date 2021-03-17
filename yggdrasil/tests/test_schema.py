@@ -194,3 +194,18 @@ def test_get_model_form_schema():
     finally:
         if os.path.isfile(fname):
             os.remove(fname)
+
+
+def test_update_constants():
+    r"""Test script to update constants and check that they have not changed."""
+    filename = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'constants.py')
+    with open(filename, 'r') as fd:
+        old = fd.read()
+    try:
+        schema.update_constants()
+        with open(filename, 'r') as fd:
+            new = fd.read()
+        assert_equal(old, new)
+    finally:
+        with open(filename, 'w') as fd:
+            fd.write(old)

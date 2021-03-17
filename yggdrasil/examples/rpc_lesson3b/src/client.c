@@ -5,6 +5,7 @@
 
 int model_function(char* in_buf, uint64_t length_in_buf,
 		   char** out_buf, uint64_t* length_out_buf) {
+  ygg_init();
   int error_code = 0;
   int nthreads = atoi(getenv("NTHREAD"));
 #ifdef _OPENMP
@@ -50,6 +51,9 @@ int model_function(char* in_buf, uint64_t length_in_buf,
 #ifdef _OPENMP
 	}
 #endif
+      }
+      if (i != 0) {
+	free(out_temp);
       }
     }
   }

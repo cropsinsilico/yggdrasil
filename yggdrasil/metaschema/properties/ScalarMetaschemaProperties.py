@@ -27,8 +27,6 @@ for t, t_np in _valid_types.items():
         prec_list = [64, 128]
         if not platform._is_win:
             prec_list.append(256)  # Not available on windows
-    if hasattr(np, t_np):
-        _python_scalars[t].append(getattr(np, t_np))
     _python_scalars[t].append(np.dtype(t_np).type)
     for p in prec_list:
         _python_scalars[t].append(np.dtype(t_np + str(p)).type)

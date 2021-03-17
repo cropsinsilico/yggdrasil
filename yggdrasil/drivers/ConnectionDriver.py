@@ -5,11 +5,9 @@ import numpy as np
 import functools
 import queue
 from yggdrasil import multitasking
-from yggdrasil.communication import new_comm
+from yggdrasil.communication import new_comm, CommBase
 from yggdrasil.drivers.Driver import Driver
-from yggdrasil.components import (
-    import_component, create_component, isinstance_component)
-from yggdrasil.schema import get_schema
+from yggdrasil.components import create_component, isinstance_component
 
 
 def _translate_list2element(arr):
@@ -56,6 +54,11 @@ class RemoteTaskLoop(multitasking.YggTaskLoop):
         self.break_flag = multitasking.Event(
             task_method='process',
             task_context=connection.process_instance.context)
+
+    def __getstate__(self):
+        out = super(RemoteTaskLoop, self).__getstate__()
+        del out['connection']
+        return out
 
     def is_open(self):
         return (not self.was_break)
@@ -124,11 +127,15 @@ class ConnectionDriver(Driver):
 
     Args:
         name (str): Name that should be used to set names of input/output comms.
-        icomm_kws (dict, optional): Keyword arguments for the input communicator.
-        ocomm_kws (dict, optional): Keyword arguments for the output communicator.
-        translator (str, func, optional): Function or string specifying a function
-            that should be used to translate messages from the input communicator(s)
-            before passing them to the output communicator(s). If a string, the
+        inputs (list, optional): One or more dictionaries containing keyword
+            arguments for constructing input communicators. Defaults to an
+            empty dictionary if not provided.
+        outputs (list, optional): One or more dictionaries containing keyword
+            arguments for constructing output communicators. Defaults to an
+            empty dictionary if not provided.
+        translator (str, func, optional): Function or string specifying function
+            that should be used to translate messages from the input communicator
+            before passing them to the output communicator. If a string, the
             format should be "<package.module>:<function>" so that <function>
             can be imported from <package>. Defaults to None and messages are
             passed directly. This can also be a list of functions/strings that
@@ -150,7 +157,6 @@ class ConnectionDriver(Driver):
         nrecv (int): Number of messages received.
         nproc (int): Number of messages processed.
         nsent (int): Number of messages sent.
-        nskip (int): Number of messages skipped.
         state (str): Descriptor of last action taken.
         translator (func): Function that will be used to translate messages from
             the input communicator before passing them to the output communicator.
@@ -164,20 +170,22 @@ class ConnectionDriver(Driver):
     """
 
     _connection_type = 'default'
-    _icomm_type = 'DefaultComm'
-    _ocomm_type = 'DefaultComm'
+    _icomm_type = 'default'
+    _ocomm_type = 'default'
     _direction = 'any'
     _schema_type = 'connection'
     _schema_subtype_key = 'connection_type'
     _schema_subtype_description = ('Connection between one or more comms/files '
                                    'and one or more comms/files.')
     _schema_subtype_default = 'default'
+    _connection_type = 'connection'
     _schema_required = ['inputs', 'outputs']
     _schema_properties = {
-        'connection_type': {'type': 'string'},  # 'default': 'default'},
+        'connection_type': {'type': 'string'},
         'inputs': {'type': 'array', 'minItems': 1,
                    'items': {'anyOf': [{'$ref': '#/definitions/comm'},
                                        {'$ref': '#/definitions/file'}]},
+                   'default': [{}],
                    'description': (
                        'One or more name(s) of model output channel(s) '
                        'and/or new channel/file objects that the '
@@ -188,6 +196,7 @@ class ConnectionDriver(Driver):
         'outputs': {'type': 'array', 'minItems': 1,
                     'items': {'anyOf': [{'$ref': '#/definitions/comm'},
                                         {'$ref': '#/definitions/file'}]},
+                    'default': [{}],
                     'description': (
                         'One or more name(s) of model input channel(s) '
                         'and/or new channel/file objects that the '
@@ -204,27 +213,17 @@ class ConnectionDriver(Driver):
     _disconnect_attr = Driver._disconnect_attr + [
         '_comm_closed', '_skip_after_loop', 'shared', 'task_thread']
 
-    @property
-    def _is_input(self):
-        r"""bool: True if the connection is providing input to a model."""
-        return (self._direction == 'input')
-
-    @property
-    def _is_output(self):
-        r"""bool: True if the connection is retreiving output from a model."""
-        return (self._direction == 'output')
-
     def __init__(self, name, translator=None, single_use=False, onexit=None, **kwargs):
+        # kwargs['method'] = 'process'
         super(ConnectionDriver, self).__init__(name, **kwargs)
         # Shared attributes (set once or synced using events)
         self.single_use = single_use
         self.shared = self.context.Dict()
-        self.shared.update(nrecv=0, nproc=0, nsent=0, nskip=0,
+        self.shared.update(nrecv=0, nproc=0, nsent=0,
                            state='started', close_state='',
                            _comm_closed=multitasking.DummyEvent(),
                            _skip_after_loop=multitasking.DummyEvent())
         # Attributes used by process
-        self._last_header = None
         self._eof_sent = False
         self._first_send_done = False
         self._used = False
@@ -250,6 +249,8 @@ class ConnectionDriver(Driver):
         self.onexit = onexit
         # Add comms and print debug info
         self._init_comms(name, **kwargs)
+        self.models = {'input': list(self.icomm.model_env.keys()),
+                       'output': list(self.ocomm.model_env.keys())}
         # self.debug('    env: %s', str(self.env))
         self.debug(('\n' + 80 * '=' + '\n'
                     + 'class = %s\n'
@@ -259,84 +260,73 @@ class ConnectionDriver(Driver):
                    self.icomm.name, self.icomm.address,
                    self.ocomm.name, self.ocomm.address)
 
-    def _init_single_comm(self, name, io, comm_kws, **kwargs):
+    def _init_single_comm(self, io, comm_list):
         r"""Parse keyword arguments for input/output comm."""
         self.debug("Creating %s comm", io)
-        s = get_schema()
-        if comm_kws is None:
-            comm_kws = dict()
-        else:
-            comm_kws = copy.deepcopy(comm_kws)
+        comm_kws = dict()
+        assert(isinstance(comm_list, list))
+        assert(comm_list)
         if io == 'input':
             direction = 'recv'
-            comm_type = self._icomm_type
-            touches_model = self._is_output
             attr_comm = 'icomm'
             comm_kws['close_on_eof_recv'] = False
+            comm_type = self._icomm_type
         else:
             direction = 'send'
-            comm_type = self._ocomm_type
-            touches_model = self._is_input
             attr_comm = 'ocomm'
+            comm_type = self._ocomm_type
         comm_kws['direction'] = direction
         comm_kws['dont_open'] = True
         comm_kws['reverse_names'] = True
-        comm_kws.setdefault('comm', {'comm': comm_type})
-        assert(name == self.name)
-        comm_kws.setdefault('name', name)
-        if not isinstance(comm_kws['comm'], list):
-            comm_kws['comm'] = [comm_kws['comm']]
-        for i, x in enumerate(comm_kws['comm']):
+        comm_kws['use_async'] = True
+        comm_kws['name'] = self.name
+        for i, x in enumerate(comm_list):
             if x is None:
-                comm_kws['comm'][i] = dict()
-            elif not isinstance(x, dict):
-                comm_kws['comm'][i] = dict(comm=x)
-            comm_kws['comm'][i].setdefault('comm', comm_type)
-        any_files = False
-        all_files = True
-        if not touches_model:
-            comm_kws['no_suffix'] = True
-            ikws = []
-            for x in comm_kws['comm']:
-                icomm_cls = import_component('comm', x['comm'])
-                if icomm_cls.is_file:
-                    any_files = True
-                    ikws += s['file'].get_subtype_properties(icomm_cls._filetype)
-                else:
-                    all_files = False
-                    ikws += s['comm'].get_subtype_properties(icomm_cls._commtype)
-                    if (icomm_cls._commtype == 'buffer') and self.as_process:
-                        x['buffer_task_method'] = 'process'
-            ikws = list(set(ikws))
-            for k in ikws:
-                if (k not in comm_kws) and (k in kwargs):
-                    comm_kws[k] = kwargs.pop(k)
-            if ('comm_env' in kwargs) and ('comm_env' not in comm_kws):
-                comm_kws['env'] = kwargs.pop('comm_env')
-        if any_files and (io == 'input'):
-            kwargs.setdefault('timeout_send_1st', 60)
+                comm_list[i] = dict()
+            else:
+                assert(isinstance(x, dict))
+            if 'filetype' not in comm_list[i]:
+                comm_list[i].setdefault('commtype', comm_type)
+            if self.as_process:
+                comm_list[i]['buffer_task_method'] = 'process'
+        comm_kws['commtype'] = copy.deepcopy(comm_list)
         self.debug('%s comm_kws:\n%s', attr_comm, self.pprint(comm_kws, 1))
-        comm_kws['touches_model'] = touches_model
         setattr(self, attr_comm, new_comm(**comm_kws))
         setattr(self, '%s_kws' % attr_comm, comm_kws)
-        if touches_model:
-            self.env.update(getattr(self, attr_comm).opp_comms)
-        elif not all_files:
-            self.comm_env.update(getattr(self, attr_comm).opp_comms)
-        return kwargs
 
-    def _init_comms(self, name, icomm_kws=None, ocomm_kws=None, **kwargs):
+    def _init_comms(self, name, **kwargs):
         r"""Parse keyword arguments for input/output comms."""
-        kwargs = self._init_single_comm(name, 'input', icomm_kws, **kwargs)
+        self._init_single_comm('input', self.inputs)
         try:
-            kwargs = self._init_single_comm(name, 'output', ocomm_kws, **kwargs)
+            self._init_single_comm('output', self.outputs)
         except BaseException:
             self.icomm.close()
             raise
         # Apply keywords dependent on comms
+        if self.icomm.any_files:
+            kwargs.setdefault('timeout_send_1st', 60)
         self.timeout_send_1st = kwargs.pop('timeout_send_1st', self.timeout)
         self.debug('Final env:\n%s', self.pprint(self.env, 1))
 
+    def __setstate__(self, state):
+        super(ConnectionDriver, self).__setstate__(state)
+        if self.as_process:
+            self.task_thread.connection = self
+
+    @property
+    def model_env(self):
+        r"""dict: Mapping between model name and opposite comm
+        environment variables that need to be provided to the model."""
+        out = {}
+        for x in [self.icomm, self.ocomm]:
+            iout = x.model_env
+            for k, v in iout.items():
+                if k in out:
+                    out[k].update(v)
+                else:
+                    out[k] = v
+        return out
+        
     def get_flag_attr(self, attr):
         r"""Return the flag attribute."""
         if attr in self.shared:
@@ -372,15 +362,6 @@ class ConnectionDriver(Driver):
     @nsent.setter
     def nsent(self, x):
         self.shared['nsent'] = x
-
-    @property
-    def nskip(self):
-        r"""int: Number of messages skipped."""
-        return self.shared['nskip']
-
-    @nskip.setter
-    def nskip(self, x):
-        self.shared['nskip'] = x
 
     @property
     def nproc(self):
@@ -419,12 +400,12 @@ class ConnectionDriver(Driver):
     @run_remotely
     def wait_for_route(self, timeout=None):
         r"""Wait until messages have been routed."""
-        T = self.start_timeout(timeout)
+        T = self.start_timeout(timeout, key_suffix='.route')
         while ((not T.is_out)
-               and (self.nrecv != (self.nsent + self.nskip))):  # pragma: debug
+               and (self.nrecv != self.nsent)):  # pragma: debug
             self.sleep()
-        self.stop_timeout()
-        return (self.nrecv == (self.nsent + self.nskip))
+        self.stop_timeout(key_suffix='.route')
+        return (self.nrecv == self.nsent)
 
     @property
     @run_remotely
@@ -457,6 +438,7 @@ class ConnectionDriver(Driver):
         with self.lock:
             return self.icomm.n_msg_recv
 
+    @run_remotely
     def open_comm(self):
         r"""Open the communicators."""
         self.debug('')
@@ -536,31 +518,88 @@ class ConnectionDriver(Driver):
         self.debug('Returning')
 
     @run_remotely
-    def on_model_exit_remote(self):
-        r"""Drain input and then close it (on the remote process)."""
-        if (self.onexit not in [None, 'on_model_exit', 'pass']):
+    def remove_model(self, direction, name):
+        r"""Remove a model from the list of models.
+
+        Args:
+            direction (str): Direction of model.
+            name (str): Name of model exiting.
+
+        Returns:
+            bool: True if all of the input/output models have signed
+                off; False otherwise.
+
+        """
+        self.debug('')
+        with self.lock:
+            if name in self.models[direction]:
+                self.models[direction].remove(name)
+            self.debug(("%s model '%s' signed off."
+                        "\n\tInput  models: %d"
+                        "\n\tOutput models: %d")
+                       % (direction.title(), name,
+                          len(self.models["input"]),
+                          len(self.models["output"])))
+            return (len(self.models[direction]) == 0)
+
+    @run_remotely
+    def on_model_exit_remote(self, direction, name,
+                             errors=False):
+        r"""Drain input and then close it (on the remote process).
+
+        Args:
+            direction (str): Direction of model.
+            name (str): Name of model exiting.
+            errors (list, optional): Errors generated by the
+                model. Defaults to False.
+
+        Returns:
+            bool: True if all of the input/output models have signed
+                off; False otherwise.
+
+        """
+        if not self.remove_model(direction, name):
+            self.debug("%s models remain: %s",
+                       direction, self.models[direction])
+            return False
+        if not self.is_alive():
+            return False
+        self.debug("All %s models have signed off.", direction)
+        if (((self.onexit not in [None, 'on_model_exit',
+                                  'pass'])
+             and (not errors))):
             self.debug("Calling onexit = '%s'" % self.onexit)
             getattr(self, self.onexit)()
-        self.drain_input(timeout=self.timeout)
-        self.set_close_state('model exit')
-        self.debug('Model exit triggered close')
-        if self._is_input:
+        if not errors:
+            if direction == 'output':
+                T = self.start_timeout(60, key_suffix='.model_exit')
+                while (not T.is_out) and self.models['input']:
+                    self.debug("remaining input models: %s",
+                               self.models['input'])
+                    self.sleep(10 * self.sleeptime)
+                self.stop_timeout(key_suffix='.model_exit')
+            self.drain_input(timeout=self.timeout)
+        if direction == 'input':
+            if not errors:
+                self.wait_for_route(timeout=self.timeout)
+            with self.lock:
+                self.icomm.close()
+        elif direction == 'output':
             with self.lock:
                 self.icomm.close()
                 self.ocomm.close()
-        if self._is_output:
-            self.wait_for_route(timeout=self.timeout)
-            with self.lock:
-                self.icomm.close()
+        self.set_close_state('%s model exit' % direction)
+        self.debug('Exit of %s model triggered close', direction)
         self.set_break_flag()
+        return True
 
-    def on_model_exit(self):
+    def on_model_exit(self, direction, name, errors=False):
         r"""Drain input and then close it."""
-        self.debug('')
-        self.on_model_exit_remote()
-        self.wait()
-        self.debug('Finished')
-        super(ConnectionDriver, self).on_model_exit()
+        self.debug('%s model %s exiting', direction.title(), name)
+        if self.on_model_exit_remote(direction, name,
+                                     errors=errors):
+            self.wait()
+            self.debug('Finished')
 
     def do_terminate(self):
         r"""Stop the driver by closing the communicators."""
@@ -598,7 +637,6 @@ class ConnectionDriver(Driver):
                                                  self.ocomm.is_open))
         msg += '%-15s' % (str(self.nrecv) + ' received, ')
         msg += '%-15s' % (str(self.nproc) + ' processed, ')
-        msg += '%-15s' % (str(self.nskip) + ' skipped, ')
         msg += '%-15s' % (str(self.nsent) + ' sent, ')
         msg += '%-20s' % (str(self.icomm.n_msg) + ' ready to recv')
         msg += '%-20s' % (str(self.ocomm.n_msg) + ' ready to send')
@@ -614,7 +652,7 @@ class ConnectionDriver(Driver):
     @run_remotely
     def confirm_input(self, timeout=None):
         r"""Confirm receipt of messages from input comm."""
-        T = self.start_timeout(timeout)
+        T = self.start_timeout(timeout, key_suffix='.confirm_input')
         while not T.is_out:  # pragma: debug
             with self.lock:
                 if (not self.icomm.is_open):
@@ -622,12 +660,12 @@ class ConnectionDriver(Driver):
                 elif self.icomm.is_confirmed_recv:
                     break
             self.sleep(10 * self.sleeptime)
-        self.stop_timeout()
+        self.stop_timeout(key_suffix='.confirm_input')
 
     @run_remotely
     def confirm_output(self, timeout=None):
         r"""Confirm receipt of messages from output comm."""
-        T = self.start_timeout(timeout)
+        T = self.start_timeout(timeout, key_suffix='.confirm_output')
         while not T.is_out:  # pragma: debug
             with self.lock:
                 if (not self.ocomm.is_open):
@@ -635,12 +673,12 @@ class ConnectionDriver(Driver):
                 elif self.ocomm.is_confirmed_send:
                     break
             self.sleep(10 * self.sleeptime)
-        self.stop_timeout()
+        self.stop_timeout(key_suffix='.confirm_output')
 
     @run_remotely
     def drain_input(self, timeout=None):
         r"""Drain messages from input comm."""
-        T = self.start_timeout(timeout)
+        T = self.start_timeout(timeout, key_suffix='.drain_input')
         while not T.is_out:
             with self.lock:
                 if (not (self.icomm.is_open
@@ -650,7 +688,7 @@ class ConnectionDriver(Driver):
                       and self.icomm.is_confirmed_recv):
                     break
             self.sleep()
-        self.stop_timeout()
+        self.stop_timeout(key_suffix='.drain_input')
 
     @run_remotely
     def drain_output(self, timeout=None, dont_confirm_eof=False):
@@ -658,7 +696,7 @@ class ConnectionDriver(Driver):
         nwait = 0
         if dont_confirm_eof:
             nwait += 1
-        T = self.start_timeout(timeout)
+        T = self.start_timeout(timeout, key_suffix='.drain_output')
         while not T.is_out:
             with self.lock:
                 if (not (self.ocomm.is_open
@@ -668,7 +706,7 @@ class ConnectionDriver(Driver):
                       and self.ocomm.is_confirmed_send):
                     break
             self.sleep()  # pragma: no cover
-        self.stop_timeout()
+        self.stop_timeout(key_suffix='.drain_output')
 
     def before_loop(self):
         r"""Actions to perform prior to sending messages."""
@@ -728,7 +766,7 @@ class ConnectionDriver(Driver):
                 recv method.
 
         Returns:
-            str, bool: False if no more messages, message otherwise.
+            CommMessage, bool: False if no more messages, message otherwise.
 
         """
         assert(self.in_process)
@@ -736,21 +774,23 @@ class ConnectionDriver(Driver):
         with self.lock:
             if self.icomm.is_closed:
                 return False
-            flag, msg, header = self.icomm.recv(return_header=True, **kwargs)
-        if self.icomm.is_eof(msg):
-            self._last_header = header
-            return self.on_eof()
-        if flag:
-            self._last_header = header
+            msg = self.icomm.recv(return_message_object=True, **kwargs)
+            self.errors += self.icomm.errors
+        if msg.flag == CommBase.FLAG_EOF:
+            return self.on_eof(msg)
+        if msg.flag == CommBase.FLAG_SUCCESS:
             return msg
         else:
-            return flag
+            return bool(msg.flag)
 
-    def on_eof(self):
+    def on_eof(self, msg):
         r"""Actions to take when EOF received.
 
+        Args:
+            msg (CommMessage): Message object that provided the EOF.
+
         Returns:
-            str, bool: Value that should be returned by recv_message on EOF.
+            CommMessage, bool: Value that should be returned by recv_message on EOF.
 
         """
         with self.lock:
@@ -774,21 +814,11 @@ class ConnectionDriver(Driver):
         if (self.ocomm._send_serializer) and self.icomm.serializer.initialized:
             self.update_serializer(msg)
         for t in self.translator:
-            msg = t(msg)
+            msg.args = t(msg.args)
         return msg
 
     def update_serializer(self, msg):
         r"""Update the serializer for the output comm based on input."""
-        sinfo_keys = ['format_str', 'field_names', 'field_units']
-        stype = self.icomm.serializer.typedef
-        sinfo = self.icomm.serializer.serializer_info
-        for k in sinfo_keys:
-            if k in sinfo:
-                stype[k] = sinfo[k]
-        for t in self.icomm.transform:
-            t.set_original_datatype(stype)
-            stype = t.transformed_datatype
-        sinfo.pop('seritype', None)
         self.debug('Before update:\n'
                    + '  icomm:\n    sinfo:\n%s\n    typedef:\n%s\n'
                    + '  ocomm:\n    sinfo:\n%s\n    typedef:\n%s',
@@ -798,21 +828,14 @@ class ConnectionDriver(Driver):
                    self.pprint(self.ocomm.serializer.typedef, 2))
         for t in self.translator:
             if isinstance_component(t, 'transform'):
-                t.set_original_datatype(stype)
-                stype = t.transformed_datatype
-        for t in self.ocomm.transform:
-            t.set_original_datatype(stype)
-            stype = t.transformed_datatype
-        for k in sinfo_keys:
-            if k in stype:
-                sinfo[k] = stype.pop(k)
-        sinfo['datatype'] = stype
-        self.ocomm.serializer.initialize_serializer(sinfo)
-        self.ocomm.serializer.update_serializer(skip_type=True,
-                                                **self._last_header)
-        if (((stype['type'] == 'array')
+                t.set_original_datatype(msg.stype)
+                msg.stype = t.transformed_datatype
+        # This can be removed if send_message is set up to update and send the
+        # received message rather than create a new one by sending msg.args
+        self.ocomm.update_serializer_from_message(msg)
+        if (((msg.stype['type'] == 'array')
              and (self.ocomm.serializer.typedef['type'] != 'array')
-             and (len(stype['items']) == 1))):
+             and (len(msg.stype['items']) == 1))):
             # if (((self.icomm.serializer.typedef['type'] == 'array')
             #      and (self.ocomm.serializer.typedef['type'] != 'array')
             #      and (len(self.icomm.serializer.typedef['items']) == 1))):
@@ -839,8 +862,7 @@ class ConnectionDriver(Driver):
         with self.lock:
             if self.ocomm.is_closed:
                 return False
-            flag = self.ocomm.send(*args, **kwargs)
-            return flag
+            return self.ocomm.send_message(*args, **kwargs)
         
     def _send_1st_message(self, *args, **kwargs):
         r"""Send the first message, trying multiple times.
@@ -854,7 +876,8 @@ class ConnectionDriver(Driver):
 
         """
         self.ocomm._multiple_first_send = False
-        T = self.start_timeout(self.timeout_send_1st)
+        T = self.start_timeout(self.timeout_send_1st,
+                               key_suffix='.1st_send')
         flag = self._send_message(*args, **kwargs)
         self.ocomm.suppress_special_debug = True
         if (not flag) and (not self.ocomm._type_errors):
@@ -865,7 +888,7 @@ class ConnectionDriver(Driver):
                 flag = self._send_message(*args, **kwargs)
                 if not flag:
                     self.sleep()
-        self.stop_timeout()
+        self.stop_timeout(key_suffix='.1st_send')
         self.ocomm.suppress_special_debug = False
         self._first_send_done = True
         if not flag:
@@ -887,13 +910,15 @@ class ConnectionDriver(Driver):
                 return False
             self._eof_sent = True
         self.debug('Sent EOF')
-        return self.send_message(self.ocomm.eof_msg, is_eof=True)
+        msg = CommBase.CommMessage(flag=CommBase.FLAG_EOF,
+                                   args=self.ocomm.eof_msg)
+        return self.send_message(msg)
 
-    def send_message(self, *args, **kwargs):
+    def send_message(self, msg, **kwargs):
         r"""Send a single message.
 
         Args:
-            *args: Arguments are passed to the output comm send method.
+            msg (CommMessage): Message being sent.
             *kwargs: Keyword arguments are passed to the output comm send method.
 
         Returns:
@@ -902,18 +927,21 @@ class ConnectionDriver(Driver):
         """
         assert(self.in_process)
         self.debug('')
-        kwargs.pop('is_eof', False)
         with self.lock:
             self._used = True
+        kws_prepare = {k: kwargs.pop(k) for k in self.ocomm._prepare_message_kws
+                       if k in kwargs}
+        msg_out = self.ocomm.prepare_message(msg.args, **kws_prepare)
         if self._first_send_done:
-            flag = self._send_message(*args, **kwargs)
+            flag = self._send_message(msg_out, **kwargs)
         else:
-            flag = self._send_1st_message(*args, **kwargs)
+            flag = self._send_1st_message(msg_out, **kwargs)
         # if self.single_use:
         #     with self.lock:
         #         self.debug('Used')
         #         self.icomm.drain_messages()
         #         self.icomm.close()
+        self.errors += self.ocomm.errors
         return flag
 
     def set_close_state(self, state):
@@ -926,31 +954,14 @@ class ConnectionDriver(Driver):
                 out = True
         return out
 
-    def wait_close_state(self, state, timeout=None):
-        r"""Set the close state after waiting for specified time for the
-        close state to be set by another method.
-
-        Args:
-            state (str): Close state that should be set after timeout.
-            timeout (float, optional): Time that should be waited before
-                setting the timeout. Defaults to self.timeout.
-
-        """
-        T = self.start_timeout(timeout)
-        while (not T.is_out):  # pragma: debug
-            with self.lock:
-                if self.close_state:
-                    break
-            self.sleep(2 * self.sleeptime)
-        self.stop_timeout()
-        self.set_close_state(state)
-
     def run_loop(self):
         r"""Run the driver. Continue looping over messages until there are not
         any left or the communication channel is closed.
         """
         self.state = 'in loop'
-        if not self.is_valid:
+        # if not self.is_valid:
+        if (((self.single_use and self._used)
+             or self.check_flag_attr('_comm_closed'))):
             self.debug("Breaking loop")
             self.set_close_state('invalid')
             self.set_break_flag()
@@ -963,22 +974,23 @@ class ConnectionDriver(Driver):
             self.set_break_flag()
             self.set_close_state('receiving')
             return
-        if self.icomm.is_empty_recv(msg):
+        if (msg is True) or (isinstance(msg, CommBase.CommMessage)
+                             and (msg.flag != CommBase.FLAG_SUCCESS)):
             self.state = 'waiting'
             self.verbose_debug(':run: Waiting for next message.')
             self.sleep()
             return
         self.nrecv += 1
         self.state = 'received'
-        if isinstance(msg, bytes):
+        if isinstance(msg.args, bytes):
             self.debug('Received message that is %d bytes from %s.',
-                       len(msg), self.icomm.address)
-        elif isinstance(msg, np.ndarray):
+                       len(msg.args), self.icomm.address)
+        elif isinstance(msg.args, np.ndarray):
             self.debug('Received array with shape %s and data type %s from %s',
-                       msg.shape, msg.dtype, self.icomm.address)
+                       msg.args.shape, msg.args.dtype, self.icomm.address)
         else:
             self.debug('Received message of type %s from %s',
-                       type(msg), self.icomm.address)
+                       type(msg.args), self.icomm.address)
         # Process message
         self.state = 'processing'
         msg = self.on_message(msg)
@@ -986,10 +998,6 @@ class ConnectionDriver(Driver):
             self.error('Could not process message.')
             self.set_break_flag()
             self.set_close_state('processing')
-            return
-        elif self.ocomm.is_empty_send(msg):
-            self.debug('Message skipped.')
-            self.nskip += 1
             return
         self.nproc += 1
         self.state = 'processed'

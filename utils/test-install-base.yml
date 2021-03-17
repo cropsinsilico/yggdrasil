@@ -38,7 +38,7 @@ jobs:
         os: [ubuntu-latest, macos-latest, windows-latest]
         python-version: [3.6]
         install-method: [pip]
-        test-flags1: [--long-running --test-suite=timing --test-suite=demos --test-suite=top, --test-suite=examples, --test-suite=types --skip-languages osr]
+        test-flags1: [--long-running --test-suite=timing --test-suite=demos --test-suite=top, --test-suite=examples, --test-suite=types --skip-languages c c++, --test-suite=types --languages c cpp]
         test-flags2: [""]
         install-c: [true]
         include:
@@ -114,10 +114,14 @@ jobs:
         python-version: ${{ matrix.python-version }}
     - name: (PIP) Set up Virtual Env
       if: env.USEVIRTUALENV == 1 && matrix.install-method == 'pip'
-      uses: syphar/restore-virtualenv@v1
-      # run: |
-      #   python utils/setup_test_env.py env virtualenv ${{ matrix.python-version }} --env-name=test
-      #   source test/bin/activate
+      # uses: syphar/restore-virtualenv@v1
+      run: |
+        python utils/setup_test_env.py env virtualenv ${{ matrix.python-version }} --env-name=test
+        echo "source activate ygg" > ~/.bashrc
+        source test/bin/activate
+        echo "$VIRTUAL_ENV"
+        echo "VIRTUAL_ENV=$VIRTUAL_ENV" >> $GITHUB_ENV
+        echo "PATH=$VIRTUAL_ENV/bin:$PATH" >> $GITHUB_ENV
     - name: (PIP) Install dependencies & package
       if: matrix.install-method == 'pip'
       run: python utils/setup_test_env.py install ${{ matrix.install-method }}
@@ -132,17 +136,17 @@ jobs:
     # ========================================================
     # Conda specific installation steps
     # ========================================================
-    - name: (CONDA) Cache conda
-      uses: actions/cache@v1
-      if: matrix.install-method == 'conda'
-      env:
-        # Increase this value to reset cache if file not changed
-        CACHE_NUMBER: 0
-      with:
-        path: ~/conda_pkgs_dir
-        key:
-          ${{ runner.os }}-conda-${{ env.CACHE_NUMBER }}-${{
-          hashFiles('recipe/meta.yaml') }}
+    # - name: (CONDA) Cache conda
+    #   uses: actions/cache@v1
+    #   if: matrix.install-method == 'conda'
+    #   env:
+    #     # Increase this value to reset cache if file not changed
+    #     CACHE_NUMBER: 0
+    #   with:
+    #     path: ~/conda_pkgs_dir
+    #     key:
+    #       ${{ runner.os }}-conda-${{ env.CACHE_NUMBER }}-${{
+    #       hashFiles('recipe/meta.yaml') }}
     - name: (WINDOWS,CONDA) Set up miniconda base environment
       uses: conda-incubator/setup-miniconda@v2
       if: matrix.install-method == 'conda' && matrix.os == 'windows-latest'
@@ -189,7 +193,7 @@ jobs:
       if: matrix.install-method == 'conda'
       with:
         # TODO: Move autoupdate into script?
-        # auto-update-conda: true
+        auto-update-conda: true
         python-version: ${{ matrix.python-version }}
         channels: conda-forge
         use-only-tar-bz2: true
@@ -200,6 +204,9 @@ jobs:
     - name: (CONDA) Install dependencies & package from existing build
       if: matrix.install-method == 'conda'
       run: python utils/setup_test_env.py install ${{ matrix.install-method }} --without-build
+    - name: (MACOS,CONDA) Set allow_multiple_omp config
+      if: matrix.install-method == 'conda' && matrix.os == 'macos-latest'
+      run: yggconfig --allow-multiple-omp
     # ========================================================
     
     - name: Verify installation
@@ -215,19 +222,21 @@ jobs:
     - name: Run tests (1st)
       id: test1
       run: yggtest --ci --cov-append ${{ matrix.test-flags1 }}
+      continue-on-error: true
     - name: Re-run test failures (1st)
-      if: ${{ failure() && steps.test1.outcome == 'failure' }}
+      if: ${{ steps.test1.outcome == 'failure' }}
       run: yggtest --ci --cov-append ${{ matrix.test-flags1 }} --last-failed --last-failed-no-failures=none
     - name: Run tests (2nd)
       if: matrix.test-flags2 != ''
       id: test2
       run: yggtest --ci --cov-append ${{ matrix.test-flags2 }}
+      continue-on-error: true
     - name: Re-run test failures (2nd)
-      if: ${{ failure() && steps.test2.outcome == 'failure' }}
+      if: ${{ steps.test2.outcome == 'failure' }}
       run: yggtest --ci --cov-append ${{ matrix.test-flags2 }} --last-failed --last-failed-no-failures=none
     # - name: Start SSH session
     #   uses: luchihoratiu/debug-via-ssh@main
-    #   if: ${{ failure() && matrix.install-method == 'conda' && matrix.os == 'macos-latest' }}
+    #   if: ${{ failure() }}  # && env.USEVIRTUALENV == 1 }}
     #   with:
     #     NGROK_AUTH_TOKEN: ${{ secrets.NGROK_AUTH_TOKEN }}
     #     SSH_PASS: ${{ secrets.SSH_PASS }}

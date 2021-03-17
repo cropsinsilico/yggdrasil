@@ -42,6 +42,7 @@ typedef struct comm_t {
   void *reply; //!< Reply information.
   int is_file; //!< Flag specifying if the comm connects directly to a file.
   int is_work_comm; //!< Flag specifying if comm is a temporary work comm.
+  int is_rpc; //!< Flag specifying if comm is the receiving comm for a client/server request connection.
   int is_global; //!< Flag specifying if the comm is global.
   int thread_id; //!< ID for the thread that created the comm.
 } comm_t;
@@ -120,6 +121,7 @@ comm_t empty_comm_base() {
   ret.reply = NULL;
   ret.is_file = 0;
   ret.is_work_comm = 0;
+  ret.is_rpc = 0;
   ret.is_global = 0;
   ret.thread_id = 0;
   return ret;

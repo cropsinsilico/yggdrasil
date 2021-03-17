@@ -157,6 +157,9 @@ class ModelDriver(Driver):
         logging_level (str, optional): The level of logging messages that should
             be displayed by the model. Defaults to the logging level as
             determined by the configuration file and environment variables.
+        allow_threading (bool, optional): If True, comm connections will be set up
+            so that the model-side comms can be used by more than one thread.
+            Defaults to False.
         **kwargs: Additional keyword arguments are passed to parent class.
 
     Class Attributes:
@@ -250,6 +253,8 @@ class ModelDriver(Driver):
         model_index (int): Index of model in list of models being run.
         modified_files (list): List of pairs of originals and copies of files
             that should be restored during cleanup.
+        allow_threading (bool): If True, comm connections will be set up so that
+            the model-side comms can be used by more than one thread.
 
     Raises:
         RuntimeError: If both with_strace and with_valgrind are True.
@@ -298,7 +303,7 @@ class ModelDriver(Driver):
         'source_products': {'type': 'array', 'default': [],
                             'items': {'type': 'string'}},
         'working_dir': {'type': 'string'},
-        'overwrite': {'type': 'boolean', 'default': True},
+        'overwrite': {'type': 'boolean'},
         'preserve_cache': {'type': 'boolean', 'default': False},
         'function': {'type': 'string'},
         'is_server': {'anyOf': [{'type': 'boolean'},
@@ -350,7 +355,8 @@ class ModelDriver(Driver):
                                        '--show-leak-kinds=all'],  # '-v'
                            'items': {'type': 'string'}},
         'outputs_in_inputs': {'type': 'boolean'},
-        'logging_level': {'type': 'string', 'default': ''}}
+        'logging_level': {'type': 'string', 'default': ''},
+        'allow_threading': {'type': 'boolean'}}
     _schema_excluded_from_class = ['name', 'language', 'args', 'working_dir']
     _schema_excluded_from_class_validation = ['inputs', 'outputs']
     
@@ -401,6 +407,8 @@ class ModelDriver(Driver):
                  **kwargs):
         self.model_outputs_in_inputs = kwargs.pop('outputs_in_inputs', None)
         super(ModelDriver, self).__init__(name, **kwargs)
+        if self.overwrite is None:
+            self.overwrite = (not self.preserve_cache)
         # Setup process things
         self.model_process = None
         self.queue = multitasking.Queue()
@@ -446,21 +454,22 @@ class ModelDriver(Driver):
                                  % self.model_function_file)
             model_dir, model_base = os.path.split(self.model_function_file)
             model_base = os.path.splitext(model_base)[0]
-            self.model_function_info = self.parse_function_definition(
-                self.model_function_file, self.function)
-            # Write file
             args[0] = os.path.join(model_dir, 'ygg_' + model_base
                                    + self.language_ext[0])
-            client_comms = ['%s:%s_%s' % (self.name, x, self.name)
-                            for x in self.client_of]
-            lines = self.write_model_wrapper(
-                self.model_function_file, self.function,
-                inputs=copy.deepcopy(self.inputs),
-                outputs=copy.deepcopy(self.outputs),
-                outputs_in_inputs=self.model_outputs_in_inputs,
-                client_comms=client_comms)
-            with open(args[0], 'w') as fd:
-                fd.write('\n'.join(lines))
+            # Write file
+            if (not os.path.isfile(args[0])) or self.overwrite:
+                self.model_function_info = self.parse_function_definition(
+                    self.model_function_file, self.function)
+                client_comms = ['%s:%s_%s' % (self.name, x, self.name)
+                                for x in self.client_of]
+                lines = self.write_model_wrapper(
+                    self.model_function_file, self.function,
+                    inputs=copy.deepcopy(self.inputs),
+                    outputs=copy.deepcopy(self.outputs),
+                    outputs_in_inputs=self.model_outputs_in_inputs,
+                    client_comms=client_comms)
+                with open(args[0], 'w') as fd:
+                    fd.write('\n'.join(lines))
         # Parse arguments
         self.debug(str(args))
         self.parse_arguments(args)
@@ -469,6 +478,8 @@ class ModelDriver(Driver):
         if self.overwrite:
             self.remove_products()
         # Write wrapper
+        if self.function:
+            self.wrapper_products.append(args[0])
         self.wrapper_products += self.write_wrappers()
 
     @staticmethod
@@ -539,7 +550,8 @@ class ModelDriver(Driver):
         return cls.inverse_type_map
 
     @classmethod
-    def get_language_for_source(cls, fname, languages=None, early_exit=False):
+    def get_language_for_source(cls, fname, languages=None, early_exit=False,
+                                **kwargs):
         r"""Determine the language that can be used with the provided source
         file(s). If more than one language applies to a set of multiple files,
         the language that applies to the most files is returned.
@@ -551,6 +563,7 @@ class ModelDriver(Driver):
                 Defaults to None and any language will be acceptable.
             early_exit (bool, optional): If True, the first language identified
                 will be returned if fname is a list of files. Defaults to False.
+            **kwargs: Additional keyword arguments are passed to recursive calls.
 
         Returns:
             str: The language that can operate on the specified file.
@@ -560,15 +573,14 @@ class ModelDriver(Driver):
             lang_dict = {}
             for f in fname:
                 try:
-                    ilang = cls.get_language_for_source(f, languages=languages)
+                    ilang = cls.get_language_for_source(f, languages=languages,
+                                                        **kwargs)
                     if early_exit:
                         return ilang
                 except ValueError:
                     continue
-                if ilang in lang_dict:
-                    lang_dict[ilang] += 1
-                else:
-                    lang_dict[ilang] = 1
+                lang_dict.setdefault(ilang, 0)
+                lang_dict[ilang] += 1
             if lang_dict:
                 return max(lang_dict, key=lang_dict.get)
         else:
@@ -739,13 +751,16 @@ class ModelDriver(Driver):
                          % (' '.join(cmd), unused_kwargs.get('cwd', os.getcwd())))
             logger.debug("Process keyword arguments:\n%s\n",
                          '    ' + pformat(unused_kwargs).replace('\n', '\n    '))
+            print(' '.join(cmd))
             proc = tools.popen_nobuffer(cmd, **unused_kwargs)
             if return_process:
                 return proc
             out, err = proc.communicate()
             if proc.returncode != 0:
-                logger.info('%s' % out)
-                logger.info('%s' % err)
+                if out:
+                    logger.info('\n%s' % out.decode('utf-8'))
+                if err:  # pragma: debug
+                    logger.info('\n%s' % err.decode('utf-8'))
                 raise RuntimeError("Command '%s' failed with code %d."
                                    % (' '.join(cmd), proc.returncode))
             out = out.decode("utf-8")
@@ -1087,11 +1102,12 @@ class ModelDriver(Driver):
         if (((not cls.is_language_installed())
              and (cls.executable_type is not None))):  # pragma: debug
             try:
-                fpath = tools.locate_file(
-                    cls.language_executable(),
-                    directory_list=cls._executable_search_dirs)
-                if fpath:
-                    cfg.set(cls.language, cls.executable_type, fpath)
+                exec_file = cls.language_executable()
+                if exec_file is not None:
+                    fpath = tools.locate_file(
+                        exec_file, directory_list=cls._executable_search_dirs)
+                    if fpath:
+                        cfg.set(cls.language, cls.executable_type, fpath)
             except NotImplementedError:
                 pass
         # Configure libraries
@@ -1168,6 +1184,7 @@ class ModelDriver(Driver):
             dict: Environment variables for the model process.
 
         """
+        from yggdrasil.config import ygg_cfg
         if existing is None:
             existing = {}
         existing.update(copy.deepcopy(self.env))
@@ -1179,6 +1196,8 @@ class ModelDriver(Driver):
         env['YGG_PYTHON_EXEC'] = sys.executable
         env['YGG_DEFAULT_COMM'] = tools.get_default_comm()
         env['YGG_NCLIENTS'] = str(len(self.clients))
+        if self.allow_threading:
+            env['YGG_THREADING'] = '1'
         if isinstance(self.is_server, dict):
             env['YGG_SERVER_INPUT'] = self.is_server['input']
             env['YGG_SERVER_OUTPUT'] = self.is_server['output']
@@ -1187,6 +1206,8 @@ class ModelDriver(Driver):
         replace = [k for k in env.keys() if ':' in k]
         for k in replace:
             env[k.replace(':', '__COLON__')] = env.pop(k)
+        if ygg_cfg.get('general', 'allow_multiple_omp', False):
+            env['KMP_DUPLICATE_LIB_OK'] = 'True'
         return env
 
     def before_start(self, no_queue_thread=False, **kwargs):
@@ -1224,7 +1245,10 @@ class ModelDriver(Driver):
         if len(line) == 0:
             # self.info("%s: Empty line from stdout" % self.name)
             self.queue_thread.set_break_flag()
-            self.queue.put(self._exit_line)
+            try:
+                self.queue.put(self._exit_line)
+            except multitasking.AliasDisconnectError:  # pragma: debug
+                self.error("Queue disconnected")
             self.debug("End of model output")
             try:
                 self.queue_close()
@@ -1251,6 +1275,9 @@ class ModelDriver(Driver):
             # This sleep is necessary to allow changes in queue without lock
             self.sleep()
             return
+        except multitasking.AliasDisconnectError:  # pragma: debug
+            self.error("Queue disconnected")
+            self.set_break_flag()
         else:
             if (line == self._exit_line):
                 self.debug("No more output")
@@ -1272,6 +1299,27 @@ class ModelDriver(Driver):
                 return
         self.wait_process(self.timeout, key_suffix='.after_loop')
         self.kill_process()
+        self.debug(("Closing input/output drivers:\n"
+                    "\tinput: %s\n\toutput: %s")
+                   % ([drv['name'] for drv in
+                       self.yml.get('input_drivers', [])],
+                      [drv['name'] for drv in
+                       self.yml.get('output_drivers', [])]))
+        for drv in self.yml.get('input_drivers', []):
+            drv['instance'].on_model_exit('output', self.name,
+                                          errors=self.errors)
+        for drv in self.yml.get('output_drivers', []):
+            drv['instance'].on_model_exit('input', self.name,
+                                          errors=self.errors)
+
+    @property
+    def io_errors(self):
+        errors = []
+        for drv in self.yml.get('input_drivers', []):
+            errors += drv['instance'].errors
+        for drv in self.yml.get('output_drivers', []):
+            errors += drv['instance'].errors
+        return errors
 
     @property
     def model_process_complete(self):
@@ -1325,7 +1373,8 @@ class ModelDriver(Driver):
                 except BaseException:  # pragma: debug
                     self.exception("Error killing model process")
             assert(self.model_process_complete)
-            if self.model_process.returncode != 0:
+            if (((self.model_process is not None)
+                 and (self.model_process.returncode != 0))):
                 self.error("return code of %s indicates model error.",
                            str(self.model_process.returncode))
             self.event_process_kill_complete.set()
@@ -1354,12 +1403,8 @@ class ModelDriver(Driver):
 
     def cleanup_products(self):
         r"""Remove products created in order to run the model."""
-        if self.overwrite:
+        if self.overwrite and (not self.preserve_cache):
             self.remove_products()
-        if ((self.function and isinstance(self.model_src, str)
-             and os.path.isfile(self.model_src))):
-            assert(os.path.basename(self.model_src).startswith('ygg_'))
-            os.remove(self.model_src)
         self.restore_files()
 
     def cleanup(self):

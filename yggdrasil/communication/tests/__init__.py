@@ -1,12 +1,18 @@
 import os
 import uuid
-from yggdrasil.tests import generate_component_tests, assert_equal, assert_raises
+from yggdrasil.tests import (
+    generate_component_tests, generate_component_subtests,
+    assert_equal, assert_raises)
 from yggdrasil.communication import open_file_comm
 from yggdrasil.communication.tests.test_FileComm import TestFileComm
 
 
 generate_component_tests('file', TestFileComm, globals(), __file__,
                          class_attr='comm')
+generate_component_subtests('comm', 'Async', globals(),
+                            'yggdrasil.communication.tests',
+                            new_attr={'use_async': True},
+                            skip_subtypes=['default'])
 
 
 def test_open_file_comm():

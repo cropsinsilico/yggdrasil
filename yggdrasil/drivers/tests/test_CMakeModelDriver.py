@@ -6,10 +6,11 @@ import unittest
 from yggdrasil import platform
 from yggdrasil.tests import (
     scripts, assert_raises, assert_equal, requires_language)
-import yggdrasil.drivers.tests.test_CompiledModelDriver as parent
+import yggdrasil.drivers.tests.test_BuildModelDriver as parent
 from yggdrasil.drivers.CMakeModelDriver import (
     CMakeModelDriver, CMakeConfigure, CMakeBuilder)
 from yggdrasil.drivers.CModelDriver import GCCCompiler
+from yggdrasil.drivers.CPPModelDriver import CPPModelDriver
 
 
 @requires_language('cmake', installed='any')
@@ -87,10 +88,12 @@ def test_create_include():
     from yggdrasil.drivers.CModelDriver import CModelDriver
     CModelDriver.compile_dependencies()
     CMakeModelDriver.compile_dependencies()
+    kws = {'compiler': CModelDriver.get_tool('compiler'),
+           'linker': CModelDriver.get_tool('linker')}
     for c, l, lines in testlist:
-        out = CMakeConfigure.create_include(None, target, compile_flags=c,
+        out = CMakeConfigure.create_include(None, target, compiler_flags=c,
                                             linker_flags=l, verbose=True,
-                                            driver=CModelDriver)
+                                            **kws)
         for x in lines:
             try:
                 assert(x in out)
@@ -101,11 +104,11 @@ def test_create_include():
     for fname in [fname_dll, fname_lib]:
         os.remove(fname)
     assert_raises(ValueError, CMakeConfigure.create_include,
-                  None, target, compile_flags=['invalid'], driver=CModelDriver)
+                  None, target, compiler_flags=['invalid'], **kws)
     assert_raises(ValueError, CMakeConfigure.create_include,
-                  None, target, linker_flags=['-invalid'], driver=CModelDriver)
+                  None, target, linker_flags=['-invalid'], **kws)
     assert_raises(ValueError, CMakeConfigure.create_include,
-                  None, target, linker_flags=['/invalid'], driver=CModelDriver)
+                  None, target, linker_flags=['/invalid'], **kws)
 
 
 @requires_language('cmake', installed=False)
@@ -138,7 +141,7 @@ def test_CMakeModelDriver_error_nofile():
                   target_language='c')
 
 
-class TestCMakeModelParam(parent.TestCompiledModelParam):
+class TestCMakeModelParam(parent.TestBuildModelParam):
     r"""Test parameters for CMakeModelDriver."""
 
     driver = 'CMakeModelDriver'
@@ -150,26 +153,14 @@ class TestCMakeModelParam(parent.TestCompiledModelParam):
         self.builddir = os.path.join(self.sourcedir, 'build')
         self.args = [self.target]
         self._inst_kwargs['yml']['working_dir'] = self.sourcedir
+        self._inst_kwargs.update(env_compiler='CXX',
+                                 env_compiler_flags='CXXFLAGS')
         
 
 class TestCMakeModelDriverNoInit(TestCMakeModelParam,
-                                 parent.TestCompiledModelDriverNoInit):
+                                 parent.TestBuildModelDriverNoInit):
     r"""Test runner for CMakeModelDriver without init."""
 
-    def __init__(self, *args, **kwargs):
-        super(TestCMakeModelDriverNoInit, self).__init__(*args, **kwargs)
-        self._inst_kwargs['skip_compile'] = True
-
-    @unittest.skip("Redundant since called by C driver.")
-    def test_build(self):  # pragma: no cover
-        r"""Test building libraries as a shared/static library or object files."""
-        pass
-    
-    def run_model_instance(self, **kwargs):
-        r"""Create a driver for a model and run it."""
-        kwargs.setdefault('skip_compile', False)
-        return super(TestCMakeModelDriverNoInit, self).run_model_instance(**kwargs)
-        
     @unittest.skipIf(not platform._is_win, "Windows only.")
     @unittest.skipIf(not GCCCompiler.is_installed(),
                      "GNU compiler not installed.")
@@ -179,7 +170,7 @@ class TestCMakeModelDriverNoInit(TestCMakeModelParam,
     
     
 class TestCMakeModelDriverNoStart(TestCMakeModelParam,
-                                  parent.TestCompiledModelDriverNoStart):
+                                  parent.TestBuildModelDriverNoStart):
     r"""Test runner for CMakeModelDriver without start."""
     
     def __init__(self, *args, **kwargs):
@@ -195,18 +186,27 @@ class TestCMakeModelDriverNoStart(TestCMakeModelParam,
     def test_call_compiler(self):
         r"""Test call_compiler without full path."""
         # self.instance.cleanup()
+        CPPModelDriver.compile_dependencies()
         self.import_cls.call_compiler(self.instance.source_files,
                                       builddir='build',
                                       working_dir=self.instance.working_dir,
                                       dont_build=True)
+        out = self.instance.model_file
+        if platform._is_win:
+            out = os.path.join(os.path.dirname(out),
+                               'Debug',
+                               os.path.basename(out))
+        compiler = CPPModelDriver.get_tool('compiler')
         self.import_cls.call_compiler(self.instance.source_files,
-                                      out=self.instance.model_file,
+                                      out=out,
                                       builddir='build',
                                       working_dir=self.instance.working_dir,
-                                      overwrite=True)
+                                      overwrite=True,
+                                      target_compiler=compiler.toolname,
+                                      target_linker=compiler.linker().toolname)
         
 
-class TestCMakeModelDriver(TestCMakeModelParam, parent.TestCompiledModelDriver):
+class TestCMakeModelDriver(TestCMakeModelParam, parent.TestBuildModelDriver):
     r"""Test runner for CMakeModelDriver."""
 
     def test_sbdir(self):
@@ -217,4 +217,11 @@ class TestCMakeModelDriver(TestCMakeModelParam, parent.TestCompiledModelDriver):
     def test_write_wrappers(self):
         r"""Test write_wrappers method with verbosity and existing
         include file."""
-        self.instance.write_wrappers(verbose=True)
+        try:
+            self.instance.overwrite = False
+            self.instance.write_wrappers(verbose=False)
+            self.instance.write_wrappers(verbose=True)
+            self.instance.overwrite = True
+            self.instance.write_wrappers(verbose=True)
+        finally:
+            self.instance.overwrite = True

@@ -131,7 +131,7 @@ class TestCModelDriverNoInit(TestCModelParam,
             dll = self.import_cls.get_dependency_library('python', **kws)
             gcc.dll2a(dll, overwrite=True)
         else:
-            self.assert_raises(ValueError, self.import_cls.get_tool,
+            self.assert_raises(NotImplementedError, self.import_cls.get_tool,
                                'compiler', toolname='gcc')
 
 

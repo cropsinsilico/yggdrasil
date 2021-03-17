@@ -1,5 +1,5 @@
 from yggdrasil import tools, multitasking
-from yggdrasil.communication import RMQComm
+from yggdrasil.communication import RMQComm, NoMessages
 from yggdrasil.communication.RMQComm import pika
 
 
@@ -41,6 +41,11 @@ class RMQAsyncComm(RMQComm.RMQComm):
         self._qres_event = multitasking.Event()
         self._qres_event.set()
         super(RMQAsyncComm, self)._init_before_open(**kwargs)
+
+    # @classmethod
+    # def underlying_comm_class(self):
+    #     r"""str: Name of underlying communication class."""
+    #     return 'rmq'
 
     @property
     def rmq_lock(self):
@@ -101,15 +106,15 @@ class RMQAsyncComm(RMQComm.RMQComm):
         self.register_comm(self.address, (self.connection, self.channel))
         super(RMQComm.RMQComm, self).bind()
     
-    def _open_direct(self):
+    def open(self):
         r"""Open connection and bind/connect to queue as necessary."""
-        super(RMQAsyncComm, self)._open_direct()
+        super(RMQAsyncComm, self).open()
         T = self.start_timeout()
         while (not T.is_out) and self._opening:  # pragma: debug
             self.sleep()
         self.stop_timeout()
 
-    def _close_direct(self, linger=False):
+    def _close(self, linger=False):
         r"""Close the connection.
 
         Args:
@@ -157,7 +162,7 @@ class RMQAsyncComm(RMQComm.RMQComm):
                 raise RuntimeError("Thread still running.")
         # Close workers
         # with self.rmq_lock:
-        super(RMQAsyncComm, self)._close_direct(linger=linger)
+        super(RMQAsyncComm, self)._close(linger=linger)
 
     def _set_qres(self, res):
         r"""Callback for getting message count."""
@@ -167,7 +172,7 @@ class RMQAsyncComm(RMQComm.RMQComm):
     def get_queue_result(self):
         r"""Get the fram from passive queue declare."""
         res = None
-        if self.is_open_direct:
+        if self.is_open:
             with self._qres_lock:
                 if self._qres_event.is_set():
                     self._qres_event.clear()
@@ -179,7 +184,7 @@ class RMQAsyncComm(RMQComm.RMQComm):
                     except (pika.exceptions.ChannelClosed,
                             pika.exceptions.ConnectionClosed):  # pragma: debug
                         if not self._reconnecting:
-                            self._close_direct()
+                            self._close()
                         else:
                             self._qres = None
                             self._qres_event.set()
@@ -188,34 +193,13 @@ class RMQAsyncComm(RMQComm.RMQComm):
         return res
 
     @property
-    def n_msg_direct_recv(self):
+    def n_msg_recv(self):
         r"""int: Number of messages in the queue."""
-        if self.is_open_direct:
+        if self.is_open:
             return len(self._buffered_messages)
         return 0
         
-    # Access work comms with lock
-    # def get_work_comm(self, *args, **kwargs):
-    #     r"""Alias for parent class that wraps method in Lock."""
-    #     with self.rmq_lock:
-    #         return super(RMQAsyncComm, self).get_work_comm(*args, **kwargs)
-
-    # def create_work_comm(self, *args, **kwargs):
-    #     r"""Alias for parent class that wraps method in Lock."""
-    #     with self.rmq_lock:
-    #         return super(RMQAsyncComm, self).create_work_comm(*args, **kwargs)
-
-    # def add_work_comm(self, *args, **kwargs):
-    #     r"""Alias for parent class that wraps method in Lock."""
-    #     with self.rmq_lock:
-    #         return super(RMQAsyncComm, self).add_work_comm(*args, **kwargs)
-
-    # def remove_work_comm(self, *args, **kwargs):
-    #     r"""Alias for parent class that wraps method in Lock."""
-    #     with self.rmq_lock:
-    #         return super(RMQAsyncComm, self).remove_work_comm(*args, **kwargs)
-
-    def _send_direct(self, msg, exchange=None, routing_key=None, **kwargs):
+    def _send(self, msg, exchange=None, routing_key=None, **kwargs):
         r"""Send a message.
 
         Args:
@@ -234,15 +218,15 @@ class RMQAsyncComm(RMQComm.RMQComm):
         with self.rmq_lock:
             if self.is_closed:  # pragma: debug
                 return False
-            out = super(RMQAsyncComm, self)._send_direct(msg, exchange=exchange,
-                                                         routing_key=routing_key,
-                                                         **kwargs)
+            out = super(RMQAsyncComm, self)._send(msg, exchange=exchange,
+                                                  routing_key=routing_key,
+                                                  **kwargs)
         # Basic publish returns None for asynchronous connection
         if out is None:
             out = True
         return out
 
-    def _recv_direct(self):
+    def _recv(self):
         r"""Receive a message.
 
         Returns:
@@ -251,21 +235,9 @@ class RMQAsyncComm(RMQComm.RMQComm):
 
         """
         with self.rmq_lock:
+            if len(self._buffered_messages) == 0:
+                raise NoMessages("No messages in buffer.")
             return (True, self._buffered_messages.pop(0))
-        # if self.n_msg_recv != 0:
-        #     with self.rmq_lock:
-        #         out = (True, self._buffered_messages.pop(0))
-        #     return out
-        # if self.is_closed:  # pragma: debug
-        #     self.debug("Connection closed.")
-        #     return (False, None)
-        # if self.n_msg_recv == 0:
-        #     # self.debug(".recv(): No buffered messages.")
-        #     out = (True, self.empty_bytes_msg)
-        # else:
-        #     with self.rmq_lock:
-        #         out = (True, self._buffered_messages.pop(0))
-        # return out
 
     def on_message(self, ch, method, props, body):
         r"""Buffer received messages."""

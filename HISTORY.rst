@@ -2,7 +2,47 @@
 History
 =======
 
-1.5.0 (2021-02-10) Migrate to GHA, refactor CLI, & bug fixes
+1.5.0 (XXXX-XX-XX)
+------------------
+
+* Made the asynchronous comm class more generic so it can be used to wrap any comm type and is more robust
+* Changed the communication pattern so that a single connection driver is used by default to limit unnecessary message passing
+* Changed the connection to use ‘inputs’/‘outputs’ instead of ‘icomm_kws’/‘ocomm_kws’ to provide simpler mapping form the yaml to inputs
+* Migrated away from use of ‘comm’ to ‘commtype’/‘comm_list’ keyword in comms for clarity
+* Migrated away from use of comm_class to using commtype
+* Added specialized error classes for catching specific issues during communication (timeouts, no message waiting, etc)
+* Specialized comm registration on the comm classes
+* Generalized the RPC client/server drivers in name
+* Added support for importing models as functions
+* Modified the RPC pattern so that client/server one-to-many send operation occurs at the interface between the connection and the server
+* Added model information to message headers
+* Added a ValueComm communication object for returning a constant value set in the yaml via the 'default_value' option
+* Added C method for checking if a key exists in a generic wrapped map object
+* Added a definition to the default compilation flags to indicate that yggdrasil is being compiled against which can be checked by the pre-compiler (e.g. #ifdef WITH_YGGDRASIL)
+* Added an iteration transformation that can be used to expand an iteratable object (currently lists, dicts, and arrays) into its elements
+* Added a transform class for filtering so that filters can be nested with transforms
+* Added new tests for transformations as part of comms and fixed bugs that those tests showed in how empty messages are transformed
+* Modify comm class such that the type is updated based on the transformed datatype when receiving *and* sending
+* Added a dedicated CommMessage class for wrapping messages with information about the message (e.g. header, work comms, status) and update comm & connection methods to expect this type
+* Fixed a bug that caused segfault when calling yggdrasil interface from inside a threaded model by introducing an 'allow_threading' parameter for models which sets a new parameter 'allow_multiple_comms' for comms associated with the model and causes the comm to be initialized such that multiple connections to the same address can be made (this is really just important for ZMQ comms and should only be invoked when using a server/client communication pattern).
+* Refactor CommBase so that there are two components to send and receive calls and use the refactoring to cut down on repeat serialization in async comms and connection drivers.
+
+  When sending...
+
+  1) prepare_message, which does all of the steps from filtering, transforming, creating headers & work comms, to serializing and
+  2) send_message which does sends messages including iterator messages and work comms.
+
+  When receiving...
+
+  1) recv_message, which receives the message and deserializes it, and
+  2) finalize_message, which filters and transforms messages and performs actions associated with specific message types.
+
+TODO
+~~~~
+
+* Updated documentation with information on using threads with yggdrasil.
+
+1.5.0 (2021-02-10) Migrate to GHA, refactor CLI, & fix bugs
 ------------------
 
 * Move continuous integration for testing and deployment to Github actions

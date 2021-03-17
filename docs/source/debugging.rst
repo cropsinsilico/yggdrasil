@@ -15,9 +15,27 @@ Tips for Debugging
 Possible Errors
 ===============
 
-..
-  General Errors
-  --------------
+
+General Errors
+--------------
+
+- You get errors that look like ``zmq.error.ZMQError: Too many open files`` when running integrations.
+   **Possible Cause:** The limit on the number of file identifiers that can be open is too low (the default on Mac is 256) and |yggdrasil| is trying to use more than this limit (file identifiers are opened for multiprocessing objects, ZeroMQ sockets, files, etc.).
+   **Solution:** Check what the limit is via ``ulimit -n``. If it is of order 100 (as on Mac by default), this is likely the cause and you can fix it by increasing the limit via ``ulimit -n 1024``.
+- You get an error that starts with the line::
+    
+    OMP: Error #15: Initializing libomp.dylib, but found libiomp5.dylib already initialized.
+    
+  ..
+
+    **Possible Cause:** You have multiple version of OpenMP installed and the model is trying to load more than one. This is most likely to occur if 1) you use conda to install yggdrasil and its dependencies as many conda dependencies use the Intel Math Kernel library for optimization which are threaded via OpenMP (See discussion `here <https://github.com/dmlc/xgboost/issues/1715>`_) and 2) your model includes threading or has an dependency/interpreter that is using a different version of OpenMP (e.g. Matlab also installs its own version of libiomp5).
+    
+    **Solutions:** 
+
+    #. [RECOMMENDED] Set the ``KMP_DUPLICATE_LIB_OK`` environment variable to disable this error (e.g. via ``export KMP_DUPLICATE_LIB_OK=1``). This works in most cases, but may cause unexpected behavior as described in the error message. You can also have yggdrasil set the environment variable any time it runs a model by running ``yggconfig --allow-multiple-omp`` so that you don't need to set in each time you open a new terminal/command prompt (or in your startup script, e.g. .bashrc).
+    #. [MATLAB ONLY] Try hidding the Matlab version of libiomp by running ``yggconfig --hide-matlab-libiomp``, which will slightly modify the name of the libiomp installed by Matlab so that Matlab uses the conda version of OpenMP during runtime. This solution is not recommended if you use Matlab outside of conda environments and can be reversed via ``yggconfig --restore-matlab-libiomp``.
+    #. Re-install yggdrasil in a clean conda environment *after* installing the ``nomkl`` conda package to ensure that versions of yggdrasil's dependencies are installed that don't use Intel's Math Kernel Library. If this does not work, it is likely that other dependencies require the OpenMP library.
+    #. Uninstall all but one of the conflicting versions of OpenMP. This can be tricky to do and should be approached with caution as removing libraries without understanding how/why they were installed can cause unintended consequences if it is required by another application.
 
 Linux Errors
 ------------
@@ -51,6 +69,13 @@ MacOS Errors
     You will need to set the ``CONDA_BUILD_SYSROOT`` environment variable in every process in which you will be running |yggdrasil|. Alternatively, you can permanently add it to your |yggdrasil| configuration file using the following command::
 
       $ yggconfig --macos-sdkroot <path to sdk>
+
+- When compiling a model using CMake you get ``ld: library not found for -lintl``
+  **Possible Causes:**
+  
+  #. The ``libintl`` cannot be found because it is not installed.
+#. The ``-lintl`` library is linked via the ``LDFLAGS`` environment variable, but the directory containing the library is not added to the list of paths searched for libraries (typically ``/usr/lib`` or ``/usr/local/lib``).
+  **Solution:** Verify that ``libintl`` is installed and install it if it is not (it can be installed via ``brew reinstall gettext``). If you still get the error, report it via an issue on the `yggdrasil Github repository<https://github.com/cropsinsilico/yggdrasil/issues>`_ as yggdrasil should be able to add the appropriate paths that CMake misses. In the meantime, you can manually add the path via the environment variable (e.g. ``LDFLAGS="$LDFLAGS -L/path/to/directory/containing/libintl"``).
       
 Matlab Errors
 -------------
@@ -59,6 +84,9 @@ Matlab Errors
     **Possible Cause:** If MATLAB has trouble accessing the license server, it can hang for a long time during startup. |yggdrasil| has a config parameter that controls how long it will wait for MATLAB to start. If it takes longer than that amount of time, it will kill the process and report an error.
 
     **Solution:** Verify that you have access to the MATLAB license server (e.g. an internet connection and, if appropriate, the correct VPN). If you do (i.e. you can start the MATLAB application independent of |yggdrasil|), increase the ``startup_waittime_s`` config parameter described :ref:`here <config_rst>`.
+- The MATLAB model seems to run, but does not output anything to stdout or to any output comms.
+    **Possible Cause:** Another error is occuring, but you are using the MATLAB engine for Python to run models and the error is not being redirected to the Python output.
+    **Solution:** Try running your model without the MATLAB engine for Python by setting the ``disable_engine`` config parameter in the matlab section of your |yggdrasil| config file to ``True`` by running ``yggconfig --disable-matlab-engine-for-python`` or editting the file directly (see :ref:`here <config_rst>`).
 
 C++ Errors
 ----------

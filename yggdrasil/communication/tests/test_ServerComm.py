@@ -15,7 +15,16 @@ class TestServerComm(test_CommBase.TestCommBase):
     @property
     def send_inst_kwargs(self):
         r"""dict: Keyword arguments for send instance."""
-        return {'comm': 'ClientComm'}
+        return {'commtype': 'client'}
+    
+    @property
+    def inst_kwargs(self):
+        r"""dict: Keyword arguments for tested class."""
+        out = super(TestServerComm, self).inst_kwargs
+        # Required to prevent use of ZMQ DEALER socket when just
+        # testing functionality of server-client interaction
+        out['is_server'] = False
+        return out
     
     @unittest.skipIf(True, 'Server')
     def test_error_send(self):
@@ -39,7 +48,8 @@ class TestServerComm(test_CommBase.TestCommBase):
 
     def test_newcomm_server(self):
         r"""Test creation of server using newcomm."""
-        inst = new_comm('testserver_%s' % str(uuid.uuid4()), comm=self.comm)
+        inst = new_comm('testserver_%s' % str(uuid.uuid4()),
+                        commtype=self.commtype)
         self.remove_instance(inst)
         
     def test_eof_no_close(self):
@@ -92,8 +102,11 @@ class TestServerComm(test_CommBase.TestCommBase):
         r"""Test RPC nolimit call."""
         self.send_instance.sched_task(0.0, self.send_instance.call_nolimit,
                                       args=[self.msg_long], store_output=True)
-        flag, msg_recv, header = self.recv_instance.recv_nolimit(
-            timeout=self.timeout, return_header=True)
+        msg = self.recv_instance.recv_nolimit(timeout=self.timeout,
+                                              return_message_object=True)
+        flag = bool(msg.flag)
+        msg_recv = msg.args
+        header = msg.header
         assert(flag)
         self.assert_equal(msg_recv, self.msg_long)
         assert(isinstance(header, dict))
@@ -121,9 +134,9 @@ class TestServerComm(test_CommBase.TestCommBase):
 
         """
         target = comm
-        if comm.comm_class == 'ServerComm':
+        if comm._commtype == 'server':
             target = comm.icomm
-        elif comm.comm_class == 'ClientComm':
+        elif comm._commtype == 'client':
             target = comm.ocomm
         return super(TestServerComm, self).add_filter(target, filter=filter)
         

@@ -80,7 +80,7 @@ class FileComm(CommBase.CommBase):
                                   'class': SerializeBase}],
                        'default': {'seritype': 'direct'}}}
     _schema_excluded_from_inherit = (
-        ['commtype', 'datatype', 'read_meth', 'serializer']
+        ['commtype', 'datatype', 'read_meth', 'serializer', 'default_value']
         + CommBase.CommBase._model_schema_prop)
     _schema_excluded_from_class_validation = ['serializer']
     _schema_base_class = None
@@ -142,6 +142,7 @@ class FileComm(CommBase.CommBase):
             cls._schema_properties.update(
                 cls._default_serializer_class._schema_properties)
             del cls._schema_properties['seritype']
+        cls._commtype = cls._filetype
 
     @classmethod
     def get_testing_options(cls, read_meth=None, **kwargs):
@@ -201,19 +202,22 @@ class FileComm(CommBase.CommBase):
         Args:
             language (str, optional): Specific language that should be checked
                 for compatibility. Defaults to None and all languages supported
-                on the current platform will be checked.
+                on the current platform will be checked. If set to 'any', the
+                result will be True if this comm is installed for any of the
+                supported languages.
 
         Returns:
             bool: Is the comm installed.
 
         """
-        # Filesystem is implied
-        return True
-
+        if language == 'python':
+            return True
+        return False
+        
     @classmethod
-    def underlying_comm_class(self):
+    def underlying_comm_class(cls):
         r"""str: Name of underlying communication class."""
-        return 'FileComm'
+        return cls._filetype
 
     @classmethod
     def close_registry_entry(cls, value):
@@ -305,15 +309,18 @@ class FileComm(CommBase.CommBase):
     @property
     def file_size(self):
         r"""int: Current size of file."""
-        prev_pos = self.file_tell()
-        self.file_seek(0, os.SEEK_END)
-        out = self.file_tell() - prev_pos
-        self.file_seek(prev_pos)
+        with self._closing_thread.lock:
+            prev_pos = self.file_tell()
+            self.file_seek(0, os.SEEK_END)
+            out = self.file_tell() - prev_pos
+            self.file_seek(0, 0)
+            self.file_seek(prev_pos)
         return out
 
     def file_tell(self):
         r"""int: Current position in the file."""
-        return self.fd.tell()
+        with self._closing_thread.lock:
+            return self.fd.tell()
 
     def file_seek(self, pos, whence=os.SEEK_SET):
         r"""Move in the file to the specified position.
@@ -326,11 +333,13 @@ class FileComm(CommBase.CommBase):
                 file.
 
         """
-        self.fd.seek(pos, whence)
+        with self._closing_thread.lock:
+            self.fd.seek(pos, whence)
 
     def file_flush(self):
         r"""Flush the file."""
-        self.fd.flush()
+        with self._closing_thread.lock:
+            self.fd.flush()
 
     def record_position(self):
         r"""Record the current position in the file/series."""
@@ -414,9 +423,10 @@ class FileComm(CommBase.CommBase):
             if self._series_index != series_index:
                 if (((self.direction == 'send')
                      or os.path.isfile(self.get_series_address(series_index)))):
-                    self._file_close()
-                    self._series_index = series_index
-                    self._open()
+                    with self._closing_thread.lock:
+                        self._file_close()
+                        self._series_index = series_index
+                        self._open()
                     out = True
                     self.debug("Advanced to %d", series_index)
         if out:
@@ -541,76 +551,84 @@ class FileComm(CommBase.CommBase):
         out = 0
         if self.is_closed or self.direction == 'send':
             return out
-        pos = self.record_position()
-        try:
-            curpos = self.file_tell()
-            self.file_seek(0, os.SEEK_END)
-            endpos = self.file_tell()
-            out = endpos - curpos
-        except (ValueError, AttributeError, OSError):  # pragma: debug
-            if self.is_open:
-                raise
-        if self.is_series:
-            i = self._series_index + 1
-            while True:
-                fname = self.get_series_address(i)
-                if not os.path.isfile(fname):
-                    break
-                out += os.path.getsize(fname)
-                i += 1
-        self.change_position(*pos)
+        with self._closing_thread.lock:
+            pos = self.record_position()
+            try:
+                curpos = self.file_tell()
+                self.file_seek(0, os.SEEK_END)
+                endpos = self.file_tell()
+                out = endpos - curpos
+            except (ValueError, AttributeError, OSError):  # pragma: debug
+                if self.is_open:
+                    raise
+            if self.is_series:
+                i = self._series_index + 1
+                while True:
+                    fname = self.get_series_address(i)
+                    if not os.path.isfile(fname):
+                        break
+                    out += os.path.getsize(fname)
+                    i += 1
+            self.change_position(*pos)
         return out
 
     @property
     def n_msg_recv(self):
         r"""int: The number of messages in the file."""
-        if self.is_closed:
-            return 0
-        if self.read_meth == 'read':
-            return int(self.remaining_bytes > 0)
-        elif self.read_meth == 'readline':
-            pos = self.record_position()
-            try:
-                out = 0
-                flag, msg = self._recv()
-                while len(msg) != 0 and (not self.is_eof(msg)):
-                    out += 1
+        with self._closing_thread.lock:
+            if self.is_closed:
+                return 0
+            if self.read_meth == 'read':
+                return int(self.remaining_bytes > 0)
+            elif self.read_meth == 'readline':
+                pos = self.record_position()
+                try:
+                    out = 0
                     flag, msg = self._recv()
-            except ValueError:  # pragma: debug
+                    while len(msg) != 0 and (not self.is_eof(msg)):
+                        out += 1
+                        flag, msg = self._recv()
+                except ValueError:  # pragma: debug
+                    out = 0
+                self.change_position(*pos)
+            else:  # pragma: debug
+                self.error('Unsupported read_meth: %s', self.read_meth)
                 out = 0
-            self.change_position(*pos)
-        else:  # pragma: debug
-            self.error('Unsupported read_meth: %s', self.read_meth)
-            out = 0
-        return out
+            return out
 
-    def on_send_eof(self, *args, **kwargs):
-        r"""Close file when EOF to be sent.
+    def prepare_message(self, *args, **kwargs):
+        r"""Perform actions preparing to send a message.
+
+        Args:
+            *args: Components of the outgoing message.
+            **kwargs: Keyword arguments are passed to the parent class's method.
 
         Returns:
-            bool: False so that message not sent.
+            CommMessage: Serialized and annotated message.
 
         """
-        flag, msg_s = super(FileComm, self).on_send_eof(*args, **kwargs)
-        try:
-            self.file_flush()
-        except (AttributeError, ValueError):  # pragma: debug
-            if self.is_open:
-                raise
-        # self.close()
-        return flag, msg_s
-
+        msg = super(FileComm, self).prepare_message(*args, **kwargs)
+        if msg.flag == CommBase.FLAG_EOF:
+            try:
+                self.file_flush()
+            except (AttributeError, ValueError):  # pragma: debug
+                if self.is_open:
+                    raise
+            # self.close()
+        return msg
+        
     def serialize(self, obj, **kwargs):
         r"""Serialize a message using the associated serializer."""
-        if (not self.concats_as_str) and (self.file_tell() != 0):
-            new_obj = obj
-            with open(self.current_address, 'rb') as fd:
-                old_obj = self.deserialize(fd.read())[0]
-            obj = self.serializer.concatenate([old_obj, new_obj])
-            assert(len(obj) == 1)
-            obj = obj[0]
-            # Reset file so that header will be written
-            self.reset_position(truncate=True)
+        with self._closing_thread.lock:
+            if (not self.concats_as_str) and self.is_open and (self.file_tell() != 0):
+                new_obj = obj
+                with open(self.current_address, 'rb') as fd:
+                    old_obj = self.deserialize(fd.read())[0]
+                obj = self.serializer.concatenate([old_obj, new_obj])
+                assert(len(obj) == 1)
+                obj = obj[0]
+                # Reset file so that header will be written
+                self.reset_position(truncate=True)
         return super(FileComm, self).serialize(obj, **kwargs)
 
     def _file_send(self, msg):

@@ -21,14 +21,78 @@ extern "C" {
 static void **vcomms2clean = NULL;
 static size_t ncomms2clean = 0;
 static size_t clean_registered = 0;
+static size_t clean_in_progress = 0;
 static size_t clean_called = 0;
+#ifdef _OPENMP
+#pragma omp threadprivate(clean_in_progress)
+#endif
 
 /*! @brief Memory to keep track of global scope comms. */
-static size_t global_scope_comm = 0;
 #ifdef _OPENMP
+static size_t global_scope_comm = 1;
+#define WITH_GLOBAL_SCOPE(COMM) global_scope_comm = 1; COMM
 #pragma omp threadprivate(global_scope_comm)
-#endif
+#else
+static size_t global_scope_comm = 0;
 #define WITH_GLOBAL_SCOPE(COMM) global_scope_comm = 1; COMM; global_scope_comm = 0
+#endif
+
+
+/*!
+ @brief Check if EOF should be sent for a comm being used on multiple threads.
+ @param[in] x const comm_t* Comm to check.
+ @returns int 1 if EOF has been sent for all but this comm and 0 otherwise.
+ */
+static
+int check_threaded_eof(const comm_t* x) {
+  int out = 1;
+#ifdef _OPENMP
+#pragma omp critical (comms)
+  {
+    size_t i;
+    comm_t* icomm = NULL;
+    int nthreads = 1;
+    for (i = 0; i < ncomms2clean; i++) {
+      if ((out == 1) && (vcomms2clean[i] != NULL)) {
+	icomm = (comm_t*)(vcomms2clean[i]);
+	if ((strcmp(icomm->name, x->name) == 0)
+	    && (icomm->thread_id != x->thread_id)) {
+	  nthreads++;
+#pragma omp critical (sent_eof)
+	  {
+	    if ((x->sent_eof != NULL) && (x->sent_eof[0] == 0))
+	      out = 0;
+	  }
+	}
+      }
+    }
+    if (nthreads < omp_get_num_threads())
+      out = 0;  // all threads havn't initialized a comm
+  }
+#endif
+  return out;
+};
+
+/*!
+  @brief Set the sent_eof flag on the comm.
+  @param[in] x comm_t* Comm to set the flag for.
+*/
+static
+void set_sent_eof(const comm_t* x) {
+#ifdef _OPENMP
+#pragma omp critical (sent_eof)
+  {
+#endif
+  x->sent_eof[0] = 1;
+  if (x->type == CLIENT_COMM) {
+    comm_t *req_comm = (comm_t*)(x->handle);
+    // Don't recurse to prevent block w/ omp critical recursion
+    req_comm->sent_eof[0] = 1;
+  }
+#ifdef _OPENMP
+  }
+#endif
+};
 
 
 /*!
@@ -48,7 +112,6 @@ comm_t* get_global_scope_comm(const char *name) {
     size_t i;
     comm_t* icomm = NULL;
     int current_thread = get_thread_id();
-    printf("CURRENT THREAD: %d\n", current_thread);
     for (i = 0; i < ncomms2clean; i++) {
       if (vcomms2clean[i] != NULL) {
 	icomm = (comm_t*)(vcomms2clean[i]);
@@ -92,6 +155,22 @@ int is_comm_format_array_type(const comm_t *x) {
   return is_dtype_format_array(datatype);
 };
 
+
+/*!
+  @brief Determine if the current thread can use a comm registered by another.
+  @param[in] int Thread that created the comm.
+  @returns int 1 if the current thread can use the comm, 0 otherwise.
+ */
+static
+int thread_can_use(int thread_id) {
+  int current_thread_id = get_thread_id();
+  if ((clean_in_progress) && (current_thread_id == 0))
+    return 1;
+  if (thread_id == current_thread_id)
+    return 1;
+  return 0;
+};
+
   
 /*!
   @brief Perform deallocation for type specific communicator.
@@ -102,7 +181,7 @@ static
 int free_comm_type(comm_t *x) {
   comm_type t = x->type;
   int ret = 1;
-  if (x->thread_id != get_thread_id()) {
+  if (!(thread_can_use(x->thread_id))) {
     ygglog_error("free_comm_type: Thread is attempting to use a comm it did not initialize");
     return ret;
   }
@@ -134,10 +213,6 @@ int free_comm(comm_t *x) {
   int ret = 0;
   if (x == NULL)
     return ret;
-#ifdef _OPENMP
-#pragma omp critical (comms)
-  {
-#endif
   ygglog_debug("free_comm(%s)", x->name);
   // Send EOF for output comms and then wait for messages to be recv'd
   if ((is_send(x->direction)) && (x->valid)) {
@@ -153,6 +228,10 @@ int free_comm(comm_t *x) {
       ygglog_error("free_comm(%s): Error registered", x->name);
     }
   }
+#ifdef _OPENMP
+#pragma omp critical (comms)
+  {
+#endif
   ret = free_comm_type(x);
   int idx = x->index_in_register;
   free_comm_base(x);
@@ -174,23 +253,31 @@ int free_comm(comm_t *x) {
 */
 static
 void clean_comms(void) {
-  size_t i;
 #ifdef _OPENMP
-#pragma omp critical (comms)
-  {
+#pragma omp critical (clean)
+    {
 #endif
+  size_t i;
   if (!(clean_called)) {
+    clean_in_progress = 1;
     ygglog_debug("atexit begin");
-    for (i = 0; i < ncomms2clean; i++) {
-      if (vcomms2clean[i] != NULL) {
-	free_comm((comm_t*)(vcomms2clean[i]));
+    if (vcomms2clean != NULL) {
+      for (i = 0; i < ncomms2clean; i++) {
+	if (vcomms2clean[i] != NULL) {
+	  free_comm((comm_t*)(vcomms2clean[i]));
+	}
       }
     }
+#ifdef _OPENMP
+#pragma omp critical (comms)
+    {
+#endif
     if (vcomms2clean != NULL) {
       free(vcomms2clean);
       vcomms2clean = NULL;
     }
     ncomms2clean = 0;
+    ygglog_debug("atexit finished cleaning comms, in final shutdown");
 #if defined(ZMQINSTALLED)
     // #if defined(_MSC_VER) && defined(ZMQINSTALLED)
     ygg_zsys_shutdown();
@@ -200,6 +287,9 @@ void clean_comms(void) {
     }
   /* printf(""); */
     clean_called = 1;
+#ifdef _OPENMP
+    }
+#endif
   }
 #ifdef _OPENMP
   }
@@ -399,6 +489,7 @@ comm_t* init_comm(const char *name, const char *direction,
 #endif
   comm_t *ret = get_global_scope_comm(name);
   if (ret != NULL) {
+    destroy_dtype(&datatype);
     return ret;
   }
   if ((datatype == NULL) && (strcmp(direction, "send") == 0)) {
@@ -420,11 +511,13 @@ comm_t* init_comm(const char *name, const char *direction,
       ret->valid = 0;
     }
   }
-  if (global_scope_comm) {
-    ret->is_global = 1;
-    ygglog_debug("init_comm(%s): Global comm!", name);
+  if (ret->valid) {
+    if (global_scope_comm) {
+      ret->is_global = 1;
+      ygglog_debug("init_comm(%s): Global comm!", name);
+    }
+    ygglog_debug("init_comm(%s): Initialized comm.", name);
   }
-  ygglog_debug("init_comm(%s): Initialized comm.", name);
   return ret;
 };
 
@@ -522,7 +615,7 @@ int comm_send_single(const comm_t *x, const char *data, const size_t len) {
     ygglog_error("comm_send_single: Invalid comm");
     return ret;
   }
-  if (x->thread_id != get_thread_id()) {
+  if (!(thread_can_use(x->thread_id))) {
     ygglog_error("comm_send_single: Thread is attempting to use a comm it did not initialize");
     return ret;
   }
@@ -565,6 +658,10 @@ comm_head_t comm_send_multipart_header(const comm_t *x, const char * data,
 				       const size_t len) {
   comm_head_t head = init_header(len, NULL, NULL);
   sprintf(head.id, "%d", rand());
+  char *model_name = getenv("YGG_MODEL_NAME");
+  if (model_name != NULL) {
+    strcpy(head.model, model_name);
+  }
   head.multipart = 1;
   head.valid = 1;
   // Add datatype information to header
@@ -705,7 +802,7 @@ int comm_send_multipart(const comm_t *x, const char *data, const size_t len) {
   }
   // Send header
   size_t data_in_header = 0;
-  if ((head.type_in_data) && (headlen > (x->maxMsgSize - x->msgBufSize))) {
+  if ((head.type_in_data) && ((size_t)headlen > (x->maxMsgSize - x->msgBufSize))) {
     ret = comm_send_single(x, headbuf, x->maxMsgSize - x->msgBufSize);
     data_in_header = headlen - (x->maxMsgSize - x->msgBufSize);
   } else {
@@ -727,7 +824,7 @@ int comm_send_multipart(const comm_t *x, const char *data, const size_t len) {
   // Send data stored in header
   size_t msgsiz;
   size_t prev = headlen - data_in_header;
-  while (prev < headlen) {
+  while (prev < (size_t)headlen) {
     if ((headlen - prev) > (xmulti->maxMsgSize - xmulti->msgBufSize)) {
       msgsiz = xmulti->maxMsgSize - xmulti->msgBufSize;
     } else {
@@ -805,17 +902,17 @@ int comm_send(const comm_t *x, const char *data, const size_t len) {
   }
   int sending_eof = 0;
   if (is_eof(data)) {
-    if (x->sent_eof[0] == 0) {
-      x->sent_eof[0] = 1;
-      if (x->type == CLIENT_COMM) {
-	comm_t *req_comm = (comm_t*)(x->handle);
-	req_comm->sent_eof[0] = 1;
-      }
-      sending_eof = 1;
-      ygglog_debug("comm_send(%s): Sending EOF", x->name);
-    } else {
+    if (x->sent_eof[0]) {
       ygglog_debug("comm_send(%s): EOF already sent", x->name);
       return ret;
+    } else if (!(check_threaded_eof(x))) {
+      ygglog_debug("comm_send(%s): EOF not sent on other threads", x->name);
+      set_sent_eof(x);
+      return 0;
+    } else {
+      set_sent_eof(x);
+      sending_eof = 1;
+      ygglog_debug("comm_send(%s): Sending EOF", x->name);
     }
   }
   if (((len > x->maxMsgSize) && (x->maxMsgSize > 0)) ||
@@ -869,7 +966,7 @@ int comm_recv_single(comm_t *x, char **data, const size_t len,
     ygglog_error("comm_recv_single: Invalid comm");
     return ret;
   }
-  if (x->thread_id != get_thread_id()) {
+  if (!(thread_can_use(x->thread_id))) {
     ygglog_error("comm_recv_single: Thread is attempting to use a comm it did not initialize");
     return ret;
   }
@@ -922,6 +1019,7 @@ int comm_recv_multipart(comm_t *x, char **data, const size_t len,
     if (is_eof(*data)) {
       ygglog_debug("comm_recv_multipart(%s): EOF received.", x->name);
       x->recv_eof[0] = 1;
+      destroy_header(&head);
       return -2;
     }
     // Get datatype information from header on first recv
@@ -938,12 +1036,14 @@ int comm_recv_multipart(comm_t *x, char **data, const size_t len,
       ret = update_dtype(updtype, head.dtype);
       if (ret != 0) {
 	ygglog_error("comm_recv_multipart(%s): Error updating datatype.", x->name);
+	destroy_header(&head);
 	return -1;
       }
     } else if ((x->is_file == 0) && (head.dtype != NULL)) {
       ret = update_dtype(updtype, head.dtype);
       if (ret != 0) {
 	ygglog_error("comm_recv_multipart(%s): Error updating existing datatype.", x->name);
+	destroy_header(&head);
 	return -1;
       }
     }
@@ -951,12 +1051,14 @@ int comm_recv_multipart(comm_t *x, char **data, const size_t len,
       // Return early if header contained entire message
       if (head.size == head.bodysiz) {
         x->used[0] = 1;
+	destroy_header(&head);
 	return (int)(head.bodysiz);
       }
       // Get address for new comm
       comm_t* xmulti = new_comm(head.address, "recv", x->type, NULL);
       if ((xmulti == NULL) || (!(xmulti->valid))) {
 	ygglog_error("comm_recv_multipart: Failed to initialize a new comm.");
+	destroy_header(&head);
 	return -1;
       }
       xmulti->sent_eof[0] = 1;
@@ -966,6 +1068,7 @@ int comm_recv_multipart(comm_t *x, char **data, const size_t len,
 	int reply_socket = set_reply_recv(xmulti, head.zmq_reply_worker);
 	if (reply_socket < 0) {
 	  ygglog_error("comm_recv_multipart: Failed to set worker reply address.");
+	  destroy_header(&head);
 	  return -1;
 	}
       }
@@ -981,6 +1084,7 @@ int comm_recv_multipart(comm_t *x, char **data, const size_t len,
 			 x->name);
 	    free(*data);
 	    free_comm(xmulti);
+	    destroy_header(&head);
 	    return -1;
 	  }
 	  *data = t_data;
@@ -988,6 +1092,7 @@ int comm_recv_multipart(comm_t *x, char **data, const size_t len,
 	  ygglog_error("comm_recv_multipart(%s): buffer is not large enough",
 		       x->name);
 	  free_comm(xmulti);
+	  destroy_header(&head);
 	  return -1;
 	}
       }
@@ -1014,6 +1119,7 @@ int comm_recv_multipart(comm_t *x, char **data, const size_t len,
 	  ret = update_dtype(updtype, head.dtype);
 	  if (ret != 0) {
 	    ygglog_error("comm_recv_multipart(%s): Error updating existing datatype.", x->name);
+	    destroy_header(&head);
 	    return -1;
 	  } else {
 	    ret = (int)prev;
@@ -1031,6 +1137,7 @@ int comm_recv_multipart(comm_t *x, char **data, const size_t len,
   }
   if (ret >= 0)
     x->used[0] = 1;
+  destroy_header(&head);
   return ret;
 };
 

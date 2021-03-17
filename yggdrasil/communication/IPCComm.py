@@ -2,7 +2,8 @@ import sys
 import logging
 from subprocess import Popen, PIPE
 from yggdrasil import platform, tools
-from yggdrasil.communication import CommBase, AsyncComm
+from yggdrasil.communication import (
+    CommBase, TemporaryCommunicationError, NoMessages)
 logger = logging.getLogger(__name__)
 try:
     import sysv_ipc
@@ -29,9 +30,12 @@ def get_queue(qid=None):
         kwargs = dict(max_message_size=tools.get_YGG_MSG_MAX())
         if qid is None:
             kwargs['flags'] = sysv_ipc.IPC_CREX
-        mq = sysv_ipc.MessageQueue(qid, **kwargs)
+        try:
+            mq = sysv_ipc.MessageQueue(qid, **kwargs)
+        except sysv_ipc.ExistentialError as e:  # pragma: debug
+            raise sysv_ipc.ExistentialError("%s: %s" % (e, qid))
         key = str(mq.key)
-        CommBase.register_comm('IPCComm', key, mq)
+        IPCComm.register_comm(key, mq)
         return mq
     else:  # pragma: windows
         logger.warning("IPC not installed. Queue cannot be returned.")
@@ -49,9 +53,9 @@ def remove_queue(mq):
 
     """
     key = str(mq.key)
-    if not CommBase.is_registered('IPCComm', key):
+    if not IPCComm.is_registered(key):
         raise KeyError("Queue not registered.")
-    CommBase.unregister_comm('IPCComm', key)
+    IPCComm.unregister_comm(key)
     
 
 def ipcs(options=[]):
@@ -165,11 +169,11 @@ class IPCServer(CommBase.CommServer):
     r"""IPC server object for cleaning up server queue."""
 
     def terminate(self, *args, **kwargs):
-        CommBase.unregister_comm('IPCComm', self.srv_address)
+        IPCComm.unregister_comm(self.srv_address)
         super(IPCServer, self).terminate(*args, **kwargs)
 
 
-class IPCComm(AsyncComm.AsyncComm):
+class IPCComm(CommBase.CommBase):
     r"""Class for handling I/O via IPC message queues.
 
     Attributes:
@@ -194,11 +198,6 @@ class IPCComm(AsyncComm.AsyncComm):
         self._server_class = IPCServer
         super(IPCComm, self)._init_before_open(**kwargs)
             
-    @classmethod
-    def underlying_comm_class(self):
-        r"""str: Name of underlying communication class."""
-        return 'IPCComm'
-
     @classmethod
     def close_registry_entry(cls, value):
         r"""Close a registry entry."""
@@ -230,14 +229,14 @@ class IPCComm(AsyncComm.AsyncComm):
         qid = int(self.address)
         self.q = get_queue(qid)
 
-    def _open_direct(self):
+    def open(self):
         r"""Open the queue."""
-        if not self.is_open_direct:
-            self.bind()
+        super(IPCComm, self).open()
+        if not self.is_open:
             self.open_after_bind()
             self.debug("qid: %s", self.q.key)
 
-    def _close_direct(self, skip_remove=False):
+    def _close(self, linger=False, skip_remove=False):
         r"""Close the queue."""
         if self._bound and (self.q is None):
             try:
@@ -253,9 +252,16 @@ class IPCComm(AsyncComm.AsyncComm):
             self.unregister_comm(self.address, dont_close=dont_close)
         self.q = None
         self._bound = False
+        super(IPCComm, self)._close(linger=linger)
 
+    def atexit(self):  # pragma: debug
+        r"""Close operations."""
+        if self.direction == 'send':
+            self.linger()
+        super(IPCComm, self).atexit()
+        
     @property
-    def is_open_direct(self):
+    def is_open(self):
         r"""bool: True if the queue is not None."""
         if self.q is None:
             return False
@@ -266,7 +272,7 @@ class IPCComm(AsyncComm.AsyncComm):
                 raise
             return False
         except sysv_ipc.ExistentialError:  # pragma: debug
-            self._close_direct()
+            self._close()
             return False
         return True
 
@@ -274,35 +280,35 @@ class IPCComm(AsyncComm.AsyncComm):
         r"""Confirm that sent message was received."""
         if noblock:
             return True
-        return (self.n_msg_direct_send == 0)
+        return (self.n_msg_send == 0)
 
     def confirm_recv(self, noblock=False):
         r"""Confirm that message was received."""
         return True
 
     @property
-    def n_msg_direct_send(self):
+    def n_msg_send(self):
         r"""int: Number of messages in the queue to send."""
-        if self.is_open_direct:
+        if self.is_open:
             try:
                 return self.q.current_messages
             except AttributeError:  # pragma: debug
-                if self.is_open_direct:
+                if self.is_open:
                     raise
                 return 0
             except sysv_ipc.ExistentialError:  # pragma: debug
-                self._close_direct()
+                self._close()
                 return 0
         else:
             return 0
         
     @property
-    def n_msg_direct_recv(self):
+    def n_msg_recv(self):
         r"""int: Number of messages in the queue to recv."""
-        return self.n_msg_direct_send
+        return self.n_msg_send
 
-    def _send_direct(self, payload):
-        r"""Send a message to the comm directly.
+    def _send(self, payload):
+        r"""Send a message.
 
         Args:
             payload (str): Message to send.
@@ -311,56 +317,32 @@ class IPCComm(AsyncComm.AsyncComm):
             bool: Success or failure of sending the message.
 
         """
-        if not self.is_open_direct:  # pragma: debug
-            return False
         try:
-            self.debug('Sending %d bytes', len(payload))
             self.q.send(payload, block=False)
-            self.debug('Sent %d bytes', len(payload))
         except sysv_ipc.BusyError:  # pragma: debug
-            self.debug("IPC Queue Full")
-            raise AsyncComm.AsyncTryAgain
-        except OSError:  # pragma: debug
-            self.debug("Send failed")
-            self._close_direct()
-            return False
-        except AttributeError:  # pragma: debug
-            if self.is_closed:
-                self.debug("Comm closed")
-                return False
-            raise
+            raise TemporaryCommunicationError("Queue full.")
         return True
 
-    def _recv_direct(self):
-        r"""Receive a message from the comm directly.
+    def _recv(self):
+        r"""Receive a message from the IPC queue.
 
         Returns:
             tuple (bool, str): The success or failure of receiving a message
                 and the message received.
 
         """
-        # Receive message
-        self.debug("Message ready, reading it.")
         try:
-            data, _ = self.q.receive()  # ignore ident
-            self.debug("Received %d bytes", len(data))
-        except sysv_ipc.ExistentialError:  # pragma: debug
-            self.debug("sysv_ipc.ExistentialError: closing")
-            self._close_direct()
-            return (False, self.empty_bytes_msg)
-        except AttributeError:  # pragma: debug
-            if self.is_closed:
-                self.debug("Queue closed")
-                return (False, self.empty_bytes_msg)
-            raise
+            data, _ = self.q.receive(block=False)  # ignore ident
+        except sysv_ipc.BusyError:  # pragma: debug
+            raise NoMessages("No messages in queue.")
         return (True, data)
 
     def purge(self):
         r"""Purge all messages from the comm."""
         super(IPCComm, self).purge()
         try:
-            while self.n_msg_direct > 0:  # pragma: debug
+            while self.n_msg > 0:  # pragma: debug
                 self.q.receive()
         except AttributeError:  # pragma: debug
-            if self.is_open_direct:
+            if self.is_open:
                 raise

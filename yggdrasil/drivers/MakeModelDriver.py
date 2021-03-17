@@ -1,6 +1,5 @@
-import copy
 from collections import OrderedDict
-from yggdrasil import components, platform
+from yggdrasil import platform, constants
 from yggdrasil.drivers.BuildModelDriver import (
     BuildModelDriver, BuildToolBase)
 
@@ -16,58 +15,11 @@ class MakeCompiler(BuildToolBase):
             if it is not the same as the directory containing the makefile.
             Defaults to directory containing makefile if provided, otherwise
             working_dir.
-        target (str, optional): Make target that should be built to create the
-            model executable. Defaults to None.
-        target_language (str, optional): Language that the target is written in.
-            Defaults to None and will be set based on the source files provided.
-        target_compiler (str, optional): Compilation tool that should be used
-            for the target language. Defaults to None and will be set based on
-            the selected language driver.
-        env_compiler (str, optional): Environment variable where the compiler
-            executable should be stored for use within the Makefile. Defaults
-            to 'CC'.
-        env_compiler_flags (str, optional): Environment variable where the
-            compiler flags should be stored (including those required to compile
-            against the |yggdrasil| interface). Defaults to 'CFLAGS'.
-        env_linker (str, optional): Environment variable where the linker
-            executable should be stored for use within the Makefile. Defaults
-            to 'CC'. If the same variable is provided for both env_compiler and
-            env_linker, this indicates that the same program should be used for
-            both compiling and linking (e.g. gcc). In such cases, the compiler
-            will be stored there and it is assumed that it will be appropriate
-            for linking as well.
-        env_linker_flags (str, optional): Environment variable where the
-            linker flags should be stored (including those required to link
-            against the |yggdrasil| interface). Defaults to 'LDFLAGS'.
         **kwargs: Additional keyword arguments are passed to parent class.
 
-    Attributes:
-        makefile (str): Path to make file either relative to makedir or absolute.
-        makedir (str): Directory where make should be invoked from.
-        target (str): Name of executable that should be created and called.
-        target_language (str): Language that the target is written in.
-        target_language_driver (ModelDriver): Language driver for the target
-            language.
-        target_compiler (str): Compilation tool that should be used
-            for the target language.
-        env_compiler (str): Compiler environment variable.
-        env_compiler_flags (str): Compiler flags environment variable.
-        env_linker (str): Linker environment variable.
-        env_linker_flags (str): Linker flags environment variable.
-
     """
-    _schema_properties = {
-        'makefile': {'type': 'string', 'default': 'Makefile'},
-        'makedir': {'type': 'string'},  # default will depend on makefile
-        'target': {'type': 'string'},
-        'target_language': {'type': 'string'},
-        'target_compiler': {'type': 'string'},
-        'env_compiler': {'type': 'string', 'default': 'CC'},
-        'env_compiler_flags': {'type': 'string', 'default': 'CFLAGS'},
-        'env_linker': {'type': 'string', 'default': 'CC'},
-        'env_linker_flags': {'type': 'string', 'default': 'LDFLAGS'}}
     toolname = 'make'
-    languages = ['make', 'c', 'c++']
+    languages = ['make']
     platforms = ['MacOS', 'Linux']
     default_flags = ['--always-make']  # Always overwrite
     flag_options = OrderedDict([('makefile', {'key': '-f', 'position': 0})])
@@ -141,19 +93,15 @@ class MakeCompiler(BuildToolBase):
         Args:
             target (str, optional): Target that should be built. Defaults to
                 to None and is ignored.
-            **kwargs: Additional keyword arguments are ignored.
+            **kwargs: Additional keyword arguments are passed to the parent
+                class's method.
 
         Returns:
-            list: Linker flags.
+            list: Compiler flags.
 
         """
-        link_kws = ['linker_flags']
-        for k in link_kws:
-            kwargs.pop(k, None)
+        kwargs.pop('linker_flags', None)
         kwargs.pop('outfile', None)
-        kwargs.pop('target_compiler', None)
-        # if (target is None) and (outfile is not None):
-        #     target = cls.file2base(outfile)
         out = super(MakeCompiler, cls).get_flags(outfile=target, **kwargs)
         return out
 
@@ -193,61 +141,6 @@ class MakeCompiler(BuildToolBase):
             kwargs['target'] = target
         return super(MakeCompiler, cls).get_executable_command(args, **kwargs)
 
-    @classmethod
-    def set_env(cls, logging_level=None, language=None, language_driver=None,
-                language_compiler=None, **kwargs):
-        r"""Get environment variables that should be set for the model process.
-
-        Args:
-            logging_level (int, optional): Logging level that should be passed
-                to get flags.
-            language (str, optional): Language that is being compiled. Defaults
-                to the first language in cls.languages that isn't toolname.
-            language_driver (ModelDriver, optional): Driver for language that
-                should be used. Defaults to None and will be imported based
-                on language.
-            language_compiler (str, optional): name of compilation tool that
-                should be used to set the environment variables. Defaults to
-                None and the default compilation tools for the provided
-                language/language_driver will be used.
-            **kwargs: Additional keyword arguments are passed to the parent
-                class's method.
-
-        Returns:
-            dict: Environment variables for the model process.
-
-        """
-        if language_driver is None:
-            if language is None:
-                language = cls.get_default_target_language()
-            language_driver = components.import_component('model', language)
-        kwargs['language_driver'] = language_driver
-        out = super(MakeCompiler, cls).set_env(**kwargs)
-        compiler = language_driver.get_tool('compiler', toolname=language_compiler)
-        compile_flags = language_driver.get_compiler_flags(
-            for_model=True, skip_defaults=True, dont_skip_env_defaults=True,
-            logging_level=logging_level, dont_link=True, toolname=language_compiler)
-        linker = language_driver.get_tool('linker', toolname=language_compiler)
-        linker_flags = language_driver.get_linker_flags(
-            for_model=True, skip_defaults=True, dont_skip_env_defaults=True,
-            toolname=language_compiler)
-        for k in ['env_compiler', 'env_compiler_flags',
-                  'env_linker', 'env_linker_flags']:
-            kwargs.setdefault(k, cls._schema_properties[k]['default'])
-        out[kwargs['env_compiler']] = compiler.get_executable()
-        out[kwargs['env_compiler_flags']] = ' '.join(compile_flags)
-        # yggdrasil requires that linking be done in C++
-        if (((compiler.languages[0].lower() == 'c')
-             and ('-lstdc++' not in linker_flags))):
-            linker_flags.append('-lstdc++')
-        out[kwargs['env_linker_flags']] = ' '.join(linker_flags)
-        if kwargs['env_compiler'] != kwargs['env_linker']:  # pragma: debug
-            out[kwargs['env_linker']] = linker.get_executable()
-            raise NotImplementedError("Functionality allowing linker to be specified "
-                                      "in a separate environment variable from the "
-                                      "compiler is untested.")
-        return out
-    
 
 class NMakeCompiler(MakeCompiler):
     toolname = 'nmake'
@@ -276,35 +169,11 @@ class MakeModelDriver(BuildModelDriver):
             if it is not the same as the directory containing the makefile.
             Defaults to directory containing makefile if provided, otherwise
             working_dir.
-        target (str, optional): Make target that should be built to create the
-            model executable. Defaults to None.
-        target_language (str, optional): Language that the target is written in.
-            Defaults to None and will be set based on the source files provided.
-        env_compiler (str, optional): Environment variable where the compiler
-            executable should be stored for use within the Makefile. Defaults
-            to 'CC'.
-        env_compiler_flags (str, optional): Environment variable where the
-            compiler flags should be stored (including those required to compile
-            against the |yggdrasil| interface). Defaults to 'CFLAGS'.
-        env_linker (str, optional): Environment variable where the linker
-            executable should be stored for use within the Makefile. Defaults
-            to 'CC'.
-        env_linker_flags (str, optional): Environment variable where the
-            linker flags should be stored (including those required to link
-            against the |yggdrasil| interface). Defaults to 'LDFLAGS'.
         **kwargs: Additional keyword arguments are passed to parent class.
 
     Attributes:
         makefile (str): Path to make file either relative to makedir or absolute.
         makedir (str): Directory where make should be invoked from.
-        target (str): Name of executable that should be created and called.
-        target_language (str): Language that the target is written in.
-        target_language_driver (ModelDriver): Language driver for the target
-            language.
-        env_compiler (str): Compiler environment variable.
-        env_compiler_flags (str): Compiler flags environment variable.
-        env_linker (str): Linker environment variable.
-        env_linker_flags (str): Linker flags environment variable.
 
     Raises:
         RuntimeError: If neither the IPC or ZMQ C libraries are available.
@@ -313,10 +182,12 @@ class MakeModelDriver(BuildModelDriver):
 
     _schema_subtype_description = ('Model is written in C/C++ and has a '
                                    'Makefile for compilation.')
-    _schema_properties = copy.deepcopy(MakeCompiler._schema_properties)
+    _schema_properties = {
+        'makefile': {'type': 'string', 'default': 'Makefile'},
+        'makedir': {'type': 'string'}}  # default will depend on makefile
     language = 'make'
-    base_languages = ['c', 'c++']
     built_where_called = True
+    buildfile_base = 'Makefile'
 
     @staticmethod
     def before_registration(cls):
@@ -343,6 +214,33 @@ class MakeModelDriver(BuildModelDriver):
         self.compile_working_dir = self.makedir
         super(MakeModelDriver, self).parse_arguments(args, **kwargs)
 
+    @classmethod
+    def get_language_for_buildfile(cls, buildfile, target=None):
+        r"""Determine the target language based on the contents of a build
+        file.
+
+        Args:
+            buildfile (str): Full path to the build configuration file.
+            target (str, optional): Target that will be built. Defaults to None
+                and the default target in the build file will be used.
+
+        """
+        with open(buildfile, 'r') as fd:
+            lines = fd.read()
+        ext_present = []
+        for lang, info in constants.COMPILER_ENV_VARS.items():
+            if info['exec'] in lines:
+                ext_present.append(lang)
+        if ('c' in ext_present) and ('c++' in ext_present):  # pragma: debug
+            ext_present.remove('c')
+        if len(ext_present) == 1:
+            return ext_present[0]
+        elif len(ext_present) > 1:  # pragma: debug
+            raise RuntimeError("More than one extension found in "
+                               "'%s': %s" % (buildfile, ext_present))
+        return super(MakeModelDriver, cls).get_language_for_buildfile(
+            buildfile)  # pragma: debug
+        
     def compile_model(self, target=None, **kwargs):
         r"""Compile model executable(s).
 
@@ -370,22 +268,43 @@ class MakeModelDriver(BuildModelDriver):
             for k, v in default_kwargs.items():
                 kwargs.setdefault(k, v)
             return super(MakeModelDriver, self).compile_model(**kwargs)
-        
-    def set_env(self, **kwargs):
-        r"""Get environment variables that should be set for the model process.
+
+    @classmethod
+    def fix_path(cls, path, for_env=False, **kwargs):
+        r"""Update a path.
 
         Args:
+            path (str): Path that should be formatted.
+            for_env (bool, optional): If True, the path is formatted for use in
+                and environment variable. Defaults to False.
             **kwargs: Additional keyword arguments are passed to the parent
                 class's method.
 
         Returns:
-            dict: Environment variables for the model process.
+            str: Updated path.
 
         """
-        if kwargs.get('for_compile', False):
-            kwargs.setdefault('compile_kwargs', {})
-            for k in ['env_compiler', 'env_compiler_flags',
-                      'env_linker', 'env_linker_flags']:
-                kwargs['compile_kwargs'][k] = getattr(self, k)
-        out = super(MakeModelDriver, self).set_env(**kwargs)
+        out = super(MakeModelDriver, cls).fix_path(path, for_env=for_env,
+                                                   **kwargs)
+        if platform._is_win and for_env:
+            out = '"%s"' % out
+        return out
+
+    @classmethod
+    def get_target_language_info(cls, *args, **kwargs):
+        r"""Get a dictionary of information about language compilation tools.
+
+        Args:
+            *args: Arguments are passed to the parent class's method.
+            **kwargs: Keyword arguments are passed to the parent class's method.
+
+        Returns:
+            dict: Information about language compilers and linkers.
+
+        """
+        out = super(MakeModelDriver, cls).get_target_language_info(*args, **kwargs)
+        if (((cls.get_tool('compiler', return_prop='name') == 'nmake')
+             and platform._is_win and ('-lstdc++' in out['linker_flags']))):
+            out['linker_flags'].remove('-lstdc++')
+            out['linker_env'] = ''
         return out

@@ -490,6 +490,9 @@ def test_dict2list():
     r"""Test conversion of a dictionary to a list and back."""
     assert_raises(TypeError, serialize.dict2list, None)
     assert_raises(TypeError, serialize.list2dict, None)
+    x = {'c': 0, 'b': 1, 'a': 2}
+    y = [2, 1, 0]
+    assert_equal(serialize.dict2list(x), y)
 
 
 def test_numpy2pandas():

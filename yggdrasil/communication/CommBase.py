@@ -5,13 +5,18 @@ import atexit
 import logging
 import types
 import time
+import collections
+import numpy as np
 from yggdrasil import tools, multitasking
 from yggdrasil.tools import YGG_MSG_EOF
-from yggdrasil.communication import new_comm, get_comm, determine_suffix
+from yggdrasil.communication import (
+    new_comm, get_comm, determine_suffix, TemporaryCommunicationError,
+    import_comm)
 from yggdrasil.components import import_component, create_component
-from yggdrasil.metaschema.datatypes import MetaschemaTypeError
+from yggdrasil.metaschema.datatypes import MetaschemaTypeError, type2numpy
 from yggdrasil.metaschema.datatypes.MetaschemaType import MetaschemaType
 from yggdrasil.communication.transforms.TransformBase import TransformBase
+from yggdrasil.serialize import consolidate_array
 
 
 logger = logging.getLogger(__name__)
@@ -19,61 +24,175 @@ _registered_servers = multitasking.LockedDict(task_method='thread')
 _registered_comms = multitasking.LockedDict(task_method='thread')
 
 
-def is_registered(comm_class, key):
+FLAG_FAILURE = 0
+FLAG_SUCCESS = 1
+FLAG_TRYAGAIN = 2
+FLAG_SKIP = 3
+FLAG_EOF = 4
+FLAG_INCOMPLETE = 5
+FLAG_EMPTY = 6
+
+
+class NeverMatch(Exception):
+    'An exception class that is never raised by any code anywhere'
+
+
+class IncompleteBaseComm(Exception):
+    r"""An exception class for methods that are incomplete for base classes."""
+
+
+class CommMessage(object):
+    r"""Class for passing messages around with additional information required
+    to send/receive them.
+
+    Attributes:
+        msg (bytes): The serialized message including the header.
+        length (int): The size of the message.
+        flag (int): Indicates the result of processing the message. Values are:
+            FLAG_FAILURE: Processing was unsuccessful.
+            FLAG_SUCCESS: Processing was successful.
+            FLAG_SKIP:    The message should be skipped.
+            FLAG_EOF:     The message indicates that there will be no more messages.
+        args (object): The unserialized message (post-transformation).
+        header (dict): Parameters sent in the header of the message.
+        additional_messages (list): Messages that should be sent along with this
+            message as in the case that the message was an iterator.
+        worker (CommBase): Worker communicator that should be used to send
+            worker messages in the case that the original message had to be split.
+        worker_messages (list): Messages that should be sent via the worker comm
+            comm as the original message had to be split due to its size.
+        sent (bool): True if the message has been sent, False otherwise.
+        singular (bool): True if there was only one argument.
+
+    """
+
+    __slots__ = ['msg', 'length', 'flag', 'args', 'header',
+                 'additional_messages', 'worker', 'worker_messages',
+                 'sent', 'finalized', 'singular', 'stype', 'sinfo']
+
+    def __init__(self, msg=None, length=0, flag=None, args=None, header=None):
+        self.msg = msg
+        self.length = length
+        self.flag = flag
+        self.args = args
+        self.header = header
+        self.additional_messages = []
+        self.worker_messages = []
+        self.worker = None
+        self.sent = False
+        self.finalized = False
+        self.singular = False
+        self.stype = None
+        self.sinfo = None
+
+    def __str__(self):
+        return 'CommMessage(flag=%s, %.100s..., sent=%s)' % (
+            self.flag, str(self.msg), self.sent)
+
+    @property
+    def tuple_args(self):
+        r"""tuple: Form that arguments were originally supplied."""
+        if self.singular:
+            return (self.args, )
+        return self.args
+
+    def add_message(self, *args, **kwargs):
+        r"""Add a message to the list of additional messages that should be sent
+        following this one.
+
+        Args:
+            *args: Arguments are passed to the CommMessage constructor.
+            *kwargs: Keyword arguments are passed to the CommMessage constructor.
+
+        """
+        kwargs.setdefault('flag', FLAG_SUCCESS)
+        self.additional_messages.append(CommMessage(*args, **kwargs))
+
+    def add_worker_message(self, *args, **kwargs):
+        r"""Add a message to the list of messages that should be sent via work
+        comm following this one.
+
+        Args:
+            *args: Arguments are passed to the CommMessage constructor.
+            *kwargs: Keyword arguments are passed to the CommMessage constructor.
+
+        """
+        kwargs.setdefault('flag', FLAG_SUCCESS)
+        self.worker_messages.append(CommMessage(*args, **kwargs))
+
+    def send_worker_messages(self, **kwargs):
+        r"""Send the worker messages via the worker comm.
+
+        Args:
+            **kwargs: Keyword arguments are passed to the send_message
+                 method of the worker comm for each message.
+
+        Returns:
+            bool: Success of the send operations.
+
+        """
+        if self.worker is not None:
+            for x in self.worker_messages:
+                if not self.worker.send_message(x, **kwargs):
+                    return False  # pragma: debug
+        return True
+
+
+def is_registered(commtype, key):
     r"""Determine if a comm object has been registered under the specified key.
     
     Args:
-        comm_class (str): Comm class to check for the key under.
+        commtype (str): Comm class to check for the key under.
         key (str): Key that should be checked.
 
     """
     global _registered_comms
     with _registered_comms.lock:
-        if comm_class not in _registered_comms:
+        if commtype not in _registered_comms:
             return False
-        return (key in _registered_comms[comm_class])
+        return (key in _registered_comms[commtype])
 
 
-def get_comm_registry(comm_class):
+def get_comm_registry(commtype):
     r"""Get the comm registry for a comm class.
 
     Args:
-        comm_class (str): Comm class to get registry for.
+        commtype (str): Comm class to get registry for.
 
     Returns:
         dict: Dictionary of registered comm objects.
 
     """
     with _registered_comms.lock:
-        if comm_class is None:
-            out = {}
-        else:
-            out = _registered_comms.get(comm_class, {})
+        # if commtype is None:
+        #     out = {}
+        # else:
+        out = _registered_comms.get(commtype, {})
     return out
 
 
-def register_comm(comm_class, key, value):
+def register_comm(commtype, key, value):
     r"""Add a comm object to the global registry.
 
     Args:
-        comm_class (str): Comm class to register the object under.
+        commtype (str): Comm class to register the object under.
         key (str): Key that should be used to register the object.
         value (obj): Object being registered.
 
     """
     global _registered_comms
     with _registered_comms.lock:
-        if comm_class not in _registered_comms:
-            _registered_comms.add_subdict(comm_class)
-        if key not in _registered_comms[comm_class]:
-            _registered_comms[comm_class][key] = value
+        if commtype not in _registered_comms:
+            _registered_comms.add_subdict(commtype)
+        if key not in _registered_comms[commtype]:
+            _registered_comms[commtype][key] = value
 
 
-def unregister_comm(comm_class, key, dont_close=False):
+def unregister_comm(commtype, key, dont_close=False):
     r"""Remove a comm object from the global registry and close it.
 
     Args:
-        comm_class (str): Comm class to check for key under.
+        commtype (str): Comm class to check for key under.
         key (str): Key for object that should be removed from the registry.
         dont_close (bool, optional): If True, the comm will be removed from
             the registry, but it won't be closed. Defaults to False.
@@ -84,37 +203,37 @@ def unregister_comm(comm_class, key, dont_close=False):
     """
     global _registered_comms
     with _registered_comms.lock:
-        if comm_class not in _registered_comms:
+        if commtype not in _registered_comms:
             return False
-        if key not in _registered_comms[comm_class]:
+        if key not in _registered_comms[commtype]:
             return False
-        value = _registered_comms[comm_class].pop(key)
+        value = _registered_comms[commtype].pop(key)
         if dont_close:
             return False
-        out = import_component('comm', comm_class).close_registry_entry(value)
+        out = import_comm(commtype).close_registry_entry(value)
         del value
     return out
 
 
-def cleanup_comms(comm_class, close_func=None):
+def cleanup_comms(commtype, close_func=None):
     r"""Clean up comms of a certain type.
 
     Args:
-        comm_class (str): Comm class that should be cleaned up.
+        commtype (str): Comm class that should be cleaned up.
 
     Returns:
         int: Number of comms closed.
 
     """
     count = 0
-    if comm_class is None:
-        return count
+    # if commtype is None:
+    #     return count
     global _registered_comms
     with _registered_comms.lock:
-        if comm_class in _registered_comms:
-            keys = list(_registered_comms[comm_class].keys())
+        if commtype in _registered_comms:
+            keys = list(_registered_comms[commtype].keys())
             for k in keys:
-                flag = unregister_comm(comm_class, k)
+                flag = unregister_comm(commtype, k)
                 if flag:  # pragma: debug
                     count += 1
     return count
@@ -164,15 +283,23 @@ class CommServer(multitasking.YggTaskLoop):
         cli_count (int): Number of clients that have connected to this server.
 
     """
-    def __init__(self, srv_address, cli_address=None, **kwargs):
+    def __init__(self, srv_address, cli_address=None, name=None, **kwargs):
         global _registered_servers
         self.cli_count = 0
+        self.srv_count = 0
         if cli_address is None:
             cli_address = srv_address
         self.srv_address = srv_address
         self.cli_address = cli_address
-        super(CommServer, self).__init__('CommServer.%s' % srv_address, **kwargs)
+        super(CommServer, self).__init__('CommServer(%s).%s.to.%s' % (
+            name, cli_address, srv_address), **kwargs)
         _registered_servers[self.srv_address] = self
+
+    def add_server(self):
+        r"""Increment the server count."""
+        global _registered_servers
+        _registered_servers[self.srv_address].srv_count += 1
+        self.debug("Added server to server: nservers = %d", self.srv_count)
 
     def add_client(self):
         r"""Increment the client count."""
@@ -180,6 +307,16 @@ class CommServer(multitasking.YggTaskLoop):
         _registered_servers[self.srv_address].cli_count += 1
         self.debug("Added client to server: nclients = %d", self.cli_count)
 
+    def remove_server(self):
+        r"""Decrement the client count, closing the server if all clients done."""
+        global _registered_servers
+        self.debug("Removing server from server")
+        _registered_servers[self.srv_address].srv_count -= 1
+        if _registered_servers[self.srv_address].srv_count <= 0:
+            self.debug("Shutting down server")
+            self.terminate()
+            _registered_servers.pop(self.srv_address)
+            
     def remove_client(self):
         r"""Decrement the client count, closing the server if all clients done."""
         global _registered_servers
@@ -207,6 +344,9 @@ class CommBase(tools.YggClass):
             interface binding. Defaults to False.
         language (str, optional): Programming language of the calling model.
             Defaults to 'python'.
+        partner_model (str, optional): Name of model that this comm is
+            partnered with. Default to None, indicating that the partner
+            is not a model.
         partner_language (str, optional): Programming language of this comm's
             partner comm. Defaults to 'python'.
         datatype (schema, optional): JSON schema (with expanded core types
@@ -252,6 +392,9 @@ class CommBase(tools.YggClass):
             with be reversed. Defaults to False.
         no_suffix (bool, optional): If True, no directional suffix will be added
             to the comm name. Defaults to False.
+        allow_multiple_comms (bool, optional): If True, initialize the comm
+            such that mulitiple comms can connect to the same address. Defaults
+            to False.
         is_client (bool, optional): If True, the comm is one of many potential
             clients that will be sending messages to one or more servers.
             Defaults to False.
@@ -293,6 +436,9 @@ class CommBase(tools.YggClass):
             or that output should be sent to (for output comms) in
             the event that a yaml does not pair the comm with another
             model comm or a file.
+        default_value (object, optional): Value that should be returned in
+            the event that a yaml does not pair the comm with another
+            model comm or a file.
         **kwargs: Additional keywords arguments are passed to parent class.
 
     Class Attributes:
@@ -309,6 +455,7 @@ class CommBase(tools.YggClass):
             connection.
         is_interface (bool): True if this comm is a Python interface binding.
         language (str): Language that this comm is being called from.
+        partner_model (str): Name of model that this comm is partnered with.
         partner_language (str): Programming language of this comm's partner comm.
         serializer (:class:.DefaultSerialize): Object that will be used to
             serialize/deserialize messages to/from python objects.
@@ -320,6 +467,8 @@ class CommBase(tools.YggClass):
             sends an end-of-file messages. Otherwise, it will remain open.
         single_use (bool): If True, the comm will only be used to send/recv a
             single message.
+        allow_multiple_comms (bool): If True, initialize the comm such that
+            mulitiple comms can connect to the same address.
         is_client (bool): If True, the comm is one of many potential clients
             that will be sending messages to one or more servers.
         is_response_client (bool): If True, the comm is a client-side response
@@ -387,7 +536,8 @@ class CommBase(tools.YggClass):
                           'is_default': {'type': 'boolean', 'default': False},
                           'outside_loop': {'type': 'boolean',
                                            'default': False},
-                          'default_file': {'$ref': '#/definitions/file'}}
+                          'default_file': {'$ref': '#/definitions/file'},
+                          'default_value': {'type': 'any'}}
     _schema_excluded_from_class = ['name']
     _default_serializer = 'default'
     _default_serializer_class = None
@@ -396,26 +546,32 @@ class CommBase(tools.YggClass):
     _maxMsgSize = 0
     address_description = None
     no_serialization = False
-    _model_schema_prop = ['is_default', 'outside_loop', 'default_file']
+    _model_schema_prop = ['is_default', 'outside_loop', 'default_file',
+                          'default_value']
     _disconnect_attr = (tools.YggClass._disconnect_attr
                         + ['_closing_event', '_closing_thread',
                            '_eof_recv', '_eof_sent'])
+    _prepare_message_kws = ['header_kwargs', 'skip_serialization',
+                            'skip_processing', 'skip_language2python',
+                            'after_prepare_message']
+    _finalize_message_kws = ['skip_python2language', 'after_finalize_message']
 
     def __init__(self, name, address=None, direction='send', dont_open=False,
-                 is_interface=None, language=None, partner_language='python',
+                 is_interface=None, language=None,
+                 partner_model=None, partner_language='python',
                  recv_timeout=0.0, close_on_eof_recv=True, close_on_eof_send=False,
                  single_use=False, reverse_names=False, no_suffix=False,
+                 allow_multiple_comms=False,
                  is_client=False, is_response_client=False,
                  is_server=False, is_response_server=False,
-                 comm=None, touches_model=False, **kwargs):
-        self._comm_class = None
-        if comm is not None:
-            assert(comm == self.comm_class)
+                 is_async=False, **kwargs):
         if isinstance(kwargs.get('datatype', None), MetaschemaType):
             self.datatype = kwargs.pop('datatype')
         super(CommBase, self).__init__(name, **kwargs)
         if not self.__class__.is_installed(language='python'):  # pragma: debug
             raise RuntimeError("Comm class %s not installed" % self.__class__)
+        if (partner_model is None) and (not is_interface):
+            no_suffix = True
         suffix = determine_suffix(no_suffix=no_suffix,
                                   reverse_names=reverse_names,
                                   direction=direction)
@@ -448,19 +604,26 @@ class CommBase(tools.YggClass):
         self.is_interface = is_interface
         if self.is_interface:
             # All models connect to python connection drivers
+            partner_model = None
             partner_language = 'python'
             recv_timeout = False
         if language is None:
             language = 'python'
         self.language = language
+        self.partner_model = partner_model
         self.partner_language = partner_language
         self.partner_language_driver = None
-        if partner_language:
+        if self.partner_language:
             self.partner_language_driver = import_component(
                 'model', self.partner_language)
         self.language_driver = import_component('model', self.language)
+        self.touches_model = (self.partner_model is not None)
+        self.allow_multiple_comms = allow_multiple_comms
+        if self.is_interface and (os.environ.get('YGG_THREADING', False)):
+            self.allow_multiple_comms = True
         self.is_client = is_client
         self.is_server = is_server
+        self.is_async = is_async
         self.is_response_client = is_response_client
         self.is_response_server = is_response_server
         self._server = None
@@ -469,7 +632,6 @@ class CommBase(tools.YggClass):
         self.close_on_eof_send = close_on_eof_send
         self._work_comms = {}
         self.single_use = single_use
-        self.touches_model = touches_model
         self._used = False
         self._multiple_first_send = True
         self._n_sent = 0
@@ -495,11 +657,10 @@ class CommBase(tools.YggClass):
         self._closing_thread = multitasking.YggTask(
             target=self.linger_close,
             name=self.name + '.ClosingTask')
-        self._eof_recv = multitasking.Event()
         self._eof_sent = multitasking.Event()
+        self._iterator_backlog = None
         self._field_backlog = dict()
         if self.single_use:
-            self._eof_recv.set()
             self._eof_sent.set()
         if self.is_response_client or self.is_response_server:
             self._eof_sent.set()  # Don't send EOF, these are single use
@@ -510,14 +671,20 @@ class CommBase(tools.YggClass):
             self.bind()
         else:
             self.open()
+        self.logger._instance_name += (
+            '=>%s' % str(self.address).replace('%', '%%'))
 
     def __getstate__(self):
         if self.is_open and (self._commtype != 'buffer'):  # pragma: debug
             raise RuntimeError("Cannot pickle an open comm.")
-        return super(CommBase, self).__getstate__()
+        out = super(CommBase, self).__getstate__()
+        del out['_closing_thread']
+        return out
 
     def __setstate__(self, state):
         super(CommBase, self).__setstate__(state)
+        self._closing_thread = multitasking.YggTask(
+            target=self.linger_close, name=self.name + '.ClosingTask')
         if self.is_interface:  # pragma: debug
             atexit.register(self.atexit)
 
@@ -552,7 +719,7 @@ class CommBase(tools.YggClass):
                 if k in kwargs:
                     seri_kws.setdefault(k, kwargs[k])
             # Create serializer instance
-            self.debug('seri_kws = %s', str(seri_kws))
+            self.debug('seri_kws = %.100s', str(seri_kws))
             self.serializer = seri_cls(**seri_kws)
         # Set send/recv converter based on the serializer
         dir_conv = '%s_converter' % self.direction
@@ -609,7 +776,7 @@ class CommBase(tools.YggClass):
         cls._default_serializer_class = import_component('serializer',
                                                          cls._default_serializer,
                                                          without_schema=True)
-        
+
     @classmethod
     def get_testing_options(cls, serializer=None, **kwargs):
         r"""Method to return a dictionary of testing options for this class.
@@ -659,14 +826,18 @@ class CommBase(tools.YggClass):
                 out[k] = copy.deepcopy(out_seri[k])
         return out
 
-    def get_status_message(self, nindent=0, extra_lines=None):
+    def get_status_message(self, nindent=0, extra_lines_before=None,
+                           extra_lines_after=None):
         r"""Return lines composing a status message.
         
         Args:
             nindent (int, optional): Number of tabs that should be used to
                 indent each line. Defaults to 0.
-            extra_lines (list, optional): Additional lines that should be
+            extra_lines_before (list, optional): Additional lines that should be
                 added to the beginning of the default print message. Defaults to
+                empty list if not provided.
+            extra_lines_after (list, optional): Additional lines that should be
+                added to the end of the default print message. Defaults to
                 empty list if not provided.
                 
         Returns:
@@ -674,24 +845,37 @@ class CommBase(tools.YggClass):
                 prefix string used for the last message.
 
         """
-        if extra_lines is None:
-            extra_lines = []
+        if extra_lines_before is None:
+            extra_lines_before = []
+        if extra_lines_after is None:
+            extra_lines_after = []
         prefix = nindent * '\t'
         lines = ['', '%s%s:' % (prefix, self.name)]
         prefix += '\t'
-        lines += ['%s%s' % (prefix, x) for x in extra_lines]
+        lines += ['%s%s' % (prefix, x) for x in extra_lines_before]
         lines += ['%s%-15s: %s' % (prefix, 'address', self.address),
                   '%s%-15s: %s' % (prefix, 'direction', self.direction),
                   '%s%-15s: %s' % (prefix, 'open', self.is_open),
                   '%s%-15s: %s' % (prefix, 'nsent', self._n_sent),
                   '%s%-15s: %s' % (prefix, 'nrecv', self._n_recv)]
+        lines += ['%s%s' % (prefix, x) for x in extra_lines_after]
         return lines, prefix
 
     def printStatus(self, *args, **kwargs):
         r"""Print status of the communicator."""
-        lines, _ = self.get_status_message(*args, **kwargs)
+        nindent = kwargs.get('nindent', 0)
+        lines, prefix = self.get_status_message(*args, **kwargs)
+        if len(self._work_comms) > 0:
+            lines.append('%sWork comms:' % prefix)
+            for v in self._work_comms.values():
+                lines += v.get_status_message(nindent=nindent + 1)[0]
         self.info('\n'.join(lines))
 
+    @property
+    def any_files(self):
+        r"""bool: True if the comm interfaces with any files."""
+        return self.is_file
+        
     @classmethod
     def is_installed(cls, language=None):
         r"""Determine if the necessary libraries are installed for this
@@ -709,7 +893,7 @@ class CommBase(tools.YggClass):
 
         """
         lang_list = tools.get_supported_lang()
-        comm_class = str(cls).split("'")[1].split(".")[-1]
+        commtype = cls._commtype
         use_any = False
         if language in [None, 'all']:
             language = lang_list
@@ -727,8 +911,7 @@ class CommBase(tools.YggClass):
                     out = True
                     break
         else:
-            if comm_class in ['CommBase', 'AsyncComm', 'ForkComm',
-                              'ErrorClass']:
+            if commtype in [None, 'server', 'client', 'fork']:
                 out = (language in lang_list)
             else:
                 # Check driver
@@ -750,26 +933,16 @@ class CommBase(tools.YggClass):
         return b''
         
     @property
-    def comm_class(self):
-        r"""str: Name of communication class."""
-        # TODO: Change this to return self._commtype
-        if self._comm_class is None:
-            if getattr(self, '_is_error_class', False):
-                name_cls = self.__class__.__bases__[0]
-            else:
-                name_cls = self.__class__
-            self._comm_class = str(name_cls).split("'")[1].split(".")[-1]
-        return self._comm_class
-
-    @property
     def model_name(self):
         r"""str: Name of the model using the comm."""
         return os.environ.get('YGG_MODEL_NAME', '')
 
     @classmethod
-    def underlying_comm_class(self):
+    def underlying_comm_class(cls):
         r"""str: Name of underlying communication class."""
-        return None
+        if cls._commtype in [None, 'fork']:
+            return False
+        return cls._commtype
 
     @classmethod
     def close_registry_entry(cls, value):
@@ -786,25 +959,37 @@ class CommBase(tools.YggClass):
         r"""dict: Registry of comms of this class."""
         return get_comm_registry(cls.underlying_comm_class())
 
-    def register_comm(self, key, value):
-        r"""Register a comm."""
-        self.debug("Registering %s comm: %s", self.comm_class, key)
-        register_comm(self.comm_class, key, value)
+    @classmethod
+    def is_registered(cls, key):
+        r"""bool: True if the comm is registered, False otherwise."""
+        commtype = cls.underlying_comm_class()
+        return is_registered(commtype, key)
 
-    def unregister_comm(self, key, dont_close=False):
+    @classmethod
+    def register_comm(cls, key, value):
+        r"""Register a comm."""
+        # commtype = cls._commtype
+        commtype = cls.underlying_comm_class()
+        logger.debug("Registering %s comm: %s" % (commtype, key))
+        register_comm(commtype, key, value)
+
+    @classmethod
+    def unregister_comm(cls, key, dont_close=False):
         r"""Unregister a comm."""
-        self.debug("Unregistering %s comm: %s (dont_close = %s)",
-                   self.comm_class, key, dont_close)
-        unregister_comm(self.comm_class, key, dont_close=dont_close)
+        # commtype = cls._commtype
+        commtype = cls.underlying_comm_class()
+        logger.debug("Unregistering %s comm: %s (dont_close = %s)",
+                     commtype, key, dont_close)
+        unregister_comm(commtype, key, dont_close=dont_close)
 
     @classmethod
     def comm_count(cls):
         r"""int: Number of communication connections."""
         out = len(cls.comm_registry())
         if out > 0:
-            logger.info('There are %d %s comms: %s',
-                        len(cls.comm_registry()), cls.__name__,
-                        [k for k in cls.comm_registry().keys()])
+            logger.debug('There are %d %s comms: %s',
+                         len(cls.comm_registry()), cls.__name__,
+                         [k for k in cls.comm_registry().keys()])
         return out
 
     @classmethod
@@ -818,20 +1003,33 @@ class CommBase(tools.YggClass):
         r"""Initialize communication with new queue."""
         dont_create = kwargs.pop('dont_create', False)
         env = kwargs.get('env', {})
-        if name in env:
-            kwargs.setdefault('address', env[name])
-        elif name in os.environ:
-            kwargs.setdefault('address', os.environ[name])
-        new_comm_class = kwargs.pop('new_comm_class', None)
+        for ienv in [env, os.environ]:
+            if name in ienv:
+                kwargs.setdefault('address', ienv[name])
+        new_commtype = kwargs.pop('commtype', None)
         if dont_create:
             args = tuple([name] + list(args))
         else:
             args, kwargs = cls.new_comm_kwargs(name, *args, **kwargs)
-        if new_comm_class is not None:
-            new_cls = import_component('comm', new_comm_class)
+        if new_commtype is not None:
+            new_cls = import_comm(new_commtype)
             return new_cls(*args, **kwargs)
         return cls(*args, **kwargs)
 
+    @property
+    def model_env(self):
+        r"""dict: Mapping between model name and opposite comm
+        environment variables that need to be provided to the model."""
+        out = {}
+        if self.partner_model is not None:
+            out[self.partner_model] = self.opp_comms
+        return out
+
+    @property
+    def opp_name(self):
+        r"""str: Name that should be used for the opposite comm."""
+        return self.name
+        
     @property
     def opp_address(self):
         r"""str: Address for opposite comm."""
@@ -840,7 +1038,7 @@ class CommBase(tools.YggClass):
     @property
     def opp_comms(self):
         r"""dict: Name/address pairs for opposite comms."""
-        return {self.name: self.opp_address}
+        return {self.opp_name: self.opp_address}
 
     def opp_comm_kwargs(self):
         r"""Get keyword arguments to initialize communication with opposite
@@ -850,7 +1048,8 @@ class CommBase(tools.YggClass):
             dict: Keyword arguments for opposite comm object.
 
         """
-        kwargs = {'comm': self.comm_class}
+        kwargs = {'commtype': self._commtype, 'use_async': self.is_async,
+                  'allow_multiple_comms': self.allow_multiple_comms}
         kwargs['address'] = self.opp_address
         kwargs['serializer'] = self.serializer
         if self.direction == 'send':
@@ -862,7 +1061,7 @@ class CommBase(tools.YggClass):
 
     def bind(self):
         r"""Bind in place of open."""
-        if self.is_client:
+        if (self.is_client or self.allow_multiple_comms) and (not self.is_interface):
             self.signon_to_server()
 
     def open(self):
@@ -874,17 +1073,19 @@ class CommBase(tools.YggClass):
         r"""Close the connection."""
         pass
 
-    def close(self, linger=False):
+    def close(self, linger=False, **kwargs):
         r"""Close the connection.
 
         Args:
             linger (bool, optional): If True, drain messages before closing the
                 comm. Defaults to False.
+            **kwargs: Additional keyword arguments are passed to linger
+                method if linger is True.
 
         """
         self.debug("Closing %s", self.address)
         if linger and self.is_open:
-            self.linger()
+            self.linger(**kwargs)
         else:
             self._closing_thread.set_terminated_flag()
             linger = False
@@ -893,7 +1094,7 @@ class CommBase(tools.YggClass):
             self._close(linger=linger)
             self._n_sent = 0
             self._n_recv = 0
-            if self.is_client:
+            if (self.is_client or self.allow_multiple_comms) and (not self.is_interface):
                 self.debug("Signing off from server")
                 self.signoff_from_server()
             if len(self._work_comms) > 0:
@@ -932,20 +1133,26 @@ class CommBase(tools.YggClass):
                 self.debug("Closing thread took too long")
                 self.close()
 
-    def linger_close(self):
+    def linger_close(self, **kwargs):
         r"""Wait for messages to drain, then close."""
-        self.close(linger=True)
+        self.close(linger=True, **kwargs)
 
-    def linger(self):
+    def linger(self, active_confirm=False):
         r"""Wait for messages to drain."""
         self.debug('')
         if self.direction == 'recv':
             while self.is_open and (self.n_msg_recv_drain > 0):  # pragma: debug
-                self.recv(timeout=0)
-            self.wait_for_confirm(timeout=self._timeout_drain)
+                self.recv_message(timeout=0, skip_deserialization=True)
+            self.wait_for_confirm(timeout=self._timeout_drain,
+                                  active_confirm=active_confirm)
         else:
+            if (self.direction == 'send') and (not self.is_async):
+                self.wait_for_workers(timeout=self._timeout_drain)
+            for x in self._work_comms.values():
+                x.linger()
             self.drain_messages(variable='n_msg_send')
-            self.wait_for_confirm(timeout=self._timeout_drain)
+            self.wait_for_confirm(timeout=self._timeout_drain,
+                                  active_confirm=active_confirm)
         self.debug("Finished (timeout_drain = %s)", str(self._timeout_drain))
 
     def language_atexit(self):  # pragma: debug
@@ -955,7 +1162,7 @@ class CommBase(tools.YggClass):
 
     def atexit(self):  # pragma: debug
         r"""Close operations."""
-        self.debug('atexit begins')
+        self.debug('atexit begins (n_msg=%d)', self.n_msg)
         self.language_atexit()
         self.debug('atexit after language_atexit, but before close')
         self.close()
@@ -977,12 +1184,18 @@ class CommBase(tools.YggClass):
     @property
     def is_confirmed_send(self):
         r"""bool: True if all sent messages have been confirmed."""
-        return True
+        for v in list(self._work_comms.values()):
+            if (v.direction == 'send') and not v.is_confirmed_send:  # pragma: debug
+                return False
+        return (self.n_msg_send == 0)
 
     @property
     def is_confirmed_recv(self):
         r"""bool: True if all received messages have been confirmed."""
-        return True
+        for v in list(self._work_comms.values()):
+            if (v.direction == 'recv') and not v.is_confirmed_recv:  # pragma: debug
+                return False
+        return (self.n_msg_recv == 0)
 
     @property
     def is_confirmed(self):
@@ -991,6 +1204,27 @@ class CommBase(tools.YggClass):
             return self.is_confirmed_recv
         else:
             return self.is_confirmed_send
+
+    def wait_for_workers(self, timeout=None):
+        r"""Sleep until all workers are closed or have been used."""
+        Tout = self.start_timeout(t=timeout,
+                                  key_suffix='.wait_for_workers')
+        flag = False
+        while (not Tout.is_out):
+            for x in self._work_comms.values():
+                if hasattr(x, 'task_timer'):
+                    flag = (not x.task_timer.is_alive())
+                else:  # pragma: completion
+                    # This is currently unused as wait_for_workers is only
+                    # called for non-asynchronous comms
+                    flag = (x._used or x.is_closed)
+                if not flag:
+                    break
+            else:
+                break
+            self.sleep()
+        self.stop_timeout(key_suffix='.wait_for_workers')
+        return flag
 
     def wait_for_confirm(self, timeout=None, direction=None,
                          active_confirm=False, noblock=False):
@@ -1076,11 +1310,67 @@ class CommBase(tools.YggClass):
         out = (isinstance(msg, bytes) and (msg == self.eof_msg))
         return out
 
-    def apply_transform(self, msg_in):
+    def update_message_from_serializer(self, msg):
+        r"""Update a message with information about the serializer.
+
+        Args:
+            msg (CommMessage): Incoming message.
+
+        """
+        if self.serializer.initialized:
+            msg.stype = self.serializer.typedef
+            msg.sinfo = self.serializer.serializer_info
+            for k in ['format_str', 'field_names', 'field_units']:
+                if k in msg.sinfo:
+                    msg.stype[k] = msg.sinfo[k]
+
+    def update_serializer_from_message(self, msg):
+        r"""Update the serializer based on information stored in a message.
+
+        Args:
+            msg (CommMessage): Outgoing message.
+
+        """
+        if msg.sinfo is None:
+            return
+        assert(msg.stype is not None)
+        msg.stype = self.apply_transform_to_type(msg.stype)
+        msg.sinfo.pop('seritype', None)
+        for k in ['format_str', 'field_names', 'field_units']:
+            if k in msg.stype:
+                msg.sinfo[k] = msg.stype.pop(k)
+        msg.sinfo['datatype'] = msg.stype
+        self.serializer.initialize_serializer(msg.sinfo)
+        self.serializer.update_serializer(skip_type=True, **msg.header)
+
+    def apply_transform_to_type(self, typedef):
+        r"""Evaluate the transform to alter the type definition.
+
+        Args:
+            typedef (dict): Type definition to transform.
+
+        Returns:
+            dict: Transformed type definition.
+
+        """
+        for iconv in self.transform:
+            if not iconv.original_datatype:
+                iconv.set_original_datatype(typedef)
+            typedef = iconv.transformed_datatype
+        return typedef
+
+    def apply_transform(self, msg_in, for_empty=False, header=False):
         r"""Evaluate the transform to alter the emssage being sent/received.
 
         Args:
             msg_in (object): Message being transformed.
+            for_empty (bool, optional): If True, the transformation is being used
+                to check for an empty message and errors will be caught. Defaults
+                to False.
+            header (dict, optional): Header keyword arguments associated
+                with a message. Defaults to False and is ignored.
+            typedef (dict, optiona): Type to transform. Default to None and will
+                be determined by the serializer if receiving.
 
         Returns:
             object: Transformed message.
@@ -1092,20 +1382,36 @@ class CommBase(tools.YggClass):
                    % self.direction)
         # If receiving, update the expected datatypes to use information
         # about the received datatype that was recorded by the serializer
-        if (((self.direction == 'recv')
-             and self.serializer.initialized
-             and (not self.transform[0].original_datatype))):
-            typedef = self.serializer.typedef
-            for iconv in self.transform:
-                if not iconv.original_datatype:
-                    iconv.set_original_datatype(typedef)
-                typedef = iconv.transformed_datatype
+        if (((self.direction == 'recv') and self.serializer.initialized
+             and (not for_empty))):
+            assert(self.transform[0].original_datatype)
+        # if (((self.direction == 'recv')
+        #      and self.serializer.initialized
+        #      and (not self.transform[0].original_datatype))):
+        #     typedef = self.serializer.typedef
+        #     for iconv in self.transform:
+        #         if not iconv.original_datatype:
+        #             iconv.set_original_datatype(typedef)
+        #         typedef = iconv.transformed_datatype
         # Actual conversion
         msg_out = msg_in
-        no_init = ((self.direction == 'recv')
-                   and (not self.serializer.initialized))
-        for iconv in self.transform:
-            msg_out = iconv(msg_out, no_init=no_init)
+        no_init = (for_empty or ((self.direction == 'recv')
+                                 and (not self.serializer.initialized)))
+        try:
+            for iconv in self.transform:
+                msg_out = iconv(msg_out, no_init=no_init)
+        except BaseException:
+            if for_empty:
+                return None
+            raise  # pragma: debug
+        if (((self.direction == 'send') and (header is not False)
+             and iconv and iconv.transformed_datatype
+             and (not self.serializer.initialized))):
+            if not header:
+                header = {}
+            metadata = dict(header,
+                            datatype=iconv.transformed_datatype)
+            self.serializer.initialize_serializer(metadata, extract=True)
         return msg_out
 
     def evaluate_filter(self, *msg_in):
@@ -1130,7 +1436,7 @@ class CommBase(tools.YggClass):
     @property
     def empty_obj_recv(self):
         r"""obj: Empty message object."""
-        return self.apply_transform(self.serializer.empty_msg)
+        return self.apply_transform(self.serializer.empty_msg, for_empty=True)
 
     def is_empty(self, msg, emsg):
         r"""Check that a message matches an empty message object.
@@ -1164,20 +1470,6 @@ class CommBase(tools.YggClass):
         if self.is_eof(msg):
             return False
         return self.is_empty(msg, self.empty_obj_recv)
-    
-    def is_empty_send(self, msg):
-        r"""Check if a message object being sent is empty.
-
-        Args:
-            msg (obj): Message object.
-
-        Returns:
-            bool: True if the object is empty, False otherwise.
-
-        """
-        smsg = self.apply_transform(msg)
-        emsg, _ = self.deserialize(self.empty_bytes_msg)
-        return self.is_empty(smsg, emsg)
         
     def chunk_message(self, msg):
         r"""Yield chunks of message of size maxMsgSize
@@ -1194,6 +1486,25 @@ class CommBase(tools.YggClass):
             next = min(prev + self.maxMsgSize, len(msg))
             yield msg[prev:next]
             prev = next
+
+    def precheck(self, direction):
+        r"""Check that comm is ready for action in specified direction,
+        raising errors if it is not.
+
+        Args:
+            direction (str): Check that comm is ready to perform this
+                action.
+
+        """
+        if (((self._commtype not in ['server', 'client'])
+             and (self.direction != direction))):
+            raise RuntimeError(("This comm (%s, %s) is designated to %s and "
+                                "therefore cannot %s.")
+                               % (self.name, self.address, self.direction, direction))
+        if self.single_use and self._used:
+            raise RuntimeError("This comm (%s, %s) is single use and it "
+                               "was already used."
+                               % (self.name, self.address))
 
     # CLIENT/SERVER METHODS
     def server_exists(self, srv_address):
@@ -1217,21 +1528,26 @@ class CommBase(tools.YggClass):
             srv_address (str): Address of server comm.
 
         """
-        return self._server_class(srv_address, **self._server_kwargs)
+        return self._server_class(srv_address, name=self.name,
+                                  **self._server_kwargs)
 
     def signon_to_server(self):
         r"""Add a client to an existing server or create one."""
         global _registered_servers
         with _registered_servers.lock:
             if self._server is None:
-                if not self.server_exists(self.address):
-                    self.debug("Creating new server")
-                    self._server = self.new_server(self.address)
-                    self._server.start()
+                assert(not self.server_exists(self.address))
+                self.debug("Creating new server")
+                self._server = self.new_server(self.address)
+                self._server.start()
+                # Currently server are only started once per model
+                # self._server = _registered_servers[self.address]
+                if self.direction == 'send':
+                    self._server.add_client()
+                    self.address = self._server.cli_address
                 else:
-                    self._server = _registered_servers[self.address]
-                self._server.add_client()
-                self.address = self._server.cli_address
+                    self._server.add_server()
+                    self.address = self._server.srv_address
 
     def signoff_from_server(self):
         r"""Remove a client from the server."""
@@ -1239,24 +1555,41 @@ class CommBase(tools.YggClass):
         with _registered_servers.lock:
             if self._server is not None:
                 self.debug("Signing off")
-                self._server.remove_client()
+                if self.direction == 'send':
+                    self._server.remove_client()
+                else:
+                    self._server.remove_server()
                 self._server = None
 
     # TEMP COMMS
     @property
     def get_work_comm_kwargs(self):
         r"""dict: Keyword arguments for an existing work comm."""
-        return dict(comm=self.comm_class, direction='recv',
-                    recv_timeout=self.recv_timeout,
-                    is_interface=self.is_interface,
-                    single_use=True)
+        if self._commtype is None:
+            raise IncompleteBaseComm(
+                "Base comm class '%s' cannot create work comm."
+                % self.__class__.__name__)
+        out = dict(commtype=self._commtype, direction='recv',
+                   recv_timeout=self.recv_timeout,
+                   is_interface=self.is_interface,
+                   use_async=self.is_async,
+                   single_use=True)
+        if out.get('use_async', False):
+            out['async_recv_method'] = 'recv_message'
+            out['async_recv_kwargs'] = {'skip_deserialization': True}
+        return out
 
     @property
     def create_work_comm_kwargs(self):
         r"""dict: Keyword arguments for a new work comm."""
-        return dict(comm=self.comm_class, direction='send',
+        if self._commtype is None:
+            raise IncompleteBaseComm(
+                "Base comm class '%s' cannot create work comm."
+                % self.__class__.__name__)
+        return dict(commtype=self._commtype, direction='send',
                     recv_timeout=self.recv_timeout,
                     is_interface=self.is_interface,
+                    use_async=self.is_async,
                     uuid=str(uuid.uuid4()), single_use=True)
 
     def get_work_comm(self, header, **kwargs):
@@ -1272,10 +1605,9 @@ class CommBase(tools.YggClass):
 
         """
         c = self._work_comms.get(header['id'], None)
-        if c is not None:
-            return c
-        c = self.header2workcomm(header, **kwargs)
-        self.add_work_comm(c)
+        if c is None:
+            c = self.header2workcomm(header, **kwargs)
+            self.add_work_comm(c)
         return c
 
     def create_work_comm(self, work_comm_name=None, **kwargs):
@@ -1295,7 +1627,7 @@ class CommBase(tools.YggClass):
         kws = self.create_work_comm_kwargs
         kws.update(**kwargs)
         if work_comm_name is None:
-            cls = kws.get("comm", tools.get_default_comm())
+            cls = kws.get('commtype', 'default')
             work_comm_name = '%s_temp_%s_%s.%s' % (
                 self.name, cls, kws['direction'], kws['uuid'])
         c = new_comm(work_comm_name, **kws)
@@ -1349,10 +1681,10 @@ class CommBase(tools.YggClass):
             dict: Header information that will be sent with a message.
 
         """
-        header_kwargs = kwargs
-        header_kwargs['address'] = work_comm.address
-        header_kwargs['id'] = work_comm.uuid
-        return header_kwargs
+        header = kwargs
+        header['address'] = work_comm.address
+        header['id'] = work_comm.uuid
+        return header
 
     def header2workcomm(self, header, work_comm_name=None, **kwargs):
         r"""Get a work comm based on header info.
@@ -1375,7 +1707,7 @@ class CommBase(tools.YggClass):
         kws['uuid'] = header['id']
         kws['address'] = header['address']
         if work_comm_name is None:
-            cls = kws.get("comm", tools.get_default_comm())
+            cls = kws.get('commtype', 'default')
             work_comm_name = '%s_temp_%s_%s.%s' % (
                 self.name, cls, kws['direction'], header['id'])
         c = get_comm(work_comm_name, **kws)
@@ -1386,6 +1718,8 @@ class CommBase(tools.YggClass):
         r"""Serialize a message using the associated serializer."""
         # Don't send metadata for files
         # kwargs.setdefault('dont_encode', self.is_file)
+        kwargs.setdefault('add_serializer_info',
+                          (self._send_serializer and (not self.is_file)))
         kwargs.setdefault('no_metadata', self.is_file)
         kwargs.setdefault('max_header_size', self.maxMsgSize)
         return self.serializer.serialize(*args, **kwargs)
@@ -1399,260 +1733,270 @@ class CommBase(tools.YggClass):
     # SEND METHODS
     def _safe_send(self, *args, **kwargs):
         r"""Send message checking if is 1st message and then waiting."""
-        if (not self._used) and self._multiple_first_send:
-            out = self._send_1st(*args, **kwargs)
-        else:
-            self.debug('is_closed = %s', self.is_closed)
-            with self._closing_thread.lock:
-                self.debug(
-                    "inside safe_send lock, is_closed = %s", self.is_closed)
-                if self.is_closed:  # pragma: debug
-                    return False
-                out = self._send(*args, **kwargs)
+        timeout = kwargs.pop('timeout', self.timeout)
+        send_1st = ((not self._used) and self._multiple_first_send)
+        if send_1st:
+            timeout = max(timeout, self.timeout)
+            self.suppress_special_debug = True
+        Tout = self.start_timeout(timeout, key_suffix='._safe_send')
+        out = False
+        error = None
+        while (not Tout.is_out):
+            error = None
+            try:
+                with self._closing_thread.lock:
+                    if self.is_open:
+                        out = self._send(*args, **kwargs)
+                        if out or (not send_1st):
+                            break
+                    else:  # pragma: debug
+                        self.debug('Comm closed')
+                        out = False
+                        break
+            except TemporaryCommunicationError as e:
+                error = e
+                self.special_debug("TemporaryCommunicationError: %s" % e)
+            self.sleep()
+        self.stop_timeout(key_suffix='._safe_send')
+        if error and self.is_async:
+            raise TemporaryCommunicationError(error)
+        if send_1st:
+            self.suppress_special_debug = False
         if out:
             self._n_sent += 1
             self._last_send = time.perf_counter()
         return out
     
-    def _send_1st(self, *args, **kwargs):
-        r"""Send first message until it succeeds."""
-        with self._closing_thread.lock:
-            if self.is_closed:  # pragma: debug
-                return False
-            flag = self._send(*args, **kwargs)
-        T = self.start_timeout(key_suffix='._send_1st')
-        self.suppress_special_debug = True
-        while (not T.is_out) and (self.is_open) and (not flag):  # pragma: debug
-            with self._closing_thread.lock:
-                if not self.is_open:
-                    break
-                flag = self._send(*args, **kwargs)
-            if flag or (self.is_closed):
-                break
-            self.sleep()
-        self.stop_timeout(key_suffix='._send_1st')
-        self.suppress_special_debug = False
-        return flag
-        
-    def _send(self, msg, *args, **kwargs):
+    def _send(self, msg, *args, **kwargs):  # pragma: debug
         r"""Raw send. Should be overridden by inheriting class."""
-        raise NotImplementedError("_send method needs implemented.")
+        raise IncompleteBaseComm("_send method needs implemented.")
 
-    def _send_multipart(self, msg, **kwargs):
-        r"""Send a message larger than maxMsgSize in multiple parts.
-
-        Args:
-            msg (str): Message to send.
-            **kwargs: Additional keyword arguments are apssed to _send.
-
-        Returns:
-            bool: Success or failure of sending the message.
-
-        """
-        nsent = 0
-        ret = True
-        for imsg in self.chunk_message(msg):
-            if self.is_closed:  # pragma: debug
-                self.error("._send_multipart(): Connection closed.")
-                return False
-            ret = self._safe_send(imsg, **kwargs)
-            if not ret:  # pragma: debug
-                self.debug("Send interupted at %d of %d bytes.",
-                           nsent, len(msg))
-                break
-            nsent += len(imsg)
-            self.debug("%d of %d bytes sent", nsent, len(msg))
-        if ret and len(msg) > 0:
-            self.debug("%d bytes completed", len(msg))
-        return ret
-
-    def _send_multipart_worker(self, msg, info, **kwargs):
-        r"""Send multipart message to the worker comm identified.
+    def send_message(self, msg, skip_safe_send=False, **kwargs):
+        r"""Send a message encapsulated in a CommMessage object.
 
         Args:
-            msg (str): Message to be sent.
-            info (dict): Information about the outgoing message.
-            **kwargs: Additional keyword arguments are passed to the
-                workcomm _send_multipart method.
+            msg (CommMessage): Message to be sent.
+            skip_safe_send (bool, optional): If True, no actual send will take
+                place. Defaults to False.
+            **kwargs: Additional keyword arguments are passed to _safe_send.
 
         Returns:
-            bool: Success or failure of sending the message.
-
+            bool: Success or failure of send.
+        
         """
-        workcomm = self.get_work_comm(info)
-        ret = workcomm._send_multipart(msg, **kwargs)
-        # self.remove_work_comm(workcomm.uuid, in_thread=True)
-        return ret
-            
-    def on_send_eof(self, header_kwargs=None):
-        r"""Actions to perform when EOF being sent.
-
-        Args:
-            header_kwargs (dict, optional): Keyword arguments that should be
-                added to the header.
-
-        Returns:
-            bool: True if EOF message should be sent, False otherwise.
-
-        """
-        self.debug('')
-        if header_kwargs:
-            msg_s = self.serialize(self.eof_msg,
-                                   header_kwargs=header_kwargs)
-        else:
-            msg_s = self.eof_msg
-        msg_len = len(msg_s)
-        if (msg_len > self.maxMsgSize) and (self.maxMsgSize != 0):  # pragma: debug
-            raise NotImplementedError(("EOF message with header (%d) "
-                                       "exceeds max message size (%d).")
-                                      % (msg_len, self.maxMsgSize))
-        with self._closing_thread.lock:
-            if not self._eof_sent.is_set():
-                self._eof_sent.set()
-            else:  # pragma: debug
-                return False, msg_s
-        return True, msg_s
-
-    def on_send(self, msg, header_kwargs=None):
-        r"""Process message to be sent including handling serializing
-        message and handling EOF.
-
-        Args:
-            msg (obj): Message to be sent
-            header_kwargs (dict, optional): Keyword arguments that should be
-                added to the header.
-
-        Returns:
-            tuple (bool, str, dict): Truth of if message should be sent, raw
-                bytes message to send, and header info contained in the message.
-
-        """
-        work_comm = None
         if self.is_closed:
             self.debug('Comm closed')
-            return False, self.empty_bytes_msg, work_comm
-        if len(msg) == 1:
-            msg = msg[0]
-        if self.is_eof(msg):
-            flag, msg_s = self.on_send_eof(header_kwargs=header_kwargs)
+            return False
+        if msg.flag == FLAG_SKIP:
+            return True
+        elif msg.flag == FLAG_FAILURE:
+            return False  # pragma: debug
+        elif msg.flag == FLAG_EOF:
+            with self._closing_thread.lock:
+                if not self._eof_sent.is_set():
+                    self._eof_sent.set()
+                else:  # pragma: debug
+                    self.error("EOF SENT TWICE")
+                    return False
+        elif msg.flag == FLAG_SUCCESS:
+            pass
+        else:  # pragma: debug
+            raise Exception("Unrecognized message flag: %s" % msg.flag)
+        self.special_debug('Sending %d bytes to %s', msg.length, self.address)
+        if self.maxMsgSize != 0:
+            assert(msg.length <= self.maxMsgSize)
+        try:
+            if skip_safe_send:
+                pass
+            elif not msg.sent:
+                if not self._safe_send(msg.msg, **kwargs):  # pragma: debug
+                    self.special_debug('Failed to send %d bytes', msg.length)
+                    return False
+                msg.sent = True
+                self.debug('Sent %d bytes to %s', msg.length, self.address)
+            if msg.worker is not None:
+                if msg.worker.is_async:
+                    if not msg.send_worker_messages(**kwargs):  # pragma: debug
+                        self.error("Error sending message chunk")
+                        return False
+                else:
+                    msg.worker.task_timer = self.sched_task(
+                        0, msg.send_worker_messages, kwargs=kwargs,
+                        name=(msg.worker.name + '.task'))
+            for x in msg.additional_messages:
+                if not self.send_message(x, **kwargs):  # pragma: debug
+                    self.error("Error sending message iteration")
+                    return False
+            self._used = True
+            if self.serializer.initialized:
+                self._send_serializer = False
+            if (msg.flag == FLAG_EOF) and self.close_on_eof_send:
+                self.debug('Close on send EOF')
+                self.linger_close()
+                # self.close_in_thread(no_wait=True, timeout=False)
+            return True
+        except MetaschemaTypeError as e:  # pragma: debug
+            self._type_errors.append(e)
+            try:
+                self.exception('Failed to send: %.100s.', str(msg.args))
+            except ValueError:  # pragma: debug
+                self.exception('Failed to send (unyt array in message)')
+        except TemporaryCommunicationError if self.is_async else NeverMatch:
+            if msg.flag == FLAG_EOF:
+                with self._closing_thread.lock:
+                    self._eof_sent.clear()
+            raise
+        except BaseException:
+            # Handle error caused by calling repr on unyt array that isn't float64
+            try:
+                self.exception('Failed to send: %.100s.', str(msg.args))
+            except ValueError:  # pragma: debug
+                self.exception('Failed to send (unyt array in message)')
+        return False
+
+    def prepare_message(self, *args, header_kwargs=None, skip_serialization=False,
+                        skip_processing=False, skip_language2python=False,
+                        after_prepare_message=None):
+        r"""Perform actions preparing to send a message. The order of steps is
+
+            1. Convert the message based on the language
+            2. Isolate the message if there is only one
+            3. Check if the message is EOF
+            4. Check if the message should be filtered
+            5. Transform the message
+            6. Apply after_prepare_message functions
+            7. Serialize the message
+            8. Create a work comm if the message is too large to be sent all at once
+
+        Args:
+            *args: Components of the outgoing message.
+            header_kwargs (dict, optional): Header options that should be set.
+            skip_serialization (bool, optional): If True, serialization will not
+                be performed. Defaults to False.
+            skip_processing (bool, optional): If True, filters, transformations, and
+                after_prepare_message function applications will not be performed.
+                Defaults to False.
+            skip_language2python (bool, optional): If True, language2python will be
+                skipped. Defaults to False.
+            after_prepare_message (list, optional): Functions that should be applied
+                after transformation, but before serialization. Defaults to None
+                and is ignored.
+
+        Returns:
+            CommMessage: Serialized and annotated message.
+
+        """
+        if (len(args) == 1) and isinstance(args[0], CommMessage):
+            msg = args[0]
+            if header_kwargs:
+                if msg.header is None:
+                    msg.header = header_kwargs
+                else:
+                    msg.header = copy.deepcopy(msg.header)
+                    msg.header.update(header_kwargs)
         else:
-            flag = True
-            # Covert object
-            msg_ = self.apply_transform(msg)
-            # Serialize
-            add_sinfo = (self._send_serializer and (not self.is_file))
-            if add_sinfo:
-                self.debug('Sending sinfo: %s', self.serializer.serializer_info)
-            msg_s = self.serialize(msg_, header_kwargs=header_kwargs,
-                                   add_serializer_info=add_sinfo)
-            if self.no_serialization:
-                msg_len = 1
-            else:
-                msg_len = len(msg_s)
-            # Create work comm if message too large to be sent all at once
-            if (msg_len > self.maxMsgSize) and (self.maxMsgSize != 0):
+            if self.model_name:
                 if header_kwargs is None:
-                    header_kwargs = dict()
-                work_comm = self.create_work_comm()
-                # if 'address' not in header_kwargs:
-                #     work_comm = self.create_work_comm()
-                # else:
-                #     work_comm = self.get_work_comm(header_kwargs)
-                header_kwargs = self.workcomm2header(work_comm, **header_kwargs)
-                msg_s = self.serialize(msg_, header_kwargs=header_kwargs)
-        return flag, msg_s, header_kwargs
+                    header_kwargs = {}
+                header_kwargs.setdefault('model', self.model_name)
+            msg = CommMessage(args=args, header=header_kwargs,
+                              flag=FLAG_SUCCESS)
+            # 1. Convert the message based on the language
+            if not skip_language2python:
+                msg.args = self.language_driver.language2python(msg.args)
+            # 2. Isolate the message if there is only one
+            if len(msg.args) == 1:
+                msg.args = msg.args[0]
+                msg.singular = True
+            # 3. Check if the message is EOF
+            if self.is_eof(msg.args):
+                msg.flag = FLAG_EOF
+        if not skip_processing:
+            # 4. Check if the message should be filtered
+            if msg.flag not in [FLAG_SKIP, FLAG_EOF]:
+                if not self.evaluate_filter(*msg.tuple_args):
+                    self.debug("Sent message skipped based on filter: %.100s",
+                               str(msg.args))
+                    msg.flag = FLAG_SKIP
+                    return msg
+            # 5. Transform the message
+            if msg.flag not in [FLAG_SKIP, FLAG_EOF]:
+                args = self.apply_transform(msg.args, header=msg.header)
+                if isinstance(args, collections.abc.Iterator):
+                    try:
+                        msg.args = args.__next__()
+                    except StopIteration:
+                        msg.args = None
+                        msg.flag = FLAG_SKIP
+                        return msg
+                    for iarg in args:
+                        msg.add_message(args=iarg,
+                                        header=copy.deepcopy(msg.header))
+                else:
+                    msg.args = args
+                self.update_serializer_from_message(msg)
+            # 6. Apply after_prepare_message function
+            if after_prepare_message:
+                for x in after_prepare_message:
+                    msg = x(msg)
+        # Looping over all messages (allowing for transform to produce iterator)
+        if (msg.flag not in [FLAG_SKIP]) and (not skip_serialization):
+            for x in [msg] + msg.additional_messages:
+                # 7. Serialize the message
+                if self.no_serialization:
+                    x.msg = x.args
+                    x.length = 1
+                    x.flag = FLAG_SUCCESS
+                else:
+                    if x.flag == FLAG_EOF:
+                        if x.header:
+                            x.msg = self.serialize(x.args, header_kwargs=x.header,
+                                                   add_serializer_info=True)
+                        else:
+                            x.msg = x.args
+                    else:
+                        x.msg = self.serialize(x.args, header_kwargs=x.header)
+                        x.flag = FLAG_SUCCESS
+                    x.length = len(x.msg)
+                # 8. Create a work comm if the message is too large to be sent all
+                #    at once and re-serialize the message w/ the work comm info in it
+                if (x.length > self.maxMsgSize) and (self.maxMsgSize != 0):
+                    if x.flag == FLAG_EOF:  # pragma: debug
+                        raise NotImplementedError(("EOF message with header (%d) "
+                                                   "exceeds max message size (%d).")
+                                                  % (msg.length, self.maxMsgSize))
+                    if x.header is None:
+                        x.header = dict()
+                    x.worker = self.create_work_comm()
+                    # if 'address' not in x.header:
+                    #     x.worker = self.create_work_comm()
+                    # else:
+                    #     x.worker = self.get_work_comm(x.header)
+                    x.header = self.workcomm2header(x.worker, **x.header)
+                    total = self.serialize(x.args, header_kwargs=x.header)
+                    x.msg = total[:self.maxMsgSize]
+                    x.length = len(x.msg)
+                    for imsg in self.chunk_message(total[self.maxMsgSize:]):
+                        x.add_worker_message(msg=imsg, length=len(imsg))
+        return msg
 
     def send(self, *args, **kwargs):
         r"""Send a message.
 
         Args:
             *args: All arguments are assumed to be part of the message.
-            **kwargs: All keywords arguments are passed to comm _send method.
+            **kwargs: All keywords arguments are passed to prepare_message or
+                send_message.
 
         Returns:
             bool: Success or failure of send.
 
         """
-        if self.single_use and self._used:  # pragma: debug
-            raise RuntimeError("This comm is single use and it was already used.")
-        args = self.language_driver.language2python(args)
-        if not self.evaluate_filter(*args):
-            # Return True to indicate success because nothing should be done
-            self.debug("Sent message skipped based on filter: %.100s", str(args))
-            return True
-        try:
-            ret = self.send_multipart(args, **kwargs)
-            if ret:
-                self._used = True
-                if self.serializer.initialized:
-                    self._send_serializer = False
-        except MetaschemaTypeError as e:  # pragma: debug
-            self._type_errors.append(e)
-            try:
-                self.exception('Failed to send: %.100s.', str(args))
-            except ValueError:  # pragma: debug
-                self.exception('Failed to send (unyt array in message)')
-            return False
-        except BaseException:
-            # Handle error caused by calling repr on unyt array that isn't float64
-            try:
-                self.exception('Failed to send: %.100s.', str(args))
-            except ValueError:  # pragma: debug
-                self.exception('Failed to send (unyt array in message)')
-            return False
-        if self.single_use and self._used:
-            self.debug('Closing single use send comm [DISABLED]')
-            # self.linger_close()
-            # self.close_in_thread(no_wait=True)
-        elif ret and self._eof_sent.is_set() and self.close_on_eof_send:
-            self.debug('Close on send EOF')
-            self.linger_close()
-            # self.close_in_thread(no_wait=True, timeout=False)
-        return ret
-
-    def send_multipart(self, msg, header_kwargs=None, **kwargs):
-        r"""Send a multipart message. If the message is smaller than maxMsgSize,
-        it is sent using _send, otherwise it is sent to a worker comm using
-        _send_multipart_worker.
-
-        Args:
-            msg (obj): Message to be sent.
-            header_kwargs (dict, optional): Keyword arguments that should be
-                added to the header.
-            **kwargs: Additional keyword arguments are passed to _send or
-                _send_multipart_worker.
-
-        Returns:
-            bool: Success or failure of send.
-        
-        """
-        # Create serialized message that should be sent
-        flag, msg_s, header = self.on_send(msg, header_kwargs=header_kwargs)
-        if not flag:
-            return flag
-        if self.no_serialization:
-            msg_len = 1
-        else:
-            msg_len = len(msg_s)
-        # Sent first part of message which includes the header describing the
-        # work comm
-        self.special_debug('Sending %d bytes', msg_len)
-        if (msg_len < self.maxMsgSize) or (self.maxMsgSize == 0):
-            flag = self._safe_send(msg_s, **kwargs)
-        else:
-            self.special_debug('Message will be split.')
-            flag = self._safe_send(msg_s[:self.maxMsgSize])
-            if flag:
-                # Send remainder of message using work comm
-                flag = self._send_multipart_worker(msg_s[self.maxMsgSize:],
-                                                   header, **kwargs)
-            else:  # pragma: debug
-                self.special_debug("Sending message header failed.")
-        if flag:
-            self.debug('Sent %d bytes to %s', msg_len, self.address)
-        else:  # pragma: debug
-            self.special_debug('Failed to send %d bytes', msg_len)
-        return flag
+        self.precheck('send')
+        kws_prepare = {k: kwargs.pop(k) for k in self._prepare_message_kws
+                       if k in kwargs}
+        msg = self.prepare_message(*args, **kws_prepare)
+        return self.send_message(msg, **kwargs)
 
     def send_nolimit(self, *args, **kwargs):
         r"""Alias for send."""
@@ -1670,205 +2014,214 @@ class CommBase(tools.YggClass):
 
         """
         return self.send(self.eof_msg, *args, **kwargs)
-        # with self._closing_thread.lock:
-        #     if not self._eof_sent.is_set():
-        #         self._eof_sent.set()
-        #         return self.send(self.eof_msg, *args, **kwargs)
-        # return False
 
     # RECV METHODS
-    def _safe_recv(self, *args, **kwargs):
+    def _safe_recv(self, timeout=None, **kwargs):
         r"""Safe receive that does things for all comm classes."""
-        with self._closing_thread.lock:
-            if self.is_closed:
-                return (False, self.empty_bytes_msg)
-            out = self._recv(*args, **kwargs)
+        if timeout is None:
+            timeout = self.recv_timeout
+        Tout = self.start_timeout(timeout, key_suffix='._safe_recv')
+        out = (True, self.empty_bytes_msg)
+        error = None
+        while (not Tout.is_out):
+            error = None
+            try:
+                with self._closing_thread.lock:
+                    if self.is_open:
+                        out = self._recv(**kwargs)
+                    else:
+                        self.debug('Comm closed')
+                        out = (False, self.empty_bytes_msg)
+                    break
+            except TemporaryCommunicationError as e:
+                error = e
+                self.periodic_debug("_safe_recv", period=1000)(
+                    "TemporaryCommunicationError: %s" % e)
+            self.sleep()
+        self.stop_timeout(key_suffix='._safe_recv')
+        if error and self.is_async:
+            raise TemporaryCommunicationError(error)
         if out[0] and (not self.is_empty(out[1], self.empty_bytes_msg)):
             self._n_recv += 1
             self._last_recv = time.perf_counter()
         return out
 
-    def _recv(self, *args, **kwargs):
+    def _recv(self, *args, **kwargs):  # pragma: debug
         r"""Raw recv. Should be overridden by inheriting class."""
-        raise NotImplementedError("_recv method needs implemented.")
+        raise IncompleteBaseComm("_recv method needs implemented.")
 
-    def _recv_multipart(self, data, leng_exp, **kwargs):
-        r"""Receive a message larger than YGG_MSG_MAX that is sent in multiple
-        parts.
-
-        Args:
-            data (str): Initial data received.
-            leng_exp (int): Size of message expected.
-            **kwargs: All keyword arguments are passed to _recv.
-
-        Returns:
-            tuple (bool, str): The success or failure of receiving a message
-                and the complete message received.
-
-        """
-        ret = True
-        while len(data) < leng_exp:
-            payload = self._safe_recv(**kwargs)
-            if not payload[0]:  # pragma: debug
-                self.debug("Read interupted at %d of %d bytes.",
-                           len(data), leng_exp)
-                ret = False
-                break
-            data = data + payload[1]
-            # if len(payload[1]) == 0:
-            #     self.sleep()
-        payload = (ret, data)
-        self.debug("Read %d/%d bytes", len(data), leng_exp)
-        return payload
-
-    def _recv_multipart_worker(self, info, **kwargs):
-        r"""Receive a message in multiple parts from a worker comm.
-
-        Args:
-            info (dict): Information about the incoming message.
-            **kwargs: Additional keyword arguments are passed to the
-                workcomm _recv_multipart method.
-
-        Returns:
-            tuple (bool, str): The success or failure of receiving a message
-                and the complete message received.
-
-        """
-        workcomm = self.get_work_comm(info)
-        out = workcomm._recv_multipart(info['body'], info['size'], **kwargs)
-        # self.remove_work_comm(info['id'], linger=True)
-        return out
-        
-    def on_recv_eof(self):
-        r"""Actions to perform when EOF received.
-
-        Returns:
-            bool: Flag that should be returned for EOF.
-
-        """
-        self.debug("Received EOF")
-        self._eof_recv.set()
-        if self.close_on_eof_recv:
-            self.debug("Lingering close on EOF Received")
-            self.linger_close()
-            return False
-        else:
-            return True
-
-    def on_recv(self, s_msg, previous_header=None):
-        r"""Process raw received message including handling deserializing
-        message and handling EOF.
-
-        Args:
-            s_msg (bytes, str): Raw bytes message.
-            previous_header (dict, optional): If not None, this is the header
-                for the message. Defaults to None.
-
-        Returns:
-            tuple (bool, str, dict): Success or failure, processed message, and
-                header information.
-
-        """
-        flag = True
-        metadata = previous_header
-        msg_, header = self.deserialize(s_msg, metadata=metadata)
-        if self.is_eof(msg_):
-            flag = self.on_recv_eof()
-            msg = msg_
-        elif not header.get('incomplete', False):
-            msg = self.apply_transform(msg_)
-        else:
-            msg = msg_
-        if not header.get('incomplete', False):
-            # if not self._used:
-            #     self.serializer = serialize.get_serializer(**header)
-            #     msg, _ = self.deserialize(s_msg)
-            self._used = True
-        return flag, msg, header
-
-    def recv(self, *args, **kwargs):
+    def recv(self, *args, return_message_object=False, **kwargs):
         r"""Receive a message.
 
         Args:
             *args: All arguments are passed to comm _recv method.
+            return_message_object (bool, optional): If True, the full wrapped
+                CommMessage message object is returned instead of the tuple.
+                Defaults to False.
             **kwargs: All keywords arguments are passed to comm _recv method.
 
         Returns:
             tuple (bool, obj): Success or failure of receive and received
-                message.
+                message. If return_message_object is True, the CommMessage object
+                will be returned instead.
 
         """
-        if self.single_use and self._used:
-            raise RuntimeError("This comm is single use and it was already used.")
-        return_header = kwargs.pop('return_header', False)
-        if return_header:
-            out_error = (False, None, None)
-        else:
-            out_error = (False, None)
-        if self.is_closed:
-            self.debug('Comm closed')
-            return out_error
-        try:
-            flag, msg, header = self.recv_multipart(*args, **kwargs)
-        except BaseException:
-            self.exception('Failed to recv.')
-            return out_error
-        if flag and (not self.evaluate_filter(msg)):
-            assert(not self.single_use)
-            self.debug("Recieved message skipped based on filter: %.100s", str(msg))
-            kwargs['return_header'] = return_header
+        self.precheck('recv')
+        kws_finalize = {k: kwargs.pop(k) for k in self._finalize_message_kws
+                        if k in kwargs}
+        msg = self.recv_message(*args, **kwargs)
+        msg = self.finalize_message(msg, **kws_finalize)
+        if msg.flag == FLAG_SKIP:
+            kwargs['return_message_object'] = return_message_object
+            kwargs.update(kws_finalize)
             return self.recv(*args, **kwargs)
-        if self.single_use and self._used:
-            self.debug('Linger close on single use')
-            self.linger_close()
-        if return_header:
-            out = (flag, msg, header)
+        if return_message_object:
+            out = msg
         else:
-            out = (flag, msg)
-        out = self.language_driver.python2language(out)
+            out = (bool(msg.flag), msg.args)
         return out
 
-    def recv_multipart(self, *args, **kwargs):
-        r"""Receive a multipart message. If a message is received without a
-        header, it assumed to be complete. Otherwise, the message is received
-        in parts from a worker comm initialized by the sender.
+    def recv_message(self, *args, skip_deserialization=False, **kwargs):
+        r"""Receive a message.
 
         Args:
-            *args: All arguments are passed to comm _recv method.
-            **kwargs: All keywords arguments are passed to comm _recv method.
+            *args: Arguments are passed to _safe_recv.
+            skip_deserialization (bool, optional): If True, deserialization is not
+                performed. Defaults to False.
+            **kwargs: Additional keyword arguments are passed to _safe_recv.
 
         Returns:
-            tuple (bool, str): Success or failure of receive and received
-                message.
+            CommMessage: Received message.
 
         """
-        header = None
-        # Receive first part of message
-        flag, s_msg = self._safe_recv(*args, **kwargs)
-        if not flag:
-            return flag, s_msg, header
-        # Parse message
-        flag, msg, header = self.on_recv(s_msg)
-        if not flag:
-            if not header.get('raw', False):  # pragma: debug
-                self.debug("Failed to receive message header.")
-            return flag, msg, header
-        # Receive remainder of message that was not received
-        if header.get('incomplete', False):
-            header['body'] = msg
-            flag, s_msg = self._recv_multipart_worker(header, **kwargs)
-            if not flag:  # pragma: debug
-                return flag, s_msg, header
-            # Parse complete message
-            flag, msg, header2 = self.on_recv(s_msg, previous_header=header)
-        if isinstance(s_msg, bytes):
-            msg_len = len(s_msg)
+        no_serialization = (skip_deserialization or self.no_serialization)
+        if self.is_closed:
+            self.debug('Comm closed')
+            return CommMessage(flag=FLAG_FAILURE)
+        try:
+            self.periodic_debug("recv_message", period=1000)(
+                "Receiving message from %s" % self.address)
+            flag, s_msg = self._safe_recv(*args, **kwargs)
+            msg = CommMessage(msg=s_msg)
+            if not flag:
+                msg.flag = FLAG_FAILURE
+                return msg
+            if no_serialization:
+                msg.args = msg.msg
+                msg.header = {}
+                if isinstance(msg.msg, bytes):
+                    msg.header['size'] = len(msg.msg)
+            else:
+                msg.args, msg.header = self.deserialize(msg.msg)
+            msg.flag = FLAG_SUCCESS
+            if msg.header.get('incomplete', False):
+                msg.msg = msg.args
+                msg.worker = self.get_work_comm(msg.header)
+                msg.flag = FLAG_INCOMPLETE
+                while len(msg.msg) < msg.header['size']:
+                    imsg = msg.worker.recv_message(skip_deserialization=True, **kwargs)
+                    if imsg.flag in [FLAG_EOF, FLAG_FAILURE]:  # pragma: debug
+                        self.error("Receive interupted at %d of %d bytes.",
+                                   len(msg.msg), msg.header['size'])
+                        msg.flag = FLAG_FAILURE
+                        break
+                    if imsg.flag == FLAG_SUCCESS:
+                        msg.msg += imsg.msg
+                self.debug("Received %d/%d bytes", len(msg.msg), msg.header['size'])
+                if msg.flag in [FLAG_INCOMPLETE, FLAG_SUCCESS]:
+                    msg.args = msg.msg
+                    if not (no_serialization or msg.header.get('raw', False)):
+                        msg.args, msg.header = self.deserialize(msg.msg,
+                                                                metadata=msg.header)
+                    msg.flag = FLAG_SUCCESS
+                msg.worker.linger_close()
+            if not no_serialization:
+                self.update_message_from_serializer(msg)
+        except TemporaryCommunicationError if self.is_async else NeverMatch:
+            raise
+        except BaseException:
+            self.exception('Failed to recv.')
+            self.close()
+            return CommMessage(flag=FLAG_FAILURE)
+        if isinstance(msg.msg, bytes):
+            msg.length = len(msg.msg)
         else:
-            msg_len = 1
-        if flag and (msg_len > 0):
-            self.debug('%d bytes received from %s', msg_len, self.address)
-        return flag, msg, header
-        
+            msg.length = 1
+        if msg.length == 0:
+            msg.flag = FLAG_EMPTY
+        if msg.flag == FLAG_SUCCESS:
+            self.debug('%d bytes received from %s', msg.length, self.address)
+        if self.is_eof(msg.args):
+            msg.flag = FLAG_EOF
+        msg.header['commtype'] = self._commtype
+        return msg
+
+    def finalize_message(self, msg, skip_processing=False,
+                         skip_python2language=False, after_finalize_message=None):
+        r"""Perform actions to decipher a message. The order of steps is
+
+            1. Transform the message
+            2. Filter
+            3. python2language
+            4. Close comm on EOF if close_on_eof_recv set
+            5. Check for empty recv after processing
+            6. Mark comm as used and close if single use
+            7. Apply after_finalize_message functions
+
+        Args:
+            msg (CommMessage): Initial message object to be finalized.
+            skip_processing (bool, optional): If True, filters, transformations,
+                and after_finalize_message funciton applications will not be
+                performed. Defaults to False.
+            skip_python2language (bool, optional): If True, python2language will
+                not be applied. Defaults to False.
+            after_finalize_message (list, optional): A set of function that should
+                be applied to received CommMessage objects following the standard
+                finalization. Defaults to None and is ignored.
+
+        Returns:
+            CommMessage: Deserialized and annotated message.
+
+        """
+        if msg.finalized:
+            return msg
+        if not skip_processing:
+            # 1. Transform the message
+            if msg.flag == FLAG_SUCCESS:
+                if msg.stype is not None:
+                    msg.stype = self.apply_transform_to_type(msg.stype)
+                msg.args = self.apply_transform(msg.args)
+            # 2. Filter
+            if (msg.flag == FLAG_SUCCESS) and (not self.evaluate_filter(msg.args)):
+                msg.flag = FLAG_SKIP
+            # 3. Perform python2language
+            if (msg.flag in [FLAG_EOF, FLAG_SUCCESS]) and (not skip_python2language):
+                msg.args = self.language_driver.python2language(msg.args)
+        # 4. Close the comm on EOF
+        if msg.flag == FLAG_EOF:
+            self.debug("Received EOF")
+            if self.close_on_eof_recv:
+                self.debug("Lingering close on EOF Received")
+                self.linger_close()
+                msg.flag = FLAG_FAILURE
+        # 5. Check for empty receive
+        if (msg.flag == FLAG_SUCCESS) and (self.is_empty_recv(msg.args)):
+            msg.flag = FLAG_EMPTY
+        # if not (self.is_empty(msg.msg, self.empty_bytes_msg)
+        #         or msg.header.get('incomplete', False)):
+        # 6. Mark comm as used and close if single use
+        if msg.flag in [FLAG_EOF, FLAG_SUCCESS]:
+            self._used = True
+        if self.single_use and self._used and self.is_open:
+            self.debug('Linger close on single use')
+            self.linger_close(active_confirm=self.is_async)
+        # 7. Apply after_finalize_message functions
+        if after_finalize_message:
+            for x in after_finalize_message:
+                msg = x(msg)
+        msg.finalized = True
+        return msg
+
     def recv_nolimit(self, *args, **kwargs):
         r"""Alias for recv."""
         return self.recv(*args, **kwargs)
@@ -1898,6 +2251,9 @@ class CommBase(tools.YggClass):
 
     def purge(self):
         r"""Purge all messages from the comm."""
+        if self.direction == 'recv':
+            while self.n_msg_recv > 0:  # pragma: debug
+                self.recv(skip_deserialization=True)
         self._n_sent = 0
         self._n_recv = 0
         self._last_send = None
@@ -1958,22 +2314,27 @@ class CommBase(tools.YggClass):
         if 'field_order' in kwargs:
             kwargs.setdefault('key_order', kwargs.pop('field_order'))
         key_order = kwargs.pop('key_order', None)
-        kwargs['return_header'] = True
-        flag, msg, header = self.recv(*args, **kwargs)
-        if flag and (not self.is_eof(msg)):
+        return_message_object = kwargs.pop('return_message_object', False)
+        kwargs['return_message_object'] = True
+        msg = self.recv(*args, **kwargs)
+        if msg.flag == FLAG_SUCCESS:
             if self.serializer.typedef['type'] == 'array':
-                metadata = copy.deepcopy(header)
+                metadata = copy.deepcopy(msg.header)
                 # if metadata is None:
                 #     metadata = {}
                 if key_order is not None:
                     metadata['key_order'] = key_order
                 metadata.setdefault('key_order', self.serializer.get_field_names())
-                msg_dict = JSONObjectMetaschemaType.coerce_type(msg, **metadata)
+                msg_dict = JSONObjectMetaschemaType.coerce_type(msg.args, **metadata)
             else:
-                msg_dict = {'f0': msg}
+                msg_dict = {'f0': msg.args}
         else:
-            msg_dict = msg
-        return flag, msg_dict
+            msg_dict = msg.args
+        out = copy.deepcopy(msg)
+        out.args = msg_dict
+        if not return_message_object:
+            out = (bool(out.flag), out.args)
+        return out
 
     # SEND/RECV FIELDS
     # def recv_field(self, field, *args, **kwargs):
@@ -2017,5 +2378,10 @@ class CommBase(tools.YggClass):
         r"""Alias for recv."""
         flag, out = self.recv(*args, **kwargs)
         if flag:
-            out = self.serializer.consolidate_array(out)
+            if self.transform:
+                dtype = type2numpy(self.transform[-1].transformed_datatype)
+                if dtype and isinstance(out, (list, tuple, np.ndarray)):
+                    out = consolidate_array(out, dtype=dtype)
+            else:
+                out = self.serializer.consolidate_array(out)
         return flag, out

@@ -135,7 +135,7 @@ def convert_unit_string(orig_str, replacements=None):
                 tools.bytes2str(b'\xc2\xb0'),
                 r'(?:100\%)']
     regex = (r'(?P<paren>\()?(?P<name>[A-Za-z%s]+)'
-             r'(?:(?:\*\*)?(?P<exp_paren>\()?(?P<exp>-?[0-9]+)'
+             r'(?:(?:(?:\^)|(?:\*\*))?(?P<exp_paren>\()?(?P<exp>-?[0-9]+)'
              r'(?(exp_paren)\)))?'
              r'(?(paren)\)|)(?P<op> |(?:\*)|(?:\/))?' % ''.join(regex_mu))
     out = ''

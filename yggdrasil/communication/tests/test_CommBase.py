@@ -38,11 +38,20 @@ class TestCommBase(YggTestClassInfo):
                  'serializer', 'recv_timeout',
                  'close_on_eof_recv', 'opp_address', 'opp_comms',
                  'maxMsgSize']
+    use_async = False
     
     @property
     def cleanup_comm_classes(self):
         r"""list: Comm classes that should be cleaned up following the test."""
-        return set([self.comm, self.send_inst_kwargs['comm']])
+        return set([self.commtype, self.comm, self.send_inst_kwargs['commtype']])
+
+    @property
+    def commtype(self):
+        r"""str: Subtype associated with comm class."""
+        out = self.import_cls._commtype
+        if out is None:
+            out = self.comm
+        return out
 
     @property
     def name(self):
@@ -67,7 +76,8 @@ class TestCommBase(YggTestClassInfo):
     @property
     def send_inst_kwargs(self):
         r"""dict: Keyword arguments for send instance."""
-        out = {'comm': self.comm, 'reverse_names': True, 'direction': 'send'}
+        out = {'commtype': self.commtype, 'reverse_names': True,
+               'direction': 'send', 'use_async': self.use_async}
         out.update(self.testing_options['kwargs'])
         return out
 
@@ -79,7 +89,9 @@ class TestCommBase(YggTestClassInfo):
     @property
     def inst_kwargs(self):
         r"""dict: Keyword arguments for tested class."""
-        return self.send_instance.opp_comm_kwargs()
+        out = self.send_instance.opp_comm_kwargs()
+        out['commtype'] = self.commtype
+        return out
 
     @property
     def recv_instance(self):
@@ -150,13 +162,15 @@ class TestCommBase(YggTestClassInfo):
         r"""Get comm instance with ErrorClass parent class."""
         try:
             send_kwargs = self.send_inst_kwargs
-            err_kwargs = dict(base_comm=send_kwargs['comm'], new_comm_class='ErrorComm')
+            base_commtype = send_kwargs['commtype']
+            err_kwargs = dict(base_commtype=base_commtype,
+                              commtype='ErrorComm')
             err_name = self.name + '_' + self.uuid
             if not recv:
                 send_kwargs.update(**err_kwargs)
             send_inst = new_comm(err_name, **send_kwargs)
             recv_kwargs = send_inst.opp_comm_kwargs()
-            recv_kwargs['comm'] = send_kwargs['comm']
+            recv_kwargs['commtype'] = base_commtype
             if recv:
                 recv_kwargs.update(**err_kwargs)
             recv_inst = new_comm(err_name, **recv_kwargs)
@@ -179,7 +193,7 @@ class TestCommBase(YggTestClassInfo):
         r"""Test error on send."""
         send_inst, recv_inst = self.get_fresh_error_instance()
         send_inst._first_send_done = True
-        send_inst.error_replace('send_multipart')
+        send_inst.error_replace('_safe_send')
         flag = send_inst.send(self.test_msg)
         assert(not flag)
         send_inst.restore_all()
@@ -191,8 +205,13 @@ class TestCommBase(YggTestClassInfo):
         self.fd_count
         send_inst, recv_inst = self.get_fresh_error_instance(recv=True)
         self.fd_count
-        recv_inst.error_replace('recv_multipart')
-        flag, msg_recv = recv_inst.recv()
+        recv_inst.error_replace('_safe_recv')
+        if recv_inst.is_async:
+            nloop = max(1, recv_inst.backlog_thread.loop_count + 1)
+            recv_inst.backlog_thread.wait_for_loop(timeout=10.0,
+                                                   key="error_recv",
+                                                   nloop=nloop)
+        flag, msg_recv = recv_inst.recv(timeout=5.0)
         self.fd_count
         assert(not flag)
         recv_inst.restore_all()
@@ -230,10 +249,7 @@ class TestCommBase(YggTestClassInfo):
                             self.send_instance.maxMsgSize,
                             self.recv_instance.maxMsgSize)
         self.instance.opp_comm_kwargs()
-        if self.import_cls.is_file:
-            assert(self.import_cls.is_installed(language='invalid'))
-        else:
-            assert(not self.import_cls.is_installed(language='invalid'))
+        assert(not self.import_cls.is_installed(language='invalid'))
 
     def test_invalid_direction(self):
         r"""Check that error raised for invalid direction."""
@@ -244,33 +260,34 @@ class TestCommBase(YggTestClassInfo):
 
     def test_work_comm(self):
         r"""Test creating/removing a work comm."""
+        if self.comm in ['CommBase', 'AsyncComm']:
+            self.assert_raises(CommBase.IncompleteBaseComm,
+                               self.instance.create_work_comm)
+            self.assert_raises(CommBase.IncompleteBaseComm, getattr,
+                               self.instance, 'get_work_comm_kwargs')
+            return
         wc_send = self.instance.create_work_comm()
         self.assert_raises(KeyError, self.instance.add_work_comm, wc_send)
         # Create recv instance in way that tests new_comm
         header_recv = dict(id=self.uuid + '1', address=wc_send.address)
         recv_kwargs = self.instance.get_work_comm_kwargs
+        recv_kwargs.pop('async_recv_kwargs', None)
         recv_kwargs['work_comm_name'] = 'test_worker_%s' % header_recv['id']
-        recv_kwargs['new_comm_class'] = wc_send.comm_class
+        recv_kwargs['commtype'] = wc_send._commtype
         if isinstance(wc_send.opp_address, str):
             os.environ[recv_kwargs['work_comm_name']] = wc_send.opp_address
         else:
             recv_kwargs['address'] = wc_send.opp_address
         wc_recv = self.instance.create_work_comm(**recv_kwargs)
         # wc_recv = self.instance.get_work_comm(header_recv)
-        if self.comm in ['CommBase', 'AsyncComm']:
-            flag = wc_send.send(self.test_msg)
-            assert(not flag)
-            flag, msg_recv = wc_recv.recv()
-            assert(not flag)
-        else:
-            flag = wc_send.send(self.test_msg)
-            assert(flag)
-            flag, msg_recv = wc_recv.recv(self.timeout)
-            assert(flag)
-            self.assert_equal(msg_recv, self.test_msg)
-            # Assert errors on second attempt
-            # self.assert_raises(RuntimeError, wc_send.send, self.test_msg)
-            self.assert_raises(RuntimeError, wc_recv.recv)
+        flag = wc_send.send(self.test_msg)
+        assert(flag)
+        flag, msg_recv = wc_recv.recv(self.timeout)
+        assert(flag)
+        self.assert_equal(msg_recv, self.test_msg)
+        # Assert errors on second attempt
+        # self.assert_raises(RuntimeError, wc_send.send, self.test_msg)
+        self.assert_raises(RuntimeError, wc_recv.recv)
         self.instance.remove_work_comm(wc_send.uuid)
         self.instance.remove_work_comm(wc_recv.uuid)
         self.instance.remove_work_comm(wc_recv.uuid)
@@ -335,7 +352,7 @@ class TestCommBase(YggTestClassInfo):
                      close_on_send_eof=None, close_on_recv_eof=None,
                      no_recv=False, recv_timeout=None):
         r"""Generic send/recv of a message."""
-        tkey = 'do_send_recv'
+        tkey = '.do_send_recv'
         is_eof_send = (('eof' in send_meth) or self.send_instance.is_eof(msg_send))
         is_eof_recv = (is_eof_send or self.recv_instance.is_eof(msg_recv))
         if recv_timeout is None:
@@ -360,6 +377,8 @@ class TestCommBase(YggTestClassInfo):
         if reverse_comms:
             send_instance = self.recv_instance
             recv_instance = self.send_instance
+            send_instance.direction = 'send'
+            recv_instance.direction = 'recv'
         else:
             send_instance = self.send_instance
             recv_instance = self.recv_instance
@@ -381,10 +400,6 @@ class TestCommBase(YggTestClassInfo):
             assert(not flag)
             flag, msg_recv0 = frecv_meth(**recv_kwargs)
             assert(not flag)
-            if self.comm == 'CommBase':
-                self.assert_raises(NotImplementedError, self.recv_instance._send,
-                                   self.test_msg)
-                self.assert_raises(NotImplementedError, self.recv_instance._recv)
         else:
             for i in range(n_send):
                 flag = fsend_meth(*send_args, **send_kwargs)
@@ -438,11 +453,14 @@ class TestCommBase(YggTestClassInfo):
             recv_instance.confirm(noblock=True)
         self.assert_equal(getattr(send_instance, n_msg_send_meth), 0)
         self.assert_equal(getattr(recv_instance, n_msg_recv_meth), 0)
+        if reverse_comms:
+            send_instance.direction = 'recv'
+            recv_instance.direction = 'send'
 
     def test_cleanup_comms(self):
         r"""Test cleanup_comms for comm class."""
-        CommBase.cleanup_comms(self.recv_instance.comm_class)
-        assert(len(CommBase.get_comm_registry(self.recv_instance.comm_class)) == 0)
+        self.recv_instance.cleanup_comms()
+        assert(len(self.recv_instance.comm_registry()) == 0)
 
     def test_drain_messages(self):
         r"""Test waiting for messages to drain."""
@@ -589,11 +607,37 @@ class TestCommBase(YggTestClassInfo):
         kwargs.setdefault('msg_send', self.msg_filter_recv)
         kwargs.setdefault('msg_recv', self.recv_instance.empty_obj_recv)
         kwargs.setdefault('recv_timeout', 10 * self.sleeptime)
+        if self.recv_instance.is_async:
+            kwargs.setdefault('no_recv', True)
         self.do_send_recv(**kwargs)
 
     def test_send_recv(self):
         r"""Test send/recv of a small message."""
         self.do_send_recv(print_status=True)
+
+    def test_send_recv_raw(self):
+        r"""Test send/recv of a small message."""
+        if self.comm in ['CommBase', 'AsyncComm', 'ValueComm', 'ForkComm',
+                         'ServerComm', 'ClientComm']:
+            return
+
+        def dummy(msg):
+            print(msg)
+            msg.msg = b''
+            msg.args = b''
+            msg.length = 0
+            return msg
+
+        assert(self.send_instance.send(self.test_msg))
+        msg = self.recv_instance.recv(
+            timeout=60.0, skip_deserialization=True,
+            return_message_object=True, after_finalize_message=[dummy])
+        assert(msg.finalized)
+        assert_equal(self.recv_instance.finalize_message(msg), msg)
+        msg.finalized = False
+        assert(self.recv_instance.is_empty_recv(msg.args))
+        msg = self.recv_instance.finalize_message(msg)
+        assert_equal(msg.flag, CommBase.FLAG_EMPTY)
 
     def test_send_recv_nolimit(self):
         r"""Test send/recv of a large message."""
@@ -619,6 +663,10 @@ class TestCommBase(YggTestClassInfo):
         r"""Test purging messages from the comm."""
         self.assert_equal(self.send_instance.n_msg, 0)
         self.assert_equal(self.recv_instance.n_msg, 0)
+        if self.send_instance.is_async:
+            self.assert_equal(self.send_instance.n_msg_direct, 0)
+        if self.recv_instance.is_async:
+            self.assert_equal(self.recv_instance.n_msg_direct, 0)
         # Purge recv while open
         if self.comm not in ['CommBase', 'AsyncComm']:
             flag = self.send_instance.send(self.test_msg)

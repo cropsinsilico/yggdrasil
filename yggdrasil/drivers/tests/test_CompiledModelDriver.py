@@ -1,9 +1,19 @@
 import os
+import shutil
+from yggdrasil import platform
 from yggdrasil.config import ygg_cfg
 from yggdrasil.tests import assert_equal, assert_raises, YggTestClass
 from yggdrasil.drivers import CompiledModelDriver
 import yggdrasil.drivers.tests.test_ModelDriver as parent
 from yggdrasil.components import import_component
+
+
+def test_get_compatible_tool():
+    r"""Test get_compatible_tool when default provided."""
+    assert_raises(ValueError, CompiledModelDriver.get_compatible_tool,
+                  'invalid', 'compiler', 'c')
+    assert_equal(CompiledModelDriver.get_compatible_tool(
+        'invalid', 'compiler', 'c', default=None), None)
 
 
 def test_get_compilation_tool_registry():
@@ -34,7 +44,9 @@ def test_get_compilation_tool():
         toolname = out.toolname.lower()
         toolpath = os.path.join('somedir', toolname)
         toolfile = toolpath + '.exe'
-        vals = [toolname.upper(), toolpath, toolfile, toolfile.upper()]
+        vals = [toolpath, toolfile]
+        if platform._is_win:
+            vals += [toolname.upper(), toolfile.upper()]
         for v in vals:
             assert_equal(CompiledModelDriver.get_compilation_tool(tooltype, v), out)
         assert_raises(ValueError, CompiledModelDriver.get_compilation_tool,
@@ -56,7 +68,7 @@ def test_CompilationToolBase():
 class DummyCompiler(CompiledModelDriver.CompilerBase):
     r"""Dummy test class."""
     _dont_register = True
-    toolname = 'dummy'
+    toolname = 'dummy12345'
     languages = ['dummy']
     search_path_envvar = ['PATH']
     _language_ext = ['.c']
@@ -64,6 +76,7 @@ class DummyCompiler(CompiledModelDriver.CompilerBase):
     default_archiver = None
     combine_with_linker = True
     compile_only_flag = None
+    linker_attributes = {'_dont_register': True}
 
 
 class TestCompilationTool(YggTestClass):
@@ -133,8 +146,11 @@ class TestDummyCompiler(TestCompilationTool):
 
     def test_call(self):
         r"""Test call."""
+        out = 'test123'
+        assert(not shutil.which(self.import_cls.toolname))
+        assert(not (os.path.isfile(out) or os.path.isdir(out)))
         self.assert_raises(RuntimeError, self.import_cls.call, 'args',
-                           out='test', dont_link=True)
+                           out=out, dont_link=True)
 
     def test_linker(self):
         r"""Test linker."""
@@ -147,7 +163,8 @@ class TestDummyCompiler(TestCompilationTool):
     def test_get_flags(self):
         r"""Test get_flags."""
         self.assert_equal(self.import_cls.get_flags(flags='hello',
-                                                    libtype='object'), ['hello'])
+                                                    libtype='object'),
+                          ['hello', '-DWITH_YGGDRASIL'])
         
     def test_get_executable_command(self):
         r"""Test get_executable_command."""
@@ -161,6 +178,7 @@ class TestCompiledModelParam(parent.TestModelParam):
     
     def __init__(self, *args, **kwargs):
         super(TestCompiledModelParam, self).__init__(*args, **kwargs)
+        self._inst_kwargs['skip_compile'] = (self.skip_init or self.skip_start)
         self.attr_list += ['source_files']
         for k in ['compiler', 'linker', 'archiver']:
             self.attr_list += [k, '%s_flags' % k, '%s_tool' % k]
@@ -174,8 +192,17 @@ class TestCompiledModelDriverNoInit(TestCompiledModelParam,
                                     parent.TestModelDriverNoInit):
     r"""Test runner for CompiledModelDriver without creating an instance."""
     
+    def run_model_instance(self, **kwargs):
+        r"""Create a driver for a model and run it."""
+        kwargs['skip_compile'] = False
+        return super(TestCompiledModelDriverNoInit, self).run_model_instance(**kwargs)
+        
     def test_build(self):
         r"""Test building libraries as a shared/static library or object files."""
+        # Finish on the default libtype
+        order = ['shared', 'object', 'static']
+        order.remove(CompiledModelDriver._default_libtype)
+        order.append(CompiledModelDriver._default_libtype)
         for libtype in ['shared', 'object', 'static']:
             self.import_cls.compile_dependencies(
                 libtype=libtype, overwrite=True)
@@ -367,8 +394,8 @@ class TestCompiledModelDriverNoStart(TestCompiledModelParam,
             setattr(self.instance, k, [])
         # Compile with each compiler
         for k, v in self.import_cls.get_available_tools('compiler').items():
-            if (not v.is_installed()) or getattr(v, 'is_build_tool', False):
-                continue
+            if not v.is_installed():
+                continue  # pragma: debug
             setattr(self.instance, 'compiler_tool', v)
             setattr(self.instance, 'linker_tool', v.linker())
             setattr(self.instance, 'archiver_tool', v.archiver())
@@ -384,6 +411,14 @@ class TestCompiledModelDriverNoStart(TestCompiledModelParam,
                            out=os.path.basename(fname),
                            working_dir=os.path.dirname(fname),
                            overwrite=True)
+        if not self.instance.is_build_tool:
+            self.instance.compile_model(out=self.instance.model_file,
+                                        overwrite=False)
+            assert(os.path.isfile(self.instance.model_file))
+            self.instance.compile_model(out=self.instance.model_file,
+                                        overwrite=False)
+            assert(os.path.isfile(self.instance.model_file))
+            os.remove(self.instance.model_file)
         
     # Done in driver, but driver not started
     def teardown(self):

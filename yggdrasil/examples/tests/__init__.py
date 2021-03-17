@@ -6,13 +6,13 @@ import tempfile
 import shutil
 import itertools
 import flaky
-import pytest
 from yggdrasil.components import ComponentMeta, import_component
 from yggdrasil import runner, tools, platform
 from yggdrasil.examples import (
     get_example_yaml, get_example_source, get_example_languages,
     ext_map, display_example)
 from yggdrasil.tests import YggTestBase, check_enabled_languages, assert_raises
+from yggdrasil.tests import timeout as timeout_dec
 
 
 _ext2lang = {v: k for k, v in ext_map.items()}
@@ -87,6 +87,50 @@ def make_iter_test(is_flaky=False, **kwargs):
     return itest
 
 
+def example_decorator(name, x, iter_over, timeout):
+    r"""Consolidate decorator based on iteration values.
+
+    Args:
+        name (str): Example name.
+        x (list): Iteration parameters.
+        iter_over (list): Iteration dimensions.
+        timeout (float): Test timeout.
+
+    Returns:
+        function: Decorator.
+
+    """
+
+    def deco(func):
+        deco_list = [
+            timeout_dec(timeout=timeout),
+            unittest.skipIf(
+                (not tools.check_environ_bool('YGG_ENABLE_EXAMPLE_TESTS')),
+                "Example tests not enabled."),
+        ]
+        for i, k in enumerate(iter_over):
+            v = x[i]
+            flag = None
+            msg = None
+            if k == 'comm':
+                flag = tools.is_comm_installed(v)
+            elif k == 'language':
+                flag = True
+                for vv in get_example_languages(name, language=v):
+                    if not tools.is_lang_installed(vv):
+                        flag = False
+                        break
+            if flag is not None:
+                if msg is None:
+                    msg = "%s %s not installed." % (k.title(), v)
+                deco_list.append(unittest.skipIf(not flag, msg))
+        for v in deco_list:
+            func = v(func)
+        return func
+
+    return deco
+
+
 class ExampleMeta(ComponentMeta):
 
     def __new__(cls, name, bases, dct):
@@ -128,8 +172,8 @@ class ExampleMeta(ComponentMeta):
                            zip(iter_keys, x)})
                     itest_func.__name__ = itest_name
                     if timeout is not None:
-                        itest_func = pytest.mark.timeout(timeout=timeout)(
-                            itest_func)
+                        itest_func = example_decorator(
+                            dct['example_name'], x, iter_over, timeout)(itest_func)
                     dct[itest_name] = itest_func
         out = super(ExampleMeta, cls).__new__(cls, name, bases, dct)
         if out.example_name is not None:
@@ -151,7 +195,7 @@ class ExampleTstBase(YggTestBase, tools.YggClass):
     iter_skip = []
     iter_flaky = []
     iter_list_language = None
-    iter_list_comm = tools.get_supported_comm()
+    iter_list_comm = tools.get_supported_comm(dont_include_value=True)
     iter_list_datatype = tools.get_supported_type()
 
     def __init__(self, *args, **kwargs):
@@ -296,6 +340,9 @@ class ExampleTstBase(YggTestBase, tools.YggClass):
             assert(not self.runner.error_flag)
         try:
             self.check_results()
+        except BaseException:  # pragma: debug
+            self.runner.printStatus()
+            raise
         finally:
             self.example_cleanup()
             # Remove copied makefile
@@ -342,9 +389,9 @@ class ExampleTstBase(YggTestBase, tools.YggClass):
     def setup_iteration_comm(self, comm=None):
         r"""Perform setup associated with a comm iteration."""
         assert(comm is not None)
-        if not tools.is_comm_installed(comm):
-            raise unittest.SkipTest("%s library not installed."
-                                    % comm)
+        # if not tools.is_comm_installed(comm):
+        #     raise unittest.SkipTest("%s library not installed."
+        #                             % comm)
         self.set_default_comm(default_comm=comm)
         return comm
 

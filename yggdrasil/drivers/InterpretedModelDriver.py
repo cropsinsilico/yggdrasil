@@ -166,9 +166,26 @@ class InterpretedModelDriver(ModelDriver):
         """
         return cls.get_interpreter()
 
+    def run_model(self, *args, **kwargs):
+        r"""Run the model. Unless overridden, the model will be run using
+        run_executable.
+
+        Args:
+            *args: Arguments are passed to the parent class's method.
+            **kwargs: Keyword arguments are passed to the parent class's
+                method.
+
+        """
+        if self.interpreter:
+            kwargs.setdefault('interpreter', self.interpreter)
+        if self.interpreter_flags:
+            kwargs.setdefault('interpreter_flags', self.interpreter_flags)
+        return super(InterpretedModelDriver, self).run_model(*args, **kwargs)
+        
     @classmethod
     def executable_command(cls, args, exec_type='interpreter', unused_kwargs=None,
-                           skip_interpreter_flags=False, **kwargs):
+                           skip_interpreter_flags=False, interpreter=None,
+                           interpreter_flags=None, **kwargs):
         r"""Compose a command for running a program in this language with the
         provied arguments. If not already present, the interpreter command and
         interpreter flags are prepended to the provided arguments.
@@ -201,9 +218,13 @@ class InterpretedModelDriver(ModelDriver):
         assert(isinstance(ext, (tuple, list)))
         if exec_type == 'interpreter':
             if not cls.is_interpreter(args[0]):
-                new_args = [cls.get_interpreter()]
+                if interpreter is None:
+                    interpreter = cls.get_interpreter()
+                new_args = [interpreter]
                 if not skip_interpreter_flags:
                     new_args += cls.get_interpreter_flags()
+                if interpreter_flags:
+                    new_args += interpreter_flags
                 args = new_args + args
         elif exec_type != 'direct':
             raise ValueError("Invalid exec_type '%s'" % exec_type)

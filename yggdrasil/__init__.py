@@ -3,12 +3,13 @@ such that they can be run simultaneously, passing input back and forth."""
 import os
 import sys
 import shutil
-import logging
 from ._version import get_versions
 from yggdrasil import platform, config
-logging.basicConfig()
-logger = logging.getLogger(__name__)
-    
+from yggdrasil.runner import YggFunction
+_test_package_name = None
+_test_package = None
+config.cfg_logging()
+
 
 if platform._is_win:  # pragma: windows
     # This is required to fix crash on Windows in case of Ctrl+C
@@ -24,6 +25,22 @@ if not os.path.isfile(config.usr_config_file):  # pragma: config
                 for x in sys.argv]):
         # Don't configure if that is what is going to happen anyway
         config.update_language_config(verbose=True)
+
+
+def import_as_function(model_yaml, **kwargs):
+    r"""Import a model as a function from a yaml specification file.
+
+    Args:
+        model_yaml (str, list): Full path to model yaml describing
+            the model(s) and an inputs or outputs.
+        **kwargs: Additional keyword arguments are passed to the
+            YggFunction constructor.
+
+    Returns:
+        YggFunction: Callable wrapper for model.
+
+    """
+    return YggFunction(model_yaml, **kwargs)
 
 
 __all__ = []

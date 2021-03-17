@@ -26,7 +26,7 @@ if _venv_prefix is not None:
     _system_suffix += '_' + os.path.basename(_venv_prefix)
 
 
-def get_compatible_tool(tool, tooltype, language):
+def get_compatible_tool(tool, tooltype, language, default=False):
     r"""Get a compatible compilation tool that can be used in
     conjunction with the one provided based on the registry of
     compilation toolsets.
@@ -37,13 +37,33 @@ def get_compatible_tool(tool, tooltype, language):
         tooltype (str): Type of compilation tool that should be
             returned.
         language (str): Language that compilation tool should handle.
+        default (CompilationToolBase, optional): Default tool that
+            should be returned if not compatible tool can be located.
+            Defaults to False and an error will be raised if a tool
+            cannot be located.
 
     Returns:
         CompilationToolBase: Compatible compilation tool class.
 
     """
     if isinstance(tool, str):
-        tool = get_compilation_tool(tooltype, tool)
+        out = get_compilation_tool(tooltype, tool, default=None)
+        if out is None:
+            for k in ['compiler', 'linker', 'archiver']:
+                if k == tooltype:
+                    continue
+                out = get_compilation_tool(k, tool, default=None)
+                if out is not None:
+                    break
+        if out is None:
+            if default is not False:
+                return default
+            raise ValueError(("Could not locate %s for %s language "
+                              "associated with a tool named %s")
+                             % (tooltype, language, tool))
+        tool = out
+    if isinstance(tool, bool):
+        return tool
     if (tool.tooltype == tooltype) and (language in tool.languages):
         return tool
     reg = get_compilation_tool_registry(tooltype)['by_toolset']
@@ -56,6 +76,8 @@ def get_compatible_tool(tool, tooltype, language):
                 if ix.is_installed():
                     reg[t][language] = [ix]
                     return ix
+    if default is not False:
+        return default
     raise ValueError(("Could not locate %s for %s language "
                       "that is compatible with the %s %s.")
                      % (tooltype, language, tool.toolname,
@@ -93,7 +115,8 @@ def get_compilation_tool_registry(tooltype):
     return reg
 
 
-def find_compilation_tool(tooltype, language, allow_failure=False):
+def find_compilation_tool(tooltype, language, allow_failure=False,
+                          dont_check_installation=False):
     r"""Return the prioritized class for a compilation tool of a certain type
     that can handle the specified language.
 
@@ -103,6 +126,9 @@ def find_compilation_tool(tooltype, language, allow_failure=False):
         allow_failure (bool, optional): If True and a tool cannot be located,
             None will be returned. Otherwise, an error will be raised if a tool
             cannot be located. Defaults to False.
+        dont_check_installation (bool, optional): If True, the first tool
+            in the registry will be returned even if it is not installed.
+            Defaults to False.
 
     Returns:
         str: Name of the determined tool type.
@@ -115,8 +141,10 @@ def find_compilation_tool(tooltype, language, allow_failure=False):
     out = None
     reg = get_compilation_tool_registry(tooltype).get('by_language', {})
     for kname, v in reg.get(language, {}).items():
-        if (platform._platform in v.platforms) and v.is_installed():
+        if ((dont_check_installation
+             or ((platform._platform in v.platforms) and v.is_installed()))):
             out = kname
+            break
     if (out is None) and (not allow_failure):
         raise RuntimeError("Could not locate a %s tool." % tooltype)
     return out
@@ -140,24 +168,25 @@ def get_compilation_tool(tooltype, name, default=False):
         ValueError: If a tool with the provided name cannot be located.
 
     """
+    names_to_try = [name, os.path.basename(name),
+                    os.path.splitext(os.path.basename(name))[0]]
+    if platform._is_win:
+        names_to_try += [x.lower() for x in names_to_try.copy()]
+    out = None
     reg = get_compilation_tool_registry(tooltype)
-    if name in reg:
-        return reg[name]
-    # Try variations before raising an error
-    if name.lower() in reg:
-        return reg[name.lower()]
-    name = os.path.basename(name)
-    if name in reg:
-        return reg[name]
-    name = os.path.splitext(name)[0]
-    if name in reg:
-        return reg[name]
-    if name.lower() in reg:
-        return reg[name.lower()]
-    if default is False:
-        raise ValueError("Could not locate a %s tool with name '%s'"
-                         % (tooltype, name))
-    return default
+    for x in names_to_try:
+        if x in reg:
+            out = reg[x]
+            break
+    if out is None:
+        if default is False:
+            raise ValueError("Could not locate a %s tool with name '%s'"
+                             % (tooltype, name))
+        out = default
+    if ((isinstance(out, CompilationToolMeta) and (out.toolname != name)
+         and (os.path.isfile(name) or shutil.which(name)))):
+        out.executable = name
+    return out
 
 
 # TODO: Cannot currently make compilation tools components because
@@ -431,6 +460,13 @@ class CompilationToolBase(object):
         if existing is None:
             existing = {}
             existing.update(os.environ)
+        if not cls.env_matches_tool():
+            env = getattr(cls, 'default_flags_env', None)
+            if env is not None:
+                if not isinstance(env, list):
+                    env = [env]
+                for ienv in env:
+                    existing.pop(ienv, [])
         return existing
 
     @classmethod
@@ -622,15 +658,28 @@ class CompilationToolBase(object):
         envi_base = ''
         if isinstance(cls.toolname, str):
             tool_base.append(cls.toolname)
+        if isinstance(cls.default_executable, str):
+            tool_base.append(cls.default_executable)
         if isinstance(cls.default_executable_env, str):
-            envi_base = os.environ.get(cls.default_executable_env, '')
+            envi_base = os.path.basename(
+                os.environ.get(cls.default_executable_env, ''))
         if os.environ.get('PATHEXT', ''):
             tool_base = [x.split(os.environ['PATHEXT'])[0]
                          for x in tool_base]
             envi_base = envi_base.split(os.environ['PATHEXT'])[0]
         out = False
+        regex_literal = '-+*$%#@!^&(){}[]<>,.;:'
+        regex_pathsep = r'(?:[\-\_\.0-9])'
         if tool_base and envi_base:
-            out = envi_base.endswith(tuple(tool_base))
+            for x in tool_base:
+                for k in regex_literal:
+                    x = x.replace(k, '\\' + k)
+                regex = r'(?:(?:^)|%s)%s(?:(?:$)|%s)' % (regex_pathsep, x,
+                                                         regex_pathsep)
+                if re.search(regex, envi_base):
+                    out = True
+                    break
+            # out = envi_base.endswith(tuple(tool_base))
         return out
 
     @classmethod
@@ -736,7 +785,14 @@ class CompilationToolBase(object):
             str: Name of (or path to) the tool executable.
 
         """
-        out = getattr(cls, 'executable', cls.default_executable)
+        out = getattr(cls, 'executable', None)
+        if out is None:
+            from yggdrasil.config import ygg_cfg
+            out = cls.default_executable
+            if cls.languages:
+                out = ygg_cfg.get(cls.languages[0],
+                                  '%s_executable' % cls.toolname,
+                                  out)
         if out is None:
             raise NotImplementedError("Executable not set for %s '%s'."
                                       % (cls.tooltype, cls.toolname))
@@ -816,7 +872,6 @@ class CompilationToolBase(object):
         if platform._is_win:  # pragma: windows
             base_paths = []
             vcpkg_dir = cfg.get('c', 'vcpkg_dir', None)
-            logger.info("vcpkg_dir = '%s'" % vcpkg_dir)
             if vcpkg_dir is not None:
                 if not os.path.isdir(vcpkg_dir):  # pragma: debug
                     raise RuntimeError("vcpkg_dir is not valid: '%s'"
@@ -1095,6 +1150,10 @@ class CompilationToolBase(object):
             if not allow_error:
                 raise RuntimeError("Could not call command '%s': %s"
                                    % (' '.join(cmd), e))
+        except BaseException as e:
+            print("Unexpected call error: %s" % e)
+            print(e, type(e))
+            raise
         # Check for output
         if (not skip_flags):
             if (out != 'clean'):
@@ -1202,7 +1261,7 @@ class CompilerBase(CompilationToolBase):
         if cls.no_separate_linking:
             cls.is_linker = True
             cls.compile_only_flag = None
-        if cls.is_linker:
+        if cls.is_linker and (not getattr(cls, 'dont_create_linker', False)):
             if cls.default_linker is None:
                 cls.default_linker = cls.toolname
             copy_attr = ['toolname', 'aliases', 'languages', 'platforms',
@@ -1242,8 +1301,6 @@ class CompilerBase(CompilationToolBase):
             out = get_compilation_tool('linker', linker)(flags=linker_flags,
                                                          executable=linker)
             assert(out.is_installed())
-            # if not out.is_installed():
-            #     out = get_compatible_tool(cls, 'linker', language=cls.languages[0])
         else:
             out = linker
         return out
@@ -1260,13 +1317,12 @@ class CompilerBase(CompilationToolBase):
         archiver_flags = getattr(cls, '_archiver_flags', cls.default_archiver_flags)
         if archiver is None:
             archiver = find_compilation_tool('archiver', cls.languages[0])
+        out = archiver
         if archiver:
             out = get_compilation_tool('archiver', archiver)(flags=archiver_flags,
                                                              executable=archiver)
             if not out.is_installed():
                 out = get_compatible_tool(cls, 'archiver', language=cls.languages[0])
-        else:
-            out = archiver
         return out
 
     @classmethod
@@ -1329,6 +1385,10 @@ class CompilerBase(CompilationToolBase):
                 dont_link = True
             else:
                 dont_link = False
+        # Add flag that model is yggdrasil
+        if not cls.is_build_tool:
+            kwargs.setdefault('definitions', [])
+            kwargs['definitions'].append('WITH_YGGDRASIL')
         # Add logging level as a definition
         if logging_level is not None:
             kwargs.setdefault('definitions', [])
@@ -1480,7 +1540,7 @@ class CompilerBase(CompilationToolBase):
                 dont_link = False
         # Get appropriate tool
         tool = None
-        if not dont_link:
+        if not (dont_link or skip_flags):
             tool = cls.get_library_tool(libtype=libtype, **kwargs)
         # Handle list of sources
         if (not skip_flags) and isinstance(args, list) and (len(args) > 1):
@@ -2034,9 +2094,9 @@ class CompiledModelDriver(ModelDriver):
                         {'attr': 'default_archiver_flags',
                          'key': 'archiver_flags',
                          'type': list}]
+    is_build_tool = False
 
     def __init__(self, name, args, skip_compile=False, **kwargs):
-        kwargs.setdefault('overwrite', (not kwargs.pop('preserve_cache', False)))
         super(CompiledModelDriver, self).__init__(name, args, **kwargs)
         # Compile
         if not skip_compile:
@@ -2098,8 +2158,10 @@ class CompiledModelDriver(ModelDriver):
                     setattr(self, k, getattr(self, 'default_%s' % k))
         # Set tools so that they are cached
         for k in ['compiler', 'linker', 'archiver']:
-            setattr(self, '%s_tool' % k, self.get_tool_instance(k))
-            self.get_tool_instance(k)
+            if self.is_build_tool and (k == 'archiver'):
+                setattr(self, '%s_tool' % k, False)
+            else:
+                setattr(self, '%s_tool' % k, self.get_tool_instance(k))
         super(CompiledModelDriver, self).parse_arguments(args, **kwargs)
         # Handle case where provided argument is source and not executable
         # and case where provided argument is executable, but source files are
@@ -2266,60 +2328,67 @@ class CompiledModelDriver(ModelDriver):
         if (out is None) or ((toolname is not None) and (toolname != out.toolname)):
             # Associate linker & archiver with compiler so that it can be
             # used to retrieve them
-            if (tooltype == 'compiler') or (return_prop in ['name', 'flags']):
-                # Get tool name by checking:
-                #   1. The tooltype attribute
-                #   2. The default tooltype attribute
-                #   3. The default argument (if one is provided).
-                if toolname is None:
-                    toolname = getattr(cls, tooltype, None)
-                if toolname is None:
-                    toolname = getattr(cls, 'default_%s' % tooltype, None)
-                if toolname is None:
-                    if default is False:
-                        raise NotImplementedError("%s not set for language '%s'."
-                                                  % (tooltype.title(), cls.language))
-                    return default
-                if return_prop == 'name':
-                    return toolname
-                # Get flags
-                tool_flags = getattr(cls, '%s_flags' % tooltype, None)
-                if tool_flags is None:
-                    tool_flags = getattr(cls, 'default_%s_flags' % tooltype, None)
-                if return_prop == 'flags':
-                    return tool_flags
-                # Get tool
-                kwargs = {'executable': toolname, 'flags': tool_flags}
-                if tooltype == 'compiler':
-                    kwargs.update(
-                        linker=cls.get_tool(
-                            'linker', return_prop='name', default=None),
-                        linker_flags=cls.get_tool(
-                            'linker', return_prop='flags', default=None),
-                        archiver=cls.get_tool(
-                            'archiver', return_prop='name', default=None),
-                        archiver_flags=cls.get_tool(
-                            'archiver', return_prop='flags', default=None))
-                try:
-                    out = get_compatible_tool(toolname, tooltype,
-                                              cls.language)(**kwargs)
-                except ValueError:
-                    if default is False:
-                        raise
-                    return default
-            else:
-                out_tool = cls.get_tool('compiler', toolname=toolname, default=None)
-                if out_tool is None:  # pragma: debug
-                    if default is False:
-                        raise NotImplementedError("%s not set for language '%s'."
-                                                  % (tooltype.title(), cls.language))
-                    return default
-                try:
-                    out = getattr(out_tool, tooltype)()
-                except BaseException:  # pragma: debug
-                    if default is False:
-                        raise
-                    return default
+            # Get tool name by checking:
+            #   1. The tooltype attribute
+            #   2. The default tooltype attribute
+            #   3. The default argument (if one is provided).
+            if toolname is None:
+                toolname = getattr(cls, tooltype, None)
+            if toolname is None:
+                toolname = getattr(cls, 'default_%s' % tooltype, None)
+            if toolname is None:
+                toolname = find_compilation_tool(tooltype, cls.language,
+                                                 allow_failure=True)
+            if toolname is None:
+                if default is False:
+                    raise NotImplementedError("%s not set for language '%s'."
+                                              % (tooltype.title(), cls.language))
+                logger.debug("%s not set for language '%s'."
+                             % (tooltype.title(), cls.language))
+                return default
+            if return_prop == 'name':
+                return toolname
+            # Get flags
+            tool_flags = getattr(cls, '%s_flags' % tooltype, None)
+            if tool_flags is None:
+                tool_flags = getattr(cls, 'default_%s_flags' % tooltype, None)
+            if return_prop == 'flags':
+                return tool_flags
+            # Get tool
+            kwargs = {'flags': tool_flags}
+            kwargs['executable'] = cls.cfg.get(cls.language,
+                                               '%s_executable' % toolname,
+                                               toolname)
+            if tooltype == 'compiler':
+                kwargs.update(
+                    linker=cls.get_tool(
+                        'linker', return_prop='name', default=None),
+                    linker_flags=cls.get_tool(
+                        'linker', return_prop='flags', default=None),
+                    archiver=cls.get_tool(
+                        'archiver', return_prop='name', default=None),
+                    archiver_flags=cls.get_tool(
+                        'archiver', return_prop='flags', default=None))
+            out = get_compatible_tool(toolname, tooltype, cls.language,
+                                      default=None)
+            if (out is None) and (tooltype != 'compiler'):
+                out_comp = cls.get_tool('compiler', toolname=toolname,
+                                        default=None)
+                if out_comp is not None:
+                    try:
+                        out = getattr(out_comp, tooltype)()
+                    except BaseException:  # pragma: debug
+                        out = None
+            if out is None:
+                if default is False:
+                    raise NotImplementedError(
+                        "%s not set for language '%s' (toolname=%s)."
+                        % (tooltype.title(), cls.language, toolname))
+                logger.debug("%s not set for language '%s' (toolname=%s)."
+                             % (tooltype.title(), cls.language, toolname))
+                out = default
+            if isinstance(out, type):
+                out = out(**kwargs)
         # Returns correct property given the tool
         if return_prop == 'tool':
             return out
@@ -2764,13 +2833,16 @@ class CompiledModelDriver(ModelDriver):
         return out
 
     @classmethod
-    def get_compiler_flags(cls, toolname=None, **kwargs):
+    def get_compiler_flags(cls, toolname=None, compiler=None, **kwargs):
         r"""Determine the flags required by the current compiler.
 
         Args:
             toolname (str, optional): Name of compiler tool that should be used.
                 Defaults to None and the default compiler for the language will
                 be used.
+            compiler (CompilerBase, optional): Compilation tool class for the
+                compiler that should be used. Defaults to None and is set
+                based on toolname.
             **kwargs: Keyword arguments are passed to cls.update_compiler_kwargs
                 first and then the compiler's get_flags method.
 
@@ -2778,8 +2850,10 @@ class CompiledModelDriver(ModelDriver):
             list: Flags for the compiler.
 
         """
+        if compiler is None:
+            compiler = cls.get_tool('compiler', toolname=toolname)
         kwargs = cls.update_compiler_kwargs(toolname=toolname, **kwargs)
-        return cls.get_tool('compiler', toolname=toolname).get_flags(**kwargs)
+        return compiler.get_flags(**kwargs)
 
     @classmethod
     def get_linker_flags(cls, toolname=None, **kwargs):
@@ -3166,6 +3240,23 @@ class CompiledModelDriver(ModelDriver):
                 break
             out = cls.is_library_installed(k)
         return out
+
+    @classmethod
+    def is_tool_installed(cls, tooltype):
+        r"""Determine if a compilation tool of a certain is installed for
+        this language.
+
+        Args:
+            tooltype (str): Type of tool to check for. Supported values include
+                'compiler', 'linker', & 'archiver'.
+
+        Returns:
+            bool: True if a tool of the specified type is installed.
+
+        """
+        if cls.is_build_tool and (tooltype != 'compiler'):
+            return True
+        return (cls.get_tool(tooltype, default=None) is not None)
             
     @classmethod
     def is_language_installed(cls):
@@ -3180,9 +3271,46 @@ class CompiledModelDriver(ModelDriver):
         for k in ['compiler', 'archiver', 'linker']:
             if not out:  # pragma: no cover
                 break
-            out = (cls.get_tool(k, default=None) is not None)
+            out = cls.is_tool_installed(k)
         return out
 
+    @classmethod
+    def configure(cls, cfg, **kwargs):
+        r"""Add configuration options for this language.
+
+        Args:
+            cfg (CisConfigParser): Config class that options should be set for.
+            **kwargs: Additional keyword arguments are used to set tool
+                configuration options (e.g. 'compiler').
+        
+        Returns:
+            list: Section, option, description tuples for options that could not
+                be set.
+
+        """
+        if (cls.language is not None) and (not cfg.has_section(cls.language)):
+            cfg.add_section(cls.language)
+        for k, v in kwargs.items():
+            if k not in ['compiler', 'linker', 'archiver']:  # pragma: debug
+                raise ValueError("Unexpected configuration option: '%s'" % k)
+            vtool = None
+            try:
+                vtool = get_compilation_tool(k, v)
+            except ValueError:  # pragma: debug
+                reg = get_compilation_tool_registry(k)
+                for kreg, vreg in reg.keys():
+                    if kreg in v:
+                        vtool = vreg
+                        break
+            if not vtool:  # pragma: debug
+                raise ValueError("Could not locate a %s tool '%s'." % (k, v))
+            cfg.set(cls.language, k, vtool.toolname)
+            if os.path.isfile(v):
+                cfg.set(cls.language, '%s_executable' % vtool.toolname, v)
+        # Call __func__ to avoid direct invoking of class which dosn't exist
+        # in after_registration where this is called
+        return ModelDriver.configure.__func__(cls, cfg)
+        
     @classmethod
     def configure_executable_type(cls, cfg):
         r"""Add configuration options specific in the executable type
@@ -3414,6 +3542,10 @@ class CompiledModelDriver(ModelDriver):
                 logging_level=self.numeric_logging_level,
                 **compile_kwargs)
         return out
+
+    def compile_dependencies_instance(self, *args, **kwargs):
+        r"""Compile dependencies specifically for this instance."""
+        return self.compile_dependencies(*args, **kwargs)
         
     @classmethod
     def compile_dependencies(cls, toolname=None, dep=None, **kwargs):
@@ -3452,7 +3584,10 @@ class CompiledModelDriver(ModelDriver):
         if compiler is not None:
             suffix = cls.get_internal_suffix(commtype=kwargs.get('commtype', None))
             suffix += compiler.get_tool_suffix()
-            cls.compile_dependencies(products=products, **kwargs)
+            try:
+                cls.compile_dependencies(products=products, **kwargs)
+            except NotImplementedError:  # pragma: debug
+                pass
             new_products = []
             for i in range(len(products)):
                 if suffix in products[i]:
@@ -3495,16 +3630,22 @@ class CompiledModelDriver(ModelDriver):
             default_kwargs.update(linker_flags=self.linker_flags)
         for k, v in default_kwargs.items():
             kwargs.setdefault(k, v)
+        if ((isinstance(kwargs['out'], str) and os.path.isfile(kwargs['out'])
+             and (not kwargs['overwrite']))):
+            self.debug("Result already exists: %s", kwargs['out'])
+            return kwargs['out']
         if 'env' not in kwargs:
             kwargs['env'] = self.set_env(for_compile=True,
                                          toolname=kwargs['toolname'])
         try:
             if not kwargs.get('dry_run', False):
-                self.compile_dependencies(toolname=kwargs['toolname'])
+                self.compile_dependencies_instance(toolname=kwargs['toolname'])
             return self.call_compiler(source_files, **kwargs)
         except BaseException:
             self.cleanup_products()
             raise
+        finally:
+            self.restore_files()
 
     @classmethod
     def get_internal_suffix(cls, commtype=None):

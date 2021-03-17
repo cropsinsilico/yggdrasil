@@ -140,14 +140,14 @@ class YamlTestBase(YggTestClass):
         r"""Disabled: Create a new instance of the class."""
         return None
 
-    def test_parse_yaml(self):
+    def test_parse_yaml(self, as_function=False):
         r"""Test successfully reading & parsing yaml."""
         if self.nfiles == 0:
             pass
         elif self.nfiles == 1:
-            yamlfile.parse_yaml(self.files[0])
+            yamlfile.parse_yaml(self.files[0], as_function=as_function)
         else:
-            yamlfile.parse_yaml(self.files)
+            yamlfile.parse_yaml(self.files, as_function=as_function)
 
 
 class YamlTestBaseError(YamlTestBase):
@@ -594,6 +594,46 @@ class TestYamlConnectionInputObj(YamlTestBase):
                   '  - input: outputA',
                   '    output: output.obj',
                   '    write_meth: obj'], )
+
+
+class TestYamlModelFunction(YamlTestBase):
+    r"""Test when missing input/output connections should be routed to a function."""
+    _contents = (['models:',
+                  '  - name: modelA',
+                  '    language: c',
+                  '    args: ./src/modelA.c',
+                  '    inputs:',
+                  '      - inputA',
+                  '    outputs:',
+                  '      - outputA',
+                  '',
+                  '  - name: modelB',
+                  '    language: c',
+                  '    args: ./src/modelB.c',
+                  '    inputs:',
+                  '      - inputB',
+                  '    outputs:',
+                  '      - outputB',
+                  '',
+                  'connections:',
+                  '  - input: outputA',
+                  '    output: inputB'], )
+    
+    def test_parse_yaml(self, *args, **kwargs):
+        r"""Test successfully reading & parsing yaml."""
+        kwargs.setdefault('as_function', True)
+        super(TestYamlModelFunction, self).test_parse_yaml(*args, **kwargs)
+
+
+class TestYamlConnectionDefaultValue(YamlTestBase):
+    r"""Test use of default_value parameter."""
+    _contents = (['models:',
+                  '  - name: modelA',
+                  '    driver: GCCModelDriver',
+                  '    args: ./src/modelA.c',
+                  '    inputs:',
+                  '      - name: inputA',
+                  '        default_value: test'],)
 
 
 class TestYamlServerNoClient(YamlTestBaseError):

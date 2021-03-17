@@ -22,6 +22,9 @@ static int _last_port = 49152;
 static char _reply_msg[100] = "YGG_REPLY";
 static char _purge_msg[100] = "YGG_PURGE";
 static int _zmq_sleeptime = 10000;
+#ifdef _OPENMP
+#pragma omp threadprivate(_reply_msg, _purge_msg, _zmq_sleeptime)
+#endif
 static void *ygg_s_process_ctx = NULL;
 
 
@@ -55,7 +58,7 @@ void* ygg_zsys_init() {
       } else {
 	ygglog_error("ygg_zsys_init: Can only initialize the "
 		     "zeromq context on the main thread. Call ygg_init "
-		     "before the threaded porition of your model.");
+		     "before the threaded portion of your model.");
       }
     }
   }
@@ -328,6 +331,22 @@ int do_reply_send(const comm_t *comm) {
   }
   ygglog_debug("do_reply_send(%s): address=%s, end", comm->name,
 	       zrep->addresses[0]);
+#if defined(__cplusplus) && defined(_WIN32)
+  // TODO: There seems to be an error in the poller when using it in C++
+#else
+  if (ret >= 0) {
+    poller = zpoller_new(s, NULL);
+    if (!(poller)) {
+      ygglog_error("do_reply_send(%s): Could not create poller", comm->name);
+      return -1;
+    }
+    assert(poller);
+    ygglog_debug("do_reply_send(%s): waiting on poller...", comm->name);
+    p = zpoller_wait(poller, 10);
+    ygglog_debug("do_reply_send(%s): poller returned", comm->name); 
+    zpoller_destroy(&poller);
+  }
+#endif
   return ret;
 };
 
@@ -570,8 +589,10 @@ int check_reply_recv(const comm_t *comm, char *data, const size_t len) {
   } else {
     ygglog_error("check_reply_recv(%s): Error parsing reply header in '%s'",
 		 comm->name, data);
+    destroy_header(&head);
     return -1;
   }
+  destroy_header(&head);
   address[address_len] = '\0';
   // Match address and create if it dosn't exist
   int isock = set_reply_recv(comm, address);
@@ -685,7 +706,13 @@ int init_zmq_comm(comm_t *comm) {
   if (comm->valid == 0)
     return ret;
   comm->msgBufSize = 100;
-  zsock_t *s = ygg_zsock_new(ZMQ_PAIR);
+  zsock_t *s;
+  char *allow_threading = getenv("YGG_THREADING");
+  if ((comm->is_rpc) || ((allow_threading != NULL) && (strcmp(allow_threading, "1") == 0))) {
+    s = ygg_zsock_new(ZMQ_DEALER);
+  } else {
+    s = ygg_zsock_new(ZMQ_PAIR);
+  }
   if (s == NULL) {
     ygglog_error("init_zmq_address: Could not initialize empty socket.");
     return -1;

@@ -67,7 +67,8 @@ def get_comm_list():
         list: Names of testable communication methods using timed_pipe.
 
     """
-    _comm_list = tools.get_installed_comm(language=get_lang_list())
+    _comm_list = tools.get_installed_comm(language=get_lang_list(),
+                                          dont_include_value=True)
     if (len(_comm_list) == 0):  # pragma: debug
         raise Exception(("Timings cannot be performed if there is not at least "
                          "one valid communication mechanism. len(valid_comms) "

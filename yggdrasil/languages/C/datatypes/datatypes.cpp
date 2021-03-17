@@ -204,7 +204,8 @@ bool update_header_from_doc(comm_head_t &head, rapidjson::Value &head_doc) {
   // String fields
   const char **n;
   const char *string_fields[] = {"address", "id", "request_id", "response_address",
-				 "zmq_reply", "zmq_reply_worker", ""};
+				 "zmq_reply", "zmq_reply_worker",
+				 "model", ""};
   n = string_fields;
   while (strcmp(*n, "") != 0) {
     if (head_doc.HasMember(*n)) {
@@ -226,6 +227,8 @@ bool update_header_from_doc(comm_head_t &head, rapidjson::Value &head_doc) {
 	target = head.zmq_reply;
       } else if (strcmp(*n, "zmq_reply_worker") == 0) {
 	target = head.zmq_reply_worker;
+      } else if (strcmp(*n, "model") == 0) {
+	target = head.model;
       } else {
 	ygglog_error("update_header_from_doc: '%s' not handled.", *n);
 	return false;
@@ -349,6 +352,10 @@ JSONArrayMetaschemaType* create_dtype_format_class(const char *format_str,
     beg = end;
   }
   out->update_items(items, true);
+  for (size_t i = 0; i < items.size(); i++) {
+    delete items[i];
+    items[i] = NULL;
+  }
   return out;
 };
 
@@ -501,7 +508,8 @@ rapidjson::StringBuffer format_comm_header_json(const comm_head_t head,
   // Strings
   const char **n;
   const char *string_fields[] = {"address", "id", "request_id", "response_address",
-				 "zmq_reply", "zmq_reply_worker", ""};
+				 "zmq_reply", "zmq_reply_worker",
+				 "model", ""};
   n = string_fields;
   while (strcmp(*n, "") != 0) {
     const char *target = NULL;
@@ -517,6 +525,8 @@ rapidjson::StringBuffer format_comm_header_json(const comm_head_t head,
       target = head.zmq_reply;
     } else if (strcmp(*n, "zmq_reply_worker") == 0) {
       target = head.zmq_reply_worker;
+    } else if (strcmp(*n, "model") == 0) {
+      target = head.model;
     } else {
       ygglog_throw_error("format_comm_header_json: '%s' not handled.", *n);
     }
@@ -1351,6 +1361,24 @@ extern "C" {
     }
     return out;
   }
+  int generic_map_has_key(generic_t x, char* key) {
+    int out = 0;
+    try {
+      if (!(is_generic_init(x))) {
+	ygglog_throw_error("generic_map_get_keys: Object not initialized.");
+      }
+      YggGeneric* x_obj = (YggGeneric*)(x.obj);
+      if (x_obj == NULL) {
+	ygglog_throw_error("generic_map_get_keys: Object is NULL.");
+      }
+      if (x_obj->has_data_map_key(key)) {
+	out = 1;
+      }
+    } catch (...) {
+      ygglog_error("generic_map_get_keys: C++ exception thrown.");
+    }
+    return out;
+  }
   size_t generic_map_get_keys(generic_t x, char*** keys) {
     size_t out = 0;
     try {
@@ -1558,6 +1586,7 @@ extern "C" {
       delete item_type;
     } catch (...) {
       ygglog_error("generic_map_get_scalar: C++ exception thrown.");
+      out = NULL;
     }
     return out;
   }
@@ -2693,9 +2722,17 @@ extern "C" {
     if (dtype->obj == NULL) {
       return 1;
     }
-    MetaschemaType *obj = dtype2class(dtype);
-    if (obj->is_empty())
+    if (strlen(dtype->type) == 0) {
       return 1;
+    }
+    try {
+      MetaschemaType *obj = dtype2class(dtype);
+      if (obj->is_empty())
+	return 1;
+    } catch(...) {
+      ygglog_error("is_empty_dtype: C++ exception thrown.");
+      return 1;
+    }
     return 0;
   }
   
@@ -3170,6 +3207,7 @@ extern "C" {
 	free(head);
 	return out;
       }
+      free(head);
       return out;
     } catch(...) {
       ygglog_error("parse_comm_header: C++ exception thrown.");

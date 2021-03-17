@@ -684,7 +684,7 @@ class MetaschemaType(object):
             header = YGG_MSG_HEAD + encoder.encode_json(metadata) + YGG_MSG_HEAD
             if len(header) > max_header_size:  # pragma: debug
                 raise AssertionError(("The header is larger (%d) than the "
-                                      "maximum (%d): %s")
+                                      "maximum (%d): %.100s...")
                                      % (len(header), max_header_size, header))
         msg = header + data
         return msg

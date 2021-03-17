@@ -70,7 +70,8 @@ class CCompilerBase(CompilerBase):
     default_flags_env = 'CFLAGS'
     default_flags = ['-g', '-Wall']
     # GCC & CLANG have similar call patterns
-    linker_attributes = {'default_flags_env': 'LDFLAGS',
+    linker_attributes = {'default_executable_env': 'LD',
+                         'default_flags_env': 'LDFLAGS',
                          'search_path_envvar': ['LIBRARY_PATH', 'LD_LIBRARY_PATH']}
     search_path_envvar = ['C_INCLUDE_PATH']
     search_path_flags = ['-E', '-v', '-xc', '/dev/null']
@@ -94,9 +95,6 @@ class CCompilerBase(CompilerBase):
             cls.linker_attributes = dict(cls.linker_attributes,
                                          search_path_flags=['-Xlinker', '--verbose'],
                                          search_regex=[r'SEARCH_DIR\("=([^"]+)"\);'])
-        elif platform._is_win and (cls.toolname not in [None, 'cl', 'msvc']):
-            cls.default_executable_env = None
-            cls.default_flags_env = None
         CompilerBase.before_registration(cls)
 
     @classmethod
@@ -244,13 +242,21 @@ class ClangCompiler(CCompilerBase):
     is_linker = False
     toolset = 'llvm'
 
+    @classmethod
+    def get_flags(cls, *args, **kwargs):
+        r"""Get a list of compiler flags."""
+        out = super(ClangCompiler, cls).get_flags(*args, **kwargs)
+        if '-fopenmp' in out:
+            idx = out.index('-fopenmp')
+            if (idx > 0) and (out[idx - 1] != '-Xpreprocessor'):
+                out.insert(idx, '-Xpreprocessor')
+        return out
+        
 
 class MSVCCompiler(CCompilerBase):
     r"""Microsoft Visual Studio C Compiler."""
     toolname = 'cl'
-    languages = ['c', 'c++']
     platforms = ['Windows']
-    default_flags_env = ['CFLAGS', 'CXXFLAGS']
     # TODO: Currently everything compiled as C++ on windows to allow use
     # of complex types. Use '/TC' instead of '/TP' for strictly C
     default_flags = ['/W4',      # Display all errors
@@ -276,8 +282,7 @@ class MSVCCompiler(CCompilerBase):
     combine_with_linker = True  # Must be explicit; linker is separate .exe
     linker_attributes = dict(GCCCompiler.linker_attributes,
                              default_executable=None,
-                             default_executable_env=None,
-                             default_flags_env=None,
+                             default_executable_env='LINK',
                              output_key='/OUT:%s',
                              output_first=True,
                              output_first_library=False,
@@ -299,8 +304,8 @@ class MSVCCompiler(CCompilerBase):
         compiler_path = shutil.which('cl.exe')
         linker_path = shutil.which('link.exe')
         if (((compiler_path and linker_path)
-             and (os.path.dirname(compiler_path)
-                  != os.path.dirname(linker_path)))):
+             and (os.path.dirname(compiler_path).lower()
+                  != os.path.dirname(linker_path).lower()))):
             cls.linker_attributes['default_executable'] = os.path.join(
                 os.path.dirname(compiler_path), os.path.basename(linker_path))
             assert(os.path.isfile(
@@ -369,7 +374,6 @@ class ClangLinker(LDLinker):
     languages = ClangCompiler.languages
     platforms = ClangCompiler.platforms
     default_executable = ClangCompiler.default_executable
-    default_executable_env = ClangCompiler.default_executable_env
     toolset = ClangCompiler.toolset
     search_path_flags = ['-Xlinker', '-v']
     search_regex = [r'\t([^\t\n]+)\n']
@@ -415,6 +419,8 @@ class ClangLinker(LDLinker):
         out = super(ClangLinker, cls).get_flags(*args, **kwargs)
         if '-lstdc++' not in out:
             out.append('-lstdc++')
+        if '-fopenmp' in out:
+            out[out.index('-fopenmp')] = '-lomp'
         return out
 
 
@@ -779,7 +785,7 @@ class CModelDriver(CompiledModelDriver):
                     cls.internal_libraries[x]['compiler_flags'].append('-fPIC')
         
     @classmethod
-    def configure(cls, cfg, macos_sdkroot=None, vcpkg_dir=None):
+    def configure(cls, cfg, macos_sdkroot=None, vcpkg_dir=None, **kwargs):
         r"""Add configuration options for this language. This includes locating
         any required external libraries and setting option defaults.
 
@@ -792,6 +798,8 @@ class CModelDriver(CompiledModelDriver):
                 a vcpkg installation. This should be the directory that contains
                 the vcpkg executable and any packages installed by vcpkg (in
                 subdirectories). Defaults to None and is ignored.
+            **kwargs: Additional keyword arguments are passed to the parent
+                class's method.
 
         Returns:
             list: Section, option, description tuples for options that could not
@@ -819,7 +827,7 @@ class CModelDriver(CompiledModelDriver):
             cfg.set(cls._language, 'macos_sdkroot', macos_sdkroot)
         # Call __func__ to avoid direct invoking of class which dosn't exist
         # in after_registration where this is called
-        out = CompiledModelDriver.configure.__func__(cls, cfg)
+        out = CompiledModelDriver.configure.__func__(cls, cfg, **kwargs)
         # Change configuration to be directory containing include files
         rjlib = cfg.get(cls._language, 'rapidjson_include', None)
         if (rjlib is not None) and os.path.isfile(rjlib):

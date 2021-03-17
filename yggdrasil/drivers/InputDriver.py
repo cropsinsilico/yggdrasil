@@ -19,8 +19,8 @@ class InputDriver(ConnectionDriver):
                                    'and a model.')
 
     def __init__(self, name, args, **kwargs):
-        kwargs.setdefault('icomm_kws', {})
-        kwargs['icomm_kws']['name'] = args
-        if kwargs['icomm_kws'].get('comm', self._icomm_type) == 'RMQComm':
-            kwargs['icomm_kws']['queue'] = args
+        kwargs.setdefault('inputs', [{}])
+        kwargs['inputs'][0]['name'] = args
+        if kwargs['inputs'][0].get('commtype', self._icomm_type) in ['rmq', 'RMQComm']:
+            kwargs['inputs'][0]['queue'] = args
         super(InputDriver, self).__init__(name, **kwargs)

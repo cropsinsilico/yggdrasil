@@ -494,7 +494,7 @@ class SerializeBase(tools.YggClass):
                        'commtype', 'filetype', 'response_address', 'request_id',
                        'append', 'in_temp', 'is_series', 'working_dir', 'fmts',
                        'model_driver', 'env', 'send_converter', 'recv_converter',
-                       'typedef_base', 'client_model', 'closed_clients']
+                       'typedef_base', 'model', 'closed_clients']
         kws = list(kwargs.keys())
         for k in kws:
             if (k in _remove_kws) or k.startswith('zmq'):
@@ -508,7 +508,7 @@ class SerializeBase(tools.YggClass):
         # Update extra keywords
         if (len(kwargs) > 0):
             self.extra_kwargs.update(kwargs)
-            self.debug("Extra kwargs: %s" % str(self.extra_kwargs))
+            self.debug("Extra kwargs: %.100s..." % str(self.extra_kwargs))
         # Update type
         if not skip_type:
             # Update typedef from oldstyle keywords in extra_kwargs
@@ -694,7 +694,8 @@ class SerializeBase(tools.YggClass):
         metadata = {'no_metadata': no_metadata,
                     'max_header_size': max_header_size}
         if add_serializer_info:
-            self.debug("serializer_info = %s", str(self.serializer_info))
+            self.verbose_debug("serializer_info = %.100s...",
+                               str(self.serializer_info))
             metadata.update(self.serializer_info)
             metadata['typedef_base'] = self.typedef
         if header_kwargs is not None:

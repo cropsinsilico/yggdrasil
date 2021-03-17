@@ -50,17 +50,14 @@ int init_server_comm(comm_t *comm) {
   } else {
     handle = init_comm_base(comm->name, "recv", _default_comm, dtype_in);
   }
+  handle->is_rpc = 1;
   ret = init_default_comm(handle);
   strcpy(comm->address, handle->address);
   // printf("init_server_comm: name = %s, type=%d, address = %s\n",
   // 	 handle->name, handle->type, handle->address);
   strcpy(comm->direction, "recv");
   comm->handle = (void*)handle;
-  if (_default_comm == ZMQ_COMM) {
-    comm->always_send_header = 1;
-  } else {
-    comm->always_send_header = 1; // Always send header.
-  }
+  comm->always_send_header = 1;
   comm_t **info = (comm_t**)malloc(sizeof(comm_t*));
   if (info == NULL) {
     ygglog_error("init_server_comm: Failed to malloc info.");

@@ -1,5 +1,5 @@
 {% set name = "yggdrasil" %}
-{% set version = "1.4.1" %}
+{% set version = "1.5.0" %}
 
 package:
   name: {{ name|lower }}
@@ -59,7 +59,7 @@ requirements:
     - GitPython
     - jsonschema
     - matplotlib-base
-    - numpy>=1.13.0
+    - numpy >=1.13.0
     - pandas
     - pyperf
     - pint  # [py2k]

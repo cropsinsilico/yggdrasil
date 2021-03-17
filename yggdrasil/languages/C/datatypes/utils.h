@@ -383,15 +383,21 @@ public:
    */
   void* get_data(const MetaschemaType* exp_type) const;
   /*!
-    @brief Get the size of a map.
-    @returns size_t Size of the wrapped map.
-   */
-  size_t get_data_array_size() const;
-  /*!
     @brief Get the size of an array.
     @returns size_t Size of the wrapped array.
    */
+  size_t get_data_array_size() const;
+  /*!
+    @brief Get the size of a map.
+    @returns size_t Size of the wrapped map.
+   */
   size_t get_data_map_size() const;
+  /*!
+    @brief Determine if a map contains a specific key.
+    @param[in] key char* Key to check for.
+    @returns bool true if the key is present, false otherwise.
+   */
+  bool has_data_map_key(char* key) const;
   /*!
     @brief Get an array of keys in the map.
     @param[out] keys char*** Pointer to memory that should be reallocated

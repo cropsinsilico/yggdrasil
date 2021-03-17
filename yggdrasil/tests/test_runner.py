@@ -2,8 +2,8 @@ import os
 import unittest
 import signal
 import uuid
-from yggdrasil import runner, tools, platform
-from yggdrasil.tests import YggTestBase, assert_raises
+from yggdrasil import runner, tools, platform, import_as_function
+from yggdrasil.tests import assert_raises, requires_language
 # from yggdrasil.tests import yamls as sc_yamls
 from yggdrasil.examples import yamls as ex_yamls
 
@@ -73,24 +73,46 @@ def test_runner_error():
     r"""Test error on missing yaml."""
     assert_raises(IOError, runner.YggRunner,
                   ['fake_yaml.yml'], 'test_ygg_run')
-    
 
-class TestYggRunner(YggTestBase):
-    r"""Tests of the YggRunner class."""
-    def setup(self, *args, **kwargs):
-        super(TestYggRunner, self).setup(*args, **kwargs)
-        self.runner = runner.YggRunner([ex_yamls['hello']['python']],
-                                       'test_ygg_run')
 
-    def test_createIODriver(self):
-        r"""Test createInputDriver and createOutputDriver."""
-        yml = {'name': 'fake_IODriver',
-               'args': 'fake_channel',
-               'driver': 'InputDriver',
-               'working_dir': os.getcwd(),
-               'icomm_kws': {'comm': [{'name': 'fake_IODriver'}]},
-               'ocomm_kws': {'comm': [{'name': 'fake_IODriver'}]},
-               'kwargs': {}}
-        assert_raises(Exception, self.runner.createInputDriver, yml)
-        yml['driver'] = 'OutputDriver'
-        assert_raises(Exception, self.runner.createOutputDriver, yml)
+def test_import_as_function():
+    r"""Test import_as_function."""
+    yamlfile = ex_yamls['fakeplant']['python']
+    fmodel = import_as_function(yamlfile)
+    input_args = {}
+    for x in fmodel.arguments:
+        input_args[x] = 1.0
+    result = fmodel(**input_args)
+    for x in fmodel.returns:
+        assert(x in result)
+    fmodel.stop()
+    fmodel.stop()
+
+
+@requires_language('c')
+def test_import_as_function_C():
+    r"""Test import_as_function for C."""
+    contents = r"""models:
+      - name: c_modelA
+        language: c
+        args: ./src/model_function_modelA.c
+        function: model_function
+        inputs: inputA
+        outputs: outputA"""
+    yamlfile = os.path.join(os.path.dirname(ex_yamls['model_function']['c']),
+                            'test_import.yml')
+    assert(not os.path.isfile(yamlfile))
+    with open(yamlfile, 'w') as fd:
+        fd.write(contents)
+    try:
+        fmodel = import_as_function(yamlfile)
+        input_args = {}
+        for x in fmodel.arguments:
+            input_args[x] = b'hello'
+        result = fmodel(**input_args)
+        for x in fmodel.returns:
+            assert(x in result)
+        fmodel.stop()
+        fmodel.stop()
+    finally:
+        os.remove(yamlfile)

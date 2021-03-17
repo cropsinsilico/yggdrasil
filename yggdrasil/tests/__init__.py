@@ -1,5 +1,6 @@
 """Testing things."""
 import os
+import sys
 import shutil
 import uuid
 import difflib
@@ -15,10 +16,13 @@ import pprint
 import types
 import warnings
 import json
+import functools
+import pytest
+import subprocess
 from pandas.testing import assert_frame_equal
 from yggdrasil.config import ygg_cfg, cfg_logging
 from yggdrasil import tools, platform, units
-from yggdrasil.communication import cleanup_comms
+from yggdrasil.communication import cleanup_comms, import_comm
 from yggdrasil.components import import_component
 
 
@@ -156,10 +160,10 @@ def requires_language(language, installed=True):
         skips = []
         if installed is True:
             skips.append(unittest.skipIf(not drv.is_installed(),
-                                         "%s not installed"))
+                                         "%s not installed" % language))
         elif installed is False:
             skips.append(unittest.skipIf(drv.is_installed(),
-                                         "%s installed"))
+                                         "%s installed" % language))
         skips += check_enabled_languages(language, return_decorators=True)
         for s in skips:
             function = s(function)
@@ -244,7 +248,10 @@ class WrappedTestCase(unittest.TestCase):  # pragma: no cover
         except ValueError:
             if dont_nest:
                 raise
-            self.assertEqualNested(first, second, msg=msg)
+            if isinstance(first, (np.ndarray, pd.DataFrame)):
+                self.assertArrayEqual(first, second, msg=msg)
+            else:
+                self.assertEqualNested(first, second, msg=msg)
 
     def assertEqualNested(self, first, second, msg=None):
         r"""Fail if the two objects are unequal as determined by descending
@@ -481,6 +488,133 @@ def assert_not_equal(x, y):
 
     """
     ut.assertNotEqual(x, y)
+
+
+def get_timeout_args(args0=None):
+    r"""Determine which arguments should be passed to the timeout subprocess.
+
+    Args:
+        args0 (list, optional): Initial set of arguments. Defaults to sys.argv[1:].
+
+    Returns:
+        dict: Argument information.
+
+    """
+    if args0 is None:
+        args0 = sys.argv[1:]
+    args_preserve_path = ['-c']
+    args_remove = ['--clear-cache']
+    args_remove_value = []
+    args_add = ['--cov-append']
+    if int(pytest.__version__.split('.')[0]) >= 6:
+        args_add.append('--import-mode=importlib')
+    args_remove_value_match = tuple([k + '=' for k in args_remove_value])
+    out = {'args': [], 'rootdir': None}
+    args = out['args']
+    i = 0
+    for i in range(1, len(args0)):
+        v = args0[i]
+        if v in args_remove:  # pragma: testing
+            pass
+        elif v in args_remove_value:  # pragma: testing
+            i += 1
+        elif v.startswith(args_remove_value_match):  # pragma: testing
+            pass
+        elif v in args_preserve_path:
+            args.append(v)
+            i += 1
+            args.append(args0[i])
+        elif os.path.isfile(v) or os.path.isdir(v):
+            pass
+        else:
+            if v.startswith('--rootdir='):
+                out['rootdir'] = v.split('=')[-1]
+            elif v == '--rootdir':  # pragma: testing
+                out['rootdir'] = args0[i + 1]
+                i += 1
+            args.append(v)
+        i += 1
+    for v in args_add:
+        if '=' in v:
+            if not any(vv.startswith(v.split('=')[0]) for vv in args):
+                args.append(v)
+        elif v not in args:  # pragma: testing
+            args.append(v)
+    return out
+
+
+def timeout(*args, allow_arguments=False, **kwargs):
+    r"""Patch for pytest timeout on windows to allow pytest to cache.
+
+    Args:
+        *args: Arguments are passed on to the pytest.mark.timeout decorator.
+        **kwargs: Keyword arguments are passed on to the pytest.mark.timeout
+            decorator.
+        allow_arguments (bool, optional): If True, decoration with the timeout
+            decorator will allow arguments to be passed to the test function.
+            Defaults to False.
+
+    Source:
+        https://stackoverflow.com/questions/21827874/timeout-a-function-windows/
+            48980413#48980413
+
+
+    """
+    env_flag = 'YGG_IN_TIMEOUT_PROCESS'
+    if platform._is_win:
+        kwargs['method'] = 'thread'
+    method = kwargs.get('method', 'signal')
+    pytest_deco = pytest.mark.timeout(*args, **kwargs)
+    if (((method == 'thread') and (not os.environ.get(env_flag, False))
+         and (not allow_arguments))):
+        arginfo = get_timeout_args()
+        testargs = arginfo['args']
+        rootdir = arginfo['rootdir']
+        
+        def deco(func):
+            if getattr(func, '_timeout_wrapped', False):
+                return func
+            if isinstance(func, type):
+                for k in dir(func):
+                    v = getattr(func, k)
+                    if k.startswith('test_') and isinstance(v,
+                                                            types.MethodType):
+                        setattr(func, k, deco(v))  # pragma: testing
+                func._timeout_wrapped = True
+                return func
+
+            @functools.wraps(func)
+            def wrapper(*args, **kwargs):  # pragma: testing
+                testname = os.environ['PYTEST_CURRENT_TEST'].split()[0]
+                if rootdir:
+                    testname = os.path.join(rootdir, testname)
+                max_args = testname.count('::') - 1
+                if (len(args) > max_args) or kwargs:  # pragma: debug
+                    raise Exception("Arguments not compatible with forked "
+                                    "timeout, add 'allow_arguments=True' to "
+                                    "the decorator")
+                env = copy.deepcopy(os.environ)
+                env[env_flag] = '1'
+                out = None
+                try:
+                    out = subprocess.run(['pytest'] + testargs + [testname],
+                                         env=env, check=True,
+                                         stdout=subprocess.PIPE,
+                                         stderr=subprocess.PIPE)
+                except subprocess.CalledProcessError as e:  # pragma: debug
+                    out = e
+                print(out.stdout.decode('utf-8'))
+                print(out.stderr.decode('utf-8'), file=sys.stderr)
+                if b'========= 1 skipped in' in out.stdout:
+                    raise unittest.SkipTest('')
+                if out.returncode != 0:  # pragma: debug
+                    raise RuntimeError("Error in test subprocess. "
+                                       "See above output.")
+            wrapper._timeout_wrapped = True
+            return wrapper
+        return deco
+    else:
+        return pytest_deco
         
 
 class YggTestBase(unittest.TestCase):
@@ -544,7 +678,7 @@ class YggTestBase(unittest.TestCase):
         r"""int: The number of comms."""
         out = 0
         for k in self.cleanup_comm_classes:
-            cls = import_component('comm', k)
+            cls = import_comm(k)
             out += cls.comm_count()
         return out
 
@@ -1088,8 +1222,59 @@ def ErrorClass(base_class, *args, **kwargs):
     return ErrorClass(*args, **kwargs)
 
 
+def generate_component_subtests(comptype, suffix, target_globals,
+                                parent_module_name, new_attr=None,
+                                module_name_format='test_%s',
+                                class_name_format='Test%s',
+                                skip_subtypes=[]):
+    r"""Function that generates tests for all component subtypes that
+    subclass the original test class for the subtype.
+
+    Args:
+        comptype (str): Component type.
+        suffix (str): Suffix to be added to the end of the original
+            test class name to get the name for the new test.
+        target_globals (dict): Globals dictionary that class should be
+            added to.
+        parent_module_name (str): Parent module that contains test
+            classes for the specified component type.
+        new_attr (dict, optional): Attributes to add to the test classes.
+            Defaults to None and will be an empty dict.
+        module_name_format (str, optional): Format string that should
+            be used to locate the original test modules. Defaults to
+            'test_%s'.
+        class_name_format (str, optional): Format string that should
+            be used to both name generated test classes and locate the
+            original test classes. Defaults to 'Test%s'.
+        skip_subtypes (list, optional): List of subtypes to skip.
+            Defaults to empty list.
+
+    """
+    from yggdrasil.schema import get_schema
+    _schema = get_schema()
+    if new_attr is None:  # pragma: debug
+        new_attr = {}
+    if comptype not in _schema.keys():  # pragma: debug
+        raise NotImplementedError("%s is not a component type." % comptype)
+    for subtype in _schema[comptype].subtypes:
+        if subtype in skip_subtypes:
+            continue
+        subtype_cls = _schema[comptype].subtype2class[subtype]
+        old_mod_name = (parent_module_name + '.'
+                        + (module_name_format % subtype_cls))
+        old_cls_name = class_name_format % subtype_cls
+        new_cls_name = class_name_format % (subtype_cls + suffix.title())
+        base_class = getattr(importlib.import_module(old_mod_name),
+                             old_cls_name)
+        new_cls = type(new_cls_name, (base_class, ), new_attr)
+        target_globals[new_cls.__name__] = new_cls
+        del new_cls
+    
+
 def generate_component_tests(comptype, base_class, target_globals,
-                             directory, class_attr='_cls'):
+                             directory, class_attr='_cls', new_attr=None,
+                             class_name_format='Test%s',
+                             class_file_format='test_%s.py'):
     r"""Function that generates tests for all component subtypes
     based on the registered classes.
 
@@ -1102,23 +1287,34 @@ def generate_component_tests(comptype, base_class, target_globals,
             that should be checked for tests.
         class_attr (str, optional): Attribute that should be set to the
             name of the class being tested.
+        new_attr (dict, optional): Attributes to add to the test classes.
+            Defaults to None and will be an empty dict.
+        class_name_format (str, optional): Format string that should
+            be used to name generated test class's. Defaults to
+            'Test%s'.
+        class_file_format (str, optional): Format string that should
+            be used to name test files that are checked for. Defaults
+            to 'test_%s.py'.
 
     """
     from yggdrasil.schema import get_schema
     _schema = get_schema()
+    if new_attr is None:
+        new_attr = {}
     if os.path.isfile(directory):
         directory = os.path.dirname(directory)
     if comptype not in _schema.keys():  # pragma: debug
         raise NotImplementedError("%s is not a component type." % comptype)
     for subtype in _schema[comptype].subtypes:
         subtype_cls = _schema[comptype].subtype2class[subtype]
-        new_cls_name = 'Test%s' % subtype_cls
+        new_cls_name = class_name_format % subtype_cls
         new_cls_file = os.path.join(directory,
-                                    'test_%s' % subtype_cls) + '.py'
+                                    class_file_format % subtype_cls)
         if os.path.isfile(new_cls_file):
             continue
-        cls_attr = {class_attr: subtype_cls}
-        new_cls = type(new_cls_name, (base_class, ), cls_attr)
+        inew_attr = copy.deepcopy(new_attr)
+        inew_attr.setdefault(class_attr, subtype_cls)
+        new_cls = type(new_cls_name, (base_class, ), inew_attr)
         target_globals[new_cls.__name__] = new_cls
         del new_cls
 

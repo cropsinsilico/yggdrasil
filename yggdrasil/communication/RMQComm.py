@@ -1,4 +1,4 @@
-from yggdrasil.communication import CommBase, AsyncComm
+from yggdrasil.communication import CommBase, NoMessages
 from yggdrasil.config import ygg_cfg
 import logging
 logger = logging.getLogger(__name__)
@@ -74,11 +74,11 @@ class RMQServer(CommBase.CommServer):
     r"""RMQ server object for cleaning up server connections."""
 
     def terminate(self, *args, **kwargs):
-        CommBase.unregister_comm('RMQComm', self.srv_address)
+        RMQComm.unregister_comm(self.srv_address)
         super(RMQServer, self).terminate(*args, **kwargs)
 
 
-class RMQComm(AsyncComm.AsyncComm):
+class RMQComm(CommBase.CommBase):
     r"""Class for handling basic RabbitMQ communications.
 
     Attributes:
@@ -194,11 +194,6 @@ class RMQComm(AsyncComm.AsyncComm):
             kwargs['address'] = _rmq_param_sep.join([url, exchange, queue])
         return args, kwargs
 
-    @classmethod
-    def underlying_comm_class(self):
-        r"""str: Name of underlying communication class."""
-        return 'RMQComm'
-
     def opp_comm_kwargs(self):
         r"""Get keyword arguments to initialize communication with opposite
         comm object.
@@ -240,15 +235,15 @@ class RMQComm(AsyncComm.AsyncComm):
         self.register_comm(self.address, (self.connection, self.channel))
         super(RMQComm, self).bind()
 
-    def _open_direct(self):
+    def open(self):
         r"""Open connection and bind/connect to queue as necessary."""
-        super(RMQComm, self)._open_direct()
+        super(RMQComm, self).open()
         if not self.is_open:
             self.bind()
             self._is_open = True
             self._bound = False
 
-    def _close_direct(self, linger=False):
+    def _close(self, linger=False):
         r"""Close the connection.
 
         Args:
@@ -266,7 +261,7 @@ class RMQComm(AsyncComm.AsyncComm):
             self.unregister_comm(self.address)
         self.connection = None
         self.channel = None
-        super(RMQComm, self)._close_direct(linger=linger)
+        super(RMQComm, self)._close(linger=linger)
 
     def close_queue(self):
         r"""Close the queue if the channel exists."""
@@ -307,7 +302,7 @@ class RMQComm(AsyncComm.AsyncComm):
         self.connection = None
 
     @property
-    def is_open_direct(self):
+    def is_open(self):
         r"""bool: True if the connection and channel are open."""
         # with self._closing_thread.lock:
         if self.channel is None or self.connection is None:
@@ -327,7 +322,7 @@ class RMQComm(AsyncComm.AsyncComm):
     def get_queue_result(self):
         r"""Get the fram from passive queue declare."""
         res = None
-        if self.is_open_direct:
+        if self.is_open:
             try:
                 res = self.channel.queue_declare(queue=self.queue,
                                                  auto_delete=True,
@@ -338,20 +333,20 @@ class RMQComm(AsyncComm.AsyncComm):
             except (pika.exceptions.ChannelClosed,
                     pika.exceptions.ConnectionClosed,
                     AttributeError):  # pragma: debug
-                self._close_direct()
+                self._close()
         return res
         
     @property
-    def n_msg_direct_recv(self):
+    def n_msg_recv(self):
         r"""int: Number of messages in the queue."""
-        return self.n_msg_direct_send
+        return self.n_msg_send
 
     @property
-    def n_msg_direct_send(self):
+    def n_msg_send(self):
         r"""int: Number of messages in the queue."""
         out = 0
         # with self._closing_thread.lock:
-        if self.is_open_direct:
+        if self.is_open:
             res = self.get_queue_result()
             if res is not None:
                 out = res.method.message_count
@@ -381,35 +376,7 @@ class RMQComm(AsyncComm.AsyncComm):
         out['exchange'] = self.exchange
         return out
 
-    def _send_multipart_worker(self, msg, header, **kwargs):
-        r"""Send multipart message to the worker comm identified.
-
-        Args:
-            msg (str): Message to be sent.
-            header (dict): Message info including work comm address.
-
-        Returns:
-            bool: Success or failure of sending the message.
-
-        """
-        self.sched_task(0.0, super(RMQComm, self)._send_multipart_worker,
-                        args=[msg, header], kwargs=kwargs, store_output=True)
-        T = self.start_timeout()
-        while (not T.is_out) and (self.sched_out is None):  # pragma: debug
-            self.sleep()
-        self.stop_timeout()
-        out = self.sched_out
-        self.sched_out = None
-        # workcomm = self.get_work_comm(header)
-        # args = [msg]
-        # self.sched_task(self.sleeptime, workcomm._send_multipart,
-        #                 args=args, kwargs=kwargs)
-        # self.sched_task(1, self.remove_work_comm,
-        #                 args=[header['id']], kwargs=dict(dont_close=True))
-        # self.remove_work_comm(header['id'], dont_close=True)
-        return out
-    
-    def _send_direct(self, msg, exchange=None, routing_key=None, **kwargs):
+    def _send(self, msg, exchange=None, routing_key=None, **kwargs):
         r"""Send a message.
 
         Args:
@@ -433,7 +400,7 @@ class RMQComm(AsyncComm.AsyncComm):
         out = self.channel.basic_publish(exchange, routing_key, msg, **kwargs)
         return out
 
-    def _recv_direct(self):
+    def _recv(self):
         r"""Receive a message.
 
         Returns:
@@ -446,8 +413,7 @@ class RMQComm(AsyncComm.AsyncComm):
         if method_frame:
             self.channel.basic_ack(method_frame.delivery_tag)
         else:  # pragma: debug
-            self.debug("No message")
-            msg = self.empty_bytes_msg
+            raise NoMessages("No messages in connection.")
         return (True, msg)
 
     def purge(self):

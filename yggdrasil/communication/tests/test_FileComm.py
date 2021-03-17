@@ -1,6 +1,5 @@
 import os
 import copy
-import unittest
 import jsonschema
 from yggdrasil.tests import assert_equal
 from yggdrasil.communication import new_comm
@@ -11,8 +10,8 @@ def test_wait_for_creation():
     r"""Test FileComm waiting for creation."""
     msg_send = b'Test message\n'
     name = 'temp_file_create.txt'
-    kwargs = {'in_temp': True, 'comm': 'FileComm', 'dont_open': True}
-    # kwargs = {'wait_for_creation': 5, 'in_temp': True, comm='FileComm'}
+    kwargs = {'in_temp': True, 'commtype': 'binary', 'dont_open': True}
+    # kwargs = {'wait_for_creation': 5, 'in_temp': True, commtype='binary'}
     send_instance = new_comm(name, direction='send', **kwargs)
     recv_instance = new_comm(name, direction='recv',
                              wait_for_creation=5.0, **kwargs)
@@ -48,6 +47,14 @@ class TestFileComm(parent.TestCommBase):
                  + ['fd', 'read_meth', 'append', 'in_temp',
                     'is_series', 'wait_for_creation', 'serializer',
                     'platform_newline'])
+    test_send_recv_nolimit = None
+    test_work_comm = None
+    test_send_recv_raw = None
+    
+    @property
+    def commtype(self):
+        r"""str: Subtype associated with comm class."""
+        return self.import_cls._filetype
     
     def teardown(self):
         r"""Remove the file."""
@@ -75,16 +82,6 @@ class TestFileComm(parent.TestCommBase):
         kwargs.setdefault('msg_recv', self.recv_instance.eof_msg)
         super(TestFileComm, self).test_send_recv_filter_recv_filter(**kwargs)
         
-    @unittest.skipIf(True, 'File comm')
-    def test_send_recv_nolimit(self):
-        r"""Disabled: Test send/recv of a large message."""
-        pass  # pragma: no cover
-
-    @unittest.skipIf(True, 'File comm')
-    def test_work_comm(self):
-        r"""Disabled: Test creating/removing a work comm."""
-        pass  # pragma: no cover
-
     def test_invalid_read_meth(self):
         r"""Test raise of error on invalid read_meth."""
         if self.comm == 'FileComm':
