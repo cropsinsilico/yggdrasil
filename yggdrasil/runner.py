@@ -408,7 +408,7 @@ class YggRunner(YggClass):
                      and (self.modeldrivers[model0].get('copies', 0) > 1))):
                     self.modeldrivers[model0].setdefault('env_%s' % model, {})
                     self.modeldrivers[model0]['env_%s' % model].update(env)
-                else:
+                else:  # pragma: debug
                     raise
         return drv
         

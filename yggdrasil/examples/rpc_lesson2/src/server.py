@@ -1,5 +1,5 @@
 import numpy as np
-from yggdrasil.interface.YggInterface import YggRpcServer
+from yggdrasil.interface.YggInterface import YggInput, YggRpcServer
 
 
 def get_fibonacci(n):
@@ -29,6 +29,13 @@ def main():
     r"""Function to execute server communication and computation in a loop."""
 
     print('Hello from Python server!')
+
+    # Get parameters
+    inp = YggInput("params")
+    retval, params = inp.recv()
+    if not retval:
+        raise RuntimeError('server: ERROR receiving parameters')
+    print('server: Parameters = %s' % params)
 
     # Create server-side rpc conneciton using model name
     rpc = YggRpcServer("server", "%d", "%d")

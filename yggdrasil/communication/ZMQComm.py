@@ -901,7 +901,7 @@ class ZMQComm(CommBase.CommBase):
             elif self.is_server and (self.cli_address is not None):
                 # Requeue messages in transit during close
                 self._send_client_msg(ZMQProxy.server_signoff_msg)
-                while self.is_message(zmq.POLLIN):
+                while self.is_message(zmq.POLLIN):  # pragma: debug
                     back_messages.append(self.socket.recv())
             # Ensure socket not still open
             self._openned = False
@@ -917,8 +917,10 @@ class ZMQComm(CommBase.CommBase):
                 #     if os.path.isfile(self.host):
                 #         os.remove(self.host)
             self.unregister_comm(self.registry_key)
-            if back_messages:
-                self._send_client_msg(back_messages)
+            if back_messages:  # pragma: debug
+                # for x in back_messages:
+                #     self._send_client_msg(x)
+                raise RuntimeError("backlogged messages not supported.")
         super(ZMQComm, self)._close(linger=linger)
         if self.cli_socket is not None:
             self.cli_socket.disconnect(self.cli_address)
@@ -946,11 +948,7 @@ class ZMQComm(CommBase.CommBase):
             if self.cli_socket is None:
                 self.cli_socket = self.context.socket(zmq.DEALER)
                 self.cli_socket.connect(self.cli_address)
-            if isinstance(msg, list):
-                for imsg in msg:
-                    self.cli_socket.send(imsg)
-            else:
-                self.cli_socket.send(msg)
+            self.cli_socket.send(msg)
             # cli_socket.disconnect(self.cli_address)
             # cli_socket.close()
 
@@ -1172,7 +1170,7 @@ class ZMQComm(CommBase.CommBase):
                             "Socket not yet available.")
                     self.special_debug(("Socket could not receive. "
                                         "(errno=%d)"), e.errno)  # pragma: debug
-                    self.info("zmq error: %s", e)
+                    self.info("zmq error: %s", e)  # pragma: debug
                     raise
             # Check for server sign-on
             if total_msg.startswith(ZMQProxy.server_signon_msg):

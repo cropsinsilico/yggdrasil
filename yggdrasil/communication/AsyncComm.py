@@ -3,7 +3,7 @@ from yggdrasil import multitasking
 from yggdrasil.tools import ProxyObject
 from yggdrasil.components import ComponentBaseUnregistered
 from yggdrasil.communication import (
-    CommBase, TemporaryCommunicationError, get_comm)
+    CommBase, TemporaryCommunicationError)
 
 
 FLAG_FAILURE = 0
@@ -142,14 +142,17 @@ class AsyncComm(ProxyObject, ComponentBaseUnregistered):
         with self.backlog_thread.lock:
             self._closed = True
         # Requeue messages for other servers
-        if self.is_server and (self.model_copies > 1):
-            client_kws = self.opp_comm_kwargs
-            client_kws.update(use_async=False)
-            client = get_comm(self.name + '_client', **client_kws)
-            for msg in self._backlog_buffer:
-                self.info("Resending: %s", msg)
-                client.send(msg[0])
-            client.close()
+        if ((self.is_server and (self.model_copies > 1)
+             and self._backlog_buffer)):  # pragma: debug
+            # client_kws = self.opp_comm_kwargs
+            # client_kws.update(use_async=False)
+            # client = get_comm(self.name + '_client', **client_kws)
+            # for msg in self._backlog_buffer:
+            #     self.info("Resending: %s", msg)
+            #     client.send(msg[0])
+            # client.close()
+            raise RuntimeError("Returning backlogged messages to the server "
+                               "is untested.")
 
     def _close_backlog(self, wait=False):
         r"""Close the backlog thread."""
