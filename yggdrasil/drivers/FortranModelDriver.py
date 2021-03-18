@@ -375,9 +375,9 @@ class FortranModelDriver(CompiledModelDriver):
         cxx_orig = cls.external_libraries.pop('cxx', None)
         if cxx_orig is not None:
             cxx_lib = 'stdc++'  # GNU
-            # if ((CModelDriver.CModelDriver.get_tool(
-            #         'compiler', return_prop='name', default=None) == 'clang')):
-            #     cxx_lib = 'c++'
+            if ((CModelDriver.CModelDriver.get_tool(
+                    'compiler', return_prop='name', default=None) == 'clang')):
+                cxx_lib = 'c++'
             if cxx_lib not in cls.external_libraries:
                 cls.external_libraries[cxx_lib] = cxx_orig.copy()
                 cls.internal_libraries['fygg']['external_dependencies'].append(cxx_lib)
