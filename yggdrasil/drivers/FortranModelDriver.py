@@ -375,7 +375,8 @@ class FortranModelDriver(CompiledModelDriver):
         CompiledModelDriver.before_registration(cls)
         cxx_orig = cls.external_libraries.pop('cxx', None)
         if cxx_orig is not None:
-            c_compilers = get_compilation_tool_registry('compiler')['by_language']['c++']
+            c_compilers = get_compilation_tool_registry(
+                'compiler', init_languages=['c++'])['by_language'].get('c++', {})
             add_cxx_lib = None
             for k, v in c_compilers.items():
                 if not v.is_installed():
