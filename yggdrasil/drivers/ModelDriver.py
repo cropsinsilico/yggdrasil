@@ -471,7 +471,7 @@ class ModelDriver(Driver):
                     inputs=copy.deepcopy(self.inputs),
                     outputs=copy.deepcopy(self.outputs),
                     outputs_in_inputs=self.model_outputs_in_inputs,
-                    client_comms=client_comms)
+                    client_comms=client_comms, copies=self.copies)
                 with open(args[0], 'w') as fd:
                     fd.write('\n'.join(lines))
         # Parse arguments
@@ -1836,7 +1836,7 @@ class ModelDriver(Driver):
     def write_model_wrapper(cls, model_file, model_function,
                             inputs=[], outputs=[],
                             outputs_in_inputs=None, verbose=False,
-                            client_comms=[]):
+                            client_comms=[], copies=1):
         r"""Return the lines required to wrap a model function as an integrated
         model.
 
@@ -1855,6 +1855,9 @@ class ModelDriver(Driver):
                 are displayed. Defaults to False.
             client_comms (list, optional): List of the names of client comms
                 that should be removed from the list of outputs. Defaults to [].
+            copies (int, optional): Number of times the model driver is
+                duplicated. If more than one, no error will be raised in the
+                event there is never a call the the function. Defaults to 1.
 
         Returns:
             list: Lines of code wrapping the provided model with the necessary
@@ -1945,12 +1948,15 @@ class ModelDriver(Driver):
         loop_lines = []
         # Receive inputs
         any_loop_inputs = False
+        loop_iter_var = iter_var
+        if copies > 1:
+            loop_iter_var = None
         for x in inputs:
             if not x.get('outside_loop', False):
                 any_loop_inputs = True
                 loop_lines += cls.write_model_recv(x['channel'], x,
                                                    flag_var=flag_var,
-                                                   iter_var=iter_var,
+                                                   iter_var=loop_iter_var,
                                                    allow_failure=True)
         # Call model
         loop_lines += cls.write_model_function_call(

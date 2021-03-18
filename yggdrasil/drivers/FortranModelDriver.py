@@ -7,7 +7,8 @@ from yggdrasil import platform, tools
 from yggdrasil.languages import get_language_dir
 from yggdrasil.drivers import CModelDriver
 from yggdrasil.drivers.CompiledModelDriver import (
-    CompilerBase, CompiledModelDriver, get_compilation_tool)
+    CompilerBase, CompiledModelDriver, get_compilation_tool,
+    get_compilation_tool_registry)
 from yggdrasil.metaschema.properties.ScalarMetaschemaProperties import (
     _valid_types)
 
@@ -374,13 +375,23 @@ class FortranModelDriver(CompiledModelDriver):
         CompiledModelDriver.before_registration(cls)
         cxx_orig = cls.external_libraries.pop('cxx', None)
         if cxx_orig is not None:
-            cxx_lib = 'stdc++'  # GNU
-            if ((CModelDriver.CModelDriver.get_tool(
-                    'compiler', return_prop='name', default=None) == 'clang')):
-                cxx_lib = 'c++'
-            if cxx_lib not in cls.external_libraries:
-                cls.external_libraries[cxx_lib] = cxx_orig.copy()
-                cls.internal_libraries['fygg']['external_dependencies'].append(cxx_lib)
+            c_compilers = get_compilation_tool_registry('compiler')['by_language']['c++']
+            add_cxx_lib = None
+            for k, v in c_compilers.items():
+                if not v.is_installed():
+                    continue
+                if k == 'clang++':
+                    cxx_lib = 'c++'
+                    if not add_cxx_lib:
+                        add_cxx_lib = cxx_lib
+                else:
+                    # GNU takes precedence when present
+                    cxx_lib = 'stdc++'
+                    add_cxx_lib = cxx_lib
+            if add_cxx_lib not in cls.external_libraries:
+                cls.external_libraries[add_cxx_lib] = copy.deepcopy(cxx_orig)
+                cls.internal_libraries['fygg']['external_dependencies'].append(
+                    add_cxx_lib)
                 # if platform._is_win:  # pragma: windows
                 #     cls.external_libraries[cxx_lib]['libtype'] = 'windows_import'
         if platform._is_win:  # pragma: windows
