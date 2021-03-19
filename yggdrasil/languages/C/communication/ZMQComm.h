@@ -574,7 +574,7 @@ int check_reply_recv(const comm_t *comm, char *data, const size_t len) {
   zrep->n_msg++;
   // Extract address
   comm_head_t head = parse_comm_header(data, len);
-  if (!(head.flags & COMM_FLAG_VALID)) {
+  if (!(head.flags & HEAD_FLAG_VALID)) {
     ygglog_error("check_reply_recv(%s): Invalid header.", comm->name);
     return -1;
   }

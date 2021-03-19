@@ -165,7 +165,7 @@ int server_comm_recv(comm_t* x, char **data, const size_t len, const int allow_r
   }
   // Initialize new comm from received address
   comm_head_t head = parse_comm_header(*data, ret);
-  if (!(head.flags & COMM_FLAG_VALID)) {
+  if (!(head.flags & HEAD_FLAG_VALID)) {
     ygglog_error("server_comm_recv(%s): Error parsing header.", x->name);
     return -1;
   }
