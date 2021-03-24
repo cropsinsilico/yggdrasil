@@ -1202,7 +1202,7 @@ class ModelDriver(Driver):
         else:
             env['YGG_MODEL_NAME'] = self.name
         env['YGG_MODEL_COPIES'] = str(self.copies)
-        env['YGG_PYTHON_EXEC'] = sys.executable
+        # env['YGG_PYTHON_EXEC'] = sys.executable
         env['YGG_DEFAULT_COMM'] = tools.get_default_comm()
         env['YGG_NCLIENTS'] = str(len(self.clients))
         if self.allow_threading or (self.copies > 1):

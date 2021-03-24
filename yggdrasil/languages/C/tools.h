@@ -308,7 +308,7 @@ int init_python_API() {
 	printf("Error decoding YGG_PYTHON_EXEC\n");
 	out = -1;
       } else {
-	/* Py_SetProgramName(wname); */
+	Py_SetProgramName(wname);
 	PyMem_RawFree(wname);
       }
     }
