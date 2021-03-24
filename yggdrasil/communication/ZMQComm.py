@@ -534,7 +534,7 @@ class ZMQComm(CommBase.CommBase):
 
     @property
     def reply_thread(self):
-        r"""tools.YggTask: Task that will handle sinding or receiving
+        r"""tools.YggTask: Task that will handle sending or receiving
         backlogged messages."""
         if (self._reply_thread is None) and (not self.is_async):
             def reply_target():
@@ -544,7 +544,7 @@ class ZMQComm(CommBase.CommBase):
                             if (((self._n_zmq_sent != self._n_reply_sent)
                                  and (self.reply_socket_send is not None)
                                  and (not self.reply_socket_send.closed))):
-                                self._reply_handshake_send()
+                                self._reply_handshake_send()  # pragma: intermittent
                         self._close_backlog(wait=True)
                     raise multitasking.BreakLoopException("Comm closed")
                 if self.direction == 'send':
@@ -625,8 +625,9 @@ class ZMQComm(CommBase.CommBase):
                 raise Exception("The proxy does not yet have an address.")
             if self.direction == 'send':
                 return self._server.srv_address
-            else:
-                return self._server.cli_address
+            else:  # pragma: debug
+                # return self._server.cli_address
+                raise RuntimeError("Receive-side proxy untested")
         else:
             return self.address
 

@@ -306,11 +306,11 @@ class CommServer(multitasking.YggTaskLoop):
             name, cli_address, srv_address), **kwargs)
         _registered_servers[self.srv_address] = self
 
-    def add_server(self):
-        r"""Increment the server count."""
-        global _registered_servers
-        _registered_servers[self.srv_address].srv_count += 1
-        self.debug("Added server to server: nservers = %d", self.srv_count)
+    # def add_server(self):
+    #     r"""Increment the server count."""
+    #     global _registered_servers
+    #     _registered_servers[self.srv_address].srv_count += 1
+    #     self.debug("Added server to server: nservers = %d", self.srv_count)
 
     def add_client(self):
         r"""Increment the client count."""
@@ -318,15 +318,15 @@ class CommServer(multitasking.YggTaskLoop):
         _registered_servers[self.srv_address].cli_count += 1
         self.debug("Added client to server: nclients = %d", self.cli_count)
 
-    def remove_server(self):
-        r"""Decrement the client count, closing the server if all clients done."""
-        global _registered_servers
-        self.debug("Removing server from server")
-        _registered_servers[self.srv_address].srv_count -= 1
-        if _registered_servers[self.srv_address].srv_count <= 0:
-            self.debug("Shutting down server")
-            self.terminate()
-            _registered_servers.pop(self.srv_address)
+    # def remove_server(self):
+    #     r"""Decrement the client count, closing the server if all clients done."""
+    #     global _registered_servers
+    #     self.debug("Removing server from server")
+    #     _registered_servers[self.srv_address].srv_count -= 1
+    #     if _registered_servers[self.srv_address].srv_count <= 0:
+    #         self.debug("Shutting down server")
+    #         self.terminate()
+    #         _registered_servers.pop(self.srv_address)
             
     def remove_client(self):
         r"""Decrement the client count, closing the server if all clients done."""
@@ -1576,9 +1576,10 @@ class CommBase(tools.YggClass):
                 if self.direction == 'send':
                     self._server.add_client()
                     self.address = self._server.cli_address
-                else:
-                    self._server.add_server()
-                    self.address = self._server.srv_address
+                else:  # pragma: debug
+                    # self._server.add_server()
+                    # self.address = self._server.srv_address
+                    raise RuntimeError("Receive-side proxy untested")
 
     def signoff_from_server(self):
         r"""Remove a client from the server."""
@@ -1588,8 +1589,9 @@ class CommBase(tools.YggClass):
                 self.debug("Signing off")
                 if self.direction == 'send':
                     self._server.remove_client()
-                else:
-                    self._server.remove_server()
+                else:  # pragma: debug
+                    # self._server.remove_server()
+                    raise RuntimeError("Receive-side proxy untested")
                 self._server = None
 
     # TEMP COMMS

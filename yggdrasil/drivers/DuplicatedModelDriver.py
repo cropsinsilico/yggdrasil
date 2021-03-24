@@ -40,11 +40,6 @@ class DuplicatedModelDriver(Driver):
             self.copies.append(create_driver(yml=iyml, **ikws))
         super(DuplicatedModelDriver, self).__init__(**kwargs)
 
-    def cleanup_products(self, *args, **kwargs):
-        r"""Remove products created in order to run the model."""
-        for x in self.copies:
-            x.cleanup_products(*args, **kwargs)
-        
     def cleanup(self, *args, **kwargs):
         r"""Actions to perform to clean up the thread after it has stopped."""
         for x in self.copies:
@@ -68,12 +63,6 @@ class DuplicatedModelDriver(Driver):
         for x in self.copies:
             x.graceful_stop(*args, **kwargs)
         super(DuplicatedModelDriver, self).graceful_stop(*args, **kwargs)
-        
-    def kill(self, *args, **kwargs):
-        r"""Kill the process."""
-        for x in self.copies:
-            x.kill(*args, **kwargs)
-        super(DuplicatedModelDriver, self).kill(*args, **kwargs)
         
     def terminate(self, *args, **kwargs):
         r"""Set the terminate event and wait for the thread/process to stop."""
