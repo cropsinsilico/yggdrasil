@@ -990,7 +990,7 @@ def verify_pkg(install_opts=None):
     elif (not install_opts['fortran']) and shutil.which('gfortran'):
         install_opts['fortran'] = True
     if (not install_opts['R']) and shutil.which('Rscript'):
-        if not (_on_gha and (_is_linux or _is_win)):
+        if not (_on_gha and _is_linux):
             # The installation on GHA-ubuntu machines requires sudo
             # and so installation will not be complete unless it is
             # enabled explicitly. This does not seem to be True on
