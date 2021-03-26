@@ -1200,7 +1200,7 @@ class run_tsts(SubCommand):
                 args.ignore = []
             args.ignore.append('yggdrasil/rapidjson/')
             args.rootdir = package_dir
-            extra += ['--reruns=2', '--reruns-delay=1']
+            extra += ['--reruns=2', '--reruns-delay=1', '--timeout=600']
         # Separate out paths from options
         test_paths = []
         if args.test_suites:
