@@ -539,13 +539,13 @@ class ZMQComm(CommBase.CommBase):
         if (self._reply_thread is None) and (not self.is_async):
             def reply_target():
                 if self.is_closed:
-                    if self.direction == 'send':
-                        with self.reply_socket_lock:
-                            if (((self._n_zmq_sent != self._n_reply_sent)
-                                 and (self.reply_socket_send is not None)
-                                 and (not self.reply_socket_send.closed))):
-                                self._reply_handshake_send()  # pragma: intermittent
-                        self._close_backlog(wait=True)
+                    # if self.direction == 'send':
+                    #     with self.reply_socket_lock:
+                    #         if (((self._n_zmq_sent != self._n_reply_sent)
+                    #              and (self.reply_socket_send is not None)
+                    #              and (not self.reply_socket_send.closed))):
+                    #             self._reply_handshake_send()  # pragma: intermittent
+                    #     self._close_backlog(wait=True)
                     raise multitasking.BreakLoopException("Comm closed")
                 if self.direction == 'send':
                     self.confirm_send()
