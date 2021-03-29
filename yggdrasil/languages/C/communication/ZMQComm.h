@@ -283,7 +283,6 @@ int do_reply_send(const comm_t *comm) {
   void *p = zpoller_wait(poller, -1);
   //void *p = zpoller_wait(poller, 1000);
   ygglog_debug("do_reply_send(%s): poller returned", comm->name); 
-  zpoller_destroy(&poller);
   if (p == NULL) {
     if (zpoller_terminated(poller)) {
       ygglog_error("do_reply_send(%s): Poller interrupted", comm->name);
@@ -292,8 +291,10 @@ int do_reply_send(const comm_t *comm) {
     } else {
       ygglog_error("do_reply_send(%s): Poller failed", comm->name);
     }
+    zpoller_destroy(&poller);
     return -1;
   }
+  zpoller_destroy(&poller);
 #endif
   // Receive
   zframe_t *msg = zframe_recv(s);
@@ -385,11 +386,40 @@ int do_reply_recv(const comm_t *comm, const int isock, const char *msg) {
     return -1;
   }
   if (strcmp(msg, YGG_MSG_EOF) == 0) {
+    ygglog_info("do_reply_recv(%s): EOF confirmation.", comm->name);
     zrep->n_msg = 0;
     zrep->n_rep = 0;
     zsock_set_linger(s, _zmq_sleeptime);
     return -2;
   }
+  // Poll to prevent block
+  ygglog_debug("do_reply_recv(%s): address=%s, polling for reply", comm->name,
+	       zrep->addresses[isock]);
+#if defined(__cplusplus) && defined(_WIN32)
+  // TODO: There seems to be an error in the poller when using it in C++
+#else
+  zpoller_t *poller = zpoller_new(s, NULL);
+  if (!(poller)) {
+    ygglog_error("do_reply_send(%s): Could not create poller", comm->name);
+    return -1;
+  }
+  assert(poller);
+  ygglog_debug("do_reply_recv(%s): waiting on poller...", comm->name);
+  void *p = zpoller_wait(poller, 1000);
+  ygglog_debug("do_reply_recv(%s): poller returned", comm->name); 
+  if (p == NULL) {
+    if (zpoller_terminated(poller)) {
+      ygglog_error("do_reply_recv(%s): Poller interrupted", comm->name);
+    } else if (zpoller_expired(poller)) {
+      ygglog_error("do_reply_recv(%s): Poller expired", comm->name);
+    } else {
+      ygglog_error("do_reply_recv(%s): Poller failed", comm->name);
+    }
+    zpoller_destroy(&poller);
+    return -1;
+  }
+  zpoller_destroy(&poller);
+#endif
   // Receive
   zframe_t *msg_recv = zframe_recv(s);
   if (msg_recv == NULL) {
