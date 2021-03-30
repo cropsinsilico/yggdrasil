@@ -5,6 +5,23 @@ from yggdrasil.communication import CommBase, get_comm, import_comm
 _address_sep = ':YGG_ADD:'
 
 
+class ForkedCommMessage(CommBase.CommMessage):
+    r"""Class for forked comm messages."""
+
+    __slots__ = ['orig']
+
+    def __init__(self, msg, comm_list, **kwargs):
+        super(ForkedCommMessage, self).__init__(
+            msg=msg.msg, length=msg.length, flag=msg.flag,
+            args=msg.args, header=msg.header)
+        for k in CommBase.CommMessage.__slots__:
+            setattr(self, k, getattr(msg, k))
+        args = {i: x.prepare_message(copy.deepcopy(msg), **kwargs)
+                for i, x in enumerate(comm_list)}
+        self.orig = msg.args
+        self.args = args
+
+
 def get_comm_name(name, i):
     r"""Get the name of the ith comm in the series.
 
@@ -306,10 +323,8 @@ class ForkComm(CommBase.CommBase):
             if k in kwargs:
                 kws_root[k] = kwargs.pop(k)
         msg = super(ForkComm, self).prepare_message(*args, **kws_root)
-        out = {i: x.prepare_message(copy.deepcopy(msg), **kwargs)
-               for i, x in enumerate(self.comm_list)}
-        out['orig'] = msg.args
-        msg.args = out
+        if not isinstance(msg, ForkedCommMessage):
+            msg = ForkedCommMessage(msg, self.comm_list, **kwargs)
         return msg
         
     def send_message(self, msg, **kwargs):
@@ -329,7 +344,7 @@ class ForkComm(CommBase.CommBase):
             self.errors += x.errors
             if not out:
                 return out
-        msg.args = msg.args['orig']
+        msg.args = msg.orig
         msg.additional_messages = []
         kwargs['skip_safe_send'] = True
         return super(ForkComm, self).send_message(msg, **kwargs)

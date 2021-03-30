@@ -34,7 +34,7 @@ class AsyncComm(ProxyObject, ComponentBaseUnregistered):
 
     __slots__ = ['_backlog_buffer', '_backlog_thread',
                  'backlog_ready', '_used_direct', 'close_on_eof_recv',
-                 '_used', '_closed',
+                 '_backlog_received_eof', '_used', '_closed',
                  'async_recv_method', 'async_send_method',
                  'async_recv_kwargs', 'async_send_kwargs']
     __overrides__ = ['_input_args', '_input_kwargs']
@@ -52,6 +52,7 @@ class AsyncComm(ProxyObject, ComponentBaseUnregistered):
         self.close_on_eof_recv = wrapped.close_on_eof_recv
         self._used = False
         self._closed = False
+        self._backlog_received_eof = False
         self.async_recv_method = async_recv_method
         self.async_send_method = async_send_method
         if async_recv_kwargs is None:
@@ -362,6 +363,8 @@ class AsyncComm(ProxyObject, ComponentBaseUnregistered):
             elif msg.flag in [CommBase.FLAG_SUCCESS, CommBase.FLAG_EOF]:
                 async_flag = FLAG_SUCCESS
                 self._used_direct = True
+                if msg.flag == CommBase.FLAG_EOF:
+                    self._backlog_received_eof = True
             elif msg.flag == CommBase.FLAG_FAILURE:
                 async_flag = FLAG_FAILURE
             else:  # pragma: debug
@@ -389,6 +392,10 @@ class AsyncComm(ProxyObject, ComponentBaseUnregistered):
         backlog."""
         if not self.is_open_direct:
             flag = False
+        elif self._backlog_received_eof and self.close_on_eof_recv:
+            # Don't keep receiving, but don't close so that this thread
+            # can continue confirmation until the EOF is actually received
+            flag = True
         else:
             async_flag, msg = self.recv_direct()
             flag = bool(async_flag)
@@ -522,7 +529,6 @@ class AsyncComm(ProxyObject, ComponentBaseUnregistered):
             self.debug('Returning backlogged received message')
             out = self.pop_backlog()
             if not dont_finalize:
-                # if self.is_eof(out.args) and self.close_on_eof_recv:
                 if (out.flag == CommBase.FLAG_EOF) and self.close_on_eof_recv:
                     self.close()
                     out.flag = CommBase.FLAG_FAILURE
