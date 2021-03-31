@@ -28,6 +28,7 @@ env:
   USEVIRTUALENV: 0
   BUILDDOCS: 0
   YGG_GHA_JOB_ID_SUFFIX: null
+  TMPDIR: /tmp/
 jobs:
   test_pip:
     name: Test (${{ matrix.python-version }}, ${{ matrix.os }}, ${{ matrix.install-method

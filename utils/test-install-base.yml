@@ -27,6 +27,7 @@ env:
   USEVIRTUALENV: 0
   BUILDDOCS: 0
   YGG_GHA_JOB_ID_SUFFIX:
+  TMPDIR: /tmp/
 
 jobs:
   test_pip:
