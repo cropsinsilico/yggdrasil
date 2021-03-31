@@ -203,7 +203,12 @@ jobs:
       if: matrix.os == 'macos-latest' && matrix.install-method == 'conda'
       run: ./utils/setup_old_mac_sdk.sh
     - name: (CONDA) Install dependencies & package from existing build
+      id: conda1
+      continue-on-error: true
       if: matrix.install-method == 'conda'
+      run: python utils/setup_test_env.py install ${{ matrix.install-method }} --without-build
+    - name: (CONDA) Install dependencies & package from existing build (re-attempt)
+      if: ${{ steps.test2.outcome == 'failure' && matrix.install-method == 'conda'}}
       run: python utils/setup_test_env.py install ${{ matrix.install-method }} --without-build
     - name: (MACOS,CONDA) Set allow_multiple_omp config
       if: matrix.install-method == 'conda' && matrix.os == 'macos-latest'
@@ -235,12 +240,6 @@ jobs:
     - name: Re-run test failures (2nd)
       if: ${{ steps.test2.outcome == 'failure' }}
       run: yggtest --ci --cov-append ${{ matrix.test-flags2 }} --last-failed --last-failed-no-failures=none
-    - name: Start SSH session
-      uses: luchihoratiu/debug-via-ssh@main
-      if: ${{ failure() }}
-      with:
-        NGROK_AUTH_TOKEN: ${{ secrets.NGROK_AUTH_TOKEN }}
-        SSH_PASS: ${{ secrets.SSH_PASS }}
     - name: Combine coverage reports
       continue-on-error: true
       run: 'ls .*
@@ -468,7 +467,12 @@ jobs:
       if: matrix.os == 'macos-latest' && matrix.install-method == 'conda'
       run: ./utils/setup_old_mac_sdk.sh
     - name: (CONDA) Install dependencies & package from existing build
+      id: conda1
+      continue-on-error: true
       if: matrix.install-method == 'conda'
+      run: python utils/setup_test_env.py install ${{ matrix.install-method }} --without-build
+    - name: (CONDA) Install dependencies & package from existing build (re-attempt)
+      if: ${{ steps.test2.outcome == 'failure' && matrix.install-method == 'conda'}}
       run: python utils/setup_test_env.py install ${{ matrix.install-method }} --without-build
     - name: (MACOS,CONDA) Set allow_multiple_omp config
       if: matrix.install-method == 'conda' && matrix.os == 'macos-latest'
@@ -500,12 +504,6 @@ jobs:
     - name: Re-run test failures (2nd)
       if: ${{ steps.test2.outcome == 'failure' }}
       run: yggtest --ci --cov-append ${{ matrix.test-flags2 }} --last-failed --last-failed-no-failures=none
-    - name: Start SSH session
-      uses: luchihoratiu/debug-via-ssh@main
-      if: ${{ failure() }}
-      with:
-        NGROK_AUTH_TOKEN: ${{ secrets.NGROK_AUTH_TOKEN }}
-        SSH_PASS: ${{ secrets.SSH_PASS }}
     - name: Combine coverage reports
       continue-on-error: true
       run: 'ls .*
@@ -713,7 +711,12 @@ jobs:
       if: matrix.os == 'macos-latest' && matrix.install-method == 'conda'
       run: ./utils/setup_old_mac_sdk.sh
     - name: (CONDA) Install dependencies & package from existing build
+      id: conda1
+      continue-on-error: true
       if: matrix.install-method == 'conda'
+      run: python utils/setup_test_env.py install ${{ matrix.install-method }} --without-build
+    - name: (CONDA) Install dependencies & package from existing build (re-attempt)
+      if: ${{ steps.test2.outcome == 'failure' && matrix.install-method == 'conda'}}
       run: python utils/setup_test_env.py install ${{ matrix.install-method }} --without-build
     - name: (MACOS,CONDA) Set allow_multiple_omp config
       if: matrix.install-method == 'conda' && matrix.os == 'macos-latest'
@@ -745,12 +748,6 @@ jobs:
     - name: Re-run test failures (2nd)
       if: ${{ steps.test2.outcome == 'failure' }}
       run: yggtest --ci --cov-append ${{ matrix.test-flags2 }} --last-failed --last-failed-no-failures=none
-    - name: Start SSH session
-      uses: luchihoratiu/debug-via-ssh@main
-      if: ${{ failure() }}
-      with:
-        NGROK_AUTH_TOKEN: ${{ secrets.NGROK_AUTH_TOKEN }}
-        SSH_PASS: ${{ secrets.SSH_PASS }}
     - name: Combine coverage reports
       continue-on-error: true
       run: 'ls .*
@@ -960,7 +957,12 @@ jobs:
       if: matrix.os == 'macos-latest' && matrix.install-method == 'conda'
       run: ./utils/setup_old_mac_sdk.sh
     - name: (CONDA) Install dependencies & package from existing build
+      id: conda1
+      continue-on-error: true
       if: matrix.install-method == 'conda'
+      run: python utils/setup_test_env.py install ${{ matrix.install-method }} --without-build
+    - name: (CONDA) Install dependencies & package from existing build (re-attempt)
+      if: ${{ steps.test2.outcome == 'failure' && matrix.install-method == 'conda'}}
       run: python utils/setup_test_env.py install ${{ matrix.install-method }} --without-build
     - name: (MACOS,CONDA) Set allow_multiple_omp config
       if: matrix.install-method == 'conda' && matrix.os == 'macos-latest'
@@ -992,12 +994,6 @@ jobs:
     - name: Re-run test failures (2nd)
       if: ${{ steps.test2.outcome == 'failure' }}
       run: yggtest --ci --cov-append ${{ matrix.test-flags2 }} --last-failed --last-failed-no-failures=none
-    - name: Start SSH session
-      uses: luchihoratiu/debug-via-ssh@main
-      if: ${{ failure() }}
-      with:
-        NGROK_AUTH_TOKEN: ${{ secrets.NGROK_AUTH_TOKEN }}
-        SSH_PASS: ${{ secrets.SSH_PASS }}
     - name: Combine coverage reports
       continue-on-error: true
       run: 'ls .*
@@ -1205,7 +1201,12 @@ jobs:
       if: matrix.os == 'macos-latest' && matrix.install-method == 'conda'
       run: ./utils/setup_old_mac_sdk.sh
     - name: (CONDA) Install dependencies & package from existing build
+      id: conda1
+      continue-on-error: true
       if: matrix.install-method == 'conda'
+      run: python utils/setup_test_env.py install ${{ matrix.install-method }} --without-build
+    - name: (CONDA) Install dependencies & package from existing build (re-attempt)
+      if: ${{ steps.test2.outcome == 'failure' && matrix.install-method == 'conda'}}
       run: python utils/setup_test_env.py install ${{ matrix.install-method }} --without-build
     - name: (MACOS,CONDA) Set allow_multiple_omp config
       if: matrix.install-method == 'conda' && matrix.os == 'macos-latest'
@@ -1237,12 +1238,6 @@ jobs:
     - name: Re-run test failures (2nd)
       if: ${{ steps.test2.outcome == 'failure' }}
       run: yggtest --ci --cov-append ${{ matrix.test-flags2 }} --last-failed --last-failed-no-failures=none
-    - name: Start SSH session
-      uses: luchihoratiu/debug-via-ssh@main
-      if: ${{ failure() }}
-      with:
-        NGROK_AUTH_TOKEN: ${{ secrets.NGROK_AUTH_TOKEN }}
-        SSH_PASS: ${{ secrets.SSH_PASS }}
     - name: Combine coverage reports
       continue-on-error: true
       run: 'ls .*
