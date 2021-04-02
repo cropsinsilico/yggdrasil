@@ -231,7 +231,7 @@ jobs:
       continue-on-error: true
     - name: Re-run test failures (1st)
       if: ${{ steps.test1.outcome == 'failure' }}
-      run: yggtest --ci --cov-append ${{ matrix.test-flags1 }} --last-failed --last-failed-no-failures=none
+      run: yggtest --ci --cov-append ${{ matrix.test-flags1 }} --last-failed --last-failed-no-failures=none --debug
     - name: Run tests (2nd)
       if: matrix.test-flags2 != ''
       id: test2
@@ -239,7 +239,7 @@ jobs:
       continue-on-error: true
     - name: Re-run test failures (2nd)
       if: ${{ steps.test2.outcome == 'failure' }}
-      run: yggtest --ci --cov-append ${{ matrix.test-flags2 }} --last-failed --last-failed-no-failures=none
+      run: yggtest --ci --cov-append ${{ matrix.test-flags2 }} --last-failed --last-failed-no-failures=none --debug
     # - name: Start SSH session
     #   uses: luchihoratiu/debug-via-ssh@main
     #   if: ${{ failure() }}  # && env.USEVIRTUALENV == 1 }}

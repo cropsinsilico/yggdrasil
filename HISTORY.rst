@@ -2,7 +2,7 @@
 History
 =======
 
-1.6.0 (2021-03-31)
+1.6.0 (2021-04-02)
 ------------------
 
 * Made the asynchronous comm class more generic so it can be used to wrap any comm type and is more robust
