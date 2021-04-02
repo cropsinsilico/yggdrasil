@@ -26,6 +26,7 @@ History
 * Added a dedicated CommMessage class for wrapping messages with information about the message (e.g. header, work comms, status) and update comm & connection methods to expect this type
 * Fixed a bug that caused segfault when calling yggdrasil interface from inside a threaded model by introducing an 'allow_threading' parameter for models which sets a new parameter 'allow_multiple_comms' for comms associated with the model and causes the comm to be initialized such that multiple connections to the same address can be made (this is really just important for ZMQ comms and should only be invoked when using a server/client communication pattern).
 * Change fmt input parameter to YggAsciiArrayOutput Python interface to optional
+* Allow delimiter in YAML to override format_str provided via the interface for output serialization
 * Refactor CommBase so that there are two components to send and receive calls and use the refactoring to cut down on repeat serialization in async comms and connection drivers.
 
   When sending...

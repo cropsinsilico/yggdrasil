@@ -131,9 +131,9 @@ definitions:
             type: string
           type: array
       required:
-      - name
-      - commtype
       - datatype
+      - commtype
+      - name
       title: comm_base
       type: object
     - anyOf:
@@ -605,9 +605,9 @@ definitions:
             is used.
           type: string
       required:
+      - working_dir
       - name
       - filetype
-      - working_dir
       title: file_base
       type: object
     - anyOf:
@@ -794,7 +794,6 @@ definitions:
               will be used to serialize/deserialize. Defaults to default_datatype.
             type: schema
           delimiter:
-            default: "\t"
             description: Character(s) that should be used to separate columns. Defaults
               to '\t'.
             type: string
@@ -888,7 +887,6 @@ definitions:
               will be used to serialize/deserialize. Defaults to default_datatype.
             type: schema
           delimiter:
-            default: "\t"
             description: Character(s) that should be used to separate columns. Defaults
               to '\t'.
             type: string
@@ -1672,10 +1670,10 @@ definitions:
             is used.
           type: string
       required:
-      - name
-      - args
       - working_dir
+      - args
       - language
+      - name
       title: model_base
       type: object
     - anyOf:
@@ -2492,7 +2490,6 @@ definitions:
             `PyYAML Documentation <https://pyyaml.org/wiki/PyYAMLDocumentation>`_.
           type: boolean
         delimiter:
-          default: "\t"
           description: Character(s) that should be used to separate columns. Defaults
             to '\t'.
           type: string
@@ -2612,7 +2609,6 @@ definitions:
               order. Otherwise, each argument should be a scalar. Defaults to False.
             type: boolean
           delimiter:
-            default: "\t"
             description: Character(s) that should be used to separate columns. Defaults
               to '\t'.
             type: string
@@ -2651,7 +2647,6 @@ definitions:
         description: Schema for serializer component ['pandas'] subtype.
         properties:
           delimiter:
-            default: "\t"
             description: Character(s) that should be used to separate columns. Defaults
               to '\t'.
             type: string
