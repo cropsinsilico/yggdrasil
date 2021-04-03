@@ -372,6 +372,24 @@ class TestYggRpcClient(TestYggOutput):
                                  'response_kwargs': {'format_str': self.fmt_str}}
         self._messages = [(b'one', np.int32(1), 1.0)]
         
+    def setup(self):
+        r"""Start driver and instance."""
+        super(TestYggRpcClient, self).setup()
+        if self.iodriver.ocomm._commtype in ['zmq', 'ZMQComm']:
+            # Wait for signon message
+            T = self.test_comm.start_timeout(10.0)
+            while ((not T.is_out) and (self.test_comm.n_msg == 0)):  # pragma: debug
+                self.test_comm.sleep()
+            self.test_comm.stop_timeout()
+            # Drain signon messages
+            T = self.test_comm.start_timeout(10.0)
+            while ((not T.is_out) and (self.test_comm.n_msg > 0)):  # pragma: debug
+                flag, msg = self.test_comm.recv(timeout=0)
+                assert(flag)
+                assert(self.test_comm.is_empty_recv(msg))
+                self.test_comm.sleep()
+            self.test_comm.stop_timeout()
+        
     @property
     def iodriver_class(self):
         r"""class: Input/output driver class."""
@@ -420,6 +438,24 @@ class TestYggRpcServer(TestYggInput):
         self.test_comm_kwargs = {'commtype': 'client',
                                  'response_kwargs': {'format_str': self.fmt_str}}
         self._messages = [(b'one', np.int32(1), 1.0)]
+        
+    def setup(self):
+        r"""Start driver and instance."""
+        super(TestYggRpcServer, self).setup()
+        if self.iodriver.ocomm._commtype in ['zmq', 'ZMQComm']:
+            # Wait for signon message
+            T = self.instance.start_timeout(10.0)
+            while ((not T.is_out) and (self.instance.n_msg == 0)):  # pragma: debug
+                self.instance.sleep()
+            self.instance.stop_timeout()
+            # Drain signon messages
+            T = self.instance.start_timeout(10.0)
+            while ((not T.is_out) and (self.instance.n_msg > 0)):  # pragma: debug
+                flag, msg = self.instance.recv(timeout=0)
+                assert(flag)
+                assert(self.instance.icomm.is_empty_recv(msg))
+                self.instance.sleep()
+            self.instance.stop_timeout()
         
     @property
     def iodriver_class(self):

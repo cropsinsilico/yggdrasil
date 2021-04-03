@@ -68,6 +68,21 @@ class TestRPCRequestDriver(TestRPCRequestParam,
         while ((not T.is_out) and (not self.instance.is_valid)):
             self.instance.sleep()  # pragma: debug
         self.instance.stop_timeout()
+        # Drain ZMQ server signon
+        if self.ocomm_name in ['zmq', 'ZMQComm']:
+            # Wait for signon message
+            T = self.recv_comm.start_timeout(10.0)
+            while ((not T.is_out) and (self.recv_comm.n_msg == 0)):  # pragma: debug
+                self.recv_comm.sleep()
+            self.recv_comm.stop_timeout()
+            # Drain signon messages
+            T = self.recv_comm.start_timeout(10.0)
+            while ((not T.is_out) and (self.recv_comm.n_msg > 0)):  # pragma: debug
+                flag, msg = self.recv_comm.recv(timeout=0)
+                assert(flag)
+                assert(self.recv_comm.is_empty_recv(msg))
+                self.recv_comm.sleep()
+            self.recv_comm.stop_timeout()
         
     def test_send_recv(self, msg_send=None):
         r"""Test routing of a short message between client and server."""
