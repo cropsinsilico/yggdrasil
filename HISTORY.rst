@@ -34,6 +34,9 @@ History
 * Updated the classes in the C interface to use bit flags
 * Updated documentation with information on using threads with yggdrasil and more advanced RPC features.
 * Refactored CommBase so that there are two components to send and receive calls and use the refactoring to cut down on repeat serialization in async comms and connection drivers.
+* Change fmt input parameter to YggAsciiArrayOutput Python interface to optional
+* Allow delimiter in YAML to override format_str provided via the interface for output serialization
+* Refactor CommBase so that there are two components to send and receive calls and use the refactoring to cut down on repeat serialization in async comms and connection drivers.
 
   When sending...
 
