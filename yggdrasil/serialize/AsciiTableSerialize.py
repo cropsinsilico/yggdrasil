@@ -68,6 +68,8 @@ class AsciiTableSerialize(DefaultSerialize):
         if self._explicit_delimiter and ('format_str' in kwargs):
             info = serialize.format2table(kwargs['format_str'])
             info['delimiter'] = self.delimiter
+            info.setdefault('comment', '')
+            info.setdefault('newline', '')
             kwargs['format_str'] = serialize.table2format(**info)
         # Transform scalar into array for table
         old_typedef = kwargs.get('datatype', {})
