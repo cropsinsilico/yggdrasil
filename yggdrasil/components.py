@@ -631,6 +631,7 @@ class ComponentBase(ComponentBaseUnregistered):
                               getattr(self, '_%s' % self._schema_subtype_key, None))
         # Fall back to some simple parsing/normalization to save time on
         # full jsonschema normalization
+        self._defaults_set = []
         for k, v in self._schema_properties.items():
             if k in self._schema_excluded_from_class:
                 continue
@@ -639,6 +640,7 @@ class ComponentBase(ComponentBaseUnregistered):
                 default = subtype
             if default is not None:
                 kwargs.setdefault(k, copy.deepcopy(default))
+                self._defaults_set.append(k)
             if v.get('type', None) == 'array':
                 if isinstance(kwargs.get(k, None), (bytes, str)):
                     kwargs[k] = kwargs[k].split()

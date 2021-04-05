@@ -183,7 +183,8 @@ def parse_yaml(files, as_function=False):
     yml_prep = prep_yaml(files)
     # print('prepped')
     # pprint.pprint(yml_prep)
-    yml_norm = s.validate(yml_prep, normalize=True)
+    yml_norm = s.validate(yml_prep, normalize=True,
+                          no_defaults=True, required_defaults=True)
     # print('normalized')
     # pprint.pprint(yml_norm)
     # Determine if any of the models require synchronization

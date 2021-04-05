@@ -50,7 +50,7 @@ class AsciiTableSerialize(DefaultSerialize):
         'field_names': {'type': 'array', 'items': {'type': 'string'}},
         'field_units': {'type': 'array', 'items': {'type': 'string'}},
         'as_array': {'type': 'boolean', 'default': False},
-        'delimiter': {'type': 'string'},
+        'delimiter': {'type': 'string', 'default': _default_delimiter_str},
         'use_astropy': {'type': 'boolean', 'default': False}}
     _attr_conv = DefaultSerialize._attr_conv + ['format_str', 'delimiter']
     has_header = True
@@ -59,7 +59,6 @@ class AsciiTableSerialize(DefaultSerialize):
 
     def __init__(self, **kwargs):
         self._explicit_delimiter = ('delimiter' in kwargs)
-        kwargs.setdefault('delimiter', _default_delimiter_str)
         super(AsciiTableSerialize, self).__init__(**kwargs)
 
     def update_serializer(self, *args, **kwargs):
