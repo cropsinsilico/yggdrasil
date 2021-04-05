@@ -92,19 +92,7 @@ def do_send_recv(language='python', fmt='%f\\n%d', msg=[float(1.0), int(2)],
         with ModelEnv(language=language, YGG_THREADING='True'):
             # Ensure start-up by waiting for signon message
             i = YggInterface.YggInit(input_interface, (name, fmt))
-            # Wait for signon message
-            T = i.start_timeout(10.0)
-            while ((not T.is_out) and (i.n_msg == 0)):  # pragma: debug
-                i.sleep()
-            i.stop_timeout()
-            # Drain signon messages
-            T = i.start_timeout(10.0)
-            while ((not T.is_out) and (i.n_msg > 0)):  # pragma: debug
-                flag, imsg = i.recv(timeout=0)
-                assert(flag)
-                assert(i.is_empty_recv(imsg))
-                i.sleep()
-            i.stop_timeout()
+            i.drain_server_signon_messages()
             # Output
             o = YggInterface.YggInit(output_interface, (name, fmt))
             o.send(*msg)
@@ -389,20 +377,7 @@ class TestYggRpcClient(TestYggOutput):
     def setup(self):
         r"""Start driver and instance."""
         super(TestYggRpcClient, self).setup()
-        if self.iodriver.ocomm._commtype in ['zmq', 'ZMQComm']:
-            # Wait for signon message
-            T = self.test_comm.start_timeout(10.0)
-            while ((not T.is_out) and (self.test_comm.n_msg == 0)):  # pragma: debug
-                self.test_comm.sleep()
-            self.test_comm.stop_timeout()
-            # Drain signon messages
-            T = self.test_comm.start_timeout(10.0)
-            while ((not T.is_out) and (self.test_comm.n_msg > 0)):  # pragma: debug
-                flag, msg = self.test_comm.recv(timeout=0)
-                assert(flag)
-                assert(self.test_comm.is_empty_recv(msg))
-                self.test_comm.sleep()
-            self.test_comm.stop_timeout()
+        self.test_comm.drain_server_signon_messages()
         
     @property
     def iodriver_class(self):
@@ -456,20 +431,7 @@ class TestYggRpcServer(TestYggInput):
     def setup(self):
         r"""Start driver and instance."""
         super(TestYggRpcServer, self).setup()
-        if self.iodriver.ocomm._commtype in ['zmq', 'ZMQComm']:
-            # Wait for signon message
-            T = self.instance.start_timeout(10.0)
-            while ((not T.is_out) and (self.instance.n_msg == 0)):  # pragma: debug
-                self.instance.sleep()
-            self.instance.stop_timeout()
-            # Drain signon messages
-            T = self.instance.start_timeout(10.0)
-            while ((not T.is_out) and (self.instance.n_msg > 0)):  # pragma: debug
-                flag, msg = self.instance.recv(timeout=0)
-                assert(flag)
-                assert(self.instance.icomm.is_empty_recv(msg))
-                self.instance.sleep()
-            self.instance.stop_timeout()
+        self.instance.drain_server_signon_messages()
         
     @property
     def iodriver_class(self):

@@ -450,3 +450,9 @@ class ForkComm(CommBase.CommBase):
         super(ForkComm, self).purge()
         for x in self.comm_list:
             x.purge()
+    
+    def drain_server_signon_messages(self):
+        r"""Drain server signon messages. This should only be used
+        for testing purposes."""
+        for x in self.comm_list:
+            x.drain_server_signon_messages()

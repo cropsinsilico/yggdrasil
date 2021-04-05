@@ -139,6 +139,7 @@ class TestCommBase(YggTestClassInfo):
         else:
             assert(self.send_instance.is_open)
             assert(self.recv_instance.is_open)
+        self.recv_instance.drain_server_signon_messages()
 
     def teardown(self, *args, **kwargs):
         r"""Destroy comm object pair."""

@@ -2274,6 +2274,11 @@ class CommBase(tools.YggClass):
         r"""Alias for recv."""
         return self.recv(*args, **kwargs)
 
+    def drain_server_signon_messages(self):
+        r"""Drain server signon messages. This should only be used
+        for testing purposes."""
+        pass
+
     def drain_messages(self, direction=None, timeout=None, variable=None):
         r"""Sleep while waiting for messages to be drained."""
         self.debug('')

@@ -1220,6 +1220,27 @@ class ZMQComm(CommBase.CommBase):
             self.info("No reply address.")
         return (True, msg)
 
+    def drain_server_signon_messages(self):
+        r"""Drain server signon messages. This should only be used
+        for testing purposes."""
+        super(ZMQComm, self).drain_server_signon_messages()
+        if not ((self.direction == 'recv')
+                and (self.is_server or self.allow_multiple_comms)):
+            return
+        # Wait for signon message
+        T = self.start_timeout(10.0)
+        while ((not T.is_out) and (self.n_msg == 0)):  # pragma: debug
+            self.sleep()
+        self.stop_timeout()
+        # Drain signon messages
+        T = self.start_timeout(10.0)
+        while ((not T.is_out) and (self.n_msg > 0)):  # pragma: debug
+            flag, msg = self.recv(timeout=0)
+            assert(flag)
+            assert(self.is_empty_recv(msg))
+            self.sleep()
+        self.stop_timeout()
+        
     def confirm_send(self, noblock=False):
         r"""Confirm that sent message was received."""
         if noblock:

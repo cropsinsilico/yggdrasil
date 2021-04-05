@@ -12,23 +12,6 @@ class TestServerComm(test_CommBase.TestCommBase):
     attr_list = (copy.deepcopy(test_CommBase.TestCommBase.attr_list)
                  + ['response_kwargs', 'icomm', 'ocomm'])
 
-    def setup(self, *args, **kwargs):
-        r"""Initialize comm object pair."""
-        super(TestServerComm, self).setup(*args, **kwargs)
-        # Wait for signon message
-        T = self.recv_instance.start_timeout(10.0)
-        while ((not T.is_out) and (self.recv_instance.n_msg == 0)):  # pragma: debug
-            self.recv_instance.sleep()
-        self.recv_instance.stop_timeout()
-        # Drain signon messages
-        T = self.recv_instance.start_timeout(10.0)
-        while ((not T.is_out) and (self.recv_instance.n_msg > 0)):  # pragma: debug
-            flag, msg = self.recv_instance.recv(timeout=0)
-            assert(flag)
-            assert(self.recv_instance.is_empty_recv(msg))
-            self.recv_instance.sleep()
-        self.recv_instance.stop_timeout()
-        
     @property
     def send_inst_kwargs(self):
         r"""dict: Keyword arguments for send instance."""

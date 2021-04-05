@@ -102,23 +102,6 @@ class TestZMQComm_client(TestZMQComm):
 
     test_drain_messages = None
 
-    def setup(self, *args, **kwargs):
-        r"""Initialize comm object pair."""
-        super(TestZMQComm_client, self).setup(*args, **kwargs)
-        # Wait for signon message
-        T = self.recv_instance.start_timeout(10.0)
-        while ((not T.is_out) and (self.recv_instance.n_msg == 0)):  # pragma: debug
-            self.recv_instance.sleep()
-        self.recv_instance.stop_timeout()
-        # Drain signon messages
-        T = self.recv_instance.start_timeout(10.0)
-        while ((not T.is_out) and (self.recv_instance.n_msg > 0)):  # pragma: debug
-            flag, msg = self.recv_instance.recv(timeout=0)
-            assert(flag)
-            assert(self.recv_instance.is_empty_recv(msg))
-            self.recv_instance.sleep()
-        self.recv_instance.stop_timeout()
-        
     @property
     def send_inst_kwargs(self):
         r"""Keyword arguments for send instance."""

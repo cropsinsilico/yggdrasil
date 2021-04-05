@@ -344,6 +344,11 @@ class TestConnectionDriver(TestConnectionParam, parent.TestDriver):
         self.nmsg_recv = 1
         if self.instance.icomm._commtype == 'value':
             self.nmsg_recv = self.get_options()['kwargs']['count']
+        T = self.instance.start_timeout()
+        while ((not T.is_out) and (not self.instance.is_valid)):
+            self.instance.sleep()  # pragma: debug
+        self.instance.stop_timeout()
+        self.recv_comm.drain_server_signon_messages()
 
     def test_init_del(self):
         r"""Test driver creation and deletion."""

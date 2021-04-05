@@ -375,7 +375,7 @@ class ServerComm(CommBase.CommBase):
     def rpcRecv(self, *args, **kwargs):
         r"""Alias for RPCComm.recv"""
         return self.recv(*args, **kwargs)
-    
+        
     def drain_messages(self, direction='recv', **kwargs):
         r"""Sleep while waiting for messages to be drained."""
         if direction == 'recv':
@@ -389,3 +389,8 @@ class ServerComm(CommBase.CommBase):
         # for ocomm in self.ocomm.values():
         #     ocomm.purge()
         super(ServerComm, self).purge()
+    
+    def drain_server_signon_messages(self):
+        r"""Drain server signon messages. This should only be used
+        for testing purposes."""
+        self.icomm.drain_server_signon_messages()
