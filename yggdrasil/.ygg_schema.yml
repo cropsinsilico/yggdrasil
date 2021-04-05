@@ -288,8 +288,8 @@ definitions:
             - $ref: '#/definitions/transform'
           type: array
       required:
-      - inputs
       - outputs
+      - inputs
       title: connection_base
       type: object
     - anyOf:
@@ -608,9 +608,9 @@ definitions:
             is used.
           type: string
       required:
+      - name
       - filetype
       - working_dir
-      - name
       title: file_base
       type: object
     - anyOf:
@@ -1615,6 +1615,8 @@ definitions:
                 - items:
                     type: string
                   type: array
+            required:
+            - name
             type: object
           - items:
               anyOf:
@@ -1635,6 +1637,8 @@ definitions:
                     - items:
                         type: string
                       type: array
+                required:
+                - name
                 type: object
             type: array
           default: false
@@ -1681,10 +1685,10 @@ definitions:
             is used.
           type: string
       required:
-      - language
-      - working_dir
       - name
+      - language
       - args
+      - working_dir
       title: model_base
       type: object
     - anyOf:

@@ -199,7 +199,7 @@ def parse_yaml(files, as_function=False):
                 if isinstance(tsync, str):
                     tsync = {'name': tsync}
                     yml['timesync'][i] = tsync
-            timesync_names.append(tsync['name'])
+                timesync_names.append(tsync['name'])
             yml.setdefault('timesync_client_of', [])
             yml['timesync_client_of'].append(tsync['name'])
     for tsync in set(timesync_names):

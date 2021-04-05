@@ -321,6 +321,7 @@ class ModelDriver(Driver):
             'anyOf': [
                 {'type': 'boolean'}, {'type': 'string'},
                 {'type': 'object',
+                 'required': ['name'],
                  'properties': {
                      'name': {'type': 'string', 'default': 'timesync'},
                      'inputs': {'anyOf': [
@@ -336,6 +337,7 @@ class ModelDriver(Driver):
                      'anyOf': [
                          {'type': 'string'},
                          {'type': 'object',
+                          'required': ['name'],
                           'properties': {
                               'name': {'type': 'string',
                                        'default': 'timesync'},
