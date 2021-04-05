@@ -4,7 +4,10 @@ from yggdrasil.components import import_component
 
 class TemporaryCommunicationError(Exception):
     r"""Raised when the comm is open, but send/recv is temporarily disabled."""
-    pass
+
+    def __init__(self, msg, max_consecutive_allowed=None, **kwargs):
+        super(TemporaryCommunicationError, self).__init__(msg, **kwargs)
+        self.max_consecutive_allowed = max_consecutive_allowed
 
 
 class NoMessages(TemporaryCommunicationError):

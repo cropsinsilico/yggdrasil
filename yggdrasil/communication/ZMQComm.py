@@ -1126,9 +1126,11 @@ class ZMQComm(CommBase.CommBase):
                 else:
                     self.socket.send(total_msg, **kwargs)
             except zmq.ZMQError as e:  # pragma: debug
-                if (e.errno == zmq.EAGAIN) and (not self._used):
+                if e.errno == zmq.EAGAIN:
                     raise TemporaryCommunicationError(
-                        "Socket not yet available.")
+                        "Socket not yet available.",
+                        max_consecutive_allowed=(
+                            100 if self._used else None))
                 self.special_debug("Socket could not send. (errno=%d)", e.errno)
                 raise
         if self.socket_type_name == 'ROUTER':

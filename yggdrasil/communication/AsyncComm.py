@@ -36,7 +36,8 @@ class AsyncComm(ProxyObject, ComponentBaseUnregistered):
                  'backlog_ready', '_used_direct', 'close_on_eof_recv',
                  '_backlog_received_eof', '_used', '_closed',
                  'async_recv_method', 'async_send_method',
-                 'async_recv_kwargs', 'async_send_kwargs']
+                 'async_recv_kwargs', 'async_send_kwargs',
+                 '_error_registry']
     __overrides__ = ['_input_args', '_input_kwargs']
     _disconnect_attr = ['backlog_ready', '_backlog_thread', '_wrapped']
     _async_kws = ['async_recv_method', 'async_send_method',
@@ -53,6 +54,7 @@ class AsyncComm(ProxyObject, ComponentBaseUnregistered):
         self._used = False
         self._closed = False
         self._backlog_received_eof = False
+        self._error_registry = {}
         self.async_recv_method = async_recv_method
         self.async_send_method = async_send_method
         if async_recv_kwargs is None:
@@ -341,8 +343,14 @@ class AsyncComm(ProxyObject, ComponentBaseUnregistered):
                 self._used_direct = True
             else:
                 async_flag = FLAG_FAILURE
-        except TemporaryCommunicationError:
+            self._error_registry = {}
+        except TemporaryCommunicationError as e:
             async_flag = FLAG_TRYAGAIN
+            if e.max_consecutive_allowed is not None:  # pragma: debug
+                self._error_registry.setdefault(str(e), 0)
+                self._error_registry[str(e)] += 1
+                if self._error_registry[str(e)] > e.max_consecutive_allowed:
+                    async_flag = FLAG_FAILURE
         self.suppress_special_debug = False
         return async_flag
 
@@ -369,8 +377,14 @@ class AsyncComm(ProxyObject, ComponentBaseUnregistered):
                 async_flag = FLAG_FAILURE
             else:  # pragma: debug
                 raise Exception("Unsupported flag: %s" % msg.flag)
-        except TemporaryCommunicationError:
+            self._error_registry = {}
+        except TemporaryCommunicationError as e:
             async_flag = FLAG_TRYAGAIN
+            if e.max_consecutive_allowed is not None:  # pragma: debug
+                self._error_registry.setdefault(str(e), 0)
+                self._error_registry[str(e)] += 1
+                if self._error_registry[str(e)] > e.max_consecutive_allowed:
+                    async_flag = FLAG_FAILURE
         self.suppress_special_debug = False
         return async_flag, msg
 
