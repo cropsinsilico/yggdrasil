@@ -814,6 +814,21 @@ class ZMQComm(CommBase.CommBase):
             self.set_reply_socket_recv(address)
         return msg, address
 
+    def _catch_eagain(self, function, *args, **kwargs):
+        tries = 10
+        error = BaseException('_catch_eagain')
+        while (tries > 0):
+            try:
+                return function(*args, **kwargs)
+            except zmq.ZMQError as e:  # pragma: debug
+                if e.errno == zmq.EAGAIN:
+                    tries -= 1
+                    error = e
+                    self.sleep()
+                    continue
+                raise
+        raise error  # pragma: debug
+
     def _reply_handshake_send(self):
         r"""Do send side of handshake."""
         if (((self.reply_socket_send is None)
@@ -825,7 +840,8 @@ class ZMQComm(CommBase.CommBase):
                 'No reply handshake waiting')
             return False
         try:
-            msg = self.reply_socket_send.recv(flags=zmq.NOBLOCK)
+            msg = self._catch_eagain(self.reply_socket_send.recv,
+                                     flags=zmq.NOBLOCK)
         except zmq.ZMQError:  # pragma: debug
             self.periodic_debug('_reply_handshake_send', period=1000)(
                 'Error receiving handshake.')
@@ -833,7 +849,8 @@ class ZMQComm(CommBase.CommBase):
         if self.is_eof(msg):  # pragma: debug
             self.error("REPLY EOF RECV'D")
             return msg
-        self.reply_socket_send.send(msg, flags=zmq.NOBLOCK)
+        self._catch_eagain(self.reply_socket_send.send,
+                           msg, flags=zmq.NOBLOCK)
         self._n_reply_sent += 1
         self.reply_socket_send.poll(timeout=self.zmq_sleeptime,
                                     flags=zmq.POLLIN)
@@ -850,7 +867,7 @@ class ZMQComm(CommBase.CommBase):
                 self.periodic_debug('_reply_handshake_recv', period=1000)(
                     'Cannot initiate reply handshake')
                 return False
-            socket.send(msg_send, flags=zmq.NOBLOCK)
+            self._catch_eagain(socket.send, msg_send, flags=zmq.NOBLOCK)
             if self.is_eof(msg_send):  # pragma: debug
                 self.error("REPLY EOF SENT")
                 return True
@@ -864,7 +881,7 @@ class ZMQComm(CommBase.CommBase):
                         ("No response waiting (address=%s). "
                          "%d tries left."), key, tries)
                     tries -= 1
-            msg_recv = socket.recv(flags=zmq.NOBLOCK)
+            msg_recv = self._catch_eagain(socket.recv, flags=zmq.NOBLOCK)
             assert(msg_recv == msg_send)
             self._n_reply_recv[key] += 1
             return True
@@ -1125,12 +1142,14 @@ class ZMQComm(CommBase.CommBase):
                     #                            **kwargs)
                 else:
                     self.socket.send(total_msg, **kwargs)
+                TemporaryCommunicationError.reset((self.address, "zmq.EAGAIN"))
             except zmq.ZMQError as e:  # pragma: debug
                 if e.errno == zmq.EAGAIN:
                     raise TemporaryCommunicationError(
                         "Socket not yet available.",
                         max_consecutive_allowed=(
-                            100 if self._used else None))
+                            100 if self._used else None),
+                        registry_key=(self.address, "zmq.EAGAIN"))
                 self.special_debug("Socket could not send. (errno=%d)", e.errno)
                 raise
         if self.socket_type_name == 'ROUTER':

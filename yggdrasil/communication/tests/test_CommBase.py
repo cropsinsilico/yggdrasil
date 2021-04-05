@@ -576,7 +576,7 @@ class TestCommBase(YggTestClassInfo):
         if self.comm in ['CommBase', 'AsyncComm']:
             return
         self.setup_filters()
-        self.do_send_recv(send_meth='send_eof')
+        self.do_send_recv(send_meth='send_eof', **kwargs)
 
     def test_send_recv_filter_pass(self, **kwargs):
         r"""Test send/recv with filter that passes both messages."""

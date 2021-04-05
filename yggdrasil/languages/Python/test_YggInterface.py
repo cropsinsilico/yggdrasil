@@ -90,13 +90,27 @@ def do_send_recv(language='python', fmt='%f\\n%d', msg=[float(1.0), int(2)],
     # Connect and utilize interface under disguise as target language
     try:
         with ModelEnv(language=language, YGG_THREADING='True'):
+            # Ensure start-up by waiting for signon message
+            i = YggInterface.YggInit(input_interface, (name, fmt))
+            # Wait for signon message
+            T = i.start_timeout(10.0)
+            while ((not T.is_out) and (i.n_msg == 0)):  # pragma: debug
+                i.sleep()
+            i.stop_timeout()
+            # Drain signon messages
+            T = i.start_timeout(10.0)
+            while ((not T.is_out) and (i.n_msg > 0)):  # pragma: debug
+                flag, imsg = i.recv(timeout=0)
+                assert(flag)
+                assert(i.is_empty_recv(imsg))
+                i.sleep()
+            i.stop_timeout()
             # Output
             o = YggInterface.YggInit(output_interface, (name, fmt))
             o.send(*msg)
             o.send_eof()
             o.close(linger=True)
             # Input
-            i = YggInterface.YggInit(input_interface, (name, fmt))
             assert_equal(i.recv(), (True, converter(msg)))
             assert_equal(i.recv(), (False, converter(YGG_MSG_EOF)))
     finally:
@@ -148,8 +162,8 @@ class TestBase(YggTestClassInfo):
         self.test_comm_kwargs = {}
         # self._driver_kwargs = {}
         self._inst_args = [self.name]
-        self.fmt_str = b'%5s\t%d\t%f\n'
-        self.fmt_str_matlab = b'%5s\\t%d\\t%f\\n'
+        self.fmt_str = '%5s\t%d\t%f\n'
+        self.fmt_str_matlab = '%5s\\t%d\\t%f\\n'
 
     @property
     def iodriver_class(self):

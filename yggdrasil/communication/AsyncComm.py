@@ -344,13 +344,8 @@ class AsyncComm(ProxyObject, ComponentBaseUnregistered):
             else:
                 async_flag = FLAG_FAILURE
             self._error_registry = {}
-        except TemporaryCommunicationError as e:
+        except TemporaryCommunicationError:
             async_flag = FLAG_TRYAGAIN
-            if e.max_consecutive_allowed is not None:  # pragma: debug
-                self._error_registry.setdefault(str(e), 0)
-                self._error_registry[str(e)] += 1
-                if self._error_registry[str(e)] > e.max_consecutive_allowed:
-                    async_flag = FLAG_FAILURE
         self.suppress_special_debug = False
         return async_flag
 
@@ -378,13 +373,8 @@ class AsyncComm(ProxyObject, ComponentBaseUnregistered):
             else:  # pragma: debug
                 raise Exception("Unsupported flag: %s" % msg.flag)
             self._error_registry = {}
-        except TemporaryCommunicationError as e:
+        except TemporaryCommunicationError:
             async_flag = FLAG_TRYAGAIN
-            if e.max_consecutive_allowed is not None:  # pragma: debug
-                self._error_registry.setdefault(str(e), 0)
-                self._error_registry[str(e)] += 1
-                if self._error_registry[str(e)] > e.max_consecutive_allowed:
-                    async_flag = FLAG_FAILURE
         self.suppress_special_debug = False
         return async_flag, msg
 

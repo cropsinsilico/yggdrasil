@@ -2,12 +2,45 @@ from contextlib import contextmanager
 from yggdrasil.components import import_component
 
 
-class TemporaryCommunicationError(Exception):
-    r"""Raised when the comm is open, but send/recv is temporarily disabled."""
+_temp_error_registry = {}
 
-    def __init__(self, msg, max_consecutive_allowed=None, **kwargs):
+
+class TemporaryCommunicationError(Exception):
+    r"""Raised when the comm is open, but send/recv is temporarily disabled.
+
+    Args:
+        msg (str): Error message.
+        max_consecutive_allowed (int, optional): Maximum number of times this
+            error should be raised as a TemporaryCommunicationError before
+            being elevated to a FatalCommunicationError. Defaults to None and
+            is never elevated.
+        registry_key (str, optional): Key that should be used to register the
+            error. Defaults to msg.
+
+    Raises:
+        FatalCommunicationError: If the error is raised more than the number
+            of times specified via max_consecutive_allowed.
+
+    """
+
+    def __init__(self, msg, max_consecutive_allowed=None,
+                 registry_key=None, **kwargs):
         super(TemporaryCommunicationError, self).__init__(msg, **kwargs)
         self.max_consecutive_allowed = max_consecutive_allowed
+        if max_consecutive_allowed is not None:
+            global _temp_error_registry
+            assert(registry_key is not None)
+            _temp_error_registry.setdefault(registry_key, 0)
+            _temp_error_registry[registry_key] += 1
+            if ((_temp_error_registry[registry_key]
+                 > max_consecutive_allowed)):  # pragma: debug
+                raise FatalCommunicationError(msg, **kwargs)
+
+    @classmethod
+    def reset(cls, registry_key):
+        r"""Reset the registry for a TemporaryCommunicationError."""
+        global _temp_error_registry
+        _temp_error_registry.pop(registry_key, None)
 
 
 class NoMessages(TemporaryCommunicationError):

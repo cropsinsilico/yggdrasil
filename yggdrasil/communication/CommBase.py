@@ -1878,7 +1878,7 @@ class CommBase(tools.YggClass):
             except ValueError:  # pragma: debug
                 self.exception('Failed to send (unyt array in message)')
         except TemporaryCommunicationError if self.is_async else NeverMatch:
-            if msg.flag == FLAG_EOF:
+            if (msg.flag == FLAG_EOF) and self._used:
                 with self._closing_thread.lock:
                     self._eof_sent.clear()
             raise
