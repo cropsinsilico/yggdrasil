@@ -390,7 +390,7 @@ class ServerComm(CommBase.CommBase):
         #     ocomm.purge()
         super(ServerComm, self).purge()
     
-    def drain_server_signon_messages(self):
+    def drain_server_signon_messages(self, **kwargs):
         r"""Drain server signon messages. This should only be used
         for testing purposes."""
-        self.icomm.drain_server_signon_messages()
+        self.icomm.drain_server_signon_messages(**kwargs)

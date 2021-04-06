@@ -1220,10 +1220,10 @@ class ZMQComm(CommBase.CommBase):
             self.info("No reply address.")
         return (True, msg)
 
-    def drain_server_signon_messages(self):
+    def drain_server_signon_messages(self, **kwargs):
         r"""Drain server signon messages. This should only be used
         for testing purposes."""
-        super(ZMQComm, self).drain_server_signon_messages()
+        super(ZMQComm, self).drain_server_signon_messages(**kwargs)
         if not ((self.direction == 'recv')
                 and (self.is_server or self.allow_multiple_comms)):
             return

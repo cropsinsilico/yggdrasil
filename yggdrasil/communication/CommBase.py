@@ -2274,7 +2274,7 @@ class CommBase(tools.YggClass):
         r"""Alias for recv."""
         return self.recv(*args, **kwargs)
 
-    def drain_server_signon_messages(self):
+    def drain_server_signon_messages(self, **kwargs):
         r"""Drain server signon messages. This should only be used
         for testing purposes."""
         pass

@@ -579,3 +579,8 @@ class AsyncComm(ProxyObject, ComponentBaseUnregistered):
     def recv_dict(self, *args, **kwargs):
         r"""Alias for recv_dict on wrapped comm."""
         return CommBase.CommBase.recv_dict(self, *args, **kwargs)
+    
+    def drain_server_signon_messages(self, **kwargs):
+        r"""Drain server signon messages. This should only be used
+        for testing purposes."""
+        pass
