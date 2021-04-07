@@ -244,14 +244,14 @@ jobs:
         --debug
     - name: Combine coverage reports
       continue-on-error: true
-      run: 'ls .*
+      run: '# ls .*
 
         coverage combine --append
 
         '
     - name: (CONDA) Generate XML version of coverage report
       if: matrix.install-method == 'conda'
-      run: 'ls .*
+      run: '# ls .*
 
         coverage xml
 
@@ -510,14 +510,14 @@ jobs:
         --debug
     - name: Combine coverage reports
       continue-on-error: true
-      run: 'ls .*
+      run: '# ls .*
 
         coverage combine --append
 
         '
     - name: (CONDA) Generate XML version of coverage report
       if: matrix.install-method == 'conda'
-      run: 'ls .*
+      run: '# ls .*
 
         coverage xml
 
@@ -756,14 +756,14 @@ jobs:
         --debug
     - name: Combine coverage reports
       continue-on-error: true
-      run: 'ls .*
+      run: '# ls .*
 
         coverage combine --append
 
         '
     - name: (CONDA) Generate XML version of coverage report
       if: matrix.install-method == 'conda'
-      run: 'ls .*
+      run: '# ls .*
 
         coverage xml
 
@@ -1004,14 +1004,14 @@ jobs:
         --debug
     - name: Combine coverage reports
       continue-on-error: true
-      run: 'ls .*
+      run: '# ls .*
 
         coverage combine --append
 
         '
     - name: (CONDA) Generate XML version of coverage report
       if: matrix.install-method == 'conda'
-      run: 'ls .*
+      run: '# ls .*
 
         coverage xml
 
@@ -1250,14 +1250,14 @@ jobs:
         --debug
     - name: Combine coverage reports
       continue-on-error: true
-      run: 'ls .*
+      run: '# ls .*
 
         coverage combine --append
 
         '
     - name: (CONDA) Generate XML version of coverage report
       if: matrix.install-method == 'conda'
-      run: 'ls .*
+      run: '# ls .*
 
         coverage xml
 
