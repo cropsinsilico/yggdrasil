@@ -57,7 +57,7 @@ def test_init():
     assert_raises(Exception, YggInterface.YggOutput, 'error')
 
 
-def do_send_recv(language='python', fmt='%f\\n%d', msg=[float(1.0), int(2)],
+def do_send_recv(language='python', fmt='%f\\n%d', msg=[float(1.0), np.int32(2)],
                  input_interface='YggInput', output_interface='YggOutput'):
     r"""Function to perform simple send/receive between two comms using a
     language interface that calls the Python interface.
