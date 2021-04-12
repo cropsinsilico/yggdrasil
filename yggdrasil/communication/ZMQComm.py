@@ -31,8 +31,17 @@ _default_protocol = 'tcp'
 _wait_send_t = 0  # 0.0001
 _reply_msg = b'YGG_REPLY'
 _purge_msg = b'YGG_PURGE'
+
+
+def set_context_opts(context):
+    context.set(zmq.MAX_SOCKETS, 8000)
+    context.setsockopt(zmq.LINGER, 0)
+    context.setsockopt(zmq.IMMEDIATE, 0)
+
+
 if _zmq_installed:
     _global_context = zmq.Context.instance()
+    set_context_opts(_global_context)
 else:  # pragma: debug
     _global_context = None
 
@@ -135,6 +144,22 @@ def parse_address(address):
     return out
 
 
+def create_socket(context, socket_type):
+    r"""Create a socket w/ some default options to improve cleanup.
+
+    Args:
+        context (zmq.Context): ZeroMQ context.
+        socket_type (int): ZeroMQ socket type.
+
+    Returns:
+        zmq.Socket: New socket.
+
+    """
+    socket = context.socket(socket_type)
+    socket.setsockopt(zmq.LINGER, 0)
+    return socket
+
+
 def bind_socket(socket, address, retry_timeout=-1, nretry=1):
     r"""Bind a socket to an address, getting a random port as necessary.
 
@@ -217,17 +242,15 @@ class ZMQProxy(CommBase.CommServer):
         if cli_param['protocol'] in ['inproc', 'ipc']:
             cli_param['host'] = get_ipc_host()
         cli_address = format_address(cli_param['protocol'], cli_param['host'])
-        self.cli_socket = zmq_context.socket(zmq.ROUTER)
+        self.cli_socket = create_socket(zmq_context, zmq.ROUTER)
         self.cli_address = bind_socket(self.cli_socket, cli_address,
                                        nretry=nretry,
                                        retry_timeout=retry_timeout)
-        self.cli_socket.setsockopt(zmq.LINGER, 0)
         self.nsignon = 0
         ZMQComm.register_comm('ROUTER_server_' + self.cli_address,
                               self.cli_socket)
         # Bind backend
-        self.srv_socket = zmq_context.socket(zmq.DEALER)
-        self.srv_socket.setsockopt(zmq.LINGER, 0)
+        self.srv_socket = create_socket(zmq_context, zmq.DEALER)
         try:
             self.srv_address = bind_socket(self.srv_socket, srv_address,
                                            nretry=nretry,
@@ -279,7 +302,6 @@ class ZMQProxy(CommBase.CommServer):
         while not self.was_break:
             try:
                 self.srv_socket.send(msg, zmq.NOBLOCK)
-                # self.srv_socket.send_multipart(msg, zmq.NOBLOCK)
                 break
             except zmq.ZMQError:  # pragma: no cover
                 self.sleep(0.0001)
@@ -455,14 +477,15 @@ class ZMQComm(CommBase.CommBase):
             else:
                 socket_action = 'connect'
         if new_process:
+            self.info("NEW CONTEXT")
             self.context = zmq.Context()
+            set_context_opts(self.context)
         else:
             self.context = context or _global_context
         self.socket_type_name = socket_type
         self.socket_type = getattr(zmq, socket_type)
         self.socket_action = socket_action
-        self.socket = self.context.socket(self.socket_type)
-        self.socket.setsockopt(zmq.LINGER, 0)
+        self.socket = create_socket(self.context, self.socket_type)
         self.topic_filter = tools.str2bytes(topic_filter)
         if dealer_identity is None:
             dealer_identity = str(uuid.uuid4())
@@ -502,8 +525,7 @@ class ZMQComm(CommBase.CommBase):
         state['context'] = zmq.Context()
         state['_server_kwargs']['zmq_context'] = state['context']
         super(ZMQComm, self).__setstate__(state)
-        self.socket = self.context.socket(self.socket_type)
-        self.socket.setsockopt(zmq.LINGER, 0)
+        self.socket = create_socket(self.context, self.socket_type)
         if self._bound:
             self._bound = False
             self.bind()
@@ -754,8 +776,7 @@ class ZMQComm(CommBase.CommBase):
     def set_reply_socket_send(self):
         r"""Set the send reply socket if it dosn't exist."""
         if self.reply_socket_send is None:
-            s = self.context.socket(zmq.REP)
-            s.setsockopt(zmq.LINGER, 0)
+            s = create_socket(self.context, zmq.REP)
             address = format_address(_default_protocol, 'localhost')
             address = bind_socket(s, address)
             self.register_comm('REPLY_SEND_' + address, s)
@@ -769,8 +790,7 @@ class ZMQComm(CommBase.CommBase):
         r"""Set the recv reply socket if the address dosn't exist."""
         address = tools.bytes2str(address)
         if address not in self.reply_socket_recv:
-            s = self.context.socket(zmq.REQ)
-            s.setsockopt(zmq.LINGER, 0)
+            s = create_socket(self.context, zmq.REQ)
             s.connect(address)
             self.register_comm('REPLY_RECV_' + address, s)
             with self.reply_socket_lock:
@@ -899,7 +919,7 @@ class ZMQComm(CommBase.CommBase):
         r"""Close the backlog thread and the reply sockets."""
         with self.reply_socket_lock:
             if (self.reply_socket_send is not None):
-                self.reply_socket_send.close(linger=self.zmq_sleeptime)
+                self.reply_socket_send.close(linger=0)  # self.zmq_sleeptime)
                 self.unregister_comm("REPLY_SEND_" + self.reply_socket_address)
             for k, socket in self.reply_socket_recv.items():
                 socket.close(linger=0)
@@ -924,7 +944,7 @@ class ZMQComm(CommBase.CommBase):
                 self._connected = False
             elif self.is_server and (self.cli_address is not None):
                 # Requeue messages in transit during close
-                self._send_client_msg(ZMQProxy.server_signoff_msg)
+                # self._send_client_msg(ZMQProxy.server_signoff_msg)
                 while self.is_message(zmq.POLLIN):  # pragma: debug
                     back_messages.append(self.socket.recv())
             # Ensure socket not still open
@@ -970,9 +990,9 @@ class ZMQComm(CommBase.CommBase):
     def _send_client_msg(self, msg):
         if self.cli_address is not None:
             if self.cli_socket is None:
-                self.cli_socket = self.context.socket(zmq.DEALER)
+                self.cli_socket = create_socket(self.context, zmq.DEALER)
                 self.cli_socket.connect(self.cli_address)
-            self.cli_socket.send(msg)
+            self._catch_eagain(self.cli_socket.send, msg, flags=zmq.NOBLOCK)
             # cli_socket.disconnect(self.cli_address)
             # cli_socket.close()
 

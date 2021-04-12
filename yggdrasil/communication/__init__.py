@@ -1,3 +1,5 @@
+import subprocess
+import os
 from contextlib import contextmanager
 from yggdrasil.components import import_component
 
@@ -216,6 +218,22 @@ def open_file_comm(fname, mode, filetype='binary', **kwargs):
     finally:
         if comm is not None:
             comm.close()
+
+
+def get_open_fds():  # pragma: debug
+    '''
+    return the number of open file descriptors for current process
+    
+    .. warning: will only work on UNIX-like os-es.
+    '''
+    procs = subprocess.check_output(["lsof", '-w', "-p", str(os.getpid())])
+    nprocs = len(procs.split(b'\n'))
+    # nprocs = len(
+    #     list(filter(
+    #         lambda s: s and s[ 0 ] == b'f' and s[1: ].isdigit(),
+    #         procs.split( b'\n' ) ) )
+    # )
+    return nprocs
 
 
 __all__ = ['new_comm', 'get_comm', 'cleanup_comms']

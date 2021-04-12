@@ -1883,14 +1883,14 @@ class CommBase(tools.YggClass):
                     self._eof_sent.clear()
             raise
         except BaseException:
-            if (msg.flag == FLAG_EOF) and self._used:  # pragma: intermittent
-                # This will only be called if the EOF send fails because
-                # the receiving connection has already been closed (most
-                # likely due to circular dependence).
-                if self.close_on_eof_send:
-                    self.debug('Close on send EOF (send failed)')
-                    self.linger_close()
-                return True
+            # if (msg.flag == FLAG_EOF) and self._used:  # pragma: intermittent
+            #     # This will only be called if the EOF send fails because
+            #     # the receiving connection has already been closed (most
+            #     # likely due to circular dependence).
+            #     if self.close_on_eof_send:
+            #         self.debug('Close on send EOF (send failed)')
+            #         self.linger_close()
+            #     return True
             # Handle error caused by calling repr on unyt array that isn't float64
             try:
                 self.exception('Failed to send: %.100s.', str(msg.args))
