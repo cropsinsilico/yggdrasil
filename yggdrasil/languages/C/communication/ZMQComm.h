@@ -149,6 +149,13 @@ ygg_zsock_new(int type) {
 #define ygg_zsock_new zsock_new
 #endif
 
+static inline
+zsock_t* create_zsock(int type) {
+  zsock_t* out = ygg_zsock_new(type);
+  zsock_set_linger(out, 0);
+  return out;
+};
+  
 
 /*! 
   @brief Struct to store info for reply.
@@ -455,8 +462,7 @@ char *set_reply_send(const comm_t *comm) {
       return out;
     }
     zrep->nsockets = 1;
-    zrep->sockets[0] = ygg_zsock_new(ZMQ_REP);
-    zsock_set_linger(zrep->sockets[0], 0);
+    zrep->sockets[0] = create_zsock(ZMQ_REP);
     if (zrep->sockets[0] == NULL) {
       ygglog_error("set_reply_send(%s): Could not initialize empty socket.",
 		   comm->name);
@@ -537,8 +543,7 @@ int set_reply_recv(const comm_t *comm, const char* address) {
     // Create new socket
     isock = zrep->nsockets;
     zrep->nsockets++;
-    zrep->sockets[isock] = ygg_zsock_new(ZMQ_REQ);
-    zsock_set_linger(zrep->sockets[isock], 0);
+    zrep->sockets[isock] = create_zsock(ZMQ_REQ);
     if (zrep->sockets[isock] == NULL) {
       ygglog_error("set_reply_recv(%s): Could not initialize empty socket.",
 		   comm->name);
@@ -692,17 +697,16 @@ int new_zmq_address(comm_t *comm) {
   // Bind
   zsock_t *s = NULL;
   if (comm->flags & COMM_FLAG_CLIENT_RESPONSE) {
-    s = ygg_zsock_new(ZMQ_ROUTER);
+    s = create_zsock(ZMQ_ROUTER);
   } else if (comm->flags & COMM_ALLOW_MULTIPLE_COMMS) {
-    s = ygg_zsock_new(ZMQ_DEALER);
+    s = create_zsock(ZMQ_DEALER);
   } else {
-    s = ygg_zsock_new(ZMQ_PAIR);
+    s = create_zsock(ZMQ_PAIR);
   }
   if (s == NULL) {
     ygglog_error("new_zmq_address: Could not initialize empty socket.");
     return -1;
   }
-  zsock_set_linger(s, 0);
   int port = zsock_bind(s, "%s", address);
   if (port == -1) {
     ygglog_error("new_zmq_address: Could not bind socket to address = %s",
@@ -745,15 +749,14 @@ int init_zmq_comm(comm_t *comm) {
   comm->msgBufSize = 100;
   zsock_t *s;
   if (comm->flags & (COMM_FLAG_SERVER | COMM_ALLOW_MULTIPLE_COMMS)) {
-    s = ygg_zsock_new(ZMQ_DEALER);
+    s = create_zsock(ZMQ_DEALER);
   } else {
-    s = ygg_zsock_new(ZMQ_PAIR);
+    s = create_zsock(ZMQ_PAIR);
   }
   if (s == NULL) {
     ygglog_error("init_zmq_address: Could not initialize empty socket.");
     return -1;
   }
-  zsock_set_linger(s, 0);
   ret = zsock_connect(s, "%s", comm->address);
   if (ret == -1) {
     ygglog_error("init_zmq_address: Could not connect socket to address = %s",
@@ -919,6 +922,45 @@ int zmq_comm_send(const comm_t *x, const char *data, const size_t len) {
   return ret;
 };
 
+
+static inline
+zframe_t * zmq_comm_recv_zframe(const comm_t* x) {
+  ygglog_debug("zmq_comm_recv_zframe(%s)", x->name);
+  zsock_t *s = (zsock_t*)(x->handle);
+  if (s == NULL) {
+    ygglog_error("zmq_comm_recv_zframe(%s): socket handle is NULL", x->name);
+    return NULL;
+  }
+  clock_t start = clock();
+  while ((((double)(clock() - start))/CLOCKS_PER_SEC) < 180) {
+    int nmsg = zmq_comm_nmsg(x);
+    if (nmsg < 0) return NULL;
+    else if (nmsg > 0) break;
+    else {
+      ygglog_debug("zmq_comm_recv_zframe(%s): no messages, sleep %d", x->name,
+		   YGG_SLEEP_TIME);
+      if (usleep(YGG_SLEEP_TIME) != 0) return NULL;
+    }
+  }
+  ygglog_debug("zmq_comm_recv_zframe(%s): receiving", x->name);
+  zframe_t *out = NULL;
+  if (x->flags & COMM_FLAG_CLIENT_RESPONSE) {
+    out = zframe_recv(s);
+    if (out == NULL) {
+      ygglog_debug("zmq_comm_recv_zframe(%s): did not receive identity", x->name);
+      return NULL;
+    }
+    zframe_destroy(&out);
+    out = NULL;
+  }
+  out = zframe_recv(s);
+  if (out == NULL) {
+    ygglog_debug("zmq_comm_recv_zframe(%s): did not receive", x->name);
+    return NULL;
+  }
+  return out;
+};
+
 /*!
   @brief Receive a message from an input comm.
   Receive a message smaller than YGG_MSG_MAX bytes from an input comm.
@@ -941,42 +983,27 @@ int zmq_comm_recv(const comm_t* x, char **data, const size_t len,
     ygglog_error("zmq_comm_recv(%s): socket handle is NULL", x->name);
     return ret;
   }
-  while (1) {
-    int nmsg = zmq_comm_nmsg(x);
-    if (nmsg < 0) return ret;
-    else if (nmsg > 0) break;
-    else {
-      ygglog_debug("zmq_comm_recv(%s): no messages, sleep", x->name);
-      usleep(YGG_SLEEP_TIME);
-    }
-  }
-  zframe_t *out = NULL;
-  if (x->flags & COMM_FLAG_CLIENT_RESPONSE) {
-    out = zframe_recv(s);
-    if (out == NULL) {
-      ygglog_debug("zmq_comm_recv(%s): did not receive identity", x->name);
-      return ret;
-    }
-    zframe_destroy(&out);
-    out = NULL;
-  }
-  out = zframe_recv(s);
+  zframe_t *out = zmq_comm_recv_zframe(x);
   if (out == NULL) {
     ygglog_debug("zmq_comm_recv(%s): did not receive", x->name);
     return ret;
   }
   // Check for server signon and respond
   while (strncmp((char*)zframe_data(out), "ZMQ_SERVER_SIGNING_ON::", 23) == 0) {
+    ygglog_debug("zmq_comm_recv(%s): Received sign-on", x->name);
     char* client_address = (char*)zframe_data(out) + 23;
     // create a DEALER socket and connect to address
-    zsock_t *client_socket = ygg_zsock_new(ZMQ_DEALER);
+    zsock_t *client_socket = create_zsock(ZMQ_DEALER);
     if (client_socket == NULL) {
       ygglog_error("zmq_comm_recv(%s): Could not initalize the client side of the proxy socket to confirm signon", x->name);
       zframe_destroy(&out);
       return ret;
     }
+    zsock_set_sndtimeo(client_socket, _zmq_sleeptime);
+    zsock_set_immediate(client_socket, 1);
+    zsock_set_linger(client_socket, _zmq_sleeptime);
     if (zsock_connect(client_socket, "%s", client_address) < 0) {
-      ygglog_error("zmq_comm_recv(%s): Error when connecting to the client proxy socket to respond to signon", x->name);
+      ygglog_error("zmq_comm_recv(%s): Error when connecting to the client proxy socket to respond to signon: %s", x->name, client_address);
       zframe_destroy(&out);
       ygg_zsock_destroy(&client_socket);
       return ret;
@@ -996,10 +1023,10 @@ int zmq_comm_recv(const comm_t* x, char **data, const size_t len,
       ygg_zsock_destroy(&client_socket);
       return ret;
     }
-    zframe_destroy(&out);
     zframe_destroy(&response);
     ygg_zsock_destroy(&client_socket);
-    out = zframe_recv(s);
+    zframe_destroy(&out);
+    out = zmq_comm_recv_zframe(x);
     if (out == NULL) {
       ygglog_debug("zmq_comm_recv(%s): did not receive", x->name);
       return ret;

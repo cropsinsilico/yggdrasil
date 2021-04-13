@@ -138,7 +138,7 @@ typedef struct complex_long_double_t {
 #include <process.h>
 #define ygg_getpid _getpid
 #define sleep(tsec) Sleep(1000*tsec)
-#define usleep(usec) Sleep(usec/1000)
+#define usleep(usec) Sleep(((double)usec)/1000)
 #else
 #include <stdint.h>
 #include <unistd.h>
@@ -160,7 +160,7 @@ typedef struct complex_long_double_t {
 /*! @brief Resonable size for buffer. */
 #define YGG_MSG_BUF 2048
 /*! @brief Sleep time in micro-seconds */
-#define YGG_SLEEP_TIME 250000
+#define YGG_SLEEP_TIME ((int)250000)
 /*! @brief Size for buffers to contain names of Python objects. */
 #define PYTHON_NAME_SIZE 1000
 

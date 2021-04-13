@@ -599,7 +599,7 @@ class ConnectionDriver(Driver):
                 self.icomm.close()
         elif direction == 'output':
             with self.lock:
-                self.icomm.close()
+                # self.icomm.close()
                 self.ocomm.close()
         self.set_close_state('%s model exit' % direction)
         self.debug('Exit of %s model triggered close', direction)
