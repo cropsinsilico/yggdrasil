@@ -368,6 +368,7 @@ class ForkComm(CommBase.CommBase):
         first_comm = True
         T = self.start_timeout(timeout, key_suffix='recv:forkd')
         out = None
+        out_idx = None
         i = 0
         while ((not T.is_out) or first_comm) and self.is_open and (out is None):
             for i in range(len(self)):
@@ -385,19 +386,22 @@ class ForkComm(CommBase.CommBase):
                             x.finalize_message(msg)
                     elif msg.flag not in [CommBase.FLAG_FAILURE, CommBase.FLAG_EMPTY]:
                         out = msg
+                if out is not None:
+                    out_idx = self.curr_comm_index % len(self)
                 self.curr_comm_index += 1
             first_comm = False
             if out is None:
                 self.sleep()
         self.stop_timeout(key_suffix='recv:forkd')
         if out is None:
+            out_idx = 0
             if self.is_closed:
                 self.debug('Comm closed')
                 out = CommBase.CommMessage(flag=CommBase.FLAG_FAILURE)
             else:
                 out = CommBase.CommMessage(flag=CommBase.FLAG_EMPTY,
                                            args=self.last_comm.empty_obj_recv)
-        out.args = {i: out.args}
+        out.args = {out_idx: out.args}
         return out
 
     def finalize_message(self, msg, **kwargs):
