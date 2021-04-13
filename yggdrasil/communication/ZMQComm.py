@@ -1222,14 +1222,12 @@ class ZMQComm(CommBase.CommBase):
                     raise
             # Check for server sign-on
             if total_msg.startswith(ZMQProxy.server_signon_msg):
-                # if not self.is_server:
-                #     raise Exception("Non-server received a signon message.")
                 if self.cli_address is None:
                     self.debug("Server received signon: %s, msg=%s",
                                self.address, total_msg)
                     self.cli_address = total_msg.split(
                         ZMQProxy.server_signon_msg)[-1].decode('utf-8')
-                    self._send_client_msg(total_msg)
+                self._send_client_msg(total_msg)
             else:
                 break
         # Interpret headers

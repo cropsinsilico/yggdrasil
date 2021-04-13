@@ -138,7 +138,7 @@ typedef struct complex_long_double_t {
 #include <process.h>
 #define ygg_getpid _getpid
 #define sleep(tsec) Sleep(1000*tsec)
-#define usleep(usec) Sleep(((double)usec)/1000)
+#define usleep(usec) Sleep(usec/1000)
 #else
 #include <stdint.h>
 #include <unistd.h>
