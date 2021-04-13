@@ -939,7 +939,7 @@ zframe_t * zmq_comm_recv_zframe(const comm_t* x) {
     else {
       ygglog_debug("zmq_comm_recv_zframe(%s): no messages, sleep %d", x->name,
 		   YGG_SLEEP_TIME);
-      if (usleep(YGG_SLEEP_TIME) != 0) return NULL;
+      usleep(YGG_SLEEP_TIME);
     }
   }
   ygglog_debug("zmq_comm_recv_zframe(%s): receiving", x->name);
