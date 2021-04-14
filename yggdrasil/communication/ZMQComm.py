@@ -228,7 +228,7 @@ class ZMQProxy(CommBase.CommServer):
     """
 
     server_signon_msg = b'ZMQ_SERVER_SIGNING_ON::'
-    server_signoff_msg = b'ZMQ_SERVER_SIGNING_OFF::'
+    # server_signoff_msg = b'ZMQ_SERVER_SIGNING_OFF::'
     
     def __init__(self, srv_address, zmq_context=None, retry_timeout=-1,
                  nretry=1, **kwargs):
@@ -286,9 +286,9 @@ class ZMQProxy(CommBase.CommServer):
                             "activating proxy.") % self.nsignon)
                 self.server_active = True
                 return None
-            if msg[1].startswith(self.server_signoff_msg):
-                self.sleep(1.0)
-                return None
+            # if msg[1].startswith(self.server_signoff_msg):
+            #     self.sleep(1.0)
+            #     return None
             if not self.server_active:
                 self.debug("Backlogging message")
                 self.backlog.append(msg)
