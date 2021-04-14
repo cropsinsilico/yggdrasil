@@ -20,6 +20,8 @@ Examples
    rpc_lesson1
    rpc_lesson2
    rpc_lesson3
+   rpc_lesson2b
+   rpc_lesson3b
    model_function
    conditional_io
    transformed_io

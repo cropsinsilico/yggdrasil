@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>yggdrasil.communication.tests.test_RMQAsyncComm &mdash; yggdrasil v1.5.0 documentation</title>
+  <title>yggdrasil.communication.tests.test_RMQAsyncComm &mdash; yggdrasil v1.6.0 documentation</title>
   
 
   
@@ -62,7 +62,7 @@
             
             
               <div class="version">
-                v1.5.0
+                v1.6.0
               </div>
             
           
@@ -104,6 +104,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../../units.html">Units</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../c_format_strings.html">C-Style Format Strings</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../debugging.html">Debugging</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../threading.html">OpenMP Threading in Models</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../examples/examples_toc.html">Examples</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../advanced/index.html">Advanced</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../development/index.html">Development</a></li>
@@ -162,8 +163,6 @@
         
           <li><a href="../../communication.html">yggdrasil.communication</a> &raquo;</li>
         
-          <li><a href="../tests.html">yggdrasil.communication.tests</a> &raquo;</li>
-        
       <li>yggdrasil.communication.tests.test_RMQAsyncComm</li>
     
     
@@ -183,7 +182,7 @@
 <span></span><span class="kn">import</span> <span class="nn">unittest</span>
 <span class="kn">import</span> <span class="nn">copy</span>
 <span class="kn">import</span> <span class="nn">flaky</span>
-<span class="kn">from</span> <span class="nn">yggdrasil.tests</span> <span class="kn">import</span> <span class="n">assert_raises</span>
+<span class="kn">from</span> <span class="nn">yggdrasil.tests</span> <span class="kn">import</span> <span class="n">assert_raises</span><span class="p">,</span> <span class="n">timeout</span>
 <span class="kn">from</span> <span class="nn">yggdrasil.communication</span> <span class="kn">import</span> <span class="n">new_comm</span>
 <span class="kn">from</span> <span class="nn">yggdrasil.communication.RMQComm</span> <span class="kn">import</span> <span class="n">RMQComm</span>
 <span class="kn">from</span> <span class="nn">yggdrasil.communication.tests</span> <span class="kn">import</span> <span class="n">test_RMQComm</span> <span class="k">as</span> <span class="n">parent</span>
@@ -194,6 +193,7 @@
 
 <div class="viewcode-block" id="TestRMQAsyncComm"><a class="viewcode-back" href="../../../../yggdrasil.communication.tests.html#yggdrasil.communication.tests.test_RMQAsyncComm.TestRMQAsyncComm">[docs]</a><span class="nd">@unittest</span><span class="o">.</span><span class="n">skipIf</span><span class="p">(</span><span class="ow">not</span> <span class="n">_rmq_installed</span><span class="p">,</span> <span class="s2">&quot;RMQ Server not running&quot;</span><span class="p">)</span>
 <span class="nd">@flaky</span><span class="o">.</span><span class="n">flaky</span>
+<span class="nd">@timeout</span><span class="p">(</span><span class="n">timeout</span><span class="o">=</span><span class="mi">600</span><span class="p">)</span>
 <span class="k">class</span> <span class="nc">TestRMQAsyncComm</span><span class="p">(</span><span class="n">parent</span><span class="o">.</span><span class="n">TestRMQComm</span><span class="p">):</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test for RMQAsyncComm communication class.&quot;&quot;&quot;</span>
 
@@ -209,16 +209,12 @@
         <span class="k">while</span> <span class="p">(</span><span class="ow">not</span> <span class="n">T</span><span class="o">.</span><span class="n">is_out</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">recv_instance</span><span class="o">.</span><span class="n">times_connected</span> <span class="o">==</span> <span class="mi">1</span><span class="p">):</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="o">.</span><span class="n">sleep</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="o">.</span><span class="n">stop_timeout</span><span class="p">()</span></div></div>
-
-    <span class="c1"># def test_send_recv_direct(self):</span>
-    <span class="c1">#     r&quot;&quot;&quot;Disabled: Test send/recv direct.&quot;&quot;&quot;</span>
-    <span class="c1">#     pass</span>
         
 
 <div class="viewcode-block" id="test_not_running"><a class="viewcode-back" href="../../../../yggdrasil.communication.tests.html#yggdrasil.communication.tests.test_RMQAsyncComm.test_not_running">[docs]</a><span class="nd">@unittest</span><span class="o">.</span><span class="n">skipIf</span><span class="p">(</span><span class="n">_rmq_installed</span><span class="p">,</span> <span class="s2">&quot;RMQ Server running&quot;</span><span class="p">)</span>
 <span class="k">def</span> <span class="nf">test_not_running</span><span class="p">():</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test raise of an error if a RMQ server is not running.&quot;&quot;&quot;</span>
-    <span class="n">comm_kwargs</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">comm</span><span class="o">=</span><span class="s1">&#39;RMQAsyncComm&#39;</span><span class="p">,</span> <span class="n">direction</span><span class="o">=</span><span class="s1">&#39;send&#39;</span><span class="p">,</span> <span class="n">reverse_names</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">comm_kwargs</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">commtype</span><span class="o">=</span><span class="s1">&#39;rmq_async&#39;</span><span class="p">,</span> <span class="n">direction</span><span class="o">=</span><span class="s1">&#39;send&#39;</span><span class="p">,</span> <span class="n">reverse_names</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
     <span class="n">assert_raises</span><span class="p">(</span><span class="ne">RuntimeError</span><span class="p">,</span> <span class="n">new_comm</span><span class="p">,</span> <span class="s1">&#39;test&#39;</span><span class="p">,</span> <span class="o">**</span><span class="n">comm_kwargs</span><span class="p">)</span></div>
 </pre></div>
 

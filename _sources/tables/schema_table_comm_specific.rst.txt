@@ -1,5 +1,7 @@
 .. _schema_table_comm_specific_rst:
 
-
-
-
+======   =======   =======================
+Option   Type      Valid For 'Commtype' Of
+======   =======   =======================
+count    integer   ['value']              
+======   =======   =======================

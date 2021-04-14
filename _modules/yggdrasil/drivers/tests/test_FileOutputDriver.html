@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>yggdrasil.drivers.tests.test_FileOutputDriver &mdash; yggdrasil v1.5.0 documentation</title>
+  <title>yggdrasil.drivers.tests.test_FileOutputDriver &mdash; yggdrasil v1.6.0 documentation</title>
   
 
   
@@ -62,7 +62,7 @@
             
             
               <div class="version">
-                v1.5.0
+                v1.6.0
               </div>
             
           
@@ -104,6 +104,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../../units.html">Units</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../c_format_strings.html">C-Style Format Strings</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../debugging.html">Debugging</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../threading.html">OpenMP Threading in Models</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../examples/examples_toc.html">Examples</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../advanced/index.html">Advanced</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../development/index.html">Development</a></li>
@@ -162,8 +163,6 @@
         
           <li><a href="../../drivers.html">yggdrasil.drivers</a> &raquo;</li>
         
-          <li><a href="../tests.html">yggdrasil.drivers.tests</a> &raquo;</li>
-        
       <li>yggdrasil.drivers.tests.test_FileOutputDriver</li>
     
     
@@ -181,7 +180,6 @@
             
   <h1>Source code for yggdrasil.drivers.tests.test_FileOutputDriver</h1><div class="highlight"><pre>
 <span></span><span class="kn">import</span> <span class="nn">os</span>
-<span class="kn">import</span> <span class="nn">unittest</span>
 <span class="kn">from</span> <span class="nn">yggdrasil.schema</span> <span class="kn">import</span> <span class="n">get_schema</span>
 <span class="kn">import</span> <span class="nn">yggdrasil.drivers.tests.test_ConnectionDriver</span> <span class="k">as</span> <span class="nn">parent</span>
 
@@ -209,7 +207,7 @@
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">recv_comm_kwargs</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Keyword arguments for receive comm.&quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="p">{</span><span class="s1">&#39;comm&#39;</span><span class="p">:</span> <span class="s1">&#39;CommBase&#39;</span><span class="p">}</span>
+        <span class="k">return</span> <span class="p">{</span><span class="s1">&#39;commtype&#39;</span><span class="p">:</span> <span class="s1">&#39;CommBase&#39;</span><span class="p">,</span> <span class="s1">&#39;direction&#39;</span><span class="p">:</span> <span class="s1">&#39;recv&#39;</span><span class="p">}</span>
         
 <div class="viewcode-block" id="TestFileOutputParam.teardown"><a class="viewcode-back" href="../../../../yggdrasil.drivers.tests.html#yggdrasil.drivers.tests.test_FileOutputDriver.TestFileOutputParam.teardown">[docs]</a>    <span class="k">def</span> <span class="nf">teardown</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Remove the instance, stoppping it.&quot;&quot;&quot;</span>
@@ -260,6 +258,9 @@
 <div class="viewcode-block" id="TestFileOutputDriver"><a class="viewcode-back" href="../../../../yggdrasil.drivers.tests.html#yggdrasil.drivers.tests.test_FileOutputDriver.TestFileOutputDriver">[docs]</a><span class="k">class</span> <span class="nc">TestFileOutputDriver</span><span class="p">(</span><span class="n">TestFileOutputParam</span><span class="p">,</span> <span class="n">parent</span><span class="o">.</span><span class="n">TestConnectionDriver</span><span class="p">):</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test runner for FileOutputDriver.&quot;&quot;&quot;</span>
 
+    <span class="n">test_send_recv</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">test_send_recv_nolimit</span> <span class="o">=</span> <span class="kc">None</span>
+
 <div class="viewcode-block" id="TestFileOutputDriver.send_file_contents"><a class="viewcode-back" href="../../../../yggdrasil.drivers.tests.html#yggdrasil.drivers.tests.test_FileOutputDriver.TestFileOutputDriver.send_file_contents">[docs]</a>    <span class="k">def</span> <span class="nf">send_file_contents</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Send file contents to driver.&quot;&quot;&quot;</span>
         <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">testing_options</span><span class="p">[</span><span class="s1">&#39;send&#39;</span><span class="p">]:</span>
@@ -305,17 +306,7 @@
 <div class="viewcode-block" id="TestFileOutputDriver.run_before_terminate"><a class="viewcode-back" href="../../../../yggdrasil.drivers.tests.html#yggdrasil.drivers.tests.test_FileOutputDriver.TestFileOutputDriver.run_before_terminate">[docs]</a>    <span class="k">def</span> <span class="nf">run_before_terminate</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Commands to run while the instance is running, before terminate.&quot;&quot;&quot;</span>
         <span class="c1"># Don&#39;t send any messages to the file</span>
-        <span class="k">pass</span></div>
-    
-<div class="viewcode-block" id="TestFileOutputDriver.test_send_recv"><a class="viewcode-back" href="../../../../yggdrasil.drivers.tests.html#yggdrasil.drivers.tests.test_FileOutputDriver.TestFileOutputDriver.test_send_recv">[docs]</a>    <span class="nd">@unittest</span><span class="o">.</span><span class="n">skipIf</span><span class="p">(</span><span class="kc">True</span><span class="p">,</span> <span class="s1">&#39;File driver&#39;</span><span class="p">)</span>
-    <span class="k">def</span> <span class="nf">test_send_recv</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Disabled: Test sending/receiving small message.&quot;&quot;&quot;</span>
-        <span class="k">pass</span>  <span class="c1"># pragma: no cover</span></div>
-
-<div class="viewcode-block" id="TestFileOutputDriver.test_send_recv_nolimit"><a class="viewcode-back" href="../../../../yggdrasil.drivers.tests.html#yggdrasil.drivers.tests.test_FileOutputDriver.TestFileOutputDriver.test_send_recv_nolimit">[docs]</a>    <span class="nd">@unittest</span><span class="o">.</span><span class="n">skipIf</span><span class="p">(</span><span class="kc">True</span><span class="p">,</span> <span class="s1">&#39;File driver&#39;</span><span class="p">)</span>
-    <span class="k">def</span> <span class="nf">test_send_recv_nolimit</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Disabled: Test sending/receiving large message.&quot;&quot;&quot;</span>
-        <span class="k">pass</span>  <span class="c1"># pragma: no cover</span></div></div>
+        <span class="k">pass</span></div></div>
 
 
 <span class="c1"># Dynamically create tests based on registered file classes</span>

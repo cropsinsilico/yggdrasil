@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>yggdrasil.languages.R.install &mdash; yggdrasil v1.5.0 documentation</title>
+  <title>yggdrasil.languages.R.install &mdash; yggdrasil v1.6.0 documentation</title>
   
 
   
@@ -62,7 +62,7 @@
             
             
               <div class="version">
-                v1.5.0
+                v1.6.0
               </div>
             
           
@@ -104,6 +104,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../../units.html">Units</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../c_format_strings.html">C-Style Format Strings</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../debugging.html">Debugging</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../threading.html">OpenMP Threading in Models</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../examples/examples_toc.html">Examples</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../advanced/index.html">Advanced</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../development/index.html">Development</a></li>
@@ -253,11 +254,12 @@
         <span class="n">match</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="n">regex</span><span class="p">,</span> <span class="n">out</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s1">&#39;utf-8&#39;</span><span class="p">))</span>
         <span class="k">if</span> <span class="n">match</span><span class="p">:</span>
             <span class="n">ldver</span> <span class="o">=</span> <span class="n">match</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="s1">&#39;version&#39;</span><span class="p">)</span>
-    <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;CC&#39;</span><span class="p">,</span> <span class="s1">&#39;CFLAGS&#39;</span><span class="p">,</span> <span class="s1">&#39;CXX&#39;</span><span class="p">,</span> <span class="s1">&#39;CXXFLAGS&#39;</span><span class="p">,</span> <span class="s1">&#39;LD&#39;</span><span class="p">,</span> <span class="s1">&#39;LDFLAGS&#39;</span><span class="p">]:</span>
+    <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;CC&#39;</span><span class="p">,</span> <span class="s1">&#39;CFLAGS&#39;</span><span class="p">,</span> <span class="s1">&#39;CXX&#39;</span><span class="p">,</span> <span class="s1">&#39;CXXFLAGS&#39;</span><span class="p">,</span> <span class="s1">&#39;FC&#39;</span><span class="p">,</span> <span class="s1">&#39;FFLAGS&#39;</span><span class="p">,</span>
+              <span class="s1">&#39;LD&#39;</span><span class="p">,</span> <span class="s1">&#39;LDFLAGS&#39;</span><span class="p">]:</span>
         <span class="n">env</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">)</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">env</span><span class="p">:</span>
             <span class="k">continue</span>
-        <span class="k">if</span> <span class="p">(</span><span class="n">x</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;CFLAGS&#39;</span><span class="p">,</span> <span class="s1">&#39;CXXFLAGS&#39;</span><span class="p">,</span> <span class="s1">&#39;LDFLAGS&#39;</span><span class="p">])</span> <span class="ow">and</span> <span class="n">ldver</span><span class="p">:</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">x</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;CFLAGS&#39;</span><span class="p">,</span> <span class="s1">&#39;CXXFLAGS&#39;</span><span class="p">,</span> <span class="s1">&#39;FFLAGS&#39;</span><span class="p">,</span> <span class="s1">&#39;LDFLAGS&#39;</span><span class="p">])</span> <span class="ow">and</span> <span class="n">ldver</span><span class="p">:</span>
             <span class="k">if</span> <span class="s1">&#39;-mlinker-version&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">env</span><span class="p">:</span>
                 <span class="n">env</span> <span class="o">+=</span> <span class="s1">&#39; -mlinker-version=</span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">ldver</span>
         <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">%s</span><span class="s1">=</span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">env</span><span class="p">))</span>
@@ -313,6 +315,7 @@
 <span class="sd">        bool: True if call was successful, False otherwise.</span>
 
 <span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">R_cmd</span> <span class="o">=</span> <span class="p">[]</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">package_list</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
         <span class="n">package_list</span> <span class="o">=</span> <span class="p">[</span><span class="n">package_list</span><span class="p">]</span>
     <span class="n">regex_ver</span> <span class="o">=</span> <span class="p">(</span><span class="sa">r</span><span class="s1">&#39;(?P&lt;name&gt;.+?)\s*(?:\(\s*(?P&lt;comparison&gt;[=&lt;&gt;]+?)\s*&#39;</span>
@@ -321,51 +324,75 @@
     <span class="n">req_nover</span> <span class="o">=</span> <span class="p">[]</span>
     <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">package_list</span><span class="p">:</span>
         <span class="n">out</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">fullmatch</span><span class="p">(</span><span class="n">regex_ver</span><span class="p">,</span> <span class="n">x</span><span class="p">)</span><span class="o">.</span><span class="n">groupdict</span><span class="p">()</span>
+        <span class="n">kws</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">if</span> <span class="n">sys</span><span class="o">.</span><span class="n">platform</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="o">==</span> <span class="s1">&#39;darwin&#39;</span><span class="p">:</span>
+            <span class="n">kws</span><span class="p">[</span><span class="s1">&#39;args&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;INSTALL_opts=c(</span><span class="se">\&quot;</span><span class="s2">--no-multiarch</span><span class="se">\&quot;</span><span class="s2">)&quot;</span>
+        <span class="k">if</span> <span class="n">x</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;units&#39;</span><span class="p">)</span> <span class="ow">and</span> <span class="n">sys</span><span class="o">.</span><span class="n">platform</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="o">==</span> <span class="s1">&#39;darwin&#39;</span><span class="p">:</span>
+            <span class="c1"># These are the libs associated w/ brew</span>
+            <span class="n">libdir</span> <span class="o">=</span> <span class="s1">&#39;/usr/local/opt/udunits/include/&#39;</span>
+            <span class="n">incdir</span> <span class="o">=</span> <span class="s1">&#39;/usr/local/opt/udunits/lib/&#39;</span>
+            <span class="k">if</span> <span class="p">((</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">libdir</span><span class="p">,</span> <span class="s1">&#39;libudunits2.dylib&#39;</span><span class="p">))</span>
+                 <span class="ow">and</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">incdir</span><span class="p">,</span> <span class="s1">&#39;udunits2.h&#39;</span><span class="p">)))):</span>
+                <span class="n">kws</span><span class="p">[</span><span class="s1">&#39;flags&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span>
+                    <span class="s1">&#39;configure.args=c(&#39;</span>
+                    <span class="s1">&#39;</span><span class="se">\&quot;</span><span class="s1">--with-udunits2-include=</span><span class="si">%s</span><span class="se">\&quot;</span><span class="s1">,&#39;</span>
+                    <span class="s1">&#39;</span><span class="se">\&quot;</span><span class="s1">--with-udunits2-lib=</span><span class="si">%s</span><span class="se">\&quot;</span><span class="s1">)&#39;</span><span class="p">)</span> <span class="o">%</span> <span class="p">(</span><span class="n">incdir</span><span class="p">,</span> <span class="n">libdir</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">out</span><span class="p">[</span><span class="s1">&#39;ver&#39;</span><span class="p">]</span> <span class="ow">and</span> <span class="p">(</span><span class="s1">&#39;=&#39;</span> <span class="ow">in</span> <span class="n">out</span><span class="p">[</span><span class="s1">&#39;comparison&#39;</span><span class="p">]):</span>
-            <span class="n">req_ver</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">out</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">],</span> <span class="n">out</span><span class="p">[</span><span class="s1">&#39;ver&#39;</span><span class="p">]))</span>
+            <span class="n">kws</span><span class="p">[</span><span class="s1">&#39;ver&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">out</span><span class="p">[</span><span class="s1">&#39;ver&#39;</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">kws</span><span class="p">:</span>
+            <span class="n">kws</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">out</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">]</span>
+            <span class="n">req_ver</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">kws</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">req_nover</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">out</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">])</span>
     <span class="k">if</span> <span class="n">repos</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">repos</span> <span class="o">=</span> <span class="s1">&#39;http://cloud.r-project.org&#39;</span>
-    <span class="n">R_cmd</span> <span class="o">=</span> <span class="p">[]</span>
     <span class="k">if</span> <span class="n">req_nover</span><span class="p">:</span>
         <span class="n">req_list</span> <span class="o">=</span> <span class="s1">&#39;c(</span><span class="si">%s</span><span class="s1">)&#39;</span> <span class="o">%</span> <span class="s1">&#39;, &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="s1">&#39;</span><span class="se">\&quot;</span><span class="si">%s</span><span class="se">\&quot;</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">x</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">req_nover</span><span class="p">])</span>
         <span class="k">if</span> <span class="n">update</span><span class="p">:</span>
             <span class="c1"># R_cmd = [&#39;install.packages(%s, repos=&quot;%s&quot;)&#39; % (req_list, repos)]</span>
-            <span class="n">R_cmd</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;req &lt;- </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">req_list</span><span class="p">,</span>
-                     <span class="s1">&#39;for (x in req) {&#39;</span><span class="p">,</span>
-                     <span class="s1">&#39;  if (is.element(x, installed.packages()[,1])) {&#39;</span><span class="p">,</span>
-                     <span class="s1">&#39;    remove.packages(x)&#39;</span><span class="p">,</span>
-                     <span class="s1">&#39;  }&#39;</span><span class="p">,</span>
-                     <span class="s1">&#39;  install.packages(x, dep=TRUE, repos=&quot;</span><span class="si">%s</span><span class="s1">&quot;)&#39;</span> <span class="o">%</span> <span class="n">repos</span><span class="p">,</span>
-                     <span class="s1">&#39;}&#39;</span><span class="p">]</span>
+            <span class="n">R_cmd</span> <span class="o">+=</span> <span class="p">[</span><span class="s1">&#39;req &lt;- </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">req_list</span><span class="p">,</span>
+                      <span class="s1">&#39;for (x in req) {&#39;</span><span class="p">,</span>
+                      <span class="s1">&#39;  if (is.element(x, installed.packages()[,1])) {&#39;</span><span class="p">,</span>
+                      <span class="s1">&#39;    remove.packages(x)&#39;</span><span class="p">,</span>
+                      <span class="s1">&#39;  }&#39;</span><span class="p">,</span>
+                      <span class="s1">&#39;  install.packages(x, dep=TRUE, repos=&quot;</span><span class="si">%s</span><span class="s1">&quot;)&#39;</span> <span class="o">%</span> <span class="n">repos</span><span class="p">,</span>
+                      <span class="s1">&#39;}&#39;</span><span class="p">]</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="n">R_cmd</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;req &lt;- </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">req_list</span><span class="p">,</span>
-                     <span class="s1">&#39;for (x in req) {&#39;</span><span class="p">,</span>
-                     <span class="s1">&#39;  if (!is.element(x, installed.packages()[,1])) {&#39;</span><span class="p">,</span>
-                     <span class="s1">&#39;    print(sprintf(&quot;Installing </span><span class="se">\&#39;</span><span class="si">%s</span><span class="se">\&#39;</span><span class="s1"> from CRAN.&quot;, x))&#39;</span><span class="p">,</span>
-                     <span class="s1">&#39;    install.packages(x, dep=TRUE, repos=&quot;</span><span class="si">%s</span><span class="s1">&quot;)&#39;</span> <span class="o">%</span> <span class="n">repos</span><span class="p">,</span>
-                     <span class="s1">&#39;  } else {&#39;</span><span class="p">,</span>
-                     <span class="s1">&#39;    print(sprintf(&quot;</span><span class="si">%s</span><span class="s1"> already installed.&quot;, x))&#39;</span><span class="p">,</span>
-                     <span class="s1">&#39;  }&#39;</span><span class="p">,</span>
-                     <span class="s1">&#39;}&#39;</span><span class="p">]</span>
+            <span class="n">R_cmd</span> <span class="o">+=</span> <span class="p">[</span><span class="s1">&#39;req &lt;- </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">req_list</span><span class="p">,</span>
+                      <span class="s1">&#39;for (x in req) {&#39;</span><span class="p">,</span>
+                      <span class="s1">&#39;  if (!is.element(x, installed.packages()[,1])) {&#39;</span><span class="p">,</span>
+                      <span class="s1">&#39;    print(sprintf(&quot;Installing </span><span class="se">\&#39;</span><span class="si">%s</span><span class="se">\&#39;</span><span class="s1"> from CRAN.&quot;, x))&#39;</span><span class="p">,</span>
+                      <span class="s1">&#39;    install.packages(x, dep=TRUE, repos=&quot;</span><span class="si">%s</span><span class="s1">&quot;)&#39;</span> <span class="o">%</span> <span class="n">repos</span><span class="p">,</span>
+                      <span class="s1">&#39;  } else {&#39;</span><span class="p">,</span>
+                      <span class="s1">&#39;    print(sprintf(&quot;</span><span class="si">%s</span><span class="s1"> already installed.&quot;, x))&#39;</span><span class="p">,</span>
+                      <span class="s1">&#39;  }&#39;</span><span class="p">,</span>
+                      <span class="s1">&#39;}&#39;</span><span class="p">]</span>
     <span class="k">if</span> <span class="n">req_ver</span><span class="p">:</span>
         <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">req_ver</span><span class="p">:</span>
-            <span class="n">R_cmd</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
-                <span class="p">(</span><span class="s1">&#39;packageurl &lt;- </span><span class="se">\&quot;</span><span class="s1">http://cran.r-project.org/src/contrib/Archive/</span><span class="si">%s</span><span class="s1">/&#39;</span>
-                 <span class="s1">&#39;</span><span class="si">%s</span><span class="s1">_</span><span class="si">%s</span><span class="s1">.tar.gz</span><span class="se">\&quot;</span><span class="s1">&#39;</span><span class="p">)</span> <span class="o">%</span> <span class="p">(</span><span class="n">x</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">x</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">x</span><span class="p">[</span><span class="mi">1</span><span class="p">]))</span>
+            <span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="se">\&quot;</span><span class="si">%s</span><span class="se">\&quot;</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">x</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">]</span>
+            <span class="n">args</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;repos=</span><span class="se">\&quot;</span><span class="si">%s</span><span class="se">\&quot;</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">repos</span>
+                    <span class="o">+</span> <span class="p">(</span><span class="s2">&quot;,&quot;</span> <span class="k">if</span> <span class="n">x</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;args&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">)</span> <span class="k">else</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
+                    <span class="o">+</span> <span class="n">x</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;args&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">))</span>
+            <span class="k">if</span> <span class="s1">&#39;ver&#39;</span> <span class="ow">in</span> <span class="n">x</span><span class="p">:</span>
+                <span class="n">R_cmd</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                    <span class="p">(</span><span class="s1">&#39;packageurl &lt;- </span><span class="se">\&quot;</span><span class="s1">http://cran.r-project.org/src/contrib/Archive/</span><span class="si">%s</span><span class="s1">/&#39;</span>
+                     <span class="s1">&#39;</span><span class="si">%s</span><span class="s1">_</span><span class="si">%s</span><span class="s1">.tar.gz</span><span class="se">\&quot;</span><span class="s1">&#39;</span><span class="p">)</span> <span class="o">%</span> <span class="p">(</span><span class="n">x</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">],</span> <span class="n">x</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">],</span> <span class="n">x</span><span class="p">[</span><span class="s1">&#39;ver&#39;</span><span class="p">]))</span>
+                <span class="n">name</span> <span class="o">=</span> <span class="s1">&#39;packageurl&#39;</span>
+                <span class="n">args</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;repos=NULL, type=</span><span class="se">\&quot;</span><span class="s1">source</span><span class="se">\&quot;</span><span class="s1">&#39;</span>
+                        <span class="o">+</span> <span class="p">(</span><span class="s2">&quot;,&quot;</span> <span class="k">if</span> <span class="n">x</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;args&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">)</span> <span class="k">else</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
+                        <span class="o">+</span> <span class="n">x</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;args&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">))</span>
             <span class="k">if</span> <span class="n">update</span><span class="p">:</span>
                 <span class="n">R_cmd</span> <span class="o">+=</span> <span class="p">[</span>
-                    <span class="s1">&#39;if (is.element(</span><span class="se">\&quot;</span><span class="si">%s</span><span class="se">\&quot;</span><span class="s1">, installed.packages()[,1])) {&#39;</span> <span class="o">%</span> <span class="n">x</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
-                    <span class="s1">&#39;  remove.packages(</span><span class="se">\&quot;</span><span class="si">%s</span><span class="se">\&quot;</span><span class="s1">)&#39;</span> <span class="o">%</span> <span class="n">x</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
+                    <span class="s1">&#39;if (is.element(</span><span class="se">\&quot;</span><span class="si">%s</span><span class="se">\&quot;</span><span class="s1">, installed.packages()[,1])) {&#39;</span> <span class="o">%</span> <span class="n">x</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">],</span>
+                    <span class="s1">&#39;  remove.packages(</span><span class="se">\&quot;</span><span class="si">%s</span><span class="se">\&quot;</span><span class="s1">)&#39;</span> <span class="o">%</span> <span class="n">x</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">],</span>
                     <span class="s1">&#39;}&#39;</span>
-                    <span class="s1">&#39;install.packages(packageurl, repos=NULL, type=</span><span class="se">\&quot;</span><span class="s1">source</span><span class="se">\&quot;</span><span class="s1">)&#39;</span><span class="p">]</span>
+                    <span class="s1">&#39;install.packages(</span><span class="si">%s</span><span class="s1">, </span><span class="si">%s</span><span class="s1">)&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">args</span><span class="p">)]</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="n">R_cmd</span> <span class="o">+=</span> <span class="p">[</span>
-                    <span class="s1">&#39;if (!is.element(</span><span class="se">\&quot;</span><span class="si">%s</span><span class="se">\&quot;</span><span class="s1">, installed.packages()[,1])) {&#39;</span> <span class="o">%</span> <span class="n">x</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
-                    <span class="s1">&#39;  install.packages(packageurl, repos=NULL, type=</span><span class="se">\&quot;</span><span class="s1">source</span><span class="se">\&quot;</span><span class="s1">)&#39;</span><span class="p">,</span>
+                    <span class="s1">&#39;if (!is.element(</span><span class="se">\&quot;</span><span class="si">%s</span><span class="se">\&quot;</span><span class="s1">, installed.packages()[,1])) {&#39;</span> <span class="o">%</span> <span class="n">x</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">],</span>
+                    <span class="s1">&#39;  install.packages(</span><span class="si">%s</span><span class="s1">, </span><span class="si">%s</span><span class="s1">)&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">args</span><span class="p">),</span>
                     <span class="s1">&#39;} else {&#39;</span><span class="p">,</span>
-                    <span class="s1">&#39;  print(&quot;</span><span class="si">%s</span><span class="s1"> already installed.&quot;)&#39;</span> <span class="o">%</span> <span class="n">x</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
+                    <span class="s1">&#39;  print(&quot;</span><span class="si">%s</span><span class="s1"> already installed.&quot;)&#39;</span> <span class="o">%</span> <span class="n">x</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">],</span>
                     <span class="s1">&#39;}&#39;</span><span class="p">]</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="n">call_R</span><span class="p">(</span><span class="n">R_cmd</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;Error installing dependencies: </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="s1">&#39;, &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">package_list</span><span class="p">))</span>
@@ -535,6 +562,7 @@
         <span class="c1"># Install package</span>
         <span class="n">package_name</span> <span class="o">=</span> <span class="s1">&#39;yggdrasil_0.1.tar.gz&#39;</span>
         <span class="n">R_call</span> <span class="o">=</span> <span class="p">(</span><span class="s2">&quot;install.packages(</span><span class="se">\&quot;</span><span class="si">%s</span><span class="se">\&quot;</span><span class="s2">, verbose=TRUE,&quot;</span>
+                  <span class="s2">&quot;INSTALL_opts=c(</span><span class="se">\&quot;</span><span class="s2">--no-multiarch</span><span class="se">\&quot;</span><span class="s2">),&quot;</span>
                   <span class="s2">&quot;repos=NULL, type=</span><span class="se">\&quot;</span><span class="s2">source</span><span class="se">\&quot;</span><span class="s2">)&quot;</span><span class="p">)</span> <span class="o">%</span> <span class="n">package_name</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">call_R</span><span class="p">([</span><span class="n">R_call</span><span class="p">],</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
             <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;Error installing R interface from the built package.&quot;</span><span class="p">)</span>

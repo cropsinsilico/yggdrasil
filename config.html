@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>Configuration Files &mdash; yggdrasil v1.5.0 documentation</title>
+  <title>Configuration Files &mdash; yggdrasil v1.6.0 documentation</title>
   
 
   
@@ -64,7 +64,7 @@
             
             
               <div class="version">
-                v1.5.0
+                v1.6.0
               </div>
             
           
@@ -103,6 +103,7 @@
 <li class="toctree-l1"><a class="reference internal" href="timesync_io.html">Timestep Synchronization</a></li>
 <li class="toctree-l1"><a class="reference internal" href="yaml.html">YAML Files</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Configuration Files</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#updating-the-compilation-tools">Updating the Compilation Tools</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#debug-options">Debug Options</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#language-options">Language Options</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#c-options">C Options</a></li>
@@ -116,6 +117,7 @@
 <li class="toctree-l1"><a class="reference internal" href="units.html">Units</a></li>
 <li class="toctree-l1"><a class="reference internal" href="c_format_strings.html">C-Style Format Strings</a></li>
 <li class="toctree-l1"><a class="reference internal" href="debugging.html">Debugging</a></li>
+<li class="toctree-l1"><a class="reference internal" href="threading.html">OpenMP Threading in Models</a></li>
 <li class="toctree-l1"><a class="reference internal" href="examples/examples_toc.html">Examples</a></li>
 <li class="toctree-l1"><a class="reference internal" href="advanced/index.html">Advanced</a></li>
 <li class="toctree-l1"><a class="reference internal" href="development/index.html">Development</a></li>
@@ -196,6 +198,19 @@
 </pre></div>
 </div>
 <p>Further customization for specific runs can be achieved by creating a local config file called ‘.yggdrasil.cfg’ in the directory where the interface will be run. Any options not found in the local will be filled in with values from the user config file. Any options not found in the user config file will be filled in with default package values.</p>
+<p>There are also several options you can provide to the <code class="docutils literal notranslate"><span class="pre">yggconfig</span></code> CLI to modify the configuration file. To see the options available, run <code class="docutils literal notranslate"><span class="pre">yggconfig</span> <span class="pre">-h</span></code>.</p>
+<div class="section" id="updating-the-compilation-tools">
+<h2>Updating the Compilation Tools<a class="headerlink" href="#updating-the-compilation-tools" title="Permalink to this headline">¶</a></h2>
+<p>To update the compilation tools that yggdrasil uses when building models of a certain language against the yggdrasil interface, you can use the <code class="docutils literal notranslate"><span class="pre">--XXX-compiler</span></code>, <code class="docutils literal notranslate"><span class="pre">--XXX-linker</span></code>, and <code class="docutils literal notranslate"><span class="pre">--XXX-archiver</span></code> options (where <code class="docutils literal notranslate"><span class="pre">XXX</span></code> is the language). For example, to configure yggdrasil to use the clang++ compiler tools for C++ models (if they are not the default), you would run:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ yggconfig --c++-compiler=clang++ --c++-linker=clang++ --c++-archiver=libtool
+</pre></div>
+</div>
+<p>You do not need to specify all three (e.g. you could just specify the compiler) and you can provide just the toolname or the full path to the executable. e.g.:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ yggconfig --c-compiler=/full/path/to/gcc
+</pre></div>
+</div>
+<p>Make sure that the tools you select are compatible with each other or you may get linking errors. You can run <code class="docutils literal notranslate"><span class="pre">ygginfo</span></code> to verify that yggdrasil is using the specified tools.</p>
+</div>
 <div class="section" id="debug-options">
 <h2>Debug Options<a class="headerlink" href="#debug-options" title="Permalink to this headline">¶</a></h2>
 <p>Options for controlling the level of information printed during a run can be controlled by options in the ‘[debug]’ section of the config files. Each one can have any of the valid
@@ -302,6 +317,11 @@ be used for creating static interface libraries.</p></td>
 <tr class="row-odd"><td><p>archiver_flags</p></td>
 <td><p>A list of flags that should be used when calling the
 archiver.</p></td>
+</tr>
+<tr class="row-even"><td><p>XXX_executable</p></td>
+<td><p>Full path to the executable that should be used for
+a compilation tool (compiler, linker, or archiver)
+with the name XXX.</p></td>
 </tr>
 </tbody>
 </table>

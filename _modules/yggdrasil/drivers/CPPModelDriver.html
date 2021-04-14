@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>yggdrasil.drivers.CPPModelDriver &mdash; yggdrasil v1.5.0 documentation</title>
+  <title>yggdrasil.drivers.CPPModelDriver &mdash; yggdrasil v1.6.0 documentation</title>
   
 
   
@@ -62,7 +62,7 @@
             
             
               <div class="version">
-                v1.5.0
+                v1.6.0
               </div>
             
           
@@ -104,6 +104,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../units.html">Units</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../c_format_strings.html">C-Style Format Strings</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../debugging.html">Debugging</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../threading.html">OpenMP Threading in Models</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../examples/examples_toc.html">Examples</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../advanced/index.html">Advanced</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../development/index.html">Development</a></li>
@@ -182,7 +183,7 @@
 <span class="kn">import</span> <span class="nn">copy</span>
 <span class="kn">from</span> <span class="nn">yggdrasil</span> <span class="kn">import</span> <span class="n">platform</span>
 <span class="kn">from</span> <span class="nn">yggdrasil.drivers.CModelDriver</span> <span class="kn">import</span> <span class="p">(</span>
-    <span class="n">CCompilerBase</span><span class="p">,</span> <span class="n">CModelDriver</span><span class="p">,</span> <span class="n">GCCCompiler</span><span class="p">,</span> <span class="n">ClangCompiler</span><span class="p">,</span>
+    <span class="n">CCompilerBase</span><span class="p">,</span> <span class="n">CModelDriver</span><span class="p">,</span> <span class="n">GCCCompiler</span><span class="p">,</span> <span class="n">ClangCompiler</span><span class="p">,</span> <span class="n">MSVCCompiler</span><span class="p">,</span>
     <span class="n">ClangLinker</span><span class="p">)</span>
 
 
@@ -272,12 +273,44 @@
         <span class="k">return</span> <span class="nb">super</span><span class="p">(</span><span class="n">ClangPPCompiler</span><span class="p">,</span> <span class="bp">cls</span><span class="p">)</span><span class="o">.</span><span class="n">get_executable_command</span><span class="p">(</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div></div>
 
 
+<div class="viewcode-block" id="MSVCPPCompiler"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.CPPModelDriver.MSVCPPCompiler">[docs]</a><span class="k">class</span> <span class="nc">MSVCPPCompiler</span><span class="p">(</span><span class="n">CPPCompilerBase</span><span class="p">,</span> <span class="n">MSVCCompiler</span><span class="p">):</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Inteface class for MSVC compiler when compiling C++.&quot;&quot;&quot;</span>
+    <span class="n">toolname</span> <span class="o">=</span> <span class="s1">&#39;cl++&#39;</span>
+    <span class="n">default_linker</span> <span class="o">=</span> <span class="n">MSVCCompiler</span><span class="o">.</span><span class="n">default_linker</span>
+    <span class="n">default_archiver</span> <span class="o">=</span> <span class="n">MSVCCompiler</span><span class="o">.</span><span class="n">default_archiver</span>
+    <span class="n">default_executable</span> <span class="o">=</span> <span class="n">MSVCCompiler</span><span class="o">.</span><span class="n">default_executable</span>
+    <span class="n">search_path_flags</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">dont_create_linker</span> <span class="o">=</span> <span class="kc">True</span>
+    
+<div class="viewcode-block" id="MSVCPPCompiler.get_flags"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.CPPModelDriver.MSVCPPCompiler.get_flags">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">get_flags</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Get a list of compiler flags.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            **kwargs: Additional keyword arguments are passed to the parent</span>
+<span class="sd">                class&#39;s method.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            list: Compiler flags.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;skip_standard_flag&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="k">return</span> <span class="nb">super</span><span class="p">(</span><span class="n">MSVCPPCompiler</span><span class="p">,</span> <span class="bp">cls</span><span class="p">)</span><span class="o">.</span><span class="n">get_flags</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="MSVCPPCompiler.before_registration"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.CPPModelDriver.MSVCPPCompiler.before_registration">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">before_registration</span><span class="p">(</span><span class="bp">cls</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Operations that should be performed to modify class attributes prior</span>
+<span class="sd">        to registration including things like platform dependent properties and</span>
+<span class="sd">        checking environment variables for default settings.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">MSVCCompiler</span><span class="o">.</span><span class="n">before_registration</span><span class="p">(</span><span class="bp">cls</span><span class="p">)</span></div></div>
+
+
 <div class="viewcode-block" id="ClangPPLinker"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.CPPModelDriver.ClangPPLinker">[docs]</a><span class="k">class</span> <span class="nc">ClangPPLinker</span><span class="p">(</span><span class="n">ClangLinker</span><span class="p">):</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Interface class for clang++ linker (calls to ld).&quot;&quot;&quot;</span>
     <span class="n">toolname</span> <span class="o">=</span> <span class="n">ClangPPCompiler</span><span class="o">.</span><span class="n">toolname</span>
     <span class="n">languages</span> <span class="o">=</span> <span class="n">ClangPPCompiler</span><span class="o">.</span><span class="n">languages</span>
     <span class="n">default_executable</span> <span class="o">=</span> <span class="n">ClangPPCompiler</span><span class="o">.</span><span class="n">default_executable</span>
-    <span class="n">default_executable_env</span> <span class="o">=</span> <span class="n">ClangPPCompiler</span><span class="o">.</span><span class="n">default_executable_env</span>
     <span class="n">toolset</span> <span class="o">=</span> <span class="n">ClangPPCompiler</span><span class="o">.</span><span class="n">toolset</span></div>
 
 

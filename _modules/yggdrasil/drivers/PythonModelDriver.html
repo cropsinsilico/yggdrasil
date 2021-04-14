@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>yggdrasil.drivers.PythonModelDriver &mdash; yggdrasil v1.5.0 documentation</title>
+  <title>yggdrasil.drivers.PythonModelDriver &mdash; yggdrasil v1.6.0 documentation</title>
   
 
   
@@ -62,7 +62,7 @@
             
             
               <div class="version">
-                v1.5.0
+                v1.6.0
               </div>
             
           
@@ -104,6 +104,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../units.html">Units</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../c_format_strings.html">C-Style Format Strings</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../debugging.html">Debugging</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../threading.html">OpenMP Threading in Models</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../examples/examples_toc.html">Examples</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../advanced/index.html">Advanced</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../development/index.html">Development</a></li>
@@ -274,6 +275,22 @@
 <span class="sd">        initialized and registered.&quot;&quot;&quot;</span>
         <span class="bp">cls</span><span class="o">.</span><span class="n">supported_comms</span> <span class="o">=</span> <span class="n">tools</span><span class="o">.</span><span class="n">get_supported_comm</span><span class="p">()</span>
         <span class="n">InterpretedModelDriver</span><span class="o">.</span><span class="n">finalize_registration</span><span class="p">(</span><span class="bp">cls</span><span class="p">)</span></div>
+        
+<div class="viewcode-block" id="PythonModelDriver.set_env"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.PythonModelDriver.PythonModelDriver.set_env">[docs]</a>    <span class="k">def</span> <span class="nf">set_env</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Get environment variables that should be set for the model process.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            **kwargs: Additional keyword arguments are passed to the parent class&#39;s</span>
+<span class="sd">                method.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            dict: Environment variables for the model process.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">out</span> <span class="o">=</span> <span class="nb">super</span><span class="p">(</span><span class="n">PythonModelDriver</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">set_env</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">with_valgrind</span><span class="p">:</span>
+            <span class="n">out</span><span class="p">[</span><span class="s1">&#39;PYTHONMALLOC&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;malloc&#39;</span>
+        <span class="k">return</span> <span class="n">out</span></div>
         
 <div class="viewcode-block" id="PythonModelDriver.is_language_installed"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.PythonModelDriver.PythonModelDriver.is_language_installed">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">is_language_installed</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>

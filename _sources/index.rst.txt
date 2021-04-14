@@ -24,6 +24,7 @@ Welcome to yggdrasil's documentation!
    units
    c_format_strings
    debugging
+   threading
    examples/examples_toc
    advanced/index
    development/index

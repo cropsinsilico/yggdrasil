@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>yggdrasil.drivers.tests.test_ConnectionDriver &mdash; yggdrasil v1.5.0 documentation</title>
+  <title>yggdrasil.drivers.tests.test_ConnectionDriver &mdash; yggdrasil v1.6.0 documentation</title>
   
 
   
@@ -62,7 +62,7 @@
             
             
               <div class="version">
-                v1.5.0
+                v1.6.0
               </div>
             
           
@@ -104,6 +104,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../../units.html">Units</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../c_format_strings.html">C-Style Format Strings</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../debugging.html">Debugging</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../threading.html">OpenMP Threading in Models</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../examples/examples_toc.html">Examples</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../advanced/index.html">Advanced</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../development/index.html">Development</a></li>
@@ -162,8 +163,6 @@
         
           <li><a href="../../drivers.html">yggdrasil.drivers</a> &raquo;</li>
         
-          <li><a href="../tests.html">yggdrasil.drivers.tests</a> &raquo;</li>
-        
       <li>yggdrasil.drivers.tests.test_ConnectionDriver</li>
     
     
@@ -181,15 +180,14 @@
             
   <h1>Source code for yggdrasil.drivers.tests.test_ConnectionDriver</h1><div class="highlight"><pre>
 <span></span><span class="kn">import</span> <span class="nn">unittest</span>
-<span class="kn">import</span> <span class="nn">pytest</span>
 <span class="kn">from</span> <span class="nn">yggdrasil</span> <span class="kn">import</span> <span class="n">tools</span><span class="p">,</span> <span class="n">platform</span>
-<span class="kn">from</span> <span class="nn">yggdrasil.tests</span> <span class="kn">import</span> <span class="n">MagicTestError</span><span class="p">,</span> <span class="n">assert_raises</span>
+<span class="kn">from</span> <span class="nn">yggdrasil.tests</span> <span class="kn">import</span> <span class="n">MagicTestError</span><span class="p">,</span> <span class="n">assert_raises</span><span class="p">,</span> <span class="n">timeout</span>
 <span class="kn">from</span> <span class="nn">yggdrasil.schema</span> <span class="kn">import</span> <span class="n">get_schema</span>
 <span class="kn">from</span> <span class="nn">yggdrasil.components</span> <span class="kn">import</span> <span class="n">import_component</span>
 <span class="kn">from</span> <span class="nn">yggdrasil.drivers.tests</span> <span class="kn">import</span> <span class="n">test_Driver</span> <span class="k">as</span> <span class="n">parent</span>
 <span class="kn">from</span> <span class="nn">yggdrasil.drivers.ConnectionDriver</span> <span class="kn">import</span> <span class="n">ConnectionDriver</span>
 <span class="kn">from</span> <span class="nn">yggdrasil.communication</span> <span class="kn">import</span> <span class="p">(</span>
-    <span class="n">new_comm</span><span class="p">,</span> <span class="n">ZMQComm</span><span class="p">,</span> <span class="n">IPCComm</span><span class="p">,</span> <span class="n">RMQComm</span><span class="p">)</span>
+    <span class="n">new_comm</span><span class="p">,</span> <span class="n">CommBase</span><span class="p">,</span> <span class="n">ZMQComm</span><span class="p">,</span> <span class="n">IPCComm</span><span class="p">,</span> <span class="n">RMQComm</span><span class="p">)</span>
 
 
 <span class="n">_default_comm</span> <span class="o">=</span> <span class="n">tools</span><span class="o">.</span><span class="n">get_default_comm</span><span class="p">()</span>
@@ -226,11 +224,6 @@
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;int: Maximum message size.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="nb">min</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="o">.</span><span class="n">icomm</span><span class="o">.</span><span class="n">maxMsgSize</span><span class="p">,</span>
                    <span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="o">.</span><span class="n">ocomm</span><span class="o">.</span><span class="n">maxMsgSize</span><span class="p">)</span>
-
-    <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">is_input</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;bool: True if the connection is for input.&quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">icomm_name</span> <span class="o">!=</span> <span class="bp">self</span><span class="o">.</span><span class="n">comm_name</span><span class="p">)</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">is_output</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -275,7 +268,9 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">flag</span> <span class="o">=</span> <span class="kc">True</span>
         <span class="n">msg_list</span> <span class="o">=</span> <span class="p">[]</span>
-        <span class="k">while</span> <span class="n">flag</span><span class="p">:</span>
+        <span class="n">timeout</span> <span class="o">=</span> <span class="mf">10.0</span>
+        <span class="n">Tout</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="o">.</span><span class="n">start_timeout</span><span class="p">(</span><span class="n">timeout</span><span class="p">,</span> <span class="n">key_suffix</span><span class="o">=</span><span class="s1">&#39;.stoptest&#39;</span><span class="p">)</span>
+        <span class="k">while</span> <span class="n">flag</span> <span class="ow">and</span> <span class="p">(</span><span class="ow">not</span> <span class="n">Tout</span><span class="o">.</span><span class="n">is_out</span><span class="p">):</span>
             <span class="n">flag</span><span class="p">,</span> <span class="n">msg_recv</span> <span class="o">=</span> <span class="n">recv_inst</span><span class="o">.</span><span class="n">recv</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">timeout</span><span class="p">)</span>
             <span class="k">if</span> <span class="n">flag</span><span class="p">:</span>
                 <span class="k">if</span> <span class="n">break_on_empty</span> <span class="ow">and</span> <span class="n">recv_inst</span><span class="o">.</span><span class="n">is_empty_recv</span><span class="p">(</span><span class="n">msg_recv</span><span class="p">):</span>
@@ -283,6 +278,7 @@
                 <span class="n">msg_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">msg_recv</span><span class="p">)</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">assert_equal</span><span class="p">(</span><span class="n">msg_recv</span><span class="p">,</span> <span class="n">recv_inst</span><span class="o">.</span><span class="n">eof_msg</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="o">.</span><span class="n">stop_timeout</span><span class="p">(</span><span class="n">key_suffix</span><span class="o">=</span><span class="s1">&#39;.stoptest&#39;</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">expected_result</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">assert_msg_lists_equal</span><span class="p">(</span><span class="n">msg_list</span><span class="p">,</span> <span class="n">expected_result</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">msg_list</span></div>
@@ -304,19 +300,19 @@
         <span class="k">return</span> <span class="n">comms</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">icomm_kws</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;dict: Keyword arguments for connection input comm.&quot;&quot;&quot;</span>
-        <span class="n">out</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">icomm_name</span><span class="p">,</span> <span class="s1">&#39;comm&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">icomm_name</span><span class="p">}</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_input</span><span class="p">:</span>
-            <span class="n">out</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">testing_options</span><span class="p">[</span><span class="s1">&#39;kwargs&#39;</span><span class="p">])</span>
+    <span class="k">def</span> <span class="nf">inputs</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;list: List of keyword arguments for connection input comms.&quot;&quot;&quot;</span>
+        <span class="n">out</span> <span class="o">=</span> <span class="p">[{</span><span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">icomm_name</span><span class="p">,</span> <span class="s1">&#39;commtype&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">icomm_name</span><span class="p">}]</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_output</span><span class="p">:</span>
+            <span class="n">out</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">testing_options</span><span class="p">[</span><span class="s1">&#39;kwargs&#39;</span><span class="p">])</span>
         <span class="k">return</span> <span class="n">out</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">ocomm_kws</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;dict: Keyword arguments for connection output comm.&quot;&quot;&quot;</span>
-        <span class="n">out</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">ocomm_name</span><span class="p">,</span> <span class="s1">&#39;comm&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">ocomm_name</span><span class="p">}</span>
+    <span class="k">def</span> <span class="nf">outputs</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;list: List of keyword arguments for connection output comms.&quot;&quot;&quot;</span>
+        <span class="n">out</span> <span class="o">=</span> <span class="p">[{</span><span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">ocomm_name</span><span class="p">,</span> <span class="s1">&#39;commtype&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">ocomm_name</span><span class="p">}]</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_output</span><span class="p">:</span>
-            <span class="n">out</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">testing_options</span><span class="p">[</span><span class="s1">&#39;kwargs&#39;</span><span class="p">])</span>
+            <span class="n">out</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">testing_options</span><span class="p">[</span><span class="s1">&#39;kwargs&#39;</span><span class="p">])</span>
         <span class="k">return</span> <span class="n">out</span>
 
     <span class="nd">@property</span>
@@ -332,7 +328,10 @@
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">send_comm_kwargs</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;dict: Keyword arguments for send comm.&quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="o">.</span><span class="n">icomm</span><span class="o">.</span><span class="n">opp_comm_kwargs</span><span class="p">()</span>
+        <span class="n">out</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="o">.</span><span class="n">icomm</span><span class="o">.</span><span class="n">opp_comm_kwargs</span><span class="p">()</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">icomm_name</span> <span class="o">==</span> <span class="s1">&#39;value&#39;</span><span class="p">:</span>
+            <span class="n">out</span><span class="p">[</span><span class="s1">&#39;direction&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;recv&#39;</span>
+        <span class="k">return</span> <span class="n">out</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">recv_comm_kwargs</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -343,8 +342,8 @@
     <span class="k">def</span> <span class="nf">inst_kwargs</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;dict: Keyword arguments for tested class.&quot;&quot;&quot;</span>
         <span class="n">out</span> <span class="o">=</span> <span class="nb">super</span><span class="p">(</span><span class="n">TestConnectionParam</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">inst_kwargs</span>
-        <span class="n">out</span><span class="p">[</span><span class="s1">&#39;icomm_kws&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">icomm_kws</span>
-        <span class="n">out</span><span class="p">[</span><span class="s1">&#39;ocomm_kws&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ocomm_kws</span>
+        <span class="n">out</span><span class="p">[</span><span class="s1">&#39;inputs&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">inputs</span>
+        <span class="n">out</span><span class="p">[</span><span class="s1">&#39;outputs&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">outputs</span>
         <span class="k">return</span> <span class="n">out</span>
 
     <span class="nd">@property</span>
@@ -397,16 +396,16 @@
         <span class="k">if</span> <span class="n">kwargs</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">kwargs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">inst_kwargs</span>
         <span class="c1"># Adjust kwargs</span>
-        <span class="k">if</span> <span class="s1">&#39;comm_address&#39;</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="p">:</span>
-            <span class="k">del</span> <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;comm_address&#39;</span><span class="p">]</span>
         <span class="k">if</span> <span class="n">comm</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;ocomm&#39;</span><span class="p">,</span> <span class="s1">&#39;both&#39;</span><span class="p">]:</span>
-            <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;ocomm_kws&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">update</span><span class="p">(</span>
-                <span class="n">base_comm</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">ocomm_name</span><span class="p">,</span> <span class="n">new_comm_class</span><span class="o">=</span><span class="s1">&#39;ErrorComm&#39;</span><span class="p">,</span>
-                <span class="n">error_on_init</span><span class="o">=</span><span class="n">error_on_init</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;outputs&#39;</span><span class="p">]:</span>
+                <span class="n">x</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">base_commtype</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">ocomm_name</span><span class="p">,</span>
+                         <span class="n">commtype</span><span class="o">=</span><span class="s1">&#39;ErrorComm&#39;</span><span class="p">,</span>
+                         <span class="n">error_on_init</span><span class="o">=</span><span class="n">error_on_init</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">comm</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;icomm&#39;</span><span class="p">,</span> <span class="s1">&#39;both&#39;</span><span class="p">]:</span>
-            <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;icomm_kws&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">update</span><span class="p">(</span>
-                <span class="n">base_comm</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">icomm_name</span><span class="p">,</span> <span class="n">new_comm_class</span><span class="o">=</span><span class="s1">&#39;ErrorComm&#39;</span><span class="p">,</span>
-                <span class="n">error_on_init</span><span class="o">=</span><span class="n">error_on_init</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;inputs&#39;</span><span class="p">]:</span>
+                <span class="n">x</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">base_commtype</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">icomm_name</span><span class="p">,</span>
+                         <span class="n">commtype</span><span class="o">=</span><span class="s1">&#39;ErrorComm&#39;</span><span class="p">,</span>
+                         <span class="n">error_on_init</span><span class="o">=</span><span class="n">error_on_init</span><span class="p">)</span>
         <span class="c1"># Get error class</span>
         <span class="k">if</span> <span class="p">(</span><span class="n">error_class</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">comm</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;ocomm&#39;</span><span class="p">,</span> <span class="s1">&#39;icomm&#39;</span><span class="p">,</span> <span class="s1">&#39;both&#39;</span><span class="p">]):</span>
             <span class="n">error_class</span> <span class="o">=</span> <span class="n">inst_class</span>
@@ -436,22 +435,28 @@
         <span class="k">assert</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="o">.</span><span class="n">is_comm_closed</span><span class="p">)</span>
         <span class="k">assert</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">send_comm</span><span class="o">.</span><span class="n">is_closed</span><span class="p">)</span>
         <span class="k">assert</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">recv_comm</span><span class="o">.</span><span class="n">is_closed</span><span class="p">)</span>
-        <span class="n">flag</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="o">.</span><span class="n">send_message</span><span class="p">()</span>
+        <span class="n">flag</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="o">.</span><span class="n">send_message</span><span class="p">(</span><span class="n">CommBase</span><span class="o">.</span><span class="n">CommMessage</span><span class="p">(</span><span class="n">args</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">test_msg</span><span class="p">))</span>
         <span class="k">assert</span><span class="p">(</span><span class="ow">not</span> <span class="n">flag</span><span class="p">)</span>
         <span class="n">flag</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="o">.</span><span class="n">recv_message</span><span class="p">()</span>
-        <span class="k">assert</span><span class="p">(</span><span class="ow">not</span> <span class="n">flag</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="o">.</span><span class="n">icomm</span><span class="o">.</span><span class="n">_commtype</span> <span class="o">!=</span> <span class="s1">&#39;value&#39;</span><span class="p">:</span>
+            <span class="k">assert</span><span class="p">(</span><span class="ow">not</span> <span class="n">flag</span><span class="p">)</span>
         <span class="c1"># Short</span>
-        <span class="n">flag</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">send_comm</span><span class="o">.</span><span class="n">send</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">test_msg</span><span class="p">)</span>
-        <span class="k">assert</span><span class="p">(</span><span class="ow">not</span> <span class="n">flag</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="o">.</span><span class="n">icomm</span><span class="o">.</span><span class="n">_commtype</span> <span class="o">!=</span> <span class="s1">&#39;value&#39;</span><span class="p">:</span>
+            <span class="n">flag</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">send_comm</span><span class="o">.</span><span class="n">send</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">test_msg</span><span class="p">)</span>
+            <span class="k">assert</span><span class="p">(</span><span class="ow">not</span> <span class="n">flag</span><span class="p">)</span>
         <span class="n">flag</span><span class="p">,</span> <span class="n">ret</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">recv_comm</span><span class="o">.</span><span class="n">recv</span><span class="p">()</span>
-        <span class="k">assert</span><span class="p">(</span><span class="ow">not</span> <span class="n">flag</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">assert_equal</span><span class="p">(</span><span class="n">ret</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="o">.</span><span class="n">icomm</span><span class="o">.</span><span class="n">_commtype</span> <span class="o">!=</span> <span class="s1">&#39;value&#39;</span><span class="p">:</span>
+            <span class="k">assert</span><span class="p">(</span><span class="ow">not</span> <span class="n">flag</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">assert_equal</span><span class="p">(</span><span class="n">ret</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
         <span class="c1"># Long</span>
-        <span class="n">flag</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">send_comm</span><span class="o">.</span><span class="n">send_nolimit</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">test_msg</span><span class="p">)</span>
-        <span class="k">assert</span><span class="p">(</span><span class="ow">not</span> <span class="n">flag</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="o">.</span><span class="n">icomm</span><span class="o">.</span><span class="n">_commtype</span> <span class="o">!=</span> <span class="s1">&#39;value&#39;</span><span class="p">:</span>
+            <span class="n">flag</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">send_comm</span><span class="o">.</span><span class="n">send_nolimit</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">test_msg</span><span class="p">)</span>
+            <span class="k">assert</span><span class="p">(</span><span class="ow">not</span> <span class="n">flag</span><span class="p">)</span>
         <span class="n">flag</span><span class="p">,</span> <span class="n">ret</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">recv_comm</span><span class="o">.</span><span class="n">recv_nolimit</span><span class="p">()</span>
-        <span class="k">assert</span><span class="p">(</span><span class="ow">not</span> <span class="n">flag</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">assert_equal</span><span class="p">(</span><span class="n">ret</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span></div></div>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="o">.</span><span class="n">icomm</span><span class="o">.</span><span class="n">_commtype</span> <span class="o">!=</span> <span class="s1">&#39;value&#39;</span><span class="p">:</span>
+            <span class="k">assert</span><span class="p">(</span><span class="ow">not</span> <span class="n">flag</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">assert_equal</span><span class="p">(</span><span class="n">ret</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="o">.</span><span class="n">confirm_output</span><span class="p">(</span><span class="n">timeout</span><span class="o">=</span><span class="mf">1.0</span><span class="p">)</span></div></div>
 
         
 <div class="viewcode-block" id="TestConnectionDriverNoInit"><a class="viewcode-back" href="../../../../yggdrasil.drivers.tests.html#yggdrasil.drivers.tests.test_ConnectionDriver.TestConnectionDriverNoInit">[docs]</a><span class="k">class</span> <span class="nc">TestConnectionDriverNoInit</span><span class="p">(</span><span class="n">TestConnectionParam</span><span class="p">):</span>
@@ -513,11 +518,18 @@
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Initialize comm object pair.&quot;&quot;&quot;</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">TestConnectionDriver</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">setup</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
         <span class="c1"># CommBase is dummy class that never opens</span>
-        <span class="k">if</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">send_comm</span><span class="o">.</span><span class="n">comm_class</span> <span class="o">!=</span> <span class="s1">&#39;CommBase&#39;</span><span class="p">):</span>
+        <span class="k">if</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">send_comm</span><span class="o">.</span><span class="n">_commtype</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">):</span>
             <span class="k">assert</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">send_comm</span><span class="o">.</span><span class="n">is_open</span><span class="p">)</span>
-        <span class="k">if</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">recv_comm</span><span class="o">.</span><span class="n">comm_class</span> <span class="o">!=</span> <span class="s1">&#39;CommBase&#39;</span><span class="p">):</span>
+        <span class="k">if</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">recv_comm</span><span class="o">.</span><span class="n">_commtype</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">):</span>
             <span class="k">assert</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">recv_comm</span><span class="o">.</span><span class="n">is_open</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">nmsg_recv</span> <span class="o">=</span> <span class="mi">1</span></div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">nmsg_recv</span> <span class="o">=</span> <span class="mi">1</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="o">.</span><span class="n">icomm</span><span class="o">.</span><span class="n">_commtype</span> <span class="o">==</span> <span class="s1">&#39;value&#39;</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">nmsg_recv</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_options</span><span class="p">()[</span><span class="s1">&#39;kwargs&#39;</span><span class="p">][</span><span class="s1">&#39;count&#39;</span><span class="p">]</span>
+        <span class="n">T</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="o">.</span><span class="n">start_timeout</span><span class="p">()</span>
+        <span class="k">while</span> <span class="p">((</span><span class="ow">not</span> <span class="n">T</span><span class="o">.</span><span class="n">is_out</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="o">.</span><span class="n">is_valid</span><span class="p">)):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="o">.</span><span class="n">sleep</span><span class="p">()</span>  <span class="c1"># pragma: debug</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="o">.</span><span class="n">stop_timeout</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">recv_comm</span><span class="o">.</span><span class="n">drain_server_signon_messages</span><span class="p">()</span></div>
 
 <div class="viewcode-block" id="TestConnectionDriver.test_init_del"><a class="viewcode-back" href="../../../../yggdrasil.drivers.tests.html#yggdrasil.drivers.tests.test_ConnectionDriver.TestConnectionDriver.test_init_del">[docs]</a>    <span class="k">def</span> <span class="nf">test_init_del</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test driver creation and deletion.&quot;&quot;&quot;</span>
@@ -529,40 +541,55 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="o">.</span><span class="n">open_comm</span><span class="p">()</span>
         <span class="k">assert</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="o">.</span><span class="n">is_comm_closed</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="TestConnectionDriver.test_send_recv"><a class="viewcode-back" href="../../../../yggdrasil.drivers.tests.html#yggdrasil.drivers.tests.test_ConnectionDriver.TestConnectionDriver.test_send_recv">[docs]</a>    <span class="nd">@pytest</span><span class="o">.</span><span class="n">mark</span><span class="o">.</span><span class="n">timeout</span><span class="p">(</span><span class="n">timeout</span><span class="o">=</span><span class="mi">600</span><span class="p">)</span>
+<div class="viewcode-block" id="TestConnectionDriver.test_send_recv"><a class="viewcode-back" href="../../../../yggdrasil.drivers.tests.html#yggdrasil.drivers.tests.test_ConnectionDriver.TestConnectionDriver.test_send_recv">[docs]</a>    <span class="nd">@timeout</span><span class="p">(</span><span class="n">timeout</span><span class="o">=</span><span class="mi">600</span><span class="p">)</span>
     <span class="k">def</span> <span class="nf">test_send_recv</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test sending/receiving small message.&quot;&quot;&quot;</span>
-        <span class="n">flag</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">send_comm</span><span class="o">.</span><span class="n">send</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">test_msg</span><span class="p">)</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">comm_name</span> <span class="o">!=</span> <span class="s1">&#39;CommBase&#39;</span><span class="p">:</span>
-            <span class="k">assert</span><span class="p">(</span><span class="n">flag</span><span class="p">)</span>
-        <span class="c1"># self.instance.sleep()</span>
-        <span class="c1"># if self.comm_name != &#39;CommBase&#39;:</span>
-        <span class="c1">#     self.assert_equal(self.recv_comm.n_msg, 1)</span>
-        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">nmsg_recv</span><span class="p">):</span>
-            <span class="n">flag</span><span class="p">,</span> <span class="n">msg_recv</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">recv_comm</span><span class="o">.</span><span class="n">recv</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">timeout</span><span class="p">)</span>
-            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">comm_name</span> <span class="o">!=</span> <span class="s1">&#39;CommBase&#39;</span><span class="p">:</span>
-                <span class="k">assert</span><span class="p">(</span><span class="n">flag</span><span class="p">)</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">assert_msg_equal</span><span class="p">(</span><span class="n">msg_recv</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">test_msg</span><span class="p">)</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">comm_name</span> <span class="o">!=</span> <span class="s1">&#39;CommBase&#39;</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">assert_equal</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="o">.</span><span class="n">n_msg</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span></div>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="o">.</span><span class="n">icomm</span><span class="o">.</span><span class="n">_commtype</span> <span class="o">!=</span> <span class="s1">&#39;value&#39;</span><span class="p">:</span>
+                <span class="n">flag</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">send_comm</span><span class="o">.</span><span class="n">send</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">test_msg</span><span class="p">)</span>
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">comm_name</span> <span class="o">!=</span> <span class="s1">&#39;CommBase&#39;</span><span class="p">:</span>
+                    <span class="k">assert</span><span class="p">(</span><span class="n">flag</span><span class="p">)</span>
+            <span class="c1"># self.instance.sleep()</span>
+            <span class="c1"># if self.comm_name != &#39;CommBase&#39;:</span>
+            <span class="c1">#     self.assert_equal(self.recv_comm.n_msg, 1)</span>
+            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">nmsg_recv</span><span class="p">):</span>
+                <span class="n">flag</span><span class="p">,</span> <span class="n">msg_recv</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">recv_comm</span><span class="o">.</span><span class="n">recv</span><span class="p">(</span><span class="n">timeout</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">timeout</span><span class="p">)</span>
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">comm_name</span> <span class="o">!=</span> <span class="s1">&#39;CommBase&#39;</span><span class="p">:</span>
+                    <span class="k">assert</span><span class="p">(</span><span class="n">flag</span><span class="p">)</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">assert_msg_equal</span><span class="p">(</span><span class="n">msg_recv</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">test_msg</span><span class="p">)</span>
+            <span class="k">if</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">comm_name</span> <span class="o">!=</span> <span class="s1">&#39;CommBase&#39;</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">icomm_name</span> <span class="o">!=</span> <span class="s1">&#39;value&#39;</span><span class="p">):</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">assert_equal</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="o">.</span><span class="n">n_msg</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">BaseException</span><span class="p">:</span>  <span class="c1"># pragma: debug</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">send_comm</span><span class="o">.</span><span class="n">printStatus</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="o">.</span><span class="n">printStatus</span><span class="p">(</span><span class="n">verbose</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">recv_comm</span><span class="o">.</span><span class="n">printStatus</span><span class="p">()</span>
+            <span class="k">raise</span></div>
 
-<div class="viewcode-block" id="TestConnectionDriver.test_send_recv_nolimit"><a class="viewcode-back" href="../../../../yggdrasil.drivers.tests.html#yggdrasil.drivers.tests.test_ConnectionDriver.TestConnectionDriver.test_send_recv_nolimit">[docs]</a>    <span class="nd">@pytest</span><span class="o">.</span><span class="n">mark</span><span class="o">.</span><span class="n">timeout</span><span class="p">(</span><span class="n">timeout</span><span class="o">=</span><span class="mi">600</span><span class="p">)</span>
+<div class="viewcode-block" id="TestConnectionDriver.test_send_recv_nolimit"><a class="viewcode-back" href="../../../../yggdrasil.drivers.tests.html#yggdrasil.drivers.tests.test_ConnectionDriver.TestConnectionDriver.test_send_recv_nolimit">[docs]</a>    <span class="nd">@timeout</span><span class="p">(</span><span class="n">timeout</span><span class="o">=</span><span class="mi">600</span><span class="p">)</span>
     <span class="k">def</span> <span class="nf">test_send_recv_nolimit</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test sending/receiving large message.&quot;&quot;&quot;</span>
-        <span class="k">assert</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">msg_long</span><span class="p">)</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">maxMsgSize</span><span class="p">)</span>
-        <span class="n">flag</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">send_comm</span><span class="o">.</span><span class="n">send_nolimit</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">msg_long</span><span class="p">)</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">comm_name</span> <span class="o">!=</span> <span class="s1">&#39;CommBase&#39;</span><span class="p">:</span>
-            <span class="k">assert</span><span class="p">(</span><span class="n">flag</span><span class="p">)</span>
-        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">nmsg_recv</span><span class="p">):</span>
-            <span class="n">flag</span><span class="p">,</span> <span class="n">msg_recv</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">recv_comm</span><span class="o">.</span><span class="n">recv_nolimit</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">timeout</span><span class="p">)</span>
-            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">comm_name</span> <span class="o">!=</span> <span class="s1">&#39;CommBase&#39;</span><span class="p">:</span>
-                <span class="k">assert</span><span class="p">(</span><span class="n">flag</span><span class="p">)</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">assert_msg_equal</span><span class="p">(</span><span class="n">msg_recv</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">msg_long</span><span class="p">)</span></div>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="o">.</span><span class="n">icomm</span><span class="o">.</span><span class="n">_commtype</span> <span class="o">!=</span> <span class="s1">&#39;value&#39;</span><span class="p">:</span>
+                <span class="k">assert</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">msg_long</span><span class="p">)</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">maxMsgSize</span><span class="p">)</span>
+                <span class="n">flag</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">send_comm</span><span class="o">.</span><span class="n">send_nolimit</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">msg_long</span><span class="p">)</span>
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">comm_name</span> <span class="o">!=</span> <span class="s1">&#39;CommBase&#39;</span><span class="p">:</span>
+                    <span class="k">assert</span><span class="p">(</span><span class="n">flag</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">nmsg_recv</span><span class="p">):</span>
+                <span class="n">flag</span><span class="p">,</span> <span class="n">msg_recv</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">recv_comm</span><span class="o">.</span><span class="n">recv_nolimit</span><span class="p">(</span><span class="n">timeout</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">timeout</span><span class="p">)</span>
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">comm_name</span> <span class="o">!=</span> <span class="s1">&#39;CommBase&#39;</span><span class="p">:</span>
+                    <span class="k">assert</span><span class="p">(</span><span class="n">flag</span><span class="p">)</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">assert_msg_equal</span><span class="p">(</span><span class="n">msg_recv</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">msg_long</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">BaseException</span><span class="p">:</span>  <span class="c1"># pragma: debug</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">send_comm</span><span class="o">.</span><span class="n">printStatus</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="o">.</span><span class="n">printStatus</span><span class="p">(</span><span class="n">verbose</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">recv_comm</span><span class="o">.</span><span class="n">printStatus</span><span class="p">()</span>
+            <span class="k">raise</span></div>
 
 <div class="viewcode-block" id="TestConnectionDriver.assert_before_stop"><a class="viewcode-back" href="../../../../yggdrasil.drivers.tests.html#yggdrasil.drivers.tests.test_ConnectionDriver.TestConnectionDriver.assert_before_stop">[docs]</a>    <span class="k">def</span> <span class="nf">assert_before_stop</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">check_open</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Assertions to make before stopping the driver instance.&quot;&quot;&quot;</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">TestConnectionDriver</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">assert_before_stop</span><span class="p">()</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">comm_name</span> <span class="o">!=</span> <span class="s1">&#39;CommBase&#39;</span> <span class="ow">and</span> <span class="n">check_open</span><span class="p">:</span>
+        <span class="k">if</span> <span class="p">(((</span><span class="bp">self</span><span class="o">.</span><span class="n">comm_name</span> <span class="o">!=</span> <span class="s1">&#39;CommBase&#39;</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">icomm_name</span> <span class="o">!=</span> <span class="s1">&#39;value&#39;</span><span class="p">)</span>
+             <span class="ow">and</span> <span class="n">check_open</span><span class="p">)):</span>
             <span class="k">assert</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="o">.</span><span class="n">is_comm_open</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="TestConnectionDriver.run_before_terminate"><a class="viewcode-back" href="../../../../yggdrasil.drivers.tests.html#yggdrasil.drivers.tests.test_ConnectionDriver.TestConnectionDriver.run_before_terminate">[docs]</a>    <span class="k">def</span> <span class="nf">run_before_terminate</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -591,7 +618,7 @@
     <span class="k">def</span> <span class="nf">inst_kwargs</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;dict: Keyword arguments for tested class.&quot;&quot;&quot;</span>
         <span class="n">out</span> <span class="o">=</span> <span class="nb">super</span><span class="p">(</span><span class="n">TestConnectionDriverFork</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">inst_kwargs</span>
-        <span class="n">out</span><span class="p">[</span><span class="s1">&#39;icomm_kws&#39;</span><span class="p">][</span><span class="s1">&#39;comm&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="kc">None</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ncomm_input</span><span class="p">)]</span>
+        <span class="n">out</span><span class="p">[</span><span class="s1">&#39;inputs&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="kc">None</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ncomm_input</span><span class="p">)]</span>
         <span class="k">return</span> <span class="n">out</span></div>
 
 
@@ -600,6 +627,8 @@
 
 <div class="viewcode-block" id="TestConnectionDriverTranslate"><a class="viewcode-back" href="../../../../yggdrasil.drivers.tests.html#yggdrasil.drivers.tests.test_ConnectionDriver.TestConnectionDriverTranslate">[docs]</a><span class="k">class</span> <span class="nc">TestConnectionDriverTranslate</span><span class="p">(</span><span class="n">TestConnectionDriver</span><span class="p">):</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test class for the ConnectionDriver class with translator.&quot;&quot;&quot;</span>
+
+    <span class="n">test_send_recv_nolimit</span> <span class="o">=</span> <span class="kc">None</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">inst_kwargs</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -616,14 +645,43 @@
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;str: Test message that should be used for any send/recv tests.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="p">{</span><span class="s1">&#39;a&#39;</span><span class="p">:</span> <span class="nb">int</span><span class="p">(</span><span class="mi">1</span><span class="p">),</span> <span class="s1">&#39;b&#39;</span><span class="p">:</span> <span class="nb">float</span><span class="p">(</span><span class="mi">2</span><span class="p">)}</span>
 
-<div class="viewcode-block" id="TestConnectionDriverTranslate.test_send_recv_nolimit"><a class="viewcode-back" href="../../../../yggdrasil.drivers.tests.html#yggdrasil.drivers.tests.test_ConnectionDriver.TestConnectionDriverTranslate.test_send_recv_nolimit">[docs]</a>    <span class="k">def</span> <span class="nf">test_send_recv_nolimit</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test sending/receiving large message.&quot;&quot;&quot;</span>
-        <span class="k">pass</span></div>
-    
 <div class="viewcode-block" id="TestConnectionDriverTranslate.map_sent2recv"><a class="viewcode-back" href="../../../../yggdrasil.drivers.tests.html#yggdrasil.drivers.tests.test_ConnectionDriver.TestConnectionDriverTranslate.map_sent2recv">[docs]</a>    <span class="k">def</span> <span class="nf">map_sent2recv</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Convert a sent object into a received one.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="n">obj</span><span class="p">[</span><span class="s1">&#39;a&#39;</span><span class="p">]</span></div></div>
     
+
+<div class="viewcode-block" id="TestConnectionDriverIterate"><a class="viewcode-back" href="../../../../yggdrasil.drivers.tests.html#yggdrasil.drivers.tests.test_ConnectionDriver.TestConnectionDriverIterate">[docs]</a><span class="k">class</span> <span class="nc">TestConnectionDriverIterate</span><span class="p">(</span><span class="n">TestConnectionDriver</span><span class="p">):</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test class for the ConnectionDriver class with iteration.&quot;&quot;&quot;</span>
+
+    <span class="n">test_send_recv_nolimit</span> <span class="o">=</span> <span class="kc">None</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">inst_kwargs</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;dict: Keyword arguments for tested class.&quot;&quot;&quot;</span>
+        <span class="n">out</span> <span class="o">=</span> <span class="nb">super</span><span class="p">(</span><span class="n">TestConnectionDriverIterate</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">inst_kwargs</span>
+        <span class="n">out</span><span class="p">[</span><span class="s1">&#39;translator&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[{</span><span class="s1">&#39;transformtype&#39;</span><span class="p">:</span> <span class="s1">&#39;select_fields&#39;</span><span class="p">,</span>
+                              <span class="s1">&#39;selected&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;a&#39;</span><span class="p">,</span> <span class="s1">&#39;b&#39;</span><span class="p">]},</span>
+                             <span class="p">{</span><span class="s1">&#39;transformtype&#39;</span><span class="p">:</span> <span class="s1">&#39;iterate&#39;</span><span class="p">}]</span>
+        <span class="n">out</span><span class="p">[</span><span class="s1">&#39;onexit&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;printStatus&#39;</span>
+        <span class="k">return</span> <span class="n">out</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">test_msg</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;str: Test message that should be used for any send/recv tests.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="p">{</span><span class="s1">&#39;a&#39;</span><span class="p">:</span> <span class="nb">int</span><span class="p">(</span><span class="mi">1</span><span class="p">),</span> <span class="s1">&#39;b&#39;</span><span class="p">:</span> <span class="s1">&#39;hello&#39;</span><span class="p">,</span> <span class="s1">&#39;c&#39;</span><span class="p">:</span> <span class="nb">float</span><span class="p">(</span><span class="mi">2</span><span class="p">)}</span>
+
+<div class="viewcode-block" id="TestConnectionDriverIterate.test_send_recv"><a class="viewcode-back" href="../../../../yggdrasil.drivers.tests.html#yggdrasil.drivers.tests.test_ConnectionDriver.TestConnectionDriverIterate.test_send_recv">[docs]</a>    <span class="nd">@timeout</span><span class="p">(</span><span class="n">timeout</span><span class="o">=</span><span class="mi">600</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">test_send_recv</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test sending/receiving small message.&quot;&quot;&quot;</span>
+        <span class="n">msg</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">test_msg</span>
+        <span class="n">flag</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">send_comm</span><span class="o">.</span><span class="n">send</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+        <span class="k">assert</span><span class="p">(</span><span class="n">flag</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">imsg</span> <span class="ow">in</span> <span class="p">[</span><span class="n">v</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">msg</span><span class="o">.</span><span class="n">items</span><span class="p">()</span> <span class="k">if</span> <span class="n">k</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;a&#39;</span><span class="p">,</span> <span class="s1">&#39;b&#39;</span><span class="p">]]:</span>
+            <span class="n">flag</span><span class="p">,</span> <span class="n">msg_recv</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">recv_comm</span><span class="o">.</span><span class="n">recv</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">timeout</span><span class="p">)</span>
+            <span class="k">assert</span><span class="p">(</span><span class="n">flag</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">assert_msg_equal</span><span class="p">(</span><span class="n">msg_recv</span><span class="p">,</span> <span class="n">imsg</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assert_equal</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="o">.</span><span class="n">n_msg</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span></div></div>
+
 
 <div class="viewcode-block" id="TestConnectionDriverProcess"><a class="viewcode-back" href="../../../../yggdrasil.drivers.tests.html#yggdrasil.drivers.tests.test_ConnectionDriver.TestConnectionDriverProcess">[docs]</a><span class="k">class</span> <span class="nc">TestConnectionDriverProcess</span><span class="p">(</span><span class="n">TestConnectionDriver</span><span class="p">):</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test class for the TestConnectionDriver using process.&quot;&quot;&quot;</span>
@@ -651,38 +709,39 @@
                   <span class="n">translator</span><span class="o">=</span><span class="n">invalid_translate</span><span class="p">)</span></div>
 
     
-<span class="c1"># Dynamically create tests based on registered file classes</span>
+<span class="c1"># Dynamically create tests based on registered comm classes</span>
 <span class="n">s</span> <span class="o">=</span> <span class="n">get_schema</span><span class="p">()</span>
-<span class="n">comm_types</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">s</span><span class="p">[</span><span class="s1">&#39;comm&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">schema_subtypes</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
+<span class="n">comm_types</span> <span class="o">=</span> <span class="n">s</span><span class="p">[</span><span class="s1">&#39;comm&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">subtypes</span>
 <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">comm_types</span><span class="p">:</span>
-    <span class="k">if</span> <span class="n">k</span> <span class="o">==</span> <span class="n">_default_comm</span><span class="p">:</span>  <span class="c1"># pragma: debug</span>
+    <span class="k">if</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">_default_comm</span><span class="p">:</span>  <span class="c1"># pragma: debug</span>
         <span class="k">continue</span>
     <span class="c1"># Output</span>
-    <span class="n">ocls</span> <span class="o">=</span> <span class="nb">type</span><span class="p">(</span><span class="s1">&#39;Test</span><span class="si">%s</span><span class="s1">OutputDriver&#39;</span> <span class="o">%</span> <span class="n">k</span><span class="p">,</span>
+    <span class="n">ocls</span> <span class="o">=</span> <span class="nb">type</span><span class="p">(</span><span class="s1">&#39;Test</span><span class="si">%s</span><span class="s1">OutputDriver&#39;</span> <span class="o">%</span> <span class="n">k</span><span class="o">.</span><span class="n">title</span><span class="p">(),</span>
                 <span class="p">(</span><span class="n">TestConnectionDriver</span><span class="p">,</span> <span class="p">),</span> <span class="p">{</span><span class="s1">&#39;ocomm_name&#39;</span><span class="p">:</span> <span class="n">k</span><span class="p">,</span>
                                            <span class="s1">&#39;driver&#39;</span><span class="p">:</span> <span class="s1">&#39;OutputDriver&#39;</span><span class="p">,</span>
                                            <span class="s1">&#39;args&#39;</span><span class="p">:</span> <span class="s1">&#39;test&#39;</span><span class="p">})</span>
     <span class="c1"># Input</span>
-    <span class="n">icls</span> <span class="o">=</span> <span class="nb">type</span><span class="p">(</span><span class="s1">&#39;Test</span><span class="si">%s</span><span class="s1">InputDriver&#39;</span> <span class="o">%</span> <span class="n">k</span><span class="p">,</span>
+    <span class="n">icls</span> <span class="o">=</span> <span class="nb">type</span><span class="p">(</span><span class="s1">&#39;Test</span><span class="si">%s</span><span class="s1">InputDriver&#39;</span> <span class="o">%</span> <span class="n">k</span><span class="o">.</span><span class="n">title</span><span class="p">(),</span>
                 <span class="p">(</span><span class="n">TestConnectionDriver</span><span class="p">,</span> <span class="p">),</span> <span class="p">{</span><span class="s1">&#39;icomm_name&#39;</span><span class="p">:</span> <span class="n">k</span><span class="p">,</span>
                                            <span class="s1">&#39;driver&#39;</span><span class="p">:</span> <span class="s1">&#39;InputDriver&#39;</span><span class="p">,</span>
                                            <span class="s1">&#39;args&#39;</span><span class="p">:</span> <span class="s1">&#39;test&#39;</span><span class="p">})</span>
     <span class="c1"># Flags</span>
     <span class="n">flag_func</span> <span class="o">=</span> <span class="kc">None</span>
-    <span class="k">if</span> <span class="n">k</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;RMQComm&#39;</span><span class="p">,</span> <span class="s1">&#39;RMQAsyncComm&#39;</span><span class="p">]:</span>
+    <span class="k">if</span> <span class="n">k</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;RMQComm&#39;</span><span class="p">,</span> <span class="s1">&#39;RMQAsyncComm&#39;</span><span class="p">,</span> <span class="s1">&#39;rmq&#39;</span><span class="p">,</span> <span class="s1">&#39;rmq_async&#39;</span><span class="p">]:</span>
         <span class="n">flag_func</span> <span class="o">=</span> <span class="n">unittest</span><span class="o">.</span><span class="n">skipIf</span><span class="p">(</span><span class="ow">not</span> <span class="n">_rmq_installed</span><span class="p">,</span>
                                     <span class="s2">&quot;RMQ Server not running&quot;</span><span class="p">)</span>
-    <span class="k">elif</span> <span class="n">k</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;ZMQComm&#39;</span><span class="p">]:</span>
+    <span class="k">elif</span> <span class="n">k</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;ZMQComm&#39;</span><span class="p">,</span> <span class="s1">&#39;zmq&#39;</span><span class="p">]:</span>
         <span class="n">flag_func</span> <span class="o">=</span> <span class="n">unittest</span><span class="o">.</span><span class="n">skipIf</span><span class="p">(</span><span class="ow">not</span> <span class="n">_zmq_installed</span><span class="p">,</span>
                                     <span class="s2">&quot;ZMQ library not installed&quot;</span><span class="p">)</span>
-    <span class="k">elif</span> <span class="n">k</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;IPCComm&#39;</span><span class="p">]:</span>
+    <span class="k">elif</span> <span class="n">k</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;IPCComm&#39;</span><span class="p">,</span> <span class="s1">&#39;ipc&#39;</span><span class="p">]:</span>
         <span class="n">flag_func</span> <span class="o">=</span> <span class="n">unittest</span><span class="o">.</span><span class="n">skipIf</span><span class="p">(</span><span class="ow">not</span> <span class="n">_ipc_installed</span><span class="p">,</span>
                                     <span class="s2">&quot;IPC library not installed&quot;</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">flag_func</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">ocls</span> <span class="o">=</span> <span class="n">flag_func</span><span class="p">(</span><span class="n">ocls</span><span class="p">)</span>
         <span class="n">icls</span> <span class="o">=</span> <span class="n">flag_func</span><span class="p">(</span><span class="n">icls</span><span class="p">)</span>
     <span class="c1"># Add class to globals</span>
-    <span class="nb">globals</span><span class="p">()[</span><span class="n">ocls</span><span class="o">.</span><span class="vm">__name__</span><span class="p">]</span> <span class="o">=</span> <span class="n">ocls</span>
+    <span class="k">if</span> <span class="n">k</span> <span class="o">!=</span> <span class="s1">&#39;value&#39;</span><span class="p">:</span>
+        <span class="nb">globals</span><span class="p">()[</span><span class="n">ocls</span><span class="o">.</span><span class="vm">__name__</span><span class="p">]</span> <span class="o">=</span> <span class="n">ocls</span>
     <span class="nb">globals</span><span class="p">()[</span><span class="n">icls</span><span class="o">.</span><span class="vm">__name__</span><span class="p">]</span> <span class="o">=</span> <span class="n">icls</span>
     <span class="k">del</span> <span class="n">ocls</span><span class="p">,</span> <span class="n">icls</span>
 </pre></div>

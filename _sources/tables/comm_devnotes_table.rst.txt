@@ -17,6 +17,7 @@ rmq      AMPQ queue address of the form ``<url>_R   It is not advised that new l
          of the exchange on the queue that should                                                                                   
          be used, and ``queue`` is the name of                                                                                      
          the queue.                                                                                                                 
+value                                               []                                                                              
 zmq      A ZeroMQ endpoint of the form              |yggdrasil| uses the tcp transport by default with a PAIR socket type. For every
          <transport>://<address>, where the         connection, |yggdrasil| establishes a second request/reply connection that is   
          format of address depends on the           used to confirm messages passed between the primary PAIR of sockets. On the     

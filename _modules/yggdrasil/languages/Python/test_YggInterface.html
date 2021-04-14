@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>yggdrasil.languages.Python.test_YggInterface &mdash; yggdrasil v1.5.0 documentation</title>
+  <title>yggdrasil.languages.Python.test_YggInterface &mdash; yggdrasil v1.6.0 documentation</title>
   
 
   
@@ -62,7 +62,7 @@
             
             
               <div class="version">
-                v1.5.0
+                v1.6.0
               </div>
             
           
@@ -104,6 +104,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../../units.html">Units</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../c_format_strings.html">C-Style Format Strings</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../debugging.html">Debugging</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../threading.html">OpenMP Threading in Models</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../examples/examples_toc.html">Examples</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../advanced/index.html">Advanced</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../development/index.html">Development</a></li>
@@ -186,7 +187,7 @@
 <span class="kn">from</span> <span class="nn">yggdrasil.tools</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">YGG_MSG_EOF</span><span class="p">,</span> <span class="n">get_YGG_MSG_MAX</span><span class="p">,</span> <span class="n">YGG_MSG_BUF</span><span class="p">,</span> <span class="n">is_lang_installed</span><span class="p">)</span>
 <span class="kn">from</span> <span class="nn">yggdrasil.components</span> <span class="kn">import</span> <span class="n">import_component</span>
-<span class="kn">from</span> <span class="nn">yggdrasil.drivers</span> <span class="kn">import</span> <span class="p">(</span><span class="n">InputDriver</span><span class="p">,</span> <span class="n">OutputDriver</span><span class="p">)</span>
+<span class="kn">from</span> <span class="nn">yggdrasil.drivers</span> <span class="kn">import</span> <span class="n">ConnectionDriver</span>
 <span class="kn">from</span> <span class="nn">yggdrasil.tests</span> <span class="kn">import</span> <span class="n">YggTestClassInfo</span><span class="p">,</span> <span class="n">assert_equal</span><span class="p">,</span> <span class="n">assert_raises</span>
 
 
@@ -195,8 +196,8 @@
 
 <div class="viewcode-block" id="ModelEnv"><a class="viewcode-back" href="../../../../yggdrasil.languages.Python.html#yggdrasil.languages.Python.test_YggInterface.ModelEnv">[docs]</a><span class="k">class</span> <span class="nc">ModelEnv</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
     
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">language</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-        <span class="n">new_kw</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;YGG_SUBPROCESS&#39;</span><span class="p">:</span> <span class="s1">&#39;True&#39;</span><span class="p">}</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">language</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">new_kw</span><span class="p">):</span>
+        <span class="n">new_kw</span><span class="p">[</span><span class="s1">&#39;YGG_SUBPROCESS&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;True&#39;</span>
         <span class="k">if</span> <span class="n">language</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">new_kw</span><span class="p">[</span><span class="s1">&#39;YGG_MODEL_LANGUAGE&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">language</span>
         <span class="c1"># Send environment keyword to fake language</span>
@@ -237,7 +238,7 @@
     <span class="n">assert_raises</span><span class="p">(</span><span class="ne">Exception</span><span class="p">,</span> <span class="n">YggInterface</span><span class="o">.</span><span class="n">YggOutput</span><span class="p">,</span> <span class="s1">&#39;error&#39;</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="do_send_recv"><a class="viewcode-back" href="../../../../yggdrasil.languages.Python.html#yggdrasil.languages.Python.test_YggInterface.do_send_recv">[docs]</a><span class="k">def</span> <span class="nf">do_send_recv</span><span class="p">(</span><span class="n">language</span><span class="o">=</span><span class="s1">&#39;python&#39;</span><span class="p">,</span> <span class="n">fmt</span><span class="o">=</span><span class="s1">&#39;</span><span class="si">%f</span><span class="se">\\</span><span class="s1">n</span><span class="si">%d</span><span class="s1">&#39;</span><span class="p">,</span> <span class="n">msg</span><span class="o">=</span><span class="p">[</span><span class="nb">float</span><span class="p">(</span><span class="mf">1.0</span><span class="p">),</span> <span class="nb">int</span><span class="p">(</span><span class="mi">2</span><span class="p">)],</span>
+<div class="viewcode-block" id="do_send_recv"><a class="viewcode-back" href="../../../../yggdrasil.languages.Python.html#yggdrasil.languages.Python.test_YggInterface.do_send_recv">[docs]</a><span class="k">def</span> <span class="nf">do_send_recv</span><span class="p">(</span><span class="n">language</span><span class="o">=</span><span class="s1">&#39;python&#39;</span><span class="p">,</span> <span class="n">fmt</span><span class="o">=</span><span class="s1">&#39;</span><span class="si">%f</span><span class="se">\\</span><span class="s1">n</span><span class="si">%d</span><span class="s1">&#39;</span><span class="p">,</span> <span class="n">msg</span><span class="o">=</span><span class="p">[</span><span class="nb">float</span><span class="p">(</span><span class="mf">1.0</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">int32</span><span class="p">(</span><span class="mi">2</span><span class="p">)],</span>
                  <span class="n">input_interface</span><span class="o">=</span><span class="s1">&#39;YggInput&#39;</span><span class="p">,</span> <span class="n">output_interface</span><span class="o">=</span><span class="s1">&#39;YggOutput&#39;</span><span class="p">):</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Function to perform simple send/receive between two comms using a</span>
 <span class="sd">    language interface that calls the Python interface.</span>
@@ -260,33 +261,34 @@
     <span class="n">ldrv</span> <span class="o">=</span> <span class="n">import_component</span><span class="p">(</span><span class="s1">&#39;model&#39;</span><span class="p">,</span> <span class="n">language</span><span class="p">)</span>
     <span class="n">converter</span> <span class="o">=</span> <span class="n">ldrv</span><span class="o">.</span><span class="n">python2language</span>
     <span class="c1"># Create and start drivers to transport messages</span>
-    <span class="n">odrv</span> <span class="o">=</span> <span class="n">OutputDriver</span><span class="o">.</span><span class="n">OutputDriver</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="s1">&#39;link&#39;</span><span class="p">)</span>
-    <span class="n">odrv</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
-    <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">odrv</span><span class="o">.</span><span class="n">env</span><span class="p">)</span>
-    <span class="n">idrv</span> <span class="o">=</span> <span class="n">InputDriver</span><span class="o">.</span><span class="n">InputDriver</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="s1">&#39;link&#39;</span><span class="p">,</span> <span class="n">comm_env</span><span class="o">=</span><span class="n">odrv</span><span class="o">.</span><span class="n">comm_env</span><span class="p">)</span>
-    <span class="n">idrv</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
-    <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">idrv</span><span class="o">.</span><span class="n">env</span><span class="p">)</span>
+    <span class="n">iodrv</span> <span class="o">=</span> <span class="n">ConnectionDriver</span><span class="o">.</span><span class="n">ConnectionDriver</span><span class="p">(</span>
+        <span class="n">name</span><span class="p">,</span>
+        <span class="n">inputs</span><span class="o">=</span><span class="p">[{</span><span class="s1">&#39;partner_model&#39;</span><span class="p">:</span> <span class="s1">&#39;model1&#39;</span><span class="p">,</span> <span class="s1">&#39;allow_multiple_comms&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">}],</span>
+        <span class="n">outputs</span><span class="o">=</span><span class="p">[{</span><span class="s1">&#39;partner_model&#39;</span><span class="p">:</span> <span class="s1">&#39;model2&#39;</span><span class="p">,</span> <span class="s1">&#39;allow_multiple_comms&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">}])</span>
+    <span class="n">iodrv</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
+    <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">iodrv</span><span class="o">.</span><span class="n">icomm</span><span class="o">.</span><span class="n">opp_comms</span><span class="p">)</span>
+    <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">iodrv</span><span class="o">.</span><span class="n">ocomm</span><span class="o">.</span><span class="n">opp_comms</span><span class="p">)</span>
     <span class="c1"># Connect and utilize interface under disguise as target language</span>
     <span class="k">try</span><span class="p">:</span>
-        <span class="k">with</span> <span class="n">ModelEnv</span><span class="p">(</span><span class="n">language</span><span class="o">=</span><span class="n">language</span><span class="p">):</span>
+        <span class="k">with</span> <span class="n">ModelEnv</span><span class="p">(</span><span class="n">language</span><span class="o">=</span><span class="n">language</span><span class="p">,</span> <span class="n">YGG_THREADING</span><span class="o">=</span><span class="s1">&#39;True&#39;</span><span class="p">):</span>
+            <span class="c1"># Ensure start-up by waiting for signon message</span>
+            <span class="n">i</span> <span class="o">=</span> <span class="n">YggInterface</span><span class="o">.</span><span class="n">YggInit</span><span class="p">(</span><span class="n">input_interface</span><span class="p">,</span> <span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">fmt</span><span class="p">))</span>
+            <span class="n">i</span><span class="o">.</span><span class="n">drain_server_signon_messages</span><span class="p">()</span>
             <span class="c1"># Output</span>
             <span class="n">o</span> <span class="o">=</span> <span class="n">YggInterface</span><span class="o">.</span><span class="n">YggInit</span><span class="p">(</span><span class="n">output_interface</span><span class="p">,</span> <span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">fmt</span><span class="p">))</span>
             <span class="n">o</span><span class="o">.</span><span class="n">send</span><span class="p">(</span><span class="o">*</span><span class="n">msg</span><span class="p">)</span>
             <span class="n">o</span><span class="o">.</span><span class="n">send_eof</span><span class="p">()</span>
-            <span class="n">o</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+            <span class="n">o</span><span class="o">.</span><span class="n">close</span><span class="p">(</span><span class="n">linger</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
             <span class="c1"># Input</span>
-            <span class="n">i</span> <span class="o">=</span> <span class="n">YggInterface</span><span class="o">.</span><span class="n">YggInit</span><span class="p">(</span><span class="n">input_interface</span><span class="p">,</span> <span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">fmt</span><span class="p">))</span>
             <span class="n">assert_equal</span><span class="p">(</span><span class="n">i</span><span class="o">.</span><span class="n">recv</span><span class="p">(),</span> <span class="p">(</span><span class="kc">True</span><span class="p">,</span> <span class="n">converter</span><span class="p">(</span><span class="n">msg</span><span class="p">)))</span>
             <span class="n">assert_equal</span><span class="p">(</span><span class="n">i</span><span class="o">.</span><span class="n">recv</span><span class="p">(),</span> <span class="p">(</span><span class="kc">False</span><span class="p">,</span> <span class="n">converter</span><span class="p">(</span><span class="n">YGG_MSG_EOF</span><span class="p">)))</span>
     <span class="k">finally</span><span class="p">:</span>
-        <span class="n">odrv</span><span class="o">.</span><span class="n">terminate</span><span class="p">()</span>
-        <span class="n">idrv</span><span class="o">.</span><span class="n">terminate</span><span class="p">()</span></div>
+        <span class="n">iodrv</span><span class="o">.</span><span class="n">terminate</span><span class="p">()</span></div>
 
 
-<div class="viewcode-block" id="test_YggInit_langauge"><a class="viewcode-back" href="../../../../yggdrasil.languages.Python.html#yggdrasil.languages.Python.test_YggInterface.test_YggInit_langauge">[docs]</a><span class="k">def</span> <span class="nf">test_YggInit_langauge</span><span class="p">():</span>
+<div class="viewcode-block" id="test_YggInit_language"><a class="viewcode-back" href="../../../../yggdrasil.languages.Python.html#yggdrasil.languages.Python.test_YggInterface.test_YggInit_language">[docs]</a><span class="k">def</span> <span class="nf">test_YggInit_language</span><span class="p">():</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test access to YggInit via languages that call the Python interface.&quot;&quot;&quot;</span>
     <span class="k">for</span> <span class="n">language</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;matlab&#39;</span><span class="p">,</span> <span class="s1">&#39;R&#39;</span><span class="p">]:</span>
-        <span class="nb">print</span><span class="p">(</span><span class="n">language</span><span class="p">)</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">is_lang_installed</span><span class="p">(</span><span class="n">language</span><span class="p">):</span>
             <span class="k">continue</span>
         <span class="n">do_send_recv</span><span class="p">(</span><span class="n">language</span><span class="o">=</span><span class="n">language</span><span class="p">)</span></div>
@@ -316,9 +318,10 @@
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">TestBase</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="s1">&#39;test&#39;</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">uuid</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">model1</span> <span class="o">=</span> <span class="s1">&#39;model1&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">model2</span> <span class="o">=</span> <span class="s1">&#39;model2&#39;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">language</span> <span class="o">=</span> <span class="kc">None</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">idriver</span> <span class="o">=</span> <span class="kc">None</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">odriver</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">iodriver</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">test_comm</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">is_file</span> <span class="o">=</span> <span class="kc">False</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">filecomm</span> <span class="o">=</span> <span class="kc">None</span>
@@ -328,62 +331,38 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">test_comm_kwargs</span> <span class="o">=</span> <span class="p">{}</span>
         <span class="c1"># self._driver_kwargs = {}</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_inst_args</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">]</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">fmt_str</span> <span class="o">=</span> <span class="sa">b</span><span class="s1">&#39;</span><span class="si">%5s</span><span class="se">\t</span><span class="si">%d</span><span class="se">\t</span><span class="si">%f</span><span class="se">\n</span><span class="s1">&#39;</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">fmt_str_matlab</span> <span class="o">=</span> <span class="sa">b</span><span class="s1">&#39;</span><span class="si">%5s</span><span class="se">\\</span><span class="s1">t</span><span class="si">%d</span><span class="se">\\</span><span class="s1">t</span><span class="si">%f</span><span class="se">\\</span><span class="s1">n&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">fmt_str</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="si">%5s</span><span class="se">\t</span><span class="si">%d</span><span class="se">\t</span><span class="si">%f</span><span class="se">\n</span><span class="s1">&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">fmt_str_matlab</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="si">%5s</span><span class="se">\\</span><span class="s1">t</span><span class="si">%d</span><span class="se">\\</span><span class="s1">t</span><span class="si">%f</span><span class="se">\\</span><span class="s1">n&#39;</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">odriver_class</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;class: Output driver class.&quot;&quot;&quot;</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">direction</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="k">return</span> <span class="kc">None</span>  <span class="c1"># pragma: no cover</span>
-        <span class="k">elif</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">direction</span> <span class="o">==</span> <span class="s1">&#39;output&#39;</span><span class="p">)</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_file</span><span class="p">:</span>
-            <span class="k">return</span> <span class="n">import_component</span><span class="p">(</span><span class="s1">&#39;connection&#39;</span><span class="p">,</span> <span class="s1">&#39;file_output&#39;</span><span class="p">)</span>
-        <span class="k">elif</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">direction</span> <span class="o">==</span> <span class="s1">&#39;input&#39;</span><span class="p">)</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_file</span><span class="p">:</span>
-            <span class="k">return</span> <span class="kc">None</span>
-        <span class="k">return</span> <span class="n">import_component</span><span class="p">(</span><span class="s1">&#39;connection&#39;</span><span class="p">,</span> <span class="s1">&#39;output&#39;</span><span class="p">)</span>
-
+    <span class="k">def</span> <span class="nf">iodriver_class</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;class: Input/output driver class.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_file</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">import_component</span><span class="p">(</span><span class="s1">&#39;connection&#39;</span><span class="p">,</span>
+                                    <span class="s1">&#39;file_&#39;</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">direction</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">ConnectionDriver</span><span class="o">.</span><span class="n">ConnectionDriver</span>
+        
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">idriver_class</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;class: Input driver class.&quot;&quot;&quot;</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">direction</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="k">return</span> <span class="kc">None</span>  <span class="c1"># pragma: no cover</span>
-        <span class="k">elif</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">direction</span> <span class="o">==</span> <span class="s1">&#39;output&#39;</span><span class="p">)</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_file</span><span class="p">:</span>
-            <span class="k">return</span> <span class="kc">None</span>
-        <span class="k">elif</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">direction</span> <span class="o">==</span> <span class="s1">&#39;input&#39;</span><span class="p">)</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_file</span><span class="p">:</span>
-            <span class="k">return</span> <span class="n">import_component</span><span class="p">(</span><span class="s1">&#39;connection&#39;</span><span class="p">,</span> <span class="s1">&#39;file_input&#39;</span><span class="p">)</span>
-        <span class="k">return</span> <span class="n">import_component</span><span class="p">(</span><span class="s1">&#39;connection&#39;</span><span class="p">,</span> <span class="s1">&#39;input&#39;</span><span class="p">)</span>
-
-    <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">odriver_args</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;list: Output driver arguments.&quot;&quot;&quot;</span>
-        <span class="k">if</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">direction</span> <span class="o">==</span> <span class="s1">&#39;output&#39;</span><span class="p">)</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_file</span><span class="p">:</span>
-            <span class="n">filecomm_kwargs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">testing_options</span><span class="p">[</span><span class="s1">&#39;kwargs&#39;</span><span class="p">]</span>
-            <span class="n">filecomm_kwargs</span><span class="p">[</span><span class="s1">&#39;comm&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">filecomm</span>
-            <span class="k">return</span> <span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">filename</span><span class="p">],</span>
-                    <span class="p">{</span><span class="s1">&#39;ocomm_kws&#39;</span><span class="p">:</span> <span class="n">filecomm_kwargs</span><span class="p">})</span>
-        <span class="k">elif</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">direction</span> <span class="o">==</span> <span class="s1">&#39;input&#39;</span><span class="p">)</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_file</span><span class="p">:</span>
-            <span class="k">return</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span>  <span class="c1"># pragma: no cover</span>
-        <span class="k">elif</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">direction</span> <span class="o">==</span> <span class="s1">&#39;output&#39;</span><span class="p">):</span>
-            <span class="k">return</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">+</span> <span class="s1">&#39;_link&#39;</span><span class="p">],</span> <span class="p">{}</span>
-        <span class="k">elif</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">direction</span> <span class="o">==</span> <span class="s1">&#39;input&#39;</span><span class="p">):</span>
-            <span class="k">return</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">+</span> <span class="s1">&#39;_odriver&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">+</span> <span class="s1">&#39;_link&#39;</span><span class="p">],</span> <span class="p">{}</span>
-        <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s1">&#39;Direction was not set. (</span><span class="si">%s</span><span class="s1">)&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">direction</span><span class="p">)</span>  <span class="c1"># pragma: debug</span>
-
-    <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">idriver_args</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;list: Input driver arguments.&quot;&quot;&quot;</span>
-        <span class="k">if</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">direction</span> <span class="o">==</span> <span class="s1">&#39;output&#39;</span><span class="p">)</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_file</span><span class="p">:</span>
-            <span class="k">return</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span>  <span class="c1"># pragma: no cover</span>
-        <span class="k">elif</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">direction</span> <span class="o">==</span> <span class="s1">&#39;input&#39;</span><span class="p">)</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_file</span><span class="p">:</span>
-            <span class="n">filecomm_kwargs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">testing_options</span><span class="p">[</span><span class="s1">&#39;kwargs&#39;</span><span class="p">]</span>
-            <span class="n">filecomm_kwargs</span><span class="p">[</span><span class="s1">&#39;comm&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">filecomm</span>
-            <span class="k">return</span> <span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">filename</span><span class="p">],</span>
-                    <span class="p">{</span><span class="s1">&#39;icomm_kws&#39;</span><span class="p">:</span> <span class="n">filecomm_kwargs</span><span class="p">})</span>
-        <span class="k">elif</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">direction</span> <span class="o">==</span> <span class="s1">&#39;output&#39;</span><span class="p">):</span>
-            <span class="k">return</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">+</span> <span class="s1">&#39;_idriver&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">+</span> <span class="s1">&#39;_link&#39;</span><span class="p">],</span> <span class="p">{}</span>
-        <span class="k">elif</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">direction</span> <span class="o">==</span> <span class="s1">&#39;input&#39;</span><span class="p">):</span>
-            <span class="k">return</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">+</span> <span class="s1">&#39;_link&#39;</span><span class="p">],</span> <span class="p">{}</span>
-        <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s1">&#39;Direction was not set. (</span><span class="si">%s</span><span class="s1">)&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">direction</span><span class="p">)</span>  <span class="c1"># pragma: debug</span>
+    <span class="k">def</span> <span class="nf">iodriver_args</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;list: Connection driver arguments.&quot;&quot;&quot;</span>
+        <span class="n">args</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">]</span>
+        <span class="n">kwargs</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;inputs&#39;</span><span class="p">:</span> <span class="p">[{</span><span class="s1">&#39;partner_model&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">model1</span><span class="p">}],</span>
+                  <span class="s1">&#39;outputs&#39;</span><span class="p">:</span> <span class="p">[{</span><span class="s1">&#39;partner_model&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">model2</span><span class="p">}]}</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_file</span><span class="p">:</span>
+            <span class="n">args</span> <span class="o">+=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">filename</span><span class="p">]</span>
+            <span class="k">if</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">direction</span> <span class="o">==</span> <span class="s1">&#39;output&#39;</span><span class="p">):</span>
+                <span class="n">filecomm_kwargs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">testing_options</span><span class="p">[</span><span class="s1">&#39;kwargs&#39;</span><span class="p">]</span>
+                <span class="n">filecomm_kwargs</span><span class="p">[</span><span class="s1">&#39;filetype&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">filecomm</span>
+                <span class="k">return</span> <span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">filename</span><span class="p">],</span>
+                        <span class="p">{</span><span class="s1">&#39;inputs&#39;</span><span class="p">:</span> <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;inputs&#39;</span><span class="p">],</span>
+                         <span class="s1">&#39;outputs&#39;</span><span class="p">:</span> <span class="p">[</span><span class="n">filecomm_kwargs</span><span class="p">]})</span>
+            <span class="k">elif</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">direction</span> <span class="o">==</span> <span class="s1">&#39;input&#39;</span><span class="p">):</span>
+                <span class="n">filecomm_kwargs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">testing_options</span><span class="p">[</span><span class="s1">&#39;kwargs&#39;</span><span class="p">]</span>
+                <span class="n">filecomm_kwargs</span><span class="p">[</span><span class="s1">&#39;filetype&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">filecomm</span>
+                <span class="k">return</span> <span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">filename</span><span class="p">],</span>
+                        <span class="p">{</span><span class="s1">&#39;inputs&#39;</span><span class="p">:</span> <span class="p">[</span><span class="n">filecomm_kwargs</span><span class="p">],</span>
+                         <span class="s1">&#39;outputs&#39;</span><span class="p">:</span> <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;outputs&#39;</span><span class="p">]})</span>
+        <span class="k">return</span> <span class="p">(</span><span class="n">args</span><span class="p">,</span> <span class="n">kwargs</span><span class="p">)</span>
 
 <div class="viewcode-block" id="TestBase.get_options"><a class="viewcode-back" href="../../../../yggdrasil.languages.Python.html#yggdrasil.languages.Python.test_YggInterface.TestBase.get_options">[docs]</a>    <span class="k">def</span> <span class="nf">get_options</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Get testing options.&quot;&quot;&quot;</span>
@@ -411,36 +390,24 @@
         <span class="n">nprev_comm</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">comm_count</span>
         <span class="n">nprev_thread</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">thread_count</span>
         <span class="n">nprev_fd</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">fd_count</span>
-        <span class="n">idriver_class</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">idriver_class</span>
-        <span class="n">odriver_class</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">odriver_class</span>
         <span class="c1"># File</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_file</span> <span class="ow">and</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">direction</span> <span class="o">==</span> <span class="s1">&#39;input&#39;</span><span class="p">):</span>
             <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">filename</span><span class="p">,</span> <span class="s1">&#39;wb&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">fd</span><span class="p">:</span>
                 <span class="n">fd</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">testing_options</span><span class="p">[</span><span class="s1">&#39;contents&#39;</span><span class="p">])</span>
+            <span class="k">assert</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">filename</span><span class="p">))</span>
         <span class="c1"># Drivers</span>
-        <span class="n">comm_env</span> <span class="o">=</span> <span class="kc">None</span>
-        <span class="k">if</span> <span class="n">idriver_class</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">args</span><span class="p">,</span> <span class="n">kwargs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">idriver_args</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">idriver</span> <span class="o">=</span> <span class="n">idriver_class</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">idriver</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
-            <span class="n">comm_env</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">idriver</span><span class="o">.</span><span class="n">comm_env</span>
-        <span class="k">if</span> <span class="n">odriver_class</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">args</span><span class="p">,</span> <span class="n">kwargs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">odriver_args</span>
-            <span class="k">if</span> <span class="n">comm_env</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-                <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;comm_env&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">comm_env</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">odriver</span> <span class="o">=</span> <span class="n">odriver_class</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">odriver</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
+        <span class="n">args</span><span class="p">,</span> <span class="n">kwargs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">iodriver_args</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">iodriver</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">iodriver_class</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">iodriver</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">iodriver</span><span class="o">.</span><span class="n">wait_for_loop</span><span class="p">()</span>
         <span class="c1"># Test comm</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">direction</span> <span class="o">==</span> <span class="s1">&#39;input&#39;</span><span class="p">:</span>
-            <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">idriver</span><span class="o">.</span><span class="n">env</span><span class="p">)</span>
-            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">odriver</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-                <span class="n">kws</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">odriver</span><span class="o">.</span><span class="n">icomm</span><span class="o">.</span><span class="n">opp_comm_kwargs</span><span class="p">()</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_file</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">direction</span> <span class="o">==</span> <span class="s1">&#39;input&#39;</span><span class="p">:</span>
+                <span class="n">kws</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">iodriver</span><span class="o">.</span><span class="n">icomm</span><span class="o">.</span><span class="n">opp_comm_kwargs</span><span class="p">()</span>
                 <span class="n">kws</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">test_comm_kwargs</span><span class="p">)</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">test_comm</span> <span class="o">=</span> <span class="n">get_comm</span><span class="p">(</span><span class="s1">&#39;in&#39;</span><span class="p">,</span> <span class="o">**</span><span class="n">kws</span><span class="p">)</span>
-        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">direction</span> <span class="o">==</span> <span class="s1">&#39;output&#39;</span><span class="p">:</span>
-            <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">odriver</span><span class="o">.</span><span class="n">env</span><span class="p">)</span>
-            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">idriver</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-                <span class="n">kws</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">idriver</span><span class="o">.</span><span class="n">ocomm</span><span class="o">.</span><span class="n">opp_comm_kwargs</span><span class="p">()</span>
+            <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">direction</span> <span class="o">==</span> <span class="s1">&#39;output&#39;</span><span class="p">:</span>
+                <span class="n">kws</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">iodriver</span><span class="o">.</span><span class="n">ocomm</span><span class="o">.</span><span class="n">opp_comm_kwargs</span><span class="p">()</span>
                 <span class="n">kws</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">test_comm_kwargs</span><span class="p">)</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">test_comm</span> <span class="o">=</span> <span class="n">get_comm</span><span class="p">(</span><span class="s1">&#39;out&#39;</span><span class="p">,</span> <span class="o">**</span><span class="n">kws</span><span class="p">)</span>
         <span class="c1"># Test class</span>
@@ -450,12 +417,9 @@
 
 <div class="viewcode-block" id="TestBase.teardown"><a class="viewcode-back" href="../../../../yggdrasil.languages.Python.html#yggdrasil.languages.Python.test_YggInterface.TestBase.teardown">[docs]</a>    <span class="k">def</span> <span class="nf">teardown</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Stop the driver.&quot;&quot;&quot;</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">odriver</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">odriver</span><span class="o">.</span><span class="n">terminate</span><span class="p">()</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">odriver</span><span class="o">.</span><span class="n">cleanup</span><span class="p">()</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">idriver</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">idriver</span><span class="o">.</span><span class="n">terminate</span><span class="p">()</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">idriver</span><span class="o">.</span><span class="n">cleanup</span><span class="p">()</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">iodriver</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">iodriver</span><span class="o">.</span><span class="n">terminate</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">iodriver</span><span class="o">.</span><span class="n">cleanup</span><span class="p">()</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">test_comm</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">test_comm</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_file</span> <span class="ow">and</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">filename</span><span class="p">):</span>
@@ -465,9 +429,21 @@
         <span class="nb">super</span><span class="p">(</span><span class="n">TestBase</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">teardown</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">cleanup_comms</span><span class="p">()</span></div>
 
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">model_env</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Environment variables that should be set for interface.&quot;&quot;&quot;</span>
+        <span class="n">out</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">direction</span> <span class="o">==</span> <span class="s1">&#39;input&#39;</span><span class="p">:</span>
+            <span class="n">out</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">iodriver</span><span class="o">.</span><span class="n">ocomm</span><span class="o">.</span><span class="n">opp_comms</span><span class="p">,</span>
+                       <span class="n">YGG_MODEL_NAME</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">model2</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">direction</span> <span class="o">==</span> <span class="s1">&#39;output&#39;</span><span class="p">:</span>
+            <span class="n">out</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">iodriver</span><span class="o">.</span><span class="n">icomm</span><span class="o">.</span><span class="n">opp_comms</span><span class="p">,</span>
+                       <span class="n">YGG_MODEL_NAME</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">model1</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">out</span>
+
 <div class="viewcode-block" id="TestBase.create_instance"><a class="viewcode-back" href="../../../../yggdrasil.languages.Python.html#yggdrasil.languages.Python.test_YggInterface.TestBase.create_instance">[docs]</a>    <span class="k">def</span> <span class="nf">create_instance</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Create a new instance of the class.&quot;&quot;&quot;</span>
-        <span class="k">with</span> <span class="n">ModelEnv</span><span class="p">(</span><span class="n">language</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">language</span><span class="p">):</span>
+        <span class="k">with</span> <span class="n">ModelEnv</span><span class="p">(</span><span class="n">language</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">language</span><span class="p">,</span> <span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">model_env</span><span class="p">):</span>
             <span class="n">out</span> <span class="o">=</span> <span class="nb">super</span><span class="p">(</span><span class="n">TestBase</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">create_instance</span><span class="p">()</span>
         <span class="k">return</span> <span class="n">out</span></div>
         
@@ -539,7 +515,7 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="o">.</span><span class="n">send_eof</span><span class="p">()</span>
             <span class="c1"># Read temp file</span>
             <span class="n">Tout</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="o">.</span><span class="n">start_timeout</span><span class="p">()</span>
-            <span class="k">while</span> <span class="bp">self</span><span class="o">.</span><span class="n">odriver</span><span class="o">.</span><span class="n">ocomm</span><span class="o">.</span><span class="n">is_open</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">Tout</span><span class="o">.</span><span class="n">is_out</span><span class="p">:</span>
+            <span class="k">while</span> <span class="bp">self</span><span class="o">.</span><span class="n">iodriver</span><span class="o">.</span><span class="n">ocomm</span><span class="o">.</span><span class="n">is_open</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">Tout</span><span class="o">.</span><span class="n">is_out</span><span class="p">:</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="o">.</span><span class="n">sleep</span><span class="p">()</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="o">.</span><span class="n">stop_timeout</span><span class="p">()</span>
             <span class="k">assert</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">filename</span><span class="p">))</span>
@@ -573,21 +549,32 @@
     
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">TestYggRpcClient</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_inst_args</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">fmt_str</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">fmt_str</span><span class="p">]</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">test_comm_kwargs</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;comm&#39;</span><span class="p">:</span> <span class="s1">&#39;ServerComm&#39;</span><span class="p">,</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_inst_args</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">+</span> <span class="s1">&#39;_&#39;</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">model1</span><span class="p">,</span>
+                           <span class="bp">self</span><span class="o">.</span><span class="n">fmt_str</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">fmt_str</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">test_comm_kwargs</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;commtype&#39;</span><span class="p">:</span> <span class="s1">&#39;server&#39;</span><span class="p">,</span>
                                  <span class="s1">&#39;response_kwargs&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;format_str&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">fmt_str</span><span class="p">}}</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_messages</span> <span class="o">=</span> <span class="p">[(</span><span class="sa">b</span><span class="s1">&#39;one&#39;</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">int32</span><span class="p">(</span><span class="mi">1</span><span class="p">),</span> <span class="mf">1.0</span><span class="p">)]</span>
         
+<div class="viewcode-block" id="TestYggRpcClient.setup"><a class="viewcode-back" href="../../../../yggdrasil.languages.Python.html#yggdrasil.languages.Python.test_YggInterface.TestYggRpcClient.setup">[docs]</a>    <span class="k">def</span> <span class="nf">setup</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Start driver and instance.&quot;&quot;&quot;</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">TestYggRpcClient</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">setup</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">test_comm</span><span class="o">.</span><span class="n">drain_server_signon_messages</span><span class="p">()</span></div>
+        
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">odriver_class</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;class: Output driver class.&quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="n">import_component</span><span class="p">(</span><span class="s1">&#39;connection&#39;</span><span class="p">,</span> <span class="s1">&#39;client&#39;</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">iodriver_class</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;class: Input/output driver class.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">import_component</span><span class="p">(</span><span class="s1">&#39;connection&#39;</span><span class="p">,</span> <span class="s1">&#39;rpc_request&#39;</span><span class="p">)</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">idriver_class</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;class: Input driver class.&quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="n">import_component</span><span class="p">(</span><span class="s1">&#39;connection&#39;</span><span class="p">,</span> <span class="s1">&#39;server&#39;</span><span class="p">)</span>
-    
+    <span class="k">def</span> <span class="nf">iodriver_args</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;list: Connection driver arguments.&quot;&quot;&quot;</span>
+        <span class="n">args</span><span class="p">,</span> <span class="n">kwargs</span> <span class="o">=</span> <span class="nb">super</span><span class="p">(</span><span class="n">TestYggRpcClient</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">iodriver_args</span>
+        <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;inputs&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="p">{</span><span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="s1">&#39;</span><span class="si">%s</span><span class="s1">:</span><span class="si">%s</span><span class="s1">_</span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">model1</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">model1</span><span class="p">),</span>
+             <span class="s1">&#39;partner_model&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">model1</span><span class="p">}]</span>
+        <span class="k">return</span> <span class="p">(</span><span class="n">args</span><span class="p">,</span> <span class="n">kwargs</span><span class="p">)</span>
+        
 <div class="viewcode-block" id="TestYggRpcClient.test_msg"><a class="viewcode-back" href="../../../../yggdrasil.languages.Python.html#yggdrasil.languages.Python.test_YggInterface.TestYggRpcClient.test_msg">[docs]</a>    <span class="k">def</span> <span class="nf">test_msg</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test sending/receiving message.&quot;&quot;&quot;</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">TestYggRpcClient</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">test_msg</span><span class="p">()</span>
@@ -605,7 +592,8 @@
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">TestYggRpcClientMatlab</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">language</span> <span class="o">=</span> <span class="s1">&#39;matlab&#39;</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_inst_args</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">fmt_str_matlab</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">fmt_str_matlab</span><span class="p">]</span></div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_inst_args</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">+</span> <span class="s1">&#39;_&#39;</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">model1</span><span class="p">,</span>
+                           <span class="bp">self</span><span class="o">.</span><span class="n">fmt_str_matlab</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">fmt_str_matlab</span><span class="p">]</span></div>
 
 
 <div class="viewcode-block" id="TestYggRpcServer"><a class="viewcode-back" href="../../../../yggdrasil.languages.Python.html#yggdrasil.languages.Python.test_YggInterface.TestYggRpcServer">[docs]</a><span class="nd">@flaky</span><span class="o">.</span><span class="n">flaky</span>
@@ -617,20 +605,37 @@
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">TestYggRpcServer</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_inst_args</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">fmt_str</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">fmt_str</span><span class="p">]</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">test_comm_kwargs</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;comm&#39;</span><span class="p">:</span> <span class="s1">&#39;ClientComm&#39;</span><span class="p">,</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">test_comm_kwargs</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;commtype&#39;</span><span class="p">:</span> <span class="s1">&#39;client&#39;</span><span class="p">,</span>
                                  <span class="s1">&#39;response_kwargs&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;format_str&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">fmt_str</span><span class="p">}}</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_messages</span> <span class="o">=</span> <span class="p">[(</span><span class="sa">b</span><span class="s1">&#39;one&#39;</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">int32</span><span class="p">(</span><span class="mi">1</span><span class="p">),</span> <span class="mf">1.0</span><span class="p">)]</span>
         
+<div class="viewcode-block" id="TestYggRpcServer.setup"><a class="viewcode-back" href="../../../../yggdrasil.languages.Python.html#yggdrasil.languages.Python.test_YggInterface.TestYggRpcServer.setup">[docs]</a>    <span class="k">def</span> <span class="nf">setup</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Start driver and instance.&quot;&quot;&quot;</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">TestYggRpcServer</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">setup</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="o">.</span><span class="n">drain_server_signon_messages</span><span class="p">()</span></div>
+        
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">odriver_class</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">iodriver_class</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;class: Output driver class.&quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="n">import_component</span><span class="p">(</span><span class="s1">&#39;connection&#39;</span><span class="p">,</span> <span class="s1">&#39;client&#39;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">import_component</span><span class="p">(</span><span class="s1">&#39;connection&#39;</span><span class="p">,</span> <span class="s1">&#39;rpc_request&#39;</span><span class="p">)</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">idriver_class</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;class: Input driver class.&quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="n">import_component</span><span class="p">(</span><span class="s1">&#39;connection&#39;</span><span class="p">,</span> <span class="s1">&#39;server&#39;</span><span class="p">)</span>
-    
+    <span class="k">def</span> <span class="nf">iodriver_args</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;list: Connection driver arguments.&quot;&quot;&quot;</span>
+        <span class="n">args</span><span class="p">,</span> <span class="n">kwargs</span> <span class="o">=</span> <span class="nb">super</span><span class="p">(</span><span class="n">TestYggRpcServer</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">iodriver_args</span>
+        <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;inputs&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="p">{</span><span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="s1">&#39;</span><span class="si">%s</span><span class="s1">:</span><span class="si">%s</span><span class="s1">_</span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">model1</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">model1</span><span class="p">),</span>
+             <span class="s1">&#39;partner_model&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">model1</span><span class="p">}]</span>
+        <span class="k">return</span> <span class="p">(</span><span class="n">args</span><span class="p">,</span> <span class="n">kwargs</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">model_env</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Environment variables that should be set for interface.&quot;&quot;&quot;</span>
+        <span class="n">out</span> <span class="o">=</span> <span class="nb">super</span><span class="p">(</span><span class="n">TestYggRpcServer</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">model_env</span>
+        <span class="n">out</span><span class="p">[</span><span class="s1">&#39;YGG_NCLIENTS&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;1&#39;</span>
+        <span class="k">return</span> <span class="n">out</span>
+        
 <div class="viewcode-block" id="TestYggRpcServer.test_msg"><a class="viewcode-back" href="../../../../yggdrasil.languages.Python.html#yggdrasil.languages.Python.test_YggInterface.TestYggRpcServer.test_msg">[docs]</a>    <span class="k">def</span> <span class="nf">test_msg</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test sending/receiving message.&quot;&quot;&quot;</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">TestYggRpcServer</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">test_msg</span><span class="p">()</span>

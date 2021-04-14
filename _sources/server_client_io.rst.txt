@@ -41,6 +41,26 @@ that the model will act as a client of the ``<server_model_name>`` model.
 
 .. include:: examples/rpc_lesson1_yml.rst
 
+In addition to the RPC API call, the example server also has an input ``params``.
+Models acting as servers can have as many inputs/outputs as desired in addition to
+the RPC connections. While the example input is not used to modify the output
+in this example, such a comm could be used to initialize a model with
+parameters and/or initial conditions.
+
+
+Using Existing Inputs/Outputs
+-----------------------------
+
+Models that have already been integrated via |yggdrasil| can also be turned
+into servers without modifying the code. Instead of passing a boolean to
+the ``is_server`` parameter, such models can provide a mapping with ``input``
+and ``output`` parameters that explicitly outline which of a existing model's 
+inputs/outputs should be used for the RPC call. Receive/send calls to named
+input/output channels will then behave as receive/send calls on a server 
+interface comm.
+
+.. todo:: Example source code and YAML of server replacing an existing input/output
+
 
 One Server, Two Clients
 -----------------------
@@ -62,4 +82,52 @@ source code.
 During runtime, request messages from both clients will be routed to the 
 server model which will process the requests in the order they are received.
 
-.. todo:: Section on having multiple servers.
+
+Two Servers, Two Clients
+------------------------
+
+There is also no limit on the number of copies of a server model that can be 
+used to responsd to RPC requests from the clients. In the example below, the 
+server and clients are the same as above, but 2 copies of the server model 
+are run as specified by the model ``copies`` parameter in the server YAML.
+
+.. include:: examples/rpc_lesson2b_yml.rst
+
+This allow client requests to be returned twice as fast, but precludes any 
+use of an internal state by the server model as there is no way for a client 
+to be sure that the same server model is responding to its requests and only
+its requests.
+
+
+Wrapped Function Server
+-----------------------
+
+Models that are created by letting |yggdrasil| automatically
+:ref:`wrap a function <autowrap_rst>` can also act as servers and/or clients.
+In the example below, the model acting as a server
+is a very simple function that takes a string as an input and returns the
+same string and the client is a function that takes a string as an input, 
+calls the server models with the input string and returns the response.
+
+When a client model is autowrapped from a function, additional care must be
+taken so that the client RPC comm can be reused during each call to the
+model. In interpreted models (Python, R, MATLAB), this is done by passing the
+keyword ``global_scope`` to the RPC client interface initialization function 
+(``YggRpcClient`` in Python). In compiled models (C, C++, Fortran), this is
+done by framing RPC client interface initialization calls with the
+``WITH_GLOBAL_SCOPE`` macro (see the language specific versions of this
+example for specifics).
+
+.. include:: examples/rpc_lesson3_src.rst
+
+The RPC connection between the server and the client is controlled by the
+same ``is_server`` and ``client_of`` YAML parameters as before.
+
+.. include:: examples/rpc_lesson3_yml.rst
+
+By default, all inputs to a wrapped server function will be used in
+the RPC call. However if only some of the inputs should be passed in by the
+RPC calls, they can be specified explicitly by providing the ``is_server``
+parameter with a map that contains ``input`` and ``output`` parameters that 
+map to the names of function input/output variables (as in the case of
+using existing input/output channels above).

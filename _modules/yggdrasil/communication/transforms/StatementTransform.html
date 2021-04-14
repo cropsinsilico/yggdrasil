@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>yggdrasil.communication.transforms.StatementTransform &mdash; yggdrasil v1.5.0 documentation</title>
+  <title>yggdrasil.communication.transforms.StatementTransform &mdash; yggdrasil v1.6.0 documentation</title>
   
 
   
@@ -62,7 +62,7 @@
             
             
               <div class="version">
-                v1.5.0
+                v1.6.0
               </div>
             
           
@@ -104,6 +104,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../../units.html">Units</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../c_format_strings.html">C-Style Format Strings</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../debugging.html">Debugging</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../threading.html">OpenMP Threading in Models</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../examples/examples_toc.html">Examples</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../advanced/index.html">Advanced</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../development/index.html">Development</a></li>
@@ -237,9 +238,11 @@
                <span class="p">{</span><span class="s1">&#39;kwargs&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;statement&#39;</span><span class="p">:</span> <span class="s1">&#39;</span><span class="si">%x</span><span class="s1">% * array([1, 1, 1])&#39;</span><span class="p">},</span>
                 <span class="s1">&#39;in/out&#39;</span><span class="p">:</span> <span class="p">[(</span><span class="mi">1</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="nb">int</span><span class="p">)),</span> <span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="nb">int</span><span class="p">))]},</span>
                <span class="p">{</span><span class="s1">&#39;kwargs&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;statement&#39;</span><span class="p">:</span> <span class="s1">&#39;</span><span class="si">%x</span><span class="s1">% * &#39;</span>
-                           <span class="o">+</span> <span class="nb">repr</span><span class="p">(</span><span class="n">units</span><span class="o">.</span><span class="n">add_units</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="s1">&#39;cm&#39;</span><span class="p">))},</span>
-                <span class="s1">&#39;in/out&#39;</span><span class="p">:</span> <span class="p">[(</span><span class="mi">1</span><span class="p">,</span> <span class="n">units</span><span class="o">.</span><span class="n">add_units</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="s1">&#39;cm&#39;</span><span class="p">)),</span>
-                           <span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="n">units</span><span class="o">.</span><span class="n">add_units</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="s1">&#39;cm&#39;</span><span class="p">))]}]</span>
+                           <span class="o">+</span> <span class="nb">repr</span><span class="p">(</span><span class="n">units</span><span class="o">.</span><span class="n">add_units</span><span class="p">(</span><span class="mf">1.0</span><span class="p">,</span> <span class="s1">&#39;cm&#39;</span><span class="p">))},</span>
+                <span class="s1">&#39;in/out&#39;</span><span class="p">:</span> <span class="p">[(</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">units</span><span class="o">.</span><span class="n">add_units</span><span class="p">(</span><span class="mf">1.0</span><span class="p">,</span> <span class="s1">&#39;cm&#39;</span><span class="p">)),</span>
+                           <span class="p">(</span><span class="mf">2.0</span><span class="p">,</span> <span class="n">units</span><span class="o">.</span><span class="n">add_units</span><span class="p">(</span><span class="mf">2.0</span><span class="p">,</span> <span class="s1">&#39;cm&#39;</span><span class="p">))]},</span>
+               <span class="p">{</span><span class="s1">&#39;kwargs&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;statement&#39;</span><span class="p">:</span> <span class="s1">&#39;</span><span class="si">%x</span><span class="s1">%**3&#39;</span><span class="p">},</span>
+                <span class="s1">&#39;in/out&#39;</span><span class="p">:</span> <span class="p">[(</span><span class="nb">iter</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">]),</span> <span class="nb">iter</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span> <span class="mi">8</span><span class="p">]))]}]</span>
         <span class="k">return</span> <span class="n">out</span></div></div>
 </pre></div>
 

@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>yggdrasil.tests.test_yamlfile &mdash; yggdrasil v1.5.0 documentation</title>
+  <title>yggdrasil.tests.test_yamlfile &mdash; yggdrasil v1.6.0 documentation</title>
   
 
   
@@ -62,7 +62,7 @@
             
             
               <div class="version">
-                v1.5.0
+                v1.6.0
               </div>
             
           
@@ -104,6 +104,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../units.html">Units</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../c_format_strings.html">C-Style Format Strings</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../debugging.html">Debugging</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../threading.html">OpenMP Threading in Models</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../examples/examples_toc.html">Examples</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../advanced/index.html">Advanced</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../development/index.html">Development</a></li>
@@ -320,14 +321,14 @@
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Disabled: Create a new instance of the class.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="kc">None</span></div>
 
-<div class="viewcode-block" id="YamlTestBase.test_parse_yaml"><a class="viewcode-back" href="../../../yggdrasil.tests.html#yggdrasil.tests.test_yamlfile.YamlTestBase.test_parse_yaml">[docs]</a>    <span class="k">def</span> <span class="nf">test_parse_yaml</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="YamlTestBase.test_parse_yaml"><a class="viewcode-back" href="../../../yggdrasil.tests.html#yggdrasil.tests.test_yamlfile.YamlTestBase.test_parse_yaml">[docs]</a>    <span class="k">def</span> <span class="nf">test_parse_yaml</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">as_function</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test successfully reading &amp; parsing yaml.&quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">nfiles</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
             <span class="k">pass</span>
         <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">nfiles</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
-            <span class="n">yamlfile</span><span class="o">.</span><span class="n">parse_yaml</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">files</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+            <span class="n">yamlfile</span><span class="o">.</span><span class="n">parse_yaml</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">files</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">as_function</span><span class="o">=</span><span class="n">as_function</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="n">yamlfile</span><span class="o">.</span><span class="n">parse_yaml</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">files</span><span class="p">)</span></div></div>
+            <span class="n">yamlfile</span><span class="o">.</span><span class="n">parse_yaml</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">files</span><span class="p">,</span> <span class="n">as_function</span><span class="o">=</span><span class="n">as_function</span><span class="p">)</span></div></div>
 
 
 <div class="viewcode-block" id="YamlTestBaseError"><a class="viewcode-back" href="../../../yggdrasil.tests.html#yggdrasil.tests.test_yamlfile.YamlTestBaseError">[docs]</a><span class="k">class</span> <span class="nc">YamlTestBaseError</span><span class="p">(</span><span class="n">YamlTestBase</span><span class="p">):</span>
@@ -774,6 +775,46 @@
                   <span class="s1">&#39;  - input: outputA&#39;</span><span class="p">,</span>
                   <span class="s1">&#39;    output: output.obj&#39;</span><span class="p">,</span>
                   <span class="s1">&#39;    write_meth: obj&#39;</span><span class="p">],</span> <span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="TestYamlModelFunction"><a class="viewcode-back" href="../../../yggdrasil.tests.html#yggdrasil.tests.test_yamlfile.TestYamlModelFunction">[docs]</a><span class="k">class</span> <span class="nc">TestYamlModelFunction</span><span class="p">(</span><span class="n">YamlTestBase</span><span class="p">):</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test when missing input/output connections should be routed to a function.&quot;&quot;&quot;</span>
+    <span class="n">_contents</span> <span class="o">=</span> <span class="p">([</span><span class="s1">&#39;models:&#39;</span><span class="p">,</span>
+                  <span class="s1">&#39;  - name: modelA&#39;</span><span class="p">,</span>
+                  <span class="s1">&#39;    language: c&#39;</span><span class="p">,</span>
+                  <span class="s1">&#39;    args: ./src/modelA.c&#39;</span><span class="p">,</span>
+                  <span class="s1">&#39;    inputs:&#39;</span><span class="p">,</span>
+                  <span class="s1">&#39;      - inputA&#39;</span><span class="p">,</span>
+                  <span class="s1">&#39;    outputs:&#39;</span><span class="p">,</span>
+                  <span class="s1">&#39;      - outputA&#39;</span><span class="p">,</span>
+                  <span class="s1">&#39;&#39;</span><span class="p">,</span>
+                  <span class="s1">&#39;  - name: modelB&#39;</span><span class="p">,</span>
+                  <span class="s1">&#39;    language: c&#39;</span><span class="p">,</span>
+                  <span class="s1">&#39;    args: ./src/modelB.c&#39;</span><span class="p">,</span>
+                  <span class="s1">&#39;    inputs:&#39;</span><span class="p">,</span>
+                  <span class="s1">&#39;      - inputB&#39;</span><span class="p">,</span>
+                  <span class="s1">&#39;    outputs:&#39;</span><span class="p">,</span>
+                  <span class="s1">&#39;      - outputB&#39;</span><span class="p">,</span>
+                  <span class="s1">&#39;&#39;</span><span class="p">,</span>
+                  <span class="s1">&#39;connections:&#39;</span><span class="p">,</span>
+                  <span class="s1">&#39;  - input: outputA&#39;</span><span class="p">,</span>
+                  <span class="s1">&#39;    output: inputB&#39;</span><span class="p">],</span> <span class="p">)</span>
+    
+<div class="viewcode-block" id="TestYamlModelFunction.test_parse_yaml"><a class="viewcode-back" href="../../../yggdrasil.tests.html#yggdrasil.tests.test_yamlfile.TestYamlModelFunction.test_parse_yaml">[docs]</a>    <span class="k">def</span> <span class="nf">test_parse_yaml</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test successfully reading &amp; parsing yaml.&quot;&quot;&quot;</span>
+        <span class="n">kwargs</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s1">&#39;as_function&#39;</span><span class="p">,</span> <span class="kc">True</span><span class="p">)</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">TestYamlModelFunction</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">test_parse_yaml</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div></div>
+
+
+<div class="viewcode-block" id="TestYamlConnectionDefaultValue"><a class="viewcode-back" href="../../../yggdrasil.tests.html#yggdrasil.tests.test_yamlfile.TestYamlConnectionDefaultValue">[docs]</a><span class="k">class</span> <span class="nc">TestYamlConnectionDefaultValue</span><span class="p">(</span><span class="n">YamlTestBase</span><span class="p">):</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test use of default_value parameter.&quot;&quot;&quot;</span>
+    <span class="n">_contents</span> <span class="o">=</span> <span class="p">([</span><span class="s1">&#39;models:&#39;</span><span class="p">,</span>
+                  <span class="s1">&#39;  - name: modelA&#39;</span><span class="p">,</span>
+                  <span class="s1">&#39;    driver: GCCModelDriver&#39;</span><span class="p">,</span>
+                  <span class="s1">&#39;    args: ./src/modelA.c&#39;</span><span class="p">,</span>
+                  <span class="s1">&#39;    inputs:&#39;</span><span class="p">,</span>
+                  <span class="s1">&#39;      - name: inputA&#39;</span><span class="p">,</span>
+                  <span class="s1">&#39;        default_value: test&#39;</span><span class="p">],)</span></div>
 
 
 <div class="viewcode-block" id="TestYamlServerNoClient"><a class="viewcode-back" href="../../../yggdrasil.tests.html#yggdrasil.tests.test_yamlfile.TestYamlServerNoClient">[docs]</a><span class="k">class</span> <span class="nc">TestYamlServerNoClient</span><span class="p">(</span><span class="n">YamlTestBaseError</span><span class="p">):</span>

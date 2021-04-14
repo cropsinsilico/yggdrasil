@@ -1,0 +1,12 @@
+Model Code:
+
+.. literalinclude:: /../../../../../../../opt/hostedtoolcache/Python/3.8.9/x64/lib/python3.8/site-packages/yggdrasil/examples/rpc_lesson2b/src/server.py
+   :language: python
+   :linenos:
+
+.. literalinclude:: /../../../../../../../opt/hostedtoolcache/Python/3.8.9/x64/lib/python3.8/site-packages/yggdrasil/examples/rpc_lesson2b/src/client.py
+   :language: python
+   :linenos:
+
+
+(`Example in other languages <examples/rpc_lesson2b.html>`__)

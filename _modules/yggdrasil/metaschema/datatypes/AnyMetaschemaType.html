@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>yggdrasil.metaschema.datatypes.AnyMetaschemaType &mdash; yggdrasil v1.5.0 documentation</title>
+  <title>yggdrasil.metaschema.datatypes.AnyMetaschemaType &mdash; yggdrasil v1.6.0 documentation</title>
   
 
   
@@ -62,7 +62,7 @@
             
             
               <div class="version">
-                v1.5.0
+                v1.6.0
               </div>
             
           
@@ -104,6 +104,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../../units.html">Units</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../c_format_strings.html">C-Style Format Strings</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../debugging.html">Debugging</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../threading.html">OpenMP Threading in Models</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../examples/examples_toc.html">Examples</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../advanced/index.html">Advanced</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../development/index.html">Development</a></li>
@@ -215,12 +216,14 @@
         <span class="k">return</span> <span class="kc">True</span></div>
     
 <div class="viewcode-block" id="AnyMetaschemaType.get_temptype"><a class="viewcode-back" href="../../../../yggdrasil.metaschema.datatypes.html#yggdrasil.metaschema.datatypes.AnyMetaschemaType.AnyMetaschemaType.get_temptype">[docs]</a>    <span class="nd">@classmethod</span>
-    <span class="k">def</span> <span class="nf">get_temptype</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">typedef</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">get_temptype</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">typedef</span><span class="p">,</span> <span class="n">return_none</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Extract temporary type from type definition.</span>
 <span class="sd">        </span>
 <span class="sd">        Args:</span>
 <span class="sd">            typedef (dict): Type definition containing temporary type under the</span>
 <span class="sd">                temptype key.</span>
+<span class="sd">            return_none (bool, optional): If True, None will be returned if there</span>
+<span class="sd">                is not a temptype in the provided typedef. Defaults to False.</span>
 
 <span class="sd">        Returns:</span>
 <span class="sd">            dict: Temporary type definition or None if not present.</span>
@@ -228,7 +231,9 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">out</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">typedef</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
-            <span class="n">out</span> <span class="o">=</span> <span class="n">typedef</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;temptype&#39;</span><span class="p">,</span> <span class="n">typedef</span><span class="p">)</span>
+            <span class="n">out</span> <span class="o">=</span> <span class="n">typedef</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;temptype&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+            <span class="k">if</span> <span class="p">(</span><span class="n">out</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="ow">not</span> <span class="n">return_none</span><span class="p">):</span>
+                <span class="n">out</span> <span class="o">=</span> <span class="n">typedef</span>
         <span class="k">return</span> <span class="n">out</span></div>
         
 <div class="viewcode-block" id="AnyMetaschemaType.encode_data"><a class="viewcode-back" href="../../../../yggdrasil.metaschema.datatypes.html#yggdrasil.metaschema.datatypes.AnyMetaschemaType.AnyMetaschemaType.encode_data">[docs]</a>    <span class="nd">@classmethod</span>
@@ -290,7 +295,7 @@
 <span class="sd">            object: Transformed object.</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="n">transform_type</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="bp">cls</span><span class="o">.</span><span class="n">get_temptype</span><span class="p">(</span><span class="n">typedef</span><span class="p">))</span></div>
+        <span class="k">return</span> <span class="n">transform_type</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="bp">cls</span><span class="o">.</span><span class="n">get_temptype</span><span class="p">(</span><span class="n">typedef</span><span class="p">,</span> <span class="n">return_none</span><span class="o">=</span><span class="kc">True</span><span class="p">))</span></div>
 
     <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">_generate_data</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">typedef</span><span class="p">):</span>

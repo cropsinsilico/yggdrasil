@@ -8,5 +8,6 @@ default     [DEFAULT] Communication mechanism selected based on the current plat
 ipc         Interprocess communication (IPC) queue.                                         
 rmq         RabbitMQ connection.                                                            
 rmq_async   Asynchronous RabbitMQ connection.                                               
+value       Constant value.                                                                 
 zmq         ZeroMQ socket.                                                                  
 =========   ================================================================================

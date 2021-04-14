@@ -1,6 +1,6 @@
 Model YAML:
 
-.. literalinclude:: /../../../../../../../opt/hostedtoolcache/Python/3.8.7/x64/lib/python3.8/site-packages/yggdrasil/examples/gs_lesson2/gs_lesson2_python.yml
+.. literalinclude:: /../../../../../../../opt/hostedtoolcache/Python/3.8.9/x64/lib/python3.8/site-packages/yggdrasil/examples/gs_lesson2/gs_lesson2_python.yml
    :language: yaml
    :linenos:
 

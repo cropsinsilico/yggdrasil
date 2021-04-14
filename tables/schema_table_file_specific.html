@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>&lt;no title&gt; &mdash; yggdrasil v1.5.0 documentation</title>
+  <title>&lt;no title&gt; &mdash; yggdrasil v1.6.0 documentation</title>
   
 
   
@@ -62,7 +62,7 @@
             
             
               <div class="version">
-                v1.5.0
+                v1.6.0
               </div>
             
           
@@ -104,6 +104,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../units.html">Units</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../c_format_strings.html">C-Style Format Strings</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../debugging.html">Debugging</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../threading.html">OpenMP Threading in Models</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../examples/examples_toc.html">Examples</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../advanced/index.html">Advanced</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../development/index.html">Development</a></li>
@@ -195,13 +196,13 @@
 <tr class="row-even"><td><p>comment</p></td>
 <td><p>string</p></td>
 <td><p>One or more characters indicating a comment. Defaults to ‘# ‘.</p></td>
-<td><p>[‘table’, ‘pickle’, ‘ascii’, ‘yaml’, ‘map’, ‘json’, ‘mat’, ‘wofost’, ‘netcdf’, ‘ply’, ‘obj’, ‘pandas’]</p></td>
+<td><p>[‘netcdf’, ‘table’, ‘map’, ‘yaml’, ‘ascii’, ‘wofost’, ‘ply’, ‘obj’, ‘pandas’, ‘mat’, ‘json’, ‘pickle’]</p></td>
 </tr>
 <tr class="row-odd"><td><p>datatype</p></td>
 <td><p>schema</p></td>
 <td><p>JSON schema defining the type of object that the serializer will be used to
 serialize/deserialize. Defaults to default_datatype.</p></td>
-<td><p>[‘table’, ‘pickle’, ‘ascii’, ‘yaml’, ‘map’, ‘json’, ‘mat’, ‘wofost’, ‘netcdf’, ‘ply’, ‘obj’, ‘pandas’]</p></td>
+<td><p>[‘netcdf’, ‘table’, ‘map’, ‘yaml’, ‘ascii’, ‘wofost’, ‘ply’, ‘obj’, ‘pandas’, ‘mat’, ‘json’, ‘pickle’]</p></td>
 </tr>
 <tr class="row-even"><td><p>default_flow_style</p></td>
 <td><p>boolean</p></td>
@@ -213,7 +214,7 @@ they will always be serialized in the flow style. See <a class="reference extern
 <td><p>string</p></td>
 <td><p>Delimiter that should be used to separate name/value pairs in the map. Defaults
 to t.</p></td>
-<td><p>[‘table’, ‘pandas’, ‘wofost’, ‘map’]</p></td>
+<td><p>[‘table’, ‘wofost’, ‘map’, ‘pandas’]</p></td>
 </tr>
 <tr class="row-even"><td><p>encoding</p></td>
 <td><p>string</p></td>
@@ -224,12 +225,12 @@ to t.</p></td>
 <td><p>[‘string’, ‘int’]</p></td>
 <td><p>String or number of spaces that should be used to indent each level within the
 seiralized structure. Defaults to ‘t’.</p></td>
-<td><p>[‘json’, ‘yaml’]</p></td>
+<td><p>[‘yaml’, ‘json’]</p></td>
 </tr>
 <tr class="row-even"><td><p>newline</p></td>
 <td><p>string</p></td>
 <td><p>One or more characters indicating a newline. Defaults to ‘n’.</p></td>
-<td><p>[‘table’, ‘pickle’, ‘ascii’, ‘yaml’, ‘map’, ‘json’, ‘mat’, ‘wofost’, ‘netcdf’, ‘ply’, ‘obj’, ‘pandas’]</p></td>
+<td><p>[‘netcdf’, ‘table’, ‘map’, ‘yaml’, ‘ascii’, ‘wofost’, ‘ply’, ‘obj’, ‘pandas’, ‘mat’, ‘json’, ‘pickle’]</p></td>
 </tr>
 <tr class="row-odd"><td><p>no_header</p></td>
 <td><p>boolean</p></td>

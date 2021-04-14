@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>yggdrasil.communication.tests.test_ServerComm &mdash; yggdrasil v1.5.0 documentation</title>
+  <title>yggdrasil.communication.tests.test_ServerComm &mdash; yggdrasil v1.6.0 documentation</title>
   
 
   
@@ -62,7 +62,7 @@
             
             
               <div class="version">
-                v1.5.0
+                v1.6.0
               </div>
             
           
@@ -104,6 +104,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../../units.html">Units</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../c_format_strings.html">C-Style Format Strings</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../debugging.html">Debugging</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../threading.html">OpenMP Threading in Models</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../examples/examples_toc.html">Examples</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../advanced/index.html">Advanced</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../development/index.html">Development</a></li>
@@ -162,8 +163,6 @@
         
           <li><a href="../../communication.html">yggdrasil.communication</a> &raquo;</li>
         
-          <li><a href="../tests.html">yggdrasil.communication.tests</a> &raquo;</li>
-        
       <li>yggdrasil.communication.tests.test_ServerComm</li>
     
     
@@ -197,7 +196,7 @@
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">send_inst_kwargs</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;dict: Keyword arguments for send instance.&quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="p">{</span><span class="s1">&#39;comm&#39;</span><span class="p">:</span> <span class="s1">&#39;ClientComm&#39;</span><span class="p">}</span>
+        <span class="k">return</span> <span class="p">{</span><span class="s1">&#39;commtype&#39;</span><span class="p">:</span> <span class="s1">&#39;client&#39;</span><span class="p">,</span> <span class="s1">&#39;direct_connection&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">}</span>
     
 <div class="viewcode-block" id="TestServerComm.test_error_send"><a class="viewcode-back" href="../../../../yggdrasil.communication.tests.html#yggdrasil.communication.tests.test_ServerComm.TestServerComm.test_error_send">[docs]</a>    <span class="nd">@unittest</span><span class="o">.</span><span class="n">skipIf</span><span class="p">(</span><span class="kc">True</span><span class="p">,</span> <span class="s1">&#39;Server&#39;</span><span class="p">)</span>
     <span class="k">def</span> <span class="nf">test_error_send</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -221,7 +220,8 @@
 
 <div class="viewcode-block" id="TestServerComm.test_newcomm_server"><a class="viewcode-back" href="../../../../yggdrasil.communication.tests.html#yggdrasil.communication.tests.test_ServerComm.TestServerComm.test_newcomm_server">[docs]</a>    <span class="k">def</span> <span class="nf">test_newcomm_server</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test creation of server using newcomm.&quot;&quot;&quot;</span>
-        <span class="n">inst</span> <span class="o">=</span> <span class="n">new_comm</span><span class="p">(</span><span class="s1">&#39;testserver_</span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="nb">str</span><span class="p">(</span><span class="n">uuid</span><span class="o">.</span><span class="n">uuid4</span><span class="p">()),</span> <span class="n">comm</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">comm</span><span class="p">)</span>
+        <span class="n">inst</span> <span class="o">=</span> <span class="n">new_comm</span><span class="p">(</span><span class="s1">&#39;testserver_</span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="nb">str</span><span class="p">(</span><span class="n">uuid</span><span class="o">.</span><span class="n">uuid4</span><span class="p">()),</span>
+                        <span class="n">commtype</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">commtype</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">remove_instance</span><span class="p">(</span><span class="n">inst</span><span class="p">)</span></div>
         
 <div class="viewcode-block" id="TestServerComm.test_eof_no_close"><a class="viewcode-back" href="../../../../yggdrasil.communication.tests.html#yggdrasil.communication.tests.test_ServerComm.TestServerComm.test_eof_no_close">[docs]</a>    <span class="k">def</span> <span class="nf">test_eof_no_close</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -274,8 +274,11 @@
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test RPC nolimit call.&quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">send_instance</span><span class="o">.</span><span class="n">sched_task</span><span class="p">(</span><span class="mf">0.0</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">send_instance</span><span class="o">.</span><span class="n">call_nolimit</span><span class="p">,</span>
                                       <span class="n">args</span><span class="o">=</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">msg_long</span><span class="p">],</span> <span class="n">store_output</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-        <span class="n">flag</span><span class="p">,</span> <span class="n">msg_recv</span><span class="p">,</span> <span class="n">header</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">recv_instance</span><span class="o">.</span><span class="n">recv_nolimit</span><span class="p">(</span>
-            <span class="n">timeout</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">timeout</span><span class="p">,</span> <span class="n">return_header</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="n">msg</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">recv_instance</span><span class="o">.</span><span class="n">recv_nolimit</span><span class="p">(</span><span class="n">timeout</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">timeout</span><span class="p">,</span>
+                                              <span class="n">return_message_object</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="n">flag</span> <span class="o">=</span> <span class="nb">bool</span><span class="p">(</span><span class="n">msg</span><span class="o">.</span><span class="n">flag</span><span class="p">)</span>
+        <span class="n">msg_recv</span> <span class="o">=</span> <span class="n">msg</span><span class="o">.</span><span class="n">args</span>
+        <span class="n">header</span> <span class="o">=</span> <span class="n">msg</span><span class="o">.</span><span class="n">header</span>
         <span class="k">assert</span><span class="p">(</span><span class="n">flag</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">assert_equal</span><span class="p">(</span><span class="n">msg_recv</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">msg_long</span><span class="p">)</span>
         <span class="k">assert</span><span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">header</span><span class="p">,</span> <span class="nb">dict</span><span class="p">))</span>
@@ -294,7 +297,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">send_instance</span><span class="o">.</span><span class="n">close_in_thread</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">recv_instance</span><span class="o">.</span><span class="n">close_in_thread</span><span class="p">()</span></div>
 
-<div class="viewcode-block" id="TestServerComm.add_filter"><a class="viewcode-back" href="../../../../yggdrasil.communication.tests.html#yggdrasil.communication.tests.test_ServerComm.TestServerComm.add_filter">[docs]</a>    <span class="k">def</span> <span class="nf">add_filter</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">comm</span><span class="p">,</span> <span class="nb">filter</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<div class="viewcode-block" id="TestServerComm.add_filter"><a class="viewcode-back" href="../../../../yggdrasil.communication.tests.html#yggdrasil.communication.tests.test_ServerComm.TestServerComm.add_filter">[docs]</a>    <span class="k">def</span> <span class="nf">add_filter</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">comm</span><span class="p">,</span> <span class="nb">filter</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Add a filter to a comm.</span>
 
 <span class="sd">        Args:</span>
@@ -303,11 +306,12 @@
 
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">target</span> <span class="o">=</span> <span class="n">comm</span>
-        <span class="k">if</span> <span class="n">comm</span><span class="o">.</span><span class="n">comm_class</span> <span class="o">==</span> <span class="s1">&#39;ServerComm&#39;</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">comm</span><span class="o">.</span><span class="n">_commtype</span> <span class="o">==</span> <span class="s1">&#39;server&#39;</span><span class="p">:</span>
             <span class="n">target</span> <span class="o">=</span> <span class="n">comm</span><span class="o">.</span><span class="n">icomm</span>
-        <span class="k">elif</span> <span class="n">comm</span><span class="o">.</span><span class="n">comm_class</span> <span class="o">==</span> <span class="s1">&#39;ClientComm&#39;</span><span class="p">:</span>
+        <span class="k">elif</span> <span class="n">comm</span><span class="o">.</span><span class="n">_commtype</span> <span class="o">==</span> <span class="s1">&#39;client&#39;</span><span class="p">:</span>
             <span class="n">target</span> <span class="o">=</span> <span class="n">comm</span><span class="o">.</span><span class="n">ocomm</span>
-        <span class="k">return</span> <span class="nb">super</span><span class="p">(</span><span class="n">TestServerComm</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">add_filter</span><span class="p">(</span><span class="n">target</span><span class="p">,</span> <span class="nb">filter</span><span class="o">=</span><span class="nb">filter</span><span class="p">)</span></div></div>
+        <span class="k">return</span> <span class="nb">super</span><span class="p">(</span><span class="n">TestServerComm</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">add_filter</span><span class="p">(</span><span class="n">target</span><span class="p">,</span> <span class="nb">filter</span><span class="o">=</span><span class="nb">filter</span><span class="p">,</span>
+                                                      <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div></div>
         
     <span class="c1"># # This dosn&#39;t work for comms that are uni-directional</span>
     <span class="c1"># def test_purge_recv(self):</span>

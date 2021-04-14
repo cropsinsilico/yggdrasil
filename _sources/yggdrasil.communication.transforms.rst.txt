@@ -28,10 +28,26 @@ yggdrasil.communication.transforms.DirectTransform module
    :undoc-members:
    :show-inheritance:
 
+yggdrasil.communication.transforms.FilterTransform module
+---------------------------------------------------------
+
+.. automodule:: yggdrasil.communication.transforms.FilterTransform
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 yggdrasil.communication.transforms.FunctionTransform module
 -----------------------------------------------------------
 
 .. automodule:: yggdrasil.communication.transforms.FunctionTransform
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+yggdrasil.communication.transforms.IterateTransform module
+----------------------------------------------------------
+
+.. automodule:: yggdrasil.communication.transforms.IterateTransform
    :members:
    :undoc-members:
    :show-inheritance:

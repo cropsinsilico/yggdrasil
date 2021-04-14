@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>yggdrasil.tests.test_config &mdash; yggdrasil v1.5.0 documentation</title>
+  <title>yggdrasil.tests.test_config &mdash; yggdrasil v1.6.0 documentation</title>
   
 
   
@@ -62,7 +62,7 @@
             
             
               <div class="version">
-                v1.5.0
+                v1.6.0
               </div>
             
           
@@ -104,6 +104,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../units.html">Units</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../c_format_strings.html">C-Style Format Strings</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../debugging.html">Debugging</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../threading.html">OpenMP Threading in Models</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../examples/examples_toc.html">Examples</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../advanced/index.html">Advanced</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../development/index.html">Development</a></li>
@@ -182,7 +183,7 @@
 <span class="kn">import</span> <span class="nn">json</span>
 <span class="kn">import</span> <span class="nn">shutil</span>
 <span class="kn">from</span> <span class="nn">yggdrasil.tests</span> <span class="kn">import</span> <span class="n">assert_equal</span><span class="p">,</span> <span class="n">assert_raises</span>
-<span class="kn">from</span> <span class="nn">yggdrasil</span> <span class="kn">import</span> <span class="n">config</span><span class="p">,</span> <span class="n">tools</span>
+<span class="kn">from</span> <span class="nn">yggdrasil</span> <span class="kn">import</span> <span class="n">config</span><span class="p">,</span> <span class="n">tools</span><span class="p">,</span> <span class="n">platform</span>
 
 
 <div class="viewcode-block" id="test_YggConfigParser"><a class="viewcode-back" href="../../../yggdrasil.tests.html#yggdrasil.tests.test_config.test_YggConfigParser">[docs]</a><span class="k">def</span> <span class="nf">test_YggConfigParser</span><span class="p">():</span>
@@ -211,7 +212,11 @@
                 <span class="s1">&#39;c&#39;</span><span class="p">,</span> <span class="n">lang_kwargs</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;c&#39;</span><span class="p">:</span> <span class="p">{</span>
                     <span class="s1">&#39;vcpkg_dir&#39;</span><span class="p">:</span> <span class="n">config</span><span class="o">.</span><span class="n">ygg_cfg_usr</span><span class="o">.</span><span class="n">get</span><span class="p">(</span>
                         <span class="s1">&#39;c&#39;</span><span class="p">,</span> <span class="s1">&#39;vcpkg_dir&#39;</span><span class="p">)}})</span>
-        <span class="n">config</span><span class="o">.</span><span class="n">update_language_config</span><span class="p">(</span><span class="n">overwrite</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">platform</span><span class="o">.</span><span class="n">_is_mac</span><span class="p">:</span>
+            <span class="n">config</span><span class="o">.</span><span class="n">update_language_config</span><span class="p">(</span>
+                <span class="s1">&#39;c&#39;</span><span class="p">,</span> <span class="n">lang_kwargs</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;c&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;compiler&#39;</span><span class="p">:</span> <span class="n">shutil</span><span class="o">.</span><span class="n">which</span><span class="p">(</span><span class="s1">&#39;clang&#39;</span><span class="p">)}})</span>
+        <span class="n">config</span><span class="o">.</span><span class="n">update_language_config</span><span class="p">(</span><span class="n">overwrite</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                                      <span class="n">allow_multiple_omp</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">languages</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
             <span class="n">config</span><span class="o">.</span><span class="n">ygg_cfg_usr</span><span class="o">.</span><span class="n">remove_section</span><span class="p">(</span><span class="n">languages</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
             <span class="n">config</span><span class="o">.</span><span class="n">update_language_config</span><span class="p">(</span>

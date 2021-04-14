@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>yggdrasil.communication.AsyncComm &mdash; yggdrasil v1.5.0 documentation</title>
+  <title>yggdrasil.communication.AsyncComm &mdash; yggdrasil v1.6.0 documentation</title>
   
 
   
@@ -62,7 +62,7 @@
             
             
               <div class="version">
-                v1.5.0
+                v1.6.0
               </div>
             
           
@@ -104,6 +104,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../units.html">Units</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../c_format_strings.html">C-Style Format Strings</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../debugging.html">Debugging</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../threading.html">OpenMP Threading in Models</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../examples/examples_toc.html">Examples</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../advanced/index.html">Advanced</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../development/index.html">Development</a></li>
@@ -180,73 +181,102 @@
   <h1>Source code for yggdrasil.communication.AsyncComm</h1><div class="highlight"><pre>
 <span></span><span class="kn">import</span> <span class="nn">uuid</span>
 <span class="kn">from</span> <span class="nn">yggdrasil</span> <span class="kn">import</span> <span class="n">multitasking</span>
-<span class="kn">from</span> <span class="nn">yggdrasil.communication</span> <span class="kn">import</span> <span class="n">CommBase</span>
+<span class="kn">from</span> <span class="nn">yggdrasil.tools</span> <span class="kn">import</span> <span class="n">ProxyObject</span>
+<span class="kn">from</span> <span class="nn">yggdrasil.components</span> <span class="kn">import</span> <span class="n">ComponentBaseUnregistered</span>
+<span class="kn">from</span> <span class="nn">yggdrasil.communication</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">CommBase</span><span class="p">,</span> <span class="n">TemporaryCommunicationError</span><span class="p">)</span>
 
 
-<div class="viewcode-block" id="AsyncTryAgain"><a class="viewcode-back" href="../../../yggdrasil.communication.html#yggdrasil.communication.AsyncComm.AsyncTryAgain">[docs]</a><span class="k">class</span> <span class="nc">AsyncTryAgain</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Exception raised when comm open, but send should be attempted again.&quot;&quot;&quot;</span>
-    <span class="k">pass</span></div>
+<span class="n">FLAG_FAILURE</span> <span class="o">=</span> <span class="mi">0</span>
+<span class="n">FLAG_SUCCESS</span> <span class="o">=</span> <span class="mi">1</span>
+<span class="n">FLAG_TRYAGAIN</span> <span class="o">=</span> <span class="mi">2</span>
 
 
-<div class="viewcode-block" id="AsyncComm"><a class="viewcode-back" href="../../../yggdrasil.communication.html#yggdrasil.communication.AsyncComm.AsyncComm">[docs]</a><span class="k">class</span> <span class="nc">AsyncComm</span><span class="p">(</span><span class="n">CommBase</span><span class="o">.</span><span class="n">CommBase</span><span class="p">):</span>
+<div class="viewcode-block" id="AsyncComm"><a class="viewcode-back" href="../../../yggdrasil.communication.html#yggdrasil.communication.AsyncComm.AsyncComm">[docs]</a><span class="k">class</span> <span class="nc">AsyncComm</span><span class="p">(</span><span class="n">ProxyObject</span><span class="p">,</span> <span class="n">ComponentBaseUnregistered</span><span class="p">):</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Class for handling asynchronous I/O.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        name (str): The name of the message queue.</span>
-<span class="sd">        dont_backlog (bool, optional): If True, the backlog will not be started</span>
-<span class="sd">            and all messages will be sent/received directly to/from the comm.</span>
-<span class="sd">            Defaults to False.</span>
+<span class="sd">        async_recv_method (str, optional): The method that should be used</span>
+<span class="sd">            to receive message into the backlog. Defaults to &#39;recv&#39;.</span>
+<span class="sd">        async_send_method (str, optional): The method that should be used</span>
+<span class="sd">            to send message in the backlog. Defaults to &#39;send_message&#39;.</span>
+<span class="sd">        async_recv_kwargs (dict, optional): Keyword arguments to pass to calls</span>
+<span class="sd">            receiving messages into the backlog. Defaults to {}.</span>
+<span class="sd">        async_send_method (dict, optional): Keyword arguments to pass to calls</span>
+<span class="sd">            sending message from the backlog. Defaults to {}.</span>
 <span class="sd">        **kwargs: Additional keyword arguments are passed to CommBase.</span>
 <span class="sd">        </span>
 <span class="sd">    Attributes:</span>
-<span class="sd">        dont_backlog (bool): If True, the backlog will not be started and all</span>
-<span class="sd">            messages will be sent/received directly to/from the comm.</span>
-<span class="sd">        backlog_send_ready (multitasking.Event): Event set when there is a</span>
-<span class="sd">            message in the send backlog.</span>
-<span class="sd">        backlog_recv_ready (multitasking.Event): Event set when there is a</span>
+<span class="sd">        backlog_ready (multitasking.Event): Event set when there is a</span>
 <span class="sd">            message in the recv backlog.</span>
 <span class="sd">        </span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    
-    <span class="n">_disconnect_attr</span> <span class="o">=</span> <span class="p">(</span><span class="n">CommBase</span><span class="o">.</span><span class="n">CommBase</span><span class="o">.</span><span class="n">_disconnect_attr</span>
-                        <span class="o">+</span> <span class="p">[</span><span class="s1">&#39;backlog_send_ready&#39;</span><span class="p">,</span> <span class="s1">&#39;backlog_recv_ready&#39;</span><span class="p">,</span>
-                           <span class="s1">&#39;_backlog_thread&#39;</span><span class="p">])</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">dont_backlog</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">dont_backlog</span> <span class="o">=</span> <span class="p">(</span><span class="n">dont_backlog</span> <span class="ow">or</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;is_interface&#39;</span><span class="p">,</span> <span class="kc">False</span><span class="p">))</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_backlog_recv</span> <span class="o">=</span> <span class="p">[]</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_backlog_send</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="vm">__slots__</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;_backlog_buffer&#39;</span><span class="p">,</span> <span class="s1">&#39;_backlog_thread&#39;</span><span class="p">,</span>
+                 <span class="s1">&#39;backlog_ready&#39;</span><span class="p">,</span> <span class="s1">&#39;_used_direct&#39;</span><span class="p">,</span> <span class="s1">&#39;close_on_eof_recv&#39;</span><span class="p">,</span>
+                 <span class="s1">&#39;_backlog_received_eof&#39;</span><span class="p">,</span> <span class="s1">&#39;_used&#39;</span><span class="p">,</span> <span class="s1">&#39;_closed&#39;</span><span class="p">,</span>
+                 <span class="s1">&#39;async_recv_method&#39;</span><span class="p">,</span> <span class="s1">&#39;async_send_method&#39;</span><span class="p">,</span>
+                 <span class="s1">&#39;async_recv_kwargs&#39;</span><span class="p">,</span> <span class="s1">&#39;async_send_kwargs&#39;</span><span class="p">,</span>
+                 <span class="s1">&#39;_error_registry&#39;</span><span class="p">]</span>
+    <span class="n">__overrides__</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;_input_args&#39;</span><span class="p">,</span> <span class="s1">&#39;_input_kwargs&#39;</span><span class="p">]</span>
+    <span class="n">_disconnect_attr</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;backlog_ready&#39;</span><span class="p">,</span> <span class="s1">&#39;_backlog_thread&#39;</span><span class="p">,</span> <span class="s1">&#39;_wrapped&#39;</span><span class="p">]</span>
+    <span class="n">_async_kws</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;async_recv_method&#39;</span><span class="p">,</span> <span class="s1">&#39;async_send_method&#39;</span><span class="p">,</span>
+                  <span class="s1">&#39;async_recv_kwargs&#39;</span><span class="p">,</span> <span class="s1">&#39;async_send_kwargs&#39;</span><span class="p">]</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">wrapped</span><span class="p">,</span>
+                 <span class="n">async_recv_method</span><span class="o">=</span><span class="s1">&#39;recv&#39;</span><span class="p">,</span> <span class="n">async_send_method</span><span class="o">=</span><span class="s1">&#39;send_message&#39;</span><span class="p">,</span>
+                 <span class="n">async_recv_kwargs</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">async_send_kwargs</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_backlog_buffer</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_backlog_thread</span> <span class="o">=</span> <span class="kc">None</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">backlog_send_ready</span> <span class="o">=</span> <span class="n">multitasking</span><span class="o">.</span><span class="n">Event</span><span class="p">()</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">backlog_recv_ready</span> <span class="o">=</span> <span class="n">multitasking</span><span class="o">.</span><span class="n">Event</span><span class="p">()</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">backlog_open</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">backlog_ready</span> <span class="o">=</span> <span class="n">multitasking</span><span class="o">.</span><span class="n">Event</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_used_direct</span> <span class="o">=</span> <span class="kc">False</span>
-        <span class="nb">super</span><span class="p">(</span><span class="n">AsyncComm</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">close_on_eof_recv</span> <span class="o">=</span> <span class="n">wrapped</span><span class="o">.</span><span class="n">close_on_eof_recv</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_used</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_closed</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_backlog_received_eof</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_error_registry</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">async_recv_method</span> <span class="o">=</span> <span class="n">async_recv_method</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">async_send_method</span> <span class="o">=</span> <span class="n">async_send_method</span>
+        <span class="k">if</span> <span class="n">async_recv_kwargs</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">async_recv_kwargs</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">if</span> <span class="n">async_send_kwargs</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">async_send_kwargs</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">async_recv_kwargs</span> <span class="o">=</span> <span class="n">async_recv_kwargs</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">async_send_kwargs</span> <span class="o">=</span> <span class="n">async_send_kwargs</span>
+        <span class="n">wrapped</span><span class="o">.</span><span class="n">close_on_eof_recv</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="n">wrapped</span><span class="o">.</span><span class="n">is_async</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">AsyncComm</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">wrapped</span><span class="p">)</span>
+        <span class="c1"># Open backlog to match</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_wrapped</span><span class="o">.</span><span class="n">is_open</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">open</span><span class="p">()</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_wrapped</span><span class="o">.</span><span class="n">is_interface</span><span class="p">:</span>  <span class="c1"># pragma: debug</span>
+            <span class="c1"># atexit.register(self.atexit)</span>
+            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">&quot;Use of async comm inside model is untested&quot;</span><span class="p">)</span>
 
-<div class="viewcode-block" id="AsyncComm.get_status_message"><a class="viewcode-back" href="../../../yggdrasil.communication.html#yggdrasil.communication.AsyncComm.AsyncComm.get_status_message">[docs]</a>    <span class="k">def</span> <span class="nf">get_status_message</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">nindent</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Return lines composing a status message.</span>
-<span class="sd">        </span>
-<span class="sd">        Args:</span>
-<span class="sd">            nindent (int, optional): Number of tabs that should be used to</span>
-<span class="sd">                indent each line. Defaults to 0.</span>
-<span class="sd">                </span>
-<span class="sd">        Returns:</span>
-<span class="sd">            tuple(list, prefix): Lines composing the status message and the</span>
-<span class="sd">                prefix string used for the last message.</span>
+    <span class="k">def</span> <span class="nf">__reduce__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">rv</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">super</span><span class="p">(</span><span class="n">AsyncComm</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__reduce__</span><span class="p">())</span>
+        <span class="p">(</span><span class="n">wrapped</span><span class="p">,</span> <span class="p">)</span> <span class="o">=</span> <span class="n">rv</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+        <span class="n">wrapped</span><span class="o">.</span><span class="n">close_on_eof_recv</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">close_on_eof_recv</span>
+        <span class="n">rv</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">wrapped</span><span class="p">,</span> <span class="p">)</span>
+        <span class="k">return</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">rv</span><span class="p">)</span>
 
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">lines</span><span class="p">,</span> <span class="n">prefix</span> <span class="o">=</span> <span class="nb">super</span><span class="p">(</span><span class="n">AsyncComm</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">get_status_message</span><span class="p">(</span><span class="n">nindent</span><span class="o">=</span><span class="n">nindent</span><span class="p">)</span>
-        <span class="n">lines</span> <span class="o">+=</span> <span class="p">[</span><span class="s1">&#39;</span><span class="si">%s%-15s</span><span class="s1">: </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">prefix</span><span class="p">,</span> <span class="s1">&#39;open (backlog)&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_open_backlog</span><span class="p">),</span>
-                  <span class="s1">&#39;</span><span class="si">%s%-15s</span><span class="s1">: </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">prefix</span><span class="p">,</span> <span class="s1">&#39;open (direct)&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_open_direct</span><span class="p">),</span>
-                  <span class="s1">&#39;</span><span class="si">%s%-15s</span><span class="s1">: </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">prefix</span><span class="p">,</span> <span class="s1">&#39;nsent (backlog)&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_msg_backlog_send</span><span class="p">),</span>
-                  <span class="s1">&#39;</span><span class="si">%s%-15s</span><span class="s1">: </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">prefix</span><span class="p">,</span> <span class="s1">&#39;nrecv (backlog)&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_msg_backlog_recv</span><span class="p">),</span>
-                  <span class="s1">&#39;</span><span class="si">%s%-15s</span><span class="s1">: </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">prefix</span><span class="p">,</span> <span class="s1">&#39;nsent (direct)&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_msg_direct_send</span><span class="p">),</span>
-                  <span class="s1">&#39;</span><span class="si">%s%-15s</span><span class="s1">: </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">prefix</span><span class="p">,</span> <span class="s1">&#39;nrecv (direct)&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_msg_direct_recv</span><span class="p">)]</span>
-        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_work_comms</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
-            <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">%s</span><span class="s1">Work comms:&#39;</span> <span class="o">%</span> <span class="n">prefix</span><span class="p">)</span>
-            <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_work_comms</span><span class="o">.</span><span class="n">values</span><span class="p">():</span>
-                <span class="n">lines</span> <span class="o">+=</span> <span class="n">v</span><span class="o">.</span><span class="n">get_status_message</span><span class="p">(</span><span class="n">nindent</span><span class="o">=</span><span class="n">nindent</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
-        <span class="k">return</span> <span class="n">lines</span><span class="p">,</span> <span class="n">prefix</span></div>
+<div class="viewcode-block" id="AsyncComm.precheck"><a class="viewcode-back" href="../../../yggdrasil.communication.html#yggdrasil.communication.AsyncComm.AsyncComm.precheck">[docs]</a>    <span class="k">def</span> <span class="nf">precheck</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="n">CommBase</span><span class="o">.</span><span class="n">CommBase</span><span class="o">.</span><span class="n">precheck</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="AsyncComm.printStatus"><a class="viewcode-back" href="../../../yggdrasil.communication.html#yggdrasil.communication.AsyncComm.AsyncComm.printStatus">[docs]</a>    <span class="k">def</span> <span class="nf">printStatus</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Print status of the communicator.&quot;&quot;&quot;</span>
+        <span class="n">lines</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;</span><span class="si">%-15s</span><span class="s1">: </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="s1">&#39;open (backlog)&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_open_backlog</span><span class="p">),</span>
+                 <span class="s1">&#39;</span><span class="si">%-15s</span><span class="s1">: </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="s1">&#39;close called (backlog)&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_closed</span><span class="p">)]</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">direction</span> <span class="o">==</span> <span class="s1">&#39;send&#39;</span><span class="p">:</span>
+            <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                <span class="s1">&#39;</span><span class="si">%-15s</span><span class="s1">: </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="s1">&#39;nsent (backlog)&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_msg_backlog_send</span><span class="p">))</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                <span class="s1">&#39;</span><span class="si">%-15s</span><span class="s1">: </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="s1">&#39;nrecv (backlog)&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_msg_backlog_recv</span><span class="p">))</span>
+        <span class="n">kwargs</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s1">&#39;extra_lines_after&#39;</span><span class="p">,</span> <span class="p">[])</span>
+        <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;extra_lines_after&#39;</span><span class="p">]</span> <span class="o">+=</span> <span class="n">lines</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_wrapped</span><span class="o">.</span><span class="n">printStatus</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
         
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">backlog_thread</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -261,41 +291,28 @@
                     <span class="bp">self</span><span class="p">,</span> <span class="n">target</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">run_backlog_recv</span><span class="p">,</span> <span class="n">suffix</span><span class="o">=</span><span class="s1">&#39;RecvBacklog&#39;</span><span class="p">)</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_backlog_thread</span>
 
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">errors</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;list: Errors raised by the wrapped comm or async thread.&quot;&quot;&quot;</span>
+        <span class="n">out</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_wrapped</span><span class="o">.</span><span class="n">errors</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_backlog_thread</span><span class="p">:</span>
+            <span class="n">out</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_backlog_thread</span><span class="o">.</span><span class="n">errors</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_backlog_thread</span><span class="o">.</span><span class="n">errors</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">return</span> <span class="n">out</span>
+
+<div class="viewcode-block" id="AsyncComm.atexit"><a class="viewcode-back" href="../../../yggdrasil.communication.html#yggdrasil.communication.AsyncComm.AsyncComm.atexit">[docs]</a>    <span class="k">def</span> <span class="nf">atexit</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>  <span class="c1"># pragma: debug</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Close operations.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">direction</span> <span class="o">==</span> <span class="s1">&#39;send&#39;</span><span class="p">)</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_open_backlog</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">linger</span><span class="p">()</span></div>
+
 <div class="viewcode-block" id="AsyncComm.open"><a class="viewcode-back" href="../../../yggdrasil.communication.html#yggdrasil.communication.AsyncComm.AsyncComm.open">[docs]</a>    <span class="k">def</span> <span class="nf">open</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Open the connection by connecting to the queue.&quot;&quot;&quot;</span>
-        <span class="nb">super</span><span class="p">(</span><span class="n">AsyncComm</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">open</span><span class="p">()</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_open_direct</span><span class="p">()</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_open_direct</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_open_backlog</span><span class="p">()</span></div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_wrapped</span><span class="o">.</span><span class="n">open</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_wrapped</span><span class="o">.</span><span class="n">suppress_special_debug</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_wrapped</span><span class="o">.</span><span class="n">is_open</span> <span class="ow">and</span> <span class="p">(</span><span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_open_backlog</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">backlog_thread</span><span class="o">.</span><span class="n">start</span><span class="p">()</span></div>
 
-    <span class="k">def</span> <span class="nf">_open_direct</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Open the comm directly.&quot;&quot;&quot;</span>
-        <span class="k">pass</span>
-
-    <span class="k">def</span> <span class="nf">_open_backlog</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Open the backlog.&quot;&quot;&quot;</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_open_backlog</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">backlog_open</span> <span class="o">=</span> <span class="kc">True</span>
-            <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">dont_backlog</span><span class="p">:</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">backlog_thread</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
-
-    <span class="k">def</span> <span class="nf">_close_direct</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">linger</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Close the comm directly.&quot;&quot;&quot;</span>
-        <span class="k">pass</span>
-
-    <span class="k">def</span> <span class="nf">_close_backlog</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">wait</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Close the backlog thread.&quot;&quot;&quot;</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;&#39;</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">backlog_open</span> <span class="o">=</span> <span class="kc">False</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_backlog_thread</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">backlog_thread</span><span class="o">.</span><span class="n">set_break_flag</span><span class="p">()</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">backlog_send_ready</span><span class="o">.</span><span class="n">set</span><span class="p">()</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">backlog_recv_ready</span><span class="o">.</span><span class="n">set</span><span class="p">()</span>
-        <span class="k">if</span> <span class="p">((</span><span class="n">wait</span> <span class="ow">and</span> <span class="p">(</span><span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">dont_backlog</span><span class="p">)</span>
-             <span class="ow">and</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_backlog_thread</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">))):</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">backlog_thread</span><span class="o">.</span><span class="n">wait</span><span class="p">(</span><span class="n">key</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="n">uuid</span><span class="o">.</span><span class="n">uuid4</span><span class="p">()))</span>
-
-    <span class="k">def</span> <span class="nf">_close</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">linger</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+<div class="viewcode-block" id="AsyncComm.close"><a class="viewcode-back" href="../../../yggdrasil.communication.html#yggdrasil.communication.AsyncComm.AsyncComm.close">[docs]</a>    <span class="k">def</span> <span class="nf">close</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">linger</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Close the connection.</span>
 
 <span class="sd">        Args:</span>
@@ -303,40 +320,88 @@
 <span class="sd">                comm. Defaults to False.</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;&#39;</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_close_backlog</span><span class="p">(</span><span class="n">wait</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_close_direct</span><span class="p">()</span>
-        <span class="nb">super</span><span class="p">(</span><span class="n">AsyncComm</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">_close</span><span class="p">(</span><span class="n">linger</span><span class="o">=</span><span class="n">linger</span><span class="p">)</span>
+        <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">_closing_thread</span><span class="o">.</span><span class="n">lock</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_wrapped</span><span class="o">.</span><span class="n">close</span><span class="p">(</span><span class="n">linger</span><span class="o">=</span><span class="n">linger</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_close_backlog</span><span class="p">(</span><span class="n">wait</span><span class="o">=</span><span class="n">linger</span><span class="p">)</span>
+        <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">backlog_thread</span><span class="o">.</span><span class="n">lock</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_closed</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="c1"># Requeue messages for other servers</span>
+        <span class="k">if</span> <span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">is_server</span> <span class="ow">and</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">model_copies</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">)</span>
+             <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">_backlog_buffer</span><span class="p">)):</span>  <span class="c1"># pragma: debug</span>
+            <span class="c1"># client_kws = self.opp_comm_kwargs</span>
+            <span class="c1"># client_kws.update(use_async=False)</span>
+            <span class="c1"># client = get_comm(self.name + &#39;_client&#39;, **client_kws)</span>
+            <span class="c1"># for msg in self._backlog_buffer:</span>
+            <span class="c1">#     self.info(&quot;Resending: %s&quot;, msg)</span>
+            <span class="c1">#     client.send(msg[0])</span>
+            <span class="c1"># client.close()</span>
+            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">&quot;Returning backlogged messages to the server &quot;</span>
+                               <span class="s2">&quot;is untested.&quot;</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="AsyncComm.stop_backlog"><a class="viewcode-back" href="../../../yggdrasil.communication.html#yggdrasil.communication.AsyncComm.AsyncComm.stop_backlog">[docs]</a>    <span class="k">def</span> <span class="nf">stop_backlog</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Stop the asynchronous backlog, turning this into a direct comm.&quot;&quot;&quot;</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_close_backlog</span><span class="p">(</span><span class="n">wait</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">dont_backlog</span> <span class="o">=</span> <span class="kc">True</span></div>
+    <span class="k">def</span> <span class="nf">_close_backlog</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">wait</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Close the backlog thread.&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_backlog_thread</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">backlog_thread</span><span class="o">.</span><span class="n">set_break_flag</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">backlog_ready</span><span class="o">.</span><span class="n">set</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">wait</span> <span class="ow">and</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_backlog_thread</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">backlog_thread</span><span class="o">.</span><span class="n">wait</span><span class="p">(</span><span class="n">key</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="n">uuid</span><span class="o">.</span><span class="n">uuid4</span><span class="p">()))</span>
+        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_wrapped</span><span class="p">,</span> <span class="s1">&#39;_close_backlog&#39;</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_wrapped</span><span class="o">.</span><span class="n">_close_backlog</span><span class="p">(</span><span class="n">wait</span><span class="o">=</span><span class="n">wait</span><span class="p">)</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">is_open</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;bool: True if the backlog is open.&quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_open_direct</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_open_backlog</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">direction</span> <span class="o">==</span> <span class="s1">&#39;send&#39;</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_wrapped</span><span class="o">.</span><span class="n">is_open</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_open_backlog</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">is_open_backlog</span> <span class="ow">or</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">n_msg_backlog</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">))</span>
+                    <span class="ow">and</span> <span class="p">(</span><span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_closed</span><span class="p">))</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">is_open_direct</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;bool: True if the direct comm is not None.&quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="kc">False</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_wrapped</span><span class="o">.</span><span class="n">is_open</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">is_open_backlog</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;bool: True if the backlog thread is running.&quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">backlog_open</span>
+        <span class="k">return</span> <span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">_backlog_thread</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">)</span>
+                <span class="ow">and</span> <span class="p">(</span><span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">backlog_thread</span><span class="o">.</span><span class="n">was_break</span><span class="p">)</span>
+                <span class="ow">and</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">backlog_thread</span><span class="o">.</span><span class="n">is_alive</span><span class="p">()))</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">is_closed</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;bool: True if the connection is closed.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="p">(</span><span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_open</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">n_msg</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;int: The number of messages in the connection.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">direction</span> <span class="o">==</span> <span class="s1">&#39;recv&#39;</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_msg_recv</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_msg_send</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">n_msg_recv</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;int: Number of messages in the receive backlog.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_msg_backlog_recv</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">n_msg_send</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;int: Number of messages in the send backlog.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_msg_backlog_send</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">n_msg_direct_recv</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;int: Number of messages currently being routed in recv.&quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="mi">0</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_wrapped</span><span class="o">.</span><span class="n">n_msg_recv</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">n_msg_direct_send</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;int: Number of messages currently being routed in send.&quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="mi">0</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_wrapped</span><span class="o">.</span><span class="n">n_msg_send</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">n_msg_direct</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -349,46 +414,23 @@
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">n_msg_backlog_recv</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;int: Number of messages in the receive backlog.&quot;&quot;&quot;</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_open_backlog</span><span class="p">:</span>
-            <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">backlog_recv</span><span class="p">)</span>
-        <span class="k">return</span> <span class="mi">0</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">direction</span> <span class="o">==</span> <span class="s1">&#39;recv&#39;</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_msg_backlog</span>
+        <span class="k">return</span> <span class="mi">0</span>  <span class="c1"># pragma: debug</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">n_msg_backlog_send</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;int: Number of messages in the send backlog.&quot;&quot;&quot;</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_open_backlog</span><span class="p">:</span>
-            <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">backlog_send</span><span class="p">)</span>
-        <span class="k">return</span> <span class="mi">0</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">direction</span> <span class="o">==</span> <span class="s1">&#39;send&#39;</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_msg_backlog</span>
+        <span class="k">return</span> <span class="mi">0</span>  <span class="c1"># pragma: debug</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">n_msg_backlog</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;int: Number of messages in the backlog.&quot;&quot;&quot;</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">direction</span> <span class="o">==</span> <span class="s1">&#39;recv&#39;</span><span class="p">:</span>
-            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_msg_backlog_recv</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_msg_backlog_send</span>
-
-    <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">n_msg_recv</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;int: Number of messages in the receive backlog.&quot;&quot;&quot;</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">direction</span> <span class="o">==</span> <span class="s1">&#39;recv&#39;</span><span class="p">:</span>
-            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">dont_backlog</span><span class="p">:</span>
-                <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_msg_direct_recv</span>
-            <span class="k">else</span><span class="p">:</span>
-                <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_msg_backlog_recv</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_msg_direct_recv</span>
-
-    <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">n_msg_send</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;int: Number of messages in the send backlog.&quot;&quot;&quot;</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">direction</span> <span class="o">==</span> <span class="s1">&#39;send&#39;</span><span class="p">:</span>
-            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">dont_backlog</span><span class="p">:</span>
-                <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_msg_direct_send</span>
-            <span class="k">else</span><span class="p">:</span>
-                <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_msg_backlog_send</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_msg_direct_send</span>
+        <span class="k">if</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">direction</span> <span class="o">==</span> <span class="s1">&#39;recv&#39;</span><span class="p">)</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_open_backlog</span><span class="p">:</span>
+            <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">backlog_buffer</span><span class="p">)</span>
+        <span class="k">return</span> <span class="mi">0</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">n_msg_recv_drain</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -403,94 +445,48 @@
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">is_confirmed_send</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;bool: True if all sent messages have been confirmed.&quot;&quot;&quot;</span>
-        <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_work_comms</span><span class="o">.</span><span class="n">values</span><span class="p">():</span>
-            <span class="k">if</span> <span class="p">(</span><span class="n">v</span><span class="o">.</span><span class="n">direction</span> <span class="o">==</span> <span class="s1">&#39;send&#39;</span><span class="p">)</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">v</span><span class="o">.</span><span class="n">is_confirmed_send</span><span class="p">:</span>  <span class="c1"># pragma: debug</span>
-                <span class="k">return</span> <span class="kc">False</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_open_backlog</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_msg_backlog_send</span><span class="p">:</span>  <span class="c1"># pragma: debug</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_wrapped</span><span class="o">.</span><span class="n">is_confirmed_send</span><span class="p">:</span>
             <span class="k">return</span> <span class="kc">False</span>
-        <span class="k">return</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">n_msg_direct_send</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span>
-
+        <span class="k">return</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">n_msg_send</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span>
+        
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">is_confirmed_recv</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;bool: True if all received messages have been confirmed.&quot;&quot;&quot;</span>
-        <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_work_comms</span><span class="o">.</span><span class="n">values</span><span class="p">():</span>
-            <span class="k">if</span> <span class="p">(</span><span class="n">v</span><span class="o">.</span><span class="n">direction</span> <span class="o">==</span> <span class="s1">&#39;recv&#39;</span><span class="p">)</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">v</span><span class="o">.</span><span class="n">is_confirmed_recv</span><span class="p">:</span>  <span class="c1"># pragma: debug</span>
-                <span class="k">return</span> <span class="kc">False</span>
-        <span class="k">return</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">n_msg_direct_recv</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span>
-
-    <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">backlog_recv</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">backlog_buffer</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;list: Messages that have been received.&quot;&quot;&quot;</span>
         <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">backlog_thread</span><span class="o">.</span><span class="n">lock</span><span class="p">:</span>
-            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_backlog_recv</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_backlog_buffer</span>
 
-    <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">backlog_send</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;list: Messages that should be sent.&quot;&quot;&quot;</span>
-        <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">backlog_thread</span><span class="o">.</span><span class="n">lock</span><span class="p">:</span>
-            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_backlog_send</span>
-
-<div class="viewcode-block" id="AsyncComm.add_backlog_recv"><a class="viewcode-back" href="../../../yggdrasil.communication.html#yggdrasil.communication.AsyncComm.AsyncComm.add_backlog_recv">[docs]</a>    <span class="k">def</span> <span class="nf">add_backlog_recv</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">msg</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Add a message to the backlog of received messages.</span>
+<div class="viewcode-block" id="AsyncComm.add_backlog"><a class="viewcode-back" href="../../../yggdrasil.communication.html#yggdrasil.communication.AsyncComm.AsyncComm.add_backlog">[docs]</a>    <span class="k">def</span> <span class="nf">add_backlog</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">payload</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Add a message to the backlog of messages.</span>
 
 <span class="sd">        Args:</span>
-<span class="sd">            msg (str): Received message that should be backlogged.</span>
+<span class="sd">            payload (tuple): Arguments and keyword argumetns for send</span>
+<span class="sd">                or data from receive.</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">backlog_thread</span><span class="o">.</span><span class="n">lock</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Added </span><span class="si">%d</span><span class="s2"> bytes to recv backlog.&quot;</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">msg</span><span class="p">))</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_backlog_recv</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">backlog_recv_ready</span><span class="o">.</span><span class="n">set</span><span class="p">()</span></div>
+            <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Added message to </span><span class="si">%s</span><span class="s2"> backlog.&quot;</span><span class="p">,</span>
+                       <span class="bp">self</span><span class="o">.</span><span class="n">direction</span><span class="p">)</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_closed</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_backlog_buffer</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">payload</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">backlog_ready</span><span class="o">.</span><span class="n">set</span><span class="p">()</span></div>
 
-<div class="viewcode-block" id="AsyncComm.add_backlog_send"><a class="viewcode-back" href="../../../yggdrasil.communication.html#yggdrasil.communication.AsyncComm.AsyncComm.add_backlog_send">[docs]</a>    <span class="k">def</span> <span class="nf">add_backlog_send</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">msg</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Add a message to the backlog of messages to be sent.</span>
-
-<span class="sd">        Args:</span>
-<span class="sd">            msg (str): Message that should be backlogged for sending.</span>
-<span class="sd">            **kwargs: Additional keyword arguments are added along with</span>
-<span class="sd">                the message.</span>
-
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">backlog_thread</span><span class="o">.</span><span class="n">lock</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Added </span><span class="si">%d</span><span class="s2"> bytes to send backlog.&quot;</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">msg</span><span class="p">))</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_backlog_send</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">msg</span><span class="p">,</span> <span class="n">kwargs</span><span class="p">))</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">backlog_send_ready</span><span class="o">.</span><span class="n">set</span><span class="p">()</span></div>
-
-<div class="viewcode-block" id="AsyncComm.pop_backlog_recv"><a class="viewcode-back" href="../../../yggdrasil.communication.html#yggdrasil.communication.AsyncComm.AsyncComm.pop_backlog_recv">[docs]</a>    <span class="k">def</span> <span class="nf">pop_backlog_recv</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Pop a message from the front of the recv backlog.</span>
+<div class="viewcode-block" id="AsyncComm.pop_backlog"><a class="viewcode-back" href="../../../yggdrasil.communication.html#yggdrasil.communication.AsyncComm.AsyncComm.pop_backlog">[docs]</a>    <span class="k">def</span> <span class="nf">pop_backlog</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Pop a message from the front of the backlog.</span>
 
 <span class="sd">        Returns:</span>
-<span class="sd">            str: First backlogged recv message.</span>
+<span class="sd">            tuple: First backlogged send arguments/keyword arguments</span>
+<span class="sd">                or received data.</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">backlog_thread</span><span class="o">.</span><span class="n">lock</span><span class="p">:</span>
-            <span class="n">msg</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_backlog_recv</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Popped </span><span class="si">%d</span><span class="s2"> bytes from recv backlog.&quot;</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">msg</span><span class="p">))</span>
-            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_backlog_recv</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">backlog_recv_ready</span><span class="o">.</span><span class="n">clear</span><span class="p">()</span>
-        <span class="k">return</span> <span class="n">msg</span></div>
-
-<div class="viewcode-block" id="AsyncComm.pop_backlog_send"><a class="viewcode-back" href="../../../yggdrasil.communication.html#yggdrasil.communication.AsyncComm.AsyncComm.pop_backlog_send">[docs]</a>    <span class="k">def</span> <span class="nf">pop_backlog_send</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Pop a message from the front of the send backlog.</span>
-
-<span class="sd">        Returns:</span>
-<span class="sd">            tuple (str, dict): First backlogged send message and</span>
-<span class="sd">                keyword arguments.</span>
-
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">backlog_thread</span><span class="o">.</span><span class="n">lock</span><span class="p">:</span>
-            <span class="n">msg</span><span class="p">,</span> <span class="n">kwargs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_backlog_send</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Popped </span><span class="si">%d</span><span class="s2"> bytes from send backlog.&quot;</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">msg</span><span class="p">))</span>
-            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_backlog_send</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">backlog_send_ready</span><span class="o">.</span><span class="n">clear</span><span class="p">()</span>
-        <span class="k">return</span> <span class="n">msg</span><span class="p">,</span> <span class="n">kwargs</span></div>
+            <span class="n">out</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_backlog_buffer</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Removed message from backlog.&quot;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_backlog_buffer</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">backlog_ready</span><span class="o">.</span><span class="n">clear</span><span class="p">()</span>
+        <span class="k">return</span> <span class="n">out</span></div>
 
 <div class="viewcode-block" id="AsyncComm.run_backlog_send"><a class="viewcode-back" href="../../../yggdrasil.communication.html#yggdrasil.communication.AsyncComm.AsyncComm.run_backlog_send">[docs]</a>    <span class="k">def</span> <span class="nf">run_backlog_send</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Continue trying to send buffered messages.&quot;&quot;&quot;</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_open_backlog</span><span class="p">:</span>  <span class="c1"># pragma: debug</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Backlog closed&quot;</span><span class="p">)</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_close_backlog</span><span class="p">()</span>
-            <span class="k">return</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">send_backlog</span><span class="p">():</span>  <span class="c1"># pragma: debug</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Stopping because send_backlog failed&quot;</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_close_backlog</span><span class="p">()</span>
@@ -504,42 +500,75 @@
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Continue buffering received messages.&quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">backlog_thread</span><span class="o">.</span><span class="n">main_terminated</span><span class="p">:</span>  <span class="c1"># pragma: debug</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Main thread terminated&quot;</span><span class="p">)</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_close_backlog</span><span class="p">()</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_open_backlog</span><span class="p">:</span>  <span class="c1"># pragma: debug</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Backlog closed&quot;</span><span class="p">)</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_close_backlog</span><span class="p">()</span>
             <span class="k">return</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">recv_backlog</span><span class="p">():</span>
-            <span class="c1"># Stop the thread, but don&#39;t close the backlog</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Stopping backlog recv thread&quot;</span><span class="p">)</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">backlog_thread</span><span class="o">.</span><span class="n">set_break_flag</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Failure to receive message into backlog.&quot;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_close_backlog</span><span class="p">()</span>
             <span class="k">return</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">periodic_debug</span><span class="p">(</span><span class="s1">&#39;run_backlog_recv&#39;</span><span class="p">,</span> <span class="n">period</span><span class="o">=</span><span class="mi">1000</span><span class="p">)(</span>
             <span class="s2">&quot;Sleeping (is_confirmed_recv=</span><span class="si">%s</span><span class="s2">)&quot;</span><span class="p">,</span>
             <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">is_confirmed_recv</span><span class="p">))</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">sleep</span><span class="p">()</span></div>
 
+<div class="viewcode-block" id="AsyncComm.send_direct"><a class="viewcode-back" href="../../../yggdrasil.communication.html#yggdrasil.communication.AsyncComm.AsyncComm.send_direct">[docs]</a>    <span class="k">def</span> <span class="nf">send_direct</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Send a message directly to the underlying comm.&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">periodic_debug</span><span class="p">(</span><span class="s2">&quot;send_direct&quot;</span><span class="p">,</span> <span class="n">period</span><span class="o">=</span><span class="mi">1000</span><span class="p">)(</span>
+            <span class="s2">&quot;Sending message to </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">address</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">suppress_special_debug</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="n">kwargs</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">async_send_kwargs</span><span class="p">)</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">kwargs</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s1">&#39;timeout&#39;</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+            <span class="k">if</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_wrapped</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">async_send_method</span><span class="p">)(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+                <span class="n">async_flag</span> <span class="o">=</span> <span class="n">FLAG_SUCCESS</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_used_direct</span> <span class="o">=</span> <span class="kc">True</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">async_flag</span> <span class="o">=</span> <span class="n">FLAG_FAILURE</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_error_registry</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">except</span> <span class="n">TemporaryCommunicationError</span><span class="p">:</span>
+            <span class="n">async_flag</span> <span class="o">=</span> <span class="n">FLAG_TRYAGAIN</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">suppress_special_debug</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="k">return</span> <span class="n">async_flag</span></div>
+
+<div class="viewcode-block" id="AsyncComm.recv_direct"><a class="viewcode-back" href="../../../yggdrasil.communication.html#yggdrasil.communication.AsyncComm.AsyncComm.recv_direct">[docs]</a>    <span class="k">def</span> <span class="nf">recv_direct</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Receive a message directly from the underlying comm.&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">periodic_debug</span><span class="p">(</span><span class="s2">&quot;recv_direct&quot;</span><span class="p">,</span> <span class="n">period</span><span class="o">=</span><span class="mi">1000</span><span class="p">)(</span>
+            <span class="s2">&quot;Receiving message from </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">address</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">suppress_special_debug</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="n">msg</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="n">kwargs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">async_recv_kwargs</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">kwargs</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s1">&#39;timeout&#39;</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">async_recv_method</span> <span class="o">!=</span> <span class="s1">&#39;recv_message&#39;</span><span class="p">:</span>
+                <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;return_message_object&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
+            <span class="n">msg</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_wrapped</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">async_recv_method</span><span class="p">)(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">msg</span><span class="o">.</span><span class="n">flag</span> <span class="ow">in</span> <span class="p">[</span><span class="n">CommBase</span><span class="o">.</span><span class="n">FLAG_EMPTY</span><span class="p">,</span> <span class="n">CommBase</span><span class="o">.</span><span class="n">FLAG_SKIP</span><span class="p">]:</span>
+                <span class="n">async_flag</span> <span class="o">=</span> <span class="n">FLAG_TRYAGAIN</span>  <span class="c1"># pragma: debug</span>
+            <span class="k">elif</span> <span class="n">msg</span><span class="o">.</span><span class="n">flag</span> <span class="ow">in</span> <span class="p">[</span><span class="n">CommBase</span><span class="o">.</span><span class="n">FLAG_SUCCESS</span><span class="p">,</span> <span class="n">CommBase</span><span class="o">.</span><span class="n">FLAG_EOF</span><span class="p">]:</span>
+                <span class="n">async_flag</span> <span class="o">=</span> <span class="n">FLAG_SUCCESS</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_used_direct</span> <span class="o">=</span> <span class="kc">True</span>
+                <span class="k">if</span> <span class="n">msg</span><span class="o">.</span><span class="n">flag</span> <span class="o">==</span> <span class="n">CommBase</span><span class="o">.</span><span class="n">FLAG_EOF</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">_backlog_received_eof</span> <span class="o">=</span> <span class="kc">True</span>
+            <span class="k">elif</span> <span class="n">msg</span><span class="o">.</span><span class="n">flag</span> <span class="o">==</span> <span class="n">CommBase</span><span class="o">.</span><span class="n">FLAG_FAILURE</span><span class="p">:</span>
+                <span class="n">async_flag</span> <span class="o">=</span> <span class="n">FLAG_FAILURE</span>
+            <span class="k">else</span><span class="p">:</span>  <span class="c1"># pragma: debug</span>
+                <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s2">&quot;Unsupported flag: </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">msg</span><span class="o">.</span><span class="n">flag</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_error_registry</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">except</span> <span class="n">TemporaryCommunicationError</span><span class="p">:</span>
+            <span class="n">async_flag</span> <span class="o">=</span> <span class="n">FLAG_TRYAGAIN</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">suppress_special_debug</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="k">return</span> <span class="n">async_flag</span><span class="p">,</span> <span class="n">msg</span></div>
+
 <div class="viewcode-block" id="AsyncComm.send_backlog"><a class="viewcode-back" href="../../../yggdrasil.communication.html#yggdrasil.communication.AsyncComm.AsyncComm.send_backlog">[docs]</a>    <span class="k">def</span> <span class="nf">send_backlog</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Send a message from the send backlog to the queue.&quot;&quot;&quot;</span>
-        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">backlog_send</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">confirm_send</span><span class="p">()</span>
-            <span class="k">return</span> <span class="kc">True</span>
-        <span class="k">try</span><span class="p">:</span>
-            <span class="n">imsg</span><span class="p">,</span> <span class="n">ikwargs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">backlog_send</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
-            <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_used_direct</span><span class="p">:</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">suppress_special_debug</span> <span class="o">=</span> <span class="kc">True</span>
-            <span class="n">flag</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_send_direct</span><span class="p">(</span><span class="n">imsg</span><span class="p">,</span> <span class="o">**</span><span class="n">ikwargs</span><span class="p">)</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">suppress_special_debug</span> <span class="o">=</span> <span class="kc">False</span>
-            <span class="k">if</span> <span class="n">flag</span><span class="p">:</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Sent </span><span class="si">%d</span><span class="s2"> bytes to </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">imsg</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">address</span><span class="p">)</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">pop_backlog_send</span><span class="p">()</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">_used_direct</span> <span class="o">=</span> <span class="kc">True</span>
-        <span class="k">except</span> <span class="n">AsyncTryAgain</span><span class="p">:</span>  <span class="c1"># pragma: debug</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">backlog_buffer</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
             <span class="n">flag</span> <span class="o">=</span> <span class="kc">True</span>
-        <span class="k">except</span> <span class="ne">BaseException</span><span class="p">:</span>  <span class="c1"># pragma: debug</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">exception</span><span class="p">(</span><span class="s1">&#39;Error sending backlogged message&#39;</span><span class="p">)</span>
-            <span class="n">flag</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">iargs</span><span class="p">,</span> <span class="n">ikwargs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">backlog_buffer</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="n">async_flag</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">send_direct</span><span class="p">(</span><span class="o">*</span><span class="n">iargs</span><span class="p">,</span> <span class="o">**</span><span class="n">ikwargs</span><span class="p">)</span>
+            <span class="n">flag</span> <span class="o">=</span> <span class="nb">bool</span><span class="p">(</span><span class="n">async_flag</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">async_flag</span> <span class="o">==</span> <span class="n">FLAG_SUCCESS</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">pop_backlog</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">confirm_send</span><span class="p">()</span>
         <span class="k">return</span> <span class="n">flag</span></div>
 
@@ -547,179 +576,195 @@
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Check for any messages in the queue and add them to the recv</span>
 <span class="sd">        backlog.&quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_open_direct</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Direct comm closed.&quot;</span><span class="p">)</span>
             <span class="n">flag</span> <span class="o">=</span> <span class="kc">False</span>
-        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_msg_direct_recv</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">verbose_debug</span><span class="p">(</span><span class="s2">&quot;No messages waiting.&quot;</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">_backlog_received_eof</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">close_on_eof_recv</span><span class="p">:</span>
+            <span class="c1"># Don&#39;t keep receiving, but don&#39;t close so that this thread</span>
+            <span class="c1"># can continue confirmation until the EOF is actually received</span>
             <span class="n">flag</span> <span class="o">=</span> <span class="kc">True</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="k">try</span><span class="p">:</span>
-                <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_used_direct</span><span class="p">:</span>
-                    <span class="bp">self</span><span class="o">.</span><span class="n">suppress_special_debug</span> <span class="o">=</span> <span class="kc">True</span>
-                <span class="n">flag</span><span class="p">,</span> <span class="n">data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_recv_direct</span><span class="p">()</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">suppress_special_debug</span> <span class="o">=</span> <span class="kc">False</span>
-                <span class="k">if</span> <span class="n">flag</span> <span class="ow">and</span> <span class="n">data</span><span class="p">:</span>
-                    <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Recv </span><span class="si">%d</span><span class="s2"> bytes from </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">address</span><span class="p">)</span>
-                    <span class="bp">self</span><span class="o">.</span><span class="n">add_backlog_recv</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
-                    <span class="bp">self</span><span class="o">.</span><span class="n">_used_direct</span> <span class="o">=</span> <span class="kc">True</span>
-            <span class="k">except</span> <span class="ne">BaseException</span><span class="p">:</span>  <span class="c1"># pragma: debug</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">exception</span><span class="p">(</span><span class="s1">&#39;Error receiving into backlog.&#39;</span><span class="p">)</span>
-                <span class="n">flag</span> <span class="o">=</span> <span class="kc">False</span>
+            <span class="n">async_flag</span><span class="p">,</span> <span class="n">msg</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">recv_direct</span><span class="p">()</span>
+            <span class="n">flag</span> <span class="o">=</span> <span class="nb">bool</span><span class="p">(</span><span class="n">async_flag</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">async_flag</span> <span class="o">==</span> <span class="n">FLAG_SUCCESS</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">add_backlog</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">confirm_recv</span><span class="p">()</span>
         <span class="k">return</span> <span class="n">flag</span></div>
 
-    <span class="k">def</span> <span class="nf">_send_direct</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">payload</span><span class="p">):</span>  <span class="c1"># pragma: debug</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Send a message to the comm directly.</span>
+<div class="viewcode-block" id="AsyncComm.send_message"><a class="viewcode-back" href="../../../yggdrasil.communication.html#yggdrasil.communication.AsyncComm.AsyncComm.send_message">[docs]</a>    <span class="k">def</span> <span class="nf">send_message</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">msg</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Send a message encapsulated in a CommMessage object.</span>
 
 <span class="sd">        Args:</span>
-<span class="sd">            payload (str): Message to send.</span>
+<span class="sd">            msg (CommMessage): Message to be sent.</span>
+<span class="sd">            **kwargs: Additional keyword arguments are passed to _safe_send.</span>
 
 <span class="sd">        Returns:</span>
-<span class="sd">            bool: Success or failure of sending the message.</span>
-
+<span class="sd">            bool: Success or failure of send.</span>
+<span class="sd">        </span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="kc">False</span>
-
-    <span class="k">def</span> <span class="nf">_recv_direct</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>  <span class="c1"># pragma: debug</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Receive a message from the comm directly.</span>
-
-<span class="sd">        Returns:</span>
-<span class="sd">            tuple (bool, str): The success or failure of receiving a message</span>
-<span class="sd">                and the message received.</span>
-
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="p">(</span><span class="kc">False</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">empty_bytes_msg</span><span class="p">)</span>
-
-    <span class="k">def</span> <span class="nf">_send</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">payload</span><span class="p">,</span> <span class="n">no_backlog</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">no_confirm</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="c1"># This is required so that call to send_message for work comms</span>
+        <span class="c1"># in CommBase.send_message will put the messages in the backlog</span>
+        <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;dont_prepare&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">send</span><span class="p">(</span><span class="n">msg</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
+        
+<div class="viewcode-block" id="AsyncComm.send"><a class="viewcode-back" href="../../../yggdrasil.communication.html#yggdrasil.communication.AsyncComm.AsyncComm.send">[docs]</a>    <span class="k">def</span> <span class="nf">send</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="n">dont_prepare</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Send a message to the backlog.</span>
 
 <span class="sd">        Args:</span>
-<span class="sd">            payload (str): Message to send.</span>
-<span class="sd">            no_backlog (bool, optional): If False, any messages that can&#39;t be</span>
-<span class="sd">                sent because the queue is full will be added to a list of</span>
-<span class="sd">                messages to be sent once the queue is no longer full. If True,</span>
-<span class="sd">                messages are not backlogged and an error will be raised if the</span>
-<span class="sd">                queue is full. Defaults to False.</span>
-<span class="sd">            no_confirm (bool, optional): If False and no_backlog is True, then</span>
-<span class="sd">                this will block until the sent message is confirmed. If True,</span>
-<span class="sd">                this will return without confirmation. Defaults to False.</span>
+<span class="sd">            *args: All arguments are assumed to be part of the message.</span>
+<span class="sd">            **kwargs: All keywords arguments are passed to comm _send method.</span>
 
 <span class="sd">        Returns:</span>
 <span class="sd">            bool: Success or failure of sending the message.</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">precheck</span><span class="p">(</span><span class="s1">&#39;send&#39;</span><span class="p">)</span>
+        <span class="n">kws_prepare</span> <span class="o">=</span> <span class="p">{</span><span class="n">k</span><span class="p">:</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="n">k</span><span class="p">)</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_prepare_message_kws</span>
+                       <span class="k">if</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="p">}</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_open_direct</span><span class="p">:</span>  <span class="c1"># pragma: debug</span>
             <span class="k">return</span> <span class="kc">False</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">dont_backlog</span><span class="p">:</span>
-            <span class="n">no_backlog</span> <span class="o">=</span> <span class="kc">True</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">direction</span> <span class="o">==</span> <span class="s1">&#39;recv&#39;</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Receive comm sending </span><span class="si">%d</span><span class="s2"> bytes direct.&quot;</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">payload</span><span class="p">))</span>
-            <span class="n">no_backlog</span> <span class="o">=</span> <span class="kc">True</span>
-        <span class="k">if</span> <span class="n">no_backlog</span> <span class="ow">or</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">backlog_send_ready</span><span class="o">.</span><span class="n">is_set</span><span class="p">():</span>
-            <span class="k">try</span><span class="p">:</span>
-                <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_used_direct</span><span class="p">:</span>
-                    <span class="bp">self</span><span class="o">.</span><span class="n">suppress_special_debug</span> <span class="o">=</span> <span class="kc">True</span>
-                <span class="n">out</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_send_direct</span><span class="p">(</span><span class="n">payload</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">suppress_special_debug</span> <span class="o">=</span> <span class="kc">False</span>
-                <span class="k">if</span> <span class="n">out</span><span class="p">:</span>
-                    <span class="bp">self</span><span class="o">.</span><span class="n">_used_direct</span> <span class="o">=</span> <span class="kc">True</span>
-                <span class="k">if</span> <span class="n">no_backlog</span><span class="p">:</span>
-                    <span class="k">if</span> <span class="n">out</span> <span class="ow">and</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">direction</span> <span class="o">==</span> <span class="s1">&#39;send&#39;</span><span class="p">):</span>
-                        <span class="n">out</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">wait_for_confirm</span><span class="p">(</span><span class="n">active_confirm</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-                                                    <span class="n">timeout</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
-                                                    <span class="n">noblock</span><span class="o">=</span><span class="n">no_confirm</span><span class="p">,</span>
-                                                    <span class="n">direction</span><span class="o">=</span><span class="s1">&#39;send&#39;</span><span class="p">)</span>
-                    <span class="k">return</span> <span class="n">out</span>
-                <span class="k">elif</span> <span class="n">out</span><span class="p">:</span>
-                    <span class="k">return</span> <span class="n">out</span>
-            <span class="k">except</span> <span class="n">AsyncTryAgain</span><span class="p">:</span>
-                <span class="k">if</span> <span class="n">no_backlog</span><span class="p">:</span>  <span class="c1"># pragma: debug</span>
-                    <span class="k">if</span> <span class="p">(</span><span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_used</span><span class="p">)</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">_multiple_first_send</span><span class="p">:</span>
-                        <span class="k">return</span> <span class="kc">False</span>
-                    <span class="k">else</span><span class="p">:</span>
-                        <span class="k">raise</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">add_backlog_send</span><span class="p">(</span><span class="n">payload</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">%d</span><span class="s1"> bytes backlogged&#39;</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">payload</span><span class="p">))</span>
-        <span class="k">return</span> <span class="kc">True</span>
+        <span class="k">if</span> <span class="n">dont_prepare</span><span class="p">:</span>
+            <span class="k">assert</span><span class="p">((</span><span class="nb">len</span><span class="p">(</span><span class="n">args</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">CommBase</span><span class="o">.</span><span class="n">CommMessage</span><span class="p">))</span>
+            <span class="n">msg</span> <span class="o">=</span> <span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">msg</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_wrapped</span><span class="o">.</span><span class="n">prepare_message</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kws_prepare</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">backlog_ready</span><span class="o">.</span><span class="n">is_set</span><span class="p">():</span>
+            <span class="n">async_flag</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">send_direct</span><span class="p">(</span><span class="n">msg</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">async_flag</span> <span class="o">!=</span> <span class="n">FLAG_TRYAGAIN</span><span class="p">:</span>
+                <span class="k">return</span> <span class="nb">bool</span><span class="p">(</span><span class="n">async_flag</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">add_backlog</span><span class="p">(((</span><span class="n">msg</span><span class="p">,</span> <span class="p">),</span> <span class="n">kwargs</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_used</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="k">return</span> <span class="kc">True</span></div>
 
-    <span class="k">def</span> <span class="nf">_recv</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">no_backlog</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">no_confirm</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Receive a message from the backlog.</span>
-
+<div class="viewcode-block" id="AsyncComm.send_eof"><a class="viewcode-back" href="../../../yggdrasil.communication.html#yggdrasil.communication.AsyncComm.AsyncComm.send_eof">[docs]</a>    <span class="k">def</span> <span class="nf">send_eof</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Send the EOF message as a short message.</span>
+<span class="sd">        </span>
 <span class="sd">        Args:</span>
-<span class="sd">            timeout (float, optional): Time in seconds to wait for a message.</span>
-<span class="sd">                Defaults to self.recv_timeout.</span>
-<span class="sd">            no_backlog (bool, optional): If False and there are messages in the</span>
-<span class="sd">                receive backlog, they will be returned first. Otherwise the</span>
-<span class="sd">                queue is checked for a message. Defaults to False.</span>
-<span class="sd">            no_confirm (bool, optional): If False and no_backlog is True, then</span>
-<span class="sd">                this will block until the sent message is confirmed. If True,</span>
-<span class="sd">                this will return without confirmation. Defaults to False.</span>
+<span class="sd">            *args: All arguments are passed to comm send.</span>
+<span class="sd">            **kwargs: All keywords arguments are passed to comm send.</span>
 
 <span class="sd">        Returns:</span>
-<span class="sd">            tuple (bool, str): The success or failure of receiving a message</span>
-<span class="sd">                and the message received.</span>
+<span class="sd">            bool: Success or failure of send.</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">if</span> <span class="n">timeout</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">timeout</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">recv_timeout</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">dont_backlog</span><span class="p">:</span>
-            <span class="n">no_backlog</span> <span class="o">=</span> <span class="kc">True</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">direction</span> <span class="o">==</span> <span class="s1">&#39;send&#39;</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Send comm receiving direct.&quot;</span><span class="p">)</span>
-            <span class="n">no_backlog</span> <span class="o">=</span> <span class="kc">True</span>
-        <span class="c1"># If no backlog, receive from queue</span>
-        <span class="k">if</span> <span class="n">no_backlog</span><span class="p">:</span>
-            <span class="n">T</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">start_timeout</span><span class="p">(</span><span class="n">timeout</span><span class="p">,</span> <span class="n">key_suffix</span><span class="o">=</span><span class="s1">&#39;_recv:direct&#39;</span><span class="p">)</span>
-            <span class="k">while</span> <span class="p">((</span><span class="ow">not</span> <span class="n">T</span><span class="o">.</span><span class="n">is_out</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">n_msg_direct_recv</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span>
-                   <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_open_direct</span><span class="p">):</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">sleep</span><span class="p">()</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">stop_timeout</span><span class="p">(</span><span class="n">key_suffix</span><span class="o">=</span><span class="s1">&#39;_recv:direct&#39;</span><span class="p">,</span> <span class="n">quiet</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-            <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_open_direct</span><span class="p">:</span>  <span class="c1"># pragma: debug</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Comm closed&quot;</span><span class="p">)</span>
-                <span class="k">return</span> <span class="p">(</span><span class="kc">False</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">empty_bytes_msg</span><span class="p">)</span>
-            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_msg_direct_recv</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>  <span class="c1"># pragma: debug</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">verbose_debug</span><span class="p">(</span><span class="s2">&quot;No messages waiting.&quot;</span><span class="p">)</span>
-                <span class="k">return</span> <span class="p">(</span><span class="kc">True</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">empty_bytes_msg</span><span class="p">)</span>
-            <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_used_direct</span><span class="p">:</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">suppress_special_debug</span> <span class="o">=</span> <span class="kc">True</span>
-            <span class="n">out</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_recv_direct</span><span class="p">()</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">suppress_special_debug</span> <span class="o">=</span> <span class="kc">False</span>
-            <span class="k">if</span> <span class="n">out</span><span class="p">:</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">_used_direct</span> <span class="o">=</span> <span class="kc">True</span>
-            <span class="k">if</span> <span class="n">out</span> <span class="ow">and</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">direction</span> <span class="o">==</span> <span class="s1">&#39;recv&#39;</span><span class="p">):</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">wait_for_confirm</span><span class="p">(</span><span class="n">active_confirm</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-                                      <span class="n">timeout</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
-                                      <span class="n">noblock</span><span class="o">=</span><span class="n">no_confirm</span><span class="p">,</span>
-                                      <span class="n">direction</span><span class="o">=</span><span class="s1">&#39;recv&#39;</span><span class="p">)</span>
-            <span class="k">return</span> <span class="n">out</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">send</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">eof_msg</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="AsyncComm.recv_message"><a class="viewcode-back" href="../../../yggdrasil.communication.html#yggdrasil.communication.AsyncComm.AsyncComm.recv_message">[docs]</a>    <span class="k">def</span> <span class="nf">recv_message</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Receive a message.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            *args: Arguments are passed to the response comm&#39;s recv_message method.</span>
+<span class="sd">            **kwargs: Keyword arguments are passed to the response comm&#39;s recv_message</span>
+<span class="sd">                method.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            CommMessage: Received message.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># This is required so that call to recv_message for work comms</span>
+        <span class="c1"># in CommBase.recv_message will retrieve messages from the backlog</span>
+        <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;return_message_object&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;dont_finalize&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">recv</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
+        
+<div class="viewcode-block" id="AsyncComm.recv"><a class="viewcode-back" href="../../../yggdrasil.communication.html#yggdrasil.communication.AsyncComm.AsyncComm.recv">[docs]</a>    <span class="k">def</span> <span class="nf">recv</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">return_message_object</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">dont_finalize</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+             <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Receive a message.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            *args: All arguments are passed to comm _recv method.</span>
+<span class="sd">            return_message_object (bool, optional): If True, the full wrapped</span>
+<span class="sd">                CommMessage message object is returned instead of the tuple.</span>
+<span class="sd">                Defaults to False.</span>
+<span class="sd">            dont_finalize (bool, optional): If True, finalize_message will not</span>
+<span class="sd">                be called even if async_recv_method is &#39;recv_message&#39;. Defaults</span>
+<span class="sd">                to False.</span>
+<span class="sd">            **kwargs: All keywords arguments are passed to comm _recv method.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            tuple (bool, obj): Success or failure of receive and received</span>
+<span class="sd">                message.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">precheck</span><span class="p">(</span><span class="s1">&#39;recv&#39;</span><span class="p">)</span>
         <span class="c1"># Sleep until there is a message</span>
-        <span class="n">T</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">start_timeout</span><span class="p">(</span><span class="n">timeout</span><span class="p">,</span> <span class="n">key_suffix</span><span class="o">=</span><span class="s1">&#39;_recv:backlog&#39;</span><span class="p">)</span>
-        <span class="k">while</span> <span class="p">(</span><span class="ow">not</span> <span class="n">T</span><span class="o">.</span><span class="n">is_out</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">backlog_recv_ready</span><span class="o">.</span><span class="n">is_set</span><span class="p">()):</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">backlog_recv_ready</span><span class="o">.</span><span class="n">wait</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sleeptime</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">stop_timeout</span><span class="p">(</span><span class="n">key_suffix</span><span class="o">=</span><span class="s1">&#39;_recv:backlog&#39;</span><span class="p">)</span>
-        <span class="c1"># Return False if the queue is closed</span>
-        <span class="k">if</span> <span class="p">(</span><span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_open_backlog</span><span class="p">):</span>  <span class="c1"># pragma: debug</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Backlog closed&quot;</span><span class="p">)</span>
-            <span class="k">return</span> <span class="p">(</span><span class="kc">False</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">empty_bytes_msg</span><span class="p">)</span>
-        <span class="c1"># Return True, &#39;&#39; if there are no messages</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">backlog_recv_ready</span><span class="o">.</span><span class="n">is_set</span><span class="p">():</span>
+        <span class="k">if</span> <span class="n">timeout</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">timeout</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;timeout&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">recv_timeout</span><span class="p">)</span>
+        <span class="n">T</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">start_timeout</span><span class="p">(</span><span class="n">timeout</span><span class="p">,</span> <span class="n">key_suffix</span><span class="o">=</span><span class="s1">&#39;.recv:backlog&#39;</span><span class="p">)</span>
+        <span class="k">while</span> <span class="p">(</span><span class="ow">not</span> <span class="n">T</span><span class="o">.</span><span class="n">is_out</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">backlog_ready</span><span class="o">.</span><span class="n">is_set</span><span class="p">()):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">backlog_ready</span><span class="o">.</span><span class="n">wait</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sleeptime</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">stop_timeout</span><span class="p">(</span><span class="n">key_suffix</span><span class="o">=</span><span class="s1">&#39;.recv:backlog&#39;</span><span class="p">)</span>
+        <span class="c1"># Handle absence of messages</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_msg_backlog</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">verbose_debug</span><span class="p">(</span><span class="s2">&quot;No messages waiting.&quot;</span><span class="p">)</span>
-            <span class="k">return</span> <span class="p">(</span><span class="kc">True</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">empty_bytes_msg</span><span class="p">)</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_closed</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">info</span><span class="p">((</span><span class="s2">&quot;No messages waiting and comm closed.&quot;</span>
+                           <span class="s2">&quot;</span><span class="si">%s</span><span class="s2">, </span><span class="si">%s</span><span class="s2">, </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">)</span>
+                          <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">backlog_thread</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">,</span>
+                             <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">backlog_thread</span><span class="o">.</span><span class="n">was_break</span><span class="p">,</span>
+                             <span class="bp">self</span><span class="o">.</span><span class="n">backlog_thread</span><span class="o">.</span><span class="n">is_alive</span><span class="p">()))</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">printStatus</span><span class="p">()</span>
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">backlog_thread</span><span class="o">.</span><span class="n">was_break</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Break stack:</span><span class="se">\n</span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span>
+                              <span class="bp">self</span><span class="o">.</span><span class="n">backlog_thread</span><span class="o">.</span><span class="n">break_stack</span><span class="p">)</span>
+                <span class="n">out</span> <span class="o">=</span> <span class="n">CommBase</span><span class="o">.</span><span class="n">CommMessage</span><span class="p">(</span><span class="n">flag</span><span class="o">=</span><span class="n">CommBase</span><span class="o">.</span><span class="n">FLAG_FAILURE</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">out</span> <span class="o">=</span> <span class="n">CommBase</span><span class="o">.</span><span class="n">CommMessage</span><span class="p">(</span><span class="n">flag</span><span class="o">=</span><span class="n">CommBase</span><span class="o">.</span><span class="n">FLAG_EMPTY</span><span class="p">,</span>
+                                           <span class="n">args</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">empty_obj_recv</span><span class="p">)</span>
         <span class="c1"># Return backlogged message</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;Returning backlogged received message&#39;</span><span class="p">)</span>
-        <span class="k">return</span> <span class="p">(</span><span class="kc">True</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">pop_backlog_recv</span><span class="p">())</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;Returning backlogged received message&#39;</span><span class="p">)</span>
+            <span class="n">out</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">pop_backlog</span><span class="p">()</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">dont_finalize</span><span class="p">:</span>
+                <span class="k">if</span> <span class="p">(</span><span class="n">out</span><span class="o">.</span><span class="n">flag</span> <span class="o">==</span> <span class="n">CommBase</span><span class="o">.</span><span class="n">FLAG_EOF</span><span class="p">)</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">close_on_eof_recv</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+                    <span class="n">out</span><span class="o">.</span><span class="n">flag</span> <span class="o">=</span> <span class="n">CommBase</span><span class="o">.</span><span class="n">FLAG_FAILURE</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_used</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">dont_finalize</span><span class="p">:</span>
+            <span class="n">kws_finalize</span> <span class="o">=</span> <span class="p">{</span><span class="n">k</span><span class="p">:</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="n">k</span><span class="p">)</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_finalize_message_kws</span>
+                            <span class="k">if</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="p">}</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">async_recv_method</span> <span class="o">!=</span> <span class="s1">&#39;recv_message&#39;</span><span class="p">:</span>
+                <span class="n">out</span><span class="o">.</span><span class="n">finalized</span> <span class="o">=</span> <span class="kc">False</span>
+                <span class="n">kws_finalize</span><span class="p">[</span><span class="s1">&#39;skip_processing&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
+            <span class="n">out</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_wrapped</span><span class="o">.</span><span class="n">finalize_message</span><span class="p">(</span><span class="n">out</span><span class="p">,</span> <span class="o">**</span><span class="n">kws_finalize</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">return_message_object</span><span class="p">:</span>
+            <span class="n">out</span> <span class="o">=</span> <span class="p">(</span><span class="nb">bool</span><span class="p">(</span><span class="n">out</span><span class="o">.</span><span class="n">flag</span><span class="p">),</span> <span class="n">out</span><span class="o">.</span><span class="n">args</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">out</span></div>
 
 <div class="viewcode-block" id="AsyncComm.purge"><a class="viewcode-back" href="../../../yggdrasil.communication.html#yggdrasil.communication.AsyncComm.AsyncComm.purge">[docs]</a>    <span class="k">def</span> <span class="nf">purge</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Purge all messages from the comm.&quot;&quot;&quot;</span>
-        <span class="nb">super</span><span class="p">(</span><span class="n">AsyncComm</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">purge</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_wrapped</span><span class="o">.</span><span class="n">purge</span><span class="p">()</span>
         <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">backlog_thread</span><span class="o">.</span><span class="n">lock</span><span class="p">:</span>
-            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">direction</span> <span class="o">==</span> <span class="s1">&#39;recv&#39;</span><span class="p">:</span>
-                <span class="k">while</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_msg_direct</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>  <span class="c1"># pragma: debug</span>
-                    <span class="bp">self</span><span class="o">.</span><span class="n">_recv_direct</span><span class="p">()</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">backlog_recv_ready</span><span class="o">.</span><span class="n">clear</span><span class="p">()</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">backlog_send_ready</span><span class="o">.</span><span class="n">clear</span><span class="p">()</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_backlog_recv</span> <span class="o">=</span> <span class="p">[]</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_backlog_send</span> <span class="o">=</span> <span class="p">[]</span></div></div>
+            <span class="bp">self</span><span class="o">.</span><span class="n">backlog_ready</span><span class="o">.</span><span class="n">clear</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_backlog_buffer</span> <span class="o">=</span> <span class="p">[]</span></div>
+
+    <span class="c1"># ALIASES</span>
+<div class="viewcode-block" id="AsyncComm.send_nolimit"><a class="viewcode-back" href="../../../yggdrasil.communication.html#yggdrasil.communication.AsyncComm.AsyncComm.send_nolimit">[docs]</a>    <span class="k">def</span> <span class="nf">send_nolimit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Alias for send_nolimit on wrapped comm.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">CommBase</span><span class="o">.</span><span class="n">CommBase</span><span class="o">.</span><span class="n">send_nolimit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="AsyncComm.recv_nolimit"><a class="viewcode-back" href="../../../yggdrasil.communication.html#yggdrasil.communication.AsyncComm.AsyncComm.recv_nolimit">[docs]</a>    <span class="k">def</span> <span class="nf">recv_nolimit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Alias for recv_nolimit on wrapped comm.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">CommBase</span><span class="o">.</span><span class="n">CommBase</span><span class="o">.</span><span class="n">recv_nolimit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="AsyncComm.send_array"><a class="viewcode-back" href="../../../yggdrasil.communication.html#yggdrasil.communication.AsyncComm.AsyncComm.send_array">[docs]</a>    <span class="k">def</span> <span class="nf">send_array</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Alias for send_array on wrapped comm.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">CommBase</span><span class="o">.</span><span class="n">CommBase</span><span class="o">.</span><span class="n">send_array</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="AsyncComm.recv_array"><a class="viewcode-back" href="../../../yggdrasil.communication.html#yggdrasil.communication.AsyncComm.AsyncComm.recv_array">[docs]</a>    <span class="k">def</span> <span class="nf">recv_array</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Alias for recv_array on wrapped comm.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">CommBase</span><span class="o">.</span><span class="n">CommBase</span><span class="o">.</span><span class="n">recv_array</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="AsyncComm.send_dict"><a class="viewcode-back" href="../../../yggdrasil.communication.html#yggdrasil.communication.AsyncComm.AsyncComm.send_dict">[docs]</a>    <span class="k">def</span> <span class="nf">send_dict</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Alias for send_dict on wrapped comm.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">CommBase</span><span class="o">.</span><span class="n">CommBase</span><span class="o">.</span><span class="n">send_dict</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="AsyncComm.recv_dict"><a class="viewcode-back" href="../../../yggdrasil.communication.html#yggdrasil.communication.AsyncComm.AsyncComm.recv_dict">[docs]</a>    <span class="k">def</span> <span class="nf">recv_dict</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Alias for recv_dict on wrapped comm.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">CommBase</span><span class="o">.</span><span class="n">CommBase</span><span class="o">.</span><span class="n">recv_dict</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
+    
+<div class="viewcode-block" id="AsyncComm.drain_server_signon_messages"><a class="viewcode-back" href="../../../yggdrasil.communication.html#yggdrasil.communication.AsyncComm.AsyncComm.drain_server_signon_messages">[docs]</a>    <span class="k">def</span> <span class="nf">drain_server_signon_messages</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Drain server signon messages. This should only be used</span>
+<span class="sd">        for testing purposes.&quot;&quot;&quot;</span>
+        <span class="k">pass</span></div></div>
 </pre></div>
 
            </div>

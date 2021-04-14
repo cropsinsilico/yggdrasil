@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>yggdrasil.drivers.OSRModelDriver &mdash; yggdrasil v1.5.0 documentation</title>
+  <title>yggdrasil.drivers.OSRModelDriver &mdash; yggdrasil v1.6.0 documentation</title>
   
 
   
@@ -62,7 +62,7 @@
             
             
               <div class="version">
-                v1.5.0
+                v1.6.0
               </div>
             
           
@@ -104,6 +104,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../units.html">Units</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../c_format_strings.html">C-Style Format Strings</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../debugging.html">Debugging</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../threading.html">OpenMP Threading in Models</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../examples/examples_toc.html">Examples</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../advanced/index.html">Advanced</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../development/index.html">Development</a></li>
@@ -228,6 +229,7 @@
         <span class="s1">&#39;update_interval&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;object&#39;</span><span class="p">,</span>
                             <span class="s1">&#39;additionalProperties&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;float&#39;</span><span class="p">},</span>
                             <span class="s1">&#39;default&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;timesync&#39;</span><span class="p">:</span> <span class="mf">1.0</span><span class="p">}}}</span>
+    <span class="n">executable_type</span> <span class="o">=</span> <span class="s1">&#39;dsl&#39;</span>
     <span class="n">language</span> <span class="o">=</span> <span class="s1">&#39;osr&#39;</span>
     <span class="n">language_ext</span> <span class="o">=</span> <span class="s1">&#39;.xml&#39;</span>
     <span class="n">base_languages</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;cpp&#39;</span><span class="p">]</span>
@@ -491,8 +493,9 @@
                     <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Failed to clone from </span><span class="si">%s</span><span class="s1">. error = </span><span class="si">%s</span><span class="s1">&#39;</span>
                                 <span class="o">%</span> <span class="p">(</span><span class="bp">cls</span><span class="o">.</span><span class="n">repository_url</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">)))</span>
                     <span class="n">out</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="bp">cls</span><span class="o">.</span><span class="n">language</span><span class="p">,</span> <span class="n">opt</span><span class="p">,</span> <span class="n">desc</span><span class="p">))</span>
-            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Located </span><span class="si">%s</span><span class="s1">: </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">fname</span><span class="p">,</span> <span class="n">fpath</span><span class="p">))</span>
-            <span class="n">cfg</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="bp">cls</span><span class="o">.</span><span class="n">language</span><span class="p">,</span> <span class="n">opt</span><span class="p">,</span> <span class="n">fpath</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">fpath</span><span class="p">:</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Located </span><span class="si">%s</span><span class="s1">: </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">fname</span><span class="p">,</span> <span class="n">fpath</span><span class="p">))</span>
+                <span class="n">cfg</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="bp">cls</span><span class="o">.</span><span class="n">language</span><span class="p">,</span> <span class="n">opt</span><span class="p">,</span> <span class="n">fpath</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">out</span></div>
         
 <div class="viewcode-block" id="OSRModelDriver.set_env_class"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.OSRModelDriver.OSRModelDriver.set_env_class">[docs]</a>    <span class="nd">@classmethod</span>

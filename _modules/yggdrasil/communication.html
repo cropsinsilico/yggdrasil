@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>yggdrasil.communication &mdash; yggdrasil v1.5.0 documentation</title>
+  <title>yggdrasil.communication &mdash; yggdrasil v1.6.0 documentation</title>
   
 
   
@@ -62,7 +62,7 @@
             
             
               <div class="version">
-                v1.5.0
+                v1.6.0
               </div>
             
           
@@ -104,6 +104,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../../units.html">Units</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../c_format_strings.html">C-Style Format Strings</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../debugging.html">Debugging</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../threading.html">OpenMP Threading in Models</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../examples/examples_toc.html">Examples</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../advanced/index.html">Advanced</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../development/index.html">Development</a></li>
@@ -176,8 +177,77 @@
            <div itemprop="articleBody">
             
   <h1>Source code for yggdrasil.communication</h1><div class="highlight"><pre>
-<span></span><span class="kn">from</span> <span class="nn">contextlib</span> <span class="kn">import</span> <span class="n">contextmanager</span>
+<span></span><span class="kn">import</span> <span class="nn">subprocess</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">from</span> <span class="nn">contextlib</span> <span class="kn">import</span> <span class="n">contextmanager</span>
 <span class="kn">from</span> <span class="nn">yggdrasil.components</span> <span class="kn">import</span> <span class="n">import_component</span>
+
+
+<span class="n">_temp_error_registry</span> <span class="o">=</span> <span class="p">{}</span>
+
+
+<span class="k">class</span> <span class="nc">TemporaryCommunicationError</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Raised when the comm is open, but send/recv is temporarily disabled.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        msg (str): Error message.</span>
+<span class="sd">        max_consecutive_allowed (int, optional): Maximum number of times this</span>
+<span class="sd">            error should be raised as a TemporaryCommunicationError before</span>
+<span class="sd">            being elevated to a FatalCommunicationError. Defaults to None and</span>
+<span class="sd">            is never elevated.</span>
+<span class="sd">        registry_key (str, optional): Key that should be used to register the</span>
+<span class="sd">            error. Defaults to msg.</span>
+
+<span class="sd">    Raises:</span>
+<span class="sd">        FatalCommunicationError: If the error is raised more than the number</span>
+<span class="sd">            of times specified via max_consecutive_allowed.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">msg</span><span class="p">,</span> <span class="n">max_consecutive_allowed</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                 <span class="n">registry_key</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">TemporaryCommunicationError</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">msg</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">max_consecutive_allowed</span> <span class="o">=</span> <span class="n">max_consecutive_allowed</span>
+        <span class="k">if</span> <span class="n">max_consecutive_allowed</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">global</span> <span class="n">_temp_error_registry</span>
+            <span class="k">assert</span><span class="p">(</span><span class="n">registry_key</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">)</span>
+            <span class="n">_temp_error_registry</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="n">registry_key</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+            <span class="n">_temp_error_registry</span><span class="p">[</span><span class="n">registry_key</span><span class="p">]</span> <span class="o">+=</span> <span class="mi">1</span>
+            <span class="k">if</span> <span class="p">((</span><span class="n">_temp_error_registry</span><span class="p">[</span><span class="n">registry_key</span><span class="p">]</span>
+                 <span class="o">&gt;</span> <span class="n">max_consecutive_allowed</span><span class="p">)):</span>  <span class="c1"># pragma: debug</span>
+                <span class="k">raise</span> <span class="n">FatalCommunicationError</span><span class="p">(</span><span class="n">msg</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">reset</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">registry_key</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Reset the registry for a TemporaryCommunicationError.&quot;&quot;&quot;</span>
+        <span class="k">global</span> <span class="n">_temp_error_registry</span>
+        <span class="n">_temp_error_registry</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="n">registry_key</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+
+
+<span class="k">class</span> <span class="nc">NoMessages</span><span class="p">(</span><span class="n">TemporaryCommunicationError</span><span class="p">):</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Raised when the comm is open, but there are no messages waiting.&quot;&quot;&quot;</span>
+    <span class="k">pass</span>
+
+
+<span class="k">class</span> <span class="nc">FatalCommunicationError</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Raised when the comm cannot recover.&quot;&quot;&quot;</span>
+    <span class="k">pass</span>
+
+
+<span class="k">def</span> <span class="nf">import_comm</span><span class="p">(</span><span class="n">commtype</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Import a comm class from its component subtype.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        commtype (str, optional): Communication class subtype. Defaults to</span>
+<span class="sd">            the default comm type for the current OS.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        CommBase: Associated communication class.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">commtype</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;server&#39;</span><span class="p">,</span> <span class="s1">&#39;client&#39;</span><span class="p">,</span> <span class="s1">&#39;fork&#39;</span><span class="p">]:</span>
+        <span class="n">commtype</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="si">%s</span><span class="s1">Comm&#39;</span> <span class="o">%</span> <span class="n">commtype</span><span class="o">.</span><span class="n">title</span><span class="p">()</span>
+    <span class="k">return</span> <span class="n">import_component</span><span class="p">(</span><span class="s1">&#39;comm&#39;</span><span class="p">,</span> <span class="n">commtype</span><span class="p">)</span>
 
 
 <span class="k">def</span> <span class="nf">determine_suffix</span><span class="p">(</span><span class="n">no_suffix</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">reverse_names</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
@@ -215,13 +285,18 @@
     <span class="k">return</span> <span class="n">suffix</span>
 
 
-<div class="viewcode-block" id="new_comm"><a class="viewcode-back" href="../../yggdrasil.communication.html#yggdrasil.communication.new_comm">[docs]</a><span class="k">def</span> <span class="nf">new_comm</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">comm</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<div class="viewcode-block" id="new_comm"><a class="viewcode-back" href="../../yggdrasil.communication.html#yggdrasil.communication.new_comm">[docs]</a><span class="k">def</span> <span class="nf">new_comm</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">commtype</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">use_async</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Return a new communicator, creating necessary components for</span>
 <span class="sd">    communication (queues, sockets, channels, etc.).</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        name (str): Communicator name.</span>
-<span class="sd">        comm (str, optional): Name of communicator class.</span>
+<span class="sd">        commtype (str, list, optional): Name of communicator type or a list</span>
+<span class="sd">            of specifiers for multiple communicators that should be joined.</span>
+<span class="sd">            Defaults to None.</span>
+<span class="sd">        use_async (bool, optional): If True, send/recv operations will</span>
+<span class="sd">            be performed asynchronously on new threads. Defaults to</span>
+<span class="sd">            False.</span>
 <span class="sd">        **kwargs: Additional keyword arguments are passed to communicator</span>
 <span class="sd">            class method new_comm.</span>
 
@@ -229,19 +304,36 @@
 <span class="sd">        Comm: Communicator of given class.</span>
 
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">comm</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
-        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">comm</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
-            <span class="n">kwargs</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">comm</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+    <span class="k">assert</span><span class="p">(</span><span class="s1">&#39;comm&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="p">)</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">commtype</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">commtype</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="n">kwargs</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">commtype</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
             <span class="n">kwargs</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s1">&#39;name&#39;</span><span class="p">,</span> <span class="n">name</span><span class="p">)</span>
-            <span class="k">return</span> <span class="n">new_comm</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">new_comm</span><span class="p">(</span><span class="n">use_async</span><span class="o">=</span><span class="n">use_async</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;comm&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">comm</span>
-            <span class="n">comm</span> <span class="o">=</span> <span class="s1">&#39;ForkComm&#39;</span>
-    <span class="n">comm_cls</span> <span class="o">=</span> <span class="n">import_component</span><span class="p">(</span><span class="s1">&#39;comm&#39;</span><span class="p">,</span> <span class="n">comm</span><span class="p">)</span>
-    <span class="k">if</span> <span class="n">comm</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;DefaultComm&#39;</span><span class="p">,</span> <span class="s1">&#39;default&#39;</span><span class="p">]:</span>
-        <span class="n">commtype</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;commtype&#39;</span><span class="p">,</span> <span class="s1">&#39;default&#39;</span><span class="p">)</span>
-        <span class="k">assert</span><span class="p">(</span><span class="n">commtype</span> <span class="o">==</span> <span class="s1">&#39;default&#39;</span><span class="p">)</span>
-    <span class="k">return</span> <span class="n">comm_cls</span><span class="o">.</span><span class="n">new_comm</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
+            <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;comm_list&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">commtype</span>
+            <span class="n">commtype</span> <span class="o">=</span> <span class="s1">&#39;fork&#39;</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">commtype</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">and</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;filetype&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">):</span>
+        <span class="n">commtype</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;filetype&#39;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">commtype</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;ErrorComm&#39;</span><span class="p">,</span> <span class="s1">&#39;error&#39;</span><span class="p">]:</span>
+        <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;commtype&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">commtype</span>
+        <span class="n">commtype</span> <span class="o">=</span> <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;base_commtype&#39;</span><span class="p">]</span>
+    <span class="n">comm_cls</span> <span class="o">=</span> <span class="n">import_comm</span><span class="p">(</span><span class="n">commtype</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;is_interface&#39;</span><span class="p">,</span> <span class="kc">False</span><span class="p">):</span>
+        <span class="n">use_async</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="n">async_kws</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="k">if</span> <span class="n">use_async</span><span class="p">:</span>
+        <span class="kn">from</span> <span class="nn">yggdrasil.communication.AsyncComm</span> <span class="kn">import</span> <span class="n">AsyncComm</span>
+        <span class="n">async_kws</span> <span class="o">=</span> <span class="p">{</span><span class="n">k</span><span class="p">:</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="n">k</span><span class="p">)</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">AsyncComm</span><span class="o">.</span><span class="n">_async_kws</span>
+                     <span class="k">if</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="p">}</span>
+    <span class="k">if</span> <span class="n">use_async</span><span class="p">:</span>
+        <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;is_async&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
+    <span class="n">out</span> <span class="o">=</span> <span class="n">comm_cls</span><span class="o">.</span><span class="n">new_comm</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">use_async</span> <span class="ow">and</span> <span class="p">(</span><span class="n">out</span><span class="o">.</span><span class="n">_commtype</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">[</span><span class="kc">None</span><span class="p">,</span> <span class="s1">&#39;client&#39;</span><span class="p">,</span>
+                                            <span class="s1">&#39;server&#39;</span><span class="p">,</span> <span class="s1">&#39;fork&#39;</span><span class="p">]):</span>
+        <span class="kn">from</span> <span class="nn">yggdrasil.communication.AsyncComm</span> <span class="kn">import</span> <span class="n">AsyncComm</span>
+        <span class="n">out</span> <span class="o">=</span> <span class="n">AsyncComm</span><span class="p">(</span><span class="n">out</span><span class="p">,</span> <span class="o">**</span><span class="n">async_kws</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">out</span></div>
 
 
 <div class="viewcode-block" id="get_comm"><a class="viewcode-back" href="../../yggdrasil.communication.html#yggdrasil.communication.get_comm">[docs]</a><span class="k">def</span> <span class="nf">get_comm</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
@@ -259,18 +351,18 @@
     <span class="k">return</span> <span class="n">new_comm</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
     
 
-<div class="viewcode-block" id="cleanup_comms"><a class="viewcode-back" href="../../yggdrasil.communication.html#yggdrasil.communication.cleanup_comms">[docs]</a><span class="k">def</span> <span class="nf">cleanup_comms</span><span class="p">(</span><span class="n">comm</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<div class="viewcode-block" id="cleanup_comms"><a class="viewcode-back" href="../../yggdrasil.communication.html#yggdrasil.communication.cleanup_comms">[docs]</a><span class="k">def</span> <span class="nf">cleanup_comms</span><span class="p">(</span><span class="n">commtype</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Call cleanup_comms for the appropriate communicator class.</span>
 
 <span class="sd">    Args:</span>
-<span class="sd">        comm (str, optional): Name of communicator class. Defaults to</span>
-<span class="sd">            tools.get_default_comm() if not provided.</span>
+<span class="sd">        commtype (str, optional): Name of communicator class. Defaults to</span>
+<span class="sd">            &#39;default&#39; if not provided.</span>
 
 <span class="sd">    Returns:</span>
 <span class="sd">        int: Number of comms closed.</span>
 
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">return</span> <span class="n">import_component</span><span class="p">(</span><span class="s1">&#39;comm&#39;</span><span class="p">,</span> <span class="n">comm</span><span class="p">)</span><span class="o">.</span><span class="n">cleanup_comms</span><span class="p">()</span></div>
+    <span class="k">return</span> <span class="n">import_comm</span><span class="p">(</span><span class="n">commtype</span><span class="p">)</span><span class="o">.</span><span class="n">cleanup_comms</span><span class="p">()</span></div>
 
 
 <span class="nd">@contextmanager</span>
@@ -305,6 +397,22 @@
     <span class="k">finally</span><span class="p">:</span>
         <span class="k">if</span> <span class="n">comm</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">comm</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+
+
+<span class="k">def</span> <span class="nf">get_open_fds</span><span class="p">():</span>  <span class="c1"># pragma: debug</span>
+    <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    return the number of open file descriptors for current process</span>
+<span class="sd">    </span>
+<span class="sd">    .. warning: will only work on UNIX-like os-es.</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="n">procs</span> <span class="o">=</span> <span class="n">subprocess</span><span class="o">.</span><span class="n">check_output</span><span class="p">([</span><span class="s2">&quot;lsof&quot;</span><span class="p">,</span> <span class="s1">&#39;-w&#39;</span><span class="p">,</span> <span class="s2">&quot;-p&quot;</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">getpid</span><span class="p">())])</span>
+    <span class="n">nprocs</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">procs</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="sa">b</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">))</span>
+    <span class="c1"># nprocs = len(</span>
+    <span class="c1">#     list(filter(</span>
+    <span class="c1">#         lambda s: s and s[ 0 ] == b&#39;f&#39; and s[1: ].isdigit(),</span>
+    <span class="c1">#         procs.split( b&#39;\n&#39; ) ) )</span>
+    <span class="c1"># )</span>
+    <span class="k">return</span> <span class="n">nprocs</span>
 
 
 <span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;new_comm&#39;</span><span class="p">,</span> <span class="s1">&#39;get_comm&#39;</span><span class="p">,</span> <span class="s1">&#39;cleanup_comms&#39;</span><span class="p">]</span>

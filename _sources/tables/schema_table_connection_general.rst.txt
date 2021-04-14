@@ -14,10 +14,10 @@ connection_type   string               (Options described :ref:`here <schema_tab
 driver            string              [DEPRECATED] Name of driver class that should be used.                          
 onexit            string              Class method that should be called when a model that the connection interacts   
                                       with exits, but before the connection driver is shut down. Defaults to None.    
-translator        array               Function or string specifying a function that should be used to translate       
-                                      messages from the input communicator(s) before passing them to the output       
-                                      communicator(s). If a string, the format should be "<package.module>:<function>"
-                                      so that <function> can be imported from <package>. Defaults to None and messages
-                                      are passed directly. This can also be a list of functions/strings that will be  
-                                      called on the messages in the order they are provided.                          
+translator        array               Function or string specifying function that should be used to translate messages
+                                      from the input communicator before passing them to the output communicator. If a
+                                      string, the format should be "<package.module>:<function>" so that <function>   
+                                      can be imported from <package>. Defaults to None and messages are passed        
+                                      directly. This can also be a list of functions/strings that will be called on   
+                                      the messages in the order they are provided.                                    
 ===============   ======   ========   ================================================================================

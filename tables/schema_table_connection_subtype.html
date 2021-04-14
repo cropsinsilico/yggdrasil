@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>&lt;no title&gt; &mdash; yggdrasil v1.5.0 documentation</title>
+  <title>&lt;no title&gt; &mdash; yggdrasil v1.6.0 documentation</title>
   
 
   
@@ -62,7 +62,7 @@
             
             
               <div class="version">
-                v1.5.0
+                v1.6.0
               </div>
             
           
@@ -104,6 +104,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../units.html">Units</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../c_format_strings.html">C-Style Format Strings</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../debugging.html">Debugging</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../threading.html">OpenMP Threading in Models</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../examples/examples_toc.html">Examples</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../advanced/index.html">Advanced</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../development/index.html">Development</a></li>
@@ -179,8 +180,8 @@
             
   <table class="docutils align-default" id="schema-table-connection-subtype-rst">
 <colgroup>
-<col style="width: 17%" />
-<col style="width: 83%" />
+<col style="width: 16%" />
+<col style="width: 84%" />
 </colgroup>
 <thead>
 <tr class="row-odd"><th class="head"><p>Connection_Type</p></th>
@@ -188,42 +189,26 @@
 </tr>
 </thead>
 <tbody>
-<tr class="row-even"><td><p>client</p></td>
-<td><p>Connection between a model acting as a client and a server request comm.</p></td>
-</tr>
-<tr class="row-odd"><td><p>default</p></td>
+<tr class="row-even"><td><p>connection</p></td>
 <td><p>Connection between one or more comms/files and one or more comms/files.</p></td>
 </tr>
-<tr class="row-even"><td><p>file_input</p></td>
+<tr class="row-odd"><td><p>file_input</p></td>
 <td><p>Connection between a file and a model.</p></td>
 </tr>
-<tr class="row-odd"><td><p>file_output</p></td>
+<tr class="row-even"><td><p>file_output</p></td>
 <td><p>Connection between a model and a file.</p></td>
 </tr>
-<tr class="row-even"><td><p>input</p></td>
+<tr class="row-odd"><td><p>input</p></td>
 <td><p>Connection between one or more comms/files and a model.</p></td>
 </tr>
-<tr class="row-odd"><td><p>output</p></td>
+<tr class="row-even"><td><p>output</p></td>
 <td><p>Connection between a model and one or more comms/files.</p></td>
 </tr>
-<tr class="row-even"><td><p>rmq_async_client</p></td>
-<td><p>Connection between a model acting as a client and an asynchronous RabbitMQ
-server request comm.</p></td>
+<tr class="row-odd"><td><p>rpc_request</p></td>
+<td><p>Connection between one or more comms/files and one or more comms/files.</p></td>
 </tr>
-<tr class="row-odd"><td><p>rmq_async_server</p></td>
-<td><p>Connection between an asynchronous RabbitMQ server request comm and a model
-acting as a server.</p></td>
-</tr>
-<tr class="row-even"><td><p>rmq_client</p></td>
-<td><p>Connection between a model acting as a client and a RabbitMQ server request
-comm.</p></td>
-</tr>
-<tr class="row-odd"><td><p>rmq_server</p></td>
-<td><p>Connection between a RabbitMQ server request comm and a model acting as a
-server.</p></td>
-</tr>
-<tr class="row-even"><td><p>server</p></td>
-<td><p>Connection between a server request comm and a model acting as a server.</p></td>
+<tr class="row-even"><td><p>rpc_response</p></td>
+<td><p>Connection between one or more comms/files and one or more comms/files.</p></td>
 </tr>
 </tbody>
 </table>

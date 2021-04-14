@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>yggdrasil.drivers.FortranModelDriver &mdash; yggdrasil v1.5.0 documentation</title>
+  <title>yggdrasil.drivers.FortranModelDriver &mdash; yggdrasil v1.6.0 documentation</title>
   
 
   
@@ -62,7 +62,7 @@
             
             
               <div class="version">
-                v1.5.0
+                v1.6.0
               </div>
             
           
@@ -104,6 +104,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../units.html">Units</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../c_format_strings.html">C-Style Format Strings</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../debugging.html">Debugging</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../threading.html">OpenMP Threading in Models</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../examples/examples_toc.html">Examples</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../advanced/index.html">Advanced</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../development/index.html">Development</a></li>
@@ -187,7 +188,8 @@
 <span class="kn">from</span> <span class="nn">yggdrasil.languages</span> <span class="kn">import</span> <span class="n">get_language_dir</span>
 <span class="kn">from</span> <span class="nn">yggdrasil.drivers</span> <span class="kn">import</span> <span class="n">CModelDriver</span>
 <span class="kn">from</span> <span class="nn">yggdrasil.drivers.CompiledModelDriver</span> <span class="kn">import</span> <span class="p">(</span>
-    <span class="n">CompilerBase</span><span class="p">,</span> <span class="n">CompiledModelDriver</span><span class="p">,</span> <span class="n">get_compilation_tool</span><span class="p">)</span>
+    <span class="n">CompilerBase</span><span class="p">,</span> <span class="n">CompiledModelDriver</span><span class="p">,</span> <span class="n">get_compilation_tool</span><span class="p">,</span>
+    <span class="n">get_compilation_tool_registry</span><span class="p">)</span>
 <span class="kn">from</span> <span class="nn">yggdrasil.metaschema.properties.ScalarMetaschemaProperties</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">_valid_types</span><span class="p">)</span>
 
@@ -554,13 +556,24 @@
         <span class="n">CompiledModelDriver</span><span class="o">.</span><span class="n">before_registration</span><span class="p">(</span><span class="bp">cls</span><span class="p">)</span>
         <span class="n">cxx_orig</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">external_libraries</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;cxx&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">cxx_orig</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="k">if</span> <span class="n">platform</span><span class="o">.</span><span class="n">_is_mac</span><span class="p">:</span>
-                <span class="n">cxx_lib</span> <span class="o">=</span> <span class="s1">&#39;c++&#39;</span>
-            <span class="k">else</span><span class="p">:</span>
-                <span class="n">cxx_lib</span> <span class="o">=</span> <span class="s1">&#39;stdc++&#39;</span>
-            <span class="k">if</span> <span class="n">cxx_lib</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">cls</span><span class="o">.</span><span class="n">external_libraries</span><span class="p">:</span>
-                <span class="bp">cls</span><span class="o">.</span><span class="n">external_libraries</span><span class="p">[</span><span class="n">cxx_lib</span><span class="p">]</span> <span class="o">=</span> <span class="n">cxx_orig</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
-                <span class="bp">cls</span><span class="o">.</span><span class="n">internal_libraries</span><span class="p">[</span><span class="s1">&#39;fygg&#39;</span><span class="p">][</span><span class="s1">&#39;external_dependencies&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">cxx_lib</span><span class="p">)</span>
+            <span class="n">c_compilers</span> <span class="o">=</span> <span class="n">get_compilation_tool_registry</span><span class="p">(</span>
+                <span class="s1">&#39;compiler&#39;</span><span class="p">,</span> <span class="n">init_languages</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;c++&#39;</span><span class="p">])[</span><span class="s1">&#39;by_language&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;c++&#39;</span><span class="p">,</span> <span class="p">{})</span>
+            <span class="n">add_cxx_lib</span> <span class="o">=</span> <span class="kc">None</span>
+            <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">c_compilers</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">v</span><span class="o">.</span><span class="n">is_installed</span><span class="p">():</span>
+                    <span class="k">continue</span>
+                <span class="k">if</span> <span class="n">k</span> <span class="o">==</span> <span class="s1">&#39;clang++&#39;</span><span class="p">:</span>
+                    <span class="n">cxx_lib</span> <span class="o">=</span> <span class="s1">&#39;c++&#39;</span>
+                    <span class="k">if</span> <span class="ow">not</span> <span class="n">add_cxx_lib</span><span class="p">:</span>
+                        <span class="n">add_cxx_lib</span> <span class="o">=</span> <span class="n">cxx_lib</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="c1"># GNU takes precedence when present</span>
+                    <span class="n">cxx_lib</span> <span class="o">=</span> <span class="s1">&#39;stdc++&#39;</span>
+                    <span class="n">add_cxx_lib</span> <span class="o">=</span> <span class="n">cxx_lib</span>
+            <span class="k">if</span> <span class="n">add_cxx_lib</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">cls</span><span class="o">.</span><span class="n">external_libraries</span><span class="p">:</span>
+                <span class="bp">cls</span><span class="o">.</span><span class="n">external_libraries</span><span class="p">[</span><span class="n">add_cxx_lib</span><span class="p">]</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">cxx_orig</span><span class="p">)</span>
+                <span class="bp">cls</span><span class="o">.</span><span class="n">internal_libraries</span><span class="p">[</span><span class="s1">&#39;fygg&#39;</span><span class="p">][</span><span class="s1">&#39;external_dependencies&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                    <span class="n">add_cxx_lib</span><span class="p">)</span>
                 <span class="c1"># if platform._is_win:  # pragma: windows</span>
                 <span class="c1">#     cls.external_libraries[cxx_lib][&#39;libtype&#39;] = &#39;windows_import&#39;</span>
         <span class="k">if</span> <span class="n">platform</span><span class="o">.</span><span class="n">_is_win</span><span class="p">:</span>  <span class="c1"># pragma: windows</span>

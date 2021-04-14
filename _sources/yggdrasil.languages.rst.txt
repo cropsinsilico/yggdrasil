@@ -9,6 +9,7 @@ Subpackages
 
    yggdrasil.languages.Python
    yggdrasil.languages.R
+   yggdrasil.languages.function
    yggdrasil.languages.tests
 
 Submodules

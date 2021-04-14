@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>yggdrasil.communication.ForkComm &mdash; yggdrasil v1.5.0 documentation</title>
+  <title>yggdrasil.communication.ForkComm &mdash; yggdrasil v1.6.0 documentation</title>
   
 
   
@@ -62,7 +62,7 @@
             
             
               <div class="version">
-                v1.5.0
+                v1.6.0
               </div>
             
           
@@ -104,6 +104,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../units.html">Units</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../c_format_strings.html">C-Style Format Strings</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../debugging.html">Debugging</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../threading.html">OpenMP Threading in Models</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../examples/examples_toc.html">Examples</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../advanced/index.html">Advanced</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../development/index.html">Development</a></li>
@@ -178,11 +179,28 @@
            <div itemprop="articleBody">
             
   <h1>Source code for yggdrasil.communication.ForkComm</h1><div class="highlight"><pre>
-<span></span><span class="kn">from</span> <span class="nn">yggdrasil.communication</span> <span class="kn">import</span> <span class="n">CommBase</span><span class="p">,</span> <span class="n">get_comm</span>
-<span class="kn">from</span> <span class="nn">yggdrasil.components</span> <span class="kn">import</span> <span class="n">import_component</span>
+<span></span><span class="kn">import</span> <span class="nn">copy</span>
+<span class="kn">from</span> <span class="nn">yggdrasil.communication</span> <span class="kn">import</span> <span class="n">CommBase</span><span class="p">,</span> <span class="n">get_comm</span><span class="p">,</span> <span class="n">import_comm</span>
 
 
 <span class="n">_address_sep</span> <span class="o">=</span> <span class="s1">&#39;:YGG_ADD:&#39;</span>
+
+
+<div class="viewcode-block" id="ForkedCommMessage"><a class="viewcode-back" href="../../../yggdrasil.communication.html#yggdrasil.communication.ForkComm.ForkedCommMessage">[docs]</a><span class="k">class</span> <span class="nc">ForkedCommMessage</span><span class="p">(</span><span class="n">CommBase</span><span class="o">.</span><span class="n">CommMessage</span><span class="p">):</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Class for forked comm messages.&quot;&quot;&quot;</span>
+
+    <span class="vm">__slots__</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;orig&#39;</span><span class="p">]</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">msg</span><span class="p">,</span> <span class="n">comm_list</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">ForkedCommMessage</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
+            <span class="n">msg</span><span class="o">=</span><span class="n">msg</span><span class="o">.</span><span class="n">msg</span><span class="p">,</span> <span class="n">length</span><span class="o">=</span><span class="n">msg</span><span class="o">.</span><span class="n">length</span><span class="p">,</span> <span class="n">flag</span><span class="o">=</span><span class="n">msg</span><span class="o">.</span><span class="n">flag</span><span class="p">,</span>
+            <span class="n">args</span><span class="o">=</span><span class="n">msg</span><span class="o">.</span><span class="n">args</span><span class="p">,</span> <span class="n">header</span><span class="o">=</span><span class="n">msg</span><span class="o">.</span><span class="n">header</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">CommBase</span><span class="o">.</span><span class="n">CommMessage</span><span class="o">.</span><span class="vm">__slots__</span><span class="p">:</span>
+            <span class="nb">setattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">k</span><span class="p">,</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">msg</span><span class="p">,</span> <span class="n">k</span><span class="p">))</span>
+        <span class="n">args</span> <span class="o">=</span> <span class="p">{</span><span class="n">i</span><span class="p">:</span> <span class="n">x</span><span class="o">.</span><span class="n">prepare_message</span><span class="p">(</span><span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">msg</span><span class="p">),</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+                <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">x</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">comm_list</span><span class="p">)}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">orig</span> <span class="o">=</span> <span class="n">msg</span><span class="o">.</span><span class="n">args</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">args</span> <span class="o">=</span> <span class="n">args</span></div>
 
 
 <div class="viewcode-block" id="get_comm_name"><a class="viewcode-back" href="../../../yggdrasil.communication.html#yggdrasil.communication.ForkComm.get_comm_name">[docs]</a><span class="k">def</span> <span class="nf">get_comm_name</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">i</span><span class="p">):</span>
@@ -205,7 +223,7 @@
 <span class="sd">    Args:</span>
 <span class="sd">        name (str): The environment variable where communication address is</span>
 <span class="sd">            stored.</span>
-<span class="sd">        comm (list, optional): The list of options for the comms that</span>
+<span class="sd">        comm_list (list, optional): The list of options for the comms that</span>
 <span class="sd">            should be bundled. If not provided, the bundle will be empty.</span>
 <span class="sd">        **kwargs: Additional keyword arguments are passed to the parent class.</span>
 
@@ -215,40 +233,53 @@
 
 <span class="sd">    &quot;&quot;&quot;</span>
 
+    <span class="n">_commtype</span> <span class="o">=</span> <span class="s1">&#39;fork&#39;</span>
     <span class="n">_dont_register</span> <span class="o">=</span> <span class="kc">True</span>
+    <span class="n">child_keys</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;serializer_class&#39;</span><span class="p">,</span> <span class="s1">&#39;serializer_kwargs&#39;</span><span class="p">,</span>  <span class="c1"># &#39;datatype&#39;,</span>
+                  <span class="s1">&#39;format_str&#39;</span><span class="p">,</span> <span class="s1">&#39;field_names&#39;</span><span class="p">,</span> <span class="s1">&#39;field_units&#39;</span><span class="p">,</span> <span class="s1">&#39;as_array&#39;</span><span class="p">]</span>
+    <span class="n">noprop_keys</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;send_converter&#39;</span><span class="p">,</span> <span class="s1">&#39;recv_converter&#39;</span><span class="p">,</span> <span class="s1">&#39;filter&#39;</span><span class="p">,</span> <span class="s1">&#39;transform&#39;</span><span class="p">]</span>
     
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">comm</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">comm_list</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">is_async</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="n">child_kwargs</span> <span class="o">=</span> <span class="p">{</span><span class="n">k</span><span class="p">:</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="n">k</span><span class="p">)</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">child_keys</span> <span class="k">if</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="p">}</span>
+        <span class="n">noprop_kwargs</span> <span class="o">=</span> <span class="p">{</span><span class="n">k</span><span class="p">:</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="n">k</span><span class="p">)</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">noprop_keys</span> <span class="k">if</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="p">}</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">comm_list</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">curr_comm_index</span> <span class="o">=</span> <span class="mi">0</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">eof_recv</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="n">address</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;address&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
-        <span class="k">if</span> <span class="p">(</span><span class="n">comm</span> <span class="ow">in</span> <span class="p">[</span><span class="kc">None</span><span class="p">,</span> <span class="s1">&#39;ForkComm&#39;</span><span class="p">]):</span>
+        <span class="k">if</span> <span class="n">comm_list</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">address</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
                 <span class="n">ncomm</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">address</span><span class="p">)</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="n">ncomm</span> <span class="o">=</span> <span class="mi">0</span>
-            <span class="n">comm</span> <span class="o">=</span> <span class="p">[</span><span class="kc">None</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">ncomm</span><span class="p">)]</span>
-        <span class="k">assert</span><span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">comm</span><span class="p">,</span> <span class="nb">list</span><span class="p">))</span>
-        <span class="n">ncomm</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">comm</span><span class="p">)</span>
+            <span class="n">comm_list</span> <span class="o">=</span> <span class="p">[</span><span class="kc">None</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">ncomm</span><span class="p">)]</span>
+        <span class="k">assert</span><span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">comm_list</span><span class="p">,</span> <span class="nb">list</span><span class="p">))</span>
+        <span class="n">ncomm</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">comm_list</span><span class="p">)</span>
         <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">ncomm</span><span class="p">):</span>
-            <span class="k">if</span> <span class="n">comm</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-                <span class="n">comm</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
-            <span class="k">if</span> <span class="n">comm</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;name&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-                <span class="n">comm</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="s1">&#39;name&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">get_comm_name</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">i</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">comm_list</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">comm_list</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+            <span class="k">if</span> <span class="n">comm_list</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;name&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">comm_list</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="s1">&#39;name&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">get_comm_name</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">i</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">child_kwargs</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+                <span class="k">if</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">comm_list</span><span class="p">[</span><span class="n">i</span><span class="p">]:</span>  <span class="c1"># pragma: debug</span>
+                    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;The keyword &#39;</span><span class="si">%s</span><span class="s2">&#39; was specified for both the &quot;</span>
+                                     <span class="s2">&quot;root ForkComm and a child comm, but can only &quot;</span>
+                                     <span class="s2">&quot;be present for one.&quot;</span> <span class="o">%</span> <span class="n">k</span><span class="p">)</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">address</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
             <span class="k">assert</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">address</span><span class="p">)</span> <span class="o">==</span> <span class="n">ncomm</span><span class="p">)</span>
             <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">ncomm</span><span class="p">):</span>
-                <span class="n">comm</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="s1">&#39;address&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">address</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+                <span class="n">comm_list</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="s1">&#39;address&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">address</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
         <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">ncomm</span><span class="p">):</span>
-            <span class="n">ikw</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
-            <span class="n">ikw</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="o">**</span><span class="n">comm</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+            <span class="n">ikw</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">kwargs</span><span class="p">)</span>
+            <span class="n">ikw</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">child_kwargs</span><span class="p">)</span>
+            <span class="n">ikw</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">comm_list</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+            <span class="n">ikw</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s1">&#39;use_async&#39;</span><span class="p">,</span> <span class="n">is_async</span><span class="p">)</span>
             <span class="n">iname</span> <span class="o">=</span> <span class="n">ikw</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;name&#39;</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">comm_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">get_comm</span><span class="p">(</span><span class="n">iname</span><span class="p">,</span> <span class="o">**</span><span class="n">ikw</span><span class="p">))</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">eof_recv</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">ncomm</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
             <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;address&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">x</span><span class="o">.</span><span class="n">address</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">comm_list</span><span class="p">]</span>
-        <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;comm&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;ForkComm&#39;</span>
-        <span class="nb">super</span><span class="p">(</span><span class="n">ForkComm</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="n">kwargs</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">noprop_kwargs</span><span class="p">)</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">ForkComm</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">is_async</span><span class="o">=</span><span class="n">is_async</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
         <span class="k">assert</span><span class="p">(</span><span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">single_use</span><span class="p">)</span>
         <span class="k">assert</span><span class="p">(</span><span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_server</span><span class="p">)</span>
         <span class="k">assert</span><span class="p">(</span><span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_client</span><span class="p">)</span>
@@ -259,15 +290,29 @@
             <span class="n">x</span><span class="o">.</span><span class="n">disconnect</span><span class="p">()</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">ForkComm</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">disconnect</span><span class="p">()</span></div>
         
-<div class="viewcode-block" id="ForkComm.printStatus"><a class="viewcode-back" href="../../../yggdrasil.communication.html#yggdrasil.communication.ForkComm.ForkComm.printStatus">[docs]</a>    <span class="k">def</span> <span class="nf">printStatus</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">nindent</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
+<div class="viewcode-block" id="ForkComm.printStatus"><a class="viewcode-back" href="../../../yggdrasil.communication.html#yggdrasil.communication.ForkComm.ForkComm.printStatus">[docs]</a>    <span class="k">def</span> <span class="nf">printStatus</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">nindent</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Print status of the communicator.&quot;&quot;&quot;</span>
-        <span class="nb">super</span><span class="p">(</span><span class="n">ForkComm</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">printStatus</span><span class="p">(</span><span class="n">nindent</span><span class="o">=</span><span class="n">nindent</span><span class="p">)</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">ForkComm</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">printStatus</span><span class="p">(</span><span class="n">nindent</span><span class="o">=</span><span class="n">nindent</span><span class="p">,</span>
+                                          <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
         <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">comm_list</span><span class="p">:</span>
             <span class="n">x</span><span class="o">.</span><span class="n">printStatus</span><span class="p">(</span><span class="n">nindent</span><span class="o">=</span><span class="n">nindent</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span></div>
 
     <span class="k">def</span> <span class="fm">__len__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">comm_list</span><span class="p">)</span>
 
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">any_files</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;bool: True if the comm interfaces with any files.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="nb">any</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">is_file</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">comm_list</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">last_comm</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;CommBase: Last comm that was used.&quot;&quot;&quot;</span>
+        <span class="n">idx</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">curr_comm_index</span>
+        <span class="k">if</span> <span class="n">idx</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">idx</span> <span class="o">-=</span> <span class="mi">1</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">comm_list</span><span class="p">[</span><span class="n">idx</span> <span class="o">%</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="p">)]</span>
+    
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">curr_comm</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;CommBase: Current comm.&quot;&quot;&quot;</span>
@@ -283,26 +328,38 @@
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Get keyword arguments for new comm.&quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="s1">&#39;address&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="p">:</span>
             <span class="n">addresses</span> <span class="o">=</span> <span class="p">[]</span>
-            <span class="n">comm</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;comm&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+            <span class="n">comm_list</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;comm_list&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
             <span class="n">ncomm</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;ncomm&#39;</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
-            <span class="k">if</span> <span class="n">comm</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-                <span class="n">comm</span> <span class="o">=</span> <span class="p">[</span><span class="kc">None</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">ncomm</span><span class="p">)]</span>
-            <span class="k">assert</span><span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">comm</span><span class="p">,</span> <span class="nb">list</span><span class="p">))</span>
-            <span class="n">ncomm</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">comm</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">comm_list</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">comm_list</span> <span class="o">=</span> <span class="p">[</span><span class="kc">None</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">ncomm</span><span class="p">)]</span>
+            <span class="k">assert</span><span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">comm_list</span><span class="p">,</span> <span class="nb">list</span><span class="p">))</span>
+            <span class="n">ncomm</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">comm_list</span><span class="p">)</span>
             <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">ncomm</span><span class="p">):</span>
-                <span class="n">x</span> <span class="o">=</span> <span class="n">comm</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+                <span class="n">x</span> <span class="o">=</span> <span class="n">comm_list</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
                 <span class="k">if</span> <span class="n">x</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
                     <span class="n">x</span> <span class="o">=</span> <span class="p">{}</span>
                 <span class="n">iname</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;name&#39;</span><span class="p">,</span> <span class="n">get_comm_name</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">i</span><span class="p">))</span>
-                <span class="n">icls</span> <span class="o">=</span> <span class="n">import_component</span><span class="p">(</span><span class="s1">&#39;comm&#39;</span><span class="p">,</span> <span class="n">x</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;comm&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">))</span>
+                <span class="n">icls</span> <span class="o">=</span> <span class="n">import_comm</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;commtype&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">))</span>
                 <span class="n">_</span><span class="p">,</span> <span class="n">ickw</span> <span class="o">=</span> <span class="n">icls</span><span class="o">.</span><span class="n">new_comm_kwargs</span><span class="p">(</span><span class="n">iname</span><span class="p">,</span> <span class="o">**</span><span class="n">x</span><span class="p">)</span>
                 <span class="n">ickw</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">iname</span>
-                <span class="n">comm</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">ickw</span>
+                <span class="n">comm_list</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">ickw</span>
                 <span class="n">addresses</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">ickw</span><span class="p">[</span><span class="s1">&#39;address&#39;</span><span class="p">])</span>
-            <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;comm&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">comm</span>
+            <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;comm_list&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">comm_list</span>
             <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;address&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">addresses</span>
         <span class="n">args</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">([</span><span class="n">name</span><span class="p">]</span> <span class="o">+</span> <span class="nb">list</span><span class="p">(</span><span class="n">args</span><span class="p">))</span>
         <span class="k">return</span> <span class="n">args</span><span class="p">,</span> <span class="n">kwargs</span></div>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">model_env</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;dict: Mapping between model name and opposite comm</span>
+<span class="sd">        environment variables that need to be provided to the model.&quot;&quot;&quot;</span>
+        <span class="n">out</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">comm_list</span><span class="p">:</span>
+            <span class="n">iout</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">model_env</span>
+            <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">iout</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                <span class="n">out</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="p">{})</span>
+                <span class="n">out</span><span class="p">[</span><span class="n">k</span><span class="p">]</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">v</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">out</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">opp_comms</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -322,9 +379,9 @@
 
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">kwargs</span> <span class="o">=</span> <span class="nb">super</span><span class="p">(</span><span class="n">ForkComm</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">opp_comm_kwargs</span><span class="p">()</span>
-        <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;comm&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">x</span><span class="o">.</span><span class="n">opp_comm_kwargs</span><span class="p">()</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">comm_list</span><span class="p">]</span>
+        <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;comm_list&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">x</span><span class="o">.</span><span class="n">opp_comm_kwargs</span><span class="p">()</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">comm_list</span><span class="p">]</span>
         <span class="c1"># for i, x in enumerate(self.comm_list):</span>
-        <span class="c1">#     kwargs[&#39;comm&#39;][i][&#39;name&#39;] = x.name</span>
+        <span class="c1">#     kwargs[&#39;comm_list&#39;][i][&#39;name&#39;] = x.name</span>
         <span class="k">return</span> <span class="n">kwargs</span></div>
 
 <div class="viewcode-block" id="ForkComm.bind"><a class="viewcode-back" href="../../../yggdrasil.communication.html#yggdrasil.communication.ForkComm.ForkComm.bind">[docs]</a>    <span class="k">def</span> <span class="nf">bind</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -406,77 +463,184 @@
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;int: The number of outgoing messages in the connection to drain.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="nb">sum</span><span class="p">([</span><span class="n">x</span><span class="o">.</span><span class="n">n_msg_send_drain</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">comm_list</span><span class="p">])</span>
 
-<div class="viewcode-block" id="ForkComm.send"><a class="viewcode-back" href="../../../yggdrasil.communication.html#yggdrasil.communication.ForkComm.ForkComm.send">[docs]</a>    <span class="k">def</span> <span class="nf">send</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Send a message.</span>
+<div class="viewcode-block" id="ForkComm.is_empty_recv"><a class="viewcode-back" href="../../../yggdrasil.communication.html#yggdrasil.communication.ForkComm.ForkComm.is_empty_recv">[docs]</a>    <span class="k">def</span> <span class="nf">is_empty_recv</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">msg</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Check if a received message object is empty.</span>
 
 <span class="sd">        Args:</span>
-<span class="sd">            *args: All arguments are assumed to be part of the message.</span>
-<span class="sd">            **kwargs: All keywords arguments are passed to comm _send method.</span>
+<span class="sd">            msg (obj): Message object.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            bool: True if the object is empty, False otherwise.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">last_comm</span><span class="o">.</span><span class="n">is_empty_recv</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="ForkComm.update_serializer_from_message"><a class="viewcode-back" href="../../../yggdrasil.communication.html#yggdrasil.communication.ForkComm.ForkComm.update_serializer_from_message">[docs]</a>    <span class="k">def</span> <span class="nf">update_serializer_from_message</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">msg</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Update the serializer based on information stored in a message.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            msg (CommMessage): Outgoing message.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">msg</span><span class="o">.</span><span class="n">stype</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">msg</span><span class="o">.</span><span class="n">stype</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">apply_transform_to_type</span><span class="p">(</span><span class="n">msg</span><span class="o">.</span><span class="n">stype</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">comm_list</span><span class="p">:</span>
+            <span class="n">x</span><span class="o">.</span><span class="n">update_serializer_from_message</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span></div>
+        
+<div class="viewcode-block" id="ForkComm.prepare_message"><a class="viewcode-back" href="../../../yggdrasil.communication.html#yggdrasil.communication.ForkComm.ForkComm.prepare_message">[docs]</a>    <span class="k">def</span> <span class="nf">prepare_message</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Perform actions preparing to send a message.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            *args: Components of the outgoing message.</span>
+<span class="sd">            **kwargs: Additional keyword arguments are passed to the prepare_message</span>
+<span class="sd">                methods for the forked comms.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            CommMessage: Serialized and annotated message.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">kws_root</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;skip_serialization&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">}</span>
+        <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;header_kwargs&#39;</span><span class="p">]:</span>
+            <span class="k">if</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="p">:</span>
+                <span class="n">kws_root</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="n">k</span><span class="p">)</span>
+        <span class="n">msg</span> <span class="o">=</span> <span class="nb">super</span><span class="p">(</span><span class="n">ForkComm</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">prepare_message</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kws_root</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">msg</span><span class="p">,</span> <span class="n">ForkedCommMessage</span><span class="p">):</span>
+            <span class="n">msg</span> <span class="o">=</span> <span class="n">ForkedCommMessage</span><span class="p">(</span><span class="n">msg</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">comm_list</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">msg</span></div>
+        
+<div class="viewcode-block" id="ForkComm.send_message"><a class="viewcode-back" href="../../../yggdrasil.communication.html#yggdrasil.communication.ForkComm.ForkComm.send_message">[docs]</a>    <span class="k">def</span> <span class="nf">send_message</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">msg</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Send a message encapsulated in a CommMessage object.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            msg (CommMessage): Message to be sent.</span>
+<span class="sd">            **kwargs: Additional keyword arguments are passed to _safe_send.</span>
 
 <span class="sd">        Returns:</span>
 <span class="sd">            bool: Success or failure of send.</span>
-
+<span class="sd">        </span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">comm_list</span><span class="p">:</span>
-            <span class="n">out</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">send</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="k">assert</span><span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">msg</span><span class="o">.</span><span class="n">args</span><span class="p">,</span> <span class="nb">dict</span><span class="p">))</span>
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">x</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">comm_list</span><span class="p">):</span>
+            <span class="n">out</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">send_message</span><span class="p">(</span><span class="n">msg</span><span class="o">.</span><span class="n">args</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">errors</span> <span class="o">+=</span> <span class="n">x</span><span class="o">.</span><span class="n">errors</span>
             <span class="k">if</span> <span class="ow">not</span> <span class="n">out</span><span class="p">:</span>
                 <span class="k">return</span> <span class="n">out</span>
-        <span class="k">return</span> <span class="n">out</span></div>
-
-<div class="viewcode-block" id="ForkComm.recv"><a class="viewcode-back" href="../../../yggdrasil.communication.html#yggdrasil.communication.ForkComm.ForkComm.recv">[docs]</a>    <span class="k">def</span> <span class="nf">recv</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="n">msg</span><span class="o">.</span><span class="n">args</span> <span class="o">=</span> <span class="n">msg</span><span class="o">.</span><span class="n">orig</span>
+        <span class="n">msg</span><span class="o">.</span><span class="n">additional_messages</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;skip_safe_send&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="k">return</span> <span class="nb">super</span><span class="p">(</span><span class="n">ForkComm</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">send_message</span><span class="p">(</span><span class="n">msg</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
+        
+<div class="viewcode-block" id="ForkComm.recv_message"><a class="viewcode-back" href="../../../yggdrasil.communication.html#yggdrasil.communication.ForkComm.ForkComm.recv_message">[docs]</a>    <span class="k">def</span> <span class="nf">recv_message</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Receive a message.</span>
 
 <span class="sd">        Args:</span>
-<span class="sd">            *args: All arguments are passed to comm _recv method.</span>
-<span class="sd">            **kwargs: All keywords arguments are passed to comm _recv method.</span>
+<span class="sd">            *args: Arguments are passed to the forked comm&#39;s recv_message method.</span>
+<span class="sd">            **kwargs: Keyword arguments are passed to the forked comm&#39;s recv_message</span>
+<span class="sd">                method.</span>
 
 <span class="sd">        Returns:</span>
-<span class="sd">            tuple (bool, obj): Success or failure of receive and received</span>
-<span class="sd">                message.</span>
+<span class="sd">            CommMessage: Received message.</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">return_header</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;return_header&#39;</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>
         <span class="n">timeout</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;timeout&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">timeout</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">timeout</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">recv_timeout</span>
         <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;timeout&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
-        <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;return_header&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
         <span class="n">first_comm</span> <span class="o">=</span> <span class="kc">True</span>
         <span class="n">T</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">start_timeout</span><span class="p">(</span><span class="n">timeout</span><span class="p">,</span> <span class="n">key_suffix</span><span class="o">=</span><span class="s1">&#39;recv:forkd&#39;</span><span class="p">)</span>
         <span class="n">out</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="n">out_idx</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span>
         <span class="k">while</span> <span class="p">((</span><span class="ow">not</span> <span class="n">T</span><span class="o">.</span><span class="n">is_out</span><span class="p">)</span> <span class="ow">or</span> <span class="n">first_comm</span><span class="p">)</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_open</span> <span class="ow">and</span> <span class="p">(</span><span class="n">out</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">):</span>
             <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="p">)):</span>
                 <span class="k">if</span> <span class="n">out</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
                     <span class="k">break</span>
                 <span class="n">x</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">curr_comm</span>
                 <span class="k">if</span> <span class="n">x</span><span class="o">.</span><span class="n">is_open</span><span class="p">:</span>
-                    <span class="n">flag</span><span class="p">,</span> <span class="n">msg</span><span class="p">,</span> <span class="n">header</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">recv</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
-                    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_eof</span><span class="p">(</span><span class="n">msg</span><span class="p">):</span>
+                    <span class="n">msg</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">recv_message</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">errors</span> <span class="o">+=</span> <span class="n">x</span><span class="o">.</span><span class="n">errors</span>
+                    <span class="k">if</span> <span class="n">msg</span><span class="o">.</span><span class="n">flag</span> <span class="o">==</span> <span class="n">CommBase</span><span class="o">.</span><span class="n">FLAG_EOF</span><span class="p">:</span>
                         <span class="bp">self</span><span class="o">.</span><span class="n">eof_recv</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">curr_comm_index</span> <span class="o">%</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="p">)]</span> <span class="o">=</span> <span class="mi">1</span>
                         <span class="k">if</span> <span class="nb">sum</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">eof_recv</span><span class="p">)</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-                            <span class="n">out</span> <span class="o">=</span> <span class="p">(</span><span class="n">flag</span><span class="p">,</span> <span class="n">msg</span><span class="p">,</span> <span class="n">header</span><span class="p">)</span>
-                    <span class="k">elif</span> <span class="p">(</span><span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_empty_recv</span><span class="p">(</span><span class="n">msg</span><span class="p">)):</span>
-                        <span class="n">out</span> <span class="o">=</span> <span class="p">(</span><span class="n">flag</span><span class="p">,</span> <span class="n">msg</span><span class="p">,</span> <span class="n">header</span><span class="p">)</span>
+                            <span class="n">out</span> <span class="o">=</span> <span class="n">msg</span>
+                        <span class="k">else</span><span class="p">:</span>
+                            <span class="n">x</span><span class="o">.</span><span class="n">finalize_message</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+                    <span class="k">elif</span> <span class="n">msg</span><span class="o">.</span><span class="n">flag</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">[</span><span class="n">CommBase</span><span class="o">.</span><span class="n">FLAG_FAILURE</span><span class="p">,</span> <span class="n">CommBase</span><span class="o">.</span><span class="n">FLAG_EMPTY</span><span class="p">]:</span>
+                        <span class="n">out</span> <span class="o">=</span> <span class="n">msg</span>
+                <span class="k">if</span> <span class="n">out</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="n">out_idx</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">curr_comm_index</span> <span class="o">%</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">curr_comm_index</span> <span class="o">+=</span> <span class="mi">1</span>
             <span class="n">first_comm</span> <span class="o">=</span> <span class="kc">False</span>
             <span class="k">if</span> <span class="n">out</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">sleep</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">stop_timeout</span><span class="p">(</span><span class="n">key_suffix</span><span class="o">=</span><span class="s1">&#39;recv:forkd&#39;</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">out</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">out_idx</span> <span class="o">=</span> <span class="mi">0</span>
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_closed</span><span class="p">:</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;Comm closed&#39;</span><span class="p">)</span>
-                <span class="n">out</span> <span class="o">=</span> <span class="p">(</span><span class="kc">False</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+                <span class="n">out</span> <span class="o">=</span> <span class="n">CommBase</span><span class="o">.</span><span class="n">CommMessage</span><span class="p">(</span><span class="n">flag</span><span class="o">=</span><span class="n">CommBase</span><span class="o">.</span><span class="n">FLAG_FAILURE</span><span class="p">)</span>
             <span class="k">else</span><span class="p">:</span>
-                <span class="n">out</span> <span class="o">=</span> <span class="p">(</span><span class="kc">True</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">empty_obj_recv</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="n">return_header</span><span class="p">:</span>
-            <span class="n">out</span> <span class="o">=</span> <span class="p">(</span><span class="n">out</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">out</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+                <span class="n">out</span> <span class="o">=</span> <span class="n">CommBase</span><span class="o">.</span><span class="n">CommMessage</span><span class="p">(</span><span class="n">flag</span><span class="o">=</span><span class="n">CommBase</span><span class="o">.</span><span class="n">FLAG_EMPTY</span><span class="p">,</span>
+                                           <span class="n">args</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">last_comm</span><span class="o">.</span><span class="n">empty_obj_recv</span><span class="p">)</span>
+        <span class="n">out</span><span class="o">.</span><span class="n">args</span> <span class="o">=</span> <span class="p">{</span><span class="n">out_idx</span><span class="p">:</span> <span class="n">out</span><span class="o">.</span><span class="n">args</span><span class="p">}</span>
         <span class="k">return</span> <span class="n">out</span></div>
 
+<div class="viewcode-block" id="ForkComm.finalize_message"><a class="viewcode-back" href="../../../yggdrasil.communication.html#yggdrasil.communication.ForkComm.ForkComm.finalize_message">[docs]</a>    <span class="k">def</span> <span class="nf">finalize_message</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">msg</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Perform actions to decipher a message.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            msg (CommMessage): Initial message object to be finalized.</span>
+<span class="sd">            **kwargs: Keyword arguments are passed to the forked comm&#39;s</span>
+<span class="sd">                finalize_message method.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            CommMessage: Deserialized and annotated message.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">assert</span><span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">msg</span><span class="o">.</span><span class="n">args</span><span class="p">,</span> <span class="nb">dict</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">msg</span><span class="o">.</span><span class="n">args</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">))</span>
+        <span class="n">idx</span><span class="p">,</span> <span class="n">msg</span><span class="o">.</span><span class="n">args</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span><span class="nb">iter</span><span class="p">(</span><span class="n">msg</span><span class="o">.</span><span class="n">args</span><span class="o">.</span><span class="n">items</span><span class="p">()))</span>
+        <span class="n">msg</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">comm_list</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span><span class="o">.</span><span class="n">finalize_message</span><span class="p">(</span><span class="n">msg</span><span class="p">,</span> <span class="n">skip_python2language</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="n">msg</span><span class="o">.</span><span class="n">finalized</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="k">return</span> <span class="nb">super</span><span class="p">(</span><span class="n">ForkComm</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">finalize_message</span><span class="p">(</span><span class="n">msg</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
+        
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">_multiple_first_send</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>  <span class="c1"># pragma: debug</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">last_comm</span><span class="o">.</span><span class="n">_multiple_first_send</span>
+
+    <span class="nd">@_multiple_first_send</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">_multiple_first_send</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">comm_list</span><span class="p">:</span>
+            <span class="n">x</span><span class="o">.</span><span class="n">_multiple_first_send</span> <span class="o">=</span> <span class="n">value</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">suppress_special_debug</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">last_comm</span><span class="o">.</span><span class="n">suppress_special_debug</span>
+
+    <span class="nd">@suppress_special_debug</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">suppress_special_debug</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">comm_list</span><span class="p">:</span>
+            <span class="n">x</span><span class="o">.</span><span class="n">suppress_special_debug</span> <span class="o">=</span> <span class="n">value</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">_type_errors</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>  <span class="c1"># pragma: debug</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">last_comm</span><span class="o">.</span><span class="n">_type_errors</span>
+
+    <span class="nd">@_type_errors</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">_type_errors</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">comm_list</span><span class="p">:</span>
+            <span class="n">x</span><span class="o">.</span><span class="n">_type_errors</span> <span class="o">=</span> <span class="n">value</span>
+    
 <div class="viewcode-block" id="ForkComm.purge"><a class="viewcode-back" href="../../../yggdrasil.communication.html#yggdrasil.communication.ForkComm.ForkComm.purge">[docs]</a>    <span class="k">def</span> <span class="nf">purge</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Purge all messages from the comm.&quot;&quot;&quot;</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">ForkComm</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">purge</span><span class="p">()</span>
         <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">comm_list</span><span class="p">:</span>
-            <span class="n">x</span><span class="o">.</span><span class="n">purge</span><span class="p">()</span></div></div>
+            <span class="n">x</span><span class="o">.</span><span class="n">purge</span><span class="p">()</span></div>
+    
+<div class="viewcode-block" id="ForkComm.drain_server_signon_messages"><a class="viewcode-back" href="../../../yggdrasil.communication.html#yggdrasil.communication.ForkComm.ForkComm.drain_server_signon_messages">[docs]</a>    <span class="k">def</span> <span class="nf">drain_server_signon_messages</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Drain server signon messages. This should only be used</span>
+<span class="sd">        for testing purposes.&quot;&quot;&quot;</span>
+        <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">comm_list</span><span class="p">:</span>
+            <span class="n">x</span><span class="o">.</span><span class="n">drain_server_signon_messages</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div></div>
 </pre></div>
 
            </div>

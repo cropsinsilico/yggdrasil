@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>yggdrasil.communication.FileComm &mdash; yggdrasil v1.5.0 documentation</title>
+  <title>yggdrasil.communication.FileComm &mdash; yggdrasil v1.6.0 documentation</title>
   
 
   
@@ -62,7 +62,7 @@
             
             
               <div class="version">
-                v1.5.0
+                v1.6.0
               </div>
             
           
@@ -104,6 +104,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../units.html">Units</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../c_format_strings.html">C-Style Format Strings</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../debugging.html">Debugging</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../threading.html">OpenMP Threading in Models</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../examples/examples_toc.html">Examples</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../advanced/index.html">Advanced</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../development/index.html">Development</a></li>
@@ -260,7 +261,7 @@
                                   <span class="s1">&#39;class&#39;</span><span class="p">:</span> <span class="n">SerializeBase</span><span class="p">}],</span>
                        <span class="s1">&#39;default&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;seritype&#39;</span><span class="p">:</span> <span class="s1">&#39;direct&#39;</span><span class="p">}}}</span>
     <span class="n">_schema_excluded_from_inherit</span> <span class="o">=</span> <span class="p">(</span>
-        <span class="p">[</span><span class="s1">&#39;commtype&#39;</span><span class="p">,</span> <span class="s1">&#39;datatype&#39;</span><span class="p">,</span> <span class="s1">&#39;read_meth&#39;</span><span class="p">,</span> <span class="s1">&#39;serializer&#39;</span><span class="p">]</span>
+        <span class="p">[</span><span class="s1">&#39;commtype&#39;</span><span class="p">,</span> <span class="s1">&#39;datatype&#39;</span><span class="p">,</span> <span class="s1">&#39;read_meth&#39;</span><span class="p">,</span> <span class="s1">&#39;serializer&#39;</span><span class="p">,</span> <span class="s1">&#39;default_value&#39;</span><span class="p">]</span>
         <span class="o">+</span> <span class="n">CommBase</span><span class="o">.</span><span class="n">CommBase</span><span class="o">.</span><span class="n">_model_schema_prop</span><span class="p">)</span>
     <span class="n">_schema_excluded_from_class_validation</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;serializer&#39;</span><span class="p">]</span>
     <span class="n">_schema_base_class</span> <span class="o">=</span> <span class="kc">None</span>
@@ -321,7 +322,8 @@
             <span class="k">assert</span><span class="p">(</span><span class="s1">&#39;serializer&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">cls</span><span class="o">.</span><span class="n">_schema_properties</span><span class="p">)</span>
             <span class="bp">cls</span><span class="o">.</span><span class="n">_schema_properties</span><span class="o">.</span><span class="n">update</span><span class="p">(</span>
                 <span class="bp">cls</span><span class="o">.</span><span class="n">_default_serializer_class</span><span class="o">.</span><span class="n">_schema_properties</span><span class="p">)</span>
-            <span class="k">del</span> <span class="bp">cls</span><span class="o">.</span><span class="n">_schema_properties</span><span class="p">[</span><span class="s1">&#39;seritype&#39;</span><span class="p">]</span></div>
+            <span class="k">del</span> <span class="bp">cls</span><span class="o">.</span><span class="n">_schema_properties</span><span class="p">[</span><span class="s1">&#39;seritype&#39;</span><span class="p">]</span>
+        <span class="bp">cls</span><span class="o">.</span><span class="n">_commtype</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">_filetype</span></div>
 
 <div class="viewcode-block" id="FileComm.get_testing_options"><a class="viewcode-back" href="../../../yggdrasil.communication.html#yggdrasil.communication.FileComm.FileComm.get_testing_options">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">get_testing_options</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">read_meth</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
@@ -381,19 +383,22 @@
 <span class="sd">        Args:</span>
 <span class="sd">            language (str, optional): Specific language that should be checked</span>
 <span class="sd">                for compatibility. Defaults to None and all languages supported</span>
-<span class="sd">                on the current platform will be checked.</span>
+<span class="sd">                on the current platform will be checked. If set to &#39;any&#39;, the</span>
+<span class="sd">                result will be True if this comm is installed for any of the</span>
+<span class="sd">                supported languages.</span>
 
 <span class="sd">        Returns:</span>
 <span class="sd">            bool: Is the comm installed.</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="c1"># Filesystem is implied</span>
-        <span class="k">return</span> <span class="kc">True</span></div>
-
+        <span class="k">if</span> <span class="n">language</span> <span class="o">==</span> <span class="s1">&#39;python&#39;</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">True</span>
+        <span class="k">return</span> <span class="kc">False</span></div>
+        
 <div class="viewcode-block" id="FileComm.underlying_comm_class"><a class="viewcode-back" href="../../../yggdrasil.communication.html#yggdrasil.communication.FileComm.FileComm.underlying_comm_class">[docs]</a>    <span class="nd">@classmethod</span>
-    <span class="k">def</span> <span class="nf">underlying_comm_class</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">underlying_comm_class</span><span class="p">(</span><span class="bp">cls</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;str: Name of underlying communication class.&quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="s1">&#39;FileComm&#39;</span></div>
+        <span class="k">return</span> <span class="bp">cls</span><span class="o">.</span><span class="n">_filetype</span></div>
 
 <div class="viewcode-block" id="FileComm.close_registry_entry"><a class="viewcode-back" href="../../../yggdrasil.communication.html#yggdrasil.communication.FileComm.FileComm.close_registry_entry">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">close_registry_entry</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
@@ -485,15 +490,18 @@
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">file_size</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;int: Current size of file.&quot;&quot;&quot;</span>
-        <span class="n">prev_pos</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">file_tell</span><span class="p">()</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">file_seek</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">os</span><span class="o">.</span><span class="n">SEEK_END</span><span class="p">)</span>
-        <span class="n">out</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">file_tell</span><span class="p">()</span> <span class="o">-</span> <span class="n">prev_pos</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">file_seek</span><span class="p">(</span><span class="n">prev_pos</span><span class="p">)</span>
+        <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">_closing_thread</span><span class="o">.</span><span class="n">lock</span><span class="p">:</span>
+            <span class="n">prev_pos</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">file_tell</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">file_seek</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">os</span><span class="o">.</span><span class="n">SEEK_END</span><span class="p">)</span>
+            <span class="n">out</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">file_tell</span><span class="p">()</span> <span class="o">-</span> <span class="n">prev_pos</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">file_seek</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">file_seek</span><span class="p">(</span><span class="n">prev_pos</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">out</span>
 
 <div class="viewcode-block" id="FileComm.file_tell"><a class="viewcode-back" href="../../../yggdrasil.communication.html#yggdrasil.communication.FileComm.FileComm.file_tell">[docs]</a>    <span class="k">def</span> <span class="nf">file_tell</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;int: Current position in the file.&quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">fd</span><span class="o">.</span><span class="n">tell</span><span class="p">()</span></div>
+        <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">_closing_thread</span><span class="o">.</span><span class="n">lock</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">fd</span><span class="o">.</span><span class="n">tell</span><span class="p">()</span></div>
 
 <div class="viewcode-block" id="FileComm.file_seek"><a class="viewcode-back" href="../../../yggdrasil.communication.html#yggdrasil.communication.FileComm.FileComm.file_seek">[docs]</a>    <span class="k">def</span> <span class="nf">file_seek</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pos</span><span class="p">,</span> <span class="n">whence</span><span class="o">=</span><span class="n">os</span><span class="o">.</span><span class="n">SEEK_SET</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Move in the file to the specified position.</span>
@@ -506,11 +514,13 @@
 <span class="sd">                file.</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">fd</span><span class="o">.</span><span class="n">seek</span><span class="p">(</span><span class="n">pos</span><span class="p">,</span> <span class="n">whence</span><span class="p">)</span></div>
+        <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">_closing_thread</span><span class="o">.</span><span class="n">lock</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">fd</span><span class="o">.</span><span class="n">seek</span><span class="p">(</span><span class="n">pos</span><span class="p">,</span> <span class="n">whence</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="FileComm.file_flush"><a class="viewcode-back" href="../../../yggdrasil.communication.html#yggdrasil.communication.FileComm.FileComm.file_flush">[docs]</a>    <span class="k">def</span> <span class="nf">file_flush</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Flush the file.&quot;&quot;&quot;</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">fd</span><span class="o">.</span><span class="n">flush</span><span class="p">()</span></div>
+        <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">_closing_thread</span><span class="o">.</span><span class="n">lock</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">fd</span><span class="o">.</span><span class="n">flush</span><span class="p">()</span></div>
 
 <div class="viewcode-block" id="FileComm.record_position"><a class="viewcode-back" href="../../../yggdrasil.communication.html#yggdrasil.communication.FileComm.FileComm.record_position">[docs]</a>    <span class="k">def</span> <span class="nf">record_position</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Record the current position in the file/series.&quot;&quot;&quot;</span>
@@ -594,9 +604,10 @@
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_series_index</span> <span class="o">!=</span> <span class="n">series_index</span><span class="p">:</span>
                 <span class="k">if</span> <span class="p">(((</span><span class="bp">self</span><span class="o">.</span><span class="n">direction</span> <span class="o">==</span> <span class="s1">&#39;send&#39;</span><span class="p">)</span>
                      <span class="ow">or</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_series_address</span><span class="p">(</span><span class="n">series_index</span><span class="p">)))):</span>
-                    <span class="bp">self</span><span class="o">.</span><span class="n">_file_close</span><span class="p">()</span>
-                    <span class="bp">self</span><span class="o">.</span><span class="n">_series_index</span> <span class="o">=</span> <span class="n">series_index</span>
-                    <span class="bp">self</span><span class="o">.</span><span class="n">_open</span><span class="p">()</span>
+                    <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">_closing_thread</span><span class="o">.</span><span class="n">lock</span><span class="p">:</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">_file_close</span><span class="p">()</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">_series_index</span> <span class="o">=</span> <span class="n">series_index</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">_open</span><span class="p">()</span>
                     <span class="n">out</span> <span class="o">=</span> <span class="kc">True</span>
                     <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Advanced to </span><span class="si">%d</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">series_index</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">out</span><span class="p">:</span>
@@ -721,76 +732,84 @@
         <span class="n">out</span> <span class="o">=</span> <span class="mi">0</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_closed</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">direction</span> <span class="o">==</span> <span class="s1">&#39;send&#39;</span><span class="p">:</span>
             <span class="k">return</span> <span class="n">out</span>
-        <span class="n">pos</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">record_position</span><span class="p">()</span>
-        <span class="k">try</span><span class="p">:</span>
-            <span class="n">curpos</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">file_tell</span><span class="p">()</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">file_seek</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">os</span><span class="o">.</span><span class="n">SEEK_END</span><span class="p">)</span>
-            <span class="n">endpos</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">file_tell</span><span class="p">()</span>
-            <span class="n">out</span> <span class="o">=</span> <span class="n">endpos</span> <span class="o">-</span> <span class="n">curpos</span>
-        <span class="k">except</span> <span class="p">(</span><span class="ne">ValueError</span><span class="p">,</span> <span class="ne">AttributeError</span><span class="p">,</span> <span class="ne">OSError</span><span class="p">):</span>  <span class="c1"># pragma: debug</span>
-            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_open</span><span class="p">:</span>
-                <span class="k">raise</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_series</span><span class="p">:</span>
-            <span class="n">i</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_series_index</span> <span class="o">+</span> <span class="mi">1</span>
-            <span class="k">while</span> <span class="kc">True</span><span class="p">:</span>
-                <span class="n">fname</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_series_address</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
-                <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">fname</span><span class="p">):</span>
-                    <span class="k">break</span>
-                <span class="n">out</span> <span class="o">+=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">getsize</span><span class="p">(</span><span class="n">fname</span><span class="p">)</span>
-                <span class="n">i</span> <span class="o">+=</span> <span class="mi">1</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">change_position</span><span class="p">(</span><span class="o">*</span><span class="n">pos</span><span class="p">)</span>
+        <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">_closing_thread</span><span class="o">.</span><span class="n">lock</span><span class="p">:</span>
+            <span class="n">pos</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">record_position</span><span class="p">()</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">curpos</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">file_tell</span><span class="p">()</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">file_seek</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">os</span><span class="o">.</span><span class="n">SEEK_END</span><span class="p">)</span>
+                <span class="n">endpos</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">file_tell</span><span class="p">()</span>
+                <span class="n">out</span> <span class="o">=</span> <span class="n">endpos</span> <span class="o">-</span> <span class="n">curpos</span>
+            <span class="k">except</span> <span class="p">(</span><span class="ne">ValueError</span><span class="p">,</span> <span class="ne">AttributeError</span><span class="p">,</span> <span class="ne">OSError</span><span class="p">):</span>  <span class="c1"># pragma: debug</span>
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_open</span><span class="p">:</span>
+                    <span class="k">raise</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_series</span><span class="p">:</span>
+                <span class="n">i</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_series_index</span> <span class="o">+</span> <span class="mi">1</span>
+                <span class="k">while</span> <span class="kc">True</span><span class="p">:</span>
+                    <span class="n">fname</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_series_address</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
+                    <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">fname</span><span class="p">):</span>
+                        <span class="k">break</span>
+                    <span class="n">out</span> <span class="o">+=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">getsize</span><span class="p">(</span><span class="n">fname</span><span class="p">)</span>
+                    <span class="n">i</span> <span class="o">+=</span> <span class="mi">1</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">change_position</span><span class="p">(</span><span class="o">*</span><span class="n">pos</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">out</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">n_msg_recv</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;int: The number of messages in the file.&quot;&quot;&quot;</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_closed</span><span class="p">:</span>
-            <span class="k">return</span> <span class="mi">0</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">read_meth</span> <span class="o">==</span> <span class="s1">&#39;read&#39;</span><span class="p">:</span>
-            <span class="k">return</span> <span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">remaining_bytes</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)</span>
-        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">read_meth</span> <span class="o">==</span> <span class="s1">&#39;readline&#39;</span><span class="p">:</span>
-            <span class="n">pos</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">record_position</span><span class="p">()</span>
-            <span class="k">try</span><span class="p">:</span>
-                <span class="n">out</span> <span class="o">=</span> <span class="mi">0</span>
-                <span class="n">flag</span><span class="p">,</span> <span class="n">msg</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_recv</span><span class="p">()</span>
-                <span class="k">while</span> <span class="nb">len</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">0</span> <span class="ow">and</span> <span class="p">(</span><span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_eof</span><span class="p">(</span><span class="n">msg</span><span class="p">)):</span>
-                    <span class="n">out</span> <span class="o">+=</span> <span class="mi">1</span>
+        <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">_closing_thread</span><span class="o">.</span><span class="n">lock</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_closed</span><span class="p">:</span>
+                <span class="k">return</span> <span class="mi">0</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">read_meth</span> <span class="o">==</span> <span class="s1">&#39;read&#39;</span><span class="p">:</span>
+                <span class="k">return</span> <span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">remaining_bytes</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)</span>
+            <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">read_meth</span> <span class="o">==</span> <span class="s1">&#39;readline&#39;</span><span class="p">:</span>
+                <span class="n">pos</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">record_position</span><span class="p">()</span>
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="n">out</span> <span class="o">=</span> <span class="mi">0</span>
                     <span class="n">flag</span><span class="p">,</span> <span class="n">msg</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_recv</span><span class="p">()</span>
-            <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>  <span class="c1"># pragma: debug</span>
+                    <span class="k">while</span> <span class="nb">len</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">0</span> <span class="ow">and</span> <span class="p">(</span><span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_eof</span><span class="p">(</span><span class="n">msg</span><span class="p">)):</span>
+                        <span class="n">out</span> <span class="o">+=</span> <span class="mi">1</span>
+                        <span class="n">flag</span><span class="p">,</span> <span class="n">msg</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_recv</span><span class="p">()</span>
+                <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>  <span class="c1"># pragma: debug</span>
+                    <span class="n">out</span> <span class="o">=</span> <span class="mi">0</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">change_position</span><span class="p">(</span><span class="o">*</span><span class="n">pos</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>  <span class="c1"># pragma: debug</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s1">&#39;Unsupported read_meth: </span><span class="si">%s</span><span class="s1">&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">read_meth</span><span class="p">)</span>
                 <span class="n">out</span> <span class="o">=</span> <span class="mi">0</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">change_position</span><span class="p">(</span><span class="o">*</span><span class="n">pos</span><span class="p">)</span>
-        <span class="k">else</span><span class="p">:</span>  <span class="c1"># pragma: debug</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s1">&#39;Unsupported read_meth: </span><span class="si">%s</span><span class="s1">&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">read_meth</span><span class="p">)</span>
-            <span class="n">out</span> <span class="o">=</span> <span class="mi">0</span>
-        <span class="k">return</span> <span class="n">out</span>
+            <span class="k">return</span> <span class="n">out</span>
 
-<div class="viewcode-block" id="FileComm.on_send_eof"><a class="viewcode-back" href="../../../yggdrasil.communication.html#yggdrasil.communication.FileComm.FileComm.on_send_eof">[docs]</a>    <span class="k">def</span> <span class="nf">on_send_eof</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Close file when EOF to be sent.</span>
+<div class="viewcode-block" id="FileComm.prepare_message"><a class="viewcode-back" href="../../../yggdrasil.communication.html#yggdrasil.communication.FileComm.FileComm.prepare_message">[docs]</a>    <span class="k">def</span> <span class="nf">prepare_message</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Perform actions preparing to send a message.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            *args: Components of the outgoing message.</span>
+<span class="sd">            **kwargs: Keyword arguments are passed to the parent class&#39;s method.</span>
 
 <span class="sd">        Returns:</span>
-<span class="sd">            bool: False so that message not sent.</span>
+<span class="sd">            CommMessage: Serialized and annotated message.</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">flag</span><span class="p">,</span> <span class="n">msg_s</span> <span class="o">=</span> <span class="nb">super</span><span class="p">(</span><span class="n">FileComm</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">on_send_eof</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
-        <span class="k">try</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">file_flush</span><span class="p">()</span>
-        <span class="k">except</span> <span class="p">(</span><span class="ne">AttributeError</span><span class="p">,</span> <span class="ne">ValueError</span><span class="p">):</span>  <span class="c1"># pragma: debug</span>
-            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_open</span><span class="p">:</span>
-                <span class="k">raise</span>
-        <span class="c1"># self.close()</span>
-        <span class="k">return</span> <span class="n">flag</span><span class="p">,</span> <span class="n">msg_s</span></div>
-
+        <span class="n">msg</span> <span class="o">=</span> <span class="nb">super</span><span class="p">(</span><span class="n">FileComm</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">prepare_message</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">msg</span><span class="o">.</span><span class="n">flag</span> <span class="o">==</span> <span class="n">CommBase</span><span class="o">.</span><span class="n">FLAG_EOF</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">file_flush</span><span class="p">()</span>
+            <span class="k">except</span> <span class="p">(</span><span class="ne">AttributeError</span><span class="p">,</span> <span class="ne">ValueError</span><span class="p">):</span>  <span class="c1"># pragma: debug</span>
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_open</span><span class="p">:</span>
+                    <span class="k">raise</span>
+            <span class="c1"># self.close()</span>
+        <span class="k">return</span> <span class="n">msg</span></div>
+        
 <div class="viewcode-block" id="FileComm.serialize"><a class="viewcode-back" href="../../../yggdrasil.communication.html#yggdrasil.communication.FileComm.FileComm.serialize">[docs]</a>    <span class="k">def</span> <span class="nf">serialize</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Serialize a message using the associated serializer.&quot;&quot;&quot;</span>
-        <span class="k">if</span> <span class="p">(</span><span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">concats_as_str</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">file_tell</span><span class="p">()</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">):</span>
-            <span class="n">new_obj</span> <span class="o">=</span> <span class="n">obj</span>
-            <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">current_address</span><span class="p">,</span> <span class="s1">&#39;rb&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">fd</span><span class="p">:</span>
-                <span class="n">old_obj</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">deserialize</span><span class="p">(</span><span class="n">fd</span><span class="o">.</span><span class="n">read</span><span class="p">())[</span><span class="mi">0</span><span class="p">]</span>
-            <span class="n">obj</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">serializer</span><span class="o">.</span><span class="n">concatenate</span><span class="p">([</span><span class="n">old_obj</span><span class="p">,</span> <span class="n">new_obj</span><span class="p">])</span>
-            <span class="k">assert</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">obj</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">)</span>
-            <span class="n">obj</span> <span class="o">=</span> <span class="n">obj</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
-            <span class="c1"># Reset file so that header will be written</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">reset_position</span><span class="p">(</span><span class="n">truncate</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">_closing_thread</span><span class="o">.</span><span class="n">lock</span><span class="p">:</span>
+            <span class="k">if</span> <span class="p">(</span><span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">concats_as_str</span><span class="p">)</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_open</span> <span class="ow">and</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">file_tell</span><span class="p">()</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">):</span>
+                <span class="n">new_obj</span> <span class="o">=</span> <span class="n">obj</span>
+                <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">current_address</span><span class="p">,</span> <span class="s1">&#39;rb&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">fd</span><span class="p">:</span>
+                    <span class="n">old_obj</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">deserialize</span><span class="p">(</span><span class="n">fd</span><span class="o">.</span><span class="n">read</span><span class="p">())[</span><span class="mi">0</span><span class="p">]</span>
+                <span class="n">obj</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">serializer</span><span class="o">.</span><span class="n">concatenate</span><span class="p">([</span><span class="n">old_obj</span><span class="p">,</span> <span class="n">new_obj</span><span class="p">])</span>
+                <span class="k">assert</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">obj</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">)</span>
+                <span class="n">obj</span> <span class="o">=</span> <span class="n">obj</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+                <span class="c1"># Reset file so that header will be written</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">reset_position</span><span class="p">(</span><span class="n">truncate</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
         <span class="k">return</span> <span class="nb">super</span><span class="p">(</span><span class="n">FileComm</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">serialize</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
 
     <span class="k">def</span> <span class="nf">_file_send</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">msg</span><span class="p">):</span>

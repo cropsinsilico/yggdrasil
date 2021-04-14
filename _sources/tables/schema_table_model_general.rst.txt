@@ -11,6 +11,8 @@ language            string    X          The programming language that the model
                                          described :ref:`here <schema_table_model_subtype_rst>`)                         
 name                string    X          Name used for component in log messages.                                        
 working_dir         string    X          Working directory. If not provided, the current working directory is used.      
+allow_threading     boolean              If True, comm connections will be set up so that the model-side comms can be    
+                                         used by more than one thread. Defaults to False.                                
 client_of           array                The names of one or more models that this model will call as a server. If there 
                                          are more than one, this should be specified as a sequence collection (list). The
                                          corresponding channel(s) that should be passed to the yggdrasil API will be the 
@@ -18,6 +20,7 @@ client_of           array                The names of one or more models that th
                                          underscore `<server_model>_<client_model>`. There will be one channel created   
                                          for each server the model is a client of. Defaults to empty list. Use of        
                                          `client_of` with `function` is not currently supported.                         
+copies              integer              The number of copies of the model that should be created. Defaults to 1.        
 driver              string               [DEPRECATED] Name of driver class that should be used.                          
 env                 object               Dictionary of environment variables that should be set when the driver starts.  
                                          Defaults to {}.                                                                 

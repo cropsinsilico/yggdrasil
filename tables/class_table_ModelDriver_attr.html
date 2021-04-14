@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>&lt;no title&gt; &mdash; yggdrasil v1.5.0 documentation</title>
+  <title>&lt;no title&gt; &mdash; yggdrasil v1.6.0 documentation</title>
   
 
   
@@ -62,7 +62,7 @@
             
             
               <div class="version">
-                v1.5.0
+                v1.6.0
               </div>
             
           
@@ -104,6 +104,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../units.html">Units</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../c_format_strings.html">C-Style Format Strings</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../debugging.html">Debugging</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../threading.html">OpenMP Threading in Models</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../examples/examples_toc.html">Examples</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../advanced/index.html">Advanced</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../development/index.html">Development</a></li>
@@ -192,15 +193,26 @@
 </tr>
 </thead>
 <tbody>
-<tr class="row-even"><td><p>args</p></td>
+<tr class="row-even"><td><p>allow_threading</p></td>
+<td><p>If True, comm connections will be set up so that the model-side comms can be
+used by more than one thread.</p></td>
+<td></td>
+<td><p>bool</p></td>
+</tr>
+<tr class="row-odd"><td><p>args</p></td>
 <td><p>Argument(s) for running the model on the command line.</p></td>
 <td></td>
 <td><p>list</p></td>
 </tr>
-<tr class="row-odd"><td><p>client_of</p></td>
+<tr class="row-even"><td><p>client_of</p></td>
 <td><p>The names of server models that this model is a client of.</p></td>
 <td></td>
 <td><p>list</p></td>
+</tr>
+<tr class="row-odd"><td><p>copies</p></td>
+<td><p>The number of copies of the model that should be created.</p></td>
+<td></td>
+<td><p>int</p></td>
 </tr>
 <tr class="row-even"><td><p>function</p></td>
 <td><p>The name of the model function that should be wrapped.</p></td>
@@ -209,7 +221,7 @@
 </tr>
 <tr class="row-odd"><td><p>is_server</p></td>
 <td><p>If True, the model is assumed to be a server and an instance of
-<a class="reference internal" href="../yggdrasil.drivers.html#module-yggdrasil.drivers.ServerDriver" title="yggdrasil.drivers.ServerDriver"><code class="xref py py-class docutils literal notranslate"><span class="pre">yggdrasil.drivers.ServerDriver</span></code></a> is started. If a dict, the input/output
+<code class="xref py py-class docutils literal notranslate"><span class="pre">yggdrasil.drivers.ServerDriver</span></code> is started. If a dict, the input/output
 channels with the specified names in the dict will be replaced with a server.</p></td>
 <td></td>
 <td><p>bool, dict</p></td>

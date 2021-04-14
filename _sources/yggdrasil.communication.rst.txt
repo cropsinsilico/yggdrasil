@@ -190,6 +190,14 @@ yggdrasil.communication.ServerComm module
    :undoc-members:
    :show-inheritance:
 
+yggdrasil.communication.ValueComm module
+----------------------------------------
+
+.. automodule:: yggdrasil.communication.ValueComm
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 yggdrasil.communication.WOFOSTParamFileComm module
 --------------------------------------------------
 

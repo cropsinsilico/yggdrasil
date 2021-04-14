@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>Debugging &mdash; yggdrasil v1.5.0 documentation</title>
+  <title>Debugging &mdash; yggdrasil v1.6.0 documentation</title>
   
 
   
@@ -39,7 +39,7 @@
     
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="Examples" href="examples/examples_toc.html" />
+    <link rel="next" title="OpenMP Threading in Models" href="threading.html" />
     <link rel="prev" title="C-Style Format Strings" href="c_format_strings.html" /> 
 </head>
 
@@ -64,7 +64,7 @@
             
             
               <div class="version">
-                v1.5.0
+                v1.6.0
               </div>
             
           
@@ -108,6 +108,7 @@
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Debugging</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#tips-for-debugging">Tips for Debugging</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#possible-errors">Possible Errors</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#general-errors">General Errors</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#linux-errors">Linux Errors</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#macos-errors">MacOS Errors</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#matlab-errors">Matlab Errors</a></li>
@@ -117,6 +118,7 @@
 </li>
 </ul>
 </li>
+<li class="toctree-l1"><a class="reference internal" href="threading.html">OpenMP Threading in Models</a></li>
 <li class="toctree-l1"><a class="reference internal" href="examples/examples_toc.html">Examples</a></li>
 <li class="toctree-l1"><a class="reference internal" href="advanced/index.html">Advanced</a></li>
 <li class="toctree-l1"><a class="reference internal" href="development/index.html">Development</a></li>
@@ -204,6 +206,32 @@
 </div>
 <div class="section" id="possible-errors">
 <h2>Possible Errors<a class="headerlink" href="#possible-errors" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="general-errors">
+<h3>General Errors<a class="headerlink" href="#general-errors" title="Permalink to this headline">¶</a></h3>
+<ul>
+<li><dl class="simple">
+<dt>You get errors that look like <code class="docutils literal notranslate"><span class="pre">zmq.error.ZMQError:</span> <span class="pre">Too</span> <span class="pre">many</span> <span class="pre">open</span> <span class="pre">files</span></code> when running integrations.</dt><dd><p><strong>Possible Cause:</strong> The limit on the number of file identifiers that can be open is too low (the default on Mac is 256) and yggdrasil is trying to use more than this limit (file identifiers are opened for multiprocessing objects, ZeroMQ sockets, files, etc.).
+<strong>Solution:</strong> Check what the limit is via <code class="docutils literal notranslate"><span class="pre">ulimit</span> <span class="pre">-n</span></code>. If it is of order 100 (as on Mac by default), this is likely the cause and you can fix it by increasing the limit via <code class="docutils literal notranslate"><span class="pre">ulimit</span> <span class="pre">-n</span> <span class="pre">1024</span></code>.</p>
+</dd>
+</dl>
+</li>
+<li><p>You get an error that starts with the line:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">OMP</span><span class="p">:</span> <span class="n">Error</span> <span class="c1">#15: Initializing libomp.dylib, but found libiomp5.dylib already initialized.</span>
+</pre></div>
+</div>
+<blockquote>
+<div><p><strong>Possible Cause:</strong> You have multiple version of OpenMP installed and the model is trying to load more than one. This is most likely to occur if 1) you use conda to install yggdrasil and its dependencies as many conda dependencies use the Intel Math Kernel library for optimization which are threaded via OpenMP (See discussion <a class="reference external" href="https://github.com/dmlc/xgboost/issues/1715">here</a>) and 2) your model includes threading or has an dependency/interpreter that is using a different version of OpenMP (e.g. Matlab also installs its own version of libiomp5).</p>
+<p><strong>Solutions:</strong></p>
+<ol class="arabic simple">
+<li><p>[RECOMMENDED] Set the <code class="docutils literal notranslate"><span class="pre">KMP_DUPLICATE_LIB_OK</span></code> environment variable to disable this error (e.g. via <code class="docutils literal notranslate"><span class="pre">export</span> <span class="pre">KMP_DUPLICATE_LIB_OK=1</span></code>). This works in most cases, but may cause unexpected behavior as described in the error message. You can also have yggdrasil set the environment variable any time it runs a model by running <code class="docutils literal notranslate"><span class="pre">yggconfig</span> <span class="pre">--allow-multiple-omp</span></code> so that you don’t need to set in each time you open a new terminal/command prompt (or in your startup script, e.g. .bashrc).</p></li>
+<li><p>[MATLAB ONLY] Try hidding the Matlab version of libiomp by running <code class="docutils literal notranslate"><span class="pre">yggconfig</span> <span class="pre">--hide-matlab-libiomp</span></code>, which will slightly modify the name of the libiomp installed by Matlab so that Matlab uses the conda version of OpenMP during runtime. This solution is not recommended if you use Matlab outside of conda environments and can be reversed via <code class="docutils literal notranslate"><span class="pre">yggconfig</span> <span class="pre">--restore-matlab-libiomp</span></code>.</p></li>
+<li><p>Re-install yggdrasil in a clean conda environment <em>after</em> installing the <code class="docutils literal notranslate"><span class="pre">nomkl</span></code> conda package to ensure that versions of yggdrasil’s dependencies are installed that don’t use Intel’s Math Kernel Library. If this does not work, it is likely that other dependencies require the OpenMP library.</p></li>
+<li><p>Uninstall all but one of the conflicting versions of OpenMP. This can be tricky to do and should be approached with caution as removing libraries without understanding how/why they were installed can cause unintended consequences if it is required by another application.</p></li>
+</ol>
+</div></blockquote>
+</li>
+</ul>
+</div>
 <div class="section" id="linux-errors">
 <h3>Linux Errors<a class="headerlink" href="#linux-errors" title="Permalink to this headline">¶</a></h3>
 <ul class="simple">
@@ -241,7 +269,19 @@ $ tar -xf MacOSX${MACOSX_DEPLOYMENT_TARGET}.sdk.tar.xz -C &quot;$(dirname &quot;
 </div>
 </div></blockquote>
 </li>
+<li><p>When compiling a model using CMake you get <code class="docutils literal notranslate"><span class="pre">ld:</span> <span class="pre">library</span> <span class="pre">not</span> <span class="pre">found</span> <span class="pre">for</span> <span class="pre">-lintl</span></code>
+<strong>Possible Causes:</strong></p>
+<ol class="arabic simple">
+<li><p>The <code class="docutils literal notranslate"><span class="pre">libintl</span></code> cannot be found because it is not installed.</p></li>
+</ol>
+</li>
 </ul>
+<ol class="arabic simple">
+<li><p>The <code class="docutils literal notranslate"><span class="pre">-lintl</span></code> library is linked via the <code class="docutils literal notranslate"><span class="pre">LDFLAGS</span></code> environment variable, but the directory containing the library is not added to the list of paths searched for libraries (typically <code class="docutils literal notranslate"><span class="pre">/usr/lib</span></code> or <code class="docutils literal notranslate"><span class="pre">/usr/local/lib</span></code>).</p></li>
+</ol>
+<blockquote>
+<div><p><strong>Solution:</strong> Verify that <code class="docutils literal notranslate"><span class="pre">libintl</span></code> is installed and install it if it is not (it can be installed via <code class="docutils literal notranslate"><span class="pre">brew</span> <span class="pre">reinstall</span> <span class="pre">gettext</span></code>). If you still get the error, report it via an issue on the <a href="#id2"><span class="problematic" id="id3">`yggdrasil Github repository&lt;https://github.com/cropsinsilico/yggdrasil/issues&gt;`_</span></a> as yggdrasil should be able to add the appropriate paths that CMake misses. In the meantime, you can manually add the path via the environment variable (e.g. <code class="docutils literal notranslate"><span class="pre">LDFLAGS=&quot;$LDFLAGS</span> <span class="pre">-L/path/to/directory/containing/libintl&quot;</span></code>).</p>
+</div></blockquote>
 </div>
 <div class="section" id="matlab-errors">
 <h3>Matlab Errors<a class="headerlink" href="#matlab-errors" title="Permalink to this headline">¶</a></h3>
@@ -249,6 +289,12 @@ $ tar -xf MacOSX${MACOSX_DEPLOYMENT_TARGET}.sdk.tar.xz -C &quot;$(dirname &quot;
 <li><dl>
 <dt>The MATLAB model hangs for a long time during startup and then times out.</dt><dd><p><strong>Possible Cause:</strong> If MATLAB has trouble accessing the license server, it can hang for a long time during startup. yggdrasil has a config parameter that controls how long it will wait for MATLAB to start. If it takes longer than that amount of time, it will kill the process and report an error.</p>
 <p><strong>Solution:</strong> Verify that you have access to the MATLAB license server (e.g. an internet connection and, if appropriate, the correct VPN). If you do (i.e. you can start the MATLAB application independent of yggdrasil), increase the <code class="docutils literal notranslate"><span class="pre">startup_waittime_s</span></code> config parameter described <a class="reference internal" href="config.html#config-rst"><span class="std std-ref">here</span></a>.</p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>The MATLAB model seems to run, but does not output anything to stdout or to any output comms.</dt><dd><p><strong>Possible Cause:</strong> Another error is occuring, but you are using the MATLAB engine for Python to run models and the error is not being redirected to the Python output.
+<strong>Solution:</strong> Try running your model without the MATLAB engine for Python by setting the <code class="docutils literal notranslate"><span class="pre">disable_engine</span></code> config parameter in the matlab section of your yggdrasil config file to <code class="docutils literal notranslate"><span class="pre">True</span></code> by running <code class="docutils literal notranslate"><span class="pre">yggconfig</span> <span class="pre">--disable-matlab-engine-for-python</span></code> or editting the file directly (see <a class="reference internal" href="config.html#config-rst"><span class="std std-ref">here</span></a>).</p>
 </dd>
 </dl>
 </li>
@@ -321,7 +367,7 @@ $ tar -xf MacOSX${MACOSX_DEPLOYMENT_TARGET}.sdk.tar.xz -C &quot;$(dirname &quot;
           </div>
           <footer>
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
-        <a href="examples/examples_toc.html" class="btn btn-neutral float-right" title="Examples" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="threading.html" class="btn btn-neutral float-right" title="OpenMP Threading in Models" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
         <a href="c_format_strings.html" class="btn btn-neutral float-left" title="C-Style Format Strings" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
     </div>
 

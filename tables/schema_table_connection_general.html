@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>&lt;no title&gt; &mdash; yggdrasil v1.5.0 documentation</title>
+  <title>&lt;no title&gt; &mdash; yggdrasil v1.6.0 documentation</title>
   
 
   
@@ -62,7 +62,7 @@
             
             
               <div class="version">
-                v1.5.0
+                v1.6.0
               </div>
             
           
@@ -104,6 +104,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../units.html">Units</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../c_format_strings.html">C-Style Format Strings</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../debugging.html">Debugging</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../threading.html">OpenMP Threading in Models</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../examples/examples_toc.html">Examples</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../advanced/index.html">Advanced</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../development/index.html">Development</a></li>
@@ -230,12 +231,12 @@ with exits, but before the connection driver is shut down. Defaults to None.</p>
 <tr class="row-even"><td><p>translator</p></td>
 <td><p>array</p></td>
 <td></td>
-<td><p>Function or string specifying a function that should be used to translate
-messages from the input communicator(s) before passing them to the output
-communicator(s). If a string, the format should be “&lt;package.module&gt;:&lt;function&gt;”
-so that &lt;function&gt; can be imported from &lt;package&gt;. Defaults to None and messages
-are passed directly. This can also be a list of functions/strings that will be
-called on the messages in the order they are provided.</p></td>
+<td><p>Function or string specifying function that should be used to translate messages
+from the input communicator before passing them to the output communicator. If a
+string, the format should be “&lt;package.module&gt;:&lt;function&gt;” so that &lt;function&gt;
+can be imported from &lt;package&gt;. Defaults to None and messages are passed
+directly. This can also be a list of functions/strings that will be called on
+the messages in the order they are provided.</p></td>
 </tr>
 </tbody>
 </table>

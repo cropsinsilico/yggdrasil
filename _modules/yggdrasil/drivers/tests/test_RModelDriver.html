@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>yggdrasil.drivers.tests.test_RModelDriver &mdash; yggdrasil v1.5.0 documentation</title>
+  <title>yggdrasil.drivers.tests.test_RModelDriver &mdash; yggdrasil v1.6.0 documentation</title>
   
 
   
@@ -62,7 +62,7 @@
             
             
               <div class="version">
-                v1.5.0
+                v1.6.0
               </div>
             
           
@@ -104,6 +104,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../../units.html">Units</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../c_format_strings.html">C-Style Format Strings</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../debugging.html">Debugging</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../threading.html">OpenMP Threading in Models</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../examples/examples_toc.html">Examples</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../advanced/index.html">Advanced</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../development/index.html">Development</a></li>
@@ -162,8 +163,6 @@
         
           <li><a href="../../drivers.html">yggdrasil.drivers</a> &raquo;</li>
         
-          <li><a href="../tests.html">yggdrasil.drivers.tests</a> &raquo;</li>
-        
       <li>yggdrasil.drivers.tests.test_RModelDriver</li>
     
     
@@ -189,7 +188,14 @@
 <div class="viewcode-block" id="TestRModelParam"><a class="viewcode-back" href="../../../../yggdrasil.drivers.tests.html#yggdrasil.drivers.tests.test_RModelDriver.TestRModelParam">[docs]</a><span class="k">class</span> <span class="nc">TestRModelParam</span><span class="p">(</span><span class="n">parent</span><span class="o">.</span><span class="n">TestInterpretedModelParam</span><span class="p">):</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test parameters for RModelDriver.&quot;&quot;&quot;</span>
 
-    <span class="n">driver</span> <span class="o">=</span> <span class="s2">&quot;RModelDriver&quot;</span></div>
+    <span class="n">driver</span> <span class="o">=</span> <span class="s2">&quot;RModelDriver&quot;</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">inst_kwargs</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;dict: Keyword arguments for creating a class instance.&quot;&quot;&quot;</span>
+        <span class="n">out</span> <span class="o">=</span> <span class="nb">super</span><span class="p">(</span><span class="n">TestRModelParam</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">inst_kwargs</span>
+        <span class="n">out</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s1">&#39;interpreter_flags&#39;</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;--vanilla&#39;</span><span class="p">])</span>
+        <span class="k">return</span> <span class="n">out</span></div>
 
 
 <div class="viewcode-block" id="TestRModelDriverNoInit"><a class="viewcode-back" href="../../../../yggdrasil.drivers.tests.html#yggdrasil.drivers.tests.test_RModelDriver.TestRModelDriverNoInit">[docs]</a><span class="k">class</span> <span class="nc">TestRModelDriverNoInit</span><span class="p">(</span><span class="n">TestRModelParam</span><span class="p">,</span>

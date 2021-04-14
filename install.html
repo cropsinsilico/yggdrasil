@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>Installation &mdash; yggdrasil v1.5.0 documentation</title>
+  <title>Installation &mdash; yggdrasil v1.6.0 documentation</title>
   
 
   
@@ -64,7 +64,7 @@
             
             
               <div class="version">
-                v1.5.0
+                v1.6.0
               </div>
             
           
@@ -131,6 +131,7 @@
 <li class="toctree-l1"><a class="reference internal" href="units.html">Units</a></li>
 <li class="toctree-l1"><a class="reference internal" href="c_format_strings.html">C-Style Format Strings</a></li>
 <li class="toctree-l1"><a class="reference internal" href="debugging.html">Debugging</a></li>
+<li class="toctree-l1"><a class="reference internal" href="threading.html">OpenMP Threading in Models</a></li>
 <li class="toctree-l1"><a class="reference internal" href="examples/examples_toc.html">Examples</a></li>
 <li class="toctree-l1"><a class="reference internal" href="advanced/index.html">Advanced</a></li>
 <li class="toctree-l1"><a class="reference internal" href="development/index.html">Development</a></li>
@@ -536,6 +537,18 @@ $ sudo apt-get install libudunits2-dev
 <p class="admonition-title">Note</p>
 <p>[MAC ONLY] If <code class="docutils literal notranslate"><span class="pre">install.packages(&quot;units&quot;)</span></code> fails with messages about the <code class="docutils literal notranslate"><span class="pre">udunits</span></code> library being missing and you installed <code class="docutils literal notranslate"><span class="pre">udunits</span></code> using homebrew as described above, then you can install the R <code class="docutils literal notranslate"><span class="pre">units</span></code> and point to the library by running:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">&gt;</span> <span class="n">install</span><span class="o">.</span><span class="n">packages</span><span class="p">(</span><span class="s2">&quot;units&quot;</span><span class="p">,</span> <span class="n">configure</span><span class="o">.</span><span class="n">args</span> <span class="o">=</span> <span class="n">c</span><span class="p">(</span><span class="s2">&quot;--with-udunits2-include=/usr/local/opt/udunits/include/&quot;</span><span class="p">,</span> <span class="s2">&quot;--with-udunits2-lib=/usr/local/opt/udunits/lib/&quot;</span><span class="p">))</span>
+</pre></div>
+</div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>[MAC ONLY?] If any <code class="docutils literal notranslate"><span class="pre">install.packages</span></code> calls fail with errors that look like those shown below, add the <code class="docutils literal notranslate"><span class="pre">--no-multiarch</span></code> install option to those passed (e.g. <code class="docutils literal notranslate"><span class="pre">install.packages(&quot;R6&quot;,</span> <span class="pre">INSTALL_opts=c(&quot;--no-multiarch&quot;))</span></code>).:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>*** arch - R
+*** arch - R.dSYM
+ERROR: loading failed for ‘R’, ‘R.dSYM’
+...
+ERROR: sub-architecture &#39;R&#39; is not installed
+ERROR: sub-architecture &#39;R.dSYM&#39; is not installed
 </pre></div>
 </div>
 </div>

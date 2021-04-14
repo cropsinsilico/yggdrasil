@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>yggdrasil.drivers.InterpretedModelDriver &mdash; yggdrasil v1.5.0 documentation</title>
+  <title>yggdrasil.drivers.InterpretedModelDriver &mdash; yggdrasil v1.6.0 documentation</title>
   
 
   
@@ -62,7 +62,7 @@
             
             
               <div class="version">
-                v1.5.0
+                v1.6.0
               </div>
             
           
@@ -104,6 +104,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../units.html">Units</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../c_format_strings.html">C-Style Format Strings</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../debugging.html">Debugging</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../threading.html">OpenMP Threading in Models</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../examples/examples_toc.html">Examples</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../advanced/index.html">Advanced</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../development/index.html">Development</a></li>
@@ -346,9 +347,26 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">cls</span><span class="o">.</span><span class="n">get_interpreter</span><span class="p">()</span></div>
 
+<div class="viewcode-block" id="InterpretedModelDriver.run_model"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.InterpretedModelDriver.InterpretedModelDriver.run_model">[docs]</a>    <span class="k">def</span> <span class="nf">run_model</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Run the model. Unless overridden, the model will be run using</span>
+<span class="sd">        run_executable.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            *args: Arguments are passed to the parent class&#39;s method.</span>
+<span class="sd">            **kwargs: Keyword arguments are passed to the parent class&#39;s</span>
+<span class="sd">                method.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">interpreter</span><span class="p">:</span>
+            <span class="n">kwargs</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s1">&#39;interpreter&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">interpreter</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">interpreter_flags</span><span class="p">:</span>
+            <span class="n">kwargs</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s1">&#39;interpreter_flags&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">interpreter_flags</span><span class="p">)</span>
+        <span class="k">return</span> <span class="nb">super</span><span class="p">(</span><span class="n">InterpretedModelDriver</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">run_model</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
+        
 <div class="viewcode-block" id="InterpretedModelDriver.executable_command"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.InterpretedModelDriver.InterpretedModelDriver.executable_command">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">executable_command</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">args</span><span class="p">,</span> <span class="n">exec_type</span><span class="o">=</span><span class="s1">&#39;interpreter&#39;</span><span class="p">,</span> <span class="n">unused_kwargs</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-                           <span class="n">skip_interpreter_flags</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+                           <span class="n">skip_interpreter_flags</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">interpreter</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                           <span class="n">interpreter_flags</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Compose a command for running a program in this language with the</span>
 <span class="sd">        provied arguments. If not already present, the interpreter command and</span>
 <span class="sd">        interpreter flags are prepended to the provided arguments.</span>
@@ -381,9 +399,13 @@
         <span class="k">assert</span><span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">ext</span><span class="p">,</span> <span class="p">(</span><span class="nb">tuple</span><span class="p">,</span> <span class="nb">list</span><span class="p">)))</span>
         <span class="k">if</span> <span class="n">exec_type</span> <span class="o">==</span> <span class="s1">&#39;interpreter&#39;</span><span class="p">:</span>
             <span class="k">if</span> <span class="ow">not</span> <span class="bp">cls</span><span class="o">.</span><span class="n">is_interpreter</span><span class="p">(</span><span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">]):</span>
-                <span class="n">new_args</span> <span class="o">=</span> <span class="p">[</span><span class="bp">cls</span><span class="o">.</span><span class="n">get_interpreter</span><span class="p">()]</span>
+                <span class="k">if</span> <span class="n">interpreter</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="n">interpreter</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">get_interpreter</span><span class="p">()</span>
+                <span class="n">new_args</span> <span class="o">=</span> <span class="p">[</span><span class="n">interpreter</span><span class="p">]</span>
                 <span class="k">if</span> <span class="ow">not</span> <span class="n">skip_interpreter_flags</span><span class="p">:</span>
                     <span class="n">new_args</span> <span class="o">+=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">get_interpreter_flags</span><span class="p">()</span>
+                <span class="k">if</span> <span class="n">interpreter_flags</span><span class="p">:</span>
+                    <span class="n">new_args</span> <span class="o">+=</span> <span class="n">interpreter_flags</span>
                 <span class="n">args</span> <span class="o">=</span> <span class="n">new_args</span> <span class="o">+</span> <span class="n">args</span>
         <span class="k">elif</span> <span class="n">exec_type</span> <span class="o">!=</span> <span class="s1">&#39;direct&#39;</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Invalid exec_type &#39;</span><span class="si">%s</span><span class="s2">&#39;&quot;</span> <span class="o">%</span> <span class="n">exec_type</span><span class="p">)</span>

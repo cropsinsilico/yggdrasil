@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>yggdrasil.communication.tests.test_ForkComm &mdash; yggdrasil v1.5.0 documentation</title>
+  <title>yggdrasil.communication.tests.test_ForkComm &mdash; yggdrasil v1.6.0 documentation</title>
   
 
   
@@ -62,7 +62,7 @@
             
             
               <div class="version">
-                v1.5.0
+                v1.6.0
               </div>
             
           
@@ -104,6 +104,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../../units.html">Units</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../c_format_strings.html">C-Style Format Strings</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../debugging.html">Debugging</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../threading.html">OpenMP Threading in Models</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../examples/examples_toc.html">Examples</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../advanced/index.html">Advanced</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../development/index.html">Development</a></li>
@@ -162,8 +163,6 @@
         
           <li><a href="../../communication.html">yggdrasil.communication</a> &raquo;</li>
         
-          <li><a href="../tests.html">yggdrasil.communication.tests</a> &raquo;</li>
-        
       <li>yggdrasil.communication.tests.test_ForkComm</li>
     
     
@@ -192,6 +191,9 @@
     <span class="n">attr_list</span> <span class="o">=</span> <span class="p">(</span><span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">parent</span><span class="o">.</span><span class="n">TestCommBase</span><span class="o">.</span><span class="n">attr_list</span><span class="p">)</span>
                  <span class="o">+</span> <span class="p">[</span><span class="s1">&#39;comm_list&#39;</span><span class="p">,</span> <span class="s1">&#39;curr_comm_index&#39;</span><span class="p">])</span>
     <span class="n">ncomm</span> <span class="o">=</span> <span class="mi">2</span>
+    <span class="n">test_error_send</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">test_error_recv</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">test_work_comm</span> <span class="o">=</span> <span class="kc">None</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">cleanup_comm_classes</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -208,18 +210,6 @@
 <div class="viewcode-block" id="TestForkComm.test_error_name"><a class="viewcode-back" href="../../../../yggdrasil.communication.tests.html#yggdrasil.communication.tests.test_ForkComm.TestForkComm.test_error_name">[docs]</a>    <span class="k">def</span> <span class="nf">test_error_name</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test error on missing address.&quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">assert_raises</span><span class="p">(</span><span class="ne">RuntimeError</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">import_cls</span><span class="p">,</span> <span class="s1">&#39;test</span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">uuid</span><span class="o">.</span><span class="n">uuid4</span><span class="p">())</span></div>
-
-<div class="viewcode-block" id="TestForkComm.test_error_send"><a class="viewcode-back" href="../../../../yggdrasil.communication.tests.html#yggdrasil.communication.tests.test_ForkComm.TestForkComm.test_error_send">[docs]</a>    <span class="k">def</span> <span class="nf">test_error_send</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Disabled: Test error on send.&quot;&quot;&quot;</span>
-        <span class="k">pass</span></div>
-
-<div class="viewcode-block" id="TestForkComm.test_error_recv"><a class="viewcode-back" href="../../../../yggdrasil.communication.tests.html#yggdrasil.communication.tests.test_ForkComm.TestForkComm.test_error_recv">[docs]</a>    <span class="k">def</span> <span class="nf">test_error_recv</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Disabled: Test error on recv.&quot;&quot;&quot;</span>
-        <span class="k">pass</span></div>
-
-<div class="viewcode-block" id="TestForkComm.test_work_comm"><a class="viewcode-back" href="../../../../yggdrasil.communication.tests.html#yggdrasil.communication.tests.test_ForkComm.TestForkComm.test_work_comm">[docs]</a>    <span class="k">def</span> <span class="nf">test_work_comm</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Disabled: Test creating/removing a work comm.&quot;&quot;&quot;</span>
-        <span class="k">pass</span></div>
 
 <div class="viewcode-block" id="TestForkComm.do_send_recv"><a class="viewcode-back" href="../../../../yggdrasil.communication.tests.html#yggdrasil.communication.tests.test_ForkComm.TestForkComm.do_send_recv">[docs]</a>    <span class="k">def</span> <span class="nf">do_send_recv</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Generic send/recv of a message.&quot;&quot;&quot;</span>
@@ -239,6 +229,11 @@
         <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">comm</span><span class="o">.</span><span class="n">comm_list</span><span class="p">:</span>
             <span class="nb">super</span><span class="p">(</span><span class="n">TestForkComm</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">add_filter</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="nb">filter</span><span class="o">=</span><span class="nb">filter</span><span class="p">)</span></div>
             
+<div class="viewcode-block" id="TestForkComm.test_send_recv_filter_eof"><a class="viewcode-back" href="../../../../yggdrasil.communication.tests.html#yggdrasil.communication.tests.test_ForkComm.TestForkComm.test_send_recv_filter_eof">[docs]</a>    <span class="k">def</span> <span class="nf">test_send_recv_filter_eof</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test send/recv of EOF with filter.&quot;&quot;&quot;</span>
+        <span class="n">kwargs</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s1">&#39;recv_timeout&#39;</span><span class="p">,</span> <span class="mi">2</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">timeout</span><span class="p">)</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">TestForkComm</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">test_send_recv_filter_eof</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
+        
 <div class="viewcode-block" id="TestForkComm.test_send_recv_filter_recv_filter"><a class="viewcode-back" href="../../../../yggdrasil.communication.tests.html#yggdrasil.communication.tests.test_ForkComm.TestForkComm.test_send_recv_filter_recv_filter">[docs]</a>    <span class="k">def</span> <span class="nf">test_send_recv_filter_recv_filter</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test send/recv with filter that blocks recv.&quot;&quot;&quot;</span>
         <span class="n">kwargs</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s1">&#39;n_recv&#39;</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
@@ -256,7 +251,7 @@
     <span class="k">def</span> <span class="nf">inst_kwargs</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;list: Keyword arguments for tested class.&quot;&quot;&quot;</span>
         <span class="n">out</span> <span class="o">=</span> <span class="nb">super</span><span class="p">(</span><span class="n">TestForkComm</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">inst_kwargs</span>
-        <span class="n">out</span><span class="p">[</span><span class="s1">&#39;comm&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;ForkComm&#39;</span>  <span class="c1"># To force test of construction from addresses</span>
+        <span class="n">out</span><span class="p">[</span><span class="s1">&#39;comm_list&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>  <span class="c1"># To force test of construction from addresses</span>
         <span class="k">return</span> <span class="n">out</span></div>
 </pre></div>
 

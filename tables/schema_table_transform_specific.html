@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>&lt;no title&gt; &mdash; yggdrasil v1.5.0 documentation</title>
+  <title>&lt;no title&gt; &mdash; yggdrasil v1.6.0 documentation</title>
   
 
   
@@ -62,7 +62,7 @@
             
             
               <div class="version">
-                v1.5.0
+                v1.6.0
               </div>
             
           
@@ -104,6 +104,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../units.html">Units</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../c_format_strings.html">C-Style Format Strings</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../debugging.html">Debugging</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../threading.html">OpenMP Threading in Models</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../examples/examples_toc.html">Examples</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../advanced/index.html">Advanced</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../development/index.html">Development</a></li>
@@ -197,7 +198,12 @@
 <td></td>
 <td><p>[‘array’, ‘pandas’]</p></td>
 </tr>
-<tr class="row-odd"><td><p>function</p></td>
+<tr class="row-odd"><td><p>filter</p></td>
+<td></td>
+<td></td>
+<td><p>[‘filter’]</p></td>
+</tr>
+<tr class="row-even"><td><p>function</p></td>
 <td><p>function</p></td>
 <td><p>The handle for a callable Python object (e.g. function) that should be used to
 transform messages or a string of the form “&lt;function file&gt;:&lt;function name&gt;”
@@ -206,29 +212,29 @@ containing the function and “&lt;function name&gt;” is the name of the funct
 function should take the message as input and return the transformed message.</p></td>
 <td><p>[‘function’]</p></td>
 </tr>
-<tr class="row-even"><td><p>map</p></td>
+<tr class="row-odd"><td><p>map</p></td>
 <td><p>object</p></td>
 <td><p>A mapping from original field name to new field names.</p></td>
 <td><p>[‘map_fields’]</p></td>
 </tr>
-<tr class="row-odd"><td><p>original_order</p></td>
+<tr class="row-even"><td><p>original_order</p></td>
 <td><p>array</p></td>
 <td><p>The original order of fields that should be used for selecting from
 lists/tuples.</p></td>
 <td><p>[‘select_fields’]</p></td>
 </tr>
-<tr class="row-even"><td><p>selected</p></td>
+<tr class="row-odd"><td><p>selected</p></td>
 <td><p>array</p></td>
 <td><p>A list of fields that should be selected.</p></td>
 <td><p>[‘select_fields’]</p></td>
 </tr>
-<tr class="row-odd"><td><p>single_as_scalar</p></td>
+<tr class="row-even"><td><p>single_as_scalar</p></td>
 <td><p>boolean</p></td>
 <td><p>If True and only a single field is selected, the transformed messages will be
 scalars rather than arrays with single elements. Defaults to False.</p></td>
 <td><p>[‘select_fields’]</p></td>
 </tr>
-<tr class="row-even"><td><p>statement</p></td>
+<tr class="row-odd"><td><p>statement</p></td>
 <td><p>string</p></td>
 <td><p>Python statement in terms of the message as represented by the string “%x%” that
 should evaluate to the transformed message. The statement should only use a

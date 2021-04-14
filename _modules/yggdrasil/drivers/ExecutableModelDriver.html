@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>yggdrasil.drivers.ExecutableModelDriver &mdash; yggdrasil v1.5.0 documentation</title>
+  <title>yggdrasil.drivers.ExecutableModelDriver &mdash; yggdrasil v1.6.0 documentation</title>
   
 
   
@@ -62,7 +62,7 @@
             
             
               <div class="version">
-                v1.5.0
+                v1.6.0
               </div>
             
           
@@ -104,6 +104,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../units.html">Units</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../c_format_strings.html">C-Style Format Strings</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../debugging.html">Debugging</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../threading.html">OpenMP Threading in Models</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../examples/examples_toc.html">Examples</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../advanced/index.html">Advanced</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../development/index.html">Development</a></li>
@@ -198,6 +199,7 @@
     <span class="c1"># version_flags = _os_version_flags</span>
     <span class="n">_schema_subtype_description</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;Model is an executable.&#39;</span><span class="p">)</span>
     <span class="n">full_language</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="n">executable_type</span> <span class="o">=</span> <span class="s1">&#39;other&#39;</span>
 
 <div class="viewcode-block" id="ExecutableModelDriver.before_registration"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.ExecutableModelDriver.ExecutableModelDriver.before_registration">[docs]</a>    <span class="nd">@staticmethod</span>
     <span class="k">def</span> <span class="nf">before_registration</span><span class="p">(</span><span class="bp">cls</span><span class="p">):</span>
@@ -205,7 +207,8 @@
 <span class="sd">        to registration including things like platform dependent properties and</span>
 <span class="sd">        checking environment variables for default settings.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">if</span> <span class="n">platform</span><span class="o">.</span><span class="n">_is_win</span><span class="p">:</span>  <span class="c1"># pragma: windows</span>
+        <span class="k">if</span> <span class="p">((</span><span class="n">platform</span><span class="o">.</span><span class="n">_is_win</span>
+             <span class="ow">and</span> <span class="p">(</span><span class="ow">not</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="s1">&#39;language_ext&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)))):</span>  <span class="c1"># pragma: windows</span>
             <span class="bp">cls</span><span class="o">.</span><span class="n">language_ext</span> <span class="o">=</span> <span class="s1">&#39;.exe&#39;</span>
         <span class="n">ModelDriver</span><span class="o">.</span><span class="n">before_registration</span><span class="p">(</span><span class="bp">cls</span><span class="p">)</span></div>
         

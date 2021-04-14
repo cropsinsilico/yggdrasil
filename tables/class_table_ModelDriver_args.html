@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>&lt;no title&gt; &mdash; yggdrasil v1.5.0 documentation</title>
+  <title>&lt;no title&gt; &mdash; yggdrasil v1.6.0 documentation</title>
   
 
   
@@ -62,7 +62,7 @@
             
             
               <div class="version">
-                v1.5.0
+                v1.6.0
               </div>
             
           
@@ -104,6 +104,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../units.html">Units</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../c_format_strings.html">C-Style Format Strings</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../debugging.html">Debugging</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../threading.html">OpenMP Threading in Models</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../examples/examples_toc.html">Examples</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../advanced/index.html">Advanced</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../development/index.html">Development</a></li>
@@ -205,7 +206,13 @@ associated with the model.</p></td>
 <td><p>X</p></td>
 <td><p>str</p></td>
 </tr>
-<tr class="row-even"><td><p>client_of</p></td>
+<tr class="row-even"><td><p>allow_threading</p></td>
+<td><p>If True, comm connections will be set up so that the model-side comms can be
+used by more than one thread. Defaults to False.</p></td>
+<td></td>
+<td><p>bool</p></td>
+</tr>
+<tr class="row-odd"><td><p>client_of</p></td>
 <td><p>The names of one or more models that this model will call as a server. If there
 are more than one, this should be specified as a sequence collection (list). The
 corresponding channel(s) that should be passed to the yggdrasil API will be the
@@ -215,6 +222,11 @@ for each server the model is a client of. Defaults to empty list. Use of
 <cite>client_of</cite> with <cite>function</cite> is not currently supported.</p></td>
 <td></td>
 <td><p>str, list</p></td>
+</tr>
+<tr class="row-even"><td><p>copies</p></td>
+<td><p>The number of copies of the model that should be created. Defaults to 1.</p></td>
+<td></td>
+<td><p>int</p></td>
 </tr>
 <tr class="row-odd"><td><p>function</p></td>
 <td><p>If provided, an integrated model is created by wrapping the function named here.
@@ -226,7 +238,7 @@ the yggdrasil interface.</p></td>
 </tr>
 <tr class="row-even"><td><p>is_server</p></td>
 <td><p>If <cite>True</cite>, the model is assumed to be a server for one or more client models and
-an instance of <a class="reference internal" href="../yggdrasil.drivers.html#module-yggdrasil.drivers.ServerDriver" title="yggdrasil.drivers.ServerDriver"><code class="xref py py-class docutils literal notranslate"><span class="pre">yggdrasil.drivers.ServerDriver</span></code></a> is started. The
+an instance of <code class="xref py py-class docutils literal notranslate"><span class="pre">yggdrasil.drivers.ServerDriver</span></code> is started. The
 corresponding channel that should be passed to the yggdrasil API will be the
 name of the model. If is_server is a dictionary, it should contain an ‘input’
 key and an ‘output’ key. These are required to be the names of existing input

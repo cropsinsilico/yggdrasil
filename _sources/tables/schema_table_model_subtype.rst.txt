@@ -9,6 +9,8 @@ c++          Model is written in C++.                                           
 cmake        Model is written in C/C++ and has a CMake build system.                                          
 executable   [DEFAULT] Model is an executable.                                                                
 fortran      Model is written in Fortran.                                                                     
+function     The programming language that the model is written in. A list of available                       
+             languages can be found :ref:`here <schema_table_model_subtype_rst>`.                             
 lpy          Model is an LPy system.                                                                          
 make         Model is written in C/C++ and has a Makefile for compilation.                                    
 matlab       Model is written in Matlab.                                                                      

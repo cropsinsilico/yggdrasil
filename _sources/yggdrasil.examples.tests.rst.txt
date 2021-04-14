@@ -228,6 +228,14 @@ yggdrasil.examples.tests.test\_rpc\_lesson2 module
    :undoc-members:
    :show-inheritance:
 
+yggdrasil.examples.tests.test\_rpc\_lesson2b module
+---------------------------------------------------
+
+.. automodule:: yggdrasil.examples.tests.test_rpc_lesson2b
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 yggdrasil.examples.tests.test\_rpc\_lesson3 module
 --------------------------------------------------
 

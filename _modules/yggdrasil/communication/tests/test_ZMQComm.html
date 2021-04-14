@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>yggdrasil.communication.tests.test_ZMQComm &mdash; yggdrasil v1.5.0 documentation</title>
+  <title>yggdrasil.communication.tests.test_ZMQComm &mdash; yggdrasil v1.6.0 documentation</title>
   
 
   
@@ -62,7 +62,7 @@
             
             
               <div class="version">
-                v1.5.0
+                v1.6.0
               </div>
             
           
@@ -104,6 +104,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../../units.html">Units</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../c_format_strings.html">C-Style Format Strings</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../debugging.html">Debugging</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../threading.html">OpenMP Threading in Models</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../examples/examples_toc.html">Examples</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../advanced/index.html">Advanced</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../development/index.html">Development</a></li>
@@ -162,8 +163,6 @@
         
           <li><a href="../../communication.html">yggdrasil.communication</a> &raquo;</li>
         
-          <li><a href="../tests.html">yggdrasil.communication.tests</a> &raquo;</li>
-        
       <li>yggdrasil.communication.tests.test_ZMQComm</li>
     
     
@@ -185,7 +184,7 @@
 <span class="kn">from</span> <span class="nn">yggdrasil</span> <span class="kn">import</span> <span class="n">platform</span>
 <span class="kn">from</span> <span class="nn">yggdrasil.tests</span> <span class="kn">import</span> <span class="n">assert_raises</span><span class="p">,</span> <span class="n">assert_equal</span>
 <span class="kn">from</span> <span class="nn">yggdrasil.communication</span> <span class="kn">import</span> <span class="n">new_comm</span>
-<span class="kn">from</span> <span class="nn">yggdrasil.communication.tests</span> <span class="kn">import</span> <span class="n">test_AsyncComm</span>
+<span class="kn">from</span> <span class="nn">yggdrasil.communication.tests</span> <span class="kn">import</span> <span class="n">test_CommBase</span>
 <span class="kn">from</span> <span class="nn">yggdrasil.communication</span> <span class="kn">import</span> <span class="n">ZMQComm</span><span class="p">,</span> <span class="n">IPCComm</span>
 
 
@@ -221,7 +220,7 @@
 <span class="k">def</span> <span class="nf">test_invalid_protocol</span><span class="p">():</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test raise of an error in the event of an invalid protocol.&quot;&quot;&quot;</span>
     <span class="n">assert_raises</span><span class="p">(</span><span class="ne">ValueError</span><span class="p">,</span> <span class="n">new_comm</span><span class="p">,</span> <span class="s1">&#39;test_invalid_protocol&#39;</span><span class="p">,</span>
-                  <span class="n">comm</span><span class="o">=</span><span class="s1">&#39;ZMQComm&#39;</span><span class="p">,</span> <span class="n">protocol</span><span class="o">=</span><span class="s1">&#39;invalid&#39;</span><span class="p">)</span></div>
+                  <span class="n">commtype</span><span class="o">=</span><span class="s1">&#39;zmq&#39;</span><span class="p">,</span> <span class="n">protocol</span><span class="o">=</span><span class="s1">&#39;invalid&#39;</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="test_error_on_send_open_twice"><a class="viewcode-back" href="../../../../yggdrasil.communication.tests.html#yggdrasil.communication.tests.test_ZMQComm.test_error_on_send_open_twice">[docs]</a><span class="nd">@unittest</span><span class="o">.</span><span class="n">skipIf</span><span class="p">(</span><span class="ow">not</span> <span class="n">_zmq_installed</span><span class="p">,</span> <span class="s2">&quot;ZMQ library not installed&quot;</span><span class="p">)</span>
@@ -233,7 +232,7 @@
     <span class="k">for</span> <span class="n">s</span><span class="p">,</span> <span class="n">r</span> <span class="ow">in</span> <span class="n">ZMQComm</span><span class="o">.</span><span class="n">_socket_type_pairs</span><span class="p">:</span>
         <span class="c1"># Send comm</span>
         <span class="n">name1</span> <span class="o">=</span> <span class="s1">&#39;test_</span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">s</span>
-        <span class="n">comm1</span> <span class="o">=</span> <span class="n">new_comm</span><span class="p">(</span><span class="n">name1</span> <span class="o">+</span> <span class="s1">&#39;_1&#39;</span><span class="p">,</span> <span class="n">comm</span><span class="o">=</span><span class="s1">&#39;ZMQComm&#39;</span><span class="p">,</span> <span class="n">socket_type</span><span class="o">=</span><span class="n">s</span><span class="p">,</span>
+        <span class="n">comm1</span> <span class="o">=</span> <span class="n">new_comm</span><span class="p">(</span><span class="n">name1</span> <span class="o">+</span> <span class="s1">&#39;_1&#39;</span><span class="p">,</span> <span class="n">commtype</span><span class="o">=</span><span class="s1">&#39;zmq&#39;</span><span class="p">,</span> <span class="n">socket_type</span><span class="o">=</span><span class="n">s</span><span class="p">,</span>
                          <span class="n">dont_open</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">socket_action</span><span class="o">=</span><span class="s1">&#39;bind&#39;</span><span class="p">)</span>
         <span class="n">assert_raises</span><span class="p">(</span><span class="n">zmq</span><span class="o">.</span><span class="n">ZMQError</span><span class="p">,</span> <span class="n">ZMQComm</span><span class="o">.</span><span class="n">ZMQComm</span><span class="p">,</span>
                       <span class="n">name1</span> <span class="o">+</span> <span class="s1">&#39;_2&#39;</span><span class="p">,</span> <span class="n">socket_type</span><span class="o">=</span><span class="n">s</span><span class="p">,</span>
@@ -242,11 +241,11 @@
 
         
 <div class="viewcode-block" id="TestZMQComm"><a class="viewcode-back" href="../../../../yggdrasil.communication.tests.html#yggdrasil.communication.tests.test_ZMQComm.TestZMQComm">[docs]</a><span class="nd">@unittest</span><span class="o">.</span><span class="n">skipIf</span><span class="p">(</span><span class="ow">not</span> <span class="n">_zmq_installed</span><span class="p">,</span> <span class="s2">&quot;ZMQ library not installed&quot;</span><span class="p">)</span>
-<span class="k">class</span> <span class="nc">TestZMQComm</span><span class="p">(</span><span class="n">test_AsyncComm</span><span class="o">.</span><span class="n">TestAsyncComm</span><span class="p">):</span>
+<span class="k">class</span> <span class="nc">TestZMQComm</span><span class="p">(</span><span class="n">test_CommBase</span><span class="o">.</span><span class="n">TestCommBase</span><span class="p">):</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test for ZMQComm communication class.&quot;&quot;&quot;</span>
 
     <span class="n">comm</span> <span class="o">=</span> <span class="s1">&#39;ZMQComm&#39;</span>
-    <span class="n">attr_list</span> <span class="o">=</span> <span class="p">(</span><span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">test_AsyncComm</span><span class="o">.</span><span class="n">TestAsyncComm</span><span class="o">.</span><span class="n">attr_list</span><span class="p">)</span>
+    <span class="n">attr_list</span> <span class="o">=</span> <span class="p">(</span><span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">test_CommBase</span><span class="o">.</span><span class="n">TestCommBase</span><span class="o">.</span><span class="n">attr_list</span><span class="p">)</span>
                  <span class="o">+</span> <span class="p">[</span><span class="s1">&#39;context&#39;</span><span class="p">,</span> <span class="s1">&#39;socket&#39;</span><span class="p">,</span> <span class="s1">&#39;socket_type_name&#39;</span><span class="p">,</span>
                     <span class="s1">&#39;socket_type&#39;</span><span class="p">,</span> <span class="s1">&#39;protocol&#39;</span><span class="p">,</span> <span class="s1">&#39;host&#39;</span><span class="p">,</span> <span class="s1">&#39;port&#39;</span><span class="p">])</span>
     <span class="n">protocol</span> <span class="o">=</span> <span class="kc">None</span>
@@ -281,6 +280,8 @@
 <span class="c1"># Tests for server/client</span>
 <div class="viewcode-block" id="TestZMQComm_client"><a class="viewcode-back" href="../../../../yggdrasil.communication.tests.html#yggdrasil.communication.tests.test_ZMQComm.TestZMQComm_client">[docs]</a><span class="k">class</span> <span class="nc">TestZMQComm_client</span><span class="p">(</span><span class="n">TestZMQComm</span><span class="p">):</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test for ZMQComm communication class for client/server.&quot;&quot;&quot;</span>
+
+    <span class="n">test_drain_messages</span> <span class="o">=</span> <span class="kc">None</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">send_inst_kwargs</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -366,7 +367,37 @@
 
 <div class="viewcode-block" id="TestZMQCommREQ.test_send_recv_condition"><a class="viewcode-back" href="../../../../yggdrasil.communication.tests.html#yggdrasil.communication.tests.test_ZMQComm.TestZMQCommREQ.test_send_recv_condition">[docs]</a>    <span class="k">def</span> <span class="nf">test_send_recv_condition</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test send/recv with conditional.&quot;&quot;&quot;</span>
-        <span class="k">pass</span></div></div>
+        <span class="k">pass</span></div>
+
+<div class="viewcode-block" id="TestZMQCommREQ.test_send_recv_filter_eof"><a class="viewcode-back" href="../../../../yggdrasil.communication.tests.html#yggdrasil.communication.tests.test_ZMQComm.TestZMQCommREQ.test_send_recv_filter_eof">[docs]</a>    <span class="k">def</span> <span class="nf">test_send_recv_filter_eof</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test send/recv of EOF with filter.&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">setup_filters</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assert_raises</span><span class="p">(</span><span class="ne">RuntimeError</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">do_send_recv</span><span class="p">,</span>
+                           <span class="n">send_meth</span><span class="o">=</span><span class="s1">&#39;send_eof&#39;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="TestZMQCommREQ.test_send_recv_filter_pass"><a class="viewcode-back" href="../../../../yggdrasil.communication.tests.html#yggdrasil.communication.tests.test_ZMQComm.TestZMQCommREQ.test_send_recv_filter_pass">[docs]</a>    <span class="k">def</span> <span class="nf">test_send_recv_filter_pass</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test send/recv with filter that passes both messages.&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">setup_filters</span><span class="p">()</span>
+        <span class="n">kwargs</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s1">&#39;msg_send&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">msg_filter_pass</span><span class="p">)</span>
+        <span class="n">kwargs</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s1">&#39;msg_recv&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">msg_filter_pass</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assert_raises</span><span class="p">(</span><span class="ne">RuntimeError</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">do_send_recv</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
+        
+<div class="viewcode-block" id="TestZMQCommREQ.test_send_recv_filter_send_filter"><a class="viewcode-back" href="../../../../yggdrasil.communication.tests.html#yggdrasil.communication.tests.test_ZMQComm.TestZMQCommREQ.test_send_recv_filter_send_filter">[docs]</a>    <span class="k">def</span> <span class="nf">test_send_recv_filter_send_filter</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test send/recv with filter that blocks send.&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">setup_filters</span><span class="p">()</span>
+        <span class="n">kwargs</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s1">&#39;msg_send&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">msg_filter_send</span><span class="p">)</span>
+        <span class="n">kwargs</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s1">&#39;msg_recv&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">recv_instance</span><span class="o">.</span><span class="n">empty_obj_recv</span><span class="p">)</span>
+        <span class="n">kwargs</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s1">&#39;recv_timeout&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">sleeptime</span><span class="p">)</span>
+        <span class="n">kwargs</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s1">&#39;no_recv&#39;</span><span class="p">,</span> <span class="kc">True</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assert_raises</span><span class="p">(</span><span class="ne">RuntimeError</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">do_send_recv</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
+        
+<div class="viewcode-block" id="TestZMQCommREQ.test_send_recv_filter_recv_filter"><a class="viewcode-back" href="../../../../yggdrasil.communication.tests.html#yggdrasil.communication.tests.test_ZMQComm.TestZMQCommREQ.test_send_recv_filter_recv_filter">[docs]</a>    <span class="k">def</span> <span class="nf">test_send_recv_filter_recv_filter</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test send/recv with filter that blocks recv.&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">setup_filters</span><span class="p">()</span>
+        <span class="n">kwargs</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s1">&#39;msg_send&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">msg_filter_recv</span><span class="p">)</span>
+        <span class="n">kwargs</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s1">&#39;msg_recv&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">recv_instance</span><span class="o">.</span><span class="n">empty_obj_recv</span><span class="p">)</span>
+        <span class="n">kwargs</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s1">&#39;recv_timeout&#39;</span><span class="p">,</span> <span class="mi">10</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">sleeptime</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assert_raises</span><span class="p">(</span><span class="ne">RuntimeError</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">do_send_recv</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div></div>
     
 
 <div class="viewcode-block" id="TestZMQCommROUTER"><a class="viewcode-back" href="../../../../yggdrasil.communication.tests.html#yggdrasil.communication.tests.test_ZMQComm.TestZMQCommROUTER">[docs]</a><span class="k">class</span> <span class="nc">TestZMQCommROUTER</span><span class="p">(</span><span class="n">TestZMQComm</span><span class="p">):</span>
@@ -389,7 +420,7 @@
 <span class="c1"># @unittest.skipIf(_zmq_installed, &quot;ZMQ library installed&quot;)</span>
 <span class="c1"># def test_not_running():</span>
 <span class="c1">#     r&quot;&quot;&quot;Test raise of an error if a ZMQ library is not installed.&quot;&quot;&quot;</span>
-<span class="c1">#     comm_kwargs = dict(comm=&#39;ZMQComm&#39;, direction=&#39;send&#39;, reverse_names=True)</span>
+<span class="c1">#     comm_kwargs = dict(commtype=&#39;zmq&#39;, direction=&#39;send&#39;, reverse_names=True)</span>
 <span class="c1">#     assert_raises(RuntimeError, new_comm, &#39;test&#39;, **comm_kwargs)</span>
 </pre></div>
 

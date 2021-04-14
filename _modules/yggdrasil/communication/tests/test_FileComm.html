@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>yggdrasil.communication.tests.test_FileComm &mdash; yggdrasil v1.5.0 documentation</title>
+  <title>yggdrasil.communication.tests.test_FileComm &mdash; yggdrasil v1.6.0 documentation</title>
   
 
   
@@ -62,7 +62,7 @@
             
             
               <div class="version">
-                v1.5.0
+                v1.6.0
               </div>
             
           
@@ -104,6 +104,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../../units.html">Units</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../c_format_strings.html">C-Style Format Strings</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../debugging.html">Debugging</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../threading.html">OpenMP Threading in Models</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../examples/examples_toc.html">Examples</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../advanced/index.html">Advanced</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../development/index.html">Development</a></li>
@@ -162,8 +163,6 @@
         
           <li><a href="../../communication.html">yggdrasil.communication</a> &raquo;</li>
         
-          <li><a href="../tests.html">yggdrasil.communication.tests</a> &raquo;</li>
-        
       <li>yggdrasil.communication.tests.test_FileComm</li>
     
     
@@ -182,7 +181,6 @@
   <h1>Source code for yggdrasil.communication.tests.test_FileComm</h1><div class="highlight"><pre>
 <span></span><span class="kn">import</span> <span class="nn">os</span>
 <span class="kn">import</span> <span class="nn">copy</span>
-<span class="kn">import</span> <span class="nn">unittest</span>
 <span class="kn">import</span> <span class="nn">jsonschema</span>
 <span class="kn">from</span> <span class="nn">yggdrasil.tests</span> <span class="kn">import</span> <span class="n">assert_equal</span>
 <span class="kn">from</span> <span class="nn">yggdrasil.communication</span> <span class="kn">import</span> <span class="n">new_comm</span>
@@ -193,8 +191,8 @@
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test FileComm waiting for creation.&quot;&quot;&quot;</span>
     <span class="n">msg_send</span> <span class="o">=</span> <span class="sa">b</span><span class="s1">&#39;Test message</span><span class="se">\n</span><span class="s1">&#39;</span>
     <span class="n">name</span> <span class="o">=</span> <span class="s1">&#39;temp_file_create.txt&#39;</span>
-    <span class="n">kwargs</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;in_temp&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span> <span class="s1">&#39;comm&#39;</span><span class="p">:</span> <span class="s1">&#39;FileComm&#39;</span><span class="p">,</span> <span class="s1">&#39;dont_open&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">}</span>
-    <span class="c1"># kwargs = {&#39;wait_for_creation&#39;: 5, &#39;in_temp&#39;: True, comm=&#39;FileComm&#39;}</span>
+    <span class="n">kwargs</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;in_temp&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span> <span class="s1">&#39;commtype&#39;</span><span class="p">:</span> <span class="s1">&#39;binary&#39;</span><span class="p">,</span> <span class="s1">&#39;dont_open&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">}</span>
+    <span class="c1"># kwargs = {&#39;wait_for_creation&#39;: 5, &#39;in_temp&#39;: True, commtype=&#39;binary&#39;}</span>
     <span class="n">send_instance</span> <span class="o">=</span> <span class="n">new_comm</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">direction</span><span class="o">=</span><span class="s1">&#39;send&#39;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
     <span class="n">recv_instance</span> <span class="o">=</span> <span class="n">new_comm</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">direction</span><span class="o">=</span><span class="s1">&#39;recv&#39;</span><span class="p">,</span>
                              <span class="n">wait_for_creation</span><span class="o">=</span><span class="mf">5.0</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
@@ -230,6 +228,14 @@
                  <span class="o">+</span> <span class="p">[</span><span class="s1">&#39;fd&#39;</span><span class="p">,</span> <span class="s1">&#39;read_meth&#39;</span><span class="p">,</span> <span class="s1">&#39;append&#39;</span><span class="p">,</span> <span class="s1">&#39;in_temp&#39;</span><span class="p">,</span>
                     <span class="s1">&#39;is_series&#39;</span><span class="p">,</span> <span class="s1">&#39;wait_for_creation&#39;</span><span class="p">,</span> <span class="s1">&#39;serializer&#39;</span><span class="p">,</span>
                     <span class="s1">&#39;platform_newline&#39;</span><span class="p">])</span>
+    <span class="n">test_send_recv_nolimit</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">test_work_comm</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">test_send_recv_raw</span> <span class="o">=</span> <span class="kc">None</span>
+    
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">commtype</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;str: Subtype associated with comm class.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">import_cls</span><span class="o">.</span><span class="n">_filetype</span>
     
 <div class="viewcode-block" id="TestFileComm.teardown"><a class="viewcode-back" href="../../../../yggdrasil.communication.tests.html#yggdrasil.communication.tests.test_FileComm.TestFileComm.teardown">[docs]</a>    <span class="k">def</span> <span class="nf">teardown</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Remove the file.&quot;&quot;&quot;</span>
@@ -257,16 +263,6 @@
         <span class="n">kwargs</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s1">&#39;msg_recv&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">recv_instance</span><span class="o">.</span><span class="n">eof_msg</span><span class="p">)</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">TestFileComm</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">test_send_recv_filter_recv_filter</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
         
-<div class="viewcode-block" id="TestFileComm.test_send_recv_nolimit"><a class="viewcode-back" href="../../../../yggdrasil.communication.tests.html#yggdrasil.communication.tests.test_FileComm.TestFileComm.test_send_recv_nolimit">[docs]</a>    <span class="nd">@unittest</span><span class="o">.</span><span class="n">skipIf</span><span class="p">(</span><span class="kc">True</span><span class="p">,</span> <span class="s1">&#39;File comm&#39;</span><span class="p">)</span>
-    <span class="k">def</span> <span class="nf">test_send_recv_nolimit</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Disabled: Test send/recv of a large message.&quot;&quot;&quot;</span>
-        <span class="k">pass</span>  <span class="c1"># pragma: no cover</span></div>
-
-<div class="viewcode-block" id="TestFileComm.test_work_comm"><a class="viewcode-back" href="../../../../yggdrasil.communication.tests.html#yggdrasil.communication.tests.test_FileComm.TestFileComm.test_work_comm">[docs]</a>    <span class="nd">@unittest</span><span class="o">.</span><span class="n">skipIf</span><span class="p">(</span><span class="kc">True</span><span class="p">,</span> <span class="s1">&#39;File comm&#39;</span><span class="p">)</span>
-    <span class="k">def</span> <span class="nf">test_work_comm</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Disabled: Test creating/removing a work comm.&quot;&quot;&quot;</span>
-        <span class="k">pass</span>  <span class="c1"># pragma: no cover</span></div>
-
 <div class="viewcode-block" id="TestFileComm.test_invalid_read_meth"><a class="viewcode-back" href="../../../../yggdrasil.communication.tests.html#yggdrasil.communication.tests.test_FileComm.TestFileComm.test_invalid_read_meth">[docs]</a>    <span class="k">def</span> <span class="nf">test_invalid_read_meth</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test raise of error on invalid read_meth.&quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">comm</span> <span class="o">==</span> <span class="s1">&#39;FileComm&#39;</span><span class="p">:</span>

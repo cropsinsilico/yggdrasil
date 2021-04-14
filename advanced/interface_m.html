@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>Matlab Interface &mdash; yggdrasil v1.5.0 documentation</title>
+  <title>Matlab Interface &mdash; yggdrasil v1.6.0 documentation</title>
   
 
   
@@ -64,7 +64,7 @@
             
             
               <div class="version">
-                v1.5.0
+                v1.6.0
               </div>
             
           
@@ -106,6 +106,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../units.html">Units</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../c_format_strings.html">C-Style Format Strings</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../debugging.html">Debugging</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../threading.html">OpenMP Threading in Models</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../examples/examples_toc.html">Examples</a></li>
 <li class="toctree-l1 current"><a class="reference internal" href="index.html">Advanced</a><ul class="current">
 <li class="toctree-l2"><a class="reference internal" href="serialization.html">Serialization</a></li>
@@ -202,73 +203,73 @@
   <div class="section" id="matlab-interface">
 <h1>Matlab Interface<a class="headerlink" href="#matlab-interface" title="Permalink to this headline">¶</a></h1>
 <div class="breathe-sectiondef docutils container">
-<p class="breathe-sectiondef-title rubric">Functions</p>
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-functions">Functions</p>
 <dl class="cpp function">
 <dt>
-<span class="target" id="_ygg_interface_8m_1ac74d0897ff75d18de42c8774f0bd756d"></span><code class="sig-name descname">while (i&lt;=length(varargin))</code></dt>
+<span class="target" id="_ygg_interface_8m_1ac74d0897ff75d18de42c8774f0bd756d"></span><code class="sig-name descname"><span class="pre">while</span> <span class="pre">(i&lt;=length(varargin))</span></code></dt>
 <dd></dd></dl>
 
 <dl class="cpp function">
 <dt>
-<span class="target" id="_ygg_interface_8m_1a22940ca16c8276f5830e24beb7e85cf6"></span><code class="sig-name descname">if (ischar(varargin{i}))</code></dt>
+<span class="target" id="_ygg_interface_8m_1a22940ca16c8276f5830e24beb7e85cf6"></span><code class="sig-name descname"><span class="pre">if</span> <span class="pre">(ischar(varargin{i}))</span></code></dt>
 <dd></dd></dl>
 
 <dl class="cpp function">
 <dt>
-<span class="target" id="_ygg_interface_8m_1ae38c6bd6372a322614305597f4820e1e"></span><code class="sig-name descname">if any (strcmp(varargin{i}, keyword_names))</code></dt>
+<span class="target" id="_ygg_interface_8m_1ae38c6bd6372a322614305597f4820e1e"></span><code class="sig-name descname"><span class="pre">if</span> <span class="pre">any</span> <span class="pre">(strcmp(varargin{i},</span> <span class="pre">keyword_names))</span></code></dt>
 <dd></dd></dl>
 
 <dl class="cpp function">
 <dt>
-<span class="target" id="_ygg_interface_8m_1af099cbc0b677453c94a08ca6742dabd2"></span><code class="sig-name descname">kwargs (varargin{i})</code></dt>
+<span class="target" id="_ygg_interface_8m_1af099cbc0b677453c94a08ca6742dabd2"></span><code class="sig-name descname"><span class="pre">kwargs</span> <span class="pre">(varargin{i})</span></code></dt>
 <dd></dd></dl>
 
 <dl class="cpp function">
 <dt>
-<span class="target" id="_ygg_interface_8m_1a7028523a410a9bca4d61edf8582f8d82"></span><code class="sig-name descname">if (nargin &gt; 1)</code></dt>
+<span class="target" id="_ygg_interface_8m_1a7028523a410a9bca4d61edf8582f8d82"></span><code class="sig-name descname"><span class="pre">if</span> <span class="pre">(nargin</span> <span class="pre">&gt;</span> <span class="pre">1)</span></code></dt>
 <dd></dd></dl>
 
 </div>
 <div class="breathe-sectiondef docutils container">
-<p class="breathe-sectiondef-title rubric">Variables</p>
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-variables">Variables</p>
 <dl class="cpp var">
 <dt>
-<span class="target" id="_ygg_interface_8m_1ae67dfd822a094c7d9337aec92be9935c"></span><code class="sig-name descname">keyword_names  = {'global_scope', 'format_str', 'infmt', 'outfmt', ...		   'as_array', 'fmt'}</code></dt>
+<span class="target" id="_ygg_interface_8m_1ae67dfd822a094c7d9337aec92be9935c"></span><code class="sig-name descname"><span class="pre">keyword_names</span>&#160; <span class="pre">=</span> <span class="pre">{'global_scope',</span> <span class="pre">'format_str',</span> <span class="pre">'infmt',</span> <span class="pre">'outfmt',</span> <span class="pre">...		</span>&#160;&#160; <span class="pre">'as_array',</span> <span class="pre">'fmt'}</span></code></dt>
 <dd></dd></dl>
 
 <dl class="cpp var">
 <dt>
-<span class="target" id="_ygg_interface_8m_1a8187411843a6284ffb964ef3fb9fcab3"></span><code class="sig-name descname">args   = {}</code></dt>
+<span class="target" id="_ygg_interface_8m_1a8187411843a6284ffb964ef3fb9fcab3"></span><code class="sig-name descname"><span class="pre">args</span>&#160;&#160; <span class="pre">=</span> <span class="pre">{}</span></code></dt>
 <dd></dd></dl>
 
 <dl class="cpp var">
 <dt>
-<span class="target" id="_ygg_interface_8m_1aca174a4ca5cbfb3d1b2873c5e38f50aa"></span><code class="sig-name descname">kwargs   = containers.Map()</code></dt>
+<span class="target" id="_ygg_interface_8m_1aca174a4ca5cbfb3d1b2873c5e38f50aa"></span><code class="sig-name descname"><span class="pre">kwargs</span>&#160;&#160; <span class="pre">=</span> <span class="pre">containers.Map()</span></code></dt>
 <dd></dd></dl>
 
 <dl class="cpp var">
 <dt>
-<span class="target" id="_ygg_interface_8m_1a6f6ccfcf58b31cb6412107d9d5281426"></span><code class="sig-name descname">i   = 1</code></dt>
+<span class="target" id="_ygg_interface_8m_1a7e98b8a17c0aad30ba64d47b74e2a6c1"></span><code class="sig-name descname"><span class="pre">i</span>&#160;&#160; <span class="pre">=</span> <span class="pre">1</span></code></dt>
 <dd></dd></dl>
 
 <dl class="cpp var">
 <dt>
-<span class="target" id="_ygg_interface_8m_1a0544c3fe466e421738dae463968b70ba"></span><code class="sig-name descname">else</code></dt>
+<span class="target" id="_ygg_interface_8m_1a0544c3fe466e421738dae463968b70ba"></span><code class="sig-name descname"><span class="pre">else</span></code></dt>
 <dd></dd></dl>
 
 <dl class="cpp var">
 <dt>
-<span class="target" id="_ygg_interface_8m_1afb358f48b1646c750fb9da6c6585be2b"></span><code class="sig-name descname">end</code></dt>
+<span class="target" id="_ygg_interface_8m_1afb358f48b1646c750fb9da6c6585be2b"></span><code class="sig-name descname"><span class="pre">end</span></code></dt>
 <dd></dd></dl>
 
 <dl class="cpp var">
 <dt>
-<span class="target" id="_ygg_interface_8m_1ac20f542425d23d5b71774e61a30c7884"></span><code class="sig-name descname">pyobj  = YggInterface.YggInit(type, matlab2python(args), ...			       matlab2python(kwargs))</code></dt>
+<span class="target" id="_ygg_interface_8m_1ac20f542425d23d5b71774e61a30c7884"></span><code class="sig-name descname"><span class="pre">pyobj</span>&#160; <span class="pre">=</span> <span class="pre">YggInterface.YggInit(type,</span> <span class="pre">matlab2python(args),</span> <span class="pre">...			</span>&#160;&#160;&#160;&#160;&#160;&#160; <span class="pre">matlab2python(kwargs))</span></code></dt>
 <dd></dd></dl>
 
 <dl class="cpp var">
 <dt>
-<span class="target" id="_ygg_interface_8m_1a2a89187d8e8e8fba509ef9ab5f815d88"></span><code class="sig-name descname">out   = YggInterfaceClass(pyobj)</code></dt>
+<span class="target" id="_ygg_interface_8m_1a2a89187d8e8e8fba509ef9ab5f815d88"></span><code class="sig-name descname"><span class="pre">out</span>&#160;&#160; <span class="pre">=</span> <span class="pre">YggInterfaceClass(pyobj)</span></code></dt>
 <dd></dd></dl>
 
 </div>

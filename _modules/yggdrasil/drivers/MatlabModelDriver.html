@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>yggdrasil.drivers.MatlabModelDriver &mdash; yggdrasil v1.5.0 documentation</title>
+  <title>yggdrasil.drivers.MatlabModelDriver &mdash; yggdrasil v1.6.0 documentation</title>
   
 
   
@@ -62,7 +62,7 @@
             
             
               <div class="version">
-                v1.5.0
+                v1.6.0
               </div>
             
           
@@ -104,6 +104,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../units.html">Units</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../c_format_strings.html">C-Style Format Strings</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../debugging.html">Debugging</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../threading.html">OpenMP Threading in Models</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../examples/examples_toc.html">Examples</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../advanced/index.html">Advanced</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../development/index.html">Development</a></li>
@@ -187,6 +188,7 @@
 <span class="kn">import</span> <span class="nn">psutil</span>
 <span class="kn">import</span> <span class="nn">warnings</span>
 <span class="kn">import</span> <span class="nn">weakref</span>
+<span class="kn">import</span> <span class="nn">shutil</span>
 <span class="kn">import</span> <span class="nn">io</span> <span class="k">as</span> <span class="nn">sio</span>
 <span class="kn">from</span> <span class="nn">yggdrasil</span> <span class="kn">import</span> <span class="n">tools</span><span class="p">,</span> <span class="n">platform</span><span class="p">,</span> <span class="n">serialize</span>
 <span class="kn">from</span> <span class="nn">yggdrasil.languages</span> <span class="kn">import</span> <span class="n">get_language_dir</span>
@@ -195,8 +197,10 @@
 <span class="kn">from</span> <span class="nn">yggdrasil.tools</span> <span class="kn">import</span> <span class="n">TimeOut</span><span class="p">,</span> <span class="n">sleep</span>
 <span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
 <span class="k">try</span><span class="p">:</span>  <span class="c1"># pragma: matlab</span>
-    <span class="n">disable_engine</span> <span class="o">=</span> <span class="n">ygg_cfg</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;matlab&#39;</span><span class="p">,</span> <span class="s1">&#39;disable_engine&#39;</span><span class="p">,</span> <span class="s1">&#39;False&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
-    <span class="k">if</span> <span class="n">platform</span><span class="o">.</span><span class="n">_is_win</span> <span class="ow">or</span> <span class="p">(</span><span class="n">disable_engine</span> <span class="o">==</span> <span class="s1">&#39;true&#39;</span><span class="p">):</span>
+    <span class="n">disable_engine</span> <span class="o">=</span> <span class="n">ygg_cfg</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;matlab&#39;</span><span class="p">,</span> <span class="s1">&#39;disable_engine&#39;</span><span class="p">,</span> <span class="s1">&#39;False&#39;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">disable_engine</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+        <span class="n">disable_engine</span> <span class="o">=</span> <span class="p">(</span><span class="n">disable_engine</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="o">==</span> <span class="s1">&#39;true&#39;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">platform</span><span class="o">.</span><span class="n">_is_win</span> <span class="ow">or</span> <span class="n">disable_engine</span><span class="p">:</span>
         <span class="n">_matlab_engine_installed</span> <span class="o">=</span> <span class="kc">False</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">tools</span><span class="o">.</span><span class="n">is_subprocess</span><span class="p">():</span>
             <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;matlab.engine disabled&quot;</span><span class="p">)</span>
@@ -943,7 +947,7 @@
         <span class="k">return</span> <span class="nb">super</span><span class="p">(</span><span class="n">MatlabModelDriver</span><span class="p">,</span> <span class="bp">cls</span><span class="p">)</span><span class="o">.</span><span class="n">executable_command</span><span class="p">(</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
     
 <div class="viewcode-block" id="MatlabModelDriver.configure"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.MatlabModelDriver.MatlabModelDriver.configure">[docs]</a>    <span class="nd">@classmethod</span>
-    <span class="k">def</span> <span class="nf">configure</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">cfg</span><span class="p">,</span> <span class="n">disable_engine</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">configure</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">cfg</span><span class="p">,</span> <span class="n">disable_engine</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">hide_matlab_libiomp</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Add configuration options for this language. This includes locating</span>
 <span class="sd">        any required external libraries and setting option defaults.</span>
 
@@ -951,6 +955,10 @@
 <span class="sd">            cfg (YggConfigParser): Config class that options should be set for.</span>
 <span class="sd">            disable_engine (bool, optional): Disable the use of the</span>
 <span class="sd">                Python engine for Matlab. If not provided, this</span>
+<span class="sd">                argument will be ignored.</span>
+<span class="sd">            hide_matlab_libiomp (bool, optional): Hide the Matlab version of</span>
+<span class="sd">                libiomp by moving it and recording the name of the file. If False,</span>
+<span class="sd">                the file will be restored if it exists. If not provided, this</span>
 <span class="sd">                argument will be ignored.</span>
 
 <span class="sd">        Returns:</span>
@@ -980,6 +988,37 @@
                     <span class="n">out</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="bp">cls</span><span class="o">.</span><span class="n">language</span><span class="p">,</span> <span class="n">k</span><span class="p">,</span> <span class="n">opts</span><span class="p">[</span><span class="n">k</span><span class="p">][</span><span class="mi">0</span><span class="p">]))</span>
         <span class="k">if</span> <span class="n">disable_engine</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">cfg</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="bp">cls</span><span class="o">.</span><span class="n">_language</span><span class="p">,</span> <span class="s1">&#39;disable_engine&#39;</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">disable_engine</span><span class="p">))</span>
+        <span class="k">if</span> <span class="n">hide_matlab_libiomp</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">matlab_root</span> <span class="o">=</span> <span class="n">cfg</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;matlab&#39;</span><span class="p">,</span> <span class="s1">&#39;matlabroot&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">matlab_root</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;matlabroot not set so we cannot locate the &quot;</span>
+                               <span class="s2">&quot;matlab version of libiomp to hide/restore it.&quot;</span><span class="p">)</span>
+                <span class="n">out</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="bp">cls</span><span class="o">.</span><span class="n">language</span><span class="p">,</span> <span class="s1">&#39;hidden_matlab_libiomp&#39;</span><span class="p">,</span>
+                            <span class="s1">&#39;The hidden copy of libiomp installed by Matlab&#39;</span><span class="p">))</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">hide_matlab_libiomp</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="ow">not</span> <span class="n">cfg</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="bp">cls</span><span class="o">.</span><span class="n">_language</span><span class="p">,</span> <span class="s1">&#39;hidden_matlab_libiomp&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">):</span>
+                        <span class="n">origlib</span> <span class="o">=</span> <span class="n">glob</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">matlab_root</span><span class="p">,</span> <span class="s1">&#39;sys&#39;</span><span class="p">,</span> <span class="s1">&#39;os&#39;</span><span class="p">,</span> <span class="s1">&#39;*&#39;</span><span class="p">,</span>
+                                                         <span class="s1">&#39;libiomp*&#39;</span><span class="p">))</span>
+                        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">origlib</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+                            <span class="n">origlib</span> <span class="o">=</span> <span class="n">origlib</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+                            <span class="n">copylib</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">origlib</span><span class="p">),</span>
+                                                   <span class="s1">&#39;_&#39;</span> <span class="o">+</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">basename</span><span class="p">(</span><span class="n">origlib</span><span class="p">))</span>
+                            <span class="n">cfg</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="bp">cls</span><span class="o">.</span><span class="n">_language</span><span class="p">,</span> <span class="s1">&#39;hidden_matlab_libiomp&#39;</span><span class="p">,</span> <span class="n">copylib</span><span class="p">)</span>
+                            <span class="n">shutil</span><span class="o">.</span><span class="n">move</span><span class="p">(</span><span class="n">origlib</span><span class="p">,</span> <span class="n">copylib</span><span class="p">)</span>
+                        <span class="k">elif</span> <span class="nb">len</span><span class="p">(</span><span class="n">origlib</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>  <span class="c1"># pragma: debug</span>
+                            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;Could not locate the version of libiomp &quot;</span>
+                                           <span class="s2">&quot;installed by matlab.&quot;</span><span class="p">)</span>
+                        <span class="k">else</span><span class="p">:</span>
+                            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;More than one version of libiomp located &quot;</span>
+                                           <span class="s2">&quot;in the Matlab installation: </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">origlib</span><span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">copylib</span> <span class="o">=</span> <span class="n">cfg</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="bp">cls</span><span class="o">.</span><span class="n">_language</span><span class="p">,</span> <span class="s1">&#39;hidden_matlab_libiomp&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+                    <span class="k">if</span> <span class="n">copylib</span><span class="p">:</span>
+                        <span class="n">origlib</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">copylib</span><span class="p">),</span>
+                                               <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">basename</span><span class="p">(</span><span class="n">copylib</span><span class="p">)[</span><span class="mi">1</span><span class="p">:])</span>
+                        <span class="n">cfg</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="bp">cls</span><span class="o">.</span><span class="n">_language</span><span class="p">,</span> <span class="s1">&#39;hidden_matlab_libiomp&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">)</span>
+                        <span class="n">shutil</span><span class="o">.</span><span class="n">move</span><span class="p">(</span><span class="n">copylib</span><span class="p">,</span> <span class="n">origlib</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">out</span></div>
 
 <div class="viewcode-block" id="MatlabModelDriver.get_matlab_info"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.MatlabModelDriver.MatlabModelDriver.get_matlab_info">[docs]</a>    <span class="nd">@classmethod</span>
@@ -1166,8 +1205,9 @@
 
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="n">comm</span><span class="o">.</span><span class="n">direction</span> <span class="o">==</span> <span class="s1">&#39;recv&#39;</span><span class="p">:</span>
-            <span class="k">while</span> <span class="n">comm</span><span class="o">.</span><span class="n">recv</span><span class="p">(</span><span class="n">timeout</span><span class="o">=</span><span class="mi">0</span><span class="p">)[</span><span class="mi">0</span><span class="p">]:</span>
-                <span class="n">comm</span><span class="o">.</span><span class="n">sleep</span><span class="p">()</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span><span class="n">comm</span><span class="o">.</span><span class="n">is_server</span> <span class="ow">or</span> <span class="n">comm</span><span class="o">.</span><span class="n">is_client</span><span class="p">):</span>
+                <span class="k">while</span> <span class="n">comm</span><span class="o">.</span><span class="n">recv</span><span class="p">(</span><span class="n">timeout</span><span class="o">=</span><span class="mi">0</span><span class="p">)[</span><span class="mi">0</span><span class="p">]:</span>
+                    <span class="n">comm</span><span class="o">.</span><span class="n">sleep</span><span class="p">()</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">comm</span><span class="o">.</span><span class="n">send_eof</span><span class="p">()</span>
         <span class="n">comm</span><span class="o">.</span><span class="n">linger_close</span><span class="p">()</span></div>

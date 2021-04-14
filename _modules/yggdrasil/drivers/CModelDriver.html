@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>yggdrasil.drivers.CModelDriver &mdash; yggdrasil v1.5.0 documentation</title>
+  <title>yggdrasil.drivers.CModelDriver &mdash; yggdrasil v1.6.0 documentation</title>
   
 
   
@@ -62,7 +62,7 @@
             
             
               <div class="version">
-                v1.5.0
+                v1.6.0
               </div>
             
           
@@ -104,6 +104,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../units.html">Units</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../c_format_strings.html">C-Style Format Strings</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../debugging.html">Debugging</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../threading.html">OpenMP Threading in Models</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../examples/examples_toc.html">Examples</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../advanced/index.html">Advanced</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../development/index.html">Development</a></li>
@@ -250,7 +251,8 @@
     <span class="n">default_flags_env</span> <span class="o">=</span> <span class="s1">&#39;CFLAGS&#39;</span>
     <span class="n">default_flags</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;-g&#39;</span><span class="p">,</span> <span class="s1">&#39;-Wall&#39;</span><span class="p">]</span>
     <span class="c1"># GCC &amp; CLANG have similar call patterns</span>
-    <span class="n">linker_attributes</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;default_flags_env&#39;</span><span class="p">:</span> <span class="s1">&#39;LDFLAGS&#39;</span><span class="p">,</span>
+    <span class="n">linker_attributes</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;default_executable_env&#39;</span><span class="p">:</span> <span class="s1">&#39;LD&#39;</span><span class="p">,</span>
+                         <span class="s1">&#39;default_flags_env&#39;</span><span class="p">:</span> <span class="s1">&#39;LDFLAGS&#39;</span><span class="p">,</span>
                          <span class="s1">&#39;search_path_envvar&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;LIBRARY_PATH&#39;</span><span class="p">,</span> <span class="s1">&#39;LD_LIBRARY_PATH&#39;</span><span class="p">]}</span>
     <span class="n">search_path_envvar</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;C_INCLUDE_PATH&#39;</span><span class="p">]</span>
     <span class="n">search_path_flags</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;-E&#39;</span><span class="p">,</span> <span class="s1">&#39;-v&#39;</span><span class="p">,</span> <span class="s1">&#39;-xc&#39;</span><span class="p">,</span> <span class="s1">&#39;/dev/null&#39;</span><span class="p">]</span>
@@ -274,9 +276,6 @@
             <span class="bp">cls</span><span class="o">.</span><span class="n">linker_attributes</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="bp">cls</span><span class="o">.</span><span class="n">linker_attributes</span><span class="p">,</span>
                                          <span class="n">search_path_flags</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;-Xlinker&#39;</span><span class="p">,</span> <span class="s1">&#39;--verbose&#39;</span><span class="p">],</span>
                                          <span class="n">search_regex</span><span class="o">=</span><span class="p">[</span><span class="sa">r</span><span class="s1">&#39;SEARCH_DIR\(&quot;=([^&quot;]+)&quot;\);&#39;</span><span class="p">])</span>
-        <span class="k">elif</span> <span class="n">platform</span><span class="o">.</span><span class="n">_is_win</span> <span class="ow">and</span> <span class="p">(</span><span class="bp">cls</span><span class="o">.</span><span class="n">toolname</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">[</span><span class="kc">None</span><span class="p">,</span> <span class="s1">&#39;cl&#39;</span><span class="p">,</span> <span class="s1">&#39;msvc&#39;</span><span class="p">]):</span>
-            <span class="bp">cls</span><span class="o">.</span><span class="n">default_executable_env</span> <span class="o">=</span> <span class="kc">None</span>
-            <span class="bp">cls</span><span class="o">.</span><span class="n">default_flags_env</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="n">CompilerBase</span><span class="o">.</span><span class="n">before_registration</span><span class="p">(</span><span class="bp">cls</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="CCompilerBase.set_env"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.CModelDriver.CCompilerBase.set_env">[docs]</a>    <span class="nd">@classmethod</span>
@@ -422,15 +421,23 @@
     <span class="c1"># Set to False since ClangLinker has its own class to handle</span>
     <span class="c1"># conflict between versions of clang and ld.</span>
     <span class="n">is_linker</span> <span class="o">=</span> <span class="kc">False</span>
-    <span class="n">toolset</span> <span class="o">=</span> <span class="s1">&#39;llvm&#39;</span></div>
+    <span class="n">toolset</span> <span class="o">=</span> <span class="s1">&#39;llvm&#39;</span>
 
+<div class="viewcode-block" id="ClangCompiler.get_flags"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.CModelDriver.ClangCompiler.get_flags">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">get_flags</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Get a list of compiler flags.&quot;&quot;&quot;</span>
+        <span class="n">out</span> <span class="o">=</span> <span class="nb">super</span><span class="p">(</span><span class="n">ClangCompiler</span><span class="p">,</span> <span class="bp">cls</span><span class="p">)</span><span class="o">.</span><span class="n">get_flags</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="k">if</span> <span class="s1">&#39;-fopenmp&#39;</span> <span class="ow">in</span> <span class="n">out</span><span class="p">:</span>
+            <span class="n">idx</span> <span class="o">=</span> <span class="n">out</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="s1">&#39;-fopenmp&#39;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="p">(</span><span class="n">idx</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">out</span><span class="p">[</span><span class="n">idx</span> <span class="o">-</span> <span class="mi">1</span><span class="p">]</span> <span class="o">!=</span> <span class="s1">&#39;-Xpreprocessor&#39;</span><span class="p">):</span>
+                <span class="n">out</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="n">idx</span><span class="p">,</span> <span class="s1">&#39;-Xpreprocessor&#39;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">out</span></div></div>
+        
 
 <div class="viewcode-block" id="MSVCCompiler"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.CModelDriver.MSVCCompiler">[docs]</a><span class="k">class</span> <span class="nc">MSVCCompiler</span><span class="p">(</span><span class="n">CCompilerBase</span><span class="p">):</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Microsoft Visual Studio C Compiler.&quot;&quot;&quot;</span>
     <span class="n">toolname</span> <span class="o">=</span> <span class="s1">&#39;cl&#39;</span>
-    <span class="n">languages</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;c&#39;</span><span class="p">,</span> <span class="s1">&#39;c++&#39;</span><span class="p">]</span>
     <span class="n">platforms</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;Windows&#39;</span><span class="p">]</span>
-    <span class="n">default_flags_env</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;CFLAGS&#39;</span><span class="p">,</span> <span class="s1">&#39;CXXFLAGS&#39;</span><span class="p">]</span>
     <span class="c1"># TODO: Currently everything compiled as C++ on windows to allow use</span>
     <span class="c1"># of complex types. Use &#39;/TC&#39; instead of &#39;/TP&#39; for strictly C</span>
     <span class="n">default_flags</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;/W4&#39;</span><span class="p">,</span>      <span class="c1"># Display all errors</span>
@@ -456,8 +463,7 @@
     <span class="n">combine_with_linker</span> <span class="o">=</span> <span class="kc">True</span>  <span class="c1"># Must be explicit; linker is separate .exe</span>
     <span class="n">linker_attributes</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">GCCCompiler</span><span class="o">.</span><span class="n">linker_attributes</span><span class="p">,</span>
                              <span class="n">default_executable</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-                             <span class="n">default_executable_env</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-                             <span class="n">default_flags_env</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                             <span class="n">default_executable_env</span><span class="o">=</span><span class="s1">&#39;LINK&#39;</span><span class="p">,</span>
                              <span class="n">output_key</span><span class="o">=</span><span class="s1">&#39;/OUT:</span><span class="si">%s</span><span class="s1">&#39;</span><span class="p">,</span>
                              <span class="n">output_first</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
                              <span class="n">output_first_library</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
@@ -479,8 +485,8 @@
         <span class="n">compiler_path</span> <span class="o">=</span> <span class="n">shutil</span><span class="o">.</span><span class="n">which</span><span class="p">(</span><span class="s1">&#39;cl.exe&#39;</span><span class="p">)</span>
         <span class="n">linker_path</span> <span class="o">=</span> <span class="n">shutil</span><span class="o">.</span><span class="n">which</span><span class="p">(</span><span class="s1">&#39;link.exe&#39;</span><span class="p">)</span>
         <span class="k">if</span> <span class="p">(((</span><span class="n">compiler_path</span> <span class="ow">and</span> <span class="n">linker_path</span><span class="p">)</span>
-             <span class="ow">and</span> <span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">compiler_path</span><span class="p">)</span>
-                  <span class="o">!=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">linker_path</span><span class="p">)))):</span>
+             <span class="ow">and</span> <span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">compiler_path</span><span class="p">)</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
+                  <span class="o">!=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">linker_path</span><span class="p">)</span><span class="o">.</span><span class="n">lower</span><span class="p">()))):</span>
             <span class="bp">cls</span><span class="o">.</span><span class="n">linker_attributes</span><span class="p">[</span><span class="s1">&#39;default_executable&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
                 <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">compiler_path</span><span class="p">),</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">basename</span><span class="p">(</span><span class="n">linker_path</span><span class="p">))</span>
             <span class="k">assert</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span>
@@ -549,7 +555,6 @@
     <span class="n">languages</span> <span class="o">=</span> <span class="n">ClangCompiler</span><span class="o">.</span><span class="n">languages</span>
     <span class="n">platforms</span> <span class="o">=</span> <span class="n">ClangCompiler</span><span class="o">.</span><span class="n">platforms</span>
     <span class="n">default_executable</span> <span class="o">=</span> <span class="n">ClangCompiler</span><span class="o">.</span><span class="n">default_executable</span>
-    <span class="n">default_executable_env</span> <span class="o">=</span> <span class="n">ClangCompiler</span><span class="o">.</span><span class="n">default_executable_env</span>
     <span class="n">toolset</span> <span class="o">=</span> <span class="n">ClangCompiler</span><span class="o">.</span><span class="n">toolset</span>
     <span class="n">search_path_flags</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;-Xlinker&#39;</span><span class="p">,</span> <span class="s1">&#39;-v&#39;</span><span class="p">]</span>
     <span class="n">search_regex</span> <span class="o">=</span> <span class="p">[</span><span class="sa">r</span><span class="s1">&#39;\t([^\t\n]+)\n&#39;</span><span class="p">]</span>
@@ -595,6 +600,8 @@
         <span class="n">out</span> <span class="o">=</span> <span class="nb">super</span><span class="p">(</span><span class="n">ClangLinker</span><span class="p">,</span> <span class="bp">cls</span><span class="p">)</span><span class="o">.</span><span class="n">get_flags</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
         <span class="k">if</span> <span class="s1">&#39;-lstdc++&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">out</span><span class="p">:</span>
             <span class="n">out</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;-lstdc++&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="s1">&#39;-fopenmp&#39;</span> <span class="ow">in</span> <span class="n">out</span><span class="p">:</span>
+            <span class="n">out</span><span class="p">[</span><span class="n">out</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="s1">&#39;-fopenmp&#39;</span><span class="p">)]</span> <span class="o">=</span> <span class="s1">&#39;-lomp&#39;</span>
         <span class="k">return</span> <span class="n">out</span></div></div>
 
 
@@ -959,7 +966,7 @@
                     <span class="bp">cls</span><span class="o">.</span><span class="n">internal_libraries</span><span class="p">[</span><span class="n">x</span><span class="p">][</span><span class="s1">&#39;compiler_flags&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;-fPIC&#39;</span><span class="p">)</span></div>
         
 <div class="viewcode-block" id="CModelDriver.configure"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.CModelDriver.CModelDriver.configure">[docs]</a>    <span class="nd">@classmethod</span>
-    <span class="k">def</span> <span class="nf">configure</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">cfg</span><span class="p">,</span> <span class="n">macos_sdkroot</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">vcpkg_dir</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">configure</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">cfg</span><span class="p">,</span> <span class="n">macos_sdkroot</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">vcpkg_dir</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Add configuration options for this language. This includes locating</span>
 <span class="sd">        any required external libraries and setting option defaults.</span>
 
@@ -972,6 +979,8 @@
 <span class="sd">                a vcpkg installation. This should be the directory that contains</span>
 <span class="sd">                the vcpkg executable and any packages installed by vcpkg (in</span>
 <span class="sd">                subdirectories). Defaults to None and is ignored.</span>
+<span class="sd">            **kwargs: Additional keyword arguments are passed to the parent</span>
+<span class="sd">                class&#39;s method.</span>
 
 <span class="sd">        Returns:</span>
 <span class="sd">            list: Section, option, description tuples for options that could not</span>
@@ -999,7 +1008,7 @@
             <span class="n">cfg</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="bp">cls</span><span class="o">.</span><span class="n">_language</span><span class="p">,</span> <span class="s1">&#39;macos_sdkroot&#39;</span><span class="p">,</span> <span class="n">macos_sdkroot</span><span class="p">)</span>
         <span class="c1"># Call __func__ to avoid direct invoking of class which dosn&#39;t exist</span>
         <span class="c1"># in after_registration where this is called</span>
-        <span class="n">out</span> <span class="o">=</span> <span class="n">CompiledModelDriver</span><span class="o">.</span><span class="n">configure</span><span class="o">.</span><span class="vm">__func__</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">cfg</span><span class="p">)</span>
+        <span class="n">out</span> <span class="o">=</span> <span class="n">CompiledModelDriver</span><span class="o">.</span><span class="n">configure</span><span class="o">.</span><span class="vm">__func__</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">cfg</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
         <span class="c1"># Change configuration to be directory containing include files</span>
         <span class="n">rjlib</span> <span class="o">=</span> <span class="n">cfg</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="bp">cls</span><span class="o">.</span><span class="n">_language</span><span class="p">,</span> <span class="s1">&#39;rapidjson_include&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
         <span class="k">if</span> <span class="p">(</span><span class="n">rjlib</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">and</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">rjlib</span><span class="p">):</span>

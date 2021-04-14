@@ -8,6 +8,8 @@ args                The full path to the file containing the model program that 
                     should be passed as input to the program.                                                                
 name                Unique name used to identify the model. This will be used to report errors         X          str        
                     associated with the model.                                                                               
+allow_threading     If True, comm connections will be set up so that the model-side comms can be                  bool       
+                    used by more than one thread. Defaults to False.                                                         
 client_of           The names of one or more models that this model will call as a server. If there               str, list  
                     are more than one, this should be specified as a sequence collection (list). The                         
                     corresponding channel(s) that should be passed to the yggdrasil API will be the                          
@@ -15,6 +17,7 @@ client_of           The names of one or more models that this model will call as
                     underscore `<server_model>_<client_model>`. There will be one channel created                            
                     for each server the model is a client of. Defaults to empty list. Use of                                 
                     `client_of` with `function` is not currently supported.                                                  
+copies              The number of copies of the model that should be created. Defaults to 1.                      int        
 function            If provided, an integrated model is created by wrapping the function named here.              str        
                     The function must be located within the file specified by the source file listed                         
                     in the first argument. If not provided, the model must contain it's own calls to                         

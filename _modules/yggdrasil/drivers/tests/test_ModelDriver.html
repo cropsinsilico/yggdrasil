@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>yggdrasil.drivers.tests.test_ModelDriver &mdash; yggdrasil v1.5.0 documentation</title>
+  <title>yggdrasil.drivers.tests.test_ModelDriver &mdash; yggdrasil v1.6.0 documentation</title>
   
 
   
@@ -62,7 +62,7 @@
             
             
               <div class="version">
-                v1.5.0
+                v1.6.0
               </div>
             
           
@@ -104,6 +104,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../../units.html">Units</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../c_format_strings.html">C-Style Format Strings</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../debugging.html">Debugging</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../threading.html">OpenMP Threading in Models</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../examples/examples_toc.html">Examples</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../advanced/index.html">Advanced</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../development/index.html">Development</a></li>
@@ -161,8 +162,6 @@
           <li><a href="../../../index.html">Module code</a> &raquo;</li>
         
           <li><a href="../../drivers.html">yggdrasil.drivers</a> &raquo;</li>
-        
-          <li><a href="../tests.html">yggdrasil.drivers.tests</a> &raquo;</li>
         
       <li>yggdrasil.drivers.tests.test_ModelDriver</li>
     
@@ -324,7 +323,9 @@
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test running script used without debug.&quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">run_model_instance</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="TestModelDriverNoInit.test_valgrind"><a class="viewcode-back" href="../../../../yggdrasil.drivers.tests.html#yggdrasil.drivers.tests.test_ModelDriver.TestModelDriverNoInit.test_valgrind">[docs]</a>    <span class="nd">@unittest</span><span class="o">.</span><span class="n">skipIf</span><span class="p">(</span><span class="n">platform</span><span class="o">.</span><span class="n">_is_win</span><span class="p">,</span> <span class="s2">&quot;No valgrind on windows&quot;</span><span class="p">)</span>
+    <span class="c1"># @unittest.skip(&quot;temp&quot;)</span>
+<div class="viewcode-block" id="TestModelDriverNoInit.test_valgrind"><a class="viewcode-back" href="../../../../yggdrasil.drivers.tests.html#yggdrasil.drivers.tests.test_ModelDriver.TestModelDriverNoInit.test_valgrind">[docs]</a>    <span class="nd">@unittest</span><span class="o">.</span><span class="n">skipIf</span><span class="p">(</span><span class="n">platform</span><span class="o">.</span><span class="n">_is_mac</span><span class="p">,</span> <span class="s2">&quot;Valgrind slow on Mac&quot;</span><span class="p">)</span>
+    <span class="nd">@unittest</span><span class="o">.</span><span class="n">skipIf</span><span class="p">(</span><span class="n">platform</span><span class="o">.</span><span class="n">_is_win</span><span class="p">,</span> <span class="s2">&quot;No valgrind on windows&quot;</span><span class="p">)</span>
     <span class="nd">@unittest</span><span class="o">.</span><span class="n">skipIf</span><span class="p">(</span><span class="n">shutil</span><span class="o">.</span><span class="n">which</span><span class="p">(</span><span class="s1">&#39;valgrind&#39;</span><span class="p">)</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">,</span>
                      <span class="s2">&quot;Valgrind not installed.&quot;</span><span class="p">)</span>
     <span class="k">def</span> <span class="nf">test_valgrind</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>

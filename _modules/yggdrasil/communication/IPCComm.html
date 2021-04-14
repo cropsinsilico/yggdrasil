@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>yggdrasil.communication.IPCComm &mdash; yggdrasil v1.5.0 documentation</title>
+  <title>yggdrasil.communication.IPCComm &mdash; yggdrasil v1.6.0 documentation</title>
   
 
   
@@ -62,7 +62,7 @@
             
             
               <div class="version">
-                v1.5.0
+                v1.6.0
               </div>
             
           
@@ -104,6 +104,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../units.html">Units</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../c_format_strings.html">C-Style Format Strings</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../debugging.html">Debugging</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../threading.html">OpenMP Threading in Models</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../examples/examples_toc.html">Examples</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../advanced/index.html">Advanced</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../development/index.html">Development</a></li>
@@ -182,7 +183,8 @@
 <span class="kn">import</span> <span class="nn">logging</span>
 <span class="kn">from</span> <span class="nn">subprocess</span> <span class="kn">import</span> <span class="n">Popen</span><span class="p">,</span> <span class="n">PIPE</span>
 <span class="kn">from</span> <span class="nn">yggdrasil</span> <span class="kn">import</span> <span class="n">platform</span><span class="p">,</span> <span class="n">tools</span>
-<span class="kn">from</span> <span class="nn">yggdrasil.communication</span> <span class="kn">import</span> <span class="n">CommBase</span><span class="p">,</span> <span class="n">AsyncComm</span>
+<span class="kn">from</span> <span class="nn">yggdrasil.communication</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">CommBase</span><span class="p">,</span> <span class="n">TemporaryCommunicationError</span><span class="p">,</span> <span class="n">NoMessages</span><span class="p">)</span>
 <span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
 <span class="k">try</span><span class="p">:</span>
     <span class="kn">import</span> <span class="nn">sysv_ipc</span>
@@ -209,9 +211,12 @@
         <span class="n">kwargs</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">max_message_size</span><span class="o">=</span><span class="n">tools</span><span class="o">.</span><span class="n">get_YGG_MSG_MAX</span><span class="p">())</span>
         <span class="k">if</span> <span class="n">qid</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;flags&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">sysv_ipc</span><span class="o">.</span><span class="n">IPC_CREX</span>
-        <span class="n">mq</span> <span class="o">=</span> <span class="n">sysv_ipc</span><span class="o">.</span><span class="n">MessageQueue</span><span class="p">(</span><span class="n">qid</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">mq</span> <span class="o">=</span> <span class="n">sysv_ipc</span><span class="o">.</span><span class="n">MessageQueue</span><span class="p">(</span><span class="n">qid</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="k">except</span> <span class="n">sysv_ipc</span><span class="o">.</span><span class="n">ExistentialError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>  <span class="c1"># pragma: debug</span>
+            <span class="k">raise</span> <span class="n">sysv_ipc</span><span class="o">.</span><span class="n">ExistentialError</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">%s</span><span class="s2">: </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">e</span><span class="p">,</span> <span class="n">qid</span><span class="p">))</span>
         <span class="n">key</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">mq</span><span class="o">.</span><span class="n">key</span><span class="p">)</span>
-        <span class="n">CommBase</span><span class="o">.</span><span class="n">register_comm</span><span class="p">(</span><span class="s1">&#39;IPCComm&#39;</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">mq</span><span class="p">)</span>
+        <span class="n">IPCComm</span><span class="o">.</span><span class="n">register_comm</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">mq</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">mq</span>
     <span class="k">else</span><span class="p">:</span>  <span class="c1"># pragma: windows</span>
         <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;IPC not installed. Queue cannot be returned.&quot;</span><span class="p">)</span>
@@ -229,9 +234,9 @@
 
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">key</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">mq</span><span class="o">.</span><span class="n">key</span><span class="p">)</span>
-    <span class="k">if</span> <span class="ow">not</span> <span class="n">CommBase</span><span class="o">.</span><span class="n">is_registered</span><span class="p">(</span><span class="s1">&#39;IPCComm&#39;</span><span class="p">,</span> <span class="n">key</span><span class="p">):</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">IPCComm</span><span class="o">.</span><span class="n">is_registered</span><span class="p">(</span><span class="n">key</span><span class="p">):</span>
         <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span><span class="s2">&quot;Queue not registered.&quot;</span><span class="p">)</span>
-    <span class="n">CommBase</span><span class="o">.</span><span class="n">unregister_comm</span><span class="p">(</span><span class="s1">&#39;IPCComm&#39;</span><span class="p">,</span> <span class="n">key</span><span class="p">)</span></div>
+    <span class="n">IPCComm</span><span class="o">.</span><span class="n">unregister_comm</span><span class="p">(</span><span class="n">key</span><span class="p">)</span></div>
     
 
 <div class="viewcode-block" id="ipcs"><a class="viewcode-back" href="../../../yggdrasil.communication.html#yggdrasil.communication.IPCComm.ipcs">[docs]</a><span class="k">def</span> <span class="nf">ipcs</span><span class="p">(</span><span class="n">options</span><span class="o">=</span><span class="p">[]):</span>
@@ -345,11 +350,11 @@
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;IPC server object for cleaning up server queue.&quot;&quot;&quot;</span>
 
 <div class="viewcode-block" id="IPCServer.terminate"><a class="viewcode-back" href="../../../yggdrasil.communication.html#yggdrasil.communication.IPCComm.IPCServer.terminate">[docs]</a>    <span class="k">def</span> <span class="nf">terminate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="n">CommBase</span><span class="o">.</span><span class="n">unregister_comm</span><span class="p">(</span><span class="s1">&#39;IPCComm&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">srv_address</span><span class="p">)</span>
+        <span class="n">IPCComm</span><span class="o">.</span><span class="n">unregister_comm</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">srv_address</span><span class="p">)</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">IPCServer</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">terminate</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div></div>
 
 
-<div class="viewcode-block" id="IPCComm"><a class="viewcode-back" href="../../../yggdrasil.communication.html#yggdrasil.communication.IPCComm.IPCComm">[docs]</a><span class="k">class</span> <span class="nc">IPCComm</span><span class="p">(</span><span class="n">AsyncComm</span><span class="o">.</span><span class="n">AsyncComm</span><span class="p">):</span>
+<div class="viewcode-block" id="IPCComm"><a class="viewcode-back" href="../../../yggdrasil.communication.html#yggdrasil.communication.IPCComm.IPCComm">[docs]</a><span class="k">class</span> <span class="nc">IPCComm</span><span class="p">(</span><span class="n">CommBase</span><span class="o">.</span><span class="n">CommBase</span><span class="p">):</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Class for handling I/O via IPC message queues.</span>
 
 <span class="sd">    Attributes:</span>
@@ -374,11 +379,6 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">_server_class</span> <span class="o">=</span> <span class="n">IPCServer</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">IPCComm</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">_init_before_open</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
             
-<div class="viewcode-block" id="IPCComm.underlying_comm_class"><a class="viewcode-back" href="../../../yggdrasil.communication.html#yggdrasil.communication.IPCComm.IPCComm.underlying_comm_class">[docs]</a>    <span class="nd">@classmethod</span>
-    <span class="k">def</span> <span class="nf">underlying_comm_class</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;str: Name of underlying communication class.&quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="s1">&#39;IPCComm&#39;</span></div>
-
 <div class="viewcode-block" id="IPCComm.close_registry_entry"><a class="viewcode-back" href="../../../yggdrasil.communication.html#yggdrasil.communication.IPCComm.IPCComm.close_registry_entry">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">close_registry_entry</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Close a registry entry.&quot;&quot;&quot;</span>
@@ -410,14 +410,14 @@
         <span class="n">qid</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">address</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">q</span> <span class="o">=</span> <span class="n">get_queue</span><span class="p">(</span><span class="n">qid</span><span class="p">)</span></div>
 
-    <span class="k">def</span> <span class="nf">_open_direct</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="IPCComm.open"><a class="viewcode-back" href="../../../yggdrasil.communication.html#yggdrasil.communication.IPCComm.IPCComm.open">[docs]</a>    <span class="k">def</span> <span class="nf">open</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Open the queue.&quot;&quot;&quot;</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_open_direct</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">bind</span><span class="p">()</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">IPCComm</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">open</span><span class="p">()</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_open</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">open_after_bind</span><span class="p">()</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;qid: </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">q</span><span class="o">.</span><span class="n">key</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;qid: </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">q</span><span class="o">.</span><span class="n">key</span><span class="p">)</span></div>
 
-    <span class="k">def</span> <span class="nf">_close_direct</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">skip_remove</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">_close</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">linger</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">skip_remove</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Close the queue.&quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_bound</span> <span class="ow">and</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">q</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">):</span>
             <span class="k">try</span><span class="p">:</span>
@@ -433,9 +433,16 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">unregister_comm</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">address</span><span class="p">,</span> <span class="n">dont_close</span><span class="o">=</span><span class="n">dont_close</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">q</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_bound</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">IPCComm</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">_close</span><span class="p">(</span><span class="n">linger</span><span class="o">=</span><span class="n">linger</span><span class="p">)</span>
 
+<div class="viewcode-block" id="IPCComm.atexit"><a class="viewcode-back" href="../../../yggdrasil.communication.html#yggdrasil.communication.IPCComm.IPCComm.atexit">[docs]</a>    <span class="k">def</span> <span class="nf">atexit</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>  <span class="c1"># pragma: debug</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Close operations.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">direction</span> <span class="o">==</span> <span class="s1">&#39;send&#39;</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">linger</span><span class="p">()</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">IPCComm</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">atexit</span><span class="p">()</span></div>
+        
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">is_open_direct</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">is_open</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;bool: True if the queue is not None.&quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">q</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">return</span> <span class="kc">False</span>
@@ -446,7 +453,7 @@
                 <span class="k">raise</span>
             <span class="k">return</span> <span class="kc">False</span>
         <span class="k">except</span> <span class="n">sysv_ipc</span><span class="o">.</span><span class="n">ExistentialError</span><span class="p">:</span>  <span class="c1"># pragma: debug</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_close_direct</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_close</span><span class="p">()</span>
             <span class="k">return</span> <span class="kc">False</span>
         <span class="k">return</span> <span class="kc">True</span>
 
@@ -454,35 +461,35 @@
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Confirm that sent message was received.&quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="n">noblock</span><span class="p">:</span>
             <span class="k">return</span> <span class="kc">True</span>
-        <span class="k">return</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">n_msg_direct_send</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span></div>
+        <span class="k">return</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">n_msg_send</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="IPCComm.confirm_recv"><a class="viewcode-back" href="../../../yggdrasil.communication.html#yggdrasil.communication.IPCComm.IPCComm.confirm_recv">[docs]</a>    <span class="k">def</span> <span class="nf">confirm_recv</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">noblock</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Confirm that message was received.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="kc">True</span></div>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">n_msg_direct_send</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">n_msg_send</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;int: Number of messages in the queue to send.&quot;&quot;&quot;</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_open_direct</span><span class="p">:</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_open</span><span class="p">:</span>
             <span class="k">try</span><span class="p">:</span>
                 <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">q</span><span class="o">.</span><span class="n">current_messages</span>
             <span class="k">except</span> <span class="ne">AttributeError</span><span class="p">:</span>  <span class="c1"># pragma: debug</span>
-                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_open_direct</span><span class="p">:</span>
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_open</span><span class="p">:</span>
                     <span class="k">raise</span>
                 <span class="k">return</span> <span class="mi">0</span>
             <span class="k">except</span> <span class="n">sysv_ipc</span><span class="o">.</span><span class="n">ExistentialError</span><span class="p">:</span>  <span class="c1"># pragma: debug</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">_close_direct</span><span class="p">()</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_close</span><span class="p">()</span>
                 <span class="k">return</span> <span class="mi">0</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="k">return</span> <span class="mi">0</span>
         
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">n_msg_direct_recv</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">n_msg_recv</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;int: Number of messages in the queue to recv.&quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_msg_direct_send</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_msg_send</span>
 
-    <span class="k">def</span> <span class="nf">_send_direct</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">payload</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Send a message to the comm directly.</span>
+    <span class="k">def</span> <span class="nf">_send</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">payload</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Send a message.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            payload (str): Message to send.</span>
@@ -491,58 +498,34 @@
 <span class="sd">            bool: Success or failure of sending the message.</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_open_direct</span><span class="p">:</span>  <span class="c1"># pragma: debug</span>
-            <span class="k">return</span> <span class="kc">False</span>
         <span class="k">try</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;Sending </span><span class="si">%d</span><span class="s1"> bytes&#39;</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">payload</span><span class="p">))</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">q</span><span class="o">.</span><span class="n">send</span><span class="p">(</span><span class="n">payload</span><span class="p">,</span> <span class="n">block</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;Sent </span><span class="si">%d</span><span class="s1"> bytes&#39;</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">payload</span><span class="p">))</span>
         <span class="k">except</span> <span class="n">sysv_ipc</span><span class="o">.</span><span class="n">BusyError</span><span class="p">:</span>  <span class="c1"># pragma: debug</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;IPC Queue Full&quot;</span><span class="p">)</span>
-            <span class="k">raise</span> <span class="n">AsyncComm</span><span class="o">.</span><span class="n">AsyncTryAgain</span>
-        <span class="k">except</span> <span class="ne">OSError</span><span class="p">:</span>  <span class="c1"># pragma: debug</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Send failed&quot;</span><span class="p">)</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_close_direct</span><span class="p">()</span>
-            <span class="k">return</span> <span class="kc">False</span>
-        <span class="k">except</span> <span class="ne">AttributeError</span><span class="p">:</span>  <span class="c1"># pragma: debug</span>
-            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_closed</span><span class="p">:</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Comm closed&quot;</span><span class="p">)</span>
-                <span class="k">return</span> <span class="kc">False</span>
-            <span class="k">raise</span>
+            <span class="k">raise</span> <span class="n">TemporaryCommunicationError</span><span class="p">(</span><span class="s2">&quot;Queue full.&quot;</span><span class="p">)</span>
         <span class="k">return</span> <span class="kc">True</span>
 
-    <span class="k">def</span> <span class="nf">_recv_direct</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Receive a message from the comm directly.</span>
+    <span class="k">def</span> <span class="nf">_recv</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Receive a message from the IPC queue.</span>
 
 <span class="sd">        Returns:</span>
 <span class="sd">            tuple (bool, str): The success or failure of receiving a message</span>
 <span class="sd">                and the message received.</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="c1"># Receive message</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Message ready, reading it.&quot;</span><span class="p">)</span>
         <span class="k">try</span><span class="p">:</span>
-            <span class="n">data</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">q</span><span class="o">.</span><span class="n">receive</span><span class="p">()</span>  <span class="c1"># ignore ident</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Received </span><span class="si">%d</span><span class="s2"> bytes&quot;</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="p">))</span>
-        <span class="k">except</span> <span class="n">sysv_ipc</span><span class="o">.</span><span class="n">ExistentialError</span><span class="p">:</span>  <span class="c1"># pragma: debug</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;sysv_ipc.ExistentialError: closing&quot;</span><span class="p">)</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_close_direct</span><span class="p">()</span>
-            <span class="k">return</span> <span class="p">(</span><span class="kc">False</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">empty_bytes_msg</span><span class="p">)</span>
-        <span class="k">except</span> <span class="ne">AttributeError</span><span class="p">:</span>  <span class="c1"># pragma: debug</span>
-            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_closed</span><span class="p">:</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Queue closed&quot;</span><span class="p">)</span>
-                <span class="k">return</span> <span class="p">(</span><span class="kc">False</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">empty_bytes_msg</span><span class="p">)</span>
-            <span class="k">raise</span>
+            <span class="n">data</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">q</span><span class="o">.</span><span class="n">receive</span><span class="p">(</span><span class="n">block</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>  <span class="c1"># ignore ident</span>
+        <span class="k">except</span> <span class="n">sysv_ipc</span><span class="o">.</span><span class="n">BusyError</span><span class="p">:</span>  <span class="c1"># pragma: debug</span>
+            <span class="k">raise</span> <span class="n">NoMessages</span><span class="p">(</span><span class="s2">&quot;No messages in queue.&quot;</span><span class="p">)</span>
         <span class="k">return</span> <span class="p">(</span><span class="kc">True</span><span class="p">,</span> <span class="n">data</span><span class="p">)</span>
 
 <div class="viewcode-block" id="IPCComm.purge"><a class="viewcode-back" href="../../../yggdrasil.communication.html#yggdrasil.communication.IPCComm.IPCComm.purge">[docs]</a>    <span class="k">def</span> <span class="nf">purge</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Purge all messages from the comm.&quot;&quot;&quot;</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">IPCComm</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">purge</span><span class="p">()</span>
         <span class="k">try</span><span class="p">:</span>
-            <span class="k">while</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_msg_direct</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>  <span class="c1"># pragma: debug</span>
+            <span class="k">while</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_msg</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>  <span class="c1"># pragma: debug</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">q</span><span class="o">.</span><span class="n">receive</span><span class="p">()</span>
         <span class="k">except</span> <span class="ne">AttributeError</span><span class="p">:</span>  <span class="c1"># pragma: debug</span>
-            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_open_direct</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_open</span><span class="p">:</span>
                 <span class="k">raise</span></div></div>
 </pre></div>
 

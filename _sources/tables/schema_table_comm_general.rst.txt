@@ -14,6 +14,8 @@ args             string               [DEPRECATED] Arguments that should be prov
 as_array         boolean              [DEPRECATED] If True and the datatype is table-like, tables are sent/recieved   
                                       with either columns rather than row by row. Defaults to False.                  
 default_file                                                                                                          
+default_value    any                                                                                                  
+dont_copy        boolean                                                                                              
 driver           string               [DEPRECATED] Name of driver class that should be used.                          
 field_names      array                [DEPRECATED] Field names that should be used to label fields in sent/received   
                                       tables. This keyword is only valid for table-like datatypes. If not provided,   

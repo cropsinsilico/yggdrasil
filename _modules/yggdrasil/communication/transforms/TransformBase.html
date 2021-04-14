@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>yggdrasil.communication.transforms.TransformBase &mdash; yggdrasil v1.5.0 documentation</title>
+  <title>yggdrasil.communication.transforms.TransformBase &mdash; yggdrasil v1.6.0 documentation</title>
   
 
   
@@ -62,7 +62,7 @@
             
             
               <div class="version">
-                v1.5.0
+                v1.6.0
               </div>
             
           
@@ -104,6 +104,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../../units.html">Units</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../c_format_strings.html">C-Style Format Strings</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../debugging.html">Debugging</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../threading.html">OpenMP Threading in Models</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../examples/examples_toc.html">Examples</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../advanced/index.html">Advanced</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../development/index.html">Development</a></li>
@@ -178,7 +179,8 @@
            <div itemprop="articleBody">
             
   <h1>Source code for yggdrasil.communication.transforms.TransformBase</h1><div class="highlight"><pre>
-<span></span><span class="kn">from</span> <span class="nn">yggdrasil.components</span> <span class="kn">import</span> <span class="n">ComponentBase</span>
+<span></span><span class="kn">import</span> <span class="nn">collections</span>
+<span class="kn">from</span> <span class="nn">yggdrasil.components</span> <span class="kn">import</span> <span class="n">ComponentBase</span>
 <span class="kn">from</span> <span class="nn">yggdrasil.metaschema.datatypes</span> <span class="kn">import</span> <span class="n">encode_type</span><span class="p">,</span> <span class="n">generate_data</span>
 
 
@@ -285,11 +287,18 @@
 <span class="sd">            object: The transformed message.</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">if</span> <span class="p">(</span><span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">original_datatype</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="ow">not</span> <span class="n">no_init</span><span class="p">):</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">set_original_datatype</span><span class="p">(</span><span class="n">encode_type</span><span class="p">(</span><span class="n">x</span><span class="p">))</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="nb">bytes</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span> <span class="ow">and</span> <span class="n">no_init</span><span class="p">:</span>
             <span class="k">return</span> <span class="sa">b</span><span class="s1">&#39;&#39;</span>
-        <span class="n">out</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">evaluate_transform</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">no_copy</span><span class="o">=</span><span class="n">no_copy</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">collections</span><span class="o">.</span><span class="n">abc</span><span class="o">.</span><span class="n">Iterator</span><span class="p">):</span>
+            <span class="n">xlist</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+            <span class="k">if</span> <span class="p">(</span><span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">original_datatype</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="ow">not</span> <span class="n">no_init</span><span class="p">)</span> <span class="ow">and</span> <span class="n">xlist</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">set_original_datatype</span><span class="p">(</span><span class="n">encode_type</span><span class="p">(</span><span class="n">xlist</span><span class="p">[</span><span class="mi">0</span><span class="p">]))</span>
+            <span class="n">out</span> <span class="o">=</span> <span class="nb">iter</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">evaluate_transform</span><span class="p">(</span><span class="n">xx</span><span class="p">,</span> <span class="n">no_copy</span><span class="o">=</span><span class="n">no_copy</span><span class="p">)</span>
+                        <span class="k">for</span> <span class="n">xx</span> <span class="ow">in</span> <span class="n">xlist</span><span class="p">])</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">if</span> <span class="p">(</span><span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">original_datatype</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="ow">not</span> <span class="n">no_init</span><span class="p">):</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">set_original_datatype</span><span class="p">(</span><span class="n">encode_type</span><span class="p">(</span><span class="n">x</span><span class="p">))</span>
+            <span class="n">out</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">evaluate_transform</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">no_copy</span><span class="o">=</span><span class="n">no_copy</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">out</span></div>
 
 <div class="viewcode-block" id="TransformBase.get_testing_options"><a class="viewcode-back" href="../../../../yggdrasil.communication.transforms.html#yggdrasil.communication.transforms.TransformBase.TransformBase.get_testing_options">[docs]</a>    <span class="nd">@classmethod</span>

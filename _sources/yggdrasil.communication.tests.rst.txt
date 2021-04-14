@@ -20,14 +20,6 @@ yggdrasil.communication.tests.test\_AsciiTableComm module
    :undoc-members:
    :show-inheritance:
 
-yggdrasil.communication.tests.test\_AsyncComm module
-----------------------------------------------------
-
-.. automodule:: yggdrasil.communication.tests.test_AsyncComm
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
 yggdrasil.communication.tests.test\_BufferComm module
 -----------------------------------------------------
 
@@ -96,6 +88,14 @@ yggdrasil.communication.tests.test\_ServerComm module
 -----------------------------------------------------
 
 .. automodule:: yggdrasil.communication.tests.test_ServerComm
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+yggdrasil.communication.tests.test\_ValueComm module
+----------------------------------------------------
+
+.. automodule:: yggdrasil.communication.tests.test_ValueComm
    :members:
    :undoc-members:
    :show-inheritance:

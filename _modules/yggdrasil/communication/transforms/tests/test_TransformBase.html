@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>yggdrasil.communication.transforms.tests.test_TransformBase &mdash; yggdrasil v1.5.0 documentation</title>
+  <title>yggdrasil.communication.transforms.tests.test_TransformBase &mdash; yggdrasil v1.6.0 documentation</title>
   
 
   
@@ -62,7 +62,7 @@
             
             
               <div class="version">
-                v1.5.0
+                v1.6.0
               </div>
             
           
@@ -104,6 +104,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../../../units.html">Units</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../../c_format_strings.html">C-Style Format Strings</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../../debugging.html">Debugging</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../threading.html">OpenMP Threading in Models</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../../examples/examples_toc.html">Examples</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../../advanced/index.html">Advanced</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../../development/index.html">Development</a></li>
@@ -179,7 +180,11 @@
             
   <h1>Source code for yggdrasil.communication.transforms.tests.test_TransformBase</h1><div class="highlight"><pre>
 <span></span><span class="kn">import</span> <span class="nn">pprint</span>
+<span class="kn">import</span> <span class="nn">collections</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">copy</span>
 <span class="kn">from</span> <span class="nn">yggdrasil.tests</span> <span class="kn">import</span> <span class="n">YggTestClass</span>
+<span class="kn">from</span> <span class="nn">yggdrasil.communication</span> <span class="kn">import</span> <span class="n">new_comm</span>
 
 
 <div class="viewcode-block" id="TestTransformBase"><a class="viewcode-back" href="../../../../../yggdrasil.communication.transforms.tests.html#yggdrasil.communication.transforms.tests.test_TransformBase.TestTransformBase">[docs]</a><span class="k">class</span> <span class="nc">TestTransformBase</span><span class="p">(</span><span class="n">YggTestClass</span><span class="p">):</span>
@@ -207,23 +212,49 @@
             <span class="n">out</span> <span class="o">=</span> <span class="n">opt</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;kwargs&#39;</span><span class="p">,</span> <span class="p">{})</span>
         <span class="k">return</span> <span class="n">out</span>
 
+<div class="viewcode-block" id="TestTransformBase.assert_equal_msg"><a class="viewcode-back" href="../../../../../yggdrasil.communication.transforms.tests.html#yggdrasil.communication.transforms.tests.test_TransformBase.TestTransformBase.assert_equal_msg">[docs]</a>    <span class="k">def</span> <span class="nf">assert_equal_msg</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Assert that two message are the same.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            a (object): Message for comarison.</span>
+<span class="sd">            b (object): Expected message.</span>
+<span class="sd">            original (object, None): Original message.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">if</span> <span class="p">((</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">collections</span><span class="o">.</span><span class="n">abc</span><span class="o">.</span><span class="n">Iterator</span><span class="p">)</span>
+                 <span class="ow">and</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">b</span><span class="p">,</span> <span class="n">collections</span><span class="o">.</span><span class="n">abc</span><span class="o">.</span><span class="n">Iterator</span><span class="p">))):</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">assert_equal</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">a</span><span class="p">)),</span> <span class="nb">list</span><span class="p">(</span><span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">b</span><span class="p">)))</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">assert_equal</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">BaseException</span><span class="p">:</span>  <span class="c1"># pragma: debug</span>
+            <span class="n">labels</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;expected&#39;</span><span class="p">,</span> <span class="s1">&#39;out&#39;</span><span class="p">]</span>
+            <span class="n">values</span> <span class="o">=</span> <span class="p">[</span><span class="n">b</span><span class="p">,</span> <span class="n">a</span><span class="p">]</span>
+            <span class="k">if</span> <span class="s1">&#39;original&#39;</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="p">:</span>
+                <span class="n">labels</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="s1">&#39;in&#39;</span><span class="p">)</span>
+                <span class="n">values</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;original&#39;</span><span class="p">])</span>
+            <span class="k">for</span> <span class="n">t</span><span class="p">,</span> <span class="n">x</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">labels</span><span class="p">,</span> <span class="n">values</span><span class="p">):</span>
+                <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">%s</span><span class="s1">:&#39;</span> <span class="o">%</span> <span class="n">t</span><span class="p">)</span>
+                <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">collections</span><span class="o">.</span><span class="n">abc</span><span class="o">.</span><span class="n">Iterator</span><span class="p">):</span>
+                    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;iter(</span><span class="si">%s</span><span class="s1">)&#39;</span> <span class="o">%</span> <span class="n">pprint</span><span class="o">.</span><span class="n">pformat</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">x</span><span class="p">)))</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">pprint</span><span class="o">.</span><span class="n">pprint</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+            <span class="k">raise</span></div>
+
 <div class="viewcode-block" id="TestTransformBase.test_transform"><a class="viewcode-back" href="../../../../../yggdrasil.communication.transforms.tests.html#yggdrasil.communication.transforms.tests.test_TransformBase.TestTransformBase.test_transform">[docs]</a>    <span class="k">def</span> <span class="nf">test_transform</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test transform.&quot;&quot;&quot;</span>
         <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_options</span><span class="p">():</span>
             <span class="n">inst</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">import_cls</span><span class="p">(</span><span class="o">**</span><span class="n">x</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;kwargs&#39;</span><span class="p">,</span> <span class="p">{}))</span>
             <span class="k">for</span> <span class="n">msg_in</span><span class="p">,</span> <span class="n">msg_exp</span> <span class="ow">in</span> <span class="n">x</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;in/out&#39;</span><span class="p">,</span> <span class="p">[]):</span>
+                <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">msg_in</span><span class="p">,</span> <span class="n">collections</span><span class="o">.</span><span class="n">abc</span><span class="o">.</span><span class="n">Iterator</span><span class="p">):</span>
+                    <span class="n">msg_in0</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">msg_in</span><span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">msg_in0</span> <span class="o">=</span> <span class="n">msg_in</span>
                 <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">msg_exp</span><span class="p">,</span> <span class="nb">type</span><span class="p">(</span><span class="ne">BaseException</span><span class="p">)):</span>
                     <span class="bp">self</span><span class="o">.</span><span class="n">assert_raises</span><span class="p">(</span><span class="n">msg_exp</span><span class="p">,</span> <span class="n">inst</span><span class="p">,</span> <span class="n">msg_in</span><span class="p">)</span>
                 <span class="k">else</span><span class="p">:</span>
                     <span class="n">msg_out</span> <span class="o">=</span> <span class="n">inst</span><span class="p">(</span><span class="n">msg_in</span><span class="p">)</span>
-                    <span class="k">try</span><span class="p">:</span>
-                        <span class="bp">self</span><span class="o">.</span><span class="n">assert_equal</span><span class="p">(</span><span class="n">msg_out</span><span class="p">,</span> <span class="n">msg_exp</span><span class="p">)</span>
-                    <span class="k">except</span> <span class="ne">BaseException</span><span class="p">:</span>  <span class="c1"># pragma: debug</span>
-                        <span class="k">for</span> <span class="n">t</span><span class="p">,</span> <span class="n">x</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">([</span><span class="s1">&#39;in&#39;</span><span class="p">,</span> <span class="s1">&#39;expected&#39;</span><span class="p">,</span> <span class="s1">&#39;out&#39;</span><span class="p">],</span>
-                                        <span class="p">[</span><span class="n">msg_in</span><span class="p">,</span> <span class="n">msg_exp</span><span class="p">,</span> <span class="n">msg_out</span><span class="p">]):</span>
-                            <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">%s</span><span class="s1">:&#39;</span> <span class="o">%</span> <span class="n">t</span><span class="p">)</span>
-                            <span class="n">pprint</span><span class="o">.</span><span class="n">pprint</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
-                        <span class="k">raise</span></div>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">assert_equal_msg</span><span class="p">(</span><span class="n">msg_out</span><span class="p">,</span> <span class="n">msg_exp</span><span class="p">,</span> <span class="n">original</span><span class="o">=</span><span class="n">msg_in0</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="TestTransformBase.test_transform_type"><a class="viewcode-back" href="../../../../../yggdrasil.communication.transforms.tests.html#yggdrasil.communication.transforms.tests.test_TransformBase.TestTransformBase.test_transform_type">[docs]</a>    <span class="k">def</span> <span class="nf">test_transform_type</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test transform_type.&quot;&quot;&quot;</span>
@@ -236,18 +267,97 @@
                 <span class="k">else</span><span class="p">:</span>
                     <span class="n">inst</span><span class="o">.</span><span class="n">validate_datatype</span><span class="p">(</span><span class="n">typ_in</span><span class="p">)</span>
                     <span class="n">typ_out</span> <span class="o">=</span> <span class="n">inst</span><span class="o">.</span><span class="n">transform_datatype</span><span class="p">(</span><span class="n">typ_in</span><span class="p">)</span>
-                    <span class="k">try</span><span class="p">:</span>
-                        <span class="bp">self</span><span class="o">.</span><span class="n">assert_equal</span><span class="p">(</span><span class="n">typ_out</span><span class="p">,</span> <span class="n">typ_exp</span><span class="p">)</span>
-                    <span class="k">except</span> <span class="ne">BaseException</span><span class="p">:</span>  <span class="c1"># pragma: debug</span>
-                        <span class="k">for</span> <span class="n">t</span><span class="p">,</span> <span class="n">x</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">([</span><span class="s1">&#39;in&#39;</span><span class="p">,</span> <span class="s1">&#39;expected&#39;</span><span class="p">,</span> <span class="s1">&#39;out&#39;</span><span class="p">],</span>
-                                        <span class="p">[</span><span class="n">typ_in</span><span class="p">,</span> <span class="n">typ_exp</span><span class="p">,</span> <span class="n">typ_out</span><span class="p">]):</span>
-                            <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">%s</span><span class="s1">:&#39;</span> <span class="o">%</span> <span class="n">t</span><span class="p">)</span>
-                            <span class="n">pprint</span><span class="o">.</span><span class="n">pprint</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
-                        <span class="k">raise</span></div>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">assert_equal_msg</span><span class="p">(</span><span class="n">typ_out</span><span class="p">,</span> <span class="n">typ_exp</span><span class="p">,</span> <span class="n">original</span><span class="o">=</span><span class="n">typ_in</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="TestTransformBase.test_transform_empty"><a class="viewcode-back" href="../../../../../yggdrasil.communication.transforms.tests.html#yggdrasil.communication.transforms.tests.test_TransformBase.TestTransformBase.test_transform_empty">[docs]</a>    <span class="k">def</span> <span class="nf">test_transform_empty</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test transform of empty bytes message.&quot;&quot;&quot;</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">assert_equal</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="p">(</span><span class="sa">b</span><span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="n">no_init</span><span class="o">=</span><span class="kc">True</span><span class="p">),</span> <span class="sa">b</span><span class="s1">&#39;&#39;</span><span class="p">)</span></div></div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assert_equal</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="p">(</span><span class="sa">b</span><span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="n">no_init</span><span class="o">=</span><span class="kc">True</span><span class="p">),</span> <span class="sa">b</span><span class="s1">&#39;&#39;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="TestTransformBase.test_send_comm"><a class="viewcode-back" href="../../../../../yggdrasil.communication.transforms.tests.html#yggdrasil.communication.transforms.tests.test_TransformBase.TestTransformBase.test_send_comm">[docs]</a>    <span class="k">def</span> <span class="nf">test_send_comm</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test transform within send comm.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">transform</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;pandas&#39;</span><span class="p">,</span> <span class="s1">&#39;PandasTransform&#39;</span><span class="p">,</span>
+                              <span class="s1">&#39;array&#39;</span><span class="p">,</span> <span class="s1">&#39;ArrayTransform&#39;</span><span class="p">]:</span>
+            <span class="c1"># These transformation are negated on send</span>
+            <span class="k">return</span>
+        <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_options</span><span class="p">():</span>
+            <span class="k">if</span> <span class="p">(((</span><span class="ow">not</span> <span class="n">x</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;in/out&#39;</span><span class="p">,</span> <span class="kc">False</span><span class="p">))</span>
+                 <span class="ow">or</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">x</span><span class="p">[</span><span class="s1">&#39;in/out&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">][</span><span class="mi">1</span><span class="p">],</span>
+                               <span class="nb">type</span><span class="p">(</span><span class="ne">BaseException</span><span class="p">)))):</span>  <span class="c1"># pragma: debug</span>
+                <span class="k">continue</span>
+            <span class="n">msg_in</span><span class="p">,</span> <span class="n">msg_out</span> <span class="o">=</span> <span class="n">x</span><span class="p">[</span><span class="s1">&#39;in/out&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+            <span class="n">send_comm</span> <span class="o">=</span> <span class="n">new_comm</span><span class="p">(</span><span class="s1">&#39;test_send&#39;</span><span class="p">,</span> <span class="n">reverse_names</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                                 <span class="n">direction</span><span class="o">=</span><span class="s1">&#39;send&#39;</span><span class="p">,</span> <span class="n">use_async</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                                 <span class="n">transform</span><span class="o">=</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">import_cls</span><span class="p">(</span><span class="o">**</span><span class="n">x</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;kwargs&#39;</span><span class="p">,</span> <span class="p">{}))])</span>
+            <span class="n">recv_comm</span> <span class="o">=</span> <span class="n">new_comm</span><span class="p">(</span><span class="s1">&#39;test_recv&#39;</span><span class="p">,</span> <span class="o">**</span><span class="n">send_comm</span><span class="o">.</span><span class="n">opp_comm_kwargs</span><span class="p">())</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">msg_in</span><span class="p">,</span> <span class="n">collections</span><span class="o">.</span><span class="n">abc</span><span class="o">.</span><span class="n">Iterator</span><span class="p">):</span>
+                <span class="n">msg_out_list</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">msg_out</span><span class="p">)</span>
+                <span class="n">msg_out</span> <span class="o">=</span> <span class="nb">iter</span><span class="p">(</span><span class="n">msg_out_list</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">msg_out_list</span> <span class="o">=</span> <span class="p">[</span><span class="n">msg_out</span><span class="p">]</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="k">for</span> <span class="n">imsg_out</span> <span class="ow">in</span> <span class="n">msg_out_list</span><span class="p">:</span>
+                    <span class="n">flag</span> <span class="o">=</span> <span class="n">send_comm</span><span class="o">.</span><span class="n">send</span><span class="p">(</span><span class="n">msg_in</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">timeout</span><span class="p">)</span>
+                    <span class="k">assert</span><span class="p">(</span><span class="n">flag</span><span class="p">)</span>
+                    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">transform</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;iterate&#39;</span><span class="p">,</span> <span class="s1">&#39;IterateTransform&#39;</span><span class="p">]:</span>
+                        <span class="k">for</span> <span class="n">iimsg_out</span> <span class="ow">in</span> <span class="n">imsg_out</span><span class="p">:</span>
+                            <span class="n">flag</span><span class="p">,</span> <span class="n">msg_recv</span> <span class="o">=</span> <span class="n">recv_comm</span><span class="o">.</span><span class="n">recv</span><span class="p">(</span><span class="n">timeout</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">timeout</span><span class="p">)</span>
+                            <span class="k">assert</span><span class="p">(</span><span class="n">flag</span><span class="p">)</span>
+                            <span class="bp">self</span><span class="o">.</span><span class="n">assert_equal_msg</span><span class="p">(</span><span class="n">msg_recv</span><span class="p">,</span> <span class="n">iimsg_out</span><span class="p">,</span>
+                                                  <span class="n">original</span><span class="o">=</span><span class="n">msg_in</span><span class="p">)</span>
+                        <span class="n">msg_recv</span> <span class="o">=</span> <span class="n">imsg_out</span>
+                    <span class="k">elif</span> <span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">transform</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;filter&#39;</span><span class="p">,</span> <span class="s1">&#39;FilterTransform&#39;</span><span class="p">])</span>
+                          <span class="ow">and</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">imsg_out</span><span class="p">,</span> <span class="n">collections</span><span class="o">.</span><span class="n">abc</span><span class="o">.</span><span class="n">Iterator</span><span class="p">)):</span>
+                        <span class="k">assert</span><span class="p">(</span><span class="n">recv_comm</span><span class="o">.</span><span class="n">n_msg_recv</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span>
+                        <span class="n">flag</span><span class="p">,</span> <span class="n">msg_recv</span> <span class="o">=</span> <span class="n">recv_comm</span><span class="o">.</span><span class="n">recv</span><span class="p">(</span><span class="n">timeout</span><span class="o">=</span><span class="mf">0.0</span><span class="p">)</span>
+                        <span class="k">assert</span><span class="p">(</span><span class="n">flag</span><span class="p">)</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">assert_equal_msg</span><span class="p">(</span><span class="n">msg_recv</span><span class="p">,</span> <span class="sa">b</span><span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="n">original</span><span class="o">=</span><span class="n">msg_in</span><span class="p">)</span>
+                        <span class="n">msg_recv</span> <span class="o">=</span> <span class="n">imsg_out</span>
+                    <span class="k">elif</span> <span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">transform</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;map&#39;</span><span class="p">,</span> <span class="s1">&#39;MapFieldsTransform&#39;</span><span class="p">,</span>
+                                              <span class="s1">&#39;select_fields&#39;</span><span class="p">,</span> <span class="s1">&#39;SelectFieldsTransform&#39;</span><span class="p">])</span>
+                          <span class="ow">and</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">imsg_out</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)):</span>
+                        <span class="n">flag</span><span class="p">,</span> <span class="n">msg_recv</span> <span class="o">=</span> <span class="n">recv_comm</span><span class="o">.</span><span class="n">recv_array</span><span class="p">(</span><span class="n">timeout</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">timeout</span><span class="p">)</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="n">flag</span><span class="p">,</span> <span class="n">msg_recv</span> <span class="o">=</span> <span class="n">recv_comm</span><span class="o">.</span><span class="n">recv</span><span class="p">(</span><span class="n">timeout</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">timeout</span><span class="p">)</span>
+                    <span class="k">assert</span><span class="p">(</span><span class="n">flag</span><span class="p">)</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">assert_equal_msg</span><span class="p">(</span><span class="n">msg_recv</span><span class="p">,</span> <span class="n">imsg_out</span><span class="p">,</span>
+                                          <span class="n">original</span><span class="o">=</span><span class="n">msg_in</span><span class="p">)</span>
+            <span class="k">finally</span><span class="p">:</span>
+                <span class="n">send_comm</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+                <span class="n">recv_comm</span><span class="o">.</span><span class="n">close</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="TestTransformBase.test_recv_comm"><a class="viewcode-back" href="../../../../../yggdrasil.communication.transforms.tests.html#yggdrasil.communication.transforms.tests.test_TransformBase.TestTransformBase.test_recv_comm">[docs]</a>    <span class="k">def</span> <span class="nf">test_recv_comm</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test transform within recv comm.&quot;&quot;&quot;</span>
+        <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_options</span><span class="p">():</span>
+            <span class="k">if</span> <span class="p">(((</span><span class="ow">not</span> <span class="n">x</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;in/out&#39;</span><span class="p">,</span> <span class="kc">False</span><span class="p">))</span>
+                 <span class="ow">or</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">x</span><span class="p">[</span><span class="s1">&#39;in/out&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">][</span><span class="mi">1</span><span class="p">],</span>
+                               <span class="nb">type</span><span class="p">(</span><span class="ne">BaseException</span><span class="p">)))):</span>  <span class="c1"># pragma: debug</span>
+                <span class="k">continue</span>
+            <span class="n">msg_in</span><span class="p">,</span> <span class="n">msg_out</span> <span class="o">=</span> <span class="n">x</span><span class="p">[</span><span class="s1">&#39;in/out&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+            <span class="n">send_comm</span> <span class="o">=</span> <span class="n">new_comm</span><span class="p">(</span><span class="s1">&#39;test_send&#39;</span><span class="p">,</span> <span class="n">reverse_names</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                                 <span class="n">direction</span><span class="o">=</span><span class="s1">&#39;send&#39;</span><span class="p">,</span> <span class="n">use_async</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+            <span class="n">recv_comm</span> <span class="o">=</span> <span class="n">new_comm</span><span class="p">(</span><span class="s1">&#39;test_recv&#39;</span><span class="p">,</span>
+                                 <span class="n">transform</span><span class="o">=</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">import_cls</span><span class="p">(</span><span class="o">**</span><span class="n">x</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;kwargs&#39;</span><span class="p">,</span> <span class="p">{}))],</span>
+                                 <span class="o">**</span><span class="n">send_comm</span><span class="o">.</span><span class="n">opp_comm_kwargs</span><span class="p">())</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">msg_in</span><span class="p">,</span> <span class="n">collections</span><span class="o">.</span><span class="n">abc</span><span class="o">.</span><span class="n">Iterator</span><span class="p">):</span>
+                <span class="n">msg_out_list</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">msg_out</span><span class="p">)</span>
+                <span class="n">msg_out</span> <span class="o">=</span> <span class="nb">iter</span><span class="p">(</span><span class="n">msg_out_list</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">msg_out_list</span> <span class="o">=</span> <span class="p">[</span><span class="n">msg_out</span><span class="p">]</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">flag</span> <span class="o">=</span> <span class="n">send_comm</span><span class="o">.</span><span class="n">send</span><span class="p">(</span><span class="n">msg_in</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">timeout</span><span class="p">)</span>
+                <span class="k">assert</span><span class="p">(</span><span class="n">flag</span><span class="p">)</span>
+                <span class="k">for</span> <span class="n">imsg_out</span> <span class="ow">in</span> <span class="n">msg_out_list</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="p">(((</span><span class="bp">self</span><span class="o">.</span><span class="n">transform</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;map&#39;</span><span class="p">,</span> <span class="s1">&#39;MapFieldsTransform&#39;</span><span class="p">,</span>
+                                             <span class="s1">&#39;select_fields&#39;</span><span class="p">,</span> <span class="s1">&#39;SelectFieldsTransform&#39;</span><span class="p">])</span>
+                         <span class="ow">and</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">imsg_out</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">))):</span>
+                        <span class="n">flag</span><span class="p">,</span> <span class="n">msg_recv</span> <span class="o">=</span> <span class="n">recv_comm</span><span class="o">.</span><span class="n">recv_array</span><span class="p">(</span><span class="n">timeout</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">timeout</span><span class="p">)</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="n">flag</span><span class="p">,</span> <span class="n">msg_recv</span> <span class="o">=</span> <span class="n">recv_comm</span><span class="o">.</span><span class="n">recv</span><span class="p">(</span><span class="n">timeout</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">timeout</span><span class="p">)</span>
+                    <span class="k">assert</span><span class="p">(</span><span class="n">flag</span><span class="p">)</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">assert_equal_msg</span><span class="p">(</span><span class="n">msg_recv</span><span class="p">,</span> <span class="n">imsg_out</span><span class="p">,</span> <span class="n">original</span><span class="o">=</span><span class="n">msg_in</span><span class="p">)</span>
+            <span class="k">finally</span><span class="p">:</span>
+                <span class="n">send_comm</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+                <span class="n">recv_comm</span><span class="o">.</span><span class="n">close</span><span class="p">()</span></div></div>
 </pre></div>
 
            </div>

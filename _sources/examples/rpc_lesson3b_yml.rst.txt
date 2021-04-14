@@ -1,0 +1,12 @@
+Model YAML:
+
+.. literalinclude:: /../../../../../../../opt/hostedtoolcache/Python/3.8.9/x64/lib/python3.8/site-packages/yggdrasil/examples/rpc_lesson3b/server_python.yml
+   :language: yaml
+   :linenos:
+
+.. literalinclude:: /../../../../../../../opt/hostedtoolcache/Python/3.8.9/x64/lib/python3.8/site-packages/yggdrasil/examples/rpc_lesson3b/client_c.yml
+   :language: yaml
+   :linenos:
+
+
+(`Example in other languages <examples/rpc_lesson3b.html>`__)

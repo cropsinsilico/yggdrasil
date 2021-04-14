@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>yggdrasil.drivers.tests.test_CompiledModelDriver &mdash; yggdrasil v1.5.0 documentation</title>
+  <title>yggdrasil.drivers.tests.test_CompiledModelDriver &mdash; yggdrasil v1.6.0 documentation</title>
   
 
   
@@ -62,7 +62,7 @@
             
             
               <div class="version">
-                v1.5.0
+                v1.6.0
               </div>
             
           
@@ -104,6 +104,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../../units.html">Units</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../c_format_strings.html">C-Style Format Strings</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../debugging.html">Debugging</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../threading.html">OpenMP Threading in Models</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../examples/examples_toc.html">Examples</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../advanced/index.html">Advanced</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../development/index.html">Development</a></li>
@@ -162,8 +163,6 @@
         
           <li><a href="../../drivers.html">yggdrasil.drivers</a> &raquo;</li>
         
-          <li><a href="../tests.html">yggdrasil.drivers.tests</a> &raquo;</li>
-        
       <li>yggdrasil.drivers.tests.test_CompiledModelDriver</li>
     
     
@@ -181,11 +180,21 @@
             
   <h1>Source code for yggdrasil.drivers.tests.test_CompiledModelDriver</h1><div class="highlight"><pre>
 <span></span><span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">shutil</span>
+<span class="kn">from</span> <span class="nn">yggdrasil</span> <span class="kn">import</span> <span class="n">platform</span>
 <span class="kn">from</span> <span class="nn">yggdrasil.config</span> <span class="kn">import</span> <span class="n">ygg_cfg</span>
 <span class="kn">from</span> <span class="nn">yggdrasil.tests</span> <span class="kn">import</span> <span class="n">assert_equal</span><span class="p">,</span> <span class="n">assert_raises</span><span class="p">,</span> <span class="n">YggTestClass</span>
 <span class="kn">from</span> <span class="nn">yggdrasil.drivers</span> <span class="kn">import</span> <span class="n">CompiledModelDriver</span>
 <span class="kn">import</span> <span class="nn">yggdrasil.drivers.tests.test_ModelDriver</span> <span class="k">as</span> <span class="nn">parent</span>
 <span class="kn">from</span> <span class="nn">yggdrasil.components</span> <span class="kn">import</span> <span class="n">import_component</span>
+
+
+<div class="viewcode-block" id="test_get_compatible_tool"><a class="viewcode-back" href="../../../../yggdrasil.drivers.tests.html#yggdrasil.drivers.tests.test_CompiledModelDriver.test_get_compatible_tool">[docs]</a><span class="k">def</span> <span class="nf">test_get_compatible_tool</span><span class="p">():</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test get_compatible_tool when default provided.&quot;&quot;&quot;</span>
+    <span class="n">assert_raises</span><span class="p">(</span><span class="ne">ValueError</span><span class="p">,</span> <span class="n">CompiledModelDriver</span><span class="o">.</span><span class="n">get_compatible_tool</span><span class="p">,</span>
+                  <span class="s1">&#39;invalid&#39;</span><span class="p">,</span> <span class="s1">&#39;compiler&#39;</span><span class="p">,</span> <span class="s1">&#39;c&#39;</span><span class="p">)</span>
+    <span class="n">assert_equal</span><span class="p">(</span><span class="n">CompiledModelDriver</span><span class="o">.</span><span class="n">get_compatible_tool</span><span class="p">(</span>
+        <span class="s1">&#39;invalid&#39;</span><span class="p">,</span> <span class="s1">&#39;compiler&#39;</span><span class="p">,</span> <span class="s1">&#39;c&#39;</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">),</span> <span class="kc">None</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="test_get_compilation_tool_registry"><a class="viewcode-back" href="../../../../yggdrasil.drivers.tests.html#yggdrasil.drivers.tests.test_CompiledModelDriver.test_get_compilation_tool_registry">[docs]</a><span class="k">def</span> <span class="nf">test_get_compilation_tool_registry</span><span class="p">():</span>
@@ -216,7 +225,9 @@
         <span class="n">toolname</span> <span class="o">=</span> <span class="n">out</span><span class="o">.</span><span class="n">toolname</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
         <span class="n">toolpath</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="s1">&#39;somedir&#39;</span><span class="p">,</span> <span class="n">toolname</span><span class="p">)</span>
         <span class="n">toolfile</span> <span class="o">=</span> <span class="n">toolpath</span> <span class="o">+</span> <span class="s1">&#39;.exe&#39;</span>
-        <span class="n">vals</span> <span class="o">=</span> <span class="p">[</span><span class="n">toolname</span><span class="o">.</span><span class="n">upper</span><span class="p">(),</span> <span class="n">toolpath</span><span class="p">,</span> <span class="n">toolfile</span><span class="p">,</span> <span class="n">toolfile</span><span class="o">.</span><span class="n">upper</span><span class="p">()]</span>
+        <span class="n">vals</span> <span class="o">=</span> <span class="p">[</span><span class="n">toolpath</span><span class="p">,</span> <span class="n">toolfile</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">platform</span><span class="o">.</span><span class="n">_is_win</span><span class="p">:</span>
+            <span class="n">vals</span> <span class="o">+=</span> <span class="p">[</span><span class="n">toolname</span><span class="o">.</span><span class="n">upper</span><span class="p">(),</span> <span class="n">toolfile</span><span class="o">.</span><span class="n">upper</span><span class="p">()]</span>
         <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">vals</span><span class="p">:</span>
             <span class="n">assert_equal</span><span class="p">(</span><span class="n">CompiledModelDriver</span><span class="o">.</span><span class="n">get_compilation_tool</span><span class="p">(</span><span class="n">tooltype</span><span class="p">,</span> <span class="n">v</span><span class="p">),</span> <span class="n">out</span><span class="p">)</span>
         <span class="n">assert_raises</span><span class="p">(</span><span class="ne">ValueError</span><span class="p">,</span> <span class="n">CompiledModelDriver</span><span class="o">.</span><span class="n">get_compilation_tool</span><span class="p">,</span>
@@ -238,14 +249,15 @@
 <div class="viewcode-block" id="DummyCompiler"><a class="viewcode-back" href="../../../../yggdrasil.drivers.tests.html#yggdrasil.drivers.tests.test_CompiledModelDriver.DummyCompiler">[docs]</a><span class="k">class</span> <span class="nc">DummyCompiler</span><span class="p">(</span><span class="n">CompiledModelDriver</span><span class="o">.</span><span class="n">CompilerBase</span><span class="p">):</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Dummy test class.&quot;&quot;&quot;</span>
     <span class="n">_dont_register</span> <span class="o">=</span> <span class="kc">True</span>
-    <span class="n">toolname</span> <span class="o">=</span> <span class="s1">&#39;dummy&#39;</span>
+    <span class="n">toolname</span> <span class="o">=</span> <span class="s1">&#39;dummy12345&#39;</span>
     <span class="n">languages</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;dummy&#39;</span><span class="p">]</span>
     <span class="n">search_path_envvar</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;PATH&#39;</span><span class="p">]</span>
     <span class="n">_language_ext</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;.c&#39;</span><span class="p">]</span>
     <span class="n">default_linker</span> <span class="o">=</span> <span class="kc">False</span>
     <span class="n">default_archiver</span> <span class="o">=</span> <span class="kc">None</span>
     <span class="n">combine_with_linker</span> <span class="o">=</span> <span class="kc">True</span>
-    <span class="n">compile_only_flag</span> <span class="o">=</span> <span class="kc">None</span></div>
+    <span class="n">compile_only_flag</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">linker_attributes</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;_dont_register&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">}</span></div>
 
 
 <div class="viewcode-block" id="TestCompilationTool"><a class="viewcode-back" href="../../../../yggdrasil.drivers.tests.html#yggdrasil.drivers.tests.test_CompiledModelDriver.TestCompilationTool">[docs]</a><span class="k">class</span> <span class="nc">TestCompilationTool</span><span class="p">(</span><span class="n">YggTestClass</span><span class="p">):</span>
@@ -315,8 +327,11 @@
 
 <div class="viewcode-block" id="TestDummyCompiler.test_call"><a class="viewcode-back" href="../../../../yggdrasil.drivers.tests.html#yggdrasil.drivers.tests.test_CompiledModelDriver.TestDummyCompiler.test_call">[docs]</a>    <span class="k">def</span> <span class="nf">test_call</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test call.&quot;&quot;&quot;</span>
+        <span class="n">out</span> <span class="o">=</span> <span class="s1">&#39;test123&#39;</span>
+        <span class="k">assert</span><span class="p">(</span><span class="ow">not</span> <span class="n">shutil</span><span class="o">.</span><span class="n">which</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">import_cls</span><span class="o">.</span><span class="n">toolname</span><span class="p">))</span>
+        <span class="k">assert</span><span class="p">(</span><span class="ow">not</span> <span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">out</span><span class="p">)</span> <span class="ow">or</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isdir</span><span class="p">(</span><span class="n">out</span><span class="p">)))</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">assert_raises</span><span class="p">(</span><span class="ne">RuntimeError</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">import_cls</span><span class="o">.</span><span class="n">call</span><span class="p">,</span> <span class="s1">&#39;args&#39;</span><span class="p">,</span>
-                           <span class="n">out</span><span class="o">=</span><span class="s1">&#39;test&#39;</span><span class="p">,</span> <span class="n">dont_link</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span></div>
+                           <span class="n">out</span><span class="o">=</span><span class="n">out</span><span class="p">,</span> <span class="n">dont_link</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="TestDummyCompiler.test_linker"><a class="viewcode-back" href="../../../../yggdrasil.drivers.tests.html#yggdrasil.drivers.tests.test_CompiledModelDriver.TestDummyCompiler.test_linker">[docs]</a>    <span class="k">def</span> <span class="nf">test_linker</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test linker.&quot;&quot;&quot;</span>
@@ -329,7 +344,8 @@
 <div class="viewcode-block" id="TestDummyCompiler.test_get_flags"><a class="viewcode-back" href="../../../../yggdrasil.drivers.tests.html#yggdrasil.drivers.tests.test_CompiledModelDriver.TestDummyCompiler.test_get_flags">[docs]</a>    <span class="k">def</span> <span class="nf">test_get_flags</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test get_flags.&quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">assert_equal</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">import_cls</span><span class="o">.</span><span class="n">get_flags</span><span class="p">(</span><span class="n">flags</span><span class="o">=</span><span class="s1">&#39;hello&#39;</span><span class="p">,</span>
-                                                    <span class="n">libtype</span><span class="o">=</span><span class="s1">&#39;object&#39;</span><span class="p">),</span> <span class="p">[</span><span class="s1">&#39;hello&#39;</span><span class="p">])</span></div>
+                                                    <span class="n">libtype</span><span class="o">=</span><span class="s1">&#39;object&#39;</span><span class="p">),</span>
+                          <span class="p">[</span><span class="s1">&#39;hello&#39;</span><span class="p">,</span> <span class="s1">&#39;-DWITH_YGGDRASIL&#39;</span><span class="p">])</span></div>
         
 <div class="viewcode-block" id="TestDummyCompiler.test_get_executable_command"><a class="viewcode-back" href="../../../../yggdrasil.drivers.tests.html#yggdrasil.drivers.tests.test_CompiledModelDriver.TestDummyCompiler.test_get_executable_command">[docs]</a>    <span class="k">def</span> <span class="nf">test_get_executable_command</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test get_executable_command.&quot;&quot;&quot;</span>
@@ -343,6 +359,7 @@
     
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">TestCompiledModelParam</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_inst_kwargs</span><span class="p">[</span><span class="s1">&#39;skip_compile&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">skip_init</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">skip_start</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">attr_list</span> <span class="o">+=</span> <span class="p">[</span><span class="s1">&#39;source_files&#39;</span><span class="p">]</span>
         <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;compiler&#39;</span><span class="p">,</span> <span class="s1">&#39;linker&#39;</span><span class="p">,</span> <span class="s1">&#39;archiver&#39;</span><span class="p">]:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">attr_list</span> <span class="o">+=</span> <span class="p">[</span><span class="n">k</span><span class="p">,</span> <span class="s1">&#39;</span><span class="si">%s</span><span class="s1">_flags&#39;</span> <span class="o">%</span> <span class="n">k</span><span class="p">,</span> <span class="s1">&#39;</span><span class="si">%s</span><span class="s1">_tool&#39;</span> <span class="o">%</span> <span class="n">k</span><span class="p">]</span>
@@ -356,8 +373,17 @@
                                     <span class="n">parent</span><span class="o">.</span><span class="n">TestModelDriverNoInit</span><span class="p">):</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test runner for CompiledModelDriver without creating an instance.&quot;&quot;&quot;</span>
     
+<div class="viewcode-block" id="TestCompiledModelDriverNoInit.run_model_instance"><a class="viewcode-back" href="../../../../yggdrasil.drivers.tests.html#yggdrasil.drivers.tests.test_CompiledModelDriver.TestCompiledModelDriverNoInit.run_model_instance">[docs]</a>    <span class="k">def</span> <span class="nf">run_model_instance</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Create a driver for a model and run it.&quot;&quot;&quot;</span>
+        <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;skip_compile&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="k">return</span> <span class="nb">super</span><span class="p">(</span><span class="n">TestCompiledModelDriverNoInit</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">run_model_instance</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
+        
 <div class="viewcode-block" id="TestCompiledModelDriverNoInit.test_build"><a class="viewcode-back" href="../../../../yggdrasil.drivers.tests.html#yggdrasil.drivers.tests.test_CompiledModelDriver.TestCompiledModelDriverNoInit.test_build">[docs]</a>    <span class="k">def</span> <span class="nf">test_build</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test building libraries as a shared/static library or object files.&quot;&quot;&quot;</span>
+        <span class="c1"># Finish on the default libtype</span>
+        <span class="n">order</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;shared&#39;</span><span class="p">,</span> <span class="s1">&#39;object&#39;</span><span class="p">,</span> <span class="s1">&#39;static&#39;</span><span class="p">]</span>
+        <span class="n">order</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">CompiledModelDriver</span><span class="o">.</span><span class="n">_default_libtype</span><span class="p">)</span>
+        <span class="n">order</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">CompiledModelDriver</span><span class="o">.</span><span class="n">_default_libtype</span><span class="p">)</span>
         <span class="k">for</span> <span class="n">libtype</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;shared&#39;</span><span class="p">,</span> <span class="s1">&#39;object&#39;</span><span class="p">,</span> <span class="s1">&#39;static&#39;</span><span class="p">]:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">import_cls</span><span class="o">.</span><span class="n">compile_dependencies</span><span class="p">(</span>
                 <span class="n">libtype</span><span class="o">=</span><span class="n">libtype</span><span class="p">,</span> <span class="n">overwrite</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
@@ -549,8 +575,8 @@
             <span class="nb">setattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="p">,</span> <span class="n">k</span><span class="p">,</span> <span class="p">[])</span>
         <span class="c1"># Compile with each compiler</span>
         <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">import_cls</span><span class="o">.</span><span class="n">get_available_tools</span><span class="p">(</span><span class="s1">&#39;compiler&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
-            <span class="k">if</span> <span class="p">(</span><span class="ow">not</span> <span class="n">v</span><span class="o">.</span><span class="n">is_installed</span><span class="p">())</span> <span class="ow">or</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="s1">&#39;is_build_tool&#39;</span><span class="p">,</span> <span class="kc">False</span><span class="p">):</span>
-                <span class="k">continue</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">v</span><span class="o">.</span><span class="n">is_installed</span><span class="p">():</span>
+                <span class="k">continue</span>  <span class="c1"># pragma: debug</span>
             <span class="nb">setattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="p">,</span> <span class="s1">&#39;compiler_tool&#39;</span><span class="p">,</span> <span class="n">v</span><span class="p">)</span>
             <span class="nb">setattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="p">,</span> <span class="s1">&#39;linker_tool&#39;</span><span class="p">,</span> <span class="n">v</span><span class="o">.</span><span class="n">linker</span><span class="p">())</span>
             <span class="nb">setattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="p">,</span> <span class="s1">&#39;archiver_tool&#39;</span><span class="p">,</span> <span class="n">v</span><span class="o">.</span><span class="n">archiver</span><span class="p">())</span>
@@ -565,7 +591,15 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">assert_raises</span><span class="p">(</span><span class="ne">RuntimeError</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="o">.</span><span class="n">compile_model</span><span class="p">,</span>
                            <span class="n">out</span><span class="o">=</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">basename</span><span class="p">(</span><span class="n">fname</span><span class="p">),</span>
                            <span class="n">working_dir</span><span class="o">=</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">fname</span><span class="p">),</span>
-                           <span class="n">overwrite</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span></div>
+                           <span class="n">overwrite</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="o">.</span><span class="n">is_build_tool</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="o">.</span><span class="n">compile_model</span><span class="p">(</span><span class="n">out</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="o">.</span><span class="n">model_file</span><span class="p">,</span>
+                                        <span class="n">overwrite</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+            <span class="k">assert</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="o">.</span><span class="n">model_file</span><span class="p">))</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="o">.</span><span class="n">compile_model</span><span class="p">(</span><span class="n">out</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="o">.</span><span class="n">model_file</span><span class="p">,</span>
+                                        <span class="n">overwrite</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+            <span class="k">assert</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="o">.</span><span class="n">model_file</span><span class="p">))</span>
+            <span class="n">os</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="o">.</span><span class="n">model_file</span><span class="p">)</span></div>
         
     <span class="c1"># Done in driver, but driver not started</span>
 <div class="viewcode-block" id="TestCompiledModelDriverNoStart.teardown"><a class="viewcode-back" href="../../../../yggdrasil.drivers.tests.html#yggdrasil.drivers.tests.test_CompiledModelDriver.TestCompiledModelDriverNoStart.teardown">[docs]</a>    <span class="k">def</span> <span class="nf">teardown</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>

@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>yggdrasil.tests &mdash; yggdrasil v1.5.0 documentation</title>
+  <title>yggdrasil.tests &mdash; yggdrasil v1.6.0 documentation</title>
   
 
   
@@ -62,7 +62,7 @@
             
             
               <div class="version">
-                v1.5.0
+                v1.6.0
               </div>
             
           
@@ -104,6 +104,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../../units.html">Units</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../c_format_strings.html">C-Style Format Strings</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../debugging.html">Debugging</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../threading.html">OpenMP Threading in Models</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../examples/examples_toc.html">Examples</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../advanced/index.html">Advanced</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../development/index.html">Development</a></li>
@@ -178,6 +179,7 @@
   <h1>Source code for yggdrasil.tests</h1><div class="highlight"><pre>
 <span></span><span class="sd">&quot;&quot;&quot;Testing things.&quot;&quot;&quot;</span>
 <span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">sys</span>
 <span class="kn">import</span> <span class="nn">shutil</span>
 <span class="kn">import</span> <span class="nn">uuid</span>
 <span class="kn">import</span> <span class="nn">difflib</span>
@@ -193,10 +195,13 @@
 <span class="kn">import</span> <span class="nn">types</span>
 <span class="kn">import</span> <span class="nn">warnings</span>
 <span class="kn">import</span> <span class="nn">json</span>
+<span class="kn">import</span> <span class="nn">functools</span>
+<span class="kn">import</span> <span class="nn">pytest</span>
+<span class="kn">import</span> <span class="nn">subprocess</span>
 <span class="kn">from</span> <span class="nn">pandas.testing</span> <span class="kn">import</span> <span class="n">assert_frame_equal</span>
 <span class="kn">from</span> <span class="nn">yggdrasil.config</span> <span class="kn">import</span> <span class="n">ygg_cfg</span><span class="p">,</span> <span class="n">cfg_logging</span>
 <span class="kn">from</span> <span class="nn">yggdrasil</span> <span class="kn">import</span> <span class="n">tools</span><span class="p">,</span> <span class="n">platform</span><span class="p">,</span> <span class="n">units</span>
-<span class="kn">from</span> <span class="nn">yggdrasil.communication</span> <span class="kn">import</span> <span class="n">cleanup_comms</span>
+<span class="kn">from</span> <span class="nn">yggdrasil.communication</span> <span class="kn">import</span> <span class="n">cleanup_comms</span><span class="p">,</span> <span class="n">import_comm</span>
 <span class="kn">from</span> <span class="nn">yggdrasil.components</span> <span class="kn">import</span> <span class="n">import_component</span>
 
 
@@ -334,10 +339,10 @@
         <span class="n">skips</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="k">if</span> <span class="n">installed</span> <span class="ow">is</span> <span class="kc">True</span><span class="p">:</span>
             <span class="n">skips</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">unittest</span><span class="o">.</span><span class="n">skipIf</span><span class="p">(</span><span class="ow">not</span> <span class="n">drv</span><span class="o">.</span><span class="n">is_installed</span><span class="p">(),</span>
-                                         <span class="s2">&quot;</span><span class="si">%s</span><span class="s2"> not installed&quot;</span><span class="p">))</span>
+                                         <span class="s2">&quot;</span><span class="si">%s</span><span class="s2"> not installed&quot;</span> <span class="o">%</span> <span class="n">language</span><span class="p">))</span>
         <span class="k">elif</span> <span class="n">installed</span> <span class="ow">is</span> <span class="kc">False</span><span class="p">:</span>
             <span class="n">skips</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">unittest</span><span class="o">.</span><span class="n">skipIf</span><span class="p">(</span><span class="n">drv</span><span class="o">.</span><span class="n">is_installed</span><span class="p">(),</span>
-                                         <span class="s2">&quot;</span><span class="si">%s</span><span class="s2"> installed&quot;</span><span class="p">))</span>
+                                         <span class="s2">&quot;</span><span class="si">%s</span><span class="s2"> installed&quot;</span> <span class="o">%</span> <span class="n">language</span><span class="p">))</span>
         <span class="n">skips</span> <span class="o">+=</span> <span class="n">check_enabled_languages</span><span class="p">(</span><span class="n">language</span><span class="p">,</span> <span class="n">return_decorators</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
         <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">skips</span><span class="p">:</span>
             <span class="n">function</span> <span class="o">=</span> <span class="n">s</span><span class="p">(</span><span class="n">function</span><span class="p">)</span>
@@ -422,7 +427,10 @@
         <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
             <span class="k">if</span> <span class="n">dont_nest</span><span class="p">:</span>
                 <span class="k">raise</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">assertEqualNested</span><span class="p">(</span><span class="n">first</span><span class="p">,</span> <span class="n">second</span><span class="p">,</span> <span class="n">msg</span><span class="o">=</span><span class="n">msg</span><span class="p">)</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">first</span><span class="p">,</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">)):</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">assertArrayEqual</span><span class="p">(</span><span class="n">first</span><span class="p">,</span> <span class="n">second</span><span class="p">,</span> <span class="n">msg</span><span class="o">=</span><span class="n">msg</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">assertEqualNested</span><span class="p">(</span><span class="n">first</span><span class="p">,</span> <span class="n">second</span><span class="p">,</span> <span class="n">msg</span><span class="o">=</span><span class="n">msg</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">assertEqualNested</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">first</span><span class="p">,</span> <span class="n">second</span><span class="p">,</span> <span class="n">msg</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Fail if the two objects are unequal as determined by descending</span>
@@ -659,6 +667,133 @@
 
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">ut</span><span class="o">.</span><span class="n">assertNotEqual</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">get_timeout_args</span><span class="p">(</span><span class="n">args0</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Determine which arguments should be passed to the timeout subprocess.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        args0 (list, optional): Initial set of arguments. Defaults to sys.argv[1:].</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        dict: Argument information.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">args0</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">args0</span> <span class="o">=</span> <span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span>
+    <span class="n">args_preserve_path</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;-c&#39;</span><span class="p">]</span>
+    <span class="n">args_remove</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;--clear-cache&#39;</span><span class="p">]</span>
+    <span class="n">args_remove_value</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">args_add</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;--cov-append&#39;</span><span class="p">]</span>
+    <span class="k">if</span> <span class="nb">int</span><span class="p">(</span><span class="n">pytest</span><span class="o">.</span><span class="n">__version__</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;.&#39;</span><span class="p">)[</span><span class="mi">0</span><span class="p">])</span> <span class="o">&gt;=</span> <span class="mi">6</span><span class="p">:</span>
+        <span class="n">args_add</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;--import-mode=importlib&#39;</span><span class="p">)</span>
+    <span class="n">args_remove_value_match</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">([</span><span class="n">k</span> <span class="o">+</span> <span class="s1">&#39;=&#39;</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">args_remove_value</span><span class="p">])</span>
+    <span class="n">out</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;args&#39;</span><span class="p">:</span> <span class="p">[],</span> <span class="s1">&#39;rootdir&#39;</span><span class="p">:</span> <span class="kc">None</span><span class="p">}</span>
+    <span class="n">args</span> <span class="o">=</span> <span class="n">out</span><span class="p">[</span><span class="s1">&#39;args&#39;</span><span class="p">]</span>
+    <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">args0</span><span class="p">)):</span>
+        <span class="n">v</span> <span class="o">=</span> <span class="n">args0</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">args_remove</span><span class="p">:</span>  <span class="c1"># pragma: testing</span>
+            <span class="k">pass</span>
+        <span class="k">elif</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">args_remove_value</span><span class="p">:</span>  <span class="c1"># pragma: testing</span>
+            <span class="n">i</span> <span class="o">+=</span> <span class="mi">1</span>
+        <span class="k">elif</span> <span class="n">v</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="n">args_remove_value_match</span><span class="p">):</span>  <span class="c1"># pragma: testing</span>
+            <span class="k">pass</span>
+        <span class="k">elif</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">args_preserve_path</span><span class="p">:</span>
+            <span class="n">args</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">v</span><span class="p">)</span>
+            <span class="n">i</span> <span class="o">+=</span> <span class="mi">1</span>
+            <span class="n">args</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">args0</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+        <span class="k">elif</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">v</span><span class="p">)</span> <span class="ow">or</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isdir</span><span class="p">(</span><span class="n">v</span><span class="p">):</span>
+            <span class="k">pass</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">v</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;--rootdir=&#39;</span><span class="p">):</span>
+                <span class="n">out</span><span class="p">[</span><span class="s1">&#39;rootdir&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">v</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;=&#39;</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+            <span class="k">elif</span> <span class="n">v</span> <span class="o">==</span> <span class="s1">&#39;--rootdir&#39;</span><span class="p">:</span>  <span class="c1"># pragma: testing</span>
+                <span class="n">out</span><span class="p">[</span><span class="s1">&#39;rootdir&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">args0</span><span class="p">[</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]</span>
+                <span class="n">i</span> <span class="o">+=</span> <span class="mi">1</span>
+            <span class="n">args</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">v</span><span class="p">)</span>
+        <span class="n">i</span> <span class="o">+=</span> <span class="mi">1</span>
+    <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">args_add</span><span class="p">:</span>
+        <span class="k">if</span> <span class="s1">&#39;=&#39;</span> <span class="ow">in</span> <span class="n">v</span><span class="p">:</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="nb">any</span><span class="p">(</span><span class="n">vv</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="n">v</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;=&#39;</span><span class="p">)[</span><span class="mi">0</span><span class="p">])</span> <span class="k">for</span> <span class="n">vv</span> <span class="ow">in</span> <span class="n">args</span><span class="p">):</span>
+                <span class="n">args</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">v</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">v</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">args</span><span class="p">:</span>  <span class="c1"># pragma: testing</span>
+            <span class="n">args</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">v</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">out</span>
+
+
+<span class="k">def</span> <span class="nf">timeout</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="n">allow_arguments</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Patch for pytest timeout on windows to allow pytest to cache.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        *args: Arguments are passed on to the pytest.mark.timeout decorator.</span>
+<span class="sd">        **kwargs: Keyword arguments are passed on to the pytest.mark.timeout</span>
+<span class="sd">            decorator.</span>
+<span class="sd">        allow_arguments (bool, optional): If True, decoration with the timeout</span>
+<span class="sd">            decorator will allow arguments to be passed to the test function.</span>
+<span class="sd">            Defaults to False.</span>
+
+<span class="sd">    Source:</span>
+<span class="sd">        https://stackoverflow.com/questions/21827874/timeout-a-function-windows/</span>
+<span class="sd">            48980413#48980413</span>
+
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">env_flag</span> <span class="o">=</span> <span class="s1">&#39;YGG_IN_TIMEOUT_PROCESS&#39;</span>
+    <span class="k">if</span> <span class="n">platform</span><span class="o">.</span><span class="n">_is_win</span><span class="p">:</span>
+        <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;method&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;thread&#39;</span>
+    <span class="n">method</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;method&#39;</span><span class="p">,</span> <span class="s1">&#39;signal&#39;</span><span class="p">)</span>
+    <span class="n">pytest_deco</span> <span class="o">=</span> <span class="n">pytest</span><span class="o">.</span><span class="n">mark</span><span class="o">.</span><span class="n">timeout</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+    <span class="k">if</span> <span class="p">(((</span><span class="n">method</span> <span class="o">==</span> <span class="s1">&#39;thread&#39;</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">env_flag</span><span class="p">,</span> <span class="kc">False</span><span class="p">))</span>
+         <span class="ow">and</span> <span class="p">(</span><span class="ow">not</span> <span class="n">allow_arguments</span><span class="p">))):</span>
+        <span class="n">arginfo</span> <span class="o">=</span> <span class="n">get_timeout_args</span><span class="p">()</span>
+        <span class="n">testargs</span> <span class="o">=</span> <span class="n">arginfo</span><span class="p">[</span><span class="s1">&#39;args&#39;</span><span class="p">]</span>
+        <span class="n">rootdir</span> <span class="o">=</span> <span class="n">arginfo</span><span class="p">[</span><span class="s1">&#39;rootdir&#39;</span><span class="p">]</span>
+        
+        <span class="k">def</span> <span class="nf">deco</span><span class="p">(</span><span class="n">func</span><span class="p">):</span>
+            <span class="k">if</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">func</span><span class="p">,</span> <span class="s1">&#39;_timeout_wrapped&#39;</span><span class="p">,</span> <span class="kc">False</span><span class="p">):</span>
+                <span class="k">return</span> <span class="n">func</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">func</span><span class="p">,</span> <span class="nb">type</span><span class="p">):</span>
+                <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">dir</span><span class="p">(</span><span class="n">func</span><span class="p">):</span>
+                    <span class="n">v</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">func</span><span class="p">,</span> <span class="n">k</span><span class="p">)</span>
+                    <span class="k">if</span> <span class="n">k</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;test_&#39;</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">v</span><span class="p">,</span>
+                                                            <span class="n">types</span><span class="o">.</span><span class="n">MethodType</span><span class="p">):</span>
+                        <span class="nb">setattr</span><span class="p">(</span><span class="n">func</span><span class="p">,</span> <span class="n">k</span><span class="p">,</span> <span class="n">deco</span><span class="p">(</span><span class="n">v</span><span class="p">))</span>  <span class="c1"># pragma: testing</span>
+                <span class="n">func</span><span class="o">.</span><span class="n">_timeout_wrapped</span> <span class="o">=</span> <span class="kc">True</span>
+                <span class="k">return</span> <span class="n">func</span>
+
+            <span class="nd">@functools</span><span class="o">.</span><span class="n">wraps</span><span class="p">(</span><span class="n">func</span><span class="p">)</span>
+            <span class="k">def</span> <span class="nf">wrapper</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>  <span class="c1"># pragma: testing</span>
+                <span class="n">testname</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s1">&#39;PYTEST_CURRENT_TEST&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span>
+                <span class="k">if</span> <span class="n">rootdir</span><span class="p">:</span>
+                    <span class="n">testname</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">rootdir</span><span class="p">,</span> <span class="n">testname</span><span class="p">)</span>
+                <span class="n">max_args</span> <span class="o">=</span> <span class="n">testname</span><span class="o">.</span><span class="n">count</span><span class="p">(</span><span class="s1">&#39;::&#39;</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span>
+                <span class="k">if</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">args</span><span class="p">)</span> <span class="o">&gt;</span> <span class="n">max_args</span><span class="p">)</span> <span class="ow">or</span> <span class="n">kwargs</span><span class="p">:</span>  <span class="c1"># pragma: debug</span>
+                    <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s2">&quot;Arguments not compatible with forked &quot;</span>
+                                    <span class="s2">&quot;timeout, add &#39;allow_arguments=True&#39; to &quot;</span>
+                                    <span class="s2">&quot;the decorator&quot;</span><span class="p">)</span>
+                <span class="n">env</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">)</span>
+                <span class="n">env</span><span class="p">[</span><span class="n">env_flag</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;1&#39;</span>
+                <span class="n">out</span> <span class="o">=</span> <span class="kc">None</span>
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="n">out</span> <span class="o">=</span> <span class="n">subprocess</span><span class="o">.</span><span class="n">run</span><span class="p">([</span><span class="s1">&#39;pytest&#39;</span><span class="p">]</span> <span class="o">+</span> <span class="n">testargs</span> <span class="o">+</span> <span class="p">[</span><span class="n">testname</span><span class="p">],</span>
+                                         <span class="n">env</span><span class="o">=</span><span class="n">env</span><span class="p">,</span> <span class="n">check</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                                         <span class="n">stdout</span><span class="o">=</span><span class="n">subprocess</span><span class="o">.</span><span class="n">PIPE</span><span class="p">,</span>
+                                         <span class="n">stderr</span><span class="o">=</span><span class="n">subprocess</span><span class="o">.</span><span class="n">PIPE</span><span class="p">)</span>
+                <span class="k">except</span> <span class="n">subprocess</span><span class="o">.</span><span class="n">CalledProcessError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>  <span class="c1"># pragma: debug</span>
+                    <span class="n">out</span> <span class="o">=</span> <span class="n">e</span>
+                <span class="nb">print</span><span class="p">(</span><span class="n">out</span><span class="o">.</span><span class="n">stdout</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s1">&#39;utf-8&#39;</span><span class="p">))</span>
+                <span class="nb">print</span><span class="p">(</span><span class="n">out</span><span class="o">.</span><span class="n">stderr</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s1">&#39;utf-8&#39;</span><span class="p">),</span> <span class="n">file</span><span class="o">=</span><span class="n">sys</span><span class="o">.</span><span class="n">stderr</span><span class="p">)</span>
+                <span class="k">if</span> <span class="sa">b</span><span class="s1">&#39;========= 1 skipped in&#39;</span> <span class="ow">in</span> <span class="n">out</span><span class="o">.</span><span class="n">stdout</span><span class="p">:</span>
+                    <span class="k">raise</span> <span class="n">unittest</span><span class="o">.</span><span class="n">SkipTest</span><span class="p">(</span><span class="s1">&#39;&#39;</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">out</span><span class="o">.</span><span class="n">returncode</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>  <span class="c1"># pragma: debug</span>
+                    <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">&quot;Error in test subprocess. &quot;</span>
+                                       <span class="s2">&quot;See above output.&quot;</span><span class="p">)</span>
+            <span class="n">wrapper</span><span class="o">.</span><span class="n">_timeout_wrapped</span> <span class="o">=</span> <span class="kc">True</span>
+            <span class="k">return</span> <span class="n">wrapper</span>
+        <span class="k">return</span> <span class="n">deco</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">pytest_deco</span>
         
 
 <div class="viewcode-block" id="YggTestBase"><a class="viewcode-back" href="../../yggdrasil.tests.html#yggdrasil.tests.YggTestBase">[docs]</a><span class="k">class</span> <span class="nc">YggTestBase</span><span class="p">(</span><span class="n">unittest</span><span class="o">.</span><span class="n">TestCase</span><span class="p">):</span>
@@ -722,7 +857,7 @@
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;int: The number of comms.&quot;&quot;&quot;</span>
         <span class="n">out</span> <span class="o">=</span> <span class="mi">0</span>
         <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">cleanup_comm_classes</span><span class="p">:</span>
-            <span class="bp">cls</span> <span class="o">=</span> <span class="n">import_component</span><span class="p">(</span><span class="s1">&#39;comm&#39;</span><span class="p">,</span> <span class="n">k</span><span class="p">)</span>
+            <span class="bp">cls</span> <span class="o">=</span> <span class="n">import_comm</span><span class="p">(</span><span class="n">k</span><span class="p">)</span>
             <span class="n">out</span> <span class="o">+=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">comm_count</span><span class="p">()</span>
         <span class="k">return</span> <span class="n">out</span>
 
@@ -1266,8 +1401,59 @@
     <span class="k">return</span> <span class="n">ErrorClass</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
 
 
+<span class="k">def</span> <span class="nf">generate_component_subtests</span><span class="p">(</span><span class="n">comptype</span><span class="p">,</span> <span class="n">suffix</span><span class="p">,</span> <span class="n">target_globals</span><span class="p">,</span>
+                                <span class="n">parent_module_name</span><span class="p">,</span> <span class="n">new_attr</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                                <span class="n">module_name_format</span><span class="o">=</span><span class="s1">&#39;test_</span><span class="si">%s</span><span class="s1">&#39;</span><span class="p">,</span>
+                                <span class="n">class_name_format</span><span class="o">=</span><span class="s1">&#39;Test</span><span class="si">%s</span><span class="s1">&#39;</span><span class="p">,</span>
+                                <span class="n">skip_subtypes</span><span class="o">=</span><span class="p">[]):</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Function that generates tests for all component subtypes that</span>
+<span class="sd">    subclass the original test class for the subtype.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        comptype (str): Component type.</span>
+<span class="sd">        suffix (str): Suffix to be added to the end of the original</span>
+<span class="sd">            test class name to get the name for the new test.</span>
+<span class="sd">        target_globals (dict): Globals dictionary that class should be</span>
+<span class="sd">            added to.</span>
+<span class="sd">        parent_module_name (str): Parent module that contains test</span>
+<span class="sd">            classes for the specified component type.</span>
+<span class="sd">        new_attr (dict, optional): Attributes to add to the test classes.</span>
+<span class="sd">            Defaults to None and will be an empty dict.</span>
+<span class="sd">        module_name_format (str, optional): Format string that should</span>
+<span class="sd">            be used to locate the original test modules. Defaults to</span>
+<span class="sd">            &#39;test_%s&#39;.</span>
+<span class="sd">        class_name_format (str, optional): Format string that should</span>
+<span class="sd">            be used to both name generated test classes and locate the</span>
+<span class="sd">            original test classes. Defaults to &#39;Test%s&#39;.</span>
+<span class="sd">        skip_subtypes (list, optional): List of subtypes to skip.</span>
+<span class="sd">            Defaults to empty list.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="kn">from</span> <span class="nn">yggdrasil.schema</span> <span class="kn">import</span> <span class="n">get_schema</span>
+    <span class="n">_schema</span> <span class="o">=</span> <span class="n">get_schema</span><span class="p">()</span>
+    <span class="k">if</span> <span class="n">new_attr</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>  <span class="c1"># pragma: debug</span>
+        <span class="n">new_attr</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="k">if</span> <span class="n">comptype</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">_schema</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>  <span class="c1"># pragma: debug</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">%s</span><span class="s2"> is not a component type.&quot;</span> <span class="o">%</span> <span class="n">comptype</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">subtype</span> <span class="ow">in</span> <span class="n">_schema</span><span class="p">[</span><span class="n">comptype</span><span class="p">]</span><span class="o">.</span><span class="n">subtypes</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">subtype</span> <span class="ow">in</span> <span class="n">skip_subtypes</span><span class="p">:</span>
+            <span class="k">continue</span>
+        <span class="n">subtype_cls</span> <span class="o">=</span> <span class="n">_schema</span><span class="p">[</span><span class="n">comptype</span><span class="p">]</span><span class="o">.</span><span class="n">subtype2class</span><span class="p">[</span><span class="n">subtype</span><span class="p">]</span>
+        <span class="n">old_mod_name</span> <span class="o">=</span> <span class="p">(</span><span class="n">parent_module_name</span> <span class="o">+</span> <span class="s1">&#39;.&#39;</span>
+                        <span class="o">+</span> <span class="p">(</span><span class="n">module_name_format</span> <span class="o">%</span> <span class="n">subtype_cls</span><span class="p">))</span>
+        <span class="n">old_cls_name</span> <span class="o">=</span> <span class="n">class_name_format</span> <span class="o">%</span> <span class="n">subtype_cls</span>
+        <span class="n">new_cls_name</span> <span class="o">=</span> <span class="n">class_name_format</span> <span class="o">%</span> <span class="p">(</span><span class="n">subtype_cls</span> <span class="o">+</span> <span class="n">suffix</span><span class="o">.</span><span class="n">title</span><span class="p">())</span>
+        <span class="n">base_class</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">importlib</span><span class="o">.</span><span class="n">import_module</span><span class="p">(</span><span class="n">old_mod_name</span><span class="p">),</span>
+                             <span class="n">old_cls_name</span><span class="p">)</span>
+        <span class="n">new_cls</span> <span class="o">=</span> <span class="nb">type</span><span class="p">(</span><span class="n">new_cls_name</span><span class="p">,</span> <span class="p">(</span><span class="n">base_class</span><span class="p">,</span> <span class="p">),</span> <span class="n">new_attr</span><span class="p">)</span>
+        <span class="n">target_globals</span><span class="p">[</span><span class="n">new_cls</span><span class="o">.</span><span class="vm">__name__</span><span class="p">]</span> <span class="o">=</span> <span class="n">new_cls</span>
+        <span class="k">del</span> <span class="n">new_cls</span>
+    
+
 <span class="k">def</span> <span class="nf">generate_component_tests</span><span class="p">(</span><span class="n">comptype</span><span class="p">,</span> <span class="n">base_class</span><span class="p">,</span> <span class="n">target_globals</span><span class="p">,</span>
-                             <span class="n">directory</span><span class="p">,</span> <span class="n">class_attr</span><span class="o">=</span><span class="s1">&#39;_cls&#39;</span><span class="p">):</span>
+                             <span class="n">directory</span><span class="p">,</span> <span class="n">class_attr</span><span class="o">=</span><span class="s1">&#39;_cls&#39;</span><span class="p">,</span> <span class="n">new_attr</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                             <span class="n">class_name_format</span><span class="o">=</span><span class="s1">&#39;Test</span><span class="si">%s</span><span class="s1">&#39;</span><span class="p">,</span>
+                             <span class="n">class_file_format</span><span class="o">=</span><span class="s1">&#39;test_</span><span class="si">%s</span><span class="s1">.py&#39;</span><span class="p">):</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Function that generates tests for all component subtypes</span>
 <span class="sd">    based on the registered classes.</span>
 
@@ -1280,23 +1466,34 @@
 <span class="sd">            that should be checked for tests.</span>
 <span class="sd">        class_attr (str, optional): Attribute that should be set to the</span>
 <span class="sd">            name of the class being tested.</span>
+<span class="sd">        new_attr (dict, optional): Attributes to add to the test classes.</span>
+<span class="sd">            Defaults to None and will be an empty dict.</span>
+<span class="sd">        class_name_format (str, optional): Format string that should</span>
+<span class="sd">            be used to name generated test class&#39;s. Defaults to</span>
+<span class="sd">            &#39;Test%s&#39;.</span>
+<span class="sd">        class_file_format (str, optional): Format string that should</span>
+<span class="sd">            be used to name test files that are checked for. Defaults</span>
+<span class="sd">            to &#39;test_%s.py&#39;.</span>
 
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="kn">from</span> <span class="nn">yggdrasil.schema</span> <span class="kn">import</span> <span class="n">get_schema</span>
     <span class="n">_schema</span> <span class="o">=</span> <span class="n">get_schema</span><span class="p">()</span>
+    <span class="k">if</span> <span class="n">new_attr</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">new_attr</span> <span class="o">=</span> <span class="p">{}</span>
     <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">directory</span><span class="p">):</span>
         <span class="n">directory</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">directory</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">comptype</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">_schema</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>  <span class="c1"># pragma: debug</span>
         <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">%s</span><span class="s2"> is not a component type.&quot;</span> <span class="o">%</span> <span class="n">comptype</span><span class="p">)</span>
     <span class="k">for</span> <span class="n">subtype</span> <span class="ow">in</span> <span class="n">_schema</span><span class="p">[</span><span class="n">comptype</span><span class="p">]</span><span class="o">.</span><span class="n">subtypes</span><span class="p">:</span>
         <span class="n">subtype_cls</span> <span class="o">=</span> <span class="n">_schema</span><span class="p">[</span><span class="n">comptype</span><span class="p">]</span><span class="o">.</span><span class="n">subtype2class</span><span class="p">[</span><span class="n">subtype</span><span class="p">]</span>
-        <span class="n">new_cls_name</span> <span class="o">=</span> <span class="s1">&#39;Test</span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">subtype_cls</span>
+        <span class="n">new_cls_name</span> <span class="o">=</span> <span class="n">class_name_format</span> <span class="o">%</span> <span class="n">subtype_cls</span>
         <span class="n">new_cls_file</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">directory</span><span class="p">,</span>
-                                    <span class="s1">&#39;test_</span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">subtype_cls</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39;.py&#39;</span>
+                                    <span class="n">class_file_format</span> <span class="o">%</span> <span class="n">subtype_cls</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">new_cls_file</span><span class="p">):</span>
             <span class="k">continue</span>
-        <span class="n">cls_attr</span> <span class="o">=</span> <span class="p">{</span><span class="n">class_attr</span><span class="p">:</span> <span class="n">subtype_cls</span><span class="p">}</span>
-        <span class="n">new_cls</span> <span class="o">=</span> <span class="nb">type</span><span class="p">(</span><span class="n">new_cls_name</span><span class="p">,</span> <span class="p">(</span><span class="n">base_class</span><span class="p">,</span> <span class="p">),</span> <span class="n">cls_attr</span><span class="p">)</span>
+        <span class="n">inew_attr</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">new_attr</span><span class="p">)</span>
+        <span class="n">inew_attr</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="n">class_attr</span><span class="p">,</span> <span class="n">subtype_cls</span><span class="p">)</span>
+        <span class="n">new_cls</span> <span class="o">=</span> <span class="nb">type</span><span class="p">(</span><span class="n">new_cls_name</span><span class="p">,</span> <span class="p">(</span><span class="n">base_class</span><span class="p">,</span> <span class="p">),</span> <span class="n">inew_attr</span><span class="p">)</span>
         <span class="n">target_globals</span><span class="p">[</span><span class="n">new_cls</span><span class="o">.</span><span class="vm">__name__</span><span class="p">]</span> <span class="o">=</span> <span class="n">new_cls</span>
         <span class="k">del</span> <span class="n">new_cls</span>
 

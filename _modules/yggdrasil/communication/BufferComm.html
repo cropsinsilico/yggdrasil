@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>yggdrasil.communication.BufferComm &mdash; yggdrasil v1.5.0 documentation</title>
+  <title>yggdrasil.communication.BufferComm &mdash; yggdrasil v1.6.0 documentation</title>
   
 
   
@@ -62,7 +62,7 @@
             
             
               <div class="version">
-                v1.5.0
+                v1.6.0
               </div>
             
           
@@ -104,6 +104,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../units.html">Units</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../c_format_strings.html">C-Style Format Strings</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../debugging.html">Debugging</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../threading.html">OpenMP Threading in Models</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../examples/examples_toc.html">Examples</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../advanced/index.html">Advanced</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../development/index.html">Development</a></li>
@@ -179,7 +180,7 @@
             
   <h1>Source code for yggdrasil.communication.BufferComm</h1><div class="highlight"><pre>
 <span></span><span class="kn">from</span> <span class="nn">yggdrasil</span> <span class="kn">import</span> <span class="n">multitasking</span>
-<span class="kn">from</span> <span class="nn">yggdrasil.communication</span> <span class="kn">import</span> <span class="n">CommBase</span>
+<span class="kn">from</span> <span class="nn">yggdrasil.communication</span> <span class="kn">import</span> <span class="n">CommBase</span><span class="p">,</span> <span class="n">NoMessages</span>
 
 
 <div class="viewcode-block" id="LockedBuffer"><a class="viewcode-back" href="../../../yggdrasil.communication.html#yggdrasil.communication.BufferComm.LockedBuffer">[docs]</a><span class="k">class</span> <span class="nc">LockedBuffer</span><span class="p">(</span><span class="n">multitasking</span><span class="o">.</span><span class="n">Queue</span><span class="p">):</span>
@@ -217,7 +218,7 @@
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Add an element to the queue.&quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">put_nowait</span><span class="p">(</span><span class="n">x</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="LockedBuffer.pop"><a class="viewcode-back" href="../../../yggdrasil.communication.html#yggdrasil.communication.BufferComm.LockedBuffer.pop">[docs]</a>    <span class="k">def</span> <span class="nf">pop</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<div class="viewcode-block" id="LockedBuffer.pop"><a class="viewcode-back" href="../../../yggdrasil.communication.html#yggdrasil.communication.BufferComm.LockedBuffer.pop">[docs]</a>    <span class="k">def</span> <span class="nf">pop</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Remove the first element from the queue.&quot;&quot;&quot;</span>
         <span class="k">assert</span><span class="p">(</span><span class="n">index</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span>
         <span class="c1"># with self.lock:</span>
@@ -277,23 +278,22 @@
         <span class="k">return</span> <span class="kc">False</span></div>
         
 <div class="viewcode-block" id="BufferComm.bind"><a class="viewcode-back" href="../../../yggdrasil.communication.html#yggdrasil.communication.BufferComm.BufferComm.bind">[docs]</a>    <span class="k">def</span> <span class="nf">bind</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Bind to address, getting random port as necessary.&quot;&quot;&quot;</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Bind to new buffer.&quot;&quot;&quot;</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">BufferComm</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">bind</span><span class="p">()</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">address</span><span class="p">,</span> <span class="n">LockedBuffer</span><span class="p">):</span>
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">address</span> <span class="o">==</span> <span class="s1">&#39;address&#39;</span><span class="p">:</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">address</span> <span class="o">=</span> <span class="n">LockedBuffer</span><span class="p">(</span><span class="n">task_method</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">buffer_task_method</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">address</span><span class="o">.</span><span class="n">_closed</span><span class="o">.</span><span class="n">set</span><span class="p">()</span>
             <span class="k">else</span><span class="p">:</span>  <span class="c1"># pragma: debug</span>
                 <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Invalid address for a buffer: </span><span class="si">%s</span><span class="s2">&quot;</span>
                                  <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">address</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="BufferComm.open"><a class="viewcode-back" href="../../../yggdrasil.communication.html#yggdrasil.communication.BufferComm.BufferComm.open">[docs]</a>    <span class="k">def</span> <span class="nf">open</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Open the buffer.&quot;&quot;&quot;</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">BufferComm</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">open</span><span class="p">()</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">address</span><span class="o">.</span><span class="n">closed</span> <span class="ow">and</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">address</span><span class="o">.</span><span class="n">_base</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">address</span><span class="o">.</span><span class="n">_closed</span><span class="o">.</span><span class="n">clear</span><span class="p">()</span></div>
         
-<div class="viewcode-block" id="BufferComm.serialize"><a class="viewcode-back" href="../../../yggdrasil.communication.html#yggdrasil.communication.BufferComm.BufferComm.serialize">[docs]</a>    <span class="k">def</span> <span class="nf">serialize</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Serialize a message using the associated serializer.&quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="n">args</span></div>
-        
-<div class="viewcode-block" id="BufferComm.deserialize"><a class="viewcode-back" href="../../../yggdrasil.communication.html#yggdrasil.communication.BufferComm.BufferComm.deserialize">[docs]</a>    <span class="k">def</span> <span class="nf">deserialize</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Deserialize a message using the associated deserializer.&quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="n">args</span><span class="p">,</span> <span class="p">{}</span></div>
-    
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">is_open</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;bool: True if the connection is open.&quot;&quot;&quot;</span>
@@ -333,13 +333,10 @@
 <span class="sd">            bool: Success or failure of sending the message.</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">direction</span> <span class="o">==</span> <span class="s1">&#39;recv&#39;</span><span class="p">:</span>  <span class="c1"># pragma: debug</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;Receiving buffer comm cannot send.&quot;</span><span class="p">)</span>
-            <span class="k">return</span> <span class="kc">False</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">address</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">payload</span><span class="p">)</span>
         <span class="k">return</span> <span class="kc">True</span>
 
-    <span class="k">def</span> <span class="nf">_recv</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">_recv</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Receive a message from the buffer.</span>
 
 <span class="sd">        Args:</span>
@@ -351,16 +348,8 @@
 <span class="sd">                and the message received.</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">if</span> <span class="n">timeout</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>  <span class="c1"># pragma: no cover</span>
-            <span class="n">timeout</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">recv_timeout</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">direction</span> <span class="o">==</span> <span class="s1">&#39;send&#39;</span><span class="p">:</span>  <span class="c1"># pragma: debug</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;Sending buffer comm cannot receive.&quot;</span><span class="p">)</span>
-            <span class="k">return</span> <span class="p">(</span><span class="kc">False</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">empty_bytes_msg</span><span class="p">)</span>
-        <span class="c1"># Sleep until there is a message</span>
-        <span class="n">T</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">start_timeout</span><span class="p">(</span><span class="n">timeout</span><span class="p">,</span> <span class="n">key_suffix</span><span class="o">=</span><span class="s1">&#39;_recv&#39;</span><span class="p">)</span>
-        <span class="k">while</span> <span class="p">(</span><span class="ow">not</span> <span class="n">T</span><span class="o">.</span><span class="n">is_out</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="ow">not</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">address</span><span class="p">)):</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">sleep</span><span class="p">()</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">stop_timeout</span><span class="p">(</span><span class="n">key_suffix</span><span class="o">=</span><span class="s1">&#39;_recv&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">address</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="n">NoMessages</span><span class="p">(</span><span class="s2">&quot;No messages in queue.&quot;</span><span class="p">)</span>
         <span class="k">return</span> <span class="p">(</span><span class="kc">True</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">address</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">empty_bytes_msg</span><span class="p">))</span>
 
 <div class="viewcode-block" id="BufferComm.purge"><a class="viewcode-back" href="../../../yggdrasil.communication.html#yggdrasil.communication.BufferComm.BufferComm.purge">[docs]</a>    <span class="k">def</span> <span class="nf">purge</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>

@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>yggdrasil.drivers.tests.test_FileInputDriver &mdash; yggdrasil v1.5.0 documentation</title>
+  <title>yggdrasil.drivers.tests.test_FileInputDriver &mdash; yggdrasil v1.6.0 documentation</title>
   
 
   
@@ -62,7 +62,7 @@
             
             
               <div class="version">
-                v1.5.0
+                v1.6.0
               </div>
             
           
@@ -104,6 +104,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../../units.html">Units</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../c_format_strings.html">C-Style Format Strings</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../debugging.html">Debugging</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../threading.html">OpenMP Threading in Models</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../examples/examples_toc.html">Examples</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../advanced/index.html">Advanced</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../development/index.html">Development</a></li>
@@ -162,8 +163,6 @@
         
           <li><a href="../../drivers.html">yggdrasil.drivers</a> &raquo;</li>
         
-          <li><a href="../tests.html">yggdrasil.drivers.tests</a> &raquo;</li>
-        
       <li>yggdrasil.drivers.tests.test_FileInputDriver</li>
     
     
@@ -182,7 +181,6 @@
   <h1>Source code for yggdrasil.drivers.tests.test_FileInputDriver</h1><div class="highlight"><pre>
 <span></span><span class="kn">import</span> <span class="nn">os</span>
 <span class="kn">import</span> <span class="nn">tempfile</span>
-<span class="kn">import</span> <span class="nn">unittest</span>
 <span class="kn">from</span> <span class="nn">yggdrasil.schema</span> <span class="kn">import</span> <span class="n">get_schema</span>
 <span class="kn">import</span> <span class="nn">yggdrasil.drivers.tests.test_ConnectionDriver</span> <span class="k">as</span> <span class="nn">parent</span>
 
@@ -254,6 +252,9 @@
 <div class="viewcode-block" id="TestFileInputDriver"><a class="viewcode-back" href="../../../../yggdrasil.drivers.tests.html#yggdrasil.drivers.tests.test_FileInputDriver.TestFileInputDriver">[docs]</a><span class="k">class</span> <span class="nc">TestFileInputDriver</span><span class="p">(</span><span class="n">TestFileInputParam</span><span class="p">,</span> <span class="n">parent</span><span class="o">.</span><span class="n">TestConnectionDriver</span><span class="p">):</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test runner for FileInputDriver.&quot;&quot;&quot;</span>
 
+    <span class="n">test_send_recv</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">test_send_recv_nolimit</span> <span class="o">=</span> <span class="kc">None</span>
+
 <div class="viewcode-block" id="TestFileInputDriver.assert_before_stop"><a class="viewcode-back" href="../../../../yggdrasil.drivers.tests.html#yggdrasil.drivers.tests.test_FileInputDriver.TestFileInputDriver.assert_before_stop">[docs]</a>    <span class="k">def</span> <span class="nf">assert_before_stop</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Assertions to make before stopping the driver instance.&quot;&quot;&quot;</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">TestFileInputDriver</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">assert_before_stop</span><span class="p">(</span><span class="n">check_open</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
@@ -269,17 +270,7 @@
 <div class="viewcode-block" id="TestFileInputDriver.run_before_terminate"><a class="viewcode-back" href="../../../../yggdrasil.drivers.tests.html#yggdrasil.drivers.tests.test_FileInputDriver.TestFileInputDriver.run_before_terminate">[docs]</a>    <span class="k">def</span> <span class="nf">run_before_terminate</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Commands to run while the instance is running, before terminate.&quot;&quot;&quot;</span>
         <span class="c1"># Don&#39;t send any messages to the file</span>
-        <span class="k">pass</span></div>
-
-<div class="viewcode-block" id="TestFileInputDriver.test_send_recv"><a class="viewcode-back" href="../../../../yggdrasil.drivers.tests.html#yggdrasil.drivers.tests.test_FileInputDriver.TestFileInputDriver.test_send_recv">[docs]</a>    <span class="nd">@unittest</span><span class="o">.</span><span class="n">skipIf</span><span class="p">(</span><span class="kc">True</span><span class="p">,</span> <span class="s1">&#39;File driver&#39;</span><span class="p">)</span>
-    <span class="k">def</span> <span class="nf">test_send_recv</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Disabled: Test sending/receiving small message.&quot;&quot;&quot;</span>
-        <span class="k">pass</span>  <span class="c1"># pragma: no cover</span></div>
-
-<div class="viewcode-block" id="TestFileInputDriver.test_send_recv_nolimit"><a class="viewcode-back" href="../../../../yggdrasil.drivers.tests.html#yggdrasil.drivers.tests.test_FileInputDriver.TestFileInputDriver.test_send_recv_nolimit">[docs]</a>    <span class="nd">@unittest</span><span class="o">.</span><span class="n">skipIf</span><span class="p">(</span><span class="kc">True</span><span class="p">,</span> <span class="s1">&#39;File driver&#39;</span><span class="p">)</span>
-    <span class="k">def</span> <span class="nf">test_send_recv_nolimit</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Disabled: Test sending/receiving large message.&quot;&quot;&quot;</span>
-        <span class="k">pass</span>  <span class="c1"># pragma: no cover</span></div></div>
+        <span class="k">pass</span></div></div>
 
 
 <span class="c1"># Dynamically create tests based on registered file classes</span>

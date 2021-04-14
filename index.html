@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>Welcome to yggdrasil’s documentation! &mdash; yggdrasil v1.5.0 documentation</title>
+  <title>Welcome to yggdrasil’s documentation! &mdash; yggdrasil v1.6.0 documentation</title>
   
 
   
@@ -63,7 +63,7 @@
             
             
               <div class="version">
-                v1.5.0
+                v1.6.0
               </div>
             
           
@@ -105,6 +105,7 @@
 <li class="toctree-l1"><a class="reference internal" href="units.html">Units</a></li>
 <li class="toctree-l1"><a class="reference internal" href="c_format_strings.html">C-Style Format Strings</a></li>
 <li class="toctree-l1"><a class="reference internal" href="debugging.html">Debugging</a></li>
+<li class="toctree-l1"><a class="reference internal" href="threading.html">OpenMP Threading in Models</a></li>
 <li class="toctree-l1"><a class="reference internal" href="examples/examples_toc.html">Examples</a></li>
 <li class="toctree-l1"><a class="reference internal" href="advanced/index.html">Advanced</a></li>
 <li class="toctree-l1"><a class="reference internal" href="development/index.html">Development</a></li>
@@ -219,7 +220,10 @@
 </li>
 <li class="toctree-l1"><a class="reference internal" href="server_client_io.html">Server/Client I/O</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="server_client_io.html#one-server-one-client">One Server, One Client</a></li>
+<li class="toctree-l2"><a class="reference internal" href="server_client_io.html#using-existing-inputs-outputs">Using Existing Inputs/Outputs</a></li>
 <li class="toctree-l2"><a class="reference internal" href="server_client_io.html#one-server-two-clients">One Server, Two Clients</a></li>
+<li class="toctree-l2"><a class="reference internal" href="server_client_io.html#two-servers-two-clients">Two Servers, Two Clients</a></li>
+<li class="toctree-l2"><a class="reference internal" href="server_client_io.html#wrapped-function-server">Wrapped Function Server</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="autowrap.html">Autowrapping Model Functions</a></li>
@@ -251,6 +255,7 @@
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="config.html">Configuration Files</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="config.html#updating-the-compilation-tools">Updating the Compilation Tools</a></li>
 <li class="toctree-l2"><a class="reference internal" href="config.html#debug-options">Debug Options</a></li>
 <li class="toctree-l2"><a class="reference internal" href="config.html#language-options">Language Options</a></li>
 <li class="toctree-l2"><a class="reference internal" href="config.html#rabbitmq-options">RabbitMQ Options</a></li>
@@ -268,6 +273,7 @@
 <li class="toctree-l2"><a class="reference internal" href="debugging.html#possible-errors">Possible Errors</a></li>
 </ul>
 </li>
+<li class="toctree-l1"><a class="reference internal" href="threading.html">OpenMP Threading in Models</a></li>
 <li class="toctree-l1"><a class="reference internal" href="examples/examples_toc.html">Examples</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="examples/gs_lesson1.html">gs_lesson1 Example</a></li>
 <li class="toctree-l2"><a class="reference internal" href="examples/gs_lesson2.html">gs_lesson2 Example</a></li>
@@ -286,6 +292,8 @@
 <li class="toctree-l2"><a class="reference internal" href="examples/rpc_lesson1.html">rpc_lesson1 Example</a></li>
 <li class="toctree-l2"><a class="reference internal" href="examples/rpc_lesson2.html">rpc_lesson2 Example</a></li>
 <li class="toctree-l2"><a class="reference internal" href="examples/rpc_lesson3.html">rpc_lesson3 Example</a></li>
+<li class="toctree-l2"><a class="reference internal" href="examples/rpc_lesson2b.html">rpc_lesson2b Example</a></li>
+<li class="toctree-l2"><a class="reference internal" href="examples/rpc_lesson3b.html">rpc_lesson3b Example</a></li>
 <li class="toctree-l2"><a class="reference internal" href="examples/model_function.html">model_function Example</a></li>
 <li class="toctree-l2"><a class="reference internal" href="examples/conditional_io.html">conditional_io Example</a></li>
 <li class="toctree-l2"><a class="reference internal" href="examples/transformed_io.html">transformed_io Example</a></li>
