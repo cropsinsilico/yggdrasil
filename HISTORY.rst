@@ -2,7 +2,7 @@
 History
 =======
 
-1.6.0 (2021-04-14)
+1.6.0 (2021-04-14) Single connection, async refactor, threading, & model copies
 ------------------
 
 * Made the asynchronous comm class more generic so it can be used to wrap any comm type and is more robust
