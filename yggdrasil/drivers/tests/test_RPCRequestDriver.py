@@ -61,14 +61,6 @@ class TestRPCRequestDriver(TestRPCRequestParam,
                            parent.TestConnectionDriver):
     r"""Test class for RPCRequestDriver class."""
 
-    def setup(self, *args, **kwargs):
-        r"""Wait for drivers to start."""
-        super(TestRPCRequestDriver, self).setup(*args, **kwargs)
-        T = self.instance.start_timeout()
-        while ((not T.is_out) and (not self.instance.is_valid)):
-            self.instance.sleep()  # pragma: debug
-        self.instance.stop_timeout()
-        
     def test_send_recv(self, msg_send=None):
         r"""Test routing of a short message between client and server."""
         try:

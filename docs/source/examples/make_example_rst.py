@@ -15,7 +15,7 @@ lang2print = {'python': 'Python',
               'all': 'Mixed',
               'all_nomatlab': 'Mixed w/o Matlab',
               'fortran': 'Fortran'}
-_default_lang = 'python'
+_default_lang = ['python', 'cpp', 'c', 'R', 'fortran', 'matlab']
 
 
 def get_file(fname, local=False):
@@ -75,13 +75,25 @@ def get_rel_path(fname, upone=False):
 
 
 def write_src_ref(fd, k):
-    write_src(fd, k, _default_lang, upone=True)
+    default = None
+    for x in _default_lang:
+        if x in source[k]:
+            default = x
+            break
+    assert(default)
+    write_src(fd, k, default, upone=True)
     fd.write('\n')
     write_ref_link(fd, k)
 
     
 def write_yml_ref(fd, k):
-    write_yml(fd, k, _default_lang, upone=True)
+    default = None
+    for x in _default_lang:
+        if x in source[k]:
+            default = x
+            break
+    assert(default)
+    write_yml(fd, k, default, upone=True)
     fd.write('\n')
     write_ref_link(fd, k)
 
@@ -178,6 +190,7 @@ rst_examples = ['gs_lesson%d' % x for x in range(1, 5)]
 rst_examples.append('gs_lesson4b')  # Special case
 rst_examples += ['formatted_io%d' % x for x in range(1, 10)]
 rst_examples += ['rpc_lesson%d' % x for x in range(1, 4)]
+rst_examples += ['rpc_lesson%db' % x for x in range(2, 4)]
 rst_examples += ['model_function', 'conditional_io', 'transformed_io']
 rst_examples += ['timesync%d' % x for x in range(1, 3)]
 make_toc_file(rst_examples)

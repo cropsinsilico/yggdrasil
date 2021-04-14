@@ -144,6 +144,8 @@ def install_packages(package_list, update=False, repos=None, **kwargs):
     for x in package_list:
         out = re.fullmatch(regex_ver, x).groupdict()
         kws = {}
+        if sys.platform.lower() == 'darwin':
+            kws['args'] = "INSTALL_opts=c(\"--no-multiarch\")"
         if x.startswith('units') and sys.platform.lower() == 'darwin':
             # These are the libs associated w/ brew
             libdir = '/usr/local/opt/udunits/include/'
@@ -186,13 +188,18 @@ def install_packages(package_list, update=False, repos=None, **kwargs):
                       '}']
     if req_ver:
         for x in req_ver:
-            name = x['name']
-            args = 'repos=NULL, type=\"source\"' + x.get('args', '')
+            name = "\"%s\"" % x['name']
+            args = ('repos=\"%s\"' % repos
+                    + ("," if x.get('args', '') else "")
+                    + x.get('args', ''))
             if 'ver' in x:
                 R_cmd.append(
                     ('packageurl <- \"http://cran.r-project.org/src/contrib/Archive/%s/'
                      '%s_%s.tar.gz\"') % (x['name'], x['name'], x['ver']))
                 name = 'packageurl'
+                args = ('repos=NULL, type=\"source\"'
+                        + ("," if x.get('args', '') else "")
+                        + x.get('args', ''))
             if update:
                 R_cmd += [
                     'if (is.element(\"%s\", installed.packages()[,1])) {' % x['name'],

@@ -57,7 +57,7 @@ def test_init():
     assert_raises(Exception, YggInterface.YggOutput, 'error')
 
 
-def do_send_recv(language='python', fmt='%f\\n%d', msg=[float(1.0), int(2)],
+def do_send_recv(language='python', fmt='%f\\n%d', msg=[float(1.0), np.int32(2)],
                  input_interface='YggInput', output_interface='YggOutput'):
     r"""Function to perform simple send/receive between two comms using a
     language interface that calls the Python interface.
@@ -90,13 +90,15 @@ def do_send_recv(language='python', fmt='%f\\n%d', msg=[float(1.0), int(2)],
     # Connect and utilize interface under disguise as target language
     try:
         with ModelEnv(language=language, YGG_THREADING='True'):
+            # Ensure start-up by waiting for signon message
+            i = YggInterface.YggInit(input_interface, (name, fmt))
+            i.drain_server_signon_messages()
             # Output
             o = YggInterface.YggInit(output_interface, (name, fmt))
             o.send(*msg)
             o.send_eof()
             o.close(linger=True)
             # Input
-            i = YggInterface.YggInit(input_interface, (name, fmt))
             assert_equal(i.recv(), (True, converter(msg)))
             assert_equal(i.recv(), (False, converter(YGG_MSG_EOF)))
     finally:
@@ -148,8 +150,8 @@ class TestBase(YggTestClassInfo):
         self.test_comm_kwargs = {}
         # self._driver_kwargs = {}
         self._inst_args = [self.name]
-        self.fmt_str = b'%5s\t%d\t%f\n'
-        self.fmt_str_matlab = b'%5s\\t%d\\t%f\\n'
+        self.fmt_str = '%5s\t%d\t%f\n'
+        self.fmt_str_matlab = '%5s\\t%d\\t%f\\n'
 
     @property
     def iodriver_class(self):
@@ -372,6 +374,11 @@ class TestYggRpcClient(TestYggOutput):
                                  'response_kwargs': {'format_str': self.fmt_str}}
         self._messages = [(b'one', np.int32(1), 1.0)]
         
+    def setup(self):
+        r"""Start driver and instance."""
+        super(TestYggRpcClient, self).setup()
+        self.test_comm.drain_server_signon_messages()
+        
     @property
     def iodriver_class(self):
         r"""class: Input/output driver class."""
@@ -420,6 +427,11 @@ class TestYggRpcServer(TestYggInput):
         self.test_comm_kwargs = {'commtype': 'client',
                                  'response_kwargs': {'format_str': self.fmt_str}}
         self._messages = [(b'one', np.int32(1), 1.0)]
+        
+    def setup(self):
+        r"""Start driver and instance."""
+        super(TestYggRpcServer, self).setup()
+        self.instance.drain_server_signon_messages()
         
     @property
     def iodriver_class(self):

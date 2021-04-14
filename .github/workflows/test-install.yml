@@ -28,6 +28,7 @@ env:
   USEVIRTUALENV: 0
   BUILDDOCS: 0
   YGG_GHA_JOB_ID_SUFFIX: null
+  TMPDIR: /tmp/
 jobs:
   test_pip:
     name: Test (${{ matrix.python-version }}, ${{ matrix.os }}, ${{ matrix.install-method
@@ -202,7 +203,12 @@ jobs:
       if: matrix.os == 'macos-latest' && matrix.install-method == 'conda'
       run: ./utils/setup_old_mac_sdk.sh
     - name: (CONDA) Install dependencies & package from existing build
+      id: conda1
+      continue-on-error: true
       if: matrix.install-method == 'conda'
+      run: python utils/setup_test_env.py install ${{ matrix.install-method }} --without-build
+    - name: (CONDA) Install dependencies & package from existing build (re-attempt)
+      if: ${{ steps.test2.outcome == 'failure' && matrix.install-method == 'conda'}}
       run: python utils/setup_test_env.py install ${{ matrix.install-method }} --without-build
     - name: (MACOS,CONDA) Set allow_multiple_omp config
       if: matrix.install-method == 'conda' && matrix.os == 'macos-latest'
@@ -226,6 +232,7 @@ jobs:
     - name: Re-run test failures (1st)
       if: ${{ steps.test1.outcome == 'failure' }}
       run: yggtest --ci --cov-append ${{ matrix.test-flags1 }} --last-failed --last-failed-no-failures=none
+        --debug
     - name: Run tests (2nd)
       if: matrix.test-flags2 != ''
       id: test2
@@ -234,16 +241,17 @@ jobs:
     - name: Re-run test failures (2nd)
       if: ${{ steps.test2.outcome == 'failure' }}
       run: yggtest --ci --cov-append ${{ matrix.test-flags2 }} --last-failed --last-failed-no-failures=none
+        --debug
     - name: Combine coverage reports
       continue-on-error: true
-      run: 'ls .*
+      run: '# ls .*
 
         coverage combine --append
 
         '
     - name: (CONDA) Generate XML version of coverage report
       if: matrix.install-method == 'conda'
-      run: 'ls .*
+      run: '# ls .*
 
         coverage xml
 
@@ -461,7 +469,12 @@ jobs:
       if: matrix.os == 'macos-latest' && matrix.install-method == 'conda'
       run: ./utils/setup_old_mac_sdk.sh
     - name: (CONDA) Install dependencies & package from existing build
+      id: conda1
+      continue-on-error: true
       if: matrix.install-method == 'conda'
+      run: python utils/setup_test_env.py install ${{ matrix.install-method }} --without-build
+    - name: (CONDA) Install dependencies & package from existing build (re-attempt)
+      if: ${{ steps.test2.outcome == 'failure' && matrix.install-method == 'conda'}}
       run: python utils/setup_test_env.py install ${{ matrix.install-method }} --without-build
     - name: (MACOS,CONDA) Set allow_multiple_omp config
       if: matrix.install-method == 'conda' && matrix.os == 'macos-latest'
@@ -485,6 +498,7 @@ jobs:
     - name: Re-run test failures (1st)
       if: ${{ steps.test1.outcome == 'failure' }}
       run: yggtest --ci --cov-append ${{ matrix.test-flags1 }} --last-failed --last-failed-no-failures=none
+        --debug
     - name: Run tests (2nd)
       if: matrix.test-flags2 != ''
       id: test2
@@ -493,16 +507,17 @@ jobs:
     - name: Re-run test failures (2nd)
       if: ${{ steps.test2.outcome == 'failure' }}
       run: yggtest --ci --cov-append ${{ matrix.test-flags2 }} --last-failed --last-failed-no-failures=none
+        --debug
     - name: Combine coverage reports
       continue-on-error: true
-      run: 'ls .*
+      run: '# ls .*
 
         coverage combine --append
 
         '
     - name: (CONDA) Generate XML version of coverage report
       if: matrix.install-method == 'conda'
-      run: 'ls .*
+      run: '# ls .*
 
         coverage xml
 
@@ -700,7 +715,12 @@ jobs:
       if: matrix.os == 'macos-latest' && matrix.install-method == 'conda'
       run: ./utils/setup_old_mac_sdk.sh
     - name: (CONDA) Install dependencies & package from existing build
+      id: conda1
+      continue-on-error: true
       if: matrix.install-method == 'conda'
+      run: python utils/setup_test_env.py install ${{ matrix.install-method }} --without-build
+    - name: (CONDA) Install dependencies & package from existing build (re-attempt)
+      if: ${{ steps.test2.outcome == 'failure' && matrix.install-method == 'conda'}}
       run: python utils/setup_test_env.py install ${{ matrix.install-method }} --without-build
     - name: (MACOS,CONDA) Set allow_multiple_omp config
       if: matrix.install-method == 'conda' && matrix.os == 'macos-latest'
@@ -724,6 +744,7 @@ jobs:
     - name: Re-run test failures (1st)
       if: ${{ steps.test1.outcome == 'failure' }}
       run: yggtest --ci --cov-append ${{ matrix.test-flags1 }} --last-failed --last-failed-no-failures=none
+        --debug
     - name: Run tests (2nd)
       if: matrix.test-flags2 != ''
       id: test2
@@ -732,16 +753,17 @@ jobs:
     - name: Re-run test failures (2nd)
       if: ${{ steps.test2.outcome == 'failure' }}
       run: yggtest --ci --cov-append ${{ matrix.test-flags2 }} --last-failed --last-failed-no-failures=none
+        --debug
     - name: Combine coverage reports
       continue-on-error: true
-      run: 'ls .*
+      run: '# ls .*
 
         coverage combine --append
 
         '
     - name: (CONDA) Generate XML version of coverage report
       if: matrix.install-method == 'conda'
-      run: 'ls .*
+      run: '# ls .*
 
         coverage xml
 
@@ -941,7 +963,12 @@ jobs:
       if: matrix.os == 'macos-latest' && matrix.install-method == 'conda'
       run: ./utils/setup_old_mac_sdk.sh
     - name: (CONDA) Install dependencies & package from existing build
+      id: conda1
+      continue-on-error: true
       if: matrix.install-method == 'conda'
+      run: python utils/setup_test_env.py install ${{ matrix.install-method }} --without-build
+    - name: (CONDA) Install dependencies & package from existing build (re-attempt)
+      if: ${{ steps.test2.outcome == 'failure' && matrix.install-method == 'conda'}}
       run: python utils/setup_test_env.py install ${{ matrix.install-method }} --without-build
     - name: (MACOS,CONDA) Set allow_multiple_omp config
       if: matrix.install-method == 'conda' && matrix.os == 'macos-latest'
@@ -965,6 +992,7 @@ jobs:
     - name: Re-run test failures (1st)
       if: ${{ steps.test1.outcome == 'failure' }}
       run: yggtest --ci --cov-append ${{ matrix.test-flags1 }} --last-failed --last-failed-no-failures=none
+        --debug
     - name: Run tests (2nd)
       if: matrix.test-flags2 != ''
       id: test2
@@ -973,16 +1001,17 @@ jobs:
     - name: Re-run test failures (2nd)
       if: ${{ steps.test2.outcome == 'failure' }}
       run: yggtest --ci --cov-append ${{ matrix.test-flags2 }} --last-failed --last-failed-no-failures=none
+        --debug
     - name: Combine coverage reports
       continue-on-error: true
-      run: 'ls .*
+      run: '# ls .*
 
         coverage combine --append
 
         '
     - name: (CONDA) Generate XML version of coverage report
       if: matrix.install-method == 'conda'
-      run: 'ls .*
+      run: '# ls .*
 
         coverage xml
 
@@ -1180,7 +1209,12 @@ jobs:
       if: matrix.os == 'macos-latest' && matrix.install-method == 'conda'
       run: ./utils/setup_old_mac_sdk.sh
     - name: (CONDA) Install dependencies & package from existing build
+      id: conda1
+      continue-on-error: true
       if: matrix.install-method == 'conda'
+      run: python utils/setup_test_env.py install ${{ matrix.install-method }} --without-build
+    - name: (CONDA) Install dependencies & package from existing build (re-attempt)
+      if: ${{ steps.test2.outcome == 'failure' && matrix.install-method == 'conda'}}
       run: python utils/setup_test_env.py install ${{ matrix.install-method }} --without-build
     - name: (MACOS,CONDA) Set allow_multiple_omp config
       if: matrix.install-method == 'conda' && matrix.os == 'macos-latest'
@@ -1204,6 +1238,7 @@ jobs:
     - name: Re-run test failures (1st)
       if: ${{ steps.test1.outcome == 'failure' }}
       run: yggtest --ci --cov-append ${{ matrix.test-flags1 }} --last-failed --last-failed-no-failures=none
+        --debug
     - name: Run tests (2nd)
       if: matrix.test-flags2 != ''
       id: test2
@@ -1212,16 +1247,17 @@ jobs:
     - name: Re-run test failures (2nd)
       if: ${{ steps.test2.outcome == 'failure' }}
       run: yggtest --ci --cov-append ${{ matrix.test-flags2 }} --last-failed --last-failed-no-failures=none
+        --debug
     - name: Combine coverage reports
       continue-on-error: true
-      run: 'ls .*
+      run: '# ls .*
 
         coverage combine --append
 
         '
     - name: (CONDA) Generate XML version of coverage report
       if: matrix.install-method == 'conda'
-      run: 'ls .*
+      run: '# ls .*
 
         coverage xml
 

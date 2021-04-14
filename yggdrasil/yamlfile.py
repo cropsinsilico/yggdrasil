@@ -183,7 +183,8 @@ def parse_yaml(files, as_function=False):
     yml_prep = prep_yaml(files)
     # print('prepped')
     # pprint.pprint(yml_prep)
-    yml_norm = s.validate(yml_prep, normalize=True)
+    yml_norm = s.validate(yml_prep, normalize=True,
+                          no_defaults=True, required_defaults=True)
     # print('normalized')
     # pprint.pprint(yml_norm)
     # Determine if any of the models require synchronization
@@ -198,7 +199,7 @@ def parse_yaml(files, as_function=False):
                 if isinstance(tsync, str):
                     tsync = {'name': tsync}
                     yml['timesync'][i] = tsync
-            timesync_names.append(tsync['name'])
+                timesync_names.append(tsync['name'])
             yml.setdefault('timesync_client_of', [])
             yml['timesync_client_of'].append(tsync['name'])
     for tsync in set(timesync_names):
@@ -485,10 +486,17 @@ def parse_model(yml, existing):
     yml['model_index'] = len(existing['model'])
     for io in ['inputs', 'outputs']:
         for x in yml[io]:
-            if yml.get('allow_threading', False):
+            if yml.get('function', False) and (not x.get('outside_loop', False)):
+                x.setdefault('dont_copy', True)
+            if yml.get('allow_threading', False) or (
+                    (yml.get('copies', 1) > 1)
+                    and (not x.get('dont_copy', False))):
                 x['allow_multiple_comms'] = True
+            # TODO: Replace model_driver with partner_model?
             x['model_driver'] = [yml['name']]
             x['partner_model'] = yml['name']
+            if yml.get('copies', 1) > 1:
+                x['partner_copies'] = yml['copies']
             x['partner_language'] = language
             existing = parse_component(x, io[:-1], existing=existing)
     for k in yml.get('env', {}).keys():

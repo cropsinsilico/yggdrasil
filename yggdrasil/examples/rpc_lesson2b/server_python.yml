@@ -1,0 +1,13 @@
+---
+
+model:
+  name: server
+  language: python
+  args: ./src/server.py
+  is_server: True  # Creates a RPC server queue called "server"
+  copies: 2
+  inputs:
+    name: params
+    default_file:
+      name: ./Input/server_params.txt
+      filetype: ascii

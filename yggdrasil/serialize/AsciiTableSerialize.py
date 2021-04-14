@@ -50,15 +50,26 @@ class AsciiTableSerialize(DefaultSerialize):
         'field_names': {'type': 'array', 'items': {'type': 'string'}},
         'field_units': {'type': 'array', 'items': {'type': 'string'}},
         'as_array': {'type': 'boolean', 'default': False},
-        'delimiter': {'type': 'string',
-                      'default': _default_delimiter_str},
+        'delimiter': {'type': 'string', 'default': _default_delimiter_str},
         'use_astropy': {'type': 'boolean', 'default': False}}
     _attr_conv = DefaultSerialize._attr_conv + ['format_str', 'delimiter']
     has_header = True
     default_read_meth = 'readline'  # because default for as_array is False
     default_datatype = {'type': 'array'}
 
+    def __init__(self, **kwargs):
+        self._explicit_delimiter = ('delimiter' in kwargs)
+        super(AsciiTableSerialize, self).__init__(**kwargs)
+
     def update_serializer(self, *args, **kwargs):
+        if 'delimiter' in kwargs:
+            self._explicit_delimiter = True
+        if self._explicit_delimiter and ('format_str' in kwargs):
+            info = serialize.format2table(kwargs['format_str'])
+            info['delimiter'] = self.delimiter
+            info.setdefault('comment', '')
+            info.setdefault('newline', '')
+            kwargs['format_str'] = serialize.table2format(**info)
         # Transform scalar into array for table
         old_typedef = kwargs.get('datatype', {})
         if old_typedef.get('type', 'array') != 'array':

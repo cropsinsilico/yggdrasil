@@ -325,7 +325,7 @@ def YggAsciiArrayInput(name, **kwargs):
     return YggAsciiTableInput(name, **kwargs)
 
 
-def YggAsciiArrayOutput(name, fmt, **kwargs):
+def YggAsciiArrayOutput(name, fmt=None, **kwargs):
     r"""Get class for handling table-like formatted output as arrays.
 
     Args:

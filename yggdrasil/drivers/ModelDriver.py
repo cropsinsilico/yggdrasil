@@ -77,7 +77,7 @@ def remove_products(products, source_products, timer_class=None):
         remove_product(p, timer_class=timer_class)
     for p in products:
         remove_product(p, timer_class=timer_class, check_for_source=True)
-        
+
 
 class ModelDriver(Driver):
     r"""Base class for Model drivers and for running executable based models.
@@ -160,6 +160,8 @@ class ModelDriver(Driver):
         allow_threading (bool, optional): If True, comm connections will be set up
             so that the model-side comms can be used by more than one thread.
             Defaults to False.
+        copies (int, optional): The number of copies of the model that should be
+            created. Defaults to 1.
         **kwargs: Additional keyword arguments are passed to parent class.
 
     Class Attributes:
@@ -255,6 +257,7 @@ class ModelDriver(Driver):
             that should be restored during cleanup.
         allow_threading (bool): If True, comm connections will be set up so that
             the model-side comms can be used by more than one thread.
+        copies (int): The number of copies of the model that should be created.
 
     Raises:
         RuntimeError: If both with_strace and with_valgrind are True.
@@ -318,6 +321,7 @@ class ModelDriver(Driver):
             'anyOf': [
                 {'type': 'boolean'}, {'type': 'string'},
                 {'type': 'object',
+                 'required': ['name'],
                  'properties': {
                      'name': {'type': 'string', 'default': 'timesync'},
                      'inputs': {'anyOf': [
@@ -333,6 +337,7 @@ class ModelDriver(Driver):
                      'anyOf': [
                          {'type': 'string'},
                          {'type': 'object',
+                          'required': ['name'],
                           'properties': {
                               'name': {'type': 'string',
                                        'default': 'timesync'},
@@ -356,7 +361,8 @@ class ModelDriver(Driver):
                            'items': {'type': 'string'}},
         'outputs_in_inputs': {'type': 'boolean'},
         'logging_level': {'type': 'string', 'default': ''},
-        'allow_threading': {'type': 'boolean'}}
+        'allow_threading': {'type': 'boolean'},
+        'copies': {'type': 'integer', 'default': 1, 'minimum': 1}}
     _schema_excluded_from_class = ['name', 'language', 'args', 'working_dir']
     _schema_excluded_from_class_validation = ['inputs', 'outputs']
     
@@ -467,7 +473,7 @@ class ModelDriver(Driver):
                     inputs=copy.deepcopy(self.inputs),
                     outputs=copy.deepcopy(self.outputs),
                     outputs_in_inputs=self.model_outputs_in_inputs,
-                    client_comms=client_comms)
+                    client_comms=client_comms, copies=self.copies)
                 with open(args[0], 'w') as fd:
                     fd.write('\n'.join(lines))
         # Parse arguments
@@ -1192,11 +1198,16 @@ class ModelDriver(Driver):
         env['YGG_SUBPROCESS'] = "True"
         env['YGG_MODEL_INDEX'] = str(self.model_index)
         env['YGG_MODEL_LANGUAGE'] = self.language
-        env['YGG_MODEL_NAME'] = self.name
-        env['YGG_PYTHON_EXEC'] = sys.executable
+        if self.copies > 1:
+            env['YGG_MODEL_NAME'] = self.name.split('_copy')[0]
+            env['YGG_MODEL_COPY'] = self.name.split('_copy')[-1]
+        else:
+            env['YGG_MODEL_NAME'] = self.name
+        env['YGG_MODEL_COPIES'] = str(self.copies)
+        # env['YGG_PYTHON_EXEC'] = sys.executable
         env['YGG_DEFAULT_COMM'] = tools.get_default_comm()
         env['YGG_NCLIENTS'] = str(len(self.clients))
-        if self.allow_threading:
+        if self.allow_threading or (self.copies > 1):
             env['YGG_THREADING'] = '1'
         if isinstance(self.is_server, dict):
             env['YGG_SERVER_INPUT'] = self.is_server['input']
@@ -1314,6 +1325,7 @@ class ModelDriver(Driver):
 
     @property
     def io_errors(self):
+        r"""list: Errors produced by input/output drivers to this model."""
         errors = []
         for drv in self.yml.get('input_drivers', []):
             errors += drv['instance'].errors
@@ -1826,7 +1838,7 @@ class ModelDriver(Driver):
     def write_model_wrapper(cls, model_file, model_function,
                             inputs=[], outputs=[],
                             outputs_in_inputs=None, verbose=False,
-                            client_comms=[]):
+                            client_comms=[], copies=1):
         r"""Return the lines required to wrap a model function as an integrated
         model.
 
@@ -1845,6 +1857,9 @@ class ModelDriver(Driver):
                 are displayed. Defaults to False.
             client_comms (list, optional): List of the names of client comms
                 that should be removed from the list of outputs. Defaults to [].
+            copies (int, optional): Number of times the model driver is
+                duplicated. If more than one, no error will be raised in the
+                event there is never a call the the function. Defaults to 1.
 
         Returns:
             list: Lines of code wrapping the provided model with the necessary
@@ -1935,12 +1950,15 @@ class ModelDriver(Driver):
         loop_lines = []
         # Receive inputs
         any_loop_inputs = False
+        loop_iter_var = iter_var
+        if copies > 1:
+            loop_iter_var = None
         for x in inputs:
             if not x.get('outside_loop', False):
                 any_loop_inputs = True
                 loop_lines += cls.write_model_recv(x['channel'], x,
                                                    flag_var=flag_var,
-                                                   iter_var=iter_var,
+                                                   iter_var=loop_iter_var,
                                                    allow_failure=True)
         # Call model
         loop_lines += cls.write_model_function_call(

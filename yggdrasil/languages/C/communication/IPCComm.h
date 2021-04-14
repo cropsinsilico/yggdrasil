@@ -200,7 +200,7 @@ int new_ipc_address(comm_t *comm) {
  */
 static inline
 int init_ipc_comm(comm_t *comm) {
-  if (comm->valid == 0)
+  if (!(comm->flags & COMM_FLAG_VALID))
     return -1;
   if (strlen(comm->name) == 0) {
     sprintf(comm->name, "tempinitIPC.%s", comm->address);

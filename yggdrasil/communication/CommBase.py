@@ -137,6 +137,17 @@ class CommMessage(object):
                     return False  # pragma: debug
         return True
 
+    def apply_function(self, x):
+        r"""Apply a function to the message.
+
+        Args:
+            x (function): Function to apply.
+
+        """
+        out = x(self)
+        out.additional_messages = [x(imsg) for imsg in out.additional_messages]
+        return out
+
 
 def is_registered(commtype, key):
     r"""Determine if a comm object has been registered under the specified key.
@@ -295,11 +306,11 @@ class CommServer(multitasking.YggTaskLoop):
             name, cli_address, srv_address), **kwargs)
         _registered_servers[self.srv_address] = self
 
-    def add_server(self):
-        r"""Increment the server count."""
-        global _registered_servers
-        _registered_servers[self.srv_address].srv_count += 1
-        self.debug("Added server to server: nservers = %d", self.srv_count)
+    # def add_server(self):
+    #     r"""Increment the server count."""
+    #     global _registered_servers
+    #     _registered_servers[self.srv_address].srv_count += 1
+    #     self.debug("Added server to server: nservers = %d", self.srv_count)
 
     def add_client(self):
         r"""Increment the client count."""
@@ -307,15 +318,15 @@ class CommServer(multitasking.YggTaskLoop):
         _registered_servers[self.srv_address].cli_count += 1
         self.debug("Added client to server: nclients = %d", self.cli_count)
 
-    def remove_server(self):
-        r"""Decrement the client count, closing the server if all clients done."""
-        global _registered_servers
-        self.debug("Removing server from server")
-        _registered_servers[self.srv_address].srv_count -= 1
-        if _registered_servers[self.srv_address].srv_count <= 0:
-            self.debug("Shutting down server")
-            self.terminate()
-            _registered_servers.pop(self.srv_address)
+    # def remove_server(self):
+    #     r"""Decrement the client count, closing the server if all clients done."""
+    #     global _registered_servers
+    #     self.debug("Removing server from server")
+    #     _registered_servers[self.srv_address].srv_count -= 1
+    #     if _registered_servers[self.srv_address].srv_count <= 0:
+    #         self.debug("Shutting down server")
+    #         self.terminate()
+    #         _registered_servers.pop(self.srv_address)
             
     def remove_client(self):
         r"""Decrement the client count, closing the server if all clients done."""
@@ -431,6 +442,11 @@ class CommBase(tools.YggClass):
             input/outputs to/from a model being wrapped. The receive/send
             calls for this comm will be outside the loop for the model.
             Defaults to False.
+        dont_copy (bool, optional): If True, the comm will not be duplicated
+            in the even a model is duplicated via the 'copies' parameter.
+            Defaults to False except for in the case that a model is wrapped
+            and the comm is inside the loop or that a model is a RPC input to
+            a model server.
         default_file (:class:FileComm, optional): Comm information for
             a file that input should be drawn from (for input comms)
             or that output should be sent to (for output comms) in
@@ -494,50 +510,52 @@ class CommBase(tools.YggClass):
     _schema_type = 'comm'
     _schema_subtype_key = 'commtype'
     _schema_required = ['name', 'commtype', 'datatype']
-    _schema_properties = {'name': {'type': 'string'},
-                          'commtype': {'type': 'string', 'default': 'default',
-                                       'description': ('Communication mechanism '
-                                                       'that should be used.')},
-                          'datatype': {'type': 'schema',
-                                       'default': {'type': 'bytes'}},
-                          'recv_converter': {'anyOf': [
-                              {'$ref': '#/definitions/transform'},
-                              {'type': ['function', 'string']},
-                              {'type': 'array',
-                               'items': {'anyOf': [
-                                   {'$ref': '#/definitions/transform'},
-                                   {'type': ['function', 'string']}]}}]},
-                          'send_converter': {'anyOf': [
-                              {'$ref': '#/definitions/transform'},
-                              {'type': ['function', 'string']},
-                              {'type': 'array',
-                               'items': {'anyOf': [
-                                   {'$ref': '#/definitions/transform'},
-                                   {'type': ['function', 'string']}]}}]},
-                          'vars': {'type': 'array',
-                                   'items': {'type': 'string'}},
-                          'length_map': {
-                              'type': 'object',
-                              'additionalProperties': {'type': 'string'}},
-                          'format_str': {'type': 'string'},
-                          'field_names': {'type': 'array',
-                                          'items': {'type': 'string'}},
-                          'field_units': {'type': 'array',
-                                          'items': {'type': 'string'}},
-                          'as_array': {'type': 'boolean', 'default': False},
-                          'filter': {'$ref': '#/definitions/filter'},
-                          'transform': {'anyOf': [
-                              {'$ref': '#/definitions/transform'},
-                              {'type': ['function', 'string']},
-                              {'type': 'array',
-                               'items': {'anyOf': [
-                                   {'$ref': '#/definitions/transform'},
-                                   {'type': ['function', 'string']}]}}]},
-                          'is_default': {'type': 'boolean', 'default': False},
-                          'outside_loop': {'type': 'boolean',
-                                           'default': False},
-                          'default_file': {'$ref': '#/definitions/file'},
-                          'default_value': {'type': 'any'}}
+    _schema_properties = {
+        'name': {'type': 'string'},
+        'commtype': {'type': 'string', 'default': 'default',
+                     'description': ('Communication mechanism '
+                                     'that should be used.')},
+        'datatype': {'type': 'schema',
+                     'default': {'type': 'bytes'}},
+        'recv_converter': {'anyOf': [
+            {'$ref': '#/definitions/transform'},
+            {'type': ['function', 'string']},
+            {'type': 'array',
+             'items': {'anyOf': [
+                 {'$ref': '#/definitions/transform'},
+                 {'type': ['function', 'string']}]}}]},
+        'send_converter': {'anyOf': [
+            {'$ref': '#/definitions/transform'},
+            {'type': ['function', 'string']},
+            {'type': 'array',
+             'items': {'anyOf': [
+                 {'$ref': '#/definitions/transform'},
+                 {'type': ['function', 'string']}]}}]},
+        'vars': {'type': 'array',
+                 'items': {'type': 'string'}},
+        'length_map': {
+            'type': 'object',
+            'additionalProperties': {'type': 'string'}},
+        'format_str': {'type': 'string'},
+        'field_names': {'type': 'array',
+                        'items': {'type': 'string'}},
+        'field_units': {'type': 'array',
+                        'items': {'type': 'string'}},
+        'as_array': {'type': 'boolean', 'default': False},
+        'filter': {'$ref': '#/definitions/filter'},
+        'transform': {'anyOf': [
+            {'$ref': '#/definitions/transform'},
+            {'type': ['function', 'string']},
+            {'type': 'array',
+             'items': {'anyOf': [
+                 {'$ref': '#/definitions/transform'},
+                 {'type': ['function', 'string']}]}}]},
+        'is_default': {'type': 'boolean', 'default': False},
+        'outside_loop': {'type': 'boolean',
+                         'default': False},
+        'dont_copy': {'type': 'boolean', 'default': False},
+        'default_file': {'$ref': '#/definitions/file'},
+        'default_value': {'type': 'any'}}
     _schema_excluded_from_class = ['name']
     _default_serializer = 'default'
     _default_serializer_class = None
@@ -546,8 +564,8 @@ class CommBase(tools.YggClass):
     _maxMsgSize = 0
     address_description = None
     no_serialization = False
-    _model_schema_prop = ['is_default', 'outside_loop', 'default_file',
-                          'default_value']
+    _model_schema_prop = ['is_default', 'outside_loop', 'dont_copy',
+                          'default_file', 'default_value']
     _disconnect_attr = (tools.YggClass._disconnect_attr
                         + ['_closing_event', '_closing_thread',
                            '_eof_recv', '_eof_sent'])
@@ -557,7 +575,7 @@ class CommBase(tools.YggClass):
     _finalize_message_kws = ['skip_python2language', 'after_finalize_message']
 
     def __init__(self, name, address=None, direction='send', dont_open=False,
-                 is_interface=None, language=None,
+                 is_interface=None, language=None, partner_copies=0,
                  partner_model=None, partner_language='python',
                  recv_timeout=0.0, close_on_eof_recv=True, close_on_eof_send=False,
                  single_use=False, reverse_names=False, no_suffix=False,
@@ -606,11 +624,13 @@ class CommBase(tools.YggClass):
             # All models connect to python connection drivers
             partner_model = None
             partner_language = 'python'
+            partner_copies = 1
             recv_timeout = False
         if language is None:
             language = 'python'
         self.language = language
         self.partner_model = partner_model
+        self.partner_copies = partner_copies
         self.partner_language = partner_language
         self.partner_language_driver = None
         if self.partner_language:
@@ -618,9 +638,6 @@ class CommBase(tools.YggClass):
                 'model', self.partner_language)
         self.language_driver = import_component('model', self.language)
         self.touches_model = (self.partner_model is not None)
-        self.allow_multiple_comms = allow_multiple_comms
-        if self.is_interface and (os.environ.get('YGG_THREADING', False)):
-            self.allow_multiple_comms = True
         self.is_client = is_client
         self.is_server = is_server
         self.is_async = is_async
@@ -644,8 +661,16 @@ class CommBase(tools.YggClass):
         self._server_class = CommServer
         self._server_kwargs = {}
         self._send_serializer = True
+        self.allow_multiple_comms = allow_multiple_comms
+        if (((not self.single_use)
+             and ((self.is_interface and os.environ.get('YGG_THREADING', False))
+                  or (self.model_copies > 1) or (self.partner_copies > 1)))):
+            self.allow_multiple_comms = True
         if self.single_use and (not self.is_response_server):
             self._send_serializer = False
+        self.create_proxy = ((self.is_client or self.allow_multiple_comms)
+                             and (not self.is_interface)
+                             and (self.direction != 'recv'))
         # Add interface tag
         if self.is_interface:
             self._name += '_I'
@@ -937,6 +962,11 @@ class CommBase(tools.YggClass):
         r"""str: Name of the model using the comm."""
         return os.environ.get('YGG_MODEL_NAME', '')
 
+    @property
+    def model_copies(self):
+        r"""int: Number of copies of the model using the comm."""
+        return int(os.environ.get('YGG_MODEL_COPIES', '1'))
+
     @classmethod
     def underlying_comm_class(cls):
         r"""str: Name of underlying communication class."""
@@ -1052,6 +1082,7 @@ class CommBase(tools.YggClass):
                   'allow_multiple_comms': self.allow_multiple_comms}
         kwargs['address'] = self.opp_address
         kwargs['serializer'] = self.serializer
+        # TODO: Pass copies/partner_copies in kwargs?
         if self.direction == 'send':
             kwargs['direction'] = 'recv'
         else:
@@ -1061,7 +1092,7 @@ class CommBase(tools.YggClass):
 
     def bind(self):
         r"""Bind in place of open."""
-        if (self.is_client or self.allow_multiple_comms) and (not self.is_interface):
+        if self.create_proxy:
             self.signon_to_server()
 
     def open(self):
@@ -1094,7 +1125,7 @@ class CommBase(tools.YggClass):
             self._close(linger=linger)
             self._n_sent = 0
             self._n_recv = 0
-            if (self.is_client or self.allow_multiple_comms) and (not self.is_interface):
+            if self.create_proxy:
                 self.debug("Signing off from server")
                 self.signoff_from_server()
             if len(self._work_comms) > 0:
@@ -1545,9 +1576,10 @@ class CommBase(tools.YggClass):
                 if self.direction == 'send':
                     self._server.add_client()
                     self.address = self._server.cli_address
-                else:
-                    self._server.add_server()
-                    self.address = self._server.srv_address
+                else:  # pragma: debug
+                    # self._server.add_server()
+                    # self.address = self._server.srv_address
+                    raise RuntimeError("Receive-side proxy untested")
 
     def signoff_from_server(self):
         r"""Remove a client from the server."""
@@ -1557,8 +1589,9 @@ class CommBase(tools.YggClass):
                 self.debug("Signing off")
                 if self.direction == 'send':
                     self._server.remove_client()
-                else:
-                    self._server.remove_server()
+                else:  # pragma: debug
+                    # self._server.remove_server()
+                    raise RuntimeError("Receive-side proxy untested")
                 self._server = None
 
     # TEMP COMMS
@@ -1794,7 +1827,10 @@ class CommBase(tools.YggClass):
         elif msg.flag == FLAG_EOF:
             with self._closing_thread.lock:
                 if not self._eof_sent.is_set():
-                    self._eof_sent.set()
+                    if self.partner_copies == 1:
+                        self._eof_sent.set()
+                    else:
+                        self.partner_copies -= 1
                 else:  # pragma: debug
                     self.error("EOF SENT TWICE")
                     return False
@@ -1842,11 +1878,19 @@ class CommBase(tools.YggClass):
             except ValueError:  # pragma: debug
                 self.exception('Failed to send (unyt array in message)')
         except TemporaryCommunicationError if self.is_async else NeverMatch:
-            if msg.flag == FLAG_EOF:
+            if (msg.flag == FLAG_EOF) and self._used:
                 with self._closing_thread.lock:
                     self._eof_sent.clear()
             raise
         except BaseException:
+            # if (msg.flag == FLAG_EOF) and self._used:  # pragma: intermittent
+            #     # This will only be called if the EOF send fails because
+            #     # the receiving connection has already been closed (most
+            #     # likely due to circular dependence).
+            #     if self.close_on_eof_send:
+            #         self.debug('Close on send EOF (send failed)')
+            #         self.linger_close()
+            #     return True
             # Handle error caused by calling repr on unyt array that isn't float64
             try:
                 self.exception('Failed to send: %.100s.', str(msg.args))
@@ -1911,6 +1955,10 @@ class CommBase(tools.YggClass):
             # 3. Check if the message is EOF
             if self.is_eof(msg.args):
                 msg.flag = FLAG_EOF
+                if self.partner_copies > 1:
+                    for i in range(self.partner_copies - 1):
+                        msg.add_message(args=msg.args,
+                                        header=copy.deepcopy(msg.header))
         if not skip_processing:
             # 4. Check if the message should be filtered
             if msg.flag not in [FLAG_SKIP, FLAG_EOF]:
@@ -1938,7 +1986,7 @@ class CommBase(tools.YggClass):
             # 6. Apply after_prepare_message function
             if after_prepare_message:
                 for x in after_prepare_message:
-                    msg = x(msg)
+                    msg = msg.apply_function(x)
         # Looping over all messages (allowing for transform to produce iterator)
         if (msg.flag not in [FLAG_SKIP]) and (not skip_serialization):
             for x in [msg] + msg.additional_messages:
@@ -2218,13 +2266,18 @@ class CommBase(tools.YggClass):
         # 7. Apply after_finalize_message functions
         if after_finalize_message:
             for x in after_finalize_message:
-                msg = x(msg)
+                msg = msg.apply_function(x)
         msg.finalized = True
         return msg
 
     def recv_nolimit(self, *args, **kwargs):
         r"""Alias for recv."""
         return self.recv(*args, **kwargs)
+
+    def drain_server_signon_messages(self, **kwargs):
+        r"""Drain server signon messages. This should only be used
+        for testing purposes."""
+        pass
 
     def drain_messages(self, direction=None, timeout=None, variable=None):
         r"""Sleep while waiting for messages to be drained."""

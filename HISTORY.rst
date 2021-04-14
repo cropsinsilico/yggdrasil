@@ -2,7 +2,7 @@
 History
 =======
 
-1.5.0 (XXXX-XX-XX)
+1.6.0 (2021-04-14)
 ------------------
 
 * Made the asynchronous comm class more generic so it can be used to wrap any comm type and is more robust
@@ -24,7 +24,18 @@ History
 * Added new tests for transformations as part of comms and fixed bugs that those tests showed in how empty messages are transformed
 * Modify comm class such that the type is updated based on the transformed datatype when receiving *and* sending
 * Added a dedicated CommMessage class for wrapping messages with information about the message (e.g. header, work comms, status) and update comm & connection methods to expect this type
-* Fixed a bug that caused segfault when calling yggdrasil interface from inside a threaded model by introducing an 'allow_threading' parameter for models which sets a new parameter 'allow_multiple_comms' for comms associated with the model and causes the comm to be initialized such that multiple connections to the same address can be made (this is really just important for ZMQ comms and should only be invoked when using a server/client communication pattern).
+* Fixed a bug that caused segfault when calling yggdrasil interface from inside a threaded model by introducing an 'allow_threading' parameter for models which sets a new parameter 'allow_multiple_comms' for comms associated with the model and causes the comm to be initialized such that multiple connections to the same address can be made (this is really just important for ZMQ comms and should only be invoked when using a server/client communication pattern)
+* Allow multiple models to be run from a single YAML entry via the 'copies' model parameter.
+* Added DuplicatedModelDriver to handle model duplication via 'copies'
+* Added comm parameter 'dont_copy' to prevent duplication of comms (sharing) when a model is duplicated.
+* Updated ZMQProxy class so that server comms 'sign on' to the proxy by responding to a sign-on message that is sent continuously until a server signs on. Requests from clients received before the sign-on exchange are backlogged and sent after sign-on.
+* Updated ZMQComm to allow multiple connections during threading or when a model is duplicated.
+* Added rpc_lesson2b to demonstrate use of 'copies' parameter.
+* Updated the classes in the C interface to use bit flags
+* Updated documentation with information on using threads with yggdrasil and more advanced RPC features.
+* Refactored CommBase so that there are two components to send and receive calls and use the refactoring to cut down on repeat serialization in async comms and connection drivers.
+* Change fmt input parameter to YggAsciiArrayOutput Python interface to optional
+* Allow delimiter in YAML to override format_str provided via the interface for output serialization
 * Refactor CommBase so that there are two components to send and receive calls and use the refactoring to cut down on repeat serialization in async comms and connection drivers.
 
   When sending...
@@ -37,10 +48,6 @@ History
   1) recv_message, which receives the message and deserializes it, and
   2) finalize_message, which filters and transforms messages and performs actions associated with specific message types.
 
-TODO
-~~~~
-
-* Updated documentation with information on using threads with yggdrasil.
 
 1.5.0 (2021-02-10) Migrate to GHA, refactor CLI, & fix bugs
 ------------------

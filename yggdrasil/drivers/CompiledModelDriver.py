@@ -84,12 +84,16 @@ def get_compatible_tool(tool, tooltype, language, default=False):
                         tool.tooltype))
 
 
-def get_compilation_tool_registry(tooltype):
+def get_compilation_tool_registry(tooltype, init_languages=None):
     r"""Return the registry containing compilation tools of the specified type.
 
     Args:
         tooltype (str): Type of tool. Valid values include 'compiler', 'linker',
             and 'archiver'.
+        init_languages (list, optional): List of languages that should be
+            imported prior to returning the registry, thereby populating the
+            compilation tools for that language. Defaults to None and is
+            ignored.
 
     Returns:
         collections.OrderedDict: Registry for specified type.
@@ -112,6 +116,10 @@ def get_compilation_tool_registry(tooltype):
         raise ValueError(("tooltype '%s' is not supported. This keyword must "
                           "be one of 'compiler', 'linker', or 'archiver'.")
                          % tooltype)
+    if isinstance(init_languages, list):
+        for x in init_languages:
+            if x not in reg.get('by_language', {}):
+                import_component('model', x)
     return reg
 
 

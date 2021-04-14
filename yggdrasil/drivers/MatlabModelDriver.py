@@ -1024,8 +1024,9 @@ class MatlabModelDriver(InterpretedModelDriver):  # pragma: matlab
 
         """
         if comm.direction == 'recv':
-            while comm.recv(timeout=0)[0]:
-                comm.sleep()
+            if not (comm.is_server or comm.is_client):
+                while comm.recv(timeout=0)[0]:
+                    comm.sleep()
         else:
             comm.send_eof()
         comm.linger_close()

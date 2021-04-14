@@ -289,6 +289,19 @@ class ConnectionDriver(Driver):
                 comm_list[i].setdefault('commtype', comm_type)
             if self.as_process:
                 comm_list[i]['buffer_task_method'] = 'process'
+            if (((comm_list[i].get('partner_copies', 0) > 1)
+                 and (not comm_list[i].get('is_client', False))
+                 and (direction == 'send')
+                 and (not comm_list[i].get('dont_copy', False)))):
+                from yggdrasil.communication import ForkComm
+                # TODO: Handle recv?
+                comm_list[i]['commtype'] = [
+                    dict(comm_list[i],
+                         partner_model=(
+                             '%s_copy%d' % (comm_list[i]['partner_model'], idx)))
+                    for idx in range(comm_list[i]['partner_copies'])]
+                for k in ForkComm.ForkComm.child_keys:
+                    comm_list[i].pop(k, None)
         comm_kws['commtype'] = copy.deepcopy(comm_list)
         self.debug('%s comm_kws:\n%s', attr_comm, self.pprint(comm_kws, 1))
         setattr(self, attr_comm, new_comm(**comm_kws))
@@ -586,7 +599,7 @@ class ConnectionDriver(Driver):
                 self.icomm.close()
         elif direction == 'output':
             with self.lock:
-                self.icomm.close()
+                # self.icomm.close()
                 self.ocomm.close()
         self.set_close_state('%s model exit' % direction)
         self.debug('Exit of %s model triggered close', direction)

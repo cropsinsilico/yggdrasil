@@ -48,6 +48,11 @@ class TestForkComm(parent.TestCommBase):
         for x in comm.comm_list:
             super(TestForkComm, self).add_filter(x, filter=filter)
             
+    def test_send_recv_filter_eof(self, **kwargs):
+        r"""Test send/recv of EOF with filter."""
+        kwargs.setdefault('recv_timeout', 2 * self.timeout)
+        super(TestForkComm, self).test_send_recv_filter_eof(**kwargs)
+        
     def test_send_recv_filter_recv_filter(self, **kwargs):
         r"""Test send/recv with filter that blocks recv."""
         kwargs.setdefault('n_recv', 1)

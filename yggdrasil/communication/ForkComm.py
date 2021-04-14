@@ -5,6 +5,23 @@ from yggdrasil.communication import CommBase, get_comm, import_comm
 _address_sep = ':YGG_ADD:'
 
 
+class ForkedCommMessage(CommBase.CommMessage):
+    r"""Class for forked comm messages."""
+
+    __slots__ = ['orig']
+
+    def __init__(self, msg, comm_list, **kwargs):
+        super(ForkedCommMessage, self).__init__(
+            msg=msg.msg, length=msg.length, flag=msg.flag,
+            args=msg.args, header=msg.header)
+        for k in CommBase.CommMessage.__slots__:
+            setattr(self, k, getattr(msg, k))
+        args = {i: x.prepare_message(copy.deepcopy(msg), **kwargs)
+                for i, x in enumerate(comm_list)}
+        self.orig = msg.args
+        self.args = args
+
+
 def get_comm_name(name, i):
     r"""Get the name of the ith comm in the series.
 
@@ -37,13 +54,13 @@ class ForkComm(CommBase.CommBase):
 
     _commtype = 'fork'
     _dont_register = True
+    child_keys = ['serializer_class', 'serializer_kwargs',  # 'datatype',
+                  'format_str', 'field_names', 'field_units', 'as_array']
+    noprop_keys = ['send_converter', 'recv_converter', 'filter', 'transform']
     
     def __init__(self, name, comm_list=None, is_async=False, **kwargs):
-        child_keys = ['serializer_class', 'serializer_kwargs',  # 'datatype',
-                      'format_str', 'field_names', 'field_units', 'as_array']
-        noprop_keys = ['send_converter', 'recv_converter', 'filter', 'transform']
-        child_kwargs = {k: kwargs.pop(k) for k in child_keys if k in kwargs}
-        noprop_kwargs = {k: kwargs.pop(k) for k in noprop_keys if k in kwargs}
+        child_kwargs = {k: kwargs.pop(k) for k in self.child_keys if k in kwargs}
+        noprop_kwargs = {k: kwargs.pop(k) for k in self.noprop_keys if k in kwargs}
         self.comm_list = []
         self.curr_comm_index = 0
         self.eof_recv = []
@@ -306,10 +323,8 @@ class ForkComm(CommBase.CommBase):
             if k in kwargs:
                 kws_root[k] = kwargs.pop(k)
         msg = super(ForkComm, self).prepare_message(*args, **kws_root)
-        out = {i: x.prepare_message(copy.deepcopy(msg), **kwargs)
-               for i, x in enumerate(self.comm_list)}
-        out['orig'] = msg.args
-        msg.args = out
+        if not isinstance(msg, ForkedCommMessage):
+            msg = ForkedCommMessage(msg, self.comm_list, **kwargs)
         return msg
         
     def send_message(self, msg, **kwargs):
@@ -329,7 +344,7 @@ class ForkComm(CommBase.CommBase):
             self.errors += x.errors
             if not out:
                 return out
-        msg.args = msg.args['orig']
+        msg.args = msg.orig
         msg.additional_messages = []
         kwargs['skip_safe_send'] = True
         return super(ForkComm, self).send_message(msg, **kwargs)
@@ -353,6 +368,7 @@ class ForkComm(CommBase.CommBase):
         first_comm = True
         T = self.start_timeout(timeout, key_suffix='recv:forkd')
         out = None
+        out_idx = None
         i = 0
         while ((not T.is_out) or first_comm) and self.is_open and (out is None):
             for i in range(len(self)):
@@ -370,19 +386,22 @@ class ForkComm(CommBase.CommBase):
                             x.finalize_message(msg)
                     elif msg.flag not in [CommBase.FLAG_FAILURE, CommBase.FLAG_EMPTY]:
                         out = msg
+                if out is not None:
+                    out_idx = self.curr_comm_index % len(self)
                 self.curr_comm_index += 1
             first_comm = False
             if out is None:
                 self.sleep()
         self.stop_timeout(key_suffix='recv:forkd')
         if out is None:
+            out_idx = 0
             if self.is_closed:
                 self.debug('Comm closed')
                 out = CommBase.CommMessage(flag=CommBase.FLAG_FAILURE)
             else:
                 out = CommBase.CommMessage(flag=CommBase.FLAG_EMPTY,
                                            args=self.last_comm.empty_obj_recv)
-        out.args = {i: out.args}
+        out.args = {out_idx: out.args}
         return out
 
     def finalize_message(self, msg, **kwargs):
@@ -435,3 +454,9 @@ class ForkComm(CommBase.CommBase):
         super(ForkComm, self).purge()
         for x in self.comm_list:
             x.purge()
+    
+    def drain_server_signon_messages(self, **kwargs):
+        r"""Drain server signon messages. This should only be used
+        for testing purposes."""
+        for x in self.comm_list:
+            x.drain_server_signon_messages(**kwargs)

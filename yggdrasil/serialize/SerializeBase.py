@@ -319,7 +319,7 @@ class SerializeBase(tools.YggClass):
         r"""dict: Serializer info."""
         out = copy.deepcopy(self.extra_kwargs)
         for k in self._schema_properties.keys():
-            if k in ['datatype']:
+            if (k != 'seritype') and (k in ['datatype'] + self._defaults_set):
                 continue
             v = getattr(self, k, None)
             if v is not None:

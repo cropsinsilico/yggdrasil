@@ -705,6 +705,8 @@ class ComponentSchema(object):
                 if k != self.subtype_key:
                     old.pop('description', None)
                     new.pop('description', None)
+                    old.pop('default', None)
+                    new.pop('default', None)
                     if old != new:  # pragma: debug
                         raise ValueError(
                             ("Schema for property '%s' of class '%s' "

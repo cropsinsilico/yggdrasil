@@ -100,6 +100,8 @@ class TestZMQComm(test_CommBase.TestCommBase):
 class TestZMQComm_client(TestZMQComm):
     r"""Test for ZMQComm communication class for client/server."""
 
+    test_drain_messages = None
+
     @property
     def send_inst_kwargs(self):
         r"""Keyword arguments for send instance."""
