@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>yggdrasil.communication.BufferComm &mdash; yggdrasil v1.6.0 documentation</title>
+  <title>yggdrasil.communication.BufferComm &mdash; yggdrasil v1.6.0+5.g622c9ac0 documentation</title>
   
 
   
@@ -161,6 +161,8 @@
         
           <li><a href="../../index.html">Module code</a> &raquo;</li>
         
+          <li><a href="../../yggdrasil.html">yggdrasil</a> &raquo;</li>
+        
           <li><a href="../communication.html">yggdrasil.communication</a> &raquo;</li>
         
       <li>yggdrasil.communication.BufferComm</li>
@@ -179,14 +181,14 @@
            <div itemprop="articleBody">
             
   <h1>Source code for yggdrasil.communication.BufferComm</h1><div class="highlight"><pre>
-<span></span><span class="kn">from</span> <span class="nn">yggdrasil</span> <span class="kn">import</span> <span class="n">multitasking</span>
-<span class="kn">from</span> <span class="nn">yggdrasil.communication</span> <span class="kn">import</span> <span class="n">CommBase</span><span class="p">,</span> <span class="n">NoMessages</span>
+<span></span><span class="kn">from</span> <span class="nn">yggdrasil</span> <span class="k">import</span> <span class="n">multitasking</span>
+<span class="kn">from</span> <span class="nn">yggdrasil.communication</span> <span class="k">import</span> <span class="n">CommBase</span><span class="p">,</span> <span class="n">NoMessages</span>
 
 
 <div class="viewcode-block" id="LockedBuffer"><a class="viewcode-back" href="../../../yggdrasil.communication.html#yggdrasil.communication.BufferComm.LockedBuffer">[docs]</a><span class="k">class</span> <span class="nc">LockedBuffer</span><span class="p">(</span><span class="n">multitasking</span><span class="o">.</span><span class="n">Queue</span><span class="p">):</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Buffer intended to be shared between threads/processes.&quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="n">kwargs</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s1">&#39;task_method&#39;</span><span class="p">,</span> <span class="s1">&#39;process&#39;</span><span class="p">)</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">LockedBuffer</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_closed</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">context</span><span class="o">.</span><span class="n">Event</span><span class="p">()</span>
@@ -209,7 +211,7 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">_closed</span><span class="o">.</span><span class="n">disconnect</span><span class="p">()</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">LockedBuffer</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">disconnect</span><span class="p">()</span></div>
         
-    <span class="k">def</span> <span class="fm">__len__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__len__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">closed</span><span class="p">:</span>  <span class="c1"># pragma: debug</span>
             <span class="k">return</span> <span class="mi">0</span>
         <span class="k">return</span> <span class="nb">int</span><span class="p">(</span><span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">empty</span><span class="p">())</span>
@@ -253,7 +255,7 @@
     <span class="n">_commtype</span> <span class="o">=</span> <span class="s1">&#39;buffer&#39;</span>
     <span class="n">no_serialization</span> <span class="o">=</span> <span class="kc">True</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="n">buffer_task_method</span><span class="o">=</span><span class="s2">&quot;thread&quot;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="n">buffer_task_method</span><span class="o">=</span><span class="s2">&quot;thread&quot;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">buffer_task_method</span> <span class="o">=</span> <span class="n">buffer_task_method</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">BufferComm</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
 

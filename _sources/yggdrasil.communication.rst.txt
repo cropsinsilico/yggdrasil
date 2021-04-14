@@ -14,6 +14,14 @@ Subpackages
 Submodules
 ----------
 
+yggdrasil.communication.AddressBroker module
+--------------------------------------------
+
+.. automodule:: yggdrasil.communication.AddressBroker
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 yggdrasil.communication.AsciiFileComm module
 --------------------------------------------
 

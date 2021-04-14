@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>yggdrasil.communication.FileComm &mdash; yggdrasil v1.6.0 documentation</title>
+  <title>yggdrasil.communication.FileComm &mdash; yggdrasil v1.6.0+5.g622c9ac0 documentation</title>
   
 
   
@@ -161,6 +161,8 @@
         
           <li><a href="../../index.html">Module code</a> &raquo;</li>
         
+          <li><a href="../../yggdrasil.html">yggdrasil</a> &raquo;</li>
+        
           <li><a href="../communication.html">yggdrasil.communication</a> &raquo;</li>
         
       <li>yggdrasil.communication.FileComm</li>
@@ -182,9 +184,9 @@
 <span></span><span class="kn">import</span> <span class="nn">os</span>
 <span class="kn">import</span> <span class="nn">copy</span>
 <span class="kn">import</span> <span class="nn">tempfile</span>
-<span class="kn">from</span> <span class="nn">yggdrasil</span> <span class="kn">import</span> <span class="n">platform</span><span class="p">,</span> <span class="n">tools</span>
-<span class="kn">from</span> <span class="nn">yggdrasil.serialize.SerializeBase</span> <span class="kn">import</span> <span class="n">SerializeBase</span>
-<span class="kn">from</span> <span class="nn">yggdrasil.communication</span> <span class="kn">import</span> <span class="n">CommBase</span>
+<span class="kn">from</span> <span class="nn">yggdrasil</span> <span class="k">import</span> <span class="n">platform</span><span class="p">,</span> <span class="n">tools</span>
+<span class="kn">from</span> <span class="nn">yggdrasil.serialize.SerializeBase</span> <span class="k">import</span> <span class="n">SerializeBase</span>
+<span class="kn">from</span> <span class="nn">yggdrasil.communication</span> <span class="k">import</span> <span class="n">CommBase</span>
 
 
 <div class="viewcode-block" id="FileComm"><a class="viewcode-back" href="../../../yggdrasil.communication.html#yggdrasil.communication.FileComm.FileComm">[docs]</a><span class="k">class</span> <span class="nc">FileComm</span><span class="p">(</span><span class="n">CommBase</span><span class="o">.</span><span class="n">CommBase</span><span class="p">):</span>
@@ -272,7 +274,7 @@
     <span class="n">_mode_as_bytes</span> <span class="o">=</span> <span class="kc">True</span>
     <span class="n">_synchronous_read</span> <span class="o">=</span> <span class="kc">False</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="n">kwargs</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s1">&#39;close_on_eof_send&#39;</span><span class="p">,</span> <span class="kc">True</span><span class="p">)</span>
         <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;partner_language&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>  <span class="c1"># Files don&#39;t have partner comms</span>
         <span class="k">return</span> <span class="nb">super</span><span class="p">(</span><span class="n">FileComm</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>

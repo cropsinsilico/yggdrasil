@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>yggdrasil.metaschema.properties.ClassMetaschemaProperty &mdash; yggdrasil v1.6.0 documentation</title>
+  <title>yggdrasil.metaschema.properties.ClassMetaschemaProperty &mdash; yggdrasil v1.6.0+5.g622c9ac0 documentation</title>
   
 
   
@@ -161,6 +161,8 @@
         
           <li><a href="../../../index.html">Module code</a> &raquo;</li>
         
+          <li><a href="../../../yggdrasil.html">yggdrasil</a> &raquo;</li>
+        
           <li><a href="../../metaschema.html">yggdrasil.metaschema</a> &raquo;</li>
         
           <li><a href="../properties.html">yggdrasil.metaschema.properties</a> &raquo;</li>
@@ -181,7 +183,7 @@
            <div itemprop="articleBody">
             
   <h1>Source code for yggdrasil.metaschema.properties.ClassMetaschemaProperty</h1><div class="highlight"><pre>
-<span></span><span class="kn">from</span> <span class="nn">yggdrasil.metaschema.properties.MetaschemaProperty</span> <span class="kn">import</span> <span class="n">MetaschemaProperty</span>
+<span></span><span class="kn">from</span> <span class="nn">yggdrasil.metaschema.properties.MetaschemaProperty</span> <span class="k">import</span> <span class="n">MetaschemaProperty</span>
 
 
 <div class="viewcode-block" id="ClassMetaschemaProperty"><a class="viewcode-back" href="../../../../yggdrasil.metaschema.properties.html#yggdrasil.metaschema.properties.ClassMetaschemaProperty.ClassMetaschemaProperty">[docs]</a><span class="k">class</span> <span class="nc">ClassMetaschemaProperty</span><span class="p">(</span><span class="n">MetaschemaProperty</span><span class="p">):</span>
@@ -204,7 +206,7 @@
     <span class="k">def</span> <span class="nf">_validate</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">validator</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> <span class="n">instance</span><span class="p">,</span> <span class="n">schema</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Validator for &#39;class&#39; property.&quot;&quot;&quot;</span>
         <span class="c1"># TODO: Normalization can be removed if metadata is normalized</span>
-        <span class="kn">from</span> <span class="nn">yggdrasil.metaschema</span> <span class="kn">import</span> <span class="n">validate_instance</span>
+        <span class="kn">from</span> <span class="nn">yggdrasil.metaschema</span> <span class="k">import</span> <span class="n">validate_instance</span>
         <span class="n">value</span> <span class="o">=</span> <span class="n">validate_instance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="bp">cls</span><span class="o">.</span><span class="n">schema</span><span class="p">,</span> <span class="n">normalize</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">instance</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
             <span class="k">yield</span> <span class="s2">&quot;Instance </span><span class="si">%s</span><span class="s2"> is not of type(s) </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">instance</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span>
@@ -225,7 +227,7 @@
 
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="c1"># TODO: Normalization can be removed if metadata is normalized</span>
-        <span class="kn">from</span> <span class="nn">yggdrasil.metaschema</span> <span class="kn">import</span> <span class="n">validate_instance</span>
+        <span class="kn">from</span> <span class="nn">yggdrasil.metaschema</span> <span class="k">import</span> <span class="n">validate_instance</span>
         <span class="n">prop1</span> <span class="o">=</span> <span class="n">validate_instance</span><span class="p">(</span><span class="n">prop1</span><span class="p">,</span> <span class="bp">cls</span><span class="o">.</span><span class="n">schema</span><span class="p">,</span> <span class="n">normalize</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
         <span class="n">prop2</span> <span class="o">=</span> <span class="n">validate_instance</span><span class="p">(</span><span class="n">prop2</span><span class="p">,</span> <span class="bp">cls</span><span class="o">.</span><span class="n">schema</span><span class="p">,</span> <span class="n">normalize</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">prop1</span><span class="p">,</span> <span class="p">(</span><span class="nb">list</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">)):</span>

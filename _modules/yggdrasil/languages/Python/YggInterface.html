@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>yggdrasil.languages.Python.YggInterface &mdash; yggdrasil v1.6.0 documentation</title>
+  <title>yggdrasil.languages.Python.YggInterface &mdash; yggdrasil v1.6.0+5.g622c9ac0 documentation</title>
   
 
   
@@ -161,6 +161,8 @@
         
           <li><a href="../../../index.html">Module code</a> &raquo;</li>
         
+          <li><a href="../../../yggdrasil.html">yggdrasil</a> &raquo;</li>
+        
           <li><a href="../../languages.html">yggdrasil.languages</a> &raquo;</li>
         
       <li>yggdrasil.languages.Python.YggInterface</li>
@@ -180,8 +182,8 @@
             
   <h1>Source code for yggdrasil.languages.Python.YggInterface</h1><div class="highlight"><pre>
 <span></span><span class="kn">import</span> <span class="nn">os</span>
-<span class="kn">from</span> <span class="nn">yggdrasil</span> <span class="kn">import</span> <span class="n">tools</span>
-<span class="kn">from</span> <span class="nn">yggdrasil.communication.DefaultComm</span> <span class="kn">import</span> <span class="n">DefaultComm</span>
+<span class="kn">from</span> <span class="nn">yggdrasil</span> <span class="k">import</span> <span class="n">tools</span>
+<span class="kn">from</span> <span class="nn">yggdrasil.communication.DefaultComm</span> <span class="k">import</span> <span class="n">DefaultComm</span>
 
 
 <span class="n">YGG_MSG_MAX</span> <span class="o">=</span> <span class="n">tools</span><span class="o">.</span><span class="n">get_YGG_MSG_MAX</span><span class="p">()</span>
@@ -338,7 +340,7 @@
 <span class="sd">        :class:.ServerComm: Communication object.</span>
 <span class="sd">        </span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="kn">from</span> <span class="nn">yggdrasil.communication</span> <span class="kn">import</span> <span class="n">ServerComm</span>
+    <span class="kn">from</span> <span class="nn">yggdrasil.communication</span> <span class="k">import</span> <span class="n">ServerComm</span>
     <span class="n">icomm_kwargs</span> <span class="o">=</span> <span class="p">{}</span>
     <span class="n">ocomm_kwargs</span> <span class="o">=</span> <span class="p">{}</span>
     <span class="k">if</span> <span class="n">infmt</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
@@ -367,7 +369,7 @@
 <span class="sd">        :class:.ClientComm: Communication object.</span>
 <span class="sd">        </span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="kn">from</span> <span class="nn">yggdrasil.communication</span> <span class="kn">import</span> <span class="n">ClientComm</span>
+    <span class="kn">from</span> <span class="nn">yggdrasil.communication</span> <span class="k">import</span> <span class="n">ClientComm</span>
     <span class="n">icomm_kwargs</span> <span class="o">=</span> <span class="p">{}</span>
     <span class="n">ocomm_kwargs</span> <span class="o">=</span> <span class="p">{}</span>
     <span class="k">if</span> <span class="n">infmt</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
@@ -393,7 +395,7 @@
 <span class="sd">        :class:.ServerComm: Communication object.</span>
 <span class="sd">        </span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="kn">from</span> <span class="nn">yggdrasil.communication</span> <span class="kn">import</span> <span class="n">ServerComm</span>
+    <span class="kn">from</span> <span class="nn">yggdrasil.communication</span> <span class="k">import</span> <span class="n">ServerComm</span>
     <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;comm_class&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">ServerComm</span><span class="o">.</span><span class="n">ServerComm</span>
     <span class="n">kwargs</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s1">&#39;recv_timeout&#39;</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">InterfaceComm</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
@@ -411,7 +413,7 @@
 <span class="sd">        :class:.ClientComm: Communication object.</span>
 <span class="sd">        </span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="kn">from</span> <span class="nn">yggdrasil.communication</span> <span class="kn">import</span> <span class="n">ClientComm</span>
+    <span class="kn">from</span> <span class="nn">yggdrasil.communication</span> <span class="k">import</span> <span class="n">ClientComm</span>
     <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;comm_class&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">ClientComm</span><span class="o">.</span><span class="n">ClientComm</span>
     <span class="n">kwargs</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s1">&#39;recv_timeout&#39;</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">InterfaceComm</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>

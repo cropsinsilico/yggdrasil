@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>&lt;no title&gt; &mdash; yggdrasil v1.6.0 documentation</title>
+  <title>&lt;no title&gt; &mdash; yggdrasil v1.6.0+5.g622c9ac0 documentation</title>
   
 
   
@@ -196,13 +196,13 @@
 <tr class="row-even"><td><p>comment</p></td>
 <td><p>string</p></td>
 <td><p>One or more characters indicating a comment. Defaults to ‘# ‘.</p></td>
-<td><p>[‘netcdf’, ‘table’, ‘map’, ‘yaml’, ‘ascii’, ‘wofost’, ‘ply’, ‘obj’, ‘pandas’, ‘mat’, ‘json’, ‘pickle’]</p></td>
+<td><p>[‘obj’, ‘ply’, ‘wofost’, ‘mat’, ‘map’, ‘pickle’, ‘pandas’, ‘yaml’, ‘netcdf’, ‘ascii’, ‘json’, ‘table’]</p></td>
 </tr>
 <tr class="row-odd"><td><p>datatype</p></td>
 <td><p>schema</p></td>
 <td><p>JSON schema defining the type of object that the serializer will be used to
 serialize/deserialize. Defaults to default_datatype.</p></td>
-<td><p>[‘netcdf’, ‘table’, ‘map’, ‘yaml’, ‘ascii’, ‘wofost’, ‘ply’, ‘obj’, ‘pandas’, ‘mat’, ‘json’, ‘pickle’]</p></td>
+<td><p>[‘obj’, ‘ply’, ‘wofost’, ‘mat’, ‘map’, ‘pickle’, ‘pandas’, ‘yaml’, ‘netcdf’, ‘ascii’, ‘json’, ‘table’]</p></td>
 </tr>
 <tr class="row-even"><td><p>default_flow_style</p></td>
 <td><p>boolean</p></td>
@@ -214,7 +214,7 @@ they will always be serialized in the flow style. See <a class="reference extern
 <td><p>string</p></td>
 <td><p>Delimiter that should be used to separate name/value pairs in the map. Defaults
 to t.</p></td>
-<td><p>[‘table’, ‘wofost’, ‘map’, ‘pandas’]</p></td>
+<td><p>[‘pandas’, ‘table’, ‘map’, ‘wofost’]</p></td>
 </tr>
 <tr class="row-even"><td><p>encoding</p></td>
 <td><p>string</p></td>
@@ -230,7 +230,7 @@ seiralized structure. Defaults to ‘t’.</p></td>
 <tr class="row-even"><td><p>newline</p></td>
 <td><p>string</p></td>
 <td><p>One or more characters indicating a newline. Defaults to ‘n’.</p></td>
-<td><p>[‘netcdf’, ‘table’, ‘map’, ‘yaml’, ‘ascii’, ‘wofost’, ‘ply’, ‘obj’, ‘pandas’, ‘mat’, ‘json’, ‘pickle’]</p></td>
+<td><p>[‘obj’, ‘ply’, ‘wofost’, ‘mat’, ‘map’, ‘pickle’, ‘pandas’, ‘yaml’, ‘netcdf’, ‘ascii’, ‘json’, ‘table’]</p></td>
 </tr>
 <tr class="row-odd"><td><p>no_header</p></td>
 <td><p>boolean</p></td>
@@ -271,7 +271,7 @@ to True.</p></td>
 <td><p>boolean</p></td>
 <td><p>If True, the astropy package will be used to serialize/deserialize table.
 Defaults to False.</p></td>
-<td><p>[‘table’, ‘pandas’]</p></td>
+<td><p>[‘pandas’, ‘table’]</p></td>
 </tr>
 <tr class="row-even"><td><p>variables</p></td>
 <td><p>array</p></td>

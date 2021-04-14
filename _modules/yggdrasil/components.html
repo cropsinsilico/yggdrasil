@@ -1,0 +1,938 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+  <title>yggdrasil.components &mdash; yggdrasil v1.6.0+5.g622c9ac0 documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/theme_overrides.css" type="text/css" />
+
+  
+  
+
+  
+  
+
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+        <script src="../../_static/jquery.js"></script>
+        <script src="../../_static/underscore.js"></script>
+        <script src="../../_static/doctools.js"></script>
+    
+    <script type="text/javascript" src="../../_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../index.html" class="icon icon-home"> yggdrasil
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                v1.6.0
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../includeme.html">Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../install.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../getting_started.html">Getting started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../formatted_io.html">Formatted I/O</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../server_client_io.html">Server/Client I/O</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../autowrap.html">Autowrapping Model Functions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../autowrap.html#notes-on-autowrapping-c-c-model-functions">Notes on Autowrapping C/C++ Model Functions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../conditional_io.html">Conditional I/O</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../transformed_io.html">Transformed I/O</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../timesync_io.html">Timestep Synchronization</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../yaml.html">YAML Files</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../config.html">Configuration Files</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../units.html">Units</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../c_format_strings.html">C-Style Format Strings</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../debugging.html">Debugging</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../threading.html">OpenMP Threading in Models</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../examples/examples_toc.html">Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../advanced/index.html">Advanced</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../development/index.html">Development</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../publications.html">Publications</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../hackathon2018/index.html">Welcome to the 2018 Crops in Silico Hackathon!</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../hackathon2019/index.html">Welcome to the 2019 Crops in Silico Hackathon!</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">yggdrasil</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../index.html" class="icon icon-home"></a> &raquo;</li>
+        
+          <li><a href="../index.html">Module code</a> &raquo;</li>
+        
+          <li><a href="../yggdrasil.html">yggdrasil</a> &raquo;</li>
+        
+      <li>yggdrasil.components</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for yggdrasil.components</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">glob</span>
+<span class="kn">import</span> <span class="nn">copy</span>
+<span class="kn">import</span> <span class="nn">six</span>
+<span class="kn">import</span> <span class="nn">inspect</span>
+<span class="kn">import</span> <span class="nn">importlib</span>
+<span class="c1"># import warnings</span>
+<span class="kn">import</span> <span class="nn">weakref</span>
+<span class="kn">from</span> <span class="nn">collections</span> <span class="k">import</span> <span class="n">OrderedDict</span>
+<span class="kn">from</span> <span class="nn">yggdrasil.doctools</span> <span class="k">import</span> <span class="n">docs2args</span>
+
+
+<span class="n">_registry</span> <span class="o">=</span> <span class="p">{}</span>
+<span class="n">_registry_defaults</span> <span class="o">=</span> <span class="p">{}</span>
+<span class="n">_registry_base_classes</span> <span class="o">=</span> <span class="p">{}</span>
+<span class="n">_registry_class2subtype</span> <span class="o">=</span> <span class="p">{}</span>
+<span class="n">_registry_complete</span> <span class="o">=</span> <span class="kc">False</span>
+<span class="n">_comptype2key</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;comm&#39;</span><span class="p">:</span> <span class="s1">&#39;commtype&#39;</span><span class="p">,</span>
+                 <span class="s1">&#39;file&#39;</span><span class="p">:</span> <span class="s1">&#39;filetype&#39;</span><span class="p">,</span>
+                 <span class="s1">&#39;model&#39;</span><span class="p">:</span> <span class="s1">&#39;language&#39;</span><span class="p">,</span>
+                 <span class="s1">&#39;connection&#39;</span><span class="p">:</span> <span class="s1">&#39;connection_type&#39;</span><span class="p">,</span>
+                 <span class="c1"># &#39;datatype&#39;: None,</span>
+                 <span class="s1">&#39;serializer&#39;</span><span class="p">:</span> <span class="s1">&#39;seritype&#39;</span><span class="p">,</span>
+                 <span class="s1">&#39;filter&#39;</span><span class="p">:</span> <span class="s1">&#39;filtertype&#39;</span><span class="p">,</span>
+                 <span class="s1">&#39;transform&#39;</span><span class="p">:</span> <span class="s1">&#39;transformtype&#39;</span><span class="p">}</span>
+<span class="c1"># &#39;compiler&#39;: &#39;toolname&#39;,</span>
+<span class="c1"># &#39;linker&#39;: &#39;toolname&#39;,</span>
+<span class="c1"># &#39;archiver&#39;: &#39;toolname&#39;}</span>
+<span class="n">_comptype2mod</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;serializer&#39;</span><span class="p">:</span> <span class="s1">&#39;serialize&#39;</span><span class="p">,</span>
+                 <span class="s1">&#39;comm&#39;</span><span class="p">:</span> <span class="s1">&#39;communication&#39;</span><span class="p">,</span>
+                 <span class="s1">&#39;file&#39;</span><span class="p">:</span> <span class="s1">&#39;communication&#39;</span><span class="p">,</span>
+                 <span class="s1">&#39;model&#39;</span><span class="p">:</span> <span class="s1">&#39;drivers&#39;</span><span class="p">,</span>
+                 <span class="s1">&#39;connection&#39;</span><span class="p">:</span> <span class="s1">&#39;drivers&#39;</span><span class="p">,</span>
+                 <span class="s1">&#39;filter&#39;</span><span class="p">:</span> <span class="s1">&#39;communication.filters&#39;</span><span class="p">,</span>
+                 <span class="s1">&#39;transform&#39;</span><span class="p">:</span> <span class="s1">&#39;communication.transforms&#39;</span><span class="p">}</span>
+<span class="c1"># &#39;datatype&#39;: [&#39;metaschema&#39;, &#39;datatypes&#39;],</span>
+<span class="c1"># &#39;compiler&#39;: &#39;drivers&#39;,</span>
+<span class="c1"># &#39;linker&#39;: &#39;drivers&#39;,</span>
+<span class="c1"># &#39;archiver&#39;: &#39;drivers&#39;}</span>
+
+
+<div class="viewcode-block" id="ClassRegistry"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.components.ClassRegistry">[docs]</a><span class="k">class</span> <span class="nc">ClassRegistry</span><span class="p">(</span><span class="n">OrderedDict</span><span class="p">):</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Class for registering classes.&quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="n">import_function</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="n">module</span> <span class="o">=</span> <span class="n">inspect</span><span class="o">.</span><span class="n">getmodule</span><span class="p">(</span><span class="n">inspect</span><span class="o">.</span><span class="n">stack</span><span class="p">()[</span><span class="mi">1</span><span class="p">][</span><span class="mi">0</span><span class="p">])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_module</span> <span class="o">=</span> <span class="n">module</span><span class="o">.</span><span class="vm">__name__</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_directory</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">module</span><span class="o">.</span><span class="vm">__file__</span><span class="p">)</span>
+        <span class="c1"># self._schema_directory = os.path.join(self._directory, &#39;schemas&#39;)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_import_function</span> <span class="o">=</span> <span class="n">import_function</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_imported</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">ClassRegistry</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+<div class="viewcode-block" id="ClassRegistry.import_classes"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.components.ClassRegistry.import_classes">[docs]</a>    <span class="k">def</span> <span class="nf">import_classes</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Import all classes in the same directory.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_imported</span><span class="p">:</span>
+            <span class="k">return</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_imported</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">glob</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_directory</span><span class="p">,</span> <span class="s1">&#39;*.py&#39;</span><span class="p">)):</span>
+            <span class="n">mod</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">basename</span><span class="p">(</span><span class="n">x</span><span class="p">)[:</span><span class="o">-</span><span class="mi">3</span><span class="p">]</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">mod</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;__&#39;</span><span class="p">):</span>
+                <span class="n">importlib</span><span class="o">.</span><span class="n">import_module</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_module</span> <span class="o">+</span> <span class="s1">&#39;.</span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">mod</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_import_function</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_import_function</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="ClassRegistry.keys"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.components.ClassRegistry.keys">[docs]</a>    <span class="k">def</span> <span class="nf">keys</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">import_classes</span><span class="p">()</span>
+        <span class="k">return</span> <span class="nb">super</span><span class="p">(</span><span class="n">ClassRegistry</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">keys</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="ClassRegistry.values"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.components.ClassRegistry.values">[docs]</a>    <span class="k">def</span> <span class="nf">values</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">import_classes</span><span class="p">()</span>
+        <span class="k">return</span> <span class="nb">super</span><span class="p">(</span><span class="n">ClassRegistry</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">values</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="ClassRegistry.items"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.components.ClassRegistry.items">[docs]</a>    <span class="k">def</span> <span class="nf">items</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">import_classes</span><span class="p">()</span>
+        <span class="k">return</span> <span class="nb">super</span><span class="p">(</span><span class="n">ClassRegistry</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">items</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
+
+    <span class="k">def</span> <span class="nf">__contains__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">import_classes</span><span class="p">()</span>
+        <span class="k">return</span> <span class="nb">super</span><span class="p">(</span><span class="n">ClassRegistry</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__contains__</span><span class="p">(</span><span class="n">key</span><span class="p">)</span>
+
+<div class="viewcode-block" id="ClassRegistry.get"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.components.ClassRegistry.get">[docs]</a>    <span class="k">def</span> <span class="nf">get</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="k">if</span> <span class="p">(</span><span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">has_entry</span><span class="p">(</span><span class="n">key</span><span class="p">)):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">import_classes</span><span class="p">()</span>
+        <span class="k">return</span> <span class="nb">super</span><span class="p">(</span><span class="n">ClassRegistry</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">default</span><span class="p">)</span></div>
+
+    <span class="k">def</span> <span class="nf">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">return</span> <span class="nb">super</span><span class="p">(</span><span class="n">ClassRegistry</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__getitem__</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>  <span class="c1"># pragma: no cover</span>
+            <span class="c1"># This will only be called during import</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_imported</span><span class="p">:</span>
+                <span class="k">raise</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">import_classes</span><span class="p">()</span>
+            <span class="k">return</span> <span class="nb">super</span><span class="p">(</span><span class="n">ClassRegistry</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__getitem__</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+<div class="viewcode-block" id="ClassRegistry.has_entry"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.components.ClassRegistry.has_entry">[docs]</a>    <span class="k">def</span> <span class="nf">has_entry</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">super</span><span class="p">(</span><span class="n">ClassRegistry</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__contains__</span><span class="p">(</span><span class="n">key</span><span class="p">)</span></div></div>
+
+
+<div class="viewcode-block" id="init_registry"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.components.init_registry">[docs]</a><span class="k">def</span> <span class="nf">init_registry</span><span class="p">():</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Initialize the registries and schema.&quot;&quot;&quot;</span>
+    <span class="k">global</span> <span class="n">_registry</span>
+    <span class="k">global</span> <span class="n">_registry_complete</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">_registry_complete</span><span class="p">:</span>
+        <span class="n">comp_list</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">mod_list</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">_comptype2mod</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="k">if</span> <span class="n">v</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">mod_list</span><span class="p">:</span>
+                <span class="n">comp_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">k</span><span class="p">)</span>
+                <span class="n">mod_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">v</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">comp_list</span><span class="p">:</span>
+            <span class="n">import_all_components</span><span class="p">(</span><span class="n">k</span><span class="p">)</span>
+        <span class="n">_registry_complete</span> <span class="o">=</span> <span class="kc">True</span>
+    <span class="k">return</span> <span class="n">_registry</span></div>
+
+
+<span class="c1"># This dosn&#39;t work as desried because classes that have already been imported</span>
+<span class="c1"># will not call registration on second import</span>
+<span class="c1"># def clear_registry():</span>
+<span class="c1">#     r&quot;&quot;&quot;Reset registries.&quot;&quot;&quot;</span>
+<span class="c1">#     global _registry</span>
+<span class="c1">#     global _registry_defaults</span>
+<span class="c1">#     global _registry_class2subtype</span>
+<span class="c1">#     global _registry_complete</span>
+<span class="c1">#     _registry = {}</span>
+<span class="c1">#     _registry_defaults = {}</span>
+<span class="c1">#     _registry_class2subtype = {}</span>
+<span class="c1">#     _registry_complete = False</span>
+
+    
+<div class="viewcode-block" id="suspend_registry"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.components.suspend_registry">[docs]</a><span class="k">def</span> <span class="nf">suspend_registry</span><span class="p">():</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Suspend the registry by storing the global registries in a dictionary.&quot;&quot;&quot;</span>
+    <span class="k">global</span> <span class="n">_registry</span>
+    <span class="k">global</span> <span class="n">_registry_defaults</span>
+    <span class="k">global</span> <span class="n">_registry_base_classes</span>
+    <span class="k">global</span> <span class="n">_registry_class2subtype</span>
+    <span class="k">global</span> <span class="n">_registry_complete</span>
+    <span class="n">out</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;_registry&#39;</span><span class="p">:</span> <span class="n">_registry</span><span class="p">,</span> <span class="s1">&#39;_registry_defaults&#39;</span><span class="p">:</span> <span class="n">_registry_defaults</span><span class="p">,</span>
+           <span class="s1">&#39;_registry_base_classes&#39;</span><span class="p">:</span> <span class="n">_registry_base_classes</span><span class="p">,</span>
+           <span class="s1">&#39;_registry_class2subtype&#39;</span><span class="p">:</span> <span class="n">_registry_class2subtype</span><span class="p">,</span>
+           <span class="s1">&#39;_registry_complete&#39;</span><span class="p">:</span> <span class="n">_registry_complete</span><span class="p">}</span>
+    <span class="n">_registry</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="n">_registry_defaults</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="n">_registry_base_classes</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="n">_registry_class2subtype</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="n">_registry_complete</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="k">return</span> <span class="n">out</span></div>
+
+
+<div class="viewcode-block" id="restore_registry"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.components.restore_registry">[docs]</a><span class="k">def</span> <span class="nf">restore_registry</span><span class="p">(</span><span class="n">reg_dict</span><span class="p">):</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Restore the registry to values in the provided dictionary.&quot;&quot;&quot;</span>
+    <span class="k">global</span> <span class="n">_registry</span>
+    <span class="k">global</span> <span class="n">_registry_defaults</span>
+    <span class="k">global</span> <span class="n">_registry_base_classes</span>
+    <span class="k">global</span> <span class="n">_registry_class2subtype</span>
+    <span class="k">global</span> <span class="n">_registry_complete</span>
+    <span class="n">_registry</span> <span class="o">=</span> <span class="n">reg_dict</span><span class="p">[</span><span class="s1">&#39;_registry&#39;</span><span class="p">]</span>
+    <span class="n">_registry_defaults</span> <span class="o">=</span> <span class="n">reg_dict</span><span class="p">[</span><span class="s1">&#39;_registry_defaults&#39;</span><span class="p">]</span>
+    <span class="n">_registry_base_classes</span> <span class="o">=</span> <span class="n">reg_dict</span><span class="p">[</span><span class="s1">&#39;_registry_base_classes&#39;</span><span class="p">]</span>
+    <span class="n">_registry_class2subtype</span> <span class="o">=</span> <span class="n">reg_dict</span><span class="p">[</span><span class="s1">&#39;_registry_class2subtype&#39;</span><span class="p">]</span>
+    <span class="n">_registry_complete</span> <span class="o">=</span> <span class="n">reg_dict</span><span class="p">[</span><span class="s1">&#39;_registry_complete&#39;</span><span class="p">]</span></div>
+
+
+<div class="viewcode-block" id="import_all_components"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.components.import_all_components">[docs]</a><span class="k">def</span> <span class="nf">import_all_components</span><span class="p">(</span><span class="n">comptype</span><span class="p">):</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Dynamically import all component classes for a component type.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        comptype (str): Component type.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># Get module and directory</span>
+    <span class="n">mod</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">_comptype2mod</span><span class="p">[</span><span class="n">comptype</span><span class="p">])</span>
+    <span class="n">moddir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="o">*</span><span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">_comptype2mod</span><span class="p">[</span><span class="n">comptype</span><span class="p">])</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;.&#39;</span><span class="p">))</span>
+    <span class="c1"># The next three lines will be required if there are ever any components</span>
+    <span class="c1"># nested in multiple directories (e.g. metaschema/datatypes)</span>
+    <span class="c1"># if isinstance(mod, list):</span>
+    <span class="c1">#     mod = &#39;.&#39;.join(mod)</span>
+    <span class="c1">#     moddir = os.path.join(*moddir)</span>
+    <span class="n">moddir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="vm">__file__</span><span class="p">),</span> <span class="n">moddir</span><span class="p">)</span>
+    <span class="n">modbase</span> <span class="o">=</span> <span class="n">importlib</span><span class="o">.</span><span class="n">import_module</span><span class="p">(</span><span class="s1">&#39;yggdrasil.</span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">mod</span><span class="p">)</span>
+    <span class="n">non_comp</span> <span class="o">=</span> <span class="p">[</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">splitext</span><span class="p">(</span><span class="n">x</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span>
+                <span class="nb">getattr</span><span class="p">(</span><span class="n">modbase</span><span class="p">,</span> <span class="s1">&#39;_non_component_modules&#39;</span><span class="p">,</span> <span class="p">[])]</span>
+    <span class="c1"># Import all files</span>
+    <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">glob</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">moddir</span><span class="p">,</span> <span class="s1">&#39;*.py&#39;</span><span class="p">)):</span>
+        <span class="n">xbase</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">splitext</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">basename</span><span class="p">(</span><span class="n">x</span><span class="p">))[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="k">if</span> <span class="p">(</span><span class="ow">not</span> <span class="n">xbase</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;__&#39;</span><span class="p">))</span> <span class="ow">and</span> <span class="p">(</span><span class="n">xbase</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">non_comp</span><span class="p">):</span>
+            <span class="n">importlib</span><span class="o">.</span><span class="n">import_module</span><span class="p">(</span><span class="s1">&#39;yggdrasil.</span><span class="si">%s</span><span class="s1">.</span><span class="si">%s</span><span class="s1">&#39;</span>
+                                    <span class="o">%</span> <span class="p">(</span><span class="n">mod</span><span class="p">,</span> <span class="n">xbase</span><span class="p">))</span></div>
+
+
+<div class="viewcode-block" id="import_component"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.components.import_component">[docs]</a><span class="k">def</span> <span class="nf">import_component</span><span class="p">(</span><span class="n">comptype</span><span class="p">,</span> <span class="n">subtype</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">without_schema</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                     <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Dynamically import a component by name.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        comptype (str): Component type.</span>
+<span class="sd">        subtype (str, optional): Component subtype. If subtype is not one of the</span>
+<span class="sd">            registered subtypes for the specified comptype, subtype is treated</span>
+<span class="sd">            as the name of class. Defaults to None if not provided and the</span>
+<span class="sd">            default subtype defined in the schema for the specified component</span>
+<span class="sd">            will be used.</span>
+<span class="sd">        without_schema (bool, optional): If True, the schema is not used to</span>
+<span class="sd">            import the component and subtype must be the name of a component</span>
+<span class="sd">            class. Defaults to False. subtype must be provided if without_schema</span>
+<span class="sd">            is True.</span>
+<span class="sd">        **kwargs: Additional keyword arguments are used to determine the</span>
+<span class="sd">            subtype if it is None.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        class: Component class.</span>
+
+<span class="sd">    Raises:</span>
+<span class="sd">        ValueError: If subtype is not provided, but without_schema is True.</span>
+<span class="sd">        ValueError: If comptype is not a registered component type.</span>
+<span class="sd">        ValueError: If subtype is not a registered subtype or the name of a</span>
+<span class="sd">            registered subtype class for the specified comptype.</span>
+<span class="sd">            </span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># Get module</span>
+    <span class="n">mod</span> <span class="o">=</span> <span class="n">_comptype2mod</span><span class="p">[</span><span class="n">comptype</span><span class="p">]</span>
+    <span class="c1"># if isinstance(mod, list):</span>
+    <span class="c1">#     mod = &#39;.&#39;.join(mod)</span>
+    <span class="c1"># Set direct import shortcuts for unregistered classes</span>
+    <span class="k">if</span> <span class="p">(((</span><span class="n">subtype</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">comptype</span> <span class="ow">in</span> <span class="n">_comptype2key</span><span class="p">)</span>
+         <span class="ow">and</span> <span class="p">(</span><span class="n">_comptype2key</span><span class="p">[</span><span class="n">comptype</span><span class="p">]</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="p">))):</span>
+        <span class="n">subtype</span> <span class="o">=</span> <span class="n">kwargs</span><span class="p">[</span><span class="n">_comptype2key</span><span class="p">[</span><span class="n">comptype</span><span class="p">]]</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">comptype</span> <span class="o">==</span> <span class="s1">&#39;comm&#39;</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">subtype</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">):</span>
+        <span class="n">subtype</span> <span class="o">=</span> <span class="s1">&#39;DefaultComm&#39;</span>
+    <span class="k">if</span> <span class="p">(((</span><span class="n">comptype</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;comm&#39;</span><span class="p">,</span> <span class="s1">&#39;file&#39;</span><span class="p">])</span> <span class="ow">and</span> <span class="p">(</span><span class="n">subtype</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">)</span>
+         <span class="ow">and</span> <span class="p">((</span><span class="n">subtype</span> <span class="o">==</span> <span class="s1">&#39;CommBase&#39;</span><span class="p">)</span> <span class="ow">or</span> <span class="n">subtype</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s1">&#39;Comm&#39;</span><span class="p">)))):</span>
+        <span class="n">without_schema</span> <span class="o">=</span> <span class="kc">True</span>
+    <span class="c1"># Set default based on registry to avoid schema if possible</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">subtype</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">comptype</span> <span class="ow">in</span> <span class="n">_registry_defaults</span><span class="p">):</span>
+        <span class="n">subtype</span> <span class="o">=</span> <span class="n">_registry_defaults</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">comptype</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+    <span class="c1"># Check registered components to prevent importing multiple times</span>
+    <span class="k">if</span> <span class="n">subtype</span> <span class="ow">in</span> <span class="n">_registry</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">comptype</span><span class="p">,</span> <span class="p">{}):</span>
+        <span class="n">out_cls</span> <span class="o">=</span> <span class="n">_registry</span><span class="p">[</span><span class="n">comptype</span><span class="p">][</span><span class="n">subtype</span><span class="p">]</span>
+    <span class="k">elif</span> <span class="n">subtype</span> <span class="ow">in</span> <span class="n">_registry_class2subtype</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">comptype</span><span class="p">,</span> <span class="p">{}):</span>
+        <span class="n">out_cls</span> <span class="o">=</span> <span class="n">_registry</span><span class="p">[</span><span class="n">comptype</span><span class="p">][</span><span class="n">_registry_class2subtype</span><span class="p">[</span><span class="n">comptype</span><span class="p">][</span><span class="n">subtype</span><span class="p">]]</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="c1"># Get class name</span>
+        <span class="k">if</span> <span class="n">without_schema</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">subtype</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>  <span class="c1"># pragma: debug</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;subtype must be provided if without_schema is True.&quot;</span><span class="p">)</span>
+            <span class="n">class_name</span> <span class="o">=</span> <span class="n">subtype</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="kn">from</span> <span class="nn">yggdrasil.schema</span> <span class="k">import</span> <span class="n">get_schema</span>
+            <span class="n">s</span> <span class="o">=</span> <span class="n">get_schema</span><span class="p">()</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">comptype</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">s</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>  <span class="c1"># pragma: debug</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Unrecognized component type: </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">comptype</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">subtype</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>  <span class="c1"># pragma: no cover</span>
+                <span class="c1"># This will only be called if the test is run before the component</span>
+                <span class="c1"># module is imported</span>
+                <span class="n">subtype</span> <span class="o">=</span> <span class="n">s</span><span class="o">.</span><span class="n">default_subtype</span>
+            <span class="k">if</span> <span class="n">subtype</span> <span class="ow">in</span> <span class="n">s</span><span class="o">.</span><span class="n">class2subtype</span><span class="p">:</span>
+                <span class="n">class_name</span> <span class="o">=</span> <span class="n">subtype</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">class_name</span> <span class="o">=</span> <span class="n">s</span><span class="o">.</span><span class="n">subtype2class</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">subtype</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">class_name</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="c1"># Attempt file since they are subclass of comm</span>
+                    <span class="k">if</span> <span class="p">(</span><span class="n">comptype</span> <span class="o">==</span> <span class="s1">&#39;comm&#39;</span><span class="p">):</span>
+                        <span class="k">try</span><span class="p">:</span>
+                            <span class="k">return</span> <span class="n">import_component</span><span class="p">(</span><span class="s1">&#39;file&#39;</span><span class="p">,</span> <span class="n">subtype</span><span class="p">)</span>
+                        <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
+                            <span class="k">pass</span>
+                    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Unrecognized </span><span class="si">%s</span><span class="s2"> subtype: </span><span class="si">%s</span><span class="s2">&quot;</span>
+                                     <span class="o">%</span> <span class="p">(</span><span class="n">comptype</span><span class="p">,</span> <span class="n">subtype</span><span class="p">))</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">out_mod</span> <span class="o">=</span> <span class="n">importlib</span><span class="o">.</span><span class="n">import_module</span><span class="p">(</span><span class="s1">&#39;yggdrasil.</span><span class="si">%s</span><span class="s1">.</span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">mod</span><span class="p">,</span> <span class="n">class_name</span><span class="p">))</span>
+        <span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>  <span class="c1"># pragma: debug</span>
+            <span class="n">import_all_components</span><span class="p">(</span><span class="n">comptype</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">import_component</span><span class="p">(</span><span class="n">comptype</span><span class="p">,</span> <span class="n">subtype</span><span class="o">=</span><span class="n">subtype</span><span class="p">,</span>
+                                    <span class="n">without_schema</span><span class="o">=</span><span class="n">without_schema</span><span class="p">,</span>
+                                    <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="n">out_cls</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">out_mod</span><span class="p">,</span> <span class="n">class_name</span><span class="p">)</span>
+    <span class="c1"># Check for an aliased class</span>
+    <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">out_cls</span><span class="p">,</span> <span class="s1">&#39;_get_alias&#39;</span><span class="p">):</span>
+        <span class="n">out_cls</span> <span class="o">=</span> <span class="n">out_cls</span><span class="o">.</span><span class="n">_get_alias</span><span class="p">()</span>
+    <span class="k">return</span> <span class="n">out_cls</span></div>
+
+
+<div class="viewcode-block" id="create_component"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.components.create_component">[docs]</a><span class="k">def</span> <span class="nf">create_component</span><span class="p">(</span><span class="n">comptype</span><span class="p">,</span> <span class="n">subtype</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Dynamically create an instance of a component with the specified options</span>
+<span class="sd">    as outlined in the component schema. This function requires loading the</span>
+<span class="sd">    component schemas and so should not be used at the module or class level to</span>
+<span class="sd">    prevent circular dependencies.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        comptype (str): Component type.</span>
+<span class="sd">        subtype (str, optional): Component subtype. If subtype is not one of the</span>
+<span class="sd">            registered subtypes for the specified comptype, subtype is treated</span>
+<span class="sd">            as the name of the class. Defaults to None if not provided and the</span>
+<span class="sd">            default subtype defined in the schema for the specified component</span>
+<span class="sd">            will be used. If the subtype is specified by the component subtype</span>
+<span class="sd">            key in the remaining kwargs, that subtype will be used instead.</span>
+<span class="sd">        **kwargs: Additional keyword arguments are treated as options for the</span>
+<span class="sd">            component as outlined in the component schema.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        ComponentBase: Instance of the specified component type/subtype and</span>
+<span class="sd">            options.</span>
+<span class="sd">    </span>
+<span class="sd">    Raises:</span>
+<span class="sd">        ValueError: If comptype is not a registered component type.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="kn">from</span> <span class="nn">yggdrasil.schema</span> <span class="k">import</span> <span class="n">get_schema</span>
+    <span class="n">s</span> <span class="o">=</span> <span class="n">get_schema</span><span class="p">()</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">comptype</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">s</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>  <span class="c1"># pragma: debug</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Unrecognized component type: </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">comptype</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">s</span><span class="o">.</span><span class="n">subtype_key</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="p">:</span>
+        <span class="n">subtype</span> <span class="o">=</span> <span class="n">kwargs</span><span class="p">[</span><span class="n">s</span><span class="o">.</span><span class="n">subtype_key</span><span class="p">]</span>
+    <span class="k">if</span> <span class="n">subtype</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">subtype</span> <span class="o">=</span> <span class="n">s</span><span class="o">.</span><span class="n">identify_subtype</span><span class="p">(</span><span class="n">kwargs</span><span class="p">)</span>
+    <span class="bp">cls</span> <span class="o">=</span> <span class="n">import_component</span><span class="p">(</span><span class="n">comptype</span><span class="p">,</span> <span class="n">subtype</span><span class="o">=</span><span class="n">subtype</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+    <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="get_component_base_class"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.components.get_component_base_class">[docs]</a><span class="k">def</span> <span class="nf">get_component_base_class</span><span class="p">(</span><span class="n">comptype</span><span class="p">,</span> <span class="n">subtype</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">without_schema</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                             <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Determine the base class for a component type.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        comptype (str): The name of a component to test against.</span>
+<span class="sd">        subtype (str, optional): Subtype to use to determine the component</span>
+<span class="sd">            base class. Defaults to None.</span>
+<span class="sd">        without_schema (bool, optional): If True, the schema is not used to</span>
+<span class="sd">            import the component and subtype must be the name of a component</span>
+<span class="sd">            class. Defaults to False. subtype must be provided if without_schema</span>
+<span class="sd">            is True.</span>
+<span class="sd">        **kwargs: Additional keyword arguments are used to determine the</span>
+<span class="sd">            subtype if it is None.</span>
+<span class="sd">    </span>
+<span class="sd">    Returns:</span>
+<span class="sd">        ComponentBase: Component base class.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">comptype</span> <span class="ow">in</span> <span class="n">_registry_base_classes</span><span class="p">:</span>
+        <span class="n">base_class_name</span> <span class="o">=</span> <span class="n">_registry_base_classes</span><span class="p">[</span><span class="n">comptype</span><span class="p">]</span>
+    <span class="k">else</span><span class="p">:</span>  <span class="c1"># pragma: no cover</span>
+        <span class="c1"># Only called during initial import which is not covered by</span>
+        <span class="c1"># the test runner</span>
+        <span class="n">default_class</span> <span class="o">=</span> <span class="n">import_component</span><span class="p">(</span><span class="n">comptype</span><span class="p">,</span> <span class="n">subtype</span><span class="o">=</span><span class="n">subtype</span><span class="p">,</span>
+                                         <span class="n">without_schema</span><span class="o">=</span><span class="n">without_schema</span><span class="p">,</span>
+                                         <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="n">base_class_name</span> <span class="o">=</span> <span class="n">default_class</span><span class="o">.</span><span class="n">_schema_base_class</span>
+    <span class="n">base_class</span> <span class="o">=</span> <span class="n">import_component</span><span class="p">(</span><span class="n">comptype</span><span class="p">,</span> <span class="n">subtype</span><span class="o">=</span><span class="n">base_class_name</span><span class="p">,</span>
+                                  <span class="n">without_schema</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">base_class</span></div>
+
+
+<div class="viewcode-block" id="isinstance_component"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.components.isinstance_component">[docs]</a><span class="k">def</span> <span class="nf">isinstance_component</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">comptype</span><span class="p">,</span> <span class="n">subtype</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">without_schema</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                         <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Determine if an object is an instance of a component type.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        x (object): Object to test.</span>
+<span class="sd">        comptype (str, list): The name of one or more components to test against.</span>
+<span class="sd">        subtype (str, optional): Subtype to use to determine the component</span>
+<span class="sd">            base class. Defaults to None.</span>
+<span class="sd">        without_schema (bool, optional): If True, the schema is not used to</span>
+<span class="sd">            import the component and subtype must be the name of a component</span>
+<span class="sd">            class. Defaults to False. subtype must be provided if without_schema</span>
+<span class="sd">            is True.</span>
+<span class="sd">        **kwargs: Additional keyword arguments are used to determine the</span>
+<span class="sd">            subtype if it is None.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        bool: True if the object is an instance of the specified component(s).</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">comptype</span><span class="p">,</span> <span class="p">(</span><span class="nb">list</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">)):</span>
+        <span class="k">for</span> <span class="n">icomp</span> <span class="ow">in</span> <span class="n">comptype</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">isinstance_component</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">icomp</span><span class="p">):</span>
+                <span class="k">return</span> <span class="kc">True</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">False</span>
+    <span class="n">base_class</span> <span class="o">=</span> <span class="n">get_component_base_class</span><span class="p">(</span><span class="n">comptype</span><span class="p">,</span> <span class="n">subtype</span><span class="o">=</span><span class="n">subtype</span><span class="p">,</span>
+                                          <span class="n">without_schema</span><span class="o">=</span><span class="n">without_schema</span><span class="p">,</span>
+                                          <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+    <span class="k">return</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">base_class</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="inherit_schema"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.components.inherit_schema">[docs]</a><span class="k">def</span> <span class="nf">inherit_schema</span><span class="p">(</span><span class="n">orig</span><span class="p">,</span> <span class="n">new_properties</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">new_required</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                   <span class="n">remove_keys</span><span class="o">=</span><span class="p">[],</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Create an inherited schema, adding new value to accepted ones for</span>
+<span class="sd">    dependencies.</span>
+<span class="sd">    </span>
+<span class="sd">    Args:</span>
+<span class="sd">        orig (dict): Schema that will be inherited.</span>
+<span class="sd">        new_properties (dict, optional): Dictionary of new properties to add.</span>
+<span class="sd">            Defaults to None and is ignored.</span>
+<span class="sd">        new_requried (list, optional): Properties that should be required by the</span>
+<span class="sd">            new class. Defaults to None and is ignored.</span>
+<span class="sd">        remove_keys (list, optional): Keys that should be removed form orig</span>
+<span class="sd">            before adding the new keys. Defaults to empty list.</span>
+<span class="sd">        **kwargs: Additional keyword arguments will be added to the schema</span>
+<span class="sd">            with dependency on the provided key/value pair.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        tuple(dict, list): New schema properties and a list of requried.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">remove_keys</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">remove_keys</span><span class="p">)</span>
+    <span class="c1"># Get set of original properties</span>
+    <span class="k">assert</span><span class="p">(</span><span class="nb">issubclass</span><span class="p">(</span><span class="n">orig</span><span class="p">,</span> <span class="n">ComponentBase</span><span class="p">))</span>
+    <span class="n">out_prp</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">orig</span><span class="o">.</span><span class="n">_schema_properties</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">orig</span><span class="o">.</span><span class="n">_schema_excluded_from_inherit</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">remove_keys</span> <span class="o">+=</span> <span class="n">orig</span><span class="o">.</span><span class="n">_schema_excluded_from_inherit</span>
+    <span class="n">out_req</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">orig</span><span class="o">.</span><span class="n">_schema_required</span><span class="p">)</span>
+    <span class="c1"># Don&#39;t add duplicates</span>
+    <span class="k">if</span> <span class="n">new_properties</span> <span class="o">==</span> <span class="n">out_prp</span><span class="p">:</span>
+        <span class="n">new_properties</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="k">if</span> <span class="n">new_required</span> <span class="o">==</span> <span class="n">out_req</span><span class="p">:</span>
+        <span class="n">new_required</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="c1"># Remove keys</span>
+    <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">remove_keys</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">out_prp</span><span class="p">:</span>
+            <span class="n">out_prp</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="n">k</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">out_req</span><span class="p">:</span>
+            <span class="n">out_req</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">k</span><span class="p">)</span>
+    <span class="c1"># Add new values and keyword arguments</span>
+    <span class="k">if</span> <span class="n">new_properties</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">out_prp</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">new_properties</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">new_required</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">new_required</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">k</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">out_req</span><span class="p">:</span>
+                <span class="n">out_req</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">k</span><span class="p">)</span>
+    <span class="n">out_prp</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">kwargs</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">out_prp</span><span class="p">,</span> <span class="n">out_req</span></div>
+
+
+<div class="viewcode-block" id="ComponentMeta"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.components.ComponentMeta">[docs]</a><span class="k">class</span> <span class="nc">ComponentMeta</span><span class="p">(</span><span class="nb">type</span><span class="p">):</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Meta class for registering schema components.&quot;&quot;&quot;</span>
+    
+    <span class="k">def</span> <span class="nf">__new__</span><span class="p">(</span><span class="n">meta</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">bases</span><span class="p">,</span> <span class="n">class_dict</span><span class="p">):</span>
+        <span class="bp">cls</span> <span class="o">=</span> <span class="nb">type</span><span class="o">.</span><span class="fm">__new__</span><span class="p">(</span><span class="n">meta</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">bases</span><span class="p">,</span> <span class="n">class_dict</span><span class="p">)</span>
+        <span class="c1"># Return early for error classes which should be unregistered duplicates</span>
+        <span class="c1"># of the base class</span>
+        <span class="k">if</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="s1">&#39;_is_error_class&#39;</span><span class="p">,</span> <span class="kc">False</span><span class="p">):</span>
+            <span class="k">return</span> <span class="bp">cls</span>
+        <span class="c1"># Determine subtype</span>
+        <span class="n">subtype</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">if</span> <span class="bp">cls</span><span class="o">.</span><span class="n">_schema_subtype_key</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">subtype</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="bp">cls</span><span class="o">.</span><span class="n">_schema_subtype_key</span><span class="p">,</span>
+                              <span class="nb">getattr</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="s1">&#39;_&#39;</span> <span class="o">+</span> <span class="bp">cls</span><span class="o">.</span><span class="n">_schema_subtype_key</span><span class="p">,</span> <span class="kc">None</span><span class="p">))</span>
+        <span class="c1"># Inherit new schema properties</span>
+        <span class="k">if</span> <span class="bp">cls</span><span class="o">.</span><span class="n">_schema_inherit</span> <span class="ow">and</span> <span class="p">(</span><span class="bp">cls</span><span class="o">.</span><span class="vm">__name__</span> <span class="o">!=</span> <span class="s1">&#39;ComponentBase&#39;</span><span class="p">):</span>
+            <span class="k">assert</span><span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="bp">cls</span><span class="o">.</span><span class="n">_schema_inherit</span><span class="p">,</span> <span class="nb">bool</span><span class="p">))</span>
+            <span class="n">inherit_from</span> <span class="o">=</span> <span class="kc">None</span>
+            <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">bases</span><span class="p">:</span>
+                <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="s1">&#39;_schema_properties&#39;</span><span class="p">):</span>
+                    <span class="n">inherit_from</span> <span class="o">=</span> <span class="n">x</span>
+                    <span class="k">break</span>
+            <span class="k">if</span> <span class="n">inherit_from</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>  <span class="c1"># pragma: debug</span>
+                <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">((</span><span class="s2">&quot;Class </span><span class="si">%s</span><span class="s2"> dosn&#39;t have a component &quot;</span>
+                                    <span class="s2">&quot;parent class.&quot;</span><span class="p">)</span> <span class="o">%</span> <span class="bp">cls</span><span class="p">)</span>
+            <span class="c1"># Dont inherit if the base is ComponentBase (empty schema)</span>
+            <span class="k">if</span> <span class="n">inherit_from</span><span class="o">.</span><span class="vm">__name__</span> <span class="o">!=</span> <span class="n">ComponentBase</span><span class="p">:</span>
+                <span class="bp">cls</span><span class="o">.</span><span class="n">_schema_properties</span><span class="p">,</span> <span class="bp">cls</span><span class="o">.</span><span class="n">_schema_required</span> <span class="o">=</span> <span class="n">inherit_schema</span><span class="p">(</span>
+                    <span class="n">inherit_from</span><span class="p">,</span>
+                    <span class="n">new_properties</span><span class="o">=</span><span class="bp">cls</span><span class="o">.</span><span class="n">_schema_properties</span><span class="p">,</span>
+                    <span class="n">new_required</span><span class="o">=</span><span class="bp">cls</span><span class="o">.</span><span class="n">_schema_required</span><span class="p">,</span>
+                    <span class="n">remove_keys</span><span class="o">=</span><span class="bp">cls</span><span class="o">.</span><span class="n">_schema_excluded_from_inherit</span><span class="p">)</span>
+        <span class="c1"># Do non-registration things</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span><span class="n">name</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s1">&#39;Base&#39;</span><span class="p">)</span> <span class="ow">or</span> <span class="p">(</span><span class="n">subtype</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">or</span> <span class="bp">cls</span><span class="o">.</span><span class="n">_dont_register</span><span class="p">):</span>
+            <span class="c1"># Perform class specific actions in preparation for registration</span>
+            <span class="bp">cls</span><span class="o">.</span><span class="n">before_registration</span><span class="p">(</span><span class="bp">cls</span><span class="p">)</span>
+            <span class="c1"># assert(cls.name is not None)</span>
+            <span class="c1"># Add parameter descriptions from docs</span>
+            <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="bp">cls</span><span class="o">.</span><span class="vm">__mro__</span><span class="p">[::</span><span class="o">-</span><span class="mi">1</span><span class="p">]:</span>
+                <span class="n">args_dict</span> <span class="o">=</span> <span class="n">docs2args</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="vm">__doc__</span><span class="p">)</span>
+                <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="bp">cls</span><span class="o">.</span><span class="n">_schema_properties</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                    <span class="k">if</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">args_dict</span><span class="p">:</span>
+                        <span class="n">v</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s1">&#39;description&#39;</span><span class="p">,</span> <span class="n">args_dict</span><span class="p">[</span><span class="n">k</span><span class="p">][</span><span class="s1">&#39;description&#39;</span><span class="p">])</span>
+            <span class="c1"># Determine base class</span>
+            <span class="k">global</span> <span class="n">_registry_base_classes</span>
+            <span class="k">if</span> <span class="bp">cls</span><span class="o">.</span><span class="n">_schema_base_class</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="k">if</span> <span class="bp">cls</span><span class="o">.</span><span class="n">_schema_type</span> <span class="ow">in</span> <span class="n">_registry_base_classes</span><span class="p">:</span>
+                    <span class="bp">cls</span><span class="o">.</span><span class="n">_schema_base_class</span> <span class="o">=</span> <span class="n">_registry_base_classes</span><span class="p">[</span><span class="bp">cls</span><span class="o">.</span><span class="n">_schema_type</span><span class="p">]</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">base_comp</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="vm">__name__</span>
+                    <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">x</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">cls</span><span class="o">.</span><span class="vm">__mro__</span><span class="p">):</span>
+                        <span class="k">if</span> <span class="n">x</span><span class="o">.</span><span class="n">_schema_type</span> <span class="o">!=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">_schema_type</span><span class="p">:</span>
+                            <span class="k">break</span>
+                        <span class="n">base_comp</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="vm">__name__</span>
+                    <span class="k">else</span><span class="p">:</span>  <span class="c1"># pragma: debug</span>
+                        <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">((</span><span class="s2">&quot;Could not determine base class for </span><span class="si">%s</span><span class="s2"> &quot;</span>
+                                            <span class="s2">&quot;from </span><span class="si">%s</span><span class="s2">.&quot;</span><span class="p">)</span> <span class="o">%</span> <span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">bases</span><span class="p">))</span>
+                    <span class="bp">cls</span><span class="o">.</span><span class="n">_schema_base_class</span> <span class="o">=</span> <span class="n">base_comp</span>
+            <span class="c1"># Register</span>
+            <span class="k">global</span> <span class="n">_registry</span>
+            <span class="k">global</span> <span class="n">_registry_defaults</span>
+            <span class="k">global</span> <span class="n">_registry_class2subtype</span>
+            <span class="n">yaml_typ</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">_schema_type</span>
+            <span class="n">default_subtype</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">_schema_properties</span><span class="o">.</span><span class="n">get</span><span class="p">(</span>
+                <span class="bp">cls</span><span class="o">.</span><span class="n">_schema_subtype_key</span><span class="p">,</span> <span class="p">{})</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;default&#39;</span><span class="p">,</span>
+                                                 <span class="bp">cls</span><span class="o">.</span><span class="n">_schema_subtype_default</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">yaml_typ</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">_registry</span><span class="p">:</span>
+                <span class="n">_registry</span><span class="p">[</span><span class="n">yaml_typ</span><span class="p">]</span> <span class="o">=</span> <span class="n">OrderedDict</span><span class="p">()</span>
+                <span class="n">_registry_defaults</span><span class="p">[</span><span class="n">yaml_typ</span><span class="p">]</span> <span class="o">=</span> <span class="n">default_subtype</span>
+                <span class="n">_registry_base_classes</span><span class="p">[</span><span class="n">yaml_typ</span><span class="p">]</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">_schema_base_class</span>
+                <span class="n">_registry_class2subtype</span><span class="p">[</span><span class="n">yaml_typ</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+            <span class="k">elif</span> <span class="n">default_subtype</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="k">assert</span><span class="p">(</span><span class="n">_registry_defaults</span><span class="p">[</span><span class="n">yaml_typ</span><span class="p">]</span> <span class="o">==</span> <span class="n">default_subtype</span><span class="p">)</span>
+            <span class="k">if</span> <span class="bp">cls</span><span class="o">.</span><span class="vm">__name__</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">_registry</span><span class="p">[</span><span class="n">yaml_typ</span><span class="p">]:</span>
+                <span class="n">_registry</span><span class="p">[</span><span class="n">yaml_typ</span><span class="p">][</span><span class="bp">cls</span><span class="o">.</span><span class="vm">__name__</span><span class="p">]</span> <span class="o">=</span> <span class="bp">cls</span>
+                <span class="n">_registry_class2subtype</span><span class="p">[</span><span class="n">yaml_typ</span><span class="p">][</span><span class="n">subtype</span><span class="p">]</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="vm">__name__</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;YGG_RUNNING_YGGSCHEMA&#39;</span><span class="p">,</span> <span class="s1">&#39;None&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
+                    <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;true&#39;</span><span class="p">,</span> <span class="s1">&#39;1&#39;</span><span class="p">]):</span>
+                <span class="bp">cls</span><span class="o">.</span><span class="n">after_registration</span><span class="p">(</span><span class="bp">cls</span><span class="p">)</span>
+                <span class="bp">cls</span><span class="o">.</span><span class="n">finalize_registration</span><span class="p">(</span><span class="bp">cls</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">cls</span></div>
+
+
+<div class="viewcode-block" id="ComponentBaseUnregistered"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.components.ComponentBaseUnregistered">[docs]</a><span class="k">class</span> <span class="nc">ComponentBaseUnregistered</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Base class for schema components w/o schema and registration.&quot;&quot;&quot;</span>
+    <span class="vm">__slots__</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">_disconnect_attr</span> <span class="o">=</span> <span class="p">[]</span>
+
+    <span class="k">def</span> <span class="nf">__del__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">disconnect</span><span class="p">()</span>
+
+<div class="viewcode-block" id="ComponentBaseUnregistered.disconnect"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.components.ComponentBaseUnregistered.disconnect">[docs]</a>    <span class="k">def</span> <span class="nf">disconnect</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Disconnect attributes that are aliases.&quot;&quot;&quot;</span>
+        <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_disconnect_attr</span><span class="p">:</span>
+            <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">k</span><span class="p">,</span> <span class="kc">None</span><span class="p">),</span> <span class="s1">&#39;disconnect&#39;</span><span class="p">):</span>
+                <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">k</span><span class="p">)</span><span class="o">.</span><span class="n">disconnect</span><span class="p">()</span></div></div>
+
+
+<div class="viewcode-block" id="ComponentBase"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.components.ComponentBase">[docs]</a><span class="nd">@six</span><span class="o">.</span><span class="n">add_metaclass</span><span class="p">(</span><span class="n">ComponentMeta</span><span class="p">)</span>
+<span class="k">class</span> <span class="nc">ComponentBase</span><span class="p">(</span><span class="n">ComponentBaseUnregistered</span><span class="p">):</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Base class for schema components.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        skip_component_schema_normalization (bool, optional): If True, the</span>
+<span class="sd">            schema will not be used to normalize/validate input keyword</span>
+<span class="sd">            arguments (e.g. in case they were already parsed). Defaults to</span>
+<span class="sd">            False.</span>
+<span class="sd">        **kwargs: Keyword arguments are added to the class as attributes</span>
+<span class="sd">            according to the class attributes _schema_properties and</span>
+<span class="sd">            _schema_excluded_from_class. Keyword arguments not added to the</span>
+<span class="sd">            class as attributes are assigned to the extra_kwargs dictionary.</span>
+
+<span class="sd">    Attributes:</span>
+<span class="sd">        extra_kwargs (dict): Keyword arguments that were not parsed.</span>
+
+<span class="sd">    Class Attributes:</span>
+<span class="sd">        _schema_type (str): Name of the component type the class represents.</span>
+<span class="sd">        _schema_subtype_key (str): Attribute that should be used to identify the</span>
+<span class="sd">            subtype associated with each class.</span>
+<span class="sd">        _schema_subtype_description (str): Description for the subtype represented</span>
+<span class="sd">            by the class that should be used in documentation tables.</span>
+<span class="sd">        _schema_required (list): Keys from _schema_properties that are required</span>
+<span class="sd">            to produce a valid component.</span>
+<span class="sd">        _schema_properties (dict): Schemas describing keyword arguments that</span>
+<span class="sd">            can be supplied to the class constructor and used to specify</span>
+<span class="sd">            component behavior in YAML/JSON files. At initialization, these</span>
+<span class="sd">            keywords are added to the class instance as attributes of the</span>
+<span class="sd">            same name unless they are in _schema_excluded_from_class. Unless</span>
+<span class="sd">            _schema_inherit is False, these properties will be added in addition</span>
+<span class="sd">            to the schema properties defined by the class base.</span>
+<span class="sd">        _schema_excluded_from_class (list): Keywords in _schema_properties that</span>
+<span class="sd">            should not be added to the class as attributes during initialization.</span>
+<span class="sd">        _schema_excluded_from_inherit (list): Keywords in _schema_properties that</span>
+<span class="sd">            should not be inherited either from the base class or by child</span>
+<span class="sd">            classes.</span>
+<span class="sd">        _schema_inherit (bool, ComponentBase): If False, the base schema will</span>
+<span class="sd">            not be inherited. If a Component subclass, the schema from that</span>
+<span class="sd">            class will be inherited instead of the base class. Defaults to True.</span>
+<span class="sd">        _dont_register (bool): If True, the component class will be be registered</span>
+<span class="sd">            and the before_registration class method will not be called. Defaults</span>
+<span class="sd">            to False.</span>
+<span class="sd">        </span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">_schema_type</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">_schema_subtype_key</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">_schema_subtype_description</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">_schema_subtype_default</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">_schema_base_class</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">_schema_required</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">_schema_properties</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="n">_schema_excluded_from_class</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">_schema_excluded_from_inherit</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">_schema_excluded_from_class_validation</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">_schema_inherit</span> <span class="o">=</span> <span class="kc">True</span>
+    <span class="n">_dont_register</span> <span class="o">=</span> <span class="kc">False</span>
+
+    <span class="k">def</span> <span class="nf">__new__</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="n">obj</span> <span class="o">=</span> <span class="nb">object</span><span class="o">.</span><span class="fm">__new__</span><span class="p">(</span><span class="bp">cls</span><span class="p">)</span>
+        <span class="n">obj</span><span class="o">.</span><span class="n">_input_args</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">args</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">obj</span><span class="o">.</span><span class="n">_input_args</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">weakref</span><span class="o">.</span><span class="n">ref</span><span class="p">(</span><span class="n">x</span><span class="p">))</span>
+            <span class="k">except</span> <span class="ne">TypeError</span><span class="p">:</span>
+                <span class="n">obj</span><span class="o">.</span><span class="n">_input_args</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+        <span class="n">obj</span><span class="o">.</span><span class="n">_input_kwargs</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">obj</span><span class="o">.</span><span class="n">_input_kwargs</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">weakref</span><span class="o">.</span><span class="n">ref</span><span class="p">(</span><span class="n">v</span><span class="p">)</span>
+            <span class="k">except</span> <span class="ne">TypeError</span><span class="p">:</span>
+                <span class="n">obj</span><span class="o">.</span><span class="n">_input_kwargs</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">v</span>
+        <span class="k">return</span> <span class="n">obj</span>
+    
+    <span class="k">def</span> <span class="nf">__getstate__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">out</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+        <span class="k">del</span> <span class="n">out</span><span class="p">[</span><span class="s1">&#39;_input_args&#39;</span><span class="p">],</span> <span class="n">out</span><span class="p">[</span><span class="s1">&#39;_input_kwargs&#39;</span><span class="p">]</span>
+        <span class="k">return</span> <span class="n">out</span>
+
+    <span class="k">def</span> <span class="nf">__setstate__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">state</span><span class="p">):</span>
+        <span class="n">state</span><span class="p">[</span><span class="s1">&#39;_input_args&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">state</span><span class="p">[</span><span class="s1">&#39;_input_kwargs&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">state</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">skip_component_schema_normalization</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">skip_component_schema_normalization</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">skip_component_schema_normalization</span> <span class="o">=</span> <span class="p">(</span>
+                <span class="ow">not</span> <span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;YGG_VALIDATE_COMPONENTS&#39;</span><span class="p">,</span> <span class="s1">&#39;None&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
+                     <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;true&#39;</span><span class="p">,</span> <span class="s1">&#39;1&#39;</span><span class="p">]))</span>
+        <span class="n">comptype</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_schema_type</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">comptype</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_schema_properties</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">extra_kwargs</span> <span class="o">=</span> <span class="n">kwargs</span>
+            <span class="k">return</span>
+        <span class="n">subtype</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_schema_subtype_key</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">subtype</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_schema_subtype_key</span><span class="p">,</span>
+                              <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;_</span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">_schema_subtype_key</span><span class="p">,</span> <span class="kc">None</span><span class="p">))</span>
+        <span class="c1"># Fall back to some simple parsing/normalization to save time on</span>
+        <span class="c1"># full jsonschema normalization</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_defaults_set</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_schema_properties</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="k">if</span> <span class="n">k</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_schema_excluded_from_class</span><span class="p">:</span>
+                <span class="k">continue</span>
+            <span class="n">default</span> <span class="o">=</span> <span class="n">v</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;default&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+            <span class="k">if</span> <span class="p">(</span><span class="n">k</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">_schema_subtype_key</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">subtype</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">):</span>
+                <span class="n">default</span> <span class="o">=</span> <span class="n">subtype</span>
+            <span class="k">if</span> <span class="n">default</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">k</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">_defaults_set</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">k</span><span class="p">)</span>
+                <span class="n">kwargs</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">default</span><span class="p">))</span>
+            <span class="k">if</span> <span class="n">v</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;type&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span> <span class="o">==</span> <span class="s1">&#39;array&#39;</span><span class="p">:</span>
+                <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="kc">None</span><span class="p">),</span> <span class="p">(</span><span class="nb">bytes</span><span class="p">,</span> <span class="nb">str</span><span class="p">)):</span>
+                    <span class="n">kwargs</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">kwargs</span><span class="p">[</span><span class="n">k</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">()</span>
+        <span class="c1"># Parse keyword arguments using schema</span>
+        <span class="k">if</span> <span class="p">(((</span><span class="n">comptype</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">subtype</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">)</span>
+             <span class="ow">and</span> <span class="p">(</span><span class="ow">not</span> <span class="n">skip_component_schema_normalization</span><span class="p">)</span>
+             <span class="ow">and</span> <span class="p">(</span><span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_dont_register</span><span class="p">))):</span>
+            <span class="kn">from</span> <span class="nn">yggdrasil.schema</span> <span class="k">import</span> <span class="n">get_schema</span>
+            <span class="n">s</span> <span class="o">=</span> <span class="n">get_schema</span><span class="p">()</span><span class="o">.</span><span class="n">get_component_schema</span><span class="p">(</span>
+                <span class="n">comptype</span><span class="p">,</span> <span class="n">subtype</span><span class="p">,</span> <span class="n">relaxed</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                <span class="n">allow_instance_definitions</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+            <span class="n">props</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">s</span><span class="p">[</span><span class="s1">&#39;properties&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">skip_component_schema_normalization</span><span class="p">:</span>
+                <span class="kn">from</span> <span class="nn">yggdrasil</span> <span class="k">import</span> <span class="n">metaschema</span>
+                <span class="n">kwargs</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_schema_subtype_key</span><span class="p">,</span> <span class="n">subtype</span><span class="p">)</span>
+                <span class="c1"># Remove properties that shouldn&#39;t ve validated in class</span>
+                <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_schema_excluded_from_class_validation</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">s</span><span class="p">[</span><span class="s1">&#39;properties&#39;</span><span class="p">]:</span>
+                        <span class="k">del</span> <span class="n">s</span><span class="p">[</span><span class="s1">&#39;properties&#39;</span><span class="p">][</span><span class="n">k</span><span class="p">]</span>
+                <span class="c1"># Validate and normalize</span>
+                <span class="n">metaschema</span><span class="o">.</span><span class="n">validate_instance</span><span class="p">(</span><span class="n">kwargs</span><span class="p">,</span> <span class="n">s</span><span class="p">,</span> <span class="n">normalize</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+                <span class="c1"># TODO: Normalization performance needs improvement</span>
+                <span class="c1"># import pprint</span>
+                <span class="c1"># print(&#39;before&#39;)</span>
+                <span class="c1"># pprint.pprint(kwargs_comp)</span>
+                <span class="c1"># kwargs_comp = metaschema.validate_instance(kwargs_comp, s,</span>
+                <span class="c1">#                                            normalize=True)</span>
+                <span class="c1"># kwargs.update(kwargs_comp)</span>
+                <span class="c1"># print(&#39;normalized&#39;)</span>
+                <span class="c1"># pprint.pprint(kwargs_comp)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">props</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_schema_properties</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span>
+        <span class="c1"># Set attributes based on properties</span>
+        <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">props</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">k</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_schema_excluded_from_class</span><span class="p">:</span>
+                <span class="k">continue</span>
+            <span class="n">v</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+            <span class="k">if</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">k</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="nb">setattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span><span class="p">)</span>
+            <span class="c1"># elif (getattr(self, k) != v) and (v is not None):</span>
+            <span class="c1">#     warnings.warn((&quot;The schema property &#39;%s&#39; is provided as a &quot;</span>
+            <span class="c1">#                    &quot;keyword with a value of %s, but the class &quot;</span>
+            <span class="c1">#                    &quot;already has an attribute of the same name &quot;</span>
+            <span class="c1">#                    &quot;with the value %s.&quot;)</span>
+            <span class="c1">#                   % (k, v, getattr(self, k)))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">extra_kwargs</span> <span class="o">=</span> <span class="n">kwargs</span>
+
+<div class="viewcode-block" id="ComponentBase.before_registration"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.components.ComponentBase.before_registration">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">before_registration</span><span class="p">(</span><span class="bp">cls</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Operations that should be performed to modify class attributes prior</span>
+<span class="sd">        to registration. These actions will still be performed if the environment</span>
+<span class="sd">        variable YGG_RUNNING_YGGSCHEMA is set.&quot;&quot;&quot;</span>
+        <span class="k">pass</span></div>
+
+<div class="viewcode-block" id="ComponentBase.after_registration"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.components.ComponentBase.after_registration">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">after_registration</span><span class="p">(</span><span class="bp">cls</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Operations that should be preformed to modify class attributes after</span>
+<span class="sd">        registration. These actions will not be performed if the environment</span>
+<span class="sd">        variable YGG_RUNNING_YGGSCHEMA is set.&quot;&quot;&quot;</span>
+        <span class="k">pass</span></div>
+
+<div class="viewcode-block" id="ComponentBase.finalize_registration"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.components.ComponentBase.finalize_registration">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">finalize_registration</span><span class="p">(</span><span class="bp">cls</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Final operations to perform after a class has been fully initialized.</span>
+<span class="sd">        These actions will not be performed if the environment variable</span>
+<span class="sd">        YGG_RUNNING_YGGSCHEMA is set.&quot;&quot;&quot;</span>
+        <span class="k">pass</span></div></div>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &#169; Copyright 2017, Meagan Lang, David Raila.
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

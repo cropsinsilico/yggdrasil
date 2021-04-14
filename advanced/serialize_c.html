@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>C Serialize API &mdash; yggdrasil v1.6.0 documentation</title>
+  <title>C Serialize API &mdash; yggdrasil v1.6.0+5.g622c9ac0 documentation</title>
   
 
   
@@ -211,7 +211,7 @@
 <p class="breathe-sectiondef-title rubric" id="breathe-section-title-functions">Functions</p>
 <dl class="cpp function">
 <dt id="_CPPv421serialize_ascii_tableK6seri_tPcK6size_tPi7va_list">
-<span id="_CPPv321serialize_ascii_tableK6seri_tPcK6size_tPi7va_list"></span><span id="_CPPv221serialize_ascii_tableK6seri_tPcK6size_tPi7va_list"></span><span id="serialize_ascii_table__seri_tC.cP.sC.iP.va_list"></span><span class="target" id="_ascii_table_serialize_8h_1aa7aee33cb6af1e1f38491a4dc899ee91"></span><em class="property"><span class="pre">static</span></em> <em class="property"><span class="pre">inline</span></em> <span class="pre">int</span> <code class="sig-name descname"><span class="pre">serialize_ascii_table</span></code><span class="sig-paren">(</span><em class="property"><span class="pre">const</span></em> <a class="reference internal" href="#_CPPv46seri_t" title="seri_t"><span class="pre">seri_t</span></a> <em><span class="pre">s</span></em>, <span class="pre">char</span> <span class="pre">*</span><em><span class="pre">buf</span></em>, <em class="property"><span class="pre">const</span></em> <span class="pre">size_t</span> <em><span class="pre">buf_siz</span></em>, <span class="pre">int</span> <span class="pre">*</span><em><span class="pre">args_used</span></em>, <span class="pre">va_list</span> <em><span class="pre">ap</span></em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv421serialize_ascii_tableK6seri_tPcK6size_tPi7va_list" title="Permalink to this definition">¶</a><br /></dt>
+<span id="_CPPv321serialize_ascii_tableK6seri_tPcK6size_tPi7va_list"></span><span id="_CPPv221serialize_ascii_tableK6seri_tPcK6size_tPi7va_list"></span><span id="serialize_ascii_table__seri_tC.cP.sC.iP.va_list"></span><span class="target" id="_ascii_table_serialize_8h_1aa7aee33cb6af1e1f38491a4dc899ee91"></span><em class="property">static</em> <em class="property">inline</em> int <code class="sig-name descname">serialize_ascii_table</code><span class="sig-paren">(</span><em class="property">const</em> <a class="reference internal" href="#_CPPv46seri_t" title="seri_t">seri_t</a> <em>s</em>, char *<em>buf</em>, <em class="property">const</em> size_t <em>buf_siz</em>, int *<em>args_used</em>, va_list <em>ap</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv421serialize_ascii_tableK6seri_tPcK6size_tPi7va_list" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Serialize arguments to create a table row. </p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -228,7 +228,7 @@
 
 <dl class="cpp function">
 <dt id="_CPPv423deserialize_ascii_tableK6seri_tPKcK6size_t7va_list">
-<span id="_CPPv323deserialize_ascii_tableK6seri_tPKcK6size_t7va_list"></span><span id="_CPPv223deserialize_ascii_tableK6seri_tPKcK6size_t7va_list"></span><span id="deserialize_ascii_table__seri_tC.cCP.sC.va_list"></span><span class="target" id="_ascii_table_serialize_8h_1a0a8f4d2393a8ac96930d7cb29bc87ccf"></span><em class="property"><span class="pre">static</span></em> <em class="property"><span class="pre">inline</span></em> <span class="pre">int</span> <code class="sig-name descname"><span class="pre">deserialize_ascii_table</span></code><span class="sig-paren">(</span><em class="property"><span class="pre">const</span></em> <a class="reference internal" href="#_CPPv46seri_t" title="seri_t"><span class="pre">seri_t</span></a> <em><span class="pre">s</span></em>, <em class="property"><span class="pre">const</span></em> <span class="pre">char</span> <span class="pre">*</span><em><span class="pre">buf</span></em>, <em class="property"><span class="pre">const</span></em> <span class="pre">size_t</span> <em><span class="pre">buf_siz</span></em>, <span class="pre">va_list</span> <em><span class="pre">ap</span></em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv423deserialize_ascii_tableK6seri_tPKcK6size_t7va_list" title="Permalink to this definition">¶</a><br /></dt>
+<span id="_CPPv323deserialize_ascii_tableK6seri_tPKcK6size_t7va_list"></span><span id="_CPPv223deserialize_ascii_tableK6seri_tPKcK6size_t7va_list"></span><span id="deserialize_ascii_table__seri_tC.cCP.sC.va_list"></span><span class="target" id="_ascii_table_serialize_8h_1a0a8f4d2393a8ac96930d7cb29bc87ccf"></span><em class="property">static</em> <em class="property">inline</em> int <code class="sig-name descname">deserialize_ascii_table</code><span class="sig-paren">(</span><em class="property">const</em> <a class="reference internal" href="#_CPPv46seri_t" title="seri_t">seri_t</a> <em>s</em>, <em class="property">const</em> char *<em>buf</em>, <em class="property">const</em> size_t <em>buf_siz</em>, va_list <em>ap</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv423deserialize_ascii_tableK6seri_tPKcK6size_t7va_list" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Deserialize table row to populate arguments. </p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -244,7 +244,7 @@
 
 <dl class="cpp function">
 <dt id="_CPPv427serialize_ascii_table_arrayK6seri_tPcK6size_tPi7va_list">
-<span id="_CPPv327serialize_ascii_table_arrayK6seri_tPcK6size_tPi7va_list"></span><span id="_CPPv227serialize_ascii_table_arrayK6seri_tPcK6size_tPi7va_list"></span><span id="serialize_ascii_table_array__seri_tC.cP.sC.iP.va_list"></span><span class="target" id="_ascii_table_serialize_8h_1a4e4eabd98c07f6163161597d56a165e6"></span><em class="property"><span class="pre">static</span></em> <em class="property"><span class="pre">inline</span></em> <span class="pre">int</span> <code class="sig-name descname"><span class="pre">serialize_ascii_table_array</span></code><span class="sig-paren">(</span><em class="property"><span class="pre">const</span></em> <a class="reference internal" href="#_CPPv46seri_t" title="seri_t"><span class="pre">seri_t</span></a> <em><span class="pre">s</span></em>, <span class="pre">char</span> <span class="pre">*</span><em><span class="pre">buf</span></em>, <em class="property"><span class="pre">const</span></em> <span class="pre">size_t</span> <em><span class="pre">buf_siz</span></em>, <span class="pre">int</span> <span class="pre">*</span><em><span class="pre">args_used</span></em>, <span class="pre">va_list</span> <em><span class="pre">ap</span></em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv427serialize_ascii_table_arrayK6seri_tPcK6size_tPi7va_list" title="Permalink to this definition">¶</a><br /></dt>
+<span id="_CPPv327serialize_ascii_table_arrayK6seri_tPcK6size_tPi7va_list"></span><span id="_CPPv227serialize_ascii_table_arrayK6seri_tPcK6size_tPi7va_list"></span><span id="serialize_ascii_table_array__seri_tC.cP.sC.iP.va_list"></span><span class="target" id="_ascii_table_serialize_8h_1a4e4eabd98c07f6163161597d56a165e6"></span><em class="property">static</em> <em class="property">inline</em> int <code class="sig-name descname">serialize_ascii_table_array</code><span class="sig-paren">(</span><em class="property">const</em> <a class="reference internal" href="#_CPPv46seri_t" title="seri_t">seri_t</a> <em>s</em>, char *<em>buf</em>, <em class="property">const</em> size_t <em>buf_siz</em>, int *<em>args_used</em>, va_list <em>ap</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv427serialize_ascii_table_arrayK6seri_tPcK6size_tPi7va_list" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Serialize column arrays to create table. </p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -261,7 +261,7 @@
 
 <dl class="cpp function">
 <dt id="_CPPv429deserialize_ascii_table_arrayK6seri_tPKcK6size_t7va_list">
-<span id="_CPPv329deserialize_ascii_table_arrayK6seri_tPKcK6size_t7va_list"></span><span id="_CPPv229deserialize_ascii_table_arrayK6seri_tPKcK6size_t7va_list"></span><span id="deserialize_ascii_table_array__seri_tC.cCP.sC.va_list"></span><span class="target" id="_ascii_table_serialize_8h_1abf327d217e92ec1b07372ea41e105d87"></span><em class="property"><span class="pre">static</span></em> <em class="property"><span class="pre">inline</span></em> <span class="pre">int</span> <code class="sig-name descname"><span class="pre">deserialize_ascii_table_array</span></code><span class="sig-paren">(</span><em class="property"><span class="pre">const</span></em> <a class="reference internal" href="#_CPPv46seri_t" title="seri_t"><span class="pre">seri_t</span></a> <em><span class="pre">s</span></em>, <em class="property"><span class="pre">const</span></em> <span class="pre">char</span> <span class="pre">*</span><em><span class="pre">buf</span></em>, <em class="property"><span class="pre">const</span></em> <span class="pre">size_t</span> <em><span class="pre">buf_siz</span></em>, <span class="pre">va_list</span> <em><span class="pre">ap</span></em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv429deserialize_ascii_table_arrayK6seri_tPKcK6size_t7va_list" title="Permalink to this definition">¶</a><br /></dt>
+<span id="_CPPv329deserialize_ascii_table_arrayK6seri_tPKcK6size_t7va_list"></span><span id="_CPPv229deserialize_ascii_table_arrayK6seri_tPKcK6size_t7va_list"></span><span id="deserialize_ascii_table_array__seri_tC.cCP.sC.va_list"></span><span class="target" id="_ascii_table_serialize_8h_1abf327d217e92ec1b07372ea41e105d87"></span><em class="property">static</em> <em class="property">inline</em> int <code class="sig-name descname">deserialize_ascii_table_array</code><span class="sig-paren">(</span><em class="property">const</em> <a class="reference internal" href="#_CPPv46seri_t" title="seri_t">seri_t</a> <em>s</em>, <em class="property">const</em> char *<em>buf</em>, <em class="property">const</em> size_t <em>buf_siz</em>, va_list <em>ap</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv429deserialize_ascii_table_arrayK6seri_tPKcK6size_t7va_list" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Deserialize table to populate column arrays. </p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -280,7 +280,7 @@
 <p class="breathe-sectiondef-title rubric" id="breathe-section-title-functions">Functions</p>
 <dl class="cpp function">
 <dt id="_CPPv416serialize_formatK6seri_tPcK6size_tPi7va_list">
-<span id="_CPPv316serialize_formatK6seri_tPcK6size_tPi7va_list"></span><span id="_CPPv216serialize_formatK6seri_tPcK6size_tPi7va_list"></span><span id="serialize_format__seri_tC.cP.sC.iP.va_list"></span><span class="target" id="_format_serialize_8h_1a5f5d23f379fd9ef67ca89ad90b2e98a8"></span><em class="property"><span class="pre">static</span></em> <em class="property"><span class="pre">inline</span></em> <span class="pre">int</span> <code class="sig-name descname"><span class="pre">serialize_format</span></code><span class="sig-paren">(</span><em class="property"><span class="pre">const</span></em> <a class="reference internal" href="#_CPPv46seri_t" title="seri_t"><span class="pre">seri_t</span></a> <em><span class="pre">s</span></em>, <span class="pre">char</span> <span class="pre">*</span><em><span class="pre">buf</span></em>, <em class="property"><span class="pre">const</span></em> <span class="pre">size_t</span> <em><span class="pre">buf_siz</span></em>, <span class="pre">int</span> <span class="pre">*</span><em><span class="pre">args_used</span></em>, <span class="pre">va_list</span> <em><span class="pre">ap</span></em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv416serialize_formatK6seri_tPcK6size_tPi7va_list" title="Permalink to this definition">¶</a><br /></dt>
+<span id="_CPPv316serialize_formatK6seri_tPcK6size_tPi7va_list"></span><span id="_CPPv216serialize_formatK6seri_tPcK6size_tPi7va_list"></span><span id="serialize_format__seri_tC.cP.sC.iP.va_list"></span><span class="target" id="_format_serialize_8h_1a5f5d23f379fd9ef67ca89ad90b2e98a8"></span><em class="property">static</em> <em class="property">inline</em> int <code class="sig-name descname">serialize_format</code><span class="sig-paren">(</span><em class="property">const</em> <a class="reference internal" href="#_CPPv46seri_t" title="seri_t">seri_t</a> <em>s</em>, char *<em>buf</em>, <em class="property">const</em> size_t <em>buf_siz</em>, int *<em>args_used</em>, va_list <em>ap</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv416serialize_formatK6seri_tPcK6size_tPi7va_list" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Serialize arguments to create a message. </p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -297,7 +297,7 @@
 
 <dl class="cpp function">
 <dt id="_CPPv418deserialize_formatK6seri_tPKcK6size_t7va_list">
-<span id="_CPPv318deserialize_formatK6seri_tPKcK6size_t7va_list"></span><span id="_CPPv218deserialize_formatK6seri_tPKcK6size_t7va_list"></span><span id="deserialize_format__seri_tC.cCP.sC.va_list"></span><span class="target" id="_format_serialize_8h_1a304b463aa3b2a9be92a80f0a092f4913"></span><em class="property"><span class="pre">static</span></em> <em class="property"><span class="pre">inline</span></em> <span class="pre">int</span> <code class="sig-name descname"><span class="pre">deserialize_format</span></code><span class="sig-paren">(</span><em class="property"><span class="pre">const</span></em> <a class="reference internal" href="#_CPPv46seri_t" title="seri_t"><span class="pre">seri_t</span></a> <em><span class="pre">s</span></em>, <em class="property"><span class="pre">const</span></em> <span class="pre">char</span> <span class="pre">*</span><em><span class="pre">buf</span></em>, <em class="property"><span class="pre">const</span></em> <span class="pre">size_t</span> <em><span class="pre">buf_siz</span></em>, <span class="pre">va_list</span> <em><span class="pre">ap</span></em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv418deserialize_formatK6seri_tPKcK6size_t7va_list" title="Permalink to this definition">¶</a><br /></dt>
+<span id="_CPPv318deserialize_formatK6seri_tPKcK6size_t7va_list"></span><span id="_CPPv218deserialize_formatK6seri_tPKcK6size_t7va_list"></span><span id="deserialize_format__seri_tC.cCP.sC.va_list"></span><span class="target" id="_format_serialize_8h_1a304b463aa3b2a9be92a80f0a092f4913"></span><em class="property">static</em> <em class="property">inline</em> int <code class="sig-name descname">deserialize_format</code><span class="sig-paren">(</span><em class="property">const</em> <a class="reference internal" href="#_CPPv46seri_t" title="seri_t">seri_t</a> <em>s</em>, <em class="property">const</em> char *<em>buf</em>, <em class="property">const</em> size_t <em>buf_siz</em>, va_list <em>ap</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv418deserialize_formatK6seri_tPKcK6size_t7va_list" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Deserialize message to populate arguments. </p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -316,7 +316,7 @@
 <p class="breathe-sectiondef-title rubric" id="breathe-section-title-typedefs">Typedefs</p>
 <dl class="cpp type">
 <dt id="_CPPv45obj_t">
-<span id="_CPPv35obj_t"></span><span id="_CPPv25obj_t"></span><span id="obj_t"></span><span class="target" id="_obj_serialize_8h_1a184671ad32f4c6c6a9e77faff34b303c"></span><em class="property"><span class="pre">typedef</span> </em><em class="property"><span class="pre">struct</span></em> <a class="reference internal" href="#_CPPv45obj_t" title="obj_t"><span class="pre">obj_t</span></a> <code class="sig-name descname"><span class="pre">obj_t</span></code><a class="headerlink" href="#_CPPv45obj_t" title="Permalink to this definition">¶</a><br /></dt>
+<span id="_CPPv35obj_t"></span><span id="_CPPv25obj_t"></span><span id="obj_t"></span><span class="target" id="_obj_serialize_8h_1a184671ad32f4c6c6a9e77faff34b303c"></span><em class="property">typedef </em><em class="property">struct</em> <a class="reference internal" href="#_CPPv45obj_t" title="obj_t">obj_t</a> <code class="sig-name descname">obj_t</code><a class="headerlink" href="#_CPPv45obj_t" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Obj structure. </p>
 </dd></dl>
 
@@ -325,7 +325,7 @@
 <p class="breathe-sectiondef-title rubric" id="breathe-section-title-functions">Functions</p>
 <dl class="cpp function">
 <dt id="_CPPv48init_objv">
-<span id="_CPPv38init_objv"></span><span id="_CPPv28init_objv"></span><span id="init_obj"></span><span class="target" id="_obj_serialize_8h_1aab97abc7b3e7725b67713220a5524b0a"></span><em class="property"><span class="pre">static</span></em> <em class="property"><span class="pre">inline</span></em> <a class="reference internal" href="#_CPPv45obj_t" title="obj_t"><span class="pre">obj_t</span></a> <code class="sig-name descname"><span class="pre">init_obj</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv48init_objv" title="Permalink to this definition">¶</a><br /></dt>
+<span id="_CPPv38init_objv"></span><span id="_CPPv28init_objv"></span><span id="init_obj"></span><span class="target" id="_obj_serialize_8h_1aab97abc7b3e7725b67713220a5524b0a"></span><em class="property">static</em> <em class="property">inline</em> <a class="reference internal" href="#_CPPv45obj_t" title="obj_t">obj_t</a> <code class="sig-name descname">init_obj</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv48init_objv" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Initialize empty obj structure. </p>
 <dl class="field-list simple">
 <dt class="field-odd">Returns</dt>
@@ -336,7 +336,7 @@
 
 <dl class="cpp function">
 <dt id="_CPPv48free_objP5obj_t">
-<span id="_CPPv38free_objP5obj_t"></span><span id="_CPPv28free_objP5obj_t"></span><span id="free_obj__obj_tP"></span><span class="target" id="_obj_serialize_8h_1a818320c015a0febb2c0d03a9d97312ed"></span><em class="property"><span class="pre">static</span></em> <em class="property"><span class="pre">inline</span></em> <span class="pre">void</span> <code class="sig-name descname"><span class="pre">free_obj</span></code><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv45obj_t" title="obj_t"><span class="pre">obj_t</span></a> <span class="pre">*</span><em><span class="pre">p</span></em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv48free_objP5obj_t" title="Permalink to this definition">¶</a><br /></dt>
+<span id="_CPPv38free_objP5obj_t"></span><span id="_CPPv28free_objP5obj_t"></span><span id="free_obj__obj_tP"></span><span class="target" id="_obj_serialize_8h_1a818320c015a0febb2c0d03a9d97312ed"></span><em class="property">static</em> <em class="property">inline</em> void <code class="sig-name descname">free_obj</code><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv45obj_t" title="obj_t">obj_t</a> *<em>p</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv48free_objP5obj_t" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Free obj structure. </p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -347,7 +347,7 @@
 
 <dl class="cpp function">
 <dt id="_CPPv49alloc_objP5obj_tiiiii">
-<span id="_CPPv39alloc_objP5obj_tiiiii"></span><span id="_CPPv29alloc_objP5obj_tiiiii"></span><span id="alloc_obj__obj_tP.i.i.i.i.i"></span><span class="target" id="_obj_serialize_8h_1a1529d01629408a21556240780e7b531f"></span><em class="property"><span class="pre">static</span></em> <em class="property"><span class="pre">inline</span></em> <span class="pre">int</span> <code class="sig-name descname"><span class="pre">alloc_obj</span></code><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv45obj_t" title="obj_t"><span class="pre">obj_t</span></a> <span class="pre">*</span><em><span class="pre">p</span></em>, <span class="pre">int</span> <em><span class="pre">nvert</span></em>, <span class="pre">int</span> <em><span class="pre">nface</span></em>, <span class="pre">int</span> <em><span class="pre">ntexc</span></em>, <span class="pre">int</span> <em><span class="pre">nnorm</span></em>, <span class="pre">int</span> <em><span class="pre">do_color</span></em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv49alloc_objP5obj_tiiiii" title="Permalink to this definition">¶</a><br /></dt>
+<span id="_CPPv39alloc_objP5obj_tiiiii"></span><span id="_CPPv29alloc_objP5obj_tiiiii"></span><span id="alloc_obj__obj_tP.i.i.i.i.i"></span><span class="target" id="_obj_serialize_8h_1a1529d01629408a21556240780e7b531f"></span><em class="property">static</em> <em class="property">inline</em> int <code class="sig-name descname">alloc_obj</code><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv45obj_t" title="obj_t">obj_t</a> *<em>p</em>, int <em>nvert</em>, int <em>nface</em>, int <em>ntexc</em>, int <em>nnorm</em>, int <em>do_color</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv49alloc_objP5obj_tiiiii" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Allocate obj structure. </p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -368,7 +368,7 @@
 
 <dl class="cpp function">
 <dt id="_CPPv413serialize_objK6seri_tPcK6size_tPi7va_list">
-<span id="_CPPv313serialize_objK6seri_tPcK6size_tPi7va_list"></span><span id="_CPPv213serialize_objK6seri_tPcK6size_tPi7va_list"></span><span id="serialize_obj__seri_tC.cP.sC.iP.va_list"></span><span class="target" id="_obj_serialize_8h_1a5dec3b46eb147e3267ac247111b5f507"></span><em class="property"><span class="pre">static</span></em> <em class="property"><span class="pre">inline</span></em> <span class="pre">int</span> <code class="sig-name descname"><span class="pre">serialize_obj</span></code><span class="sig-paren">(</span><em class="property"><span class="pre">const</span></em> <a class="reference internal" href="#_CPPv46seri_t" title="seri_t"><span class="pre">seri_t</span></a> <em><span class="pre">s</span></em>, <span class="pre">char</span> <span class="pre">*</span><em><span class="pre">buf</span></em>, <em class="property"><span class="pre">const</span></em> <span class="pre">size_t</span> <em><span class="pre">buf_size</span></em>, <span class="pre">int</span> <span class="pre">*</span><em><span class="pre">args_used</span></em>, <span class="pre">va_list</span> <em><span class="pre">ap</span></em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv413serialize_objK6seri_tPcK6size_tPi7va_list" title="Permalink to this definition">¶</a><br /></dt>
+<span id="_CPPv313serialize_objK6seri_tPcK6size_tPi7va_list"></span><span id="_CPPv213serialize_objK6seri_tPcK6size_tPi7va_list"></span><span id="serialize_obj__seri_tC.cP.sC.iP.va_list"></span><span class="target" id="_obj_serialize_8h_1a5dec3b46eb147e3267ac247111b5f507"></span><em class="property">static</em> <em class="property">inline</em> int <code class="sig-name descname">serialize_obj</code><span class="sig-paren">(</span><em class="property">const</em> <a class="reference internal" href="#_CPPv46seri_t" title="seri_t">seri_t</a> <em>s</em>, char *<em>buf</em>, <em class="property">const</em> size_t <em>buf_size</em>, int *<em>args_used</em>, va_list <em>ap</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv413serialize_objK6seri_tPcK6size_tPi7va_list" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Serialize obj information to create a message. </p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -388,7 +388,7 @@
 
 <dl class="cpp function">
 <dt id="_CPPv415deserialize_objK6seri_tPKcK6size_t7va_list">
-<span id="_CPPv315deserialize_objK6seri_tPKcK6size_t7va_list"></span><span id="_CPPv215deserialize_objK6seri_tPKcK6size_t7va_list"></span><span id="deserialize_obj__seri_tC.cCP.sC.va_list"></span><span class="target" id="_obj_serialize_8h_1a498c8679a9be80cc700d4c28e13ddd2e"></span><em class="property"><span class="pre">static</span></em> <em class="property"><span class="pre">inline</span></em> <span class="pre">int</span> <code class="sig-name descname"><span class="pre">deserialize_obj</span></code><span class="sig-paren">(</span><em class="property"><span class="pre">const</span></em> <a class="reference internal" href="#_CPPv46seri_t" title="seri_t"><span class="pre">seri_t</span></a> <em><span class="pre">s</span></em>, <em class="property"><span class="pre">const</span></em> <span class="pre">char</span> <span class="pre">*</span><em><span class="pre">buf</span></em>, <em class="property"><span class="pre">const</span></em> <span class="pre">size_t</span> <em><span class="pre">buf_siz</span></em>, <span class="pre">va_list</span> <em><span class="pre">ap</span></em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv415deserialize_objK6seri_tPKcK6size_t7va_list" title="Permalink to this definition">¶</a><br /></dt>
+<span id="_CPPv315deserialize_objK6seri_tPKcK6size_t7va_list"></span><span id="_CPPv215deserialize_objK6seri_tPKcK6size_t7va_list"></span><span id="deserialize_obj__seri_tC.cCP.sC.va_list"></span><span class="target" id="_obj_serialize_8h_1a498c8679a9be80cc700d4c28e13ddd2e"></span><em class="property">static</em> <em class="property">inline</em> int <code class="sig-name descname">deserialize_obj</code><span class="sig-paren">(</span><em class="property">const</em> <a class="reference internal" href="#_CPPv46seri_t" title="seri_t">seri_t</a> <em>s</em>, <em class="property">const</em> char *<em>buf</em>, <em class="property">const</em> size_t <em>buf_siz</em>, va_list <em>ap</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv415deserialize_objK6seri_tPKcK6size_t7va_list" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Deserialize message to populate obj structure. </p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -405,93 +405,14 @@
 </div>
 <dl class="cpp struct">
 <dt>
-<span class="target" id="structobj__t"></span><em class="property"><span class="pre">struct</span> </em><code class="sig-name descname"><span class="pre">obj_t</span></code><br /></dt>
-<dd><em>#include &lt;ObjSerialize.h&gt;</em><p>Obj structure. </p>
-<div class="breathe-sectiondef docutils container">
-<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-members">Public Members</p>
-<dl class="cpp var">
-<dt id="_CPPv4N5obj_t5nvertE">
-<span id="_CPPv3N5obj_t5nvertE"></span><span id="_CPPv2N5obj_t5nvertE"></span><span id="obj_t::nvert__i"></span><span class="target" id="structobj__t_1aa08e8272f5b5f143afac1cab58d30518"></span><span class="pre">int</span> <code class="sig-name descname"><span class="pre">nvert</span></code><a class="headerlink" href="#_CPPv4N5obj_t5nvertE" title="Permalink to this definition">¶</a><br /></dt>
-<dd><p>Number of vertices. </p>
-</dd></dl>
-
-<dl class="cpp var">
-<dt id="_CPPv4N5obj_t5nfaceE">
-<span id="_CPPv3N5obj_t5nfaceE"></span><span id="_CPPv2N5obj_t5nfaceE"></span><span id="obj_t::nface__i"></span><span class="target" id="structobj__t_1a28c4194c71f1cd6c719f43c70ee14df6"></span><span class="pre">int</span> <code class="sig-name descname"><span class="pre">nface</span></code><a class="headerlink" href="#_CPPv4N5obj_t5nfaceE" title="Permalink to this definition">¶</a><br /></dt>
-<dd><p>Number faces. </p>
-<p>Number of faces. </p>
-</dd></dl>
-
-<dl class="cpp var">
-<dt id="_CPPv4N5obj_t8verticesE">
-<span id="_CPPv3N5obj_t8verticesE"></span><span id="_CPPv2N5obj_t8verticesE"></span><span id="obj_t::vertices__floatPP"></span><span class="target" id="structobj__t_1aa8e870f98ac42b0384c4d80fb84b5e21"></span><span class="pre">float</span> <span class="pre">*</span><span class="pre">*</span><code class="sig-name descname"><span class="pre">vertices</span></code><a class="headerlink" href="#_CPPv4N5obj_t8verticesE" title="Permalink to this definition">¶</a><br /></dt>
-<dd><p>X, Y, Z positions of vertices. </p>
-</dd></dl>
-
-<dl class="cpp var">
-<dt id="_CPPv4N5obj_t5facesE">
-<span id="_CPPv3N5obj_t5facesE"></span><span id="_CPPv2N5obj_t5facesE"></span><span id="obj_t::faces__iPP"></span><span class="target" id="structobj__t_1a67faeb2553f7b3d529c300c8bb67b18f"></span><span class="pre">int</span> <span class="pre">*</span><span class="pre">*</span><code class="sig-name descname"><span class="pre">faces</span></code><a class="headerlink" href="#_CPPv4N5obj_t5facesE" title="Permalink to this definition">¶</a><br /></dt>
-<dd><p>Indices of the vertices composing each face. </p>
-</dd></dl>
-
-<dl class="cpp var">
-<dt id="_CPPv4N5obj_t13vertex_colorsE">
-<span id="_CPPv3N5obj_t13vertex_colorsE"></span><span id="_CPPv2N5obj_t13vertex_colorsE"></span><span id="obj_t::vertex_colors__iPP"></span><span class="target" id="structobj__t_1a4ef1a9e85d2c9f22fe47eb4e624422af"></span><span class="pre">int</span> <span class="pre">*</span><span class="pre">*</span><code class="sig-name descname"><span class="pre">vertex_colors</span></code><a class="headerlink" href="#_CPPv4N5obj_t13vertex_colorsE" title="Permalink to this definition">¶</a><br /></dt>
-<dd><p>RGB colors of each vertex. </p>
-</dd></dl>
-
-<dl class="cpp var">
-<dt id="_CPPv4N5obj_t8materialE">
-<span id="_CPPv3N5obj_t8materialE"></span><span id="_CPPv2N5obj_t8materialE"></span><span id="obj_t::material__cA"></span><span class="target" id="structobj__t_1a49cf314cb0a7e914ec98f06b8aa67da9"></span><span class="pre">char</span> <code class="sig-name descname"><span class="pre">material</span></code><span class="pre">[</span><span class="pre">100</span><span class="pre">]</span><a class="headerlink" href="#_CPPv4N5obj_t8materialE" title="Permalink to this definition">¶</a><br /></dt>
-<dd><p>Material that should be used for faces. </p>
-</dd></dl>
-
-<dl class="cpp var">
-<dt id="_CPPv4N5obj_t5ntexcE">
-<span id="_CPPv3N5obj_t5ntexcE"></span><span id="_CPPv2N5obj_t5ntexcE"></span><span id="obj_t::ntexc__i"></span><span class="target" id="structobj__t_1aaa36aa6eda039139d79a807b591d1a1a"></span><span class="pre">int</span> <code class="sig-name descname"><span class="pre">ntexc</span></code><a class="headerlink" href="#_CPPv4N5obj_t5ntexcE" title="Permalink to this definition">¶</a><br /></dt>
-<dd><p>Number of texture coordinates. </p>
-</dd></dl>
-
-<dl class="cpp var">
-<dt id="_CPPv4N5obj_t5nnormE">
-<span id="_CPPv3N5obj_t5nnormE"></span><span id="_CPPv2N5obj_t5nnormE"></span><span id="obj_t::nnorm__i"></span><span class="target" id="structobj__t_1aeaae61787b92ea57ef185bdd9e996b02"></span><span class="pre">int</span> <code class="sig-name descname"><span class="pre">nnorm</span></code><a class="headerlink" href="#_CPPv4N5obj_t5nnormE" title="Permalink to this definition">¶</a><br /></dt>
-<dd><p>Number of normals. </p>
-</dd></dl>
-
-<dl class="cpp var">
-<dt id="_CPPv4N5obj_t9texcoordsE">
-<span id="_CPPv3N5obj_t9texcoordsE"></span><span id="_CPPv2N5obj_t9texcoordsE"></span><span id="obj_t::texcoords__floatPP"></span><span class="target" id="structobj__t_1a2f2a1be942ea0c326193a3e96b4fc8e9"></span><span class="pre">float</span> <span class="pre">*</span><span class="pre">*</span><code class="sig-name descname"><span class="pre">texcoords</span></code><a class="headerlink" href="#_CPPv4N5obj_t9texcoordsE" title="Permalink to this definition">¶</a><br /></dt>
-<dd><p>Texture coordinates. </p>
-</dd></dl>
-
-<dl class="cpp var">
-<dt id="_CPPv4N5obj_t7normalsE">
-<span id="_CPPv3N5obj_t7normalsE"></span><span id="_CPPv2N5obj_t7normalsE"></span><span id="obj_t::normals__floatPP"></span><span class="target" id="structobj__t_1ac86d2baa278b344c6b1912035fb6de30"></span><span class="pre">float</span> <span class="pre">*</span><span class="pre">*</span><code class="sig-name descname"><span class="pre">normals</span></code><a class="headerlink" href="#_CPPv4N5obj_t7normalsE" title="Permalink to this definition">¶</a><br /></dt>
-<dd><p>X, Y, Z direction of normals. </p>
-</dd></dl>
-
-<dl class="cpp var">
-<dt id="_CPPv4N5obj_t14face_texcoordsE">
-<span id="_CPPv3N5obj_t14face_texcoordsE"></span><span id="_CPPv2N5obj_t14face_texcoordsE"></span><span id="obj_t::face_texcoords__iPP"></span><span class="target" id="structobj__t_1a89d35400e2d4532483e0475ea0fd700f"></span><span class="pre">int</span> <span class="pre">*</span><span class="pre">*</span><code class="sig-name descname"><span class="pre">face_texcoords</span></code><a class="headerlink" href="#_CPPv4N5obj_t14face_texcoordsE" title="Permalink to this definition">¶</a><br /></dt>
-<dd><p>Indices of texcoords for each face. </p>
-<p>Indices of texcoords for each face vertex. </p>
-</dd></dl>
-
-<dl class="cpp var">
-<dt id="_CPPv4N5obj_t12face_normalsE">
-<span id="_CPPv3N5obj_t12face_normalsE"></span><span id="_CPPv2N5obj_t12face_normalsE"></span><span id="obj_t::face_normals__iPP"></span><span class="target" id="structobj__t_1a6c713670bf8c22be5d94c2dbd9c21a22"></span><span class="pre">int</span> <span class="pre">*</span><span class="pre">*</span><code class="sig-name descname"><span class="pre">face_normals</span></code><a class="headerlink" href="#_CPPv4N5obj_t12face_normalsE" title="Permalink to this definition">¶</a><br /></dt>
-<dd><p>Indices of normals for each face. </p>
-<p>Indices of normals for each face vertex. </p>
-</dd></dl>
-
-</div>
-</dd></dl>
+<span class="target" id="structobj__t"></span><em class="property">struct </em><code class="sig-name descname">obj_t</code><br /></dt>
+<dd><em>#include &lt;ObjDict.h&gt;</em></dd></dl>
 
 <div class="breathe-sectiondef docutils container">
 <p class="breathe-sectiondef-title rubric" id="breathe-section-title-typedefs">Typedefs</p>
 <dl class="cpp type">
 <dt id="_CPPv45ply_t">
-<span id="_CPPv35ply_t"></span><span id="_CPPv25ply_t"></span><span id="ply_t"></span><span class="target" id="_ply_serialize_8h_1adec2719fa72d5f06cd94d9daba90c780"></span><em class="property"><span class="pre">typedef</span> </em><em class="property"><span class="pre">struct</span></em> <a class="reference internal" href="#_CPPv45ply_t" title="ply_t"><span class="pre">ply_t</span></a> <code class="sig-name descname"><span class="pre">ply_t</span></code><a class="headerlink" href="#_CPPv45ply_t" title="Permalink to this definition">¶</a><br /></dt>
+<span id="_CPPv35ply_t"></span><span id="_CPPv25ply_t"></span><span id="ply_t"></span><span class="target" id="_ply_serialize_8h_1adec2719fa72d5f06cd94d9daba90c780"></span><em class="property">typedef </em><em class="property">struct</em> <a class="reference internal" href="#_CPPv45ply_t" title="ply_t">ply_t</a> <code class="sig-name descname">ply_t</code><a class="headerlink" href="#_CPPv45ply_t" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Ply structure. </p>
 </dd></dl>
 
@@ -500,7 +421,7 @@
 <p class="breathe-sectiondef-title rubric" id="breathe-section-title-functions">Functions</p>
 <dl class="cpp function">
 <dt id="_CPPv48init_plyv">
-<span id="_CPPv38init_plyv"></span><span id="_CPPv28init_plyv"></span><span id="init_ply"></span><span class="target" id="_ply_serialize_8h_1a6cbeaea58a38e4f8f4ac0248bb840d93"></span><em class="property"><span class="pre">static</span></em> <em class="property"><span class="pre">inline</span></em> <a class="reference internal" href="#_CPPv45ply_t" title="ply_t"><span class="pre">ply_t</span></a> <code class="sig-name descname"><span class="pre">init_ply</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv48init_plyv" title="Permalink to this definition">¶</a><br /></dt>
+<span id="_CPPv38init_plyv"></span><span id="_CPPv28init_plyv"></span><span id="init_ply"></span><span class="target" id="_ply_serialize_8h_1a6cbeaea58a38e4f8f4ac0248bb840d93"></span><em class="property">static</em> <em class="property">inline</em> <a class="reference internal" href="#_CPPv45ply_t" title="ply_t">ply_t</a> <code class="sig-name descname">init_ply</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv48init_plyv" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Initialize empty ply structure. </p>
 <dl class="field-list simple">
 <dt class="field-odd">Returns</dt>
@@ -511,7 +432,7 @@
 
 <dl class="cpp function">
 <dt id="_CPPv48free_plyP5ply_t">
-<span id="_CPPv38free_plyP5ply_t"></span><span id="_CPPv28free_plyP5ply_t"></span><span id="free_ply__ply_tP"></span><span class="target" id="_ply_serialize_8h_1a8a353e186e1c6b9fd41c48fc94a75116"></span><em class="property"><span class="pre">static</span></em> <em class="property"><span class="pre">inline</span></em> <span class="pre">void</span> <code class="sig-name descname"><span class="pre">free_ply</span></code><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv45ply_t" title="ply_t"><span class="pre">ply_t</span></a> <span class="pre">*</span><em><span class="pre">p</span></em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv48free_plyP5ply_t" title="Permalink to this definition">¶</a><br /></dt>
+<span id="_CPPv38free_plyP5ply_t"></span><span id="_CPPv28free_plyP5ply_t"></span><span id="free_ply__ply_tP"></span><span class="target" id="_ply_serialize_8h_1a8a353e186e1c6b9fd41c48fc94a75116"></span><em class="property">static</em> <em class="property">inline</em> void <code class="sig-name descname">free_ply</code><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv45ply_t" title="ply_t">ply_t</a> *<em>p</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv48free_plyP5ply_t" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Free ply structure. </p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -522,7 +443,7 @@
 
 <dl class="cpp function">
 <dt id="_CPPv49alloc_plyP5ply_tiii">
-<span id="_CPPv39alloc_plyP5ply_tiii"></span><span id="_CPPv29alloc_plyP5ply_tiii"></span><span id="alloc_ply__ply_tP.i.i.i"></span><span class="target" id="_ply_serialize_8h_1a0f020b1aa230d2719f64dd1f48b9ca0a"></span><em class="property"><span class="pre">static</span></em> <em class="property"><span class="pre">inline</span></em> <span class="pre">int</span> <code class="sig-name descname"><span class="pre">alloc_ply</span></code><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv45ply_t" title="ply_t"><span class="pre">ply_t</span></a> <span class="pre">*</span><em><span class="pre">p</span></em>, <span class="pre">int</span> <em><span class="pre">nvert</span></em>, <span class="pre">int</span> <em><span class="pre">nface</span></em>, <span class="pre">int</span> <em><span class="pre">do_color</span></em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv49alloc_plyP5ply_tiii" title="Permalink to this definition">¶</a><br /></dt>
+<span id="_CPPv39alloc_plyP5ply_tiii"></span><span id="_CPPv29alloc_plyP5ply_tiii"></span><span id="alloc_ply__ply_tP.i.i.i"></span><span class="target" id="_ply_serialize_8h_1a0f020b1aa230d2719f64dd1f48b9ca0a"></span><em class="property">static</em> <em class="property">inline</em> int <code class="sig-name descname">alloc_ply</code><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv45ply_t" title="ply_t">ply_t</a> *<em>p</em>, int <em>nvert</em>, int <em>nface</em>, int <em>do_color</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv49alloc_plyP5ply_tiii" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Allocate ply structure. </p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -541,7 +462,7 @@
 
 <dl class="cpp function">
 <dt id="_CPPv413serialize_plyK6seri_tPcK6size_tPi7va_list">
-<span id="_CPPv313serialize_plyK6seri_tPcK6size_tPi7va_list"></span><span id="_CPPv213serialize_plyK6seri_tPcK6size_tPi7va_list"></span><span id="serialize_ply__seri_tC.cP.sC.iP.va_list"></span><span class="target" id="_ply_serialize_8h_1aca490c7522722d17e2c3d071d5950653"></span><em class="property"><span class="pre">static</span></em> <em class="property"><span class="pre">inline</span></em> <span class="pre">int</span> <code class="sig-name descname"><span class="pre">serialize_ply</span></code><span class="sig-paren">(</span><em class="property"><span class="pre">const</span></em> <a class="reference internal" href="#_CPPv46seri_t" title="seri_t"><span class="pre">seri_t</span></a> <em><span class="pre">s</span></em>, <span class="pre">char</span> <span class="pre">*</span><em><span class="pre">buf</span></em>, <em class="property"><span class="pre">const</span></em> <span class="pre">size_t</span> <em><span class="pre">buf_size</span></em>, <span class="pre">int</span> <span class="pre">*</span><em><span class="pre">args_used</span></em>, <span class="pre">va_list</span> <em><span class="pre">ap</span></em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv413serialize_plyK6seri_tPcK6size_tPi7va_list" title="Permalink to this definition">¶</a><br /></dt>
+<span id="_CPPv313serialize_plyK6seri_tPcK6size_tPi7va_list"></span><span id="_CPPv213serialize_plyK6seri_tPcK6size_tPi7va_list"></span><span id="serialize_ply__seri_tC.cP.sC.iP.va_list"></span><span class="target" id="_ply_serialize_8h_1aca490c7522722d17e2c3d071d5950653"></span><em class="property">static</em> <em class="property">inline</em> int <code class="sig-name descname">serialize_ply</code><span class="sig-paren">(</span><em class="property">const</em> <a class="reference internal" href="#_CPPv46seri_t" title="seri_t">seri_t</a> <em>s</em>, char *<em>buf</em>, <em class="property">const</em> size_t <em>buf_size</em>, int *<em>args_used</em>, va_list <em>ap</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv413serialize_plyK6seri_tPcK6size_tPi7va_list" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Serialize ply information to create a message. </p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -561,7 +482,7 @@
 
 <dl class="cpp function">
 <dt id="_CPPv415deserialize_plyK6seri_tPKcK6size_t7va_list">
-<span id="_CPPv315deserialize_plyK6seri_tPKcK6size_t7va_list"></span><span id="_CPPv215deserialize_plyK6seri_tPKcK6size_t7va_list"></span><span id="deserialize_ply__seri_tC.cCP.sC.va_list"></span><span class="target" id="_ply_serialize_8h_1a232c7f001466b8d236bd08b9a9160e7d"></span><em class="property"><span class="pre">static</span></em> <em class="property"><span class="pre">inline</span></em> <span class="pre">int</span> <code class="sig-name descname"><span class="pre">deserialize_ply</span></code><span class="sig-paren">(</span><em class="property"><span class="pre">const</span></em> <a class="reference internal" href="#_CPPv46seri_t" title="seri_t"><span class="pre">seri_t</span></a> <em><span class="pre">s</span></em>, <em class="property"><span class="pre">const</span></em> <span class="pre">char</span> <span class="pre">*</span><em><span class="pre">buf</span></em>, <em class="property"><span class="pre">const</span></em> <span class="pre">size_t</span> <em><span class="pre">buf_siz</span></em>, <span class="pre">va_list</span> <em><span class="pre">ap</span></em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv415deserialize_plyK6seri_tPKcK6size_t7va_list" title="Permalink to this definition">¶</a><br /></dt>
+<span id="_CPPv315deserialize_plyK6seri_tPKcK6size_t7va_list"></span><span id="_CPPv215deserialize_plyK6seri_tPKcK6size_t7va_list"></span><span id="deserialize_ply__seri_tC.cCP.sC.va_list"></span><span class="target" id="_ply_serialize_8h_1a232c7f001466b8d236bd08b9a9160e7d"></span><em class="property">static</em> <em class="property">inline</em> int <code class="sig-name descname">deserialize_ply</code><span class="sig-paren">(</span><em class="property">const</em> <a class="reference internal" href="#_CPPv46seri_t" title="seri_t">seri_t</a> <em>s</em>, <em class="property">const</em> char *<em>buf</em>, <em class="property">const</em> size_t <em>buf_siz</em>, va_list <em>ap</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv415deserialize_plyK6seri_tPKcK6size_t7va_list" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Deserialize message to populate ply structure. </p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -578,60 +499,19 @@
 </div>
 <dl class="cpp struct">
 <dt>
-<span class="target" id="structply__t"></span><em class="property"><span class="pre">struct</span> </em><code class="sig-name descname"><span class="pre">ply_t</span></code><br /></dt>
-<dd><em>#include &lt;PlySerialize.h&gt;</em><p>Ply structure. </p>
-<div class="breathe-sectiondef docutils container">
-<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-members">Public Members</p>
-<dl class="cpp var">
-<dt id="_CPPv4N5ply_t5nvertE">
-<span id="_CPPv3N5ply_t5nvertE"></span><span id="_CPPv2N5ply_t5nvertE"></span><span id="ply_t::nvert__i"></span><span class="target" id="structply__t_1a8958bfc57c4354ce663eb39972efb08f"></span><span class="pre">int</span> <code class="sig-name descname"><span class="pre">nvert</span></code><a class="headerlink" href="#_CPPv4N5ply_t5nvertE" title="Permalink to this definition">¶</a><br /></dt>
-<dd><p>Number of vertices. </p>
-</dd></dl>
-
-<dl class="cpp var">
-<dt id="_CPPv4N5ply_t5nfaceE">
-<span id="_CPPv3N5ply_t5nfaceE"></span><span id="_CPPv2N5ply_t5nfaceE"></span><span id="ply_t::nface__i"></span><span class="target" id="structply__t_1a193a6563568843d5c9b21fc9b6f729ce"></span><span class="pre">int</span> <code class="sig-name descname"><span class="pre">nface</span></code><a class="headerlink" href="#_CPPv4N5ply_t5nfaceE" title="Permalink to this definition">¶</a><br /></dt>
-<dd><p>Number faces. </p>
-<p>Number of faces. </p>
-</dd></dl>
-
-<dl class="cpp var">
-<dt id="_CPPv4N5ply_t8verticesE">
-<span id="_CPPv3N5ply_t8verticesE"></span><span id="_CPPv2N5ply_t8verticesE"></span><span id="ply_t::vertices__floatPP"></span><span class="target" id="structply__t_1aa20180a10190d59c90c47de60eafa10c"></span><span class="pre">float</span> <span class="pre">*</span><span class="pre">*</span><code class="sig-name descname"><span class="pre">vertices</span></code><a class="headerlink" href="#_CPPv4N5ply_t8verticesE" title="Permalink to this definition">¶</a><br /></dt>
-<dd><p>X, Y, Z positions of vertices. </p>
-</dd></dl>
-
-<dl class="cpp var">
-<dt id="_CPPv4N5ply_t5facesE">
-<span id="_CPPv3N5ply_t5facesE"></span><span id="_CPPv2N5ply_t5facesE"></span><span id="ply_t::faces__iPP"></span><span class="target" id="structply__t_1a31ea5d1a1dbe44105273a70d757f45aa"></span><span class="pre">int</span> <span class="pre">*</span><span class="pre">*</span><code class="sig-name descname"><span class="pre">faces</span></code><a class="headerlink" href="#_CPPv4N5ply_t5facesE" title="Permalink to this definition">¶</a><br /></dt>
-<dd><p>Indices of the vertices composing each face. </p>
-</dd></dl>
-
-<dl class="cpp var">
-<dt id="_CPPv4N5ply_t13vertex_colorsE">
-<span id="_CPPv3N5ply_t13vertex_colorsE"></span><span id="_CPPv2N5ply_t13vertex_colorsE"></span><span id="ply_t::vertex_colors__iPP"></span><span class="target" id="structply__t_1aae986cac010461d1ab2ceae65ee1a984"></span><span class="pre">int</span> <span class="pre">*</span><span class="pre">*</span><code class="sig-name descname"><span class="pre">vertex_colors</span></code><a class="headerlink" href="#_CPPv4N5ply_t13vertex_colorsE" title="Permalink to this definition">¶</a><br /></dt>
-<dd><p>RGB colors of each vertex. </p>
-</dd></dl>
-
-<dl class="cpp var">
-<dt id="_CPPv4N5ply_t13nvert_in_faceE">
-<span id="_CPPv3N5ply_t13nvert_in_faceE"></span><span id="_CPPv2N5ply_t13nvert_in_faceE"></span><span id="ply_t::nvert_in_face__iP"></span><span class="target" id="structply__t_1a5283b83790baa9aeaef03c9e5145277a"></span><span class="pre">int</span> <span class="pre">*</span><code class="sig-name descname"><span class="pre">nvert_in_face</span></code><a class="headerlink" href="#_CPPv4N5ply_t13nvert_in_faceE" title="Permalink to this definition">¶</a><br /></dt>
-<dd><p>Number of vertices in each face. </p>
-</dd></dl>
-
-</div>
-</dd></dl>
+<span class="target" id="structply__t"></span><em class="property">struct </em><code class="sig-name descname">ply_t</code><br /></dt>
+<dd><em>#include &lt;PlyDict.h&gt;</em></dd></dl>
 
 <div class="breathe-sectiondef docutils container">
 <p class="breathe-sectiondef-title rubric" id="breathe-section-title-typedefs">Typedefs</p>
 <dl class="cpp type">
 <dt id="_CPPv49seri_type">
-<span id="_CPPv39seri_type"></span><span id="_CPPv29seri_type"></span><span id="seri_type"></span><span class="target" id="_serialize_base_8h_1af2ad2143ec3df29e282b9b7a493d1d90"></span><em class="property"><span class="pre">typedef</span> </em><em class="property"><span class="pre">enum</span></em> <a class="reference internal" href="#_CPPv49seri_enum" title="seri_enum"><span class="pre">seri_enum</span></a> <code class="sig-name descname"><span class="pre">seri_type</span></code><a class="headerlink" href="#_CPPv49seri_type" title="Permalink to this definition">¶</a><br /></dt>
+<span id="_CPPv39seri_type"></span><span id="_CPPv29seri_type"></span><span id="seri_type"></span><span class="target" id="_serialize_base_8h_1af2ad2143ec3df29e282b9b7a493d1d90"></span><em class="property">typedef </em><em class="property">enum</em> <a class="reference internal" href="#_CPPv49seri_enum" title="seri_enum">seri_enum</a> <code class="sig-name descname">seri_type</code><a class="headerlink" href="#_CPPv49seri_type" title="Permalink to this definition">¶</a><br /></dt>
 <dd></dd></dl>
 
 <dl class="cpp type">
 <dt id="_CPPv46seri_t">
-<span id="_CPPv36seri_t"></span><span id="_CPPv26seri_t"></span><span id="seri_t"></span><span class="target" id="_serialize_base_8h_1afd9f5e772c4823a788862ecaa81f0d6d"></span><em class="property"><span class="pre">typedef</span> </em><em class="property"><span class="pre">struct</span></em> <a class="reference internal" href="#_CPPv46seri_t" title="seri_t"><span class="pre">seri_t</span></a> <code class="sig-name descname"><span class="pre">seri_t</span></code><a class="headerlink" href="#_CPPv46seri_t" title="Permalink to this definition">¶</a><br /></dt>
+<span id="_CPPv36seri_t"></span><span id="_CPPv26seri_t"></span><span id="seri_t"></span><span class="target" id="_serialize_base_8h_1afd9f5e772c4823a788862ecaa81f0d6d"></span><em class="property">typedef </em><em class="property">struct</em> <a class="reference internal" href="#_CPPv46seri_t" title="seri_t">seri_t</a> <code class="sig-name descname">seri_t</code><a class="headerlink" href="#_CPPv46seri_t" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Serializer structure. </p>
 </dd></dl>
 
@@ -640,42 +520,42 @@
 <p class="breathe-sectiondef-title rubric" id="breathe-section-title-enums">Enums</p>
 <dl class="cpp enum">
 <dt id="_CPPv49seri_enum">
-<span id="_CPPv39seri_enum"></span><span id="_CPPv29seri_enum"></span><span class="target" id="_serialize_base_8h_1a15c32b5706befc104c79850ad392e7a0"></span><em class="property"><span class="pre">enum</span> </em><code class="sig-name descname"><span class="pre">seri_enum</span></code><a class="headerlink" href="#_CPPv49seri_enum" title="Permalink to this definition">¶</a><br /></dt>
+<span id="_CPPv39seri_enum"></span><span id="_CPPv29seri_enum"></span><span class="target" id="_serialize_base_8h_1a15c32b5706befc104c79850ad392e7a0"></span><em class="property">enum </em><code class="sig-name descname">seri_enum</code><a class="headerlink" href="#_CPPv49seri_enum" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Serializer types. </p>
 <p><em>Values:</em></p>
 <dl class="cpp enumerator">
 <dt id="_CPPv4N9seri_enum11DIRECT_SERIE">
-<span id="_CPPv3N9seri_enum11DIRECT_SERIE"></span><span id="_CPPv2N9seri_enum11DIRECT_SERIE"></span><span class="target" id="_serialize_base_8h_1a15c32b5706befc104c79850ad392e7a0a71ef06708f13ed95aef0d476ad767507"></span><em class="property"><span class="pre">enumerator</span> </em><code class="sig-name descname"><span class="pre">DIRECT_SERI</span></code><a class="headerlink" href="#_CPPv4N9seri_enum11DIRECT_SERIE" title="Permalink to this definition">¶</a><br /></dt>
+<span id="_CPPv3N9seri_enum11DIRECT_SERIE"></span><span id="_CPPv2N9seri_enum11DIRECT_SERIE"></span><span class="target" id="_serialize_base_8h_1a15c32b5706befc104c79850ad392e7a0a71ef06708f13ed95aef0d476ad767507"></span><em class="property">enumerator </em><code class="sig-name descname">DIRECT_SERI</code><a class="headerlink" href="#_CPPv4N9seri_enum11DIRECT_SERIE" title="Permalink to this definition">¶</a><br /></dt>
 <dd></dd></dl>
 
 <dl class="cpp enumerator">
 <dt id="_CPPv4N9seri_enum11FORMAT_SERIE">
-<span id="_CPPv3N9seri_enum11FORMAT_SERIE"></span><span id="_CPPv2N9seri_enum11FORMAT_SERIE"></span><span class="target" id="_serialize_base_8h_1a15c32b5706befc104c79850ad392e7a0aff41419e3631503b582ce011910d2f49"></span><em class="property"><span class="pre">enumerator</span> </em><code class="sig-name descname"><span class="pre">FORMAT_SERI</span></code><a class="headerlink" href="#_CPPv4N9seri_enum11FORMAT_SERIE" title="Permalink to this definition">¶</a><br /></dt>
+<span id="_CPPv3N9seri_enum11FORMAT_SERIE"></span><span id="_CPPv2N9seri_enum11FORMAT_SERIE"></span><span class="target" id="_serialize_base_8h_1a15c32b5706befc104c79850ad392e7a0aff41419e3631503b582ce011910d2f49"></span><em class="property">enumerator </em><code class="sig-name descname">FORMAT_SERI</code><a class="headerlink" href="#_CPPv4N9seri_enum11FORMAT_SERIE" title="Permalink to this definition">¶</a><br /></dt>
 <dd></dd></dl>
 
 <dl class="cpp enumerator">
 <dt id="_CPPv4N9seri_enum10ARRAY_SERIE">
-<span id="_CPPv3N9seri_enum10ARRAY_SERIE"></span><span id="_CPPv2N9seri_enum10ARRAY_SERIE"></span><span class="target" id="_serialize_base_8h_1a15c32b5706befc104c79850ad392e7a0a971a555630ab3741b89cc673806f66ef"></span><em class="property"><span class="pre">enumerator</span> </em><code class="sig-name descname"><span class="pre">ARRAY_SERI</span></code><a class="headerlink" href="#_CPPv4N9seri_enum10ARRAY_SERIE" title="Permalink to this definition">¶</a><br /></dt>
+<span id="_CPPv3N9seri_enum10ARRAY_SERIE"></span><span id="_CPPv2N9seri_enum10ARRAY_SERIE"></span><span class="target" id="_serialize_base_8h_1a15c32b5706befc104c79850ad392e7a0a971a555630ab3741b89cc673806f66ef"></span><em class="property">enumerator </em><code class="sig-name descname">ARRAY_SERI</code><a class="headerlink" href="#_CPPv4N9seri_enum10ARRAY_SERIE" title="Permalink to this definition">¶</a><br /></dt>
 <dd></dd></dl>
 
 <dl class="cpp enumerator">
 <dt id="_CPPv4N9seri_enum16ASCII_TABLE_SERIE">
-<span id="_CPPv3N9seri_enum16ASCII_TABLE_SERIE"></span><span id="_CPPv2N9seri_enum16ASCII_TABLE_SERIE"></span><span class="target" id="_serialize_base_8h_1a15c32b5706befc104c79850ad392e7a0a2275bf6ddec65b58c7d1a7b62c6dfbe7"></span><em class="property"><span class="pre">enumerator</span> </em><code class="sig-name descname"><span class="pre">ASCII_TABLE_SERI</span></code><a class="headerlink" href="#_CPPv4N9seri_enum16ASCII_TABLE_SERIE" title="Permalink to this definition">¶</a><br /></dt>
+<span id="_CPPv3N9seri_enum16ASCII_TABLE_SERIE"></span><span id="_CPPv2N9seri_enum16ASCII_TABLE_SERIE"></span><span class="target" id="_serialize_base_8h_1a15c32b5706befc104c79850ad392e7a0a2275bf6ddec65b58c7d1a7b62c6dfbe7"></span><em class="property">enumerator </em><code class="sig-name descname">ASCII_TABLE_SERI</code><a class="headerlink" href="#_CPPv4N9seri_enum16ASCII_TABLE_SERIE" title="Permalink to this definition">¶</a><br /></dt>
 <dd></dd></dl>
 
 <dl class="cpp enumerator">
 <dt id="_CPPv4N9seri_enum22ASCII_TABLE_ARRAY_SERIE">
-<span id="_CPPv3N9seri_enum22ASCII_TABLE_ARRAY_SERIE"></span><span id="_CPPv2N9seri_enum22ASCII_TABLE_ARRAY_SERIE"></span><span class="target" id="_serialize_base_8h_1a15c32b5706befc104c79850ad392e7a0a5d8beb87c312c12104087728665ec453"></span><em class="property"><span class="pre">enumerator</span> </em><code class="sig-name descname"><span class="pre">ASCII_TABLE_ARRAY_SERI</span></code><a class="headerlink" href="#_CPPv4N9seri_enum22ASCII_TABLE_ARRAY_SERIE" title="Permalink to this definition">¶</a><br /></dt>
+<span id="_CPPv3N9seri_enum22ASCII_TABLE_ARRAY_SERIE"></span><span id="_CPPv2N9seri_enum22ASCII_TABLE_ARRAY_SERIE"></span><span class="target" id="_serialize_base_8h_1a15c32b5706befc104c79850ad392e7a0a5d8beb87c312c12104087728665ec453"></span><em class="property">enumerator </em><code class="sig-name descname">ASCII_TABLE_ARRAY_SERI</code><a class="headerlink" href="#_CPPv4N9seri_enum22ASCII_TABLE_ARRAY_SERIE" title="Permalink to this definition">¶</a><br /></dt>
 <dd></dd></dl>
 
 <dl class="cpp enumerator">
 <dt id="_CPPv4N9seri_enum8PLY_SERIE">
-<span id="_CPPv3N9seri_enum8PLY_SERIE"></span><span id="_CPPv2N9seri_enum8PLY_SERIE"></span><span class="target" id="_serialize_base_8h_1a15c32b5706befc104c79850ad392e7a0a1ac5135dec981e3600c3d370165cf92d"></span><em class="property"><span class="pre">enumerator</span> </em><code class="sig-name descname"><span class="pre">PLY_SERI</span></code><a class="headerlink" href="#_CPPv4N9seri_enum8PLY_SERIE" title="Permalink to this definition">¶</a><br /></dt>
+<span id="_CPPv3N9seri_enum8PLY_SERIE"></span><span id="_CPPv2N9seri_enum8PLY_SERIE"></span><span class="target" id="_serialize_base_8h_1a15c32b5706befc104c79850ad392e7a0a1ac5135dec981e3600c3d370165cf92d"></span><em class="property">enumerator </em><code class="sig-name descname">PLY_SERI</code><a class="headerlink" href="#_CPPv4N9seri_enum8PLY_SERIE" title="Permalink to this definition">¶</a><br /></dt>
 <dd></dd></dl>
 
 <dl class="cpp enumerator">
 <dt id="_CPPv4N9seri_enum8OBJ_SERIE">
-<span id="_CPPv3N9seri_enum8OBJ_SERIE"></span><span id="_CPPv2N9seri_enum8OBJ_SERIE"></span><span class="target" id="_serialize_base_8h_1a15c32b5706befc104c79850ad392e7a0a2eed2a74a4921a0343c22e5c4a47c60d"></span><em class="property"><span class="pre">enumerator</span> </em><code class="sig-name descname"><span class="pre">OBJ_SERI</span></code><a class="headerlink" href="#_CPPv4N9seri_enum8OBJ_SERIE" title="Permalink to this definition">¶</a><br /></dt>
+<span id="_CPPv3N9seri_enum8OBJ_SERIE"></span><span id="_CPPv2N9seri_enum8OBJ_SERIE"></span><span class="target" id="_serialize_base_8h_1a15c32b5706befc104c79850ad392e7a0a2eed2a74a4921a0343c22e5c4a47c60d"></span><em class="property">enumerator </em><code class="sig-name descname">OBJ_SERI</code><a class="headerlink" href="#_CPPv4N9seri_enum8OBJ_SERIE" title="Permalink to this definition">¶</a><br /></dt>
 <dd></dd></dl>
 
 </dd></dl>
@@ -685,7 +565,7 @@
 <p class="breathe-sectiondef-title rubric" id="breathe-section-title-functions">Functions</p>
 <dl class="cpp function">
 <dt id="_CPPv416serialize_directK6seri_tPcK6size_tPi7va_list">
-<span id="_CPPv316serialize_directK6seri_tPcK6size_tPi7va_list"></span><span id="_CPPv216serialize_directK6seri_tPcK6size_tPi7va_list"></span><span id="serialize_direct__seri_tC.cP.sC.iP.va_list"></span><span class="target" id="_serialize_base_8h_1a5d2d0b5155e5154675621c26bf572c31"></span><em class="property"><span class="pre">static</span></em> <em class="property"><span class="pre">inline</span></em> <span class="pre">int</span> <code class="sig-name descname"><span class="pre">serialize_direct</span></code><span class="sig-paren">(</span><em class="property"><span class="pre">const</span></em> <a class="reference internal" href="#_CPPv46seri_t" title="seri_t"><span class="pre">seri_t</span></a> <em><span class="pre">s</span></em>, <span class="pre">char</span> <span class="pre">*</span><em><span class="pre">buf</span></em>, <em class="property"><span class="pre">const</span></em> <span class="pre">size_t</span> <em><span class="pre">buf_siz</span></em>, <span class="pre">int</span> <span class="pre">*</span><em><span class="pre">args_used</span></em>, <span class="pre">va_list</span> <em><span class="pre">ap</span></em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv416serialize_directK6seri_tPcK6size_tPi7va_list" title="Permalink to this definition">¶</a><br /></dt>
+<span id="_CPPv316serialize_directK6seri_tPcK6size_tPi7va_list"></span><span id="_CPPv216serialize_directK6seri_tPcK6size_tPi7va_list"></span><span id="serialize_direct__seri_tC.cP.sC.iP.va_list"></span><span class="target" id="_serialize_base_8h_1a5d2d0b5155e5154675621c26bf572c31"></span><em class="property">static</em> <em class="property">inline</em> int <code class="sig-name descname">serialize_direct</code><span class="sig-paren">(</span><em class="property">const</em> <a class="reference internal" href="#_CPPv46seri_t" title="seri_t">seri_t</a> <em>s</em>, char *<em>buf</em>, <em class="property">const</em> size_t <em>buf_siz</em>, int *<em>args_used</em>, va_list <em>ap</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv416serialize_directK6seri_tPcK6size_tPi7va_list" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Serialize arguments to create a message. </p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -702,7 +582,7 @@
 
 <dl class="cpp function">
 <dt id="_CPPv418deserialize_directK6seri_tPKcK6size_t7va_list">
-<span id="_CPPv318deserialize_directK6seri_tPKcK6size_t7va_list"></span><span id="_CPPv218deserialize_directK6seri_tPKcK6size_t7va_list"></span><span id="deserialize_direct__seri_tC.cCP.sC.va_list"></span><span class="target" id="_serialize_base_8h_1ac740904ff678676cfc37a9e462fa6c85"></span><em class="property"><span class="pre">static</span></em> <em class="property"><span class="pre">inline</span></em> <span class="pre">int</span> <code class="sig-name descname"><span class="pre">deserialize_direct</span></code><span class="sig-paren">(</span><em class="property"><span class="pre">const</span></em> <a class="reference internal" href="#_CPPv46seri_t" title="seri_t"><span class="pre">seri_t</span></a> <em><span class="pre">s</span></em>, <em class="property"><span class="pre">const</span></em> <span class="pre">char</span> <span class="pre">*</span><em><span class="pre">buf</span></em>, <em class="property"><span class="pre">const</span></em> <span class="pre">size_t</span> <em><span class="pre">buf_siz</span></em>, <span class="pre">va_list</span> <em><span class="pre">ap</span></em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv418deserialize_directK6seri_tPKcK6size_t7va_list" title="Permalink to this definition">¶</a><br /></dt>
+<span id="_CPPv318deserialize_directK6seri_tPKcK6size_t7va_list"></span><span id="_CPPv218deserialize_directK6seri_tPKcK6size_t7va_list"></span><span id="deserialize_direct__seri_tC.cCP.sC.va_list"></span><span class="target" id="_serialize_base_8h_1ac740904ff678676cfc37a9e462fa6c85"></span><em class="property">static</em> <em class="property">inline</em> int <code class="sig-name descname">deserialize_direct</code><span class="sig-paren">(</span><em class="property">const</em> <a class="reference internal" href="#_CPPv46seri_t" title="seri_t">seri_t</a> <em>s</em>, <em class="property">const</em> char *<em>buf</em>, <em class="property">const</em> size_t <em>buf_siz</em>, va_list <em>ap</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv418deserialize_directK6seri_tPKcK6size_t7va_list" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Deserialize message to populate arguments. </p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -719,25 +599,25 @@
 </div>
 <dl class="cpp struct">
 <dt>
-<span class="target" id="structseri__t"></span><em class="property"><span class="pre">struct</span> </em><code class="sig-name descname"><span class="pre">seri_t</span></code><br /></dt>
+<span class="target" id="structseri__t"></span><em class="property">struct </em><code class="sig-name descname">seri_t</code><br /></dt>
 <dd><em>#include &lt;SerializeBase.h&gt;</em><p>Serializer structure. </p>
 <div class="breathe-sectiondef docutils container">
 <p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-members">Public Members</p>
 <dl class="cpp var">
 <dt id="_CPPv4N6seri_t4typeE">
-<span id="_CPPv3N6seri_t4typeE"></span><span id="_CPPv2N6seri_t4typeE"></span><span id="seri_t::type__seri_type"></span><span class="target" id="structseri__t_1a4278a7440cc158eb8c28010c5ad73724"></span><a class="reference internal" href="#_CPPv49seri_type" title="seri_type"><span class="pre">seri_type</span></a> <code class="sig-name descname"><span class="pre">type</span></code><a class="headerlink" href="#_CPPv4N6seri_t4typeE" title="Permalink to this definition">¶</a><br /></dt>
+<span id="_CPPv3N6seri_t4typeE"></span><span id="_CPPv2N6seri_t4typeE"></span><span id="seri_t::type__seri_type"></span><span class="target" id="structseri__t_1a4278a7440cc158eb8c28010c5ad73724"></span><a class="reference internal" href="#_CPPv49seri_type" title="seri_type">seri_type</a> <code class="sig-name descname">type</code><a class="headerlink" href="#_CPPv4N6seri_t4typeE" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Serializer type. </p>
 </dd></dl>
 
 <dl class="cpp var">
 <dt id="_CPPv4N6seri_t4infoE">
-<span id="_CPPv3N6seri_t4infoE"></span><span id="_CPPv2N6seri_t4infoE"></span><span id="seri_t::info__voidP"></span><span class="target" id="structseri__t_1afe8d056809d1f3155b50603a620a52ab"></span><span class="pre">void</span> <span class="pre">*</span><code class="sig-name descname"><span class="pre">info</span></code><a class="headerlink" href="#_CPPv4N6seri_t4infoE" title="Permalink to this definition">¶</a><br /></dt>
+<span id="_CPPv3N6seri_t4infoE"></span><span id="_CPPv2N6seri_t4infoE"></span><span id="seri_t::info__voidP"></span><span class="target" id="structseri__t_1afe8d056809d1f3155b50603a620a52ab"></span>void *<code class="sig-name descname">info</code><a class="headerlink" href="#_CPPv4N6seri_t4infoE" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Pointer to any extra info serializer requires. </p>
 </dd></dl>
 
 <dl class="cpp var">
 <dt id="_CPPv4N6seri_t9size_infoE">
-<span id="_CPPv3N6seri_t9size_infoE"></span><span id="_CPPv2N6seri_t9size_infoE"></span><span id="seri_t::size_info__s"></span><span class="target" id="structseri__t_1a6cf49790453343f2ebb5690b68342ac1"></span><span class="pre">size_t</span> <code class="sig-name descname"><span class="pre">size_info</span></code><a class="headerlink" href="#_CPPv4N6seri_t9size_infoE" title="Permalink to this definition">¶</a><br /></dt>
+<span id="_CPPv3N6seri_t9size_infoE"></span><span id="_CPPv2N6seri_t9size_infoE"></span><span id="seri_t::size_info__s"></span><span class="target" id="structseri__t_1a6cf49790453343f2ebb5690b68342ac1"></span>size_t <code class="sig-name descname">size_info</code><a class="headerlink" href="#_CPPv4N6seri_t9size_infoE" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Size of allocate space for info. </p>
 </dd></dl>
 

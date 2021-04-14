@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>yggdrasil.metaschema.properties.tests.test_TypeMetaschemaProperty &mdash; yggdrasil v1.6.0 documentation</title>
+  <title>yggdrasil.metaschema.properties.tests.test_TypeMetaschemaProperty &mdash; yggdrasil v1.6.0+5.g622c9ac0 documentation</title>
   
 
   
@@ -161,6 +161,8 @@
         
           <li><a href="../../../../index.html">Module code</a> &raquo;</li>
         
+          <li><a href="../../../../yggdrasil.html">yggdrasil</a> &raquo;</li>
+        
           <li><a href="../../../metaschema.html">yggdrasil.metaschema</a> &raquo;</li>
         
           <li><a href="../../properties.html">yggdrasil.metaschema.properties</a> &raquo;</li>
@@ -184,7 +186,7 @@
             
   <h1>Source code for yggdrasil.metaschema.properties.tests.test_TypeMetaschemaProperty</h1><div class="highlight"><pre>
 <span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
-<span class="kn">from</span> <span class="nn">yggdrasil.metaschema.properties.tests</span> <span class="kn">import</span> <span class="p">(</span>
+<span class="kn">from</span> <span class="nn">yggdrasil.metaschema.properties.tests</span> <span class="k">import</span> <span class="p">(</span>
     <span class="n">test_MetaschemaProperty</span> <span class="k">as</span> <span class="n">parent</span><span class="p">)</span>
 
 
@@ -194,7 +196,7 @@
     <span class="n">_mod</span> <span class="o">=</span> <span class="s1">&#39;TypeMetaschemaProperty&#39;</span>
     <span class="n">_cls</span> <span class="o">=</span> <span class="s1">&#39;TypeMetaschemaProperty&#39;</span>
     
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">TestTypeMetaschemaProperty</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_valid</span> <span class="o">=</span> <span class="p">[(</span><span class="n">np</span><span class="o">.</span><span class="n">int8</span><span class="p">(</span><span class="mi">1</span><span class="p">),</span> <span class="s1">&#39;int&#39;</span><span class="p">),</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">int8</span><span class="p">(</span><span class="mi">1</span><span class="p">),</span> <span class="s1">&#39;scalar&#39;</span><span class="p">)]</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_invalid</span> <span class="o">=</span> <span class="p">[(</span><span class="n">np</span><span class="o">.</span><span class="n">int8</span><span class="p">(</span><span class="mi">1</span><span class="p">),</span> <span class="s1">&#39;float&#39;</span><span class="p">),</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">(</span><span class="mi">1</span><span class="p">),</span> <span class="s1">&#39;int&#39;</span><span class="p">)]</span>

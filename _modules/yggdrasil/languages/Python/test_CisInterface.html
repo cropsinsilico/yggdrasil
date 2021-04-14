@@ -1,0 +1,250 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+  <title>yggdrasil.languages.Python.test_CisInterface &mdash; yggdrasil v1.6.0+5.g622c9ac0 documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../../../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../../../_static/theme_overrides.css" type="text/css" />
+
+  
+  
+
+  
+  
+
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../../../" src="../../../../_static/documentation_options.js"></script>
+        <script src="../../../../_static/jquery.js"></script>
+        <script src="../../../../_static/underscore.js"></script>
+        <script src="../../../../_static/doctools.js"></script>
+    
+    <script type="text/javascript" src="../../../../_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../../../index.html" class="icon icon-home"> yggdrasil
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                v1.6.0
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../includeme.html">Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../install.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../getting_started.html">Getting started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../formatted_io.html">Formatted I/O</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../server_client_io.html">Server/Client I/O</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../autowrap.html">Autowrapping Model Functions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../autowrap.html#notes-on-autowrapping-c-c-model-functions">Notes on Autowrapping C/C++ Model Functions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../conditional_io.html">Conditional I/O</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../transformed_io.html">Transformed I/O</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../timesync_io.html">Timestep Synchronization</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../yaml.html">YAML Files</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../config.html">Configuration Files</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../units.html">Units</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../c_format_strings.html">C-Style Format Strings</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../debugging.html">Debugging</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../threading.html">OpenMP Threading in Models</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../examples/examples_toc.html">Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../advanced/index.html">Advanced</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../development/index.html">Development</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../publications.html">Publications</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../hackathon2018/index.html">Welcome to the 2018 Crops in Silico Hackathon!</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../hackathon2019/index.html">Welcome to the 2019 Crops in Silico Hackathon!</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../../index.html">yggdrasil</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../../../index.html" class="icon icon-home"></a> &raquo;</li>
+        
+          <li><a href="../../../index.html">Module code</a> &raquo;</li>
+        
+          <li><a href="../../../yggdrasil.html">yggdrasil</a> &raquo;</li>
+        
+          <li><a href="../../languages.html">yggdrasil.languages</a> &raquo;</li>
+        
+      <li>yggdrasil.languages.Python.test_CisInterface</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for yggdrasil.languages.Python.test_CisInterface</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">copy</span>
+<span class="kn">from</span> <span class="nn">yggdrasil.languages.Python</span> <span class="k">import</span> <span class="n">test_YggInterface</span>
+
+
+<span class="n">title_replace</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;TestYggInput&#39;</span><span class="p">,</span> <span class="s1">&#39;TestYggInputMatlab&#39;</span><span class="p">,</span>
+                 <span class="s1">&#39;TestYggRpcClient&#39;</span><span class="p">,</span> <span class="s1">&#39;TestYggRpcClientMatlab&#39;</span><span class="p">,</span>
+                 <span class="s1">&#39;TestYggAsciiFileInput&#39;</span><span class="p">,</span> <span class="s1">&#39;TestYggAsciiTableInput&#39;</span><span class="p">,</span>
+                 <span class="s1">&#39;TestYggAsciiTableOutputMatlab&#39;</span><span class="p">,</span>
+                 <span class="s1">&#39;TestYggAsciiArrayInput&#39;</span><span class="p">,</span> <span class="s1">&#39;TestYggPickleInput&#39;</span><span class="p">,</span>
+                 <span class="s1">&#39;TestYggPandasInput&#39;</span><span class="p">,</span> <span class="s1">&#39;TestYggPlyInput&#39;</span><span class="p">,</span>
+                 <span class="s1">&#39;TestYggObjInput&#39;</span><span class="p">]</span>
+<span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">title_replace</span><span class="p">):</span>
+    <span class="k">if</span> <span class="s1">&#39;Input&#39;</span> <span class="ow">in</span> <span class="n">x</span><span class="p">:</span>
+        <span class="n">title_replace</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;Input&#39;</span><span class="p">,</span> <span class="s1">&#39;Output&#39;</span><span class="p">))</span>
+    <span class="k">elif</span> <span class="s1">&#39;Client&#39;</span> <span class="ow">in</span> <span class="n">x</span><span class="p">:</span>
+        <span class="n">title_replace</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;Client&#39;</span><span class="p">,</span> <span class="s1">&#39;Server&#39;</span><span class="p">))</span>
+<span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">title_replace</span><span class="p">:</span>
+    <span class="nb">globals</span><span class="p">()[</span><span class="n">x</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;Ygg&#39;</span><span class="p">,</span> <span class="s1">&#39;Cis&#39;</span><span class="p">)]</span> <span class="o">=</span> <span class="nb">type</span><span class="p">(</span>
+        <span class="n">x</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;Ygg&#39;</span><span class="p">,</span> <span class="s1">&#39;Cis&#39;</span><span class="p">),</span> <span class="p">(</span><span class="nb">getattr</span><span class="p">(</span><span class="n">test_YggInterface</span><span class="p">,</span> <span class="n">x</span><span class="p">),</span> <span class="p">),</span>
+        <span class="p">{</span><span class="s1">&#39;_mod&#39;</span><span class="p">:</span> <span class="s1">&#39;yggdrasil.interface.CisInterface&#39;</span><span class="p">,</span>
+         <span class="s1">&#39;_cls&#39;</span><span class="p">:</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">test_YggInterface</span><span class="p">,</span> <span class="n">x</span><span class="p">)</span><span class="o">.</span><span class="n">_cls</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;Ygg&#39;</span><span class="p">,</span> <span class="s1">&#39;Cis&#39;</span><span class="p">)})</span>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &#169; Copyright 2017, Meagan Lang, David Raila.
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

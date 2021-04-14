@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>Autowrapping Model Functions &mdash; yggdrasil v1.6.0 documentation</title>
+  <title>Autowrapping Model Functions &mdash; yggdrasil v1.6.0+5.g622c9ac0 documentation</title>
   
 
   
@@ -184,20 +184,20 @@
 <span id="autowrap-rst"></span><h1>Autowrapping Model Functions<a class="headerlink" href="#autowrapping-model-functions" title="Permalink to this headline">¶</a></h1>
 <p>If your model can be expressed as a function in one of the supported languages, yggdrasil can automatically create the wrapper to make calls to the interface. In the example below, the two models being connected are just functions with one input and one output.</p>
 <p>Model Code:</p>
-<div class="highlight-python notranslate"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span class="normal">1</span>
-<span class="normal">2</span>
-<span class="normal">3</span>
-<span class="normal">4</span></pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">model_function</span><span class="p">(</span><span class="n">in_buf</span><span class="p">):</span>
-    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Model A: </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">in_buf</span><span class="p">)</span>
+<div class="highlight-python notranslate"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3
+4</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">model_function</span><span class="p">(</span><span class="n">in_buf</span><span class="p">):</span>
+    <span class="k">print</span><span class="p">(</span><span class="s2">&quot;Model A: </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">in_buf</span><span class="p">)</span>
     <span class="n">out_buf</span> <span class="o">=</span> <span class="n">in_buf</span>
     <span class="k">return</span> <span class="n">out_buf</span>
 </pre></div>
 </td></tr></table></div>
-<div class="highlight-python notranslate"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span class="normal">1</span>
-<span class="normal">2</span>
-<span class="normal">3</span>
-<span class="normal">4</span></pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">model_function</span><span class="p">(</span><span class="n">in_buf</span><span class="p">):</span>
-    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Model B: </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">in_buf</span><span class="p">)</span>
+<div class="highlight-python notranslate"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3
+4</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">model_function</span><span class="p">(</span><span class="n">in_buf</span><span class="p">):</span>
+    <span class="k">print</span><span class="p">(</span><span class="s2">&quot;Model B: </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">in_buf</span><span class="p">)</span>
     <span class="n">out_buf</span> <span class="o">=</span> <span class="n">in_buf</span>
     <span class="k">return</span> <span class="n">out_buf</span>
 </pre></div>
@@ -205,28 +205,28 @@
 <p>(<a class="reference external" href="examples/model_function.html">Example in other languages</a>)</p>
 <p>In order to allow yggdrasil to wrap model functions, the corresponding entry in the YAML specification file should include a value for the <code class="docutils literal notranslate"><span class="pre">function</span></code> parameter which should be the name of the model function within the model file (provided via the <code class="docutils literal notranslate"><span class="pre">args</span></code> parameter). If no inputs or outputs are provided, yggdrasil will attempt to parse the definition for the target model function in order to determine the model’s inputs and outputs. If inputs and/or outputs are provided in the YAML they must either match the number of inputs and/or outputs in the function defintion (as below) or there must only be one and all of the model’s inputs and/or outputs will be bundled as an array.</p>
 <p>Model YAML:</p>
-<div class="highlight-yaml notranslate"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span class="normal"> 1</span>
-<span class="normal"> 2</span>
-<span class="normal"> 3</span>
-<span class="normal"> 4</span>
-<span class="normal"> 5</span>
-<span class="normal"> 6</span>
-<span class="normal"> 7</span>
-<span class="normal"> 8</span>
-<span class="normal"> 9</span>
-<span class="normal">10</span>
-<span class="normal">11</span>
-<span class="normal">12</span>
-<span class="normal">13</span>
-<span class="normal">14</span>
-<span class="normal">15</span>
-<span class="normal">16</span>
-<span class="normal">17</span>
-<span class="normal">18</span>
-<span class="normal">19</span>
-<span class="normal">20</span>
-<span class="normal">21</span>
-<span class="normal">22</span></pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="nt">models</span><span class="p">:</span>
+<div class="highlight-yaml notranslate"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="nt">models</span><span class="p">:</span>
   <span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">python_modelA</span>
     <span class="nt">language</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">python</span>
     <span class="nt">args</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">./src/model_function_modelA.py</span>

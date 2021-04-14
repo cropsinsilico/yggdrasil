@@ -100,6 +100,14 @@ yggdrasil.drivers.tests.test\_InterpretedModelDriver module
    :undoc-members:
    :show-inheritance:
 
+yggdrasil.drivers.tests.test\_JuliaModelDriver module
+-----------------------------------------------------
+
+.. automodule:: yggdrasil.drivers.tests.test_JuliaModelDriver
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 yggdrasil.drivers.tests.test\_LPyModelDriver module
 ---------------------------------------------------
 

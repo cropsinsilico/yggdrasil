@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>yggdrasil.drivers.tests.test_MatlabModelDriver &mdash; yggdrasil v1.6.0 documentation</title>
+  <title>yggdrasil.drivers.tests.test_MatlabModelDriver &mdash; yggdrasil v1.6.0+5.g622c9ac0 documentation</title>
   
 
   
@@ -161,7 +161,11 @@
         
           <li><a href="../../../index.html">Module code</a> &raquo;</li>
         
+          <li><a href="../../../yggdrasil.html">yggdrasil</a> &raquo;</li>
+        
           <li><a href="../../drivers.html">yggdrasil.drivers</a> &raquo;</li>
+        
+          <li><a href="../tests.html">yggdrasil.drivers.tests</a> &raquo;</li>
         
       <li>yggdrasil.drivers.tests.test_MatlabModelDriver</li>
     
@@ -182,11 +186,11 @@
 <span></span><span class="kn">import</span> <span class="nn">os</span>
 <span class="kn">import</span> <span class="nn">unittest</span>
 <span class="kn">import</span> <span class="nn">logging</span>
-<span class="kn">from</span> <span class="nn">yggdrasil.tests</span> <span class="kn">import</span> <span class="n">scripts</span><span class="p">,</span> <span class="n">assert_raises</span><span class="p">,</span> <span class="n">requires_language</span>
+<span class="kn">from</span> <span class="nn">yggdrasil.tests</span> <span class="k">import</span> <span class="n">scripts</span><span class="p">,</span> <span class="n">assert_raises</span><span class="p">,</span> <span class="n">requires_language</span>
 <span class="kn">import</span> <span class="nn">yggdrasil.drivers.tests.test_InterpretedModelDriver</span> <span class="k">as</span> <span class="nn">parent</span>
-<span class="kn">from</span> <span class="nn">yggdrasil</span> <span class="kn">import</span> <span class="n">runner</span>
-<span class="kn">from</span> <span class="nn">yggdrasil.drivers</span> <span class="kn">import</span> <span class="n">MatlabModelDriver</span>
-<span class="kn">from</span> <span class="nn">yggdrasil.examples</span> <span class="kn">import</span> <span class="n">yamls</span> <span class="k">as</span> <span class="n">ex_yamls</span>
+<span class="kn">from</span> <span class="nn">yggdrasil</span> <span class="k">import</span> <span class="n">runner</span>
+<span class="kn">from</span> <span class="nn">yggdrasil.drivers</span> <span class="k">import</span> <span class="n">MatlabModelDriver</span>
+<span class="kn">from</span> <span class="nn">yggdrasil.examples</span> <span class="k">import</span> <span class="n">yamls</span> <span class="k">as</span> <span class="n">ex_yamls</span>
 
 
 <span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
@@ -238,7 +242,7 @@
 
     <span class="n">driver</span> <span class="o">=</span> <span class="s2">&quot;MatlabModelDriver&quot;</span>
     
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">TestMatlabModelParam</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">args</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">src</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="s2">&quot;test&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">attr_list</span> <span class="o">+=</span> <span class="p">[</span><span class="s1">&#39;started_matlab&#39;</span><span class="p">,</span> <span class="s1">&#39;mlengine&#39;</span><span class="p">]</span></div>

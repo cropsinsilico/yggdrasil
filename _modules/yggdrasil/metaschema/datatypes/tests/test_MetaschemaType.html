@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>yggdrasil.metaschema.datatypes.tests.test_MetaschemaType &mdash; yggdrasil v1.6.0 documentation</title>
+  <title>yggdrasil.metaschema.datatypes.tests.test_MetaschemaType &mdash; yggdrasil v1.6.0+5.g622c9ac0 documentation</title>
   
 
   
@@ -161,6 +161,8 @@
         
           <li><a href="../../../../index.html">Module code</a> &raquo;</li>
         
+          <li><a href="../../../../yggdrasil.html">yggdrasil</a> &raquo;</li>
+        
           <li><a href="../../../metaschema.html">yggdrasil.metaschema</a> &raquo;</li>
         
           <li><a href="../../datatypes.html">yggdrasil.metaschema.datatypes</a> &raquo;</li>
@@ -188,14 +190,14 @@
 <span class="kn">import</span> <span class="nn">copy</span>
 <span class="kn">import</span> <span class="nn">pprint</span>
 <span class="kn">import</span> <span class="nn">jsonschema</span>
-<span class="kn">from</span> <span class="nn">yggdrasil.metaschema.datatypes</span> <span class="kn">import</span> <span class="n">MetaschemaTypeError</span><span class="p">,</span> <span class="n">YGG_MSG_HEAD</span>
-<span class="kn">from</span> <span class="nn">yggdrasil.tests</span> <span class="kn">import</span> <span class="n">YggTestClassInfo</span><span class="p">,</span> <span class="n">assert_equal</span>
+<span class="kn">from</span> <span class="nn">yggdrasil.metaschema.datatypes</span> <span class="k">import</span> <span class="n">MetaschemaTypeError</span><span class="p">,</span> <span class="n">YGG_MSG_HEAD</span>
+<span class="kn">from</span> <span class="nn">yggdrasil.tests</span> <span class="k">import</span> <span class="n">YggTestClassInfo</span><span class="p">,</span> <span class="n">assert_equal</span>
 
 
 <div class="viewcode-block" id="TstMetaschemaTypeMeta"><a class="viewcode-back" href="../../../../../yggdrasil.metaschema.datatypes.tests.html#yggdrasil.metaschema.datatypes.tests.test_MetaschemaType.TstMetaschemaTypeMeta">[docs]</a><span class="k">class</span> <span class="nc">TstMetaschemaTypeMeta</span><span class="p">(</span><span class="nb">type</span><span class="p">):</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Meta class for setting up test information.&quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="fm">__new__</span><span class="p">(</span><span class="n">meta</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">bases</span><span class="p">,</span> <span class="n">class_dict</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__new__</span><span class="p">(</span><span class="n">meta</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">bases</span><span class="p">,</span> <span class="n">class_dict</span><span class="p">):</span>
         <span class="n">attr</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">_explicit</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
                     <span class="n">_empty_msg</span><span class="o">=</span><span class="sa">b</span><span class="s1">&#39;&#39;</span><span class="p">,</span>
                     <span class="n">_typedef</span><span class="o">=</span><span class="p">{},</span>

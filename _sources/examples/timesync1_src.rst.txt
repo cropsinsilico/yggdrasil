@@ -1,6 +1,6 @@
 Model Code:
 
-.. literalinclude:: /../../../../../../../opt/hostedtoolcache/Python/3.8.9/x64/lib/python3.8/site-packages/yggdrasil/examples/timesync1/src/timesync.py
+.. literalinclude:: /../../yggdrasil/examples/timesync1/src/timesync.py
    :language: python
    :linenos:
 

@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>timesync1 Example &mdash; yggdrasil v1.6.0 documentation</title>
+  <title>timesync1 Example &mdash; yggdrasil v1.6.0+5.g622c9ac0 documentation</title>
   
 
   
@@ -221,127 +221,127 @@
 <div class="section" id="c-version">
 <h2>C Version<a class="headerlink" href="#c-version" title="Permalink to this headline">¶</a></h2>
 <p>Model Code:</p>
-<div class="highlight-c notranslate"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span class="normal">  1</span>
-<span class="normal">  2</span>
-<span class="normal">  3</span>
-<span class="normal">  4</span>
-<span class="normal">  5</span>
-<span class="normal">  6</span>
-<span class="normal">  7</span>
-<span class="normal">  8</span>
-<span class="normal">  9</span>
-<span class="normal"> 10</span>
-<span class="normal"> 11</span>
-<span class="normal"> 12</span>
-<span class="normal"> 13</span>
-<span class="normal"> 14</span>
-<span class="normal"> 15</span>
-<span class="normal"> 16</span>
-<span class="normal"> 17</span>
-<span class="normal"> 18</span>
-<span class="normal"> 19</span>
-<span class="normal"> 20</span>
-<span class="normal"> 21</span>
-<span class="normal"> 22</span>
-<span class="normal"> 23</span>
-<span class="normal"> 24</span>
-<span class="normal"> 25</span>
-<span class="normal"> 26</span>
-<span class="normal"> 27</span>
-<span class="normal"> 28</span>
-<span class="normal"> 29</span>
-<span class="normal"> 30</span>
-<span class="normal"> 31</span>
-<span class="normal"> 32</span>
-<span class="normal"> 33</span>
-<span class="normal"> 34</span>
-<span class="normal"> 35</span>
-<span class="normal"> 36</span>
-<span class="normal"> 37</span>
-<span class="normal"> 38</span>
-<span class="normal"> 39</span>
-<span class="normal"> 40</span>
-<span class="normal"> 41</span>
-<span class="normal"> 42</span>
-<span class="normal"> 43</span>
-<span class="normal"> 44</span>
-<span class="normal"> 45</span>
-<span class="normal"> 46</span>
-<span class="normal"> 47</span>
-<span class="normal"> 48</span>
-<span class="normal"> 49</span>
-<span class="normal"> 50</span>
-<span class="normal"> 51</span>
-<span class="normal"> 52</span>
-<span class="normal"> 53</span>
-<span class="normal"> 54</span>
-<span class="normal"> 55</span>
-<span class="normal"> 56</span>
-<span class="normal"> 57</span>
-<span class="normal"> 58</span>
-<span class="normal"> 59</span>
-<span class="normal"> 60</span>
-<span class="normal"> 61</span>
-<span class="normal"> 62</span>
-<span class="normal"> 63</span>
-<span class="normal"> 64</span>
-<span class="normal"> 65</span>
-<span class="normal"> 66</span>
-<span class="normal"> 67</span>
-<span class="normal"> 68</span>
-<span class="normal"> 69</span>
-<span class="normal"> 70</span>
-<span class="normal"> 71</span>
-<span class="normal"> 72</span>
-<span class="normal"> 73</span>
-<span class="normal"> 74</span>
-<span class="normal"> 75</span>
-<span class="normal"> 76</span>
-<span class="normal"> 77</span>
-<span class="normal"> 78</span>
-<span class="normal"> 79</span>
-<span class="normal"> 80</span>
-<span class="normal"> 81</span>
-<span class="normal"> 82</span>
-<span class="normal"> 83</span>
-<span class="normal"> 84</span>
-<span class="normal"> 85</span>
-<span class="normal"> 86</span>
-<span class="normal"> 87</span>
-<span class="normal"> 88</span>
-<span class="normal"> 89</span>
-<span class="normal"> 90</span>
-<span class="normal"> 91</span>
-<span class="normal"> 92</span>
-<span class="normal"> 93</span>
-<span class="normal"> 94</span>
-<span class="normal"> 95</span>
-<span class="normal"> 96</span>
-<span class="normal"> 97</span>
-<span class="normal"> 98</span>
-<span class="normal"> 99</span>
-<span class="normal">100</span>
-<span class="normal">101</span>
-<span class="normal">102</span>
-<span class="normal">103</span>
-<span class="normal">104</span>
-<span class="normal">105</span>
-<span class="normal">106</span>
-<span class="normal">107</span>
-<span class="normal">108</span>
-<span class="normal">109</span>
-<span class="normal">110</span>
-<span class="normal">111</span>
-<span class="normal">112</span>
-<span class="normal">113</span>
-<span class="normal">114</span>
-<span class="normal">115</span>
-<span class="normal">116</span>
-<span class="normal">117</span>
-<span class="normal">118</span>
-<span class="normal">119</span>
-<span class="normal">120</span>
-<span class="normal">121</span></pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="cp">#define _USE_MATH_DEFINES  </span><span class="c1">// Required to use M_PI with MSVC</span>
+<div class="highlight-c notranslate"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>  1
+  2
+  3
+  4
+  5
+  6
+  7
+  8
+  9
+ 10
+ 11
+ 12
+ 13
+ 14
+ 15
+ 16
+ 17
+ 18
+ 19
+ 20
+ 21
+ 22
+ 23
+ 24
+ 25
+ 26
+ 27
+ 28
+ 29
+ 30
+ 31
+ 32
+ 33
+ 34
+ 35
+ 36
+ 37
+ 38
+ 39
+ 40
+ 41
+ 42
+ 43
+ 44
+ 45
+ 46
+ 47
+ 48
+ 49
+ 50
+ 51
+ 52
+ 53
+ 54
+ 55
+ 56
+ 57
+ 58
+ 59
+ 60
+ 61
+ 62
+ 63
+ 64
+ 65
+ 66
+ 67
+ 68
+ 69
+ 70
+ 71
+ 72
+ 73
+ 74
+ 75
+ 76
+ 77
+ 78
+ 79
+ 80
+ 81
+ 82
+ 83
+ 84
+ 85
+ 86
+ 87
+ 88
+ 89
+ 90
+ 91
+ 92
+ 93
+ 94
+ 95
+ 96
+ 97
+ 98
+ 99
+100
+101
+102
+103
+104
+105
+106
+107
+108
+109
+110
+111
+112
+113
+114
+115
+116
+117
+118
+119
+120
+121</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="cp">#define _USE_MATH_DEFINES  </span><span class="c1">// Required to use M_PI with MSVC</span>
 <span class="cp">#include</span> <span class="cpf">&lt;math.h&gt;</span><span class="cp"></span>
 <span class="cp">#include</span> <span class="cpf">&lt;stdio.h&gt;</span><span class="cp"></span>
 <span class="cp">#include</span> <span class="cpf">&quot;YggInterface.h&quot;</span><span class="cp"></span>
@@ -359,7 +359,7 @@
     <span class="n">y_period</span> <span class="o">=</span> <span class="n">y_period</span> <span class="o">*</span> <span class="mf">24.0</span><span class="p">;</span>
   <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
     <span class="n">printf</span><span class="p">(</span><span class="s">&quot;timestep_calc: Unsupported unit &#39;%s&#39;</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span> <span class="n">t_units</span><span class="p">);</span>
-    <span class="n">ret</span> <span class="o">=</span> <span class="mi">-1</span><span class="p">;</span>
+    <span class="n">ret</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span><span class="p">;</span>
   <span class="p">}</span>
   <span class="k">if</span> <span class="p">(</span><span class="n">ret</span> <span class="o">&gt;=</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
     <span class="n">x</span> <span class="o">=</span> <span class="n">sin</span><span class="p">(</span><span class="mf">2.0</span> <span class="o">*</span> <span class="n">M_PI</span> <span class="o">*</span> <span class="n">t</span> <span class="o">/</span> <span class="n">x_period</span><span class="p">);</span>
@@ -387,7 +387,7 @@
   <span class="n">ret</span> <span class="o">=</span> <span class="n">timestep_calc</span><span class="p">(</span><span class="n">t_start</span><span class="p">,</span> <span class="n">t_units</span><span class="p">,</span> <span class="n">state</span><span class="p">);</span>
   <span class="k">if</span> <span class="p">(</span><span class="n">ret</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
     <span class="n">printf</span><span class="p">(</span><span class="s">&quot;timesync(C): Error in initial timestep calculation.&quot;</span><span class="p">);</span>
-    <span class="k">return</span> <span class="mi">-1</span><span class="p">;</span>
+    <span class="k">return</span> <span class="o">-</span><span class="mi">1</span><span class="p">;</span>
   <span class="p">}</span>
 
   <span class="c1">// Set up connections matching yaml</span>
@@ -401,7 +401,7 @@
   <span class="n">ret</span> <span class="o">=</span> <span class="n">rpcCall</span><span class="p">(</span><span class="n">timesync</span><span class="p">,</span> <span class="n">t</span><span class="p">,</span> <span class="n">state</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">state</span><span class="p">);</span>
   <span class="k">if</span> <span class="p">(</span><span class="n">ret</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
     <span class="n">printf</span><span class="p">(</span><span class="s">&quot;timesync(C): Initial sync failed.</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">);</span>
-    <span class="k">return</span> <span class="mi">-1</span><span class="p">;</span>
+    <span class="k">return</span> <span class="o">-</span><span class="mi">1</span><span class="p">;</span>
   <span class="p">}</span>
   <span class="n">printf</span><span class="p">(</span><span class="s">&quot;timesync(C): t = %5.1f %-3s, x = %+ 5.2f, y = %+ 5.2f</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span>
 	 <span class="n">t</span><span class="p">,</span> <span class="n">t_units</span><span class="p">,</span> <span class="n">generic_map_get_double</span><span class="p">(</span><span class="n">state</span><span class="p">,</span> <span class="s">&quot;x&quot;</span><span class="p">),</span>
@@ -412,12 +412,12 @@
   <span class="n">ret</span> <span class="o">=</span> <span class="n">generic_map_set_double</span><span class="p">(</span><span class="n">msg</span><span class="p">,</span> <span class="s">&quot;time&quot;</span><span class="p">,</span> <span class="n">t</span><span class="p">,</span> <span class="n">t_units</span><span class="p">);</span>
   <span class="k">if</span> <span class="p">(</span><span class="n">ret</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
     <span class="n">printf</span><span class="p">(</span><span class="s">&quot;timesync(C): Failed to set time in initial output map.</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">);</span>
-    <span class="k">return</span> <span class="mi">-1</span><span class="p">;</span>
+    <span class="k">return</span> <span class="o">-</span><span class="mi">1</span><span class="p">;</span>
   <span class="p">}</span>
   <span class="n">ret</span> <span class="o">=</span> <span class="n">yggSend</span><span class="p">(</span><span class="n">out</span><span class="p">,</span> <span class="n">msg</span><span class="p">);</span>
   <span class="k">if</span> <span class="p">(</span><span class="n">ret</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
     <span class="n">printf</span><span class="p">(</span><span class="s">&quot;timesync(C): Failed to send initial output for t=%f.</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span> <span class="n">t</span><span class="p">);</span>
-    <span class="k">return</span> <span class="mi">-1</span><span class="p">;</span>
+    <span class="k">return</span> <span class="o">-</span><span class="mi">1</span><span class="p">;</span>
   <span class="p">}</span>
   <span class="n">destroy_generic</span><span class="p">(</span><span class="o">&amp;</span><span class="n">msg</span><span class="p">);</span>
 
@@ -429,14 +429,14 @@
     <span class="n">ret</span> <span class="o">=</span> <span class="n">timestep_calc</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">t_units</span><span class="p">,</span> <span class="n">state</span><span class="p">);</span>
     <span class="k">if</span> <span class="p">(</span><span class="n">ret</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
       <span class="n">printf</span><span class="p">(</span><span class="s">&quot;timesync(C): Error in timestep calculation for t = %f.</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span> <span class="n">t</span><span class="p">);</span>
-      <span class="k">return</span> <span class="mi">-1</span><span class="p">;</span>
+      <span class="k">return</span> <span class="o">-</span><span class="mi">1</span><span class="p">;</span>
     <span class="p">}</span>
 
     <span class="c1">// Synchronize the state</span>
     <span class="n">ret</span> <span class="o">=</span> <span class="n">rpcCall</span><span class="p">(</span><span class="n">timesync</span><span class="p">,</span> <span class="n">t</span><span class="p">,</span> <span class="n">state</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">state</span><span class="p">);</span>
     <span class="k">if</span> <span class="p">(</span><span class="n">ret</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
       <span class="n">printf</span><span class="p">(</span><span class="s">&quot;timesync(C): sync for t=%f failed.</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span> <span class="n">t</span><span class="p">);</span>
-      <span class="k">return</span> <span class="mi">-1</span><span class="p">;</span>
+      <span class="k">return</span> <span class="o">-</span><span class="mi">1</span><span class="p">;</span>
     <span class="p">}</span>
     <span class="n">printf</span><span class="p">(</span><span class="s">&quot;timesync(C): t = %5.1f %-3s, x = %+ 5.2f, y = %+ 5.2f</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span>
 	   <span class="n">t</span><span class="p">,</span> <span class="n">t_units</span><span class="p">,</span> <span class="n">generic_map_get_double</span><span class="p">(</span><span class="n">state</span><span class="p">,</span> <span class="s">&quot;x&quot;</span><span class="p">),</span>
@@ -447,12 +447,12 @@
     <span class="n">ret</span> <span class="o">=</span> <span class="n">generic_map_set_double</span><span class="p">(</span><span class="n">msg</span><span class="p">,</span> <span class="s">&quot;time&quot;</span><span class="p">,</span> <span class="n">t</span><span class="p">,</span> <span class="n">t_units</span><span class="p">);</span>
     <span class="k">if</span> <span class="p">(</span><span class="n">ret</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
       <span class="n">printf</span><span class="p">(</span><span class="s">&quot;timesync(C): Failed to set time in output map.</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">);</span>
-      <span class="k">return</span> <span class="mi">-1</span><span class="p">;</span>
+      <span class="k">return</span> <span class="o">-</span><span class="mi">1</span><span class="p">;</span>
     <span class="p">}</span>
     <span class="n">ret</span> <span class="o">=</span> <span class="n">yggSend</span><span class="p">(</span><span class="n">out</span><span class="p">,</span> <span class="n">msg</span><span class="p">);</span>
     <span class="k">if</span> <span class="p">(</span><span class="n">ret</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
       <span class="n">printf</span><span class="p">(</span><span class="s">&quot;timesync(C): Failed to send output for t=%f.</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span> <span class="n">t</span><span class="p">);</span>
-      <span class="k">return</span> <span class="mi">-1</span><span class="p">;</span>
+      <span class="k">return</span> <span class="o">-</span><span class="mi">1</span><span class="p">;</span>
     <span class="p">}</span>
     <span class="n">destroy_generic</span><span class="p">(</span><span class="o">&amp;</span><span class="n">msg</span><span class="p">);</span>
   <span class="p">}</span>
@@ -465,35 +465,35 @@
 </pre></div>
 </td></tr></table></div>
 <p>Model YAML:</p>
-<div class="highlight-yaml notranslate"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span class="normal"> 1</span>
-<span class="normal"> 2</span>
-<span class="normal"> 3</span>
-<span class="normal"> 4</span>
-<span class="normal"> 5</span>
-<span class="normal"> 6</span>
-<span class="normal"> 7</span>
-<span class="normal"> 8</span>
-<span class="normal"> 9</span>
-<span class="normal">10</span>
-<span class="normal">11</span>
-<span class="normal">12</span>
-<span class="normal">13</span>
-<span class="normal">14</span>
-<span class="normal">15</span>
-<span class="normal">16</span>
-<span class="normal">17</span>
-<span class="normal">18</span>
-<span class="normal">19</span>
-<span class="normal">20</span>
-<span class="normal">21</span>
-<span class="normal">22</span>
-<span class="normal">23</span>
-<span class="normal">24</span>
-<span class="normal">25</span>
-<span class="normal">26</span>
-<span class="normal">27</span>
-<span class="normal">28</span>
-<span class="normal">29</span></pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="nn">---</span>
+<div class="highlight-yaml notranslate"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="nn">---</span>
 
 <span class="nt">models</span><span class="p">:</span>
   <span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">modelA</span>
@@ -528,127 +528,127 @@
 <div class="section" id="id1">
 <h2>C++ Version<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h2>
 <p>Model Code:</p>
-<div class="highlight-c++ notranslate"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span class="normal">  1</span>
-<span class="normal">  2</span>
-<span class="normal">  3</span>
-<span class="normal">  4</span>
-<span class="normal">  5</span>
-<span class="normal">  6</span>
-<span class="normal">  7</span>
-<span class="normal">  8</span>
-<span class="normal">  9</span>
-<span class="normal"> 10</span>
-<span class="normal"> 11</span>
-<span class="normal"> 12</span>
-<span class="normal"> 13</span>
-<span class="normal"> 14</span>
-<span class="normal"> 15</span>
-<span class="normal"> 16</span>
-<span class="normal"> 17</span>
-<span class="normal"> 18</span>
-<span class="normal"> 19</span>
-<span class="normal"> 20</span>
-<span class="normal"> 21</span>
-<span class="normal"> 22</span>
-<span class="normal"> 23</span>
-<span class="normal"> 24</span>
-<span class="normal"> 25</span>
-<span class="normal"> 26</span>
-<span class="normal"> 27</span>
-<span class="normal"> 28</span>
-<span class="normal"> 29</span>
-<span class="normal"> 30</span>
-<span class="normal"> 31</span>
-<span class="normal"> 32</span>
-<span class="normal"> 33</span>
-<span class="normal"> 34</span>
-<span class="normal"> 35</span>
-<span class="normal"> 36</span>
-<span class="normal"> 37</span>
-<span class="normal"> 38</span>
-<span class="normal"> 39</span>
-<span class="normal"> 40</span>
-<span class="normal"> 41</span>
-<span class="normal"> 42</span>
-<span class="normal"> 43</span>
-<span class="normal"> 44</span>
-<span class="normal"> 45</span>
-<span class="normal"> 46</span>
-<span class="normal"> 47</span>
-<span class="normal"> 48</span>
-<span class="normal"> 49</span>
-<span class="normal"> 50</span>
-<span class="normal"> 51</span>
-<span class="normal"> 52</span>
-<span class="normal"> 53</span>
-<span class="normal"> 54</span>
-<span class="normal"> 55</span>
-<span class="normal"> 56</span>
-<span class="normal"> 57</span>
-<span class="normal"> 58</span>
-<span class="normal"> 59</span>
-<span class="normal"> 60</span>
-<span class="normal"> 61</span>
-<span class="normal"> 62</span>
-<span class="normal"> 63</span>
-<span class="normal"> 64</span>
-<span class="normal"> 65</span>
-<span class="normal"> 66</span>
-<span class="normal"> 67</span>
-<span class="normal"> 68</span>
-<span class="normal"> 69</span>
-<span class="normal"> 70</span>
-<span class="normal"> 71</span>
-<span class="normal"> 72</span>
-<span class="normal"> 73</span>
-<span class="normal"> 74</span>
-<span class="normal"> 75</span>
-<span class="normal"> 76</span>
-<span class="normal"> 77</span>
-<span class="normal"> 78</span>
-<span class="normal"> 79</span>
-<span class="normal"> 80</span>
-<span class="normal"> 81</span>
-<span class="normal"> 82</span>
-<span class="normal"> 83</span>
-<span class="normal"> 84</span>
-<span class="normal"> 85</span>
-<span class="normal"> 86</span>
-<span class="normal"> 87</span>
-<span class="normal"> 88</span>
-<span class="normal"> 89</span>
-<span class="normal"> 90</span>
-<span class="normal"> 91</span>
-<span class="normal"> 92</span>
-<span class="normal"> 93</span>
-<span class="normal"> 94</span>
-<span class="normal"> 95</span>
-<span class="normal"> 96</span>
-<span class="normal"> 97</span>
-<span class="normal"> 98</span>
-<span class="normal"> 99</span>
-<span class="normal">100</span>
-<span class="normal">101</span>
-<span class="normal">102</span>
-<span class="normal">103</span>
-<span class="normal">104</span>
-<span class="normal">105</span>
-<span class="normal">106</span>
-<span class="normal">107</span>
-<span class="normal">108</span>
-<span class="normal">109</span>
-<span class="normal">110</span>
-<span class="normal">111</span>
-<span class="normal">112</span>
-<span class="normal">113</span>
-<span class="normal">114</span>
-<span class="normal">115</span>
-<span class="normal">116</span>
-<span class="normal">117</span>
-<span class="normal">118</span>
-<span class="normal">119</span>
-<span class="normal">120</span>
-<span class="normal">121</span></pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="cp">#define _USE_MATH_DEFINES  </span><span class="c1">// Required to use M_PI with MSVC</span>
+<div class="highlight-c++ notranslate"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>  1
+  2
+  3
+  4
+  5
+  6
+  7
+  8
+  9
+ 10
+ 11
+ 12
+ 13
+ 14
+ 15
+ 16
+ 17
+ 18
+ 19
+ 20
+ 21
+ 22
+ 23
+ 24
+ 25
+ 26
+ 27
+ 28
+ 29
+ 30
+ 31
+ 32
+ 33
+ 34
+ 35
+ 36
+ 37
+ 38
+ 39
+ 40
+ 41
+ 42
+ 43
+ 44
+ 45
+ 46
+ 47
+ 48
+ 49
+ 50
+ 51
+ 52
+ 53
+ 54
+ 55
+ 56
+ 57
+ 58
+ 59
+ 60
+ 61
+ 62
+ 63
+ 64
+ 65
+ 66
+ 67
+ 68
+ 69
+ 70
+ 71
+ 72
+ 73
+ 74
+ 75
+ 76
+ 77
+ 78
+ 79
+ 80
+ 81
+ 82
+ 83
+ 84
+ 85
+ 86
+ 87
+ 88
+ 89
+ 90
+ 91
+ 92
+ 93
+ 94
+ 95
+ 96
+ 97
+ 98
+ 99
+100
+101
+102
+103
+104
+105
+106
+107
+108
+109
+110
+111
+112
+113
+114
+115
+116
+117
+118
+119
+120
+121</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="cp">#define _USE_MATH_DEFINES  </span><span class="c1">// Required to use M_PI with MSVC</span>
 <span class="cp">#include</span> <span class="cpf">&lt;math.h&gt;</span><span class="cp"></span>
 <span class="cp">#include</span> <span class="cpf">&lt;stdio.h&gt;</span><span class="cp"></span>
 <span class="cp">#include</span> <span class="cpf">&quot;YggInterface.hpp&quot;</span><span class="cp"></span>
@@ -666,7 +666,7 @@
     <span class="n">y_period</span> <span class="o">=</span> <span class="n">y_period</span> <span class="o">*</span> <span class="mf">24.0</span><span class="p">;</span>
   <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
     <span class="n">printf</span><span class="p">(</span><span class="s">&quot;timestep_calc: Unsupported unit &#39;%s&#39;</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span> <span class="n">t_units</span><span class="p">);</span>
-    <span class="n">ret</span> <span class="o">=</span> <span class="mi">-1</span><span class="p">;</span>
+    <span class="n">ret</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span><span class="p">;</span>
   <span class="p">}</span>
   <span class="k">if</span> <span class="p">(</span><span class="n">ret</span> <span class="o">&gt;=</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
     <span class="n">x</span> <span class="o">=</span> <span class="n">sin</span><span class="p">(</span><span class="mf">2.0</span> <span class="o">*</span> <span class="n">M_PI</span> <span class="o">*</span> <span class="n">t</span> <span class="o">/</span> <span class="n">x_period</span><span class="p">);</span>
@@ -694,7 +694,7 @@
   <span class="n">ret</span> <span class="o">=</span> <span class="n">timestep_calc</span><span class="p">(</span><span class="n">t_start</span><span class="p">,</span> <span class="n">t_units</span><span class="p">,</span> <span class="n">state</span><span class="p">);</span>
   <span class="k">if</span> <span class="p">(</span><span class="n">ret</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
     <span class="n">printf</span><span class="p">(</span><span class="s">&quot;timesync(C++): Error in initial timestep calculation.&quot;</span><span class="p">);</span>
-    <span class="k">return</span> <span class="mi">-1</span><span class="p">;</span>
+    <span class="k">return</span> <span class="o">-</span><span class="mi">1</span><span class="p">;</span>
   <span class="p">}</span>
 
   <span class="c1">// Set up connections matching yaml</span>
@@ -708,7 +708,7 @@
   <span class="n">ret</span> <span class="o">=</span> <span class="n">timesync</span><span class="p">.</span><span class="n">call</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="n">t</span><span class="p">,</span> <span class="n">state</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">state</span><span class="p">);</span>
   <span class="k">if</span> <span class="p">(</span><span class="n">ret</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
     <span class="n">printf</span><span class="p">(</span><span class="s">&quot;timesync(C++): Initial sync failed.</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">);</span>
-    <span class="k">return</span> <span class="mi">-1</span><span class="p">;</span>
+    <span class="k">return</span> <span class="o">-</span><span class="mi">1</span><span class="p">;</span>
   <span class="p">}</span>
   <span class="n">printf</span><span class="p">(</span><span class="s">&quot;timesync(C++): t = %5.1f %-3s, x = %+ 5.2f, y = %+ 5.2f</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span>
 	 <span class="n">t</span><span class="p">,</span> <span class="n">t_units</span><span class="p">,</span> <span class="n">generic_map_get_double</span><span class="p">(</span><span class="n">state</span><span class="p">,</span> <span class="s">&quot;x&quot;</span><span class="p">),</span>
@@ -719,12 +719,12 @@
   <span class="n">ret</span> <span class="o">=</span> <span class="n">generic_map_set_double</span><span class="p">(</span><span class="n">msg</span><span class="p">,</span> <span class="s">&quot;time&quot;</span><span class="p">,</span> <span class="n">t</span><span class="p">,</span> <span class="n">t_units</span><span class="p">);</span>
   <span class="k">if</span> <span class="p">(</span><span class="n">ret</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
     <span class="n">printf</span><span class="p">(</span><span class="s">&quot;timesync(C++): Failed to set time in initial output map.</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">);</span>
-    <span class="k">return</span> <span class="mi">-1</span><span class="p">;</span>
+    <span class="k">return</span> <span class="o">-</span><span class="mi">1</span><span class="p">;</span>
   <span class="p">}</span>
   <span class="n">ret</span> <span class="o">=</span> <span class="n">out</span><span class="p">.</span><span class="n">send</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">msg</span><span class="p">);</span>
   <span class="k">if</span> <span class="p">(</span><span class="n">ret</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
     <span class="n">printf</span><span class="p">(</span><span class="s">&quot;timesync(C++): Failed to send initial output for t=%f.</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span> <span class="n">t</span><span class="p">);</span>
-    <span class="k">return</span> <span class="mi">-1</span><span class="p">;</span>
+    <span class="k">return</span> <span class="o">-</span><span class="mi">1</span><span class="p">;</span>
   <span class="p">}</span>
   <span class="n">destroy_generic</span><span class="p">(</span><span class="o">&amp;</span><span class="n">msg</span><span class="p">);</span>
 
@@ -736,14 +736,14 @@
     <span class="n">ret</span> <span class="o">=</span> <span class="n">timestep_calc</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">t_units</span><span class="p">,</span> <span class="n">state</span><span class="p">);</span>
     <span class="k">if</span> <span class="p">(</span><span class="n">ret</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
       <span class="n">printf</span><span class="p">(</span><span class="s">&quot;timesync(C++): Error in timestep calculation for t = %f.</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span> <span class="n">t</span><span class="p">);</span>
-      <span class="k">return</span> <span class="mi">-1</span><span class="p">;</span>
+      <span class="k">return</span> <span class="o">-</span><span class="mi">1</span><span class="p">;</span>
     <span class="p">}</span>
 
     <span class="c1">// Synchronize the state</span>
     <span class="n">ret</span> <span class="o">=</span> <span class="n">timesync</span><span class="p">.</span><span class="n">call</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="n">t</span><span class="p">,</span> <span class="n">state</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">state</span><span class="p">);</span>
     <span class="k">if</span> <span class="p">(</span><span class="n">ret</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
       <span class="n">printf</span><span class="p">(</span><span class="s">&quot;timesync(C++): sync for t=%f failed.</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span> <span class="n">t</span><span class="p">);</span>
-      <span class="k">return</span> <span class="mi">-1</span><span class="p">;</span>
+      <span class="k">return</span> <span class="o">-</span><span class="mi">1</span><span class="p">;</span>
     <span class="p">}</span>
     <span class="n">printf</span><span class="p">(</span><span class="s">&quot;timesync(C++): t = %5.1f %-3s, x = %+ 5.2f, y = %+ 5.2f</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span>
 	   <span class="n">t</span><span class="p">,</span> <span class="n">t_units</span><span class="p">,</span> <span class="n">generic_map_get_double</span><span class="p">(</span><span class="n">state</span><span class="p">,</span> <span class="s">&quot;x&quot;</span><span class="p">),</span>
@@ -754,12 +754,12 @@
     <span class="n">ret</span> <span class="o">=</span> <span class="n">generic_map_set_double</span><span class="p">(</span><span class="n">msg</span><span class="p">,</span> <span class="s">&quot;time&quot;</span><span class="p">,</span> <span class="n">t</span><span class="p">,</span> <span class="n">t_units</span><span class="p">);</span>
     <span class="k">if</span> <span class="p">(</span><span class="n">ret</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
       <span class="n">printf</span><span class="p">(</span><span class="s">&quot;timesync(C++): Failed to set time in output map.</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">);</span>
-      <span class="k">return</span> <span class="mi">-1</span><span class="p">;</span>
+      <span class="k">return</span> <span class="o">-</span><span class="mi">1</span><span class="p">;</span>
     <span class="p">}</span>
     <span class="n">ret</span> <span class="o">=</span> <span class="n">out</span><span class="p">.</span><span class="n">send</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">msg</span><span class="p">);</span>
     <span class="k">if</span> <span class="p">(</span><span class="n">ret</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
       <span class="n">printf</span><span class="p">(</span><span class="s">&quot;timesync(C++): Failed to send output for t=%f.</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span> <span class="n">t</span><span class="p">);</span>
-      <span class="k">return</span> <span class="mi">-1</span><span class="p">;</span>
+      <span class="k">return</span> <span class="o">-</span><span class="mi">1</span><span class="p">;</span>
     <span class="p">}</span>
     <span class="n">destroy_generic</span><span class="p">(</span><span class="o">&amp;</span><span class="n">msg</span><span class="p">);</span>
   <span class="p">}</span>
@@ -772,35 +772,35 @@
 </pre></div>
 </td></tr></table></div>
 <p>Model YAML:</p>
-<div class="highlight-yaml notranslate"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span class="normal"> 1</span>
-<span class="normal"> 2</span>
-<span class="normal"> 3</span>
-<span class="normal"> 4</span>
-<span class="normal"> 5</span>
-<span class="normal"> 6</span>
-<span class="normal"> 7</span>
-<span class="normal"> 8</span>
-<span class="normal"> 9</span>
-<span class="normal">10</span>
-<span class="normal">11</span>
-<span class="normal">12</span>
-<span class="normal">13</span>
-<span class="normal">14</span>
-<span class="normal">15</span>
-<span class="normal">16</span>
-<span class="normal">17</span>
-<span class="normal">18</span>
-<span class="normal">19</span>
-<span class="normal">20</span>
-<span class="normal">21</span>
-<span class="normal">22</span>
-<span class="normal">23</span>
-<span class="normal">24</span>
-<span class="normal">25</span>
-<span class="normal">26</span>
-<span class="normal">27</span>
-<span class="normal">28</span>
-<span class="normal">29</span></pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="nn">---</span>
+<div class="highlight-yaml notranslate"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="nn">---</span>
 
 <span class="nt">models</span><span class="p">:</span>
   <span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">modelA</span>
@@ -835,141 +835,141 @@
 <div class="section" id="fortran-version">
 <h2>Fortran Version<a class="headerlink" href="#fortran-version" title="Permalink to this headline">¶</a></h2>
 <p>Model Code:</p>
-<div class="highlight-python notranslate"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span class="normal">  1</span>
-<span class="normal">  2</span>
-<span class="normal">  3</span>
-<span class="normal">  4</span>
-<span class="normal">  5</span>
-<span class="normal">  6</span>
-<span class="normal">  7</span>
-<span class="normal">  8</span>
-<span class="normal">  9</span>
-<span class="normal"> 10</span>
-<span class="normal"> 11</span>
-<span class="normal"> 12</span>
-<span class="normal"> 13</span>
-<span class="normal"> 14</span>
-<span class="normal"> 15</span>
-<span class="normal"> 16</span>
-<span class="normal"> 17</span>
-<span class="normal"> 18</span>
-<span class="normal"> 19</span>
-<span class="normal"> 20</span>
-<span class="normal"> 21</span>
-<span class="normal"> 22</span>
-<span class="normal"> 23</span>
-<span class="normal"> 24</span>
-<span class="normal"> 25</span>
-<span class="normal"> 26</span>
-<span class="normal"> 27</span>
-<span class="normal"> 28</span>
-<span class="normal"> 29</span>
-<span class="normal"> 30</span>
-<span class="normal"> 31</span>
-<span class="normal"> 32</span>
-<span class="normal"> 33</span>
-<span class="normal"> 34</span>
-<span class="normal"> 35</span>
-<span class="normal"> 36</span>
-<span class="normal"> 37</span>
-<span class="normal"> 38</span>
-<span class="normal"> 39</span>
-<span class="normal"> 40</span>
-<span class="normal"> 41</span>
-<span class="normal"> 42</span>
-<span class="normal"> 43</span>
-<span class="normal"> 44</span>
-<span class="normal"> 45</span>
-<span class="normal"> 46</span>
-<span class="normal"> 47</span>
-<span class="normal"> 48</span>
-<span class="normal"> 49</span>
-<span class="normal"> 50</span>
-<span class="normal"> 51</span>
-<span class="normal"> 52</span>
-<span class="normal"> 53</span>
-<span class="normal"> 54</span>
-<span class="normal"> 55</span>
-<span class="normal"> 56</span>
-<span class="normal"> 57</span>
-<span class="normal"> 58</span>
-<span class="normal"> 59</span>
-<span class="normal"> 60</span>
-<span class="normal"> 61</span>
-<span class="normal"> 62</span>
-<span class="normal"> 63</span>
-<span class="normal"> 64</span>
-<span class="normal"> 65</span>
-<span class="normal"> 66</span>
-<span class="normal"> 67</span>
-<span class="normal"> 68</span>
-<span class="normal"> 69</span>
-<span class="normal"> 70</span>
-<span class="normal"> 71</span>
-<span class="normal"> 72</span>
-<span class="normal"> 73</span>
-<span class="normal"> 74</span>
-<span class="normal"> 75</span>
-<span class="normal"> 76</span>
-<span class="normal"> 77</span>
-<span class="normal"> 78</span>
-<span class="normal"> 79</span>
-<span class="normal"> 80</span>
-<span class="normal"> 81</span>
-<span class="normal"> 82</span>
-<span class="normal"> 83</span>
-<span class="normal"> 84</span>
-<span class="normal"> 85</span>
-<span class="normal"> 86</span>
-<span class="normal"> 87</span>
-<span class="normal"> 88</span>
-<span class="normal"> 89</span>
-<span class="normal"> 90</span>
-<span class="normal"> 91</span>
-<span class="normal"> 92</span>
-<span class="normal"> 93</span>
-<span class="normal"> 94</span>
-<span class="normal"> 95</span>
-<span class="normal"> 96</span>
-<span class="normal"> 97</span>
-<span class="normal"> 98</span>
-<span class="normal"> 99</span>
-<span class="normal">100</span>
-<span class="normal">101</span>
-<span class="normal">102</span>
-<span class="normal">103</span>
-<span class="normal">104</span>
-<span class="normal">105</span>
-<span class="normal">106</span>
-<span class="normal">107</span>
-<span class="normal">108</span>
-<span class="normal">109</span>
-<span class="normal">110</span>
-<span class="normal">111</span>
-<span class="normal">112</span>
-<span class="normal">113</span>
-<span class="normal">114</span>
-<span class="normal">115</span>
-<span class="normal">116</span>
-<span class="normal">117</span>
-<span class="normal">118</span>
-<span class="normal">119</span>
-<span class="normal">120</span>
-<span class="normal">121</span>
-<span class="normal">122</span>
-<span class="normal">123</span>
-<span class="normal">124</span>
-<span class="normal">125</span>
-<span class="normal">126</span>
-<span class="normal">127</span>
-<span class="normal">128</span>
-<span class="normal">129</span>
-<span class="normal">130</span>
-<span class="normal">131</span>
-<span class="normal">132</span>
-<span class="normal">133</span>
-<span class="normal">134</span>
-<span class="normal">135</span></pre></div></td><td class="code"><div class="highlight"><pre><span></span>program main
+<div class="highlight-python notranslate"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>  1
+  2
+  3
+  4
+  5
+  6
+  7
+  8
+  9
+ 10
+ 11
+ 12
+ 13
+ 14
+ 15
+ 16
+ 17
+ 18
+ 19
+ 20
+ 21
+ 22
+ 23
+ 24
+ 25
+ 26
+ 27
+ 28
+ 29
+ 30
+ 31
+ 32
+ 33
+ 34
+ 35
+ 36
+ 37
+ 38
+ 39
+ 40
+ 41
+ 42
+ 43
+ 44
+ 45
+ 46
+ 47
+ 48
+ 49
+ 50
+ 51
+ 52
+ 53
+ 54
+ 55
+ 56
+ 57
+ 58
+ 59
+ 60
+ 61
+ 62
+ 63
+ 64
+ 65
+ 66
+ 67
+ 68
+ 69
+ 70
+ 71
+ 72
+ 73
+ 74
+ 75
+ 76
+ 77
+ 78
+ 79
+ 80
+ 81
+ 82
+ 83
+ 84
+ 85
+ 86
+ 87
+ 88
+ 89
+ 90
+ 91
+ 92
+ 93
+ 94
+ 95
+ 96
+ 97
+ 98
+ 99
+100
+101
+102
+103
+104
+105
+106
+107
+108
+109
+110
+111
+112
+113
+114
+115
+116
+117
+118
+119
+120
+121
+122
+123
+124
+125
+126
+127
+128
+129
+130
+131
+132
+133
+134
+135</pre></div></td><td class="code"><div class="highlight"><pre><span></span>program main
   use fygg
 
   ! Declare resulting variables and create buffer for received message
@@ -1107,35 +1107,35 @@ end function timestep_calc
 </pre></div>
 </td></tr></table></div>
 <p>Model YAML:</p>
-<div class="highlight-yaml notranslate"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span class="normal"> 1</span>
-<span class="normal"> 2</span>
-<span class="normal"> 3</span>
-<span class="normal"> 4</span>
-<span class="normal"> 5</span>
-<span class="normal"> 6</span>
-<span class="normal"> 7</span>
-<span class="normal"> 8</span>
-<span class="normal"> 9</span>
-<span class="normal">10</span>
-<span class="normal">11</span>
-<span class="normal">12</span>
-<span class="normal">13</span>
-<span class="normal">14</span>
-<span class="normal">15</span>
-<span class="normal">16</span>
-<span class="normal">17</span>
-<span class="normal">18</span>
-<span class="normal">19</span>
-<span class="normal">20</span>
-<span class="normal">21</span>
-<span class="normal">22</span>
-<span class="normal">23</span>
-<span class="normal">24</span>
-<span class="normal">25</span>
-<span class="normal">26</span>
-<span class="normal">27</span>
-<span class="normal">28</span>
-<span class="normal">29</span></pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="nn">---</span>
+<div class="highlight-yaml notranslate"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="nn">---</span>
 
 <span class="nt">models</span><span class="p">:</span>
   <span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">modelA</span>
@@ -1170,173 +1170,173 @@ end function timestep_calc
 <div class="section" id="matlab-version">
 <h2>Matlab Version<a class="headerlink" href="#matlab-version" title="Permalink to this headline">¶</a></h2>
 <p>Model Code:</p>
-<div class="highlight-matlab notranslate"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span class="normal"> 1</span>
-<span class="normal"> 2</span>
-<span class="normal"> 3</span>
-<span class="normal"> 4</span>
-<span class="normal"> 5</span>
-<span class="normal"> 6</span>
-<span class="normal"> 7</span>
-<span class="normal"> 8</span>
-<span class="normal"> 9</span>
-<span class="normal">10</span>
-<span class="normal">11</span>
-<span class="normal">12</span>
-<span class="normal">13</span>
-<span class="normal">14</span>
-<span class="normal">15</span>
-<span class="normal">16</span>
-<span class="normal">17</span>
-<span class="normal">18</span>
-<span class="normal">19</span>
-<span class="normal">20</span>
-<span class="normal">21</span>
-<span class="normal">22</span>
-<span class="normal">23</span>
-<span class="normal">24</span>
-<span class="normal">25</span>
-<span class="normal">26</span>
-<span class="normal">27</span>
-<span class="normal">28</span>
-<span class="normal">29</span>
-<span class="normal">30</span>
-<span class="normal">31</span>
-<span class="normal">32</span>
-<span class="normal">33</span>
-<span class="normal">34</span>
-<span class="normal">35</span>
-<span class="normal">36</span>
-<span class="normal">37</span>
-<span class="normal">38</span>
-<span class="normal">39</span>
-<span class="normal">40</span>
-<span class="normal">41</span>
-<span class="normal">42</span>
-<span class="normal">43</span>
-<span class="normal">44</span>
-<span class="normal">45</span>
-<span class="normal">46</span>
-<span class="normal">47</span>
-<span class="normal">48</span>
-<span class="normal">49</span>
-<span class="normal">50</span>
-<span class="normal">51</span>
-<span class="normal">52</span>
-<span class="normal">53</span>
-<span class="normal">54</span>
-<span class="normal">55</span>
-<span class="normal">56</span>
-<span class="normal">57</span>
-<span class="normal">58</span>
-<span class="normal">59</span>
-<span class="normal">60</span>
-<span class="normal">61</span>
-<span class="normal">62</span>
-<span class="normal">63</span>
-<span class="normal">64</span>
-<span class="normal">65</span>
-<span class="normal">66</span>
-<span class="normal">67</span></pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="k">function</span><span class="w"> </span><span class="nf">timesync</span><span class="p">(</span>t_step, t_units<span class="p">)</span><span class="w"></span>
+<div class="highlight-matlab notranslate"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41
+42
+43
+44
+45
+46
+47
+48
+49
+50
+51
+52
+53
+54
+55
+56
+57
+58
+59
+60
+61
+62
+63
+64
+65
+66
+67</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="k">function</span><span class="w"> </span><span class="nf">timesync</span><span class="p">(</span>t_step, t_units<span class="p">)</span><span class="w"></span>
 
-<span class="w">  </span><span class="n">t_step</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="nb">str2num</span><span class="p">(</span><span class="n">t_step</span><span class="p">);</span><span class="w"></span>
-<span class="w">  </span><span class="nb">fprintf</span><span class="p">(</span><span class="s">&#39;Hello from Matlab timesync: timestep = %f %s\n&#39;</span><span class="p">,</span><span class="w"> </span><span class="n">t_step</span><span class="p">,</span><span class="w"> </span><span class="n">t_units</span><span class="p">);</span><span class="w"></span>
-<span class="w">  </span><span class="n">t_step</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="n">t_step</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">str2symunit</span><span class="p">(</span><span class="n">t_units</span><span class="p">);</span><span class="w"></span>
-<span class="w">  </span><span class="n">t_start</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="mf">0.0000000000000001</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">str2symunit</span><span class="p">(</span><span class="n">t_units</span><span class="p">);</span><span class="w"></span>
-<span class="w">  </span><span class="n">t_end</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="mf">5.0</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">str2symunit</span><span class="p">(</span><span class="s">&#39;day&#39;</span><span class="p">);</span><span class="w"></span>
-<span class="w">  </span><span class="n">state</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="nb">containers.Map</span><span class="p">(</span><span class="s">&#39;UniformValues&#39;</span><span class="p">,</span><span class="w"> </span><span class="nb">false</span><span class="p">,</span><span class="w"> </span><span class="s">&#39;ValueType&#39;</span><span class="p">,</span><span class="w"> </span><span class="s">&#39;any&#39;</span><span class="p">);</span><span class="w"></span>
-<span class="w">  </span><span class="n">state</span><span class="p">(</span><span class="s">&#39;x&#39;</span><span class="p">)</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="nb">sin</span><span class="p">(</span><span class="mf">2.0</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="nb">pi</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">t_start</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="p">(</span><span class="mf">10.0</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">str2symunit</span><span class="p">(</span><span class="s">&#39;day&#39;</span><span class="p">)));</span><span class="w"></span>
-<span class="w">  </span><span class="n">state</span><span class="p">(</span><span class="s">&#39;y&#39;</span><span class="p">)</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="nb">cos</span><span class="p">(</span><span class="mf">2.0</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="nb">pi</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">t_start</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="p">(</span><span class="mf">5.0</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">str2symunit</span><span class="p">(</span><span class="s">&#39;day&#39;</span><span class="p">)));</span><span class="w"></span>
+<span class="w">  </span><span class="n">t_step</span> <span class="p">=</span> <span class="n">str2num</span><span class="p">(</span><span class="n">t_step</span><span class="p">);</span>
+  <span class="n">fprintf</span><span class="p">(</span><span class="s">&#39;Hello from Matlab timesync: timestep = %f %s\n&#39;</span><span class="p">,</span> <span class="n">t_step</span><span class="p">,</span> <span class="n">t_units</span><span class="p">);</span>
+  <span class="n">t_step</span> <span class="p">=</span> <span class="n">t_step</span> <span class="o">*</span> <span class="n">str2symunit</span><span class="p">(</span><span class="n">t_units</span><span class="p">);</span>
+  <span class="n">t_start</span> <span class="p">=</span> <span class="mf">0.0000000000000001</span> <span class="o">*</span> <span class="n">str2symunit</span><span class="p">(</span><span class="n">t_units</span><span class="p">);</span>
+  <span class="n">t_end</span> <span class="p">=</span> <span class="mf">5.0</span> <span class="o">*</span> <span class="n">str2symunit</span><span class="p">(</span><span class="s">&#39;day&#39;</span><span class="p">);</span>
+  <span class="n">state</span> <span class="p">=</span> <span class="n">containers</span><span class="p">.</span><span class="n">Map</span><span class="p">(</span><span class="s">&#39;UniformValues&#39;</span><span class="p">,</span> <span class="n">false</span><span class="p">,</span> <span class="s">&#39;ValueType&#39;</span><span class="p">,</span> <span class="s">&#39;any&#39;</span><span class="p">);</span>
+  <span class="n">state</span><span class="p">(</span><span class="s">&#39;x&#39;</span><span class="p">)</span> <span class="p">=</span> <span class="nb">sin</span><span class="p">(</span><span class="mf">2.0</span> <span class="o">*</span> <span class="nb">pi</span> <span class="o">*</span> <span class="n">t_start</span> <span class="o">/</span> <span class="p">(</span><span class="mf">10.0</span> <span class="o">*</span> <span class="n">str2symunit</span><span class="p">(</span><span class="s">&#39;day&#39;</span><span class="p">)));</span>
+  <span class="n">state</span><span class="p">(</span><span class="s">&#39;y&#39;</span><span class="p">)</span> <span class="p">=</span> <span class="nb">cos</span><span class="p">(</span><span class="mf">2.0</span> <span class="o">*</span> <span class="nb">pi</span> <span class="o">*</span> <span class="n">t_start</span> <span class="o">/</span> <span class="p">(</span><span class="mf">5.0</span> <span class="o">*</span> <span class="n">str2symunit</span><span class="p">(</span><span class="s">&#39;day&#39;</span><span class="p">)));</span>
 
-<span class="w">  </span><span class="c">% Set up connections matching yaml</span><span class="w"></span>
-<span class="w">  </span><span class="c">% Timestep synchonization connection will default to &#39;timesync&#39;</span><span class="w"></span>
-<span class="w">  </span><span class="n">timesync</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="n">YggInterface</span><span class="p">(</span><span class="s">&#39;YggTimesync&#39;</span><span class="p">,</span><span class="w"> </span><span class="s">&#39;timesync&#39;</span><span class="p">);</span><span class="w"></span>
-<span class="w">  </span><span class="n">out</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="n">YggInterface</span><span class="p">(</span><span class="s">&#39;YggOutput&#39;</span><span class="p">,</span><span class="w"> </span><span class="s">&#39;output&#39;</span><span class="p">);</span><span class="w"></span>
+  <span class="c">% Set up connections matching yaml</span>
+  <span class="c">% Timestep synchonization connection will default to &#39;timesync&#39;</span>
+  <span class="n">timesync</span> <span class="p">=</span> <span class="n">YggInterface</span><span class="p">(</span><span class="s">&#39;YggTimesync&#39;</span><span class="p">,</span> <span class="s">&#39;timesync&#39;</span><span class="p">);</span>
+  <span class="n">out</span> <span class="p">=</span> <span class="n">YggInterface</span><span class="p">(</span><span class="s">&#39;YggOutput&#39;</span><span class="p">,</span> <span class="s">&#39;output&#39;</span><span class="p">);</span>
 
-<span class="w">  </span><span class="c">% Initialize state and synchronize with other models</span><span class="w"></span>
-<span class="w">  </span><span class="n">t</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="n">t_start</span><span class="p">;</span><span class="w"></span>
-<span class="w">  </span><span class="p">[</span><span class="n">ret</span><span class="p">,</span><span class="w"> </span><span class="n">state</span><span class="p">]</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="n">timesync</span><span class="p">.</span><span class="n">call</span><span class="p">(</span><span class="n">t</span><span class="p">,</span><span class="w"> </span><span class="n">state</span><span class="p">);</span><span class="w"></span>
-<span class="w">  </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="o">~</span><span class="n">ret</span><span class="p">);</span><span class="w"></span>
-<span class="w">    </span><span class="nb">error</span><span class="p">(</span><span class="s">&#39;timesync(Matlab): Initial sync failed.&#39;</span><span class="p">);</span><span class="w"></span>
-<span class="w">  </span><span class="k">end</span><span class="p">;</span><span class="w"></span>
-<span class="w">  </span><span class="p">[</span><span class="n">t_data</span><span class="p">,</span><span class="w"> </span><span class="n">t_unit</span><span class="p">]</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="n">separateUnits</span><span class="p">(</span><span class="n">t</span><span class="p">);</span><span class="w"></span>
-<span class="w">  </span><span class="nb">fprintf</span><span class="p">(</span><span class="s">&#39;timesync(Matlab): t = %5.1f %-1s, x = %+ 5.2f, y = %+ 5.2f\n&#39;</span><span class="p">,</span><span class="w"> </span><span class="k">...</span><span class="w"></span>
-<span class="w">	  </span><span class="n">t_data</span><span class="p">,</span><span class="w"> </span><span class="n">symunit2str</span><span class="p">(</span><span class="n">t_unit</span><span class="p">),</span><span class="w"> </span><span class="n">state</span><span class="p">(</span><span class="s">&#39;x&#39;</span><span class="p">),</span><span class="w"> </span><span class="n">state</span><span class="p">(</span><span class="s">&#39;y&#39;</span><span class="p">));</span><span class="w"></span>
+  <span class="c">% Initialize state and synchronize with other models</span>
+  <span class="n">t</span> <span class="p">=</span> <span class="n">t_start</span><span class="p">;</span>
+  <span class="p">[</span><span class="n">ret</span><span class="p">,</span> <span class="n">state</span><span class="p">]</span> <span class="p">=</span> <span class="n">timesync</span><span class="p">.</span><span class="n">call</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">state</span><span class="p">);</span>
+  <span class="k">if</span> <span class="p">(</span><span class="o">~</span><span class="n">ret</span><span class="p">);</span>
+    <span class="n">error</span><span class="p">(</span><span class="s">&#39;timesync(Matlab): Initial sync failed.&#39;</span><span class="p">);</span>
+  <span class="k">end</span><span class="p">;</span>
+  <span class="p">[</span><span class="n">t_data</span><span class="p">,</span> <span class="n">t_unit</span><span class="p">]</span> <span class="p">=</span> <span class="n">separateUnits</span><span class="p">(</span><span class="n">t</span><span class="p">);</span>
+  <span class="n">fprintf</span><span class="p">(</span><span class="s">&#39;timesync(Matlab): t = %5.1f %-1s, x = %+ 5.2f, y = %+ 5.2f\n&#39;</span><span class="p">,</span> <span class="c">...</span>
+	  <span class="n">t_data</span><span class="p">,</span> <span class="n">symunit2str</span><span class="p">(</span><span class="n">t_unit</span><span class="p">),</span> <span class="n">state</span><span class="p">(</span><span class="s">&#39;x&#39;</span><span class="p">),</span> <span class="n">state</span><span class="p">(</span><span class="s">&#39;y&#39;</span><span class="p">));</span>
 
-<span class="w">  </span><span class="c">% Send initial state to output</span><span class="w"></span>
-<span class="w">  </span><span class="n">msg_keys</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="nb">keys</span><span class="p">(</span><span class="n">state</span><span class="p">);</span><span class="w"></span>
-<span class="w">  </span><span class="n">msg_keys</span><span class="p">{</span><span class="nb">length</span><span class="p">(</span><span class="n">msg_keys</span><span class="p">)</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">1</span><span class="p">}</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="s">&#39;time&#39;</span><span class="p">;</span><span class="w"></span>
-<span class="w">  </span><span class="n">msg_vals</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="nb">values</span><span class="p">(</span><span class="n">state</span><span class="p">);</span><span class="w"></span>
-<span class="w">  </span><span class="n">msg_vals</span><span class="p">{</span><span class="nb">length</span><span class="p">(</span><span class="n">msg_vals</span><span class="p">)</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">1</span><span class="p">}</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="n">t</span><span class="p">;</span><span class="w"></span>
-<span class="w">  </span><span class="n">msg</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="nb">containers.Map</span><span class="p">(</span><span class="n">msg_keys</span><span class="p">,</span><span class="w"> </span><span class="n">msg_vals</span><span class="p">,</span><span class="w"> </span><span class="s">&#39;UniformValues&#39;</span><span class="p">,</span><span class="w"> </span><span class="nb">false</span><span class="p">);</span><span class="w"></span>
-<span class="w">  </span><span class="nb">flag</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="n">out</span><span class="p">.</span><span class="n">send</span><span class="p">(</span><span class="n">msg</span><span class="p">);</span><span class="w"></span>
+  <span class="c">% Send initial state to output</span>
+  <span class="n">msg_keys</span> <span class="p">=</span> <span class="n">keys</span><span class="p">(</span><span class="n">state</span><span class="p">);</span>
+  <span class="n">msg_keys</span><span class="p">{</span><span class="nb">length</span><span class="p">(</span><span class="n">msg_keys</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span><span class="p">}</span> <span class="p">=</span> <span class="s">&#39;time&#39;</span><span class="p">;</span>
+  <span class="n">msg_vals</span> <span class="p">=</span> <span class="n">values</span><span class="p">(</span><span class="n">state</span><span class="p">);</span>
+  <span class="n">msg_vals</span><span class="p">{</span><span class="nb">length</span><span class="p">(</span><span class="n">msg_vals</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span><span class="p">}</span> <span class="p">=</span> <span class="n">t</span><span class="p">;</span>
+  <span class="n">msg</span> <span class="p">=</span> <span class="n">containers</span><span class="p">.</span><span class="n">Map</span><span class="p">(</span><span class="n">msg_keys</span><span class="p">,</span> <span class="n">msg_vals</span><span class="p">,</span> <span class="s">&#39;UniformValues&#39;</span><span class="p">,</span> <span class="n">false</span><span class="p">);</span>
+  <span class="n">flag</span> <span class="p">=</span> <span class="n">out</span><span class="p">.</span><span class="n">send</span><span class="p">(</span><span class="n">msg</span><span class="p">);</span>
 
-<span class="w">  </span><span class="c">% Iterate until end</span><span class="w"></span>
-<span class="w">  </span><span class="k">while</span><span class="w"> </span><span class="p">(</span><span class="nb">simplify</span><span class="p">(</span><span class="n">t</span><span class="o">/</span><span class="n">t_end</span><span class="p">)</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="mi">1</span><span class="p">)</span><span class="w"></span>
+  <span class="c">% Iterate until end</span>
+  <span class="k">while</span> <span class="p">(</span><span class="n">simplify</span><span class="p">(</span><span class="n">t</span><span class="o">/</span><span class="n">t_end</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">1</span><span class="p">)</span>
 
-<span class="w">    </span><span class="c">% Perform calculations to update the state</span><span class="w"></span>
-<span class="w">    </span><span class="n">t</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="n">t</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">t_step</span><span class="p">;</span><span class="w"></span>
-<span class="w">    </span><span class="n">state</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="nb">containers.Map</span><span class="p">(</span><span class="s">&#39;UniformValues&#39;</span><span class="p">,</span><span class="w"> </span><span class="nb">false</span><span class="p">,</span><span class="w"> </span><span class="s">&#39;ValueType&#39;</span><span class="p">,</span><span class="w"> </span><span class="s">&#39;any&#39;</span><span class="p">);</span><span class="w"></span>
-<span class="w">    </span><span class="n">state</span><span class="p">(</span><span class="s">&#39;x&#39;</span><span class="p">)</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="nb">sin</span><span class="p">(</span><span class="mf">2.0</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="nb">pi</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">t</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="p">(</span><span class="mf">10.0</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">str2symunit</span><span class="p">(</span><span class="s">&#39;day&#39;</span><span class="p">)));</span><span class="w"></span>
-<span class="w">    </span><span class="n">state</span><span class="p">(</span><span class="s">&#39;y&#39;</span><span class="p">)</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="nb">cos</span><span class="p">(</span><span class="mf">2.0</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="nb">pi</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">t</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="p">(</span><span class="mf">5.0</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">str2symunit</span><span class="p">(</span><span class="s">&#39;day&#39;</span><span class="p">)));</span><span class="w"></span>
+    <span class="c">% Perform calculations to update the state</span>
+    <span class="n">t</span> <span class="p">=</span> <span class="n">t</span> <span class="o">+</span> <span class="n">t_step</span><span class="p">;</span>
+    <span class="n">state</span> <span class="p">=</span> <span class="n">containers</span><span class="p">.</span><span class="n">Map</span><span class="p">(</span><span class="s">&#39;UniformValues&#39;</span><span class="p">,</span> <span class="n">false</span><span class="p">,</span> <span class="s">&#39;ValueType&#39;</span><span class="p">,</span> <span class="s">&#39;any&#39;</span><span class="p">);</span>
+    <span class="n">state</span><span class="p">(</span><span class="s">&#39;x&#39;</span><span class="p">)</span> <span class="p">=</span> <span class="nb">sin</span><span class="p">(</span><span class="mf">2.0</span> <span class="o">*</span> <span class="nb">pi</span> <span class="o">*</span> <span class="n">t</span> <span class="o">/</span> <span class="p">(</span><span class="mf">10.0</span> <span class="o">*</span> <span class="n">str2symunit</span><span class="p">(</span><span class="s">&#39;day&#39;</span><span class="p">)));</span>
+    <span class="n">state</span><span class="p">(</span><span class="s">&#39;y&#39;</span><span class="p">)</span> <span class="p">=</span> <span class="nb">cos</span><span class="p">(</span><span class="mf">2.0</span> <span class="o">*</span> <span class="nb">pi</span> <span class="o">*</span> <span class="n">t</span> <span class="o">/</span> <span class="p">(</span><span class="mf">5.0</span> <span class="o">*</span> <span class="n">str2symunit</span><span class="p">(</span><span class="s">&#39;day&#39;</span><span class="p">)));</span>
 
-<span class="w">    </span><span class="c">% Synchronize the state</span><span class="w"></span>
-<span class="w">    </span><span class="p">[</span><span class="n">ret</span><span class="p">,</span><span class="w"> </span><span class="n">state</span><span class="p">]</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="n">timesync</span><span class="p">.</span><span class="n">call</span><span class="p">(</span><span class="n">t</span><span class="p">,</span><span class="w"> </span><span class="n">state</span><span class="p">);</span><span class="w"></span>
-<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="o">~</span><span class="n">ret</span><span class="p">);</span><span class="w"></span>
-<span class="w">      </span><span class="nb">error</span><span class="p">(</span><span class="nb">sprintf</span><span class="p">(</span><span class="s">&#39;timesync(Matlab): sync for t=%f failed.\n&#39;</span><span class="p">,</span><span class="w"> </span><span class="n">t</span><span class="p">));</span><span class="w"></span>
-<span class="w">    </span><span class="k">end</span><span class="p">;</span><span class="w"></span>
-<span class="w">    </span><span class="p">[</span><span class="n">t_data</span><span class="p">,</span><span class="w"> </span><span class="n">t_unit</span><span class="p">]</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="n">separateUnits</span><span class="p">(</span><span class="n">t</span><span class="p">);</span><span class="w"></span>
-<span class="w">    </span><span class="nb">fprintf</span><span class="p">(</span><span class="s">&#39;timesync(Matlab): t = %5.1f %-1s, x = %+ 5.2f, y = %+ 5.2f\n&#39;</span><span class="p">,</span><span class="w"> </span><span class="k">...</span><span class="w"></span>
-<span class="w">  	    </span><span class="n">t_data</span><span class="p">,</span><span class="w"> </span><span class="n">symunit2str</span><span class="p">(</span><span class="n">t_unit</span><span class="p">),</span><span class="w"> </span><span class="n">state</span><span class="p">(</span><span class="s">&#39;x&#39;</span><span class="p">),</span><span class="w"> </span><span class="n">state</span><span class="p">(</span><span class="s">&#39;y&#39;</span><span class="p">));</span><span class="w"></span>
+    <span class="c">% Synchronize the state</span>
+    <span class="p">[</span><span class="n">ret</span><span class="p">,</span> <span class="n">state</span><span class="p">]</span> <span class="p">=</span> <span class="n">timesync</span><span class="p">.</span><span class="n">call</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">state</span><span class="p">);</span>
+    <span class="k">if</span> <span class="p">(</span><span class="o">~</span><span class="n">ret</span><span class="p">);</span>
+      <span class="n">error</span><span class="p">(</span><span class="n">sprintf</span><span class="p">(</span><span class="s">&#39;timesync(Matlab): sync for t=%f failed.\n&#39;</span><span class="p">,</span> <span class="n">t</span><span class="p">));</span>
+    <span class="k">end</span><span class="p">;</span>
+    <span class="p">[</span><span class="n">t_data</span><span class="p">,</span> <span class="n">t_unit</span><span class="p">]</span> <span class="p">=</span> <span class="n">separateUnits</span><span class="p">(</span><span class="n">t</span><span class="p">);</span>
+    <span class="n">fprintf</span><span class="p">(</span><span class="s">&#39;timesync(Matlab): t = %5.1f %-1s, x = %+ 5.2f, y = %+ 5.2f\n&#39;</span><span class="p">,</span> <span class="c">...</span>
+  	    <span class="n">t_data</span><span class="p">,</span> <span class="n">symunit2str</span><span class="p">(</span><span class="n">t_unit</span><span class="p">),</span> <span class="n">state</span><span class="p">(</span><span class="s">&#39;x&#39;</span><span class="p">),</span> <span class="n">state</span><span class="p">(</span><span class="s">&#39;y&#39;</span><span class="p">));</span>
 
-<span class="w">    </span><span class="c">% Send output</span><span class="w"></span>
-<span class="w">    </span><span class="n">msg_keys</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="nb">keys</span><span class="p">(</span><span class="n">state</span><span class="p">);</span><span class="w"></span>
-<span class="w">    </span><span class="n">msg_keys</span><span class="p">{</span><span class="nb">length</span><span class="p">(</span><span class="n">msg_keys</span><span class="p">)</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">1</span><span class="p">}</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="s">&#39;time&#39;</span><span class="p">;</span><span class="w"></span>
-<span class="w">    </span><span class="n">msg_vals</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="nb">values</span><span class="p">(</span><span class="n">state</span><span class="p">);</span><span class="w"></span>
-<span class="w">    </span><span class="n">msg_vals</span><span class="p">{</span><span class="nb">length</span><span class="p">(</span><span class="n">msg_vals</span><span class="p">)</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">1</span><span class="p">}</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="n">t</span><span class="p">;</span><span class="w"></span>
-<span class="w">    </span><span class="n">msg</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="nb">containers.Map</span><span class="p">(</span><span class="n">msg_keys</span><span class="p">,</span><span class="w"> </span><span class="n">msg_vals</span><span class="p">,</span><span class="w"> </span><span class="s">&#39;UniformValues&#39;</span><span class="p">,</span><span class="w"> </span><span class="nb">false</span><span class="p">);</span><span class="w"></span>
-<span class="w">    </span><span class="nb">flag</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="n">out</span><span class="p">.</span><span class="n">send</span><span class="p">(</span><span class="n">msg</span><span class="p">);</span><span class="w"></span>
-<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="o">~</span><span class="nb">flag</span><span class="p">);</span><span class="w"></span>
-<span class="w">      </span><span class="nb">error</span><span class="p">(</span><span class="nb">sprintf</span><span class="p">(</span><span class="s">&#39;timesync(Matlab): Failed to send output for t=%s.\n&#39;</span><span class="p">,</span><span class="w"> </span><span class="n">t</span><span class="p">));</span><span class="w"></span>
-<span class="w">    </span><span class="k">end</span><span class="p">;</span><span class="w"></span>
-<span class="w">  </span><span class="k">end</span><span class="p">;</span><span class="w"></span>
+    <span class="c">% Send output</span>
+    <span class="n">msg_keys</span> <span class="p">=</span> <span class="n">keys</span><span class="p">(</span><span class="n">state</span><span class="p">);</span>
+    <span class="n">msg_keys</span><span class="p">{</span><span class="nb">length</span><span class="p">(</span><span class="n">msg_keys</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span><span class="p">}</span> <span class="p">=</span> <span class="s">&#39;time&#39;</span><span class="p">;</span>
+    <span class="n">msg_vals</span> <span class="p">=</span> <span class="n">values</span><span class="p">(</span><span class="n">state</span><span class="p">);</span>
+    <span class="n">msg_vals</span><span class="p">{</span><span class="nb">length</span><span class="p">(</span><span class="n">msg_vals</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span><span class="p">}</span> <span class="p">=</span> <span class="n">t</span><span class="p">;</span>
+    <span class="n">msg</span> <span class="p">=</span> <span class="n">containers</span><span class="p">.</span><span class="n">Map</span><span class="p">(</span><span class="n">msg_keys</span><span class="p">,</span> <span class="n">msg_vals</span><span class="p">,</span> <span class="s">&#39;UniformValues&#39;</span><span class="p">,</span> <span class="n">false</span><span class="p">);</span>
+    <span class="n">flag</span> <span class="p">=</span> <span class="n">out</span><span class="p">.</span><span class="n">send</span><span class="p">(</span><span class="n">msg</span><span class="p">);</span>
+    <span class="k">if</span> <span class="p">(</span><span class="o">~</span><span class="n">flag</span><span class="p">);</span>
+      <span class="n">error</span><span class="p">(</span><span class="n">sprintf</span><span class="p">(</span><span class="s">&#39;timesync(Matlab): Failed to send output for t=%s.\n&#39;</span><span class="p">,</span> <span class="n">t</span><span class="p">));</span>
+    <span class="k">end</span><span class="p">;</span>
+  <span class="k">end</span><span class="p">;</span>
 
-<span class="w">  </span><span class="nb">disp</span><span class="p">(</span><span class="s">&#39;Goodbye from Matlab timesync&#39;</span><span class="p">);</span><span class="w"></span>
-<span class="w">  </span>
-<span class="k">end</span><span class="w"></span>
+  <span class="nb">disp</span><span class="p">(</span><span class="s">&#39;Goodbye from Matlab timesync&#39;</span><span class="p">);</span>
+  
+<span class="k">end</span>
 </pre></div>
 </td></tr></table></div>
 <p>Model YAML:</p>
-<div class="highlight-yaml notranslate"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span class="normal"> 1</span>
-<span class="normal"> 2</span>
-<span class="normal"> 3</span>
-<span class="normal"> 4</span>
-<span class="normal"> 5</span>
-<span class="normal"> 6</span>
-<span class="normal"> 7</span>
-<span class="normal"> 8</span>
-<span class="normal"> 9</span>
-<span class="normal">10</span>
-<span class="normal">11</span>
-<span class="normal">12</span>
-<span class="normal">13</span>
-<span class="normal">14</span>
-<span class="normal">15</span>
-<span class="normal">16</span>
-<span class="normal">17</span>
-<span class="normal">18</span>
-<span class="normal">19</span>
-<span class="normal">20</span>
-<span class="normal">21</span>
-<span class="normal">22</span>
-<span class="normal">23</span>
-<span class="normal">24</span>
-<span class="normal">25</span>
-<span class="normal">26</span>
-<span class="normal">27</span>
-<span class="normal">28</span>
-<span class="normal">29</span>
-<span class="normal">30</span>
-<span class="normal">31</span></pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="nn">---</span>
+<div class="highlight-yaml notranslate"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="nn">---</span>
 
 <span class="nt">models</span><span class="p">:</span>
   <span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">modelA</span>
@@ -1373,89 +1373,89 @@ end function timestep_calc
 <div class="section" id="python-version">
 <h2>Python Version<a class="headerlink" href="#python-version" title="Permalink to this headline">¶</a></h2>
 <p>Model Code:</p>
-<div class="highlight-python notranslate"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span class="normal"> 1</span>
-<span class="normal"> 2</span>
-<span class="normal"> 3</span>
-<span class="normal"> 4</span>
-<span class="normal"> 5</span>
-<span class="normal"> 6</span>
-<span class="normal"> 7</span>
-<span class="normal"> 8</span>
-<span class="normal"> 9</span>
-<span class="normal">10</span>
-<span class="normal">11</span>
-<span class="normal">12</span>
-<span class="normal">13</span>
-<span class="normal">14</span>
-<span class="normal">15</span>
-<span class="normal">16</span>
-<span class="normal">17</span>
-<span class="normal">18</span>
-<span class="normal">19</span>
-<span class="normal">20</span>
-<span class="normal">21</span>
-<span class="normal">22</span>
-<span class="normal">23</span>
-<span class="normal">24</span>
-<span class="normal">25</span>
-<span class="normal">26</span>
-<span class="normal">27</span>
-<span class="normal">28</span>
-<span class="normal">29</span>
-<span class="normal">30</span>
-<span class="normal">31</span>
-<span class="normal">32</span>
-<span class="normal">33</span>
-<span class="normal">34</span>
-<span class="normal">35</span>
-<span class="normal">36</span>
-<span class="normal">37</span>
-<span class="normal">38</span>
-<span class="normal">39</span>
-<span class="normal">40</span>
-<span class="normal">41</span>
-<span class="normal">42</span>
-<span class="normal">43</span>
-<span class="normal">44</span>
-<span class="normal">45</span>
-<span class="normal">46</span>
-<span class="normal">47</span>
-<span class="normal">48</span>
-<span class="normal">49</span>
-<span class="normal">50</span>
-<span class="normal">51</span>
-<span class="normal">52</span>
-<span class="normal">53</span>
-<span class="normal">54</span>
-<span class="normal">55</span>
-<span class="normal">56</span>
-<span class="normal">57</span>
-<span class="normal">58</span>
-<span class="normal">59</span>
-<span class="normal">60</span>
-<span class="normal">61</span>
-<span class="normal">62</span>
-<span class="normal">63</span>
-<span class="normal">64</span>
-<span class="normal">65</span>
-<span class="normal">66</span>
-<span class="normal">67</span>
-<span class="normal">68</span>
-<span class="normal">69</span>
-<span class="normal">70</span>
-<span class="normal">71</span>
-<span class="normal">72</span>
-<span class="normal">73</span>
-<span class="normal">74</span>
-<span class="normal">75</span>
-<span class="normal">76</span>
-<span class="normal">77</span>
-<span class="normal">78</span>
-<span class="normal">79</span>
-<span class="normal">80</span>
-<span class="normal">81</span>
-<span class="normal">82</span></pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">sys</span>
-<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<div class="highlight-python notranslate"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41
+42
+43
+44
+45
+46
+47
+48
+49
+50
+51
+52
+53
+54
+55
+56
+57
+58
+59
+60
+61
+62
+63
+64
+65
+66
+67
+68
+69
+70
+71
+72
+73
+74
+75
+76
+77
+78
+79
+80
+81
+82</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">sys</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
 <span class="kn">from</span> <span class="nn">yggdrasil</span> <span class="kn">import</span> <span class="n">units</span>
 <span class="kn">from</span> <span class="nn">yggdrasil.interface.YggInterface</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">YggTimesync</span><span class="p">,</span> <span class="n">YggOutput</span><span class="p">)</span>
@@ -1486,7 +1486,7 @@ end function timestep_calc
 <span class="sd">        t_units (str): Units of the time step.</span>
 
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Hello from Python timesync: timestep = </span><span class="si">%s</span><span class="s1"> </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">t_step</span><span class="p">,</span> <span class="n">t_units</span><span class="p">))</span>
+    <span class="k">print</span><span class="p">(</span><span class="s1">&#39;Hello from Python timesync: timestep = </span><span class="si">%s</span><span class="s1"> </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">t_step</span><span class="p">,</span> <span class="n">t_units</span><span class="p">))</span>
     <span class="n">t_step</span> <span class="o">=</span> <span class="n">units</span><span class="o">.</span><span class="n">add_units</span><span class="p">(</span><span class="n">t_step</span><span class="p">,</span> <span class="n">t_units</span><span class="p">)</span>
     <span class="n">t_start</span> <span class="o">=</span> <span class="n">units</span><span class="o">.</span><span class="n">add_units</span><span class="p">(</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">t_units</span><span class="p">)</span>
     <span class="n">t_end</span> <span class="o">=</span> <span class="n">units</span><span class="o">.</span><span class="n">add_units</span><span class="p">(</span><span class="mf">5.0</span><span class="p">,</span> <span class="s1">&#39;day&#39;</span><span class="p">)</span>
@@ -1502,7 +1502,7 @@ end function timestep_calc
     <span class="n">ret</span><span class="p">,</span> <span class="n">state</span> <span class="o">=</span> <span class="n">timesync</span><span class="o">.</span><span class="n">call</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">state</span><span class="p">)</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="n">ret</span><span class="p">:</span>
         <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">&quot;timesync(Python): Initial sync failed.&quot;</span><span class="p">)</span>
-    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;timesync(Python): t = </span><span class="si">% 8s</span><span class="s1">, x = </span><span class="si">%+ 5.2f</span><span class="s1">, y = </span><span class="si">%+ 5.2f</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span>
+    <span class="k">print</span><span class="p">(</span><span class="s1">&#39;timesync(Python): t = </span><span class="si">% 8s</span><span class="s1">, x = </span><span class="si">%+ 5.2f</span><span class="s1">, y = </span><span class="si">%+ 5.2f</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span>
         <span class="n">t</span><span class="p">,</span> <span class="n">state</span><span class="p">[</span><span class="s1">&#39;x&#39;</span><span class="p">],</span> <span class="n">state</span><span class="p">[</span><span class="s1">&#39;y&#39;</span><span class="p">]))</span>
 
     <span class="c1"># Send initial state to output</span>
@@ -1522,7 +1522,7 @@ end function timestep_calc
         <span class="n">ret</span><span class="p">,</span> <span class="n">state</span> <span class="o">=</span> <span class="n">timesync</span><span class="o">.</span><span class="n">call</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">state</span><span class="p">)</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">ret</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">&quot;timesync(Python): sync for t=</span><span class="si">%f</span><span class="s2"> failed.&quot;</span> <span class="o">%</span> <span class="n">t</span><span class="p">)</span>
-        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;timesync(Python): t = </span><span class="si">% 8s</span><span class="s1">, x = </span><span class="si">%+ 5.2f</span><span class="s1">, y = </span><span class="si">%+ 5.2f</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span>
+        <span class="k">print</span><span class="p">(</span><span class="s1">&#39;timesync(Python): t = </span><span class="si">% 8s</span><span class="s1">, x = </span><span class="si">%+ 5.2f</span><span class="s1">, y = </span><span class="si">%+ 5.2f</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span>
             <span class="n">t</span><span class="p">,</span> <span class="n">state</span><span class="p">[</span><span class="s1">&#39;x&#39;</span><span class="p">],</span> <span class="n">state</span><span class="p">[</span><span class="s1">&#39;y&#39;</span><span class="p">]))</span>
 
         <span class="c1"># Send output</span>
@@ -1530,7 +1530,7 @@ end function timestep_calc
         <span class="k">if</span> <span class="ow">not</span> <span class="n">flag</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">&quot;timesync(Python): Failed to send output for t=</span><span class="si">%s</span><span class="s2">.&quot;</span> <span class="o">%</span> <span class="n">t</span><span class="p">)</span>
 
-    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Goodbye from Python timesync&#39;</span><span class="p">)</span>
+    <span class="k">print</span><span class="p">(</span><span class="s1">&#39;Goodbye from Python timesync&#39;</span><span class="p">)</span>
 
 
 <span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s1">&#39;__main__&#39;</span><span class="p">:</span>
@@ -1539,35 +1539,35 @@ end function timestep_calc
 </pre></div>
 </td></tr></table></div>
 <p>Model YAML:</p>
-<div class="highlight-yaml notranslate"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span class="normal"> 1</span>
-<span class="normal"> 2</span>
-<span class="normal"> 3</span>
-<span class="normal"> 4</span>
-<span class="normal"> 5</span>
-<span class="normal"> 6</span>
-<span class="normal"> 7</span>
-<span class="normal"> 8</span>
-<span class="normal"> 9</span>
-<span class="normal">10</span>
-<span class="normal">11</span>
-<span class="normal">12</span>
-<span class="normal">13</span>
-<span class="normal">14</span>
-<span class="normal">15</span>
-<span class="normal">16</span>
-<span class="normal">17</span>
-<span class="normal">18</span>
-<span class="normal">19</span>
-<span class="normal">20</span>
-<span class="normal">21</span>
-<span class="normal">22</span>
-<span class="normal">23</span>
-<span class="normal">24</span>
-<span class="normal">25</span>
-<span class="normal">26</span>
-<span class="normal">27</span>
-<span class="normal">28</span>
-<span class="normal">29</span></pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="nn">---</span>
+<div class="highlight-yaml notranslate"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="nn">---</span>
 
 <span class="nt">models</span><span class="p">:</span>
   <span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">modelA</span>
@@ -1602,78 +1602,78 @@ end function timestep_calc
 <div class="section" id="r-version">
 <h2>R Version<a class="headerlink" href="#r-version" title="Permalink to this headline">¶</a></h2>
 <p>Model Code:</p>
-<div class="highlight-python notranslate"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span class="normal"> 1</span>
-<span class="normal"> 2</span>
-<span class="normal"> 3</span>
-<span class="normal"> 4</span>
-<span class="normal"> 5</span>
-<span class="normal"> 6</span>
-<span class="normal"> 7</span>
-<span class="normal"> 8</span>
-<span class="normal"> 9</span>
-<span class="normal">10</span>
-<span class="normal">11</span>
-<span class="normal">12</span>
-<span class="normal">13</span>
-<span class="normal">14</span>
-<span class="normal">15</span>
-<span class="normal">16</span>
-<span class="normal">17</span>
-<span class="normal">18</span>
-<span class="normal">19</span>
-<span class="normal">20</span>
-<span class="normal">21</span>
-<span class="normal">22</span>
-<span class="normal">23</span>
-<span class="normal">24</span>
-<span class="normal">25</span>
-<span class="normal">26</span>
-<span class="normal">27</span>
-<span class="normal">28</span>
-<span class="normal">29</span>
-<span class="normal">30</span>
-<span class="normal">31</span>
-<span class="normal">32</span>
-<span class="normal">33</span>
-<span class="normal">34</span>
-<span class="normal">35</span>
-<span class="normal">36</span>
-<span class="normal">37</span>
-<span class="normal">38</span>
-<span class="normal">39</span>
-<span class="normal">40</span>
-<span class="normal">41</span>
-<span class="normal">42</span>
-<span class="normal">43</span>
-<span class="normal">44</span>
-<span class="normal">45</span>
-<span class="normal">46</span>
-<span class="normal">47</span>
-<span class="normal">48</span>
-<span class="normal">49</span>
-<span class="normal">50</span>
-<span class="normal">51</span>
-<span class="normal">52</span>
-<span class="normal">53</span>
-<span class="normal">54</span>
-<span class="normal">55</span>
-<span class="normal">56</span>
-<span class="normal">57</span>
-<span class="normal">58</span>
-<span class="normal">59</span>
-<span class="normal">60</span>
-<span class="normal">61</span>
-<span class="normal">62</span>
-<span class="normal">63</span>
-<span class="normal">64</span>
-<span class="normal">65</span>
-<span class="normal">66</span>
-<span class="normal">67</span>
-<span class="normal">68</span>
-<span class="normal">69</span>
-<span class="normal">70</span>
-<span class="normal">71</span>
-<span class="normal">72</span></pre></div></td><td class="code"><div class="highlight"><pre><span></span>library(yggdrasil)
+<div class="highlight-python notranslate"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41
+42
+43
+44
+45
+46
+47
+48
+49
+50
+51
+52
+53
+54
+55
+56
+57
+58
+59
+60
+61
+62
+63
+64
+65
+66
+67
+68
+69
+70
+71
+72</pre></div></td><td class="code"><div class="highlight"><pre><span></span>library(yggdrasil)
 
 
 timestep_calc &lt;- function(t) {
@@ -1748,35 +1748,35 @@ main(as.double(args[[1]]), args[[2]])
 </pre></div>
 </td></tr></table></div>
 <p>Model YAML:</p>
-<div class="highlight-yaml notranslate"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span class="normal"> 1</span>
-<span class="normal"> 2</span>
-<span class="normal"> 3</span>
-<span class="normal"> 4</span>
-<span class="normal"> 5</span>
-<span class="normal"> 6</span>
-<span class="normal"> 7</span>
-<span class="normal"> 8</span>
-<span class="normal"> 9</span>
-<span class="normal">10</span>
-<span class="normal">11</span>
-<span class="normal">12</span>
-<span class="normal">13</span>
-<span class="normal">14</span>
-<span class="normal">15</span>
-<span class="normal">16</span>
-<span class="normal">17</span>
-<span class="normal">18</span>
-<span class="normal">19</span>
-<span class="normal">20</span>
-<span class="normal">21</span>
-<span class="normal">22</span>
-<span class="normal">23</span>
-<span class="normal">24</span>
-<span class="normal">25</span>
-<span class="normal">26</span>
-<span class="normal">27</span>
-<span class="normal">28</span>
-<span class="normal">29</span></pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="nn">---</span>
+<div class="highlight-yaml notranslate"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="nn">---</span>
 
 <span class="nt">models</span><span class="p">:</span>
   <span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">modelA</span>

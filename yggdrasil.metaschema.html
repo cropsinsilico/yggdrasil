@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>yggdrasil.metaschema package &mdash; yggdrasil v1.6.0 documentation</title>
+  <title>yggdrasil.metaschema package &mdash; yggdrasil v1.6.0+5.g622c9ac0 documentation</title>
   
 
   
@@ -282,12 +282,12 @@
 <span id="yggdrasil-metaschema-encoder-module"></span><h2>yggdrasil.metaschema.encoder module<a class="headerlink" href="#module-yggdrasil.metaschema.encoder" title="Permalink to this headline">¶</a></h2>
 <dl class="py class">
 <dt id="yggdrasil.metaschema.encoder.JSONDecoder">
-<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">yggdrasil.metaschema.encoder.</span></code><code class="sig-name descname"><span class="pre">JSONDecoder</span></code><a class="reference internal" href="_modules/yggdrasil/metaschema/encoder.html#JSONDecoder"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yggdrasil.metaschema.encoder.JSONDecoder" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">yggdrasil.metaschema.encoder.</code><code class="sig-name descname">JSONDecoder</code><a class="reference internal" href="_modules/yggdrasil/metaschema/encoder.html#JSONDecoder"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.metaschema.encoder.JSONDecoder" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">rapidjson.Decoder</span></code></p>
 <p>Decoder class for Ygg messages.</p>
 <dl class="py method">
 <dt id="yggdrasil.metaschema.encoder.JSONDecoder.string">
-<code class="sig-name descname"><span class="pre">string</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">s</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/metaschema/encoder.html#JSONDecoder.string"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yggdrasil.metaschema.encoder.JSONDecoder.string" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">string</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">s</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/metaschema/encoder.html#JSONDecoder.string"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.metaschema.encoder.JSONDecoder.string" title="Permalink to this definition">¶</a></dt>
 <dd><p>Try to parse string with class.</p>
 </dd></dl>
 
@@ -295,12 +295,12 @@
 
 <dl class="py class">
 <dt id="yggdrasil.metaschema.encoder.JSONEncoder">
-<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">yggdrasil.metaschema.encoder.</span></code><code class="sig-name descname"><span class="pre">JSONEncoder</span></code><a class="reference internal" href="_modules/yggdrasil/metaschema/encoder.html#JSONEncoder"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yggdrasil.metaschema.encoder.JSONEncoder" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">yggdrasil.metaschema.encoder.</code><code class="sig-name descname">JSONEncoder</code><a class="reference internal" href="_modules/yggdrasil/metaschema/encoder.html#JSONEncoder"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.metaschema.encoder.JSONEncoder" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">rapidjson.Encoder</span></code></p>
 <p>Encoder class for Ygg messages.</p>
 <dl class="py method">
 <dt id="yggdrasil.metaschema.encoder.JSONEncoder.default">
-<code class="sig-name descname"><span class="pre">default</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">o</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/metaschema/encoder.html#JSONEncoder.default"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yggdrasil.metaschema.encoder.JSONEncoder.default" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">default</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">o</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/metaschema/encoder.html#JSONEncoder.default"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.metaschema.encoder.JSONEncoder.default" title="Permalink to this definition">¶</a></dt>
 <dd><p>Encoder that allows for expansion types.</p>
 </dd></dl>
 
@@ -308,12 +308,12 @@
 
 <dl class="py class">
 <dt id="yggdrasil.metaschema.encoder.JSONReadableEncoder">
-<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">yggdrasil.metaschema.encoder.</span></code><code class="sig-name descname"><span class="pre">JSONReadableEncoder</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">skipkeys</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ensure_ascii</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">check_circular</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">allow_nan</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sort_keys</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">indent</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">separators</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">default</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/metaschema/encoder.html#JSONReadableEncoder"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yggdrasil.metaschema.encoder.JSONReadableEncoder" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">yggdrasil.metaschema.encoder.</code><code class="sig-name descname">JSONReadableEncoder</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">*</span></em>, <em class="sig-param"><span class="n">skipkeys</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">ensure_ascii</span><span class="o">=</span><span class="default_value">True</span></em>, <em class="sig-param"><span class="n">check_circular</span><span class="o">=</span><span class="default_value">True</span></em>, <em class="sig-param"><span class="n">allow_nan</span><span class="o">=</span><span class="default_value">True</span></em>, <em class="sig-param"><span class="n">sort_keys</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">indent</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">separators</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">default</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/metaschema/encoder.html#JSONReadableEncoder"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.metaschema.encoder.JSONReadableEncoder" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">json.encoder.JSONEncoder</span></code></p>
 <p>Encoder class for Ygg messages.</p>
 <dl class="py method">
 <dt id="yggdrasil.metaschema.encoder.JSONReadableEncoder.default">
-<code class="sig-name descname"><span class="pre">default</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">o</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/metaschema/encoder.html#JSONReadableEncoder.default"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yggdrasil.metaschema.encoder.JSONReadableEncoder.default" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">default</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">o</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/metaschema/encoder.html#JSONReadableEncoder.default"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.metaschema.encoder.JSONReadableEncoder.default" title="Permalink to this definition">¶</a></dt>
 <dd><p>Encoder that allows for expansion types.</p>
 </dd></dl>
 
@@ -321,7 +321,7 @@
 
 <dl class="py function">
 <dt id="yggdrasil.metaschema.encoder.decode_json">
-<code class="sig-prename descclassname"><span class="pre">yggdrasil.metaschema.encoder.</span></code><code class="sig-name descname"><span class="pre">decode_json</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">msg</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/metaschema/encoder.html#decode_json"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yggdrasil.metaschema.encoder.decode_json" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">yggdrasil.metaschema.encoder.</code><code class="sig-name descname">decode_json</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">msg</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/metaschema/encoder.html#decode_json"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.metaschema.encoder.decode_json" title="Permalink to this definition">¶</a></dt>
 <dd><p>Decode a Python object from a JSON serialization.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -341,7 +341,7 @@
 
 <dl class="py function">
 <dt id="yggdrasil.metaschema.encoder.decode_yaml">
-<code class="sig-prename descclassname"><span class="pre">yggdrasil.metaschema.encoder.</span></code><code class="sig-name descname"><span class="pre">decode_yaml</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">msg</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sorted_dict_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/metaschema/encoder.html#decode_yaml"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yggdrasil.metaschema.encoder.decode_yaml" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">yggdrasil.metaschema.encoder.</code><code class="sig-name descname">decode_yaml</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">msg</span></em>, <em class="sig-param"><span class="n">sorted_dict_type</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/metaschema/encoder.html#decode_yaml"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.metaschema.encoder.decode_yaml" title="Permalink to this definition">¶</a></dt>
 <dd><p>Decode a Python object from a YAML serialization.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -364,7 +364,7 @@ None and is ignored.</p></li>
 
 <dl class="py function">
 <dt id="yggdrasil.metaschema.encoder.encode_json">
-<code class="sig-prename descclassname"><span class="pre">yggdrasil.metaschema.encoder.</span></code><code class="sig-name descname"><span class="pre">encode_json</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">obj</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fd</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">indent</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sort_keys</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/metaschema/encoder.html#encode_json"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yggdrasil.metaschema.encoder.encode_json" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">yggdrasil.metaschema.encoder.</code><code class="sig-name descname">encode_json</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">obj</span></em>, <em class="sig-param"><span class="n">fd</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">indent</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">sort_keys</span><span class="o">=</span><span class="default_value">True</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/metaschema/encoder.html#encode_json"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.metaschema.encoder.encode_json" title="Permalink to this definition">¶</a></dt>
 <dd><p>Encode a Python object in JSON format.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -390,7 +390,7 @@ order. Defaults to True.</p></li>
 
 <dl class="py function">
 <dt id="yggdrasil.metaschema.encoder.encode_yaml">
-<code class="sig-prename descclassname"><span class="pre">yggdrasil.metaschema.encoder.</span></code><code class="sig-name descname"><span class="pre">encode_yaml</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">obj</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fd</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">indent</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sorted_dict_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/metaschema/encoder.html#encode_yaml"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yggdrasil.metaschema.encoder.encode_yaml" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">yggdrasil.metaschema.encoder.</code><code class="sig-name descname">encode_yaml</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">obj</span></em>, <em class="sig-param"><span class="n">fd</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">indent</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">sorted_dict_type</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/metaschema/encoder.html#encode_yaml"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.metaschema.encoder.encode_yaml" title="Permalink to this definition">¶</a></dt>
 <dd><p>Encode a Python object in YAML format.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -414,7 +414,7 @@ string. Defaults to None.</p></li>
 
 <dl class="py function">
 <dt id="yggdrasil.metaschema.encoder.indent_char2int">
-<code class="sig-prename descclassname"><span class="pre">yggdrasil.metaschema.encoder.</span></code><code class="sig-name descname"><span class="pre">indent_char2int</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">indent</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/metaschema/encoder.html#indent_char2int"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yggdrasil.metaschema.encoder.indent_char2int" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">yggdrasil.metaschema.encoder.</code><code class="sig-name descname">indent_char2int</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">indent</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/metaschema/encoder.html#indent_char2int"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.metaschema.encoder.indent_char2int" title="Permalink to this definition">¶</a></dt>
 <dd><p>Convert a character indent into a number of spaces that should be used.
 Tabs are set to be equivalent to 4 spaces.</p>
 <dl class="field-list simple">
@@ -432,7 +432,7 @@ Tabs are set to be equivalent to 4 spaces.</p>
 
 <dl class="py function">
 <dt id="yggdrasil.metaschema.encoder.string2import">
-<code class="sig-prename descclassname"><span class="pre">yggdrasil.metaschema.encoder.</span></code><code class="sig-name descname"><span class="pre">string2import</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">s</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/metaschema/encoder.html#string2import"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yggdrasil.metaschema.encoder.string2import" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">yggdrasil.metaschema.encoder.</code><code class="sig-name descname">string2import</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">s</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/metaschema/encoder.html#string2import"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.metaschema.encoder.string2import" title="Permalink to this definition">¶</a></dt>
 <dd><p>Import a function/class based on its representation as a string.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -457,21 +457,21 @@ importable class or function.</p>
 <span id="yggdrasil-metaschema-normalizer-module"></span><h2>yggdrasil.metaschema.normalizer module<a class="headerlink" href="#module-yggdrasil.metaschema.normalizer" title="Permalink to this headline">¶</a></h2>
 <dl class="py class">
 <dt id="yggdrasil.metaschema.normalizer.UndefinedProperty">
-<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">yggdrasil.metaschema.normalizer.</span></code><code class="sig-name descname"><span class="pre">UndefinedProperty</span></code><a class="reference internal" href="_modules/yggdrasil/metaschema/normalizer.html#UndefinedProperty"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yggdrasil.metaschema.normalizer.UndefinedProperty" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">yggdrasil.metaschema.normalizer.</code><code class="sig-name descname">UndefinedProperty</code><a class="reference internal" href="_modules/yggdrasil/metaschema/normalizer.html#UndefinedProperty"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.metaschema.normalizer.UndefinedProperty" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
 <p>Class to be used as a flag for undefined properties.</p>
 </dd></dl>
 
 <dl class="py class">
 <dt id="yggdrasil.metaschema.normalizer.UninitializedNormalized">
-<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">yggdrasil.metaschema.normalizer.</span></code><code class="sig-name descname"><span class="pre">UninitializedNormalized</span></code><a class="reference internal" href="_modules/yggdrasil/metaschema/normalizer.html#UninitializedNormalized"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yggdrasil.metaschema.normalizer.UninitializedNormalized" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">yggdrasil.metaschema.normalizer.</code><code class="sig-name descname">UninitializedNormalized</code><a class="reference internal" href="_modules/yggdrasil/metaschema/normalizer.html#UninitializedNormalized"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.metaschema.normalizer.UninitializedNormalized" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
 <p>Class to be used as a flag for uninitialized normalized value.</p>
 </dd></dl>
 
 <dl class="py function">
 <dt id="yggdrasil.metaschema.normalizer.create">
-<code class="sig-prename descclassname"><span class="pre">yggdrasil.metaschema.normalizer.</span></code><code class="sig-name descname"><span class="pre">create</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/metaschema/normalizer.html#create"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yggdrasil.metaschema.normalizer.create" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">yggdrasil.metaschema.normalizer.</code><code class="sig-name descname">create</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">*</span><span class="n">args</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/metaschema/normalizer.html#create"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.metaschema.normalizer.create" title="Permalink to this definition">¶</a></dt>
 <dd><p>Dynamically create a validation/normalization class that subclasses
 the jsonschema validation class.</p>
 <dl class="field-list simple">
@@ -498,7 +498,7 @@ jsonschema.validators.create.</p></li>
 <span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-yggdrasil.metaschema" title="Permalink to this headline">¶</a></h2>
 <dl class="py function">
 <dt id="yggdrasil.metaschema.create_metaschema">
-<code class="sig-prename descclassname"><span class="pre">yggdrasil.metaschema.</span></code><code class="sig-name descname"><span class="pre">create_metaschema</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">overwrite</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/metaschema.html#create_metaschema"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yggdrasil.metaschema.create_metaschema" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">yggdrasil.metaschema.</code><code class="sig-name descname">create_metaschema</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">overwrite</span><span class="o">=</span><span class="default_value">False</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/metaschema.html#create_metaschema"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.metaschema.create_metaschema" title="Permalink to this definition">¶</a></dt>
 <dd><p>Create the meta schema for validating ygg schema.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -525,7 +525,7 @@ property definitions.</p>
 
 <dl class="py function">
 <dt id="yggdrasil.metaschema.get_metaschema">
-<code class="sig-prename descclassname"><span class="pre">yggdrasil.metaschema.</span></code><code class="sig-name descname"><span class="pre">get_metaschema</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/metaschema.html#get_metaschema"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yggdrasil.metaschema.get_metaschema" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">yggdrasil.metaschema.</code><code class="sig-name descname">get_metaschema</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/metaschema.html#get_metaschema"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.metaschema.get_metaschema" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return the meta schema for validating ygg schema.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Returns</dt>
@@ -550,7 +550,7 @@ all of the necessary modules have been loaded.</p>
 
 <dl class="py function">
 <dt id="yggdrasil.metaschema.get_validator">
-<code class="sig-prename descclassname"><span class="pre">yggdrasil.metaschema.</span></code><code class="sig-name descname"><span class="pre">get_validator</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">overwrite</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">normalizers</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/metaschema.html#get_validator"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yggdrasil.metaschema.get_validator" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">yggdrasil.metaschema.</code><code class="sig-name descname">get_validator</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">overwrite</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">normalizers</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/metaschema.html#get_validator"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.metaschema.get_validator" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return the validator that includes ygg expansion types.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -572,7 +572,7 @@ overwritten. Defaults to False.</p></li>
 
 <dl class="py function">
 <dt id="yggdrasil.metaschema.normalize_instance">
-<code class="sig-prename descclassname"><span class="pre">yggdrasil.metaschema.</span></code><code class="sig-name descname"><span class="pre">normalize_instance</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">obj</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">schema</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/metaschema.html#normalize_instance"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yggdrasil.metaschema.normalize_instance" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">yggdrasil.metaschema.</code><code class="sig-name descname">normalize_instance</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">obj</span></em>, <em class="sig-param"><span class="n">schema</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/metaschema.html#normalize_instance"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.metaschema.normalize_instance" title="Permalink to this definition">¶</a></dt>
 <dd><p>Normalize an object using the provided schema.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -593,7 +593,7 @@ overwritten. Defaults to False.</p></li>
 
 <dl class="py function">
 <dt id="yggdrasil.metaschema.validate_instance">
-<code class="sig-prename descclassname"><span class="pre">yggdrasil.metaschema.</span></code><code class="sig-name descname"><span class="pre">validate_instance</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">obj</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">schema</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/metaschema.html#validate_instance"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yggdrasil.metaschema.validate_instance" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">yggdrasil.metaschema.</code><code class="sig-name descname">validate_instance</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">obj</span></em>, <em class="sig-param"><span class="n">schema</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/metaschema.html#validate_instance"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.metaschema.validate_instance" title="Permalink to this definition">¶</a></dt>
 <dd><p>Validate an instance against a schema.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -611,7 +611,7 @@ overwritten. Defaults to False.</p></li>
 
 <dl class="py function">
 <dt id="yggdrasil.metaschema.validate_schema">
-<code class="sig-prename descclassname"><span class="pre">yggdrasil.metaschema.</span></code><code class="sig-name descname"><span class="pre">validate_schema</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">obj</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/metaschema.html#validate_schema"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yggdrasil.metaschema.validate_schema" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">yggdrasil.metaschema.</code><code class="sig-name descname">validate_schema</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">obj</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/metaschema.html#validate_schema"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.metaschema.validate_schema" title="Permalink to this definition">¶</a></dt>
 <dd><p>Validate a schema against the metaschema.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
