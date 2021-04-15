@@ -1,4 +1,5 @@
 from yggdrasil.drivers.ConnectionDriver import ConnectionDriver, run_remotely
+from yggdrasil.drivers.RPCResponseDriver import RPCResponseDriver
 from yggdrasil.communication import CommBase
 
 
@@ -17,7 +18,7 @@ class RPCRequestDriver(ConnectionDriver):
 
     _connection_type = 'rpc_request'
 
-    def __init__(self, model_request_name, **kwargs):
+    def __init__(self, model_request_name, response_kwargs=None, **kwargs):
         # Input communicator
         inputs = kwargs.get('inputs', [{}])
         # inputs[0]['name'] = model_request_name + '.client_model_request'
@@ -28,6 +29,9 @@ class RPCRequestDriver(ConnectionDriver):
         outputs[0]['is_client'] = True
         outputs[0]['close_on_eof_send'] = False
         kwargs['outputs'] = outputs
+        if response_kwargs is None:
+            response_kwargs = {}
+        self.response_kwargs = response_kwargs
         # Parent and attributes
         super(RPCRequestDriver, self).__init__(model_request_name, **kwargs)
         self.response_kwargs.setdefault('commtype', self.ocomm._commtype)
@@ -149,7 +153,8 @@ class RPCRequestDriver(ConnectionDriver):
         self.ocomm._send_serializer = True
 
     def send_message(self, msg, **kwargs):
-        r"""Move response arguments to new header.
+        r"""Start a response driver for a request message and send message with
+        header.
 
         Args:
             msg (CommMessage): Message being sent.
@@ -161,6 +166,7 @@ class RPCRequestDriver(ConnectionDriver):
         """
         if self.ocomm.is_closed:
             return False
+        # Start response driver
         if msg.flag != CommBase.FLAG_EOF:
             with self.lock:
                 if (not self.is_comm_open) or self._block_response:  # pragma: debug
@@ -195,7 +201,7 @@ class RPCRequestDriver(ConnectionDriver):
             # Send response address in header
             kwargs.setdefault('header_kwargs', {})
             kwargs['header_kwargs'].setdefault(
-                'response_address', msg.header['response_address'])
+                'response_address', response_driver.response_address)
             kwargs['header_kwargs'].setdefault('request_id', msg.header['request_id'])
             kwargs['header_kwargs'].setdefault('model', msg.header.get('model', ''))
         return super(RPCRequestDriver, self).send_message(msg, **kwargs)
