@@ -1705,10 +1705,10 @@ definitions:
             is used.
           type: string
       required:
-      - language
       - name
-      - args
       - working_dir
+      - language
+      - args
       title: model_base
       type: object
     - anyOf:
