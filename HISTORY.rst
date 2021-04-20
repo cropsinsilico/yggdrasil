@@ -11,6 +11,7 @@ X.X.X (XXXX-XX-XX)
 * Added C, C++, Fortran, Matlab, R versions of server in rpc_lesson3 example
 * Added C, C++, Fortran, Matlab, R versions of server in rpc_lesson3b example (still need R, Python, Matlab versions of the threaded client)
 * Added C versions of rpc_lesson3b example
+* Fix bug in yggdevup CLI
 
 1.6.4 (2021-08-10) More minor bug fixes & Automated iteration
 ------------------
