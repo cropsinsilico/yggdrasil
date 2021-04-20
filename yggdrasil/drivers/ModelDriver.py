@@ -1547,6 +1547,7 @@ class ModelDriver(Driver):
         r"""Actions to perform after run_loop has finished. Mainly checking
         if there was an error and then handling it."""
         self.debug('')
+        self.stop_mpi_partner()
         if self.queue_thread is not None:
             self.queue_thread.join(self.sleeptime)
             if self.queue_thread.is_alive():

@@ -136,8 +136,8 @@ definitions:
           type: array
       required:
       - name
-      - commtype
       - datatype
+      - commtype
       title: comm_base
       type: object
     - anyOf:
@@ -300,8 +300,8 @@ definitions:
             - $ref: '#/definitions/transform'
           type: array
       required:
-      - outputs
       - inputs
+      - outputs
       title: connection_base
       type: object
     - anyOf:
@@ -621,8 +621,8 @@ definitions:
           type: string
       required:
       - name
-      - working_dir
       - filetype
+      - working_dir
       title: file_base
       type: object
     - anyOf:
@@ -1705,10 +1705,10 @@ definitions:
             is used.
           type: string
       required:
-      - language
       - name
       - args
       - working_dir
+      - language
       title: model_base
       type: object
     - anyOf:
@@ -1858,6 +1858,169 @@ definitions:
         title: MakeModelDriver
         type: object
       - additionalProperties: true
+        description: Schema for model component ['c'] subtype.
+        properties:
+          compiler:
+            description: Command or path to executable that should be used to compile
+              the model. If not provided, the compiler will be determined based on
+              configuration options for the language (if present) and the registered
+              compilers that are available on the current operating system.
+            type: string
+          compiler_flags:
+            default: []
+            description: Flags that should be passed to the compiler during compilation.
+              If nto provided, the compiler flags will be determined based on configuration
+              options for the language (if present), the compiler defaults, and the
+              default_compiler_flags class attribute.
+            items:
+              type: string
+            type: array
+          language:
+            default: executable
+            description: Model is written in C.
+            enum:
+            - c
+            type: string
+          linker:
+            description: Command or path to executable that should be used to link
+              the model. If not provided, the linker will be determined based on configuration
+              options for the language (if present) and the registered linkers that
+              are available on the current operating system
+            type: string
+          linker_flags:
+            default: []
+            description: Flags that should be passed to the linker during compilation.
+              If nto provided, the linker flags will be determined based on configuration
+              options for the language (if present), the linker defaults, and the
+              default_linker_flags class attribute.
+            items:
+              type: string
+            type: array
+          source_files:
+            default: []
+            description: Source files that should be compiled into an executable.
+              Defaults to an empty list and the driver will search for a source file
+              based on the model executable (the first model argument).
+            items:
+              type: string
+            type: array
+        title: CModelDriver
+        type: object
+      - additionalProperties: true
+        description: Schema for model component ['cmake'] subtype.
+        properties:
+          builddir:
+            description: Directory where the build should be saved. Defaults to <sourcedir>/build.
+              It can be relative to working_dir or absolute.
+            type: string
+          buildfile:
+            type: string
+          compiler:
+            description: Command or path to executable that should be used to compile
+              the model. If not provided, the compiler will be determined based on
+              configuration options for the language (if present) and the registered
+              compilers that are available on the current operating system.
+            type: string
+          compiler_flags:
+            default: []
+            description: Flags that should be passed to the compiler during compilation.
+              If nto provided, the compiler flags will be determined based on configuration
+              options for the language (if present), the compiler defaults, and the
+              default_compiler_flags class attribute.
+            items:
+              type: string
+            type: array
+          configuration:
+            default: Release
+            description: Build type/configuration that should be built. Defaults to
+              'Release'.
+            type: string
+          env_compiler:
+            description: Environment variable where the compiler executable should
+              be stored for use within the Makefile. If not provided, this will be
+              determined by the target language driver.
+            type: string
+          env_compiler_flags:
+            description: Environment variable where the compiler flags should be stored
+              (including those required to compile against the |yggdrasil| interface).
+              If not provided, this will be determined by the target language driver.
+            type: string
+          env_linker:
+            description: Environment variable where the linker executable should be
+              stored for use within the Makefile. If not provided, this will be determined
+              by the target language driver.
+            type: string
+          env_linker_flags:
+            description: Environment variable where the linker flags should be stored
+              (including those required to link against the |yggdrasil| interface).
+              If not provided, this will be determined by the target language driver.
+            type: string
+          language:
+            default: executable
+            description: Model is written in C/C++ and has a CMake build system.
+            enum:
+            - cmake
+            type: string
+          linker:
+            description: Command or path to executable that should be used to link
+              the model. If not provided, the linker will be determined based on configuration
+              options for the language (if present) and the registered linkers that
+              are available on the current operating system
+            type: string
+          linker_flags:
+            default: []
+            description: Flags that should be passed to the linker during compilation.
+              If nto provided, the linker flags will be determined based on configuration
+              options for the language (if present), the linker defaults, and the
+              default_linker_flags class attribute.
+            items:
+              type: string
+            type: array
+          source_files:
+            default: []
+            description: Source files that should be compiled into an executable.
+              Defaults to an empty list and the driver will search for a source file
+              based on the model executable (the first model argument).
+            items:
+              type: string
+            type: array
+          sourcedir:
+            description: Source directory to call cmake on. If not provided it is
+              set to working_dir. This should be the directory containing the CMakeLists.txt
+              file. It can be relative to working_dir or absolute.
+            type: string
+          target:
+            description: Make target that should be built to create the model executable.
+              Defaults to None.
+            type: string
+          target_compiler:
+            description: Compilation tool that should be used to compile the target
+              language. Defaults to None and will be set based on the selected language
+              driver.
+            type: string
+          target_compiler_flags:
+            description: Compilation flags that should be passed to the target language
+              compiler. Defaults to [].
+            items:
+              type: string
+            type: array
+          target_language:
+            description: Language that the target is written in. Defaults to None
+              and will be set based on the source files provided.
+            type: string
+          target_linker:
+            description: Compilation tool that should be used to link the target language.
+              Defaults to None and will be set based on the selected language driver.
+            type: string
+          target_linker_flags:
+            description: Linking flags that should be passed to the target language
+              linker. Defaults to [].
+            items:
+              type: string
+            type: array
+        title: CMakeModelDriver
+        type: object
+      - additionalProperties: true
         description: Schema for model component ['mpi'] subtype.
         properties:
           language:
@@ -1943,55 +2106,6 @@ definitions:
             - executable
             type: string
         title: ExecutableModelDriver
-        type: object
-      - additionalProperties: true
-        description: Schema for model component ['c'] subtype.
-        properties:
-          compiler:
-            description: Command or path to executable that should be used to compile
-              the model. If not provided, the compiler will be determined based on
-              configuration options for the language (if present) and the registered
-              compilers that are available on the current operating system.
-            type: string
-          compiler_flags:
-            default: []
-            description: Flags that should be passed to the compiler during compilation.
-              If nto provided, the compiler flags will be determined based on configuration
-              options for the language (if present), the compiler defaults, and the
-              default_compiler_flags class attribute.
-            items:
-              type: string
-            type: array
-          language:
-            default: executable
-            description: Model is written in C.
-            enum:
-            - c
-            type: string
-          linker:
-            description: Command or path to executable that should be used to link
-              the model. If not provided, the linker will be determined based on configuration
-              options for the language (if present) and the registered linkers that
-              are available on the current operating system
-            type: string
-          linker_flags:
-            default: []
-            description: Flags that should be passed to the linker during compilation.
-              If nto provided, the linker flags will be determined based on configuration
-              options for the language (if present), the linker defaults, and the
-              default_linker_flags class attribute.
-            items:
-              type: string
-            type: array
-          source_files:
-            default: []
-            description: Source files that should be compiled into an executable.
-              Defaults to an empty list and the driver will search for a source file
-              based on the model executable (the first model argument).
-            items:
-              type: string
-            type: array
-        title: CModelDriver
         type: object
       - additionalProperties: true
         description: Schema for model component ['c++', 'cpp', 'cxx'] subtype.
@@ -2334,120 +2448,6 @@ definitions:
             description: Number of steps that should be output. Defaults to None.
             type: integer
         title: SBMLModelDriver
-        type: object
-      - additionalProperties: true
-        description: Schema for model component ['cmake'] subtype.
-        properties:
-          builddir:
-            description: Directory where the build should be saved. Defaults to <sourcedir>/build.
-              It can be relative to working_dir or absolute.
-            type: string
-          buildfile:
-            type: string
-          compiler:
-            description: Command or path to executable that should be used to compile
-              the model. If not provided, the compiler will be determined based on
-              configuration options for the language (if present) and the registered
-              compilers that are available on the current operating system.
-            type: string
-          compiler_flags:
-            default: []
-            description: Flags that should be passed to the compiler during compilation.
-              If nto provided, the compiler flags will be determined based on configuration
-              options for the language (if present), the compiler defaults, and the
-              default_compiler_flags class attribute.
-            items:
-              type: string
-            type: array
-          configuration:
-            default: Release
-            description: Build type/configuration that should be built. Defaults to
-              'Release'.
-            type: string
-          env_compiler:
-            description: Environment variable where the compiler executable should
-              be stored for use within the Makefile. If not provided, this will be
-              determined by the target language driver.
-            type: string
-          env_compiler_flags:
-            description: Environment variable where the compiler flags should be stored
-              (including those required to compile against the |yggdrasil| interface).
-              If not provided, this will be determined by the target language driver.
-            type: string
-          env_linker:
-            description: Environment variable where the linker executable should be
-              stored for use within the Makefile. If not provided, this will be determined
-              by the target language driver.
-            type: string
-          env_linker_flags:
-            description: Environment variable where the linker flags should be stored
-              (including those required to link against the |yggdrasil| interface).
-              If not provided, this will be determined by the target language driver.
-            type: string
-          language:
-            default: executable
-            description: Model is written in C/C++ and has a CMake build system.
-            enum:
-            - cmake
-            type: string
-          linker:
-            description: Command or path to executable that should be used to link
-              the model. If not provided, the linker will be determined based on configuration
-              options for the language (if present) and the registered linkers that
-              are available on the current operating system
-            type: string
-          linker_flags:
-            default: []
-            description: Flags that should be passed to the linker during compilation.
-              If nto provided, the linker flags will be determined based on configuration
-              options for the language (if present), the linker defaults, and the
-              default_linker_flags class attribute.
-            items:
-              type: string
-            type: array
-          source_files:
-            default: []
-            description: Source files that should be compiled into an executable.
-              Defaults to an empty list and the driver will search for a source file
-              based on the model executable (the first model argument).
-            items:
-              type: string
-            type: array
-          sourcedir:
-            description: Source directory to call cmake on. If not provided it is
-              set to working_dir. This should be the directory containing the CMakeLists.txt
-              file. It can be relative to working_dir or absolute.
-            type: string
-          target:
-            description: Make target that should be built to create the model executable.
-              Defaults to None.
-            type: string
-          target_compiler:
-            description: Compilation tool that should be used to compile the target
-              language. Defaults to None and will be set based on the selected language
-              driver.
-            type: string
-          target_compiler_flags:
-            description: Compilation flags that should be passed to the target language
-              compiler. Defaults to [].
-            items:
-              type: string
-            type: array
-          target_language:
-            description: Language that the target is written in. Defaults to None
-              and will be set based on the source files provided.
-            type: string
-          target_linker:
-            description: Compilation tool that should be used to link the target language.
-              Defaults to None and will be set based on the selected language driver.
-            type: string
-          target_linker_flags:
-            description: Linking flags that should be passed to the target language
-              linker. Defaults to [].
-            items:
-              type: string
-            type: array
-        title: CMakeModelDriver
         type: object
       - additionalProperties: true
         description: Schema for model component ['fortran'] subtype.
