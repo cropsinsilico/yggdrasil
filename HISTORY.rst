@@ -59,6 +59,7 @@ X.X.X (XXXX-XX-XX)
 
 * Allow yggdrasil to run integrations w/o pytest installed (only require pytest for running tests)
 
+
 1.6.0 (2021-04-14) Single connection, async refactor, threading, & model copies
 ------------------
 

@@ -563,7 +563,6 @@ class YggRunner(YggClass):
             for driver in self.modeldrivers.values():
                 self.debug("Starting driver %s", driver['name'])
                 d = driver['instance']
-                # TODO: Need way to start client remotely
                 for n2 in driver.get('client_of', []):
                     self.start_server(n2)
                 if not d.was_started:
