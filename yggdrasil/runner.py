@@ -13,9 +13,10 @@ from collections import OrderedDict
 from yggdrasil.tools import YggClass
 from yggdrasil.config import ygg_cfg, cfg_environment, temp_config
 from yggdrasil import platform, yamlfile
-from yggdrasil.drivers import create_driver, DuplicatedModelDriver
+from yggdrasil.drivers import create_driver
 from yggdrasil.components import import_component
 from yggdrasil.multitasking import MPI
+from yggdrasil.drivers.DuplicatedModelDriver import DuplicatedModelDriver
 
 
 COLOR_TRACE = '\033[30;43;22m'
@@ -266,6 +267,7 @@ class YggRunner(YggClass):
         self.host = host
         self.rank = rank
         self.connection_task_method = connection_task_method
+        self.modelcopies = {}
         self.modeldrivers = {}
         self.connectiondrivers = {}
         self.interrupt_time = 0
@@ -421,8 +423,8 @@ class YggRunner(YggClass):
         if 'working_dir' in yml:
             os.chdir(yml['working_dir'])
         try:
-            if yml.get('copies', 1) > 1:
-                instance = DuplicatedModelDriver.DuplicatedModelDriver(
+            if (yml.get('copies', 1) > 1) and ('copy_index' not in yml):
+                instance = DuplicatedModelDriver(
                     yml, namespace=self.namespace, rank=self.rank, **kwargs)
             else:
                 kwargs = dict(yml, **kwargs)
@@ -455,6 +457,20 @@ class YggRunner(YggClass):
             if self.mpi_comm:
                 if self.rank == 0:
                     self.all_modeldrivers = self.modeldrivers
+                    # Expand duplicated models
+                    remove_dup = []
+                    add_dup = {}
+                    for k, v in self.modeldrivers.items():
+                        if v.get('copies', 1) > 1:
+                            self.modelcopies[v['name']] = []
+                            for x in DuplicatedModelDriver.get_yaml_copies(v):
+                                add_dup[x['name']] = x
+                                self.modelcopies[v['name']].append(x['name'])
+                            remove_dup.append(k)
+                    for k in remove_dup:
+                        self.modeldrivers.pop(k)
+                    self.modeldrivers.update(add_dup)
+                    # Sort tasks
                     size = self.mpi_comm.Get_size()
                     models = [[] for _ in range(size)]
                     for i, (k, v) in enumerate(self.modeldrivers.items()):
@@ -463,7 +479,9 @@ class YggRunner(YggClass):
                             x_cp.pop(k2, None)
                         # Skew models away from root process so that
                         # connection threading might not share process
-                        models[(i) % size].append((k, x_cp))
+                        rank = (i + 1) % size
+                        models[rank].append((k, x_cp))
+                        v['mpi_rank'] = rank
                     max_len = len(max(models, key=len))
                     for x in models:
                         while len(x) < max_len:
@@ -473,13 +491,16 @@ class YggRunner(YggClass):
                 self.modeldrivers = dict(
                     [x for x in self.mpi_comm.scatter(models, root=0)
                      if (x is not None)])
+                self.info("Models on process %d: %s", self.rank,
+                          list(self.modeldrivers.keys()))
                 if self.rank == 0:
+                    temp = {}
                     for i, (k, v) in enumerate(self.all_modeldrivers.items()):
                         if k not in self.modeldrivers:
                             v['language'] = 'mpi'
                             v['driver'] = 'MPIPartnerModel'
-                            v['mpi_rank'] = i
-                        self.modeldrivers[k] = v
+                        temp[k] = v
+                    self.modeldrivers = temp
             # Create model drivers
             self.debug("Loading model drivers")
             for driver in self.modeldrivers.values():
@@ -493,8 +514,13 @@ class YggRunner(YggClass):
 
     def start_server(self, name):
         r"""Start a server driver."""
-        if self.mpi_comm:
-            raise NotImplementedError("Start client remotely")
+        if self.mpi_comm and (self.rank != 0):
+            return
+        if name in self.modelcopies:
+            assert(name not in self.modeldrivers)
+            for cpy in self.modelcopies[name]:
+                self.start_server(cpy)
+            return
         x = self.modeldrivers[name]['instance']
         if not x.was_started:
             self.debug("Starting server '%s' before client", x.name)
@@ -502,6 +528,11 @@ class YggRunner(YggClass):
 
     def stop_server(self, name):
         r"""Stop a server driver."""
+        if name in self.modelcopies:
+            assert(name not in self.modeldrivers)
+            for cpy in self.modelcopies[name]:
+                self.stop_server(cpy)
+            return
         x = self.modeldrivers[name]['instance']
         x.stop()
 
@@ -529,7 +560,6 @@ class YggRunner(YggClass):
             for driver in self.modeldrivers.values():
                 self.debug("Starting driver %s", driver['name'])
                 d = driver['instance']
-                # TODO: Need way to start client remotely
                 for n2 in driver.get('client_of', []):
                     self.start_server(n2)
                 if not d.was_started:
@@ -624,6 +654,8 @@ class YggRunner(YggClass):
                 associated IO drivers.
 
         """
+        if self.mpi_comm and (self.rank != 0):
+            return
         # TODO: Exit upstream models that no longer have any open
         # output, connections when a connection is closed.
         for srv_name in model.get('client_of', []):
