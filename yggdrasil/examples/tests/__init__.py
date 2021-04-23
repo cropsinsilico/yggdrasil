@@ -359,8 +359,7 @@ class ExampleTstBase(YggTestBase, tools.YggClass):
                          '--production-run']
                 subprocess.check_call(args)
                 assert(not self.expects_error)
-            except subprocess.CalledProcessError as e:
-                print(e.output.decode('utf-8'))
+            except subprocess.CalledProcessError:
                 if not self.expects_error:
                     raise
         else:
