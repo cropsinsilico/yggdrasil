@@ -1218,7 +1218,10 @@ class run_tsts(SubCommand):
           'help': 'Display additional info for test results.'}),
         (('--with-mpi', '--mpi-nproc'),
          {'type': int, 'default': 1,
-          'help': 'Number of MPI processes to run tests on.'})]
+          'help': 'Number of MPI processes to run tests on.'}),
+        (('--additional-info', '-r'),
+         {'type': str, 'default': '',
+          'help': 'Display additional info for test results.'})]
     allow_unknown = True
 
     @classmethod
