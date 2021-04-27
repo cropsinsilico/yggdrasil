@@ -258,7 +258,7 @@ jobs:
     - name: Run MPI tests
       if: env.INSTALLMPI == 1 && matrix.os != 'windows-latest'
       id: mpi
-      run: yggtest --ci --cov-append --test-suite=mpi --language python make
+      run: yggtest --ci --cov-append --test-suite=mpi
     - name: Combine coverage reports
       continue-on-error: true
       run: '# ls .*
@@ -540,7 +540,7 @@ jobs:
     - name: Run MPI tests
       if: env.INSTALLMPI == 1 && matrix.os != 'windows-latest'
       id: mpi
-      run: yggtest --ci --cov-append --test-suite=mpi --language python make
+      run: yggtest --ci --cov-append --test-suite=mpi
     - name: Combine coverage reports
       continue-on-error: true
       run: '# ls .*
@@ -802,7 +802,7 @@ jobs:
     - name: Run MPI tests
       if: env.INSTALLMPI == 1 && matrix.os != 'windows-latest'
       id: mpi
-      run: yggtest --ci --cov-append --test-suite=mpi --language python make
+      run: yggtest --ci --cov-append --test-suite=mpi
     - name: Combine coverage reports
       continue-on-error: true
       run: '# ls .*
@@ -1066,7 +1066,7 @@ jobs:
     - name: Run MPI tests
       if: env.INSTALLMPI == 1 && matrix.os != 'windows-latest'
       id: mpi
-      run: yggtest --ci --cov-append --test-suite=mpi --language python make
+      run: yggtest --ci --cov-append --test-suite=mpi
     - name: Combine coverage reports
       continue-on-error: true
       run: '# ls .*
@@ -1328,7 +1328,7 @@ jobs:
     - name: Run MPI tests
       if: env.INSTALLMPI == 1 && matrix.os != 'windows-latest'
       id: mpi
-      run: yggtest --ci --cov-append --test-suite=mpi --language python make
+      run: yggtest --ci --cov-append --test-suite=mpi
     - name: Combine coverage reports
       continue-on-error: true
       run: '# ls .*
