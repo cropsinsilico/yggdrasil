@@ -681,8 +681,9 @@ class ModelDriver(Driver):
         self.model_outputs_in_inputs = self.preparsed_function['outputs_in_inputs']
         model_dir, model_base = os.path.split(self.model_function_file)
         model_base = os.path.splitext(model_base)[0]
-        wrapper_fname = os.path.join(model_dir, 'ygg_' + model_base
-                                     + self.language_ext[0])
+        wrapper_fname = os.path.join(model_dir,
+                                     'ygg_%s_%s%s' % (model_base, self.name,
+                                                      self.language_ext[0]))
         lines = self.write_model_wrapper(**self.preparsed_function)
         # Write file
         if (not os.path.isfile(wrapper_fname)) or self.overwrite:
@@ -701,6 +702,9 @@ class ModelDriver(Driver):
     @property
     def n_sent_messages(self):
         r"""dict: Number of messages sent by the model via each connection."""
+        if (self._mpi_rank > 0) and self.check_mpi_request('stopped'):
+            out = self.check_mpi_request('stopped')
+            return out
         out = {}
         for x in self.yml.get('output_drivers', []):
             x_inst = x.get('instance', None)
@@ -1311,7 +1315,7 @@ class ModelDriver(Driver):
                    YGG_DEFAULT_COMM=tools.get_default_comm(),
                    YGG_NCLIENTS=str(len(self.clients)))
         if multitasking._on_mpi:
-            env['YGG_ON_MPI'] = '1'
+            env['YGG_MPI_RANK'] = str(multitasking._mpi_rank)
         if self.copies > 1:
             env['YGG_MODEL_COPY'] = str(self.copy_index)
             env['YGG_MODEL_NAME'] = self.name.split('_copy')[0]
@@ -1400,7 +1404,7 @@ class ModelDriver(Driver):
 
     def send_mpi(self, msg, tag=0, dont_block=False):
         r"""Send an MPI message."""
-        self.debug("%d: %s", tag, msg)
+        self.debug("%d: %s (blocking=%s)", self._mpi_tag + tag, msg, dont_block)
         kws = {'dest': self._mpi_partner_rank, 'tag': (self._mpi_tag + tag)}
         if dont_block:
             return self._mpi_comm.isend(msg, **kws)
@@ -1409,7 +1413,7 @@ class ModelDriver(Driver):
 
     def recv_mpi(self, tag=0, dont_block=False):
         r"""Receive an MPI message."""
-        self.debug('%d', tag)
+        self.debug('%d (blocking=%s)', self._mpi_tag + tag, dont_block)
         kws = {'source': self._mpi_partner_rank, 'tag': (self._mpi_tag + tag)}
         if dont_block:
             return self._mpi_comm.irecv(**kws)
@@ -1429,6 +1433,23 @@ class ModelDriver(Driver):
             self._mpi_requests['stopping'] = {
                 'result': True,  # Don't call test()
                 'request': self.send_mpi(msg, tag=tag)}
+
+    def wait_on_mpi_request(self, name, timeout=False):
+        r"""Wait for a request to be completed.
+
+        Args:
+            name (str): Name that request was registered under.
+
+        Returns:
+            bool, str: Received message or False if the request does not
+                exist or is not complete.
+
+        """
+        Tout = self.start_timeout(t=timeout, key_suffix=('.%s' % name))
+        while (not self.check_mpi_request(name)) and (not Tout.is_out):
+            self.sleep()
+        self.stop_timeout(key_suffix=('.%s' % name))
+        return self.check_mpi_request(name)
 
     def check_mpi_request(self, name):
         r"""Check if a request has been completed.
@@ -1459,6 +1480,9 @@ class ModelDriver(Driver):
     def run_loop(self):
         r"""Loop to check if model is still running and forward output."""
         # Continue reading until there is not any output
+        if self.check_mpi_request('stopped'):
+            self.debug("Stop requested by MPI partner.")
+            self.set_break_flag()
         try:
             line = self.queue.get_nowait()
         except Empty:
@@ -1476,11 +1500,17 @@ class ModelDriver(Driver):
                 self.print_encoded(line, end="")
                 sys.stdout.flush()
 
+    def run_finally(self):
+        r"""Actions to perform in finally clause of try/except wrapping
+        run."""
+        # Ensure the MPI partner gets cleaned up following an error
+        self.stop_mpi_partner()
+        super(ModelDriver, self).run_finally()
+
     def after_loop(self):
         r"""Actions to perform after run_loop has finished. Mainly checking
         if there was an error and then handling it."""
         self.debug('')
-        self.stop_mpi_partner()
         if self.queue_thread is not None:
             self.queue_thread.join(self.sleeptime)
             if self.queue_thread.is_alive():
@@ -2008,6 +2038,7 @@ class ModelDriver(Driver):
             outputs=model_function_outputs,
             iter_function_over=yml.get('iter_function_over', []))
         yml['preparsed_function'] = {
+            'model_name': yml['name'],
             'model_file': model_function_info,
             'model_function': yml['function'],
             'inputs': model_function_inputs,

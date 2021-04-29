@@ -368,6 +368,8 @@ class CommBase(tools.YggClass):
             is not a model.
         partner_language (str, optional): Programming language of this comm's
             partner comm. Defaults to 'python'.
+        partner_mpi_ranks (list, optional): Ranks of processes of this comm's
+            partner comm(s). Defaults to [].
         datatype (schema, optional): JSON schema (with expanded core types
             defined by |yggdrasil|) that constrains the type of data that
             should be sent/received by this object. Defaults to {'type': 'bytes'}.
@@ -481,6 +483,7 @@ class CommBase(tools.YggClass):
         language (str): Language that this comm is being called from.
         partner_model (str): Name of model that this comm is partnered with.
         partner_language (str): Programming language of this comm's partner comm.
+        partner_mpi_ranks (list): Ranks of processes of this comm's partner comm(s).
         serializer (:class:.DefaultSerialize): Object that will be used to
             serialize/deserialize messages to/from python objects.
         recv_timeout (float): Time that should be waited for an incoming
@@ -584,7 +587,7 @@ class CommBase(tools.YggClass):
 
     def __init__(self, name, address=None, direction='send', dont_open=False,
                  is_interface=None, language=None, partner_copies=0,
-                 partner_model=None, partner_language='python',
+                 partner_model=None, partner_language='python', partner_mpi_ranks=[],
                  recv_timeout=0.0, close_on_eof_recv=True, close_on_eof_send=False,
                  single_use=False, reverse_names=False, no_suffix=False,
                  allow_multiple_comms=False,
@@ -644,6 +647,7 @@ class CommBase(tools.YggClass):
         if self.partner_language:
             self.partner_language_driver = import_component(
                 'model', self.partner_language)
+        self.partner_mpi_ranks = partner_mpi_ranks
         self.language_driver = import_component('model', self.language)
         self.touches_model = (self.partner_model is not None)
         self.is_client = is_client
