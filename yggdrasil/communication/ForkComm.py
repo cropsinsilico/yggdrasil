@@ -190,6 +190,24 @@ class ForkComm(CommBase.CommBase):
         return min([x.maxMsgSize for x in self.comm_list])
 
     @classmethod
+    def split_comm(cls, comm, copies):
+        r"""Split yaml representation of a comm into multiple copies.
+
+        Args:
+            comm (dict): Comm yaml representation.
+            copies (int): Number of times to duplicate comm.
+
+        """
+        comm['commtype'] = [
+            dict(comm,
+                 partner_model=('%s_copy%d' % (comm['partner_model'], idx)))
+            for idx in range(copies)]
+        comm['dont_copy'] = True
+        for k in cls.child_keys:
+            comm.pop(k, None)
+        return comm
+
+    @classmethod
     def new_comm_kwargs(cls, name, *args, **kwargs):
         r"""Get keyword arguments for new comm."""
         if 'address' not in kwargs:
