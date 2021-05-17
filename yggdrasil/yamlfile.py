@@ -427,7 +427,6 @@ def parse_model(yml, existing):
         srv = {'name': '%s:%s' % (yml['name'], yml['name']),
                'commtype': 'default',
                'datatype': {'type': 'bytes'},
-               'driver': 'ServerDriver',
                'args': yml['name'] + '_SERVER',
                'working_dir': yml['working_dir']}
         if yml.get('function', False) and isinstance(yml['is_server'], bool):

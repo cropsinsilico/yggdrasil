@@ -52,32 +52,49 @@ class YggFunction(YggClass):
         self.inputs = {}
         self.outputs = {}
         # import zmq; ctx = zmq.Context()
+        self.old_environ = os.environ.copy()
         for drv in self.model_driver['input_drivers']:
             for env in drv['instance'].model_env.values():
                 os.environ.update(env)
             channel_name = drv['instance'].ocomm.name
             var_name = drv['name'].split('function_')[-1]
             self.outputs[var_name] = drv.copy()
-            self.outputs[var_name]['vars'] = [
-                iv.split(':')[-1] for iv in drv.get('vars', [var_name])]
             self.outputs[var_name]['comm'] = YggInput(
-                channel_name, no_suffix=True)
-            # context=ctx)
+                channel_name, no_suffix=True)  # context=ctx)
+            if 'vars' in drv:
+                self.outputs[var_name]['vars'] = [
+                    iv.split(':')[-1] for iv in drv['vars']]
+            elif 'vars' in drv['inputs'][0]:
+                self.outputs[var_name]['vars'] = drv['inputs'][0]['vars']
+            else:
+                self.outputs[var_name]['vars'] = [var_name]
         for drv in self.model_driver['output_drivers']:
             for env in drv['instance'].model_env.values():
                 os.environ.update(env)
             channel_name = drv['instance'].icomm.name
             var_name = drv['name'].split('function_')[-1]
             self.inputs[var_name] = drv.copy()
-            self.inputs[var_name]['vars'] = [
-                iv.split(':')[-1] for iv in drv.get('vars', [var_name])]
             if drv['instance']._connection_type == 'rpc_request':
-                out_cls = YggRpcClient
+                self.inputs[var_name]['comm'] = YggRpcClient(
+                    channel_name, no_suffix=True)
+                self.outputs[var_name] = drv.copy()
+                self.outputs[var_name]['comm'] = self.inputs[var_name]['comm']
+                if drv['outputs'][0].get('server_replaces', False):
+                    srv = drv['outputs'][0]['server_replaces']
+                    self.inputs[var_name]['vars'] = [
+                        v['name'] for v in srv['input']['vars']]
+                    self.outputs[var_name]['vars'] = [
+                        v['name'] for v in srv['output']['vars']]
             else:
-                out_cls = YggOutput
-            self.inputs[var_name]['comm'] = out_cls(
-                channel_name, no_suffix=True)
-            # context=ctx)
+                self.inputs[var_name]['comm'] = YggOutput(
+                    channel_name, no_suffix=True)  # context=ctx)
+                if 'vars' in drv:
+                    self.inputs[var_name]['vars'] = [
+                        iv.split(':')[-1] for iv in drv['vars']]
+                elif 'vars' in drv['outputs'][0]:
+                    self.inputs[var_name]['vars'] = drv['outputs'][0]['vars']
+                else:
+                    self.inputs[var_name]['vars'] = [var_name]
         self._stop_called = False
         atexit.register(self.stop)
         # Get arguments
@@ -87,6 +104,7 @@ class YggFunction(YggClass):
         self.returns = []
         for k, v in self.outputs.items():
             self.returns += v['vars']
+        self.runner.pause()
 
     # def widget_function(self, *args, **kwargs):
     #     # import matplotlib.pyplot as plt
@@ -100,10 +118,12 @@ class YggFunction(YggClass):
     #     from ipywidgets import interact_manual
     #     return interact_manual(self.widget_function, *args, **kwargs)
         
-    def __call__(self, **kwargs):
+    def __call__(self, *args, **kwargs):
         r"""Call the model as a function by sending variables.
 
         Args:
+           *args: Any positional arguments are expected to be input variables
+               in the correct order.
            **kwargs: Any keyword arguments are expected to be named input
                variables for the model.
 
@@ -116,7 +136,11 @@ class YggFunction(YggClass):
             dict: Returned values for each return variable.
 
         """
+        self.runner.resume()
         # Check for arguments
+        for a, arg in zip(self.arguments, args):
+            assert(a not in kwargs)
+            kwargs[a] = arg
         for a in self.arguments:
             if a not in kwargs:  # pragma: debug
                 raise RuntimeError("Required argument %s not provided." % a)
@@ -139,10 +163,12 @@ class YggFunction(YggClass):
             else:
                 assert(len(ivars) == 1)
                 out[ivars[0]] = data
+        self.runner.pause()
         return out
 
     def stop(self):
         r"""Stop the model(s) from running."""
+        self.runner.resume()
         if self._stop_called:
             return
         self._stop_called = True
@@ -157,6 +183,19 @@ class YggFunction(YggClass):
             x['comm'].close()
         self.runner.terminate()
         self.runner.atexit()
+        os.environ.clear()
+        os.environ.update(self.old_environ)
+
+    def info(self):
+        r"""Display information about the wrapped model(s)."""
+        print("Models: %s\nInputs:\n%s\nOutputs:\n%s\n"
+              % (', '.join([x['name'] for x in
+                            self.runner.modeldrivers.values()
+                            if x['name'] != 'function_model']),
+                 '\n'.join(['\t%s (vars=%s)' % (k, v['vars'])
+                            for k, v in self.inputs.items()]),
+                 '\n'.join(['\t%s (vars=%s)' % (k, v['vars'])
+                            for k, v in self.outputs.items()])))
 
 
 class YggRunner(YggClass):
@@ -571,9 +610,24 @@ class YggRunner(YggClass):
             if iod['instance'].nclients == 0:
                 self.stop_server(srv_name)
 
+    def pause(self):
+        r"""Pause all drivers."""
+        self.debug('')
+        for driver in self.all_drivers:
+            if 'instance' in driver:
+                driver['instance'].pause()
+
+    def resume(self):
+        r"""Resume all paused drivers."""
+        self.debug('')
+        for driver in self.all_drivers:
+            if 'instance' in driver:
+                driver['instance'].resume()
+
     def terminate(self):
         r"""Immediately stop all drivers, beginning with IO drivers."""
         self.debug('')
+        self.resume()
         for driver in self.all_drivers:
             if 'instance' in driver:
                 self.debug('Stop %s', driver['name'])

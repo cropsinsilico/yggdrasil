@@ -343,13 +343,13 @@ class ConnectionDriver(Driver):
         
     def get_flag_attr(self, attr):
         r"""Return the flag attribute."""
-        if attr in self.shared:
+        if hasattr(self, 'shared') and (attr in self.shared):
             return self.shared[attr]
         return super(ConnectionDriver, self).get_flag_attr(attr)
 
     def set_flag_attr(self, attr, value=True):
         r"""Set a flag."""
-        if attr in self.shared:
+        if hasattr(self, 'shared') and (attr in self.shared):
             exist = self.shared[attr]
             if value:
                 exist.set()

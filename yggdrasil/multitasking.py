@@ -1094,6 +1094,8 @@ class YggTaskLoop(YggTask):
         self._loop_count = 0
         self.create_flag_attr('break_flag')
         self.create_flag_attr('loop_flag')
+        self.create_flag_attr('unpause_flag')
+        self.set_flag_attr('unpause_flag', value=True)
         self.break_stack = None
 
     @property
@@ -1123,6 +1125,16 @@ class YggTaskLoop(YggTask):
                 break_stack = ''.join(traceback.format_stack())
             self.break_stack = break_stack
         self.set_flag_attr('break_flag', value=value)
+        if value:
+            self.set_flag_attr('unpause_flag', value=True)
+
+    def pause(self):
+        r"""Pause the loop execution."""
+        self.set_flag_attr('unpause_flag', value=False)
+
+    def resume(self):
+        r"""Resume the loop execution."""
+        self.set_flag_attr('unpause_flag', value=True)
 
     @property
     def was_break(self):
@@ -1177,6 +1189,7 @@ class YggTaskLoop(YggTask):
                  and (not self._1st_main_terminated))):  # pragma: debug
                 self.on_main_terminated()
             else:
+                self.wait_flag_attr('unpause_flag')
                 try:
                     self.run_loop()
                 except BreakLoopError as e:
