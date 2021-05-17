@@ -5,3 +5,6 @@
 	path = yggdrasil/demos/fspm2020
 	url = https://github.com/cropsinsilico/FSPM2020_yggdrasil_workshop
 	branch = no-submodule
+[submodule "yggdrasil/demos/CiS2021-hackathon"]
+	path = yggdrasil/demos/CiS2021-hackathon
+	url = git@github.com:cropsinsilico/CiS2021-hackathon.git
