@@ -155,9 +155,15 @@ def display_source(fname, number_lines=False, return_lines=False):
         if return_lines:
             return out
         return
-    with open(fname, 'r') as fd:
-        lines = fd.read()
-    language = constants.EXT2LANG[os.path.splitext(fname)[-1]]
+    if isinstance(fname, (bytes, str)):
+        with open(fname, 'r') as fd:
+            lines = fd.read()
+        language = constants.EXT2LANG[os.path.splitext(fname)[-1]]
+        prefix = 'file: %s' % fname
+    else:
+        lines = inspect.getsource(fname)
+        language = 'python'
+        prefix = '%s: %s' % (type(fname), fname)
     try:
         from pygments import highlight
         from pygments.lexers import PythonLexer
@@ -171,6 +177,7 @@ def display_source(fname, number_lines=False, return_lines=False):
         lexer_map = {'python': PythonLexer,
                      'yaml': YamlLexer,
                      'c': CLexer,
+                     'cxx': CppLexer,
                      'c++': CppLexer,
                      'r': SLexer,
                      'fortran': FortranLexer,
@@ -182,9 +189,9 @@ def display_source(fname, number_lines=False, return_lines=False):
         pass
     if number_lines:
         lines = '\n'.join(add_line_numbers(lines.splitlines()))
-    lines = 'file: %s\n%s\n%s' % (fname, (len(fname) + 6) * '=', lines)
     if return_lines:
         return lines
+    lines = '%s\n%s\n%s\n' % (prefix, len(prefix) * '=', lines)
     print(lines)
 
 
@@ -207,7 +214,19 @@ def display_source_diff(fname1, fname2, number_lines=False,
     diff = difflib.ndiff(src1.splitlines(), src2.splitlines())
     if number_lines:
         diff = add_line_numbers(diff, for_diff=True)
-    lines = 'file1: %s\nfile2: %s\n%s' % (fname1, fname2, '\n'.join(diff))
+    if isinstance(fname1, str):
+        prefix_type1 = 'file'
+    else:
+        prefix_type1 = str(type(fname1))
+    if isinstance(fname2, str):
+        prefix_type2 = 'file'
+    else:
+        prefix_type2 = str(type(fname2))
+    prefix1 = '%s1: %s' % (prefix_type1, fname1)
+    prefix2 = '%s2: %s' % (prefix_type2, fname2)
+    lines = '%s\n%s\n%s\n%s\n' % (prefix1, prefix2,
+                                  max(len(prefix1), len(prefix2)) * '=',
+                                  '\n'.join(diff))
     if return_lines:
         return lines
     print(lines)
