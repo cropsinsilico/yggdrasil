@@ -221,6 +221,9 @@ def parse_yaml(files, as_function=False):
     for k in ['models', 'connections']:
         for yml in yml_norm[k]:
             existing = parse_component(yml, k[:-1], existing=existing)
+    # Add stand-in for function that will call to remote models
+    if as_function:
+        existing = add_model_function(existing)
     # Create server/client connections
     for srv, srv_info in existing['server'].items():
         clients = srv_info['clients']
@@ -240,8 +243,6 @@ def parse_yaml(files, as_function=False):
         existing = parse_component(yml, 'connection', existing=existing)
         existing['model'][yml['dst_models'][0]]['clients'] = yml['src_models']
     existing.pop('server')
-    if as_function:
-        existing = add_model_function(existing)
     # Make sure that servers have clients and clients have servers
     for k, v in existing['model'].items():
         if v.get('is_server', False):
@@ -325,7 +326,12 @@ def add_model_function(existing):
     miss = {}
     dir2opp = {'input': 'output', 'output': 'input'}
     for io in dir2opp.keys():
-        miss[io] = [k for k in existing[io].keys()]
+        miss[io] = [k for k in existing[io].keys()
+                    if not ((io == 'input') and (k in existing['server']))]
+    for srv_info in existing['server'].values():
+        if not srv_info['clients']:
+            new_model.setdefault('client_of', [])
+            new_model['client_of'].append(srv_info['model_name'])
     # for conn in existing['connection'].values():
     #     for io1, io2 in dir2opp.items():
     #         if ((io1 + 's') in conn):
@@ -461,7 +467,9 @@ def parse_model(yml, existing):
         else:
             yml['inputs'].append(srv)
         yml['clients'] = []
-        existing['server'].setdefault(srv['name'], {'clients': []})
+        existing['server'].setdefault(srv['name'],
+                                      {'clients': [],
+                                       'model_name': yml['name']})
         if replaces:
             existing['server'][srv['name']]['replaces'] = replaces
     # Mark timesync clients
@@ -480,7 +488,8 @@ def parse_model(yml, existing):
             cli = {'name': cli_name,
                    'working_dir': yml['working_dir']}
             yml['outputs'].append(cli)
-            existing['server'].setdefault(srv_name, {'clients': []})
+            existing['server'].setdefault(srv_name, {'clients': [],
+                                                     'model_name': srv})
             existing['server'][srv_name]['clients'].append(cli_name)
     # Model index and I/O channels
     yml['model_index'] = len(existing['model'])
@@ -584,7 +593,7 @@ def parse_connection(yml, existing):
             xx['outputs'].append(new)
             xx['dst_models'] += existing['input'][y['name']]['model_driver']
             del existing['input'][y['name']]
-    # TODO: Split comms if models are not co-located and the master
+    # TODO: Split comms if models are not co-located and the main
     # process needs access to the message passed
     yml.update(xx)
     yml.setdefault('driver', 'ConnectionDriver')

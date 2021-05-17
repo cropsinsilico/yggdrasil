@@ -89,6 +89,25 @@ def test_import_as_function():
     fmodel.stop()
 
 
+def test_import_as_function_server():
+    r"""Test import_as_function w/ server function."""
+    yamlfile = None
+    for x in ex_yamls['rpc_lesson3']['python']:
+        if 'server' in x:
+            yamlfile = x
+            break
+    assert(yamlfile)
+    fmodel = import_as_function(yamlfile)
+    input_args = {}
+    for x in fmodel.arguments:
+        input_args[x] = 'hello'
+    result = fmodel(**input_args)
+    for x in fmodel.returns:
+        assert(x in result)
+    fmodel.stop()
+    fmodel.stop()
+
+
 @requires_language('c')
 def test_import_as_function_C():
     r"""Test import_as_function for C."""

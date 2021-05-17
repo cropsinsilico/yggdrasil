@@ -38,7 +38,7 @@ class YggFunction(YggClass):
     
     def __init__(self, model_yaml, **kwargs):
         from yggdrasil.languages.Python.YggInterface import (
-            YggInput, YggOutput)
+            YggInput, YggOutput, YggRpcClient)
         # Create and start runner in another process
         self.runner = YggRunner(model_yaml, as_function=True, **kwargs)
         # Start the drivers
@@ -71,7 +71,11 @@ class YggFunction(YggClass):
             self.inputs[var_name] = drv.copy()
             self.inputs[var_name]['vars'] = [
                 iv.split(':')[-1] for iv in drv.get('vars', [var_name])]
-            self.inputs[var_name]['comm'] = YggOutput(
+            if drv['instance']._connection_type == 'rpc_request':
+                out_cls = YggRpcClient
+            else:
+                out_cls = YggOutput
+            self.inputs[var_name]['comm'] = out_cls(
                 channel_name, no_suffix=True)
             # context=ctx)
         self._stop_called = False
