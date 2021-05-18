@@ -39,6 +39,7 @@ class YggFunction(YggClass):
     def __init__(self, model_yaml, **kwargs):
         from yggdrasil.languages.Python.YggInterface import (
             YggInput, YggOutput, YggRpcClient)
+        super(YggFunction, self).__init__()
         # Create and start runner in another process
         self.runner = YggRunner(model_yaml, as_function=True, **kwargs)
         # Start the drivers
@@ -48,6 +49,7 @@ class YggFunction(YggClass):
             if k != 'function_model':
                 self.__name__ = k
                 break
+        self.debug("run started")
         # Create input/output channels
         self.inputs = {}
         self.outputs = {}
@@ -81,10 +83,8 @@ class YggFunction(YggClass):
                 self.outputs[var_name]['comm'] = self.inputs[var_name]['comm']
                 if drv['outputs'][0].get('server_replaces', False):
                     srv = drv['outputs'][0]['server_replaces']
-                    self.inputs[var_name]['vars'] = [
-                        v['name'] for v in srv['input']['vars']]
-                    self.outputs[var_name]['vars'] = [
-                        v['name'] for v in srv['output']['vars']]
+                    self.inputs[var_name]['vars'] = srv['input']['vars']
+                    self.outputs[var_name]['vars'] = srv['output']['vars']
             else:
                 self.inputs[var_name]['comm'] = YggOutput(
                     channel_name, no_suffix=True)  # context=ctx)
@@ -95,8 +95,21 @@ class YggFunction(YggClass):
                     self.inputs[var_name]['vars'] = drv['outputs'][0]['vars']
                 else:
                     self.inputs[var_name]['vars'] = [var_name]
+        self.debug('inputs: %s, outputs: %s',
+                   list(self.inputs.keys()),
+                   list(self.outputs.keys()))
         self._stop_called = False
         atexit.register(self.stop)
+        # Ensure that vars are strings
+        for k, v in chain(self.inputs.items(), self.outputs.items()):
+            v_vars = []
+            for iv in v['vars']:
+                if isinstance(iv, dict):
+                    if not iv.get('is_length_var', False):
+                        v_vars.append(iv['name'])
+                else:
+                    v_vars.append(iv)
+            v['vars'] = v_vars
         # Get arguments
         self.arguments = []
         for k, v in self.inputs.items():
@@ -104,6 +117,7 @@ class YggFunction(YggClass):
         self.returns = []
         for k, v in self.outputs.items():
             self.returns += v['vars']
+        self.debug("arguments: %s, returns: %s", self.arguments, self.returns)
         self.runner.pause()
 
     # def widget_function(self, *args, **kwargs):
@@ -186,7 +200,7 @@ class YggFunction(YggClass):
         os.environ.clear()
         os.environ.update(self.old_environ)
 
-    def info(self):
+    def display_info(self):
         r"""Display information about the wrapped model(s)."""
         print("Models: %s\nInputs:\n%s\nOutputs:\n%s\n"
               % (', '.join([x['name'] for x in
