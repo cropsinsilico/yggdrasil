@@ -2,7 +2,7 @@
 History
 =======
 
-1.6.2 (2021-05-XX) Reuse response comms, add fork patterns, & minor bug fixes
+1.6.2 (2021-05-XX) Reuse response comms, add fork patterns, minor bug fixes & hackathon materials
 ------------------
 
 * Updated client/server comms & drivers to reuse response comms
@@ -10,6 +10,13 @@ History
 * Added option to compile with ccache including for building R packages
 * Fixed bug in yggdevup CLI for missing language directories
 * Fix bug in the documentation for the Python interface
+* Added hackathon 2021 materials repo as a demo via git submodule
+* Added support for pausing YggTaskLoop instances via `pause` and `resume` methods
+* Use `pause` and `resume` to ensure that model and connection processes do not continuously run in the background in between calls to an "imported" integration
+* Fixed a bug that prevented server models created from function to be imported as python functions
+* Minor updates to how tools for displaying source code work including support for introspection of code related to Python instances
+* Track updates to inputs/outputs from wrapped model source code
+* Added test for hackathon 2021 demo
 
 1.6.1 (2021-05-18) Minor Bug Fix
 ------------------
