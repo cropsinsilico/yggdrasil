@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>yggdrasil.tests.test_yamlfile &mdash; yggdrasil v1.6.0+5.g622c9ac0 documentation</title>
+  <title>yggdrasil.tests.test_yamlfile &mdash; yggdrasil 1.6.1 documentation</title>
   
 
   
@@ -30,6 +30,7 @@
   
     
       <script type="text/javascript" id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
+        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
         <script src="../../../_static/jquery.js"></script>
         <script src="../../../_static/underscore.js"></script>
         <script src="../../../_static/doctools.js"></script>
@@ -62,7 +63,7 @@
             
             
               <div class="version">
-                v1.6.0
+                1.6.1
               </div>
             
           
@@ -161,8 +162,6 @@
         
           <li><a href="../../index.html">Module code</a> &raquo;</li>
         
-          <li><a href="../../yggdrasil.html">yggdrasil</a> &raquo;</li>
-        
           <li><a href="../tests.html">yggdrasil.tests</a> &raquo;</li>
         
       <li>yggdrasil.tests.test_yamlfile</li>
@@ -186,10 +185,10 @@
 <span class="kn">import</span> <span class="nn">yaml</span>
 <span class="kn">import</span> <span class="nn">flaky</span>
 <span class="kn">import</span> <span class="nn">io</span> <span class="k">as</span> <span class="nn">sio</span>
-<span class="kn">from</span> <span class="nn">jsonschema.exceptions</span> <span class="k">import</span> <span class="n">ValidationError</span>
-<span class="kn">from</span> <span class="nn">yggdrasil</span> <span class="k">import</span> <span class="n">yamlfile</span>
-<span class="kn">from</span> <span class="nn">yggdrasil.tests</span> <span class="k">import</span> <span class="n">YggTestClass</span><span class="p">,</span> <span class="n">assert_raises</span><span class="p">,</span> <span class="n">assert_equal</span>
-<span class="kn">from</span> <span class="nn">yaml.constructor</span> <span class="k">import</span> <span class="n">ConstructorError</span>
+<span class="kn">from</span> <span class="nn">jsonschema.exceptions</span> <span class="kn">import</span> <span class="n">ValidationError</span>
+<span class="kn">from</span> <span class="nn">yggdrasil</span> <span class="kn">import</span> <span class="n">yamlfile</span>
+<span class="kn">from</span> <span class="nn">yggdrasil.tests</span> <span class="kn">import</span> <span class="n">YggTestClass</span><span class="p">,</span> <span class="n">assert_raises</span><span class="p">,</span> <span class="n">assert_equal</span>
+<span class="kn">from</span> <span class="nn">yaml.constructor</span> <span class="kn">import</span> <span class="n">ConstructorError</span>
 <span class="n">_yaml_env</span> <span class="o">=</span> <span class="s1">&#39;TEST_YAML_FILE&#39;</span>
 
 
@@ -257,7 +256,7 @@
     <span class="n">_include</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">()</span>
     <span class="n">_use_json</span> <span class="o">=</span> <span class="kc">False</span>
 
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">YamlTestBase</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">files</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">include_files</span> <span class="o">=</span> <span class="p">[]</span>

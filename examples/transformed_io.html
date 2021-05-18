@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>transformed_io Example &mdash; yggdrasil v1.6.0+5.g622c9ac0 documentation</title>
+  <title>transformed_io Example &mdash; yggdrasil 1.6.1 documentation</title>
   
 
   
@@ -30,6 +30,7 @@
   
     
       <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
         <script src="../_static/jquery.js"></script>
         <script src="../_static/underscore.js"></script>
         <script src="../_static/doctools.js"></script>
@@ -64,7 +65,7 @@
             
             
               <div class="version">
-                v1.6.0
+                1.6.1
               </div>
             
           
@@ -220,695 +221,391 @@
 <div class="section" id="c-version">
 <h2>C Version<a class="headerlink" href="#c-version" title="Permalink to this headline">¶</a></h2>
 <p>Model Code:</p>
-<div class="highlight-c notranslate"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
-2
-3
-4
-5
-6
-7</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="cp">#include</span> <span class="cpf">&lt;stdio.h&gt;</span><span class="cp"></span>
-
-<span class="kt">int</span> <span class="nf">modelA_function</span><span class="p">(</span><span class="kt">float</span> <span class="n">in_val</span><span class="p">,</span> <span class="kt">float</span><span class="o">*</span> <span class="n">out_val</span><span class="p">)</span> <span class="p">{</span>
-  <span class="n">out_val</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">in_val</span><span class="p">;</span>
-  <span class="n">printf</span><span class="p">(</span><span class="s">&quot;modelA_function(%f) = %f</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span> <span class="n">in_val</span><span class="p">,</span> <span class="o">*</span><span class="n">out_val</span><span class="p">);</span>
-  <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
-<span class="p">}</span>
+<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="linenos">1</span><span class="cp">#include</span> <span class="cpf">&lt;stdio.h&gt;</span><span class="cp"></span>
+<span class="linenos">2</span>
+<span class="linenos">3</span><span class="kt">int</span> <span class="nf">modelA_function</span><span class="p">(</span><span class="kt">float</span> <span class="n">in_val</span><span class="p">,</span> <span class="kt">float</span><span class="o">*</span> <span class="n">out_val</span><span class="p">)</span> <span class="p">{</span>
+<span class="linenos">4</span>  <span class="n">out_val</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">in_val</span><span class="p">;</span>
+<span class="linenos">5</span>  <span class="n">printf</span><span class="p">(</span><span class="s">&quot;modelA_function(%f) = %f</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span> <span class="n">in_val</span><span class="p">,</span> <span class="o">*</span><span class="n">out_val</span><span class="p">);</span>
+<span class="linenos">6</span>  <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+<span class="linenos">7</span><span class="p">}</span>
 </pre></div>
-</td></tr></table></div>
-<div class="highlight-c notranslate"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
-2
-3
-4
-5
-6
-7
-8
-9</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="cp">#include</span> <span class="cpf">&lt;stdio.h&gt;</span><span class="cp"></span>
-<span class="cp">#include</span> <span class="cpf">&lt;math.h&gt;</span><span class="cp"></span>
-
-<span class="kt">int</span> <span class="nf">modelB_function</span><span class="p">(</span><span class="kt">float</span> <span class="n">in_val</span><span class="p">,</span> <span class="kt">float</span><span class="o">*</span> <span class="n">in_val_copy</span><span class="p">,</span> <span class="kt">float</span><span class="o">*</span> <span class="n">out_val</span><span class="p">)</span> <span class="p">{</span>
-  <span class="n">in_val_copy</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">in_val</span><span class="p">;</span>
-  <span class="n">out_val</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="mi">3</span> <span class="o">*</span> <span class="n">in_val</span><span class="p">;</span>
-  <span class="n">printf</span><span class="p">(</span><span class="s">&quot;modelB_function(%f) = %f</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span> <span class="n">in_val</span><span class="p">,</span> <span class="o">*</span><span class="n">out_val</span><span class="p">);</span>
-  <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
-<span class="p">}</span>
+</div>
+<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="linenos">1</span><span class="cp">#include</span> <span class="cpf">&lt;stdio.h&gt;</span><span class="cp"></span>
+<span class="linenos">2</span><span class="cp">#include</span> <span class="cpf">&lt;math.h&gt;</span><span class="cp"></span>
+<span class="linenos">3</span>
+<span class="linenos">4</span><span class="kt">int</span> <span class="nf">modelB_function</span><span class="p">(</span><span class="kt">float</span> <span class="n">in_val</span><span class="p">,</span> <span class="kt">float</span><span class="o">*</span> <span class="n">in_val_copy</span><span class="p">,</span> <span class="kt">float</span><span class="o">*</span> <span class="n">out_val</span><span class="p">)</span> <span class="p">{</span>
+<span class="linenos">5</span>  <span class="n">in_val_copy</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">in_val</span><span class="p">;</span>
+<span class="linenos">6</span>  <span class="n">out_val</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="mi">3</span> <span class="o">*</span> <span class="n">in_val</span><span class="p">;</span>
+<span class="linenos">7</span>  <span class="n">printf</span><span class="p">(</span><span class="s">&quot;modelB_function(%f) = %f</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span> <span class="n">in_val</span><span class="p">,</span> <span class="o">*</span><span class="n">out_val</span><span class="p">);</span>
+<span class="linenos">8</span>  <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+<span class="linenos">9</span><span class="p">}</span>
 </pre></div>
-</td></tr></table></div>
-<div class="highlight-c notranslate"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
-2
-3
-4
-5
-6
-7
-8
-9</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="cp">#include</span> <span class="cpf">&lt;stdio.h&gt;</span><span class="cp"></span>
-<span class="cp">#include</span> <span class="cpf">&lt;math.h&gt;</span><span class="cp"></span>
-
-<span class="kt">int</span> <span class="nf">modelC_function</span><span class="p">(</span><span class="kt">float</span> <span class="n">in_val</span><span class="p">,</span> <span class="kt">float</span><span class="o">*</span> <span class="n">in_val_copy</span><span class="p">,</span> <span class="kt">float</span><span class="o">*</span> <span class="n">out_val</span><span class="p">)</span> <span class="p">{</span>
-  <span class="n">in_val_copy</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">in_val</span><span class="p">;</span>
-  <span class="n">out_val</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">in_val</span><span class="p">;</span>
-  <span class="n">printf</span><span class="p">(</span><span class="s">&quot;modelC_function(%f) = %f</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span> <span class="n">in_val</span><span class="p">,</span> <span class="o">*</span><span class="n">out_val</span><span class="p">);</span>
-  <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
-<span class="p">}</span>
+</div>
+<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="linenos">1</span><span class="cp">#include</span> <span class="cpf">&lt;stdio.h&gt;</span><span class="cp"></span>
+<span class="linenos">2</span><span class="cp">#include</span> <span class="cpf">&lt;math.h&gt;</span><span class="cp"></span>
+<span class="linenos">3</span>
+<span class="linenos">4</span><span class="kt">int</span> <span class="nf">modelC_function</span><span class="p">(</span><span class="kt">float</span> <span class="n">in_val</span><span class="p">,</span> <span class="kt">float</span><span class="o">*</span> <span class="n">in_val_copy</span><span class="p">,</span> <span class="kt">float</span><span class="o">*</span> <span class="n">out_val</span><span class="p">)</span> <span class="p">{</span>
+<span class="linenos">5</span>  <span class="n">in_val_copy</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">in_val</span><span class="p">;</span>
+<span class="linenos">6</span>  <span class="n">out_val</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">in_val</span><span class="p">;</span>
+<span class="linenos">7</span>  <span class="n">printf</span><span class="p">(</span><span class="s">&quot;modelC_function(%f) = %f</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span> <span class="n">in_val</span><span class="p">,</span> <span class="o">*</span><span class="n">out_val</span><span class="p">);</span>
+<span class="linenos">8</span>  <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+<span class="linenos">9</span><span class="p">}</span>
 </pre></div>
-</td></tr></table></div>
+</div>
 <p>Model YAML:</p>
-<div class="highlight-yaml notranslate"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
- 2
- 3
- 4
- 5
- 6
- 7
- 8
- 9
-10
-11
-12
-13
-14
-15
-16
-17
-18
-19
-20
-21
-22
-23
-24
-25
-26
-27
-28
-29
-30
-31
-32
-33
-34
-35
-36
-37
-38
-39
-40
-41
-42
-43
-44
-45
-46
-47
-48
-49
-50
-51
-52
-53
-54</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="nt">models</span><span class="p">:</span>
-  <span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">c_modelA</span>
-    <span class="nt">language</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">c</span>
-    <span class="nt">args</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">./src/transformed_io_modelA.c</span>
-    <span class="nt">function</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">modelA_function</span>
-    <span class="nt">outputs</span><span class="p">:</span>
-      <span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">c_modelA:output</span>
-        <span class="nt">vars</span><span class="p">:</span>
-          <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">out_val</span>
-
-  <span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">c_modelB</span>
-    <span class="nt">language</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">c</span>
-    <span class="nt">args</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">./src/transformed_io_modelB.c</span>
-    <span class="nt">function</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">modelB_function</span>
-    <span class="nt">outputs</span><span class="p">:</span>
-      <span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">c_modelB:output</span>
-        <span class="nt">vars</span><span class="p">:</span>
-          <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">in_val_copy</span>
-          <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">out_val</span>
-
-  <span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">c_modelC</span>
-    <span class="nt">language</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">c</span>
-    <span class="nt">args</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">./src/transformed_io_modelC.c</span>
-    <span class="nt">function</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">modelC_function</span>
-    <span class="nt">outputs</span><span class="p">:</span>
-      <span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">c_modelC:output</span>
-        <span class="nt">vars</span><span class="p">:</span>
-          <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">in_val_copy</span>
-          <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">out_val</span>
-
-<span class="nt">connections</span><span class="p">:</span>
-  <span class="p p-Indicator">-</span> <span class="nt">input</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">./Input/input.txt</span>  <span class="c1"># Connection between file and model A input</span>
-    <span class="nt">output</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">c_modelA:input</span>
-    <span class="nt">filetype</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">table</span>
-  <span class="p p-Indicator">-</span> <span class="nt">input</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">c_modelA:output</span>  <span class="c1"># Connection between model A output &amp; model B input</span>
-    <span class="nt">outputs</span><span class="p">:</span>
-      <span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">c_modelB:input</span>
-        <span class="nt">transform</span><span class="p">:</span>
-          <span class="nt">statement</span><span class="p">:</span> <span class="s">&quot;%x%*5&quot;</span>
-      <span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">c_modelC:input</span>
-        <span class="nt">transform</span><span class="p">:</span>
-          <span class="nt">function</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">./src/transformed_io_modelC.py:transform_function</span>
-  <span class="p p-Indicator">-</span> <span class="nt">inputs</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">c_modelB:output</span>  <span class="c1"># Connection between model B output and file</span>
-    <span class="nt">output</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">./outputB.txt</span>
-    <span class="nt">filetype</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">table</span>
-    <span class="nt">field_names</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">InputMassRate,OuputMassRate</span>
-    <span class="nt">field_units</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">g/s,g/s</span>
-    <span class="nt">format_str</span><span class="p">:</span> <span class="s">&quot;%.1lf\t%.1lf\n&quot;</span>
-  <span class="p p-Indicator">-</span> <span class="nt">inputs</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">c_modelC:output</span>  <span class="c1"># Connection between model C output and file</span>
-    <span class="nt">output</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">./outputC.txt</span>
-    <span class="nt">filetype</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">table</span>
-    <span class="nt">field_names</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">InputMassRate,OuputMassRateDensity</span>
-    <span class="nt">field_units</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">g/s,g/(s*(cm**2))</span>
-    <span class="nt">format_str</span><span class="p">:</span> <span class="s">&quot;%.1lf\t%.1lf\n&quot;</span>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span><span class="nt">models</span><span class="p">:</span>
+<span class="linenos"> 2</span>  <span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">c_modelA</span>
+<span class="linenos"> 3</span>    <span class="nt">language</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">c</span>
+<span class="linenos"> 4</span>    <span class="nt">args</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">./src/transformed_io_modelA.c</span>
+<span class="linenos"> 5</span>    <span class="nt">function</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">modelA_function</span>
+<span class="linenos"> 6</span>    <span class="nt">outputs</span><span class="p">:</span>
+<span class="linenos"> 7</span>      <span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">c_modelA:output</span>
+<span class="linenos"> 8</span>        <span class="nt">vars</span><span class="p">:</span>
+<span class="linenos"> 9</span>          <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">out_val</span>
+<span class="linenos">10</span>
+<span class="linenos">11</span>  <span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">c_modelB</span>
+<span class="linenos">12</span>    <span class="nt">language</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">c</span>
+<span class="linenos">13</span>    <span class="nt">args</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">./src/transformed_io_modelB.c</span>
+<span class="linenos">14</span>    <span class="nt">function</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">modelB_function</span>
+<span class="linenos">15</span>    <span class="nt">outputs</span><span class="p">:</span>
+<span class="linenos">16</span>      <span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">c_modelB:output</span>
+<span class="linenos">17</span>        <span class="nt">vars</span><span class="p">:</span>
+<span class="linenos">18</span>          <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">in_val_copy</span>
+<span class="linenos">19</span>          <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">out_val</span>
+<span class="linenos">20</span>
+<span class="linenos">21</span>  <span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">c_modelC</span>
+<span class="linenos">22</span>    <span class="nt">language</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">c</span>
+<span class="linenos">23</span>    <span class="nt">args</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">./src/transformed_io_modelC.c</span>
+<span class="linenos">24</span>    <span class="nt">function</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">modelC_function</span>
+<span class="linenos">25</span>    <span class="nt">outputs</span><span class="p">:</span>
+<span class="linenos">26</span>      <span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">c_modelC:output</span>
+<span class="linenos">27</span>        <span class="nt">vars</span><span class="p">:</span>
+<span class="linenos">28</span>          <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">in_val_copy</span>
+<span class="linenos">29</span>          <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">out_val</span>
+<span class="linenos">30</span>
+<span class="linenos">31</span><span class="nt">connections</span><span class="p">:</span>
+<span class="linenos">32</span>  <span class="p p-Indicator">-</span> <span class="nt">input</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">./Input/input.txt</span>  <span class="c1"># Connection between file and model A input</span>
+<span class="linenos">33</span>    <span class="nt">output</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">c_modelA:input</span>
+<span class="linenos">34</span>    <span class="nt">filetype</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">table</span>
+<span class="linenos">35</span>  <span class="p p-Indicator">-</span> <span class="nt">input</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">c_modelA:output</span>  <span class="c1"># Connection between model A output &amp; model B input</span>
+<span class="linenos">36</span>    <span class="nt">outputs</span><span class="p">:</span>
+<span class="linenos">37</span>      <span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">c_modelB:input</span>
+<span class="linenos">38</span>        <span class="nt">transform</span><span class="p">:</span>
+<span class="linenos">39</span>          <span class="nt">statement</span><span class="p">:</span> <span class="s">&quot;%x%*5&quot;</span>
+<span class="linenos">40</span>      <span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">c_modelC:input</span>
+<span class="linenos">41</span>        <span class="nt">transform</span><span class="p">:</span>
+<span class="linenos">42</span>          <span class="nt">function</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">./src/transformed_io_modelC.py:transform_function</span>
+<span class="linenos">43</span>  <span class="p p-Indicator">-</span> <span class="nt">inputs</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">c_modelB:output</span>  <span class="c1"># Connection between model B output and file</span>
+<span class="linenos">44</span>    <span class="nt">output</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">./outputB.txt</span>
+<span class="linenos">45</span>    <span class="nt">filetype</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">table</span>
+<span class="linenos">46</span>    <span class="nt">field_names</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">InputMassRate,OuputMassRate</span>
+<span class="linenos">47</span>    <span class="nt">field_units</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">g/s,g/s</span>
+<span class="linenos">48</span>    <span class="nt">format_str</span><span class="p">:</span> <span class="s">&quot;%.1lf\t%.1lf\n&quot;</span>
+<span class="linenos">49</span>  <span class="p p-Indicator">-</span> <span class="nt">inputs</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">c_modelC:output</span>  <span class="c1"># Connection between model C output and file</span>
+<span class="linenos">50</span>    <span class="nt">output</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">./outputC.txt</span>
+<span class="linenos">51</span>    <span class="nt">filetype</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">table</span>
+<span class="linenos">52</span>    <span class="nt">field_names</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">InputMassRate,OuputMassRateDensity</span>
+<span class="linenos">53</span>    <span class="nt">field_units</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">g/s,g/(s*(cm**2))</span>
+<span class="linenos">54</span>    <span class="nt">format_str</span><span class="p">:</span> <span class="s">&quot;%.1lf\t%.1lf\n&quot;</span>
 </pre></div>
-</td></tr></table></div>
+</div>
 </div>
 <div class="section" id="id1">
 <h2>C++ Version<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h2>
 <p>Model Code:</p>
-<div class="highlight-c++ notranslate"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
-2
-3
-4
-5
-6
-7</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="cp">#include</span> <span class="cpf">&lt;iostream&gt;</span><span class="cp"></span>
-
-<span class="kt">int</span> <span class="nf">modelA_function</span><span class="p">(</span><span class="kt">float</span> <span class="n">in_val</span><span class="p">,</span> <span class="kt">float</span> <span class="o">&amp;</span><span class="n">out_val</span><span class="p">)</span> <span class="p">{</span>
-  <span class="n">out_val</span> <span class="o">=</span> <span class="n">in_val</span><span class="p">;</span>
-  <span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="s">&quot;modelA_function(&quot;</span> <span class="o">&lt;&lt;</span> <span class="n">in_val</span> <span class="o">&lt;&lt;</span> <span class="s">&quot;) = &quot;</span> <span class="o">&lt;&lt;</span> <span class="n">out_val</span> <span class="o">&lt;&lt;</span> <span class="n">std</span><span class="o">::</span><span class="n">endl</span><span class="p">;</span>
-  <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
-<span class="p">}</span>
+<div class="highlight-c++ notranslate"><div class="highlight"><pre><span></span><span class="linenos">1</span><span class="cp">#include</span> <span class="cpf">&lt;iostream&gt;</span><span class="cp"></span>
+<span class="linenos">2</span>
+<span class="linenos">3</span><span class="kt">int</span> <span class="nf">modelA_function</span><span class="p">(</span><span class="kt">float</span> <span class="n">in_val</span><span class="p">,</span> <span class="kt">float</span> <span class="o">&amp;</span><span class="n">out_val</span><span class="p">)</span> <span class="p">{</span>
+<span class="linenos">4</span>  <span class="n">out_val</span> <span class="o">=</span> <span class="n">in_val</span><span class="p">;</span>
+<span class="linenos">5</span>  <span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="s">&quot;modelA_function(&quot;</span> <span class="o">&lt;&lt;</span> <span class="n">in_val</span> <span class="o">&lt;&lt;</span> <span class="s">&quot;) = &quot;</span> <span class="o">&lt;&lt;</span> <span class="n">out_val</span> <span class="o">&lt;&lt;</span> <span class="n">std</span><span class="o">::</span><span class="n">endl</span><span class="p">;</span>
+<span class="linenos">6</span>  <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+<span class="linenos">7</span><span class="p">}</span>
 </pre></div>
-</td></tr></table></div>
-<div class="highlight-c++ notranslate"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
-2
-3
-4
-5
-6
-7
-8
-9</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="cp">#include</span> <span class="cpf">&lt;iostream&gt;</span><span class="cp"></span>
-<span class="cp">#include</span> <span class="cpf">&lt;math.h&gt;</span><span class="cp"></span>
-
-<span class="kt">int</span> <span class="nf">modelB_function</span><span class="p">(</span><span class="kt">float</span> <span class="n">in_val</span><span class="p">,</span> <span class="kt">float</span> <span class="o">&amp;</span><span class="n">in_val_copy</span><span class="p">,</span> <span class="kt">float</span> <span class="o">&amp;</span><span class="n">out_val</span><span class="p">)</span> <span class="p">{</span>
-  <span class="n">in_val_copy</span> <span class="o">=</span> <span class="n">in_val</span><span class="p">;</span>
-  <span class="n">out_val</span> <span class="o">=</span> <span class="mi">3</span> <span class="o">*</span> <span class="n">in_val</span><span class="p">;</span>
-  <span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="s">&quot;modelB_function(&quot;</span> <span class="o">&lt;&lt;</span> <span class="n">in_val</span> <span class="o">&lt;&lt;</span> <span class="s">&quot;) = &quot;</span> <span class="o">&lt;&lt;</span> <span class="n">out_val</span> <span class="o">&lt;&lt;</span> <span class="n">std</span><span class="o">::</span><span class="n">endl</span><span class="p">;</span>
-  <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
-<span class="p">}</span>
+</div>
+<div class="highlight-c++ notranslate"><div class="highlight"><pre><span></span><span class="linenos">1</span><span class="cp">#include</span> <span class="cpf">&lt;iostream&gt;</span><span class="cp"></span>
+<span class="linenos">2</span><span class="cp">#include</span> <span class="cpf">&lt;math.h&gt;</span><span class="cp"></span>
+<span class="linenos">3</span>
+<span class="linenos">4</span><span class="kt">int</span> <span class="nf">modelB_function</span><span class="p">(</span><span class="kt">float</span> <span class="n">in_val</span><span class="p">,</span> <span class="kt">float</span> <span class="o">&amp;</span><span class="n">in_val_copy</span><span class="p">,</span> <span class="kt">float</span> <span class="o">&amp;</span><span class="n">out_val</span><span class="p">)</span> <span class="p">{</span>
+<span class="linenos">5</span>  <span class="n">in_val_copy</span> <span class="o">=</span> <span class="n">in_val</span><span class="p">;</span>
+<span class="linenos">6</span>  <span class="n">out_val</span> <span class="o">=</span> <span class="mi">3</span> <span class="o">*</span> <span class="n">in_val</span><span class="p">;</span>
+<span class="linenos">7</span>  <span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="s">&quot;modelB_function(&quot;</span> <span class="o">&lt;&lt;</span> <span class="n">in_val</span> <span class="o">&lt;&lt;</span> <span class="s">&quot;) = &quot;</span> <span class="o">&lt;&lt;</span> <span class="n">out_val</span> <span class="o">&lt;&lt;</span> <span class="n">std</span><span class="o">::</span><span class="n">endl</span><span class="p">;</span>
+<span class="linenos">8</span>  <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+<span class="linenos">9</span><span class="p">}</span>
 </pre></div>
-</td></tr></table></div>
-<div class="highlight-c++ notranslate"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
-2
-3
-4
-5
-6
-7
-8
-9</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="cp">#include</span> <span class="cpf">&lt;iostream&gt;</span><span class="cp"></span>
-<span class="cp">#include</span> <span class="cpf">&lt;math.h&gt;</span><span class="cp"></span>
-
-<span class="kt">int</span> <span class="nf">modelC_function</span><span class="p">(</span><span class="kt">float</span> <span class="n">in_val</span><span class="p">,</span> <span class="kt">float</span> <span class="o">&amp;</span><span class="n">in_val_copy</span><span class="p">,</span> <span class="kt">float</span> <span class="o">&amp;</span><span class="n">out_val</span><span class="p">)</span> <span class="p">{</span>
-  <span class="n">in_val_copy</span> <span class="o">=</span> <span class="n">in_val</span><span class="p">;</span>
-  <span class="n">out_val</span> <span class="o">=</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">in_val</span><span class="p">;</span>
-  <span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="s">&quot;modelC_function(&quot;</span> <span class="o">&lt;&lt;</span> <span class="n">in_val</span> <span class="o">&lt;&lt;</span> <span class="s">&quot;) = &quot;</span> <span class="o">&lt;&lt;</span> <span class="n">out_val</span> <span class="o">&lt;&lt;</span> <span class="n">std</span><span class="o">::</span><span class="n">endl</span><span class="p">;</span>
-  <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
-<span class="p">}</span>
+</div>
+<div class="highlight-c++ notranslate"><div class="highlight"><pre><span></span><span class="linenos">1</span><span class="cp">#include</span> <span class="cpf">&lt;iostream&gt;</span><span class="cp"></span>
+<span class="linenos">2</span><span class="cp">#include</span> <span class="cpf">&lt;math.h&gt;</span><span class="cp"></span>
+<span class="linenos">3</span>
+<span class="linenos">4</span><span class="kt">int</span> <span class="nf">modelC_function</span><span class="p">(</span><span class="kt">float</span> <span class="n">in_val</span><span class="p">,</span> <span class="kt">float</span> <span class="o">&amp;</span><span class="n">in_val_copy</span><span class="p">,</span> <span class="kt">float</span> <span class="o">&amp;</span><span class="n">out_val</span><span class="p">)</span> <span class="p">{</span>
+<span class="linenos">5</span>  <span class="n">in_val_copy</span> <span class="o">=</span> <span class="n">in_val</span><span class="p">;</span>
+<span class="linenos">6</span>  <span class="n">out_val</span> <span class="o">=</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">in_val</span><span class="p">;</span>
+<span class="linenos">7</span>  <span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="s">&quot;modelC_function(&quot;</span> <span class="o">&lt;&lt;</span> <span class="n">in_val</span> <span class="o">&lt;&lt;</span> <span class="s">&quot;) = &quot;</span> <span class="o">&lt;&lt;</span> <span class="n">out_val</span> <span class="o">&lt;&lt;</span> <span class="n">std</span><span class="o">::</span><span class="n">endl</span><span class="p">;</span>
+<span class="linenos">8</span>  <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+<span class="linenos">9</span><span class="p">}</span>
 </pre></div>
-</td></tr></table></div>
+</div>
 <p>Model YAML:</p>
-<div class="highlight-yaml notranslate"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
- 2
- 3
- 4
- 5
- 6
- 7
- 8
- 9
-10
-11
-12
-13
-14
-15
-16
-17
-18
-19
-20
-21
-22
-23
-24
-25
-26
-27
-28
-29
-30
-31
-32
-33
-34
-35
-36
-37
-38
-39
-40
-41
-42
-43
-44
-45
-46
-47
-48
-49
-50
-51
-52
-53
-54</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="nt">models</span><span class="p">:</span>
-  <span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">cpp_modelA</span>
-    <span class="nt">language</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">cpp</span>
-    <span class="nt">args</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">./src/transformed_io_modelA.cpp</span>
-    <span class="nt">function</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">modelA_function</span>
-    <span class="nt">outputs</span><span class="p">:</span>
-      <span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">cpp_modelA:output</span>
-        <span class="nt">vars</span><span class="p">:</span>
-          <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">out_val</span>
-
-  <span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">cpp_modelB</span>
-    <span class="nt">language</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">cpp</span>
-    <span class="nt">args</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">./src/transformed_io_modelB.cpp</span>
-    <span class="nt">function</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">modelB_function</span>
-    <span class="nt">outputs</span><span class="p">:</span>
-      <span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">cpp_modelB:output</span>
-        <span class="nt">vars</span><span class="p">:</span>
-          <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">in_val_copy</span>
-          <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">out_val</span>
-
-  <span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">cpp_modelC</span>
-    <span class="nt">language</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">cpp</span>
-    <span class="nt">args</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">./src/transformed_io_modelC.cpp</span>
-    <span class="nt">function</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">modelC_function</span>
-    <span class="nt">outputs</span><span class="p">:</span>
-      <span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">cpp_modelC:output</span>
-        <span class="nt">vars</span><span class="p">:</span>
-          <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">in_val_copy</span>
-          <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">out_val</span>
-
-<span class="nt">connections</span><span class="p">:</span>
-  <span class="p p-Indicator">-</span> <span class="nt">input</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">./Input/input.txt</span>  <span class="c1"># Connection between file and model A input</span>
-    <span class="nt">output</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">cpp_modelA:input</span>
-    <span class="nt">filetype</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">table</span>
-  <span class="p p-Indicator">-</span> <span class="nt">input</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">cpp_modelA:output</span>  <span class="c1"># Connection between model A output &amp; model B input</span>
-    <span class="nt">outputs</span><span class="p">:</span>
-      <span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">cpp_modelB:input</span>
-        <span class="nt">transform</span><span class="p">:</span>
-          <span class="nt">statement</span><span class="p">:</span> <span class="s">&quot;%x%*5&quot;</span>
-      <span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">cpp_modelC:input</span>
-        <span class="nt">transform</span><span class="p">:</span>
-          <span class="nt">function</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">./src/transformed_io_modelC.py:transform_function</span>
-  <span class="p p-Indicator">-</span> <span class="nt">inputs</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">cpp_modelB:output</span>  <span class="c1"># Connection between model B output and file</span>
-    <span class="nt">output</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">./outputB.txt</span>
-    <span class="nt">filetype</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">table</span>
-    <span class="nt">field_names</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">InputMassRate,OuputMassRate</span>
-    <span class="nt">field_units</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">g/s,g/s</span>
-    <span class="nt">format_str</span><span class="p">:</span> <span class="s">&quot;%.1lf\t%.1lf\n&quot;</span>
-  <span class="p p-Indicator">-</span> <span class="nt">inputs</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">cpp_modelC:output</span>  <span class="c1"># Connection between model C output and file</span>
-    <span class="nt">output</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">./outputC.txt</span>
-    <span class="nt">filetype</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">table</span>
-    <span class="nt">field_names</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">InputMassRate,OuputMassRateDensity</span>
-    <span class="nt">field_units</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">g/s,g/(s*(cm**2))</span>
-    <span class="nt">format_str</span><span class="p">:</span> <span class="s">&quot;%.1lf\t%.1lf\n&quot;</span>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span><span class="nt">models</span><span class="p">:</span>
+<span class="linenos"> 2</span>  <span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">cpp_modelA</span>
+<span class="linenos"> 3</span>    <span class="nt">language</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">cpp</span>
+<span class="linenos"> 4</span>    <span class="nt">args</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">./src/transformed_io_modelA.cpp</span>
+<span class="linenos"> 5</span>    <span class="nt">function</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">modelA_function</span>
+<span class="linenos"> 6</span>    <span class="nt">outputs</span><span class="p">:</span>
+<span class="linenos"> 7</span>      <span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">cpp_modelA:output</span>
+<span class="linenos"> 8</span>        <span class="nt">vars</span><span class="p">:</span>
+<span class="linenos"> 9</span>          <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">out_val</span>
+<span class="linenos">10</span>
+<span class="linenos">11</span>  <span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">cpp_modelB</span>
+<span class="linenos">12</span>    <span class="nt">language</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">cpp</span>
+<span class="linenos">13</span>    <span class="nt">args</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">./src/transformed_io_modelB.cpp</span>
+<span class="linenos">14</span>    <span class="nt">function</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">modelB_function</span>
+<span class="linenos">15</span>    <span class="nt">outputs</span><span class="p">:</span>
+<span class="linenos">16</span>      <span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">cpp_modelB:output</span>
+<span class="linenos">17</span>        <span class="nt">vars</span><span class="p">:</span>
+<span class="linenos">18</span>          <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">in_val_copy</span>
+<span class="linenos">19</span>          <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">out_val</span>
+<span class="linenos">20</span>
+<span class="linenos">21</span>  <span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">cpp_modelC</span>
+<span class="linenos">22</span>    <span class="nt">language</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">cpp</span>
+<span class="linenos">23</span>    <span class="nt">args</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">./src/transformed_io_modelC.cpp</span>
+<span class="linenos">24</span>    <span class="nt">function</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">modelC_function</span>
+<span class="linenos">25</span>    <span class="nt">outputs</span><span class="p">:</span>
+<span class="linenos">26</span>      <span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">cpp_modelC:output</span>
+<span class="linenos">27</span>        <span class="nt">vars</span><span class="p">:</span>
+<span class="linenos">28</span>          <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">in_val_copy</span>
+<span class="linenos">29</span>          <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">out_val</span>
+<span class="linenos">30</span>
+<span class="linenos">31</span><span class="nt">connections</span><span class="p">:</span>
+<span class="linenos">32</span>  <span class="p p-Indicator">-</span> <span class="nt">input</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">./Input/input.txt</span>  <span class="c1"># Connection between file and model A input</span>
+<span class="linenos">33</span>    <span class="nt">output</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">cpp_modelA:input</span>
+<span class="linenos">34</span>    <span class="nt">filetype</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">table</span>
+<span class="linenos">35</span>  <span class="p p-Indicator">-</span> <span class="nt">input</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">cpp_modelA:output</span>  <span class="c1"># Connection between model A output &amp; model B input</span>
+<span class="linenos">36</span>    <span class="nt">outputs</span><span class="p">:</span>
+<span class="linenos">37</span>      <span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">cpp_modelB:input</span>
+<span class="linenos">38</span>        <span class="nt">transform</span><span class="p">:</span>
+<span class="linenos">39</span>          <span class="nt">statement</span><span class="p">:</span> <span class="s">&quot;%x%*5&quot;</span>
+<span class="linenos">40</span>      <span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">cpp_modelC:input</span>
+<span class="linenos">41</span>        <span class="nt">transform</span><span class="p">:</span>
+<span class="linenos">42</span>          <span class="nt">function</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">./src/transformed_io_modelC.py:transform_function</span>
+<span class="linenos">43</span>  <span class="p p-Indicator">-</span> <span class="nt">inputs</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">cpp_modelB:output</span>  <span class="c1"># Connection between model B output and file</span>
+<span class="linenos">44</span>    <span class="nt">output</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">./outputB.txt</span>
+<span class="linenos">45</span>    <span class="nt">filetype</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">table</span>
+<span class="linenos">46</span>    <span class="nt">field_names</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">InputMassRate,OuputMassRate</span>
+<span class="linenos">47</span>    <span class="nt">field_units</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">g/s,g/s</span>
+<span class="linenos">48</span>    <span class="nt">format_str</span><span class="p">:</span> <span class="s">&quot;%.1lf\t%.1lf\n&quot;</span>
+<span class="linenos">49</span>  <span class="p p-Indicator">-</span> <span class="nt">inputs</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">cpp_modelC:output</span>  <span class="c1"># Connection between model C output and file</span>
+<span class="linenos">50</span>    <span class="nt">output</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">./outputC.txt</span>
+<span class="linenos">51</span>    <span class="nt">filetype</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">table</span>
+<span class="linenos">52</span>    <span class="nt">field_names</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">InputMassRate,OuputMassRateDensity</span>
+<span class="linenos">53</span>    <span class="nt">field_units</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">g/s,g/(s*(cm**2))</span>
+<span class="linenos">54</span>    <span class="nt">format_str</span><span class="p">:</span> <span class="s">&quot;%.1lf\t%.1lf\n&quot;</span>
 </pre></div>
-</td></tr></table></div>
+</div>
 </div>
 <div class="section" id="matlab-version">
 <h2>Matlab Version<a class="headerlink" href="#matlab-version" title="Permalink to this headline">¶</a></h2>
 <p>Model Code:</p>
-<div class="highlight-matlab notranslate"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
-2
-3
-4</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="k">function</span><span class="w"> </span>out_val <span class="p">=</span><span class="w"> </span><span class="nf">transformed_io_modelA</span><span class="p">(</span>in_val<span class="p">)</span><span class="w"></span>
-<span class="w">  </span><span class="n">out_val</span> <span class="p">=</span> <span class="n">in_val</span><span class="p">;</span>
-  <span class="nb">disp</span><span class="p">(</span><span class="n">sprintf</span><span class="p">(</span><span class="s">&#39;modelA_function(%f) = %f&#39;</span><span class="p">,</span> <span class="n">in_val</span><span class="p">,</span> <span class="n">out_val</span><span class="p">));</span>
-<span class="k">end</span>
+<div class="highlight-matlab notranslate"><div class="highlight"><pre><span></span><span class="linenos">1</span><span class="k">function</span><span class="w"> </span>out_val<span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="nf">transformed_io_modelA</span><span class="p">(</span>in_val<span class="p">)</span><span class="w"></span>
+<span class="linenos">2</span><span class="w">  </span><span class="n">out_val</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="n">in_val</span><span class="p">;</span><span class="w"></span>
+<span class="linenos">3</span><span class="w">  </span><span class="nb">disp</span><span class="p">(</span><span class="nb">sprintf</span><span class="p">(</span><span class="s">&#39;modelA_function(%f) = %f&#39;</span><span class="p">,</span><span class="w"> </span><span class="n">in_val</span><span class="p">,</span><span class="w"> </span><span class="n">out_val</span><span class="p">));</span><span class="w"></span>
+<span class="linenos">4</span><span class="k">end</span><span class="w"></span>
 </pre></div>
-</td></tr></table></div>
-<div class="highlight-matlab notranslate"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
-2
-3
-4</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="k">function</span><span class="w"> </span>[in_val, out_val] <span class="p">=</span><span class="w"> </span><span class="nf">transformed_io_modelB</span><span class="p">(</span>in_val<span class="p">)</span><span class="w"></span>
-<span class="w">  </span><span class="n">out_val</span> <span class="p">=</span> <span class="mi">3</span> <span class="o">*</span> <span class="n">in_val</span><span class="p">;</span>
-  <span class="nb">disp</span><span class="p">(</span><span class="n">sprintf</span><span class="p">(</span><span class="s">&#39;modelB_function(%f) = %f&#39;</span><span class="p">,</span> <span class="n">in_val</span><span class="p">,</span> <span class="n">out_val</span><span class="p">));</span>
-<span class="k">end</span>
+</div>
+<div class="highlight-matlab notranslate"><div class="highlight"><pre><span></span><span class="linenos">1</span><span class="k">function</span><span class="w"> </span><span class="nf">[in_val, out_val] = transformed_io_modelB</span><span class="p">(</span>in_val<span class="p">)</span><span class="w"></span>
+<span class="linenos">2</span><span class="w">  </span><span class="n">out_val</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="mi">3</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">in_val</span><span class="p">;</span><span class="w"></span>
+<span class="linenos">3</span><span class="w">  </span><span class="nb">disp</span><span class="p">(</span><span class="nb">sprintf</span><span class="p">(</span><span class="s">&#39;modelB_function(%f) = %f&#39;</span><span class="p">,</span><span class="w"> </span><span class="n">in_val</span><span class="p">,</span><span class="w"> </span><span class="n">out_val</span><span class="p">));</span><span class="w"></span>
+<span class="linenos">4</span><span class="k">end</span><span class="w"></span>
 </pre></div>
-</td></tr></table></div>
-<div class="highlight-matlab notranslate"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
-2
-3
-4</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="k">function</span><span class="w"> </span>[in_val, out_val] <span class="p">=</span><span class="w"> </span><span class="nf">transformed_io_modelC</span><span class="p">(</span>in_val<span class="p">)</span><span class="w"></span>
-<span class="w">  </span><span class="n">out_val</span> <span class="p">=</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">in_val</span><span class="p">;</span>
-  <span class="nb">disp</span><span class="p">(</span><span class="n">sprintf</span><span class="p">(</span><span class="s">&#39;modelC_function(%f) = %f&#39;</span><span class="p">,</span> <span class="n">in_val</span><span class="p">,</span> <span class="n">out_val</span><span class="p">));</span>
-<span class="k">end</span>
+</div>
+<div class="highlight-matlab notranslate"><div class="highlight"><pre><span></span><span class="linenos">1</span><span class="k">function</span><span class="w"> </span><span class="nf">[in_val, out_val] = transformed_io_modelC</span><span class="p">(</span>in_val<span class="p">)</span><span class="w"></span>
+<span class="linenos">2</span><span class="w">  </span><span class="n">out_val</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="mi">2</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">in_val</span><span class="p">;</span><span class="w"></span>
+<span class="linenos">3</span><span class="w">  </span><span class="nb">disp</span><span class="p">(</span><span class="nb">sprintf</span><span class="p">(</span><span class="s">&#39;modelC_function(%f) = %f&#39;</span><span class="p">,</span><span class="w"> </span><span class="n">in_val</span><span class="p">,</span><span class="w"> </span><span class="n">out_val</span><span class="p">));</span><span class="w"></span>
+<span class="linenos">4</span><span class="k">end</span><span class="w"></span>
 </pre></div>
-</td></tr></table></div>
+</div>
 <p>Model YAML:</p>
-<div class="highlight-yaml notranslate"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
- 2
- 3
- 4
- 5
- 6
- 7
- 8
- 9
-10
-11
-12
-13
-14
-15
-16
-17
-18
-19
-20
-21
-22
-23
-24
-25
-26
-27
-28
-29
-30
-31
-32
-33
-34
-35
-36
-37
-38
-39
-40</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="nt">models</span><span class="p">:</span>
-  <span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">matlab_modelA</span>
-    <span class="nt">language</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">matlab</span>
-    <span class="nt">args</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">./src/transformed_io_modelA.m</span>
-    <span class="nt">function</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">transformed_io_modelA</span>
-
-  <span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">matlab_modelB</span>
-    <span class="nt">language</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">matlab</span>
-    <span class="nt">args</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">./src/transformed_io_modelB.m</span>
-    <span class="nt">function</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">transformed_io_modelB</span>
-
-  <span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">matlab_modelC</span>
-    <span class="nt">language</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">matlab</span>
-    <span class="nt">args</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">./src/transformed_io_modelC.m</span>
-    <span class="nt">function</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">transformed_io_modelC</span>
-
-<span class="nt">connections</span><span class="p">:</span>
-  <span class="p p-Indicator">-</span> <span class="nt">input</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">./Input/input.txt</span>  <span class="c1"># Connection between file and model A input</span>
-    <span class="nt">output</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">matlab_modelA:input</span>
-    <span class="nt">filetype</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">table</span>
-  <span class="p p-Indicator">-</span> <span class="nt">input</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">matlab_modelA:output</span>  <span class="c1"># Connection between model A output &amp; model B input</span>
-    <span class="nt">outputs</span><span class="p">:</span>
-      <span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">matlab_modelB:input</span>
-        <span class="nt">transform</span><span class="p">:</span>
-          <span class="nt">statement</span><span class="p">:</span> <span class="s">&quot;%x%*5&quot;</span>
-      <span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">matlab_modelC:input</span>
-        <span class="nt">transform</span><span class="p">:</span>
-          <span class="nt">function</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">./src/transformed_io_modelC.py:transform_function</span>
-  <span class="p p-Indicator">-</span> <span class="nt">input</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">matlab_modelB:output</span>  <span class="c1"># Connection between model B, function 1 output and file</span>
-    <span class="nt">output</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">./outputB.txt</span>
-    <span class="nt">filetype</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">table</span>
-    <span class="nt">field_names</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">InputMassRate,OuputMassRate</span>
-    <span class="nt">field_units</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">g/s,g/s</span>
-    <span class="nt">format_str</span><span class="p">:</span> <span class="s">&quot;%.1lf\t%.1lf\n&quot;</span>
-  <span class="p p-Indicator">-</span> <span class="nt">input</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">matlab_modelC:output</span>  <span class="c1"># Connection between model C, function 1 output and file</span>
-    <span class="nt">output</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">./outputC.txt</span>
-    <span class="nt">filetype</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">table</span>
-    <span class="nt">field_names</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">InputMassRate,OuputMassRateDensity</span>
-    <span class="nt">field_units</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">g/s,g/(s*(cm**2))</span>
-    <span class="nt">format_str</span><span class="p">:</span> <span class="s">&quot;%.1lf\t%.1lf\n&quot;</span>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span><span class="nt">models</span><span class="p">:</span>
+<span class="linenos"> 2</span>  <span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">matlab_modelA</span>
+<span class="linenos"> 3</span>    <span class="nt">language</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">matlab</span>
+<span class="linenos"> 4</span>    <span class="nt">args</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">./src/transformed_io_modelA.m</span>
+<span class="linenos"> 5</span>    <span class="nt">function</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">transformed_io_modelA</span>
+<span class="linenos"> 6</span>
+<span class="linenos"> 7</span>  <span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">matlab_modelB</span>
+<span class="linenos"> 8</span>    <span class="nt">language</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">matlab</span>
+<span class="linenos"> 9</span>    <span class="nt">args</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">./src/transformed_io_modelB.m</span>
+<span class="linenos">10</span>    <span class="nt">function</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">transformed_io_modelB</span>
+<span class="linenos">11</span>
+<span class="linenos">12</span>  <span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">matlab_modelC</span>
+<span class="linenos">13</span>    <span class="nt">language</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">matlab</span>
+<span class="linenos">14</span>    <span class="nt">args</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">./src/transformed_io_modelC.m</span>
+<span class="linenos">15</span>    <span class="nt">function</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">transformed_io_modelC</span>
+<span class="linenos">16</span>
+<span class="linenos">17</span><span class="nt">connections</span><span class="p">:</span>
+<span class="linenos">18</span>  <span class="p p-Indicator">-</span> <span class="nt">input</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">./Input/input.txt</span>  <span class="c1"># Connection between file and model A input</span>
+<span class="linenos">19</span>    <span class="nt">output</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">matlab_modelA:input</span>
+<span class="linenos">20</span>    <span class="nt">filetype</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">table</span>
+<span class="linenos">21</span>  <span class="p p-Indicator">-</span> <span class="nt">input</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">matlab_modelA:output</span>  <span class="c1"># Connection between model A output &amp; model B input</span>
+<span class="linenos">22</span>    <span class="nt">outputs</span><span class="p">:</span>
+<span class="linenos">23</span>      <span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">matlab_modelB:input</span>
+<span class="linenos">24</span>        <span class="nt">transform</span><span class="p">:</span>
+<span class="linenos">25</span>          <span class="nt">statement</span><span class="p">:</span> <span class="s">&quot;%x%*5&quot;</span>
+<span class="linenos">26</span>      <span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">matlab_modelC:input</span>
+<span class="linenos">27</span>        <span class="nt">transform</span><span class="p">:</span>
+<span class="linenos">28</span>          <span class="nt">function</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">./src/transformed_io_modelC.py:transform_function</span>
+<span class="linenos">29</span>  <span class="p p-Indicator">-</span> <span class="nt">input</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">matlab_modelB:output</span>  <span class="c1"># Connection between model B, function 1 output and file</span>
+<span class="linenos">30</span>    <span class="nt">output</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">./outputB.txt</span>
+<span class="linenos">31</span>    <span class="nt">filetype</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">table</span>
+<span class="linenos">32</span>    <span class="nt">field_names</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">InputMassRate,OuputMassRate</span>
+<span class="linenos">33</span>    <span class="nt">field_units</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">g/s,g/s</span>
+<span class="linenos">34</span>    <span class="nt">format_str</span><span class="p">:</span> <span class="s">&quot;%.1lf\t%.1lf\n&quot;</span>
+<span class="linenos">35</span>  <span class="p p-Indicator">-</span> <span class="nt">input</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">matlab_modelC:output</span>  <span class="c1"># Connection between model C, function 1 output and file</span>
+<span class="linenos">36</span>    <span class="nt">output</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">./outputC.txt</span>
+<span class="linenos">37</span>    <span class="nt">filetype</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">table</span>
+<span class="linenos">38</span>    <span class="nt">field_names</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">InputMassRate,OuputMassRateDensity</span>
+<span class="linenos">39</span>    <span class="nt">field_units</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">g/s,g/(s*(cm**2))</span>
+<span class="linenos">40</span>    <span class="nt">format_str</span><span class="p">:</span> <span class="s">&quot;%.1lf\t%.1lf\n&quot;</span>
 </pre></div>
-</td></tr></table></div>
+</div>
 </div>
 <div class="section" id="python-version">
 <h2>Python Version<a class="headerlink" href="#python-version" title="Permalink to this headline">¶</a></h2>
 <p>Model Code:</p>
-<div class="highlight-python notranslate"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
-2
-3
-4</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">modelA_function</span><span class="p">(</span><span class="n">in_val</span><span class="p">):</span>
-    <span class="n">out_val</span> <span class="o">=</span> <span class="n">in_val</span>
-    <span class="k">print</span><span class="p">(</span><span class="s2">&quot;modelA_function(</span><span class="si">%s</span><span class="s2">) = </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">in_val</span><span class="p">,</span> <span class="n">out_val</span><span class="p">))</span>
-    <span class="k">return</span> <span class="n">out_val</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="linenos">1</span><span class="k">def</span> <span class="nf">modelA_function</span><span class="p">(</span><span class="n">in_val</span><span class="p">):</span>
+<span class="linenos">2</span>    <span class="n">out_val</span> <span class="o">=</span> <span class="n">in_val</span>
+<span class="linenos">3</span>    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;modelA_function(</span><span class="si">%s</span><span class="s2">) = </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">in_val</span><span class="p">,</span> <span class="n">out_val</span><span class="p">))</span>
+<span class="linenos">4</span>    <span class="k">return</span> <span class="n">out_val</span>
 </pre></div>
-</td></tr></table></div>
-<div class="highlight-python notranslate"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
-2
-3
-4</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">modelB_function</span><span class="p">(</span><span class="n">in_val</span><span class="p">):</span>
-    <span class="n">out_val</span> <span class="o">=</span> <span class="mi">3</span> <span class="o">*</span> <span class="n">in_val</span>
-    <span class="k">print</span><span class="p">(</span><span class="s2">&quot;modelB_function(</span><span class="si">%s</span><span class="s2">) = </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">in_val</span><span class="p">,</span> <span class="n">out_val</span><span class="p">))</span>
-    <span class="k">return</span> <span class="n">in_val</span><span class="p">,</span> <span class="n">out_val</span>
+</div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="linenos">1</span><span class="k">def</span> <span class="nf">modelB_function</span><span class="p">(</span><span class="n">in_val</span><span class="p">):</span>
+<span class="linenos">2</span>    <span class="n">out_val</span> <span class="o">=</span> <span class="mi">3</span> <span class="o">*</span> <span class="n">in_val</span>
+<span class="linenos">3</span>    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;modelB_function(</span><span class="si">%s</span><span class="s2">) = </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">in_val</span><span class="p">,</span> <span class="n">out_val</span><span class="p">))</span>
+<span class="linenos">4</span>    <span class="k">return</span> <span class="n">in_val</span><span class="p">,</span> <span class="n">out_val</span>
 </pre></div>
-</td></tr></table></div>
-<div class="highlight-python notranslate"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
- 2
- 3
- 4
- 5
- 6
- 7
- 8
- 9
-10
-11</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">yggdrasil</span> <span class="kn">import</span> <span class="n">units</span>
-
-
-<span class="k">def</span> <span class="nf">modelC_function</span><span class="p">(</span><span class="n">in_val</span><span class="p">):</span>
-    <span class="n">out_val</span> <span class="o">=</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">in_val</span>
-    <span class="k">print</span><span class="p">(</span><span class="s2">&quot;modelC_function(</span><span class="si">%s</span><span class="s2">) = </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">in_val</span><span class="p">,</span> <span class="n">out_val</span><span class="p">))</span>
-    <span class="k">return</span> <span class="n">in_val</span><span class="p">,</span> <span class="n">out_val</span>
-
-
-<span class="k">def</span> <span class="nf">transform_function</span><span class="p">(</span><span class="n">in_val</span><span class="p">):</span>
-    <span class="k">return</span> <span class="p">(</span><span class="n">in_val</span> <span class="o">/</span> <span class="n">units</span><span class="o">.</span><span class="n">add_units</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="s1">&#39;cm**2&#39;</span><span class="p">))</span>
+</div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span><span class="kn">from</span> <span class="nn">yggdrasil</span> <span class="kn">import</span> <span class="n">units</span>
+<span class="linenos"> 2</span>
+<span class="linenos"> 3</span>
+<span class="linenos"> 4</span><span class="k">def</span> <span class="nf">modelC_function</span><span class="p">(</span><span class="n">in_val</span><span class="p">):</span>
+<span class="linenos"> 5</span>    <span class="n">out_val</span> <span class="o">=</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">in_val</span>
+<span class="linenos"> 6</span>    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;modelC_function(</span><span class="si">%s</span><span class="s2">) = </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">in_val</span><span class="p">,</span> <span class="n">out_val</span><span class="p">))</span>
+<span class="linenos"> 7</span>    <span class="k">return</span> <span class="n">in_val</span><span class="p">,</span> <span class="n">out_val</span>
+<span class="linenos"> 8</span>
+<span class="linenos"> 9</span>
+<span class="linenos">10</span><span class="k">def</span> <span class="nf">transform_function</span><span class="p">(</span><span class="n">in_val</span><span class="p">):</span>
+<span class="linenos">11</span>    <span class="k">return</span> <span class="p">(</span><span class="n">in_val</span> <span class="o">/</span> <span class="n">units</span><span class="o">.</span><span class="n">add_units</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="s1">&#39;cm**2&#39;</span><span class="p">))</span>
 </pre></div>
-</td></tr></table></div>
+</div>
 <p>Model YAML:</p>
-<div class="highlight-yaml notranslate"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
- 2
- 3
- 4
- 5
- 6
- 7
- 8
- 9
-10
-11
-12
-13
-14
-15
-16
-17
-18
-19
-20
-21
-22
-23
-24
-25
-26
-27
-28
-29
-30
-31
-32
-33
-34
-35
-36
-37
-38
-39
-40</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="nt">models</span><span class="p">:</span>
-  <span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">python_modelA</span>
-    <span class="nt">language</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">python</span>
-    <span class="nt">args</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">./src/transformed_io_modelA.py</span>
-    <span class="nt">function</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">modelA_function</span>
-
-  <span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">python_modelB</span>
-    <span class="nt">language</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">python</span>
-    <span class="nt">args</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">./src/transformed_io_modelB.py</span>
-    <span class="nt">function</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">modelB_function</span>
-
-  <span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">python_modelC</span>
-    <span class="nt">language</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">python</span>
-    <span class="nt">args</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">./src/transformed_io_modelC.py</span>
-    <span class="nt">function</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">modelC_function</span>
-
-<span class="nt">connections</span><span class="p">:</span>
-  <span class="p p-Indicator">-</span> <span class="nt">input</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">./Input/input.txt</span>  <span class="c1"># Connection between file and model A input</span>
-    <span class="nt">output</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">python_modelA:input</span>
-    <span class="nt">filetype</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">table</span>
-  <span class="p p-Indicator">-</span> <span class="nt">input</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">python_modelA:output</span>  <span class="c1"># Connection between model A output &amp; model B input</span>
-    <span class="nt">outputs</span><span class="p">:</span>
-      <span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">python_modelB:input</span>
-        <span class="nt">transform</span><span class="p">:</span>
-          <span class="nt">statement</span><span class="p">:</span> <span class="s">&quot;%x%*5&quot;</span>
-      <span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">python_modelC:input</span>
-        <span class="nt">transform</span><span class="p">:</span>
-          <span class="nt">function</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">./src/transformed_io_modelC.py:transform_function</span>
-  <span class="p p-Indicator">-</span> <span class="nt">input</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">python_modelB:output</span>  <span class="c1"># Connection between model B, function 1 output and file</span>
-    <span class="nt">output</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">./outputB.txt</span>
-    <span class="nt">filetype</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">table</span>
-    <span class="nt">field_names</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">InputMassRate,OuputMassRate</span>
-    <span class="nt">field_units</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">g/s,g/s</span>
-    <span class="nt">format_str</span><span class="p">:</span> <span class="s">&quot;%.1lf\t%.1lf\n&quot;</span>
-  <span class="p p-Indicator">-</span> <span class="nt">input</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">python_modelC:output</span>  <span class="c1"># Connection between model C, function 1 output and file</span>
-    <span class="nt">output</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">./outputC.txt</span>
-    <span class="nt">filetype</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">table</span>
-    <span class="nt">field_names</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">InputMassRate,OuputMassRateDensity</span>
-    <span class="nt">field_units</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">g/s,g/(s*(cm**2))</span>
-    <span class="nt">format_str</span><span class="p">:</span> <span class="s">&quot;%.1lf\t%.1lf\n&quot;</span>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span><span class="nt">models</span><span class="p">:</span>
+<span class="linenos"> 2</span>  <span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">python_modelA</span>
+<span class="linenos"> 3</span>    <span class="nt">language</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">python</span>
+<span class="linenos"> 4</span>    <span class="nt">args</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">./src/transformed_io_modelA.py</span>
+<span class="linenos"> 5</span>    <span class="nt">function</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">modelA_function</span>
+<span class="linenos"> 6</span>
+<span class="linenos"> 7</span>  <span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">python_modelB</span>
+<span class="linenos"> 8</span>    <span class="nt">language</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">python</span>
+<span class="linenos"> 9</span>    <span class="nt">args</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">./src/transformed_io_modelB.py</span>
+<span class="linenos">10</span>    <span class="nt">function</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">modelB_function</span>
+<span class="linenos">11</span>
+<span class="linenos">12</span>  <span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">python_modelC</span>
+<span class="linenos">13</span>    <span class="nt">language</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">python</span>
+<span class="linenos">14</span>    <span class="nt">args</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">./src/transformed_io_modelC.py</span>
+<span class="linenos">15</span>    <span class="nt">function</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">modelC_function</span>
+<span class="linenos">16</span>
+<span class="linenos">17</span><span class="nt">connections</span><span class="p">:</span>
+<span class="linenos">18</span>  <span class="p p-Indicator">-</span> <span class="nt">input</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">./Input/input.txt</span>  <span class="c1"># Connection between file and model A input</span>
+<span class="linenos">19</span>    <span class="nt">output</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">python_modelA:input</span>
+<span class="linenos">20</span>    <span class="nt">filetype</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">table</span>
+<span class="linenos">21</span>  <span class="p p-Indicator">-</span> <span class="nt">input</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">python_modelA:output</span>  <span class="c1"># Connection between model A output &amp; model B input</span>
+<span class="linenos">22</span>    <span class="nt">outputs</span><span class="p">:</span>
+<span class="linenos">23</span>      <span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">python_modelB:input</span>
+<span class="linenos">24</span>        <span class="nt">transform</span><span class="p">:</span>
+<span class="linenos">25</span>          <span class="nt">statement</span><span class="p">:</span> <span class="s">&quot;%x%*5&quot;</span>
+<span class="linenos">26</span>      <span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">python_modelC:input</span>
+<span class="linenos">27</span>        <span class="nt">transform</span><span class="p">:</span>
+<span class="linenos">28</span>          <span class="nt">function</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">./src/transformed_io_modelC.py:transform_function</span>
+<span class="linenos">29</span>  <span class="p p-Indicator">-</span> <span class="nt">input</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">python_modelB:output</span>  <span class="c1"># Connection between model B, function 1 output and file</span>
+<span class="linenos">30</span>    <span class="nt">output</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">./outputB.txt</span>
+<span class="linenos">31</span>    <span class="nt">filetype</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">table</span>
+<span class="linenos">32</span>    <span class="nt">field_names</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">InputMassRate,OuputMassRate</span>
+<span class="linenos">33</span>    <span class="nt">field_units</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">g/s,g/s</span>
+<span class="linenos">34</span>    <span class="nt">format_str</span><span class="p">:</span> <span class="s">&quot;%.1lf\t%.1lf\n&quot;</span>
+<span class="linenos">35</span>  <span class="p p-Indicator">-</span> <span class="nt">input</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">python_modelC:output</span>  <span class="c1"># Connection between model C, function 1 output and file</span>
+<span class="linenos">36</span>    <span class="nt">output</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">./outputC.txt</span>
+<span class="linenos">37</span>    <span class="nt">filetype</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">table</span>
+<span class="linenos">38</span>    <span class="nt">field_names</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">InputMassRate,OuputMassRateDensity</span>
+<span class="linenos">39</span>    <span class="nt">field_units</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">g/s,g/(s*(cm**2))</span>
+<span class="linenos">40</span>    <span class="nt">format_str</span><span class="p">:</span> <span class="s">&quot;%.1lf\t%.1lf\n&quot;</span>
 </pre></div>
-</td></tr></table></div>
+</div>
 </div>
 <div class="section" id="r-version">
 <h2>R Version<a class="headerlink" href="#r-version" title="Permalink to this headline">¶</a></h2>
 <p>Model Code:</p>
-<div class="highlight-python notranslate"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
-2
-3
-4
-5</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="n">modelA_function</span> <span class="o">&lt;-</span> <span class="n">function</span><span class="p">(</span><span class="n">in_val</span><span class="p">)</span> <span class="p">{</span>
-  <span class="n">out_val</span> <span class="o">&lt;-</span> <span class="n">in_val</span>
-  <span class="k">print</span><span class="p">(</span><span class="n">sprintf</span><span class="p">(</span><span class="s2">&quot;modelA_function(</span><span class="si">%f</span><span class="s2">) = </span><span class="si">%f</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">in_val</span><span class="p">,</span> <span class="n">out_val</span><span class="p">))</span>
-  <span class="k">return</span><span class="p">(</span><span class="n">out_val</span><span class="p">)</span>
-<span class="p">}</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="linenos">1</span><span class="n">modelA_function</span> <span class="o">&lt;-</span> <span class="n">function</span><span class="p">(</span><span class="n">in_val</span><span class="p">)</span> <span class="p">{</span>
+<span class="linenos">2</span>  <span class="n">out_val</span> <span class="o">&lt;-</span> <span class="n">in_val</span>
+<span class="linenos">3</span>  <span class="nb">print</span><span class="p">(</span><span class="n">sprintf</span><span class="p">(</span><span class="s2">&quot;modelA_function(</span><span class="si">%f</span><span class="s2">) = </span><span class="si">%f</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">in_val</span><span class="p">,</span> <span class="n">out_val</span><span class="p">))</span>
+<span class="linenos">4</span>  <span class="k">return</span><span class="p">(</span><span class="n">out_val</span><span class="p">)</span>
+<span class="linenos">5</span><span class="p">}</span>
 </pre></div>
-</td></tr></table></div>
-<div class="highlight-python notranslate"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
-2
-3
-4
-5</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="n">modelB_function</span> <span class="o">&lt;-</span> <span class="n">function</span><span class="p">(</span><span class="n">in_val</span><span class="p">)</span> <span class="p">{</span>
-  <span class="n">out_val</span> <span class="o">&lt;-</span> <span class="mi">3</span> <span class="o">*</span> <span class="n">in_val</span>
-  <span class="k">print</span><span class="p">(</span><span class="n">sprintf</span><span class="p">(</span><span class="s2">&quot;modelB_function(</span><span class="si">%f</span><span class="s2">) = </span><span class="si">%f</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">in_val</span><span class="p">,</span> <span class="n">out_val</span><span class="p">))</span>
-  <span class="k">return</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">in_val</span><span class="p">,</span> <span class="n">out_val</span><span class="p">))</span>
-<span class="p">}</span>
+</div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="linenos">1</span><span class="n">modelB_function</span> <span class="o">&lt;-</span> <span class="n">function</span><span class="p">(</span><span class="n">in_val</span><span class="p">)</span> <span class="p">{</span>
+<span class="linenos">2</span>  <span class="n">out_val</span> <span class="o">&lt;-</span> <span class="mi">3</span> <span class="o">*</span> <span class="n">in_val</span>
+<span class="linenos">3</span>  <span class="nb">print</span><span class="p">(</span><span class="n">sprintf</span><span class="p">(</span><span class="s2">&quot;modelB_function(</span><span class="si">%f</span><span class="s2">) = </span><span class="si">%f</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">in_val</span><span class="p">,</span> <span class="n">out_val</span><span class="p">))</span>
+<span class="linenos">4</span>  <span class="k">return</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">in_val</span><span class="p">,</span> <span class="n">out_val</span><span class="p">))</span>
+<span class="linenos">5</span><span class="p">}</span>
 </pre></div>
-</td></tr></table></div>
-<div class="highlight-python notranslate"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
-2
-3
-4
-5</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="n">modelC_function</span> <span class="o">&lt;-</span> <span class="n">function</span><span class="p">(</span><span class="n">in_val</span><span class="p">)</span> <span class="p">{</span>
-  <span class="n">out_val</span> <span class="o">&lt;-</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">in_val</span>
-  <span class="k">print</span><span class="p">(</span><span class="n">sprintf</span><span class="p">(</span><span class="s2">&quot;modelC_function(</span><span class="si">%f</span><span class="s2">) = </span><span class="si">%f</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">in_val</span><span class="p">,</span> <span class="n">out_val</span><span class="p">))</span>
-  <span class="k">return</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">in_val</span><span class="p">,</span> <span class="n">out_val</span><span class="p">))</span>
-<span class="p">}</span>
+</div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="linenos">1</span><span class="n">modelC_function</span> <span class="o">&lt;-</span> <span class="n">function</span><span class="p">(</span><span class="n">in_val</span><span class="p">)</span> <span class="p">{</span>
+<span class="linenos">2</span>  <span class="n">out_val</span> <span class="o">&lt;-</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">in_val</span>
+<span class="linenos">3</span>  <span class="nb">print</span><span class="p">(</span><span class="n">sprintf</span><span class="p">(</span><span class="s2">&quot;modelC_function(</span><span class="si">%f</span><span class="s2">) = </span><span class="si">%f</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">in_val</span><span class="p">,</span> <span class="n">out_val</span><span class="p">))</span>
+<span class="linenos">4</span>  <span class="k">return</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">in_val</span><span class="p">,</span> <span class="n">out_val</span><span class="p">))</span>
+<span class="linenos">5</span><span class="p">}</span>
 </pre></div>
-</td></tr></table></div>
+</div>
 <p>Model YAML:</p>
-<div class="highlight-yaml notranslate"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
- 2
- 3
- 4
- 5
- 6
- 7
- 8
- 9
-10
-11
-12
-13
-14
-15
-16
-17
-18
-19
-20
-21
-22
-23
-24
-25
-26
-27
-28
-29
-30
-31
-32
-33
-34
-35
-36
-37
-38
-39
-40</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="nt">models</span><span class="p">:</span>
-  <span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">R_modelA</span>
-    <span class="nt">language</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">R</span>
-    <span class="nt">args</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">./src/transformed_io_modelA.R</span>
-    <span class="nt">function</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">modelA_function</span>
-
-  <span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">R_modelB</span>
-    <span class="nt">language</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">R</span>
-    <span class="nt">args</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">./src/transformed_io_modelB.R</span>
-    <span class="nt">function</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">modelB_function</span>
-
-  <span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">R_modelC</span>
-    <span class="nt">language</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">R</span>
-    <span class="nt">args</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">./src/transformed_io_modelC.R</span>
-    <span class="nt">function</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">modelC_function</span>
-
-<span class="nt">connections</span><span class="p">:</span>
-  <span class="p p-Indicator">-</span> <span class="nt">input</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">./Input/input.txt</span>  <span class="c1"># Connection between file and model A input</span>
-    <span class="nt">output</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">R_modelA:input</span>
-    <span class="nt">filetype</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">table</span>
-  <span class="p p-Indicator">-</span> <span class="nt">input</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">R_modelA:output</span>  <span class="c1"># Connection between model A output &amp; model B input</span>
-    <span class="nt">outputs</span><span class="p">:</span>
-      <span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">R_modelB:input</span>
-        <span class="nt">transform</span><span class="p">:</span>
-          <span class="nt">statement</span><span class="p">:</span> <span class="s">&quot;%x%*5&quot;</span>
-      <span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">R_modelC:input</span>
-        <span class="nt">transform</span><span class="p">:</span>
-          <span class="nt">function</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">./src/transformed_io_modelC.py:transform_function</span>
-  <span class="p p-Indicator">-</span> <span class="nt">input</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">R_modelB:output</span>  <span class="c1"># Connection between model B, function 1 output and file</span>
-    <span class="nt">output</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">./outputB.txt</span>
-    <span class="nt">filetype</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">table</span>
-    <span class="nt">field_names</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">InputMassRate,OuputMassRate</span>
-    <span class="nt">field_units</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">g/s,g/s</span>
-    <span class="nt">format_str</span><span class="p">:</span> <span class="s">&quot;%.1lf\t%.1lf\n&quot;</span>
-  <span class="p p-Indicator">-</span> <span class="nt">input</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">R_modelC:output</span>  <span class="c1"># Connection between model C, function 1 output and file</span>
-    <span class="nt">output</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">./outputC.txt</span>
-    <span class="nt">filetype</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">table</span>
-    <span class="nt">field_names</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">InputMassRate,OuputMassRateDensity</span>
-    <span class="nt">field_units</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">g/s,g/(s*(cm**2))</span>
-    <span class="nt">format_str</span><span class="p">:</span> <span class="s">&quot;%.1lf\t%.1lf\n&quot;</span>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span><span class="nt">models</span><span class="p">:</span>
+<span class="linenos"> 2</span>  <span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">R_modelA</span>
+<span class="linenos"> 3</span>    <span class="nt">language</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">R</span>
+<span class="linenos"> 4</span>    <span class="nt">args</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">./src/transformed_io_modelA.R</span>
+<span class="linenos"> 5</span>    <span class="nt">function</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">modelA_function</span>
+<span class="linenos"> 6</span>
+<span class="linenos"> 7</span>  <span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">R_modelB</span>
+<span class="linenos"> 8</span>    <span class="nt">language</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">R</span>
+<span class="linenos"> 9</span>    <span class="nt">args</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">./src/transformed_io_modelB.R</span>
+<span class="linenos">10</span>    <span class="nt">function</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">modelB_function</span>
+<span class="linenos">11</span>
+<span class="linenos">12</span>  <span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">R_modelC</span>
+<span class="linenos">13</span>    <span class="nt">language</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">R</span>
+<span class="linenos">14</span>    <span class="nt">args</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">./src/transformed_io_modelC.R</span>
+<span class="linenos">15</span>    <span class="nt">function</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">modelC_function</span>
+<span class="linenos">16</span>
+<span class="linenos">17</span><span class="nt">connections</span><span class="p">:</span>
+<span class="linenos">18</span>  <span class="p p-Indicator">-</span> <span class="nt">input</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">./Input/input.txt</span>  <span class="c1"># Connection between file and model A input</span>
+<span class="linenos">19</span>    <span class="nt">output</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">R_modelA:input</span>
+<span class="linenos">20</span>    <span class="nt">filetype</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">table</span>
+<span class="linenos">21</span>  <span class="p p-Indicator">-</span> <span class="nt">input</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">R_modelA:output</span>  <span class="c1"># Connection between model A output &amp; model B input</span>
+<span class="linenos">22</span>    <span class="nt">outputs</span><span class="p">:</span>
+<span class="linenos">23</span>      <span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">R_modelB:input</span>
+<span class="linenos">24</span>        <span class="nt">transform</span><span class="p">:</span>
+<span class="linenos">25</span>          <span class="nt">statement</span><span class="p">:</span> <span class="s">&quot;%x%*5&quot;</span>
+<span class="linenos">26</span>      <span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">R_modelC:input</span>
+<span class="linenos">27</span>        <span class="nt">transform</span><span class="p">:</span>
+<span class="linenos">28</span>          <span class="nt">function</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">./src/transformed_io_modelC.py:transform_function</span>
+<span class="linenos">29</span>  <span class="p p-Indicator">-</span> <span class="nt">input</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">R_modelB:output</span>  <span class="c1"># Connection between model B, function 1 output and file</span>
+<span class="linenos">30</span>    <span class="nt">output</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">./outputB.txt</span>
+<span class="linenos">31</span>    <span class="nt">filetype</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">table</span>
+<span class="linenos">32</span>    <span class="nt">field_names</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">InputMassRate,OuputMassRate</span>
+<span class="linenos">33</span>    <span class="nt">field_units</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">g/s,g/s</span>
+<span class="linenos">34</span>    <span class="nt">format_str</span><span class="p">:</span> <span class="s">&quot;%.1lf\t%.1lf\n&quot;</span>
+<span class="linenos">35</span>  <span class="p p-Indicator">-</span> <span class="nt">input</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">R_modelC:output</span>  <span class="c1"># Connection between model C, function 1 output and file</span>
+<span class="linenos">36</span>    <span class="nt">output</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">./outputC.txt</span>
+<span class="linenos">37</span>    <span class="nt">filetype</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">table</span>
+<span class="linenos">38</span>    <span class="nt">field_names</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">InputMassRate,OuputMassRateDensity</span>
+<span class="linenos">39</span>    <span class="nt">field_units</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">g/s,g/(s*(cm**2))</span>
+<span class="linenos">40</span>    <span class="nt">format_str</span><span class="p">:</span> <span class="s">&quot;%.1lf\t%.1lf\n&quot;</span>
 </pre></div>
-</td></tr></table></div>
+</div>
 </div>
 </div>
 

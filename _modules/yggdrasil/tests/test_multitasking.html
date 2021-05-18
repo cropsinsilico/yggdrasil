@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>yggdrasil.tests.test_multitasking &mdash; yggdrasil v1.6.0+5.g622c9ac0 documentation</title>
+  <title>yggdrasil.tests.test_multitasking &mdash; yggdrasil 1.6.1 documentation</title>
   
 
   
@@ -30,6 +30,7 @@
   
     
       <script type="text/javascript" id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
+        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
         <script src="../../../_static/jquery.js"></script>
         <script src="../../../_static/underscore.js"></script>
         <script src="../../../_static/doctools.js"></script>
@@ -62,7 +63,7 @@
             
             
               <div class="version">
-                v1.6.0
+                1.6.1
               </div>
             
           
@@ -161,8 +162,6 @@
         
           <li><a href="../../index.html">Module code</a> &raquo;</li>
         
-          <li><a href="../../yggdrasil.html">yggdrasil</a> &raquo;</li>
-        
           <li><a href="../tests.html">yggdrasil.tests</a> &raquo;</li>
         
       <li>yggdrasil.tests.test_multitasking</li>
@@ -182,9 +181,9 @@
             
   <h1>Source code for yggdrasil.tests.test_multitasking</h1><div class="highlight"><pre>
 <span></span><span class="kn">import</span> <span class="nn">pickle</span>
-<span class="kn">from</span> <span class="nn">yggdrasil</span> <span class="k">import</span> <span class="n">multitasking</span><span class="p">,</span> <span class="n">tools</span>
-<span class="kn">from</span> <span class="nn">yggdrasil.tests</span> <span class="k">import</span> <span class="n">assert_raises</span>
-<span class="kn">from</span> <span class="nn">yggdrasil.tests.test_tools</span> <span class="k">import</span> <span class="n">YggTestClass</span>
+<span class="kn">from</span> <span class="nn">yggdrasil</span> <span class="kn">import</span> <span class="n">multitasking</span><span class="p">,</span> <span class="n">tools</span>
+<span class="kn">from</span> <span class="nn">yggdrasil.tests</span> <span class="kn">import</span> <span class="n">assert_raises</span>
+<span class="kn">from</span> <span class="nn">yggdrasil.tests.test_tools</span> <span class="kn">import</span> <span class="n">YggTestClass</span>
 
 
 <div class="viewcode-block" id="TstClass"><a class="viewcode-back" href="../../../yggdrasil.tests.html#yggdrasil.tests.test_multitasking.TstClass">[docs]</a><span class="k">class</span> <span class="nc">TstClass</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
@@ -236,7 +235,7 @@
     <span class="n">_mod</span> <span class="o">=</span> <span class="s1">&#39;yggdrasil.multitasking&#39;</span>
     <span class="n">_task_method</span> <span class="o">=</span> <span class="s1">&#39;thread&#39;</span>
 
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">TestContextThread</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_inst_kwargs</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;task_method&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_task_method</span><span class="p">}</span>
 
@@ -327,7 +326,7 @@
     <span class="n">_cls</span> <span class="o">=</span> <span class="s1">&#39;YggTask&#39;</span>
     <span class="n">_mod</span> <span class="o">=</span> <span class="s1">&#39;yggdrasil.multitasking&#39;</span>
 
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">TestYggTask</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">namespace</span> <span class="o">=</span> <span class="s1">&#39;TESTING_</span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">uuid</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">attr_list</span> <span class="o">+=</span> <span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">,</span> <span class="s1">&#39;sleeptime&#39;</span><span class="p">,</span> <span class="s1">&#39;longsleep&#39;</span><span class="p">,</span> <span class="s1">&#39;timeout&#39;</span><span class="p">]</span>
@@ -375,7 +374,7 @@
 <div class="viewcode-block" id="TestYggProcess"><a class="viewcode-back" href="../../../yggdrasil.tests.html#yggdrasil.tests.test_multitasking.TestYggProcess">[docs]</a><span class="k">class</span> <span class="nc">TestYggProcess</span><span class="p">(</span><span class="n">TestYggTask</span><span class="p">):</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test basic behavior of YggTask for spawned process.&quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">TestYggProcess</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_inst_kwargs</span><span class="p">[</span><span class="s1">&#39;task_method&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;process&#39;</span></div>
 
@@ -383,7 +382,7 @@
 <div class="viewcode-block" id="TestYggProcessFork"><a class="viewcode-back" href="../../../yggdrasil.tests.html#yggdrasil.tests.test_multitasking.TestYggProcessFork">[docs]</a><span class="k">class</span> <span class="nc">TestYggProcessFork</span><span class="p">(</span><span class="n">TestYggProcess</span><span class="p">):</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test basic behavior of YggTask for forked process.&quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">TestYggProcessFork</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_inst_kwargs</span><span class="p">[</span><span class="s1">&#39;context&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">multitasking</span><span class="o">.</span><span class="n">mp_ctx</span></div>
 </pre></div>

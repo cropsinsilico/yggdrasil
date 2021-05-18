@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>yggdrasil.communication.NetCDFFileComm &mdash; yggdrasil v1.6.0+5.g622c9ac0 documentation</title>
+  <title>yggdrasil.communication.NetCDFFileComm &mdash; yggdrasil 1.6.1 documentation</title>
   
 
   
@@ -30,6 +30,7 @@
   
     
       <script type="text/javascript" id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
+        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
         <script src="../../../_static/jquery.js"></script>
         <script src="../../../_static/underscore.js"></script>
         <script src="../../../_static/doctools.js"></script>
@@ -62,7 +63,7 @@
             
             
               <div class="version">
-                v1.6.0
+                1.6.1
               </div>
             
           
@@ -161,8 +162,6 @@
         
           <li><a href="../../index.html">Module code</a> &raquo;</li>
         
-          <li><a href="../../yggdrasil.html">yggdrasil</a> &raquo;</li>
-        
           <li><a href="../communication.html">yggdrasil.communication</a> &raquo;</li>
         
       <li>yggdrasil.communication.NetCDFFileComm</li>
@@ -186,9 +185,9 @@
 <span class="kn">import</span> <span class="nn">copy</span>
 <span class="kn">import</span> <span class="nn">pprint</span>
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
-<span class="kn">from</span> <span class="nn">scipy.io</span> <span class="k">import</span> <span class="n">netcdf</span>
-<span class="kn">from</span> <span class="nn">yggdrasil</span> <span class="k">import</span> <span class="n">units</span>
-<span class="kn">from</span> <span class="nn">yggdrasil.communication.FileComm</span> <span class="k">import</span> <span class="n">FileComm</span>
+<span class="kn">from</span> <span class="nn">scipy.io</span> <span class="kn">import</span> <span class="n">netcdf</span>
+<span class="kn">from</span> <span class="nn">yggdrasil</span> <span class="kn">import</span> <span class="n">units</span>
+<span class="kn">from</span> <span class="nn">yggdrasil.communication.FileComm</span> <span class="kn">import</span> <span class="n">FileComm</span>
 
 
 <div class="viewcode-block" id="NetCDFFileComm"><a class="viewcode-back" href="../../../yggdrasil.communication.html#yggdrasil.communication.NetCDFFileComm.NetCDFFileComm">[docs]</a><span class="k">class</span> <span class="nc">NetCDFFileComm</span><span class="p">(</span><span class="n">FileComm</span><span class="p">):</span>
@@ -217,7 +216,7 @@
     <span class="n">_mode_as_bytes</span> <span class="o">=</span> <span class="kc">False</span>
     <span class="n">_synchronous_read</span> <span class="o">=</span> <span class="kc">True</span>
 
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_fd_netcdf</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;read_meth&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;read&#39;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_last_size</span> <span class="o">=</span> <span class="mi">0</span>

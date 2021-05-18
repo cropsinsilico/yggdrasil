@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>&lt;no title&gt; &mdash; yggdrasil v1.6.0+5.g622c9ac0 documentation</title>
+  <title>&lt;no title&gt; &mdash; yggdrasil 1.6.1 documentation</title>
   
 
   
@@ -30,6 +30,7 @@
   
     
       <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
         <script src="../_static/jquery.js"></script>
         <script src="../_static/underscore.js"></script>
         <script src="../_static/doctools.js"></script>
@@ -62,7 +63,7 @@
             
             
               <div class="version">
-                v1.6.0
+                1.6.1
               </div>
             
           
@@ -179,45 +180,30 @@
            <div itemprop="articleBody">
             
   <p>Model Code:</p>
-<div class="highlight-python notranslate"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
-2
-3
-4</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">modelA_function</span><span class="p">(</span><span class="n">in_val</span><span class="p">):</span>
-    <span class="n">out_val</span> <span class="o">=</span> <span class="n">in_val</span>
-    <span class="k">print</span><span class="p">(</span><span class="s2">&quot;modelA_function(</span><span class="si">%s</span><span class="s2">) = </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">in_val</span><span class="p">,</span> <span class="n">out_val</span><span class="p">))</span>
-    <span class="k">return</span> <span class="n">out_val</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="linenos">1</span><span class="k">def</span> <span class="nf">modelA_function</span><span class="p">(</span><span class="n">in_val</span><span class="p">):</span>
+<span class="linenos">2</span>    <span class="n">out_val</span> <span class="o">=</span> <span class="n">in_val</span>
+<span class="linenos">3</span>    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;modelA_function(</span><span class="si">%s</span><span class="s2">) = </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">in_val</span><span class="p">,</span> <span class="n">out_val</span><span class="p">))</span>
+<span class="linenos">4</span>    <span class="k">return</span> <span class="n">out_val</span>
 </pre></div>
-</td></tr></table></div>
-<div class="highlight-python notranslate"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
-2
-3
-4
-5</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">modelB_function1</span><span class="p">(</span><span class="n">in_val</span><span class="p">):</span>
-    <span class="c1"># Only valid if in_val &lt;= 2</span>
-    <span class="n">out_val</span> <span class="o">=</span> <span class="n">in_val</span><span class="o">**</span><span class="mi">2</span>
-    <span class="k">print</span><span class="p">(</span><span class="s2">&quot;modelB_function1(</span><span class="si">%s</span><span class="s2">) = </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">in_val</span><span class="p">,</span> <span class="n">out_val</span><span class="p">))</span>
-    <span class="k">return</span> <span class="n">in_val</span><span class="p">,</span> <span class="n">out_val</span>
+</div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="linenos">1</span><span class="k">def</span> <span class="nf">modelB_function1</span><span class="p">(</span><span class="n">in_val</span><span class="p">):</span>
+<span class="linenos">2</span>    <span class="c1"># Only valid if in_val &lt;= 2</span>
+<span class="linenos">3</span>    <span class="n">out_val</span> <span class="o">=</span> <span class="n">in_val</span><span class="o">**</span><span class="mi">2</span>
+<span class="linenos">4</span>    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;modelB_function1(</span><span class="si">%s</span><span class="s2">) = </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">in_val</span><span class="p">,</span> <span class="n">out_val</span><span class="p">))</span>
+<span class="linenos">5</span>    <span class="k">return</span> <span class="n">in_val</span><span class="p">,</span> <span class="n">out_val</span>
 </pre></div>
-</td></tr></table></div>
-<div class="highlight-python notranslate"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
-2
-3
-4
-5
-6
-7
-8
-9</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">modelB_function2</span><span class="p">(</span><span class="n">in_val</span><span class="p">):</span>
-    <span class="c1"># Only valid if in_val &gt; 2</span>
-    <span class="n">out_val</span> <span class="o">=</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">in_val</span><span class="o">**</span><span class="mi">2</span>
-    <span class="k">print</span><span class="p">(</span><span class="s2">&quot;modelB_function2(</span><span class="si">%s</span><span class="s2">) = </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">in_val</span><span class="p">,</span> <span class="n">out_val</span><span class="p">))</span>
-    <span class="k">return</span> <span class="n">in_val</span><span class="p">,</span> <span class="n">out_val</span>
-
-
-<span class="k">def</span> <span class="nf">condition_function2</span><span class="p">(</span><span class="n">in_val</span><span class="p">):</span>
-    <span class="k">return</span> <span class="p">(</span><span class="n">in_val</span> <span class="o">&gt;</span> <span class="mi">2</span><span class="p">)</span>
+</div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="linenos">1</span><span class="k">def</span> <span class="nf">modelB_function2</span><span class="p">(</span><span class="n">in_val</span><span class="p">):</span>
+<span class="linenos">2</span>    <span class="c1"># Only valid if in_val &gt; 2</span>
+<span class="linenos">3</span>    <span class="n">out_val</span> <span class="o">=</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">in_val</span><span class="o">**</span><span class="mi">2</span>
+<span class="linenos">4</span>    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;modelB_function2(</span><span class="si">%s</span><span class="s2">) = </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">in_val</span><span class="p">,</span> <span class="n">out_val</span><span class="p">))</span>
+<span class="linenos">5</span>    <span class="k">return</span> <span class="n">in_val</span><span class="p">,</span> <span class="n">out_val</span>
+<span class="linenos">6</span>
+<span class="linenos">7</span>
+<span class="linenos">8</span><span class="k">def</span> <span class="nf">condition_function2</span><span class="p">(</span><span class="n">in_val</span><span class="p">):</span>
+<span class="linenos">9</span>    <span class="k">return</span> <span class="p">(</span><span class="n">in_val</span> <span class="o">&gt;</span> <span class="mi">2</span><span class="p">)</span>
 </pre></div>
-</td></tr></table></div>
+</div>
 <p>(<a class="reference external" href="examples/conditional_io.html">Example in other languages</a>)</p>
 
 

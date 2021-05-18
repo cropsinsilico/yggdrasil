@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>yggdrasil.communication.transforms.StatementTransform &mdash; yggdrasil v1.6.0+5.g622c9ac0 documentation</title>
+  <title>yggdrasil.communication.transforms.StatementTransform &mdash; yggdrasil 1.6.1 documentation</title>
   
 
   
@@ -30,6 +30,7 @@
   
     
       <script type="text/javascript" id="documentation_options" data-url_root="../../../../" src="../../../../_static/documentation_options.js"></script>
+        <script data-url_root="../../../../" id="documentation_options" src="../../../../_static/documentation_options.js"></script>
         <script src="../../../../_static/jquery.js"></script>
         <script src="../../../../_static/underscore.js"></script>
         <script src="../../../../_static/doctools.js"></script>
@@ -62,7 +63,7 @@
             
             
               <div class="version">
-                v1.6.0
+                1.6.1
               </div>
             
           
@@ -161,8 +162,6 @@
         
           <li><a href="../../../index.html">Module code</a> &raquo;</li>
         
-          <li><a href="../../../yggdrasil.html">yggdrasil</a> &raquo;</li>
-        
           <li><a href="../../communication.html">yggdrasil.communication</a> &raquo;</li>
         
       <li>yggdrasil.communication.transforms.StatementTransform</li>
@@ -182,9 +181,9 @@
             
   <h1>Source code for yggdrasil.communication.transforms.StatementTransform</h1><div class="highlight"><pre>
 <span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
-<span class="kn">from</span> <span class="nn">yggdrasil</span> <span class="k">import</span> <span class="n">units</span>
-<span class="kn">from</span> <span class="nn">yggdrasil.tools</span> <span class="k">import</span> <span class="n">safe_eval</span>
-<span class="kn">from</span> <span class="nn">yggdrasil.communication.transforms.TransformBase</span> <span class="k">import</span> <span class="n">TransformBase</span>
+<span class="kn">from</span> <span class="nn">yggdrasil</span> <span class="kn">import</span> <span class="n">units</span>
+<span class="kn">from</span> <span class="nn">yggdrasil.tools</span> <span class="kn">import</span> <span class="n">safe_eval</span>
+<span class="kn">from</span> <span class="nn">yggdrasil.communication.transforms.TransformBase</span> <span class="kn">import</span> <span class="n">TransformBase</span>
 
 
 <div class="viewcode-block" id="StatementTransform"><a class="viewcode-back" href="../../../../yggdrasil.communication.transforms.html#yggdrasil.communication.transforms.StatementTransform.StatementTransform">[docs]</a><span class="k">class</span> <span class="nc">StatementTransform</span><span class="p">(</span><span class="n">TransformBase</span><span class="p">):</span>
@@ -206,7 +205,7 @@
     <span class="n">_schema_required</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;statement&#39;</span><span class="p">]</span>
     <span class="n">_schema_properties</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;statement&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;string&#39;</span><span class="p">}}</span>
 
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">StatementTransform</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">statement</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">statement</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">%x</span><span class="s1">%&#39;</span><span class="p">,</span> <span class="s1">&#39;x&#39;</span><span class="p">)</span>
 

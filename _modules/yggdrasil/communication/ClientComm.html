@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>yggdrasil.communication.ClientComm &mdash; yggdrasil v1.6.0+5.g622c9ac0 documentation</title>
+  <title>yggdrasil.communication.ClientComm &mdash; yggdrasil 1.6.1 documentation</title>
   
 
   
@@ -30,6 +30,7 @@
   
     
       <script type="text/javascript" id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
+        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
         <script src="../../../_static/jquery.js"></script>
         <script src="../../../_static/underscore.js"></script>
         <script src="../../../_static/doctools.js"></script>
@@ -62,7 +63,7 @@
             
             
               <div class="version">
-                v1.6.0
+                1.6.1
               </div>
             
           
@@ -161,8 +162,6 @@
         
           <li><a href="../../index.html">Module code</a> &raquo;</li>
         
-          <li><a href="../../yggdrasil.html">yggdrasil</a> &raquo;</li>
-        
           <li><a href="../communication.html">yggdrasil.communication</a> &raquo;</li>
         
       <li>yggdrasil.communication.ClientComm</li>
@@ -182,8 +181,7 @@
             
   <h1>Source code for yggdrasil.communication.ClientComm</h1><div class="highlight"><pre>
 <span></span><span class="kn">import</span> <span class="nn">uuid</span>
-<span class="kn">from</span> <span class="nn">collections</span> <span class="k">import</span> <span class="n">OrderedDict</span>
-<span class="kn">from</span> <span class="nn">yggdrasil.communication</span> <span class="k">import</span> <span class="n">CommBase</span><span class="p">,</span> <span class="n">new_comm</span><span class="p">,</span> <span class="n">get_comm</span><span class="p">,</span> <span class="n">import_comm</span>
+<span class="kn">from</span> <span class="nn">yggdrasil.communication</span> <span class="kn">import</span> <span class="n">CommBase</span><span class="p">,</span> <span class="n">new_comm</span><span class="p">,</span> <span class="n">get_comm</span><span class="p">,</span> <span class="n">import_comm</span>
 
 
 <div class="viewcode-block" id="ClientComm"><a class="viewcode-back" href="../../../yggdrasil.communication.html#yggdrasil.communication.ClientComm.ClientComm">[docs]</a><span class="k">class</span> <span class="nc">ClientComm</span><span class="p">(</span><span class="n">CommBase</span><span class="o">.</span><span class="n">CommBase</span><span class="p">):</span>
@@ -202,17 +200,16 @@
 
 <span class="sd">    Attributes:</span>
 <span class="sd">        response_kwargs (dict): Keyword arguments for the response comm.</span>
-<span class="sd">        request_order (list): Order of request IDs.</span>
-<span class="sd">        responses (dict): Mapping between request IDs and response messages.</span>
+<span class="sd">        icomm (dict): Response comms keyed to the ID of the associated request.</span>
+<span class="sd">        icomm_order (list): Response comm keys in the order or the requests.</span>
 <span class="sd">        ocomm (Comm): Request comm.</span>
-<span class="sd">        icomm (Comm): Response comm.</span>
 
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="n">_commtype</span> <span class="o">=</span> <span class="s1">&#39;client&#39;</span>
     <span class="n">_dont_register</span> <span class="o">=</span> <span class="kc">True</span>
     
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">request_commtype</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">response_kwargs</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">request_commtype</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">response_kwargs</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
                  <span class="n">dont_open</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">is_async</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">direct_connection</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
                  <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="k">if</span> <span class="n">response_kwargs</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
@@ -228,9 +225,8 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">direct_connection</span> <span class="o">=</span> <span class="n">direct_connection</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">response_kwargs</span> <span class="o">=</span> <span class="n">response_kwargs</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">ocomm</span> <span class="o">=</span> <span class="n">get_comm</span><span class="p">(</span><span class="n">ocomm_name</span><span class="p">,</span> <span class="o">**</span><span class="n">ocomm_kwargs</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">icomm</span> <span class="o">=</span> <span class="kc">None</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">request_order</span> <span class="o">=</span> <span class="p">[]</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">responses</span> <span class="o">=</span> <span class="n">OrderedDict</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">icomm</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">icomm_order</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">response_kwargs</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s1">&#39;commtype&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">ocomm</span><span class="o">.</span><span class="n">_commtype</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">response_kwargs</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s1">&#39;recv_timeout&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">ocomm</span><span class="o">.</span><span class="n">recv_timeout</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">response_kwargs</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s1">&#39;language&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">ocomm</span><span class="o">.</span><span class="n">language</span><span class="p">)</span>
@@ -261,7 +257,8 @@
         <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">%s%-15s</span><span class="s1">:&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">prefix</span><span class="p">,</span> <span class="s1">&#39;request comm&#39;</span><span class="p">))</span>
         <span class="n">lines</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ocomm</span><span class="o">.</span><span class="n">get_status_message</span><span class="p">(</span><span class="n">nindent</span><span class="o">=</span><span class="p">(</span><span class="n">nindent</span> <span class="o">+</span> <span class="mi">1</span><span class="p">))[</span><span class="mi">0</span><span class="p">]</span>
         <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">%s%-15s</span><span class="s1">:&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">prefix</span><span class="p">,</span> <span class="s1">&#39;response comms&#39;</span><span class="p">))</span>
-        <span class="n">lines</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">icomm</span><span class="o">.</span><span class="n">get_status_message</span><span class="p">(</span><span class="n">nindent</span><span class="o">=</span><span class="p">(</span><span class="n">nindent</span> <span class="o">+</span> <span class="mi">1</span><span class="p">))[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">icomm</span><span class="o">.</span><span class="n">values</span><span class="p">():</span>
+            <span class="n">lines</span> <span class="o">+=</span> <span class="n">x</span><span class="o">.</span><span class="n">get_status_message</span><span class="p">(</span><span class="n">nindent</span><span class="o">=</span><span class="p">(</span><span class="n">nindent</span> <span class="o">+</span> <span class="mi">1</span><span class="p">))[</span><span class="mi">0</span><span class="p">]</span>
         <span class="k">return</span> <span class="n">lines</span><span class="p">,</span> <span class="n">prefix</span></div>
     
 <div class="viewcode-block" id="ClientComm.is_installed"><a class="viewcode-back" href="../../../yggdrasil.communication.html#yggdrasil.communication.ClientComm.ClientComm.is_installed">[docs]</a>    <span class="nd">@classmethod</span>
@@ -348,8 +345,8 @@
 <div class="viewcode-block" id="ClientComm.close"><a class="viewcode-back" href="../../../yggdrasil.communication.html#yggdrasil.communication.ClientComm.ClientComm.close">[docs]</a>    <span class="k">def</span> <span class="nf">close</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Close the connection.&quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">ocomm</span><span class="o">.</span><span class="n">close</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">icomm</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">icomm</span><span class="o">.</span><span class="n">close</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">icomm_order</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">icomm</span><span class="p">[</span><span class="n">k</span><span class="p">]</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">ClientComm</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">close</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
 
     <span class="nd">@property</span>
@@ -380,18 +377,24 @@
     <span class="c1"># RESPONSE COMM</span>
 <div class="viewcode-block" id="ClientComm.create_response_comm"><a class="viewcode-back" href="../../../yggdrasil.communication.html#yggdrasil.communication.ClientComm.ClientComm.create_response_comm">[docs]</a>    <span class="k">def</span> <span class="nf">create_response_comm</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Create a response comm based on information from the last header.&quot;&quot;&quot;</span>
+        <span class="n">comm_kwargs</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">direction</span><span class="o">=</span><span class="s1">&#39;recv&#39;</span><span class="p">,</span> <span class="n">is_response_client</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                           <span class="n">single_use</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">response_kwargs</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">comm_kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;use_async&#39;</span><span class="p">,</span> <span class="kc">False</span><span class="p">):</span>
+            <span class="n">comm_kwargs</span><span class="p">[</span><span class="s1">&#39;async_recv_method&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;recv_message&#39;</span>
         <span class="n">header</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">request_id</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="n">uuid</span><span class="o">.</span><span class="n">uuid4</span><span class="p">()))</span>
-        <span class="k">while</span> <span class="n">header</span><span class="p">[</span><span class="s1">&#39;request_id&#39;</span><span class="p">]</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">request_order</span><span class="p">:</span>  <span class="c1"># pragma: debug</span>
+        <span class="k">while</span> <span class="n">header</span><span class="p">[</span><span class="s1">&#39;request_id&#39;</span><span class="p">]</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">icomm</span><span class="p">:</span>  <span class="c1"># pragma: debug</span>
             <span class="n">header</span><span class="p">[</span><span class="s1">&#39;request_id&#39;</span><span class="p">]</span> <span class="o">+=</span> <span class="nb">str</span><span class="p">(</span><span class="n">uuid</span><span class="o">.</span><span class="n">uuid4</span><span class="p">())</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">icomm</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">comm_kwargs</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">direction</span><span class="o">=</span><span class="s1">&#39;recv&#39;</span><span class="p">,</span> <span class="n">is_response_client</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-                               <span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">response_kwargs</span><span class="p">)</span>
-            <span class="k">if</span> <span class="n">comm_kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;use_async&#39;</span><span class="p">,</span> <span class="kc">False</span><span class="p">):</span>
-                <span class="n">comm_kwargs</span><span class="p">[</span><span class="s1">&#39;async_recv_method&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;recv_message&#39;</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">icomm</span> <span class="o">=</span> <span class="n">new_comm</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">+</span> <span class="s1">&#39;.client_response_comm&#39;</span><span class="p">,</span> <span class="o">**</span><span class="n">comm_kwargs</span><span class="p">)</span>
-        <span class="n">header</span><span class="p">[</span><span class="s1">&#39;response_address&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">icomm</span><span class="o">.</span><span class="n">address</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">request_order</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">header</span><span class="p">[</span><span class="s1">&#39;request_id&#39;</span><span class="p">])</span>
+        <span class="n">c</span> <span class="o">=</span> <span class="n">new_comm</span><span class="p">(</span><span class="s1">&#39;client_response_comm.&#39;</span> <span class="o">+</span> <span class="n">header</span><span class="p">[</span><span class="s1">&#39;request_id&#39;</span><span class="p">],</span> <span class="o">**</span><span class="n">comm_kwargs</span><span class="p">)</span>
+        <span class="n">header</span><span class="p">[</span><span class="s1">&#39;response_address&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">c</span><span class="o">.</span><span class="n">address</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">icomm</span><span class="p">[</span><span class="n">header</span><span class="p">[</span><span class="s1">&#39;request_id&#39;</span><span class="p">]]</span> <span class="o">=</span> <span class="n">c</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">icomm_order</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">header</span><span class="p">[</span><span class="s1">&#39;request_id&#39;</span><span class="p">])</span>
         <span class="k">return</span> <span class="n">header</span></div>
+
+<div class="viewcode-block" id="ClientComm.remove_response_comm"><a class="viewcode-back" href="../../../yggdrasil.communication.html#yggdrasil.communication.ClientComm.ClientComm.remove_response_comm">[docs]</a>    <span class="k">def</span> <span class="nf">remove_response_comm</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Remove response comm.&quot;&quot;&quot;</span>
+        <span class="n">key</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">icomm_order</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+        <span class="n">icomm</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">icomm</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="n">key</span><span class="p">)</span>
+        <span class="n">icomm</span><span class="o">.</span><span class="n">close</span><span class="p">()</span></div>
 
     <span class="c1"># SEND METHODS</span>
 <div class="viewcode-block" id="ClientComm.prepare_message"><a class="viewcode-back" href="../../../yggdrasil.communication.html#yggdrasil.communication.ClientComm.ClientComm.prepare_message">[docs]</a>    <span class="k">def</span> <span class="nf">prepare_message</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
@@ -445,19 +448,11 @@
 <span class="sd">            CommMessage: Received message.</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">request_order</span><span class="p">:</span>  <span class="c1"># pragma: debug</span>
-            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">&quot;There are not any requests registered.&quot;</span><span class="p">)</span>
-        <span class="k">while</span> <span class="bp">self</span><span class="o">.</span><span class="n">responses</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">request_order</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">msg</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">icomm</span><span class="o">.</span><span class="n">recv_message</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">errors</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">icomm</span><span class="o">.</span><span class="n">errors</span>
-            <span class="k">if</span> <span class="n">msg</span> <span class="o">!=</span> <span class="n">CommBase</span><span class="o">.</span><span class="n">FLAG_SUCCESS</span><span class="p">:</span>
-                <span class="k">break</span>
-            <span class="k">assert</span><span class="p">(</span><span class="n">msg</span><span class="o">.</span><span class="n">header</span><span class="p">[</span><span class="s1">&#39;request_id&#39;</span><span class="p">]</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">responses</span><span class="p">)</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">responses</span><span class="p">[</span><span class="n">msg</span><span class="o">.</span><span class="n">header</span><span class="p">[</span><span class="s1">&#39;request_id&#39;</span><span class="p">]]</span> <span class="o">=</span> <span class="n">msg</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">request_order</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">responses</span><span class="p">:</span>
-            <span class="n">msg</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">responses</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">request_order</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">request_order</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
-        <span class="k">return</span> <span class="n">msg</span></div>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">icomm</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>  <span class="c1"># pragma: debug</span>
+            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">&quot;There are not any registered response comms.&quot;</span><span class="p">)</span>
+        <span class="n">out</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">icomm</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">icomm_order</span><span class="p">[</span><span class="mi">0</span><span class="p">]]</span><span class="o">.</span><span class="n">recv_message</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">errors</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">icomm</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">icomm_order</span><span class="p">[</span><span class="mi">0</span><span class="p">]]</span><span class="o">.</span><span class="n">errors</span>
+        <span class="k">return</span> <span class="n">out</span></div>
 
 <div class="viewcode-block" id="ClientComm.finalize_message"><a class="viewcode-back" href="../../../yggdrasil.communication.html#yggdrasil.communication.ClientComm.ClientComm.finalize_message">[docs]</a>    <span class="k">def</span> <span class="nf">finalize_message</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">msg</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Perform actions to decipher a message.</span>
@@ -471,9 +466,12 @@
 <span class="sd">            CommMessage: Deserialized and annotated message.</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">icomm</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>  <span class="c1"># pragma: debug</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">icomm</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>  <span class="c1"># pragma: debug</span>
             <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">&quot;There are not any registered response comms.&quot;</span><span class="p">)</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">icomm</span><span class="o">.</span><span class="n">finalize_message</span><span class="p">(</span><span class="n">msg</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
+        <span class="n">msg</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">icomm</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">icomm_order</span><span class="p">[</span><span class="mi">0</span><span class="p">]]</span><span class="o">.</span><span class="n">finalize_message</span><span class="p">(</span><span class="n">msg</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">msg</span><span class="o">.</span><span class="n">flag</span> <span class="ow">in</span> <span class="p">[</span><span class="n">CommBase</span><span class="o">.</span><span class="n">FLAG_SUCCESS</span><span class="p">,</span> <span class="n">CommBase</span><span class="o">.</span><span class="n">FLAG_FAILURE</span><span class="p">]:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">remove_response_comm</span><span class="p">()</span>
+        <span class="k">return</span> <span class="n">msg</span></div>
         
     <span class="c1"># CALL</span>
 <div class="viewcode-block" id="ClientComm.call"><a class="viewcode-back" href="../../../yggdrasil.communication.html#yggdrasil.communication.ClientComm.ClientComm.call">[docs]</a>    <span class="k">def</span> <span class="nf">call</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
@@ -514,6 +512,14 @@
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Sleep while waiting for messages to be drained.&quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="n">direction</span> <span class="o">==</span> <span class="s1">&#39;send&#39;</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">ocomm</span><span class="o">.</span><span class="n">drain_messages</span><span class="p">(</span><span class="n">direction</span><span class="o">=</span><span class="s1">&#39;send&#39;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div></div>
+
+    <span class="c1"># def purge(self):</span>
+    <span class="c1">#     r&quot;&quot;&quot;Purge input and output comms.&quot;&quot;&quot;</span>
+    <span class="c1">#     self.ocomm.purge()</span>
+    <span class="c1">#     # Unsure if client should purge all input comms...</span>
+    <span class="c1">#     # for k in self.icomm_order:</span>
+    <span class="c1">#     #     self.icomm[k].purge()</span>
+    <span class="c1">#     super(ClientComm, self).purge()</span>
 </pre></div>
 
            </div>

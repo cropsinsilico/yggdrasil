@@ -1,7 +1,7 @@
 Python Interface
 ================
 
-.. automodule:: yggdrasil.languages.Python.YggInterface
+.. automodule:: yggdrasil.interface.YggInterface
     :members:
     :undoc-members:
     :show-inheritance:

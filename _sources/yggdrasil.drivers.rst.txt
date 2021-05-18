@@ -140,14 +140,6 @@ yggdrasil.drivers.InterpretedModelDriver module
    :undoc-members:
    :show-inheritance:
 
-yggdrasil.drivers.JuliaModelDriver module
------------------------------------------
-
-.. automodule:: yggdrasil.drivers.JuliaModelDriver
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
 yggdrasil.drivers.LPyModelDriver module
 ---------------------------------------
 
@@ -216,6 +208,14 @@ yggdrasil.drivers.RPCRequestDriver module
 -----------------------------------------
 
 .. automodule:: yggdrasil.drivers.RPCRequestDriver
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+yggdrasil.drivers.RPCResponseDriver module
+------------------------------------------
+
+.. automodule:: yggdrasil.drivers.RPCResponseDriver
    :members:
    :undoc-members:
    :show-inheritance:
