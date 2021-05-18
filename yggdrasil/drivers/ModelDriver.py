@@ -477,18 +477,28 @@ class ModelDriver(Driver):
                                    + self.language_ext[0])
             # Write file
             if (not os.path.isfile(args[0])) or self.overwrite:
-                self.model_function_info = self.parse_function_definition(
-                    self.model_function_file, self.function)
                 client_comms = ['%s:%s_%s' % (self.name, x, self.name)
                                 for x in self.client_of]
                 self.model_function_inputs = copy.copy(self.inputs)
                 self.model_function_outputs = copy.copy(self.outputs)
-                lines = self.write_model_wrapper(
+                self.expand_server_io(
+                    self.model_function_inputs, self.model_function_outputs,
+                    client_comms=client_comms)
+                expected_outputs = []
+                for x in self.model_function_outputs:
+                    expected_outputs += x.get('vars', [])
+                self.model_function_info = self.parse_function_definition(
                     self.model_function_file, self.function,
+                    expected_outputs=expected_outputs)
+                if self.model_outputs_in_inputs is None:
+                    self.model_outputs_in_inputs = self.model_function_info.get(
+                        'outputs_in_inputs', None)
+                lines = self.write_model_wrapper(
+                    self.model_function_info, self.function,
                     inputs=self.model_function_inputs,
                     outputs=self.model_function_outputs,
                     outputs_in_inputs=self.model_outputs_in_inputs,
-                    client_comms=client_comms, copies=self.copies)
+                    copies=self.copies)
                 with open(args[0], 'w') as fd:
                     fd.write('\n'.join(lines))
         # Parse arguments
@@ -1698,6 +1708,7 @@ class ModelDriver(Driver):
                 if io in out:
                     out[io] = cls.parse_var_definition(
                         io, out[io], outputs_in_inputs=outputs_in_inputs)
+            out['model_file'] = model_file
         if outputs_in_inputs and expected_outputs and (not out.get('outputs', False)):
             missing_expected_outputs = []
             for o in expected_outputs:
@@ -1723,12 +1734,39 @@ class ModelDriver(Driver):
             if out.get('flag_type', None):
                 flag_var['native_type'] = out.pop('flag_type').replace(' ', '')
                 flag_var['datatype'] = cls.get_json_type(flag_var['native_type'])
-            if outputs_in_inputs:
-                out['flag_var'] = flag_var
-            else:
-                assert(not out.get('outputs', []))
-                out['outputs'] = [flag_var]
+                if ((outputs_in_inputs
+                     and (flag_var['native_type'] != cls.type_map['flag']))):
+                    outputs_in_inputs = False
+                    out['outputs_in_inputs'] = outputs_in_inputs
+            out['flag_var'] = flag_var
+            cls.check_flag_var(out, outputs_in_inputs=outputs_in_inputs)
         return out
+
+    @classmethod
+    def check_flag_var(cls, info, outputs_in_inputs=None):
+        r"""Check if the flag variable should be treated as an output.
+
+        Args:
+            info (dict): Information about the function.
+            outputs_in_inputs (bool, optional): If True, the outputs are
+                presented in the function definition as inputs. Defaults
+                to False.
+
+        """
+        if outputs_in_inputs is None:  # pragma: debug
+            outputs_in_inputs = cls.outputs_in_inputs
+        flag_t = cls.type_map['flag']
+        if (((info.get('flag_var', {}).get('native_type', flag_t) != flag_t)
+             or (not outputs_in_inputs))):
+            if info.get('outputs', []):  # pragma: debug
+                logger.warn("Support for returning outputs via parameter(s) "
+                            "and return value is not yet support. The return "
+                            "value will be assumed to be a flag indicating "
+                            "the success of the model.")
+                info['outputs_in_inputs'] = True
+            else:
+                info['outputs'] = [info.pop('flag_var')]
+                info['outputs_in_inputs'] = False
 
     @classmethod
     def channels2vars(cls, channels):
@@ -1753,9 +1791,47 @@ class ModelDriver(Driver):
         return variables
 
     @classmethod
+    def expand_server_io(cls, inputs, outputs, client_comms=[]):
+        r"""Update inputs/outputs w/ information about server that will be
+        using them.
+
+        Args:
+            inputs (list): List of model inputs including types.
+            outputs (list): List of model outputs including types.
+            client_comms (list, optional): List of the names of client comms
+                that should be removed from the list of outputs. Defaults to [].
+
+        """
+        if client_comms:
+            warnings.warn("When wrapping a model function, client comms "
+                          "must either be initialized outside the function, "
+                          "pass a 'global_scope' parameter to the "
+                          "comm initialization (e.g. Python, R, Matlab), "
+                          "or use a 'WITH_GLOBAL_SCOPE' macro "
+                          "(e.g. C, C++, Fortran) around the initialization "
+                          "so that they are persistent "
+                          "across calls and the call or recv/send methods "
+                          "must be called explicitly (as opposed to the "
+                          "function inputs/outputs which will be handled "
+                          "by the wrapper). This model's client comms are:\n"
+                          "\t%s" % client_comms)
+        # Replace server input w/ split input/output and remove client
+        # connections from inputs
+        for i, x in enumerate(inputs):
+            if x.get('server_replaces', False):
+                inputs[x['server_replaces']['input_index']] = (
+                    x['server_replaces']['input'])
+                outputs.insert(x['server_replaces']['output_index'],
+                               x['server_replaces']['output'])
+        rm_outputs = [i for i, x in enumerate(outputs)
+                      if x['name'] in client_comms]
+        for i in rm_outputs[::-1]:
+            outputs.pop(i)
+    
+    @classmethod
     def update_io_from_function(cls, model_file, model_function,
                                 inputs=[], outputs=[], contents=None,
-                                outputs_in_inputs=None, client_comms=[]):
+                                outputs_in_inputs=None):
         r"""Update inputs/outputs from the function definition.
 
         Args:
@@ -1771,8 +1847,6 @@ class ModelDriver(Driver):
             outputs_in_inputs (bool, optional): If True, the outputs are
                 presented in the function definition as inputs. Defaults
                 to False.
-            client_comms (list, optional): List of the names of client comms
-                that should be removed from the list of outputs. Defaults to [].
 
         Returns:
             dict, None: Flag variable used by the model. If None, the
@@ -1781,18 +1855,6 @@ class ModelDriver(Driver):
         """
         if outputs_in_inputs is None:  # pragma: debug
             outputs_in_inputs = cls.outputs_in_inputs
-        # Replace server input w/ split input/output and remove client
-        # connections from inputs
-        for i, x in enumerate(inputs):
-            if x.get('server_replaces', False):
-                inputs[x['server_replaces']['input_index']] = (
-                    x['server_replaces']['input'])
-                outputs.insert(x['server_replaces']['output_index'],
-                               x['server_replaces']['output'])
-        rm_outputs = [i for i, x in enumerate(outputs)
-                      if x['name'] in client_comms]
-        for i in rm_outputs[::-1]:
-            outputs.pop(i)
         # Read info from the source code
         if (((isinstance(model_file, str) and os.path.isfile(model_file))
              or (contents is not None))):
@@ -1802,6 +1864,8 @@ class ModelDriver(Driver):
             info = cls.parse_function_definition(model_file, model_function,
                                                  contents=contents,
                                                  expected_outputs=expected_outputs)
+        elif isinstance(model_file, dict):
+            info = model_file
         else:
             info = {"inputs": [], "outputs": []}
         info_map = {io: OrderedDict([(x['name'], x) for x in info.get(io, [])])
@@ -1904,8 +1968,7 @@ class ModelDriver(Driver):
     @classmethod
     def write_model_wrapper(cls, model_file, model_function,
                             inputs=[], outputs=[],
-                            outputs_in_inputs=None, verbose=False,
-                            client_comms=[], copies=1):
+                            outputs_in_inputs=None, verbose=False, copies=1):
         r"""Return the lines required to wrap a model function as an integrated
         model.
 
@@ -1922,8 +1985,6 @@ class ModelDriver(Driver):
                 to the class attribute outputs_in_inputs.
             verbose (bool, optional): If True, the contents of the created file
                 are displayed. Defaults to False.
-            client_comms (list, optional): List of the names of client comms
-                that should be removed from the list of outputs. Defaults to [].
             copies (int, optional): Number of times the model driver is
                 duplicated. If more than one, no error will be raised in the
                 event there is never a call the the function. Defaults to 1.
@@ -1939,25 +2000,13 @@ class ModelDriver(Driver):
                                       "language '%s'" % cls.language)
         if outputs_in_inputs is None:
             outputs_in_inputs = cls.outputs_in_inputs
-        if client_comms:
-            warnings.warn("When wrapping a model function, client comms "
-                          "must either be initialized outside the function, "
-                          "pass a 'global_scope' parameter to the "
-                          "comm initialization (e.g. Python, R, Matlab), "
-                          "or use a 'WITH_GLOBAL_SCOPE' macro "
-                          "(e.g. C, C++, Fortran) around the initialization "
-                          "so that they are persistent "
-                          "across calls and the call or recv/send methods "
-                          "must be called explicitly (as opposed to the "
-                          "function inputs/outputs which will be handled "
-                          "by the wrapper). This model's client comms are:\n"
-                          "\t%s" % client_comms)
         # Update types based on the function definition for typed languages
         model_flag = cls.update_io_from_function(
             model_file, model_function,
             inputs=inputs, outputs=outputs,
-            outputs_in_inputs=outputs_in_inputs,
-            client_comms=client_comms)
+            outputs_in_inputs=outputs_in_inputs)
+        if isinstance(model_file, dict):
+            model_file = model_file['model_file']
         # Declare variables and flag, then define flag
         lines = []
         flag_var = {'name': 'flag', 'datatype': {'type': 'flag'}}

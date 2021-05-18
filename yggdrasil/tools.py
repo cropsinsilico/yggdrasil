@@ -158,7 +158,10 @@ def display_source(fname, number_lines=False, return_lines=False):
     if isinstance(fname, (bytes, str)):
         with open(fname, 'r') as fd:
             lines = fd.read()
-        language = constants.EXT2LANG[os.path.splitext(fname)[-1]]
+        try:
+            language = constants.EXT2LANG[os.path.splitext(fname)[-1]]
+        except KeyError:
+            language = None
         prefix = 'file: %s' % fname
     else:
         lines = inspect.getsource(fname)
@@ -185,7 +188,7 @@ def display_source(fname, number_lines=False, return_lines=False):
                      'xml': XmlLexer}
         lines = highlight(lines, lexer_map[language](),
                           Terminal256Formatter())
-    except ImportError:
+    except (ImportError, KeyError):
         pass
     if number_lines:
         lines = '\n'.join(add_line_numbers(lines.splitlines()))

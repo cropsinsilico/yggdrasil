@@ -323,7 +323,7 @@ class FortranModelDriver(CompiledModelDriver):
             r'(?P<procedure_type>(?i:(?:subroutine)|(?:function)))\s+'
             r'{function_name}\s*\((?P<inputs>(?:[^\(]*?))\)\s*'
             r'(?:result\s*\((?P<flag_var>.+)\))?\s*\n'
-            r'(?P<preamble>(?:[^:]*?\n)*?)'
+            r'(?P<preamble>(?:^(?!\:\:).*?\n)*?)'
             r'(?P<definitions>(?:(?:(?: )|(?:.))+\s*::\s*(?:.+)\n)+)'
             r'(?P<body>(?:.*?\n?)*?)'
             r'(?i:end\s+(?P=procedure_type))\s+{function_name}'),
@@ -655,9 +655,24 @@ class FortranModelDriver(CompiledModelDriver):
                       x.groupdict()['name'].split(',')]
             for v in x_vars:
                 var_type_map[v] = x.groupdict()['type']
-        for x in out.get('inputs', []) + out.get('outputs', []):
+        allvars = out.get('inputs', []) + out.get('outputs', [])
+        if out.get('flag_var', None) and (out['flag_var']['name']
+                                          in var_type_map):
+            allvars.append(out['flag_var'])
+        for x in allvars:
             x['native_type'] = var_type_map[x['name']].strip()
             x['datatype'] = cls.get_json_type(x['native_type'])
+        if not out.get('outputs', []):
+            idx_out = [i for i, x in enumerate(out.get('inputs', []))
+                       if 'intent(out)' in x.get('native_type', '').lower()]
+            if idx_out:
+                out.setdefault('outputs', [])
+                for i in idx_out:
+                    out['outputs'].append(cls.input2output(out['inputs'].pop(i)))
+        if 'flag_var' in out:
+            outputs_in_inputs = out.get('outputs_in_inputs',
+                                        kwargs.get('outputs_in_inputs', None))
+            cls.check_flag_var(out, outputs_in_inputs=outputs_in_inputs)
         return out
 
     @classmethod
