@@ -40,16 +40,16 @@ If you use yggdrasil in your research, please cite the accompanying paper:
 .. |tag version| image:: https://img.shields.io/github/tag-date/cropsinsilico/yggdrasil.svg?style=flat-square
 .. |PyPI version| image:: https://img.shields.io/pypi/v/yggdrasil-framework.svg?style=flat-square
    :target: https://pypi.org/project/yggdrasil-framework
-.. |Travis Build Status| image:: https://img.shields.io/travis/cropsinsilico/yggdrasil/master.svg?style=flat-square
+.. |Travis Build Status| image:: https://img.shields.io/travis/cropsinsilico/yggdrasil/main.svg?style=flat-square
    :target: https://travis-ci.org/cropsinsilico/yggdrasil
 .. |Appveyor Build status| image:: https://img.shields.io/appveyor/ci/langmm/yggdrasil.svg?style=flat-square
-   :target: https://ci.appveyor.com/project/langmm/yggdrasil/branch/master
+   :target: https://ci.appveyor.com/project/langmm/yggdrasil/branch/main
 .. |GHA Build Status| image:: https://img.shields.io/github/workflow/status/cropsinsilico/yggdrasil/Test%20of%20package%20installation%20&%20execution?style=flat-square   :alt: GitHub Workflow Status
    :target: https://github.com/cropsinsilico/yggdrasil/actions?query=workflow%3A%22Test+of+package+installation+%26+execution%22
 ..
-   .. |Coverage Status| image:: https://coveralls.io/repos/github/cropsinsilico/yggdrasil/badge.svg?branch=master
-      :target: https://coveralls.io/github/cropsinsilico/yggdrasil?branch=master
-.. |codecov| image:: https://img.shields.io/codecov/c/github/cropsinsilico/yggdrasil/master.svg?style=flat-square
+   .. |Coverage Status| image:: https://coveralls.io/repos/github/cropsinsilico/yggdrasil/badge.svg?branch=main
+      :target: https://coveralls.io/github/cropsinsilico/yggdrasil?branch=main
+.. |codecov| image:: https://img.shields.io/codecov/c/github/cropsinsilico/yggdrasil/main.svg?style=flat-square
    :target: https://codecov.io/gh/cropsinsilico/yggdrasil
 .. |PEP8| image:: https://img.shields.io/badge/code%20style-pep8-blue.svg?style=flat-square
    :target: https://www.python.org/dev/peps/pep-0008/
