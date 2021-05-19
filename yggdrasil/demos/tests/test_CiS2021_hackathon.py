@@ -14,7 +14,12 @@ class TestCiS2021HackathonDemo(DemoTstBase):
     runs = {'light_v0': ('yamls/light_v0_python.yml', 'yamls/connections_v0.yml'),
             'shoot_v0': ('yamls/shoot_v0.yml', ),
             'shoot_v1': ('yamls/shoot_v1.yml', 'yamls/light_v0_python.yml',
-                         'yamls/connections_v1.yml')}
+                         'yamls/connections_v1.yml'),
+            'shoot_v2': ('yamls/light_v1_python.yml', 'yamls/shoot_v2.yml'),
+            'shoot_v2_split': ('yamls/light_v1_python.yml',
+                               'yamls/shoot_v2_split.yml')}
+    # 'shoot_v2_copies': ('yamls/light_v2_python.yml',
+    #                     'yamls/shoot_v2_copies.yml')}
 
     def __init__(self, *args, **kwargs):
         super(TestCiS2021HackathonDemo, self).__init__(*args, **kwargs)

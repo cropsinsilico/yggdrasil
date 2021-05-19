@@ -304,6 +304,8 @@ class RModelDriver(InterpretedModelDriver):  # pragma: R
                                                         new_channel)
                 out = new_contents.splitlines()
                 return out
+            if platform._is_win:  # pragma: windows
+                kwargs['filename'] = kwargs['filename'].replace('\\', '/')
         return super(RModelDriver, cls).write_executable_import(**kwargs)
 
     # The following is only provided for the yggcc CLI for building R
