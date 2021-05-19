@@ -440,10 +440,12 @@ class ZMQComm(CommBase.CommBase):
             socket_type = 'DEALER'
             socket_action = 'connect'
             self.direction = 'recv'
-        elif self.is_response_client and (self.direction == 'recv'):
+        elif ((self.is_response_client or self.is_response_server)
+              and (self.direction == 'recv')):
             socket_type = 'ROUTER'
             socket_action = 'bind'
-        elif self.is_response_client and (self.direction == 'send'):
+        elif ((self.is_response_client or self.is_response_server)
+              and (self.direction == 'send')):
             # The would be the RPCResponseDriver output comm that
             # partners with the ClientComm response comm that is set
             # to use a ROUTER socket type as defined above
@@ -456,7 +458,7 @@ class ZMQComm(CommBase.CommBase):
             elif self.direction == 'send':
                 socket_type = _socket_send_types[_default_socket_type]
         if not (self.allow_multiple_comms or self.is_client or self.is_server
-                or self.is_response_client):
+                or self.is_response_client or self.is_response_server):
             if socket_type in ['PULL', 'SUB', 'REP', 'DEALER']:
                 self.direction = 'recv'
             elif socket_type in ['PUSH', 'PUB', 'REQ', 'ROUTER']:
@@ -477,7 +479,6 @@ class ZMQComm(CommBase.CommBase):
             else:
                 socket_action = 'connect'
         if new_process:
-            self.info("NEW CONTEXT")
             self.context = zmq.Context()
             set_context_opts(self.context)
         else:
@@ -777,6 +778,7 @@ class ZMQComm(CommBase.CommBase):
         r"""Set the send reply socket if it dosn't exist."""
         if self.reply_socket_send is None:
             s = create_socket(self.context, zmq.REP)
+            s.setsockopt(zmq.IMMEDIATE, 1)
             address = format_address(_default_protocol, 'localhost')
             address = bind_socket(s, address)
             self.register_comm('REPLY_SEND_' + address, s)
@@ -791,6 +793,7 @@ class ZMQComm(CommBase.CommBase):
         address = tools.bytes2str(address)
         if address not in self.reply_socket_recv:
             s = create_socket(self.context, zmq.REQ)
+            s.setsockopt(zmq.IMMEDIATE, 1)
             s.connect(address)
             self.register_comm('REPLY_RECV_' + address, s)
             with self.reply_socket_lock:
@@ -1164,8 +1167,6 @@ class ZMQComm(CommBase.CommBase):
                 if self.socket_type_name == 'ROUTER':
                     kwargs['flags'] |= zmq.SNDMORE
                     self.socket.send(identity, **kwargs)
-                    # self.socket.send_multipart([identity, total_msg],
-                    #                            **kwargs)
                 else:
                     self.socket.send(total_msg, **kwargs)
                 TemporaryCommunicationError.reset((self.address, "zmq.EAGAIN"))

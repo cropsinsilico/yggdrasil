@@ -38,7 +38,7 @@ class RPCRequestDriver(ConnectionDriver):
         **kwargs: Additional keyword arguments are passed to parent class.
 
     Attributes:
-        response_drivers (list): Response drivers created for each request.
+        response_drivers (dict): Response drivers created for each request.
 
     """
 
@@ -61,8 +61,18 @@ class RPCRequestDriver(ConnectionDriver):
         # Parent and attributes
         super(RPCRequestDriver, self).__init__(model_request_name, **kwargs)
         self.response_kwargs.setdefault('commtype', self.ocomm._commtype)
-        self.response_drivers = []
+        self.response_drivers = {}
         self._block_response = False
+
+    @property
+    def servers_recvd(self):
+        r"""list: Names of server models that have returned responses."""
+        out = {}
+        for x in self.response_drivers.values():
+            for k, v in x.models_recvd.items():
+                out.setdefault(k, 0)
+                out[k] += v
+        return out
 
     @property
     @run_remotely
@@ -91,9 +101,9 @@ class RPCRequestDriver(ConnectionDriver):
         with self.lock:
             self.debug("Closing response drivers.")
             self._block_response = True
-            for x in self.response_drivers:
+            for x in self.response_drivers.values():
                 x.terminate()
-            self.response_drivers = []
+            self.response_drivers = {}
 
     def close_comm(self):
         r"""Close response drivers."""
@@ -103,7 +113,7 @@ class RPCRequestDriver(ConnectionDriver):
     def printStatus(self, *args, **kwargs):
         r"""Also print response drivers."""
         super(RPCRequestDriver, self).printStatus(*args, **kwargs)
-        for x in self.response_drivers:
+        for x in self.response_drivers.values():
             x.printStatus(*args, **kwargs)
 
     @run_remotely
@@ -129,6 +139,8 @@ class RPCRequestDriver(ConnectionDriver):
             out = super(RPCRequestDriver, self).remove_model(
                 direction, name)
             if out:
+                if self.ocomm.partner_copies > 1:
+                    self.ocomm.partner_copies = len(self.servers_recvd)
                 self.send_eof()
             return out
         
@@ -176,23 +188,32 @@ class RPCRequestDriver(ConnectionDriver):
                 if (not self.is_comm_open) or self._block_response:  # pragma: debug
                     self.debug("Comm closed, not creating response driver.")
                     return False
-                drv_args = [msg.header['response_address'],
-                            msg.header['request_id']]
-                drv_kwargs = dict(
-                    request_name=self.name,
-                    inputs=[self.response_kwargs.copy()],
-                    outputs=[{'commtype': msg.header["commtype"]}])
-                self.debug("Creating response comm: address = %s, request_id = %s",
-                           msg.header['response_address'], msg.header['request_id'])
-                try:
-                    response_driver = RPCResponseDriver(*drv_args, **drv_kwargs)
-                    self.response_drivers.append(response_driver)
-                    response_driver.start()
-                    self.debug("Started response comm: address = %s, request_id = %s",
-                               msg.header['response_address'], msg.header['request_id'])
-                except BaseException:  # pragma: debug
-                    self.exception("Could not create/start response driver.")
-                    return False
+                
+                if msg.header['response_address'] in self.response_drivers:
+                    response_driver = self.response_drivers[
+                        msg.header['response_address']]
+                else:
+                    drv_args = [msg.header['response_address'],
+                                msg.header['request_id']]
+                    drv_kwargs = dict(
+                        request_name=self.name,
+                        inputs=[self.response_kwargs.copy()],
+                        outputs=[{'commtype': msg.header["commtype"]}])
+                    self.debug("Creating response comm: address = %s, request_id = %s",
+                               msg.header['response_address'],
+                               msg.header['request_id'])
+                    try:
+                        response_driver = RPCResponseDriver(
+                            *drv_args, **drv_kwargs)
+                        self.response_drivers[
+                            msg.header['response_address']] = response_driver
+                        response_driver.start()
+                        self.debug("Started response comm: address = %s, request_id = %s",
+                                   msg.header['response_address'],
+                                   msg.header['request_id'])
+                    except BaseException:  # pragma: debug
+                        self.exception("Could not create/start response driver.")
+                        return False
             # Send response address in header
             kwargs.setdefault('header_kwargs', {})
             kwargs['header_kwargs'].setdefault(
@@ -212,13 +233,14 @@ class RPCRequestDriver(ConnectionDriver):
     def prune_response_drivers(self):
         r"""Remove response drivers that are no longer being used."""
         with self.lock:
-            remove_idx = []
-            for i, x in enumerate(self.response_drivers):
+            # remove_idx = []
+            # for i, x in enumerate(self.response_drivers):
+            for x in self.response_drivers.values():
                 self.errors += x.errors
-                if (((not x.is_alive())
-                     and x.icomm.is_confirmed_recv
-                     and x.ocomm.is_confirmed_send)):
-                    x.cleanup()
-                    remove_idx.append(i)
-            for i in remove_idx[::-1]:
-                self.response_drivers.pop(i)
+            #     if (((not x.is_alive())
+            #          and x.icomm.is_confirmed_recv
+            #          and x.ocomm.is_confirmed_send)):
+            #         x.cleanup()
+            #         remove_idx.append(i)
+            # for i in remove_idx[::-1]:
+            #     self.response_drivers.pop(i)

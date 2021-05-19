@@ -2,6 +2,8 @@
 History
 =======
 
+* Updated client/server comms & drivers to reuse response comms
+
 1.6.1 (2021-05-18) Minor Bug Fix
 ------------------
 

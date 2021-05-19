@@ -963,6 +963,14 @@ class CommBase(tools.YggClass):
         return os.environ.get('YGG_MODEL_NAME', '')
 
     @property
+    def full_model_name(self):
+        r"""str: Name of the model using the comm w/ copy suffix."""
+        out = self.model_name
+        if out and ('YGG_MODEL_COPY' in os.environ):
+            out += '_copy%s' % os.environ['YGG_MODEL_COPY']
+        return out
+
+    @property
     def model_copies(self):
         r"""int: Number of copies of the model using the comm."""
         return int(os.environ.get('YGG_MODEL_COPIES', '1'))
@@ -1832,7 +1840,7 @@ class CommBase(tools.YggClass):
                     else:
                         self.partner_copies -= 1
                 else:  # pragma: debug
-                    self.error("EOF SENT TWICE")
+                    self.debug("EOF SENT TWICE")
                     return False
         elif msg.flag == FLAG_SUCCESS:
             pass
@@ -1939,10 +1947,11 @@ class CommBase(tools.YggClass):
                     msg.header = copy.deepcopy(msg.header)
                     msg.header.update(header_kwargs)
         else:
-            if self.model_name:
+            model_name = self.full_model_name
+            if model_name:
                 if header_kwargs is None:
                     header_kwargs = {}
-                header_kwargs.setdefault('model', self.model_name)
+                header_kwargs.setdefault('model', model_name)
             msg = CommMessage(args=args, header=header_kwargs,
                               flag=FLAG_SUCCESS)
             # 1. Convert the message based on the language

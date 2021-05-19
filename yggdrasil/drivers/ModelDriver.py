@@ -658,6 +658,29 @@ class ModelDriver(Driver):
             out = logging.getLevelName(self.logging_level)
         return out
 
+    @property
+    def n_sent_messages(self):
+        r"""dict: Number of messages sent by the model via each connection."""
+        out = {}
+        for x in self.yml.get('output_drivers', []):
+            x_inst = x.get('instance', None)
+            if x_inst:
+                out[x_inst.name] = x_inst.models_recvd.get(self.name, 0)
+        if self.is_server:
+            for x in self.yml.get('input_drivers', []):
+                x_inst = x.get('instance', None)
+                if x_inst and (x_inst._connection_type == 'rpc_request'):
+                    out[x_inst.name] = x_inst.servers_recvd.get(self.name, 0)
+        return out
+
+    @property
+    def has_sent_messages(self):
+        r"""bool: True if output has been received from the model."""
+        n_msg = self.n_sent_messages
+        if not n_msg:
+            return True
+        return bool(sum(n_msg.values()))
+
     def write_wrappers(self, **kwargs):
         r"""Write any wrappers needed to compile and/or run a model.
 
@@ -1253,8 +1276,7 @@ class ModelDriver(Driver):
         except BaseException as e:  # pragma: debug
             print(e)
             line = ""
-        if len(line) == 0:
-            # self.info("%s: Empty line from stdout" % self.name)
+        if (len(line) == 0):
             self.queue_thread.set_break_flag()
             try:
                 self.queue.put(self._exit_line)
@@ -1317,20 +1339,24 @@ class ModelDriver(Driver):
                       [drv['name'] for drv in
                        self.yml.get('output_drivers', [])]))
         for drv in self.yml.get('input_drivers', []):
-            drv['instance'].on_model_exit('output', self.name,
-                                          errors=self.errors)
+            if 'instance' in drv:
+                drv['instance'].on_model_exit('output', self.name,
+                                              errors=self.errors)
         for drv in self.yml.get('output_drivers', []):
-            drv['instance'].on_model_exit('input', self.name,
-                                          errors=self.errors)
+            if 'instance' in drv:
+                drv['instance'].on_model_exit('input', self.name,
+                                              errors=self.errors)
 
     @property
     def io_errors(self):
         r"""list: Errors produced by input/output drivers to this model."""
         errors = []
         for drv in self.yml.get('input_drivers', []):
-            errors += drv['instance'].errors
+            if 'instance' in drv:
+                errors += drv['instance'].errors
         for drv in self.yml.get('output_drivers', []):
-            errors += drv['instance'].errors
+            if 'instance' in drv:
+                errors += drv['instance'].errors
         return errors
 
     @property
@@ -1376,7 +1402,7 @@ class ModelDriver(Driver):
         with self.lock:
             self.debug('')
             if not self.model_process_complete:  # pragma: debug
-                self.error("Process is still running. Killing it.")
+                self.debug("Process is still running. Killing it.")
                 try:
                     self.model_process.kill()
                     self.debug("Waiting %f s for process to be killed",
@@ -1386,7 +1412,8 @@ class ModelDriver(Driver):
                     self.exception("Error killing model process")
             assert(self.model_process_complete)
             if (((self.model_process is not None)
-                 and (self.model_process.returncode != 0))):
+                 and (self.model_process.returncode != 0)
+                 and self.has_sent_messages)):
                 self.error("return code of %s indicates model error.",
                            str(self.model_process.returncode))
             self.event_process_kill_complete.set()
@@ -1410,7 +1437,8 @@ class ModelDriver(Driver):
     def graceful_stop(self):
         r"""Gracefully stop the driver."""
         self.debug('')
-        self.wait_process(self.timeout, key_suffix='.graceful_stop')
+        if self.has_sent_messages:
+            self.wait_process(self.timeout, key_suffix='.graceful_stop')
         super(ModelDriver, self).graceful_stop()
 
     def cleanup_products(self):

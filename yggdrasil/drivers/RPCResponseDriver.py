@@ -34,7 +34,6 @@ class RPCResponseDriver(ConnectionDriver):
             outputs[0]['address'] = model_response_address
         kwargs['outputs'] = outputs
         # Overall keywords
-        kwargs['single_use'] = True
         super(RPCResponseDriver, self).__init__('rpc_response.' + msg_id,
                                                 **kwargs)
         self.msg_id = msg_id
@@ -43,3 +42,20 @@ class RPCResponseDriver(ConnectionDriver):
     def response_address(self):
         r"""str: Address of response comm."""
         return self.icomm.address
+
+    def send_message(self, msg, **kwargs):
+        r"""Propagate the request_id.
+
+        Args:
+            msg (CommMessage): Message being sent.
+            **kwargs: Keyword arguments are passed to parent class send_message.
+
+        Returns:
+            bool: Success or failure of send.
+
+        """
+        if msg.header and ('request_id' in msg.header):
+            kwargs.setdefault('header_kwargs', {})
+            kwargs['header_kwargs'].setdefault(
+                'request_id', msg.header['request_id'])
+        return super(RPCResponseDriver, self).send_message(msg, **kwargs)

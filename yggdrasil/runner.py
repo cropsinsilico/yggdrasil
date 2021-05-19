@@ -8,6 +8,7 @@ import atexit
 from pprint import pformat
 from itertools import chain
 import socket
+from collections import OrderedDict
 from yggdrasil.tools import YggClass
 from yggdrasil.config import ygg_cfg, cfg_environment, temp_config
 from yggdrasil import platform, yamlfile
@@ -305,7 +306,7 @@ class YggRunner(YggClass):
                 timer = time.time
             if t0 is None:
                 t0 = timer()
-            times = {}
+            times = OrderedDict()
             times['init'] = timer()
             self.loadDrivers()
             times['load drivers'] = timer()
@@ -318,12 +319,9 @@ class YggRunner(YggClass):
                 self.atexit()
                 times['at exit'] = timer()
             tprev = t0
-            key_order = ['init', 'load drivers', 'start drivers', 'run models',
-                         'at exit']
-            for k in key_order:
-                if k in times:
-                    self.info('%20s\t%f', k, times[k] - tprev)
-                    tprev = times[k]
+            for k, t in times.items():
+                self.info('%20s\t%f', k, t - tprev)
+                tprev = t
             self.info(40 * '=')
             self.info('%20s\t%f', "Total", tprev - t0)
         return times
@@ -431,6 +429,18 @@ class YggRunner(YggClass):
             self.terminate()
             raise
 
+    def start_server(self, name):
+        r"""Start a server driver."""
+        x = self.modeldrivers[name]['instance']
+        if not x.was_started:
+            self.debug("Starting server '%s' before client", x.name)
+            x.start()
+
+    def stop_server(self, name):
+        r"""Stop a server driver."""
+        x = self.modeldrivers[name]['instance']
+        x.stop()
+
     def startDrivers(self):
         r"""Start drivers, starting with the IO drivers."""
         self.info('Starting I/O drivers and models on system '
@@ -456,10 +466,7 @@ class YggRunner(YggClass):
                 self.debug("Starting driver %s", driver['name'])
                 d = driver['instance']
                 for n2 in driver.get('client_of', []):
-                    d2 = self.modeldrivers[n2]['instance']
-                    if not d2.was_started:
-                        self.debug("Starting server '%s' before client", d2.name)
-                        d2.start()
+                    self.start_server(n2)
                 if not d.was_started:
                     d.start()
         except BaseException:  # pragma: debug
@@ -558,8 +565,7 @@ class YggRunner(YggClass):
             iod = self.connectiondrivers[srv_name]
             iod['instance'].remove_model('input', model['name'])
             if iod['instance'].nclients == 0:
-                srv = self.modeldrivers[srv_name]
-                srv['instance'].stop()
+                self.stop_server(srv_name)
 
     def terminate(self):
         r"""Immediately stop all drivers, beginning with IO drivers."""
