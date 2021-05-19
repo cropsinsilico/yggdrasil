@@ -1734,10 +1734,6 @@ class ModelDriver(Driver):
             if out.get('flag_type', None):
                 flag_var['native_type'] = out.pop('flag_type').replace(' ', '')
                 flag_var['datatype'] = cls.get_json_type(flag_var['native_type'])
-                if ((outputs_in_inputs
-                     and (flag_var['native_type'] != cls.type_map['flag']))):
-                    outputs_in_inputs = False
-                    out['outputs_in_inputs'] = outputs_in_inputs
             out['flag_var'] = flag_var
             cls.check_flag_var(out, outputs_in_inputs=outputs_in_inputs)
         return out
@@ -1857,13 +1853,16 @@ class ModelDriver(Driver):
             outputs_in_inputs = cls.outputs_in_inputs
         # Read info from the source code
         if (((isinstance(model_file, str) and os.path.isfile(model_file))
-             or (contents is not None))):
+             or (contents is not None))):  # pragma: debug
             expected_outputs = []
             for x in outputs:
                 expected_outputs += x.get('vars', [])
             info = cls.parse_function_definition(model_file, model_function,
                                                  contents=contents,
                                                  expected_outputs=expected_outputs)
+            logger.warn("The new execution pattern reuses the parsed "
+                        "source code parameters. Double check results:\n%s."
+                        % pformat(info))
         elif isinstance(model_file, dict):
             info = model_file
         else:
@@ -2855,7 +2854,7 @@ checking if the model flag indicates
                             x in cls.write_declaration(
                                 o, definitions=definitions,
                                 requires_freeing=free_vars,
-                                dont_define=True)]
+                                is_argument=True)]
             for o in outputs:
                 out += [cls.function_param['indent'] + x for
                         x in cls.write_declaration(
@@ -3219,7 +3218,7 @@ checking if the model flag indicates
     
     @classmethod
     def write_declaration(cls, var, value=None, requires_freeing=None,
-                          definitions=None, dont_define=False):
+                          definitions=None, is_argument=False):
         r"""Return the lines required to declare a variable with a certain
         type.
 
@@ -3237,6 +3236,8 @@ checking if the model flag indicates
                 lines.
             dont_define (bool, optional): If True, the variable will not
                 be defined. Defaults to False.
+            is_argument (bool, optional): If True, the variable being
+                declared is an input argument. Defaults to False.
 
         Returns:
             list: The lines declaring the variable.
@@ -3248,7 +3249,7 @@ checking if the model flag indicates
         out = [cls.format_function_param('declare',
                                          type_name=type_name,
                                          variable=cls.get_name_declare(var))]
-        if dont_define:
+        if is_argument:
             return out
         if definitions is None:
             definitions = out

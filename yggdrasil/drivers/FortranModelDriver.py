@@ -849,6 +849,9 @@ class FortranModelDriver(CompiledModelDriver):
             kwargs.setdefault(
                 'function_keys',
                 ('subroutine_def_begin', 'subroutine_def_end'))
+        elif kwargs.get('outputs_in_inputs', False):
+            for o in kwargs.get('outputs', []):
+                o['intent'] = 'out'
         # Package is required for new datatypes
         kwargs['skip_interface'] = False
         return super(FortranModelDriver, cls).write_function_def(
@@ -946,6 +949,10 @@ class FortranModelDriver(CompiledModelDriver):
 
         """
         out = super(FortranModelDriver, cls).write_declaration(var, **kwargs)
+        if ((isinstance(var, dict) and kwargs.get('is_argument', False)
+             and var.get('intent', None))):
+            out = [(', intent(%s) :: ' % var['intent']).join(o.split(' :: '))
+                   for o in out]
         if ((cls.allows_realloc(var)
              and (not cls.allows_realloc(var, from_native_type=True)))):
             var = dict(var, name='%s_realloc' % var['name'])

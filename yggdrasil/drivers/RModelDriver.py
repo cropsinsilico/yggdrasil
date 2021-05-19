@@ -265,7 +265,7 @@ class RModelDriver(InterpretedModelDriver):  # pragma: R
                 code to run it as part of an integration.
 
         """
-        if platform._is_win:  # pragma: windows
+        if platform._is_win and isinstance(model_file, str):  # pragma: windows
             model_file = model_file.replace('\\', '/')
         return super(RModelDriver, cls).write_model_wrapper(
             model_file, model_function, **kwargs)

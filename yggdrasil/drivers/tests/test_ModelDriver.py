@@ -277,7 +277,8 @@ class TestModelDriverNoInit(TestModelParam, parent.TestDriverNoInit):
 
     def test_write_function_def(self, inputs=None, outputs=None,
                                 outputs_in_inputs=None,
-                                declare_functions_as_var=None, **kwargs):
+                                declare_functions_as_var=None,
+                                guess_at_outputs_in_inputs=False, **kwargs):
         r"""Test writing and running a function definition."""
         if declare_functions_as_var is None:
             declare_functions_as_var = False
@@ -329,10 +330,14 @@ class TestModelDriverNoInit(TestModelParam, parent.TestDriverNoInit):
                 skip_interface=True)
             parsed = None
             try:
+                kwargs = dict(contents='\n'.join(definition),
+                              expected_outputs=outputs,
+                              outputs_in_inputs=outputs_in_inputs)
+                if guess_at_outputs_in_inputs:
+                    kwargs.pop('expected_outputs')
+                    kwargs.pop('outputs_in_inputs')
                 parsed = self.import_cls.parse_function_definition(
-                    None, 'test_function', contents='\n'.join(definition),
-                    outputs_in_inputs=outputs_in_inputs,
-                    expected_outputs=outputs)
+                    None, 'test_function', **kwargs)
                 self.assert_equal(len(parsed.get('inputs', [])), len(inputs))
                 self.assert_equal(len(parsed.get('outputs', [])), len(outputs))
             except BaseException:  # pragma: debug

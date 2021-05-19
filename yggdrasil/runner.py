@@ -63,10 +63,7 @@ class YggFunction(YggClass):
             self.outputs[var_name] = drv.copy()
             self.outputs[var_name]['comm'] = YggInput(
                 channel_name, no_suffix=True)  # context=ctx)
-            if 'vars' in drv:
-                self.outputs[var_name]['vars'] = [
-                    iv.split(':')[-1] for iv in drv['vars']]
-            elif 'vars' in drv['inputs'][0]:
+            if 'vars' in drv['inputs'][0]:
                 self.outputs[var_name]['vars'] = drv['inputs'][0]['vars']
             else:
                 self.outputs[var_name]['vars'] = [var_name]
@@ -88,10 +85,7 @@ class YggFunction(YggClass):
             else:
                 self.inputs[var_name]['comm'] = YggOutput(
                     channel_name, no_suffix=True)  # context=ctx)
-                if 'vars' in drv:
-                    self.inputs[var_name]['vars'] = [
-                        iv.split(':')[-1] for iv in drv['vars']]
-                elif 'vars' in drv['outputs'][0]:
+                if 'vars' in drv['outputs'][0]:
                     self.inputs[var_name]['vars'] = drv['outputs'][0]['vars']
                 else:
                     self.inputs[var_name]['vars'] = [var_name]
@@ -200,7 +194,7 @@ class YggFunction(YggClass):
         os.environ.clear()
         os.environ.update(self.old_environ)
 
-    def display_info(self):
+    def model_info(self):
         r"""Display information about the wrapped model(s)."""
         print("Models: %s\nInputs:\n%s\nOutputs:\n%s\n"
               % (', '.join([x['name'] for x in

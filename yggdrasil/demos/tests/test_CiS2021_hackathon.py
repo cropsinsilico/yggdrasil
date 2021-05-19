@@ -11,19 +11,10 @@ except ImportError:  # pragma: debug
 class TestCiS2021HackathonDemo(DemoTstBase):
 
     demo_name = 'CiS2021-hackathon'
-    runs = {'light_v0': ('yamls/light_v0_python.yml', 'yamls/light_to_file.yml')}
-    # runs = {'plant_v0': ('yamls/plant_v0.yml', ),
-    #         'plant_v1': ('yamls/plant_v1.yml', 'yamls/light.yml'),
-    #         'plant_v1_cpp': ('yamls/plant_v1.yml', 'yamls/light_cpp.yml'),
-    #         'plant_v1_R': ('yamls/plant_v1.yml', 'yamls/light_R.yml'),
-    #         'plant_v1_f90': ('yamls/plant_v1.yml',
-    #                          'yamls/light_fortran.yml'),
-    #         'plant_v2': ('yamls/plant_v2.yml', 'yamls/light.yml',
-    #                      'yamls/roots.yml'),
-    #         'call_split': ('yamls/plant_v2_split.yml', 'yamls/light.yml',
-    #                        'yamls/roots.yml'),
-    #         'simple_io': ('yamls/plant_output_mesh.yml',
-    #                       'yamls/plant_io_mesh.yml')}
+    runs = {'light_v0': ('yamls/light_v0_python.yml', 'yamls/connections_v0.yml'),
+            'shoot_v0': ('yamls/shoot_v0.yml', ),
+            'shoot_v1': ('yamls/shoot_v1.yml', 'yamls/light_v0_python.yml',
+                         'yamls/connections_v1.yml')}
 
     def __init__(self, *args, **kwargs):
         super(TestCiS2021HackathonDemo, self).__init__(*args, **kwargs)

@@ -17,7 +17,10 @@ import types
 import warnings
 import json
 import functools
-import pytest
+try:
+    import pytest
+except ImportError:  # pragma: debug
+    pytest = None
 import subprocess
 from pandas.testing import assert_frame_equal
 from yggdrasil.config import ygg_cfg, cfg_logging
