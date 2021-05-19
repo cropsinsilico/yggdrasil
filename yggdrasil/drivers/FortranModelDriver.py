@@ -323,7 +323,7 @@ class FortranModelDriver(CompiledModelDriver):
             r'(?P<procedure_type>(?i:(?:subroutine)|(?:function)))\s+'
             r'{function_name}\s*\((?P<inputs>(?:[^\(]*?))\)\s*'
             r'(?:result\s*\((?P<flag_var>.+)\))?\s*\n'
-            r'(?P<preamble>(?:^(?!\:\:).*?\n)*?)'
+            r'(?P<preamble>(?:[^:]*?\n)*?)'
             r'(?P<definitions>(?:(?:(?: )|(?:.))+\s*::\s*(?:.+)\n)+)'
             r'(?P<body>(?:.*?\n?)*?)'
             r'(?i:end\s+(?P=procedure_type))\s+{function_name}'),
