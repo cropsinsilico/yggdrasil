@@ -1401,6 +1401,7 @@ class ModelDriver(Driver):
         self.event_process_kill_called.set()
         with self.lock:
             self.debug('')
+            ignore_error_code = False
             if not self.model_process_complete:  # pragma: debug
                 self.debug("Process is still running. Killing it.")
                 try:
@@ -1410,10 +1411,12 @@ class ModelDriver(Driver):
                     self.wait_process(self.timeout, key_suffix='.kill_process')
                 except BaseException:  # pragma: debug
                     self.exception("Error killing model process")
+                if not self.has_sent_messages:
+                    ignore_error_code = True
             assert(self.model_process_complete)
             if (((self.model_process is not None)
                  and (self.model_process.returncode != 0)
-                 and self.has_sent_messages)):
+                 and (not ignore_error_code))):
                 self.error("return code of %s indicates model error.",
                            str(self.model_process.returncode))
             self.event_process_kill_complete.set()
