@@ -3,20 +3,41 @@ from yggdrasil.communication import CommBase, get_comm, import_comm
 
 
 _address_sep = ':YGG_ADD:'
+_pattern_pairs = [('scatter', 'gather')]
 
 
 class ForkedCommMessage(CommBase.CommMessage):
-    r"""Class for forked comm messages."""
+    r"""Class for forked comm messages.
+
+    Args:
+        msg (CommBase.CommMessage): Message being distributed.
+        comm_list (list): List of communicators that the message is
+            being distributed to.
+        **kwargs: Additional keyword arguments are passed to the 'prepare_message'
+            method for each communicator.
+
+    """
 
     __slots__ = ['orig']
 
-    def __init__(self, msg, comm_list, **kwargs):
+    def __init__(self, msg, comm_list, pattern='broadcast', **kwargs):
         super(ForkedCommMessage, self).__init__(
             msg=msg.msg, length=msg.length, flag=msg.flag,
             args=msg.args, header=msg.header)
         for k in CommBase.CommMessage.__slots__:
             setattr(self, k, getattr(msg, k))
-        args = {i: x.prepare_message(copy.deepcopy(msg), **kwargs)
+        if (pattern in ['broadcast', 'cycle']) or (msg.flag == CommBase.FLAG_EOF):
+            msg_list = [copy.deepcopy(msg)
+                        for _ in range(len(comm_list))]
+        elif pattern == 'scatter':
+            msg_list = [copy.deepcopy(msg.args[i])
+                        for i in range(len(comm_list))]
+            kwargs.setdefault('flag', msg.flag)
+            if msg.header:
+                kwargs.setdefault('header_kwargs', msg.header)
+        else:  # pragma: debug
+            raise ValueError("Unsupported pattern: '%s'" % pattern)
+        args = {i: x.prepare_message(msg_list[i], **kwargs)
                 for i, x in enumerate(comm_list)}
         self.orig = msg.args
         self.args = args
@@ -44,6 +65,17 @@ class ForkComm(CommBase.CommBase):
             stored.
         comm_list (list, optional): The list of options for the comms that
             should be bundled. If not provided, the bundle will be empty.
+        pattern (str, optional): The communication pattern that should be
+            used to handle outgoing/incoming messages. Options include:
+              'cycle': Receive from or send to the next available comm in
+                  the list (default for receiving comms).
+              'broadcast': [SEND ONLY] Send the same message to each comm
+                  (default for sending comms).
+              'scatter': [SEND ONLY] Send part of message (must be a list)
+                  to each comm.
+              'gather': [RECV ONLY] Receive lists of messages from each
+                  comm where a message is only returned when there is a
+                  message from each.
         **kwargs: Additional keyword arguments are passed to the parent class.
 
     Attributes:
@@ -54,16 +86,29 @@ class ForkComm(CommBase.CommBase):
 
     _commtype = 'fork'
     _dont_register = True
-    child_keys = ['serializer_class', 'serializer_kwargs',  # 'datatype',
+    child_keys = ['serializer_class', 'serializer_kwargs',
                   'format_str', 'field_names', 'field_units', 'as_array']
     noprop_keys = ['send_converter', 'recv_converter', 'filter', 'transform']
     
-    def __init__(self, name, comm_list=None, is_async=False, **kwargs):
+    def __init__(self, name, comm_list=None, is_async=False,
+                 pattern=None, **kwargs):
         child_kwargs = {k: kwargs.pop(k) for k in self.child_keys if k in kwargs}
         noprop_kwargs = {k: kwargs.pop(k) for k in self.noprop_keys if k in kwargs}
+        self.comm_list_backlog = {}
         self.comm_list = []
         self.curr_comm_index = 0
         self.eof_recv = []
+        self.eof_send = []
+        if pattern is None:
+            if kwargs.get('direction', 'send') == 'recv':
+                pattern = 'cycle'
+            else:
+                pattern = 'broadcast'
+        self.pattern = pattern
+        if kwargs.get('direction', 'send') == 'recv':
+            assert(self.pattern in ['cycle', 'gather'])
+        else:
+            assert(self.pattern in ['cycle', 'scatter', 'broadcast'])
         address = kwargs.pop('address', None)
         if comm_list is None:
             if isinstance(address, list):
@@ -95,6 +140,8 @@ class ForkComm(CommBase.CommBase):
             iname = ikw.pop('name')
             self.comm_list.append(get_comm(iname, **ikw))
             self.eof_recv.append(0)
+            self.eof_send.append(0)
+            self.comm_list_backlog[i] = []
         if ncomm > 0:
             kwargs['address'] = [x.address for x in self.comm_list]
         kwargs.update(noprop_kwargs)
@@ -141,6 +188,24 @@ class ForkComm(CommBase.CommBase):
     def maxMsgSize(self):
         r"""int: Maximum size of a single message that should be sent."""
         return min([x.maxMsgSize for x in self.comm_list])
+
+    @classmethod
+    def split_comm(cls, comm, copies):
+        r"""Split yaml representation of a comm into multiple copies.
+
+        Args:
+            comm (dict): Comm yaml representation.
+            copies (int): Number of times to duplicate comm.
+
+        """
+        comm['commtype'] = [
+            dict(comm,
+                 partner_model=('%s_copy%d' % (comm['partner_model'], idx)))
+            for idx in range(copies)]
+        comm['dont_copy'] = True
+        for k in cls.child_keys:
+            comm.pop(k, None)
+        return comm
 
     @classmethod
     def new_comm_kwargs(cls, name, *args, **kwargs):
@@ -199,8 +264,9 @@ class ForkComm(CommBase.CommBase):
         """
         kwargs = super(ForkComm, self).opp_comm_kwargs()
         kwargs['comm_list'] = [x.opp_comm_kwargs() for x in self.comm_list]
-        # for i, x in enumerate(self.comm_list):
-        #     kwargs['comm_list'][i]['name'] = x.name
+        for pair in _pattern_pairs:
+            if self.pattern in pair:
+                kwargs['pattern'] = pair[(pair.index(self.pattern) + 1) % 2]
         return kwargs
 
     def bind(self):
@@ -220,8 +286,6 @@ class ForkComm(CommBase.CommBase):
 
     def close_in_thread(self, *args, **kwargs):  # pragma: debug
         r"""In a new thread, close the comm when it is empty."""
-        # for x in self.comm_list:
-        #     x.close_in_thread(*args, **kwargs)
         raise Exception("ForkComm should not be closed in thread.")
 
     @property
@@ -265,11 +329,15 @@ class ForkComm(CommBase.CommBase):
     @property
     def n_msg_recv(self):
         r"""int: The number of incoming messages in the connection."""
+        if self.pattern == 'gather':
+            return min([x.n_msg_recv for x in self.comm_list])
         return sum([x.n_msg_recv for x in self.comm_list])
 
     @property
     def n_msg_send(self):
         r"""int: The number of outgoing messages in the connection."""
+        if self.pattern in ['broadcast', 'scatter']:
+            return max([x.n_msg_send for x in self.comm_list])
         return sum([x.n_msg_send for x in self.comm_list])
 
     @property
@@ -324,9 +392,10 @@ class ForkComm(CommBase.CommBase):
                 kws_root[k] = kwargs.pop(k)
         msg = super(ForkComm, self).prepare_message(*args, **kws_root)
         if not isinstance(msg, ForkedCommMessage):
-            msg = ForkedCommMessage(msg, self.comm_list, **kwargs)
+            msg = ForkedCommMessage(msg, self.comm_list,
+                                    pattern=self.pattern, **kwargs)
         return msg
-        
+
     def send_message(self, msg, **kwargs):
         r"""Send a message encapsulated in a CommMessage object.
 
@@ -339,11 +408,18 @@ class ForkComm(CommBase.CommBase):
         
         """
         assert(isinstance(msg.args, dict))
-        for i, x in enumerate(self.comm_list):
+        for idx in range(len(self)):
+            i = self.curr_comm_index % len(self)
+            x = self.curr_comm
             out = x.send_message(msg.args[i], **kwargs)
             self.errors += x.errors
+            if msg.flag == CommBase.FLAG_EOF:
+                self.eof_send[i] = 1
+            self.curr_comm_index += 1
             if not out:
                 return out
+            elif (self.pattern == 'cycle') and (msg.flag != CommBase.FLAG_EOF):
+                break
         msg.args = msg.orig
         msg.additional_messages = []
         kwargs['skip_safe_send'] = True
@@ -368,40 +444,66 @@ class ForkComm(CommBase.CommBase):
         first_comm = True
         T = self.start_timeout(timeout, key_suffix='recv:forkd')
         out = None
-        out_idx = None
-        i = 0
-        while ((not T.is_out) or first_comm) and self.is_open and (out is None):
+        out_gather = {}
+        idx = None
+
+        if self.pattern == 'gather':
+            def complete():
+                return (len(out_gather) == len(self))
+        else:
+            def complete():
+                return bool(out_gather)
+        
+        while ((not T.is_out) or first_comm) and self.is_open and (not complete()):
             for i in range(len(self)):
-                if out is not None:
+                if complete():
                     break
+                idx = self.curr_comm_index % len(self)
                 x = self.curr_comm
-                if x.is_open:
+                if idx in out_gather:
+                    pass
+                elif self.comm_list_backlog[idx]:
+                    out_gather[idx] = self.comm_list_backlog[idx].pop(0)
+                elif x.is_open:
                     msg = x.recv_message(*args, **kwargs)
                     self.errors += x.errors
                     if msg.flag == CommBase.FLAG_EOF:
-                        self.eof_recv[self.curr_comm_index % len(self)] = 1
-                        if sum(self.eof_recv) == len(self):
-                            out = msg
+                        self.eof_recv[idx] = 1
+                        if self.pattern == 'gather':
+                            assert(all((v.flag == CommBase.FLAG_EOF)
+                                       for v in out_gather.values()))
+                            out_gather[idx] = msg
+                        elif sum(self.eof_recv) == len(self):
+                            out_gather[idx] = msg
                         else:
                             x.finalize_message(msg)
-                    elif msg.flag not in [CommBase.FLAG_FAILURE, CommBase.FLAG_EMPTY]:
-                        out = msg
-                if out is not None:
-                    out_idx = self.curr_comm_index % len(self)
+                    elif msg.flag == CommBase.FLAG_SUCCESS:
+                        out_gather[idx] = msg
                 self.curr_comm_index += 1
             first_comm = False
-            if out is None:
+            if not complete():
                 self.sleep()
         self.stop_timeout(key_suffix='recv:forkd')
-        if out is None:
-            out_idx = 0
+        if complete():
+            if self.pattern == 'cycle':
+                idx, out = next(iter(out_gather.items()))
+                out.args = {idx: copy.deepcopy(out)}
+            elif self.pattern == 'gather':
+                out = copy.deepcopy(next(iter(out_gather.values())))
+                out.args = {idx: v for idx, v in out_gather.items()}
+                # TODO: Gather header/type etc?
+        else:
+            for idx, v in out_gather.items():
+                self.comm_list_backlog[idx].append(v)
             if self.is_closed:
                 self.debug('Comm closed')
                 out = CommBase.CommMessage(flag=CommBase.FLAG_FAILURE)
             else:
-                out = CommBase.CommMessage(flag=CommBase.FLAG_EMPTY,
-                                           args=self.last_comm.empty_obj_recv)
-        out.args = {out_idx: out.args}
+                out = CommBase.CommMessage(flag=CommBase.FLAG_EMPTY)
+                if self.pattern == 'cycle':
+                    out.args = self.last_comm.empty_obj_recv
+                else:
+                    out.args = []
         return out
 
     def finalize_message(self, msg, **kwargs):
@@ -416,10 +518,19 @@ class ForkComm(CommBase.CommBase):
             CommMessage: Deserialized and annotated message.
 
         """
-        assert(isinstance(msg.args, dict) and (len(msg.args) == 1))
-        idx, msg.args = next(iter(msg.args.items()))
-        msg = self.comm_list[idx].finalize_message(msg, skip_python2language=True)
-        msg.finalized = False
+        if msg.flag in [CommBase.FLAG_EOF, CommBase.FLAG_SUCCESS]:
+            msg.args = {
+                idx: self.comm_list[idx].finalize_message(
+                    v, skip_python2language=True)
+                for idx, v in msg.args.items()}
+            if self.pattern == 'cycle':
+                assert(len(msg.args) == 1)
+                msg = next(iter(msg.args.values()))
+            elif msg.flag == CommBase.FLAG_EOF:
+                msg.args = msg.args[0].args
+            else:
+                msg.args = [msg.args[idx].args for idx in range(len(self))]
+            msg.finalized = False
         return super(ForkComm, self).finalize_message(msg, **kwargs)
         
     @property
@@ -460,3 +571,22 @@ class ForkComm(CommBase.CommBase):
         for testing purposes."""
         for x in self.comm_list:
             x.drain_server_signon_messages(**kwargs)
+
+    def coerce_to_dict(self, msg, key_order, metadata):
+        r"""Convert a message to a dictionary.
+
+        Args:
+            msg (object): Message to convert to a dictionary.
+            key_order (list): Key order to use for the output dictionary.
+            metadata (dict): Header data to accompany the message.
+
+        Returns:
+            dict: Converted message.
+
+        """
+        if self.pattern in ['scatter', 'gather']:
+            assert(isinstance(msg, (list, tuple)) and (len(msg) == len(self)))
+            out = [x.coerce_to_dict(msg[i], key_order, metadata)
+                   for i, x in enumerate(self.comm_list)]
+            return out
+        return super(ForkComm, self).coerce_to_dict(msg, key_order, metadata)

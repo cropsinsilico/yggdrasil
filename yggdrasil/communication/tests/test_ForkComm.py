@@ -10,6 +10,8 @@ class TestForkComm(parent.TestCommBase):
     attr_list = (copy.deepcopy(parent.TestCommBase.attr_list)
                  + ['comm_list', 'curr_comm_index'])
     ncomm = 2
+    send_pattern = None
+    recv_pattern = None
     test_error_send = None
     test_error_recv = None
     test_work_comm = None
@@ -24,8 +26,71 @@ class TestForkComm(parent.TestCommBase):
         r"""dict: Keyword arguments for send instance."""
         out = super(TestForkComm, self).send_inst_kwargs
         out['ncomm'] = self.ncomm
+        out['pattern'] = self.send_pattern
         return out
 
+    @property
+    def inst_kwargs(self):
+        r"""dict: Keyword arguments for tested class."""
+        out = super(TestForkComm, self).inst_kwargs
+        out['pattern'] = self.recv_pattern
+        return out
+
+    def map_sent2recv(self, obj):
+        r"""Convert a sent object into a received one."""
+        if (self.send_instance.pattern == 'scatter') and isinstance(obj, list):
+            single_obj = obj[0]
+        else:
+            single_obj = obj
+        if self.recv_instance.pattern == 'gather':
+            if obj == b'':
+                return []
+            return [single_obj for _ in range(self.ncomm)]
+        return single_obj
+
+    def duplicate_msg(self, out, direction='send'):
+        r"""Copy a message for 'scatter' communication pattern."""
+        if ((((direction == 'send')
+              and (self.send_instance.pattern == 'scatter'))
+             or ((direction == 'recv')
+                 and (self.recv_instance.pattern == 'gather')))):
+            out = [out for _ in range(self.ncomm)]
+        return out
+        
+    @property
+    def test_msg(self):
+        r"""str: Test message that should be used for any send/recv tests."""
+        return self.duplicate_msg(super(TestForkComm, self).test_msg)
+
+    @property
+    def test_msg_array(self):
+        r"""str: Test message that should be used for any send/recv tests."""
+        return self.duplicate_msg(super(TestForkComm, self).test_msg_array)
+
+    @property
+    def test_msg_dict(self):
+        r"""dict: Test message that should be used for send_dict/recv_dict
+        tests."""
+        return self.duplicate_msg(super(TestForkComm, self).test_msg_dict)
+
+    @property
+    def msg_long(self):
+        r"""str: Small test message for sending."""
+        out = super(TestForkComm, self).test_msg
+        if isinstance(out, bytes):
+            out += (self.maxMsgSize * b'0')
+        return self.duplicate_msg(out)
+        
+    @property
+    def msg_filter_send(self):
+        r"""object: Message to filter out on the send side."""
+        return self.duplicate_msg(super(TestForkComm, self).msg_filter_send)
+            
+    @property
+    def msg_filter_recv(self):
+        r"""object: Message to filter out on the recv side."""
+        return self.duplicate_msg(super(TestForkComm, self).msg_filter_recv)
+        
     def test_error_name(self):
         r"""Test error on missing address."""
         self.assert_raises(RuntimeError, self.import_cls, 'test%s' % uuid.uuid4())
@@ -33,21 +98,12 @@ class TestForkComm(parent.TestCommBase):
     def do_send_recv(self, *args, **kwargs):
         r"""Generic send/recv of a message."""
         if ((('eof' not in kwargs.get('send_meth', 'None'))
-             and (not kwargs.get('no_recv', False)))):
+             and (not kwargs.get('no_recv', False))
+             and (self.send_instance.pattern in ['broadcast', 'scatter'])
+             and (self.recv_instance.pattern == 'cycle'))):
             kwargs.setdefault('n_recv', self.ncomm)
         super(TestForkComm, self).do_send_recv(*args, **kwargs)
 
-    def add_filter(self, comm, filter=None):
-        r"""Add a filter to a comm.
-
-        Args:
-            comm (CommBase): Communication instance to add a filter to.
-            filter (FilterBase, optional): Filter class. Defaults to None and is ignored.
-
-        """
-        for x in comm.comm_list:
-            super(TestForkComm, self).add_filter(x, filter=filter)
-            
     def test_send_recv_filter_eof(self, **kwargs):
         r"""Test send/recv of EOF with filter."""
         kwargs.setdefault('recv_timeout', 2 * self.timeout)
@@ -60,8 +116,18 @@ class TestForkComm(parent.TestCommBase):
         
     def test_purge(self, **kwargs):
         r"""Test purging messages from the comm."""
-        kwargs['nrecv'] = self.ncomm
+        if self.send_instance.pattern == 'scatter':
+            kwargs['msg_recv'] = [self.test_msg for _ in range(self.ncomm)]
+        if (((self.send_instance.pattern in ['broadcast', 'scatter'])
+             and (self.recv_instance.pattern == 'cycle'))):
+            kwargs['nrecv'] = self.ncomm
         super(TestForkComm, self).test_purge(**kwargs)
+        
+    def test_send_recv_after_close(self, **kwargs):
+        r"""Test that opening twice dosn't cause errors and that send/recv after
+        close returns false."""
+        kwargs.setdefault('msg_send', [self.test_msg for _ in range(self.ncomm)])
+        super(TestForkComm, self).test_send_recv_after_close(**kwargs)
 
 
 class TestForkCommList(TestForkComm):
@@ -72,3 +138,19 @@ class TestForkCommList(TestForkComm):
         out = super(TestForkComm, self).inst_kwargs
         out['comm_list'] = None  # To force test of construction from addresses
         return out
+
+
+class TestForkCommCycle(TestForkComm):
+    r"""Tests for ForkComm communication class with cycle/cycle communication
+    pattern."""
+
+    send_pattern = 'cycle'
+    recv_pattern = 'cycle'
+
+
+class TestForkCommScatter(TestForkComm):
+    r"""Tests for ForkComm communication class with scatter/gather
+    communication pattern."""
+    
+    send_pattern = 'scatter'
+    recv_pattern = 'gather'

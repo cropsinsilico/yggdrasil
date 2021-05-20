@@ -89,6 +89,10 @@ class CommMessage(object):
         return 'CommMessage(flag=%s, %.100s..., sent=%s)' % (
             self.flag, str(self.msg), self.sent)
 
+    def __repr__(self):
+        return 'CommMessage(flag=%s, %.100s..., sent=%s)' % (
+            self.flag, str(self.msg), self.sent)
+
     @property
     def tuple_args(self):
         r"""tuple: Form that arguments were originally supplied."""
@@ -1908,7 +1912,7 @@ class CommBase(tools.YggClass):
 
     def prepare_message(self, *args, header_kwargs=None, skip_serialization=False,
                         skip_processing=False, skip_language2python=False,
-                        after_prepare_message=None):
+                        after_prepare_message=None, flag=None):
         r"""Perform actions preparing to send a message. The order of steps is
 
             1. Convert the message based on the language
@@ -1933,6 +1937,9 @@ class CommBase(tools.YggClass):
             after_prepare_message (list, optional): Functions that should be applied
                 after transformation, but before serialization. Defaults to None
                 and is ignored.
+            flag (int, optional): Flag that should be added to the message
+                before any additional processing is performed. Defaults to
+                None and is ignored.
 
         Returns:
             CommMessage: Serialized and annotated message.
@@ -1946,14 +1953,18 @@ class CommBase(tools.YggClass):
                 else:
                     msg.header = copy.deepcopy(msg.header)
                     msg.header.update(header_kwargs)
+            if flag is None:
+                flag = msg.flag
+            msg.flag = flag
         else:
             model_name = self.full_model_name
             if model_name:
                 if header_kwargs is None:
                     header_kwargs = {}
                 header_kwargs.setdefault('model', model_name)
-            msg = CommMessage(args=args, header=header_kwargs,
-                              flag=FLAG_SUCCESS)
+            if flag is None:
+                flag = FLAG_SUCCESS
+            msg = CommMessage(args=args, header=header_kwargs, flag=flag)
             # 1. Convert the message based on the language
             if not skip_language2python:
                 msg.args = self.language_driver.language2python(msg.args)
@@ -2322,6 +2333,54 @@ class CommBase(tools.YggClass):
         self._last_recv = None
 
     # Send/recv dictionary of fields
+    def extract_key_order(self, kwargs):
+        r"""Extract the key order from keyword arguments.
+
+        Args:
+            kwargs (dict): Keyword arguments.
+
+        Returns:
+            list: Key order.
+
+        """
+        if 'field_order' in kwargs:
+            kwargs.setdefault('key_order', kwargs.pop('field_order'))
+        key_order = kwargs.pop('key_order', None)
+        return key_order
+    
+    def coerce_to_dict(self, msg, key_order, metadata):
+        r"""Convert a message to a dictionary.
+
+        Args:
+            msg (object): Message to convert to a dictionary.
+            key_order (list): Key order to use for the output dictionary.
+            metadata (dict): Header data to accompany the message.
+
+        Returns:
+            dict: Converted message.
+
+        """
+        if self.direction == 'send':
+            from yggdrasil.metaschema.datatypes.JSONArrayMetaschemaType import (
+                JSONArrayMetaschemaType)
+            TypeClass = JSONArrayMetaschemaType
+        else:
+            from yggdrasil.metaschema.datatypes.JSONObjectMetaschemaType import (
+                JSONObjectMetaschemaType)
+            TypeClass = JSONObjectMetaschemaType
+            if self.serializer.typedef['type'] != 'array':
+                return {'f0': msg}
+        if key_order is None:
+            key_order = metadata.pop('key_order', self.serializer.get_field_names())
+        if (key_order is None) and isinstance(msg, dict) and (len(msg) <= 1):
+            key_order = [k for k in msg.keys()]
+        if key_order:
+            if not self.serializer.initialized:
+                metadata['field_names'] = key_order
+            metadata['key_order'] = key_order
+        out = TypeClass.coerce_type(msg, **metadata)
+        return out
+    
     def send_dict(self, args_dict, **kwargs):
         r"""Send a message with fields specified in the input dictionary.
 
@@ -2336,23 +2395,10 @@ class CommBase(tools.YggClass):
             RuntimeError: If the field order can not be determined.
 
         """
-        from yggdrasil.metaschema.datatypes.JSONArrayMetaschemaType import (
-            JSONArrayMetaschemaType)
-        metadata = kwargs.get('header_kwargs', {})
-        if 'field_order' in kwargs:
-            kwargs.setdefault('key_order', kwargs.pop('field_order'))
-        if 'key_order' in kwargs:
-            metadata['key_order'] = kwargs.pop('key_order')
-        metadata.setdefault('key_order', self.serializer.get_field_names())
-        if (((metadata['key_order'] is None)
-             and isinstance(args_dict, dict)
-             and (len(args_dict) <= 1))):
-            metadata['key_order'] = [k for k in args_dict.keys()]
-        if not self.serializer.initialized:
-            metadata['field_names'] = metadata['key_order']
-        args = JSONArrayMetaschemaType.coerce_type(args_dict, **metadata)
-        # Add field order to kwargs so it can be reconstructed
-        kwargs['header_kwargs'] = metadata
+        key_order = self.extract_key_order(kwargs)
+        kwargs.setdefault('header_kwargs', {})
+        args = self.coerce_to_dict(args_dict, key_order,
+                                   kwargs['header_kwargs'])
         return self.send(*args, **kwargs)
 
     def recv_dict(self, *args, **kwargs):
@@ -2371,25 +2417,13 @@ class CommBase(tools.YggClass):
         Raises:
 
         """
-        from yggdrasil.metaschema.datatypes.JSONObjectMetaschemaType import (
-            JSONObjectMetaschemaType)
-        if 'field_order' in kwargs:
-            kwargs.setdefault('key_order', kwargs.pop('field_order'))
-        key_order = kwargs.pop('key_order', None)
+        key_order = self.extract_key_order(kwargs)
         return_message_object = kwargs.pop('return_message_object', False)
         kwargs['return_message_object'] = True
         msg = self.recv(*args, **kwargs)
         if msg.flag == FLAG_SUCCESS:
-            if self.serializer.typedef['type'] == 'array':
-                metadata = copy.deepcopy(msg.header)
-                # if metadata is None:
-                #     metadata = {}
-                if key_order is not None:
-                    metadata['key_order'] = key_order
-                metadata.setdefault('key_order', self.serializer.get_field_names())
-                msg_dict = JSONObjectMetaschemaType.coerce_type(msg.args, **metadata)
-            else:
-                msg_dict = {'f0': msg.args}
+            msg_dict = self.coerce_to_dict(msg.args, key_order,
+                                           copy.deepcopy(msg.header))
         else:
             msg_dict = msg.args
         out = copy.deepcopy(msg)
