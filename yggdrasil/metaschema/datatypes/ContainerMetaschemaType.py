@@ -202,6 +202,35 @@ class ContainerMetaschemaType(MetaschemaType):
         return map_out
         
     @classmethod
+    def transform_type(cls, obj, typedef=None):
+        r"""Transform an object based on type info.
+
+        Args:
+            obj (object): Object to transform.
+            typedef (dict): Type definition that should be used to transform the
+                object.
+
+        Returns:
+            object: Transformed object.
+
+        """
+        if not (isinstance(typedef, dict)
+                and isinstance(typedef.get(cls._json_property, None),
+                               cls.python_types)
+                and isinstance(obj, cls.python_types)):
+            return obj
+        map_typedef = typedef[cls._json_property]
+        map_out = cls._container_type()
+        for k, v in cls._iterate(obj):
+            if cls._has_element(map_typedef, k):
+                cls._assign(map_out, k,
+                            get_type_class(map_typedef[k]['type']).transform_type(
+                                v, typedef=map_typedef[k]))
+            else:
+                cls._assign(map_out, k, v)
+        return map_out
+        
+    @classmethod
     def extract_typedef(cls, metadata):
         r"""Extract the minimum typedef required for this type from the provided
         metadata.

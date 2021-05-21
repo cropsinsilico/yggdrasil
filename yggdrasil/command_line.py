@@ -940,7 +940,7 @@ class update_config(SubCommand):
           {'action': 'store_true',
            'help': 'Suppress output.'}),
          (('--allow-multiple-omp', ),
-          {'action': 'store_true',
+          {'action': 'store_true', 'default': None,
            'help': ('Have yggdrasil set the environment variable '
                     'KMP_DUPLICATE_LIB_OK to \'True\' during model runs '
                     'to disable errors resembling '
@@ -948,8 +948,7 @@ class update_config(SubCommand):
                     'that result from having multiple versions of OpenMP '
                     'loaded during runtime.')}),
          (('--dont-allow-multiple-omp', ),
-          {'action': 'store_false',
-           'dest': 'allow_multiple_omp',
+          {'action': 'store_true', 'default': None,
            'help': ('Don\'t set the KMP_DUPLICATE_LIB_OK environment variable '
                     'when running models (see help for \'--allow-multiple-omp\' '
                     'for more information).')})]
@@ -980,15 +979,15 @@ class update_config(SubCommand):
                 conditions={'os': ['MacOS']})],
         'matlab': [
             (('--disable-matlab-engine-for-python', ),
-             {'action': 'store_true',
+             {'action': 'store_true', 'default': None,
               'dest': 'disable_engine',
               'help': 'Disable use of the Matlab engine for Python.'}),
             (('--enable-matlab-engine-for-python', ),
-             {'action': 'store_false',
-              'dest': 'disable_engine',
+             {'action': 'store_true', 'default': None,
+              'dest': 'enable_engine',
               'help': 'Enable use of the Matlab engine for Python.'}),
             (('--hide-matlab-libiomp', ),
-             {'action': 'store_true',
+             {'action': 'store_true', 'default': None,
               'help': ('Hide the version of libiomp installed by Matlab '
                        'by slightly changing the filename so that the '
                        'conda version of libomp is used instead. This '
@@ -999,11 +998,18 @@ class update_config(SubCommand):
                        'configuration file and can be restored via the '
                        '\'--restore-matlab-libiomp\' option.')}),
             (('--restore-matlab-libiomp', ),
-             {'action': 'store_false',
-              'dest': 'hide_matlab_libiomp',
+             {'action': 'store_true', 'default': None,
               'help': ('Restore the version of libiomp installed by Matlab. '
                        '(See help for \'--hide-matlab-libiomp\')')}),
-        ]}
+        ],
+        'osr': [
+            (('--osr-repository-path', ),
+             {'dest': 'repository',
+              'help': 'The full path to the OpenSimRoot repository.'})]}
+    opposite_arguments = [
+        ('allow_multiple_omp', 'dont_allow_multiple_omp'),
+        ('enable_engine', 'disable_engine'),
+        ('hide_matlab_libiomp', 'restore_matlab_libiomp')]
         
     @classmethod
     def add_arguments(cls, parser, **kwargs):
@@ -1034,13 +1040,17 @@ class update_config(SubCommand):
             os.remove(config.usr_config_file)
         if args.show_file or args.remove_file:
             return
+        for x_true, x_false in cls.opposite_arguments:
+            if getattr(args, x_false, None) is not None:
+                assert(getattr(args, x_true, None) is None)
+            setattr(args, x_true, False)
         lang_kwargs = {}
         for k, v in cls.language_arguments.items():
             for v_args in v:
                 name = v_args[1].get(
                     'dest',
                     v_args[0][0].lstrip('-').replace('-', '_'))
-                if hasattr(args, name):
+                if getattr(args, name, None) is not None:
                     lang_kwargs.setdefault(k, {})
                     lang_kwargs[k][name] = getattr(args, name)
         for x in ['compiler', 'linker', 'archiver']:

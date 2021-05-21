@@ -10,7 +10,7 @@ int timestep_calc(double t, const char* t_units, generic_t state) {
     ret = generic_map_set_double(state, "carbonAllocation2Roots", 10.0, "g");
   }
   if (ret >= 0) {
-    ret = generic_map_set_double(state, "saturatedConductivity", 10.0, "g");
+    ret = generic_map_set_double(state, "saturatedConductivity", 10.0, "cm/day");
   }
   return ret;
 }

@@ -1779,6 +1779,7 @@ class CommBase(tools.YggClass):
     def _safe_send(self, *args, **kwargs):
         r"""Send message checking if is 1st message and then waiting."""
         timeout = kwargs.pop('timeout', self.timeout)
+        quiet_timeout = kwargs.pop('quiet_timeout', False)
         send_1st = ((not self._used) and self._multiple_first_send)
         if send_1st:
             timeout = max(timeout, self.timeout)
@@ -1802,7 +1803,8 @@ class CommBase(tools.YggClass):
                 error = e
                 self.special_debug("TemporaryCommunicationError: %s" % e)
             self.sleep()
-        self.stop_timeout(key_suffix='._safe_send')
+        self.stop_timeout(key_suffix='._safe_send',
+                          quiet=quiet_timeout)
         if error and self.is_async:
             raise TemporaryCommunicationError(error)
         if send_1st:
@@ -2084,7 +2086,7 @@ class CommBase(tools.YggClass):
         return self.send(self.eof_msg, *args, **kwargs)
 
     # RECV METHODS
-    def _safe_recv(self, timeout=None, **kwargs):
+    def _safe_recv(self, timeout=None, quiet_timeout=False, **kwargs):
         r"""Safe receive that does things for all comm classes."""
         if timeout is None:
             timeout = self.recv_timeout
@@ -2106,7 +2108,8 @@ class CommBase(tools.YggClass):
                 self.periodic_debug("_safe_recv", period=1000)(
                     "TemporaryCommunicationError: %s" % e)
             self.sleep()
-        self.stop_timeout(key_suffix='._safe_recv')
+        self.stop_timeout(key_suffix='._safe_recv',
+                          quiet=quiet_timeout)
         if error and self.is_async:
             raise TemporaryCommunicationError(error)
         if out[0] and (not self.is_empty(out[1], self.empty_bytes_msg)):

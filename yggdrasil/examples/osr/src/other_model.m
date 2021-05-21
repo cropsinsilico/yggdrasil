@@ -8,7 +8,7 @@ function timesync(t_step, t_units)
   t_end = 1.0 * str2symunit('day');
   state = containers.Map('UniformValues', false, 'ValueType', 'any');
   state('carbonAllocation2Roots') = 10.0 * str2symunit('g');
-  state('saturatedConductivity') = 10.0 * str2symunit('g');
+  state('saturatedConductivity') = 10.0 * str2symunit('cm/day');
 
   % Set up connections matching yaml
   % Timestep synchonization connection will default to 'timesync'
@@ -44,7 +44,7 @@ function timesync(t_step, t_units)
     t = t + t_step;
     state = containers.Map('UniformValues', false, 'ValueType', 'any');
     state('carbonAllocation2Roots') = 10.0 * str2symunit('g');
-    state('saturatedConductivity') = 10.0 * str2symunit('g');
+    state('saturatedConductivity') = 10.0 * str2symunit('cm/day');
 
     % Synchronize the state
     [ret, state] = timesync.call(t, state);

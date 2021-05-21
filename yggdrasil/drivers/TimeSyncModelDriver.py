@@ -171,7 +171,8 @@ class TimeSyncModelDriver(DSLModelDriver):
                             v.terminate()
                     raise Exception("Error on response thread.")
             # Receive values from client models
-            flag, values, request_id = rpc.recv_from(timeout=1.0)
+            flag, values, request_id = rpc.recv_from(timeout=1.0,
+                                                     quiet_timeout=True)
             if not flag:
                 print("timesync server: End of input.")
                 break

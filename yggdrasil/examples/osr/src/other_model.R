@@ -3,7 +3,7 @@ library(yggdrasil)
 
 timestep_calc <- function(t) {
   state = list(carbonAllocation2Roots=units::set_units(10.0, 'g', mode="standard"),
-               saturatedConductivity=units::set_units(10.0, 'g', mode="standard"))
+               saturatedConductivity=units::set_units(10.0, 'cm/day', mode="standard"))
   return(state)
 }
 

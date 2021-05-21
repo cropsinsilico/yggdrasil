@@ -1,5 +1,5 @@
 # InputMassRate	OuputMassRateDensity
-# g/s	g/(s*(cm**2))
+# g/(s*(cm**2))	g/(s*(cm**2))
 # %.1lf	%.1lf
 0.0	0.0
 0.1	0.2

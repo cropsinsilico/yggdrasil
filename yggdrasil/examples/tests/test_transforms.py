@@ -37,15 +37,18 @@ class TestExampleTransforms(ExampleTstBase):
         return self._output_files
 
     @classmethod
-    def get_test_data(cls):
+    def get_test_data(cls, transform=None):
         r"""Determine a test data set for the specified type.
 
         Returns:
             object: Example of specified datatype.
 
         """
+        if transform is None:
+            transform = os.environ['TEST_TRANSFORM']
+        umol = b'\xce\xbcmol'.decode('utf-8')
         field_names = ['name', 'count', 'size']
-        field_units = ['n/a', 'umol', 'cm']
+        field_units = ['n/a', umol, 'cm']
         dtype = np.dtype(
             {'names': field_names,
              'formats': ['S5', 'i4', 'f8']})
@@ -55,6 +58,8 @@ class TestExampleTransforms(ExampleTstBase):
         arr = np.array(rows, dtype=dtype)
         lst = [units.add_units(arr[n], u) for n, u
                in zip(field_names, field_units)]
+        if transform == 'table':
+            return rows[0]
         return lst
 
     @classmethod
@@ -76,7 +81,7 @@ class TestExampleTransforms(ExampleTstBase):
         except ValueError:
             def t(x):
                 return x
-        x_sent = t(cls.get_test_data())
+        x_sent = t(cls.get_test_data(transform))
         print('RECEIVED:')
         tools.pprint_encoded(x_recv)
         print('EXPECTED:')
@@ -109,7 +114,7 @@ class TestExampleTransforms(ExampleTstBase):
         modelfile = os.path.join(_example_dir, cls.example_name,
                                  'src', 'model' + language_ext)
         drv = import_component('model', language)
-        testdata = cls.get_test_data()
+        testdata = cls.get_test_data(transform)
         testtype = encode_type(testdata)
         inputs = [{'name': 'x',
                    'datatype': copy.deepcopy(testtype)}]
