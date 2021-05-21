@@ -19,7 +19,7 @@ import json
 import functools
 try:
     import pytest
-except ImportError:
+except ImportError:  # pragma: debug
     pytest = None
 import subprocess
 from pandas.testing import assert_frame_equal
