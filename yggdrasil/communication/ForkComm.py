@@ -190,24 +190,6 @@ class ForkComm(CommBase.CommBase):
         return min([x.maxMsgSize for x in self.comm_list])
 
     @classmethod
-    def split_comm(cls, comm, copies):
-        r"""Split yaml representation of a comm into multiple copies.
-
-        Args:
-            comm (dict): Comm yaml representation.
-            copies (int): Number of times to duplicate comm.
-
-        """
-        comm['commtype'] = [
-            dict(comm,
-                 partner_model=('%s_copy%d' % (comm['partner_model'], idx)))
-            for idx in range(copies)]
-        comm['dont_copy'] = True
-        for k in cls.child_keys:
-            comm.pop(k, None)
-        return comm
-
-    @classmethod
     def new_comm_kwargs(cls, name, *args, **kwargs):
         r"""Get keyword arguments for new comm."""
         if 'address' not in kwargs:
@@ -350,18 +332,13 @@ class ForkComm(CommBase.CommBase):
         r"""int: The number of outgoing messages in the connection to drain."""
         return sum([x.n_msg_send_drain for x in self.comm_list])
 
-    def is_empty_recv(self, msg):
-        r"""Check if a received message object is empty.
-
-        Args:
-            msg (obj): Message object.
-
-        Returns:
-            bool: True if the object is empty, False otherwise.
-
-        """
-        return self.last_comm.is_empty_recv(msg)
-
+    @property
+    def empty_obj_recv(self):
+        r"""obj: Empty message object."""
+        if self.pattern in ['gather']:
+            return []
+        return self.last_comm.empty_obj_recv
+        
     def update_serializer_from_message(self, msg):
         r"""Update the serializer based on information stored in a message.
 
@@ -460,25 +437,24 @@ class ForkComm(CommBase.CommBase):
                     break
                 idx = self.curr_comm_index % len(self)
                 x = self.curr_comm
-                if idx in out_gather:
-                    pass
-                elif self.comm_list_backlog[idx]:
-                    out_gather[idx] = self.comm_list_backlog[idx].pop(0)
-                elif x.is_open:
-                    msg = x.recv_message(*args, **kwargs)
-                    self.errors += x.errors
-                    if msg.flag == CommBase.FLAG_EOF:
-                        self.eof_recv[idx] = 1
-                        if self.pattern == 'gather':
-                            assert(all((v.flag == CommBase.FLAG_EOF)
-                                       for v in out_gather.values()))
+                if idx not in out_gather:
+                    if self.comm_list_backlog[idx]:
+                        out_gather[idx] = self.comm_list_backlog[idx].pop(0)
+                    elif x.is_open:
+                        msg = x.recv_message(*args, **kwargs)
+                        self.errors += x.errors
+                        if msg.flag == CommBase.FLAG_EOF:
+                            self.eof_recv[idx] = 1
+                            if self.pattern == 'gather':
+                                assert(all((v.flag == CommBase.FLAG_EOF)
+                                           for v in out_gather.values()))
+                                out_gather[idx] = msg
+                            elif sum(self.eof_recv) == len(self):
+                                out_gather[idx] = msg
+                            else:
+                                x.finalize_message(msg)
+                        elif msg.flag == CommBase.FLAG_SUCCESS:
                             out_gather[idx] = msg
-                        elif sum(self.eof_recv) == len(self):
-                            out_gather[idx] = msg
-                        else:
-                            x.finalize_message(msg)
-                    elif msg.flag == CommBase.FLAG_SUCCESS:
-                        out_gather[idx] = msg
                 self.curr_comm_index += 1
             first_comm = False
             if not complete():

@@ -1086,7 +1086,9 @@ class ModelDriver(Driver):
                     commtype=commtype, skip_config=skip_config, **kwargs)
             return out
         if cls.comms_implicit:
-            return True
+            if commtype is None:
+                return True
+            return (commtype in tools.get_supported_comm())
         # Check for installation based on config option
         if not skip_config:
             installed_comms = cls.cfg.get(cls.language, 'commtypes', [])

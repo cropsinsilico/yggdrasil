@@ -38,12 +38,13 @@ class TestForkComm(parent.TestCommBase):
 
     def map_sent2recv(self, obj):
         r"""Convert a sent object into a received one."""
-        if (self.send_instance.pattern == 'scatter') and isinstance(obj, list):
+        if (((self.send_instance.pattern == 'scatter')
+             and isinstance(obj, list) and obj)):
             single_obj = obj[0]
         else:
             single_obj = obj
         if self.recv_instance.pattern == 'gather':
-            if obj == b'':
+            if obj in [b'', []]:
                 return []
             return [single_obj for _ in range(self.ncomm)]
         return single_obj
@@ -154,3 +155,16 @@ class TestForkCommScatter(TestForkComm):
     
     send_pattern = 'scatter'
     recv_pattern = 'gather'
+
+    def test_async_gather(self):
+        r"""Test scatter-gather w/ intermittent send."""
+        test_msg = self.test_msg
+        self.send_instance.comm_list[0].send(test_msg[0])
+        flag, msg_recv = self.recv_instance.recv()
+        assert(flag)
+        assert(self.recv_instance.is_empty_recv(msg_recv))
+        for msg_send, comm in zip(test_msg[1:], self.send_instance.comm_list[1:]):
+            assert(comm.send(msg_send))
+        flag, msg_recv = self.recv_instance.recv()
+        assert(flag)
+        self.assert_msg_equal(msg_recv, test_msg)
