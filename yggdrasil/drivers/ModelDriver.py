@@ -149,6 +149,8 @@ class ModelDriver(Driver):
         valgrind_flags (list, optional): Flags to pass to valgrind. Defaults to [].
         model_index (int, optional): Index of model in list of models being run.
             Defaults to 0.
+        copy_index (int, optional): Index of model in set of copies. Defaults
+            to -1 indicating there is only one copy of the model.
         outputs_in_inputs (bool, optional): If True, outputs from wrapped model
             functions are passed by pointer as inputs for modification and the
             return value will be a flag. If False, outputs are limited to
@@ -215,6 +217,11 @@ class ModelDriver(Driver):
         brackets (tuple): A pair of opening and clossing characters that
             are used by the language to mark blocks. Set to None and
             ignored by default.
+        no_executable (bool): True if there is not an executable associated
+            with the language driver. Defaults to False.
+        comms_implicit (bool): True if the comms installed for this driver
+            are not explicitly defined (depend on input parameters). Defaults
+            to False.
 
     Attributes:
         args (list): Argument(s) for running the model on the command line.
@@ -253,6 +260,7 @@ class ModelDriver(Driver):
         with_valgrind (bool): If True, the command is run with valgrind.
         valgrind_flags (list): Flags to pass to valgrind.
         model_index (int): Index of model in list of models being run.
+        copy_index (int): Index of model in set of copies.
         modified_files (list): List of pairs of originals and copies of files
             that should be restored during cleanup.
         allow_threading (bool): If True, comm connections will be set up so that
@@ -394,6 +402,8 @@ class ModelDriver(Driver):
     brackets = None
     zero_based = True
     max_line_width = None
+    no_executable = False
+    comms_implicit = False
     python_interface = {'table_input': 'YggAsciiTableInput',
                         'table_output': 'YggAsciiTableOutput',
                         'array_input': 'YggArrayInput',
@@ -409,7 +419,7 @@ class ModelDriver(Driver):
                            'event_process_kill_called',
                            'event_process_kill_complete'])
 
-    def __init__(self, name, args, model_index=0, clients=[],
+    def __init__(self, name, args, model_index=0, copy_index=-1, clients=[],
                  **kwargs):
         self.model_outputs_in_inputs = kwargs.pop('outputs_in_inputs', None)
         super(ModelDriver, self).__init__(name, **kwargs)
@@ -428,6 +438,7 @@ class ModelDriver(Driver):
              and platform._is_win)):  # pragma: windows
             raise RuntimeError("strace/valgrind options invalid on windows.")
         self.model_index = model_index
+        self.copy_index = copy_index
         self.clients = clients
         self.env_copy = ['LANG', 'PATH', 'USER']
         self._exit_line = b'EXIT'
@@ -714,6 +725,8 @@ class ModelDriver(Driver):
                 to run the compiler/interpreter from the command line.
 
         """
+        if cls.no_executable:
+            return ''
         raise NotImplementedError("language_executable not implemented for '%s'"
                                   % cls.language)
         
@@ -1072,6 +1085,8 @@ class ModelDriver(Driver):
                 out = import_component('model', x).is_comm_installed(
                     commtype=commtype, skip_config=skip_config, **kwargs)
             return out
+        if cls.comms_implicit:
+            return True
         # Check for installation based on config option
         if not skip_config:
             installed_comms = cls.cfg.get(cls.language, 'commtypes', [])
@@ -1223,7 +1238,7 @@ class ModelDriver(Driver):
         env['YGG_MODEL_LANGUAGE'] = self.language
         if self.copies > 1:
             env['YGG_MODEL_NAME'] = self.name.split('_copy')[0]
-            env['YGG_MODEL_COPY'] = self.name.split('_copy')[-1]
+            env['YGG_MODEL_COPY'] = str(self.copy_index)
         else:
             env['YGG_MODEL_NAME'] = self.name
         env['YGG_MODEL_COPIES'] = str(self.copies)

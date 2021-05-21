@@ -516,9 +516,12 @@ class TestCommBase(YggTestClassInfo):
     def msg_filter_recv(self):
         r"""object: Message to filter out on the recv side."""
         objs = self.get_options()['objects']
-        if (len(objs) < 2) or (objs[0] == objs[1]):  # pragma: debug
-            raise unittest.SkipTest("There aren't enough unique objects.")
-        return objs[1]
+        if (len(objs) >= 2):
+            try:
+                self.assert_equal(objs[0], objs[1])
+            except AssertionError:
+                return objs[1]
+        raise unittest.SkipTest("There aren't enough unique objects.")
 
     @property
     def msg_filter_pass(self):
@@ -660,6 +663,7 @@ class TestCommBase(YggTestClassInfo):
                           msg_send=msg,
                           send_kwargs=dict(header_kwargs=dict(x=msg)),
                           print_status=True)
+        self.send_instance.linger()
 
     def test_send_recv_array(self):
         r"""Test send/recv of a array message."""

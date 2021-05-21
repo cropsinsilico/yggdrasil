@@ -1261,11 +1261,11 @@ class CommBase(tools.YggClass):
                     # This is currently unused as wait_for_workers is only
                     # called for non-asynchronous comms
                     flag = (x._used or x.is_closed)
-                if not flag:
+                if not flag:  # pragma: intermittent
                     break
             else:
                 break
-            self.sleep()
+            self.sleep()  # pragma: intermittent
         self.stop_timeout(key_suffix='.wait_for_workers')
         return flag
 

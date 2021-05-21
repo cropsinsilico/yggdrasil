@@ -824,6 +824,7 @@ class YggTask(YggClass):
         self.create_flag_attr('start_flag')
         self.create_flag_attr('terminate_flag')
         self._calling_thread = None
+        self.state = ''
         super(YggTask, self).__init__(name, **ygg_kwargs)
         if not self.as_process:
             global _thread_registry
@@ -843,6 +844,11 @@ class YggTask(YggClass):
         if self.is_alive():
             self.info('Thread alive at exit')
             self.cleanup()
+
+    def printStatus(self):
+        r"""Print the class status."""
+        self.logger.info('%s(%s): state: %s', self.__module__,
+                         self.print_name, self.state)
 
     def cleanup(self):
         r"""Actions to perform to clean up the thread after it has stopped."""
@@ -877,6 +883,7 @@ class YggTask(YggClass):
 
     def start(self, *args, **kwargs):
         r"""Start thread/process and print info."""
+        self.state = 'starting'
         if not self.was_terminated:
             self.set_started_flag()
             self.before_start()
@@ -891,13 +898,17 @@ class YggTask(YggClass):
     def run(self, *args, **kwargs):
         r"""Continue running until terminate event set."""
         self.debug("Starting method")
+        self.state = 'running'
         try:
             self.run_init()
             self.call_target()
         except BaseException:  # pragma: debug
+            self.state = 'error'
             self.run_error()
         finally:
             self.run_finally()
+            if self.state != 'error':
+                self.state = 'finished'
 
     def run_init(self):
         r"""Actions to perform at beginning of run."""
@@ -985,6 +996,7 @@ class YggTask(YggClass):
         """
         self.debug('')
         with self.lock:
+            self.state = 'terminated'
             if self.was_terminated:  # pragma: debug
                 self.debug('Driver already terminated.')
                 return

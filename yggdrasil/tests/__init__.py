@@ -17,10 +17,7 @@ import types
 import warnings
 import json
 import functools
-try:
-    import pytest
-except ImportError:  # pragma: debug
-    pytest = None
+import pytest
 import subprocess
 from pandas.testing import assert_frame_equal
 from yggdrasil.config import ygg_cfg, cfg_logging
@@ -509,7 +506,7 @@ def get_timeout_args(args0=None):
     args_remove = ['--clear-cache']
     args_remove_value = []
     args_add = ['--cov-append']
-    if pytest and (int(pytest.__version__.split('.')[0]) >= 6):
+    if int(pytest.__version__.split('.')[0]) >= 6:
         args_add.append('--import-mode=importlib')
     args_remove_value_match = tuple([k + '=' for k in args_remove_value])
     out = {'args': [], 'rootdir': None}
@@ -563,7 +560,6 @@ def timeout(*args, allow_arguments=False, **kwargs):
 
 
     """
-    assert(pytest is not None)
     env_flag = 'YGG_IN_TIMEOUT_PROCESS'
     if platform._is_win:
         kwargs['method'] = 'thread'

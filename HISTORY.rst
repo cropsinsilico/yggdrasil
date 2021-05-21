@@ -7,6 +7,9 @@ History
 
 * Updated client/server comms & drivers to reuse response comms
 * Added additional patterns to ForkComm
+* Added option to compile with ccache including for building R packages
+* Fixed bug in yggdevup CLI for missing language directories
+* Fix bug in the documentation for the Python interface
 
 1.6.1 (2021-05-18) Minor Bug Fix
 ------------------

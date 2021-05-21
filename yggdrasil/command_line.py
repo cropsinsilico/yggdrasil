@@ -371,6 +371,7 @@ class ygginfo(SubCommand):
         from yggdrasil import tools, config, __version__
         lang_list = tools.get_installed_lang()
         comm_list = tools.get_installed_comm()
+        comm_lang_list = []
         prefix = '    '
         curr_prefix = ''
         vardict = [
@@ -391,11 +392,11 @@ class ygginfo(SubCommand):
                     drv = import_component('model', lang)
                     vardict.append(
                         (curr_prefix + '%s:' % lang.upper(), ''))
+                    if not drv.comms_implicit:
+                        comm_lang_list.append(lang)
                     curr_prefix += prefix
-                    if lang == 'executable':
-                        vardict.append((curr_prefix + 'Location', ''))
-                    else:
-                        exec_name = drv.language_executable()
+                    exec_name = drv.language_executable()
+                    if exec_name:
                         if not os.path.isabs(exec_name):
                             exec_name = shutil.which(exec_name)
                         vardict.append((curr_prefix + 'Location',
@@ -480,15 +481,15 @@ class ygginfo(SubCommand):
                         (curr_prefix + '%s:' % comm.upper(), ''))
                     curr_prefix += prefix
                     avail = [cmm.is_installed(language=lang)
-                             for lang in lang_list]
+                             for lang in comm_lang_list]
                     vardict.append(
                         (curr_prefix + "Available for ",
-                         sorted([lang_list[i].upper()
+                         sorted([comm_lang_list[i].upper()
                                  for i in range(len(avail))
                                  if avail[i]])))
                     vardict.append(
                         (curr_prefix + "Not Available for ",
-                         sorted([lang_list[i].upper()
+                         sorted([comm_lang_list[i].upper()
                                  for i in range(len(avail))
                                  if not avail[i]])))
                     curr_prefix = curr_prefix.rsplit(prefix, 1)[0]
@@ -706,6 +707,8 @@ class yggcc(SubCommand):
          {'nargs': '*',
           'help': ("Additional flags that should be added to the compilation "
                    "command")}),
+        (('--use-ccache', ),
+         {'action': 'store_true', 'help': "Run compilation with ccache."}),
         (('--Rpkg-language', ),
          {'help': ("Language that R package is written in "
                    "(only used if the specified language is R).")})]
@@ -721,10 +724,11 @@ class yggcc(SubCommand):
             else:
                 args.language = EXT2LANG[os.path.splitext(args.source[0])[-1]]
         drv = import_component('model', args.language)
-        kws = {'toolname': args.toolname, 'flags': args.flags}
-        if args.language in ['r', 'R']:
+        kws = {'toolname': args.toolname, 'flags': args.flags,
+               'use_ccache': args.use_ccache}
+        if (args.language in ['r', 'R']) and args.Rpkg_language:
             kws['language'] = args.Rpkg_language
-        print("executable: %s" % drv.call_compile(args.source, **kws))
+        print("executable: %s" % drv.call_compiler(args.source, **kws))
 
 
 class yggcompile(SubCommand):
@@ -1176,7 +1180,10 @@ class run_tsts(SubCommand):
          {'help': 'Define root directory for tests.'}),
         (('--count', ),
          {'type': int, 'default': 1,
-          'help': 'Number of times to repeat a test.'})]
+          'help': 'Number of times to repeat a test.'}),
+        (('--additional-info', '-r'),
+         {'type': str, 'default': '',
+          'help': 'Display additional info for test results.'})]
     allow_unknown = True
 
     @classmethod
@@ -1329,7 +1336,7 @@ class run_tsts(SubCommand):
     @classmethod
     def func(cls, args):
         from yggdrasil import config
-        argv = ['pytest']
+        argv = [sys.executable, '-m', 'pytest']
         # test_paths = args.test_paths
         if args.verbose:
             argv.append('-v')
@@ -1355,6 +1362,8 @@ class run_tsts(SubCommand):
             argv += ['--ignore=%s' % x for x in args.ignore]
         if args.rootdir:
             argv += ['--rootdir=%s' % args.rootdir]
+        if args.additional_info:
+            argv += ['-r', args.additional_info]
         argv += args.extra
         # Run test command and perform cleanup before logging any errors
         logger.info("Running %s from %s", argv, os.getcwd())
@@ -1412,9 +1421,9 @@ class run_tsts(SubCommand):
                         error_code = x_error_code
                         if args.stop:
                             break
-            except BaseException:
-                logger.exception('Error in running test.')
-                error_code = -1
+            # except BaseException:
+            #     logger.exception('Error in running test.')
+            #     error_code = -1
             finally:
                 os.chdir(initial_dir)
                 # if os.path.isfile(pth_file):
