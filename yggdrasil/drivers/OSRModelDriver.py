@@ -59,8 +59,7 @@ class OSRModelDriver(ExecutableModelDriver):
     repository_branch = "volatile_active"
     _config_keys = ['repository']
     _config_attr_map = [{'attr': 'repository',
-                         'key': 'repository',
-                         'desc': 'The full path to the OpenSimRoot repository.'}]
+                         'key': 'repository'}]
 
     @staticmethod
     def after_registration(cls, **kwargs):
@@ -297,7 +296,7 @@ class OSRModelDriver(ExecutableModelDriver):
         # TODO: Move clone + compile to install
         out = super(OSRModelDriver, cls).configure_executable_type(cfg)
         opt = 'repository'
-        desc = cls._config_attr_map[opt]
+        desc = 'The full path to the OpenSimRoot repository.'
         # if platform._is_win:  # pragma: windows
         #     out.append((cls.language, opt, desc))
         #     return out
