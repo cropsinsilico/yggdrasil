@@ -19,7 +19,10 @@ class TestCiS2021HackathonDemo(DemoTstBase):
             'shoot_v2_split': ('yamls/light_v1_python.yml',
                                'yamls/shoot_v2_split.yml'),
             'shoot_v2_copies': ('yamls/light_v2_python.yml',
-                                'yamls/shoot_v2_copies.yml')}
+                                'yamls/shoot_v2_copies.yml'),
+            'roots_v0': ('yamls/roots_v0.yml', ),
+            'timesync': ('yamls/roots_v1.yml', 'yamls/shoot_v3.yml',
+                         'yamls/timesync.yml', 'yamls/light_v1_python.yml')}
 
     def __init__(self, *args, **kwargs):
         super(TestCiS2021HackathonDemo, self).__init__(*args, **kwargs)

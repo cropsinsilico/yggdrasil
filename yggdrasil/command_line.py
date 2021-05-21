@@ -1008,7 +1008,7 @@ class update_config(SubCommand):
               'help': 'The full path to the OpenSimRoot repository.'})]}
     opposite_arguments = [
         ('allow_multiple_omp', 'dont_allow_multiple_omp'),
-        ('enable_engine', 'disable_engine'),
+        ('disable_engine', 'enable_engine'),
         ('hide_matlab_libiomp', 'restore_matlab_libiomp')]
         
     @classmethod
@@ -1043,7 +1043,8 @@ class update_config(SubCommand):
         for x_true, x_false in cls.opposite_arguments:
             if getattr(args, x_false, None) is not None:
                 assert(getattr(args, x_true, None) is None)
-            setattr(args, x_true, False)
+            setattr(args, x_true, not getattr(args, x_false))
+            delattr(args, x_false)
         lang_kwargs = {}
         for k, v in cls.language_arguments.items():
             for v_args in v:
