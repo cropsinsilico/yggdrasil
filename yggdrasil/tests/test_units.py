@@ -80,6 +80,8 @@ class TestUnits(YggTestBase):
         for v in self._vars_units:
             units.convert_to(v, 'm')
             self.assert_raises(ValueError, units.convert_to, v, 's')
+        x = units.add_units(int(1), 'umol')
+        units.convert_to(x, 'mol')
 
     def test_are_compatible(self):
         r"""Test are_compatible."""
