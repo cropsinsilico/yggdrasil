@@ -1051,8 +1051,7 @@ class CModelDriver(CompiledModelDriver):
         
     @classmethod
     def update_io_from_function(cls, model_file, model_function,
-                                inputs=[], outputs=[], contents=None,
-                                outputs_in_inputs=None):
+                                inputs=[], outputs=[], **kwargs):
         r"""Update inputs/outputs from the function definition.
 
         Args:
@@ -1063,11 +1062,8 @@ class CModelDriver(CompiledModelDriver):
                 Defaults to [].
             outputs (list, optional): List of model outputs including types.
                 Defaults to [].
-            contents (str, optional): Contents of file to parse rather than
-                re-reading the file. Defaults to None and is ignored.
-            outputs_in_inputs (bool, optional): If True, the outputs are
-                presented in the function definition as inputs. Defaults
-                to False.
+            **kwargs: Additional keyword arguments are passed to the parent
+                class's method.
 
         Returns:
             dict, None: Flag variable used by the model. If None, the
@@ -1076,8 +1072,7 @@ class CModelDriver(CompiledModelDriver):
         """
         flag_var = super(CModelDriver, cls).update_io_from_function(
             model_file, model_function, inputs=inputs,
-            outputs=outputs, contents=contents,
-            outputs_in_inputs=outputs_in_inputs)
+            outputs=outputs, **kwargs)
         # Add length_vars if missing for use by yggdrasil
         for x in inputs:
             for v in x['vars']:

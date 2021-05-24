@@ -227,17 +227,18 @@ class SerializeBase(tools.YggClass):
                 rows = [('one', int_type(1), 1.0),
                         ('two', int_type(2), 2.0),
                         ('three', int_type(3), 3.0)]
+            umol = b'\xce\xbcmol'.decode('utf-8')
             out = {'kwargs': {}, 'empty': [], 'dtype': None,
                    'extra_kwargs': {},
                    'typedef': {'type': 'array',
                                'items': [{'type': table_string_type,
                                           'units': 'n/a', 'title': 'name'},
                                          {'type': 'int', 'precision': 32,
-                                          'units': 'umol', 'title': 'count'},
+                                          'units': umol, 'title': 'count'},
                                          {'type': 'float', 'precision': 64,
                                           'units': 'cm', 'title': 'size'}]},
                    'contents': (b'# name\tcount\tsize\n'
-                                + b'# n/a\tumol\tcm\n'
+                                + b'# n/a\t\xce\xbcmol\tcm\n'
                                 + b'# %5s\t%d\t%f\n'
                                 + b'  one\t1\t1.000000\n'
                                 + b'  two\t2\t2.000000\n'
@@ -247,11 +248,11 @@ class SerializeBase(tools.YggClass):
                                 + b'three\t3\t3.000000\n'),
                    'objects': 2 * rows,
                    'field_names': ['name', 'count', 'size'],
-                   'field_units': ['n/a', 'umol', 'cm']}
+                   'field_units': ['n/a', umol, 'cm']}
             if include_oldkws:
                 out['kwargs'].update({'format_str': '%5s\t%d\t%f\n',
                                       'field_names': ['name', 'count', 'size'],
-                                      'field_units': ['n/a', 'umol', 'cm']})
+                                      'field_units': ['n/a', umol, 'cm']})
                 out['extra_kwargs']['format_str'] = out['kwargs']['format_str']
                 if 'format_str' in cls._attr_conv:
                     out['extra_kwargs']['format_str'] = tools.str2bytes(

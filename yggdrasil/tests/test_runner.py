@@ -82,7 +82,34 @@ def test_import_as_function():
     input_args = {}
     for x in fmodel.arguments:
         input_args[x] = 1.0
+    fmodel.model_info()
     result = fmodel(**input_args)
+    for x in fmodel.returns:
+        assert(x in result)
+    result = fmodel(*list(input_args.values()))
+    for x in fmodel.returns:
+        assert(x in result)
+    fmodel.stop()
+    fmodel.stop()
+
+
+def test_import_as_function_server():
+    r"""Test import_as_function w/ server function."""
+    yamlfile = None
+    for x in ex_yamls['rpc_lesson3']['python']:
+        if 'server' in x:
+            yamlfile = x
+            break
+    assert(yamlfile)
+    fmodel = import_as_function(yamlfile)
+    input_args = {}
+    for x in fmodel.arguments:
+        input_args[x] = 'hello'
+    fmodel.model_info()
+    result = fmodel(**input_args)
+    for x in fmodel.returns:
+        assert(x in result)
+    result = fmodel(*list(input_args.values()))
     for x in fmodel.returns:
         assert(x in result)
     fmodel.stop()
@@ -106,10 +133,14 @@ def test_import_as_function_C():
         fd.write(contents)
     try:
         fmodel = import_as_function(yamlfile)
+        fmodel.model_info()
         input_args = {}
         for x in fmodel.arguments:
             input_args[x] = b'hello'
         result = fmodel(**input_args)
+        for x in fmodel.returns:
+            assert(x in result)
+        result = fmodel(*list(input_args.values()))
         for x in fmodel.returns:
             assert(x in result)
         fmodel.stop()

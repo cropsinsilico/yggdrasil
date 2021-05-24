@@ -171,7 +171,8 @@ class TimeSyncModelDriver(DSLModelDriver):
                             v.terminate()
                     raise Exception("Error on response thread.")
             # Receive values from client models
-            flag, values, request_id = rpc.recv_from(timeout=1.0)
+            flag, values, request_id = rpc.recv_from(timeout=1.0,
+                                                     quiet_timeout=True)
             if not flag:
                 print("timesync server: End of input.")
                 break
@@ -180,7 +181,8 @@ class TimeSyncModelDriver(DSLModelDriver):
                 continue
             t, state = values[:]
             t_pd = units.convert_to_pandas_timedelta(t)
-            client_model = rpc.ocomm[request_id].client_model
+            client_model = rpc.ocomm[
+                rpc.requests[request_id].response_address].client_model
             # Remove variables marked as external so they are not merged
             external_variables = additional_variables.get(client_model, [])
             for k in external_variables:

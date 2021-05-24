@@ -50,5 +50,5 @@ connections:
     output: ./outputC.txt
     filetype: table
     field_names: InputMassRate,OuputMassRateDensity
-    field_units: g/s,g/(s*(cm**2))
+    field_units: g/(s*(cm**2)),g/(s*(cm**2))
     format_str: "%.1lf\t%.1lf\n"

@@ -824,6 +824,7 @@ class YggTask(YggClass):
         self.create_flag_attr('start_flag')
         self.create_flag_attr('terminate_flag')
         self._calling_thread = None
+        self.state = ''
         super(YggTask, self).__init__(name, **ygg_kwargs)
         if not self.as_process:
             global _thread_registry
@@ -843,6 +844,11 @@ class YggTask(YggClass):
         if self.is_alive():
             self.info('Thread alive at exit')
             self.cleanup()
+
+    def printStatus(self):
+        r"""Print the class status."""
+        self.logger.info('%s(%s): state: %s', self.__module__,
+                         self.print_name, self.state)
 
     def cleanup(self):
         r"""Actions to perform to clean up the thread after it has stopped."""
@@ -877,6 +883,7 @@ class YggTask(YggClass):
 
     def start(self, *args, **kwargs):
         r"""Start thread/process and print info."""
+        self.state = 'starting'
         if not self.was_terminated:
             self.set_started_flag()
             self.before_start()
@@ -891,13 +898,17 @@ class YggTask(YggClass):
     def run(self, *args, **kwargs):
         r"""Continue running until terminate event set."""
         self.debug("Starting method")
+        self.state = 'running'
         try:
             self.run_init()
             self.call_target()
         except BaseException:  # pragma: debug
+            self.state = 'error'
             self.run_error()
         finally:
             self.run_finally()
+            if self.state != 'error':
+                self.state = 'finished'
 
     def run_init(self):
         r"""Actions to perform at beginning of run."""
@@ -985,6 +996,7 @@ class YggTask(YggClass):
         """
         self.debug('')
         with self.lock:
+            self.state = 'terminated'
             if self.was_terminated:  # pragma: debug
                 self.debug('Driver already terminated.')
                 return
@@ -1082,6 +1094,8 @@ class YggTaskLoop(YggTask):
         self._loop_count = 0
         self.create_flag_attr('break_flag')
         self.create_flag_attr('loop_flag')
+        self.create_flag_attr('unpause_flag')
+        self.set_flag_attr('unpause_flag', value=True)
         self.break_stack = None
 
     @property
@@ -1111,6 +1125,16 @@ class YggTaskLoop(YggTask):
                 break_stack = ''.join(traceback.format_stack())
             self.break_stack = break_stack
         self.set_flag_attr('break_flag', value=value)
+        if value:
+            self.set_flag_attr('unpause_flag', value=True)
+
+    def pause(self):
+        r"""Pause the loop execution."""
+        self.set_flag_attr('unpause_flag', value=False)
+
+    def resume(self):
+        r"""Resume the loop execution."""
+        self.set_flag_attr('unpause_flag', value=True)
 
     @property
     def was_break(self):
@@ -1165,6 +1189,7 @@ class YggTaskLoop(YggTask):
                  and (not self._1st_main_terminated))):  # pragma: debug
                 self.on_main_terminated()
             else:
+                self.wait_flag_attr('unpause_flag')
                 try:
                     self.run_loop()
                 except BreakLoopError as e:

@@ -131,6 +131,6 @@ function timestep_calc(t, t_units, state) result (ret)
   ret = .true.
   if (ret) then
      call generic_map_set(state, "carbonAllocation2Roots", 10.0, "g")
-     call generic_map_set(state, "saturatedConductivity", 10.0, "g")
+     call generic_map_set(state, "saturatedConductivity", 10.0, "cm/day")
   end if
 end function timestep_calc

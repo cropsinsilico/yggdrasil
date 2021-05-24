@@ -16,7 +16,7 @@ def timestep_calc(t):
 
     """
     state = {"carbonAllocation2Roots": units.add_units(10.0, 'g'),
-             "saturatedConductivity": units.add_units(10.0, 'g')}
+             "saturatedConductivity": units.add_units(10.0, 'cm/day')}
     return state
 
 

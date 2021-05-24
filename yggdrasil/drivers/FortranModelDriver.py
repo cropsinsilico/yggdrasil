@@ -655,9 +655,24 @@ class FortranModelDriver(CompiledModelDriver):
                       x.groupdict()['name'].split(',')]
             for v in x_vars:
                 var_type_map[v] = x.groupdict()['type']
-        for x in out.get('inputs', []) + out.get('outputs', []):
+        allvars = out.get('inputs', []) + out.get('outputs', [])
+        if out.get('flag_var', None) and (out['flag_var']['name']
+                                          in var_type_map):
+            allvars.append(out['flag_var'])
+        for x in allvars:
             x['native_type'] = var_type_map[x['name']].strip()
             x['datatype'] = cls.get_json_type(x['native_type'])
+        if not out.get('outputs', []):
+            idx_out = [i for i, x in enumerate(out.get('inputs', []))
+                       if 'intent(out)' in x.get('native_type', '').lower()]
+            if idx_out:
+                out.setdefault('outputs', [])
+                for i in idx_out:
+                    out['outputs'].append(cls.input2output(out['inputs'].pop(i)))
+        if 'flag_var' in out:
+            outputs_in_inputs = out.get('outputs_in_inputs',
+                                        kwargs.get('outputs_in_inputs', None))
+            cls.check_flag_var(out, outputs_in_inputs=outputs_in_inputs)
         return out
 
     @classmethod
@@ -834,6 +849,9 @@ class FortranModelDriver(CompiledModelDriver):
             kwargs.setdefault(
                 'function_keys',
                 ('subroutine_def_begin', 'subroutine_def_end'))
+        elif kwargs.get('outputs_in_inputs', False):
+            for o in kwargs.get('outputs', []):
+                o['intent'] = 'out'
         # Package is required for new datatypes
         kwargs['skip_interface'] = False
         return super(FortranModelDriver, cls).write_function_def(
@@ -931,6 +949,10 @@ class FortranModelDriver(CompiledModelDriver):
 
         """
         out = super(FortranModelDriver, cls).write_declaration(var, **kwargs)
+        if ((isinstance(var, dict) and kwargs.get('is_argument', False)
+             and var.get('intent', None))):
+            out = [(', intent(%s) :: ' % var['intent']).join(o.split(' :: '))
+                   for o in out]
         if ((cls.allows_realloc(var)
              and (not cls.allows_realloc(var, from_native_type=True)))):
             var = dict(var, name='%s_realloc' % var['name'])

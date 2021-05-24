@@ -107,6 +107,35 @@ class TestFortranModelDriverNoInit(TestFortranModelParam,
         self.test_write_function_def(inputs=inputs, outputs=outputs,
                                      dont_add_lengths=True)
 
+    def test_write_function_def_return(self):
+        r"""Test writing and running a function definition that returns output
+        (rather than passing output but parameter reference)."""
+        inputs = [{'name': 'x', 'value': 1.0,
+                   'datatype': {'type': 'float',
+                                'precision': 32,
+                                'units': 'cm'}}]
+        outputs = [{'name': 'y',
+                    'datatype': {'type': 'float',
+                                 'precision': 32,
+                                 'units': 'cm'}}]
+        self.test_write_function_def(inputs=inputs, outputs=outputs,
+                                     outputs_in_inputs=False,
+                                     guess_at_outputs_in_inputs=True)
+
+    def test_write_function_def_guess(self):
+        r"""Test writing and running a function definition where outputs
+        are determined from the intents."""
+        inputs = [{'name': 'x', 'value': 1.0,
+                   'datatype': {'type': 'float',
+                                'precision': 32,
+                                'units': 'cm'}}]
+        outputs = [{'name': 'y',
+                    'datatype': {'type': 'float',
+                                 'precision': 32,
+                                 'units': 'cm'}}]
+        self.test_write_function_def(inputs=inputs, outputs=outputs,
+                                     guess_at_outputs_in_inputs=True)
+
     def test_write_try_except(self, **kwargs):
         r"""Test writing a try/except block."""
         pass

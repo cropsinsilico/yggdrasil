@@ -105,8 +105,15 @@ class TestCommBase(YggTestClassInfo):
 
     @property
     def test_msg_array(self):
-        r"""str: Test message that should be used for any send/recv tests."""
+        r"""array: Test message that should be used for send_array/recv_array
+        tests."""
         return self.testing_options.get('msg_array', None)
+
+    @property
+    def test_msg_dict(self):
+        r"""dict: Test message that should be used for send_dict/recv_dict
+        tests."""
+        return self.testing_options['dict']
     
     @property
     def test_msg(self):
@@ -220,9 +227,11 @@ class TestCommBase(YggTestClassInfo):
         recv_inst.close()
         self.fd_count
 
-    def test_send_recv_after_close(self):
+    def test_send_recv_after_close(self, msg_send=None):
         r"""Test that opening twice dosn't cause errors and that send/recv after
         close returns false."""
+        if msg_send is None:
+            msg_send = self.test_msg
         self.send_instance.open()
         self.recv_instance.open()
         if self.comm in ['RMQComm', 'RMQAsyncComm']:
@@ -232,7 +241,7 @@ class TestCommBase(YggTestClassInfo):
         self.recv_instance.close()
         assert(self.send_instance.is_closed)
         assert(self.recv_instance.is_closed)
-        flag = self.send_instance.send(self.test_msg)
+        flag = self.send_instance.send(msg_send)
         assert(not flag)
         flag, msg_recv = self.recv_instance.recv()
         assert(not flag)
@@ -500,16 +509,19 @@ class TestCommBase(YggTestClassInfo):
         r"""object: Message to filter out on the send side."""
         objs = self.get_options()['objects']
         if len(objs) < 1:  # pragma: debug
-            raise unittest.SkipTest("There arn't enough objects.")
+            raise unittest.SkipTest("There aren't enough objects.")
         return objs[0]
 
     @property
     def msg_filter_recv(self):
         r"""object: Message to filter out on the recv side."""
         objs = self.get_options()['objects']
-        if len(objs) < 2:  # pragma: debug
-            raise unittest.SkipTest("There arn't enough objects.")
-        return objs[1]
+        if (len(objs) >= 2):
+            try:
+                self.assert_equal(objs[0], objs[1])
+            except AssertionError:
+                return objs[1]
+        raise unittest.SkipTest("There aren't enough unique objects.")
 
     @property
     def msg_filter_pass(self):
@@ -559,6 +571,7 @@ class TestCommBase(YggTestClassInfo):
 
         def fcond(x):
             try:
+                self.send_instance.info("%s vs. %s", x, msg)
                 self.assert_equal(x, msg)
                 return False
             except AssertionError:
@@ -596,7 +609,7 @@ class TestCommBase(YggTestClassInfo):
             return
         self.setup_filters()
         kwargs.setdefault('msg_send', self.msg_filter_send)
-        kwargs.setdefault('msg_recv', self.recv_instance.empty_obj_recv)
+        kwargs.setdefault('msg_recv', self.instance.empty_obj_recv)
         kwargs.setdefault('recv_timeout', self.sleeptime)
         kwargs.setdefault('no_recv', True)
         self.do_send_recv(**kwargs)
@@ -607,9 +620,9 @@ class TestCommBase(YggTestClassInfo):
             return
         self.setup_filters()
         kwargs.setdefault('msg_send', self.msg_filter_recv)
-        kwargs.setdefault('msg_recv', self.recv_instance.empty_obj_recv)
+        kwargs.setdefault('msg_recv', self.instance.empty_obj_recv)
         kwargs.setdefault('recv_timeout', 10 * self.sleeptime)
-        if self.recv_instance.is_async:
+        if self.instance.is_async:
             kwargs.setdefault('no_recv', True)
         self.do_send_recv(**kwargs)
 
@@ -643,15 +656,20 @@ class TestCommBase(YggTestClassInfo):
 
     def test_send_recv_nolimit(self):
         r"""Test send/recv of a large message."""
-        assert(len(self.msg_long) > self.maxMsgSize)
-        self.do_send_recv('send_nolimit', 'recv_nolimit', self.msg_long,
-                          send_kwargs=dict(header_kwargs=dict(x=self.msg_long)),
+        msg = self.msg_long
+        if isinstance(msg, bytes):
+            assert(len(msg) > self.maxMsgSize)
+        self.do_send_recv(send_meth='send_nolimit', recv_meth='recv_nolimit',
+                          msg_send=msg,
+                          send_kwargs=dict(header_kwargs=dict(x=msg)),
                           print_status=True)
+        self.send_instance.linger()
 
     def test_send_recv_array(self):
         r"""Test send/recv of a array message."""
         msg_send = getattr(self, 'test_msg_array', None)
-        self.do_send_recv('send_array', 'recv_array', msg_send=msg_send)
+        self.do_send_recv(send_meth='send_array', recv_meth='recv_array',
+                          msg_send=msg_send)
 
     def test_eof(self):
         r"""Test send/recv of EOF message."""
@@ -661,8 +679,11 @@ class TestCommBase(YggTestClassInfo):
         r"""Test send/recv of EOF message with no close."""
         self.do_send_recv(send_meth='send_eof', close_on_recv_eof=False)
 
-    def test_purge(self, nrecv=1, nrecv_init=0, nsend_init=0):
+    def test_purge(self, nrecv=1, nrecv_init=0, nsend_init=0,
+                   msg_recv=None):
         r"""Test purging messages from the comm."""
+        if msg_recv is None:
+            msg_recv = self.test_msg
         self.assert_equal(self.send_instance.n_msg, nsend_init)
         self.assert_equal(self.recv_instance.n_msg, nrecv_init)
         if self.send_instance.is_async:
@@ -671,7 +692,7 @@ class TestCommBase(YggTestClassInfo):
             self.assert_equal(self.recv_instance.n_msg_direct, 0)
         # Purge recv while open
         if self.comm not in ['CommBase', 'AsyncComm']:
-            flag = self.send_instance.send(self.test_msg)
+            flag = self.send_instance.send(msg_recv)
             assert(flag)
             T = self.recv_instance.start_timeout()
             while ((not T.is_out) and (self.recv_instance.n_msg
@@ -689,7 +710,7 @@ class TestCommBase(YggTestClassInfo):
 
     def test_send_recv_dict(self):
         r"""Test send/recv message as dict."""
-        msg_send = self.testing_options['dict']
+        msg_send = self.test_msg_dict
         if msg_send:
             self.do_send_recv(send_meth='send_dict',
                               recv_meth='recv_dict',
@@ -697,7 +718,7 @@ class TestCommBase(YggTestClassInfo):
         
     def test_send_recv_dict_names(self):
         r"""Test send/recv message as dict with names."""
-        msg_send = self.testing_options['dict']
+        msg_send = self.test_msg_dict
         field_order = self.testing_options.get('field_names', None)
         if field_order is not None:
             self.do_send_recv(send_meth='send_dict', recv_meth='recv_dict',

@@ -399,7 +399,7 @@ class TestCompiledModelDriverNoStart(TestCompiledModelParam,
             setattr(self.instance, 'compiler_tool', v)
             setattr(self.instance, 'linker_tool', v.linker())
             setattr(self.instance, 'archiver_tool', v.archiver())
-            self.instance.compile_model()
+            self.instance.compile_model(use_ccache=True)
         # Restore the old tools
         for k, v in old_tools.items():
             setattr(self.instance, k, v)

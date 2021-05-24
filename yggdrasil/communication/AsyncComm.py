@@ -163,7 +163,7 @@ class AsyncComm(ProxyObject, ComponentBaseUnregistered):
         if self._backlog_thread is not None:
             self.backlog_thread.set_break_flag()
         self.backlog_ready.set()
-        if wait and (self._backlog_thread is not None):
+        if wait and (self._backlog_thread is not None):  # pragma: intermittent
             self.backlog_thread.wait(key=str(uuid.uuid4()))
         if hasattr(self._wrapped, '_close_backlog'):
             self._wrapped._close_backlog(wait=wait)

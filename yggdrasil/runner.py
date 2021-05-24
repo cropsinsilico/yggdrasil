@@ -8,6 +8,7 @@ import atexit
 from pprint import pformat
 from itertools import chain
 import socket
+from collections import OrderedDict
 from yggdrasil.tools import YggClass
 from yggdrasil.config import ygg_cfg, cfg_environment, temp_config
 from yggdrasil import platform, yamlfile
@@ -37,7 +38,8 @@ class YggFunction(YggClass):
     
     def __init__(self, model_yaml, **kwargs):
         from yggdrasil.languages.Python.YggInterface import (
-            YggInput, YggOutput)
+            YggInput, YggOutput, YggRpcClient)
+        super(YggFunction, self).__init__()
         # Create and start runner in another process
         self.runner = YggRunner(model_yaml, as_function=True, **kwargs)
         # Start the drivers
@@ -47,34 +49,61 @@ class YggFunction(YggClass):
             if k != 'function_model':
                 self.__name__ = k
                 break
+        self.debug("run started")
         # Create input/output channels
         self.inputs = {}
         self.outputs = {}
         # import zmq; ctx = zmq.Context()
+        self.old_environ = os.environ.copy()
         for drv in self.model_driver['input_drivers']:
             for env in drv['instance'].model_env.values():
                 os.environ.update(env)
             channel_name = drv['instance'].ocomm.name
             var_name = drv['name'].split('function_')[-1]
             self.outputs[var_name] = drv.copy()
-            self.outputs[var_name]['vars'] = [
-                iv.split(':')[-1] for iv in drv.get('vars', [var_name])]
             self.outputs[var_name]['comm'] = YggInput(
-                channel_name, no_suffix=True)
-            # context=ctx)
+                channel_name, no_suffix=True)  # context=ctx)
+            if 'vars' in drv['inputs'][0]:
+                self.outputs[var_name]['vars'] = drv['inputs'][0]['vars']
+            else:
+                self.outputs[var_name]['vars'] = [var_name]
         for drv in self.model_driver['output_drivers']:
             for env in drv['instance'].model_env.values():
                 os.environ.update(env)
             channel_name = drv['instance'].icomm.name
             var_name = drv['name'].split('function_')[-1]
             self.inputs[var_name] = drv.copy()
-            self.inputs[var_name]['vars'] = [
-                iv.split(':')[-1] for iv in drv.get('vars', [var_name])]
-            self.inputs[var_name]['comm'] = YggOutput(
-                channel_name, no_suffix=True)
-            # context=ctx)
+            if drv['instance']._connection_type == 'rpc_request':
+                self.inputs[var_name]['comm'] = YggRpcClient(
+                    channel_name, no_suffix=True)
+                self.outputs[var_name] = drv.copy()
+                self.outputs[var_name]['comm'] = self.inputs[var_name]['comm']
+                if drv['outputs'][0].get('server_replaces', False):
+                    srv = drv['outputs'][0]['server_replaces']
+                    self.inputs[var_name]['vars'] = srv['input']['vars']
+                    self.outputs[var_name]['vars'] = srv['output']['vars']
+            else:
+                self.inputs[var_name]['comm'] = YggOutput(
+                    channel_name, no_suffix=True)  # context=ctx)
+                if 'vars' in drv['outputs'][0]:
+                    self.inputs[var_name]['vars'] = drv['outputs'][0]['vars']
+                else:
+                    self.inputs[var_name]['vars'] = [var_name]
+        self.debug('inputs: %s, outputs: %s',
+                   list(self.inputs.keys()),
+                   list(self.outputs.keys()))
         self._stop_called = False
         atexit.register(self.stop)
+        # Ensure that vars are strings
+        for k, v in chain(self.inputs.items(), self.outputs.items()):
+            v_vars = []
+            for iv in v['vars']:
+                if isinstance(iv, dict):
+                    if not iv.get('is_length_var', False):
+                        v_vars.append(iv['name'])
+                else:
+                    v_vars.append(iv)
+            v['vars'] = v_vars
         # Get arguments
         self.arguments = []
         for k, v in self.inputs.items():
@@ -82,6 +111,8 @@ class YggFunction(YggClass):
         self.returns = []
         for k, v in self.outputs.items():
             self.returns += v['vars']
+        self.debug("arguments: %s, returns: %s", self.arguments, self.returns)
+        self.runner.pause()
 
     # def widget_function(self, *args, **kwargs):
     #     # import matplotlib.pyplot as plt
@@ -95,10 +126,12 @@ class YggFunction(YggClass):
     #     from ipywidgets import interact_manual
     #     return interact_manual(self.widget_function, *args, **kwargs)
         
-    def __call__(self, **kwargs):
+    def __call__(self, *args, **kwargs):
         r"""Call the model as a function by sending variables.
 
         Args:
+           *args: Any positional arguments are expected to be input variables
+               in the correct order.
            **kwargs: Any keyword arguments are expected to be named input
                variables for the model.
 
@@ -111,7 +144,11 @@ class YggFunction(YggClass):
             dict: Returned values for each return variable.
 
         """
+        self.runner.resume()
         # Check for arguments
+        for a, arg in zip(self.arguments, args):
+            assert(a not in kwargs)
+            kwargs[a] = arg
         for a in self.arguments:
             if a not in kwargs:  # pragma: debug
                 raise RuntimeError("Required argument %s not provided." % a)
@@ -134,10 +171,12 @@ class YggFunction(YggClass):
             else:
                 assert(len(ivars) == 1)
                 out[ivars[0]] = data
+        self.runner.pause()
         return out
 
     def stop(self):
         r"""Stop the model(s) from running."""
+        self.runner.resume()
         if self._stop_called:
             return
         self._stop_called = True
@@ -152,6 +191,19 @@ class YggFunction(YggClass):
             x['comm'].close()
         self.runner.terminate()
         self.runner.atexit()
+        os.environ.clear()
+        os.environ.update(self.old_environ)
+
+    def model_info(self):
+        r"""Display information about the wrapped model(s)."""
+        print("Models: %s\nInputs:\n%s\nOutputs:\n%s\n"
+              % (', '.join([x['name'] for x in
+                            self.runner.modeldrivers.values()
+                            if x['name'] != 'function_model']),
+                 '\n'.join(['\t%s (vars=%s)' % (k, v['vars'])
+                            for k, v in self.inputs.items()]),
+                 '\n'.join(['\t%s (vars=%s)' % (k, v['vars'])
+                            for k, v in self.outputs.items()])))
 
 
 class YggRunner(YggClass):
@@ -305,7 +357,7 @@ class YggRunner(YggClass):
                 timer = time.time
             if t0 is None:
                 t0 = timer()
-            times = {}
+            times = OrderedDict()
             times['init'] = timer()
             self.loadDrivers()
             times['load drivers'] = timer()
@@ -318,12 +370,9 @@ class YggRunner(YggClass):
                 self.atexit()
                 times['at exit'] = timer()
             tprev = t0
-            key_order = ['init', 'load drivers', 'start drivers', 'run models',
-                         'at exit']
-            for k in key_order:
-                if k in times:
-                    self.info('%20s\t%f', k, times[k] - tprev)
-                    tprev = times[k]
+            for k, t in times.items():
+                self.info('%20s\t%f', k, t - tprev)
+                tprev = t
             self.info(40 * '=')
             self.info('%20s\t%f', "Total", tprev - t0)
         return times
@@ -431,6 +480,18 @@ class YggRunner(YggClass):
             self.terminate()
             raise
 
+    def start_server(self, name):
+        r"""Start a server driver."""
+        x = self.modeldrivers[name]['instance']
+        if not x.was_started:
+            self.debug("Starting server '%s' before client", x.name)
+            x.start()
+
+    def stop_server(self, name):
+        r"""Stop a server driver."""
+        x = self.modeldrivers[name]['instance']
+        x.stop()
+
     def startDrivers(self):
         r"""Start drivers, starting with the IO drivers."""
         self.info('Starting I/O drivers and models on system '
@@ -456,10 +517,7 @@ class YggRunner(YggClass):
                 self.debug("Starting driver %s", driver['name'])
                 d = driver['instance']
                 for n2 in driver.get('client_of', []):
-                    d2 = self.modeldrivers[n2]['instance']
-                    if not d2.was_started:
-                        self.debug("Starting server '%s' before client", d2.name)
-                        d2.start()
+                    self.start_server(n2)
                 if not d.was_started:
                     d.start()
         except BaseException:  # pragma: debug
@@ -558,12 +616,26 @@ class YggRunner(YggClass):
             iod = self.connectiondrivers[srv_name]
             iod['instance'].remove_model('input', model['name'])
             if iod['instance'].nclients == 0:
-                srv = self.modeldrivers[srv_name]
-                srv['instance'].stop()
+                self.stop_server(srv_name)
+
+    def pause(self):
+        r"""Pause all drivers."""
+        self.debug('')
+        for driver in self.all_drivers:
+            if 'instance' in driver:
+                driver['instance'].pause()
+
+    def resume(self):
+        r"""Resume all paused drivers."""
+        self.debug('')
+        for driver in self.all_drivers:
+            if 'instance' in driver:
+                driver['instance'].resume()
 
     def terminate(self):
         r"""Immediately stop all drivers, beginning with IO drivers."""
         self.debug('')
+        self.resume()
         for driver in self.all_drivers:
             if 'instance' in driver:
                 self.debug('Stop %s', driver['name'])

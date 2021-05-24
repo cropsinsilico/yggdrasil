@@ -356,8 +356,15 @@ def convert_to(arr, new_units):
         return arr
     if not has_units(arr):
         return add_units(arr, new_units)
+    new_units = convert_unit_string(new_units)
     try:
+        arr1 = get_data(arr)
+        dtype = get_data(arr1).dtype
         out = arr.to(new_units)
+        arr2 = get_data(out)
+        equal = (arr2.dtype == dtype)
+        if not equal:
+            out = add_units(arr2, new_units, dtype=dtype)
     except unyt.exceptions.UnitConversionError as e:
         raise ValueError(str(e))
     return out

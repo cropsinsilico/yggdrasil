@@ -179,7 +179,14 @@ jobs:
       run: sudo chown -R $(whoami) $CONDA
       shell: bash
     - name: (CONDA) Build package in base environment
+      id: conda_build
+      continue-on-error: true
       if: matrix.install-method == 'conda'
+      run: python utils/setup_test_env.py build ${{ matrix.install-method }} --python
+        ${{ matrix.python-version }}
+      shell: bash --noprofile --norc -eo pipefail {0}
+    - name: (CONDA) Build package in base environment (re-attempt)
+      if: ${{ steps.conda_build.outcome == 'failure' && matrix.install-method == 'conda'}}
       run: python utils/setup_test_env.py build ${{ matrix.install-method }} --python
         ${{ matrix.python-version }}
       shell: bash --noprofile --norc -eo pipefail {0}
@@ -203,12 +210,13 @@ jobs:
       if: matrix.os == 'macos-latest' && matrix.install-method == 'conda'
       run: ./utils/setup_old_mac_sdk.sh
     - name: (CONDA) Install dependencies & package from existing build
-      id: conda1
+      id: conda_install
       continue-on-error: true
       if: matrix.install-method == 'conda'
       run: python utils/setup_test_env.py install ${{ matrix.install-method }} --without-build
     - name: (CONDA) Install dependencies & package from existing build (re-attempt)
-      if: ${{ steps.test2.outcome == 'failure' && matrix.install-method == 'conda'}}
+      if: ${{ steps.conda_install.outcome == 'failure' && matrix.install-method ==
+        'conda'}}
       run: python utils/setup_test_env.py install ${{ matrix.install-method }} --without-build
     - name: (MACOS,CONDA) Set allow_multiple_omp config
       if: matrix.install-method == 'conda' && matrix.os == 'macos-latest'
@@ -445,7 +453,14 @@ jobs:
       run: sudo chown -R $(whoami) $CONDA
       shell: bash
     - name: (CONDA) Build package in base environment
+      id: conda_build
+      continue-on-error: true
       if: matrix.install-method == 'conda'
+      run: python utils/setup_test_env.py build ${{ matrix.install-method }} --python
+        ${{ matrix.python-version }}
+      shell: bash --noprofile --norc -eo pipefail {0}
+    - name: (CONDA) Build package in base environment (re-attempt)
+      if: ${{ steps.conda_build.outcome == 'failure' && matrix.install-method == 'conda'}}
       run: python utils/setup_test_env.py build ${{ matrix.install-method }} --python
         ${{ matrix.python-version }}
       shell: bash --noprofile --norc -eo pipefail {0}
@@ -469,12 +484,13 @@ jobs:
       if: matrix.os == 'macos-latest' && matrix.install-method == 'conda'
       run: ./utils/setup_old_mac_sdk.sh
     - name: (CONDA) Install dependencies & package from existing build
-      id: conda1
+      id: conda_install
       continue-on-error: true
       if: matrix.install-method == 'conda'
       run: python utils/setup_test_env.py install ${{ matrix.install-method }} --without-build
     - name: (CONDA) Install dependencies & package from existing build (re-attempt)
-      if: ${{ steps.test2.outcome == 'failure' && matrix.install-method == 'conda'}}
+      if: ${{ steps.conda_install.outcome == 'failure' && matrix.install-method ==
+        'conda'}}
       run: python utils/setup_test_env.py install ${{ matrix.install-method }} --without-build
     - name: (MACOS,CONDA) Set allow_multiple_omp config
       if: matrix.install-method == 'conda' && matrix.os == 'macos-latest'
@@ -691,7 +707,14 @@ jobs:
       run: sudo chown -R $(whoami) $CONDA
       shell: bash
     - name: (CONDA) Build package in base environment
+      id: conda_build
+      continue-on-error: true
       if: matrix.install-method == 'conda'
+      run: python utils/setup_test_env.py build ${{ matrix.install-method }} --python
+        ${{ matrix.python-version }}
+      shell: bash --noprofile --norc -eo pipefail {0}
+    - name: (CONDA) Build package in base environment (re-attempt)
+      if: ${{ steps.conda_build.outcome == 'failure' && matrix.install-method == 'conda'}}
       run: python utils/setup_test_env.py build ${{ matrix.install-method }} --python
         ${{ matrix.python-version }}
       shell: bash --noprofile --norc -eo pipefail {0}
@@ -715,12 +738,13 @@ jobs:
       if: matrix.os == 'macos-latest' && matrix.install-method == 'conda'
       run: ./utils/setup_old_mac_sdk.sh
     - name: (CONDA) Install dependencies & package from existing build
-      id: conda1
+      id: conda_install
       continue-on-error: true
       if: matrix.install-method == 'conda'
       run: python utils/setup_test_env.py install ${{ matrix.install-method }} --without-build
     - name: (CONDA) Install dependencies & package from existing build (re-attempt)
-      if: ${{ steps.test2.outcome == 'failure' && matrix.install-method == 'conda'}}
+      if: ${{ steps.conda_install.outcome == 'failure' && matrix.install-method ==
+        'conda'}}
       run: python utils/setup_test_env.py install ${{ matrix.install-method }} --without-build
     - name: (MACOS,CONDA) Set allow_multiple_omp config
       if: matrix.install-method == 'conda' && matrix.os == 'macos-latest'
@@ -939,7 +963,14 @@ jobs:
       run: sudo chown -R $(whoami) $CONDA
       shell: bash
     - name: (CONDA) Build package in base environment
+      id: conda_build
+      continue-on-error: true
       if: matrix.install-method == 'conda'
+      run: python utils/setup_test_env.py build ${{ matrix.install-method }} --python
+        ${{ matrix.python-version }}
+      shell: bash --noprofile --norc -eo pipefail {0}
+    - name: (CONDA) Build package in base environment (re-attempt)
+      if: ${{ steps.conda_build.outcome == 'failure' && matrix.install-method == 'conda'}}
       run: python utils/setup_test_env.py build ${{ matrix.install-method }} --python
         ${{ matrix.python-version }}
       shell: bash --noprofile --norc -eo pipefail {0}
@@ -963,12 +994,13 @@ jobs:
       if: matrix.os == 'macos-latest' && matrix.install-method == 'conda'
       run: ./utils/setup_old_mac_sdk.sh
     - name: (CONDA) Install dependencies & package from existing build
-      id: conda1
+      id: conda_install
       continue-on-error: true
       if: matrix.install-method == 'conda'
       run: python utils/setup_test_env.py install ${{ matrix.install-method }} --without-build
     - name: (CONDA) Install dependencies & package from existing build (re-attempt)
-      if: ${{ steps.test2.outcome == 'failure' && matrix.install-method == 'conda'}}
+      if: ${{ steps.conda_install.outcome == 'failure' && matrix.install-method ==
+        'conda'}}
       run: python utils/setup_test_env.py install ${{ matrix.install-method }} --without-build
     - name: (MACOS,CONDA) Set allow_multiple_omp config
       if: matrix.install-method == 'conda' && matrix.os == 'macos-latest'
@@ -1185,7 +1217,14 @@ jobs:
       run: sudo chown -R $(whoami) $CONDA
       shell: bash
     - name: (CONDA) Build package in base environment
+      id: conda_build
+      continue-on-error: true
       if: matrix.install-method == 'conda'
+      run: python utils/setup_test_env.py build ${{ matrix.install-method }} --python
+        ${{ matrix.python-version }}
+      shell: bash --noprofile --norc -eo pipefail {0}
+    - name: (CONDA) Build package in base environment (re-attempt)
+      if: ${{ steps.conda_build.outcome == 'failure' && matrix.install-method == 'conda'}}
       run: python utils/setup_test_env.py build ${{ matrix.install-method }} --python
         ${{ matrix.python-version }}
       shell: bash --noprofile --norc -eo pipefail {0}
@@ -1209,12 +1248,13 @@ jobs:
       if: matrix.os == 'macos-latest' && matrix.install-method == 'conda'
       run: ./utils/setup_old_mac_sdk.sh
     - name: (CONDA) Install dependencies & package from existing build
-      id: conda1
+      id: conda_install
       continue-on-error: true
       if: matrix.install-method == 'conda'
       run: python utils/setup_test_env.py install ${{ matrix.install-method }} --without-build
     - name: (CONDA) Install dependencies & package from existing build (re-attempt)
-      if: ${{ steps.test2.outcome == 'failure' && matrix.install-method == 'conda'}}
+      if: ${{ steps.conda_install.outcome == 'failure' && matrix.install-method ==
+        'conda'}}
       run: python utils/setup_test_env.py install ${{ matrix.install-method }} --without-build
     - name: (MACOS,CONDA) Set allow_multiple_omp config
       if: matrix.install-method == 'conda' && matrix.os == 'macos-latest'

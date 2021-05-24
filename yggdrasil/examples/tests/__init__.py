@@ -334,6 +334,7 @@ class ExampleTstBase(YggTestBase, tools.YggClass):
         self.runner = runner.get_runner(self.yaml, namespace=self.namespace,
                                         production_run=True)
         self.runner.run()
+        self.runner.printStatus()
         if self.expects_error:
             assert(self.runner.error_flag)
         else:

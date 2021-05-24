@@ -792,6 +792,17 @@ public:
     *subtype_code_modifier = check_subtype();
   }
   /*!
+    @brief Determine if two units are compatible.
+    @returns bool true if they are compat, false otherwise
+   */
+    bool are_compat_units(const char* x, const char* y) const {
+      if ((strlen(x) == (strlen(y) + 1)) && (x[strlen(x)] == 's'))
+	return true;
+      if (((strlen(x) + 1) == strlen(y)) && (y[strlen(y)] == 's'))
+	return true;
+      return false;
+    }
+  /*!
     @brief Update the instance's units.
     @param[in] new_units const char * String for new units.
    */
@@ -801,7 +812,7 @@ public:
 	return;
       } else if (strlen(units_) == 0) {
 	// pass
-      } else {
+      } else if (!(are_compat_units(new_units, units_))) {
 	ygglog_throw_error("ScalarMetaschemaType::update_units: Cannot update units %s to %s.",
 			   units_, new_units);
       }

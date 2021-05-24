@@ -149,6 +149,8 @@ class ModelDriver(Driver):
         valgrind_flags (list, optional): Flags to pass to valgrind. Defaults to [].
         model_index (int, optional): Index of model in list of models being run.
             Defaults to 0.
+        copy_index (int, optional): Index of model in set of copies. Defaults
+            to -1 indicating there is only one copy of the model.
         outputs_in_inputs (bool, optional): If True, outputs from wrapped model
             functions are passed by pointer as inputs for modification and the
             return value will be a flag. If False, outputs are limited to
@@ -215,6 +217,11 @@ class ModelDriver(Driver):
         brackets (tuple): A pair of opening and clossing characters that
             are used by the language to mark blocks. Set to None and
             ignored by default.
+        no_executable (bool): True if there is not an executable associated
+            with the language driver. Defaults to False.
+        comms_implicit (bool): True if the comms installed for this driver
+            are not explicitly defined (depend on input parameters). Defaults
+            to False.
 
     Attributes:
         args (list): Argument(s) for running the model on the command line.
@@ -253,6 +260,7 @@ class ModelDriver(Driver):
         with_valgrind (bool): If True, the command is run with valgrind.
         valgrind_flags (list): Flags to pass to valgrind.
         model_index (int): Index of model in list of models being run.
+        copy_index (int): Index of model in set of copies.
         modified_files (list): List of pairs of originals and copies of files
             that should be restored during cleanup.
         allow_threading (bool): If True, comm connections will be set up so that
@@ -394,6 +402,8 @@ class ModelDriver(Driver):
     brackets = None
     zero_based = True
     max_line_width = None
+    no_executable = False
+    comms_implicit = False
     python_interface = {'table_input': 'YggAsciiTableInput',
                         'table_output': 'YggAsciiTableOutput',
                         'array_input': 'YggArrayInput',
@@ -409,7 +419,7 @@ class ModelDriver(Driver):
                            'event_process_kill_called',
                            'event_process_kill_complete'])
 
-    def __init__(self, name, args, model_index=0, clients=[],
+    def __init__(self, name, args, model_index=0, copy_index=-1, clients=[],
                  **kwargs):
         self.model_outputs_in_inputs = kwargs.pop('outputs_in_inputs', None)
         super(ModelDriver, self).__init__(name, **kwargs)
@@ -428,6 +438,7 @@ class ModelDriver(Driver):
              and platform._is_win)):  # pragma: windows
             raise RuntimeError("strace/valgrind options invalid on windows.")
         self.model_index = model_index
+        self.copy_index = copy_index
         self.clients = clients
         self.env_copy = ['LANG', 'PATH', 'USER']
         self._exit_line = b'EXIT'
@@ -439,6 +450,8 @@ class ModelDriver(Driver):
         self.raw_model_file = None
         self.model_function_file = None
         self.model_function_info = None
+        self.model_function_inputs = None
+        self.model_function_outputs = None
         self.model_file = None
         self.model_args = []
         self.model_dir = None
@@ -464,16 +477,28 @@ class ModelDriver(Driver):
                                    + self.language_ext[0])
             # Write file
             if (not os.path.isfile(args[0])) or self.overwrite:
-                self.model_function_info = self.parse_function_definition(
-                    self.model_function_file, self.function)
                 client_comms = ['%s:%s_%s' % (self.name, x, self.name)
                                 for x in self.client_of]
-                lines = self.write_model_wrapper(
+                self.model_function_inputs = copy.copy(self.inputs)
+                self.model_function_outputs = copy.copy(self.outputs)
+                self.expand_server_io(
+                    self.model_function_inputs, self.model_function_outputs,
+                    client_comms=client_comms)
+                expected_outputs = []
+                for x in self.model_function_outputs:
+                    expected_outputs += x.get('vars', [])
+                self.model_function_info = self.parse_function_definition(
                     self.model_function_file, self.function,
-                    inputs=copy.deepcopy(self.inputs),
-                    outputs=copy.deepcopy(self.outputs),
+                    expected_outputs=expected_outputs)
+                if self.model_outputs_in_inputs is None:
+                    self.model_outputs_in_inputs = self.model_function_info.get(
+                        'outputs_in_inputs', None)
+                lines = self.write_model_wrapper(
+                    self.model_function_info, self.function,
+                    inputs=self.model_function_inputs,
+                    outputs=self.model_function_outputs,
                     outputs_in_inputs=self.model_outputs_in_inputs,
-                    client_comms=client_comms, copies=self.copies)
+                    copies=self.copies)
                 with open(args[0], 'w') as fd:
                     fd.write('\n'.join(lines))
         # Parse arguments
@@ -658,6 +683,29 @@ class ModelDriver(Driver):
             out = logging.getLevelName(self.logging_level)
         return out
 
+    @property
+    def n_sent_messages(self):
+        r"""dict: Number of messages sent by the model via each connection."""
+        out = {}
+        for x in self.yml.get('output_drivers', []):
+            x_inst = x.get('instance', None)
+            if x_inst:
+                out[x_inst.name] = x_inst.models_recvd.get(self.name, 0)
+        if self.is_server:
+            for x in self.yml.get('input_drivers', []):
+                x_inst = x.get('instance', None)
+                if x_inst and (x_inst._connection_type == 'rpc_request'):
+                    out[x_inst.name] = x_inst.servers_recvd.get(self.name, 0)
+        return out
+
+    @property
+    def has_sent_messages(self):
+        r"""bool: True if output has been received from the model."""
+        n_msg = self.n_sent_messages
+        if not n_msg:
+            return True
+        return bool(sum(n_msg.values()))
+
     def write_wrappers(self, **kwargs):
         r"""Write any wrappers needed to compile and/or run a model.
 
@@ -691,6 +739,8 @@ class ModelDriver(Driver):
                 to run the compiler/interpreter from the command line.
 
         """
+        if cls.no_executable:
+            return ''
         raise NotImplementedError("language_executable not implemented for '%s'"
                                   % cls.language)
         
@@ -1049,6 +1099,10 @@ class ModelDriver(Driver):
                 out = import_component('model', x).is_comm_installed(
                     commtype=commtype, skip_config=skip_config, **kwargs)
             return out
+        if cls.comms_implicit:
+            if commtype is None:
+                return True
+            return (commtype in tools.get_supported_comm())
         # Check for installation based on config option
         if not skip_config:
             installed_comms = cls.cfg.get(cls.language, 'commtypes', [])
@@ -1200,7 +1254,7 @@ class ModelDriver(Driver):
         env['YGG_MODEL_LANGUAGE'] = self.language
         if self.copies > 1:
             env['YGG_MODEL_NAME'] = self.name.split('_copy')[0]
-            env['YGG_MODEL_COPY'] = self.name.split('_copy')[-1]
+            env['YGG_MODEL_COPY'] = str(self.copy_index)
         else:
             env['YGG_MODEL_NAME'] = self.name
         env['YGG_MODEL_COPIES'] = str(self.copies)
@@ -1253,8 +1307,7 @@ class ModelDriver(Driver):
         except BaseException as e:  # pragma: debug
             print(e)
             line = ""
-        if len(line) == 0:
-            # self.info("%s: Empty line from stdout" % self.name)
+        if (len(line) == 0):
             self.queue_thread.set_break_flag()
             try:
                 self.queue.put(self._exit_line)
@@ -1317,20 +1370,24 @@ class ModelDriver(Driver):
                       [drv['name'] for drv in
                        self.yml.get('output_drivers', [])]))
         for drv in self.yml.get('input_drivers', []):
-            drv['instance'].on_model_exit('output', self.name,
-                                          errors=self.errors)
+            if 'instance' in drv:
+                drv['instance'].on_model_exit('output', self.name,
+                                              errors=self.errors)
         for drv in self.yml.get('output_drivers', []):
-            drv['instance'].on_model_exit('input', self.name,
-                                          errors=self.errors)
+            if 'instance' in drv:
+                drv['instance'].on_model_exit('input', self.name,
+                                              errors=self.errors)
 
     @property
     def io_errors(self):
         r"""list: Errors produced by input/output drivers to this model."""
         errors = []
         for drv in self.yml.get('input_drivers', []):
-            errors += drv['instance'].errors
+            if 'instance' in drv:
+                errors += drv['instance'].errors
         for drv in self.yml.get('output_drivers', []):
-            errors += drv['instance'].errors
+            if 'instance' in drv:
+                errors += drv['instance'].errors
         return errors
 
     @property
@@ -1375,8 +1432,9 @@ class ModelDriver(Driver):
         self.event_process_kill_called.set()
         with self.lock:
             self.debug('')
+            ignore_error_code = False
             if not self.model_process_complete:  # pragma: debug
-                self.error("Process is still running. Killing it.")
+                self.debug("Process is still running. Killing it.")
                 try:
                     self.model_process.kill()
                     self.debug("Waiting %f s for process to be killed",
@@ -1384,9 +1442,12 @@ class ModelDriver(Driver):
                     self.wait_process(self.timeout, key_suffix='.kill_process')
                 except BaseException:  # pragma: debug
                     self.exception("Error killing model process")
+                if not self.has_sent_messages:
+                    ignore_error_code = True
             assert(self.model_process_complete)
             if (((self.model_process is not None)
-                 and (self.model_process.returncode != 0))):
+                 and (self.model_process.returncode != 0)
+                 and (not ignore_error_code))):
                 self.error("return code of %s indicates model error.",
                            str(self.model_process.returncode))
             self.event_process_kill_complete.set()
@@ -1410,7 +1471,8 @@ class ModelDriver(Driver):
     def graceful_stop(self):
         r"""Gracefully stop the driver."""
         self.debug('')
-        self.wait_process(self.timeout, key_suffix='.graceful_stop')
+        if self.has_sent_messages:
+            self.wait_process(self.timeout, key_suffix='.graceful_stop')
         super(ModelDriver, self).graceful_stop()
 
     def cleanup_products(self):
@@ -1646,6 +1708,7 @@ class ModelDriver(Driver):
                 if io in out:
                     out[io] = cls.parse_var_definition(
                         io, out[io], outputs_in_inputs=outputs_in_inputs)
+            out['model_file'] = model_file
         if outputs_in_inputs and expected_outputs and (not out.get('outputs', False)):
             missing_expected_outputs = []
             for o in expected_outputs:
@@ -1671,12 +1734,35 @@ class ModelDriver(Driver):
             if out.get('flag_type', None):
                 flag_var['native_type'] = out.pop('flag_type').replace(' ', '')
                 flag_var['datatype'] = cls.get_json_type(flag_var['native_type'])
-            if outputs_in_inputs:
-                out['flag_var'] = flag_var
-            else:
-                assert(not out.get('outputs', []))
-                out['outputs'] = [flag_var]
+            out['flag_var'] = flag_var
+            cls.check_flag_var(out, outputs_in_inputs=outputs_in_inputs)
         return out
+
+    @classmethod
+    def check_flag_var(cls, info, outputs_in_inputs=None):
+        r"""Check if the flag variable should be treated as an output.
+
+        Args:
+            info (dict): Information about the function.
+            outputs_in_inputs (bool, optional): If True, the outputs are
+                presented in the function definition as inputs. Defaults
+                to False.
+
+        """
+        if outputs_in_inputs is None:  # pragma: debug
+            outputs_in_inputs = cls.outputs_in_inputs
+        flag_t = cls.type_map['flag']
+        if (((info.get('flag_var', {}).get('native_type', flag_t) != flag_t)
+             or (not outputs_in_inputs))):
+            if info.get('outputs', []):  # pragma: debug
+                logger.warn("Support for returning outputs via parameter(s) "
+                            "and return value is not yet support. The return "
+                            "value will be assumed to be a flag indicating "
+                            "the success of the model.")
+                info['outputs_in_inputs'] = True
+            else:
+                info['outputs'] = [info.pop('flag_var')]
+                info['outputs_in_inputs'] = False
 
     @classmethod
     def channels2vars(cls, channels):
@@ -1700,6 +1786,44 @@ class ModelDriver(Driver):
         variables = sorted(variables, key=get_pos)
         return variables
 
+    @classmethod
+    def expand_server_io(cls, inputs, outputs, client_comms=[]):
+        r"""Update inputs/outputs w/ information about server that will be
+        using them.
+
+        Args:
+            inputs (list): List of model inputs including types.
+            outputs (list): List of model outputs including types.
+            client_comms (list, optional): List of the names of client comms
+                that should be removed from the list of outputs. Defaults to [].
+
+        """
+        if client_comms:
+            warnings.warn("When wrapping a model function, client comms "
+                          "must either be initialized outside the function, "
+                          "pass a 'global_scope' parameter to the "
+                          "comm initialization (e.g. Python, R, Matlab), "
+                          "or use a 'WITH_GLOBAL_SCOPE' macro "
+                          "(e.g. C, C++, Fortran) around the initialization "
+                          "so that they are persistent "
+                          "across calls and the call or recv/send methods "
+                          "must be called explicitly (as opposed to the "
+                          "function inputs/outputs which will be handled "
+                          "by the wrapper). This model's client comms are:\n"
+                          "\t%s" % client_comms)
+        # Replace server input w/ split input/output and remove client
+        # connections from inputs
+        for i, x in enumerate(inputs):
+            if x.get('server_replaces', False):
+                inputs[x['server_replaces']['input_index']] = (
+                    x['server_replaces']['input'])
+                outputs.insert(x['server_replaces']['output_index'],
+                               x['server_replaces']['output'])
+        rm_outputs = [i for i, x in enumerate(outputs)
+                      if x['name'] in client_comms]
+        for i in rm_outputs[::-1]:
+            outputs.pop(i)
+    
     @classmethod
     def update_io_from_function(cls, model_file, model_function,
                                 inputs=[], outputs=[], contents=None,
@@ -1727,14 +1851,20 @@ class ModelDriver(Driver):
         """
         if outputs_in_inputs is None:  # pragma: debug
             outputs_in_inputs = cls.outputs_in_inputs
+        # Read info from the source code
         if (((isinstance(model_file, str) and os.path.isfile(model_file))
-             or (contents is not None))):
+             or (contents is not None))):  # pragma: debug
             expected_outputs = []
             for x in outputs:
                 expected_outputs += x.get('vars', [])
             info = cls.parse_function_definition(model_file, model_function,
                                                  contents=contents,
                                                  expected_outputs=expected_outputs)
+            logger.warn("The new execution pattern reuses the parsed "
+                        "source code parameters. Double check results:\n%s."
+                        % pformat(info))
+        elif isinstance(model_file, dict):
+            info = model_file
         else:
             info = {"inputs": [], "outputs": []}
         info_map = {io: OrderedDict([(x['name'], x) for x in info.get(io, [])])
@@ -1837,8 +1967,7 @@ class ModelDriver(Driver):
     @classmethod
     def write_model_wrapper(cls, model_file, model_function,
                             inputs=[], outputs=[],
-                            outputs_in_inputs=None, verbose=False,
-                            client_comms=[], copies=1):
+                            outputs_in_inputs=None, verbose=False, copies=1):
         r"""Return the lines required to wrap a model function as an integrated
         model.
 
@@ -1855,8 +1984,6 @@ class ModelDriver(Driver):
                 to the class attribute outputs_in_inputs.
             verbose (bool, optional): If True, the contents of the created file
                 are displayed. Defaults to False.
-            client_comms (list, optional): List of the names of client comms
-                that should be removed from the list of outputs. Defaults to [].
             copies (int, optional): Number of times the model driver is
                 duplicated. If more than one, no error will be raised in the
                 event there is never a call the the function. Defaults to 1.
@@ -1870,39 +1997,19 @@ class ModelDriver(Driver):
         if cls.function_param is None:
             raise NotImplementedError("function_param attribute not set for"
                                       "language '%s'" % cls.language)
-        lines = []
-        flag_var = {'name': 'flag', 'datatype': {'type': 'flag'}}
-        iter_var = {'name': 'first_iter', 'datatype': {'type': 'flag'}}
         if outputs_in_inputs is None:
             outputs_in_inputs = cls.outputs_in_inputs
-        # Replace server input w/ split input/output and remove client
-        # connections from inputs
-        for i, x in enumerate(inputs):
-            if x.get('server_replaces', False):
-                inputs[x['server_replaces']['input_index']] = (
-                    x['server_replaces']['input'])
-                outputs.insert(x['server_replaces']['output_index'],
-                               x['server_replaces']['output'])
-        outputs = [x for x in outputs if x['name'] not in client_comms]
-        if client_comms:
-            warnings.warn("When wrapping a model function, client comms "
-                          "must either be initialized outside the function, "
-                          "pass a 'global_scope' parameter to the "
-                          "comm initialization (e.g. Python, R, Matlab), "
-                          "or use a 'WITH_GLOBAL_SCOPE' macro "
-                          "(e.g. C, C++, Fortran) around the initialization "
-                          "so that they are persistent "
-                          "across calls and the call or recv/send methods "
-                          "must be called explicitly (as opposed to the "
-                          "function inputs/outputs which will be handled "
-                          "by the wrapper). This model's client comms are:\n"
-                          "\t%s" % client_comms)
         # Update types based on the function definition for typed languages
         model_flag = cls.update_io_from_function(
             model_file, model_function,
             inputs=inputs, outputs=outputs,
             outputs_in_inputs=outputs_in_inputs)
+        if isinstance(model_file, dict):
+            model_file = model_file['model_file']
         # Declare variables and flag, then define flag
+        lines = []
+        flag_var = {'name': 'flag', 'datatype': {'type': 'flag'}}
+        iter_var = {'name': 'first_iter', 'datatype': {'type': 'flag'}}
         free_vars = []
         definitions = []
         if 'declare' in cls.function_param:
@@ -2747,7 +2854,7 @@ checking if the model flag indicates
                             x in cls.write_declaration(
                                 o, definitions=definitions,
                                 requires_freeing=free_vars,
-                                dont_define=True)]
+                                is_argument=True)]
             for o in outputs:
                 out += [cls.function_param['indent'] + x for
                         x in cls.write_declaration(
@@ -3111,7 +3218,7 @@ checking if the model flag indicates
     
     @classmethod
     def write_declaration(cls, var, value=None, requires_freeing=None,
-                          definitions=None, dont_define=False):
+                          definitions=None, is_argument=False):
         r"""Return the lines required to declare a variable with a certain
         type.
 
@@ -3129,6 +3236,8 @@ checking if the model flag indicates
                 lines.
             dont_define (bool, optional): If True, the variable will not
                 be defined. Defaults to False.
+            is_argument (bool, optional): If True, the variable being
+                declared is an input argument. Defaults to False.
 
         Returns:
             list: The lines declaring the variable.
@@ -3140,7 +3249,7 @@ checking if the model flag indicates
         out = [cls.format_function_param('declare',
                                          type_name=type_name,
                                          variable=cls.get_name_declare(var))]
-        if dont_define:
+        if is_argument:
             return out
         if definitions is None:
             definitions = out

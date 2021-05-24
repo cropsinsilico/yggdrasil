@@ -105,6 +105,14 @@ def test_display_source():
     fname = os.path.abspath(__file__)
     tools.display_source([fname], number_lines=True)
     tools.display_source([fname], return_lines=True)
+    tools.display_source(test_display_source)
+    fname_txt = os.path.join(tempfile.gettempdir(), 'unknown_example.invalid')
+    with open(fname_txt, 'w') as fd:
+        fd.write('hello')
+    try:
+        tools.display_source(fname_txt)
+    finally:
+        os.remove(fname_txt)
 
 
 def test_display_source_diff():
@@ -118,6 +126,8 @@ def test_display_source_diff():
     try:
         tools.display_source_diff(fname1, fname2, number_lines=True)
         tools.display_source_diff(fname1, fname2, return_lines=True)
+        tools.display_source_diff(test_display_source_diff,
+                                  test_display_source_diff)
     finally:
         os.remove(fname2)
 
