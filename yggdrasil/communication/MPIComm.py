@@ -13,7 +13,7 @@ class MPIRequest(object):
                  'req', 'size', 'data', '_complete']
 
     def __init__(self, comm, direction, address, tag, **kwargs):
-        if isinstance(address, list):
+        if isinstance(address, (list, tuple)):
             if len(address) == 1:
                 address = address[0]
             else:
