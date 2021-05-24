@@ -103,11 +103,10 @@ def example_decorator(name, x, iter_over, timeout):
 
     def deco(func):
         add_timeout_dec = True
-        deco_list = [
-            unittest.skipIf(
-                (not tools.check_environ_bool('YGG_ENABLE_EXAMPLE_TESTS')),
-                "Example tests not enabled."),
-        ]
+        flag = (not tools.check_environ_bool('YGG_ENABLE_EXAMPLE_TESTS'))
+        if not flag:
+            add_timeout_dec = False
+        deco_list = [unittest.skipIf(flag, "Example tests not enabled.")]
         for i, k in enumerate(iter_over):
             v = x[i]
             flag = None
@@ -120,6 +119,13 @@ def example_decorator(name, x, iter_over, timeout):
                     if not tools.is_lang_installed(vv):
                         flag = False
                         break
+                    else:
+                        try:
+                            check_enabled_languages(vv)
+                        except unittest.SkipTest as e:
+                            msg = str(e)
+                            flag = False
+                            break
             if flag is not None:
                 if not flag:
                     # Don't add timeout if the test is going to be skipped
