@@ -608,7 +608,7 @@ class CommBase(tools.YggClass):
                                   reverse_names=reverse_names,
                                   direction=direction)
         if env is None:
-            env = os.environ
+            env = os.environ.copy()
         self.env = env
         self.name_base = name
         self.suffix = suffix
@@ -623,7 +623,7 @@ class CommBase(tools.YggClass):
                      and (self.name.replace(':', '__COLON__')
                           not in self.env))):
                     import pprint
-                    env_str = pprint.pformat(self.env.copy())
+                    env_str = pprint.pformat(self.env)
                     raise RuntimeError(
                         'Cannot see %s in env (model = %s). Env:\n%s' %
                         (self.name, model_name, env_str))
