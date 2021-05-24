@@ -102,8 +102,8 @@ def example_decorator(name, x, iter_over, timeout):
     """
 
     def deco(func):
+        add_timeout_dec = True
         deco_list = [
-            timeout_dec(timeout=timeout),
             unittest.skipIf(
                 (not tools.check_environ_bool('YGG_ENABLE_EXAMPLE_TESTS')),
                 "Example tests not enabled."),
@@ -121,9 +121,14 @@ def example_decorator(name, x, iter_over, timeout):
                         flag = False
                         break
             if flag is not None:
+                if not flag:
+                    # Don't add timeout if the test is going to be skipped
+                    add_timeout_dec = False
                 if msg is None:
                     msg = "%s %s not installed." % (k.title(), v)
                 deco_list.append(unittest.skipIf(not flag, msg))
+        if add_timeout_dec:
+            deco_list.insert(0, timeout_dec(timeout=timeout))
         for v in deco_list:
             func = v(func)
         return func
