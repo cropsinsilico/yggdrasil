@@ -1448,8 +1448,10 @@ class ModelDriver(Driver):
             if (((self.model_process is not None)
                  and (self.model_process.returncode != 0)
                  and (not ignore_error_code))):
-                self.error("return code of %s indicates model error.",
-                           str(self.model_process.returncode))
+                self.error(("return code of %s indicates model error. "
+                            "(sent messages: %s)"),
+                           str(self.model_process.returncode),
+                           self.n_sent_messages)
             self.event_process_kill_complete.set()
             if self.queue_thread is not None:
                 if not self.was_break:  # pragma: debug
