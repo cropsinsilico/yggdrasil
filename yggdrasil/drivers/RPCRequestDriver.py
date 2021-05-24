@@ -108,19 +108,28 @@ class RPCRequestDriver(ConnectionDriver):
 
         """
         with self.lock:
-            # if (direction == "input") and (name in self.clients):
-            #     super(RPCRequestDriver, self).send_message(
-            #         CommBase.CommMessage(args=YGG_CLIENT_EOF,
-            #                              flag=CommBase.FLAG_SUCCESS),
-            #         header_kwargs={'raw': True, 'model': name},
-            #         skip_processing=True)
+            if (direction == "input") and (name in self.clients):
+                super(RPCRequestDriver, self).send_message(
+                    CommBase.CommMessage(args=YGG_CLIENT_EOF,
+                                         flag=CommBase.FLAG_SUCCESS),
+                    header_kwargs={'raw': True, 'model': name},
+                    skip_processing=True)
             out = super(RPCRequestDriver, self).remove_model(
                 direction, name)
             if out:
-                if self.ocomm.partner_copies > 1:
-                    self.ocomm.partner_copies = len(self.servers_recvd)
                 self.send_eof()
             return out
+        
+    def send_eof(self):
+        r"""Send EOF message.
+
+        Returns:
+            bool: Success or failure of send.
+
+        """
+        if self.ocomm.partner_copies > 1:
+            self.ocomm.partner_copies = len(self.servers_recvd)
+        return super(RPCRequestDriver, self).send_eof()
         
     def on_eof(self, msg):
         r"""On EOF, decrement number of clients. Only send EOF if the number

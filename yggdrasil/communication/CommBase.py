@@ -1977,6 +1977,7 @@ class CommBase(tools.YggClass):
             # 3. Check if the message is EOF
             if self.is_eof(msg.args):
                 msg.flag = FLAG_EOF
+                self.info("Sending EOF to %d model", self.partner_copies)
                 if self.partner_copies > 1:
                     for i in range(self.partner_copies - 1):
                         msg.add_message(args=msg.args,
