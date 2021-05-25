@@ -3,10 +3,6 @@ from yggdrasil.drivers.RPCResponseDriver import RPCResponseDriver
 from yggdrasil.communication import CommBase
 
 
-YGG_CLIENT_INI = b'YGG_BEGIN_CLIENT'
-YGG_CLIENT_EOF = b'YGG_END_CLIENT'
-
-
 class RPCRequestDriver(ConnectionDriver):
     r"""Class for handling client side RPC type communication.
 
@@ -111,7 +107,7 @@ class RPCRequestDriver(ConnectionDriver):
             clients = self.clients
             if (direction == "input") and (name in clients) and (len(clients) > 1):
                 super(RPCRequestDriver, self).send_message(
-                    CommBase.CommMessage(args=YGG_CLIENT_EOF,
+                    CommBase.CommMessage(args=CommBase.YGG_CLIENT_EOF,
                                          flag=CommBase.FLAG_SUCCESS),
                     header_kwargs={'raw': True, 'model': name},
                     skip_processing=True)
