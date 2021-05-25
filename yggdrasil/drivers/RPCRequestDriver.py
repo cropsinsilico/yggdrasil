@@ -108,7 +108,8 @@ class RPCRequestDriver(ConnectionDriver):
 
         """
         with self.lock:
-            if (direction == "input") and (name in self.clients):
+            clients = self.clients
+            if (direction == "input") and (name in clients) and (len(clients) > 1):
                 super(RPCRequestDriver, self).send_message(
                     CommBase.CommMessage(args=YGG_CLIENT_EOF,
                                          flag=CommBase.FLAG_SUCCESS),
