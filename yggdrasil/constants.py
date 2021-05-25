@@ -211,6 +211,7 @@ COMPONENT_REGISTRY = {
             'dummy': 'DummyModelDriver',
             'executable': 'ExecutableModelDriver',
             'fortran': 'FortranModelDriver',
+            'julia': 'JuliaModelDriver',
             'lpy': 'LPyModelDriver',
             'make': 'MakeModelDriver',
             'matlab': 'MatlabModelDriver',
@@ -272,6 +273,7 @@ LANG2EXT = {
     'cxx': '.cpp',
     'executable': '.exe',
     'fortran': '.f90',
+    'julia': '.jl',
     'lpy': '.lpy',
     'matlab': '.m',
     'osr': '.xml',
@@ -285,7 +287,7 @@ LANGUAGES = {
     'compiled': [
         'c', 'c++', 'fortran'],
     'interpreted': [
-        'R', 'matlab', 'python'],
+        'R', 'julia', 'matlab', 'python'],
     'build': [
         'cmake', 'make'],
     'dsl': [
@@ -303,7 +305,7 @@ LANGUAGES_WITH_ALIASES = {
     'compiled': [
         'c', 'c++', 'cpp', 'cxx', 'fortran'],
     'interpreted': [
-        'R', 'matlab', 'python', 'r'],
+        'R', 'julia', 'matlab', 'python', 'r'],
     'build': [
         'cmake', 'make'],
     'dsl': [
@@ -434,6 +436,11 @@ LANGUAGE_PROPERTIES = {
         'executable_type': 'compiled',
         'full_language': True,
         'is_typed': True,
+    },
+    'julia': {
+        'executable_type': 'interpreted',
+        'full_language': True,
+        'is_typed': False,
     },
     'lpy': {
         'executable_type': 'dsl',

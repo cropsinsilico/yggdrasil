@@ -830,6 +830,7 @@ def get_install_opts(old=None, empty=False):
             'lpy': (os.environ.get('INSTALLLPY', '0') == '1'),
             'r': (os.environ.get('INSTALLR', '0') == '1'),
             'fortran': (os.environ.get('INSTALLFORTRAN', '0') == '1'),
+            'julia': (os.environ.get('INSTALLJULIA', '0') == '1'),
             'zmq': (os.environ.get('INSTALLZMQ', '0') == '1'),
             'sbml': (os.environ.get('INSTALLSBML', '0') == '1'),
             'astropy': (os.environ.get('INSTALLAPY', '0') == '1'),
@@ -851,6 +852,7 @@ def get_install_opts(old=None, empty=False):
             'lpy': False,
             'r': True,
             'fortran': True,
+            'julia': True,
             'zmq': True,
             'sbml': False,
             'astropy': False,
@@ -1720,7 +1722,7 @@ def verify_pkg(install_opts=None):
     sys.stdout.flush()
     from yggdrasil.tools import is_lang_installed, is_comm_installed
     errors = []
-    for name in ['c', 'r', 'fortran', 'sbml', 'lpy']:
+    for name in ['c', 'r', 'fortran', 'sbml', 'lpy', 'julia']:
         flag = install_opts[name]
         if flag and (not is_lang_installed(name)):
             errors.append("Language '%s' should be installed, but is not."

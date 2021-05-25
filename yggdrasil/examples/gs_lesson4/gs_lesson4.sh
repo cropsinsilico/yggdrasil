@@ -27,6 +27,14 @@ case $1 in
 	echo "Running R"
 	yaml='gs_lesson4_r.yml'
 	;;
+    -f | --fortran )
+	echo "Running Fortran"
+	yaml='gs_lesson4_fortran.yml'
+	;;
+    -j | --julia)
+	echo "Running Julia"
+	yaml='gs_lesson4_julia.yml'
+	;;
     --make )
 	echo "Running Make"
 	cp ./src/Makefile_linux ./src/Makefile

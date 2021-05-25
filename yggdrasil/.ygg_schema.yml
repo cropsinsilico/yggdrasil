@@ -2140,6 +2140,7 @@ definitions:
           - dummy
           - executable
           - fortran
+          - julia
           - lpy
           - make
           - matlab
@@ -2890,6 +2891,38 @@ definitions:
         required:
         - language
         title: yggdrasil.drivers.FortranModelDriver.FortranModelDriver
+        type: object
+      - additionalProperties: true
+        description: Schema for model component ['julia'] subtype.
+        properties:
+          interpreter:
+            description: Name or path of interpreter executable that should be used
+              to run the model. If not provided, the interpreter will be determined
+              based on configuration options for the language (if present) and the
+              default_interpreter class attribute.
+            type: string
+          interpreter_flags:
+            default: []
+            description: Flags that should be passed to the interpreter when running
+              the model. If not provided, the flags are determined based on configuration
+              options for the language (if present) and the default_interpreter_flags
+              class attribute.
+            items:
+              type: string
+            type: array
+          language:
+            default: executable
+            description: Model is written in Julia.
+            enum:
+            - julia
+            type: string
+          skip_interpreter:
+            default: false
+            description: If True, no interpreter will be added to the arguments. This
+              should only be used for subclasses that will not be invoking the model
+              via the command line. Defaults to False.
+            type: boolean
+        title: yggdrasil.drivers.JuliaModelDriver.JuliaModelDriver
         type: object
       - additionalProperties: true
         description: Schema for model component ['lpy'] subtype.

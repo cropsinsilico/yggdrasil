@@ -168,6 +168,10 @@ extras:
           flags:
             from_src_on_travis: true
         - method: vcpkg
+  julia:
+    - julia:
+        - name: julia>=1.1.1
+          method: conda
   mpi:
     - mpi4py
     - mpi:

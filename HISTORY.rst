@@ -2,6 +2,15 @@
 History
 =======
 
+X.X.X (XXXX-XX-XX) Add support for Julia
+------------------
+
+* Added interface to Julia
+
+TODO:
+* Add Julia version of examples
+* Add Julia to docs
+  
 2.0.0 (2023-XX-XX) Migrate to using extended version of rapidjson/python-rapidjson
 ------------------
 
