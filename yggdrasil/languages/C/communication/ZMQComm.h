@@ -790,14 +790,20 @@ int free_zmq_comm(comm_t *x) {
     if (_ygg_error_flag == 0) {
       size_t data_len = 100;
       char *data = (char*)malloc(data_len);
+      comm_head_t head;
+      bool is_eof_flag = false;
       while (zmq_comm_nmsg(x) > 0) {
         ret = zmq_comm_recv(x, &data, data_len, 1);
-        if (ret < 0) {
-          if (ret == -2) {
+	if (ret >= 0) {
+	  head = parse_comm_header(data, ret);
+	  if (strncmp(YGG_MSG_EOF, data + head.bodybeg, strlen(YGG_MSG_EOF)) == 0)
+	    is_eof_flag = true;
+	  destroy_header(&head);
+	  if ((head.flags & HEAD_FLAG_VALID) && is_eof_flag) {
 	    x->const_flags[0] = x->const_flags[0] | COMM_EOF_RECV;
-            break;
-          }
-        }
+	    break;
+	  }
+	}
       }
       free(data);
     }
