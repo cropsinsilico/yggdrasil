@@ -894,6 +894,15 @@ class CommBase(tools.YggClass):
         lines += ['%s%s' % (prefix, x) for x in extra_lines_after]
         return lines, prefix
 
+    @property
+    def print_name(self):
+        r"""str: Name of the class object."""
+        out = super(CommBase, self).print_name
+        model_name = self.full_model_name
+        if model_name:
+            out += '[%s]' % model_name
+        return out
+        
     def printStatus(self, *args, **kwargs):
         r"""Print status of the communicator."""
         nindent = kwargs.get('nindent', 0)
