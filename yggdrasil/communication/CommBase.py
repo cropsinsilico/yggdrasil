@@ -33,6 +33,10 @@ FLAG_INCOMPLETE = 5
 FLAG_EMPTY = 6
 
 
+YGG_CLIENT_INI = b'YGG_BEGIN_CLIENT'
+YGG_CLIENT_EOF = b'YGG_END_CLIENT'
+
+
 class NeverMatch(Exception):
     'An exception class that is never raised by any code anywhere'
 
@@ -890,6 +894,16 @@ class CommBase(tools.YggClass):
         lines += ['%s%s' % (prefix, x) for x in extra_lines_after]
         return lines, prefix
 
+    # Re-enable this once the environment is crystalized on initialization
+    # @property
+    # def print_name(self):
+    #     r"""str: Name of the class object."""
+    #     out = super(CommBase, self).print_name
+    #     model_name = self.full_model_name
+    #     if model_name:
+    #         out += '[%s]' % model_name
+    #     return out
+        
     def printStatus(self, *args, **kwargs):
         r"""Print status of the communicator."""
         nindent = kwargs.get('nindent', 0)
@@ -1974,13 +1988,19 @@ class CommBase(tools.YggClass):
             if len(msg.args) == 1:
                 msg.args = msg.args[0]
                 msg.singular = True
-            # 3. Check if the message is EOF
+            # 3. Check if the message is EOF or YGG_CLIENT_EOF
+            once_per_partner = False
             if self.is_eof(msg.args):
                 msg.flag = FLAG_EOF
-                if self.partner_copies > 1:
-                    for i in range(self.partner_copies - 1):
-                        msg.add_message(args=msg.args,
-                                        header=copy.deepcopy(msg.header))
+                once_per_partner = True
+            elif isinstance(msg.args, bytes) and (msg.args == YGG_CLIENT_EOF):
+                once_per_partner = True
+            if once_per_partner and (self.partner_copies > 1):
+                self.debug("Sending %s to %d model(s)", msg.args,
+                           self.partner_copies)
+                for i in range(self.partner_copies - 1):
+                    msg.add_message(args=msg.args,
+                                    header=copy.deepcopy(msg.header))
         if not skip_processing:
             # 4. Check if the message should be filtered
             if msg.flag not in [FLAG_SKIP, FLAG_EOF]:

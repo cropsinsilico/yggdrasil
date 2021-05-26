@@ -571,8 +571,10 @@ def resolve_config_parser(args):
         args.validate_components = True
         args.validate_messages = True
     else:
-        args.loglevel = 'INFO'
-        args.client_loglevel = 'INFO'
+        if args.loglevel is None:
+            args.loglevel = 'INFO'
+        if args.client_loglevel is None:
+            args.client_loglevel = 'INFO'
     if args.validate_messages in ['True', 'False']:
         args.validate_messages = (args.validate_messages == 'True')
     return args

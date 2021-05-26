@@ -66,9 +66,21 @@ class DuplicatedModelDriver(Driver):
 
     def start(self, *args, **kwargs):
         r"""Start thread/process and print info."""
+        # self.delay_start(*args, **kwargs)
         for x in self.copies:
             x.start(*args, **kwargs)
         super(DuplicatedModelDriver, self).start(*args, **kwargs)
+
+    # def delay_start(self, *args, **kwargs):
+    #     r"""This method should not be called in production and is only
+    #     used for local testing to simulation a delayed start for some
+    #     copies."""
+    #     self.copies[0].start(*args, **kwargs)
+    #     def start_remainder():
+    #         for x in self.copies[1:]:
+    #             x.start(*args, **kwargs)
+    #     self.sched_task(0.4, start_remainder)
+    #     super(DuplicatedModelDriver, self).start(*args, **kwargs)
 
     def stop(self, *args, **kwargs):
         r"""Stop the driver."""

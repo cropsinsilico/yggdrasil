@@ -2,32 +2,6 @@ from yggdrasil.drivers.ConnectionDriver import ConnectionDriver, run_remotely
 from yggdrasil.drivers.RPCResponseDriver import RPCResponseDriver
 from yggdrasil.communication import CommBase
 
-# ----
-# Client sends resquest to local client output comm
-# Client recvs response from local client input comm
-# ----
-# Client request driver recvs from local client output comm
-# Client request driver creates client response driver
-# Client request driver sends to server request comm (w/ response comm header)
-# ----
-# Client response driver recvs from client response comm
-# Client response driver sends to local client input comm
-# ----
-# Server recvs request from local server input comm
-# Server sends response to local server output comm
-# ----
-# Server request driver recvs from server request comm
-# Server request driver creates server response driver
-# Server request driver sends to local server input comm
-# ----
-# Server response driver recvs from local server output comm
-# Server response driver sends to client response comm
-# ----
-
-
-YGG_CLIENT_INI = b'YGG_BEGIN_CLIENT'
-YGG_CLIENT_EOF = b'YGG_END_CLIENT'
-
 
 class RPCRequestDriver(ConnectionDriver):
     r"""Class for handling client side RPC type communication.
@@ -130,19 +104,29 @@ class RPCRequestDriver(ConnectionDriver):
 
         """
         with self.lock:
-            if (direction == "input") and (name in self.clients):
+            clients = self.clients
+            if (direction == "input") and (name in clients) and (len(clients) > 1):
                 super(RPCRequestDriver, self).send_message(
-                    CommBase.CommMessage(args=YGG_CLIENT_EOF,
+                    CommBase.CommMessage(args=CommBase.YGG_CLIENT_EOF,
                                          flag=CommBase.FLAG_SUCCESS),
                     header_kwargs={'raw': True, 'model': name},
                     skip_processing=True)
             out = super(RPCRequestDriver, self).remove_model(
                 direction, name)
             if out:
-                if self.ocomm.partner_copies > 1:
-                    self.ocomm.partner_copies = len(self.servers_recvd)
                 self.send_eof()
             return out
+        
+    # def send_eof(self):
+    #     r"""Send EOF message.
+
+    #     Returns:
+    #         bool: Success or failure of send.
+
+    #     """
+    #     if self.ocomm.partner_copies > 1:
+    #         self.ocomm.partner_copies = len(self.servers_recvd)
+    #     return super(RPCRequestDriver, self).send_eof()
         
     def on_eof(self, msg):
         r"""On EOF, decrement number of clients. Only send EOF if the number

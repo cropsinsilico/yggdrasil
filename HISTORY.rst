@@ -2,7 +2,7 @@
 History
 =======
 
-1.6.2 (2021-05-24) Reuse response comms, add fork patterns, minor bug fixes & hackathon materials
+1.6.2 (2021-05-25) Reuse response comms, add fork patterns, minor bug fixes & hackathon materials
 ------------------
 
 * Updated client/server comms & drivers to reuse response comms

@@ -394,7 +394,7 @@ class TimeSyncModelDriver(DSLModelDriver):
             for k, v in tables.items():
                 kws = interpolation.get(k, interp_default).copy()
                 if k not in open_clients:
-                    # Ensure that clients that have signed of are
+                    # Ensure that clients that have signed off are
                     # extrapolated, otherwise they would never produce
                     # valid data
                     kws['limit_area'] = None
