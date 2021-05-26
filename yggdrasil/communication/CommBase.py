@@ -904,7 +904,7 @@ class CommBase(tools.YggClass):
     #         out += '[%s]' % model_name
     #     return out
         
-    def printStatus(self, *args, **kwargs):
+    def printStatus(self, *args, level='info', **kwargs):
         r"""Print status of the communicator."""
         nindent = kwargs.get('nindent', 0)
         lines, prefix = self.get_status_message(*args, **kwargs)
@@ -912,7 +912,7 @@ class CommBase(tools.YggClass):
             lines.append('%sWork comms:' % prefix)
             for v in self._work_comms.values():
                 lines += v.get_status_message(nindent=nindent + 1)[0]
-        self.info('\n'.join(lines))
+        getattr(self, level)('\n'.join(lines))
 
     @property
     def any_files(self):
