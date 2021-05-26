@@ -43,6 +43,16 @@ class RPCResponseDriver(ConnectionDriver):
         r"""str: Address of response comm."""
         return self.icomm.address
 
+    def send_eof(self):
+        r"""Send EOF message.
+
+        Returns:
+            bool: Success or failure of send.
+
+        """
+        # Don't send EOF
+        return False
+        
     def send_message(self, msg, **kwargs):
         r"""Propagate the request_id.
 

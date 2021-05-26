@@ -117,16 +117,16 @@ class RPCRequestDriver(ConnectionDriver):
                 self.send_eof()
             return out
         
-    def send_eof(self):
-        r"""Send EOF message.
+    # def send_eof(self):
+    #     r"""Send EOF message.
 
-        Returns:
-            bool: Success or failure of send.
+    #     Returns:
+    #         bool: Success or failure of send.
 
-        """
-        if self.ocomm.partner_copies > 1:
-            self.ocomm.partner_copies = len(self.servers_recvd)
-        return super(RPCRequestDriver, self).send_eof()
+    #     """
+    #     if self.ocomm.partner_copies > 1:
+    #         self.ocomm.partner_copies = len(self.servers_recvd)
+    #     return super(RPCRequestDriver, self).send_eof()
         
     def on_eof(self, msg):
         r"""On EOF, decrement number of clients. Only send EOF if the number
