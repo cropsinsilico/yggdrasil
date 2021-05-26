@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>yggdrasil.drivers.RModelDriver &mdash; yggdrasil 1.6.1 documentation</title>
+  <title>yggdrasil.drivers.RModelDriver &mdash; yggdrasil 1.6.2 documentation</title>
   
 
   
@@ -63,7 +63,7 @@
             
             
               <div class="version">
-                1.6.1
+                1.6.2
               </div>
             
           
@@ -447,7 +447,7 @@
 <span class="sd">                code to run it as part of an integration.</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">if</span> <span class="n">platform</span><span class="o">.</span><span class="n">_is_win</span><span class="p">:</span>  <span class="c1"># pragma: windows</span>
+        <span class="k">if</span> <span class="n">platform</span><span class="o">.</span><span class="n">_is_win</span> <span class="ow">and</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">model_file</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>  <span class="c1"># pragma: windows</span>
             <span class="n">model_file</span> <span class="o">=</span> <span class="n">model_file</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\\</span><span class="s1">&#39;</span><span class="p">,</span> <span class="s1">&#39;/&#39;</span><span class="p">)</span>
         <span class="k">return</span> <span class="nb">super</span><span class="p">(</span><span class="n">RModelDriver</span><span class="p">,</span> <span class="bp">cls</span><span class="p">)</span><span class="o">.</span><span class="n">write_model_wrapper</span><span class="p">(</span>
             <span class="n">model_file</span><span class="p">,</span> <span class="n">model_function</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
@@ -486,13 +486,16 @@
                                                         <span class="n">new_channel</span><span class="p">)</span>
                 <span class="n">out</span> <span class="o">=</span> <span class="n">new_contents</span><span class="o">.</span><span class="n">splitlines</span><span class="p">()</span>
                 <span class="k">return</span> <span class="n">out</span>
+            <span class="k">if</span> <span class="n">platform</span><span class="o">.</span><span class="n">_is_win</span><span class="p">:</span>  <span class="c1"># pragma: windows</span>
+                <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;filename&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;filename&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\\</span><span class="s1">&#39;</span><span class="p">,</span> <span class="s1">&#39;/&#39;</span><span class="p">)</span>
         <span class="k">return</span> <span class="nb">super</span><span class="p">(</span><span class="n">RModelDriver</span><span class="p">,</span> <span class="bp">cls</span><span class="p">)</span><span class="o">.</span><span class="n">write_executable_import</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
 
     <span class="c1"># The following is only provided for the yggcc CLI for building R</span>
     <span class="c1"># packages and should not be used directly</span>
-<div class="viewcode-block" id="RModelDriver.call_compile"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.RModelDriver.RModelDriver.call_compile">[docs]</a>    <span class="nd">@classmethod</span>
-    <span class="k">def</span> <span class="nf">call_compile</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">package_dir</span><span class="p">,</span> <span class="n">toolname</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">flags</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-                     <span class="n">language</span><span class="o">=</span><span class="s1">&#39;c++&#39;</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>  <span class="c1"># pragma: no cover</span>
+<div class="viewcode-block" id="RModelDriver.call_compiler"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.RModelDriver.RModelDriver.call_compiler">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">call_compiler</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">package_dir</span><span class="p">,</span> <span class="n">toolname</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">flags</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                      <span class="n">language</span><span class="o">=</span><span class="s1">&#39;c++&#39;</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                      <span class="n">use_ccache</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>  <span class="c1"># pragma: no cover</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Build an R package w/ the yggdrasil compilers.</span>
 
 <span class="sd">        Args:</span>
@@ -505,6 +508,8 @@
 <span class="sd">                (e.g. c, fortran). Defautls to &#39;c++&#39;.</span>
 <span class="sd">            verbose (bool, optional): If True, information about the build</span>
 <span class="sd">                process will be displayed. Defaults to False.</span>
+<span class="sd">            use_ccache (bool, optional): If True, ccache will be added to</span>
+<span class="sd">                the compilation executable. Defaults to False.</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="kn">import</span> <span class="nn">shutil</span>
@@ -517,12 +522,16 @@
             <span class="n">package_dir</span> <span class="o">=</span> <span class="n">package_dir</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
         <span class="n">cexec_vars</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;c&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;CC&#39;</span><span class="p">,</span> <span class="s1">&#39;CC_FOR_BUILD&#39;</span><span class="p">],</span>
                       <span class="s1">&#39;c++&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;CXX&#39;</span><span class="p">,</span> <span class="s1">&#39;CPP&#39;</span><span class="p">,</span> <span class="s1">&#39;CXX98&#39;</span><span class="p">,</span> <span class="s1">&#39;CXX11&#39;</span><span class="p">,</span> <span class="s1">&#39;CXX14&#39;</span><span class="p">,</span>
-                              <span class="s1">&#39;CXX17&#39;</span><span class="p">,</span> <span class="s1">&#39;CXX_FOR_BUILD&#39;</span><span class="p">],</span>
+                              <span class="s1">&#39;CXX17&#39;</span><span class="p">,</span> <span class="s1">&#39;CXX20&#39;</span><span class="p">,</span> <span class="s1">&#39;CXX_FOR_BUILD&#39;</span><span class="p">],</span>
                       <span class="s1">&#39;fortran&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;FC&#39;</span><span class="p">,</span> <span class="s1">&#39;F77&#39;</span><span class="p">]}</span>
         <span class="n">cflag_vars</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;c&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;CFLAGS&#39;</span><span class="p">],</span>
                       <span class="s1">&#39;c++&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;CXXFLAGS&#39;</span><span class="p">,</span> <span class="s1">&#39;CXX98FLAGS&#39;</span><span class="p">,</span> <span class="s1">&#39;CXX11FLAGS&#39;</span><span class="p">,</span>
-                              <span class="s1">&#39;CXX14FLAGS&#39;</span><span class="p">,</span> <span class="s1">&#39;CXX17FLAGS&#39;</span><span class="p">],</span>
+                              <span class="s1">&#39;CXX14FLAGS&#39;</span><span class="p">,</span> <span class="s1">&#39;CXX17FLAGS&#39;</span><span class="p">,</span> <span class="s1">&#39;CXX20FLAGS&#39;</span><span class="p">],</span>
                       <span class="s1">&#39;fortran&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;FFFLAGS&#39;</span><span class="p">,</span> <span class="s1">&#39;FCFLAGS&#39;</span><span class="p">]}</span>
+        <span class="n">cstd_vars</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;c&#39;</span><span class="p">:</span> <span class="p">[],</span>
+                     <span class="s1">&#39;c++&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;CXXSTD&#39;</span><span class="p">,</span> <span class="s1">&#39;CXX11STD&#39;</span><span class="p">,</span> <span class="s1">&#39;CXX14STD&#39;</span><span class="p">,</span>
+                             <span class="s1">&#39;CXX17STD&#39;</span><span class="p">,</span> <span class="s1">&#39;CXX20STD&#39;</span><span class="p">],</span>
+                     <span class="s1">&#39;fortran&#39;</span><span class="p">:</span> <span class="p">[]}</span>
         <span class="n">env</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
         <span class="n">new_env</span> <span class="o">=</span> <span class="p">{}</span>
         <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">constants</span><span class="o">.</span><span class="n">LANGUAGES</span><span class="p">[</span><span class="s1">&#39;compiled&#39;</span><span class="p">]:</span>
@@ -532,16 +541,25 @@
             <span class="c1"># archiver = compiler.archiver()</span>
             <span class="n">env</span> <span class="o">=</span> <span class="n">drv</span><span class="o">.</span><span class="n">set_env_compiler</span><span class="p">(</span><span class="n">existing</span><span class="o">=</span><span class="n">env</span><span class="p">,</span> <span class="n">compiler</span><span class="o">=</span><span class="n">compiler</span><span class="p">)</span>
             <span class="n">cexec</span> <span class="o">=</span> <span class="n">compiler</span><span class="o">.</span><span class="n">get_executable</span><span class="p">(</span><span class="n">full_path</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">use_ccache</span> <span class="ow">and</span> <span class="n">shutil</span><span class="o">.</span><span class="n">which</span><span class="p">(</span><span class="s1">&#39;ccache&#39;</span><span class="p">):</span>
+                <span class="n">cexec</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="si">%s</span><span class="s1"> </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="s1">&#39;ccache&#39;</span><span class="p">,</span> <span class="n">cexec</span><span class="p">)</span>
+                <span class="n">env</span><span class="p">[</span><span class="s1">&#39;CCACHE_NOHASHDIR&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;true&#39;</span>
             <span class="n">kws</span> <span class="o">=</span> <span class="p">{}</span>
             <span class="k">if</span> <span class="n">x</span> <span class="o">==</span> <span class="s1">&#39;c++&#39;</span><span class="p">:</span>
                 <span class="n">kws</span><span class="p">[</span><span class="s1">&#39;skip_standard_flag&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
-            <span class="n">cflags</span> <span class="o">=</span> <span class="n">drv</span><span class="o">.</span><span class="n">get_compiler_flags</span><span class="p">(</span><span class="n">for_model</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">toolname</span><span class="o">=</span><span class="n">toolname</span><span class="p">,</span>
-                                            <span class="n">dry_run</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">compiler</span><span class="o">=</span><span class="n">compiler</span><span class="p">,</span>
-                                            <span class="n">dont_link</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="o">**</span><span class="n">kws</span><span class="p">)</span>
+            <span class="n">cflags0</span> <span class="o">=</span> <span class="n">drv</span><span class="o">.</span><span class="n">get_compiler_flags</span><span class="p">(</span><span class="n">for_model</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">toolname</span><span class="o">=</span><span class="n">toolname</span><span class="p">,</span>
+                                             <span class="n">dry_run</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">compiler</span><span class="o">=</span><span class="n">compiler</span><span class="p">,</span>
+                                             <span class="n">dont_link</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="o">**</span><span class="n">kws</span><span class="p">)</span>
             <span class="n">lflags</span> <span class="o">=</span> <span class="n">drv</span><span class="o">.</span><span class="n">get_linker_flags</span><span class="p">(</span><span class="n">for_model</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">toolname</span><span class="o">=</span><span class="n">toolname</span><span class="p">,</span>
                                           <span class="n">dry_run</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">libtype</span><span class="o">=</span><span class="s1">&#39;shared&#39;</span><span class="p">)</span>
             <span class="c1"># Remove flags that are unnecessary</span>
-            <span class="n">cflags</span> <span class="o">=</span> <span class="p">[</span><span class="n">x</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">cflags</span> <span class="k">if</span> <span class="ow">not</span> <span class="n">x</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;-std=&quot;</span><span class="p">)]</span>
+            <span class="n">cflags</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="n">stdflags</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">cflags0</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">k</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;-std=&quot;</span><span class="p">):</span>
+                    <span class="n">stdflags</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">k</span><span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">cflags</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">k</span><span class="p">)</span>
             <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;-c&#39;</span><span class="p">]:</span>
                 <span class="k">if</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">cflags</span><span class="p">:</span>
                     <span class="n">cflags</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">k</span><span class="p">)</span>
@@ -554,6 +572,9 @@
             <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">cflag_vars</span><span class="p">[</span><span class="n">x</span><span class="p">]:</span>
                 <span class="n">env</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
                 <span class="n">new_env</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39; &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">cflags</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">cstd_vars</span><span class="p">[</span><span class="n">x</span><span class="p">]:</span>
+                <span class="n">env</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+                <span class="n">new_env</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39; &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">stdflags</span><span class="p">)</span>
             <span class="k">if</span> <span class="n">language</span> <span class="o">==</span> <span class="n">x</span><span class="p">:</span>
                 <span class="n">env</span><span class="p">[</span><span class="s1">&#39;LDFLAGS&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
                 <span class="n">new_env</span><span class="p">[</span><span class="s1">&#39;LDFLAGS&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39; &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">lflags</span><span class="p">)</span>

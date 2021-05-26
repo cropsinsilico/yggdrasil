@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>yggdrasil.drivers.CompiledModelDriver &mdash; yggdrasil 1.6.1 documentation</title>
+  <title>yggdrasil.drivers.CompiledModelDriver &mdash; yggdrasil 1.6.2 documentation</title>
   
 
   
@@ -63,7 +63,7 @@
             
             
               <div class="version">
-                1.6.1
+                1.6.2
               </div>
             
           
@@ -564,7 +564,8 @@
             <span class="nb">setattr</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">k</span><span class="p">,</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="nb">getattr</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">k</span><span class="p">,</span> <span class="p">[])))</span>
         <span class="c1"># Set attributes based on environment variables</span>
         <span class="k">if</span> <span class="bp">cls</span><span class="o">.</span><span class="n">env_matches_tool</span><span class="p">():</span>
-            <span class="bp">cls</span><span class="o">.</span><span class="n">default_executable</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="bp">cls</span><span class="o">.</span><span class="n">default_executable_env</span><span class="p">]</span>
+            <span class="bp">cls</span><span class="o">.</span><span class="n">default_executable</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="bp">cls</span><span class="o">.</span><span class="n">default_executable_env</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">(</span>
+                <span class="s1">&#39;ccache &#39;</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
         <span class="c1"># Set default_executable to name</span>
         <span class="k">if</span> <span class="bp">cls</span><span class="o">.</span><span class="n">default_executable</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="bp">cls</span><span class="o">.</span><span class="n">default_executable</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">toolname</span>
@@ -852,7 +853,7 @@
             <span class="n">tool_base</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">cls</span><span class="o">.</span><span class="n">default_executable</span><span class="p">)</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">cls</span><span class="o">.</span><span class="n">default_executable_env</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
             <span class="n">envi_base</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">basename</span><span class="p">(</span>
-                <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="bp">cls</span><span class="o">.</span><span class="n">default_executable_env</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">))</span>
+                <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="bp">cls</span><span class="o">.</span><span class="n">default_executable_env</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;ccache &#39;</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
         <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;PATHEXT&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">):</span>
             <span class="n">tool_base</span> <span class="o">=</span> <span class="p">[</span><span class="n">x</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s1">&#39;PATHEXT&#39;</span><span class="p">])[</span><span class="mi">0</span><span class="p">]</span>
                          <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">tool_base</span><span class="p">]</span>
@@ -1098,7 +1099,7 @@
 
 <div class="viewcode-block" id="CompilationToolBase.get_executable_command"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.CompiledModelDriver.CompilationToolBase.get_executable_command">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">get_executable_command</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">args</span><span class="p">,</span> <span class="n">skip_flags</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">unused_kwargs</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-                               <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+                               <span class="n">use_ccache</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Determine the command required to run the tool using the specified</span>
 <span class="sd">        arguments and options.</span>
 
@@ -1113,6 +1114,8 @@
 <span class="sd">            unused_kwargs (dict, optional): Existing Python dictionary that</span>
 <span class="sd">                unused keyword arguments will be added to. Defaults to None and</span>
 <span class="sd">                is initialized to an empty dict.</span>
+<span class="sd">            use_ccache (bool, optional): If True, ccache will be added to</span>
+<span class="sd">                the compilation executable. Defaults to False.</span>
 <span class="sd">            **kwargs: Additional keyword arguments are ignored and stored in</span>
 <span class="sd">                unused_kwargs if provided.</span>
 
@@ -1136,6 +1139,8 @@
         <span class="n">cmd</span> <span class="o">=</span> <span class="n">flags</span> <span class="o">+</span> <span class="n">args</span> <span class="o">+</span> <span class="n">library_flags</span>
         <span class="k">if</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">cmd</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span> <span class="ow">or</span> <span class="p">(</span><span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">splitext</span><span class="p">(</span><span class="n">cmd</span><span class="p">[</span><span class="mi">0</span><span class="p">])[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="bp">cls</span><span class="o">.</span><span class="n">toolname</span><span class="p">)):</span>
             <span class="n">cmd</span> <span class="o">=</span> <span class="p">[</span><span class="bp">cls</span><span class="o">.</span><span class="n">get_executable</span><span class="p">()]</span> <span class="o">+</span> <span class="n">cmd</span>
+        <span class="k">if</span> <span class="n">use_ccache</span> <span class="ow">and</span> <span class="n">shutil</span><span class="o">.</span><span class="n">which</span><span class="p">(</span><span class="s1">&#39;ccache&#39;</span><span class="p">):</span>
+            <span class="n">cmd</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;ccache&#39;</span><span class="p">]</span> <span class="o">+</span> <span class="n">cmd</span>
         <span class="c1"># Pop library flags so it is not an unused_kwarg in cases of non-linking</span>
         <span class="c1"># compiler command</span>
         <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;library_flags&#39;</span><span class="p">,</span> <span class="s1">&#39;skip_library_libs&#39;</span><span class="p">]:</span>

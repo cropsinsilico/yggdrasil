@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>yggdrasil.serialize.SerializeBase &mdash; yggdrasil 1.6.1 documentation</title>
+  <title>yggdrasil.serialize.SerializeBase &mdash; yggdrasil 1.6.2 documentation</title>
   
 
   
@@ -63,7 +63,7 @@
             
             
               <div class="version">
-                1.6.1
+                1.6.2
               </div>
             
           
@@ -407,17 +407,18 @@
                 <span class="n">rows</span> <span class="o">=</span> <span class="p">[(</span><span class="s1">&#39;one&#39;</span><span class="p">,</span> <span class="n">int_type</span><span class="p">(</span><span class="mi">1</span><span class="p">),</span> <span class="mf">1.0</span><span class="p">),</span>
                         <span class="p">(</span><span class="s1">&#39;two&#39;</span><span class="p">,</span> <span class="n">int_type</span><span class="p">(</span><span class="mi">2</span><span class="p">),</span> <span class="mf">2.0</span><span class="p">),</span>
                         <span class="p">(</span><span class="s1">&#39;three&#39;</span><span class="p">,</span> <span class="n">int_type</span><span class="p">(</span><span class="mi">3</span><span class="p">),</span> <span class="mf">3.0</span><span class="p">)]</span>
+            <span class="n">umol</span> <span class="o">=</span> <span class="sa">b</span><span class="s1">&#39;</span><span class="se">\xce\xbc</span><span class="s1">mol&#39;</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s1">&#39;utf-8&#39;</span><span class="p">)</span>
             <span class="n">out</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;kwargs&#39;</span><span class="p">:</span> <span class="p">{},</span> <span class="s1">&#39;empty&#39;</span><span class="p">:</span> <span class="p">[],</span> <span class="s1">&#39;dtype&#39;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span>
                    <span class="s1">&#39;extra_kwargs&#39;</span><span class="p">:</span> <span class="p">{},</span>
                    <span class="s1">&#39;typedef&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;array&#39;</span><span class="p">,</span>
                                <span class="s1">&#39;items&#39;</span><span class="p">:</span> <span class="p">[{</span><span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="n">table_string_type</span><span class="p">,</span>
                                           <span class="s1">&#39;units&#39;</span><span class="p">:</span> <span class="s1">&#39;n/a&#39;</span><span class="p">,</span> <span class="s1">&#39;title&#39;</span><span class="p">:</span> <span class="s1">&#39;name&#39;</span><span class="p">},</span>
                                          <span class="p">{</span><span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;int&#39;</span><span class="p">,</span> <span class="s1">&#39;precision&#39;</span><span class="p">:</span> <span class="mi">32</span><span class="p">,</span>
-                                          <span class="s1">&#39;units&#39;</span><span class="p">:</span> <span class="s1">&#39;umol&#39;</span><span class="p">,</span> <span class="s1">&#39;title&#39;</span><span class="p">:</span> <span class="s1">&#39;count&#39;</span><span class="p">},</span>
+                                          <span class="s1">&#39;units&#39;</span><span class="p">:</span> <span class="n">umol</span><span class="p">,</span> <span class="s1">&#39;title&#39;</span><span class="p">:</span> <span class="s1">&#39;count&#39;</span><span class="p">},</span>
                                          <span class="p">{</span><span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;float&#39;</span><span class="p">,</span> <span class="s1">&#39;precision&#39;</span><span class="p">:</span> <span class="mi">64</span><span class="p">,</span>
                                           <span class="s1">&#39;units&#39;</span><span class="p">:</span> <span class="s1">&#39;cm&#39;</span><span class="p">,</span> <span class="s1">&#39;title&#39;</span><span class="p">:</span> <span class="s1">&#39;size&#39;</span><span class="p">}]},</span>
                    <span class="s1">&#39;contents&#39;</span><span class="p">:</span> <span class="p">(</span><span class="sa">b</span><span class="s1">&#39;# name</span><span class="se">\t</span><span class="s1">count</span><span class="se">\t</span><span class="s1">size</span><span class="se">\n</span><span class="s1">&#39;</span>
-                                <span class="o">+</span> <span class="sa">b</span><span class="s1">&#39;# n/a</span><span class="se">\t</span><span class="s1">umol</span><span class="se">\t</span><span class="s1">cm</span><span class="se">\n</span><span class="s1">&#39;</span>
+                                <span class="o">+</span> <span class="sa">b</span><span class="s1">&#39;# n/a</span><span class="se">\t\xce\xbc</span><span class="s1">mol</span><span class="se">\t</span><span class="s1">cm</span><span class="se">\n</span><span class="s1">&#39;</span>
                                 <span class="o">+</span> <span class="sa">b</span><span class="s1">&#39;# </span><span class="si">%5s</span><span class="se">\t</span><span class="si">%d</span><span class="se">\t</span><span class="si">%f</span><span class="se">\n</span><span class="s1">&#39;</span>
                                 <span class="o">+</span> <span class="sa">b</span><span class="s1">&#39;  one</span><span class="se">\t</span><span class="s1">1</span><span class="se">\t</span><span class="s1">1.000000</span><span class="se">\n</span><span class="s1">&#39;</span>
                                 <span class="o">+</span> <span class="sa">b</span><span class="s1">&#39;  two</span><span class="se">\t</span><span class="s1">2</span><span class="se">\t</span><span class="s1">2.000000</span><span class="se">\n</span><span class="s1">&#39;</span>
@@ -427,11 +428,11 @@
                                 <span class="o">+</span> <span class="sa">b</span><span class="s1">&#39;three</span><span class="se">\t</span><span class="s1">3</span><span class="se">\t</span><span class="s1">3.000000</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">),</span>
                    <span class="s1">&#39;objects&#39;</span><span class="p">:</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">rows</span><span class="p">,</span>
                    <span class="s1">&#39;field_names&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">,</span> <span class="s1">&#39;count&#39;</span><span class="p">,</span> <span class="s1">&#39;size&#39;</span><span class="p">],</span>
-                   <span class="s1">&#39;field_units&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;n/a&#39;</span><span class="p">,</span> <span class="s1">&#39;umol&#39;</span><span class="p">,</span> <span class="s1">&#39;cm&#39;</span><span class="p">]}</span>
+                   <span class="s1">&#39;field_units&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;n/a&#39;</span><span class="p">,</span> <span class="n">umol</span><span class="p">,</span> <span class="s1">&#39;cm&#39;</span><span class="p">]}</span>
             <span class="k">if</span> <span class="n">include_oldkws</span><span class="p">:</span>
                 <span class="n">out</span><span class="p">[</span><span class="s1">&#39;kwargs&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">update</span><span class="p">({</span><span class="s1">&#39;format_str&#39;</span><span class="p">:</span> <span class="s1">&#39;</span><span class="si">%5s</span><span class="se">\t</span><span class="si">%d</span><span class="se">\t</span><span class="si">%f</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">,</span>
                                       <span class="s1">&#39;field_names&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">,</span> <span class="s1">&#39;count&#39;</span><span class="p">,</span> <span class="s1">&#39;size&#39;</span><span class="p">],</span>
-                                      <span class="s1">&#39;field_units&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;n/a&#39;</span><span class="p">,</span> <span class="s1">&#39;umol&#39;</span><span class="p">,</span> <span class="s1">&#39;cm&#39;</span><span class="p">]})</span>
+                                      <span class="s1">&#39;field_units&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;n/a&#39;</span><span class="p">,</span> <span class="n">umol</span><span class="p">,</span> <span class="s1">&#39;cm&#39;</span><span class="p">]})</span>
                 <span class="n">out</span><span class="p">[</span><span class="s1">&#39;extra_kwargs&#39;</span><span class="p">][</span><span class="s1">&#39;format_str&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">out</span><span class="p">[</span><span class="s1">&#39;kwargs&#39;</span><span class="p">][</span><span class="s1">&#39;format_str&#39;</span><span class="p">]</span>
                 <span class="k">if</span> <span class="s1">&#39;format_str&#39;</span> <span class="ow">in</span> <span class="bp">cls</span><span class="o">.</span><span class="n">_attr_conv</span><span class="p">:</span>
                     <span class="n">out</span><span class="p">[</span><span class="s1">&#39;extra_kwargs&#39;</span><span class="p">][</span><span class="s1">&#39;format_str&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">tools</span><span class="o">.</span><span class="n">str2bytes</span><span class="p">(</span>

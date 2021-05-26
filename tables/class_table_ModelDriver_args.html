@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>&lt;no title&gt; &mdash; yggdrasil 1.6.1 documentation</title>
+  <title>&lt;no title&gt; &mdash; yggdrasil 1.6.2 documentation</title>
   
 
   
@@ -63,7 +63,7 @@
             
             
               <div class="version">
-                1.6.1
+                1.6.2
               </div>
             
           
@@ -229,7 +229,13 @@ for each server the model is a client of. Defaults to empty list. Use of
 <td></td>
 <td><p>int</p></td>
 </tr>
-<tr class="row-odd"><td><p>function</p></td>
+<tr class="row-odd"><td><p>copy_index</p></td>
+<td><p>Index of model in set of copies. Defaults to -1 indicating there is only one
+copy of the model.</p></td>
+<td></td>
+<td><p>int</p></td>
+</tr>
+<tr class="row-even"><td><p>function</p></td>
 <td><p>If provided, an integrated model is created by wrapping the function named here.
 The function must be located within the file specified by the source file listed
 in the first argument. If not provided, the model must contain it’s own calls to
@@ -237,7 +243,7 @@ the yggdrasil interface.</p></td>
 <td></td>
 <td><p>str</p></td>
 </tr>
-<tr class="row-even"><td><p>is_server</p></td>
+<tr class="row-odd"><td><p>is_server</p></td>
 <td><p>If <cite>True</cite>, the model is assumed to be a server for one or more client models and
 an instance of <code class="xref py py-class docutils literal notranslate"><span class="pre">yggdrasil.drivers.ServerDriver</span></code> is started. The
 corresponding channel that should be passed to the yggdrasil API will be the
@@ -250,19 +256,19 @@ each time the co-opted input channel’s recv method is called. If used with the
 <td></td>
 <td><p>bool, dict</p></td>
 </tr>
-<tr class="row-odd"><td><p>logging_level</p></td>
+<tr class="row-even"><td><p>logging_level</p></td>
 <td><p>The level of logging messages that should be displayed by the model. Defaults to
 the logging level as determined by the configuration file and environment
 variables.</p></td>
 <td></td>
 <td><p>str</p></td>
 </tr>
-<tr class="row-even"><td><p>model_index</p></td>
+<tr class="row-odd"><td><p>model_index</p></td>
 <td><p>Index of model in list of models being run. Defaults to 0.</p></td>
 <td></td>
 <td><p>int</p></td>
 </tr>
-<tr class="row-odd"><td><p>outputs_in_inputs</p></td>
+<tr class="row-even"><td><p>outputs_in_inputs</p></td>
 <td><p>If True, outputs from wrapped model functions are passed by pointer as inputs
 for modification and the return value will be a flag. If False, outputs are
 limited to return values. Defaults to the value of the class attribute
@@ -270,7 +276,7 @@ outputs_in_inputs.</p></td>
 <td></td>
 <td><p>bool</p></td>
 </tr>
-<tr class="row-even"><td><p>overwrite</p></td>
+<tr class="row-odd"><td><p>overwrite</p></td>
 <td><p>If True, any existing model products (compilation products, wrapper scripts,
 etc.) are removed prior to the run. If False, the products are not removed.
 Defaults to True. Setting this to False can improve the performance,
@@ -281,32 +287,32 @@ or not products are removed after a run.</p></td>
 <td></td>
 <td><p>bool</p></td>
 </tr>
-<tr class="row-odd"><td><p>preserve_cache</p></td>
+<tr class="row-even"><td><p>preserve_cache</p></td>
 <td><p>If True model products will be kept following the run, otherwise all products
 will be cleaned up. Defaults to False. This keyword is superceeded by overwrite.</p></td>
 <td></td>
 <td><p>bool</p></td>
 </tr>
-<tr class="row-even"><td><p>products</p></td>
+<tr class="row-odd"><td><p>products</p></td>
 <td><p>Paths to files created by the model that should be cleaned up when the model
 exits. Entries can be absolute paths or paths relative to the working directory.
 Defaults to [].</p></td>
 <td></td>
 <td><p>list</p></td>
 </tr>
-<tr class="row-odd"><td><p>source_products</p></td>
+<tr class="row-even"><td><p>source_products</p></td>
 <td><p>Files created by running the model that are source files. These files will be
 removed without checking their extension so users should avoid adding files to
 this list unless they are sure they should be deleted. Defaults to [].</p></td>
 <td></td>
 <td><p>list</p></td>
 </tr>
-<tr class="row-even"><td><p>strace_flags</p></td>
+<tr class="row-odd"><td><p>strace_flags</p></td>
 <td><p>Flags to pass to strace (or dtrace). Defaults to [].</p></td>
 <td></td>
 <td><p>list</p></td>
 </tr>
-<tr class="row-odd"><td><p>timesync</p></td>
+<tr class="row-even"><td><p>timesync</p></td>
 <td><p>If set, the model is assumed to call a send then receive of the state at each
 timestep for syncronization with other models that are also integrating in time.
 If a string is provided, it is assumed to be the name of the server that will
@@ -315,18 +321,18 @@ server will be assumed to be ‘timestep’. Defaults to False.</p></td>
 <td></td>
 <td><p>bool, str</p></td>
 </tr>
-<tr class="row-even"><td><p>valgrind_flags</p></td>
+<tr class="row-odd"><td><p>valgrind_flags</p></td>
 <td><p>Flags to pass to valgrind. Defaults to [].</p></td>
 <td></td>
 <td><p>list</p></td>
 </tr>
-<tr class="row-odd"><td><p>with_strace</p></td>
+<tr class="row-even"><td><p>with_strace</p></td>
 <td><p>If True, the command is run with strace (on Linux) or dtrace (on MacOS).
 Defaults to False.</p></td>
 <td></td>
 <td><p>bool</p></td>
 </tr>
-<tr class="row-even"><td><p>with_valgrind</p></td>
+<tr class="row-odd"><td><p>with_valgrind</p></td>
 <td><p>If True, the command is run with valgrind. Defaults to False.</p></td>
 <td></td>
 <td><p>bool</p></td>

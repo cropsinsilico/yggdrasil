@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>yggdrasil.communication.tests.test_ForkComm &mdash; yggdrasil 1.6.1 documentation</title>
+  <title>yggdrasil.communication.tests.test_ForkComm &mdash; yggdrasil 1.6.2 documentation</title>
   
 
   
@@ -63,7 +63,7 @@
             
             
               <div class="version">
-                1.6.1
+                1.6.2
               </div>
             
           
@@ -192,6 +192,8 @@
     <span class="n">attr_list</span> <span class="o">=</span> <span class="p">(</span><span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">parent</span><span class="o">.</span><span class="n">TestCommBase</span><span class="o">.</span><span class="n">attr_list</span><span class="p">)</span>
                  <span class="o">+</span> <span class="p">[</span><span class="s1">&#39;comm_list&#39;</span><span class="p">,</span> <span class="s1">&#39;curr_comm_index&#39;</span><span class="p">])</span>
     <span class="n">ncomm</span> <span class="o">=</span> <span class="mi">2</span>
+    <span class="n">send_pattern</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">recv_pattern</span> <span class="o">=</span> <span class="kc">None</span>
     <span class="n">test_error_send</span> <span class="o">=</span> <span class="kc">None</span>
     <span class="n">test_error_recv</span> <span class="o">=</span> <span class="kc">None</span>
     <span class="n">test_work_comm</span> <span class="o">=</span> <span class="kc">None</span>
@@ -206,8 +208,72 @@
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;dict: Keyword arguments for send instance.&quot;&quot;&quot;</span>
         <span class="n">out</span> <span class="o">=</span> <span class="nb">super</span><span class="p">(</span><span class="n">TestForkComm</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">send_inst_kwargs</span>
         <span class="n">out</span><span class="p">[</span><span class="s1">&#39;ncomm&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ncomm</span>
+        <span class="n">out</span><span class="p">[</span><span class="s1">&#39;pattern&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">send_pattern</span>
         <span class="k">return</span> <span class="n">out</span>
 
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">inst_kwargs</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;dict: Keyword arguments for tested class.&quot;&quot;&quot;</span>
+        <span class="n">out</span> <span class="o">=</span> <span class="nb">super</span><span class="p">(</span><span class="n">TestForkComm</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">inst_kwargs</span>
+        <span class="n">out</span><span class="p">[</span><span class="s1">&#39;pattern&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">recv_pattern</span>
+        <span class="k">return</span> <span class="n">out</span>
+
+<div class="viewcode-block" id="TestForkComm.map_sent2recv"><a class="viewcode-back" href="../../../../yggdrasil.communication.tests.html#yggdrasil.communication.tests.test_ForkComm.TestForkComm.map_sent2recv">[docs]</a>    <span class="k">def</span> <span class="nf">map_sent2recv</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Convert a sent object into a received one.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="p">(((</span><span class="bp">self</span><span class="o">.</span><span class="n">send_instance</span><span class="o">.</span><span class="n">pattern</span> <span class="o">==</span> <span class="s1">&#39;scatter&#39;</span><span class="p">)</span>
+             <span class="ow">and</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="nb">list</span><span class="p">)</span> <span class="ow">and</span> <span class="n">obj</span><span class="p">)):</span>
+            <span class="n">single_obj</span> <span class="o">=</span> <span class="n">obj</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">single_obj</span> <span class="o">=</span> <span class="n">obj</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">recv_instance</span><span class="o">.</span><span class="n">pattern</span> <span class="o">==</span> <span class="s1">&#39;gather&#39;</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">obj</span> <span class="ow">in</span> <span class="p">[</span><span class="sa">b</span><span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="p">[]]:</span>
+                <span class="k">return</span> <span class="p">[]</span>
+            <span class="k">return</span> <span class="p">[</span><span class="n">single_obj</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ncomm</span><span class="p">)]</span>
+        <span class="k">return</span> <span class="n">single_obj</span></div>
+
+<div class="viewcode-block" id="TestForkComm.duplicate_msg"><a class="viewcode-back" href="../../../../yggdrasil.communication.tests.html#yggdrasil.communication.tests.test_ForkComm.TestForkComm.duplicate_msg">[docs]</a>    <span class="k">def</span> <span class="nf">duplicate_msg</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">out</span><span class="p">,</span> <span class="n">direction</span><span class="o">=</span><span class="s1">&#39;send&#39;</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Copy a message for &#39;scatter&#39; communication pattern.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="p">((((</span><span class="n">direction</span> <span class="o">==</span> <span class="s1">&#39;send&#39;</span><span class="p">)</span>
+              <span class="ow">and</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">send_instance</span><span class="o">.</span><span class="n">pattern</span> <span class="o">==</span> <span class="s1">&#39;scatter&#39;</span><span class="p">))</span>
+             <span class="ow">or</span> <span class="p">((</span><span class="n">direction</span> <span class="o">==</span> <span class="s1">&#39;recv&#39;</span><span class="p">)</span>
+                 <span class="ow">and</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">recv_instance</span><span class="o">.</span><span class="n">pattern</span> <span class="o">==</span> <span class="s1">&#39;gather&#39;</span><span class="p">)))):</span>
+            <span class="n">out</span> <span class="o">=</span> <span class="p">[</span><span class="n">out</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ncomm</span><span class="p">)]</span>
+        <span class="k">return</span> <span class="n">out</span></div>
+        
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">test_msg</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;str: Test message that should be used for any send/recv tests.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">duplicate_msg</span><span class="p">(</span><span class="nb">super</span><span class="p">(</span><span class="n">TestForkComm</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">test_msg</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">test_msg_array</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;str: Test message that should be used for any send/recv tests.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">duplicate_msg</span><span class="p">(</span><span class="nb">super</span><span class="p">(</span><span class="n">TestForkComm</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">test_msg_array</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">test_msg_dict</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;dict: Test message that should be used for send_dict/recv_dict</span>
+<span class="sd">        tests.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">duplicate_msg</span><span class="p">(</span><span class="nb">super</span><span class="p">(</span><span class="n">TestForkComm</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">test_msg_dict</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">msg_long</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;str: Small test message for sending.&quot;&quot;&quot;</span>
+        <span class="n">out</span> <span class="o">=</span> <span class="nb">super</span><span class="p">(</span><span class="n">TestForkComm</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">test_msg</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">out</span><span class="p">,</span> <span class="nb">bytes</span><span class="p">):</span>
+            <span class="n">out</span> <span class="o">+=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">maxMsgSize</span> <span class="o">*</span> <span class="sa">b</span><span class="s1">&#39;0&#39;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">duplicate_msg</span><span class="p">(</span><span class="n">out</span><span class="p">)</span>
+        
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">msg_filter_send</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;object: Message to filter out on the send side.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">duplicate_msg</span><span class="p">(</span><span class="nb">super</span><span class="p">(</span><span class="n">TestForkComm</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">msg_filter_send</span><span class="p">)</span>
+            
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">msg_filter_recv</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;object: Message to filter out on the recv side.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">duplicate_msg</span><span class="p">(</span><span class="nb">super</span><span class="p">(</span><span class="n">TestForkComm</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">msg_filter_recv</span><span class="p">)</span>
+        
 <div class="viewcode-block" id="TestForkComm.test_error_name"><a class="viewcode-back" href="../../../../yggdrasil.communication.tests.html#yggdrasil.communication.tests.test_ForkComm.TestForkComm.test_error_name">[docs]</a>    <span class="k">def</span> <span class="nf">test_error_name</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test error on missing address.&quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">assert_raises</span><span class="p">(</span><span class="ne">RuntimeError</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">import_cls</span><span class="p">,</span> <span class="s1">&#39;test</span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">uuid</span><span class="o">.</span><span class="n">uuid4</span><span class="p">())</span></div>
@@ -215,21 +281,12 @@
 <div class="viewcode-block" id="TestForkComm.do_send_recv"><a class="viewcode-back" href="../../../../yggdrasil.communication.tests.html#yggdrasil.communication.tests.test_ForkComm.TestForkComm.do_send_recv">[docs]</a>    <span class="k">def</span> <span class="nf">do_send_recv</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Generic send/recv of a message.&quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="p">(((</span><span class="s1">&#39;eof&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;send_meth&#39;</span><span class="p">,</span> <span class="s1">&#39;None&#39;</span><span class="p">))</span>
-             <span class="ow">and</span> <span class="p">(</span><span class="ow">not</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;no_recv&#39;</span><span class="p">,</span> <span class="kc">False</span><span class="p">)))):</span>
+             <span class="ow">and</span> <span class="p">(</span><span class="ow">not</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;no_recv&#39;</span><span class="p">,</span> <span class="kc">False</span><span class="p">))</span>
+             <span class="ow">and</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">send_instance</span><span class="o">.</span><span class="n">pattern</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;broadcast&#39;</span><span class="p">,</span> <span class="s1">&#39;scatter&#39;</span><span class="p">])</span>
+             <span class="ow">and</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">recv_instance</span><span class="o">.</span><span class="n">pattern</span> <span class="o">==</span> <span class="s1">&#39;cycle&#39;</span><span class="p">))):</span>
             <span class="n">kwargs</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s1">&#39;n_recv&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">ncomm</span><span class="p">)</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">TestForkComm</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">do_send_recv</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="TestForkComm.add_filter"><a class="viewcode-back" href="../../../../yggdrasil.communication.tests.html#yggdrasil.communication.tests.test_ForkComm.TestForkComm.add_filter">[docs]</a>    <span class="k">def</span> <span class="nf">add_filter</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">comm</span><span class="p">,</span> <span class="nb">filter</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Add a filter to a comm.</span>
-
-<span class="sd">        Args:</span>
-<span class="sd">            comm (CommBase): Communication instance to add a filter to.</span>
-<span class="sd">            filter (FilterBase, optional): Filter class. Defaults to None and is ignored.</span>
-
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">comm</span><span class="o">.</span><span class="n">comm_list</span><span class="p">:</span>
-            <span class="nb">super</span><span class="p">(</span><span class="n">TestForkComm</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">add_filter</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="nb">filter</span><span class="o">=</span><span class="nb">filter</span><span class="p">)</span></div>
-            
 <div class="viewcode-block" id="TestForkComm.test_send_recv_filter_eof"><a class="viewcode-back" href="../../../../yggdrasil.communication.tests.html#yggdrasil.communication.tests.test_ForkComm.TestForkComm.test_send_recv_filter_eof">[docs]</a>    <span class="k">def</span> <span class="nf">test_send_recv_filter_eof</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test send/recv of EOF with filter.&quot;&quot;&quot;</span>
         <span class="n">kwargs</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s1">&#39;recv_timeout&#39;</span><span class="p">,</span> <span class="mi">2</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">timeout</span><span class="p">)</span>
@@ -242,8 +299,18 @@
         
 <div class="viewcode-block" id="TestForkComm.test_purge"><a class="viewcode-back" href="../../../../yggdrasil.communication.tests.html#yggdrasil.communication.tests.test_ForkComm.TestForkComm.test_purge">[docs]</a>    <span class="k">def</span> <span class="nf">test_purge</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test purging messages from the comm.&quot;&quot;&quot;</span>
-        <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;nrecv&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ncomm</span>
-        <span class="nb">super</span><span class="p">(</span><span class="n">TestForkComm</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">test_purge</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div></div>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">send_instance</span><span class="o">.</span><span class="n">pattern</span> <span class="o">==</span> <span class="s1">&#39;scatter&#39;</span><span class="p">:</span>
+            <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;msg_recv&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">test_msg</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ncomm</span><span class="p">)]</span>
+        <span class="k">if</span> <span class="p">(((</span><span class="bp">self</span><span class="o">.</span><span class="n">send_instance</span><span class="o">.</span><span class="n">pattern</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;broadcast&#39;</span><span class="p">,</span> <span class="s1">&#39;scatter&#39;</span><span class="p">])</span>
+             <span class="ow">and</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">recv_instance</span><span class="o">.</span><span class="n">pattern</span> <span class="o">==</span> <span class="s1">&#39;cycle&#39;</span><span class="p">))):</span>
+            <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;nrecv&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ncomm</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">TestForkComm</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">test_purge</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
+        
+<div class="viewcode-block" id="TestForkComm.test_send_recv_after_close"><a class="viewcode-back" href="../../../../yggdrasil.communication.tests.html#yggdrasil.communication.tests.test_ForkComm.TestForkComm.test_send_recv_after_close">[docs]</a>    <span class="k">def</span> <span class="nf">test_send_recv_after_close</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test that opening twice dosn&#39;t cause errors and that send/recv after</span>
+<span class="sd">        close returns false.&quot;&quot;&quot;</span>
+        <span class="n">kwargs</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s1">&#39;msg_send&#39;</span><span class="p">,</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">test_msg</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ncomm</span><span class="p">)])</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">TestForkComm</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">test_send_recv_after_close</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div></div>
 
 
 <div class="viewcode-block" id="TestForkCommList"><a class="viewcode-back" href="../../../../yggdrasil.communication.tests.html#yggdrasil.communication.tests.test_ForkComm.TestForkCommList">[docs]</a><span class="k">class</span> <span class="nc">TestForkCommList</span><span class="p">(</span><span class="n">TestForkComm</span><span class="p">):</span>
@@ -254,6 +321,35 @@
         <span class="n">out</span> <span class="o">=</span> <span class="nb">super</span><span class="p">(</span><span class="n">TestForkComm</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">inst_kwargs</span>
         <span class="n">out</span><span class="p">[</span><span class="s1">&#39;comm_list&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>  <span class="c1"># To force test of construction from addresses</span>
         <span class="k">return</span> <span class="n">out</span></div>
+
+
+<div class="viewcode-block" id="TestForkCommCycle"><a class="viewcode-back" href="../../../../yggdrasil.communication.tests.html#yggdrasil.communication.tests.test_ForkComm.TestForkCommCycle">[docs]</a><span class="k">class</span> <span class="nc">TestForkCommCycle</span><span class="p">(</span><span class="n">TestForkComm</span><span class="p">):</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Tests for ForkComm communication class with cycle/cycle communication</span>
+<span class="sd">    pattern.&quot;&quot;&quot;</span>
+
+    <span class="n">send_pattern</span> <span class="o">=</span> <span class="s1">&#39;cycle&#39;</span>
+    <span class="n">recv_pattern</span> <span class="o">=</span> <span class="s1">&#39;cycle&#39;</span></div>
+
+
+<div class="viewcode-block" id="TestForkCommScatter"><a class="viewcode-back" href="../../../../yggdrasil.communication.tests.html#yggdrasil.communication.tests.test_ForkComm.TestForkCommScatter">[docs]</a><span class="k">class</span> <span class="nc">TestForkCommScatter</span><span class="p">(</span><span class="n">TestForkComm</span><span class="p">):</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Tests for ForkComm communication class with scatter/gather</span>
+<span class="sd">    communication pattern.&quot;&quot;&quot;</span>
+    
+    <span class="n">send_pattern</span> <span class="o">=</span> <span class="s1">&#39;scatter&#39;</span>
+    <span class="n">recv_pattern</span> <span class="o">=</span> <span class="s1">&#39;gather&#39;</span>
+
+<div class="viewcode-block" id="TestForkCommScatter.test_async_gather"><a class="viewcode-back" href="../../../../yggdrasil.communication.tests.html#yggdrasil.communication.tests.test_ForkComm.TestForkCommScatter.test_async_gather">[docs]</a>    <span class="k">def</span> <span class="nf">test_async_gather</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test scatter-gather w/ intermittent send.&quot;&quot;&quot;</span>
+        <span class="n">test_msg</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">test_msg</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">send_instance</span><span class="o">.</span><span class="n">comm_list</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">send</span><span class="p">(</span><span class="n">test_msg</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+        <span class="n">flag</span><span class="p">,</span> <span class="n">msg_recv</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">recv_instance</span><span class="o">.</span><span class="n">recv</span><span class="p">()</span>
+        <span class="k">assert</span><span class="p">(</span><span class="n">flag</span><span class="p">)</span>
+        <span class="k">assert</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">recv_instance</span><span class="o">.</span><span class="n">is_empty_recv</span><span class="p">(</span><span class="n">msg_recv</span><span class="p">))</span>
+        <span class="k">for</span> <span class="n">msg_send</span><span class="p">,</span> <span class="n">comm</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">test_msg</span><span class="p">[</span><span class="mi">1</span><span class="p">:],</span> <span class="bp">self</span><span class="o">.</span><span class="n">send_instance</span><span class="o">.</span><span class="n">comm_list</span><span class="p">[</span><span class="mi">1</span><span class="p">:]):</span>
+            <span class="k">assert</span><span class="p">(</span><span class="n">comm</span><span class="o">.</span><span class="n">send</span><span class="p">(</span><span class="n">msg_send</span><span class="p">))</span>
+        <span class="n">flag</span><span class="p">,</span> <span class="n">msg_recv</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">recv_instance</span><span class="o">.</span><span class="n">recv</span><span class="p">()</span>
+        <span class="k">assert</span><span class="p">(</span><span class="n">flag</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assert_msg_equal</span><span class="p">(</span><span class="n">msg_recv</span><span class="p">,</span> <span class="n">test_msg</span><span class="p">)</span></div></div>
 </pre></div>
 
            </div>

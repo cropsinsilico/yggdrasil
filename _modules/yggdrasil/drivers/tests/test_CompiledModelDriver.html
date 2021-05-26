@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>yggdrasil.drivers.tests.test_CompiledModelDriver &mdash; yggdrasil 1.6.1 documentation</title>
+  <title>yggdrasil.drivers.tests.test_CompiledModelDriver &mdash; yggdrasil 1.6.2 documentation</title>
   
 
   
@@ -63,7 +63,7 @@
             
             
               <div class="version">
-                1.6.1
+                1.6.2
               </div>
             
           
@@ -581,7 +581,7 @@
             <span class="nb">setattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="p">,</span> <span class="s1">&#39;compiler_tool&#39;</span><span class="p">,</span> <span class="n">v</span><span class="p">)</span>
             <span class="nb">setattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="p">,</span> <span class="s1">&#39;linker_tool&#39;</span><span class="p">,</span> <span class="n">v</span><span class="o">.</span><span class="n">linker</span><span class="p">())</span>
             <span class="nb">setattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="p">,</span> <span class="s1">&#39;archiver_tool&#39;</span><span class="p">,</span> <span class="n">v</span><span class="o">.</span><span class="n">archiver</span><span class="p">())</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="o">.</span><span class="n">compile_model</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="o">.</span><span class="n">compile_model</span><span class="p">(</span><span class="n">use_ccache</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
         <span class="c1"># Restore the old tools</span>
         <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">old_tools</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
             <span class="nb">setattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="p">,</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span><span class="p">)</span></div>

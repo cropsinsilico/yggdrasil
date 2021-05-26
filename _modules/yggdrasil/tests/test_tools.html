@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>yggdrasil.tests.test_tools &mdash; yggdrasil 1.6.1 documentation</title>
+  <title>yggdrasil.tests.test_tools &mdash; yggdrasil 1.6.2 documentation</title>
   
 
   
@@ -63,7 +63,7 @@
             
             
               <div class="version">
-                1.6.1
+                1.6.2
               </div>
             
           
@@ -286,7 +286,15 @@
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test display_source.&quot;&quot;&quot;</span>
     <span class="n">fname</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="vm">__file__</span><span class="p">)</span>
     <span class="n">tools</span><span class="o">.</span><span class="n">display_source</span><span class="p">([</span><span class="n">fname</span><span class="p">],</span> <span class="n">number_lines</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-    <span class="n">tools</span><span class="o">.</span><span class="n">display_source</span><span class="p">([</span><span class="n">fname</span><span class="p">],</span> <span class="n">return_lines</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span></div>
+    <span class="n">tools</span><span class="o">.</span><span class="n">display_source</span><span class="p">([</span><span class="n">fname</span><span class="p">],</span> <span class="n">return_lines</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">tools</span><span class="o">.</span><span class="n">display_source</span><span class="p">(</span><span class="n">test_display_source</span><span class="p">)</span>
+    <span class="n">fname_txt</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">tempfile</span><span class="o">.</span><span class="n">gettempdir</span><span class="p">(),</span> <span class="s1">&#39;unknown_example.invalid&#39;</span><span class="p">)</span>
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">fname_txt</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">fd</span><span class="p">:</span>
+        <span class="n">fd</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;hello&#39;</span><span class="p">)</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">tools</span><span class="o">.</span><span class="n">display_source</span><span class="p">(</span><span class="n">fname_txt</span><span class="p">)</span>
+    <span class="k">finally</span><span class="p">:</span>
+        <span class="n">os</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">fname_txt</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="test_display_source_diff"><a class="viewcode-back" href="../../../yggdrasil.tests.html#yggdrasil.tests.test_tools.test_display_source_diff">[docs]</a><span class="k">def</span> <span class="nf">test_display_source_diff</span><span class="p">():</span>
@@ -300,6 +308,8 @@
     <span class="k">try</span><span class="p">:</span>
         <span class="n">tools</span><span class="o">.</span><span class="n">display_source_diff</span><span class="p">(</span><span class="n">fname1</span><span class="p">,</span> <span class="n">fname2</span><span class="p">,</span> <span class="n">number_lines</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
         <span class="n">tools</span><span class="o">.</span><span class="n">display_source_diff</span><span class="p">(</span><span class="n">fname1</span><span class="p">,</span> <span class="n">fname2</span><span class="p">,</span> <span class="n">return_lines</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="n">tools</span><span class="o">.</span><span class="n">display_source_diff</span><span class="p">(</span><span class="n">test_display_source_diff</span><span class="p">,</span>
+                                  <span class="n">test_display_source_diff</span><span class="p">)</span>
     <span class="k">finally</span><span class="p">:</span>
         <span class="n">os</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">fname2</span><span class="p">)</span></div>
 

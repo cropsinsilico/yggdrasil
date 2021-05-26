@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>yggdrasil.drivers.tests.test_ModelDriver &mdash; yggdrasil 1.6.1 documentation</title>
+  <title>yggdrasil.drivers.tests.test_ModelDriver &mdash; yggdrasil 1.6.2 documentation</title>
   
 
   
@@ -63,7 +63,7 @@
             
             
               <div class="version">
-                1.6.1
+                1.6.2
               </div>
             
           
@@ -459,7 +459,8 @@
 
 <div class="viewcode-block" id="TestModelDriverNoInit.test_write_function_def"><a class="viewcode-back" href="../../../../yggdrasil.drivers.tests.html#yggdrasil.drivers.tests.test_ModelDriver.TestModelDriverNoInit.test_write_function_def">[docs]</a>    <span class="k">def</span> <span class="nf">test_write_function_def</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">inputs</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">outputs</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
                                 <span class="n">outputs_in_inputs</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-                                <span class="n">declare_functions_as_var</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+                                <span class="n">declare_functions_as_var</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                                <span class="n">guess_at_outputs_in_inputs</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test writing and running a function definition.&quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="n">declare_functions_as_var</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">declare_functions_as_var</span> <span class="o">=</span> <span class="kc">False</span>
@@ -511,10 +512,14 @@
                 <span class="n">skip_interface</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
             <span class="n">parsed</span> <span class="o">=</span> <span class="kc">None</span>
             <span class="k">try</span><span class="p">:</span>
+                <span class="n">kwargs</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">contents</span><span class="o">=</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">definition</span><span class="p">),</span>
+                              <span class="n">expected_outputs</span><span class="o">=</span><span class="n">outputs</span><span class="p">,</span>
+                              <span class="n">outputs_in_inputs</span><span class="o">=</span><span class="n">outputs_in_inputs</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">guess_at_outputs_in_inputs</span><span class="p">:</span>
+                    <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;expected_outputs&#39;</span><span class="p">)</span>
+                    <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;outputs_in_inputs&#39;</span><span class="p">)</span>
                 <span class="n">parsed</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">import_cls</span><span class="o">.</span><span class="n">parse_function_definition</span><span class="p">(</span>
-                    <span class="kc">None</span><span class="p">,</span> <span class="s1">&#39;test_function&#39;</span><span class="p">,</span> <span class="n">contents</span><span class="o">=</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">definition</span><span class="p">),</span>
-                    <span class="n">outputs_in_inputs</span><span class="o">=</span><span class="n">outputs_in_inputs</span><span class="p">,</span>
-                    <span class="n">expected_outputs</span><span class="o">=</span><span class="n">outputs</span><span class="p">)</span>
+                    <span class="kc">None</span><span class="p">,</span> <span class="s1">&#39;test_function&#39;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">assert_equal</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">parsed</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;inputs&#39;</span><span class="p">,</span> <span class="p">[])),</span> <span class="nb">len</span><span class="p">(</span><span class="n">inputs</span><span class="p">))</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">assert_equal</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">parsed</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;outputs&#39;</span><span class="p">,</span> <span class="p">[])),</span> <span class="nb">len</span><span class="p">(</span><span class="n">outputs</span><span class="p">))</span>
             <span class="k">except</span> <span class="ne">BaseException</span><span class="p">:</span>  <span class="c1"># pragma: debug</span>

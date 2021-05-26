@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>yggdrasil.drivers.tests package &mdash; yggdrasil 1.6.1 documentation</title>
+  <title>yggdrasil.drivers.tests package &mdash; yggdrasil 1.6.2 documentation</title>
   
 
   
@@ -63,7 +63,7 @@
             
             
               <div class="version">
-                1.6.1
+                1.6.2
               </div>
             
           
@@ -2472,6 +2472,20 @@ False otherwise.</p>
 </dd></dl>
 
 <dl class="py method">
+<dt class="sig sig-object py" id="yggdrasil.drivers.tests.test_FortranModelDriver.TestFortranModelDriverNoInit.test_write_function_def_guess">
+<span class="sig-name descname"><span class="pre">test_write_function_def_guess</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/drivers/tests/test_FortranModelDriver.html#TestFortranModelDriverNoInit.test_write_function_def_guess"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yggdrasil.drivers.tests.test_FortranModelDriver.TestFortranModelDriverNoInit.test_write_function_def_guess" title="Permalink to this definition">¶</a></dt>
+<dd><p>Test writing and running a function definition where outputs
+are determined from the intents.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="yggdrasil.drivers.tests.test_FortranModelDriver.TestFortranModelDriverNoInit.test_write_function_def_return">
+<span class="sig-name descname"><span class="pre">test_write_function_def_return</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/drivers/tests/test_FortranModelDriver.html#TestFortranModelDriverNoInit.test_write_function_def_return"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yggdrasil.drivers.tests.test_FortranModelDriver.TestFortranModelDriverNoInit.test_write_function_def_return" title="Permalink to this definition">¶</a></dt>
+<dd><p>Test writing and running a function definition that returns output
+(rather than passing output but parameter reference).</p>
+</dd></dl>
+
+<dl class="py method">
 <dt class="sig sig-object py" id="yggdrasil.drivers.tests.test_FortranModelDriver.TestFortranModelDriverNoInit.test_write_function_def_single">
 <span class="sig-name descname"><span class="pre">test_write_function_def_single</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/drivers/tests/test_FortranModelDriver.html#TestFortranModelDriverNoInit.test_write_function_def_single"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yggdrasil.drivers.tests.test_FortranModelDriver.TestFortranModelDriverNoInit.test_write_function_def_single" title="Permalink to this definition">¶</a></dt>
 <dd><p>Test writing and running a function definition with single output.</p>
@@ -2875,7 +2889,7 @@ False otherwise.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="yggdrasil.drivers.tests.test_ModelDriver.TestModelDriverNoInit.test_write_function_def">
-<span class="sig-name descname"><span class="pre">test_write_function_def</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">inputs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">outputs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">outputs_in_inputs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">declare_functions_as_var</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/drivers/tests/test_ModelDriver.html#TestModelDriverNoInit.test_write_function_def"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yggdrasil.drivers.tests.test_ModelDriver.TestModelDriverNoInit.test_write_function_def" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">test_write_function_def</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">inputs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">outputs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">outputs_in_inputs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">declare_functions_as_var</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">guess_at_outputs_in_inputs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/drivers/tests/test_ModelDriver.html#TestModelDriverNoInit.test_write_function_def"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yggdrasil.drivers.tests.test_ModelDriver.TestModelDriverNoInit.test_write_function_def" title="Permalink to this definition">¶</a></dt>
 <dd><p>Test writing and running a function definition.</p>
 </dd></dl>
 

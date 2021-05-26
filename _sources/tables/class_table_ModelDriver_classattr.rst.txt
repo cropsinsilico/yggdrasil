@@ -17,6 +17,8 @@ base_languages           Other programming languages that this driver and the in
                          language are dependent on (e.g. Matlab models require Python).                                     
 brackets                 A pair of opening and clossing characters that are used by the language to mark               tuple
                          blocks. Set to None and ignored by default.                                                        
+comms_implicit           True if the comms installed for this driver are not explicitly defined (depend                bool 
+                         on input parameters). Defaults to False.                                                           
 executable_type          'compiler' or 'interpreter' to indicate the type of the executable for the                    str  
                          language. [AUTOMATED]                                                                              
 external_libraries       Information on external libraries required for running models in the target                   dict 
@@ -34,6 +36,8 @@ internal_libraries       Information on internal libraries required for running 
                          language using yggdrasil.                                                                          
 is_typed                 True if the language is typed, False otherwise.                                               bool 
 language_aliases         Additional/alternative names that the language may be known by.                               list 
+no_executable            True if there is not an executable associated with the language driver. Defaults              bool 
+                         to False.                                                                                          
 outputs_in_inputs        If True, outputs are passed by pointer as inputs for modification and the return              bool 
                          value should be a flag. Defaults to False.                                                         
 version_flags            Flags that should be called with the language executable to determine the                     list 

@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>yggdrasil.drivers.FortranModelDriver &mdash; yggdrasil 1.6.1 documentation</title>
+  <title>yggdrasil.drivers.FortranModelDriver &mdash; yggdrasil 1.6.2 documentation</title>
   
 
   
@@ -63,7 +63,7 @@
             
             
               <div class="version">
-                1.6.1
+                1.6.2
               </div>
             
           
@@ -837,9 +837,24 @@
                       <span class="n">x</span><span class="o">.</span><span class="n">groupdict</span><span class="p">()[</span><span class="s1">&#39;name&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;,&#39;</span><span class="p">)]</span>
             <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">x_vars</span><span class="p">:</span>
                 <span class="n">var_type_map</span><span class="p">[</span><span class="n">v</span><span class="p">]</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">groupdict</span><span class="p">()[</span><span class="s1">&#39;type&#39;</span><span class="p">]</span>
-        <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">out</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;inputs&#39;</span><span class="p">,</span> <span class="p">[])</span> <span class="o">+</span> <span class="n">out</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;outputs&#39;</span><span class="p">,</span> <span class="p">[]):</span>
+        <span class="n">allvars</span> <span class="o">=</span> <span class="n">out</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;inputs&#39;</span><span class="p">,</span> <span class="p">[])</span> <span class="o">+</span> <span class="n">out</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;outputs&#39;</span><span class="p">,</span> <span class="p">[])</span>
+        <span class="k">if</span> <span class="n">out</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;flag_var&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">out</span><span class="p">[</span><span class="s1">&#39;flag_var&#39;</span><span class="p">][</span><span class="s1">&#39;name&#39;</span><span class="p">]</span>
+                                          <span class="ow">in</span> <span class="n">var_type_map</span><span class="p">):</span>
+            <span class="n">allvars</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">out</span><span class="p">[</span><span class="s1">&#39;flag_var&#39;</span><span class="p">])</span>
+        <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">allvars</span><span class="p">:</span>
             <span class="n">x</span><span class="p">[</span><span class="s1">&#39;native_type&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">var_type_map</span><span class="p">[</span><span class="n">x</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">]]</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
             <span class="n">x</span><span class="p">[</span><span class="s1">&#39;datatype&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">get_json_type</span><span class="p">(</span><span class="n">x</span><span class="p">[</span><span class="s1">&#39;native_type&#39;</span><span class="p">])</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">out</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;outputs&#39;</span><span class="p">,</span> <span class="p">[]):</span>
+            <span class="n">idx_out</span> <span class="o">=</span> <span class="p">[</span><span class="n">i</span> <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">x</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">out</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;inputs&#39;</span><span class="p">,</span> <span class="p">[]))</span>
+                       <span class="k">if</span> <span class="s1">&#39;intent(out)&#39;</span> <span class="ow">in</span> <span class="n">x</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;native_type&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">lower</span><span class="p">()]</span>
+            <span class="k">if</span> <span class="n">idx_out</span><span class="p">:</span>
+                <span class="n">out</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s1">&#39;outputs&#39;</span><span class="p">,</span> <span class="p">[])</span>
+                <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">idx_out</span><span class="p">:</span>
+                    <span class="n">out</span><span class="p">[</span><span class="s1">&#39;outputs&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">cls</span><span class="o">.</span><span class="n">input2output</span><span class="p">(</span><span class="n">out</span><span class="p">[</span><span class="s1">&#39;inputs&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="n">i</span><span class="p">)))</span>
+        <span class="k">if</span> <span class="s1">&#39;flag_var&#39;</span> <span class="ow">in</span> <span class="n">out</span><span class="p">:</span>
+            <span class="n">outputs_in_inputs</span> <span class="o">=</span> <span class="n">out</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;outputs_in_inputs&#39;</span><span class="p">,</span>
+                                        <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;outputs_in_inputs&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">))</span>
+            <span class="bp">cls</span><span class="o">.</span><span class="n">check_flag_var</span><span class="p">(</span><span class="n">out</span><span class="p">,</span> <span class="n">outputs_in_inputs</span><span class="o">=</span><span class="n">outputs_in_inputs</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">out</span></div>
 
 <div class="viewcode-block" id="FortranModelDriver.update_io_from_function"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.FortranModelDriver.FortranModelDriver.update_io_from_function">[docs]</a>    <span class="nd">@classmethod</span>
@@ -1016,6 +1031,9 @@
             <span class="n">kwargs</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span>
                 <span class="s1">&#39;function_keys&#39;</span><span class="p">,</span>
                 <span class="p">(</span><span class="s1">&#39;subroutine_def_begin&#39;</span><span class="p">,</span> <span class="s1">&#39;subroutine_def_end&#39;</span><span class="p">))</span>
+        <span class="k">elif</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;outputs_in_inputs&#39;</span><span class="p">,</span> <span class="kc">False</span><span class="p">):</span>
+            <span class="k">for</span> <span class="n">o</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;outputs&#39;</span><span class="p">,</span> <span class="p">[]):</span>
+                <span class="n">o</span><span class="p">[</span><span class="s1">&#39;intent&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;out&#39;</span>
         <span class="c1"># Package is required for new datatypes</span>
         <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;skip_interface&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">False</span>
         <span class="k">return</span> <span class="nb">super</span><span class="p">(</span><span class="n">FortranModelDriver</span><span class="p">,</span> <span class="bp">cls</span><span class="p">)</span><span class="o">.</span><span class="n">write_function_def</span><span class="p">(</span>
@@ -1113,6 +1131,10 @@
 
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">out</span> <span class="o">=</span> <span class="nb">super</span><span class="p">(</span><span class="n">FortranModelDriver</span><span class="p">,</span> <span class="bp">cls</span><span class="p">)</span><span class="o">.</span><span class="n">write_declaration</span><span class="p">(</span><span class="n">var</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="k">if</span> <span class="p">((</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">var</span><span class="p">,</span> <span class="nb">dict</span><span class="p">)</span> <span class="ow">and</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;is_argument&#39;</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>
+             <span class="ow">and</span> <span class="n">var</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;intent&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">))):</span>
+            <span class="n">out</span> <span class="o">=</span> <span class="p">[(</span><span class="s1">&#39;, intent(</span><span class="si">%s</span><span class="s1">) :: &#39;</span> <span class="o">%</span> <span class="n">var</span><span class="p">[</span><span class="s1">&#39;intent&#39;</span><span class="p">])</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">o</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39; :: &#39;</span><span class="p">))</span>
+                   <span class="k">for</span> <span class="n">o</span> <span class="ow">in</span> <span class="n">out</span><span class="p">]</span>
         <span class="k">if</span> <span class="p">((</span><span class="bp">cls</span><span class="o">.</span><span class="n">allows_realloc</span><span class="p">(</span><span class="n">var</span><span class="p">)</span>
              <span class="ow">and</span> <span class="p">(</span><span class="ow">not</span> <span class="bp">cls</span><span class="o">.</span><span class="n">allows_realloc</span><span class="p">(</span><span class="n">var</span><span class="p">,</span> <span class="n">from_native_type</span><span class="o">=</span><span class="kc">True</span><span class="p">)))):</span>
             <span class="n">var</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">var</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s1">&#39;</span><span class="si">%s</span><span class="s1">_realloc&#39;</span> <span class="o">%</span> <span class="n">var</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">])</span>

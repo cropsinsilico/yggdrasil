@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>yggdrasil.communication package &mdash; yggdrasil 1.6.1 documentation</title>
+  <title>yggdrasil.communication package &mdash; yggdrasil 1.6.2 documentation</title>
   
 
   
@@ -63,7 +63,7 @@
             
             
               <div class="version">
-                1.6.1
+                1.6.2
               </div>
             
           
@@ -336,7 +336,7 @@ recv (list): List of objects that will be received from a test</p>
 <dl class="py class">
 <dt class="sig sig-object py" id="yggdrasil.communication.AsyncComm.AsyncComm">
 <em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">yggdrasil.communication.AsyncComm.</span></span><span class="sig-name descname"><span class="pre">AsyncComm</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">wrapped</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">async_recv_method</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'recv'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">async_send_method</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'send_message'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">async_recv_kwargs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">async_send_kwargs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/communication/AsyncComm.html#AsyncComm"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yggdrasil.communication.AsyncComm.AsyncComm" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">yggdrasil.tools.ProxyObject</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">yggdrasil.components.ComponentBaseUnregistered</span></code></p>
+<dd><p>Bases: <a class="reference internal" href="advanced/code_python.html#yggdrasil.tools.ProxyObject" title="yggdrasil.tools.ProxyObject"><code class="xref py py-class docutils literal notranslate"><span class="pre">yggdrasil.tools.ProxyObject</span></code></a>, <a class="reference internal" href="advanced/code_python.html#yggdrasil.components.ComponentBaseUnregistered" title="yggdrasil.components.ComponentBaseUnregistered"><code class="xref py py-class docutils literal notranslate"><span class="pre">yggdrasil.components.ComponentBaseUnregistered</span></code></a></p>
 <p>Class for handling asynchronous I/O.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -361,7 +361,7 @@ sending message from the backlog. Defaults to {}.</p></li>
 message in the recv backlog.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type</dt>
-<dd class="field-odd"><p>multitasking.Event</p>
+<dd class="field-odd"><p><a class="reference internal" href="advanced/code_python.html#yggdrasil.multitasking.Event" title="yggdrasil.multitasking.Event">multitasking.Event</a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -1023,7 +1023,7 @@ supported languages.</p>
 <dl class="py class">
 <dt class="sig sig-object py" id="yggdrasil.communication.BufferComm.LockedBuffer">
 <em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">yggdrasil.communication.BufferComm.</span></span><span class="sig-name descname"><span class="pre">LockedBuffer</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/communication/BufferComm.html#LockedBuffer"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yggdrasil.communication.BufferComm.LockedBuffer" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">yggdrasil.multitasking.Queue</span></code></p>
+<dd><p>Bases: <a class="reference internal" href="advanced/code_python.html#yggdrasil.multitasking.Queue" title="yggdrasil.multitasking.Queue"><code class="xref py py-class docutils literal notranslate"><span class="pre">yggdrasil.multitasking.Queue</span></code></a></p>
 <p>Buffer intended to be shared between threads/processes.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="yggdrasil.communication.BufferComm.LockedBuffer.append">
@@ -1104,20 +1104,9 @@ directly connected to a ServerComm. Defaults to False.</p></li>
 </dd></dl>
 
 <dl class="py attribute">
-<dt class="sig sig-object py" id="yggdrasil.communication.ClientComm.ClientComm.icomm">
-<span class="sig-name descname"><span class="pre">icomm</span></span><a class="headerlink" href="#yggdrasil.communication.ClientComm.ClientComm.icomm" title="Permalink to this definition">¶</a></dt>
-<dd><p>Response comms keyed to the ID of the associated request.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.9)">dict</a></p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="yggdrasil.communication.ClientComm.ClientComm.icomm_order">
-<span class="sig-name descname"><span class="pre">icomm_order</span></span><a class="headerlink" href="#yggdrasil.communication.ClientComm.ClientComm.icomm_order" title="Permalink to this definition">¶</a></dt>
-<dd><p>Response comm keys in the order or the requests.</p>
+<dt class="sig sig-object py" id="yggdrasil.communication.ClientComm.ClientComm.request_order">
+<span class="sig-name descname"><span class="pre">request_order</span></span><a class="headerlink" href="#yggdrasil.communication.ClientComm.ClientComm.request_order" title="Permalink to this definition">¶</a></dt>
+<dd><p>Order of request IDs.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type</dt>
 <dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.9)">list</a></p>
@@ -1126,9 +1115,31 @@ directly connected to a ServerComm. Defaults to False.</p></li>
 </dd></dl>
 
 <dl class="py attribute">
+<dt class="sig sig-object py" id="yggdrasil.communication.ClientComm.ClientComm.responses">
+<span class="sig-name descname"><span class="pre">responses</span></span><a class="headerlink" href="#yggdrasil.communication.ClientComm.ClientComm.responses" title="Permalink to this definition">¶</a></dt>
+<dd><p>Mapping between request IDs and response messages.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.9)">dict</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
 <dt class="sig sig-object py" id="yggdrasil.communication.ClientComm.ClientComm.ocomm">
 <span class="sig-name descname"><span class="pre">ocomm</span></span><a class="headerlink" href="#yggdrasil.communication.ClientComm.ClientComm.ocomm" title="Permalink to this definition">¶</a></dt>
 <dd><p>Request comm.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>Comm</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="yggdrasil.communication.ClientComm.ClientComm.icomm">
+<span class="sig-name descname"><span class="pre">icomm</span></span><a class="headerlink" href="#yggdrasil.communication.ClientComm.ClientComm.icomm" title="Permalink to this definition">¶</a></dt>
+<dd><p>Response comm.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type</dt>
 <dd class="field-odd"><p>Comm</p>
@@ -1416,12 +1427,6 @@ method.</p></li>
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="yggdrasil.communication.ClientComm.ClientComm.remove_response_comm">
-<span class="sig-name descname"><span class="pre">remove_response_comm</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/communication/ClientComm.html#ClientComm.remove_response_comm"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yggdrasil.communication.ClientComm.ClientComm.remove_response_comm" title="Permalink to this definition">¶</a></dt>
-<dd><p>Remove response comm.</p>
-</dd></dl>
-
-<dl class="py method">
 <dt class="sig sig-object py" id="yggdrasil.communication.ClientComm.ClientComm.rpcCall">
 <span class="sig-name descname"><span class="pre">rpcCall</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/communication/ClientComm.html#ClientComm.rpcCall"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yggdrasil.communication.ClientComm.ClientComm.rpcCall" title="Permalink to this definition">¶</a></dt>
 <dd><p>Alias for RPCComm.call</p>
@@ -1474,7 +1479,7 @@ comm’s send_message method.</p></li>
 <dl class="py class">
 <dt class="sig sig-object py" id="yggdrasil.communication.CommBase.CommBase">
 <em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">yggdrasil.communication.CommBase.</span></span><span class="sig-name descname"><span class="pre">CommBase</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/communication/CommBase.html#CommBase"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yggdrasil.communication.CommBase.CommBase" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">yggdrasil.tools.YggClass</span></code></p>
+<dd><p>Bases: <a class="reference internal" href="advanced/code_python.html#yggdrasil.tools.YggClass" title="yggdrasil.tools.YggClass"><code class="xref py py-class docutils literal notranslate"><span class="pre">yggdrasil.tools.YggClass</span></code></a></p>
 <p>Class for handling I/O.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -1992,6 +1997,27 @@ this will block until the comm is closed.</p></li>
 </dd></dl>
 
 <dl class="py method">
+<dt class="sig sig-object py" id="yggdrasil.communication.CommBase.CommBase.coerce_to_dict">
+<span class="sig-name descname"><span class="pre">coerce_to_dict</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">msg</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">key_order</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">metadata</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/communication/CommBase.html#CommBase.coerce_to_dict"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yggdrasil.communication.CommBase.CommBase.coerce_to_dict" title="Permalink to this definition">¶</a></dt>
+<dd><p>Convert a message to a dictionary.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>msg</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.9)"><em>object</em></a>) – Message to convert to a dictionary.</p></li>
+<li><p><strong>key_order</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.9)"><em>list</em></a>) – Key order to use for the output dictionary.</p></li>
+<li><p><strong>metadata</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.9)"><em>dict</em></a>) – Header data to accompany the message.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Converted message.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.9)">dict</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
 <dt class="sig sig-object py" id="yggdrasil.communication.CommBase.CommBase.comm_count">
 <em class="property"><span class="pre">classmethod</span> </em><span class="sig-name descname"><span class="pre">comm_count</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/communication/CommBase.html#CommBase.comm_count"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yggdrasil.communication.CommBase.CommBase.comm_count" title="Permalink to this definition">¶</a></dt>
 <dd><p>int: Number of communication connections.</p>
@@ -2123,6 +2149,23 @@ handled.</p>
 </dd></dl>
 
 <dl class="py method">
+<dt class="sig sig-object py" id="yggdrasil.communication.CommBase.CommBase.extract_key_order">
+<span class="sig-name descname"><span class="pre">extract_key_order</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/communication/CommBase.html#CommBase.extract_key_order"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yggdrasil.communication.CommBase.CommBase.extract_key_order" title="Permalink to this definition">¶</a></dt>
+<dd><p>Extract the key order from keyword arguments.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>kwargs</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.9)"><em>dict</em></a>) – Keyword arguments.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Key order.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.9)">list</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
 <dt class="sig sig-object py" id="yggdrasil.communication.CommBase.CommBase.finalize_message">
 <span class="sig-name descname"><span class="pre">finalize_message</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">msg</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">skip_processing</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">skip_python2language</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">after_finalize_message</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/communication/CommBase.html#CommBase.finalize_message"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yggdrasil.communication.CommBase.CommBase.finalize_message" title="Permalink to this definition">¶</a></dt>
 <dd><p>Perform actions to decipher a message. The order of steps is</p>
@@ -2156,6 +2199,17 @@ finalization. Defaults to None and is ignored.</p></li>
 </dd>
 <dt class="field-odd">Return type</dt>
 <dd class="field-odd"><p><a class="reference internal" href="#yggdrasil.communication.CommBase.CommMessage" title="yggdrasil.communication.CommBase.CommMessage">CommMessage</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="yggdrasil.communication.CommBase.CommBase.full_model_name">
+<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">full_model_name</span></span><a class="headerlink" href="#yggdrasil.communication.CommBase.CommBase.full_model_name" title="Permalink to this definition">¶</a></dt>
+<dd><p>Name of the model using the comm w/ copy suffix.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)">str</a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -2633,7 +2687,7 @@ action.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="yggdrasil.communication.CommBase.CommBase.prepare_message">
-<span class="sig-name descname"><span class="pre">prepare_message</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">header_kwargs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">skip_serialization</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">skip_processing</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">skip_language2python</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">after_prepare_message</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/communication/CommBase.html#CommBase.prepare_message"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yggdrasil.communication.CommBase.CommBase.prepare_message" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">prepare_message</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">header_kwargs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">skip_serialization</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">skip_processing</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">skip_language2python</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">after_prepare_message</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">flag</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/communication/CommBase.html#CommBase.prepare_message"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yggdrasil.communication.CommBase.CommBase.prepare_message" title="Permalink to this definition">¶</a></dt>
 <dd><p>Perform actions preparing to send a message. The order of steps is</p>
 <blockquote>
 <div><ol class="arabic simple">
@@ -2662,6 +2716,9 @@ skipped. Defaults to False.</p></li>
 <li><p><strong>after_prepare_message</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.9)"><em>list</em></a><em>, </em><em>optional</em>) – Functions that should be applied
 after transformation, but before serialization. Defaults to None
 and is ignored.</p></li>
+<li><p><strong>flag</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><em>int</em></a><em>, </em><em>optional</em>) – Flag that should be added to the message
+before any additional processing is performed. Defaults to
+None and is ignored.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
@@ -3265,7 +3322,7 @@ method of the worker comm for each message.</p>
 <dl class="py class">
 <dt class="sig sig-object py" id="yggdrasil.communication.CommBase.CommServer">
 <em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">yggdrasil.communication.CommBase.</span></span><span class="sig-name descname"><span class="pre">CommServer</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/communication/CommBase.html#CommServer"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yggdrasil.communication.CommBase.CommServer" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">yggdrasil.multitasking.YggTaskLoop</span></code></p>
+<dd><p>Bases: <a class="reference internal" href="advanced/code_python.html#yggdrasil.multitasking.YggTaskLoop" title="yggdrasil.multitasking.YggTaskLoop"><code class="xref py py-class docutils literal notranslate"><span class="pre">yggdrasil.multitasking.YggTaskLoop</span></code></a></p>
 <p>Basic server object to keep track of clients.</p>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="yggdrasil.communication.CommBase.CommServer.cli_count">
@@ -3295,7 +3352,7 @@ method of the worker comm for each message.</p>
 <dl class="py class">
 <dt class="sig sig-object py" id="yggdrasil.communication.CommBase.CommTaskLoop">
 <em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">yggdrasil.communication.CommBase.</span></span><span class="sig-name descname"><span class="pre">CommTaskLoop</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/communication/CommBase.html#CommTaskLoop"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yggdrasil.communication.CommBase.CommTaskLoop" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">yggdrasil.multitasking.YggTaskLoop</span></code></p>
+<dd><p>Bases: <a class="reference internal" href="advanced/code_python.html#yggdrasil.multitasking.YggTaskLoop" title="yggdrasil.multitasking.YggTaskLoop"><code class="xref py py-class docutils literal notranslate"><span class="pre">yggdrasil.multitasking.YggTaskLoop</span></code></a></p>
 <p>Task loop for comms to ensure cleanup.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -3988,6 +4045,22 @@ to False.</p>
 stored.</p></li>
 <li><p><strong>comm_list</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.9)"><em>list</em></a><em>, </em><em>optional</em>) – The list of options for the comms that
 should be bundled. If not provided, the bundle will be empty.</p></li>
+<li><p><strong>pattern</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a><em>, </em><em>optional</em>) – <p>The communication pattern that should be
+used to handle outgoing/incoming messages. Options include:</p>
+<blockquote>
+<div><dl class="simple">
+<dt>’cycle’: Receive from or send to the next available comm in</dt><dd><p>the list (default for receiving comms).</p>
+</dd>
+<dt>’broadcast’: [SEND ONLY] Send the same message to each comm</dt><dd><p>(default for sending comms).</p>
+</dd>
+<dt>’scatter’: [SEND ONLY] Send part of message (must be a list)</dt><dd><p>to each comm.</p>
+</dd>
+<dt>’gather’: [RECV ONLY] Receive lists of messages from each</dt><dd><p>comm where a message is only returned when there is a
+message from each.</p>
+</dd>
+</dl>
+</div></blockquote>
+</p></li>
 <li><p><strong>**kwargs</strong> – Additional keyword arguments are passed to the parent class.</p></li>
 </ul>
 </dd>
@@ -4049,6 +4122,27 @@ should be bundled. If not provided, the bundle will be empty.</p></li>
 </dd></dl>
 
 <dl class="py method">
+<dt class="sig sig-object py" id="yggdrasil.communication.ForkComm.ForkComm.coerce_to_dict">
+<span class="sig-name descname"><span class="pre">coerce_to_dict</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">msg</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">key_order</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">metadata</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/communication/ForkComm.html#ForkComm.coerce_to_dict"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yggdrasil.communication.ForkComm.ForkComm.coerce_to_dict" title="Permalink to this definition">¶</a></dt>
+<dd><p>Convert a message to a dictionary.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>msg</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.9)"><em>object</em></a>) – Message to convert to a dictionary.</p></li>
+<li><p><strong>key_order</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.9)"><em>list</em></a>) – Key order to use for the output dictionary.</p></li>
+<li><p><strong>metadata</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.9)"><em>dict</em></a>) – Header data to accompany the message.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Converted message.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.9)">dict</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
 <dt class="sig sig-object py" id="yggdrasil.communication.ForkComm.ForkComm.confirm_recv">
 <span class="sig-name descname"><span class="pre">confirm_recv</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">noblock</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/communication/ForkComm.html#ForkComm.confirm_recv"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yggdrasil.communication.ForkComm.ForkComm.confirm_recv" title="Permalink to this definition">¶</a></dt>
 <dd><p>Confirm that message was received.</p>
@@ -4082,6 +4176,17 @@ should be bundled. If not provided, the bundle will be empty.</p></li>
 <span class="sig-name descname"><span class="pre">drain_server_signon_messages</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/communication/ForkComm.html#ForkComm.drain_server_signon_messages"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yggdrasil.communication.ForkComm.ForkComm.drain_server_signon_messages" title="Permalink to this definition">¶</a></dt>
 <dd><p>Drain server signon messages. This should only be used
 for testing purposes.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="yggdrasil.communication.ForkComm.ForkComm.empty_obj_recv">
+<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">empty_obj_recv</span></span><a class="headerlink" href="#yggdrasil.communication.ForkComm.ForkComm.empty_obj_recv" title="Permalink to this definition">¶</a></dt>
+<dd><p>Empty message object.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>obj</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py method">
@@ -4122,23 +4227,6 @@ finalize_message method.</p></li>
 <dd><p>True if all sent messages have been confirmed.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)">bool</a></p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="yggdrasil.communication.ForkComm.ForkComm.is_empty_recv">
-<span class="sig-name descname"><span class="pre">is_empty_recv</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">msg</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/communication/ForkComm.html#ForkComm.is_empty_recv"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yggdrasil.communication.ForkComm.ForkComm.is_empty_recv" title="Permalink to this definition">¶</a></dt>
-<dd><p>Check if a received message object is empty.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>msg</strong> (<em>obj</em>) – Message object.</p>
-</dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><p>True if the object is empty, False otherwise.</p>
-</dd>
-<dt class="field-odd">Return type</dt>
 <dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)">bool</a></p>
 </dd>
 </dl>
@@ -4370,9 +4458,20 @@ method.</p></li>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="yggdrasil.communication.ForkComm.ForkedCommMessage">
-<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">yggdrasil.communication.ForkComm.</span></span><span class="sig-name descname"><span class="pre">ForkedCommMessage</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">msg</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">comm_list</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/communication/ForkComm.html#ForkedCommMessage"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yggdrasil.communication.ForkComm.ForkedCommMessage" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">yggdrasil.communication.ForkComm.</span></span><span class="sig-name descname"><span class="pre">ForkedCommMessage</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">msg</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">comm_list</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pattern</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'broadcast'</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/communication/ForkComm.html#ForkedCommMessage"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yggdrasil.communication.ForkComm.ForkedCommMessage" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#yggdrasil.communication.CommBase.CommMessage" title="yggdrasil.communication.CommBase.CommMessage"><code class="xref py py-class docutils literal notranslate"><span class="pre">yggdrasil.communication.CommBase.CommMessage</span></code></a></p>
 <p>Class for forked comm messages.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>msg</strong> (<a class="reference internal" href="#yggdrasil.communication.CommBase.CommMessage" title="yggdrasil.communication.CommBase.CommMessage"><em>CommBase.CommMessage</em></a>) – Message being distributed.</p></li>
+<li><p><strong>comm_list</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.9)"><em>list</em></a>) – List of communicators that the message is
+being distributed to.</p></li>
+<li><p><strong>**kwargs</strong> – Additional keyword arguments are passed to the ‘prepare_message’
+method for each communicator.</p></li>
+</ul>
+</dd>
+</dl>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="yggdrasil.communication.ForkComm.ForkedCommMessage.orig">
 <span class="sig-name descname"><span class="pre">orig</span></span><a class="headerlink" href="#yggdrasil.communication.ForkComm.ForkedCommMessage.orig" title="Permalink to this definition">¶</a></dt>
@@ -4913,7 +5012,7 @@ established.</p>
 <dd><p>Thread used to run IO loop.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type</dt>
-<dd class="field-odd"><p>multitasking.YggTask</p>
+<dd class="field-odd"><p><a class="reference internal" href="advanced/code_python.html#yggdrasil.multitasking.YggTask" title="yggdrasil.multitasking.YggTask">multitasking.YggTask</a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -5422,6 +5521,22 @@ config value.</p></li>
 <div class="section" id="module-yggdrasil.communication.ServerComm">
 <span id="yggdrasil-communication-servercomm-module"></span><h2>yggdrasil.communication.ServerComm module<a class="headerlink" href="#module-yggdrasil.communication.ServerComm" title="Permalink to this headline">¶</a></h2>
 <dl class="py class">
+<dt class="sig sig-object py" id="yggdrasil.communication.ServerComm.Request">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">yggdrasil.communication.ServerComm.</span></span><span class="sig-name descname"><span class="pre">Request</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">response_address</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">request_id</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/communication/ServerComm.html#Request"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yggdrasil.communication.ServerComm.Request" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="yggdrasil.communication.ServerComm.Request.request_id">
+<span class="sig-name descname"><span class="pre">request_id</span></span><a class="headerlink" href="#yggdrasil.communication.ServerComm.Request.request_id" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="yggdrasil.communication.ServerComm.Request.response_address">
+<span class="sig-name descname"><span class="pre">response_address</span></span><a class="headerlink" href="#yggdrasil.communication.ServerComm.Request.response_address" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
 <dt class="sig sig-object py" id="yggdrasil.communication.ServerComm.ServerComm">
 <em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">yggdrasil.communication.ServerComm.</span></span><span class="sig-name descname"><span class="pre">ServerComm</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/communication/ServerComm.html#ServerComm"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yggdrasil.communication.ServerComm.ServerComm" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#yggdrasil.communication.CommBase.CommBase" title="yggdrasil.communication.CommBase.CommBase"><code class="xref py py-class docutils literal notranslate"><span class="pre">yggdrasil.communication.CommBase.CommBase</span></code></a></p>
@@ -5767,18 +5882,6 @@ method.</p></li>
 </dd>
 <dt class="field-odd">Return type</dt>
 <dd class="field-odd"><p><a class="reference internal" href="#yggdrasil.communication.CommBase.CommMessage" title="yggdrasil.communication.CommBase.CommMessage">CommMessage</a></p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="yggdrasil.communication.ServerComm.ServerComm.remove_response_comm">
-<span class="sig-name descname"><span class="pre">remove_response_comm</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">response_id</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/communication/ServerComm.html#ServerComm.remove_response_comm"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yggdrasil.communication.ServerComm.ServerComm.remove_response_comm" title="Permalink to this definition">¶</a></dt>
-<dd><p>Remove response comm.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>response_id</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a>) – The ID used to register the response
-comm that should be removed.</p>
 </dd>
 </dl>
 </dd></dl>

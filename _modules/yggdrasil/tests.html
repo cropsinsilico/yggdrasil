@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>yggdrasil.tests &mdash; yggdrasil 1.6.1 documentation</title>
+  <title>yggdrasil.tests &mdash; yggdrasil 1.6.2 documentation</title>
   
 
   
@@ -63,7 +63,7 @@
             
             
               <div class="version">
-                1.6.1
+                1.6.2
               </div>
             
           
@@ -199,7 +199,7 @@
 <span class="kn">import</span> <span class="nn">functools</span>
 <span class="k">try</span><span class="p">:</span>
     <span class="kn">import</span> <span class="nn">pytest</span>
-<span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
+<span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>  <span class="c1"># pragma: debug</span>
     <span class="n">pytest</span> <span class="o">=</span> <span class="kc">None</span>
 <span class="kn">import</span> <span class="nn">subprocess</span>
 <span class="kn">from</span> <span class="nn">pandas.testing</span> <span class="kn">import</span> <span class="n">assert_frame_equal</span>
@@ -689,7 +689,7 @@
     <span class="n">args_remove</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;--clear-cache&#39;</span><span class="p">]</span>
     <span class="n">args_remove_value</span> <span class="o">=</span> <span class="p">[]</span>
     <span class="n">args_add</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;--cov-append&#39;</span><span class="p">]</span>
-    <span class="k">if</span> <span class="n">pytest</span> <span class="ow">and</span> <span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">pytest</span><span class="o">.</span><span class="n">__version__</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;.&#39;</span><span class="p">)[</span><span class="mi">0</span><span class="p">])</span> <span class="o">&gt;=</span> <span class="mi">6</span><span class="p">):</span>
+    <span class="k">if</span> <span class="nb">int</span><span class="p">(</span><span class="n">pytest</span><span class="o">.</span><span class="n">__version__</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;.&#39;</span><span class="p">)[</span><span class="mi">0</span><span class="p">])</span> <span class="o">&gt;=</span> <span class="mi">6</span><span class="p">:</span>
         <span class="n">args_add</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;--import-mode=importlib&#39;</span><span class="p">)</span>
     <span class="n">args_remove_value_match</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">([</span><span class="n">k</span> <span class="o">+</span> <span class="s1">&#39;=&#39;</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">args_remove_value</span><span class="p">])</span>
     <span class="n">out</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;args&#39;</span><span class="p">:</span> <span class="p">[],</span> <span class="s1">&#39;rootdir&#39;</span><span class="p">:</span> <span class="kc">None</span><span class="p">}</span>
@@ -743,7 +743,6 @@
 
 
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">assert</span><span class="p">(</span><span class="n">pytest</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">)</span>
     <span class="n">env_flag</span> <span class="o">=</span> <span class="s1">&#39;YGG_IN_TIMEOUT_PROCESS&#39;</span>
     <span class="k">if</span> <span class="n">platform</span><span class="o">.</span><span class="n">_is_win</span><span class="p">:</span>
         <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;method&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;thread&#39;</span>

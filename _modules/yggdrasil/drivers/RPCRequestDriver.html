@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>yggdrasil.drivers.RPCRequestDriver &mdash; yggdrasil 1.6.1 documentation</title>
+  <title>yggdrasil.drivers.RPCRequestDriver &mdash; yggdrasil 1.6.2 documentation</title>
   
 
   
@@ -63,7 +63,7 @@
             
             
               <div class="version">
-                1.6.1
+                1.6.2
               </div>
             
           
@@ -184,32 +184,6 @@
 <span class="kn">from</span> <span class="nn">yggdrasil.drivers.RPCResponseDriver</span> <span class="kn">import</span> <span class="n">RPCResponseDriver</span>
 <span class="kn">from</span> <span class="nn">yggdrasil.communication</span> <span class="kn">import</span> <span class="n">CommBase</span>
 
-<span class="c1"># ----</span>
-<span class="c1"># Client sends resquest to local client output comm</span>
-<span class="c1"># Client recvs response from local client input comm</span>
-<span class="c1"># ----</span>
-<span class="c1"># Client request driver recvs from local client output comm</span>
-<span class="c1"># Client request driver creates client response driver</span>
-<span class="c1"># Client request driver sends to server request comm (w/ response comm header)</span>
-<span class="c1"># ----</span>
-<span class="c1"># Client response driver recvs from client response comm</span>
-<span class="c1"># Client response driver sends to local client input comm</span>
-<span class="c1"># ----</span>
-<span class="c1"># Server recvs request from local server input comm</span>
-<span class="c1"># Server sends response to local server output comm</span>
-<span class="c1"># ----</span>
-<span class="c1"># Server request driver recvs from server request comm</span>
-<span class="c1"># Server request driver creates server response driver</span>
-<span class="c1"># Server request driver sends to local server input comm</span>
-<span class="c1"># ----</span>
-<span class="c1"># Server response driver recvs from local server output comm</span>
-<span class="c1"># Server response driver sends to client response comm</span>
-<span class="c1"># ----</span>
-
-
-<span class="n">YGG_CLIENT_INI</span> <span class="o">=</span> <span class="sa">b</span><span class="s1">&#39;YGG_BEGIN_CLIENT&#39;</span>
-<span class="n">YGG_CLIENT_EOF</span> <span class="o">=</span> <span class="sa">b</span><span class="s1">&#39;YGG_END_CLIENT&#39;</span>
-
 
 <div class="viewcode-block" id="RPCRequestDriver"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.RPCRequestDriver.RPCRequestDriver">[docs]</a><span class="k">class</span> <span class="nc">RPCRequestDriver</span><span class="p">(</span><span class="n">ConnectionDriver</span><span class="p">):</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Class for handling client side RPC type communication.</span>
@@ -220,7 +194,7 @@
 <span class="sd">        **kwargs: Additional keyword arguments are passed to parent class.</span>
 
 <span class="sd">    Attributes:</span>
-<span class="sd">        response_drivers (list): Response drivers created for each request.</span>
+<span class="sd">        response_drivers (dict): Response drivers created for each request.</span>
 
 <span class="sd">    &quot;&quot;&quot;</span>
 
@@ -243,8 +217,18 @@
         <span class="c1"># Parent and attributes</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">RPCRequestDriver</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">model_request_name</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">response_kwargs</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s1">&#39;commtype&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">ocomm</span><span class="o">.</span><span class="n">_commtype</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">response_drivers</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">response_drivers</span> <span class="o">=</span> <span class="p">{}</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_block_response</span> <span class="o">=</span> <span class="kc">False</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">servers_recvd</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;list: Names of server models that have returned responses.&quot;&quot;&quot;</span>
+        <span class="n">out</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">response_drivers</span><span class="o">.</span><span class="n">values</span><span class="p">():</span>
+            <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">x</span><span class="o">.</span><span class="n">models_recvd</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                <span class="n">out</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+                <span class="n">out</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">+=</span> <span class="n">v</span>
+        <span class="k">return</span> <span class="n">out</span>
 
     <span class="nd">@property</span>
     <span class="nd">@run_remotely</span>
@@ -273,9 +257,9 @@
         <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">lock</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Closing response drivers.&quot;</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_block_response</span> <span class="o">=</span> <span class="kc">True</span>
-            <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">response_drivers</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">response_drivers</span><span class="o">.</span><span class="n">values</span><span class="p">():</span>
                 <span class="n">x</span><span class="o">.</span><span class="n">terminate</span><span class="p">()</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">response_drivers</span> <span class="o">=</span> <span class="p">[]</span></div>
+            <span class="bp">self</span><span class="o">.</span><span class="n">response_drivers</span> <span class="o">=</span> <span class="p">{}</span></div>
 
 <div class="viewcode-block" id="RPCRequestDriver.close_comm"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.RPCRequestDriver.RPCRequestDriver.close_comm">[docs]</a>    <span class="k">def</span> <span class="nf">close_comm</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Close response drivers.&quot;&quot;&quot;</span>
@@ -285,7 +269,7 @@
 <div class="viewcode-block" id="RPCRequestDriver.printStatus"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.RPCRequestDriver.RPCRequestDriver.printStatus">[docs]</a>    <span class="k">def</span> <span class="nf">printStatus</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Also print response drivers.&quot;&quot;&quot;</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">RPCRequestDriver</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">printStatus</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
-        <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">response_drivers</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">response_drivers</span><span class="o">.</span><span class="n">values</span><span class="p">():</span>
             <span class="n">x</span><span class="o">.</span><span class="n">printStatus</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="RPCRequestDriver.remove_model"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.RPCRequestDriver.RPCRequestDriver.remove_model">[docs]</a>    <span class="nd">@run_remotely</span>
@@ -302,9 +286,10 @@
 
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">lock</span><span class="p">:</span>
-            <span class="k">if</span> <span class="p">(</span><span class="n">direction</span> <span class="o">==</span> <span class="s2">&quot;input&quot;</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">name</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">clients</span><span class="p">):</span>
+            <span class="n">clients</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">clients</span>
+            <span class="k">if</span> <span class="p">(</span><span class="n">direction</span> <span class="o">==</span> <span class="s2">&quot;input&quot;</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">name</span> <span class="ow">in</span> <span class="n">clients</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">clients</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">):</span>
                 <span class="nb">super</span><span class="p">(</span><span class="n">RPCRequestDriver</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">send_message</span><span class="p">(</span>
-                    <span class="n">CommBase</span><span class="o">.</span><span class="n">CommMessage</span><span class="p">(</span><span class="n">args</span><span class="o">=</span><span class="n">YGG_CLIENT_EOF</span><span class="p">,</span>
+                    <span class="n">CommBase</span><span class="o">.</span><span class="n">CommMessage</span><span class="p">(</span><span class="n">args</span><span class="o">=</span><span class="n">CommBase</span><span class="o">.</span><span class="n">YGG_CLIENT_EOF</span><span class="p">,</span>
                                          <span class="n">flag</span><span class="o">=</span><span class="n">CommBase</span><span class="o">.</span><span class="n">FLAG_SUCCESS</span><span class="p">),</span>
                     <span class="n">header_kwargs</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;raw&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span> <span class="s1">&#39;model&#39;</span><span class="p">:</span> <span class="n">name</span><span class="p">},</span>
                     <span class="n">skip_processing</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
@@ -313,6 +298,17 @@
             <span class="k">if</span> <span class="n">out</span><span class="p">:</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">send_eof</span><span class="p">()</span>
             <span class="k">return</span> <span class="n">out</span></div>
+        
+    <span class="c1"># def send_eof(self):</span>
+    <span class="c1">#     r&quot;&quot;&quot;Send EOF message.</span>
+
+    <span class="c1">#     Returns:</span>
+    <span class="c1">#         bool: Success or failure of send.</span>
+
+    <span class="c1">#     &quot;&quot;&quot;</span>
+    <span class="c1">#     if self.ocomm.partner_copies &gt; 1:</span>
+    <span class="c1">#         self.ocomm.partner_copies = len(self.servers_recvd)</span>
+    <span class="c1">#     return super(RPCRequestDriver, self).send_eof()</span>
         
 <div class="viewcode-block" id="RPCRequestDriver.on_eof"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.RPCRequestDriver.RPCRequestDriver.on_eof">[docs]</a>    <span class="k">def</span> <span class="nf">on_eof</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">msg</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;On EOF, decrement number of clients. Only send EOF if the number</span>
@@ -358,23 +354,32 @@
                 <span class="k">if</span> <span class="p">(</span><span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_comm_open</span><span class="p">)</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">_block_response</span><span class="p">:</span>  <span class="c1"># pragma: debug</span>
                     <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Comm closed, not creating response driver.&quot;</span><span class="p">)</span>
                     <span class="k">return</span> <span class="kc">False</span>
-                <span class="n">drv_args</span> <span class="o">=</span> <span class="p">[</span><span class="n">msg</span><span class="o">.</span><span class="n">header</span><span class="p">[</span><span class="s1">&#39;response_address&#39;</span><span class="p">],</span>
-                            <span class="n">msg</span><span class="o">.</span><span class="n">header</span><span class="p">[</span><span class="s1">&#39;request_id&#39;</span><span class="p">]]</span>
-                <span class="n">drv_kwargs</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span>
-                    <span class="n">request_name</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span>
-                    <span class="n">inputs</span><span class="o">=</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">response_kwargs</span><span class="o">.</span><span class="n">copy</span><span class="p">()],</span>
-                    <span class="n">outputs</span><span class="o">=</span><span class="p">[{</span><span class="s1">&#39;commtype&#39;</span><span class="p">:</span> <span class="n">msg</span><span class="o">.</span><span class="n">header</span><span class="p">[</span><span class="s2">&quot;commtype&quot;</span><span class="p">]}])</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Creating response comm: address = </span><span class="si">%s</span><span class="s2">, request_id = </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span>
-                           <span class="n">msg</span><span class="o">.</span><span class="n">header</span><span class="p">[</span><span class="s1">&#39;response_address&#39;</span><span class="p">],</span> <span class="n">msg</span><span class="o">.</span><span class="n">header</span><span class="p">[</span><span class="s1">&#39;request_id&#39;</span><span class="p">])</span>
-                <span class="k">try</span><span class="p">:</span>
-                    <span class="n">response_driver</span> <span class="o">=</span> <span class="n">RPCResponseDriver</span><span class="p">(</span><span class="o">*</span><span class="n">drv_args</span><span class="p">,</span> <span class="o">**</span><span class="n">drv_kwargs</span><span class="p">)</span>
-                    <span class="bp">self</span><span class="o">.</span><span class="n">response_drivers</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">response_driver</span><span class="p">)</span>
-                    <span class="n">response_driver</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
-                    <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Started response comm: address = </span><span class="si">%s</span><span class="s2">, request_id = </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span>
-                               <span class="n">msg</span><span class="o">.</span><span class="n">header</span><span class="p">[</span><span class="s1">&#39;response_address&#39;</span><span class="p">],</span> <span class="n">msg</span><span class="o">.</span><span class="n">header</span><span class="p">[</span><span class="s1">&#39;request_id&#39;</span><span class="p">])</span>
-                <span class="k">except</span> <span class="ne">BaseException</span><span class="p">:</span>  <span class="c1"># pragma: debug</span>
-                    <span class="bp">self</span><span class="o">.</span><span class="n">exception</span><span class="p">(</span><span class="s2">&quot;Could not create/start response driver.&quot;</span><span class="p">)</span>
-                    <span class="k">return</span> <span class="kc">False</span>
+                
+                <span class="k">if</span> <span class="n">msg</span><span class="o">.</span><span class="n">header</span><span class="p">[</span><span class="s1">&#39;response_address&#39;</span><span class="p">]</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">response_drivers</span><span class="p">:</span>
+                    <span class="n">response_driver</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">response_drivers</span><span class="p">[</span>
+                        <span class="n">msg</span><span class="o">.</span><span class="n">header</span><span class="p">[</span><span class="s1">&#39;response_address&#39;</span><span class="p">]]</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">drv_args</span> <span class="o">=</span> <span class="p">[</span><span class="n">msg</span><span class="o">.</span><span class="n">header</span><span class="p">[</span><span class="s1">&#39;response_address&#39;</span><span class="p">],</span>
+                                <span class="n">msg</span><span class="o">.</span><span class="n">header</span><span class="p">[</span><span class="s1">&#39;request_id&#39;</span><span class="p">]]</span>
+                    <span class="n">drv_kwargs</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span>
+                        <span class="n">request_name</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span>
+                        <span class="n">inputs</span><span class="o">=</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">response_kwargs</span><span class="o">.</span><span class="n">copy</span><span class="p">()],</span>
+                        <span class="n">outputs</span><span class="o">=</span><span class="p">[{</span><span class="s1">&#39;commtype&#39;</span><span class="p">:</span> <span class="n">msg</span><span class="o">.</span><span class="n">header</span><span class="p">[</span><span class="s2">&quot;commtype&quot;</span><span class="p">]}])</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Creating response comm: address = </span><span class="si">%s</span><span class="s2">, request_id = </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span>
+                               <span class="n">msg</span><span class="o">.</span><span class="n">header</span><span class="p">[</span><span class="s1">&#39;response_address&#39;</span><span class="p">],</span>
+                               <span class="n">msg</span><span class="o">.</span><span class="n">header</span><span class="p">[</span><span class="s1">&#39;request_id&#39;</span><span class="p">])</span>
+                    <span class="k">try</span><span class="p">:</span>
+                        <span class="n">response_driver</span> <span class="o">=</span> <span class="n">RPCResponseDriver</span><span class="p">(</span>
+                            <span class="o">*</span><span class="n">drv_args</span><span class="p">,</span> <span class="o">**</span><span class="n">drv_kwargs</span><span class="p">)</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">response_drivers</span><span class="p">[</span>
+                            <span class="n">msg</span><span class="o">.</span><span class="n">header</span><span class="p">[</span><span class="s1">&#39;response_address&#39;</span><span class="p">]]</span> <span class="o">=</span> <span class="n">response_driver</span>
+                        <span class="n">response_driver</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Started response comm: address = </span><span class="si">%s</span><span class="s2">, request_id = </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span>
+                                   <span class="n">msg</span><span class="o">.</span><span class="n">header</span><span class="p">[</span><span class="s1">&#39;response_address&#39;</span><span class="p">],</span>
+                                   <span class="n">msg</span><span class="o">.</span><span class="n">header</span><span class="p">[</span><span class="s1">&#39;request_id&#39;</span><span class="p">])</span>
+                    <span class="k">except</span> <span class="ne">BaseException</span><span class="p">:</span>  <span class="c1"># pragma: debug</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">exception</span><span class="p">(</span><span class="s2">&quot;Could not create/start response driver.&quot;</span><span class="p">)</span>
+                        <span class="k">return</span> <span class="kc">False</span>
             <span class="c1"># Send response address in header</span>
             <span class="n">kwargs</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s1">&#39;header_kwargs&#39;</span><span class="p">,</span> <span class="p">{})</span>
             <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;header_kwargs&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span>
@@ -394,16 +399,17 @@
 <div class="viewcode-block" id="RPCRequestDriver.prune_response_drivers"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.RPCRequestDriver.RPCRequestDriver.prune_response_drivers">[docs]</a>    <span class="k">def</span> <span class="nf">prune_response_drivers</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Remove response drivers that are no longer being used.&quot;&quot;&quot;</span>
         <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">lock</span><span class="p">:</span>
-            <span class="n">remove_idx</span> <span class="o">=</span> <span class="p">[]</span>
-            <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">x</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">response_drivers</span><span class="p">):</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">errors</span> <span class="o">+=</span> <span class="n">x</span><span class="o">.</span><span class="n">errors</span>
-                <span class="k">if</span> <span class="p">(((</span><span class="ow">not</span> <span class="n">x</span><span class="o">.</span><span class="n">is_alive</span><span class="p">())</span>
-                     <span class="ow">and</span> <span class="n">x</span><span class="o">.</span><span class="n">icomm</span><span class="o">.</span><span class="n">is_confirmed_recv</span>
-                     <span class="ow">and</span> <span class="n">x</span><span class="o">.</span><span class="n">ocomm</span><span class="o">.</span><span class="n">is_confirmed_send</span><span class="p">)):</span>
-                    <span class="n">x</span><span class="o">.</span><span class="n">cleanup</span><span class="p">()</span>
-                    <span class="n">remove_idx</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
-            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">remove_idx</span><span class="p">[::</span><span class="o">-</span><span class="mi">1</span><span class="p">]:</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">response_drivers</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="n">i</span><span class="p">)</span></div></div>
+            <span class="c1"># remove_idx = []</span>
+            <span class="c1"># for i, x in enumerate(self.response_drivers):</span>
+            <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">response_drivers</span><span class="o">.</span><span class="n">values</span><span class="p">():</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">errors</span> <span class="o">+=</span> <span class="n">x</span><span class="o">.</span><span class="n">errors</span></div></div>
+            <span class="c1">#     if (((not x.is_alive())</span>
+            <span class="c1">#          and x.icomm.is_confirmed_recv</span>
+            <span class="c1">#          and x.ocomm.is_confirmed_send)):</span>
+            <span class="c1">#         x.cleanup()</span>
+            <span class="c1">#         remove_idx.append(i)</span>
+            <span class="c1"># for i in remove_idx[::-1]:</span>
+            <span class="c1">#     self.response_drivers.pop(i)</span>
 </pre></div>
 
            </div>

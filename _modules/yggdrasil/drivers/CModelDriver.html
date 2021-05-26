@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>yggdrasil.drivers.CModelDriver &mdash; yggdrasil 1.6.1 documentation</title>
+  <title>yggdrasil.drivers.CModelDriver &mdash; yggdrasil 1.6.2 documentation</title>
   
 
   
@@ -63,7 +63,7 @@
             
             
               <div class="version">
-                1.6.1
+                1.6.2
               </div>
             
           
@@ -1233,8 +1233,7 @@
         
 <div class="viewcode-block" id="CModelDriver.update_io_from_function"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.CModelDriver.CModelDriver.update_io_from_function">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">update_io_from_function</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">model_file</span><span class="p">,</span> <span class="n">model_function</span><span class="p">,</span>
-                                <span class="n">inputs</span><span class="o">=</span><span class="p">[],</span> <span class="n">outputs</span><span class="o">=</span><span class="p">[],</span> <span class="n">contents</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-                                <span class="n">outputs_in_inputs</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+                                <span class="n">inputs</span><span class="o">=</span><span class="p">[],</span> <span class="n">outputs</span><span class="o">=</span><span class="p">[],</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Update inputs/outputs from the function definition.</span>
 
 <span class="sd">        Args:</span>
@@ -1245,11 +1244,8 @@
 <span class="sd">                Defaults to [].</span>
 <span class="sd">            outputs (list, optional): List of model outputs including types.</span>
 <span class="sd">                Defaults to [].</span>
-<span class="sd">            contents (str, optional): Contents of file to parse rather than</span>
-<span class="sd">                re-reading the file. Defaults to None and is ignored.</span>
-<span class="sd">            outputs_in_inputs (bool, optional): If True, the outputs are</span>
-<span class="sd">                presented in the function definition as inputs. Defaults</span>
-<span class="sd">                to False.</span>
+<span class="sd">            **kwargs: Additional keyword arguments are passed to the parent</span>
+<span class="sd">                class&#39;s method.</span>
 
 <span class="sd">        Returns:</span>
 <span class="sd">            dict, None: Flag variable used by the model. If None, the</span>
@@ -1258,8 +1254,7 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">flag_var</span> <span class="o">=</span> <span class="nb">super</span><span class="p">(</span><span class="n">CModelDriver</span><span class="p">,</span> <span class="bp">cls</span><span class="p">)</span><span class="o">.</span><span class="n">update_io_from_function</span><span class="p">(</span>
             <span class="n">model_file</span><span class="p">,</span> <span class="n">model_function</span><span class="p">,</span> <span class="n">inputs</span><span class="o">=</span><span class="n">inputs</span><span class="p">,</span>
-            <span class="n">outputs</span><span class="o">=</span><span class="n">outputs</span><span class="p">,</span> <span class="n">contents</span><span class="o">=</span><span class="n">contents</span><span class="p">,</span>
-            <span class="n">outputs_in_inputs</span><span class="o">=</span><span class="n">outputs_in_inputs</span><span class="p">)</span>
+            <span class="n">outputs</span><span class="o">=</span><span class="n">outputs</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
         <span class="c1"># Add length_vars if missing for use by yggdrasil</span>
         <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">inputs</span><span class="p">:</span>
             <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">x</span><span class="p">[</span><span class="s1">&#39;vars&#39;</span><span class="p">]:</span>

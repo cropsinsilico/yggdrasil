@@ -18,6 +18,8 @@ client_of           The names of one or more models that this model will call as
                     for each server the model is a client of. Defaults to empty list. Use of                                 
                     `client_of` with `function` is not currently supported.                                                  
 copies              The number of copies of the model that should be created. Defaults to 1.                      int        
+copy_index          Index of model in set of copies. Defaults to -1 indicating there is only one                  int        
+                    copy of the model.                                                                                       
 function            If provided, an integrated model is created by wrapping the function named here.              str        
                     The function must be located within the file specified by the source file listed                         
                     in the first argument. If not provided, the model must contain it's own calls to                         

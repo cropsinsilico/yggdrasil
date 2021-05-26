@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>yggdrasil.drivers.ExecutableModelDriver &mdash; yggdrasil 1.6.1 documentation</title>
+  <title>yggdrasil.drivers.ExecutableModelDriver &mdash; yggdrasil 1.6.2 documentation</title>
   
 
   
@@ -63,7 +63,7 @@
             
             
               <div class="version">
-                1.6.1
+                1.6.2
               </div>
             
           
@@ -181,7 +181,7 @@
             
   <h1>Source code for yggdrasil.drivers.ExecutableModelDriver</h1><div class="highlight"><pre>
 <span></span><span class="kn">import</span> <span class="nn">platform</span> <span class="k">as</span> <span class="nn">sys_platform</span>
-<span class="kn">from</span> <span class="nn">yggdrasil</span> <span class="kn">import</span> <span class="n">tools</span><span class="p">,</span> <span class="n">platform</span>
+<span class="kn">from</span> <span class="nn">yggdrasil</span> <span class="kn">import</span> <span class="n">platform</span>
 <span class="kn">from</span> <span class="nn">yggdrasil.drivers.ModelDriver</span> <span class="kn">import</span> <span class="n">ModelDriver</span>
 
 
@@ -201,6 +201,8 @@
     <span class="n">_schema_subtype_description</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;Model is an executable.&#39;</span><span class="p">)</span>
     <span class="n">full_language</span> <span class="o">=</span> <span class="kc">False</span>
     <span class="n">executable_type</span> <span class="o">=</span> <span class="s1">&#39;other&#39;</span>
+    <span class="n">no_executable</span> <span class="o">=</span> <span class="kc">True</span>
+    <span class="n">comms_implicit</span> <span class="o">=</span> <span class="kc">True</span>
 
 <div class="viewcode-block" id="ExecutableModelDriver.before_registration"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.ExecutableModelDriver.ExecutableModelDriver.before_registration">[docs]</a>    <span class="nd">@staticmethod</span>
     <span class="k">def</span> <span class="nf">before_registration</span><span class="p">(</span><span class="bp">cls</span><span class="p">):</span>
@@ -268,20 +270,7 @@
 <span class="sd">            bool: True if the language has been configured.</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="kc">True</span></div>
-
-<div class="viewcode-block" id="ExecutableModelDriver.is_comm_installed"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.ExecutableModelDriver.ExecutableModelDriver.is_comm_installed">[docs]</a>    <span class="nd">@classmethod</span>
-    <span class="k">def</span> <span class="nf">is_comm_installed</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">commtype</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Determine if a comm is installed for the associated programming</span>
-<span class="sd">        language.</span>
-
-<span class="sd">        Returns:</span>
-<span class="sd">            bool: True if a comm is installed for this language.</span>
-
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">if</span> <span class="n">commtype</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="k">return</span> <span class="kc">True</span>  <span class="c1"># executables presumed to include comms</span>
-        <span class="k">return</span> <span class="p">(</span><span class="n">commtype</span> <span class="ow">in</span> <span class="n">tools</span><span class="o">.</span><span class="n">get_supported_comm</span><span class="p">())</span></div></div>
+        <span class="k">return</span> <span class="kc">True</span></div></div>
 </pre></div>
 
            </div>

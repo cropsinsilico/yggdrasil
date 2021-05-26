@@ -1,0 +1,910 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+  <title>yggdrasil.config &mdash; yggdrasil 1.6.2 documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/theme_overrides.css" type="text/css" />
+
+  
+  
+
+  
+  
+
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+        <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
+        <script src="../../_static/jquery.js"></script>
+        <script src="../../_static/underscore.js"></script>
+        <script src="../../_static/doctools.js"></script>
+    
+    <script type="text/javascript" src="../../_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../index.html" class="icon icon-home"> yggdrasil
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                1.6.2
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../includeme.html">Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../install.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../getting_started.html">Getting started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../formatted_io.html">Formatted I/O</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../server_client_io.html">Server/Client I/O</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../autowrap.html">Autowrapping Model Functions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../autowrap.html#notes-on-autowrapping-c-c-model-functions">Notes on Autowrapping C/C++ Model Functions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../conditional_io.html">Conditional I/O</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../transformed_io.html">Transformed I/O</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../timesync_io.html">Timestep Synchronization</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../yaml.html">YAML Files</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../config.html">Configuration Files</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../units.html">Units</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../c_format_strings.html">C-Style Format Strings</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../debugging.html">Debugging</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../threading.html">OpenMP Threading in Models</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../examples/examples_toc.html">Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../advanced/index.html">Advanced</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../development/index.html">Development</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../publications.html">Publications</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../hackathon2018/index.html">Welcome to the 2018 Crops in Silico Hackathon!</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../hackathon2019/index.html">Welcome to the 2019 Crops in Silico Hackathon!</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">yggdrasil</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../index.html" class="icon icon-home"></a> &raquo;</li>
+        
+          <li><a href="../index.html">Module code</a> &raquo;</li>
+        
+      <li>yggdrasil.config</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for yggdrasil.config</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">This module imports the configuration for yggdrasil.</span>
+
+<span class="sd">.. todo::</span>
+<span class="sd">   Remove reference to environment variables for accessing config options.</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">sys</span>
+<span class="kn">import</span> <span class="nn">json</span>
+<span class="kn">import</span> <span class="nn">shutil</span>
+<span class="kn">import</span> <span class="nn">logging</span>
+<span class="kn">import</span> <span class="nn">warnings</span>
+<span class="kn">import</span> <span class="nn">configparser</span>
+<span class="kn">import</span> <span class="nn">copy</span>
+<span class="kn">import</span> <span class="nn">argparse</span>
+<span class="kn">from</span> <span class="nn">contextlib</span> <span class="kn">import</span> <span class="n">contextmanager</span>
+<span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">OrderedDict</span>
+<span class="kn">from</span> <span class="nn">yggdrasil</span> <span class="kn">import</span> <span class="n">tools</span>
+<span class="n">env_prefixes</span> <span class="o">=</span> <span class="n">tools</span><span class="o">.</span><span class="n">get_env_prefixes</span><span class="p">()</span>
+<span class="n">config_file</span> <span class="o">=</span> <span class="s1">&#39;.yggdrasil.cfg&#39;</span>
+<span class="n">def_config_file</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="vm">__file__</span><span class="p">),</span> <span class="s1">&#39;defaults.cfg&#39;</span><span class="p">)</span>
+<span class="n">usr_dir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">expanduser</span><span class="p">(</span><span class="s1">&#39;~&#39;</span><span class="p">)</span>
+<span class="k">if</span> <span class="n">env_prefixes</span><span class="p">:</span>
+    <span class="n">usr_dir</span> <span class="o">=</span> <span class="n">env_prefixes</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+<span class="n">usr_config_file</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">usr_dir</span><span class="p">,</span> <span class="n">config_file</span><span class="p">)</span>
+<span class="n">loc_config_file</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">getcwd</span><span class="p">(),</span> <span class="n">config_file</span><span class="p">)</span>
+<span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
+
+
+<span class="c1"># Set associated environment variables</span>
+<span class="n">_cfg_map</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="p">(</span><span class="s1">&#39;debug&#39;</span><span class="p">,</span> <span class="s1">&#39;ygg&#39;</span><span class="p">):</span> <span class="p">{</span>
+        <span class="s1">&#39;env&#39;</span><span class="p">:</span> <span class="s1">&#39;YGG_DEBUG&#39;</span><span class="p">,</span> <span class="s1">&#39;arg&#39;</span><span class="p">:</span> <span class="s1">&#39;loglevel&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;help&#39;</span><span class="p">:</span> <span class="s1">&#39;Logging level for yggdrasil operations.&#39;</span><span class="p">},</span>
+    <span class="p">(</span><span class="s1">&#39;debug&#39;</span><span class="p">,</span> <span class="s1">&#39;rmq&#39;</span><span class="p">,</span> <span class="s1">&#39;RMQ_DEBUG&#39;</span><span class="p">):</span> <span class="p">{</span>
+        <span class="s1">&#39;env&#39;</span><span class="p">:</span> <span class="s1">&#39;YGG_RMQ_DEBUG&#39;</span><span class="p">,</span> <span class="s1">&#39;arg&#39;</span><span class="p">:</span> <span class="s1">&#39;rmq-loglevel&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;help&#39;</span><span class="p">:</span> <span class="s1">&#39;Logging level for RabbitMQ operations.&#39;</span><span class="p">},</span>
+    <span class="p">(</span><span class="s1">&#39;debug&#39;</span><span class="p">,</span> <span class="s1">&#39;client&#39;</span><span class="p">):</span> <span class="p">{</span>
+        <span class="s1">&#39;env&#39;</span><span class="p">:</span> <span class="s1">&#39;YGG_CLIENT_DEBUG&#39;</span><span class="p">,</span> <span class="s1">&#39;arg&#39;</span><span class="p">:</span> <span class="s1">&#39;client-loglevel&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;help&#39;</span><span class="p">:</span> <span class="s1">&#39;Logging level for yggdrasil operations on model processes.&#39;</span><span class="p">},</span>
+    <span class="p">(</span><span class="s1">&#39;jsonschema&#39;</span><span class="p">,</span> <span class="s1">&#39;validate_components&#39;</span><span class="p">):</span> <span class="p">{</span>
+        <span class="s1">&#39;env&#39;</span><span class="p">:</span> <span class="s1">&#39;YGG_VALIDATE_COMPONENTS&#39;</span><span class="p">,</span> <span class="s1">&#39;arg&#39;</span><span class="p">:</span> <span class="s1">&#39;validate-components&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;action&#39;</span><span class="p">:</span> <span class="s1">&#39;store_true&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;help&#39;</span><span class="p">:</span> <span class="p">(</span><span class="s1">&#39;Validate components on creation using their JSON schema &#39;</span>
+                 <span class="s1">&#39;(Decreases performance).&#39;</span><span class="p">)},</span>
+    <span class="p">(</span><span class="s1">&#39;jsonschema&#39;</span><span class="p">,</span> <span class="s1">&#39;validate_messages&#39;</span><span class="p">):</span> <span class="p">{</span>
+        <span class="s1">&#39;env&#39;</span><span class="p">:</span> <span class="s1">&#39;YGG_VALIDATE_MESSAGES&#39;</span><span class="p">,</span> <span class="s1">&#39;arg&#39;</span><span class="p">:</span> <span class="s1">&#39;validate-messages&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="s1">&#39;choices&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;False&#39;</span><span class="p">,</span> <span class="s1">&#39;True&#39;</span><span class="p">,</span> <span class="s1">&#39;First&#39;</span><span class="p">],</span>
+        <span class="s1">&#39;help&#39;</span><span class="p">:</span> <span class="p">(</span><span class="s1">&#39;Which messages should be validated during communication. &#39;</span>
+                 <span class="s1">&#39;</span><span class="se">\&#39;</span><span class="s1">True</span><span class="se">\&#39;</span><span class="s1">: all messages (decreases performance), &#39;</span>
+                 <span class="s1">&#39;</span><span class="se">\&#39;</span><span class="s1">False</span><span class="se">\&#39;</span><span class="s1">: no messages, or &#39;</span>
+                 <span class="s1">&#39;</span><span class="se">\&#39;</span><span class="s1">First</span><span class="se">\&#39;</span><span class="s1">: only the first message a comm sends/receives.&#39;</span><span class="p">)},</span>
+    <span class="p">(</span><span class="s1">&#39;rmq&#39;</span><span class="p">,</span> <span class="s1">&#39;namespace&#39;</span><span class="p">):</span> <span class="p">{</span>
+        <span class="s1">&#39;env&#39;</span><span class="p">:</span> <span class="s1">&#39;YGG_NAMESPACE&#39;</span><span class="p">,</span> <span class="s1">&#39;help&#39;</span><span class="p">:</span> <span class="s1">&#39;RabbitMQ namespace.&#39;</span><span class="p">},</span>
+    <span class="p">(</span><span class="s1">&#39;rmq&#39;</span><span class="p">,</span> <span class="s1">&#39;host&#39;</span><span class="p">):</span> <span class="p">{</span>
+        <span class="s1">&#39;env&#39;</span><span class="p">:</span> <span class="s1">&#39;YGG_MSG_HOST&#39;</span><span class="p">,</span> <span class="s1">&#39;help&#39;</span><span class="p">:</span> <span class="s1">&#39;RabbitMQ host address.&#39;</span><span class="p">},</span>
+    <span class="p">(</span><span class="s1">&#39;rmq&#39;</span><span class="p">,</span> <span class="s1">&#39;vhost&#39;</span><span class="p">):</span> <span class="p">{</span>
+        <span class="s1">&#39;env&#39;</span><span class="p">:</span> <span class="s1">&#39;YGG_MSG_VHOST&#39;</span><span class="p">,</span> <span class="s1">&#39;help&#39;</span><span class="p">:</span> <span class="s1">&#39;RabbitMQ virtual host address.&#39;</span><span class="p">},</span>
+    <span class="p">(</span><span class="s1">&#39;rmq&#39;</span><span class="p">,</span> <span class="s1">&#39;user&#39;</span><span class="p">):</span> <span class="p">{</span>
+        <span class="s1">&#39;env&#39;</span><span class="p">:</span> <span class="s1">&#39;YGG_MSG_USER&#39;</span><span class="p">,</span> <span class="s1">&#39;help&#39;</span><span class="p">:</span> <span class="s1">&#39;RabbitMQ username.&#39;</span><span class="p">},</span>
+    <span class="p">(</span><span class="s1">&#39;rmq&#39;</span><span class="p">,</span> <span class="s1">&#39;password&#39;</span><span class="p">):</span> <span class="p">{</span>
+        <span class="s1">&#39;env&#39;</span><span class="p">:</span> <span class="s1">&#39;YGG_MSG_PW&#39;</span><span class="p">,</span> <span class="s1">&#39;help&#39;</span><span class="p">:</span> <span class="s1">&#39;RabbitMQ password.&#39;</span><span class="p">},</span>
+    <span class="p">(</span><span class="s1">&#39;parallel&#39;</span><span class="p">,</span> <span class="s1">&#39;cluster&#39;</span><span class="p">):</span> <span class="p">{</span>
+        <span class="s1">&#39;env&#39;</span><span class="p">:</span> <span class="s1">&#39;YGG_CLUSTER&#39;</span><span class="p">,</span> <span class="s1">&#39;help&#39;</span><span class="p">:</span> <span class="s1">&#39;Cluster that should be used.&#39;</span><span class="p">},</span>
+    <span class="p">(</span><span class="s1">&#39;testing&#39;</span><span class="p">,</span> <span class="s1">&#39;enable_examples&#39;</span><span class="p">):</span> <span class="p">{</span>
+        <span class="s1">&#39;env&#39;</span><span class="p">:</span> <span class="s1">&#39;YGG_ENABLE_EXAMPLE_TESTS&#39;</span><span class="p">,</span> <span class="s1">&#39;arg&#39;</span><span class="p">:</span> <span class="s1">&#39;with-examples&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;action&#39;</span><span class="p">:</span> <span class="s1">&#39;store_true&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;help&#39;</span><span class="p">:</span> <span class="s1">&#39;Run example tests when encountered.&#39;</span><span class="p">},</span>
+    <span class="p">(</span><span class="s1">&#39;testing&#39;</span><span class="p">,</span> <span class="s1">&#39;enable_demos&#39;</span><span class="p">):</span> <span class="p">{</span>
+        <span class="s1">&#39;env&#39;</span><span class="p">:</span> <span class="s1">&#39;YGG_ENABLE_DEMO_TESTS&#39;</span><span class="p">,</span> <span class="s1">&#39;arg&#39;</span><span class="p">:</span> <span class="s1">&#39;with-demos&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;action&#39;</span><span class="p">:</span> <span class="s1">&#39;store_true&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;help&#39;</span><span class="p">:</span> <span class="s1">&#39;Run demo tests when encountered.&#39;</span><span class="p">},</span>
+    <span class="p">(</span><span class="s1">&#39;testing&#39;</span><span class="p">,</span> <span class="s1">&#39;languages&#39;</span><span class="p">):</span> <span class="p">{</span>
+        <span class="s1">&#39;env&#39;</span><span class="p">:</span> <span class="s1">&#39;YGG_TEST_LANGUAGE&#39;</span><span class="p">,</span> <span class="s1">&#39;arg&#39;</span><span class="p">:</span> <span class="s1">&#39;language&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;default&#39;</span><span class="p">:</span> <span class="p">[],</span> <span class="s1">&#39;nargs&#39;</span><span class="p">:</span> <span class="s1">&#39;+&#39;</span><span class="p">,</span> <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="s1">&#39;help&#39;</span><span class="p">:</span> <span class="s1">&#39;Language(s) that sould not be tested.&#39;</span><span class="p">},</span>
+    <span class="p">(</span><span class="s1">&#39;testing&#39;</span><span class="p">,</span> <span class="s1">&#39;skip_languages&#39;</span><span class="p">):</span> <span class="p">{</span>
+        <span class="s1">&#39;env&#39;</span><span class="p">:</span> <span class="s1">&#39;YGG_TEST_SKIP_LANGUAGE&#39;</span><span class="p">,</span> <span class="s1">&#39;arg&#39;</span><span class="p">:</span> <span class="s1">&#39;skip-language&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;default&#39;</span><span class="p">:</span> <span class="p">[],</span> <span class="s1">&#39;nargs&#39;</span><span class="p">:</span> <span class="s1">&#39;+&#39;</span><span class="p">,</span> <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="s1">&#39;help&#39;</span><span class="p">:</span> <span class="s1">&#39;Language(s) that sould not be tested.&#39;</span><span class="p">},</span>
+    <span class="p">(</span><span class="s1">&#39;testing&#39;</span><span class="p">,</span> <span class="s1">&#39;enable_long&#39;</span><span class="p">):</span> <span class="p">{</span>
+        <span class="s1">&#39;env&#39;</span><span class="p">:</span> <span class="s1">&#39;YGG_ENABLE_LONG_TESTS&#39;</span><span class="p">,</span> <span class="s1">&#39;arg&#39;</span><span class="p">:</span> <span class="s1">&#39;long-running&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;action&#39;</span><span class="p">:</span> <span class="s1">&#39;store_true&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;help&#39;</span><span class="p">:</span> <span class="s1">&#39;Run long tests when encounterd.&#39;</span><span class="p">},</span>
+    <span class="p">(</span><span class="s1">&#39;testing&#39;</span><span class="p">,</span> <span class="s1">&#39;enable_production_runs&#39;</span><span class="p">):</span> <span class="p">{</span>
+        <span class="s1">&#39;env&#39;</span><span class="p">:</span> <span class="s1">&#39;YGG_TEST_PRODUCTION_RUNS&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;action&#39;</span><span class="p">:</span> <span class="s1">&#39;store_true&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;help&#39;</span><span class="p">:</span> <span class="s1">&#39;Run production level tests when encountered.&#39;</span><span class="p">},</span>
+    <span class="p">(</span><span class="s1">&#39;general&#39;</span><span class="p">,</span> <span class="s1">&#39;default_comm&#39;</span><span class="p">):</span> <span class="p">{</span>
+        <span class="s1">&#39;env&#39;</span><span class="p">:</span> <span class="s1">&#39;YGG_DEFAULT_COMM&#39;</span><span class="p">,</span> <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="s1">&#39;help&#39;</span><span class="p">:</span> <span class="s1">&#39;Comm type that should be used by default.&#39;</span><span class="p">}</span>
+<span class="p">}</span>
+<span class="n">_key2env</span> <span class="o">=</span> <span class="p">{}</span>
+<span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">_cfg_map</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+    <span class="n">arg</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">if</span> <span class="s1">&#39;arg&#39;</span> <span class="ow">in</span> <span class="n">v</span><span class="p">:</span>
+        <span class="n">arg</span> <span class="o">=</span> <span class="p">[</span><span class="n">v</span><span class="p">[</span><span class="s1">&#39;arg&#39;</span><span class="p">]]</span>
+    <span class="k">if</span> <span class="n">k</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;debug&#39;</span><span class="p">]:</span>
+        <span class="n">new_arg</span> <span class="o">=</span> <span class="n">k</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;_&#39;</span><span class="p">,</span> <span class="s1">&#39;-&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">new_arg</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">arg</span><span class="p">:</span>
+            <span class="n">arg</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">new_arg</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">arg</span><span class="p">):</span>
+        <span class="n">_key2env</span><span class="p">[</span><span class="n">x</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;-&#39;</span><span class="p">,</span> <span class="s1">&#39;_&#39;</span><span class="p">)]</span> <span class="o">=</span> <span class="n">v</span><span class="p">[</span><span class="s1">&#39;env&#39;</span><span class="p">]</span>
+        <span class="n">new_arg</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;-&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">new_arg</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">arg</span><span class="p">:</span>
+            <span class="n">arg</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">new_arg</span><span class="p">)</span>
+    <span class="n">v</span><span class="p">[</span><span class="s1">&#39;args&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">arg</span>
+    <span class="n">v</span><span class="p">[</span><span class="s1">&#39;kwargs&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="n">kk</span><span class="p">:</span> <span class="n">v</span><span class="p">[</span><span class="n">kk</span><span class="p">]</span> <span class="k">for</span> <span class="n">kk</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;default&#39;</span><span class="p">,</span> <span class="s1">&#39;type&#39;</span><span class="p">,</span> <span class="s1">&#39;nargs&#39;</span><span class="p">,</span> <span class="s1">&#39;help&#39;</span><span class="p">,</span> <span class="s1">&#39;choices&#39;</span><span class="p">,</span>
+                             <span class="s1">&#39;action&#39;</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">kk</span> <span class="ow">in</span> <span class="n">v</span><span class="p">}</span>
+
+    
+<div class="viewcode-block" id="YggConfigParser"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.config.YggConfigParser">[docs]</a><span class="k">class</span> <span class="nc">YggConfigParser</span><span class="p">(</span><span class="n">configparser</span><span class="o">.</span><span class="n">ConfigParser</span><span class="p">,</span> <span class="nb">object</span><span class="p">):</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Config parser that returns None if option not provided on get.&quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">files</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">files</span> <span class="o">=</span> <span class="n">files</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">YggConfigParser</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+
+<div class="viewcode-block" id="YggConfigParser.reload"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.config.YggConfigParser.reload">[docs]</a>    <span class="k">def</span> <span class="nf">reload</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Reload parameters from the original files.&quot;&quot;&quot;</span>
+        <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">sections</span><span class="p">():</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">remove_section</span><span class="p">(</span><span class="n">s</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_sections</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_dict</span><span class="p">()</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">files</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">files</span><span class="p">)</span></div>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">file_to_update</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;str: Full path to file that should be updated if update_file is</span>
+<span class="sd">        called without an explicit file path.&quot;&quot;&quot;</span>
+        <span class="n">out</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">files</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">out</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">files</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+        <span class="k">return</span> <span class="n">out</span>
+
+<div class="viewcode-block" id="YggConfigParser.update_file"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.config.YggConfigParser.update_file">[docs]</a>    <span class="k">def</span> <span class="nf">update_file</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fname</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Write out updated contents to a file.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            fname (str, optional): Full path to file where contents should be</span>
+<span class="sd">               saved. If None, file_to_update is used. Defaults to None.</span>
+
+<span class="sd">        Raises:</span>
+<span class="sd">            RuntimeError: If fname is None and file_to_update is None.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">fname</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">fname</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">file_to_update</span>
+        <span class="k">if</span> <span class="n">fname</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">&quot;No file provided or set at creation.&quot;</span><span class="p">)</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">fname</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">fd</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">fd</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="YggConfigParser.read"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.config.YggConfigParser.read">[docs]</a>    <span class="k">def</span> <span class="nf">read</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="n">out</span> <span class="o">=</span> <span class="nb">super</span><span class="p">(</span><span class="n">YggConfigParser</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="n">alias_map</span> <span class="o">=</span> <span class="p">[((</span><span class="s1">&#39;debug&#39;</span><span class="p">,</span> <span class="s1">&#39;psi&#39;</span><span class="p">),</span> <span class="p">(</span><span class="s1">&#39;debug&#39;</span><span class="p">,</span> <span class="s1">&#39;ygg&#39;</span><span class="p">)),</span>
+                     <span class="p">((</span><span class="s1">&#39;debug&#39;</span><span class="p">,</span> <span class="s1">&#39;cis&#39;</span><span class="p">),</span> <span class="p">(</span><span class="s1">&#39;debug&#39;</span><span class="p">,</span> <span class="s1">&#39;ygg&#39;</span><span class="p">))]</span>
+        <span class="k">for</span> <span class="n">old</span><span class="p">,</span> <span class="n">new</span> <span class="ow">in</span> <span class="n">alias_map</span><span class="p">:</span>
+            <span class="n">v</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="o">*</span><span class="n">old</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">v</span><span class="p">:</span>  <span class="c1"># pragma: debug</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">new</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">new</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">v</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">out</span></div>
+
+<div class="viewcode-block" id="YggConfigParser.from_files"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.config.YggConfigParser.from_files">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">from_files</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">files</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Construct a config parser from a set of files.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            files (list): One or more files that options should be read from in</span>
+<span class="sd">                the order they should be loaded.</span>
+<span class="sd">            **kwargs: Additional keyword arguments are passed to the class</span>
+<span class="sd">                constructor.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">           YggConfigParser: Config parser with information loaded from the</span>
+<span class="sd">               provided files.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">out</span> <span class="o">=</span> <span class="bp">cls</span><span class="p">(</span><span class="n">files</span><span class="o">=</span><span class="n">files</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="n">out</span><span class="o">.</span><span class="n">reload</span><span class="p">()</span>
+        <span class="k">return</span> <span class="n">out</span></div>
+
+<div class="viewcode-block" id="YggConfigParser.set"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.config.YggConfigParser.set">[docs]</a>    <span class="k">def</span> <span class="nf">set</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">section</span><span class="p">,</span> <span class="n">option</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Set an option.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+            <span class="n">value</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">YggConfigParser</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">section</span><span class="p">,</span> <span class="n">option</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="n">value</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="YggConfigParser.backwards_str2val"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.config.YggConfigParser.backwards_str2val">[docs]</a>    <span class="k">def</span> <span class="nf">backwards_str2val</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">val</span><span class="p">):</span>  <span class="c1"># pragma: no cover</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">out</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">val</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">val</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;[&#39;</span><span class="p">)</span> <span class="ow">and</span> <span class="n">val</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s1">&#39;]&#39;</span><span class="p">):</span>
+                <span class="k">if</span> <span class="n">val</span><span class="p">[</span><span class="mi">1</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">]:</span>
+                    <span class="n">out</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">backwards_str2val</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">strip</span><span class="p">())</span>
+                           <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">val</span><span class="p">[</span><span class="mi">1</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;,&#39;</span><span class="p">)]</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">out</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="k">elif</span> <span class="n">val</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;&#39;&quot;</span><span class="p">)</span> <span class="ow">and</span> <span class="n">val</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s2">&quot;&#39;&quot;</span><span class="p">):</span>
+                <span class="n">out</span> <span class="o">=</span> <span class="n">val</span><span class="o">.</span><span class="n">strip</span><span class="p">(</span><span class="s2">&quot;&#39;&quot;</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">out</span> <span class="o">=</span> <span class="n">val</span>
+        <span class="k">return</span> <span class="n">out</span></div>
+
+<div class="viewcode-block" id="YggConfigParser.get"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.config.YggConfigParser.get">[docs]</a>    <span class="k">def</span> <span class="nf">get</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">section</span><span class="p">,</span> <span class="n">option</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Return None if the section/option does not exist.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            section (str): Name of section.</span>
+<span class="sd">            option (str): Name of option in section.</span>
+<span class="sd">            default (obj, optional): Value that should be returned if the</span>
+<span class="sd">                section and/or option are not found or are an empty string.</span>
+<span class="sd">                Defaults to None.</span>
+<span class="sd">            **kwargs: Additional keyword arguments are passed to the parent</span>
+<span class="sd">                class&#39;s get.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            obj: String entry if the section &amp; option exist, otherwise default.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">section</span> <span class="o">=</span> <span class="n">section</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
+        <span class="n">option</span> <span class="o">=</span> <span class="n">option</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
+        <span class="n">out</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">out</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">and</span> <span class="p">((</span><span class="n">section</span><span class="p">,</span> <span class="n">option</span><span class="p">)</span> <span class="ow">in</span> <span class="n">_cfg_map</span><span class="p">):</span>
+            <span class="n">out</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">_cfg_map</span><span class="p">[(</span><span class="n">section</span><span class="p">,</span> <span class="n">option</span><span class="p">)][</span><span class="s1">&#39;env&#39;</span><span class="p">],</span> <span class="kc">None</span><span class="p">)</span>
+        <span class="k">if</span> <span class="p">(((</span><span class="n">out</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">has_section</span><span class="p">(</span><span class="n">section</span><span class="p">)</span>
+             <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">has_option</span><span class="p">(</span><span class="n">section</span><span class="p">,</span> <span class="n">option</span><span class="p">))):</span>
+            <span class="c1"># Super does not work for ConfigParser as not inherited from object</span>
+            <span class="n">out</span> <span class="o">=</span> <span class="n">configparser</span><span class="o">.</span><span class="n">ConfigParser</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">section</span><span class="p">,</span> <span class="n">option</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="c1"># Count empty strings as not provided</span>
+        <span class="k">if</span> <span class="n">out</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">backwards_str2val</span><span class="p">(</span><span class="n">out</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">default</span></div></div>
+
+
+<div class="viewcode-block" id="get_language_order"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.config.get_language_order">[docs]</a><span class="k">def</span> <span class="nf">get_language_order</span><span class="p">(</span><span class="n">drivers</span><span class="p">):</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Get the correct language order, including any base languages.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        drivers (dict): Drivers in order.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        dict: Drivers in sorted order.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="kn">from</span> <span class="nn">yggdrasil.components</span> <span class="kn">import</span> <span class="n">import_component</span>
+    <span class="n">out</span> <span class="o">=</span> <span class="n">OrderedDict</span><span class="p">()</span>
+    <span class="k">for</span> <span class="n">d</span><span class="p">,</span> <span class="n">drv</span> <span class="ow">in</span> <span class="n">drivers</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+        <span class="k">if</span> <span class="n">d</span> <span class="o">==</span> <span class="s1">&#39;cpp&#39;</span><span class="p">:</span>
+            <span class="n">d</span> <span class="o">=</span> <span class="s1">&#39;c++&#39;</span>
+        <span class="n">new_deps</span> <span class="o">=</span> <span class="n">OrderedDict</span><span class="p">()</span>
+        <span class="n">sub_deps</span> <span class="o">=</span> <span class="n">OrderedDict</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">sub_d</span> <span class="ow">in</span> <span class="n">drv</span><span class="o">.</span><span class="n">base_languages</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">sub_d</span> <span class="ow">in</span> <span class="n">drivers</span><span class="p">:</span>
+                <span class="n">sub_deps</span><span class="p">[</span><span class="n">sub_d</span><span class="p">]</span> <span class="o">=</span> <span class="n">drivers</span><span class="p">[</span><span class="n">sub_d</span><span class="p">]</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">sub_deps</span><span class="p">[</span><span class="n">sub_d</span><span class="p">]</span> <span class="o">=</span> <span class="n">import_component</span><span class="p">(</span><span class="s1">&#39;model&#39;</span><span class="p">,</span> <span class="n">sub_d</span><span class="p">)</span>
+        <span class="n">sub_deps</span> <span class="o">=</span> <span class="n">get_language_order</span><span class="p">(</span><span class="n">sub_deps</span><span class="p">)</span>
+        <span class="n">min_dep</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
+        <span class="k">for</span> <span class="n">sub_d</span><span class="p">,</span> <span class="n">sub_drv</span> <span class="ow">in</span> <span class="n">sub_deps</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="k">if</span> <span class="n">sub_d</span> <span class="ow">in</span> <span class="n">out</span><span class="p">:</span>
+                <span class="n">min_dep</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">min_dep</span><span class="p">,</span> <span class="nb">list</span><span class="p">(</span><span class="n">out</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">sub_d</span><span class="p">))</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">new_deps</span><span class="p">[</span><span class="n">sub_d</span><span class="p">]</span> <span class="o">=</span> <span class="n">sub_drv</span>
+        <span class="k">if</span> <span class="n">d</span> <span class="ow">in</span> <span class="n">out</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+            <span class="n">dpos</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">out</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">d</span><span class="p">)</span>
+            <span class="k">assert</span><span class="p">(</span><span class="n">dpos</span> <span class="o">&gt;</span> <span class="n">min_dep</span><span class="p">)</span>
+            <span class="n">min_dep</span> <span class="o">=</span> <span class="n">dpos</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">new_deps</span><span class="p">[</span><span class="n">d</span><span class="p">]</span> <span class="o">=</span> <span class="n">drv</span>
+        <span class="n">new_out</span> <span class="o">=</span> <span class="n">OrderedDict</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">list</span><span class="p">(</span><span class="n">out</span><span class="o">.</span><span class="n">keys</span><span class="p">())[:(</span><span class="n">min_dep</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)]:</span>
+            <span class="n">new_out</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">out</span><span class="p">[</span><span class="n">k</span><span class="p">]</span>
+        <span class="n">new_out</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">new_deps</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">list</span><span class="p">(</span><span class="n">out</span><span class="o">.</span><span class="n">keys</span><span class="p">())[(</span><span class="n">min_dep</span> <span class="o">+</span> <span class="mi">1</span><span class="p">):]:</span>
+            <span class="n">new_out</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">out</span><span class="p">[</span><span class="n">k</span><span class="p">]</span>
+        <span class="n">out</span> <span class="o">=</span> <span class="n">new_out</span>
+    <span class="k">return</span> <span class="n">out</span></div>
+
+
+<div class="viewcode-block" id="update_language_config"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.config.update_language_config">[docs]</a><span class="k">def</span> <span class="nf">update_language_config</span><span class="p">(</span><span class="n">languages</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">skip_warnings</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                           <span class="n">disable_languages</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">enable_languages</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                           <span class="n">allow_multiple_omp</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">lang_kwargs</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                           <span class="n">overwrite</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Update configuration options for a language driver.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        languages (list, optional): List of languages to configure.</span>
+<span class="sd">            Defaults to None and all supported languages will be</span>
+<span class="sd">            configured.</span>
+<span class="sd">        skip_warnings (bool, optional): If True, warnings about missing options</span>
+<span class="sd">            will not be raised. Defaults to False.</span>
+<span class="sd">        disable_languages (list, optional): List of languages that should be</span>
+<span class="sd">            disabled. Defaults to an empty list.</span>
+<span class="sd">        enable_languages (list, optional): List of languages that should be</span>
+<span class="sd">            enabled. Defaults to an empty list.</span>
+<span class="sd">        allow_multiple_omp (bool, optional): Set the allow_multiple_omp config</span>
+<span class="sd">            option controlling whether or not the KMP_DUPLICATE_LIB_OK environment</span>
+<span class="sd">            variable is set for model environments. Defaults to None and is</span>
+<span class="sd">            ignored.</span>
+<span class="sd">        overwrite (bool, optional): If True, the existing file will be overwritten.</span>
+<span class="sd">            Defaults to False.</span>
+<span class="sd">        verbose (bool, optional): If True, information about the config file</span>
+<span class="sd">            will be displayed. Defaults to False.</span>
+<span class="sd">        lang_kwargs (dict, optional): Dictionary containing language</span>
+<span class="sd">            specific keyword arguments. Defaults to {}.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="kn">from</span> <span class="nn">yggdrasil.components</span> <span class="kn">import</span> <span class="n">import_component</span>
+    <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Updating user configuration file for yggdrasil at:</span><span class="se">\n\t</span><span class="si">%s</span><span class="s2">&quot;</span>
+                    <span class="o">%</span> <span class="n">usr_config_file</span><span class="p">)</span>
+    <span class="n">miss</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">languages</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">or</span> <span class="n">overwrite</span><span class="p">:</span>
+        <span class="n">all_languages</span> <span class="o">=</span> <span class="n">tools</span><span class="o">.</span><span class="n">get_supported_lang</span><span class="p">()</span>
+        <span class="n">languages</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;c&#39;</span><span class="p">,</span> <span class="s1">&#39;c++&#39;</span><span class="p">,</span> <span class="s1">&#39;make&#39;</span><span class="p">,</span> <span class="s1">&#39;cmake&#39;</span><span class="p">,</span> <span class="s1">&#39;python&#39;</span><span class="p">,</span> <span class="s1">&#39;lpy&#39;</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">,</span> <span class="s1">&#39;matlab&#39;</span><span class="p">]</span>
+        <span class="k">for</span> <span class="n">lang</span> <span class="ow">in</span> <span class="n">all_languages</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">lang</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">languages</span><span class="p">:</span>
+                <span class="n">languages</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">lang</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">languages</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
+        <span class="n">languages</span> <span class="o">=</span> <span class="p">[</span><span class="n">languages</span><span class="p">]</span>
+    <span class="k">if</span> <span class="n">disable_languages</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">disable_languages</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">if</span> <span class="n">enable_languages</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">enable_languages</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">if</span> <span class="n">lang_kwargs</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">lang_kwargs</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="k">if</span> <span class="n">overwrite</span><span class="p">:</span>
+        <span class="n">shutil</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="n">def_config_file</span><span class="p">,</span> <span class="n">usr_config_file</span><span class="p">)</span>
+        <span class="n">ygg_cfg_usr</span><span class="o">.</span><span class="n">reload</span><span class="p">()</span>
+    <span class="k">if</span> <span class="n">allow_multiple_omp</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">ygg_cfg_usr</span><span class="o">.</span><span class="n">has_section</span><span class="p">(</span><span class="s1">&#39;general&#39;</span><span class="p">):</span>
+            <span class="n">ygg_cfg_usr</span><span class="o">.</span><span class="n">add_section</span><span class="p">(</span><span class="s1">&#39;general&#39;</span><span class="p">)</span>
+        <span class="n">ygg_cfg_usr</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="s1">&#39;general&#39;</span><span class="p">,</span> <span class="s1">&#39;allow_multiple_omp&#39;</span><span class="p">,</span> <span class="n">allow_multiple_omp</span><span class="p">)</span>
+    <span class="n">drivers</span> <span class="o">=</span> <span class="n">OrderedDict</span><span class="p">([(</span><span class="n">lang</span><span class="p">,</span> <span class="n">import_component</span><span class="p">(</span><span class="s1">&#39;model&#39;</span><span class="p">,</span> <span class="n">lang</span><span class="p">))</span>
+                           <span class="k">for</span> <span class="n">lang</span> <span class="ow">in</span> <span class="n">languages</span><span class="p">])</span>
+    <span class="n">drv</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">get_language_order</span><span class="p">(</span><span class="n">drivers</span><span class="p">)</span><span class="o">.</span><span class="n">values</span><span class="p">())</span>
+    <span class="k">for</span> <span class="n">idrv</span> <span class="ow">in</span> <span class="n">drv</span><span class="p">:</span>
+        <span class="k">if</span> <span class="p">(((</span><span class="n">idrv</span><span class="o">.</span><span class="n">language</span> <span class="ow">in</span> <span class="n">disable_languages</span><span class="p">)</span>
+             <span class="ow">and</span> <span class="p">(</span><span class="n">idrv</span><span class="o">.</span><span class="n">language</span> <span class="ow">in</span> <span class="n">enable_languages</span><span class="p">))):</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">((</span><span class="s2">&quot;</span><span class="si">%s</span><span class="s2"> language both enabled and disabled. &quot;</span>
+                         <span class="s2">&quot;No action will be taken.&quot;</span><span class="p">)</span> <span class="o">%</span> <span class="n">idrv</span><span class="o">.</span><span class="n">language</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">idrv</span><span class="o">.</span><span class="n">language</span> <span class="ow">in</span> <span class="n">disable_languages</span><span class="p">:</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">ygg_cfg_usr</span><span class="o">.</span><span class="n">has_section</span><span class="p">(</span><span class="n">idrv</span><span class="o">.</span><span class="n">language</span><span class="p">):</span>
+                <span class="n">ygg_cfg_usr</span><span class="o">.</span><span class="n">add_section</span><span class="p">(</span><span class="n">idrv</span><span class="o">.</span><span class="n">language</span><span class="p">)</span>
+            <span class="n">ygg_cfg_usr</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">idrv</span><span class="o">.</span><span class="n">language</span><span class="p">,</span> <span class="s1">&#39;disable&#39;</span><span class="p">,</span> <span class="s1">&#39;True&#39;</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">idrv</span><span class="o">.</span><span class="n">language</span> <span class="ow">in</span> <span class="n">enable_languages</span><span class="p">:</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">ygg_cfg_usr</span><span class="o">.</span><span class="n">has_section</span><span class="p">(</span><span class="n">idrv</span><span class="o">.</span><span class="n">language</span><span class="p">):</span>
+                <span class="n">ygg_cfg_usr</span><span class="o">.</span><span class="n">add_section</span><span class="p">(</span><span class="n">idrv</span><span class="o">.</span><span class="n">language</span><span class="p">)</span>
+            <span class="n">ygg_cfg_usr</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">idrv</span><span class="o">.</span><span class="n">language</span><span class="p">,</span> <span class="s1">&#39;disable&#39;</span><span class="p">,</span> <span class="s1">&#39;False&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">ygg_cfg_usr</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">idrv</span><span class="o">.</span><span class="n">language</span><span class="p">,</span> <span class="s1">&#39;disable&#39;</span><span class="p">,</span> <span class="s1">&#39;False&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="o">==</span> <span class="s1">&#39;true&#39;</span><span class="p">:</span>
+            <span class="k">continue</span>  <span class="c1"># pragma: no cover</span>
+        <span class="n">miss</span> <span class="o">+=</span> <span class="n">idrv</span><span class="o">.</span><span class="n">configure</span><span class="p">(</span><span class="n">ygg_cfg_usr</span><span class="p">,</span>
+                               <span class="o">**</span><span class="n">lang_kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">idrv</span><span class="o">.</span><span class="n">language</span><span class="p">,</span> <span class="p">{}))</span>
+    <span class="n">ygg_cfg_usr</span><span class="o">.</span><span class="n">update_file</span><span class="p">()</span>
+    <span class="n">ygg_cfg</span><span class="o">.</span><span class="n">reload</span><span class="p">()</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">skip_warnings</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">sect</span><span class="p">,</span> <span class="n">opt</span><span class="p">,</span> <span class="n">desc</span> <span class="ow">in</span> <span class="n">miss</span><span class="p">:</span>  <span class="c1"># pragma: windows</span>
+            <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">((</span><span class="s2">&quot;Could not set option </span><span class="si">%s</span><span class="s2"> in section </span><span class="si">%s</span><span class="s2">. &quot;</span>
+                           <span class="o">+</span> <span class="s2">&quot;Please set this in </span><span class="si">%s</span><span class="s2"> to: </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">)</span>
+                          <span class="o">%</span> <span class="p">(</span><span class="n">opt</span><span class="p">,</span> <span class="n">sect</span><span class="p">,</span> <span class="n">ygg_cfg_usr</span><span class="o">.</span><span class="n">file_to_update</span><span class="p">,</span> <span class="n">desc</span><span class="p">),</span>
+                          <span class="ne">RuntimeWarning</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">usr_config_file</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">fd</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="n">fd</span><span class="o">.</span><span class="n">read</span><span class="p">())</span></div>
+    
+
+<div class="viewcode-block" id="get_ygg_loglevel"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.config.get_ygg_loglevel">[docs]</a><span class="k">def</span> <span class="nf">get_ygg_loglevel</span><span class="p">(</span><span class="n">cfg</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="s1">&#39;DEBUG&#39;</span><span class="p">):</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Get the current log level.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        cfg (:class:`yggdrasil.config.YggConfigParser`, optional):</span>
+<span class="sd">            Config parser with options that should be used to determine the</span>
+<span class="sd">            log level. Defaults to :data:`yggdrasil.config.ygg_cfg`.</span>
+<span class="sd">        default (str, optional): Log level that should be returned if the log</span>
+<span class="sd">            level option is not set in cfg. Defaults to &#39;DEBUG&#39;.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        str: Log level string.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">is_model</span> <span class="o">=</span> <span class="n">tools</span><span class="o">.</span><span class="n">is_subprocess</span><span class="p">()</span>
+    <span class="k">if</span> <span class="n">cfg</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">cfg</span> <span class="o">=</span> <span class="n">ygg_cfg</span>
+    <span class="k">if</span> <span class="n">is_model</span><span class="p">:</span>
+        <span class="n">opt</span> <span class="o">=</span> <span class="s1">&#39;client&#39;</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">opt</span> <span class="o">=</span> <span class="s1">&#39;ygg&#39;</span>
+    <span class="k">return</span> <span class="n">cfg</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;debug&#39;</span><span class="p">,</span> <span class="n">opt</span><span class="p">,</span> <span class="n">default</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="set_ygg_loglevel"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.config.set_ygg_loglevel">[docs]</a><span class="k">def</span> <span class="nf">set_ygg_loglevel</span><span class="p">(</span><span class="n">level</span><span class="p">,</span> <span class="n">cfg</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Set the current log level.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        level (str): Level that the log should be set to.</span>
+<span class="sd">        cfg (:class:`yggdrasil.config.YggConfigParser`, optional):</span>
+<span class="sd">            Config parser with options that should be used to update the</span>
+<span class="sd">            environment. Defaults to :data:`yggdrasil.config.ygg_cfg`.</span>
+<span class="sd">    </span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">is_model</span> <span class="o">=</span> <span class="n">tools</span><span class="o">.</span><span class="n">is_subprocess</span><span class="p">()</span>
+    <span class="k">if</span> <span class="n">cfg</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">cfg</span> <span class="o">=</span> <span class="n">ygg_cfg</span>
+    <span class="k">if</span> <span class="n">is_model</span><span class="p">:</span>
+        <span class="n">opt</span> <span class="o">=</span> <span class="s1">&#39;client&#39;</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">opt</span> <span class="o">=</span> <span class="s1">&#39;ygg&#39;</span>
+    <span class="n">cfg</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="s1">&#39;debug&#39;</span><span class="p">,</span> <span class="n">opt</span><span class="p">,</span> <span class="n">level</span><span class="p">)</span>
+    <span class="n">logLevelYGG</span> <span class="o">=</span> <span class="nb">eval</span><span class="p">(</span><span class="s1">&#39;logging.</span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">level</span><span class="p">)</span>
+    <span class="n">ygg_logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="s2">&quot;yggdrasil&quot;</span><span class="p">)</span>
+    <span class="n">ygg_logger</span><span class="o">.</span><span class="n">setLevel</span><span class="p">(</span><span class="n">level</span><span class="o">=</span><span class="n">logLevelYGG</span><span class="p">)</span></div>
+        
+    
+<div class="viewcode-block" id="cfg_logging"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.config.cfg_logging">[docs]</a><span class="k">def</span> <span class="nf">cfg_logging</span><span class="p">(</span><span class="n">cfg</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Set logging levels from config options.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        cfg (:class:`yggdrasil.config.YggConfigParser`, optional):</span>
+<span class="sd">            Config parser with options that should be used to update the</span>
+<span class="sd">            environment. Defaults to :data:`yggdrasil.config.ygg_cfg`.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">is_model</span> <span class="o">=</span> <span class="n">tools</span><span class="o">.</span><span class="n">is_subprocess</span><span class="p">()</span>
+    <span class="n">to_stdout</span> <span class="o">=</span> <span class="n">is_model</span>
+    <span class="k">try</span><span class="p">:</span>  <span class="c1"># pragma: no cover</span>
+        <span class="c1"># Direct log messages to stdout in interpreter so that messages</span>
+        <span class="c1"># are not red in notebooks</span>
+        <span class="n">get_ipython</span>  <span class="c1"># noqa: F821</span>
+        <span class="n">in_notebook</span> <span class="o">=</span> <span class="kc">True</span>
+    <span class="k">except</span> <span class="ne">BaseException</span><span class="p">:</span>
+        <span class="n">in_notebook</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="n">to_stdout</span> <span class="o">=</span> <span class="p">(</span><span class="n">is_model</span> <span class="ow">or</span> <span class="n">in_notebook</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">cfg</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">cfg</span> <span class="o">=</span> <span class="n">ygg_cfg</span>
+    <span class="n">log_format</span> <span class="o">=</span> <span class="n">cfg</span><span class="o">.</span><span class="n">get</span><span class="p">(</span>
+        <span class="s1">&#39;debug&#39;</span><span class="p">,</span> <span class="s1">&#39;format&#39;</span><span class="p">,</span>
+        <span class="s2">&quot;</span><span class="si">%(levelname)s</span><span class="s2">:</span><span class="si">%(process)d</span><span class="s2">:</span><span class="si">%(module)s</span><span class="s2">.</span><span class="si">%(funcName)s</span><span class="s2">[</span><span class="si">%(lineno)d</span><span class="s2">]:</span><span class="si">%(message)s</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="n">logLevelYGG</span> <span class="o">=</span> <span class="nb">eval</span><span class="p">(</span>
+        <span class="s1">&#39;logging.</span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span>
+            <span class="s1">&#39;YGG_DEBUG&#39;</span><span class="p">,</span> <span class="n">cfg</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;debug&#39;</span><span class="p">,</span> <span class="s1">&#39;ygg&#39;</span><span class="p">,</span> <span class="s1">&#39;NOTSET&#39;</span><span class="p">)))</span>
+    <span class="n">logLevelRMQ</span> <span class="o">=</span> <span class="nb">eval</span><span class="p">(</span>
+        <span class="s1">&#39;logging.</span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span>
+            <span class="s1">&#39;YGG_RMQ_DEBUG&#39;</span><span class="p">,</span> <span class="n">cfg</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;debug&#39;</span><span class="p">,</span> <span class="s1">&#39;rmq&#39;</span><span class="p">,</span> <span class="s1">&#39;INFO&#39;</span><span class="p">)))</span>
+    <span class="n">logLevelCLI</span> <span class="o">=</span> <span class="nb">eval</span><span class="p">(</span>
+        <span class="s1">&#39;logging.</span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span>
+            <span class="s1">&#39;YGG_CLIENT_DEBUG&#39;</span><span class="p">,</span> <span class="n">cfg</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;debug&#39;</span><span class="p">,</span> <span class="s1">&#39;client&#39;</span><span class="p">,</span> <span class="s1">&#39;INFO&#39;</span><span class="p">)))</span>
+    <span class="k">if</span> <span class="n">is_model</span><span class="p">:</span>
+        <span class="n">logLevelYGG</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;YGG_MODEL_DEBUG&#39;</span><span class="p">,</span> <span class="n">logLevelCLI</span><span class="p">)</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">to_stdout</span><span class="p">:</span>
+        <span class="n">logging</span><span class="o">.</span><span class="n">basicConfig</span><span class="p">(</span><span class="nb">format</span><span class="o">=</span><span class="n">log_format</span><span class="p">)</span>
+    <span class="n">ygg_logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="s2">&quot;yggdrasil&quot;</span><span class="p">)</span>
+    <span class="n">rmq_logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="s2">&quot;pika&quot;</span><span class="p">)</span>
+    <span class="n">ygg_logger</span><span class="o">.</span><span class="n">setLevel</span><span class="p">(</span><span class="n">level</span><span class="o">=</span><span class="n">logLevelYGG</span><span class="p">)</span>
+    <span class="n">rmq_logger</span><span class="o">.</span><span class="n">setLevel</span><span class="p">(</span><span class="n">level</span><span class="o">=</span><span class="n">logLevelRMQ</span><span class="p">)</span>
+    <span class="c1"># For models, route the logs to stdout so that they are</span>
+    <span class="c1"># displayed by the model driver.</span>
+    <span class="k">if</span> <span class="n">to_stdout</span><span class="p">:</span>
+        <span class="n">formatter</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">Formatter</span><span class="p">(</span><span class="n">fmt</span><span class="o">=</span><span class="n">log_format</span><span class="p">)</span>
+        <span class="n">handler</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">StreamHandler</span><span class="p">(</span><span class="n">sys</span><span class="o">.</span><span class="n">stdout</span><span class="p">)</span>
+        <span class="n">handler</span><span class="o">.</span><span class="n">setFormatter</span><span class="p">(</span><span class="n">formatter</span><span class="p">)</span>
+        <span class="n">handler</span><span class="o">.</span><span class="n">setLevel</span><span class="p">(</span><span class="n">logLevelYGG</span><span class="p">)</span>
+        <span class="n">ygg_logger</span><span class="o">.</span><span class="n">handlers</span> <span class="o">=</span> <span class="p">[</span><span class="n">handler</span><span class="p">]</span>
+        <span class="n">rmq_logger</span><span class="o">.</span><span class="n">handlers</span> <span class="o">=</span> <span class="p">[</span><span class="n">handler</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">in_notebook</span><span class="p">:</span>  <span class="c1"># pragma: no cover</span>
+            <span class="n">ygg_logger</span><span class="o">.</span><span class="n">propagate</span> <span class="o">=</span> <span class="kc">False</span>
+            <span class="n">rmq_logger</span><span class="o">.</span><span class="n">propagate</span> <span class="o">=</span> <span class="kc">False</span></div>
+        <span class="c1"># ygg_logger.addHandler(handler)</span>
+        <span class="c1"># rmq_logger.addHandler(handler)</span>
+
+
+<div class="viewcode-block" id="cfg_environment"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.config.cfg_environment">[docs]</a><span class="k">def</span> <span class="nf">cfg_environment</span><span class="p">(</span><span class="n">env</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">cfg</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Set environment variables based on config options.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        env (dict, optional): Dictionary of environment variables that should</span>
+<span class="sd">            be updated. Defaults to `os.environ`.</span>
+<span class="sd">        cfg (:class:`yggdrasil.config.YggConfigParser`, optional):</span>
+<span class="sd">            Config parser with options that should be used to update the</span>
+<span class="sd">            environment. Defaults to :data:`yggdrasil.config.ygg_cfg`.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">env</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">env</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span>
+    <span class="k">if</span> <span class="n">cfg</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">cfg</span> <span class="o">=</span> <span class="n">ygg_cfg</span>
+    <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">_cfg_map</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+        <span class="n">val</span> <span class="o">=</span> <span class="n">cfg</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="o">*</span><span class="n">k</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">val</span><span class="p">:</span>
+            <span class="n">env</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="n">v</span><span class="p">[</span><span class="s1">&#39;env&#39;</span><span class="p">],</span> <span class="n">val</span><span class="p">)</span></div>
+
+            
+<span class="c1"># Initialize config</span>
+<span class="n">ygg_cfg_usr</span> <span class="o">=</span> <span class="n">YggConfigParser</span><span class="o">.</span><span class="n">from_files</span><span class="p">([</span><span class="n">usr_config_file</span><span class="p">])</span>
+<span class="n">ygg_cfg</span> <span class="o">=</span> <span class="n">YggConfigParser</span><span class="o">.</span><span class="n">from_files</span><span class="p">([</span><span class="n">def_config_file</span><span class="p">,</span> <span class="n">usr_config_file</span><span class="p">,</span>
+                                      <span class="n">loc_config_file</span><span class="p">])</span>
+
+
+<span class="c1"># Do initial update of logging &amp; environment (legacy)</span>
+<span class="n">cfg_logging</span><span class="p">()</span>
+<span class="n">cfg_environment</span><span class="p">()</span>
+
+
+<div class="viewcode-block" id="get_config_parser"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.config.get_config_parser">[docs]</a><span class="k">def</span> <span class="nf">get_config_parser</span><span class="p">(</span><span class="n">parser</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">skip_sections</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Create a parser or add to an existing parser arguments based on</span>
+<span class="sd">    configuration options.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        parser (argparse.ArgumentParser, optional): Existing argument parser</span>
+<span class="sd">            that arguments should be added to. Defaults to None and a new</span>
+<span class="sd">            parser is created.</span>
+<span class="sd">        description (str, optional): The description that should be used if</span>
+<span class="sd">            a new parser is created. Defaults to None.</span>
+<span class="sd">        skip_sections (list, optional): Configuration sections that should be</span>
+<span class="sd">            skipped when adding arguments to the parser. Defaults to None and</span>
+<span class="sd">            arguments for all configuration sections will be added.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        argparse.ArgumentParser: Argument parser with arguments added that</span>
+<span class="sd">            are associated with configuration options.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">skip_sections</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">skip_sections</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">if</span> <span class="n">parser</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">parser</span> <span class="o">=</span> <span class="n">argparse</span><span class="o">.</span><span class="n">ArgumentParser</span><span class="p">(</span><span class="n">description</span><span class="o">=</span><span class="n">description</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">_cfg_map</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+        <span class="k">if</span> <span class="n">k</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="ow">in</span> <span class="n">skip_sections</span><span class="p">:</span>
+            <span class="k">continue</span>
+        <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="o">*</span><span class="p">[</span><span class="s1">&#39;--&#39;</span> <span class="o">+</span> <span class="n">x</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">v</span><span class="p">[</span><span class="s1">&#39;args&#39;</span><span class="p">]],</span> <span class="o">**</span><span class="n">v</span><span class="p">[</span><span class="s1">&#39;kwargs&#39;</span><span class="p">])</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;--production-run&#39;</span><span class="p">,</span> <span class="n">action</span><span class="o">=</span><span class="s1">&#39;store_true&#39;</span><span class="p">,</span>
+                        <span class="n">help</span><span class="o">=</span><span class="p">(</span><span class="s1">&#39;Turn off safe guards in order to improve &#39;</span>
+                              <span class="s1">&#39;performance. This is equivalent to &#39;</span>
+                              <span class="s1">&#39;</span><span class="se">\&#39;</span><span class="s1">--validate-components &#39;</span>
+                              <span class="s1">&#39;--validate-messages=True</span><span class="se">\&#39;</span><span class="s1">&#39;</span><span class="p">))</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;--debug&#39;</span><span class="p">,</span> <span class="n">action</span><span class="o">=</span><span class="s1">&#39;store_true&#39;</span><span class="p">,</span>
+                        <span class="n">help</span><span class="o">=</span><span class="p">(</span><span class="s1">&#39;Turn on debugging utilties including &#39;</span>
+                              <span class="s1">&#39;increased logging and validation. This is &#39;</span>
+                              <span class="s1">&#39;equivalent to </span><span class="se">\&#39;</span><span class="s1">--loglevel=DEBUG &#39;</span>
+                              <span class="s1">&#39;--client-loglevel=DEBUG &#39;</span>
+                              <span class="s1">&#39;--validate-components=False &#39;</span>
+                              <span class="s1">&#39;--validate-messages=False</span><span class="se">\&#39;</span><span class="s1">&#39;</span><span class="p">))</span>
+    <span class="k">return</span> <span class="n">parser</span></div>
+
+
+<div class="viewcode-block" id="resolve_config_parser"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.config.resolve_config_parser">[docs]</a><span class="k">def</span> <span class="nf">resolve_config_parser</span><span class="p">(</span><span class="n">args</span><span class="p">):</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Process argument results by setting flags that are set by combination</span>
+<span class="sd">    arguments.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        args (argparse.ArgumentParser): Argument parser to set combination</span>
+<span class="sd">            child flags for.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        argparse.ArgumentParser: Argument parser with child flags for</span>
+<span class="sd">            combination flags set.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">args</span><span class="o">.</span><span class="n">debug</span> <span class="ow">and</span> <span class="n">args</span><span class="o">.</span><span class="n">production_run</span><span class="p">:</span>  <span class="c1"># pragma: debug</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\&#39;</span><span class="s2">--debug</span><span class="se">\&#39;</span><span class="s2"> and </span><span class="se">\&#39;</span><span class="s2">--production-run</span><span class="se">\&#39;</span><span class="s2"> flags are &quot;</span>
+                         <span class="s2">&quot;incompatible.&quot;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">args</span><span class="o">.</span><span class="n">production_run</span><span class="p">:</span>
+        <span class="n">args</span><span class="o">.</span><span class="n">validate_components</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="n">args</span><span class="o">.</span><span class="n">validate_messages</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="k">elif</span> <span class="n">args</span><span class="o">.</span><span class="n">debug</span><span class="p">:</span>
+        <span class="n">args</span><span class="o">.</span><span class="n">loglevel</span> <span class="o">=</span> <span class="s1">&#39;DEBUG&#39;</span>
+        <span class="n">args</span><span class="o">.</span><span class="n">client_loglevel</span> <span class="o">=</span> <span class="s1">&#39;DEBUG&#39;</span>
+        <span class="n">args</span><span class="o">.</span><span class="n">validate_components</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="n">args</span><span class="o">.</span><span class="n">validate_messages</span> <span class="o">=</span> <span class="kc">True</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">args</span><span class="o">.</span><span class="n">loglevel</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">args</span><span class="o">.</span><span class="n">loglevel</span> <span class="o">=</span> <span class="s1">&#39;INFO&#39;</span>
+        <span class="k">if</span> <span class="n">args</span><span class="o">.</span><span class="n">client_loglevel</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">args</span><span class="o">.</span><span class="n">client_loglevel</span> <span class="o">=</span> <span class="s1">&#39;INFO&#39;</span>
+    <span class="k">if</span> <span class="n">args</span><span class="o">.</span><span class="n">validate_messages</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;True&#39;</span><span class="p">,</span> <span class="s1">&#39;False&#39;</span><span class="p">]:</span>
+        <span class="n">args</span><span class="o">.</span><span class="n">validate_messages</span> <span class="o">=</span> <span class="p">(</span><span class="n">args</span><span class="o">.</span><span class="n">validate_messages</span> <span class="o">==</span> <span class="s1">&#39;True&#39;</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">args</span></div>
+
+
+<div class="viewcode-block" id="acquire_env"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.config.acquire_env">[docs]</a><span class="k">def</span> <span class="nf">acquire_env</span><span class="p">(</span><span class="n">new_env</span><span class="p">):</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Get the existing environment variable values and set the environment</span>
+<span class="sd">    based on the provided dictionary.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        new_env (dict): Mapping from configuration key to values that</span>
+<span class="sd">            environment variables should be set to.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        dict: Mapping of environment variables and values that were overridden</span>
+<span class="sd">            by new_env.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">old_env</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="k">if</span> <span class="n">new_env</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;debug&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">)</span> <span class="ow">and</span> <span class="n">new_env</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;production_run&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">):</span>  <span class="c1"># pragma: debug</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;&#39;debug&#39; and &#39;production_run&#39; variables are &quot;</span>
+                         <span class="s2">&quot;incompatible.&quot;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="s1">&#39;production_run&#39;</span> <span class="ow">in</span> <span class="n">new_env</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">new_env</span><span class="p">[</span><span class="s1">&#39;production_run&#39;</span><span class="p">]:</span>
+            <span class="n">new_env</span><span class="p">[</span><span class="s1">&#39;validate_components&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">False</span>
+            <span class="n">new_env</span><span class="p">[</span><span class="s1">&#39;validate_messages&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="n">new_env</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;production_run&#39;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="s1">&#39;debug&#39;</span> <span class="ow">in</span> <span class="n">new_env</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">new_env</span><span class="p">[</span><span class="s1">&#39;debug&#39;</span><span class="p">]:</span>
+            <span class="n">new_env</span><span class="p">[</span><span class="s1">&#39;loglevel&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;DEBUG&#39;</span>
+            <span class="n">new_env</span><span class="p">[</span><span class="s1">&#39;client_loglevel&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;DEBUG&#39;</span>
+            <span class="n">new_env</span><span class="p">[</span><span class="s1">&#39;validate_components&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
+            <span class="n">new_env</span><span class="p">[</span><span class="s1">&#39;validate_messages&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
+    <span class="k">if</span> <span class="n">new_env</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;validate_messages&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">)</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;True&#39;</span><span class="p">,</span> <span class="s1">&#39;False&#39;</span><span class="p">]:</span>
+        <span class="n">new_env</span><span class="p">[</span><span class="s1">&#39;validate_messages&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">new_env</span><span class="p">[</span><span class="s1">&#39;validate_messages&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;True&#39;</span><span class="p">)</span>
+    <span class="c1"># old_env = {k: os.environ.get(k, None) for k in _key2env.values()}</span>
+    <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">new_env</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+        <span class="n">k_env</span> <span class="o">=</span> <span class="n">_key2env</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="n">k</span><span class="p">)</span>
+        <span class="n">old_env</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="n">k_env</span><span class="p">,</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">k_env</span><span class="p">,</span> <span class="kc">None</span><span class="p">))</span>
+        <span class="k">if</span> <span class="p">(((</span><span class="n">k_env</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;YGG_TEST_LANGUAGE&#39;</span><span class="p">,</span> <span class="s1">&#39;YGG_TEST_SKIP_LANGUAGE&#39;</span><span class="p">])</span>
+             <span class="ow">and</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="nb">list</span><span class="p">))):</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">v</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="k">continue</span>
+            <span class="kn">from</span> <span class="nn">yggdrasil.components</span> <span class="kn">import</span> <span class="n">import_component</span>
+            <span class="n">v</span> <span class="o">=</span> <span class="p">[</span><span class="n">import_component</span><span class="p">(</span><span class="s1">&#39;model&#39;</span><span class="p">,</span> <span class="n">x</span><span class="p">)</span><span class="o">.</span><span class="n">language</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">v</span><span class="p">]</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+            <span class="n">v</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">v</span><span class="p">)</span>
+        <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="n">k_env</span><span class="p">]</span> <span class="o">=</span> <span class="n">v</span>
+    <span class="k">if</span> <span class="n">new_env</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;loglevel&#39;</span><span class="p">,</span> <span class="kc">False</span><span class="p">):</span>
+        <span class="n">set_ygg_loglevel</span><span class="p">(</span><span class="n">new_env</span><span class="p">[</span><span class="s1">&#39;loglevel&#39;</span><span class="p">])</span>
+    <span class="k">return</span> <span class="n">old_env</span></div>
+
+
+<div class="viewcode-block" id="restore_env"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.config.restore_env">[docs]</a><span class="k">def</span> <span class="nf">restore_env</span><span class="p">(</span><span class="n">old_env</span><span class="p">):</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Restore environment variables to a previous state.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        old_env (dict): Mapping from environment variable to value for state</span>
+<span class="sd">            that should be restored.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">old_env</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+        <span class="k">if</span> <span class="n">v</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">v</span></div>
+
+
+<div class="viewcode-block" id="parser_config"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.config.parser_config">[docs]</a><span class="nd">@contextmanager</span>
+<span class="k">def</span> <span class="nf">parser_config</span><span class="p">(</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Context manager for a run that modifies configuration options using</span>
+<span class="sd">    values from an argument parser.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        args (argparse.Namespace): Argument parsing results.</span>
+<span class="sd">        **kwargs: Additional environment variable key/value pairs and/or</span>
+<span class="sd">            argument name key/value pairs that should be added to the</span>
+<span class="sd">            environment.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">args</span> <span class="o">=</span> <span class="n">resolve_config_parser</span><span class="p">(</span><span class="n">args</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">k0</span> <span class="ow">in</span> <span class="n">_key2env</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+        <span class="n">k</span> <span class="o">=</span> <span class="n">k0</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;-&#39;</span><span class="p">,</span> <span class="s1">&#39;_&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">args</span><span class="p">,</span> <span class="n">k</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">kwargs</span><span class="p">[</span><span class="n">k0</span><span class="p">]</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">args</span><span class="p">,</span> <span class="n">k</span><span class="p">)</span>
+    <span class="n">old_env</span> <span class="o">=</span> <span class="n">acquire_env</span><span class="p">(</span><span class="n">kwargs</span><span class="p">)</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="k">yield</span>
+    <span class="k">finally</span><span class="p">:</span>
+        <span class="n">restore_env</span><span class="p">(</span><span class="n">old_env</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="temp_config"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.config.temp_config">[docs]</a><span class="nd">@contextmanager</span>
+<span class="k">def</span> <span class="nf">temp_config</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Context manager for a run that modifies configuration options using</span>
+<span class="sd">    a dictionary of key/value pairs.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        **kwargs: Environment variable key/value pairs and/or argument name</span>
+<span class="sd">            key/value pairs that should be added to the environment.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">old_env</span> <span class="o">=</span> <span class="n">acquire_env</span><span class="p">(</span><span class="n">kwargs</span><span class="p">)</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="k">yield</span>
+    <span class="k">finally</span><span class="p">:</span>
+        <span class="n">restore_env</span><span class="p">(</span><span class="n">old_env</span><span class="p">)</span></div>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &#169; Copyright 2017, Meagan Lang, David Raila.
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>yggdrasil.drivers.TimeSyncModelDriver &mdash; yggdrasil 1.6.1 documentation</title>
+  <title>yggdrasil.drivers.TimeSyncModelDriver &mdash; yggdrasil 1.6.2 documentation</title>
   
 
   
@@ -63,7 +63,7 @@
             
             
               <div class="version">
-                1.6.1
+                1.6.2
               </div>
             
           
@@ -353,7 +353,8 @@
                             <span class="n">v</span><span class="o">.</span><span class="n">terminate</span><span class="p">()</span>
                     <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s2">&quot;Error on response thread.&quot;</span><span class="p">)</span>
             <span class="c1"># Receive values from client models</span>
-            <span class="n">flag</span><span class="p">,</span> <span class="n">values</span><span class="p">,</span> <span class="n">request_id</span> <span class="o">=</span> <span class="n">rpc</span><span class="o">.</span><span class="n">recv_from</span><span class="p">(</span><span class="n">timeout</span><span class="o">=</span><span class="mf">1.0</span><span class="p">)</span>
+            <span class="n">flag</span><span class="p">,</span> <span class="n">values</span><span class="p">,</span> <span class="n">request_id</span> <span class="o">=</span> <span class="n">rpc</span><span class="o">.</span><span class="n">recv_from</span><span class="p">(</span><span class="n">timeout</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span>
+                                                     <span class="n">quiet_timeout</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
             <span class="k">if</span> <span class="ow">not</span> <span class="n">flag</span><span class="p">:</span>
                 <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;timesync server: End of input.&quot;</span><span class="p">)</span>
                 <span class="k">break</span>
@@ -362,7 +363,8 @@
                 <span class="k">continue</span>
             <span class="n">t</span><span class="p">,</span> <span class="n">state</span> <span class="o">=</span> <span class="n">values</span><span class="p">[:]</span>
             <span class="n">t_pd</span> <span class="o">=</span> <span class="n">units</span><span class="o">.</span><span class="n">convert_to_pandas_timedelta</span><span class="p">(</span><span class="n">t</span><span class="p">)</span>
-            <span class="n">client_model</span> <span class="o">=</span> <span class="n">rpc</span><span class="o">.</span><span class="n">ocomm</span><span class="p">[</span><span class="n">request_id</span><span class="p">]</span><span class="o">.</span><span class="n">client_model</span>
+            <span class="n">client_model</span> <span class="o">=</span> <span class="n">rpc</span><span class="o">.</span><span class="n">ocomm</span><span class="p">[</span>
+                <span class="n">rpc</span><span class="o">.</span><span class="n">requests</span><span class="p">[</span><span class="n">request_id</span><span class="p">]</span><span class="o">.</span><span class="n">response_address</span><span class="p">]</span><span class="o">.</span><span class="n">client_model</span>
             <span class="c1"># Remove variables marked as external so they are not merged</span>
             <span class="n">external_variables</span> <span class="o">=</span> <span class="n">additional_variables</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">client_model</span><span class="p">,</span> <span class="p">[])</span>
             <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">external_variables</span><span class="p">:</span>
@@ -574,7 +576,7 @@
             <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">tables</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
                 <span class="n">kws</span> <span class="o">=</span> <span class="n">interpolation</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="n">interp_default</span><span class="p">)</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
                 <span class="k">if</span> <span class="n">k</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">open_clients</span><span class="p">:</span>
-                    <span class="c1"># Ensure that clients that have signed of are</span>
+                    <span class="c1"># Ensure that clients that have signed off are</span>
                     <span class="c1"># extrapolated, otherwise they would never produce</span>
                     <span class="c1"># valid data</span>
                     <span class="n">kws</span><span class="p">[</span><span class="s1">&#39;limit_area&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>

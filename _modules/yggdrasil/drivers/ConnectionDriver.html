@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>yggdrasil.drivers.ConnectionDriver &mdash; yggdrasil 1.6.1 documentation</title>
+  <title>yggdrasil.drivers.ConnectionDriver &mdash; yggdrasil 1.6.2 documentation</title>
   
 
   
@@ -63,7 +63,7 @@
             
             
               <div class="version">
-                1.6.1
+                1.6.2
               </div>
             
           
@@ -433,6 +433,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">_init_comms</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">models</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;input&#39;</span><span class="p">:</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">icomm</span><span class="o">.</span><span class="n">model_env</span><span class="o">.</span><span class="n">keys</span><span class="p">()),</span>
                        <span class="s1">&#39;output&#39;</span><span class="p">:</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ocomm</span><span class="o">.</span><span class="n">model_env</span><span class="o">.</span><span class="n">keys</span><span class="p">())}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">models_recvd</span> <span class="o">=</span> <span class="p">{}</span>
         <span class="c1"># self.debug(&#39;    env: %s&#39;, str(self.env))</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">((</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span> <span class="o">+</span> <span class="mi">80</span> <span class="o">*</span> <span class="s1">&#39;=&#39;</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span>
                     <span class="o">+</span> <span class="s1">&#39;class = </span><span class="si">%s</span><span class="se">\n</span><span class="s1">&#39;</span>
@@ -524,13 +525,13 @@
         
 <div class="viewcode-block" id="ConnectionDriver.get_flag_attr"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.ConnectionDriver.ConnectionDriver.get_flag_attr">[docs]</a>    <span class="k">def</span> <span class="nf">get_flag_attr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">attr</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Return the flag attribute.&quot;&quot;&quot;</span>
-        <span class="k">if</span> <span class="n">attr</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">shared</span><span class="p">:</span>
+        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;shared&#39;</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">attr</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">shared</span><span class="p">):</span>
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">shared</span><span class="p">[</span><span class="n">attr</span><span class="p">]</span>
         <span class="k">return</span> <span class="nb">super</span><span class="p">(</span><span class="n">ConnectionDriver</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">get_flag_attr</span><span class="p">(</span><span class="n">attr</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="ConnectionDriver.set_flag_attr"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.ConnectionDriver.ConnectionDriver.set_flag_attr">[docs]</a>    <span class="k">def</span> <span class="nf">set_flag_attr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">attr</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Set a flag.&quot;&quot;&quot;</span>
-        <span class="k">if</span> <span class="n">attr</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">shared</span><span class="p">:</span>
+        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;shared&#39;</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">attr</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">shared</span><span class="p">):</span>
             <span class="n">exist</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">shared</span><span class="p">[</span><span class="n">attr</span><span class="p">]</span>
             <span class="k">if</span> <span class="n">value</span><span class="p">:</span>
                 <span class="n">exist</span><span class="o">.</span><span class="n">set</span><span class="p">()</span>
@@ -574,7 +575,8 @@
 
     <span class="nd">@state</span><span class="o">.</span><span class="n">setter</span>
     <span class="k">def</span> <span class="nf">state</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">shared</span><span class="p">[</span><span class="s1">&#39;state&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">x</span>
+        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;shared&#39;</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">shared</span><span class="p">[</span><span class="s1">&#39;state&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">x</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">close_state</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -760,8 +762,7 @@
         <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_alive</span><span class="p">():</span>
             <span class="k">return</span> <span class="kc">False</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;All </span><span class="si">%s</span><span class="s2"> models have signed off.&quot;</span><span class="p">,</span> <span class="n">direction</span><span class="p">)</span>
-        <span class="k">if</span> <span class="p">(((</span><span class="bp">self</span><span class="o">.</span><span class="n">onexit</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">[</span><span class="kc">None</span><span class="p">,</span> <span class="s1">&#39;on_model_exit&#39;</span><span class="p">,</span>
-                                  <span class="s1">&#39;pass&#39;</span><span class="p">])</span>
+        <span class="k">if</span> <span class="p">(((</span><span class="bp">self</span><span class="o">.</span><span class="n">onexit</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">[</span><span class="kc">None</span><span class="p">,</span> <span class="s1">&#39;on_model_exit&#39;</span><span class="p">,</span> <span class="s1">&#39;pass&#39;</span><span class="p">])</span>
              <span class="ow">and</span> <span class="p">(</span><span class="ow">not</span> <span class="n">errors</span><span class="p">))):</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Calling onexit = &#39;</span><span class="si">%s</span><span class="s2">&#39;&quot;</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">onexit</span><span class="p">)</span>
             <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">onexit</span><span class="p">)()</span>
@@ -773,7 +774,7 @@
                                <span class="bp">self</span><span class="o">.</span><span class="n">models</span><span class="p">[</span><span class="s1">&#39;input&#39;</span><span class="p">])</span>
                     <span class="bp">self</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mi">10</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">sleeptime</span><span class="p">)</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">stop_timeout</span><span class="p">(</span><span class="n">key_suffix</span><span class="o">=</span><span class="s1">&#39;.model_exit&#39;</span><span class="p">)</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">drain_input</span><span class="p">(</span><span class="n">timeout</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">timeout</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">drain_input</span><span class="p">(</span><span class="n">timeout</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">timeout</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">direction</span> <span class="o">==</span> <span class="s1">&#39;input&#39;</span><span class="p">:</span>
             <span class="k">if</span> <span class="ow">not</span> <span class="n">errors</span><span class="p">:</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">wait_for_route</span><span class="p">(</span><span class="n">timeout</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">timeout</span><span class="p">)</span>
@@ -971,6 +972,9 @@
                 <span class="k">return</span> <span class="kc">False</span>
             <span class="n">msg</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">icomm</span><span class="o">.</span><span class="n">recv</span><span class="p">(</span><span class="n">return_message_object</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">errors</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">icomm</span><span class="o">.</span><span class="n">errors</span>
+        <span class="k">if</span> <span class="n">msg</span><span class="o">.</span><span class="n">header</span> <span class="ow">and</span> <span class="p">(</span><span class="s1">&#39;model&#39;</span> <span class="ow">in</span> <span class="n">msg</span><span class="o">.</span><span class="n">header</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">models_recvd</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="n">msg</span><span class="o">.</span><span class="n">header</span><span class="p">[</span><span class="s1">&#39;model&#39;</span><span class="p">],</span> <span class="mi">0</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">models_recvd</span><span class="p">[</span><span class="n">msg</span><span class="o">.</span><span class="n">header</span><span class="p">[</span><span class="s1">&#39;model&#39;</span><span class="p">]]</span> <span class="o">+=</span> <span class="mi">1</span>
         <span class="k">if</span> <span class="n">msg</span><span class="o">.</span><span class="n">flag</span> <span class="o">==</span> <span class="n">CommBase</span><span class="o">.</span><span class="n">FLAG_EOF</span><span class="p">:</span>
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">on_eof</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">msg</span><span class="o">.</span><span class="n">flag</span> <span class="o">==</span> <span class="n">CommBase</span><span class="o">.</span><span class="n">FLAG_SUCCESS</span><span class="p">:</span>

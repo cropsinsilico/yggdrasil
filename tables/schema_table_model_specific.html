@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>&lt;no title&gt; &mdash; yggdrasil 1.6.1 documentation</title>
+  <title>&lt;no title&gt; &mdash; yggdrasil 1.6.2 documentation</title>
   
 
   
@@ -63,7 +63,7 @@
             
             
               <div class="version">
-                1.6.1
+                1.6.2
               </div>
             
           
@@ -221,7 +221,7 @@ be relative to working_dir or absolute.</p></td>
 provided, the compiler will be determined based on configuration options for the
 language (if present) and the registered compilers that are available on the
 current operating system.</p></td>
-<td><p>[‘cmake’, ‘c++’, ‘fortran’, ‘cxx’, ‘c’, ‘make’, ‘cpp’]</p></td>
+<td><p>[‘cxx’, ‘make’, ‘c’, ‘c++’, ‘cpp’, ‘cmake’, ‘fortran’]</p></td>
 </tr>
 <tr class="row-odd"><td><p>compiler_flags</p></td>
 <td><p>array</p></td>
@@ -229,7 +229,7 @@ current operating system.</p></td>
 the compiler flags will be determined based on configuration options for the
 language (if present), the compiler defaults, and the default_compiler_flags
 class attribute.</p></td>
-<td><p>[‘cmake’, ‘c++’, ‘fortran’, ‘cxx’, ‘c’, ‘make’, ‘cpp’]</p></td>
+<td><p>[‘cxx’, ‘make’, ‘c’, ‘c++’, ‘cpp’, ‘cmake’, ‘fortran’]</p></td>
 </tr>
 <tr class="row-even"><td><p>configuration</p></td>
 <td><p>string</p></td>
@@ -293,14 +293,14 @@ be determined by the target language driver.</p></td>
 <td><p>Name or path of interpreter executable that should be used to run the model. If
 not provided, the interpreter will be determined based on configuration options
 for the language (if present) and the default_interpreter class attribute.</p></td>
-<td><p>[‘R’, ‘function’, ‘matlab’, ‘sbml’, ‘timesync’, ‘r’, ‘python’, ‘lpy’]</p></td>
+<td><p>[‘r’, ‘sbml’, ‘python’, ‘lpy’, ‘matlab’, ‘function’, ‘timesync’, ‘R’]</p></td>
 </tr>
 <tr class="row-even"><td><p>interpreter_flags</p></td>
 <td><p>array</p></td>
 <td><p>Flags that should be passed to the interpreter when running the model. If not
 provided, the flags are determined based on configuration options for the
 language (if present) and the default_interpreter_flags class attribute.</p></td>
-<td><p>[‘R’, ‘function’, ‘matlab’, ‘sbml’, ‘timesync’, ‘r’, ‘python’, ‘lpy’]</p></td>
+<td><p>[‘r’, ‘sbml’, ‘python’, ‘lpy’, ‘matlab’, ‘function’, ‘timesync’, ‘R’]</p></td>
 </tr>
 <tr class="row-odd"><td><p>linker</p></td>
 <td><p>string</p></td>
@@ -308,7 +308,7 @@ language (if present) and the default_interpreter_flags class attribute.</p></td
 provided, the linker will be determined based on configuration options for the
 language (if present) and the registered linkers that are available on the
 current operating system</p></td>
-<td><p>[‘cmake’, ‘c++’, ‘fortran’, ‘cxx’, ‘c’, ‘make’, ‘cpp’]</p></td>
+<td><p>[‘cxx’, ‘make’, ‘c’, ‘c++’, ‘cpp’, ‘cmake’, ‘fortran’]</p></td>
 </tr>
 <tr class="row-even"><td><p>linker_flags</p></td>
 <td><p>array</p></td>
@@ -316,7 +316,7 @@ current operating system</p></td>
 the linker flags will be determined based on configuration options for the
 language (if present), the linker defaults, and the default_linker_flags class
 attribute.</p></td>
-<td><p>[‘cmake’, ‘c++’, ‘fortran’, ‘cxx’, ‘c’, ‘make’, ‘cpp’]</p></td>
+<td><p>[‘cxx’, ‘make’, ‘c’, ‘c++’, ‘cpp’, ‘cmake’, ‘fortran’]</p></td>
 </tr>
 <tr class="row-odd"><td><p>makedir</p></td>
 <td><p>string</p></td>
@@ -353,7 +353,7 @@ selections will be returned.</p></td>
 <td><p>If True, no interpreter will be added to the arguments. This should only be used
 for subclasses that will not be invoking the model via the command line.
 Defaults to False.</p></td>
-<td><p>[‘R’, ‘function’, ‘matlab’, ‘sbml’, ‘timesync’, ‘r’, ‘python’, ‘lpy’]</p></td>
+<td><p>[‘r’, ‘sbml’, ‘python’, ‘lpy’, ‘matlab’, ‘function’, ‘timesync’, ‘R’]</p></td>
 </tr>
 <tr class="row-odd"><td><p>skip_start_time</p></td>
 <td><p>boolean</p></td>
@@ -366,7 +366,7 @@ False. This option is ignored if only_output_final_step is True.</p></td>
 <td><p>Source files that should be compiled into an executable. Defaults to an empty
 list and the driver will search for a source file based on the model executable
 (the first model argument).</p></td>
-<td><p>[‘cmake’, ‘c++’, ‘fortran’, ‘cxx’, ‘c’, ‘make’, ‘cpp’]</p></td>
+<td><p>[‘cxx’, ‘make’, ‘c’, ‘c++’, ‘cpp’, ‘cmake’, ‘fortran’]</p></td>
 </tr>
 <tr class="row-odd"><td><p>sourcedir</p></td>
 <td><p>string</p></td>

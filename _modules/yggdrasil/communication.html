@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>yggdrasil.communication &mdash; yggdrasil 1.6.1 documentation</title>
+  <title>yggdrasil.communication &mdash; yggdrasil 1.6.2 documentation</title>
   
 
   
@@ -63,7 +63,7 @@
             
             
               <div class="version">
-                1.6.1
+                1.6.2
               </div>
             
           
@@ -310,7 +310,8 @@
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">commtype</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
             <span class="n">kwargs</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">commtype</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
             <span class="n">kwargs</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s1">&#39;name&#39;</span><span class="p">,</span> <span class="n">name</span><span class="p">)</span>
-            <span class="k">return</span> <span class="n">new_comm</span><span class="p">(</span><span class="n">use_async</span><span class="o">=</span><span class="n">use_async</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+            <span class="n">kwargs</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s1">&#39;use_async&#39;</span><span class="p">,</span> <span class="n">use_async</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">new_comm</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;comm_list&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">commtype</span>
             <span class="n">commtype</span> <span class="o">=</span> <span class="s1">&#39;fork&#39;</span>

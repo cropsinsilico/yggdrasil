@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>yggdrasil.communication.tests package &mdash; yggdrasil 1.6.1 documentation</title>
+  <title>yggdrasil.communication.tests package &mdash; yggdrasil 1.6.2 documentation</title>
   
 
   
@@ -63,7 +63,7 @@
             
             
               <div class="version">
-                1.6.1
+                1.6.2
               </div>
             
           
@@ -711,17 +711,30 @@ is received. Defaults to False.</p></li>
 <dl class="py property">
 <dt class="sig sig-object py" id="yggdrasil.communication.tests.test_CommBase.TestCommBase.test_msg_array">
 <em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">test_msg_array</span></span><a class="headerlink" href="#yggdrasil.communication.tests.test_CommBase.TestCommBase.test_msg_array" title="Permalink to this definition">¶</a></dt>
-<dd><p>Test message that should be used for any send/recv tests.</p>
+<dd><p>Test message that should be used for send_array/recv_array
+tests.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)">str</a></p>
+<dd class="field-odd"><p>array</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="yggdrasil.communication.tests.test_CommBase.TestCommBase.test_msg_dict">
+<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">test_msg_dict</span></span><a class="headerlink" href="#yggdrasil.communication.tests.test_CommBase.TestCommBase.test_msg_dict" title="Permalink to this definition">¶</a></dt>
+<dd><p>Test message that should be used for send_dict/recv_dict
+tests.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.9)">dict</a></p>
 </dd>
 </dl>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="yggdrasil.communication.tests.test_CommBase.TestCommBase.test_purge">
-<span class="sig-name descname"><span class="pre">test_purge</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">nrecv</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nrecv_init</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nsend_init</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/communication/tests/test_CommBase.html#TestCommBase.test_purge"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yggdrasil.communication.tests.test_CommBase.TestCommBase.test_purge" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">test_purge</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">nrecv</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nrecv_init</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nsend_init</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">msg_recv</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/communication/tests/test_CommBase.html#TestCommBase.test_purge"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yggdrasil.communication.tests.test_CommBase.TestCommBase.test_purge" title="Permalink to this definition">¶</a></dt>
 <dd><p>Test purging messages from the comm.</p>
 </dd></dl>
 
@@ -739,7 +752,7 @@ is received. Defaults to False.</p></li>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="yggdrasil.communication.tests.test_CommBase.TestCommBase.test_send_recv_after_close">
-<span class="sig-name descname"><span class="pre">test_send_recv_after_close</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/communication/tests/test_CommBase.html#TestCommBase.test_send_recv_after_close"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yggdrasil.communication.tests.test_CommBase.TestCommBase.test_send_recv_after_close" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">test_send_recv_after_close</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">msg_send</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/communication/tests/test_CommBase.html#TestCommBase.test_send_recv_after_close"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yggdrasil.communication.tests.test_CommBase.TestCommBase.test_send_recv_after_close" title="Permalink to this definition">¶</a></dt>
 <dd><p>Test that opening twice dosn’t cause errors and that send/recv after
 close returns false.</p>
 </dd></dl>
@@ -971,20 +984,6 @@ close returns false.</p>
 <em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">yggdrasil.communication.tests.test_ForkComm.</span></span><span class="sig-name descname"><span class="pre">TestForkComm</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/communication/tests/test_ForkComm.html#TestForkComm"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yggdrasil.communication.tests.test_ForkComm.TestForkComm" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#yggdrasil.communication.tests.test_CommBase.TestCommBase" title="yggdrasil.communication.tests.test_CommBase.TestCommBase"><code class="xref py py-class docutils literal notranslate"><span class="pre">yggdrasil.communication.tests.test_CommBase.TestCommBase</span></code></a></p>
 <p>Tests for ForkComm communication class.</p>
-<dl class="py method">
-<dt class="sig sig-object py" id="yggdrasil.communication.tests.test_ForkComm.TestForkComm.add_filter">
-<span class="sig-name descname"><span class="pre">add_filter</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">comm</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">filter</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/communication/tests/test_ForkComm.html#TestForkComm.add_filter"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yggdrasil.communication.tests.test_ForkComm.TestForkComm.add_filter" title="Permalink to this definition">¶</a></dt>
-<dd><p>Add a filter to a comm.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>comm</strong> (<a class="reference internal" href="yggdrasil.communication.html#yggdrasil.communication.CommBase.CommBase" title="yggdrasil.communication.CommBase.CommBase"><em>CommBase</em></a>) – Communication instance to add a filter to.</p></li>
-<li><p><strong>filter</strong> (<a class="reference internal" href="yggdrasil.communication.filters.html#yggdrasil.communication.filters.FilterBase.FilterBase" title="yggdrasil.communication.filters.FilterBase.FilterBase"><em>FilterBase</em></a><em>, </em><em>optional</em>) – Filter class. Defaults to None and is ignored.</p></li>
-</ul>
-</dd>
-</dl>
-</dd></dl>
-
 <dl class="py attribute">
 <dt class="sig sig-object py" id="yggdrasil.communication.tests.test_ForkComm.TestForkComm.attr_list">
 <span class="sig-name descname"><span class="pre">attr_list</span></span><em class="property"> <span class="pre">=</span> <span class="pre">['name',</span> <span class="pre">'address',</span> <span class="pre">'direction',</span> <span class="pre">'serializer',</span> <span class="pre">'recv_timeout',</span> <span class="pre">'close_on_eof_recv',</span> <span class="pre">'opp_address',</span> <span class="pre">'opp_comms',</span> <span class="pre">'maxMsgSize',</span> <span class="pre">'comm_list',</span> <span class="pre">'curr_comm_index']</span></em><a class="headerlink" href="#yggdrasil.communication.tests.test_ForkComm.TestForkComm.attr_list" title="Permalink to this definition">¶</a></dt>
@@ -1012,9 +1011,70 @@ close returns false.</p>
 <dd><p>Generic send/recv of a message.</p>
 </dd></dl>
 
+<dl class="py method">
+<dt class="sig sig-object py" id="yggdrasil.communication.tests.test_ForkComm.TestForkComm.duplicate_msg">
+<span class="sig-name descname"><span class="pre">duplicate_msg</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">out</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">direction</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'send'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/communication/tests/test_ForkComm.html#TestForkComm.duplicate_msg"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yggdrasil.communication.tests.test_ForkComm.TestForkComm.duplicate_msg" title="Permalink to this definition">¶</a></dt>
+<dd><p>Copy a message for ‘scatter’ communication pattern.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="yggdrasil.communication.tests.test_ForkComm.TestForkComm.inst_kwargs">
+<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">inst_kwargs</span></span><a class="headerlink" href="#yggdrasil.communication.tests.test_ForkComm.TestForkComm.inst_kwargs" title="Permalink to this definition">¶</a></dt>
+<dd><p>Keyword arguments for tested class.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.9)">dict</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="yggdrasil.communication.tests.test_ForkComm.TestForkComm.map_sent2recv">
+<span class="sig-name descname"><span class="pre">map_sent2recv</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">obj</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/communication/tests/test_ForkComm.html#TestForkComm.map_sent2recv"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yggdrasil.communication.tests.test_ForkComm.TestForkComm.map_sent2recv" title="Permalink to this definition">¶</a></dt>
+<dd><p>Convert a sent object into a received one.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="yggdrasil.communication.tests.test_ForkComm.TestForkComm.msg_filter_recv">
+<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">msg_filter_recv</span></span><a class="headerlink" href="#yggdrasil.communication.tests.test_ForkComm.TestForkComm.msg_filter_recv" title="Permalink to this definition">¶</a></dt>
+<dd><p>Message to filter out on the recv side.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.9)">object</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="yggdrasil.communication.tests.test_ForkComm.TestForkComm.msg_filter_send">
+<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">msg_filter_send</span></span><a class="headerlink" href="#yggdrasil.communication.tests.test_ForkComm.TestForkComm.msg_filter_send" title="Permalink to this definition">¶</a></dt>
+<dd><p>Message to filter out on the send side.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.9)">object</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="yggdrasil.communication.tests.test_ForkComm.TestForkComm.msg_long">
+<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">msg_long</span></span><a class="headerlink" href="#yggdrasil.communication.tests.test_ForkComm.TestForkComm.msg_long" title="Permalink to this definition">¶</a></dt>
+<dd><p>Small test message for sending.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)">str</a></p>
+</dd>
+</dl>
+</dd></dl>
+
 <dl class="py attribute">
 <dt class="sig sig-object py" id="yggdrasil.communication.tests.test_ForkComm.TestForkComm.ncomm">
 <span class="sig-name descname"><span class="pre">ncomm</span></span><em class="property"> <span class="pre">=</span> <span class="pre">2</span></em><a class="headerlink" href="#yggdrasil.communication.tests.test_ForkComm.TestForkComm.ncomm" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="yggdrasil.communication.tests.test_ForkComm.TestForkComm.recv_pattern">
+<span class="sig-name descname"><span class="pre">recv_pattern</span></span><em class="property"> <span class="pre">=</span> <span class="pre">None</span></em><a class="headerlink" href="#yggdrasil.communication.tests.test_ForkComm.TestForkComm.recv_pattern" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py property">
@@ -1027,6 +1087,11 @@ close returns false.</p>
 </dd>
 </dl>
 </dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="yggdrasil.communication.tests.test_ForkComm.TestForkComm.send_pattern">
+<span class="sig-name descname"><span class="pre">send_pattern</span></span><em class="property"> <span class="pre">=</span> <span class="pre">None</span></em><a class="headerlink" href="#yggdrasil.communication.tests.test_ForkComm.TestForkComm.send_pattern" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="yggdrasil.communication.tests.test_ForkComm.TestForkComm.test_error_name">
@@ -1044,10 +1109,51 @@ close returns false.</p>
 <span class="sig-name descname"><span class="pre">test_error_send</span></span><em class="property"> <span class="pre">=</span> <span class="pre">None</span></em><a class="headerlink" href="#yggdrasil.communication.tests.test_ForkComm.TestForkComm.test_error_send" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
+<dl class="py property">
+<dt class="sig sig-object py" id="yggdrasil.communication.tests.test_ForkComm.TestForkComm.test_msg">
+<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">test_msg</span></span><a class="headerlink" href="#yggdrasil.communication.tests.test_ForkComm.TestForkComm.test_msg" title="Permalink to this definition">¶</a></dt>
+<dd><p>Test message that should be used for any send/recv tests.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)">str</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="yggdrasil.communication.tests.test_ForkComm.TestForkComm.test_msg_array">
+<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">test_msg_array</span></span><a class="headerlink" href="#yggdrasil.communication.tests.test_ForkComm.TestForkComm.test_msg_array" title="Permalink to this definition">¶</a></dt>
+<dd><p>Test message that should be used for any send/recv tests.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)">str</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="yggdrasil.communication.tests.test_ForkComm.TestForkComm.test_msg_dict">
+<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">test_msg_dict</span></span><a class="headerlink" href="#yggdrasil.communication.tests.test_ForkComm.TestForkComm.test_msg_dict" title="Permalink to this definition">¶</a></dt>
+<dd><p>Test message that should be used for send_dict/recv_dict
+tests.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.9)">dict</a></p>
+</dd>
+</dl>
+</dd></dl>
+
 <dl class="py method">
 <dt class="sig sig-object py" id="yggdrasil.communication.tests.test_ForkComm.TestForkComm.test_purge">
 <span class="sig-name descname"><span class="pre">test_purge</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/communication/tests/test_ForkComm.html#TestForkComm.test_purge"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yggdrasil.communication.tests.test_ForkComm.TestForkComm.test_purge" title="Permalink to this definition">¶</a></dt>
 <dd><p>Test purging messages from the comm.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="yggdrasil.communication.tests.test_ForkComm.TestForkComm.test_send_recv_after_close">
+<span class="sig-name descname"><span class="pre">test_send_recv_after_close</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/communication/tests/test_ForkComm.html#TestForkComm.test_send_recv_after_close"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yggdrasil.communication.tests.test_ForkComm.TestForkComm.test_send_recv_after_close" title="Permalink to this definition">¶</a></dt>
+<dd><p>Test that opening twice dosn’t cause errors and that send/recv after
+close returns false.</p>
 </dd></dl>
 
 <dl class="py method">
@@ -1070,6 +1176,24 @@ close returns false.</p>
 </dd></dl>
 
 <dl class="py class">
+<dt class="sig sig-object py" id="yggdrasil.communication.tests.test_ForkComm.TestForkCommCycle">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">yggdrasil.communication.tests.test_ForkComm.</span></span><span class="sig-name descname"><span class="pre">TestForkCommCycle</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/communication/tests/test_ForkComm.html#TestForkCommCycle"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yggdrasil.communication.tests.test_ForkComm.TestForkCommCycle" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#yggdrasil.communication.tests.test_ForkComm.TestForkComm" title="yggdrasil.communication.tests.test_ForkComm.TestForkComm"><code class="xref py py-class docutils literal notranslate"><span class="pre">yggdrasil.communication.tests.test_ForkComm.TestForkComm</span></code></a></p>
+<p>Tests for ForkComm communication class with cycle/cycle communication
+pattern.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="yggdrasil.communication.tests.test_ForkComm.TestForkCommCycle.recv_pattern">
+<span class="sig-name descname"><span class="pre">recv_pattern</span></span><em class="property"> <span class="pre">=</span> <span class="pre">'cycle'</span></em><a class="headerlink" href="#yggdrasil.communication.tests.test_ForkComm.TestForkCommCycle.recv_pattern" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="yggdrasil.communication.tests.test_ForkComm.TestForkCommCycle.send_pattern">
+<span class="sig-name descname"><span class="pre">send_pattern</span></span><em class="property"> <span class="pre">=</span> <span class="pre">'cycle'</span></em><a class="headerlink" href="#yggdrasil.communication.tests.test_ForkComm.TestForkCommCycle.send_pattern" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
 <dt class="sig sig-object py" id="yggdrasil.communication.tests.test_ForkComm.TestForkCommList">
 <em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">yggdrasil.communication.tests.test_ForkComm.</span></span><span class="sig-name descname"><span class="pre">TestForkCommList</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/communication/tests/test_ForkComm.html#TestForkCommList"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yggdrasil.communication.tests.test_ForkComm.TestForkCommList" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#yggdrasil.communication.tests.test_ForkComm.TestForkComm" title="yggdrasil.communication.tests.test_ForkComm.TestForkComm"><code class="xref py py-class docutils literal notranslate"><span class="pre">yggdrasil.communication.tests.test_ForkComm.TestForkComm</span></code></a></p>
@@ -1083,6 +1207,30 @@ close returns false.</p>
 <dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.9)">list</a></p>
 </dd>
 </dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="yggdrasil.communication.tests.test_ForkComm.TestForkCommScatter">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">yggdrasil.communication.tests.test_ForkComm.</span></span><span class="sig-name descname"><span class="pre">TestForkCommScatter</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/communication/tests/test_ForkComm.html#TestForkCommScatter"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yggdrasil.communication.tests.test_ForkComm.TestForkCommScatter" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#yggdrasil.communication.tests.test_ForkComm.TestForkComm" title="yggdrasil.communication.tests.test_ForkComm.TestForkComm"><code class="xref py py-class docutils literal notranslate"><span class="pre">yggdrasil.communication.tests.test_ForkComm.TestForkComm</span></code></a></p>
+<p>Tests for ForkComm communication class with scatter/gather
+communication pattern.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="yggdrasil.communication.tests.test_ForkComm.TestForkCommScatter.recv_pattern">
+<span class="sig-name descname"><span class="pre">recv_pattern</span></span><em class="property"> <span class="pre">=</span> <span class="pre">'gather'</span></em><a class="headerlink" href="#yggdrasil.communication.tests.test_ForkComm.TestForkCommScatter.recv_pattern" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="yggdrasil.communication.tests.test_ForkComm.TestForkCommScatter.send_pattern">
+<span class="sig-name descname"><span class="pre">send_pattern</span></span><em class="property"> <span class="pre">=</span> <span class="pre">'scatter'</span></em><a class="headerlink" href="#yggdrasil.communication.tests.test_ForkComm.TestForkCommScatter.send_pattern" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="yggdrasil.communication.tests.test_ForkComm.TestForkCommScatter.test_async_gather">
+<span class="sig-name descname"><span class="pre">test_async_gather</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/communication/tests/test_ForkComm.html#TestForkCommScatter.test_async_gather"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yggdrasil.communication.tests.test_ForkComm.TestForkCommScatter.test_async_gather" title="Permalink to this definition">¶</a></dt>
+<dd><p>Test scatter-gather w/ intermittent send.</p>
 </dd></dl>
 
 </dd></dl>

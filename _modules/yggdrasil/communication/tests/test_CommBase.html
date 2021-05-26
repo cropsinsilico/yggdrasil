@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>yggdrasil.communication.tests.test_CommBase &mdash; yggdrasil 1.6.1 documentation</title>
+  <title>yggdrasil.communication.tests.test_CommBase &mdash; yggdrasil 1.6.2 documentation</title>
   
 
   
@@ -63,7 +63,7 @@
             
             
               <div class="version">
-                1.6.1
+                1.6.2
               </div>
             
           
@@ -287,8 +287,15 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">test_msg_array</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;str: Test message that should be used for any send/recv tests.&quot;&quot;&quot;</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;array: Test message that should be used for send_array/recv_array</span>
+<span class="sd">        tests.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">testing_options</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;msg_array&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">test_msg_dict</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;dict: Test message that should be used for send_dict/recv_dict</span>
+<span class="sd">        tests.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">testing_options</span><span class="p">[</span><span class="s1">&#39;dict&#39;</span><span class="p">]</span>
     
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">test_msg</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -402,9 +409,11 @@
         <span class="n">recv_inst</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">fd_count</span></div>
 
-<div class="viewcode-block" id="TestCommBase.test_send_recv_after_close"><a class="viewcode-back" href="../../../../yggdrasil.communication.tests.html#yggdrasil.communication.tests.test_CommBase.TestCommBase.test_send_recv_after_close">[docs]</a>    <span class="k">def</span> <span class="nf">test_send_recv_after_close</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="TestCommBase.test_send_recv_after_close"><a class="viewcode-back" href="../../../../yggdrasil.communication.tests.html#yggdrasil.communication.tests.test_CommBase.TestCommBase.test_send_recv_after_close">[docs]</a>    <span class="k">def</span> <span class="nf">test_send_recv_after_close</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">msg_send</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test that opening twice dosn&#39;t cause errors and that send/recv after</span>
 <span class="sd">        close returns false.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">msg_send</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">msg_send</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">test_msg</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">send_instance</span><span class="o">.</span><span class="n">open</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">recv_instance</span><span class="o">.</span><span class="n">open</span><span class="p">()</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">comm</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;RMQComm&#39;</span><span class="p">,</span> <span class="s1">&#39;RMQAsyncComm&#39;</span><span class="p">]:</span>
@@ -414,7 +423,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">recv_instance</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
         <span class="k">assert</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">send_instance</span><span class="o">.</span><span class="n">is_closed</span><span class="p">)</span>
         <span class="k">assert</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">recv_instance</span><span class="o">.</span><span class="n">is_closed</span><span class="p">)</span>
-        <span class="n">flag</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">send_instance</span><span class="o">.</span><span class="n">send</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">test_msg</span><span class="p">)</span>
+        <span class="n">flag</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">send_instance</span><span class="o">.</span><span class="n">send</span><span class="p">(</span><span class="n">msg_send</span><span class="p">)</span>
         <span class="k">assert</span><span class="p">(</span><span class="ow">not</span> <span class="n">flag</span><span class="p">)</span>
         <span class="n">flag</span><span class="p">,</span> <span class="n">msg_recv</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">recv_instance</span><span class="o">.</span><span class="n">recv</span><span class="p">()</span>
         <span class="k">assert</span><span class="p">(</span><span class="ow">not</span> <span class="n">flag</span><span class="p">)</span></div>
@@ -682,16 +691,19 @@
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;object: Message to filter out on the send side.&quot;&quot;&quot;</span>
         <span class="n">objs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_options</span><span class="p">()[</span><span class="s1">&#39;objects&#39;</span><span class="p">]</span>
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">objs</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">1</span><span class="p">:</span>  <span class="c1"># pragma: debug</span>
-            <span class="k">raise</span> <span class="n">unittest</span><span class="o">.</span><span class="n">SkipTest</span><span class="p">(</span><span class="s2">&quot;There arn&#39;t enough objects.&quot;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="n">unittest</span><span class="o">.</span><span class="n">SkipTest</span><span class="p">(</span><span class="s2">&quot;There aren&#39;t enough objects.&quot;</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">objs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">msg_filter_recv</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;object: Message to filter out on the recv side.&quot;&quot;&quot;</span>
         <span class="n">objs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_options</span><span class="p">()[</span><span class="s1">&#39;objects&#39;</span><span class="p">]</span>
-        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">objs</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">2</span><span class="p">:</span>  <span class="c1"># pragma: debug</span>
-            <span class="k">raise</span> <span class="n">unittest</span><span class="o">.</span><span class="n">SkipTest</span><span class="p">(</span><span class="s2">&quot;There arn&#39;t enough objects.&quot;</span><span class="p">)</span>
-        <span class="k">return</span> <span class="n">objs</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+        <span class="k">if</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">objs</span><span class="p">)</span> <span class="o">&gt;=</span> <span class="mi">2</span><span class="p">):</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">assert_equal</span><span class="p">(</span><span class="n">objs</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">objs</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+            <span class="k">except</span> <span class="ne">AssertionError</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">objs</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+        <span class="k">raise</span> <span class="n">unittest</span><span class="o">.</span><span class="n">SkipTest</span><span class="p">(</span><span class="s2">&quot;There aren&#39;t enough unique objects.&quot;</span><span class="p">)</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">msg_filter_pass</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -741,6 +753,7 @@
 
         <span class="k">def</span> <span class="nf">fcond</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
             <span class="k">try</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">send_instance</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">%s</span><span class="s2"> vs. </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">msg</span><span class="p">)</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">assert_equal</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">msg</span><span class="p">)</span>
                 <span class="k">return</span> <span class="kc">False</span>
             <span class="k">except</span> <span class="ne">AssertionError</span><span class="p">:</span>
@@ -778,7 +791,7 @@
             <span class="k">return</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">setup_filters</span><span class="p">()</span>
         <span class="n">kwargs</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s1">&#39;msg_send&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">msg_filter_send</span><span class="p">)</span>
-        <span class="n">kwargs</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s1">&#39;msg_recv&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">recv_instance</span><span class="o">.</span><span class="n">empty_obj_recv</span><span class="p">)</span>
+        <span class="n">kwargs</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s1">&#39;msg_recv&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="o">.</span><span class="n">empty_obj_recv</span><span class="p">)</span>
         <span class="n">kwargs</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s1">&#39;recv_timeout&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">sleeptime</span><span class="p">)</span>
         <span class="n">kwargs</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s1">&#39;no_recv&#39;</span><span class="p">,</span> <span class="kc">True</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">do_send_recv</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
@@ -789,9 +802,9 @@
             <span class="k">return</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">setup_filters</span><span class="p">()</span>
         <span class="n">kwargs</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s1">&#39;msg_send&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">msg_filter_recv</span><span class="p">)</span>
-        <span class="n">kwargs</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s1">&#39;msg_recv&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">recv_instance</span><span class="o">.</span><span class="n">empty_obj_recv</span><span class="p">)</span>
+        <span class="n">kwargs</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s1">&#39;msg_recv&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="o">.</span><span class="n">empty_obj_recv</span><span class="p">)</span>
         <span class="n">kwargs</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s1">&#39;recv_timeout&#39;</span><span class="p">,</span> <span class="mi">10</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">sleeptime</span><span class="p">)</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">recv_instance</span><span class="o">.</span><span class="n">is_async</span><span class="p">:</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="o">.</span><span class="n">is_async</span><span class="p">:</span>
             <span class="n">kwargs</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s1">&#39;no_recv&#39;</span><span class="p">,</span> <span class="kc">True</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">do_send_recv</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
 
@@ -825,15 +838,20 @@
 
 <div class="viewcode-block" id="TestCommBase.test_send_recv_nolimit"><a class="viewcode-back" href="../../../../yggdrasil.communication.tests.html#yggdrasil.communication.tests.test_CommBase.TestCommBase.test_send_recv_nolimit">[docs]</a>    <span class="k">def</span> <span class="nf">test_send_recv_nolimit</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test send/recv of a large message.&quot;&quot;&quot;</span>
-        <span class="k">assert</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">msg_long</span><span class="p">)</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">maxMsgSize</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">do_send_recv</span><span class="p">(</span><span class="s1">&#39;send_nolimit&#39;</span><span class="p">,</span> <span class="s1">&#39;recv_nolimit&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">msg_long</span><span class="p">,</span>
-                          <span class="n">send_kwargs</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">header_kwargs</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">msg_long</span><span class="p">)),</span>
-                          <span class="n">print_status</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span></div>
+        <span class="n">msg</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">msg_long</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">msg</span><span class="p">,</span> <span class="nb">bytes</span><span class="p">):</span>
+            <span class="k">assert</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">maxMsgSize</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">do_send_recv</span><span class="p">(</span><span class="n">send_meth</span><span class="o">=</span><span class="s1">&#39;send_nolimit&#39;</span><span class="p">,</span> <span class="n">recv_meth</span><span class="o">=</span><span class="s1">&#39;recv_nolimit&#39;</span><span class="p">,</span>
+                          <span class="n">msg_send</span><span class="o">=</span><span class="n">msg</span><span class="p">,</span>
+                          <span class="n">send_kwargs</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">header_kwargs</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="n">msg</span><span class="p">)),</span>
+                          <span class="n">print_status</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">send_instance</span><span class="o">.</span><span class="n">linger</span><span class="p">()</span></div>
 
 <div class="viewcode-block" id="TestCommBase.test_send_recv_array"><a class="viewcode-back" href="../../../../yggdrasil.communication.tests.html#yggdrasil.communication.tests.test_CommBase.TestCommBase.test_send_recv_array">[docs]</a>    <span class="k">def</span> <span class="nf">test_send_recv_array</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test send/recv of a array message.&quot;&quot;&quot;</span>
         <span class="n">msg_send</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;test_msg_array&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">do_send_recv</span><span class="p">(</span><span class="s1">&#39;send_array&#39;</span><span class="p">,</span> <span class="s1">&#39;recv_array&#39;</span><span class="p">,</span> <span class="n">msg_send</span><span class="o">=</span><span class="n">msg_send</span><span class="p">)</span></div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">do_send_recv</span><span class="p">(</span><span class="n">send_meth</span><span class="o">=</span><span class="s1">&#39;send_array&#39;</span><span class="p">,</span> <span class="n">recv_meth</span><span class="o">=</span><span class="s1">&#39;recv_array&#39;</span><span class="p">,</span>
+                          <span class="n">msg_send</span><span class="o">=</span><span class="n">msg_send</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="TestCommBase.test_eof"><a class="viewcode-back" href="../../../../yggdrasil.communication.tests.html#yggdrasil.communication.tests.test_CommBase.TestCommBase.test_eof">[docs]</a>    <span class="k">def</span> <span class="nf">test_eof</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test send/recv of EOF message.&quot;&quot;&quot;</span>
@@ -843,8 +861,11 @@
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test send/recv of EOF message with no close.&quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">do_send_recv</span><span class="p">(</span><span class="n">send_meth</span><span class="o">=</span><span class="s1">&#39;send_eof&#39;</span><span class="p">,</span> <span class="n">close_on_recv_eof</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="TestCommBase.test_purge"><a class="viewcode-back" href="../../../../yggdrasil.communication.tests.html#yggdrasil.communication.tests.test_CommBase.TestCommBase.test_purge">[docs]</a>    <span class="k">def</span> <span class="nf">test_purge</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">nrecv</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">nrecv_init</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">nsend_init</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
+<div class="viewcode-block" id="TestCommBase.test_purge"><a class="viewcode-back" href="../../../../yggdrasil.communication.tests.html#yggdrasil.communication.tests.test_CommBase.TestCommBase.test_purge">[docs]</a>    <span class="k">def</span> <span class="nf">test_purge</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">nrecv</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">nrecv_init</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">nsend_init</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+                   <span class="n">msg_recv</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test purging messages from the comm.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">msg_recv</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">msg_recv</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">test_msg</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">assert_equal</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">send_instance</span><span class="o">.</span><span class="n">n_msg</span><span class="p">,</span> <span class="n">nsend_init</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">assert_equal</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">recv_instance</span><span class="o">.</span><span class="n">n_msg</span><span class="p">,</span> <span class="n">nrecv_init</span><span class="p">)</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">send_instance</span><span class="o">.</span><span class="n">is_async</span><span class="p">:</span>
@@ -853,7 +874,7 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">assert_equal</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">recv_instance</span><span class="o">.</span><span class="n">n_msg_direct</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
         <span class="c1"># Purge recv while open</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">comm</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;CommBase&#39;</span><span class="p">,</span> <span class="s1">&#39;AsyncComm&#39;</span><span class="p">]:</span>
-            <span class="n">flag</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">send_instance</span><span class="o">.</span><span class="n">send</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">test_msg</span><span class="p">)</span>
+            <span class="n">flag</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">send_instance</span><span class="o">.</span><span class="n">send</span><span class="p">(</span><span class="n">msg_recv</span><span class="p">)</span>
             <span class="k">assert</span><span class="p">(</span><span class="n">flag</span><span class="p">)</span>
             <span class="n">T</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">recv_instance</span><span class="o">.</span><span class="n">start_timeout</span><span class="p">()</span>
             <span class="k">while</span> <span class="p">((</span><span class="ow">not</span> <span class="n">T</span><span class="o">.</span><span class="n">is_out</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">recv_instance</span><span class="o">.</span><span class="n">n_msg</span>
@@ -871,7 +892,7 @@
 
 <div class="viewcode-block" id="TestCommBase.test_send_recv_dict"><a class="viewcode-back" href="../../../../yggdrasil.communication.tests.html#yggdrasil.communication.tests.test_CommBase.TestCommBase.test_send_recv_dict">[docs]</a>    <span class="k">def</span> <span class="nf">test_send_recv_dict</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test send/recv message as dict.&quot;&quot;&quot;</span>
-        <span class="n">msg_send</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">testing_options</span><span class="p">[</span><span class="s1">&#39;dict&#39;</span><span class="p">]</span>
+        <span class="n">msg_send</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">test_msg_dict</span>
         <span class="k">if</span> <span class="n">msg_send</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">do_send_recv</span><span class="p">(</span><span class="n">send_meth</span><span class="o">=</span><span class="s1">&#39;send_dict&#39;</span><span class="p">,</span>
                               <span class="n">recv_meth</span><span class="o">=</span><span class="s1">&#39;recv_dict&#39;</span><span class="p">,</span>
@@ -879,7 +900,7 @@
         
 <div class="viewcode-block" id="TestCommBase.test_send_recv_dict_names"><a class="viewcode-back" href="../../../../yggdrasil.communication.tests.html#yggdrasil.communication.tests.test_CommBase.TestCommBase.test_send_recv_dict_names">[docs]</a>    <span class="k">def</span> <span class="nf">test_send_recv_dict_names</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test send/recv message as dict with names.&quot;&quot;&quot;</span>
-        <span class="n">msg_send</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">testing_options</span><span class="p">[</span><span class="s1">&#39;dict&#39;</span><span class="p">]</span>
+        <span class="n">msg_send</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">test_msg_dict</span>
         <span class="n">field_order</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">testing_options</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;field_names&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">field_order</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">do_send_recv</span><span class="p">(</span><span class="n">send_meth</span><span class="o">=</span><span class="s1">&#39;send_dict&#39;</span><span class="p">,</span> <span class="n">recv_meth</span><span class="o">=</span><span class="s1">&#39;recv_dict&#39;</span><span class="p">,</span>

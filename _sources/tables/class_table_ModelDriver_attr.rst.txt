@@ -8,6 +8,7 @@ allow_threading       If True, comm connections will be set up so that the model
 args                  Argument(s) for running the model on the command line.                                        list                             
 client_of             The names of server models that this model is a client of.                                    list                             
 copies                The number of copies of the model that should be created.                                     int                              
+copy_index            Index of model in set of copies.                                                              int                              
 function              The name of the model function that should be wrapped.                                        str                              
 is_server             If True, the model is assumed to be a server and an instance of                               bool, dict                       
                       :class:`yggdrasil.drivers.ServerDriver` is started. If a dict, the input/output                                                

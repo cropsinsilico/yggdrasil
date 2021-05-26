@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>&lt;no title&gt; &mdash; yggdrasil 1.6.1 documentation</title>
+  <title>&lt;no title&gt; &mdash; yggdrasil 1.6.2 documentation</title>
   
 
   
@@ -63,7 +63,7 @@
             
             
               <div class="version">
-                1.6.1
+                1.6.2
               </div>
             
           
@@ -244,58 +244,70 @@ blocks. Set to None and ignored by default.</p></td>
 <td></td>
 <td><p>tuple</p></td>
 </tr>
-<tr class="row-odd"><td><p>executable_type</p></td>
+<tr class="row-odd"><td><p>comms_implicit</p></td>
+<td><p>True if the comms installed for this driver are not explicitly defined (depend
+on input parameters). Defaults to False.</p></td>
+<td></td>
+<td><p>bool</p></td>
+</tr>
+<tr class="row-even"><td><p>executable_type</p></td>
 <td><p>‘compiler’ or ‘interpreter’ to indicate the type of the executable for the
 language. [AUTOMATED]</p></td>
 <td></td>
 <td><p>str</p></td>
 </tr>
-<tr class="row-even"><td><p>external_libraries</p></td>
+<tr class="row-odd"><td><p>external_libraries</p></td>
 <td><p>Information on external libraries required for running models in the target
 language using yggdrasil.</p></td>
 <td></td>
 <td><p>dict</p></td>
 </tr>
-<tr class="row-odd"><td><p>include_arg_count</p></td>
+<tr class="row-even"><td><p>include_arg_count</p></td>
 <td><p>If True, the number of arguments passed to send/recv calls is prepended to the
 arguments to the function. Defaults to False.</p></td>
 <td></td>
 <td><p>bool</p></td>
 </tr>
-<tr class="row-even"><td><p>include_channel_obj</p></td>
+<tr class="row-odd"><td><p>include_channel_obj</p></td>
 <td><p>If True, the channel object is passed as input to the send/recv calls (after the
 argument count if it is also present due to include_arg_count being True).
 Defaults to False.</p></td>
 <td></td>
 <td><p>bool</p></td>
 </tr>
-<tr class="row-odd"><td><p>interface_dependencies</p></td>
+<tr class="row-even"><td><p>interface_dependencies</p></td>
 <td><p>List of names of libraries that are required to use the interface on the current
 platform. This dosn’t include libraries required by specific communication types
 which are described by supported_comm_options.</p></td>
 <td></td>
 <td><p>list</p></td>
 </tr>
-<tr class="row-even"><td><p>interface_directories</p></td>
+<tr class="row-odd"><td><p>interface_directories</p></td>
 <td><p>Directories containing code in the interface library for the target language.</p></td>
 <td></td>
 <td><p>list</p></td>
 </tr>
-<tr class="row-odd"><td><p>internal_libraries</p></td>
+<tr class="row-even"><td><p>internal_libraries</p></td>
 <td><p>Information on internal libraries required for running models in the target
 language using yggdrasil.</p></td>
 <td></td>
 <td><p>dict</p></td>
 </tr>
-<tr class="row-even"><td><p>is_typed</p></td>
+<tr class="row-odd"><td><p>is_typed</p></td>
 <td><p>True if the language is typed, False otherwise.</p></td>
 <td></td>
 <td><p>bool</p></td>
 </tr>
-<tr class="row-odd"><td><p>language_aliases</p></td>
+<tr class="row-even"><td><p>language_aliases</p></td>
 <td><p>Additional/alternative names that the language may be known by.</p></td>
 <td></td>
 <td><p>list</p></td>
+</tr>
+<tr class="row-odd"><td><p>no_executable</p></td>
+<td><p>True if there is not an executable associated with the language driver. Defaults
+to False.</p></td>
+<td></td>
+<td><p>bool</p></td>
 </tr>
 <tr class="row-even"><td><p>outputs_in_inputs</p></td>
 <td><p>If True, outputs are passed by pointer as inputs for modification and the return

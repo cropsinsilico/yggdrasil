@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>yggdrasil.communication.AsyncComm &mdash; yggdrasil 1.6.1 documentation</title>
+  <title>yggdrasil.communication.AsyncComm &mdash; yggdrasil 1.6.2 documentation</title>
   
 
   
@@ -63,7 +63,7 @@
             
             
               <div class="version">
-                1.6.1
+                1.6.2
               </div>
             
           
@@ -345,7 +345,7 @@
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_backlog_thread</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">backlog_thread</span><span class="o">.</span><span class="n">set_break_flag</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">backlog_ready</span><span class="o">.</span><span class="n">set</span><span class="p">()</span>
-        <span class="k">if</span> <span class="n">wait</span> <span class="ow">and</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_backlog_thread</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">wait</span> <span class="ow">and</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_backlog_thread</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">):</span>  <span class="c1"># pragma: intermittent</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">backlog_thread</span><span class="o">.</span><span class="n">wait</span><span class="p">(</span><span class="n">key</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="n">uuid</span><span class="o">.</span><span class="n">uuid4</span><span class="p">()))</span>
         <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_wrapped</span><span class="p">,</span> <span class="s1">&#39;_close_backlog&#39;</span><span class="p">):</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_wrapped</span><span class="o">.</span><span class="n">_close_backlog</span><span class="p">(</span><span class="n">wait</span><span class="o">=</span><span class="n">wait</span><span class="p">)</span>

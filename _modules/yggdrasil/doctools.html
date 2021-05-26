@@ -1,0 +1,874 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+  <title>yggdrasil.doctools &mdash; yggdrasil 1.6.2 documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/theme_overrides.css" type="text/css" />
+
+  
+  
+
+  
+  
+
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+        <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
+        <script src="../../_static/jquery.js"></script>
+        <script src="../../_static/underscore.js"></script>
+        <script src="../../_static/doctools.js"></script>
+    
+    <script type="text/javascript" src="../../_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../index.html" class="icon icon-home"> yggdrasil
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                1.6.2
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../includeme.html">Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../install.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../getting_started.html">Getting started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../formatted_io.html">Formatted I/O</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../server_client_io.html">Server/Client I/O</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../autowrap.html">Autowrapping Model Functions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../autowrap.html#notes-on-autowrapping-c-c-model-functions">Notes on Autowrapping C/C++ Model Functions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../conditional_io.html">Conditional I/O</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../transformed_io.html">Transformed I/O</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../timesync_io.html">Timestep Synchronization</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../yaml.html">YAML Files</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../config.html">Configuration Files</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../units.html">Units</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../c_format_strings.html">C-Style Format Strings</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../debugging.html">Debugging</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../threading.html">OpenMP Threading in Models</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../examples/examples_toc.html">Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../advanced/index.html">Advanced</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../development/index.html">Development</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../publications.html">Publications</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../hackathon2018/index.html">Welcome to the 2018 Crops in Silico Hackathon!</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../hackathon2019/index.html">Welcome to the 2019 Crops in Silico Hackathon!</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">yggdrasil</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../index.html" class="icon icon-home"></a> &raquo;</li>
+        
+          <li><a href="../index.html">Module code</a> &raquo;</li>
+        
+      <li>yggdrasil.doctools</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for yggdrasil.doctools</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">re</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">textwrap</span>
+
+
+<div class="viewcode-block" id="write_table"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.doctools.write_table">[docs]</a><span class="k">def</span> <span class="nf">write_table</span><span class="p">(</span><span class="n">lines</span><span class="p">,</span> <span class="n">fname</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">fname_base</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">fname_dir</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Write a table to a file.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        fname (str, optional): Name of the file where the table should be written.</span>
+<span class="sd">            If not provided, one is constructed from fname_base and fname_dir.</span>
+<span class="sd">        fname_base (str, optional): Base name of the file where the table should</span>
+<span class="sd">            be written if fname is not provided. If fname is None, fname_base</span>
+<span class="sd">            must be provided.</span>
+<span class="sd">        fname_dir (str, optional): Directory where the table should be written</span>
+<span class="sd">            if fname is not provided. If not provided, this defaults to the</span>
+<span class="sd">            current working directory.</span>
+<span class="sd">        verbose (bool, optional): If True, the lines are printed to standard</span>
+<span class="sd">            out in addition to the file. Defaults to False.</span>
+<span class="sd">        **kwargs: Additional keyword arguments are ignored.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        str: Name of file created.</span>
+
+<span class="sd">    Raises:</span>
+<span class="sd">        ValueError: If neither fname nor fname_base are provided.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">fname</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">fname_base</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;If fname is not provided, fname_base must be.&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">fname_dir</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">fname_dir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">getcwd</span><span class="p">()</span>
+        <span class="n">fname</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">fname_dir</span><span class="p">,</span> <span class="n">fname_base</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">fname_dir</span><span class="p">,</span> <span class="n">fname_base</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">fname</span><span class="p">)</span>
+    <span class="n">fname_ref</span> <span class="o">=</span> <span class="n">fname_base</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;.rst&#39;</span><span class="p">,</span> <span class="s1">&#39;_rst&#39;</span><span class="p">)</span>
+    <span class="c1"># Write</span>
+    <span class="n">lines</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;.. _</span><span class="si">%s</span><span class="s1">:&#39;</span> <span class="o">%</span> <span class="n">fname_ref</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">]</span> <span class="o">+</span> <span class="n">lines</span>
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">fname</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">fd</span><span class="p">:</span>
+        <span class="n">fd</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">lines</span><span class="p">))</span>
+    <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">lines</span><span class="p">))</span>
+    <span class="k">return</span> <span class="n">fname</span></div>
+
+
+<div class="viewcode-block" id="write_comm_devnotes_table"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.doctools.write_comm_devnotes_table">[docs]</a><span class="k">def</span> <span class="nf">write_comm_devnotes_table</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Write a table containing development notes for the registered comms.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        **kwargs: Additional keyword arguments are passed to dict2table and</span>
+<span class="sd">            write_table.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        str, list: Name of file or files created.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="kn">from</span> <span class="nn">yggdrasil</span> <span class="kn">import</span> <span class="n">tools</span><span class="p">,</span> <span class="n">components</span>
+    <span class="n">kwargs</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s1">&#39;fname_base&#39;</span><span class="p">,</span> <span class="s1">&#39;comm_devnotes_table.rst&#39;</span><span class="p">)</span>
+    <span class="n">args</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="k">for</span> <span class="n">comm</span> <span class="ow">in</span> <span class="n">tools</span><span class="o">.</span><span class="n">get_supported_comm</span><span class="p">():</span>
+        <span class="k">if</span> <span class="n">comm</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;default&#39;</span><span class="p">,</span> <span class="s1">&#39;rmq_async&#39;</span><span class="p">]:</span>
+            <span class="k">continue</span>
+        <span class="n">cdrv</span> <span class="o">=</span> <span class="n">components</span><span class="o">.</span><span class="n">import_component</span><span class="p">(</span><span class="s1">&#39;comm&#39;</span><span class="p">,</span> <span class="n">comm</span><span class="p">)</span>
+        <span class="n">args</span><span class="p">[</span><span class="n">comm</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;developer notes&#39;</span><span class="p">:</span> <span class="n">get_docs_section</span><span class="p">(</span><span class="n">cdrv</span><span class="o">.</span><span class="vm">__doc__</span><span class="p">,</span>
+                                                          <span class="n">keys</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;Developer Notes:&#39;</span><span class="p">,</span>
+                                                                <span class="s1">&#39;Development Notes:&#39;</span><span class="p">],</span>
+                                                          <span class="n">join_lines</span><span class="o">=</span><span class="kc">True</span><span class="p">)}</span>
+        <span class="k">if</span> <span class="n">cdrv</span><span class="o">.</span><span class="n">address_description</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">args</span><span class="p">[</span><span class="n">comm</span><span class="p">][</span><span class="s1">&#39;address&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">cdrv</span><span class="o">.</span><span class="n">address_description</span>
+    <span class="n">kwargs</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s1">&#39;key_column_name&#39;</span><span class="p">,</span> <span class="s1">&#39;comm&#39;</span><span class="p">)</span>
+    <span class="n">kwargs</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s1">&#39;val_column_name&#39;</span><span class="p">,</span> <span class="s1">&#39;developer notes&#39;</span><span class="p">)</span>
+    <span class="n">kwargs</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s1">&#39;wrapped_columns&#39;</span><span class="p">,</span> <span class="p">{</span><span class="s1">&#39;address&#39;</span><span class="p">:</span> <span class="mi">40</span><span class="p">,</span>
+                                          <span class="s1">&#39;developer notes&#39;</span><span class="p">:</span> <span class="mi">80</span><span class="p">})</span>
+    <span class="n">kwargs</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s1">&#39;column_order&#39;</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;comm&#39;</span><span class="p">,</span> <span class="s1">&#39;address&#39;</span><span class="p">,</span> <span class="s1">&#39;developer notes&#39;</span><span class="p">])</span>
+    <span class="n">lines</span> <span class="o">=</span> <span class="n">dict2table</span><span class="p">(</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">write_table</span><span class="p">(</span><span class="n">lines</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="write_datatype_mapping_table"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.doctools.write_datatype_mapping_table">[docs]</a><span class="k">def</span> <span class="nf">write_datatype_mapping_table</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Write a table containing mapping of datatypes between different</span>
+<span class="sd">    languages.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        **kwargs: Additional keyword arguments are passed to dict2table and</span>
+<span class="sd">            write_table.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        str, list: Name of file or files created.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="kn">from</span> <span class="nn">yggdrasil</span> <span class="kn">import</span> <span class="n">tools</span><span class="p">,</span> <span class="n">components</span>
+    <span class="kn">from</span> <span class="nn">yggdrasil.metaschema.datatypes</span> <span class="kn">import</span> <span class="n">_type_registry</span>
+    <span class="n">kwargs</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s1">&#39;fname_base&#39;</span><span class="p">,</span> <span class="s1">&#39;datatype_mapping_table.rst&#39;</span><span class="p">)</span>
+    <span class="n">args</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">_type_registry</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+        <span class="k">if</span> <span class="n">v</span><span class="o">.</span><span class="n">cross_language_support</span><span class="p">:</span>
+            <span class="n">args</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;notes&#39;</span><span class="p">:</span> <span class="n">get_docs_section</span><span class="p">(</span><span class="n">v</span><span class="o">.</span><span class="vm">__doc__</span><span class="p">,</span>
+                                                 <span class="n">keys</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;Developer Notes:&#39;</span><span class="p">,</span>
+                                                       <span class="s1">&#39;Development Notes:&#39;</span><span class="p">],</span>
+                                                 <span class="n">join_lines</span><span class="o">=</span><span class="kc">True</span><span class="p">)}</span>
+    <span class="k">for</span> <span class="n">lang</span> <span class="ow">in</span> <span class="n">tools</span><span class="o">.</span><span class="n">get_supported_lang</span><span class="p">():</span>
+        <span class="k">if</span> <span class="n">lang</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;lpy&#39;</span><span class="p">,</span> <span class="s1">&#39;make&#39;</span><span class="p">,</span> <span class="s1">&#39;cmake&#39;</span><span class="p">,</span> <span class="s1">&#39;executable&#39;</span><span class="p">]:</span>
+            <span class="k">continue</span>
+        <span class="k">if</span> <span class="n">lang</span> <span class="o">==</span> <span class="s1">&#39;cpp&#39;</span><span class="p">:</span>
+            <span class="n">lang</span> <span class="o">=</span> <span class="s1">&#39;c++&#39;</span>
+        <span class="n">ldrv</span> <span class="o">=</span> <span class="n">components</span><span class="o">.</span><span class="n">import_component</span><span class="p">(</span><span class="s1">&#39;model&#39;</span><span class="p">,</span> <span class="n">lang</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">ldrv</span><span class="o">.</span><span class="n">full_language</span><span class="p">:</span>
+            <span class="k">continue</span>
+        <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">args</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+            <span class="n">entry</span> <span class="o">=</span> <span class="n">ldrv</span><span class="o">.</span><span class="n">type_map</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">entry</span><span class="p">:</span>
+                <span class="n">args</span><span class="p">[</span><span class="n">k</span><span class="p">][</span><span class="n">lang</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;``</span><span class="si">%s</span><span class="s1">``&#39;</span> <span class="o">%</span> <span class="n">entry</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">args</span><span class="p">[</span><span class="n">k</span><span class="p">][</span><span class="n">lang</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+    <span class="n">kwargs</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s1">&#39;key_column_name&#39;</span><span class="p">,</span> <span class="s1">&#39;schema&#39;</span><span class="p">)</span>
+    <span class="n">kwargs</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s1">&#39;val_column_name&#39;</span><span class="p">,</span> <span class="s1">&#39;notes&#39;</span><span class="p">)</span>
+    <span class="n">kwargs</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s1">&#39;prune_empty_columns&#39;</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>
+    <span class="n">kwargs</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s1">&#39;last_column&#39;</span><span class="p">,</span> <span class="s1">&#39;notes&#39;</span><span class="p">)</span>
+    <span class="c1"># kwargs.setdefault(&#39;column_order&#39;, [&#39;schema&#39;, &#39;notes&#39;])</span>
+    <span class="n">kwargs</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s1">&#39;wrapped_columns&#39;</span><span class="p">,</span> <span class="p">{</span><span class="s1">&#39;notes&#39;</span><span class="p">:</span> <span class="mi">40</span><span class="p">})</span>
+    <span class="n">lines</span> <span class="o">=</span> <span class="n">dict2table</span><span class="p">(</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">write_table</span><span class="p">(</span><span class="n">lines</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
+    
+
+<div class="viewcode-block" id="write_datatype_table"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.doctools.write_datatype_table">[docs]</a><span class="k">def</span> <span class="nf">write_datatype_table</span><span class="p">(</span><span class="n">table_type</span><span class="o">=</span><span class="s1">&#39;all&#39;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Write a table containing entries from the descriptions of datatypes.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        table_type (str, optional): Type of table that should be created for the</span>
+<span class="sd">            class. Defaults to &#39;all&#39;. Supported values include:</span>
+
+<span class="sd">            * &#39;all&#39;: Create each type of table.</span>
+<span class="sd">            * &#39;simple&#39;: Create a table of standard JSON datatypes.</span>
+<span class="sd">            * &#39;container&#39;: Create a table of container datatypes.</span>
+<span class="sd">            * &#39;yggdrasil&#39;: Create a table of yggdrasil specific datatypes.</span>
+
+<span class="sd">        **kwargs: Additional keyword arguments are passed to dict2table and</span>
+<span class="sd">            write_table.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        str, list: Name of file or files created.</span>
+
+<span class="sd">    Raises:</span>
+<span class="sd">        ValueError: If table_type is not one of the supported values.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="kn">from</span> <span class="nn">yggdrasil.metaschema.datatypes</span> <span class="kn">import</span> <span class="n">_type_registry</span>
+    <span class="n">table_type_list</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;simple&#39;</span><span class="p">,</span> <span class="s1">&#39;container&#39;</span><span class="p">,</span> <span class="s1">&#39;yggdrasil&#39;</span><span class="p">]</span>
+    <span class="k">if</span> <span class="n">table_type</span> <span class="o">==</span> <span class="s1">&#39;all&#39;</span><span class="p">:</span>
+        <span class="n">fname</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;fname&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+        <span class="n">fname_base</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;fname_base&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+        <span class="k">assert</span><span class="p">((</span><span class="n">fname</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">fname_base</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">))</span>
+        <span class="n">out</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">table_type_list</span><span class="p">:</span>
+            <span class="n">out</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">write_datatype_table</span><span class="p">(</span><span class="n">table_type</span><span class="o">=</span><span class="n">k</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">))</span>
+        <span class="k">return</span> <span class="n">out</span>
+    <span class="k">elif</span> <span class="n">table_type</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">table_type_list</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Unsupported table_type: &#39;</span><span class="si">%s</span><span class="s2">&#39;&quot;</span> <span class="o">%</span> <span class="n">table_type</span><span class="p">)</span>
+    <span class="n">fname_format</span> <span class="o">=</span> <span class="s1">&#39;datatype_table_</span><span class="si">%s</span><span class="s1">.rst&#39;</span>
+    <span class="n">kwargs</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s1">&#39;fname_base&#39;</span><span class="p">,</span> <span class="n">fname_format</span> <span class="o">%</span> <span class="p">(</span><span class="n">table_type</span><span class="p">))</span>
+    <span class="n">target_types</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">args</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="k">if</span> <span class="n">table_type</span> <span class="o">==</span> <span class="s1">&#39;simple&#39;</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">_type_registry</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="k">if</span> <span class="n">v</span><span class="o">.</span><span class="n">_replaces_existing</span> <span class="ow">and</span> <span class="p">(</span><span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="s1">&#39;_container_type&#39;</span><span class="p">)):</span>
+                <span class="n">target_types</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">k</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="n">table_type</span> <span class="o">==</span> <span class="s1">&#39;container&#39;</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">_type_registry</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="k">if</span> <span class="n">v</span><span class="o">.</span><span class="n">_replaces_existing</span> <span class="ow">and</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="s1">&#39;_container_type&#39;</span><span class="p">):</span>
+                <span class="n">target_types</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">k</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="n">table_type</span> <span class="o">==</span> <span class="s1">&#39;yggdrasil&#39;</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">_type_registry</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">v</span><span class="o">.</span><span class="n">_replaces_existing</span><span class="p">:</span>
+                <span class="n">target_types</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">k</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">target_types</span><span class="p">:</span>
+        <span class="n">v</span> <span class="o">=</span> <span class="n">_type_registry</span><span class="p">[</span><span class="n">k</span><span class="p">]</span>
+        <span class="n">args</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;description&#39;</span><span class="p">:</span> <span class="n">v</span><span class="o">.</span><span class="n">description</span><span class="p">,</span>
+                   <span class="s1">&#39;required properties&#39;</span><span class="p">:</span> <span class="n">v</span><span class="o">.</span><span class="n">definition_properties</span><span class="p">}</span>
+    <span class="n">kwargs</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s1">&#39;key_column_name&#39;</span><span class="p">,</span> <span class="s1">&#39;type&#39;</span><span class="p">)</span>
+    <span class="n">kwargs</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s1">&#39;list_columns&#39;</span><span class="p">,</span> <span class="s1">&#39;required properties&#39;</span><span class="p">)</span>
+    <span class="n">lines</span> <span class="o">=</span> <span class="n">dict2table</span><span class="p">(</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">write_table</span><span class="p">(</span><span class="n">lines</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
+    
+
+<div class="viewcode-block" id="write_classdocs_table"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.doctools.write_classdocs_table">[docs]</a><span class="k">def</span> <span class="nf">write_classdocs_table</span><span class="p">(</span><span class="n">class_</span><span class="p">,</span> <span class="n">table_type</span><span class="o">=</span><span class="s1">&#39;all&#39;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Write a table containing entries from a section in a class&#39;s</span>
+<span class="sd">    documentation.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        class_ (type): Class with docstring that should be parsed.</span>
+<span class="sd">        table_type (str, optional): Type of table that should be created for the</span>
+<span class="sd">            class. Defaults to &#39;all&#39;. Supported values include:</span>
+
+<span class="sd">            * &#39;all&#39;: Create each type of table for the specified class.</span>
+<span class="sd">            * &#39;args&#39;: Create a table of the class&#39;s argumetns.</span>
+<span class="sd">            * &#39;attr&#39;: Create a table of the class&#39;s attributes.</span>
+<span class="sd">            * &#39;classattr&#39;: Create a table of the class&#39;s class attributes.</span>
+
+<span class="sd">        **kwargs: Additional keyword arguments are passed to dict2table and</span>
+<span class="sd">            write_table.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        str, list: Name of file or files created.</span>
+
+<span class="sd">    Raises:</span>
+<span class="sd">        ValueError: If table_type is not one of the supported values.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">table_type2keys</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;args&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;Args:&#39;</span><span class="p">,</span> <span class="s1">&#39;Arguments:&#39;</span><span class="p">],</span>
+                       <span class="s1">&#39;attr&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;Attr:&#39;</span><span class="p">,</span> <span class="s1">&#39;Attributes:&#39;</span><span class="p">],</span>
+                       <span class="s1">&#39;classattr&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;Class Attr:&#39;</span><span class="p">,</span> <span class="s1">&#39;Class Attributes&#39;</span><span class="p">]}</span>
+    <span class="n">table_type_list</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">table_type2keys</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
+    <span class="k">if</span> <span class="n">table_type</span> <span class="o">==</span> <span class="s1">&#39;all&#39;</span><span class="p">:</span>
+        <span class="n">fname</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;fname&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+        <span class="n">fname_base</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;fname_base&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+        <span class="k">assert</span><span class="p">((</span><span class="n">fname</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">fname_base</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">))</span>
+        <span class="n">out</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">table_type_list</span><span class="p">:</span>
+            <span class="n">out</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">write_classdocs_table</span><span class="p">(</span><span class="n">class_</span><span class="p">,</span> <span class="n">table_type</span><span class="o">=</span><span class="n">k</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">))</span>
+        <span class="k">return</span> <span class="n">out</span>
+    <span class="k">elif</span> <span class="n">table_type</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">table_type2keys</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Unsupported table_type: &#39;</span><span class="si">%s</span><span class="s2">&#39;&quot;</span> <span class="o">%</span> <span class="n">table_type</span><span class="p">)</span>
+    <span class="n">fname_format</span> <span class="o">=</span> <span class="s1">&#39;class_table_</span><span class="si">%s</span><span class="s1">_</span><span class="si">%s</span><span class="s1">.rst&#39;</span>
+    <span class="n">kwargs</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s1">&#39;fname_base&#39;</span><span class="p">,</span> <span class="n">fname_format</span> <span class="o">%</span> <span class="p">(</span><span class="n">class_</span><span class="o">.</span><span class="vm">__name__</span><span class="p">,</span> <span class="n">table_type</span><span class="p">))</span>
+    <span class="n">args</span> <span class="o">=</span> <span class="n">docs2args</span><span class="p">(</span><span class="n">class_</span><span class="o">.</span><span class="vm">__doc__</span><span class="p">,</span> <span class="n">keys</span><span class="o">=</span><span class="n">table_type2keys</span><span class="p">[</span><span class="n">table_type</span><span class="p">])</span>
+    <span class="k">if</span> <span class="n">table_type</span> <span class="o">==</span> <span class="s1">&#39;args&#39;</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">args</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="k">if</span> <span class="n">v</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;type&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s1">&#39;, optional&#39;</span><span class="p">):</span>
+                <span class="n">v</span><span class="p">[</span><span class="s1">&#39;type&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">v</span><span class="p">[</span><span class="s1">&#39;type&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;, optional&#39;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+                <span class="n">v</span><span class="p">[</span><span class="s1">&#39;required&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">v</span><span class="p">[</span><span class="s1">&#39;required&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;X&#39;</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">args</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="k">if</span> <span class="n">v</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;description&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s1">&#39; [REQUIRED]&#39;</span><span class="p">):</span>
+                <span class="n">v</span><span class="p">[</span><span class="s1">&#39;description&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">v</span><span class="p">[</span><span class="s1">&#39;description&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39; [REQUIRED]&#39;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+                <span class="n">v</span><span class="p">[</span><span class="s1">&#39;required&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;X&#39;</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">v</span><span class="p">[</span><span class="s1">&#39;required&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+    <span class="n">lines</span> <span class="o">=</span> <span class="n">dict2table</span><span class="p">(</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">write_table</span><span class="p">(</span><span class="n">lines</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="write_component_table"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.doctools.write_component_table">[docs]</a><span class="k">def</span> <span class="nf">write_component_table</span><span class="p">(</span><span class="n">comp</span><span class="o">=</span><span class="s1">&#39;all&#39;</span><span class="p">,</span> <span class="n">table_type</span><span class="o">=</span><span class="s1">&#39;all&#39;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Write a component table to a file.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        comp (str): Name of a component type to create a table for. Defaults to</span>
+<span class="sd">            &#39;all&#39; and tables are created for each of the registered components.</span>
+<span class="sd">        table_type (str, optional): Type of table that should be created for the</span>
+<span class="sd">            component. Defaults to &#39;all&#39;. Supported values include:</span>
+
+<span class="sd">            * &#39;all&#39;: Create each type of table for the specified component.</span>
+<span class="sd">            * &#39;general&#39;: Create a table of properties common to all components</span>
+<span class="sd">              of the specified type.</span>
+<span class="sd">            * &#39;specific&#39;: Create a table of properties specific to only some</span>
+<span class="sd">              components of the specified type.</span>
+<span class="sd">            * &#39;subtype&#39;: Create a table describing the subtypes available for</span>
+<span class="sd">              the specified component type.</span>
+
+<span class="sd">        **kwargs: Additional keyword arguments are passed to component2table</span>
+<span class="sd">            and write_table.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        str, list: Name of file or files created.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="kn">from</span> <span class="nn">yggdrasil.schema</span> <span class="kn">import</span> <span class="n">get_schema</span>
+    <span class="n">s</span> <span class="o">=</span> <span class="n">get_schema</span><span class="p">()</span>
+    <span class="n">table_type_list</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;subtype&#39;</span><span class="p">,</span> <span class="s1">&#39;general&#39;</span><span class="p">,</span> <span class="s1">&#39;specific&#39;</span><span class="p">]</span>
+    <span class="c1"># Loop</span>
+    <span class="k">if</span> <span class="n">comp</span> <span class="o">==</span> <span class="s1">&#39;all&#39;</span><span class="p">:</span>
+        <span class="n">fname</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;fname&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+        <span class="n">fname_base</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;fname_base&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+        <span class="k">assert</span><span class="p">((</span><span class="n">fname</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">fname_base</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">))</span>
+        <span class="n">out</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">s</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+            <span class="n">new_out</span> <span class="o">=</span> <span class="n">write_component_table</span><span class="p">(</span><span class="n">comp</span><span class="o">=</span><span class="n">k</span><span class="p">,</span> <span class="n">table_type</span><span class="o">=</span><span class="n">table_type</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">new_out</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
+                <span class="n">out</span> <span class="o">+=</span> <span class="n">new_out</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">out</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">new_out</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">out</span>
+    <span class="k">if</span> <span class="n">table_type</span> <span class="o">==</span> <span class="s1">&#39;all&#39;</span><span class="p">:</span>
+        <span class="n">fname</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;fname&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+        <span class="n">fname_base</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;fname_base&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+        <span class="k">assert</span><span class="p">((</span><span class="n">fname</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">fname_base</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">))</span>
+        <span class="n">out</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">table_type_list</span><span class="p">:</span>
+            <span class="n">out</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">write_component_table</span><span class="p">(</span><span class="n">comp</span><span class="o">=</span><span class="n">comp</span><span class="p">,</span> <span class="n">table_type</span><span class="o">=</span><span class="n">k</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">))</span>
+        <span class="k">return</span> <span class="n">out</span>
+    <span class="c1"># Construct file name</span>
+    <span class="n">fname_format</span> <span class="o">=</span> <span class="s1">&#39;schema_table_</span><span class="si">%s</span><span class="s1">_</span><span class="si">%s</span><span class="s1">.rst&#39;</span>
+    <span class="n">kwargs</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s1">&#39;subtype_ref&#39;</span><span class="p">,</span>
+                      <span class="p">(</span><span class="n">fname_format</span> <span class="o">%</span> <span class="p">(</span><span class="n">comp</span><span class="p">,</span> <span class="s1">&#39;subtype&#39;</span><span class="p">))</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;.rst&#39;</span><span class="p">,</span> <span class="s1">&#39;_rst&#39;</span><span class="p">))</span>
+    <span class="n">kwargs</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s1">&#39;fname_base&#39;</span><span class="p">,</span> <span class="n">fname_format</span> <span class="o">%</span> <span class="p">(</span><span class="n">comp</span><span class="p">,</span> <span class="n">table_type</span><span class="p">))</span>
+    <span class="n">lines</span> <span class="o">=</span> <span class="n">component2table</span><span class="p">(</span><span class="n">comp</span><span class="p">,</span> <span class="n">table_type</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">write_table</span><span class="p">(</span><span class="n">lines</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="component2table"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.doctools.component2table">[docs]</a><span class="k">def</span> <span class="nf">component2table</span><span class="p">(</span><span class="n">comp</span><span class="p">,</span> <span class="n">table_type</span><span class="p">,</span> <span class="n">include_required</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                    <span class="n">subtype_ref</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Create a table describing a component.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        comp (str): Name of a component type to create a table for.</span>
+<span class="sd">        table_type (str): Type of table that should be created for the component.</span>
+<span class="sd">            Supported values include:</span>
+
+<span class="sd">            * &#39;general&#39;: Create a table of properties common to all components</span>
+<span class="sd">              of the specified type.</span>
+<span class="sd">            * &#39;specific&#39;: Create a table of properties specific to only some</span>
+<span class="sd">              components of the specified type.</span>
+<span class="sd">            * &#39;subtype&#39;: Create a table describing the subtypes available for</span>
+<span class="sd">              the specified component type.</span>
+
+<span class="sd">        include_required (bool, optional): If True, a required column is</span>
+<span class="sd">            included. Defaults to True if table_type is &#39;general&#39; and False</span>
+<span class="sd">            otherwise.</span>
+<span class="sd">        subtype_ref (str, optional): Reference for the subtype table for the</span>
+<span class="sd">            specified component that should be used in the description for the</span>
+<span class="sd">            subtype property. Defaults to None and is ignored.</span>
+<span class="sd">        **kwargs: Additional keyword arguments are passed to dict2table.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        list: Lines comprising the table.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="kn">from</span> <span class="nn">yggdrasil.schema</span> <span class="kn">import</span> <span class="n">get_schema</span>
+    <span class="k">if</span> <span class="n">include_required</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">table_type</span> <span class="o">==</span> <span class="s1">&#39;general&#39;</span><span class="p">:</span>
+            <span class="n">include_required</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">include_required</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="k">if</span> <span class="n">table_type</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;subtype&#39;</span><span class="p">,</span> <span class="s1">&#39;specific&#39;</span><span class="p">]:</span>
+        <span class="n">kwargs</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s1">&#39;prune_empty_columns&#39;</span><span class="p">,</span> <span class="kc">True</span><span class="p">)</span>
+    <span class="n">args</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="n">s</span> <span class="o">=</span> <span class="n">get_schema</span><span class="p">()</span>
+    <span class="n">subtype_key</span> <span class="o">=</span> <span class="n">s</span><span class="p">[</span><span class="n">comp</span><span class="p">]</span><span class="o">.</span><span class="n">subtype_key</span>
+    <span class="k">if</span> <span class="n">table_type</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;general&#39;</span><span class="p">,</span> <span class="s1">&#39;specific&#39;</span><span class="p">]:</span>
+        <span class="c1"># Set defaults</span>
+        <span class="n">kwargs</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s1">&#39;key_column_name&#39;</span><span class="p">,</span> <span class="s1">&#39;option&#39;</span><span class="p">)</span>
+        <span class="n">kwargs</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s1">&#39;val_column_name&#39;</span><span class="p">,</span> <span class="s1">&#39;description&#39;</span><span class="p">)</span>
+        <span class="n">kwargs</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s1">&#39;column_order&#39;</span><span class="p">,</span> <span class="p">[</span><span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;key_column_name&#39;</span><span class="p">],</span>
+                                           <span class="s1">&#39;type&#39;</span><span class="p">,</span> <span class="s1">&#39;required&#39;</span><span class="p">,</span>
+                                           <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;val_column_name&#39;</span><span class="p">]])</span>
+        <span class="k">if</span> <span class="p">(</span><span class="ow">not</span> <span class="n">include_required</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="s1">&#39;required&#39;</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;column_order&#39;</span><span class="p">]):</span>
+            <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;column_order&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="s1">&#39;required&#39;</span><span class="p">)</span>
+        <span class="c1"># Get list of component subtypes</span>
+        <span class="k">if</span> <span class="n">table_type</span> <span class="o">==</span> <span class="s1">&#39;general&#39;</span><span class="p">:</span>
+            <span class="n">s_comp_list</span> <span class="o">=</span> <span class="p">[</span><span class="n">s</span><span class="p">[</span><span class="n">comp</span><span class="p">]</span><span class="o">.</span><span class="n">get_subtype_schema</span><span class="p">(</span><span class="s1">&#39;base&#39;</span><span class="p">,</span> <span class="n">unique</span><span class="o">=</span><span class="kc">True</span><span class="p">)]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">s_comp_list</span> <span class="o">=</span> <span class="p">[</span><span class="n">s</span><span class="p">[</span><span class="n">comp</span><span class="p">]</span><span class="o">.</span><span class="n">get_subtype_schema</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">unique</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+                           <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">s</span><span class="p">[</span><span class="n">comp</span><span class="p">]</span><span class="o">.</span><span class="n">classes</span><span class="p">]</span>
+        <span class="c1"># Loop over subtyeps</span>
+        <span class="n">out_apply</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">for</span> <span class="n">s_comp</span> <span class="ow">in</span> <span class="n">s_comp_list</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">s_comp</span><span class="p">[</span><span class="s1">&#39;properties&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                <span class="k">if</span> <span class="p">(</span><span class="n">k</span> <span class="o">==</span> <span class="n">subtype_key</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">table_type</span> <span class="o">==</span> <span class="s1">&#39;specific&#39;</span><span class="p">):</span>
+                    <span class="k">continue</span>
+                <span class="k">if</span> <span class="n">k</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">args</span><span class="p">:</span>
+                    <span class="n">args</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="n">v</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;type&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">),</span>
+                               <span class="s1">&#39;description&#39;</span><span class="p">:</span> <span class="n">v</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;description&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">)}</span>
+                    <span class="k">if</span> <span class="n">include_required</span><span class="p">:</span>
+                        <span class="k">if</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">s_comp</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;required&#39;</span><span class="p">,</span> <span class="p">[]):</span>
+                            <span class="n">args</span><span class="p">[</span><span class="n">k</span><span class="p">][</span><span class="s1">&#39;required&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;X&#39;</span>
+                        <span class="k">else</span><span class="p">:</span>
+                            <span class="n">args</span><span class="p">[</span><span class="n">k</span><span class="p">][</span><span class="s1">&#39;required&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+                <span class="k">if</span> <span class="p">(</span><span class="n">table_type</span> <span class="o">==</span> <span class="s1">&#39;specific&#39;</span><span class="p">):</span>
+                    <span class="k">if</span> <span class="n">k</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">out_apply</span><span class="p">:</span>
+                        <span class="n">out_apply</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+                    <span class="n">out_apply</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">+=</span> <span class="n">s_comp</span><span class="p">[</span><span class="s1">&#39;properties&#39;</span><span class="p">][</span><span class="n">subtype_key</span><span class="p">][</span><span class="s1">&#39;enum&#39;</span><span class="p">]</span>
+                <span class="k">elif</span> <span class="p">(</span><span class="n">subtype_ref</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">k</span> <span class="o">==</span> <span class="n">subtype_key</span><span class="p">):</span>
+                    <span class="n">args</span><span class="p">[</span><span class="n">k</span><span class="p">][</span><span class="s1">&#39;description&#39;</span><span class="p">]</span> <span class="o">+=</span> <span class="p">(</span>
+                        <span class="s1">&#39; (Options described :ref:`here &lt;</span><span class="si">%s</span><span class="s1">&gt;`)&#39;</span> <span class="o">%</span> <span class="n">subtype_ref</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">table_type</span> <span class="o">==</span> <span class="s1">&#39;specific&#39;</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">args</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                <span class="n">v</span><span class="p">[</span><span class="s1">&#39;Valid for </span><span class="se">\&#39;</span><span class="si">%s</span><span class="se">\&#39;</span><span class="s1"> of&#39;</span> <span class="o">%</span> <span class="n">subtype_key</span><span class="p">]</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">out_apply</span><span class="p">[</span><span class="n">k</span><span class="p">]))</span>
+    <span class="k">elif</span> <span class="n">table_type</span> <span class="o">==</span> <span class="s1">&#39;subtype&#39;</span><span class="p">:</span>
+        <span class="n">kwargs</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s1">&#39;key_column_name&#39;</span><span class="p">,</span> <span class="n">subtype_key</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">x</span><span class="p">,</span> <span class="n">subtypes</span> <span class="ow">in</span> <span class="n">s</span><span class="p">[</span><span class="n">comp</span><span class="p">]</span><span class="o">.</span><span class="n">schema_subtypes</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="n">s_comp</span> <span class="o">=</span> <span class="n">s</span><span class="p">[</span><span class="n">comp</span><span class="p">]</span><span class="o">.</span><span class="n">get_subtype_schema</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">unique</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+            <span class="n">subt</span> <span class="o">=</span> <span class="n">subtypes</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="n">args</span><span class="p">[</span><span class="n">subt</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
+                <span class="s1">&#39;description&#39;</span><span class="p">:</span> <span class="n">s_comp</span><span class="p">[</span><span class="s1">&#39;properties&#39;</span><span class="p">][</span><span class="n">subtype_key</span><span class="p">]</span><span class="o">.</span><span class="n">get</span><span class="p">(</span>
+                    <span class="s1">&#39;description&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">)}</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">subtypes</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+                <span class="n">args</span><span class="p">[</span><span class="n">subt</span><span class="p">][</span><span class="s1">&#39;aliases&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">subtypes</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span>
+            <span class="k">if</span> <span class="n">s_comp</span><span class="p">[</span><span class="s1">&#39;properties&#39;</span><span class="p">][</span><span class="n">subtype_key</span><span class="p">]</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;default&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">in</span> <span class="n">subtypes</span><span class="p">:</span>
+                <span class="n">args</span><span class="p">[</span><span class="n">subt</span><span class="p">][</span><span class="s1">&#39;description&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;[DEFAULT] &#39;</span>
+                                             <span class="o">+</span> <span class="n">args</span><span class="p">[</span><span class="n">subt</span><span class="p">][</span><span class="s1">&#39;description&#39;</span><span class="p">])</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Unsupported table_type: &#39;</span><span class="si">%s</span><span class="s2">&#39;&quot;</span> <span class="o">%</span> <span class="n">table_type</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">dict2table</span><span class="p">(</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="dict2table"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.doctools.dict2table">[docs]</a><span class="k">def</span> <span class="nf">dict2table</span><span class="p">(</span><span class="n">args</span><span class="p">,</span> <span class="n">key_column_name</span><span class="o">=</span><span class="s1">&#39;option&#39;</span><span class="p">,</span> <span class="n">val_column_name</span><span class="o">=</span><span class="s1">&#39;description&#39;</span><span class="p">,</span>
+               <span class="n">column_order</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">wrapped_columns</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">list_columns</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+               <span class="n">sort_on_key</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">sort_required_first</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+               <span class="n">last_column</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">prune_empty_columns</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+               <span class="n">style</span><span class="o">=</span><span class="s1">&#39;simple&#39;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Convert a dictionary to a table.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        args (dict): Dictionary of entries for the table. The keys will go in</span>
+<span class="sd">            the first column (the key column) as named by key_column_name.</span>
+<span class="sd">            If the values are dictionaries, the elements in each dictionary</span>
+<span class="sd">            will be put in different columns. If the values are strings, they</span>
+<span class="sd">            will be put in the column identified by val_column_name.</span>
+<span class="sd">        key_column_name (str, optional): Label that the key column should have.</span>
+<span class="sd">            Defaults to &#39;option&#39;.</span>
+<span class="sd">        val_column_name (str, optional): Lable that the value column should have.</span>
+<span class="sd">            Defaults to &#39;description&#39;.</span>
+<span class="sd">        column_order (list, optional): List specifying the roder that fields</span>
+<span class="sd">            should be added to the table as columns. Defaults to None and is set</span>
+<span class="sd">            to [key_column_name, val_column_name]. If a column is missing from</span>
+<span class="sd">            an entry in args, an empty value will be added to the table in its</span>
+<span class="sd">            place. Columns in args entries that are not in column_order are</span>
+<span class="sd">            appended to column_order in sorted order.</span>
+<span class="sd">        wrapped_columns (dict, optional): Dictionary specifying fields that</span>
+<span class="sd">            should be wrapped as columns and the widths that the corresponding</span>
+<span class="sd">            column should be wrapped to. Defaults to {&#39;Description&#39;: 80}.</span>
+<span class="sd">        list_columns (list, optional): List of fields with values that should</span>
+<span class="sd">            be formatted with one item per line if it is a list. Defaults to</span>
+<span class="sd">            None and is ignored.</span>
+<span class="sd">        sort_on_key (bool, optional): If True, the entries in args are added</span>
+<span class="sd">            as rows in the order determined by sorting on the keys. If False,</span>
+<span class="sd">            the order will be determine by prop (which is not deterministic</span>
+<span class="sd">            if a Python 2 dictionary). Defaults to True.</span>
+<span class="sd">        sort_required_first (bool, optional): If True, the required</span>
+<span class="sd">            entries are placed first in the table. Defaults to True.</span>
+<span class="sd">        last_column (str, optional): Name of the field that should be placed</span>
+<span class="sd">            in the last column position. Defaults to None and is ignored.</span>
+<span class="sd">        prune_empty_columns (bool, optional): If True, empty columns will be</span>
+<span class="sd">            removed. If False, they will be included. Defaults to False.</span>
+<span class="sd">        style (str, optional): Style of table that should be used. &#39;simple&#39;</span>
+<span class="sd">            dosn&#39;t allow for multi-column or row cells, while &#39;complex&#39;</span>
+<span class="sd">            does. Defaults to &#39;simple&#39;.</span>
+<span class="sd">        **kwargs: Additional keyword arguments are ignored.</span>
+<span class="sd">            </span>
+<span class="sd">    Returns:</span>
+<span class="sd">        list: Lines comprising the table.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">wrapped_columns</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">wrapped_columns</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;description&#39;</span><span class="p">:</span> <span class="mi">80</span><span class="p">}</span>
+    <span class="k">if</span> <span class="n">list_columns</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">list_columns</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">style</span> <span class="o">=</span> <span class="s1">&#39;complex&#39;</span>
+    <span class="c1"># Determine column order</span>
+    <span class="k">if</span> <span class="n">column_order</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">column_order</span> <span class="o">=</span> <span class="p">[</span><span class="n">key_column_name</span><span class="p">,</span> <span class="n">val_column_name</span><span class="p">]</span>
+    <span class="c1"># Create dictionary of columns</span>
+    <span class="n">columns</span> <span class="o">=</span> <span class="p">{</span><span class="n">k</span><span class="p">:</span> <span class="p">[]</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">column_order</span><span class="p">}</span>
+    <span class="n">pos</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">prop_req</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">prop_order</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">args</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
+    <span class="k">if</span> <span class="n">sort_required_first</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">prop_order</span><span class="p">:</span>
+            <span class="n">v</span> <span class="o">=</span> <span class="n">args</span><span class="p">[</span><span class="n">k</span><span class="p">]</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="nb">dict</span><span class="p">)</span> <span class="ow">and</span> <span class="n">v</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;required&#39;</span><span class="p">,</span> <span class="kc">False</span><span class="p">):</span>
+                <span class="n">prop_req</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">k</span><span class="p">)</span>
+        <span class="n">prop_order</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">prop_order</span><span class="p">)</span> <span class="o">-</span> <span class="nb">set</span><span class="p">(</span><span class="n">prop_req</span><span class="p">))</span>
+    <span class="k">if</span> <span class="n">sort_on_key</span><span class="p">:</span>
+        <span class="n">prop_req</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">prop_req</span><span class="p">)</span>
+        <span class="n">prop_order</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">prop_order</span><span class="p">)</span>
+    <span class="n">prop_order</span> <span class="o">=</span> <span class="n">prop_req</span> <span class="o">+</span> <span class="n">prop_order</span>
+    <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">prop_order</span><span class="p">:</span>
+        <span class="n">v</span> <span class="o">=</span> <span class="n">args</span><span class="p">[</span><span class="n">k</span><span class="p">]</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
+            <span class="n">v</span> <span class="o">=</span> <span class="p">{</span><span class="n">val_column_name</span><span class="p">:</span> <span class="n">v</span><span class="p">}</span>
+        <span class="k">for</span> <span class="n">pk</span> <span class="ow">in</span> <span class="n">v</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+            <span class="k">if</span> <span class="n">pk</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">columns</span><span class="p">:</span>
+                <span class="n">columns</span><span class="p">[</span><span class="n">pk</span><span class="p">]</span> <span class="o">=</span> <span class="n">pos</span> <span class="o">*</span> <span class="p">[</span><span class="s1">&#39;&#39;</span><span class="p">]</span>
+        <span class="k">for</span> <span class="n">pk</span> <span class="ow">in</span> <span class="n">columns</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+            <span class="k">if</span> <span class="n">pk</span> <span class="o">==</span> <span class="n">key_column_name</span><span class="p">:</span>
+                <span class="n">columns</span><span class="p">[</span><span class="n">key_column_name</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">k</span><span class="p">)</span>
+            <span class="k">elif</span> <span class="n">pk</span> <span class="ow">in</span> <span class="n">list_columns</span><span class="p">:</span>
+                <span class="n">x</span> <span class="o">=</span> <span class="n">v</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">pk</span><span class="p">,</span> <span class="p">[])</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
+                    <span class="n">x</span> <span class="o">=</span> <span class="p">[</span><span class="n">x</span><span class="p">]</span>
+                <span class="n">columns</span><span class="p">[</span><span class="n">pk</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">columns</span><span class="p">[</span><span class="n">pk</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">v</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">pk</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">)))</span>
+        <span class="n">pos</span> <span class="o">+=</span> <span class="mi">1</span>
+    <span class="c1"># Add non-standard fields</span>
+    <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">columns</span><span class="o">.</span><span class="n">keys</span><span class="p">()):</span>
+        <span class="k">if</span> <span class="n">k</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">column_order</span><span class="p">:</span>
+            <span class="n">column_order</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">k</span><span class="p">)</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">last_column</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">last_column</span> <span class="ow">in</span> <span class="n">column_order</span><span class="p">):</span>
+        <span class="n">column_order</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">last_column</span><span class="p">)</span>
+        <span class="n">column_order</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">last_column</span><span class="p">)</span>
+    <span class="c1"># Prune empty columns</span>
+    <span class="n">column_widths</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">list</span><span class="p">(</span><span class="n">columns</span><span class="o">.</span><span class="n">keys</span><span class="p">()):</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">columns</span><span class="p">[</span><span class="n">k</span><span class="p">])</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">column_widths</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">column_widths</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="nb">max</span><span class="p">(</span><span class="n">columns</span><span class="p">[</span><span class="n">k</span><span class="p">],</span> <span class="n">key</span><span class="o">=</span><span class="nb">len</span><span class="p">))</span>
+        <span class="k">if</span> <span class="n">prune_empty_columns</span> <span class="ow">and</span> <span class="p">(</span><span class="n">column_widths</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">==</span> <span class="mi">0</span><span class="p">):</span>
+            <span class="k">del</span> <span class="n">column_widths</span><span class="p">[</span><span class="n">k</span><span class="p">]</span>
+            <span class="k">del</span> <span class="n">columns</span><span class="p">[</span><span class="n">k</span><span class="p">]</span>
+            <span class="n">column_order</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">k</span><span class="p">)</span>
+    <span class="c1"># Get sizes that include headers and wrapping</span>
+    <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">columns</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+        <span class="k">if</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">wrapped_columns</span><span class="p">:</span>
+            <span class="n">w</span> <span class="o">=</span> <span class="n">wrapped_columns</span><span class="p">[</span><span class="n">k</span><span class="p">]</span>
+        <span class="k">elif</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">list_columns</span><span class="p">:</span>
+            <span class="n">w</span> <span class="o">=</span> <span class="nb">max</span><span class="p">([</span><span class="nb">len</span><span class="p">(</span><span class="nb">max</span><span class="p">(</span><span class="n">irow</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="nb">len</span><span class="p">))</span> <span class="k">for</span> <span class="n">irow</span> <span class="ow">in</span> <span class="n">columns</span><span class="p">[</span><span class="n">k</span><span class="p">]])</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">w</span> <span class="o">=</span> <span class="n">column_widths</span><span class="p">[</span><span class="n">k</span><span class="p">]</span>
+        <span class="n">column_widths</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">w</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">k</span><span class="p">))</span>
+    <span class="c1"># Create format string</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">columns</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="n">style</span> <span class="o">=</span> <span class="s1">&#39;complex&#39;</span>
+    <span class="k">if</span> <span class="n">style</span> <span class="o">==</span> <span class="s1">&#39;simple&#39;</span><span class="p">:</span>
+        <span class="n">column_beg</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+        <span class="n">column_end</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+        <span class="n">column_sep</span> <span class="o">=</span> <span class="s1">&#39;   &#39;</span>
+        <span class="n">hline_beg</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+        <span class="n">hline_end</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+        <span class="n">hline_char</span> <span class="o">=</span> <span class="s1">&#39;=&#39;</span>
+        <span class="n">hline_sep</span> <span class="o">=</span> <span class="n">column_sep</span>
+        <span class="n">hline_beg_header</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+        <span class="n">hline_end_header</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+        <span class="n">hline_char_header</span> <span class="o">=</span> <span class="s1">&#39;=&#39;</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">column_beg</span> <span class="o">=</span> <span class="s1">&#39;| &#39;</span>
+        <span class="n">column_end</span> <span class="o">=</span> <span class="s1">&#39; |&#39;</span>
+        <span class="n">column_sep</span> <span class="o">=</span> <span class="s1">&#39; | &#39;</span>
+        <span class="n">hline_beg</span> <span class="o">=</span> <span class="s1">&#39;+-&#39;</span>
+        <span class="n">hline_end</span> <span class="o">=</span> <span class="s1">&#39;-+&#39;</span>
+        <span class="n">hline_char</span> <span class="o">=</span> <span class="s1">&#39;-&#39;</span>
+        <span class="n">hline_sep</span> <span class="o">=</span> <span class="s1">&#39;-+-&#39;</span>
+        <span class="n">hline_beg_header</span> <span class="o">=</span> <span class="s1">&#39;+=&#39;</span>
+        <span class="n">hline_end_header</span> <span class="o">=</span> <span class="s1">&#39;=+&#39;</span>
+        <span class="n">hline_char_header</span> <span class="o">=</span> <span class="s1">&#39;=&#39;</span>
+    <span class="n">column_format</span> <span class="o">=</span> <span class="p">(</span><span class="n">column_beg</span>
+                     <span class="o">+</span> <span class="n">column_sep</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="s1">&#39;%-&#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">column_widths</span><span class="p">[</span><span class="n">k</span><span class="p">])</span> <span class="o">+</span> <span class="s1">&#39;s&#39;</span>
+                                        <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">column_order</span><span class="p">])</span>
+                     <span class="o">+</span> <span class="n">column_end</span><span class="p">)</span>
+    <span class="n">divider</span> <span class="o">=</span> <span class="p">(</span><span class="n">hline_beg</span>
+               <span class="o">+</span> <span class="n">hline_sep</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="n">hline_char</span> <span class="o">*</span> <span class="n">column_widths</span><span class="p">[</span><span class="n">k</span><span class="p">]</span>
+                                 <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">column_order</span><span class="p">])</span>
+               <span class="o">+</span> <span class="n">hline_end</span><span class="p">)</span>
+    <span class="n">divider_header</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="n">hline_beg_header</span>
+        <span class="o">+</span> <span class="n">hline_sep</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="n">hline_char_header</span> <span class="o">*</span> <span class="n">column_widths</span><span class="p">[</span><span class="n">k</span><span class="p">]</span>
+                          <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">column_order</span><span class="p">])</span>
+        <span class="o">+</span> <span class="n">hline_end_header</span><span class="p">)</span>
+    <span class="n">header</span> <span class="o">=</span> <span class="n">column_format</span> <span class="o">%</span> <span class="nb">tuple</span><span class="p">([</span><span class="n">k</span><span class="o">.</span><span class="n">title</span><span class="p">()</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">column_order</span><span class="p">])</span>
+    <span class="c1"># Table</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">columns</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="n">pos</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">pos</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">columns</span><span class="p">[</span><span class="nb">list</span><span class="p">(</span><span class="n">columns</span><span class="o">.</span><span class="n">keys</span><span class="p">())[</span><span class="mi">0</span><span class="p">]])</span>
+    <span class="n">lines</span> <span class="o">=</span> <span class="p">[</span><span class="n">divider</span><span class="p">,</span> <span class="n">header</span><span class="p">,</span> <span class="n">divider_header</span><span class="p">]</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">pos</span><span class="p">):</span>
+        <span class="n">row</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">max_row_len</span> <span class="o">=</span> <span class="mi">1</span>
+        <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">column_order</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">wrapped_columns</span><span class="p">:</span>
+                <span class="n">row</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">textwrap</span><span class="o">.</span><span class="n">wrap</span><span class="p">(</span><span class="n">columns</span><span class="p">[</span><span class="n">k</span><span class="p">][</span><span class="n">i</span><span class="p">],</span> <span class="n">wrapped_columns</span><span class="p">[</span><span class="n">k</span><span class="p">]))</span>
+            <span class="k">elif</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">list_columns</span><span class="p">:</span>
+                <span class="n">row</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">columns</span><span class="p">[</span><span class="n">k</span><span class="p">][</span><span class="n">i</span><span class="p">])</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">row</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="n">columns</span><span class="p">[</span><span class="n">k</span><span class="p">][</span><span class="n">i</span><span class="p">]])</span>
+            <span class="n">max_row_len</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">max_row_len</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">row</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]))</span>
+        <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">row</span><span class="p">)):</span>
+            <span class="n">row</span><span class="p">[</span><span class="n">j</span><span class="p">]</span> <span class="o">+=</span> <span class="p">(</span><span class="n">max_row_len</span> <span class="o">-</span> <span class="nb">len</span><span class="p">(</span><span class="n">row</span><span class="p">[</span><span class="n">j</span><span class="p">]))</span> <span class="o">*</span> <span class="p">[</span><span class="s1">&#39;&#39;</span><span class="p">]</span>
+        <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">max_row_len</span><span class="p">):</span>
+            <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">column_format</span> <span class="o">%</span> <span class="nb">tuple</span><span class="p">([</span><span class="n">row</span><span class="p">[</span><span class="n">j</span><span class="p">][</span><span class="n">k</span><span class="p">]</span> <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">row</span><span class="p">))]))</span>
+        <span class="k">if</span> <span class="n">style</span> <span class="o">!=</span> <span class="s1">&#39;simple&#39;</span><span class="p">:</span>
+            <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">divider</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">style</span> <span class="o">==</span> <span class="s1">&#39;simple&#39;</span><span class="p">:</span>
+        <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">divider</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">lines</span></div>
+
+
+<div class="viewcode-block" id="get_docs_section"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.doctools.get_docs_section">[docs]</a><span class="k">def</span> <span class="nf">get_docs_section</span><span class="p">(</span><span class="n">docs</span><span class="p">,</span> <span class="n">keys</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;Args:&#39;</span><span class="p">,</span> <span class="s1">&#39;Arguments:&#39;</span><span class="p">],</span> <span class="n">join_lines</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Get contents of a particular sections in a docstring.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        docs (str): Docstring that should be parsed.</span>
+<span class="sd">        keys (list): Strings that should be used to identify the target section</span>
+<span class="sd">            in the docstring. Defaults to [&#39;Args:&#39;, &#39;Arguments:&#39;].</span>
+<span class="sd">        join_lines (bool, optional): If True, the returned lines will be</span>
+<span class="sd">            stripped and joined into a single string. Defaults to False.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        list: Lines in the section(s) specified by keys.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">keys</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
+        <span class="n">keys</span> <span class="o">=</span> <span class="p">[</span><span class="n">keys</span><span class="p">]</span>
+    <span class="k">if</span> <span class="n">docs</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">return</span> <span class="p">[]</span>
+    <span class="n">docs_lines</span> <span class="o">=</span> <span class="n">docs</span><span class="o">.</span><span class="n">splitlines</span><span class="p">()</span>
+    <span class="c1"># Isolate arguments section based on heading</span>
+    <span class="n">in_args</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="n">args_lines</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">docs_lines</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">in_args</span><span class="p">:</span>
+            <span class="k">if</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">strip</span><span class="p">())</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span> <span class="ow">or</span> <span class="p">(</span><span class="ow">not</span> <span class="n">x</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="mi">8</span> <span class="o">*</span> <span class="s1">&#39; &#39;</span><span class="p">)):</span>
+                <span class="c1"># Blank line or no indent indicates new section</span>
+                <span class="n">in_args</span> <span class="o">=</span> <span class="kc">False</span>
+                <span class="k">break</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">args_lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="nb">any</span><span class="p">([</span><span class="n">x</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;    </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">k</span><span class="p">)</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">keys</span><span class="p">]):</span>
+            <span class="n">in_args</span> <span class="o">=</span> <span class="kc">True</span>
+    <span class="c1"># Join lines</span>
+    <span class="k">if</span> <span class="n">join_lines</span><span class="p">:</span>
+        <span class="k">return</span> <span class="s1">&#39; &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="n">x</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">args_lines</span><span class="p">])</span>
+    <span class="k">return</span> <span class="n">args_lines</span></div>
+    
+
+<div class="viewcode-block" id="docs2args"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.doctools.docs2args">[docs]</a><span class="k">def</span> <span class="nf">docs2args</span><span class="p">(</span><span class="n">docs</span><span class="p">,</span> <span class="n">keys</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;Args:&#39;</span><span class="p">,</span> <span class="s1">&#39;Arguments:&#39;</span><span class="p">]):</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Get a dictionary of arguments and argument descriptions from a docstring.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        docs (str): Docstring that should be parsed.</span>
+<span class="sd">        keys (list): Strings that should be used to identify the target section</span>
+<span class="sd">            in the docstring. Defaults to [&#39;Args:&#39;, &#39;Arguments:&#39;].</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        dict: Dictionary of arguments/description pairs.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">args_lines</span> <span class="o">=</span> <span class="n">get_docs_section</span><span class="p">(</span><span class="n">docs</span><span class="p">,</span> <span class="n">keys</span><span class="o">=</span><span class="n">keys</span><span class="p">)</span>
+    <span class="c1"># Parse argument lines</span>
+    <span class="n">out</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="n">curr_arg</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">args_lines</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">x</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="mi">12</span> <span class="o">*</span> <span class="s1">&#39; &#39;</span><span class="p">):</span>
+            <span class="n">out</span><span class="p">[</span><span class="n">curr_arg</span><span class="p">][</span><span class="s1">&#39;description&#39;</span><span class="p">]</span> <span class="o">+=</span> <span class="s1">&#39; &#39;</span> <span class="o">+</span> <span class="n">x</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">re_arg</span> <span class="o">=</span> <span class="sa">r</span><span class="s1">&#39;        ([\S]+)[\s]+\(([^\)]+)\):[\s]+([\S\s]+)&#39;</span>
+            <span class="n">x_match</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="n">re_arg</span><span class="p">,</span> <span class="n">x</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">x_match</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="k">break</span>
+            <span class="n">curr_arg</span> <span class="o">=</span> <span class="n">x_match</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+            <span class="n">out</span><span class="p">[</span><span class="n">curr_arg</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="n">x_match</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">2</span><span class="p">),</span>
+                             <span class="s1">&#39;description&#39;</span><span class="p">:</span> <span class="n">x_match</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">3</span><span class="p">)}</span>
+    <span class="k">return</span> <span class="n">out</span></div>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &#169; Copyright 2017, Meagan Lang, David Raila.
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

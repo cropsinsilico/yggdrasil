@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>yggdrasil.drivers.ModelDriver &mdash; yggdrasil 1.6.1 documentation</title>
+  <title>yggdrasil.drivers.ModelDriver &mdash; yggdrasil 1.6.2 documentation</title>
   
 
   
@@ -63,7 +63,7 @@
             
             
               <div class="version">
-                1.6.1
+                1.6.2
               </div>
             
           
@@ -331,6 +331,8 @@
 <span class="sd">        valgrind_flags (list, optional): Flags to pass to valgrind. Defaults to [].</span>
 <span class="sd">        model_index (int, optional): Index of model in list of models being run.</span>
 <span class="sd">            Defaults to 0.</span>
+<span class="sd">        copy_index (int, optional): Index of model in set of copies. Defaults</span>
+<span class="sd">            to -1 indicating there is only one copy of the model.</span>
 <span class="sd">        outputs_in_inputs (bool, optional): If True, outputs from wrapped model</span>
 <span class="sd">            functions are passed by pointer as inputs for modification and the</span>
 <span class="sd">            return value will be a flag. If False, outputs are limited to</span>
@@ -397,6 +399,11 @@
 <span class="sd">        brackets (tuple): A pair of opening and clossing characters that</span>
 <span class="sd">            are used by the language to mark blocks. Set to None and</span>
 <span class="sd">            ignored by default.</span>
+<span class="sd">        no_executable (bool): True if there is not an executable associated</span>
+<span class="sd">            with the language driver. Defaults to False.</span>
+<span class="sd">        comms_implicit (bool): True if the comms installed for this driver</span>
+<span class="sd">            are not explicitly defined (depend on input parameters). Defaults</span>
+<span class="sd">            to False.</span>
 
 <span class="sd">    Attributes:</span>
 <span class="sd">        args (list): Argument(s) for running the model on the command line.</span>
@@ -435,6 +442,7 @@
 <span class="sd">        with_valgrind (bool): If True, the command is run with valgrind.</span>
 <span class="sd">        valgrind_flags (list): Flags to pass to valgrind.</span>
 <span class="sd">        model_index (int): Index of model in list of models being run.</span>
+<span class="sd">        copy_index (int): Index of model in set of copies.</span>
 <span class="sd">        modified_files (list): List of pairs of originals and copies of files</span>
 <span class="sd">            that should be restored during cleanup.</span>
 <span class="sd">        allow_threading (bool): If True, comm connections will be set up so that</span>
@@ -576,6 +584,8 @@
     <span class="n">brackets</span> <span class="o">=</span> <span class="kc">None</span>
     <span class="n">zero_based</span> <span class="o">=</span> <span class="kc">True</span>
     <span class="n">max_line_width</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">no_executable</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="n">comms_implicit</span> <span class="o">=</span> <span class="kc">False</span>
     <span class="n">python_interface</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;table_input&#39;</span><span class="p">:</span> <span class="s1">&#39;YggAsciiTableInput&#39;</span><span class="p">,</span>
                         <span class="s1">&#39;table_output&#39;</span><span class="p">:</span> <span class="s1">&#39;YggAsciiTableOutput&#39;</span><span class="p">,</span>
                         <span class="s1">&#39;array_input&#39;</span><span class="p">:</span> <span class="s1">&#39;YggArrayInput&#39;</span><span class="p">,</span>
@@ -591,7 +601,7 @@
                            <span class="s1">&#39;event_process_kill_called&#39;</span><span class="p">,</span>
                            <span class="s1">&#39;event_process_kill_complete&#39;</span><span class="p">])</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">args</span><span class="p">,</span> <span class="n">model_index</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">clients</span><span class="o">=</span><span class="p">[],</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">args</span><span class="p">,</span> <span class="n">model_index</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">copy_index</span><span class="o">=-</span><span class="mi">1</span><span class="p">,</span> <span class="n">clients</span><span class="o">=</span><span class="p">[],</span>
                  <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">model_outputs_in_inputs</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;outputs_in_inputs&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">ModelDriver</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
@@ -610,6 +620,7 @@
              <span class="ow">and</span> <span class="n">platform</span><span class="o">.</span><span class="n">_is_win</span><span class="p">)):</span>  <span class="c1"># pragma: windows</span>
             <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">&quot;strace/valgrind options invalid on windows.&quot;</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">model_index</span> <span class="o">=</span> <span class="n">model_index</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">copy_index</span> <span class="o">=</span> <span class="n">copy_index</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">clients</span> <span class="o">=</span> <span class="n">clients</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">env_copy</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;LANG&#39;</span><span class="p">,</span> <span class="s1">&#39;PATH&#39;</span><span class="p">,</span> <span class="s1">&#39;USER&#39;</span><span class="p">]</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_exit_line</span> <span class="o">=</span> <span class="sa">b</span><span class="s1">&#39;EXIT&#39;</span>
@@ -621,6 +632,8 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">raw_model_file</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">model_function_file</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">model_function_info</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">model_function_inputs</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">model_function_outputs</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">model_file</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">model_args</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">model_dir</span> <span class="o">=</span> <span class="kc">None</span>
@@ -646,16 +659,28 @@
                                    <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">language_ext</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
             <span class="c1"># Write file</span>
             <span class="k">if</span> <span class="p">(</span><span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">]))</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">overwrite</span><span class="p">:</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">model_function_info</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">parse_function_definition</span><span class="p">(</span>
-                    <span class="bp">self</span><span class="o">.</span><span class="n">model_function_file</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">function</span><span class="p">)</span>
                 <span class="n">client_comms</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;</span><span class="si">%s</span><span class="s1">:</span><span class="si">%s</span><span class="s1">_</span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
                                 <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">client_of</span><span class="p">]</span>
-                <span class="n">lines</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">write_model_wrapper</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">model_function_inputs</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">inputs</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">model_function_outputs</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">outputs</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">expand_server_io</span><span class="p">(</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">model_function_inputs</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">model_function_outputs</span><span class="p">,</span>
+                    <span class="n">client_comms</span><span class="o">=</span><span class="n">client_comms</span><span class="p">)</span>
+                <span class="n">expected_outputs</span> <span class="o">=</span> <span class="p">[]</span>
+                <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">model_function_outputs</span><span class="p">:</span>
+                    <span class="n">expected_outputs</span> <span class="o">+=</span> <span class="n">x</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;vars&#39;</span><span class="p">,</span> <span class="p">[])</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">model_function_info</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">parse_function_definition</span><span class="p">(</span>
                     <span class="bp">self</span><span class="o">.</span><span class="n">model_function_file</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">function</span><span class="p">,</span>
-                    <span class="n">inputs</span><span class="o">=</span><span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">inputs</span><span class="p">),</span>
-                    <span class="n">outputs</span><span class="o">=</span><span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">outputs</span><span class="p">),</span>
+                    <span class="n">expected_outputs</span><span class="o">=</span><span class="n">expected_outputs</span><span class="p">)</span>
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">model_outputs_in_inputs</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">model_outputs_in_inputs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">model_function_info</span><span class="o">.</span><span class="n">get</span><span class="p">(</span>
+                        <span class="s1">&#39;outputs_in_inputs&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+                <span class="n">lines</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">write_model_wrapper</span><span class="p">(</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">model_function_info</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">function</span><span class="p">,</span>
+                    <span class="n">inputs</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">model_function_inputs</span><span class="p">,</span>
+                    <span class="n">outputs</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">model_function_outputs</span><span class="p">,</span>
                     <span class="n">outputs_in_inputs</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">model_outputs_in_inputs</span><span class="p">,</span>
-                    <span class="n">client_comms</span><span class="o">=</span><span class="n">client_comms</span><span class="p">,</span> <span class="n">copies</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">copies</span><span class="p">)</span>
+                    <span class="n">copies</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">copies</span><span class="p">)</span>
                 <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="s1">&#39;w&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">fd</span><span class="p">:</span>
                     <span class="n">fd</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">lines</span><span class="p">))</span>
         <span class="c1"># Parse arguments</span>
@@ -840,6 +865,29 @@
             <span class="n">out</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLevelName</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">logging_level</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">out</span>
 
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">n_sent_messages</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;dict: Number of messages sent by the model via each connection.&quot;&quot;&quot;</span>
+        <span class="n">out</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">yml</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;output_drivers&#39;</span><span class="p">,</span> <span class="p">[]):</span>
+            <span class="n">x_inst</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;instance&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">x_inst</span><span class="p">:</span>
+                <span class="n">out</span><span class="p">[</span><span class="n">x_inst</span><span class="o">.</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">x_inst</span><span class="o">.</span><span class="n">models_recvd</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_server</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">yml</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;input_drivers&#39;</span><span class="p">,</span> <span class="p">[]):</span>
+                <span class="n">x_inst</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;instance&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">x_inst</span> <span class="ow">and</span> <span class="p">(</span><span class="n">x_inst</span><span class="o">.</span><span class="n">_connection_type</span> <span class="o">==</span> <span class="s1">&#39;rpc_request&#39;</span><span class="p">):</span>
+                    <span class="n">out</span><span class="p">[</span><span class="n">x_inst</span><span class="o">.</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">x_inst</span><span class="o">.</span><span class="n">servers_recvd</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">out</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">has_sent_messages</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;bool: True if output has been received from the model.&quot;&quot;&quot;</span>
+        <span class="n">n_msg</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_sent_messages</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">n_msg</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">True</span>
+        <span class="k">return</span> <span class="nb">bool</span><span class="p">(</span><span class="nb">sum</span><span class="p">(</span><span class="n">n_msg</span><span class="o">.</span><span class="n">values</span><span class="p">()))</span>
+
 <div class="viewcode-block" id="ModelDriver.write_wrappers"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.ModelDriver.ModelDriver.write_wrappers">[docs]</a>    <span class="k">def</span> <span class="nf">write_wrappers</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Write any wrappers needed to compile and/or run a model.</span>
 
@@ -873,6 +921,8 @@
 <span class="sd">                to run the compiler/interpreter from the command line.</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">cls</span><span class="o">.</span><span class="n">no_executable</span><span class="p">:</span>
+            <span class="k">return</span> <span class="s1">&#39;&#39;</span>
         <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;language_executable not implemented for &#39;</span><span class="si">%s</span><span class="s2">&#39;&quot;</span>
                                   <span class="o">%</span> <span class="bp">cls</span><span class="o">.</span><span class="n">language</span><span class="p">)</span></div>
         
@@ -1231,6 +1281,10 @@
                 <span class="n">out</span> <span class="o">=</span> <span class="n">import_component</span><span class="p">(</span><span class="s1">&#39;model&#39;</span><span class="p">,</span> <span class="n">x</span><span class="p">)</span><span class="o">.</span><span class="n">is_comm_installed</span><span class="p">(</span>
                     <span class="n">commtype</span><span class="o">=</span><span class="n">commtype</span><span class="p">,</span> <span class="n">skip_config</span><span class="o">=</span><span class="n">skip_config</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
             <span class="k">return</span> <span class="n">out</span>
+        <span class="k">if</span> <span class="bp">cls</span><span class="o">.</span><span class="n">comms_implicit</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">commtype</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="k">return</span> <span class="kc">True</span>
+            <span class="k">return</span> <span class="p">(</span><span class="n">commtype</span> <span class="ow">in</span> <span class="n">tools</span><span class="o">.</span><span class="n">get_supported_comm</span><span class="p">())</span>
         <span class="c1"># Check for installation based on config option</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">skip_config</span><span class="p">:</span>
             <span class="n">installed_comms</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">cfg</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="bp">cls</span><span class="o">.</span><span class="n">language</span><span class="p">,</span> <span class="s1">&#39;commtypes&#39;</span><span class="p">,</span> <span class="p">[])</span>
@@ -1382,7 +1436,7 @@
         <span class="n">env</span><span class="p">[</span><span class="s1">&#39;YGG_MODEL_LANGUAGE&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">language</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">copies</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
             <span class="n">env</span><span class="p">[</span><span class="s1">&#39;YGG_MODEL_NAME&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;_copy&#39;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
-            <span class="n">env</span><span class="p">[</span><span class="s1">&#39;YGG_MODEL_COPY&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;_copy&#39;</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+            <span class="n">env</span><span class="p">[</span><span class="s1">&#39;YGG_MODEL_COPY&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">copy_index</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">env</span><span class="p">[</span><span class="s1">&#39;YGG_MODEL_NAME&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span>
         <span class="n">env</span><span class="p">[</span><span class="s1">&#39;YGG_MODEL_COPIES&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">copies</span><span class="p">)</span>
@@ -1435,8 +1489,7 @@
         <span class="k">except</span> <span class="ne">BaseException</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>  <span class="c1"># pragma: debug</span>
             <span class="nb">print</span><span class="p">(</span><span class="n">e</span><span class="p">)</span>
             <span class="n">line</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
-        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">line</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
-            <span class="c1"># self.info(&quot;%s: Empty line from stdout&quot; % self.name)</span>
+        <span class="k">if</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">line</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">):</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">queue_thread</span><span class="o">.</span><span class="n">set_break_flag</span><span class="p">()</span>
             <span class="k">try</span><span class="p">:</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">queue</span><span class="o">.</span><span class="n">put</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_exit_line</span><span class="p">)</span>
@@ -1499,20 +1552,24 @@
                       <span class="p">[</span><span class="n">drv</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">]</span> <span class="k">for</span> <span class="n">drv</span> <span class="ow">in</span>
                        <span class="bp">self</span><span class="o">.</span><span class="n">yml</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;output_drivers&#39;</span><span class="p">,</span> <span class="p">[])]))</span>
         <span class="k">for</span> <span class="n">drv</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">yml</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;input_drivers&#39;</span><span class="p">,</span> <span class="p">[]):</span>
-            <span class="n">drv</span><span class="p">[</span><span class="s1">&#39;instance&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">on_model_exit</span><span class="p">(</span><span class="s1">&#39;output&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span>
-                                          <span class="n">errors</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">errors</span><span class="p">)</span>
+            <span class="k">if</span> <span class="s1">&#39;instance&#39;</span> <span class="ow">in</span> <span class="n">drv</span><span class="p">:</span>
+                <span class="n">drv</span><span class="p">[</span><span class="s1">&#39;instance&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">on_model_exit</span><span class="p">(</span><span class="s1">&#39;output&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span>
+                                              <span class="n">errors</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">errors</span><span class="p">)</span>
         <span class="k">for</span> <span class="n">drv</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">yml</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;output_drivers&#39;</span><span class="p">,</span> <span class="p">[]):</span>
-            <span class="n">drv</span><span class="p">[</span><span class="s1">&#39;instance&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">on_model_exit</span><span class="p">(</span><span class="s1">&#39;input&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span>
-                                          <span class="n">errors</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">errors</span><span class="p">)</span></div>
+            <span class="k">if</span> <span class="s1">&#39;instance&#39;</span> <span class="ow">in</span> <span class="n">drv</span><span class="p">:</span>
+                <span class="n">drv</span><span class="p">[</span><span class="s1">&#39;instance&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">on_model_exit</span><span class="p">(</span><span class="s1">&#39;input&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span>
+                                              <span class="n">errors</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">errors</span><span class="p">)</span></div>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">io_errors</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;list: Errors produced by input/output drivers to this model.&quot;&quot;&quot;</span>
         <span class="n">errors</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="k">for</span> <span class="n">drv</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">yml</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;input_drivers&#39;</span><span class="p">,</span> <span class="p">[]):</span>
-            <span class="n">errors</span> <span class="o">+=</span> <span class="n">drv</span><span class="p">[</span><span class="s1">&#39;instance&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">errors</span>
+            <span class="k">if</span> <span class="s1">&#39;instance&#39;</span> <span class="ow">in</span> <span class="n">drv</span><span class="p">:</span>
+                <span class="n">errors</span> <span class="o">+=</span> <span class="n">drv</span><span class="p">[</span><span class="s1">&#39;instance&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">errors</span>
         <span class="k">for</span> <span class="n">drv</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">yml</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;output_drivers&#39;</span><span class="p">,</span> <span class="p">[]):</span>
-            <span class="n">errors</span> <span class="o">+=</span> <span class="n">drv</span><span class="p">[</span><span class="s1">&#39;instance&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">errors</span>
+            <span class="k">if</span> <span class="s1">&#39;instance&#39;</span> <span class="ow">in</span> <span class="n">drv</span><span class="p">:</span>
+                <span class="n">errors</span> <span class="o">+=</span> <span class="n">drv</span><span class="p">[</span><span class="s1">&#39;instance&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">errors</span>
         <span class="k">return</span> <span class="n">errors</span>
 
     <span class="nd">@property</span>
@@ -1557,8 +1614,9 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">event_process_kill_called</span><span class="o">.</span><span class="n">set</span><span class="p">()</span>
         <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">lock</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;&#39;</span><span class="p">)</span>
+            <span class="n">ignore_error_code</span> <span class="o">=</span> <span class="kc">False</span>
             <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">model_process_complete</span><span class="p">:</span>  <span class="c1"># pragma: debug</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;Process is still running. Killing it.&quot;</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Process is still running. Killing it.&quot;</span><span class="p">)</span>
                 <span class="k">try</span><span class="p">:</span>
                     <span class="bp">self</span><span class="o">.</span><span class="n">model_process</span><span class="o">.</span><span class="n">kill</span><span class="p">()</span>
                     <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Waiting </span><span class="si">%f</span><span class="s2"> s for process to be killed&quot;</span><span class="p">,</span>
@@ -1566,11 +1624,16 @@
                     <span class="bp">self</span><span class="o">.</span><span class="n">wait_process</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">timeout</span><span class="p">,</span> <span class="n">key_suffix</span><span class="o">=</span><span class="s1">&#39;.kill_process&#39;</span><span class="p">)</span>
                 <span class="k">except</span> <span class="ne">BaseException</span><span class="p">:</span>  <span class="c1"># pragma: debug</span>
                     <span class="bp">self</span><span class="o">.</span><span class="n">exception</span><span class="p">(</span><span class="s2">&quot;Error killing model process&quot;</span><span class="p">)</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">has_sent_messages</span><span class="p">:</span>
+                    <span class="n">ignore_error_code</span> <span class="o">=</span> <span class="kc">True</span>
             <span class="k">assert</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">model_process_complete</span><span class="p">)</span>
             <span class="k">if</span> <span class="p">(((</span><span class="bp">self</span><span class="o">.</span><span class="n">model_process</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">)</span>
-                 <span class="ow">and</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">model_process</span><span class="o">.</span><span class="n">returncode</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">))):</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;return code of </span><span class="si">%s</span><span class="s2"> indicates model error.&quot;</span><span class="p">,</span>
-                           <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">model_process</span><span class="o">.</span><span class="n">returncode</span><span class="p">))</span>
+                 <span class="ow">and</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">model_process</span><span class="o">.</span><span class="n">returncode</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">)</span>
+                 <span class="ow">and</span> <span class="p">(</span><span class="ow">not</span> <span class="n">ignore_error_code</span><span class="p">))):</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">error</span><span class="p">((</span><span class="s2">&quot;return code of </span><span class="si">%s</span><span class="s2"> indicates model error. &quot;</span>
+                            <span class="s2">&quot;(sent messages: </span><span class="si">%s</span><span class="s2">)&quot;</span><span class="p">),</span>
+                           <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">model_process</span><span class="o">.</span><span class="n">returncode</span><span class="p">),</span>
+                           <span class="bp">self</span><span class="o">.</span><span class="n">n_sent_messages</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">event_process_kill_complete</span><span class="o">.</span><span class="n">set</span><span class="p">()</span>
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">queue_thread</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
                 <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">was_break</span><span class="p">:</span>  <span class="c1"># pragma: debug</span>
@@ -1592,7 +1655,8 @@
 <div class="viewcode-block" id="ModelDriver.graceful_stop"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.ModelDriver.ModelDriver.graceful_stop">[docs]</a>    <span class="k">def</span> <span class="nf">graceful_stop</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Gracefully stop the driver.&quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;&#39;</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">wait_process</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">timeout</span><span class="p">,</span> <span class="n">key_suffix</span><span class="o">=</span><span class="s1">&#39;.graceful_stop&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">has_sent_messages</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">wait_process</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">timeout</span><span class="p">,</span> <span class="n">key_suffix</span><span class="o">=</span><span class="s1">&#39;.graceful_stop&#39;</span><span class="p">)</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">ModelDriver</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">graceful_stop</span><span class="p">()</span></div>
 
 <div class="viewcode-block" id="ModelDriver.cleanup_products"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.ModelDriver.ModelDriver.cleanup_products">[docs]</a>    <span class="k">def</span> <span class="nf">cleanup_products</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -1828,6 +1892,7 @@
                 <span class="k">if</span> <span class="n">io</span> <span class="ow">in</span> <span class="n">out</span><span class="p">:</span>
                     <span class="n">out</span><span class="p">[</span><span class="n">io</span><span class="p">]</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">parse_var_definition</span><span class="p">(</span>
                         <span class="n">io</span><span class="p">,</span> <span class="n">out</span><span class="p">[</span><span class="n">io</span><span class="p">],</span> <span class="n">outputs_in_inputs</span><span class="o">=</span><span class="n">outputs_in_inputs</span><span class="p">)</span>
+            <span class="n">out</span><span class="p">[</span><span class="s1">&#39;model_file&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">model_file</span>
         <span class="k">if</span> <span class="n">outputs_in_inputs</span> <span class="ow">and</span> <span class="n">expected_outputs</span> <span class="ow">and</span> <span class="p">(</span><span class="ow">not</span> <span class="n">out</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;outputs&#39;</span><span class="p">,</span> <span class="kc">False</span><span class="p">)):</span>
             <span class="n">missing_expected_outputs</span> <span class="o">=</span> <span class="p">[]</span>
             <span class="k">for</span> <span class="n">o</span> <span class="ow">in</span> <span class="n">expected_outputs</span><span class="p">:</span>
@@ -1853,12 +1918,35 @@
             <span class="k">if</span> <span class="n">out</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;flag_type&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">):</span>
                 <span class="n">flag_var</span><span class="p">[</span><span class="s1">&#39;native_type&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">out</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;flag_type&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39; &#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">)</span>
                 <span class="n">flag_var</span><span class="p">[</span><span class="s1">&#39;datatype&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">get_json_type</span><span class="p">(</span><span class="n">flag_var</span><span class="p">[</span><span class="s1">&#39;native_type&#39;</span><span class="p">])</span>
-            <span class="k">if</span> <span class="n">outputs_in_inputs</span><span class="p">:</span>
-                <span class="n">out</span><span class="p">[</span><span class="s1">&#39;flag_var&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">flag_var</span>
-            <span class="k">else</span><span class="p">:</span>
-                <span class="k">assert</span><span class="p">(</span><span class="ow">not</span> <span class="n">out</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;outputs&#39;</span><span class="p">,</span> <span class="p">[]))</span>
-                <span class="n">out</span><span class="p">[</span><span class="s1">&#39;outputs&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">flag_var</span><span class="p">]</span>
+            <span class="n">out</span><span class="p">[</span><span class="s1">&#39;flag_var&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">flag_var</span>
+            <span class="bp">cls</span><span class="o">.</span><span class="n">check_flag_var</span><span class="p">(</span><span class="n">out</span><span class="p">,</span> <span class="n">outputs_in_inputs</span><span class="o">=</span><span class="n">outputs_in_inputs</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">out</span></div>
+
+<div class="viewcode-block" id="ModelDriver.check_flag_var"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.ModelDriver.ModelDriver.check_flag_var">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">check_flag_var</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">info</span><span class="p">,</span> <span class="n">outputs_in_inputs</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Check if the flag variable should be treated as an output.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            info (dict): Information about the function.</span>
+<span class="sd">            outputs_in_inputs (bool, optional): If True, the outputs are</span>
+<span class="sd">                presented in the function definition as inputs. Defaults</span>
+<span class="sd">                to False.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">outputs_in_inputs</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>  <span class="c1"># pragma: debug</span>
+            <span class="n">outputs_in_inputs</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">outputs_in_inputs</span>
+        <span class="n">flag_t</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">type_map</span><span class="p">[</span><span class="s1">&#39;flag&#39;</span><span class="p">]</span>
+        <span class="k">if</span> <span class="p">(((</span><span class="n">info</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;flag_var&#39;</span><span class="p">,</span> <span class="p">{})</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;native_type&#39;</span><span class="p">,</span> <span class="n">flag_t</span><span class="p">)</span> <span class="o">!=</span> <span class="n">flag_t</span><span class="p">)</span>
+             <span class="ow">or</span> <span class="p">(</span><span class="ow">not</span> <span class="n">outputs_in_inputs</span><span class="p">))):</span>
+            <span class="k">if</span> <span class="n">info</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;outputs&#39;</span><span class="p">,</span> <span class="p">[]):</span>  <span class="c1"># pragma: debug</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s2">&quot;Support for returning outputs via parameter(s) &quot;</span>
+                            <span class="s2">&quot;and return value is not yet support. The return &quot;</span>
+                            <span class="s2">&quot;value will be assumed to be a flag indicating &quot;</span>
+                            <span class="s2">&quot;the success of the model.&quot;</span><span class="p">)</span>
+                <span class="n">info</span><span class="p">[</span><span class="s1">&#39;outputs_in_inputs&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">info</span><span class="p">[</span><span class="s1">&#39;outputs&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">info</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;flag_var&#39;</span><span class="p">)]</span>
+                <span class="n">info</span><span class="p">[</span><span class="s1">&#39;outputs_in_inputs&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">False</span></div>
 
 <div class="viewcode-block" id="ModelDriver.channels2vars"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.ModelDriver.ModelDriver.channels2vars">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">channels2vars</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">channels</span><span class="p">):</span>
@@ -1882,6 +1970,44 @@
         <span class="n">variables</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">variables</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="n">get_pos</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">variables</span></div>
 
+<div class="viewcode-block" id="ModelDriver.expand_server_io"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.ModelDriver.ModelDriver.expand_server_io">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">expand_server_io</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">inputs</span><span class="p">,</span> <span class="n">outputs</span><span class="p">,</span> <span class="n">client_comms</span><span class="o">=</span><span class="p">[]):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Update inputs/outputs w/ information about server that will be</span>
+<span class="sd">        using them.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            inputs (list): List of model inputs including types.</span>
+<span class="sd">            outputs (list): List of model outputs including types.</span>
+<span class="sd">            client_comms (list, optional): List of the names of client comms</span>
+<span class="sd">                that should be removed from the list of outputs. Defaults to [].</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">client_comms</span><span class="p">:</span>
+            <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s2">&quot;When wrapping a model function, client comms &quot;</span>
+                          <span class="s2">&quot;must either be initialized outside the function, &quot;</span>
+                          <span class="s2">&quot;pass a &#39;global_scope&#39; parameter to the &quot;</span>
+                          <span class="s2">&quot;comm initialization (e.g. Python, R, Matlab), &quot;</span>
+                          <span class="s2">&quot;or use a &#39;WITH_GLOBAL_SCOPE&#39; macro &quot;</span>
+                          <span class="s2">&quot;(e.g. C, C++, Fortran) around the initialization &quot;</span>
+                          <span class="s2">&quot;so that they are persistent &quot;</span>
+                          <span class="s2">&quot;across calls and the call or recv/send methods &quot;</span>
+                          <span class="s2">&quot;must be called explicitly (as opposed to the &quot;</span>
+                          <span class="s2">&quot;function inputs/outputs which will be handled &quot;</span>
+                          <span class="s2">&quot;by the wrapper). This model&#39;s client comms are:</span><span class="se">\n</span><span class="s2">&quot;</span>
+                          <span class="s2">&quot;</span><span class="se">\t</span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">client_comms</span><span class="p">)</span>
+        <span class="c1"># Replace server input w/ split input/output and remove client</span>
+        <span class="c1"># connections from inputs</span>
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">x</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">inputs</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">x</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;server_replaces&#39;</span><span class="p">,</span> <span class="kc">False</span><span class="p">):</span>
+                <span class="n">inputs</span><span class="p">[</span><span class="n">x</span><span class="p">[</span><span class="s1">&#39;server_replaces&#39;</span><span class="p">][</span><span class="s1">&#39;input_index&#39;</span><span class="p">]]</span> <span class="o">=</span> <span class="p">(</span>
+                    <span class="n">x</span><span class="p">[</span><span class="s1">&#39;server_replaces&#39;</span><span class="p">][</span><span class="s1">&#39;input&#39;</span><span class="p">])</span>
+                <span class="n">outputs</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="n">x</span><span class="p">[</span><span class="s1">&#39;server_replaces&#39;</span><span class="p">][</span><span class="s1">&#39;output_index&#39;</span><span class="p">],</span>
+                               <span class="n">x</span><span class="p">[</span><span class="s1">&#39;server_replaces&#39;</span><span class="p">][</span><span class="s1">&#39;output&#39;</span><span class="p">])</span>
+        <span class="n">rm_outputs</span> <span class="o">=</span> <span class="p">[</span><span class="n">i</span> <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">x</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">outputs</span><span class="p">)</span>
+                      <span class="k">if</span> <span class="n">x</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">]</span> <span class="ow">in</span> <span class="n">client_comms</span><span class="p">]</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">rm_outputs</span><span class="p">[::</span><span class="o">-</span><span class="mi">1</span><span class="p">]:</span>
+            <span class="n">outputs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="n">i</span><span class="p">)</span></div>
+    
 <div class="viewcode-block" id="ModelDriver.update_io_from_function"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.ModelDriver.ModelDriver.update_io_from_function">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">update_io_from_function</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">model_file</span><span class="p">,</span> <span class="n">model_function</span><span class="p">,</span>
                                 <span class="n">inputs</span><span class="o">=</span><span class="p">[],</span> <span class="n">outputs</span><span class="o">=</span><span class="p">[],</span> <span class="n">contents</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
@@ -1909,14 +2035,20 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="n">outputs_in_inputs</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>  <span class="c1"># pragma: debug</span>
             <span class="n">outputs_in_inputs</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">outputs_in_inputs</span>
+        <span class="c1"># Read info from the source code</span>
         <span class="k">if</span> <span class="p">(((</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">model_file</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span> <span class="ow">and</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">model_file</span><span class="p">))</span>
-             <span class="ow">or</span> <span class="p">(</span><span class="n">contents</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">))):</span>
+             <span class="ow">or</span> <span class="p">(</span><span class="n">contents</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">))):</span>  <span class="c1"># pragma: debug</span>
             <span class="n">expected_outputs</span> <span class="o">=</span> <span class="p">[]</span>
             <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">outputs</span><span class="p">:</span>
                 <span class="n">expected_outputs</span> <span class="o">+=</span> <span class="n">x</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;vars&#39;</span><span class="p">,</span> <span class="p">[])</span>
             <span class="n">info</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">parse_function_definition</span><span class="p">(</span><span class="n">model_file</span><span class="p">,</span> <span class="n">model_function</span><span class="p">,</span>
                                                  <span class="n">contents</span><span class="o">=</span><span class="n">contents</span><span class="p">,</span>
                                                  <span class="n">expected_outputs</span><span class="o">=</span><span class="n">expected_outputs</span><span class="p">)</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s2">&quot;The new execution pattern reuses the parsed &quot;</span>
+                        <span class="s2">&quot;source code parameters. Double check results:</span><span class="se">\n</span><span class="si">%s</span><span class="s2">.&quot;</span>
+                        <span class="o">%</span> <span class="n">pformat</span><span class="p">(</span><span class="n">info</span><span class="p">))</span>
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">model_file</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
+            <span class="n">info</span> <span class="o">=</span> <span class="n">model_file</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">info</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;inputs&quot;</span><span class="p">:</span> <span class="p">[],</span> <span class="s2">&quot;outputs&quot;</span><span class="p">:</span> <span class="p">[]}</span>
         <span class="n">info_map</span> <span class="o">=</span> <span class="p">{</span><span class="n">io</span><span class="p">:</span> <span class="n">OrderedDict</span><span class="p">([(</span><span class="n">x</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">],</span> <span class="n">x</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">info</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">io</span><span class="p">,</span> <span class="p">[])])</span>
@@ -2019,8 +2151,7 @@
 <div class="viewcode-block" id="ModelDriver.write_model_wrapper"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.ModelDriver.ModelDriver.write_model_wrapper">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">write_model_wrapper</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">model_file</span><span class="p">,</span> <span class="n">model_function</span><span class="p">,</span>
                             <span class="n">inputs</span><span class="o">=</span><span class="p">[],</span> <span class="n">outputs</span><span class="o">=</span><span class="p">[],</span>
-                            <span class="n">outputs_in_inputs</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
-                            <span class="n">client_comms</span><span class="o">=</span><span class="p">[],</span> <span class="n">copies</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
+                            <span class="n">outputs_in_inputs</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">copies</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Return the lines required to wrap a model function as an integrated</span>
 <span class="sd">        model.</span>
 
@@ -2037,8 +2168,6 @@
 <span class="sd">                to the class attribute outputs_in_inputs.</span>
 <span class="sd">            verbose (bool, optional): If True, the contents of the created file</span>
 <span class="sd">                are displayed. Defaults to False.</span>
-<span class="sd">            client_comms (list, optional): List of the names of client comms</span>
-<span class="sd">                that should be removed from the list of outputs. Defaults to [].</span>
 <span class="sd">            copies (int, optional): Number of times the model driver is</span>
 <span class="sd">                duplicated. If more than one, no error will be raised in the</span>
 <span class="sd">                event there is never a call the the function. Defaults to 1.</span>
@@ -2052,39 +2181,19 @@
         <span class="k">if</span> <span class="bp">cls</span><span class="o">.</span><span class="n">function_param</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;function_param attribute not set for&quot;</span>
                                       <span class="s2">&quot;language &#39;</span><span class="si">%s</span><span class="s2">&#39;&quot;</span> <span class="o">%</span> <span class="bp">cls</span><span class="o">.</span><span class="n">language</span><span class="p">)</span>
-        <span class="n">lines</span> <span class="o">=</span> <span class="p">[]</span>
-        <span class="n">flag_var</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="s1">&#39;flag&#39;</span><span class="p">,</span> <span class="s1">&#39;datatype&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;flag&#39;</span><span class="p">}}</span>
-        <span class="n">iter_var</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="s1">&#39;first_iter&#39;</span><span class="p">,</span> <span class="s1">&#39;datatype&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;flag&#39;</span><span class="p">}}</span>
         <span class="k">if</span> <span class="n">outputs_in_inputs</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">outputs_in_inputs</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">outputs_in_inputs</span>
-        <span class="c1"># Replace server input w/ split input/output and remove client</span>
-        <span class="c1"># connections from inputs</span>
-        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">x</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">inputs</span><span class="p">):</span>
-            <span class="k">if</span> <span class="n">x</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;server_replaces&#39;</span><span class="p">,</span> <span class="kc">False</span><span class="p">):</span>
-                <span class="n">inputs</span><span class="p">[</span><span class="n">x</span><span class="p">[</span><span class="s1">&#39;server_replaces&#39;</span><span class="p">][</span><span class="s1">&#39;input_index&#39;</span><span class="p">]]</span> <span class="o">=</span> <span class="p">(</span>
-                    <span class="n">x</span><span class="p">[</span><span class="s1">&#39;server_replaces&#39;</span><span class="p">][</span><span class="s1">&#39;input&#39;</span><span class="p">])</span>
-                <span class="n">outputs</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="n">x</span><span class="p">[</span><span class="s1">&#39;server_replaces&#39;</span><span class="p">][</span><span class="s1">&#39;output_index&#39;</span><span class="p">],</span>
-                               <span class="n">x</span><span class="p">[</span><span class="s1">&#39;server_replaces&#39;</span><span class="p">][</span><span class="s1">&#39;output&#39;</span><span class="p">])</span>
-        <span class="n">outputs</span> <span class="o">=</span> <span class="p">[</span><span class="n">x</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">outputs</span> <span class="k">if</span> <span class="n">x</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">]</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">client_comms</span><span class="p">]</span>
-        <span class="k">if</span> <span class="n">client_comms</span><span class="p">:</span>
-            <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s2">&quot;When wrapping a model function, client comms &quot;</span>
-                          <span class="s2">&quot;must either be initialized outside the function, &quot;</span>
-                          <span class="s2">&quot;pass a &#39;global_scope&#39; parameter to the &quot;</span>
-                          <span class="s2">&quot;comm initialization (e.g. Python, R, Matlab), &quot;</span>
-                          <span class="s2">&quot;or use a &#39;WITH_GLOBAL_SCOPE&#39; macro &quot;</span>
-                          <span class="s2">&quot;(e.g. C, C++, Fortran) around the initialization &quot;</span>
-                          <span class="s2">&quot;so that they are persistent &quot;</span>
-                          <span class="s2">&quot;across calls and the call or recv/send methods &quot;</span>
-                          <span class="s2">&quot;must be called explicitly (as opposed to the &quot;</span>
-                          <span class="s2">&quot;function inputs/outputs which will be handled &quot;</span>
-                          <span class="s2">&quot;by the wrapper). This model&#39;s client comms are:</span><span class="se">\n</span><span class="s2">&quot;</span>
-                          <span class="s2">&quot;</span><span class="se">\t</span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">client_comms</span><span class="p">)</span>
         <span class="c1"># Update types based on the function definition for typed languages</span>
         <span class="n">model_flag</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">update_io_from_function</span><span class="p">(</span>
             <span class="n">model_file</span><span class="p">,</span> <span class="n">model_function</span><span class="p">,</span>
             <span class="n">inputs</span><span class="o">=</span><span class="n">inputs</span><span class="p">,</span> <span class="n">outputs</span><span class="o">=</span><span class="n">outputs</span><span class="p">,</span>
             <span class="n">outputs_in_inputs</span><span class="o">=</span><span class="n">outputs_in_inputs</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">model_file</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
+            <span class="n">model_file</span> <span class="o">=</span> <span class="n">model_file</span><span class="p">[</span><span class="s1">&#39;model_file&#39;</span><span class="p">]</span>
         <span class="c1"># Declare variables and flag, then define flag</span>
+        <span class="n">lines</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">flag_var</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="s1">&#39;flag&#39;</span><span class="p">,</span> <span class="s1">&#39;datatype&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;flag&#39;</span><span class="p">}}</span>
+        <span class="n">iter_var</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="s1">&#39;first_iter&#39;</span><span class="p">,</span> <span class="s1">&#39;datatype&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;flag&#39;</span><span class="p">}}</span>
         <span class="n">free_vars</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="n">definitions</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="k">if</span> <span class="s1">&#39;declare&#39;</span> <span class="ow">in</span> <span class="bp">cls</span><span class="o">.</span><span class="n">function_param</span><span class="p">:</span>
@@ -2929,7 +3038,7 @@
                             <span class="n">x</span> <span class="ow">in</span> <span class="bp">cls</span><span class="o">.</span><span class="n">write_declaration</span><span class="p">(</span>
                                 <span class="n">o</span><span class="p">,</span> <span class="n">definitions</span><span class="o">=</span><span class="n">definitions</span><span class="p">,</span>
                                 <span class="n">requires_freeing</span><span class="o">=</span><span class="n">free_vars</span><span class="p">,</span>
-                                <span class="n">dont_define</span><span class="o">=</span><span class="kc">True</span><span class="p">)]</span>
+                                <span class="n">is_argument</span><span class="o">=</span><span class="kc">True</span><span class="p">)]</span>
             <span class="k">for</span> <span class="n">o</span> <span class="ow">in</span> <span class="n">outputs</span><span class="p">:</span>
                 <span class="n">out</span> <span class="o">+=</span> <span class="p">[</span><span class="bp">cls</span><span class="o">.</span><span class="n">function_param</span><span class="p">[</span><span class="s1">&#39;indent&#39;</span><span class="p">]</span> <span class="o">+</span> <span class="n">x</span> <span class="k">for</span>
                         <span class="n">x</span> <span class="ow">in</span> <span class="bp">cls</span><span class="o">.</span><span class="n">write_declaration</span><span class="p">(</span>
@@ -3293,7 +3402,7 @@
     
 <div class="viewcode-block" id="ModelDriver.write_declaration"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.ModelDriver.ModelDriver.write_declaration">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">write_declaration</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">var</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">requires_freeing</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-                          <span class="n">definitions</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">dont_define</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+                          <span class="n">definitions</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">is_argument</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Return the lines required to declare a variable with a certain</span>
 <span class="sd">        type.</span>
 
@@ -3311,6 +3420,8 @@
 <span class="sd">                lines.</span>
 <span class="sd">            dont_define (bool, optional): If True, the variable will not</span>
 <span class="sd">                be defined. Defaults to False.</span>
+<span class="sd">            is_argument (bool, optional): If True, the variable being</span>
+<span class="sd">                declared is an input argument. Defaults to False.</span>
 
 <span class="sd">        Returns:</span>
 <span class="sd">            list: The lines declaring the variable.</span>
@@ -3322,7 +3433,7 @@
         <span class="n">out</span> <span class="o">=</span> <span class="p">[</span><span class="bp">cls</span><span class="o">.</span><span class="n">format_function_param</span><span class="p">(</span><span class="s1">&#39;declare&#39;</span><span class="p">,</span>
                                          <span class="n">type_name</span><span class="o">=</span><span class="n">type_name</span><span class="p">,</span>
                                          <span class="n">variable</span><span class="o">=</span><span class="bp">cls</span><span class="o">.</span><span class="n">get_name_declare</span><span class="p">(</span><span class="n">var</span><span class="p">))]</span>
-        <span class="k">if</span> <span class="n">dont_define</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">is_argument</span><span class="p">:</span>
             <span class="k">return</span> <span class="n">out</span>
         <span class="k">if</span> <span class="n">definitions</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">definitions</span> <span class="o">=</span> <span class="n">out</span>

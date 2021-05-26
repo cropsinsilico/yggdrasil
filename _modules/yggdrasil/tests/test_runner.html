@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>yggdrasil.tests.test_runner &mdash; yggdrasil 1.6.1 documentation</title>
+  <title>yggdrasil.tests.test_runner &mdash; yggdrasil 1.6.2 documentation</title>
   
 
   
@@ -63,7 +63,7 @@
             
             
               <div class="version">
-                1.6.1
+                1.6.2
               </div>
             
           
@@ -264,7 +264,34 @@
     <span class="n">input_args</span> <span class="o">=</span> <span class="p">{}</span>
     <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">fmodel</span><span class="o">.</span><span class="n">arguments</span><span class="p">:</span>
         <span class="n">input_args</span><span class="p">[</span><span class="n">x</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1.0</span>
+    <span class="n">fmodel</span><span class="o">.</span><span class="n">model_info</span><span class="p">()</span>
     <span class="n">result</span> <span class="o">=</span> <span class="n">fmodel</span><span class="p">(</span><span class="o">**</span><span class="n">input_args</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">fmodel</span><span class="o">.</span><span class="n">returns</span><span class="p">:</span>
+        <span class="k">assert</span><span class="p">(</span><span class="n">x</span> <span class="ow">in</span> <span class="n">result</span><span class="p">)</span>
+    <span class="n">result</span> <span class="o">=</span> <span class="n">fmodel</span><span class="p">(</span><span class="o">*</span><span class="nb">list</span><span class="p">(</span><span class="n">input_args</span><span class="o">.</span><span class="n">values</span><span class="p">()))</span>
+    <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">fmodel</span><span class="o">.</span><span class="n">returns</span><span class="p">:</span>
+        <span class="k">assert</span><span class="p">(</span><span class="n">x</span> <span class="ow">in</span> <span class="n">result</span><span class="p">)</span>
+    <span class="n">fmodel</span><span class="o">.</span><span class="n">stop</span><span class="p">()</span>
+    <span class="n">fmodel</span><span class="o">.</span><span class="n">stop</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="test_import_as_function_server"><a class="viewcode-back" href="../../../yggdrasil.tests.html#yggdrasil.tests.test_runner.test_import_as_function_server">[docs]</a><span class="k">def</span> <span class="nf">test_import_as_function_server</span><span class="p">():</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test import_as_function w/ server function.&quot;&quot;&quot;</span>
+    <span class="n">yamlfile</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">ex_yamls</span><span class="p">[</span><span class="s1">&#39;rpc_lesson3&#39;</span><span class="p">][</span><span class="s1">&#39;python&#39;</span><span class="p">]:</span>
+        <span class="k">if</span> <span class="s1">&#39;server&#39;</span> <span class="ow">in</span> <span class="n">x</span><span class="p">:</span>
+            <span class="n">yamlfile</span> <span class="o">=</span> <span class="n">x</span>
+            <span class="k">break</span>
+    <span class="k">assert</span><span class="p">(</span><span class="n">yamlfile</span><span class="p">)</span>
+    <span class="n">fmodel</span> <span class="o">=</span> <span class="n">import_as_function</span><span class="p">(</span><span class="n">yamlfile</span><span class="p">)</span>
+    <span class="n">input_args</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">fmodel</span><span class="o">.</span><span class="n">arguments</span><span class="p">:</span>
+        <span class="n">input_args</span><span class="p">[</span><span class="n">x</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;hello&#39;</span>
+    <span class="n">fmodel</span><span class="o">.</span><span class="n">model_info</span><span class="p">()</span>
+    <span class="n">result</span> <span class="o">=</span> <span class="n">fmodel</span><span class="p">(</span><span class="o">**</span><span class="n">input_args</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">fmodel</span><span class="o">.</span><span class="n">returns</span><span class="p">:</span>
+        <span class="k">assert</span><span class="p">(</span><span class="n">x</span> <span class="ow">in</span> <span class="n">result</span><span class="p">)</span>
+    <span class="n">result</span> <span class="o">=</span> <span class="n">fmodel</span><span class="p">(</span><span class="o">*</span><span class="nb">list</span><span class="p">(</span><span class="n">input_args</span><span class="o">.</span><span class="n">values</span><span class="p">()))</span>
     <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">fmodel</span><span class="o">.</span><span class="n">returns</span><span class="p">:</span>
         <span class="k">assert</span><span class="p">(</span><span class="n">x</span> <span class="ow">in</span> <span class="n">result</span><span class="p">)</span>
     <span class="n">fmodel</span><span class="o">.</span><span class="n">stop</span><span class="p">()</span>
@@ -288,10 +315,14 @@
         <span class="n">fd</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">contents</span><span class="p">)</span>
     <span class="k">try</span><span class="p">:</span>
         <span class="n">fmodel</span> <span class="o">=</span> <span class="n">import_as_function</span><span class="p">(</span><span class="n">yamlfile</span><span class="p">)</span>
+        <span class="n">fmodel</span><span class="o">.</span><span class="n">model_info</span><span class="p">()</span>
         <span class="n">input_args</span> <span class="o">=</span> <span class="p">{}</span>
         <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">fmodel</span><span class="o">.</span><span class="n">arguments</span><span class="p">:</span>
             <span class="n">input_args</span><span class="p">[</span><span class="n">x</span><span class="p">]</span> <span class="o">=</span> <span class="sa">b</span><span class="s1">&#39;hello&#39;</span>
         <span class="n">result</span> <span class="o">=</span> <span class="n">fmodel</span><span class="p">(</span><span class="o">**</span><span class="n">input_args</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">fmodel</span><span class="o">.</span><span class="n">returns</span><span class="p">:</span>
+            <span class="k">assert</span><span class="p">(</span><span class="n">x</span> <span class="ow">in</span> <span class="n">result</span><span class="p">)</span>
+        <span class="n">result</span> <span class="o">=</span> <span class="n">fmodel</span><span class="p">(</span><span class="o">*</span><span class="nb">list</span><span class="p">(</span><span class="n">input_args</span><span class="o">.</span><span class="n">values</span><span class="p">()))</span>
         <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">fmodel</span><span class="o">.</span><span class="n">returns</span><span class="p">:</span>
             <span class="k">assert</span><span class="p">(</span><span class="n">x</span> <span class="ow">in</span> <span class="n">result</span><span class="p">)</span>
         <span class="n">fmodel</span><span class="o">.</span><span class="n">stop</span><span class="p">()</span>

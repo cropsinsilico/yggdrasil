@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>yggdrasil.communication.ZMQComm &mdash; yggdrasil 1.6.1 documentation</title>
+  <title>yggdrasil.communication.ZMQComm &mdash; yggdrasil 1.6.2 documentation</title>
   
 
   
@@ -63,7 +63,7 @@
             
             
               <div class="version">
-                1.6.1
+                1.6.2
               </div>
             
           
@@ -622,10 +622,12 @@
             <span class="n">socket_type</span> <span class="o">=</span> <span class="s1">&#39;DEALER&#39;</span>
             <span class="n">socket_action</span> <span class="o">=</span> <span class="s1">&#39;connect&#39;</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">direction</span> <span class="o">=</span> <span class="s1">&#39;recv&#39;</span>
-        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_response_client</span> <span class="ow">and</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">direction</span> <span class="o">==</span> <span class="s1">&#39;recv&#39;</span><span class="p">):</span>
+        <span class="k">elif</span> <span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">is_response_client</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_response_server</span><span class="p">)</span>
+              <span class="ow">and</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">direction</span> <span class="o">==</span> <span class="s1">&#39;recv&#39;</span><span class="p">)):</span>
             <span class="n">socket_type</span> <span class="o">=</span> <span class="s1">&#39;ROUTER&#39;</span>
             <span class="n">socket_action</span> <span class="o">=</span> <span class="s1">&#39;bind&#39;</span>
-        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_response_client</span> <span class="ow">and</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">direction</span> <span class="o">==</span> <span class="s1">&#39;send&#39;</span><span class="p">):</span>
+        <span class="k">elif</span> <span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">is_response_client</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_response_server</span><span class="p">)</span>
+              <span class="ow">and</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">direction</span> <span class="o">==</span> <span class="s1">&#39;send&#39;</span><span class="p">)):</span>
             <span class="c1"># The would be the RPCResponseDriver output comm that</span>
             <span class="c1"># partners with the ClientComm response comm that is set</span>
             <span class="c1"># to use a ROUTER socket type as defined above</span>
@@ -638,7 +640,7 @@
             <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">direction</span> <span class="o">==</span> <span class="s1">&#39;send&#39;</span><span class="p">:</span>
                 <span class="n">socket_type</span> <span class="o">=</span> <span class="n">_socket_send_types</span><span class="p">[</span><span class="n">_default_socket_type</span><span class="p">]</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">allow_multiple_comms</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_client</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_server</span>
-                <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_response_client</span><span class="p">):</span>
+                <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_response_client</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_response_server</span><span class="p">):</span>
             <span class="k">if</span> <span class="n">socket_type</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;PULL&#39;</span><span class="p">,</span> <span class="s1">&#39;SUB&#39;</span><span class="p">,</span> <span class="s1">&#39;REP&#39;</span><span class="p">,</span> <span class="s1">&#39;DEALER&#39;</span><span class="p">]:</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">direction</span> <span class="o">=</span> <span class="s1">&#39;recv&#39;</span>
             <span class="k">elif</span> <span class="n">socket_type</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;PUSH&#39;</span><span class="p">,</span> <span class="s1">&#39;PUB&#39;</span><span class="p">,</span> <span class="s1">&#39;REQ&#39;</span><span class="p">,</span> <span class="s1">&#39;ROUTER&#39;</span><span class="p">]:</span>
@@ -659,7 +661,6 @@
             <span class="k">else</span><span class="p">:</span>
                 <span class="n">socket_action</span> <span class="o">=</span> <span class="s1">&#39;connect&#39;</span>
         <span class="k">if</span> <span class="n">new_process</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;NEW CONTEXT&quot;</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">context</span> <span class="o">=</span> <span class="n">zmq</span><span class="o">.</span><span class="n">Context</span><span class="p">()</span>
             <span class="n">set_context_opts</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">context</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
@@ -959,6 +960,7 @@
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Set the send reply socket if it dosn&#39;t exist.&quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">reply_socket_send</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">s</span> <span class="o">=</span> <span class="n">create_socket</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">context</span><span class="p">,</span> <span class="n">zmq</span><span class="o">.</span><span class="n">REP</span><span class="p">)</span>
+            <span class="n">s</span><span class="o">.</span><span class="n">setsockopt</span><span class="p">(</span><span class="n">zmq</span><span class="o">.</span><span class="n">IMMEDIATE</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
             <span class="n">address</span> <span class="o">=</span> <span class="n">format_address</span><span class="p">(</span><span class="n">_default_protocol</span><span class="p">,</span> <span class="s1">&#39;localhost&#39;</span><span class="p">)</span>
             <span class="n">address</span> <span class="o">=</span> <span class="n">bind_socket</span><span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="n">address</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">register_comm</span><span class="p">(</span><span class="s1">&#39;REPLY_SEND_&#39;</span> <span class="o">+</span> <span class="n">address</span><span class="p">,</span> <span class="n">s</span><span class="p">)</span>
@@ -973,6 +975,7 @@
         <span class="n">address</span> <span class="o">=</span> <span class="n">tools</span><span class="o">.</span><span class="n">bytes2str</span><span class="p">(</span><span class="n">address</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">address</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">reply_socket_recv</span><span class="p">:</span>
             <span class="n">s</span> <span class="o">=</span> <span class="n">create_socket</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">context</span><span class="p">,</span> <span class="n">zmq</span><span class="o">.</span><span class="n">REQ</span><span class="p">)</span>
+            <span class="n">s</span><span class="o">.</span><span class="n">setsockopt</span><span class="p">(</span><span class="n">zmq</span><span class="o">.</span><span class="n">IMMEDIATE</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
             <span class="n">s</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="n">address</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">register_comm</span><span class="p">(</span><span class="s1">&#39;REPLY_RECV_&#39;</span> <span class="o">+</span> <span class="n">address</span><span class="p">,</span> <span class="n">s</span><span class="p">)</span>
             <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">reply_socket_lock</span><span class="p">:</span>
@@ -1346,8 +1349,6 @@
                 <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">socket_type_name</span> <span class="o">==</span> <span class="s1">&#39;ROUTER&#39;</span><span class="p">:</span>
                     <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;flags&#39;</span><span class="p">]</span> <span class="o">|=</span> <span class="n">zmq</span><span class="o">.</span><span class="n">SNDMORE</span>
                     <span class="bp">self</span><span class="o">.</span><span class="n">socket</span><span class="o">.</span><span class="n">send</span><span class="p">(</span><span class="n">identity</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
-                    <span class="c1"># self.socket.send_multipart([identity, total_msg],</span>
-                    <span class="c1">#                            **kwargs)</span>
                 <span class="k">else</span><span class="p">:</span>
                     <span class="bp">self</span><span class="o">.</span><span class="n">socket</span><span class="o">.</span><span class="n">send</span><span class="p">(</span><span class="n">total_msg</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
                 <span class="n">TemporaryCommunicationError</span><span class="o">.</span><span class="n">reset</span><span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">address</span><span class="p">,</span> <span class="s2">&quot;zmq.EAGAIN&quot;</span><span class="p">))</span>
