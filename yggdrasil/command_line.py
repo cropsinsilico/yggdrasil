@@ -899,7 +899,11 @@ class ygginstall(SubCommand):
     @classmethod
     def func(cls, args):
         from yggdrasil.languages import install_languages
-        for x in args.language:
+        languages = args.language
+        if isinstance(languages, str) and (languages == 'all'):
+            languages = [x.lower() for x in
+                         install_languages.get_language_directories()]
+        for x in languages:
             install_languages.install_language(x, args=args)
 
 
