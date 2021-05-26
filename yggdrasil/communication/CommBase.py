@@ -1996,8 +1996,8 @@ class CommBase(tools.YggClass):
             elif isinstance(msg.args, bytes) and (msg.args == YGG_CLIENT_EOF):
                 once_per_partner = True
             if once_per_partner and (self.partner_copies > 1):
-                self.info("Sending %s to %d model(s)", msg.args,
-                          self.partner_copies)
+                self.debug("Sending %s to %d model(s)", msg.args,
+                           self.partner_copies)
                 for i in range(self.partner_copies - 1):
                     msg.add_message(args=msg.args,
                                     header=copy.deepcopy(msg.header))
