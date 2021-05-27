@@ -2,7 +2,7 @@
 History
 =======
 
-1.6.3 (2021-05-XX) Minor bug fixes in preparation for CiS hackathon
+1.6.3 (2021-05-27) Minor bug fixes in preparation for CiS hackathon
 ------------------
 
 * Quieted log message warning about closed comm in AsyncComm (comes up more often when IPCComm on binder, but can be ignored)
