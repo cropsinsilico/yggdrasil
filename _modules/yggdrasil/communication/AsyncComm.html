@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>yggdrasil.communication.AsyncComm &mdash; yggdrasil 1.6.2 documentation</title>
+  <title>yggdrasil.communication.AsyncComm &mdash; yggdrasil v1.6.3 documentation</title>
   
 
   
@@ -63,7 +63,7 @@
             
             
               <div class="version">
-                1.6.2
+                v1.6.3
               </div>
             
           
@@ -697,15 +697,15 @@
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_msg_backlog</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">verbose_debug</span><span class="p">(</span><span class="s2">&quot;No messages waiting.&quot;</span><span class="p">)</span>
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_closed</span><span class="p">:</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">info</span><span class="p">((</span><span class="s2">&quot;No messages waiting and comm closed.&quot;</span>
-                           <span class="s2">&quot;</span><span class="si">%s</span><span class="s2">, </span><span class="si">%s</span><span class="s2">, </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">)</span>
-                          <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">backlog_thread</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">,</span>
-                             <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">backlog_thread</span><span class="o">.</span><span class="n">was_break</span><span class="p">,</span>
-                             <span class="bp">self</span><span class="o">.</span><span class="n">backlog_thread</span><span class="o">.</span><span class="n">is_alive</span><span class="p">()))</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">printStatus</span><span class="p">()</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">((</span><span class="s2">&quot;No messages waiting and comm closed.&quot;</span>
+                            <span class="s2">&quot;</span><span class="si">%s</span><span class="s2">, </span><span class="si">%s</span><span class="s2">, </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">)</span>
+                           <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">backlog_thread</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">,</span>
+                              <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">backlog_thread</span><span class="o">.</span><span class="n">was_break</span><span class="p">,</span>
+                              <span class="bp">self</span><span class="o">.</span><span class="n">backlog_thread</span><span class="o">.</span><span class="n">is_alive</span><span class="p">()))</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">printStatus</span><span class="p">(</span><span class="n">level</span><span class="o">=</span><span class="s1">&#39;debug&#39;</span><span class="p">)</span>
                 <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">backlog_thread</span><span class="o">.</span><span class="n">was_break</span><span class="p">:</span>
-                    <span class="bp">self</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Break stack:</span><span class="se">\n</span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span>
-                              <span class="bp">self</span><span class="o">.</span><span class="n">backlog_thread</span><span class="o">.</span><span class="n">break_stack</span><span class="p">)</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Break stack:</span><span class="se">\n</span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span>
+                               <span class="bp">self</span><span class="o">.</span><span class="n">backlog_thread</span><span class="o">.</span><span class="n">break_stack</span><span class="p">)</span>
                 <span class="n">out</span> <span class="o">=</span> <span class="n">CommBase</span><span class="o">.</span><span class="n">CommMessage</span><span class="p">(</span><span class="n">flag</span><span class="o">=</span><span class="n">CommBase</span><span class="o">.</span><span class="n">FLAG_FAILURE</span><span class="p">)</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="n">out</span> <span class="o">=</span> <span class="n">CommBase</span><span class="o">.</span><span class="n">CommMessage</span><span class="p">(</span><span class="n">flag</span><span class="o">=</span><span class="n">CommBase</span><span class="o">.</span><span class="n">FLAG_EMPTY</span><span class="p">,</span>

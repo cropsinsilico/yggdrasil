@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>&lt;no title&gt; &mdash; yggdrasil 1.6.2 documentation</title>
+  <title>&lt;no title&gt; &mdash; yggdrasil v1.6.3 documentation</title>
   
 
   
@@ -63,7 +63,7 @@
             
             
               <div class="version">
-                1.6.2
+                v1.6.3
               </div>
             
           
@@ -208,12 +208,12 @@
 <td><p>string</p></td>
 <td><p>Directory where the build should be saved. Defaults to &lt;sourcedir&gt;/build. It can
 be relative to working_dir or absolute.</p></td>
-<td><p>[‘cmake’, ‘make’]</p></td>
+<td><p>[‘make’, ‘cmake’]</p></td>
 </tr>
 <tr class="row-odd"><td><p>buildfile</p></td>
 <td><p>string</p></td>
 <td></td>
-<td><p>[‘cmake’, ‘make’]</p></td>
+<td><p>[‘make’, ‘cmake’]</p></td>
 </tr>
 <tr class="row-even"><td><p>compiler</p></td>
 <td><p>string</p></td>
@@ -221,7 +221,7 @@ be relative to working_dir or absolute.</p></td>
 provided, the compiler will be determined based on configuration options for the
 language (if present) and the registered compilers that are available on the
 current operating system.</p></td>
-<td><p>[‘cxx’, ‘make’, ‘c’, ‘c++’, ‘cpp’, ‘cmake’, ‘fortran’]</p></td>
+<td><p>[‘fortran’, ‘make’, ‘c’, ‘cmake’, ‘cxx’, ‘c++’, ‘cpp’]</p></td>
 </tr>
 <tr class="row-odd"><td><p>compiler_flags</p></td>
 <td><p>array</p></td>
@@ -229,7 +229,7 @@ current operating system.</p></td>
 the compiler flags will be determined based on configuration options for the
 language (if present), the compiler defaults, and the default_compiler_flags
 class attribute.</p></td>
-<td><p>[‘cxx’, ‘make’, ‘c’, ‘c++’, ‘cpp’, ‘cmake’, ‘fortran’]</p></td>
+<td><p>[‘fortran’, ‘make’, ‘c’, ‘cmake’, ‘cxx’, ‘c++’, ‘cpp’]</p></td>
 </tr>
 <tr class="row-even"><td><p>configuration</p></td>
 <td><p>string</p></td>
@@ -249,28 +249,28 @@ relative. Defaults to False.</p></td>
 <td><p>Environment variable where the compiler executable should be stored for use
 within the Makefile. If not provided, this will be determined by the target
 language driver.</p></td>
-<td><p>[‘cmake’, ‘make’]</p></td>
+<td><p>[‘make’, ‘cmake’]</p></td>
 </tr>
 <tr class="row-odd"><td><p>env_compiler_flags</p></td>
 <td><p>string</p></td>
 <td><p>Environment variable where the compiler flags should be stored (including those
 required to compile against the yggdrasil interface). If not provided, this
 will be determined by the target language driver.</p></td>
-<td><p>[‘cmake’, ‘make’]</p></td>
+<td><p>[‘make’, ‘cmake’]</p></td>
 </tr>
 <tr class="row-even"><td><p>env_linker</p></td>
 <td><p>string</p></td>
 <td><p>Environment variable where the linker executable should be stored for use within
 the Makefile. If not provided, this will be determined by the target language
 driver.</p></td>
-<td><p>[‘cmake’, ‘make’]</p></td>
+<td><p>[‘make’, ‘cmake’]</p></td>
 </tr>
 <tr class="row-odd"><td><p>env_linker_flags</p></td>
 <td><p>string</p></td>
 <td><p>Environment variable where the linker flags should be stored (including those
 required to link against the yggdrasil interface). If not provided, this will
 be determined by the target language driver.</p></td>
-<td><p>[‘cmake’, ‘make’]</p></td>
+<td><p>[‘make’, ‘cmake’]</p></td>
 </tr>
 <tr class="row-even"><td><p>integrator</p></td>
 <td><p>string</p></td>
@@ -293,14 +293,14 @@ be determined by the target language driver.</p></td>
 <td><p>Name or path of interpreter executable that should be used to run the model. If
 not provided, the interpreter will be determined based on configuration options
 for the language (if present) and the default_interpreter class attribute.</p></td>
-<td><p>[‘r’, ‘sbml’, ‘python’, ‘lpy’, ‘matlab’, ‘function’, ‘timesync’, ‘R’]</p></td>
+<td><p>[‘lpy’, ‘python’, ‘function’, ‘R’, ‘sbml’, ‘matlab’, ‘timesync’, ‘r’]</p></td>
 </tr>
 <tr class="row-even"><td><p>interpreter_flags</p></td>
 <td><p>array</p></td>
 <td><p>Flags that should be passed to the interpreter when running the model. If not
 provided, the flags are determined based on configuration options for the
 language (if present) and the default_interpreter_flags class attribute.</p></td>
-<td><p>[‘r’, ‘sbml’, ‘python’, ‘lpy’, ‘matlab’, ‘function’, ‘timesync’, ‘R’]</p></td>
+<td><p>[‘lpy’, ‘python’, ‘function’, ‘R’, ‘sbml’, ‘matlab’, ‘timesync’, ‘r’]</p></td>
 </tr>
 <tr class="row-odd"><td><p>linker</p></td>
 <td><p>string</p></td>
@@ -308,7 +308,7 @@ language (if present) and the default_interpreter_flags class attribute.</p></td
 provided, the linker will be determined based on configuration options for the
 language (if present) and the registered linkers that are available on the
 current operating system</p></td>
-<td><p>[‘cxx’, ‘make’, ‘c’, ‘c++’, ‘cpp’, ‘cmake’, ‘fortran’]</p></td>
+<td><p>[‘fortran’, ‘make’, ‘c’, ‘cmake’, ‘cxx’, ‘c++’, ‘cpp’]</p></td>
 </tr>
 <tr class="row-even"><td><p>linker_flags</p></td>
 <td><p>array</p></td>
@@ -316,7 +316,7 @@ current operating system</p></td>
 the linker flags will be determined based on configuration options for the
 language (if present), the linker defaults, and the default_linker_flags class
 attribute.</p></td>
-<td><p>[‘cxx’, ‘make’, ‘c’, ‘c++’, ‘cpp’, ‘cmake’, ‘fortran’]</p></td>
+<td><p>[‘fortran’, ‘make’, ‘c’, ‘cmake’, ‘cxx’, ‘c++’, ‘cpp’]</p></td>
 </tr>
 <tr class="row-odd"><td><p>makedir</p></td>
 <td><p>string</p></td>
@@ -353,7 +353,7 @@ selections will be returned.</p></td>
 <td><p>If True, no interpreter will be added to the arguments. This should only be used
 for subclasses that will not be invoking the model via the command line.
 Defaults to False.</p></td>
-<td><p>[‘r’, ‘sbml’, ‘python’, ‘lpy’, ‘matlab’, ‘function’, ‘timesync’, ‘R’]</p></td>
+<td><p>[‘lpy’, ‘python’, ‘function’, ‘R’, ‘sbml’, ‘matlab’, ‘timesync’, ‘r’]</p></td>
 </tr>
 <tr class="row-odd"><td><p>skip_start_time</p></td>
 <td><p>boolean</p></td>
@@ -366,7 +366,7 @@ False. This option is ignored if only_output_final_step is True.</p></td>
 <td><p>Source files that should be compiled into an executable. Defaults to an empty
 list and the driver will search for a source file based on the model executable
 (the first model argument).</p></td>
-<td><p>[‘cxx’, ‘make’, ‘c’, ‘c++’, ‘cpp’, ‘cmake’, ‘fortran’]</p></td>
+<td><p>[‘fortran’, ‘make’, ‘c’, ‘cmake’, ‘cxx’, ‘c++’, ‘cpp’]</p></td>
 </tr>
 <tr class="row-odd"><td><p>sourcedir</p></td>
 <td><p>string</p></td>
@@ -415,37 +415,37 @@ variable in everything but name and units) or mappings with the keys:</p></td>
 <td><p>string</p></td>
 <td><p>Make target that should be built to create the model executable. Defaults to
 None.</p></td>
-<td><p>[‘cmake’, ‘make’]</p></td>
+<td><p>[‘make’, ‘cmake’]</p></td>
 </tr>
 <tr class="row-odd"><td><p>target_compiler</p></td>
 <td><p>string</p></td>
 <td><p>Compilation tool that should be used to compile the target language. Defaults to
 None and will be set based on the selected language driver.</p></td>
-<td><p>[‘cmake’, ‘make’]</p></td>
+<td><p>[‘make’, ‘cmake’]</p></td>
 </tr>
 <tr class="row-even"><td><p>target_compiler_flags</p></td>
 <td><p>array</p></td>
 <td><p>Compilation flags that should be passed to the target language compiler.
 Defaults to [].</p></td>
-<td><p>[‘cmake’, ‘make’]</p></td>
+<td><p>[‘make’, ‘cmake’]</p></td>
 </tr>
 <tr class="row-odd"><td><p>target_language</p></td>
 <td><p>string</p></td>
 <td><p>Language that the target is written in. Defaults to None and will be set based
 on the source files provided.</p></td>
-<td><p>[‘cmake’, ‘make’]</p></td>
+<td><p>[‘make’, ‘cmake’]</p></td>
 </tr>
 <tr class="row-even"><td><p>target_linker</p></td>
 <td><p>string</p></td>
 <td><p>Compilation tool that should be used to link the target language. Defaults to
 None and will be set based on the selected language driver.</p></td>
-<td><p>[‘cmake’, ‘make’]</p></td>
+<td><p>[‘make’, ‘cmake’]</p></td>
 </tr>
 <tr class="row-odd"><td><p>target_linker_flags</p></td>
 <td><p>array</p></td>
 <td><p>Linking flags that should be passed to the target language linker. Defaults to
 [].</p></td>
-<td><p>[‘cmake’, ‘make’]</p></td>
+<td><p>[‘make’, ‘cmake’]</p></td>
 </tr>
 <tr class="row-even"><td><p>update_interval</p></td>
 <td><p>object</p></td>

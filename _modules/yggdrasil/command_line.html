@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>yggdrasil.command_line &mdash; yggdrasil 1.6.2 documentation</title>
+  <title>yggdrasil.command_line &mdash; yggdrasil v1.6.3 documentation</title>
   
 
   
@@ -63,7 +63,7 @@
             
             
               <div class="version">
-                1.6.2
+                v1.6.3
               </div>
             
           
@@ -1079,7 +1079,11 @@
 <div class="viewcode-block" id="ygginstall.func"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.command_line.ygginstall.func">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">func</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">args</span><span class="p">):</span>
         <span class="kn">from</span> <span class="nn">yggdrasil.languages</span> <span class="kn">import</span> <span class="n">install_languages</span>
-        <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">args</span><span class="o">.</span><span class="n">language</span><span class="p">:</span>
+        <span class="n">languages</span> <span class="o">=</span> <span class="n">args</span><span class="o">.</span><span class="n">language</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">languages</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">languages</span> <span class="o">==</span> <span class="s1">&#39;all&#39;</span><span class="p">):</span>
+            <span class="n">languages</span> <span class="o">=</span> <span class="p">[</span><span class="n">x</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span>
+                         <span class="n">install_languages</span><span class="o">.</span><span class="n">get_language_directories</span><span class="p">()]</span>
+        <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">languages</span><span class="p">:</span>
             <span class="n">install_languages</span><span class="o">.</span><span class="n">install_language</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">args</span><span class="o">=</span><span class="n">args</span><span class="p">)</span></div></div>
 
 
