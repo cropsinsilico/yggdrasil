@@ -515,15 +515,15 @@ class AsyncComm(ProxyObject, ComponentBaseUnregistered):
         if self.n_msg_backlog == 0:
             self.verbose_debug("No messages waiting.")
             if self.is_closed:
-                self.info(("No messages waiting and comm closed."
-                           "%s, %s, %s")
-                          % (self.backlog_thread is not None,
-                             not self.backlog_thread.was_break,
-                             self.backlog_thread.is_alive()))
-                self.printStatus()
+                self.debug(("No messages waiting and comm closed."
+                            "%s, %s, %s")
+                           % (self.backlog_thread is not None,
+                              not self.backlog_thread.was_break,
+                              self.backlog_thread.is_alive()))
+                self.printStatus(level='debug')
                 if self.backlog_thread.was_break:
-                    self.info("Break stack:\n%s",
-                              self.backlog_thread.break_stack)
+                    self.debug("Break stack:\n%s",
+                               self.backlog_thread.break_stack)
                 out = CommBase.CommMessage(flag=CommBase.FLAG_FAILURE)
             else:
                 out = CommBase.CommMessage(flag=CommBase.FLAG_EMPTY,

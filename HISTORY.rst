@@ -2,6 +2,13 @@
 History
 =======
 
+1.6.3 (2021-05-XX) Minor bug fixes in preparation for CiS hackathon
+------------------
+
+* Quieted log message warning about closed comm in AsyncComm (comes up more often when IPCComm on binder, but can be ignored)
+* Allow log level of printStatus message to be passed
+* Fixed bug in ygginstall for all languages
+
 1.6.2 (2021-05-25) Reuse response comms, add fork patterns, minor bug fixes & hackathon materials
 ------------------
 
