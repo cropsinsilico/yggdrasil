@@ -1,0 +1,1 @@
+Two models, A & B, run simulations over time and exchange data via a timestep synchronization communication pattern. Both models compute the same variables (`x` and `y`) via the same source code and output data at each time step to a file, but they have different time steps.

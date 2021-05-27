@@ -1,0 +1,1 @@
+This example is used by yggdrasil to test the serialization/deserialization of the supported types between the supported languages and should not be used outside of the `types` test suite (run via `yggtest --test-suite=types`).

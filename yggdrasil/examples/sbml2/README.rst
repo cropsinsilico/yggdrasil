@@ -1,0 +1,1 @@
+A single SBML model runs with input from a files and output to a series of files. This example demonstrates how to control the SBML integration via model parameters in the YAML (e.g. tolerance, time steps, initial conditions).

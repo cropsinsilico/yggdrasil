@@ -1,0 +1,1 @@
+Three models, A, B, & C, pass messages which are transformed based on YAML parameters. Model A receives input from a tab delimited table and sends output to both models B & C. The output to each model is transformed in different ways controlled by the `transform` comm model parameter. Models B & C both send output to tables.

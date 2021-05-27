@@ -1,0 +1,1 @@
+A single model receives input from a file, sends the input as output to a file and back to itself, receives its own output, and sends that as output to a file in the temporary directory. The input & output files are specified via the `default_file` parameter in the model inputs/outputs and the connection demonstrates the use of the `onexit` parameter.

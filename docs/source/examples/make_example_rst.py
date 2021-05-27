@@ -1,5 +1,6 @@
 import os
 from yggdrasil.examples import source, yamls
+from yggdrasil import doctools
 
 
 rst_dir = os.path.dirname(os.path.abspath(__file__))
@@ -14,8 +15,12 @@ lang2print = {'python': 'Python',
               'cpp': 'C++',
               'all': 'Mixed',
               'all_nomatlab': 'Mixed w/o Matlab',
-              'fortran': 'Fortran'}
-_default_lang = ['python', 'cpp', 'c', 'R', 'fortran', 'matlab']
+              'fortran': 'Fortran',
+              'sbml': 'SBML',
+              'osr': 'OpenSimRoot',
+              'function': 'Function',
+              'timesync': 'Timesync'}
+_default_lang = ['python', 'cpp', 'c', 'R', 'fortran', 'matlab', 'sbml']
 
 
 def get_file(fname, local=False):
@@ -105,18 +110,43 @@ def write_ref_link(fd, k):
 
 def write_toc_file(fd, key_list):
     head = "Examples"
-    fd.write(head + '\n')
+    fd.write('.. _examples_rst:\n\n%s\n' % head)
     fd.write((len(head) * '=') + '\n\n')
-    fd.write(".. toctree::\n\n")
+    data = {}
     for k in key_list:
-        fd.write("   %s\n" % get_rst_file(k).split('.rst')[0])
-    fd.write("\n")
+        if not yamls[k]:
+            continue
+        key = ':ref:`%s_rst`' % k
+        data[key] = get_readme(k)
+    kwargs = {'key_column_name': 'Name', 'val_column_name': 'Description'}
+    lines = doctools.dict2table(data, **kwargs)
+    fd.write('\n'.join(lines))
+    # fd.write(".. toctree::\n\n")
+    # for k in key_list:
+    #     fd.write("   %s\n" % get_rst_file(k).split('.rst')[0])
+    # fd.write("\n")
+
+
+def get_readme(k):
+    yaml = next(iter(yamls[k].values()))
+    if isinstance(yaml, list):
+        yaml = yaml[0]
+    readme = os.path.join(os.path.dirname(yaml), 'README.rst')
+    if os.path.isfile(readme):
+        with open(readme, 'r') as read_fd:
+            contents = read_fd.read()
+            return contents
+    return ''
         
 
 def write_rst(fd, k):
-    head = '.. _%s_rst:\n\n%s Example' % (k, k)
+    head = '.. _%s_rst:\n\n%s' % (k, k)
     fd.write(head + '\n')
     fd.write((len(head) * '=') + '\n\n')
+    readme = get_readme(k)
+    if readme:
+        fd.write('%s\n\n' % readme)
+    fd.write('.. contents:: :local:\n\n')
     for lang in source[k]:
         write_lang(fd, k, lang)
         fd.write('\n')
@@ -185,14 +215,16 @@ def write_yml(fd, k, lang, upone=False):
                         replacements=replacements)
 
         
-# rst_examples = source.keys()  # all examples
-rst_examples = ['gs_lesson%d' % x for x in range(1, 5)]
-rst_examples.append('gs_lesson4b')  # Special case
-rst_examples += ['formatted_io%d' % x for x in range(1, 10)]
-rst_examples += ['rpc_lesson%d' % x for x in range(1, 4)]
-rst_examples += ['rpc_lesson%db' % x for x in range(2, 4)]
-rst_examples += ['model_function', 'conditional_io', 'transformed_io']
-rst_examples += ['timesync%d' % x for x in range(1, 3)]
+rst_examples = source.keys()  # all examples
+# rst_examples = ['gs_lesson%d' % x for x in range(1, 5)]
+# rst_examples.append('gs_lesson4b')  # Special case
+# rst_examples += ['formatted_io%d' % x for x in range(1, 10)]
+# rst_examples += ['rpc_lesson%d' % x for x in range(1, 4)]
+# rst_examples += ['rpc_lesson%db' % x for x in range(2, 4)]
+# rst_examples += ['model_function', 'conditional_io', 'transformed_io']
+# rst_examples += ['timesync%d' % x for x in range(1, 3)]
 make_toc_file(rst_examples)
 for k in rst_examples:
+    if not yamls[k]:
+        continue
     make_rst_file(k)

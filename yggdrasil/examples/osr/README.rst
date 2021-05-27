@@ -1,0 +1,1 @@
+Two models run in a time step synchonization pattern where one of the models is the OpenSimRoot simulation code and the other is a dummy stand in. This example demonstrates how to run OSR simulations as part of yggdrasil integrations and the use of the `timesync` model parameter and communication pattern.

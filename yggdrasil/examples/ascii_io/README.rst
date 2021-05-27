@@ -1,0 +1,1 @@
+A single model that receives data from three input files and sends received messages to three output files. The first file is an unstructure ASCII text file, the second file is a table delimited ASCII table that is read row by row, and the third file is a table identical to the second that is read all at once.

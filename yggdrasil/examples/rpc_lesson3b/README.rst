@@ -1,0 +1,1 @@
+This example is identical to the `rpc_lesson3` example except that 10 copies of the `server` model are run via the `copies` model parameter and the `client` model makes calls the server from inside an OpenMP threaded loop. This example demonstrates the use of the RPC communication pattern in conjunction with automated model wrapping, OpenMP threading, and model duplication.

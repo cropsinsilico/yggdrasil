@@ -1,0 +1,1 @@
+A single model receives input from a WOFOST-style parameter file and sends output to a file. This example demonstrates how to interact with generic data structures containing maps in the compiled languages.

@@ -1,0 +1,1 @@
+A single SBML model runs with input from a files and output to a file. This example demonstrates the use of the `only_output_final_step` model parameter to only get the final output of the simulation.
