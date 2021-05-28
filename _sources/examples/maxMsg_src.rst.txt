@@ -1,0 +1,12 @@
+Model Code:
+
+.. literalinclude:: /../../yggdrasil/examples/maxMsg/src/maxMsgCli.py
+   :language: python
+   :linenos:
+
+.. literalinclude:: /../../yggdrasil/examples/maxMsg/src/maxMsgSrv.py
+   :language: python
+   :linenos:
+
+
+(`Example in other languages <examples/maxMsg.html>`__)

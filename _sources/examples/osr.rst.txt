@@ -1,0 +1,140 @@
+.. _osr_rst:
+
+osr
+=================
+
+Two models run in a time step synchonization pattern where one of the models is the OpenSimRoot simulation code and the other is a dummy stand in. This example demonstrates how to run OSR simulations as part of yggdrasil integrations and the use of the `timesync` model parameter and communication pattern.
+
+
+C Version
+---------
+
+Model Code:
+
+.. literalinclude:: /../../yggdrasil/examples/osr/src/other_model.c
+   :language: c
+   :linenos:
+
+.. literalinclude:: /../../yggdrasil/examples/osr/src/osr_model.xml
+   :language: python
+   :linenos:
+
+
+Model YAML:
+
+.. literalinclude:: /../../yggdrasil/examples/osr/osr_c.yml
+   :language: yaml
+   :linenos:
+
+
+
+C++ Version
+-----------
+
+Model Code:
+
+.. literalinclude:: /../../yggdrasil/examples/osr/src/other_model.cpp
+   :language: c++
+   :linenos:
+
+.. literalinclude:: /../../yggdrasil/examples/osr/src/osr_model.xml
+   :language: python
+   :linenos:
+
+
+Model YAML:
+
+.. literalinclude:: /../../yggdrasil/examples/osr/osr_cpp.yml
+   :language: yaml
+   :linenos:
+
+
+
+Fortran Version
+---------------
+
+Model Code:
+
+.. literalinclude:: /../../yggdrasil/examples/osr/src/other_model.f90
+   :language: python
+   :linenos:
+
+.. literalinclude:: /../../yggdrasil/examples/osr/src/osr_model.xml
+   :language: python
+   :linenos:
+
+
+Model YAML:
+
+.. literalinclude:: /../../yggdrasil/examples/osr/osr_fortran.yml
+   :language: yaml
+   :linenos:
+
+
+
+Matlab Version
+--------------
+
+Model Code:
+
+.. literalinclude:: /../../yggdrasil/examples/osr/src/other_model.m
+   :language: matlab
+   :linenos:
+
+.. literalinclude:: /../../yggdrasil/examples/osr/src/osr_model.xml
+   :language: python
+   :linenos:
+
+
+Model YAML:
+
+.. literalinclude:: /../../yggdrasil/examples/osr/osr_matlab.yml
+   :language: yaml
+   :linenos:
+
+
+
+Python Version
+--------------
+
+Model Code:
+
+.. literalinclude:: /../../yggdrasil/examples/osr/src/other_model.py
+   :language: python
+   :linenos:
+
+.. literalinclude:: /../../yggdrasil/examples/osr/src/osr_model.xml
+   :language: python
+   :linenos:
+
+
+Model YAML:
+
+.. literalinclude:: /../../yggdrasil/examples/osr/osr_python.yml
+   :language: yaml
+   :linenos:
+
+
+
+R Version
+---------
+
+Model Code:
+
+.. literalinclude:: /../../yggdrasil/examples/osr/src/other_model.R
+   :language: python
+   :linenos:
+
+.. literalinclude:: /../../yggdrasil/examples/osr/src/osr_model.xml
+   :language: python
+   :linenos:
+
+
+Model YAML:
+
+.. literalinclude:: /../../yggdrasil/examples/osr/osr_r.yml
+   :language: yaml
+   :linenos:
+
+
+

@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>yggdrasil.serialize.FunctionalSerialize &mdash; yggdrasil v1.6.3 documentation</title>
+  <title>yggdrasil.serialize.FunctionalSerialize &mdash; yggdrasil v1.6.3+1.g5570f65a0.dirty documentation</title>
   
 
   
@@ -30,7 +30,6 @@
   
     
       <script type="text/javascript" id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
-        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
         <script src="../../../_static/jquery.js"></script>
         <script src="../../../_static/underscore.js"></script>
         <script src="../../../_static/doctools.js"></script>
@@ -162,6 +161,10 @@
         
           <li><a href="../../index.html">Module code</a> &raquo;</li>
         
+          <li><a href="../../yggdrasil.html">yggdrasil</a> &raquo;</li>
+        
+          <li><a href="../serialize.html">yggdrasil.serialize</a> &raquo;</li>
+        
       <li>yggdrasil.serialize.FunctionalSerialize</li>
     
     
@@ -178,7 +181,7 @@
            <div itemprop="articleBody">
             
   <h1>Source code for yggdrasil.serialize.FunctionalSerialize</h1><div class="highlight"><pre>
-<span></span><span class="kn">from</span> <span class="nn">yggdrasil.serialize.SerializeBase</span> <span class="kn">import</span> <span class="n">SerializeBase</span>
+<span></span><span class="kn">from</span> <span class="nn">yggdrasil.serialize.SerializeBase</span> <span class="k">import</span> <span class="n">SerializeBase</span>
 
 
 <div class="viewcode-block" id="FunctionalSerialize"><a class="viewcode-back" href="../../../yggdrasil.serialize.html#yggdrasil.serialize.FunctionalSerialize.FunctionalSerialize">[docs]</a><span class="k">class</span> <span class="nc">FunctionalSerialize</span><span class="p">(</span><span class="n">SerializeBase</span><span class="p">):</span>
@@ -215,7 +218,7 @@
     <span class="n">func_serialize</span> <span class="o">=</span> <span class="kc">None</span>
     <span class="n">func_deserialize</span> <span class="o">=</span> <span class="kc">None</span>
     
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;func_serialize&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">),</span> <span class="n">SerializeBase</span><span class="p">):</span>
             <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;func_serialize&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;func_serialize&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">func_serialize</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;func_deserialize&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">),</span> <span class="n">SerializeBase</span><span class="p">):</span>

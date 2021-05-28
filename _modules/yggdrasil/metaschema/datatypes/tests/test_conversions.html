@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>yggdrasil.metaschema.datatypes.tests.test_conversions &mdash; yggdrasil v1.6.3 documentation</title>
+  <title>yggdrasil.metaschema.datatypes.tests.test_conversions &mdash; yggdrasil v1.6.3+1.g5570f65a0.dirty documentation</title>
   
 
   
@@ -30,7 +30,6 @@
   
     
       <script type="text/javascript" id="documentation_options" data-url_root="../../../../../" src="../../../../../_static/documentation_options.js"></script>
-        <script data-url_root="../../../../../" id="documentation_options" src="../../../../../_static/documentation_options.js"></script>
         <script src="../../../../../_static/jquery.js"></script>
         <script src="../../../../../_static/underscore.js"></script>
         <script src="../../../../../_static/doctools.js"></script>
@@ -162,6 +161,8 @@
         
           <li><a href="../../../../index.html">Module code</a> &raquo;</li>
         
+          <li><a href="../../../../yggdrasil.html">yggdrasil</a> &raquo;</li>
+        
           <li><a href="../../../metaschema.html">yggdrasil.metaschema</a> &raquo;</li>
         
           <li><a href="../../datatypes.html">yggdrasil.metaschema.datatypes</a> &raquo;</li>
@@ -184,8 +185,8 @@
            <div itemprop="articleBody">
             
   <h1>Source code for yggdrasil.metaschema.datatypes.tests.test_conversions</h1><div class="highlight"><pre>
-<span></span><span class="kn">from</span> <span class="nn">yggdrasil.tests</span> <span class="kn">import</span> <span class="n">assert_raises</span>
-<span class="kn">from</span> <span class="nn">yggdrasil.metaschema.datatypes</span> <span class="kn">import</span> <span class="n">conversions</span>
+<span></span><span class="kn">from</span> <span class="nn">yggdrasil.tests</span> <span class="k">import</span> <span class="n">assert_raises</span>
+<span class="kn">from</span> <span class="nn">yggdrasil.metaschema.datatypes</span> <span class="k">import</span> <span class="n">conversions</span>
 
 
 <div class="viewcode-block" id="test_register_conversion_errors"><a class="viewcode-back" href="../../../../../yggdrasil.metaschema.datatypes.tests.html#yggdrasil.metaschema.datatypes.tests.test_conversions.test_register_conversion_errors">[docs]</a><span class="k">def</span> <span class="nf">test_register_conversion_errors</span><span class="p">():</span>
@@ -196,9 +197,9 @@
 
 <div class="viewcode-block" id="test_ply2obj"><a class="viewcode-back" href="../../../../../yggdrasil.metaschema.datatypes.tests.html#yggdrasil.metaschema.datatypes.tests.test_conversions.test_ply2obj">[docs]</a><span class="k">def</span> <span class="nf">test_ply2obj</span><span class="p">():</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test conversion between ply and obj objects.&quot;&quot;&quot;</span>
-    <span class="kn">from</span> <span class="nn">yggdrasil.metaschema.datatypes</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="kn">from</span> <span class="nn">yggdrasil.metaschema.datatypes</span> <span class="k">import</span> <span class="p">(</span>
         <span class="n">ObjMetaschemaType</span><span class="p">,</span> <span class="n">PlyMetaschemaType</span><span class="p">)</span>
-    <span class="kn">from</span> <span class="nn">yggdrasil.metaschema.datatypes.tests</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="kn">from</span> <span class="nn">yggdrasil.metaschema.datatypes.tests</span> <span class="k">import</span> <span class="p">(</span>
         <span class="n">test_ObjMetaschemaType</span><span class="p">,</span> <span class="n">test_PlyMetaschemaType</span><span class="p">)</span>
     <span class="n">obj_class</span> <span class="o">=</span> <span class="n">ObjMetaschemaType</span><span class="o">.</span><span class="n">ObjMetaschemaType</span>
     <span class="n">ply_class</span> <span class="o">=</span> <span class="n">PlyMetaschemaType</span><span class="o">.</span><span class="n">PlyMetaschemaType</span>

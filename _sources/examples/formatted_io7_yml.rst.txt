@@ -1,6 +1,6 @@
 Model YAML:
 
-.. literalinclude:: /../../../../../../../opt/hostedtoolcache/Python/3.8.10/x64/lib/python3.8/site-packages/yggdrasil/examples/formatted_io7/formatted_io7_python.yml
+.. literalinclude:: /../../yggdrasil/examples/formatted_io7/formatted_io7_python.yml
    :language: yaml
    :linenos:
 

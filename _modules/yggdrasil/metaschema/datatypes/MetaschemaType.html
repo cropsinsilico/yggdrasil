@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>yggdrasil.metaschema.datatypes.MetaschemaType &mdash; yggdrasil v1.6.3 documentation</title>
+  <title>yggdrasil.metaschema.datatypes.MetaschemaType &mdash; yggdrasil v1.6.3+1.g5570f65a0.dirty documentation</title>
   
 
   
@@ -30,7 +30,6 @@
   
     
       <script type="text/javascript" id="documentation_options" data-url_root="../../../../" src="../../../../_static/documentation_options.js"></script>
-        <script data-url_root="../../../../" id="documentation_options" src="../../../../_static/documentation_options.js"></script>
         <script src="../../../../_static/jquery.js"></script>
         <script src="../../../../_static/underscore.js"></script>
         <script src="../../../../_static/doctools.js"></script>
@@ -162,6 +161,8 @@
         
           <li><a href="../../../index.html">Module code</a> &raquo;</li>
         
+          <li><a href="../../../yggdrasil.html">yggdrasil</a> &raquo;</li>
+        
           <li><a href="../../metaschema.html">yggdrasil.metaschema</a> &raquo;</li>
         
           <li><a href="../datatypes.html">yggdrasil.metaschema.datatypes</a> &raquo;</li>
@@ -187,13 +188,13 @@
 <span class="kn">import</span> <span class="nn">uuid</span>
 <span class="kn">import</span> <span class="nn">importlib</span>
 <span class="kn">import</span> <span class="nn">jsonschema</span>
-<span class="kn">from</span> <span class="nn">yggdrasil</span> <span class="kn">import</span> <span class="n">tools</span>
-<span class="kn">from</span> <span class="nn">yggdrasil.metaschema</span> <span class="kn">import</span> <span class="p">(</span><span class="n">get_metaschema</span><span class="p">,</span> <span class="n">get_validator</span><span class="p">,</span> <span class="n">encoder</span><span class="p">,</span>
+<span class="kn">from</span> <span class="nn">yggdrasil</span> <span class="k">import</span> <span class="n">tools</span>
+<span class="kn">from</span> <span class="nn">yggdrasil.metaschema</span> <span class="k">import</span> <span class="p">(</span><span class="n">get_metaschema</span><span class="p">,</span> <span class="n">get_validator</span><span class="p">,</span> <span class="n">encoder</span><span class="p">,</span>
                                   <span class="n">validate_instance</span><span class="p">)</span>
-<span class="kn">from</span> <span class="nn">yggdrasil.metaschema.datatypes</span> <span class="kn">import</span> <span class="p">(</span>
+<span class="kn">from</span> <span class="nn">yggdrasil.metaschema.datatypes</span> <span class="k">import</span> <span class="p">(</span>
     <span class="n">MetaschemaTypeError</span><span class="p">,</span> <span class="n">MetaschemaTypeMeta</span><span class="p">,</span> <span class="n">compare_schema</span><span class="p">,</span> <span class="n">YGG_MSG_HEAD</span><span class="p">,</span>
     <span class="n">get_type_class</span><span class="p">,</span> <span class="n">conversions</span><span class="p">,</span> <span class="n">is_default_typedef</span><span class="p">)</span>
-<span class="kn">from</span> <span class="nn">yggdrasil.metaschema.properties</span> <span class="kn">import</span> <span class="n">get_metaschema_property</span>
+<span class="kn">from</span> <span class="nn">yggdrasil.metaschema.properties</span> <span class="k">import</span> <span class="n">get_metaschema_property</span>
 
 
 <span class="k">def</span> <span class="nf">_get_single_array_element</span><span class="p">(</span><span class="n">arr</span><span class="p">):</span>
@@ -274,7 +275,7 @@
     <span class="n">_replaces_existing</span> <span class="o">=</span> <span class="kc">False</span>
     <span class="n">_json_type</span> <span class="o">=</span> <span class="kc">None</span>
     
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">typedef</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">typedef</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_typedef</span> <span class="o">=</span> <span class="p">{}</span>
         <span class="n">typedef</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s1">&#39;type&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">update_typedef</span><span class="p">(</span><span class="o">**</span><span class="n">typedef</span><span class="p">)</span>

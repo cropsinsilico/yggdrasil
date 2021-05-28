@@ -1,0 +1,188 @@
+.. _SaM_rst:
+
+SaM
+=================
+
+One model that receives input from two files and sends output to one file in the temporary directory. The YAML uses the deprecated driver-based method to represent connections.
+
+
+Mixed Version
+-------------
+
+Model Code:
+
+.. literalinclude:: /../../yggdrasil/examples/SaM/src/SaM.c
+   :language: c
+   :linenos:
+
+.. literalinclude:: /../../yggdrasil/examples/SaM/src/SaM.cpp
+   :language: c++
+   :linenos:
+
+.. literalinclude:: /../../yggdrasil/examples/SaM/src/SaM.f90
+   :language: python
+   :linenos:
+
+.. literalinclude:: /../../yggdrasil/examples/SaM/src/SaM.m
+   :language: matlab
+   :linenos:
+
+.. literalinclude:: /../../yggdrasil/examples/SaM/src/SaM.py
+   :language: python
+   :linenos:
+
+.. literalinclude:: /../../yggdrasil/examples/SaM/src/SaM.R
+   :language: python
+   :linenos:
+
+
+Model YAML:
+
+.. literalinclude:: /../../yggdrasil/examples/SaM/SaM_all.yml
+   :language: yaml
+   :linenos:
+
+
+
+Mixed w/o Matlab Version
+------------------------
+
+Model Code:
+
+.. literalinclude:: /../../yggdrasil/examples/SaM/src/SaM.c
+   :language: c
+   :linenos:
+
+.. literalinclude:: /../../yggdrasil/examples/SaM/src/SaM.cpp
+   :language: c++
+   :linenos:
+
+.. literalinclude:: /../../yggdrasil/examples/SaM/src/SaM.f90
+   :language: python
+   :linenos:
+
+.. literalinclude:: /../../yggdrasil/examples/SaM/src/SaM.py
+   :language: python
+   :linenos:
+
+.. literalinclude:: /../../yggdrasil/examples/SaM/src/SaM.R
+   :language: python
+   :linenos:
+
+
+Model YAML:
+
+.. literalinclude:: /../../yggdrasil/examples/SaM/SaM_all_nomatlab.yml
+   :language: yaml
+   :linenos:
+
+
+
+C Version
+---------
+
+Model Code:
+
+.. literalinclude:: /../../yggdrasil/examples/SaM/src/SaM.c
+   :language: c
+   :linenos:
+
+
+Model YAML:
+
+.. literalinclude:: /../../yggdrasil/examples/SaM/SaM_c.yml
+   :language: yaml
+   :linenos:
+
+
+
+C++ Version
+-----------
+
+Model Code:
+
+.. literalinclude:: /../../yggdrasil/examples/SaM/src/SaM.cpp
+   :language: c++
+   :linenos:
+
+
+Model YAML:
+
+.. literalinclude:: /../../yggdrasil/examples/SaM/SaM_cpp.yml
+   :language: yaml
+   :linenos:
+
+
+
+Fortran Version
+---------------
+
+Model Code:
+
+.. literalinclude:: /../../yggdrasil/examples/SaM/src/SaM.f90
+   :language: python
+   :linenos:
+
+
+Model YAML:
+
+.. literalinclude:: /../../yggdrasil/examples/SaM/SaM_fortran.yml
+   :language: yaml
+   :linenos:
+
+
+
+Matlab Version
+--------------
+
+Model Code:
+
+.. literalinclude:: /../../yggdrasil/examples/SaM/src/SaM.m
+   :language: matlab
+   :linenos:
+
+
+Model YAML:
+
+.. literalinclude:: /../../yggdrasil/examples/SaM/SaM_matlab.yml
+   :language: yaml
+   :linenos:
+
+
+
+Python Version
+--------------
+
+Model Code:
+
+.. literalinclude:: /../../yggdrasil/examples/SaM/src/SaM.py
+   :language: python
+   :linenos:
+
+
+Model YAML:
+
+.. literalinclude:: /../../yggdrasil/examples/SaM/SaM_python.yml
+   :language: yaml
+   :linenos:
+
+
+
+R Version
+---------
+
+Model Code:
+
+.. literalinclude:: /../../yggdrasil/examples/SaM/src/SaM.R
+   :language: python
+   :linenos:
+
+
+Model YAML:
+
+.. literalinclude:: /../../yggdrasil/examples/SaM/SaM_r.yml
+   :language: yaml
+   :linenos:
+
+
+

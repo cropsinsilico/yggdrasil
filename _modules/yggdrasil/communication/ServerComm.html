@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>yggdrasil.communication.ServerComm &mdash; yggdrasil v1.6.3 documentation</title>
+  <title>yggdrasil.communication.ServerComm &mdash; yggdrasil v1.6.3+1.g5570f65a0.dirty documentation</title>
   
 
   
@@ -30,7 +30,6 @@
   
     
       <script type="text/javascript" id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
-        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
         <script src="../../../_static/jquery.js"></script>
         <script src="../../../_static/underscore.js"></script>
         <script src="../../../_static/doctools.js"></script>
@@ -162,6 +161,8 @@
         
           <li><a href="../../index.html">Module code</a> &raquo;</li>
         
+          <li><a href="../../yggdrasil.html">yggdrasil</a> &raquo;</li>
+        
           <li><a href="../communication.html">yggdrasil.communication</a> &raquo;</li>
         
       <li>yggdrasil.communication.ServerComm</li>
@@ -182,15 +183,15 @@
   <h1>Source code for yggdrasil.communication.ServerComm</h1><div class="highlight"><pre>
 <span></span><span class="kn">import</span> <span class="nn">os</span>
 <span class="kn">import</span> <span class="nn">uuid</span>
-<span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">OrderedDict</span>
-<span class="kn">from</span> <span class="nn">yggdrasil.communication</span> <span class="kn">import</span> <span class="n">CommBase</span><span class="p">,</span> <span class="n">get_comm</span><span class="p">,</span> <span class="n">import_comm</span>
+<span class="kn">from</span> <span class="nn">collections</span> <span class="k">import</span> <span class="n">OrderedDict</span>
+<span class="kn">from</span> <span class="nn">yggdrasil.communication</span> <span class="k">import</span> <span class="n">CommBase</span><span class="p">,</span> <span class="n">get_comm</span><span class="p">,</span> <span class="n">import_comm</span>
 
 
 <div class="viewcode-block" id="Request"><a class="viewcode-back" href="../../../yggdrasil.communication.html#yggdrasil.communication.ServerComm.Request">[docs]</a><span class="k">class</span> <span class="nc">Request</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
 
     <span class="vm">__slots__</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;response_address&#39;</span><span class="p">,</span> <span class="s1">&#39;request_id&#39;</span><span class="p">]</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">response_address</span><span class="p">,</span> <span class="n">request_id</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">response_address</span><span class="p">,</span> <span class="n">request_id</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">response_address</span> <span class="o">=</span> <span class="n">response_address</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">request_id</span> <span class="o">=</span> <span class="n">request_id</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">Request</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span></div>
@@ -220,7 +221,7 @@
     <span class="n">_commtype</span> <span class="o">=</span> <span class="s1">&#39;server&#39;</span>
     <span class="n">_dont_register</span> <span class="o">=</span> <span class="kc">True</span>
     
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">request_commtype</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">response_kwargs</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">request_commtype</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">response_kwargs</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
                  <span class="n">dont_open</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">is_async</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">direct_connection</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
                  <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="k">if</span> <span class="n">response_kwargs</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>

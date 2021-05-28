@@ -1,0 +1,12 @@
+Model YAML:
+
+.. literalinclude:: /../../yggdrasil/examples/root_to_shoot/shoot.yml
+   :language: yaml
+   :linenos:
+
+.. literalinclude:: /../../yggdrasil/examples/root_to_shoot/shoot_files.yml
+   :language: yaml
+   :linenos:
+
+
+(`Example in other languages <examples/root_to_shoot.html>`__)

@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>yggdrasil.metaschema &mdash; yggdrasil v1.6.3 documentation</title>
+  <title>yggdrasil.metaschema &mdash; yggdrasil v1.6.3+1.g5570f65a0.dirty documentation</title>
   
 
   
@@ -30,7 +30,6 @@
   
     
       <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
-        <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
         <script src="../../_static/jquery.js"></script>
         <script src="../../_static/underscore.js"></script>
         <script src="../../_static/doctools.js"></script>
@@ -162,6 +161,8 @@
         
           <li><a href="../index.html">Module code</a> &raquo;</li>
         
+          <li><a href="../yggdrasil.html">yggdrasil</a> &raquo;</li>
+        
       <li>yggdrasil.metaschema</li>
     
     
@@ -183,9 +184,9 @@
 <span class="kn">import</span> <span class="nn">pprint</span>
 <span class="kn">import</span> <span class="nn">jsonschema</span>
 <span class="kn">import</span> <span class="nn">yggdrasil</span>
-<span class="kn">from</span> <span class="nn">yggdrasil.metaschema.encoder</span> <span class="kn">import</span> <span class="n">encode_json</span><span class="p">,</span> <span class="n">decode_json</span>
-<span class="kn">from</span> <span class="nn">yggdrasil.metaschema.properties</span> <span class="kn">import</span> <span class="n">get_registered_properties</span>
-<span class="kn">from</span> <span class="nn">yggdrasil.metaschema.datatypes</span> <span class="kn">import</span> <span class="n">get_registered_types</span>
+<span class="kn">from</span> <span class="nn">yggdrasil.metaschema.encoder</span> <span class="k">import</span> <span class="n">encode_json</span><span class="p">,</span> <span class="n">decode_json</span>
+<span class="kn">from</span> <span class="nn">yggdrasil.metaschema.properties</span> <span class="k">import</span> <span class="n">get_registered_properties</span>
+<span class="kn">from</span> <span class="nn">yggdrasil.metaschema.datatypes</span> <span class="k">import</span> <span class="n">get_registered_types</span>
 
 
 <span class="n">_metaschema_fbase</span> <span class="o">=</span> <span class="s1">&#39;.ygg_metaschema.json&#39;</span>
@@ -283,7 +284,7 @@
 <span class="sd">        jsonschema.IValidator: JSON schema validator.</span>
 
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="kn">from</span> <span class="nn">yggdrasil.metaschema</span> <span class="kn">import</span> <span class="n">normalizer</span>
+    <span class="kn">from</span> <span class="nn">yggdrasil.metaschema</span> <span class="k">import</span> <span class="n">normalizer</span>
     <span class="k">global</span> <span class="n">_validator</span>
     <span class="k">if</span> <span class="p">(</span><span class="n">_validator</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">or</span> <span class="n">overwrite</span><span class="p">:</span>
         <span class="n">metaschema</span> <span class="o">=</span> <span class="n">get_metaschema</span><span class="p">()</span>

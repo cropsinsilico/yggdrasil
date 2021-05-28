@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>Getting started &mdash; yggdrasil v1.6.3 documentation</title>
+  <title>Getting started &mdash; yggdrasil v1.6.3+1.g5570f65a0.dirty documentation</title>
   
 
   
@@ -30,7 +30,6 @@
   
     
       <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
-        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
         <script src="_static/jquery.js"></script>
         <script src="_static/underscore.js"></script>
         <script src="_static/doctools.js"></script>
@@ -205,18 +204,21 @@ in different programming languages to allow models to access these comms.</p>
 code and the type of model. Consider the following model which just prints a
 single line of output to stdout:</p>
 <p>Model Code:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="linenos">1</span><span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Hello from Python&#39;</span><span class="p">)</span>
+<div class="highlight-python notranslate"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="k">print</span><span class="p">(</span><span class="s1">&#39;Hello from Python&#39;</span><span class="p">)</span>
 </pre></div>
-</div>
+</td></tr></table></div>
 <p>(<a class="reference external" href="examples/gs_lesson1.html">Example in other languages</a>)</p>
 <p>The YAML file to run this model would then be:</p>
 <p>Model YAML:</p>
-<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="linenos">1</span><span class="nt">models</span><span class="p">:</span>
-<span class="linenos">2</span>  <span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">python_model</span>
-<span class="linenos">3</span>    <span class="nt">language</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">python</span>  <span class="c1"># Runs the python script using default Python</span>
-<span class="linenos">4</span>    <span class="nt">args</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">./src/gs_lesson1.py</span>
+<div class="highlight-yaml notranslate"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3
+4</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="nt">models</span><span class="p">:</span>
+  <span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">python_model</span>
+    <span class="nt">language</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">python</span>  <span class="c1"># Runs the python script using default Python</span>
+    <span class="nt">args</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">./src/gs_lesson1.py</span>
 </pre></div>
-</div>
+</td></tr></table></div>
 <p>(<a class="reference external" href="examples/gs_lesson1.html">Example in other languages</a>)</p>
 <p>The first line signals that there is a model, the second line is the name that
 should be associated with the model for logging, the third line tells the
@@ -242,16 +244,23 @@ commandline entry point <cite>yggrun</cite> followed by the path to the YAML.:</
 </div>
 <p>or including multiple models in a single YAML file.</p>
 <p>Model YAML:</p>
-<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="linenos">1</span><span class="nt">models</span><span class="p">:</span>
-<span class="linenos">2</span>  <span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">python_model1</span>
-<span class="linenos">3</span>    <span class="nt">language</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">python</span>  <span class="c1"># Runs the python script using default Python</span>
-<span class="linenos">4</span>    <span class="nt">args</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">./src/gs_lesson2.py</span>
-<span class="linenos">5</span>
-<span class="linenos">6</span>  <span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">python_model2</span>
-<span class="linenos">7</span>    <span class="nt">language</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">python</span>
-<span class="linenos">8</span>    <span class="nt">args</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">./src/gs_lesson2.py</span>
+<div class="highlight-yaml notranslate"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3
+4
+5
+6
+7
+8</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="nt">models</span><span class="p">:</span>
+  <span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">python_model1</span>
+    <span class="nt">language</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">python</span>  <span class="c1"># Runs the python script using default Python</span>
+    <span class="nt">args</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">./src/gs_lesson2.py</span>
+
+  <span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">python_model2</span>
+    <span class="nt">language</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">python</span>
+    <span class="nt">args</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">./src/gs_lesson2.py</span>
 </pre></div>
-</div>
+</td></tr></table></div>
 <p>(<a class="reference external" href="examples/gs_lesson2.html">Example in other languages</a>)</p>
 </div>
 <div class="section" id="running-remote-models">
@@ -278,34 +287,59 @@ To do so yggdrasil provides several useful functions for interfacing with
 these channels. In the example below, the model receives input from a channel
 named <code class="docutils literal notranslate"><span class="pre">input</span></code> and sends output to a channel named <code class="docutils literal notranslate"><span class="pre">output</span></code>.</p>
 <p>Model Code:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span><span class="c1"># Import classes for input/output channels</span>
-<span class="linenos"> 2</span><span class="kn">from</span> <span class="nn">yggdrasil.interface.YggInterface</span> <span class="kn">import</span> <span class="n">YggInput</span><span class="p">,</span> <span class="n">YggOutput</span>
-<span class="linenos"> 3</span>
-<span class="linenos"> 4</span><span class="c1"># Initialize input/output channels</span>
-<span class="linenos"> 5</span><span class="n">in_channel</span> <span class="o">=</span> <span class="n">YggInput</span><span class="p">(</span><span class="s1">&#39;input&#39;</span><span class="p">)</span>
-<span class="linenos"> 6</span><span class="n">out_channel</span> <span class="o">=</span> <span class="n">YggOutput</span><span class="p">(</span><span class="s1">&#39;output&#39;</span><span class="p">)</span>
-<span class="linenos"> 7</span>
-<span class="linenos"> 8</span><span class="c1"># Loop until there is no longer input or the queues are closed</span>
-<span class="linenos"> 9</span><span class="k">while</span> <span class="kc">True</span><span class="p">:</span>
-<span class="linenos">10</span>    
-<span class="linenos">11</span>    <span class="c1"># Receive input from input channel</span>
-<span class="linenos">12</span>    <span class="c1"># If there is an error, the flag will be False</span>
-<span class="linenos">13</span>    <span class="n">flag</span><span class="p">,</span> <span class="n">msg</span> <span class="o">=</span> <span class="n">in_channel</span><span class="o">.</span><span class="n">recv</span><span class="p">()</span>
-<span class="linenos">14</span>    <span class="k">if</span> <span class="ow">not</span> <span class="n">flag</span><span class="p">:</span>
-<span class="linenos">15</span>        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;No more input.&quot;</span><span class="p">)</span>
-<span class="linenos">16</span>        <span class="k">break</span>
-<span class="linenos">17</span>
-<span class="linenos">18</span>    <span class="c1"># Print received message</span>
-<span class="linenos">19</span>    <span class="nb">print</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
-<span class="linenos">20</span>
-<span class="linenos">21</span>    <span class="c1"># Send output to output channel</span>
-<span class="linenos">22</span>    <span class="c1"># If there is an error, the flag will be False</span>
-<span class="linenos">23</span>    <span class="n">flag</span> <span class="o">=</span> <span class="n">out_channel</span><span class="o">.</span><span class="n">send</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
-<span class="linenos">24</span>    <span class="k">if</span> <span class="ow">not</span> <span class="n">flag</span><span class="p">:</span>
-<span class="linenos">25</span>        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Error sending output.&quot;</span><span class="p">)</span>
-<span class="linenos">26</span>        <span class="k">break</span>
+<div class="highlight-python notranslate"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="c1"># Import classes for input/output channels</span>
+<span class="kn">from</span> <span class="nn">yggdrasil.interface.YggInterface</span> <span class="kn">import</span> <span class="n">YggInput</span><span class="p">,</span> <span class="n">YggOutput</span>
+
+<span class="c1"># Initialize input/output channels</span>
+<span class="n">in_channel</span> <span class="o">=</span> <span class="n">YggInput</span><span class="p">(</span><span class="s1">&#39;input&#39;</span><span class="p">)</span>
+<span class="n">out_channel</span> <span class="o">=</span> <span class="n">YggOutput</span><span class="p">(</span><span class="s1">&#39;output&#39;</span><span class="p">)</span>
+
+<span class="c1"># Loop until there is no longer input or the queues are closed</span>
+<span class="k">while</span> <span class="bp">True</span><span class="p">:</span>
+    
+    <span class="c1"># Receive input from input channel</span>
+    <span class="c1"># If there is an error, the flag will be False</span>
+    <span class="n">flag</span><span class="p">,</span> <span class="n">msg</span> <span class="o">=</span> <span class="n">in_channel</span><span class="o">.</span><span class="n">recv</span><span class="p">()</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">flag</span><span class="p">:</span>
+        <span class="k">print</span><span class="p">(</span><span class="s2">&quot;No more input.&quot;</span><span class="p">)</span>
+        <span class="k">break</span>
+
+    <span class="c1"># Print received message</span>
+    <span class="k">print</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+
+    <span class="c1"># Send output to output channel</span>
+    <span class="c1"># If there is an error, the flag will be False</span>
+    <span class="n">flag</span> <span class="o">=</span> <span class="n">out_channel</span><span class="o">.</span><span class="n">send</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">flag</span><span class="p">:</span>
+        <span class="k">print</span><span class="p">(</span><span class="s2">&quot;Error sending output.&quot;</span><span class="p">)</span>
+        <span class="k">break</span>
 </pre></div>
-</div>
+</td></tr></table></div>
 <p>(<a class="reference external" href="examples/gs_lesson3.html">Example in other languages</a>)</p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
@@ -317,22 +351,35 @@ begin passed through the channel.</p>
 definition and then linked to files by entries in the <code class="docutils literal notranslate"><span class="pre">connections</span></code> section
 of the YAML.</p>
 <p>Model YAML:</p>
-<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span><span class="nt">models</span><span class="p">:</span>
-<span class="linenos"> 2</span>  <span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">python_model</span>
-<span class="linenos"> 3</span>    <span class="nt">language</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">python</span>  <span class="c1"># Runs the python script using default Python</span>
-<span class="linenos"> 4</span>    <span class="nt">args</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">./src/gs_lesson3.py</span>
-<span class="linenos"> 5</span>    <span class="nt">inputs</span><span class="p">:</span>
-<span class="linenos"> 6</span>      <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">input</span>
-<span class="linenos"> 7</span>    <span class="nt">outputs</span><span class="p">:</span>
-<span class="linenos"> 8</span>      <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">output</span>
-<span class="linenos"> 9</span>
-<span class="linenos">10</span><span class="nt">connections</span><span class="p">:</span>
-<span class="linenos">11</span>  <span class="p p-Indicator">-</span> <span class="nt">input_file</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">./Input/input.txt</span>
-<span class="linenos">12</span>    <span class="nt">output</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">input</span>
-<span class="linenos">13</span>  <span class="p p-Indicator">-</span> <span class="nt">input</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">output</span>
-<span class="linenos">14</span>    <span class="nt">output</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">./output.txt</span>
+<div class="highlight-yaml notranslate"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="nt">models</span><span class="p">:</span>
+  <span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">python_model</span>
+    <span class="nt">language</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">python</span>  <span class="c1"># Runs the python script using default Python</span>
+    <span class="nt">args</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">./src/gs_lesson3.py</span>
+    <span class="nt">inputs</span><span class="p">:</span>
+      <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">input</span>
+    <span class="nt">outputs</span><span class="p">:</span>
+      <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">output</span>
+
+<span class="nt">connections</span><span class="p">:</span>
+  <span class="p p-Indicator">-</span> <span class="nt">input_file</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">./Input/input.txt</span>
+    <span class="nt">output</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">input</span>
+  <span class="p p-Indicator">-</span> <span class="nt">input</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">output</span>
+    <span class="nt">output</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">./output.txt</span>
 </pre></div>
-</div>
+</td></tr></table></div>
 <p>(<a class="reference external" href="examples/gs_lesson3.html">Example in other languages</a>)</p>
 <p>The <code class="docutils literal notranslate"><span class="pre">input_file</span></code> and <code class="docutils literal notranslate"><span class="pre">output_file</span></code> connection fields can either be
 the path to the file (either absolute or relative to the directory
@@ -391,87 +438,154 @@ below, model A receives input from a channel named ‘inputA’ and sends output
 a channel named ‘outputA’, while model B receives input from a channel named
 ‘inputB’ and sends output to a channel named ‘outputB’.</p>
 <p>Model Code:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span><span class="c1"># Import classes for input/output channels</span>
-<span class="linenos"> 2</span><span class="kn">from</span> <span class="nn">yggdrasil.interface.YggInterface</span> <span class="kn">import</span> <span class="n">YggInput</span><span class="p">,</span> <span class="n">YggOutput</span>
-<span class="linenos"> 3</span>
-<span class="linenos"> 4</span><span class="c1"># Initialize input/output channels</span>
-<span class="linenos"> 5</span><span class="n">in_channel</span> <span class="o">=</span> <span class="n">YggInput</span><span class="p">(</span><span class="s1">&#39;inputA&#39;</span><span class="p">)</span>
-<span class="linenos"> 6</span><span class="n">out_channel</span> <span class="o">=</span> <span class="n">YggOutput</span><span class="p">(</span><span class="s1">&#39;outputA&#39;</span><span class="p">)</span>
-<span class="linenos"> 7</span>
-<span class="linenos"> 8</span><span class="c1"># Loop until there is no longer input or the queues are closed</span>
-<span class="linenos"> 9</span><span class="k">while</span> <span class="kc">True</span><span class="p">:</span>
-<span class="linenos">10</span>
-<span class="linenos">11</span>    <span class="c1"># Receive input from input channel</span>
-<span class="linenos">12</span>    <span class="c1"># If there is an error, the flag will be False</span>
-<span class="linenos">13</span>    <span class="n">flag</span><span class="p">,</span> <span class="n">msg</span> <span class="o">=</span> <span class="n">in_channel</span><span class="o">.</span><span class="n">recv</span><span class="p">()</span>
-<span class="linenos">14</span>    <span class="k">if</span> <span class="ow">not</span> <span class="n">flag</span><span class="p">:</span>
-<span class="linenos">15</span>        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Model A: No more input.&quot;</span><span class="p">)</span>
-<span class="linenos">16</span>        <span class="k">break</span>
-<span class="linenos">17</span>
-<span class="linenos">18</span>    <span class="c1"># Print received message</span>
-<span class="linenos">19</span>    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Model A: </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">msg</span><span class="p">)</span>
-<span class="linenos">20</span>
-<span class="linenos">21</span>    <span class="c1"># Send output to output channel</span>
-<span class="linenos">22</span>    <span class="c1"># If there is an error, the flag will be False</span>
-<span class="linenos">23</span>    <span class="n">flag</span> <span class="o">=</span> <span class="n">out_channel</span><span class="o">.</span><span class="n">send</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
-<span class="linenos">24</span>    <span class="k">if</span> <span class="ow">not</span> <span class="n">flag</span><span class="p">:</span>
-<span class="linenos">25</span>        <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">&quot;Model A: Error sending output.&quot;</span><span class="p">)</span>
+<div class="highlight-python notranslate"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="c1"># Import classes for input/output channels</span>
+<span class="kn">from</span> <span class="nn">yggdrasil.interface.YggInterface</span> <span class="kn">import</span> <span class="n">YggInput</span><span class="p">,</span> <span class="n">YggOutput</span>
+
+<span class="c1"># Initialize input/output channels</span>
+<span class="n">in_channel</span> <span class="o">=</span> <span class="n">YggInput</span><span class="p">(</span><span class="s1">&#39;inputA&#39;</span><span class="p">)</span>
+<span class="n">out_channel</span> <span class="o">=</span> <span class="n">YggOutput</span><span class="p">(</span><span class="s1">&#39;outputA&#39;</span><span class="p">)</span>
+
+<span class="c1"># Loop until there is no longer input or the queues are closed</span>
+<span class="k">while</span> <span class="bp">True</span><span class="p">:</span>
+
+    <span class="c1"># Receive input from input channel</span>
+    <span class="c1"># If there is an error, the flag will be False</span>
+    <span class="n">flag</span><span class="p">,</span> <span class="n">msg</span> <span class="o">=</span> <span class="n">in_channel</span><span class="o">.</span><span class="n">recv</span><span class="p">()</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">flag</span><span class="p">:</span>
+        <span class="k">print</span><span class="p">(</span><span class="s2">&quot;Model A: No more input.&quot;</span><span class="p">)</span>
+        <span class="k">break</span>
+
+    <span class="c1"># Print received message</span>
+    <span class="k">print</span><span class="p">(</span><span class="s1">&#39;Model A: </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">msg</span><span class="p">)</span>
+
+    <span class="c1"># Send output to output channel</span>
+    <span class="c1"># If there is an error, the flag will be False</span>
+    <span class="n">flag</span> <span class="o">=</span> <span class="n">out_channel</span><span class="o">.</span><span class="n">send</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">flag</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">&quot;Model A: Error sending output.&quot;</span><span class="p">)</span>
 </pre></div>
-</div>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span><span class="c1"># Import classes for input/output channels</span>
-<span class="linenos"> 2</span><span class="kn">from</span> <span class="nn">yggdrasil.interface.YggInterface</span> <span class="kn">import</span> <span class="n">YggInput</span><span class="p">,</span> <span class="n">YggOutput</span>
-<span class="linenos"> 3</span>
-<span class="linenos"> 4</span><span class="c1"># Initialize input/output channels</span>
-<span class="linenos"> 5</span><span class="n">in_channel</span> <span class="o">=</span> <span class="n">YggInput</span><span class="p">(</span><span class="s1">&#39;inputB&#39;</span><span class="p">)</span>
-<span class="linenos"> 6</span><span class="n">out_channel</span> <span class="o">=</span> <span class="n">YggOutput</span><span class="p">(</span><span class="s1">&#39;outputB&#39;</span><span class="p">)</span>
-<span class="linenos"> 7</span>
-<span class="linenos"> 8</span><span class="c1"># Loop until there is no longer input or the queues are closed</span>
-<span class="linenos"> 9</span><span class="k">while</span> <span class="kc">True</span><span class="p">:</span>
-<span class="linenos">10</span>
-<span class="linenos">11</span>    <span class="c1"># Receive input from input channel</span>
-<span class="linenos">12</span>    <span class="c1"># If there is an error, the flag will be False</span>
-<span class="linenos">13</span>    <span class="n">flag</span><span class="p">,</span> <span class="n">msg</span> <span class="o">=</span> <span class="n">in_channel</span><span class="o">.</span><span class="n">recv</span><span class="p">()</span>
-<span class="linenos">14</span>    <span class="k">if</span> <span class="ow">not</span> <span class="n">flag</span><span class="p">:</span>
-<span class="linenos">15</span>        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Model B: No more input.&quot;</span><span class="p">)</span>
-<span class="linenos">16</span>        <span class="k">break</span>
-<span class="linenos">17</span>
-<span class="linenos">18</span>    <span class="c1"># Print received message</span>
-<span class="linenos">19</span>    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Model B: </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">msg</span><span class="p">)</span>
-<span class="linenos">20</span>
-<span class="linenos">21</span>    <span class="c1"># Send output to output channel</span>
-<span class="linenos">22</span>    <span class="c1"># If there is an error, the flag will be False</span>
-<span class="linenos">23</span>    <span class="n">flag</span> <span class="o">=</span> <span class="n">out_channel</span><span class="o">.</span><span class="n">send</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
-<span class="linenos">24</span>    <span class="k">if</span> <span class="ow">not</span> <span class="n">flag</span><span class="p">:</span>
-<span class="linenos">25</span>        <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">&quot;Model B: Error sending output.&quot;</span><span class="p">)</span>
+</td></tr></table></div>
+<div class="highlight-python notranslate"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="c1"># Import classes for input/output channels</span>
+<span class="kn">from</span> <span class="nn">yggdrasil.interface.YggInterface</span> <span class="kn">import</span> <span class="n">YggInput</span><span class="p">,</span> <span class="n">YggOutput</span>
+
+<span class="c1"># Initialize input/output channels</span>
+<span class="n">in_channel</span> <span class="o">=</span> <span class="n">YggInput</span><span class="p">(</span><span class="s1">&#39;inputB&#39;</span><span class="p">)</span>
+<span class="n">out_channel</span> <span class="o">=</span> <span class="n">YggOutput</span><span class="p">(</span><span class="s1">&#39;outputB&#39;</span><span class="p">)</span>
+
+<span class="c1"># Loop until there is no longer input or the queues are closed</span>
+<span class="k">while</span> <span class="bp">True</span><span class="p">:</span>
+
+    <span class="c1"># Receive input from input channel</span>
+    <span class="c1"># If there is an error, the flag will be False</span>
+    <span class="n">flag</span><span class="p">,</span> <span class="n">msg</span> <span class="o">=</span> <span class="n">in_channel</span><span class="o">.</span><span class="n">recv</span><span class="p">()</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">flag</span><span class="p">:</span>
+        <span class="k">print</span><span class="p">(</span><span class="s2">&quot;Model B: No more input.&quot;</span><span class="p">)</span>
+        <span class="k">break</span>
+
+    <span class="c1"># Print received message</span>
+    <span class="k">print</span><span class="p">(</span><span class="s1">&#39;Model B: </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">msg</span><span class="p">)</span>
+
+    <span class="c1"># Send output to output channel</span>
+    <span class="c1"># If there is an error, the flag will be False</span>
+    <span class="n">flag</span> <span class="o">=</span> <span class="n">out_channel</span><span class="o">.</span><span class="n">send</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">flag</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">&quot;Model B: Error sending output.&quot;</span><span class="p">)</span>
 </pre></div>
-</div>
+</td></tr></table></div>
 <p>(<a class="reference external" href="examples/gs_lesson4.html">Example in other languages</a>)</p>
 <p>In the YAML, ‘inputA’ is connected to a local file, ‘outputA’ is connected to
 ‘inputB’, and ‘outputB’ is connected to a local file in the <code class="docutils literal notranslate"><span class="pre">connections</span></code>
 section of the YAML.</p>
 <p>Model YAML:</p>
-<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span><span class="nt">models</span><span class="p">:</span>
-<span class="linenos"> 2</span>  <span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">python_modelA</span>
-<span class="linenos"> 3</span>    <span class="nt">language</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">python</span>
-<span class="linenos"> 4</span>    <span class="nt">args</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">./src/gs_lesson4_modelA.py</span>
-<span class="linenos"> 5</span>    <span class="nt">inputs</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">inputA</span>
-<span class="linenos"> 6</span>    <span class="nt">outputs</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">outputA</span>
-<span class="linenos"> 7</span>
-<span class="linenos"> 8</span>  <span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">python_modelB</span>
-<span class="linenos"> 9</span>    <span class="nt">language</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">python</span>
-<span class="linenos">10</span>    <span class="nt">args</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">./src/gs_lesson4_modelB.py</span>
-<span class="linenos">11</span>    <span class="nt">inputs</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">inputB</span>
-<span class="linenos">12</span>    <span class="nt">outputs</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">outputB</span>
-<span class="linenos">13</span>
-<span class="linenos">14</span><span class="nt">connections</span><span class="p">:</span>
-<span class="linenos">15</span>  <span class="p p-Indicator">-</span> <span class="nt">input</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">outputA</span>  <span class="c1"># Connection between model A output &amp; model B input</span>
-<span class="linenos">16</span>    <span class="nt">output</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">inputB</span>
-<span class="linenos">17</span>  <span class="p p-Indicator">-</span> <span class="nt">input</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">./Input/input.txt</span>  <span class="c1"># Connection between file and model A input</span>
-<span class="linenos">18</span>    <span class="nt">output</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">inputA</span>
-<span class="linenos">19</span>  <span class="p p-Indicator">-</span> <span class="nt">input</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">outputB</span>  <span class="c1"># Connection between model B output and file</span>
-<span class="linenos">20</span>    <span class="nt">output</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">./output.txt</span>
+<div class="highlight-yaml notranslate"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="nt">models</span><span class="p">:</span>
+  <span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">python_modelA</span>
+    <span class="nt">language</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">python</span>
+    <span class="nt">args</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">./src/gs_lesson4_modelA.py</span>
+    <span class="nt">inputs</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">inputA</span>
+    <span class="nt">outputs</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">outputA</span>
+
+  <span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">python_modelB</span>
+    <span class="nt">language</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">python</span>
+    <span class="nt">args</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">./src/gs_lesson4_modelB.py</span>
+    <span class="nt">inputs</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">inputB</span>
+    <span class="nt">outputs</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">outputB</span>
+
+<span class="nt">connections</span><span class="p">:</span>
+  <span class="p p-Indicator">-</span> <span class="nt">input</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">outputA</span>  <span class="c1"># Connection between model A output &amp; model B input</span>
+    <span class="nt">output</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">inputB</span>
+  <span class="p p-Indicator">-</span> <span class="nt">input</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">./Input/input.txt</span>  <span class="c1"># Connection between file and model A input</span>
+    <span class="nt">output</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">inputA</span>
+  <span class="p p-Indicator">-</span> <span class="nt">input</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">outputB</span>  <span class="c1"># Connection between model B output and file</span>
+    <span class="nt">output</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">./output.txt</span>
 </pre></div>
-</div>
+</td></tr></table></div>
 <p>(<a class="reference external" href="examples/gs_lesson4.html">Example in other languages</a>)</p>
 </div>
 <div class="section" id="model-to-model-communication-with-drivers">
@@ -481,36 +595,63 @@ the underlying drivers without an explicit <code class="docutils literal notrans
 exact same models from the previous example can be connected using the
 following YAML.</p>
 <p>Model YAML:</p>
-<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span><span class="nt">models</span><span class="p">:</span>
-<span class="linenos"> 2</span>  <span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">python_modelA</span>
-<span class="linenos"> 3</span>    <span class="nt">language</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">python</span>
-<span class="linenos"> 4</span>    <span class="nt">args</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">./src/gs_lesson4b_modelA.py</span>
-<span class="linenos"> 5</span>
-<span class="linenos"> 6</span>    <span class="nt">inputs</span><span class="p">:</span>
-<span class="linenos"> 7</span>      <span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">inputA</span>
-<span class="linenos"> 8</span>        <span class="nt">driver</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">FileInputDriver</span>
-<span class="linenos"> 9</span>        <span class="nt">args</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">./Input/input.txt</span>
-<span class="linenos">10</span>
-<span class="linenos">11</span>    <span class="nt">outputs</span><span class="p">:</span>
-<span class="linenos">12</span>      <span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">outputA</span>
-<span class="linenos">13</span>        <span class="nt">driver</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">OutputDriver</span>  <span class="c1"># Output to another channel</span>
-<span class="linenos">14</span>        <span class="nt">args</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">A_to_B</span>  <span class="c1"># Connection to inputB</span>
-<span class="linenos">15</span>
-<span class="linenos">16</span>  <span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">python_modelB</span>
-<span class="linenos">17</span>    <span class="nt">language</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">python</span>
-<span class="linenos">18</span>    <span class="nt">args</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">./src/gs_lesson4b_modelB.py</span>
-<span class="linenos">19</span>
-<span class="linenos">20</span>    <span class="nt">inputs</span><span class="p">:</span>
-<span class="linenos">21</span>      <span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">inputB</span>
-<span class="linenos">22</span>        <span class="nt">driver</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">InputDriver</span>  <span class="c1"># Input from another channel</span>
-<span class="linenos">23</span>        <span class="nt">args</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">A_to_B</span>  <span class="c1"># Conneciton to inputA</span>
-<span class="linenos">24</span>
-<span class="linenos">25</span>    <span class="nt">outputs</span><span class="p">:</span>
-<span class="linenos">26</span>      <span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">outputB</span>
-<span class="linenos">27</span>        <span class="nt">driver</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">FileOutputDriver</span>
-<span class="linenos">28</span>        <span class="nt">args</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">./output.txt</span>
+<div class="highlight-yaml notranslate"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="nt">models</span><span class="p">:</span>
+  <span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">python_modelA</span>
+    <span class="nt">language</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">python</span>
+    <span class="nt">args</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">./src/gs_lesson4b_modelA.py</span>
+
+    <span class="nt">inputs</span><span class="p">:</span>
+      <span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">inputA</span>
+        <span class="nt">driver</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">FileInputDriver</span>
+        <span class="nt">args</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">./Input/input.txt</span>
+
+    <span class="nt">outputs</span><span class="p">:</span>
+      <span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">outputA</span>
+        <span class="nt">driver</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">OutputDriver</span>  <span class="c1"># Output to another channel</span>
+        <span class="nt">args</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">A_to_B</span>  <span class="c1"># Connection to inputB</span>
+
+  <span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">python_modelB</span>
+    <span class="nt">language</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">python</span>
+    <span class="nt">args</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">./src/gs_lesson4b_modelB.py</span>
+
+    <span class="nt">inputs</span><span class="p">:</span>
+      <span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">inputB</span>
+        <span class="nt">driver</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">InputDriver</span>  <span class="c1"># Input from another channel</span>
+        <span class="nt">args</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">A_to_B</span>  <span class="c1"># Conneciton to inputA</span>
+
+    <span class="nt">outputs</span><span class="p">:</span>
+      <span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">outputB</span>
+        <span class="nt">driver</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">FileOutputDriver</span>
+        <span class="nt">args</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">./output.txt</span>
 </pre></div>
-</div>
+</td></tr></table></div>
 <p>(<a class="reference external" href="examples/gs_lesson4b.html">Example in other languages</a>)</p>
 <p>In this schema, model <code class="docutils literal notranslate"><span class="pre">input</span></code> and <code class="docutils literal notranslate"><span class="pre">output</span></code> entries
 must have the following fields:</p>

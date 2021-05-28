@@ -1,0 +1,8 @@
+Model Code:
+
+.. literalinclude:: /../../yggdrasil/examples/model_error/src/model_error.py
+   :language: python
+   :linenos:
+
+
+(`Example in other languages <examples/model_error.html>`__)

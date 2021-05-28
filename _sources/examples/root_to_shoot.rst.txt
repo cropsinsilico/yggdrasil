@@ -1,0 +1,112 @@
+.. _root_to_shoot_rst:
+
+root_to_shoot
+=====================================
+
+Two models, a root model and a shoot model, that are both run via wrappers around functions. The root model receives the initial root mass, growth rate, and time steps from files. For each time step, the root model computes the new root mass and sends it to the shoot model. The shoot model receives the initial shoot mass, growth rate, and time steps from files. For each time step, the shoot model receives the new root mass from the root model, calculates the next shoot mass and outputs it to a file.
+
+
+Mixed Version
+-------------
+
+Model Code:
+
+.. literalinclude:: /../../yggdrasil/examples/root_to_shoot/src/root.c
+   :language: c
+   :linenos:
+
+.. literalinclude:: /../../yggdrasil/examples/root_to_shoot/src/shoot.py
+   :language: python
+   :linenos:
+
+
+Model YAML:
+
+.. literalinclude:: /../../yggdrasil/examples/root_to_shoot/root.yml
+   :language: yaml
+   :linenos:
+
+.. literalinclude:: /../../yggdrasil/examples/root_to_shoot/shoot.yml
+   :language: yaml
+   :linenos:
+
+.. literalinclude:: /../../yggdrasil/examples/root_to_shoot/root_to_shoot.yml
+   :language: yaml
+   :linenos:
+
+
+
+Mixed w/o Matlab Version
+------------------------
+
+Model Code:
+
+.. literalinclude:: /../../yggdrasil/examples/root_to_shoot/src/root.c
+   :language: c
+   :linenos:
+
+.. literalinclude:: /../../yggdrasil/examples/root_to_shoot/src/shoot.py
+   :language: python
+   :linenos:
+
+
+Model YAML:
+
+.. literalinclude:: /../../yggdrasil/examples/root_to_shoot/root.yml
+   :language: yaml
+   :linenos:
+
+.. literalinclude:: /../../yggdrasil/examples/root_to_shoot/shoot.yml
+   :language: yaml
+   :linenos:
+
+.. literalinclude:: /../../yggdrasil/examples/root_to_shoot/root_to_shoot.yml
+   :language: yaml
+   :linenos:
+
+
+
+C Version
+---------
+
+Model Code:
+
+.. literalinclude:: /../../yggdrasil/examples/root_to_shoot/src/root.c
+   :language: c
+   :linenos:
+
+
+Model YAML:
+
+.. literalinclude:: /../../yggdrasil/examples/root_to_shoot/root.yml
+   :language: yaml
+   :linenos:
+
+.. literalinclude:: /../../yggdrasil/examples/root_to_shoot/root_files.yml
+   :language: yaml
+   :linenos:
+
+
+
+Python Version
+--------------
+
+Model Code:
+
+.. literalinclude:: /../../yggdrasil/examples/root_to_shoot/src/shoot.py
+   :language: python
+   :linenos:
+
+
+Model YAML:
+
+.. literalinclude:: /../../yggdrasil/examples/root_to_shoot/shoot.yml
+   :language: yaml
+   :linenos:
+
+.. literalinclude:: /../../yggdrasil/examples/root_to_shoot/shoot_files.yml
+   :language: yaml
+   :linenos:
+
+
+

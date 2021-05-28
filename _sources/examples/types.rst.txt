@@ -1,0 +1,228 @@
+.. _types_rst:
+
+types
+=====================
+
+This example is used by yggdrasil to test the serialization/deserialization of the supported types between the supported languages and should not be used outside of the `types` test suite (run via `yggtest --test-suite=types`).
+
+
+R Version
+---------
+
+Model Code:
+
+.. literalinclude:: /../../yggdrasil/examples/types/src/src.py
+   :language: python
+   :linenos:
+
+.. literalinclude:: /../../yggdrasil/examples/types/src/dst.py
+   :language: python
+   :linenos:
+
+
+Model YAML:
+
+.. literalinclude:: /../../yggdrasil/examples/types/types.yml
+   :language: yaml
+   :linenos:
+
+
+
+C Version
+---------
+
+Model Code:
+
+.. literalinclude:: /../../yggdrasil/examples/types/src/src.py
+   :language: python
+   :linenos:
+
+.. literalinclude:: /../../yggdrasil/examples/types/src/dst.py
+   :language: python
+   :linenos:
+
+
+Model YAML:
+
+.. literalinclude:: /../../yggdrasil/examples/types/types.yml
+   :language: yaml
+   :linenos:
+
+
+
+C++ Version
+-----------
+
+Model Code:
+
+.. literalinclude:: /../../yggdrasil/examples/types/src/src.py
+   :language: python
+   :linenos:
+
+.. literalinclude:: /../../yggdrasil/examples/types/src/dst.py
+   :language: python
+   :linenos:
+
+
+Model YAML:
+
+.. literalinclude:: /../../yggdrasil/examples/types/types.yml
+   :language: yaml
+   :linenos:
+
+
+
+Fortran Version
+---------------
+
+Model Code:
+
+.. literalinclude:: /../../yggdrasil/examples/types/src/src.py
+   :language: python
+   :linenos:
+
+.. literalinclude:: /../../yggdrasil/examples/types/src/dst.py
+   :language: python
+   :linenos:
+
+
+Model YAML:
+
+.. literalinclude:: /../../yggdrasil/examples/types/types.yml
+   :language: yaml
+   :linenos:
+
+
+
+Function Version
+----------------
+
+Model Code:
+
+.. literalinclude:: /../../yggdrasil/examples/types/src/src.py
+   :language: python
+   :linenos:
+
+.. literalinclude:: /../../yggdrasil/examples/types/src/dst.py
+   :language: python
+   :linenos:
+
+
+Model YAML:
+
+.. literalinclude:: /../../yggdrasil/examples/types/types.yml
+   :language: yaml
+   :linenos:
+
+
+
+Matlab Version
+--------------
+
+Model Code:
+
+.. literalinclude:: /../../yggdrasil/examples/types/src/src.py
+   :language: python
+   :linenos:
+
+.. literalinclude:: /../../yggdrasil/examples/types/src/dst.py
+   :language: python
+   :linenos:
+
+
+Model YAML:
+
+.. literalinclude:: /../../yggdrasil/examples/types/types.yml
+   :language: yaml
+   :linenos:
+
+
+
+OpenSimRoot Version
+-------------------
+
+Model Code:
+
+.. literalinclude:: /../../yggdrasil/examples/types/src/src.py
+   :language: python
+   :linenos:
+
+.. literalinclude:: /../../yggdrasil/examples/types/src/dst.py
+   :language: python
+   :linenos:
+
+
+Model YAML:
+
+.. literalinclude:: /../../yggdrasil/examples/types/types.yml
+   :language: yaml
+   :linenos:
+
+
+
+Python Version
+--------------
+
+Model Code:
+
+.. literalinclude:: /../../yggdrasil/examples/types/src/src.py
+   :language: python
+   :linenos:
+
+.. literalinclude:: /../../yggdrasil/examples/types/src/dst.py
+   :language: python
+   :linenos:
+
+
+Model YAML:
+
+.. literalinclude:: /../../yggdrasil/examples/types/types.yml
+   :language: yaml
+   :linenos:
+
+
+
+SBML Version
+------------
+
+Model Code:
+
+.. literalinclude:: /../../yggdrasil/examples/types/src/src.py
+   :language: python
+   :linenos:
+
+.. literalinclude:: /../../yggdrasil/examples/types/src/dst.py
+   :language: python
+   :linenos:
+
+
+Model YAML:
+
+.. literalinclude:: /../../yggdrasil/examples/types/types.yml
+   :language: yaml
+   :linenos:
+
+
+
+Timesync Version
+----------------
+
+Model Code:
+
+.. literalinclude:: /../../yggdrasil/examples/types/src/src.py
+   :language: python
+   :linenos:
+
+.. literalinclude:: /../../yggdrasil/examples/types/src/dst.py
+   :language: python
+   :linenos:
+
+
+Model YAML:
+
+.. literalinclude:: /../../yggdrasil/examples/types/types.yml
+   :language: yaml
+   :linenos:
+
+
+

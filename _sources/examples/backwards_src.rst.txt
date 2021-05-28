@@ -1,0 +1,12 @@
+Model Code:
+
+.. literalinclude:: /../../yggdrasil/examples/backwards/src/backwards_modelA.py
+   :language: python
+   :linenos:
+
+.. literalinclude:: /../../yggdrasil/examples/backwards/src/backwards_modelB.py
+   :language: python
+   :linenos:
+
+
+(`Example in other languages <examples/backwards.html>`__)

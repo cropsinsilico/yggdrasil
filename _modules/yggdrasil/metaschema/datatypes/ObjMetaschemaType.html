@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>yggdrasil.metaschema.datatypes.ObjMetaschemaType &mdash; yggdrasil v1.6.3 documentation</title>
+  <title>yggdrasil.metaschema.datatypes.ObjMetaschemaType &mdash; yggdrasil v1.6.3+1.g5570f65a0.dirty documentation</title>
   
 
   
@@ -30,7 +30,6 @@
   
     
       <script type="text/javascript" id="documentation_options" data-url_root="../../../../" src="../../../../_static/documentation_options.js"></script>
-        <script data-url_root="../../../../" id="documentation_options" src="../../../../_static/documentation_options.js"></script>
         <script src="../../../../_static/jquery.js"></script>
         <script src="../../../../_static/underscore.js"></script>
         <script src="../../../../_static/doctools.js"></script>
@@ -162,6 +161,8 @@
         
           <li><a href="../../../index.html">Module code</a> &raquo;</li>
         
+          <li><a href="../../../yggdrasil.html">yggdrasil</a> &raquo;</li>
+        
           <li><a href="../../metaschema.html">yggdrasil.metaschema</a> &raquo;</li>
         
           <li><a href="../datatypes.html">yggdrasil.metaschema.datatypes</a> &raquo;</li>
@@ -186,12 +187,12 @@
 <span class="kn">import</span> <span class="nn">copy</span>
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="kn">import</span> <span class="nn">warnings</span>
-<span class="kn">from</span> <span class="nn">yggdrasil</span> <span class="kn">import</span> <span class="n">tools</span>
-<span class="kn">from</span> <span class="nn">yggdrasil.metaschema.encoder</span> <span class="kn">import</span> <span class="n">encode_json</span><span class="p">,</span> <span class="n">decode_json</span>
-<span class="kn">from</span> <span class="nn">yggdrasil.metaschema.datatypes</span> <span class="kn">import</span> <span class="n">_schema_dir</span>
-<span class="kn">from</span> <span class="nn">yggdrasil.metaschema.datatypes.JSONObjectMetaschemaType</span> <span class="kn">import</span> <span class="p">(</span>
+<span class="kn">from</span> <span class="nn">yggdrasil</span> <span class="k">import</span> <span class="n">tools</span>
+<span class="kn">from</span> <span class="nn">yggdrasil.metaschema.encoder</span> <span class="k">import</span> <span class="n">encode_json</span><span class="p">,</span> <span class="n">decode_json</span>
+<span class="kn">from</span> <span class="nn">yggdrasil.metaschema.datatypes</span> <span class="k">import</span> <span class="n">_schema_dir</span>
+<span class="kn">from</span> <span class="nn">yggdrasil.metaschema.datatypes.JSONObjectMetaschemaType</span> <span class="k">import</span> <span class="p">(</span>
     <span class="n">JSONObjectMetaschemaType</span><span class="p">)</span>
-<span class="kn">from</span> <span class="nn">yggdrasil.metaschema.datatypes.PlyMetaschemaType</span> <span class="kn">import</span> <span class="p">(</span>
+<span class="kn">from</span> <span class="nn">yggdrasil.metaschema.datatypes.PlyMetaschemaType</span> <span class="k">import</span> <span class="p">(</span>
     <span class="n">trimesh</span><span class="p">,</span> <span class="n">PlyDict</span><span class="p">,</span>
     <span class="n">_index_type</span><span class="p">,</span> <span class="n">_color_type</span><span class="p">,</span> <span class="n">_coord_type</span><span class="p">,</span>
     <span class="n">_index_conv</span><span class="p">,</span> <span class="n">_color_conv</span><span class="p">,</span> <span class="n">_coord_conv</span><span class="p">,</span>

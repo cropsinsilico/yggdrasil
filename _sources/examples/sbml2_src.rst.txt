@@ -1,0 +1,8 @@
+Model Code:
+
+.. literalinclude:: /../../yggdrasil/examples/sbml2/src/sbml2.xml
+   :language: python
+   :linenos:
+
+
+(`Example in other languages <examples/sbml2.html>`__)

@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>yggdrasil.drivers.tests.test_CModelDriver &mdash; yggdrasil v1.6.3 documentation</title>
+  <title>yggdrasil.drivers.tests.test_CModelDriver &mdash; yggdrasil v1.6.3+1.g5570f65a0.dirty documentation</title>
   
 
   
@@ -30,7 +30,6 @@
   
     
       <script type="text/javascript" id="documentation_options" data-url_root="../../../../" src="../../../../_static/documentation_options.js"></script>
-        <script data-url_root="../../../../" id="documentation_options" src="../../../../_static/documentation_options.js"></script>
         <script src="../../../../_static/jquery.js"></script>
         <script src="../../../../_static/underscore.js"></script>
         <script src="../../../../_static/doctools.js"></script>
@@ -162,7 +161,11 @@
         
           <li><a href="../../../index.html">Module code</a> &raquo;</li>
         
+          <li><a href="../../../yggdrasil.html">yggdrasil</a> &raquo;</li>
+        
           <li><a href="../../drivers.html">yggdrasil.drivers</a> &raquo;</li>
+        
+          <li><a href="../tests.html">yggdrasil.drivers.tests</a> &raquo;</li>
         
       <li>yggdrasil.drivers.tests.test_CModelDriver</li>
     
@@ -182,9 +185,9 @@
   <h1>Source code for yggdrasil.drivers.tests.test_CModelDriver</h1><div class="highlight"><pre>
 <span></span><span class="kn">import</span> <span class="nn">os</span>
 <span class="kn">import</span> <span class="nn">unittest</span>
-<span class="kn">from</span> <span class="nn">yggdrasil</span> <span class="kn">import</span> <span class="n">platform</span>
+<span class="kn">from</span> <span class="nn">yggdrasil</span> <span class="k">import</span> <span class="n">platform</span>
 <span class="kn">import</span> <span class="nn">yggdrasil.drivers.tests.test_CompiledModelDriver</span> <span class="k">as</span> <span class="nn">parent</span>
-<span class="kn">from</span> <span class="nn">yggdrasil.drivers.CModelDriver</span> <span class="kn">import</span> <span class="n">CModelDriver</span><span class="p">,</span> <span class="n">LDLinker</span>
+<span class="kn">from</span> <span class="nn">yggdrasil.drivers.CModelDriver</span> <span class="k">import</span> <span class="n">CModelDriver</span><span class="p">,</span> <span class="n">LDLinker</span>
 
 
 <div class="viewcode-block" id="test_LDLinker_tool_version"><a class="viewcode-back" href="../../../../yggdrasil.drivers.tests.html#yggdrasil.drivers.tests.test_CModelDriver.test_LDLinker_tool_version">[docs]</a><span class="k">def</span> <span class="nf">test_LDLinker_tool_version</span><span class="p">():</span>
@@ -200,7 +203,7 @@
 
     <span class="n">driver</span> <span class="o">=</span> <span class="s1">&#39;CModelDriver&#39;</span>
     
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">TestCModelParam</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
         <span class="n">script_dir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">src</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">args</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="s1">&#39;1&#39;</span><span class="p">]</span>

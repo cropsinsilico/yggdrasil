@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>yggdrasil.command_line &mdash; yggdrasil v1.6.3 documentation</title>
+  <title>yggdrasil.command_line &mdash; yggdrasil v1.6.3+1.g5570f65a0.dirty documentation</title>
   
 
   
@@ -30,7 +30,6 @@
   
     
       <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
-        <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
         <script src="../../_static/jquery.js"></script>
         <script src="../../_static/underscore.js"></script>
         <script src="../../_static/doctools.js"></script>
@@ -162,6 +161,8 @@
         
           <li><a href="../index.html">Module code</a> &raquo;</li>
         
+          <li><a href="../yggdrasil.html">yggdrasil</a> &raquo;</li>
+        
       <li>yggdrasil.command_line</li>
     
     
@@ -187,7 +188,7 @@
 <span class="kn">import</span> <span class="nn">argparse</span>
 <span class="kn">import</span> <span class="nn">pprint</span>
 <span class="kn">import</span> <span class="nn">shutil</span>
-<span class="kn">from</span> <span class="nn">yggdrasil.constants</span> <span class="kn">import</span> <span class="n">LANGUAGES</span><span class="p">,</span> <span class="n">LANGUAGES_WITH_ALIASES</span>
+<span class="kn">from</span> <span class="nn">yggdrasil.constants</span> <span class="k">import</span> <span class="n">LANGUAGES</span><span class="p">,</span> <span class="n">LANGUAGES_WITH_ALIASES</span>
 
 
 <span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
@@ -228,13 +229,13 @@
 
 <div class="viewcode-block" id="ArgumentTuple"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.command_line.ArgumentTuple">[docs]</a><span class="k">class</span> <span class="nc">ArgumentTuple</span><span class="p">(</span><span class="nb">tuple</span><span class="p">):</span>
 
-    <span class="k">def</span> <span class="fm">__new__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">args</span><span class="p">,</span> <span class="n">kwargs</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__new__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">args</span><span class="p">,</span> <span class="n">kwargs</span><span class="p">):</span>
         <span class="k">return</span> <span class="nb">tuple</span><span class="o">.</span><span class="fm">__new__</span><span class="p">(</span><span class="n">ArgumentTuple</span><span class="p">,</span> <span class="p">(</span><span class="n">args</span><span class="p">,</span> <span class="n">kwargs</span><span class="p">))</span></div>
 
 
 <div class="viewcode-block" id="ConditionalArgumentTuple"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.command_line.ConditionalArgumentTuple">[docs]</a><span class="k">class</span> <span class="nc">ConditionalArgumentTuple</span><span class="p">(</span><span class="n">ArgumentTuple</span><span class="p">):</span>
 
-    <span class="k">def</span> <span class="fm">__new__</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">args</span><span class="p">,</span> <span class="n">kwargs</span><span class="p">,</span> <span class="n">conditions</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__new__</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">args</span><span class="p">,</span> <span class="n">kwargs</span><span class="p">,</span> <span class="n">conditions</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="n">out</span> <span class="o">=</span> <span class="n">ArgumentTuple</span><span class="o">.</span><span class="fm">__new__</span><span class="p">(</span><span class="n">ConditionalArgumentTuple</span><span class="p">,</span>
                                     <span class="n">args</span><span class="p">,</span> <span class="n">kwargs</span><span class="p">)</span>
         <span class="n">out</span><span class="o">.</span><span class="n">conditions</span> <span class="o">=</span> <span class="n">conditions</span>
@@ -245,7 +246,7 @@
 
 <div class="viewcode-block" id="ArgumentBase"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.command_line.ArgumentBase">[docs]</a><span class="k">class</span> <span class="nc">ArgumentBase</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
     
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">arguments</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">conditions</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">arguments</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">conditions</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">arguments</span> <span class="o">=</span> <span class="n">arguments</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">arguments</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">arguments</span> <span class="o">=</span> <span class="p">[]</span>
@@ -261,14 +262,14 @@
 
 <div class="viewcode-block" id="ArgumentGroup"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.command_line.ArgumentGroup">[docs]</a><span class="k">class</span> <span class="nc">ArgumentGroup</span><span class="p">(</span><span class="n">ArgumentBase</span><span class="p">):</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">exclusive</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">exclusive</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">exclusive</span> <span class="o">=</span> <span class="n">exclusive</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">ArgumentGroup</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="ArgumentSubparser"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.command_line.ArgumentSubparser">[docs]</a><span class="k">class</span> <span class="nc">ArgumentSubparser</span><span class="p">(</span><span class="n">ArgumentBase</span><span class="p">):</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parsers</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parsers</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">parsers</span> <span class="o">=</span> <span class="n">parsers</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">parsers</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">parsers</span> <span class="o">=</span> <span class="p">[]</span>
@@ -278,7 +279,7 @@
 <div class="viewcode-block" id="SubCommandMeta"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.command_line.SubCommandMeta">[docs]</a><span class="k">class</span> <span class="nc">SubCommandMeta</span><span class="p">(</span><span class="nb">type</span><span class="p">):</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Meta class for subcommands.&quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="fm">__call__</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__call__</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">cls</span><span class="o">.</span><span class="n">call</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
 
 
@@ -340,7 +341,7 @@
         <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="s1">&#39;conditions&#39;</span><span class="p">)</span> <span class="ow">and</span> <span class="n">x</span><span class="o">.</span><span class="n">conditions</span><span class="p">:</span>
             <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">x</span><span class="o">.</span><span class="n">conditions</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
                 <span class="k">if</span> <span class="n">k</span> <span class="o">==</span> <span class="s1">&#39;os&#39;</span><span class="p">:</span>
-                    <span class="kn">from</span> <span class="nn">yggdrasil</span> <span class="kn">import</span> <span class="n">platform</span>
+                    <span class="kn">from</span> <span class="nn">yggdrasil</span> <span class="k">import</span> <span class="n">platform</span>
                     <span class="k">if</span> <span class="n">platform</span><span class="o">.</span><span class="n">_platform</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">v</span><span class="p">:</span>
                         <span class="k">return</span>
                 <span class="k">else</span><span class="p">:</span>  <span class="c1"># pragma: debug</span>
@@ -397,7 +398,7 @@
 
 <div class="viewcode-block" id="main.get_parser"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.command_line.main.get_parser">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">get_parser</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="kn">from</span> <span class="nn">yggdrasil</span> <span class="kn">import</span> <span class="n">__version__</span> <span class="k">as</span> <span class="n">ver</span>
+        <span class="kn">from</span> <span class="nn">yggdrasil</span> <span class="k">import</span> <span class="n">__version__</span> <span class="k">as</span> <span class="n">ver</span>
         <span class="n">parser</span> <span class="o">=</span> <span class="nb">super</span><span class="p">(</span><span class="n">main</span><span class="p">,</span> <span class="bp">cls</span><span class="p">)</span><span class="o">.</span><span class="n">get_parser</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
         <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;--version&#39;</span><span class="p">,</span> <span class="n">action</span><span class="o">=</span><span class="s1">&#39;version&#39;</span><span class="p">,</span>
                             <span class="n">version</span><span class="o">=</span><span class="p">(</span><span class="s1">&#39;yggdrasil </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">ver</span><span class="p">))</span>
@@ -443,13 +444,13 @@
 
 <div class="viewcode-block" id="yggrun.add_arguments"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.command_line.yggrun.add_arguments">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">add_arguments</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">parser</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="kn">from</span> <span class="nn">yggdrasil</span> <span class="kn">import</span> <span class="n">config</span>
+        <span class="kn">from</span> <span class="nn">yggdrasil</span> <span class="k">import</span> <span class="n">config</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">yggrun</span><span class="p">,</span> <span class="bp">cls</span><span class="p">)</span><span class="o">.</span><span class="n">add_arguments</span><span class="p">(</span><span class="n">parser</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
         <span class="n">config</span><span class="o">.</span><span class="n">get_config_parser</span><span class="p">(</span><span class="n">parser</span><span class="p">,</span> <span class="n">skip_sections</span><span class="o">=</span><span class="s1">&#39;testing&#39;</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="yggrun.func"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.command_line.yggrun.func">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">func</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">args</span><span class="p">):</span>
-        <span class="kn">from</span> <span class="nn">yggdrasil</span> <span class="kn">import</span> <span class="n">runner</span><span class="p">,</span> <span class="n">config</span>
+        <span class="kn">from</span> <span class="nn">yggdrasil</span> <span class="k">import</span> <span class="n">runner</span><span class="p">,</span> <span class="n">config</span>
         <span class="n">prog</span> <span class="o">=</span> <span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">sep</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
         <span class="k">with</span> <span class="n">config</span><span class="o">.</span><span class="n">parser_config</span><span class="p">(</span><span class="n">args</span><span class="p">):</span>
             <span class="n">runner</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">args</span><span class="o">.</span><span class="n">yamlfile</span><span class="p">,</span> <span class="n">ygg_debug_prefix</span><span class="o">=</span><span class="n">prog</span><span class="p">,</span>
@@ -512,8 +513,8 @@
 
 <div class="viewcode-block" id="ygginfo.func"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.command_line.ygginfo.func">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">func</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">args</span><span class="p">,</span> <span class="n">return_str</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
-        <span class="kn">from</span> <span class="nn">yggdrasil</span> <span class="kn">import</span> <span class="n">platform</span>
-        <span class="kn">from</span> <span class="nn">yggdrasil.components</span> <span class="kn">import</span> <span class="n">import_component</span>
+        <span class="kn">from</span> <span class="nn">yggdrasil</span> <span class="k">import</span> <span class="n">platform</span>
+        <span class="kn">from</span> <span class="nn">yggdrasil.components</span> <span class="k">import</span> <span class="n">import_component</span>
         <span class="k">if</span> <span class="n">args</span><span class="o">.</span><span class="n">tool</span><span class="p">:</span>
             <span class="n">drv</span> <span class="o">=</span> <span class="n">import_component</span><span class="p">(</span><span class="s1">&#39;model&#39;</span><span class="p">,</span> <span class="n">args</span><span class="o">.</span><span class="n">language</span><span class="p">)</span>
             <span class="k">if</span> <span class="n">args</span><span class="o">.</span><span class="n">flags</span><span class="p">:</span>
@@ -548,7 +549,7 @@
                 <span class="k">return</span> <span class="n">out</span>
             <span class="nb">print</span><span class="p">(</span><span class="n">out</span><span class="p">)</span>
             <span class="k">return</span>
-        <span class="kn">from</span> <span class="nn">yggdrasil</span> <span class="kn">import</span> <span class="n">tools</span><span class="p">,</span> <span class="n">config</span><span class="p">,</span> <span class="n">__version__</span>
+        <span class="kn">from</span> <span class="nn">yggdrasil</span> <span class="k">import</span> <span class="n">tools</span><span class="p">,</span> <span class="n">config</span><span class="p">,</span> <span class="n">__version__</span>
         <span class="n">lang_list</span> <span class="o">=</span> <span class="n">tools</span><span class="o">.</span><span class="n">get_installed_lang</span><span class="p">()</span>
         <span class="n">comm_list</span> <span class="o">=</span> <span class="n">tools</span><span class="o">.</span><span class="n">get_installed_comm</span><span class="p">()</span>
         <span class="n">comm_lang_list</span> <span class="o">=</span> <span class="p">[]</span>
@@ -859,7 +860,7 @@
 
 <div class="viewcode-block" id="validate_yaml.func"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.command_line.validate_yaml.func">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">func</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">args</span><span class="p">):</span>
-        <span class="kn">from</span> <span class="nn">yggdrasil</span> <span class="kn">import</span> <span class="n">yamlfile</span>
+        <span class="kn">from</span> <span class="nn">yggdrasil</span> <span class="k">import</span> <span class="n">yamlfile</span>
         <span class="n">yamlfile</span><span class="o">.</span><span class="n">parse_yaml</span><span class="p">(</span><span class="n">args</span><span class="o">.</span><span class="n">yamlfile</span><span class="p">)</span>
         <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Validation succesful.&quot;</span><span class="p">)</span></div></div>
 
@@ -895,8 +896,8 @@
 
 <div class="viewcode-block" id="yggcc.func"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.command_line.yggcc.func">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">func</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">args</span><span class="p">):</span>
-        <span class="kn">from</span> <span class="nn">yggdrasil.components</span> <span class="kn">import</span> <span class="n">import_component</span>
-        <span class="kn">from</span> <span class="nn">yggdrasil.constants</span> <span class="kn">import</span> <span class="n">EXT2LANG</span>
+        <span class="kn">from</span> <span class="nn">yggdrasil.components</span> <span class="k">import</span> <span class="n">import_component</span>
+        <span class="kn">from</span> <span class="nn">yggdrasil.constants</span> <span class="k">import</span> <span class="n">EXT2LANG</span>
         <span class="k">if</span> <span class="n">args</span><span class="o">.</span><span class="n">language</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">if</span> <span class="p">(((</span><span class="nb">len</span><span class="p">(</span><span class="n">args</span><span class="o">.</span><span class="n">source</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">)</span> <span class="ow">and</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isdir</span><span class="p">(</span><span class="n">args</span><span class="o">.</span><span class="n">source</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
                  <span class="ow">and</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isdir</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">args</span><span class="o">.</span><span class="n">source</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="s1">&#39;R&#39;</span><span class="p">)))):</span>
@@ -929,7 +930,7 @@
 
 <div class="viewcode-block" id="yggcompile.func"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.command_line.yggcompile.func">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">func</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">args</span><span class="p">):</span>
-        <span class="kn">from</span> <span class="nn">yggdrasil.components</span> <span class="kn">import</span> <span class="n">import_component</span>
+        <span class="kn">from</span> <span class="nn">yggdrasil.components</span> <span class="k">import</span> <span class="n">import_component</span>
         <span class="n">yggclean</span><span class="o">.</span><span class="n">func</span><span class="p">(</span><span class="n">args</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
         <span class="n">error_on_missing</span> <span class="o">=</span> <span class="p">(</span><span class="ow">not</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">args</span><span class="p">,</span> <span class="s1">&#39;all_languages&#39;</span><span class="p">,</span> <span class="kc">False</span><span class="p">))</span>
         <span class="n">missing</span> <span class="o">=</span> <span class="p">[]</span>
@@ -962,10 +963,10 @@
 
 <div class="viewcode-block" id="yggclean.func"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.command_line.yggclean.func">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">func</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">args</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
-        <span class="kn">from</span> <span class="nn">yggdrasil.components</span> <span class="kn">import</span> <span class="n">import_component</span>
+        <span class="kn">from</span> <span class="nn">yggdrasil.components</span> <span class="k">import</span> <span class="n">import_component</span>
         <span class="k">for</span> <span class="n">lang</span> <span class="ow">in</span> <span class="n">args</span><span class="o">.</span><span class="n">language</span><span class="p">:</span>
             <span class="k">if</span> <span class="n">lang</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;ipc&#39;</span><span class="p">,</span> <span class="s1">&#39;ipcs&#39;</span><span class="p">]:</span>
-                <span class="kn">from</span> <span class="nn">yggdrasil.communication.IPCComm</span> <span class="kn">import</span> <span class="n">ipcrm_queues</span>
+                <span class="kn">from</span> <span class="nn">yggdrasil.communication.IPCComm</span> <span class="k">import</span> <span class="n">ipcrm_queues</span>
                 <span class="n">ipcrm_queues</span><span class="p">()</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="n">import_component</span><span class="p">(</span><span class="s1">&#39;model&#39;</span><span class="p">,</span> <span class="n">lang</span><span class="p">)</span><span class="o">.</span><span class="n">cleanup_dependencies</span><span class="p">(</span>
@@ -1072,13 +1073,13 @@
 
 <div class="viewcode-block" id="ygginstall.get_parser"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.command_line.ygginstall.get_parser">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">get_parser</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="kn">from</span> <span class="nn">yggdrasil.languages</span> <span class="kn">import</span> <span class="n">install_languages</span>
+        <span class="kn">from</span> <span class="nn">yggdrasil.languages</span> <span class="k">import</span> <span class="n">install_languages</span>
         <span class="c1"># TODO: Migrate</span>
         <span class="k">return</span> <span class="n">install_languages</span><span class="o">.</span><span class="n">update_argparser</span><span class="p">()</span></div>
 
 <div class="viewcode-block" id="ygginstall.func"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.command_line.ygginstall.func">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">func</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">args</span><span class="p">):</span>
-        <span class="kn">from</span> <span class="nn">yggdrasil.languages</span> <span class="kn">import</span> <span class="n">install_languages</span>
+        <span class="kn">from</span> <span class="nn">yggdrasil.languages</span> <span class="k">import</span> <span class="n">install_languages</span>
         <span class="n">languages</span> <span class="o">=</span> <span class="n">args</span><span class="o">.</span><span class="n">language</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">languages</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">languages</span> <span class="o">==</span> <span class="s1">&#39;all&#39;</span><span class="p">):</span>
             <span class="n">languages</span> <span class="o">=</span> <span class="p">[</span><span class="n">x</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span>
@@ -1216,7 +1217,7 @@
 
 <div class="viewcode-block" id="update_config.func"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.command_line.update_config.func">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">func</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">args</span><span class="p">):</span>
-        <span class="kn">from</span> <span class="nn">yggdrasil</span> <span class="kn">import</span> <span class="n">config</span>
+        <span class="kn">from</span> <span class="nn">yggdrasil</span> <span class="k">import</span> <span class="n">config</span>
         <span class="k">if</span> <span class="n">args</span><span class="o">.</span><span class="n">show_file</span><span class="p">:</span>
             <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Config file located here: </span><span class="si">%s</span><span class="s1">&#39;</span>
                   <span class="o">%</span> <span class="n">config</span><span class="o">.</span><span class="n">usr_config_file</span><span class="p">)</span>
@@ -1260,7 +1261,7 @@
 
 <div class="viewcode-block" id="regen_metaschema.func"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.command_line.regen_metaschema.func">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">func</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">args</span><span class="p">):</span>
-        <span class="kn">from</span> <span class="nn">yggdrasil</span> <span class="kn">import</span> <span class="n">metaschema</span>
+        <span class="kn">from</span> <span class="nn">yggdrasil</span> <span class="k">import</span> <span class="n">metaschema</span>
         <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">metaschema</span><span class="o">.</span><span class="n">_metaschema_fname</span><span class="p">):</span>
             <span class="n">os</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">metaschema</span><span class="o">.</span><span class="n">_metaschema_fname</span><span class="p">)</span>
         <span class="n">metaschema</span><span class="o">.</span><span class="n">_metaschema</span> <span class="o">=</span> <span class="kc">None</span>
@@ -1281,7 +1282,7 @@
 
 <div class="viewcode-block" id="regen_schema.func"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.command_line.regen_schema.func">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">func</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">args</span><span class="p">):</span>
-        <span class="kn">from</span> <span class="nn">yggdrasil</span> <span class="kn">import</span> <span class="n">schema</span>
+        <span class="kn">from</span> <span class="nn">yggdrasil</span> <span class="k">import</span> <span class="n">schema</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">args</span><span class="o">.</span><span class="n">only_constants</span><span class="p">:</span>
             <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">schema</span><span class="o">.</span><span class="n">_schema_fname</span><span class="p">):</span>
                 <span class="n">os</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">schema</span><span class="o">.</span><span class="n">_schema_fname</span><span class="p">)</span>
@@ -1303,7 +1304,7 @@
 
 <div class="viewcode-block" id="yggmodelform.func"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.command_line.yggmodelform.func">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">func</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">args</span><span class="p">):</span>
-        <span class="kn">from</span> <span class="nn">yggdrasil.schema</span> <span class="kn">import</span> <span class="n">get_model_form_schema</span>
+        <span class="kn">from</span> <span class="nn">yggdrasil.schema</span> <span class="k">import</span> <span class="n">get_model_form_schema</span>
         <span class="n">out</span> <span class="o">=</span> <span class="n">get_model_form_schema</span><span class="p">(</span><span class="n">fname_dst</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">file</span><span class="p">)</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">args</span><span class="o">.</span><span class="n">file</span><span class="p">:</span>
             <span class="n">pprint</span><span class="o">.</span><span class="n">pprint</span><span class="p">(</span><span class="n">out</span><span class="p">)</span></div></div>
@@ -1383,13 +1384,13 @@
 
 <div class="viewcode-block" id="run_tsts.add_arguments"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.command_line.run_tsts.add_arguments">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">add_arguments</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">parser</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="kn">from</span> <span class="nn">yggdrasil</span> <span class="kn">import</span> <span class="n">config</span>
+        <span class="kn">from</span> <span class="nn">yggdrasil</span> <span class="k">import</span> <span class="n">config</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">run_tsts</span><span class="p">,</span> <span class="bp">cls</span><span class="p">)</span><span class="o">.</span><span class="n">add_arguments</span><span class="p">(</span><span class="n">parser</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
         <span class="n">parser</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">get_config_parser</span><span class="p">(</span><span class="n">parser</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="run_tsts.parse_args"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.command_line.run_tsts.parse_args">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">parse_args</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="kn">from</span> <span class="nn">yggdrasil</span> <span class="kn">import</span> <span class="n">config</span><span class="p">,</span> <span class="n">platform</span>
+        <span class="kn">from</span> <span class="nn">yggdrasil</span> <span class="k">import</span> <span class="n">config</span><span class="p">,</span> <span class="n">platform</span>
         <span class="n">args</span> <span class="o">=</span> <span class="nb">super</span><span class="p">(</span><span class="n">run_tsts</span><span class="p">,</span> <span class="bp">cls</span><span class="p">)</span><span class="o">.</span><span class="n">parse_args</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
         <span class="n">extra</span> <span class="o">=</span> <span class="n">args</span><span class="o">.</span><span class="n">_extra_commands</span>
         <span class="k">if</span> <span class="n">args</span><span class="o">.</span><span class="n">ci</span><span class="p">:</span>
@@ -1530,7 +1531,7 @@
 
 <div class="viewcode-block" id="run_tsts.func"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.command_line.run_tsts.func">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">func</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">args</span><span class="p">):</span>
-        <span class="kn">from</span> <span class="nn">yggdrasil</span> <span class="kn">import</span> <span class="n">config</span>
+        <span class="kn">from</span> <span class="nn">yggdrasil</span> <span class="k">import</span> <span class="n">config</span>
         <span class="n">argv</span> <span class="o">=</span> <span class="p">[</span><span class="n">sys</span><span class="o">.</span><span class="n">executable</span><span class="p">,</span> <span class="s1">&#39;-m&#39;</span><span class="p">,</span> <span class="s1">&#39;pytest&#39;</span><span class="p">]</span>
         <span class="c1"># test_paths = args.test_paths</span>
         <span class="k">if</span> <span class="n">args</span><span class="o">.</span><span class="n">verbose</span><span class="p">:</span>
@@ -1654,7 +1655,7 @@
 
 <div class="viewcode-block" id="timing_plots.func"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.command_line.timing_plots.func">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">func</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">args</span><span class="p">):</span>
-        <span class="kn">from</span> <span class="nn">yggdrasil</span> <span class="kn">import</span> <span class="n">timing</span>
+        <span class="kn">from</span> <span class="nn">yggdrasil</span> <span class="k">import</span> <span class="n">timing</span>
         <span class="k">if</span> <span class="n">args</span><span class="o">.</span><span class="n">comparison</span> <span class="o">==</span> <span class="s1">&#39;lang2019&#39;</span><span class="p">:</span>
             <span class="n">_lang_list</span> <span class="o">=</span> <span class="n">timing</span><span class="o">.</span><span class="n">_lang_list</span>
             <span class="n">_lang_list_nomatlab</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">_lang_list</span><span class="p">)</span>
@@ -1704,8 +1705,8 @@
 <div class="viewcode-block" id="generate_gha_workflow.func"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.command_line.generate_gha_workflow.func">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">func</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">args</span><span class="p">,</span> <span class="n">gitdir</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="kn">import</span> <span class="nn">yaml</span>
-        <span class="kn">from</span> <span class="nn">yggdrasil.metaschema.encoder</span> <span class="kn">import</span> <span class="n">decode_yaml</span><span class="p">,</span> <span class="n">encode_yaml</span>
-        <span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">OrderedDict</span>
+        <span class="kn">from</span> <span class="nn">yggdrasil.metaschema.encoder</span> <span class="k">import</span> <span class="n">decode_yaml</span><span class="p">,</span> <span class="n">encode_yaml</span>
+        <span class="kn">from</span> <span class="nn">collections</span> <span class="k">import</span> <span class="n">OrderedDict</span>
 
         <span class="k">class</span> <span class="nc">NoAliasDumper</span><span class="p">(</span><span class="n">yaml</span><span class="o">.</span><span class="n">SafeDumper</span><span class="p">):</span>
             <span class="k">def</span> <span class="nf">ignore_aliases</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">):</span>

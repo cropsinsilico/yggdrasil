@@ -1,0 +1,12 @@
+Model YAML:
+
+.. literalinclude:: /../../yggdrasil/examples/maxMsg/maxMsgCli_python.yml
+   :language: yaml
+   :linenos:
+
+.. literalinclude:: /../../yggdrasil/examples/maxMsg/maxMsgSrv_python.yml
+   :language: yaml
+   :linenos:
+
+
+(`Example in other languages <examples/maxMsg.html>`__)

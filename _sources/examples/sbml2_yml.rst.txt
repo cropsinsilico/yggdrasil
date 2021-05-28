@@ -1,0 +1,8 @@
+Model YAML:
+
+.. literalinclude:: /../../yggdrasil/examples/sbml2/sbml2.yml
+   :language: yaml
+   :linenos:
+
+
+(`Example in other languages <examples/sbml2.html>`__)

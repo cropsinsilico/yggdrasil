@@ -1,0 +1,8 @@
+Model Code:
+
+.. literalinclude:: /../../yggdrasil/examples/SaM/src/SaM.py
+   :language: python
+   :linenos:
+
+
+(`Example in other languages <examples/SaM.html>`__)

@@ -1,0 +1,8 @@
+Model YAML:
+
+.. literalinclude:: /../../yggdrasil/examples/fakeplant/photosynthesis.yml
+   :language: yaml
+   :linenos:
+
+
+(`Example in other languages <examples/fakeplant.html>`__)

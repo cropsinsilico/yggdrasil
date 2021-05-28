@@ -1,0 +1,12 @@
+Model Code:
+
+.. literalinclude:: /../../yggdrasil/examples/timed_pipe/src/timed_pipe_dst.py
+   :language: python
+   :linenos:
+
+.. literalinclude:: /../../yggdrasil/examples/timed_pipe/src/timed_pipe_src.py
+   :language: python
+   :linenos:
+
+
+(`Example in other languages <examples/timed_pipe.html>`__)

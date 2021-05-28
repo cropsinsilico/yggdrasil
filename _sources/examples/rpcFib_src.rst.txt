@@ -1,0 +1,16 @@
+Model Code:
+
+.. literalinclude:: /../../yggdrasil/examples/rpcFib/src/rpcFibCli.py
+   :language: python
+   :linenos:
+
+.. literalinclude:: /../../yggdrasil/examples/rpcFib/src/rpcFibCliPar.py
+   :language: python
+   :linenos:
+
+.. literalinclude:: /../../yggdrasil/examples/rpcFib/src/rpcFibSrv.py
+   :language: python
+   :linenos:
+
+
+(`Example in other languages <examples/rpcFib.html>`__)

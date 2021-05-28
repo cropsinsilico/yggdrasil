@@ -1,0 +1,8 @@
+Model Code:
+
+.. literalinclude:: /../../yggdrasil/examples/ascii_io/src/ascii_io.py
+   :language: python
+   :linenos:
+
+
+(`Example in other languages <examples/ascii_io.html>`__)

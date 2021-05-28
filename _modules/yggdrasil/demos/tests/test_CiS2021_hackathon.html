@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>yggdrasil.demos.tests.test_CiS2021_hackathon &mdash; yggdrasil v1.6.3 documentation</title>
+  <title>yggdrasil.demos.tests.test_CiS2021_hackathon &mdash; yggdrasil v1.6.3+1.g5570f65a0.dirty documentation</title>
   
 
   
@@ -30,7 +30,6 @@
   
     
       <script type="text/javascript" id="documentation_options" data-url_root="../../../../" src="../../../../_static/documentation_options.js"></script>
-        <script data-url_root="../../../../" id="documentation_options" src="../../../../_static/documentation_options.js"></script>
         <script src="../../../../_static/jquery.js"></script>
         <script src="../../../../_static/underscore.js"></script>
         <script src="../../../../_static/doctools.js"></script>
@@ -162,6 +161,8 @@
         
           <li><a href="../../../index.html">Module code</a> &raquo;</li>
         
+          <li><a href="../../../yggdrasil.html">yggdrasil</a> &raquo;</li>
+        
           <li><a href="../tests.html">yggdrasil.demos.tests</a> &raquo;</li>
         
       <li>yggdrasil.demos.tests.test_CiS2021_hackathon</li>
@@ -181,7 +182,7 @@
             
   <h1>Source code for yggdrasil.demos.tests.test_CiS2021_hackathon</h1><div class="highlight"><pre>
 <span></span><span class="kn">import</span> <span class="nn">os</span>
-<span class="kn">from</span> <span class="nn">yggdrasil.demos.tests</span> <span class="kn">import</span> <span class="n">DemoTstBase</span><span class="p">,</span> <span class="n">_demo_dir</span>
+<span class="kn">from</span> <span class="nn">yggdrasil.demos.tests</span> <span class="k">import</span> <span class="n">DemoTstBase</span><span class="p">,</span> <span class="n">_demo_dir</span>
 <span class="kn">import</span> <span class="nn">unittest</span>
 <span class="k">try</span><span class="p">:</span>
     <span class="kn">import</span> <span class="nn">trimesh</span>
@@ -206,7 +207,7 @@
             <span class="s1">&#39;timesync&#39;</span><span class="p">:</span> <span class="p">(</span><span class="s1">&#39;yamls/roots_v1.yml&#39;</span><span class="p">,</span> <span class="s1">&#39;yamls/shoot_v3.yml&#39;</span><span class="p">,</span>
                          <span class="s1">&#39;yamls/timesync.yml&#39;</span><span class="p">,</span> <span class="s1">&#39;yamls/light_v1_python.yml&#39;</span><span class="p">)}</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">TestCiS2021HackathonDemo</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
         <span class="n">out_dir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">_demo_dir</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">demo_name</span><span class="p">,</span> <span class="s1">&#39;output&#39;</span><span class="p">)</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isdir</span><span class="p">(</span><span class="n">out_dir</span><span class="p">):</span>

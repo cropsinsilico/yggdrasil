@@ -1,0 +1,12 @@
+Model Code:
+
+.. literalinclude:: /../../yggdrasil/examples/osr/src/other_model.py
+   :language: python
+   :linenos:
+
+.. literalinclude:: /../../yggdrasil/examples/osr/src/osr_model.xml
+   :language: python
+   :linenos:
+
+
+(`Example in other languages <examples/osr.html>`__)

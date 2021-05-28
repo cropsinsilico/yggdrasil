@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>yggdrasil.languages.Python.YggInterface &mdash; yggdrasil v1.6.3 documentation</title>
+  <title>yggdrasil.languages.Python.YggInterface &mdash; yggdrasil v1.6.3+1.g5570f65a0.dirty documentation</title>
   
 
   
@@ -30,7 +30,6 @@
   
     
       <script type="text/javascript" id="documentation_options" data-url_root="../../../../" src="../../../../_static/documentation_options.js"></script>
-        <script data-url_root="../../../../" id="documentation_options" src="../../../../_static/documentation_options.js"></script>
         <script src="../../../../_static/jquery.js"></script>
         <script src="../../../../_static/underscore.js"></script>
         <script src="../../../../_static/doctools.js"></script>
@@ -162,6 +161,8 @@
         
           <li><a href="../../../index.html">Module code</a> &raquo;</li>
         
+          <li><a href="../../../yggdrasil.html">yggdrasil</a> &raquo;</li>
+        
           <li><a href="../../languages.html">yggdrasil.languages</a> &raquo;</li>
         
       <li>yggdrasil.languages.Python.YggInterface</li>
@@ -181,8 +182,8 @@
             
   <h1>Source code for yggdrasil.languages.Python.YggInterface</h1><div class="highlight"><pre>
 <span></span><span class="kn">import</span> <span class="nn">os</span>
-<span class="kn">from</span> <span class="nn">yggdrasil</span> <span class="kn">import</span> <span class="n">tools</span>
-<span class="kn">from</span> <span class="nn">yggdrasil.communication.DefaultComm</span> <span class="kn">import</span> <span class="n">DefaultComm</span>
+<span class="kn">from</span> <span class="nn">yggdrasil</span> <span class="k">import</span> <span class="n">tools</span>
+<span class="kn">from</span> <span class="nn">yggdrasil.communication.DefaultComm</span> <span class="k">import</span> <span class="n">DefaultComm</span>
 
 
 <span class="n">YGG_MSG_MAX</span> <span class="o">=</span> <span class="n">tools</span><span class="o">.</span><span class="n">get_YGG_MSG_MAX</span><span class="p">()</span>
@@ -194,22 +195,22 @@
 <span class="n">_global_scope_comms</span> <span class="o">=</span> <span class="p">{}</span>
 
 
-<div class="viewcode-block" id="maxMsgSize"><a class="viewcode-back" href="../../../../yggdrasil.languages.Python.html#yggdrasil.languages.Python.YggInterface.maxMsgSize">[docs]</a><span class="k">def</span> <span class="nf">maxMsgSize</span><span class="p">():</span>
+<div class="viewcode-block" id="maxMsgSize"><a class="viewcode-back" href="../../../../yggdrasil.languages.Python.html#yggdrasil.interface.maxMsgSize">[docs]</a><span class="k">def</span> <span class="nf">maxMsgSize</span><span class="p">():</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;int: The maximum message size.&quot;&quot;&quot;</span>
     <span class="k">return</span> <span class="n">YGG_MSG_MAX</span></div>
 
 
-<div class="viewcode-block" id="bufMsgSize"><a class="viewcode-back" href="../../../../yggdrasil.languages.Python.html#yggdrasil.languages.Python.YggInterface.bufMsgSize">[docs]</a><span class="k">def</span> <span class="nf">bufMsgSize</span><span class="p">():</span>
+<div class="viewcode-block" id="bufMsgSize"><a class="viewcode-back" href="../../../../yggdrasil.languages.Python.html#yggdrasil.interface.bufMsgSize">[docs]</a><span class="k">def</span> <span class="nf">bufMsgSize</span><span class="p">():</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;int: Buffer size for average message.&quot;&quot;&quot;</span>
     <span class="k">return</span> <span class="n">YGG_MSG_BUF</span></div>
 
 
-<div class="viewcode-block" id="eof_msg"><a class="viewcode-back" href="../../../../yggdrasil.languages.Python.html#yggdrasil.languages.Python.YggInterface.eof_msg">[docs]</a><span class="k">def</span> <span class="nf">eof_msg</span><span class="p">():</span>
+<div class="viewcode-block" id="eof_msg"><a class="viewcode-back" href="../../../../yggdrasil.languages.Python.html#yggdrasil.interface.eof_msg">[docs]</a><span class="k">def</span> <span class="nf">eof_msg</span><span class="p">():</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;str: Message signalling end of file.&quot;&quot;&quot;</span>
     <span class="k">return</span> <span class="n">YGG_MSG_EOF</span></div>
 
 
-<div class="viewcode-block" id="YggInit"><a class="viewcode-back" href="../../../../yggdrasil.languages.Python.html#yggdrasil.languages.Python.YggInterface.YggInit">[docs]</a><span class="k">def</span> <span class="nf">YggInit</span><span class="p">(</span><span class="n">_type</span><span class="p">,</span> <span class="n">args</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">kwargs</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<div class="viewcode-block" id="YggInit"><a class="viewcode-back" href="../../../../yggdrasil.languages.Python.html#yggdrasil.interface.YggInit">[docs]</a><span class="k">def</span> <span class="nf">YggInit</span><span class="p">(</span><span class="n">_type</span><span class="p">,</span> <span class="n">args</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">kwargs</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Short interface to identify functions called by another language.</span>
 
 <span class="sd">    Args:</span>
@@ -243,7 +244,7 @@
     <span class="k">return</span> <span class="n">obj</span></div>
 
 
-<div class="viewcode-block" id="InterfaceComm"><a class="viewcode-back" href="../../../../yggdrasil.languages.Python.html#yggdrasil.languages.Python.YggInterface.InterfaceComm">[docs]</a><span class="k">def</span> <span class="nf">InterfaceComm</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">comm_class</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">global_scope</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<div class="viewcode-block" id="InterfaceComm"><a class="viewcode-back" href="../../../../yggdrasil.languages.Python.html#yggdrasil.interface.InterfaceComm">[docs]</a><span class="k">def</span> <span class="nf">InterfaceComm</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">comm_class</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">global_scope</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Short hand for initializing a default comm for use as an interface.</span>
 
 <span class="sd">    Args:</span>
@@ -270,7 +271,7 @@
     <span class="k">return</span> <span class="n">out</span></div>
 
 
-<div class="viewcode-block" id="YggInput"><a class="viewcode-back" href="../../../../yggdrasil.languages.Python.html#yggdrasil.languages.Python.YggInterface.YggInput">[docs]</a><span class="k">def</span> <span class="nf">YggInput</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">format_str</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<div class="viewcode-block" id="YggInput"><a class="viewcode-back" href="../../../../yggdrasil.languages.Python.html#yggdrasil.interface.YggInput">[docs]</a><span class="k">def</span> <span class="nf">YggInput</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">format_str</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Get class for handling input from a message queue.</span>
 
 <span class="sd">    Args:</span>
@@ -297,7 +298,7 @@
     <span class="k">return</span> <span class="n">InterfaceComm</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
     
 
-<div class="viewcode-block" id="YggOutput"><a class="viewcode-back" href="../../../../yggdrasil.languages.Python.html#yggdrasil.languages.Python.YggInterface.YggOutput">[docs]</a><span class="k">def</span> <span class="nf">YggOutput</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">format_str</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<div class="viewcode-block" id="YggOutput"><a class="viewcode-back" href="../../../../yggdrasil.languages.Python.html#yggdrasil.interface.YggOutput">[docs]</a><span class="k">def</span> <span class="nf">YggOutput</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">format_str</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Get class for handling output to a message queue.</span>
 
 <span class="sd">    Args:</span>
@@ -324,7 +325,7 @@
     <span class="k">return</span> <span class="n">InterfaceComm</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
 
     
-<div class="viewcode-block" id="YggRpcServer"><a class="viewcode-back" href="../../../../yggdrasil.languages.Python.html#yggdrasil.languages.Python.YggInterface.YggRpcServer">[docs]</a><span class="k">def</span> <span class="nf">YggRpcServer</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">infmt</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">outfmt</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<div class="viewcode-block" id="YggRpcServer"><a class="viewcode-back" href="../../../../yggdrasil.languages.Python.html#yggdrasil.interface.YggRpcServer">[docs]</a><span class="k">def</span> <span class="nf">YggRpcServer</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">infmt</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">outfmt</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Get class for handling requests and response for an RPC Server.</span>
 
 <span class="sd">    Args:</span>
@@ -339,7 +340,7 @@
 <span class="sd">        :class:.ServerComm: Communication object.</span>
 <span class="sd">        </span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="kn">from</span> <span class="nn">yggdrasil.communication</span> <span class="kn">import</span> <span class="n">ServerComm</span>
+    <span class="kn">from</span> <span class="nn">yggdrasil.communication</span> <span class="k">import</span> <span class="n">ServerComm</span>
     <span class="n">icomm_kwargs</span> <span class="o">=</span> <span class="p">{}</span>
     <span class="n">ocomm_kwargs</span> <span class="o">=</span> <span class="p">{}</span>
     <span class="k">if</span> <span class="n">infmt</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
@@ -352,7 +353,7 @@
     <span class="k">return</span> <span class="n">InterfaceComm</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="YggRpcClient"><a class="viewcode-back" href="../../../../yggdrasil.languages.Python.html#yggdrasil.languages.Python.YggInterface.YggRpcClient">[docs]</a><span class="k">def</span> <span class="nf">YggRpcClient</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">outfmt</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">infmt</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<div class="viewcode-block" id="YggRpcClient"><a class="viewcode-back" href="../../../../yggdrasil.languages.Python.html#yggdrasil.interface.YggRpcClient">[docs]</a><span class="k">def</span> <span class="nf">YggRpcClient</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">outfmt</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">infmt</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Get class for handling requests and response to an RPC Server from a</span>
 <span class="sd">    client.</span>
 
@@ -368,7 +369,7 @@
 <span class="sd">        :class:.ClientComm: Communication object.</span>
 <span class="sd">        </span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="kn">from</span> <span class="nn">yggdrasil.communication</span> <span class="kn">import</span> <span class="n">ClientComm</span>
+    <span class="kn">from</span> <span class="nn">yggdrasil.communication</span> <span class="k">import</span> <span class="n">ClientComm</span>
     <span class="n">icomm_kwargs</span> <span class="o">=</span> <span class="p">{}</span>
     <span class="n">ocomm_kwargs</span> <span class="o">=</span> <span class="p">{}</span>
     <span class="k">if</span> <span class="n">infmt</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
@@ -381,7 +382,7 @@
     <span class="k">return</span> <span class="n">InterfaceComm</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="YggTimesyncServer"><a class="viewcode-back" href="../../../../yggdrasil.languages.Python.html#yggdrasil.languages.Python.YggInterface.YggTimesyncServer">[docs]</a><span class="k">def</span> <span class="nf">YggTimesyncServer</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s1">&#39;timesync&#39;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<div class="viewcode-block" id="YggTimesyncServer"><a class="viewcode-back" href="../../../../yggdrasil.languages.Python.html#yggdrasil.interface.YggTimesyncServer">[docs]</a><span class="k">def</span> <span class="nf">YggTimesyncServer</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s1">&#39;timesync&#39;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Get class for handling timestep synchronization requests on</span>
 <span class="sd">    the driver side.</span>
 
@@ -394,13 +395,13 @@
 <span class="sd">        :class:.ServerComm: Communication object.</span>
 <span class="sd">        </span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="kn">from</span> <span class="nn">yggdrasil.communication</span> <span class="kn">import</span> <span class="n">ServerComm</span>
+    <span class="kn">from</span> <span class="nn">yggdrasil.communication</span> <span class="k">import</span> <span class="n">ServerComm</span>
     <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;comm_class&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">ServerComm</span><span class="o">.</span><span class="n">ServerComm</span>
     <span class="n">kwargs</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s1">&#39;recv_timeout&#39;</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">InterfaceComm</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
     
 
-<div class="viewcode-block" id="YggTimesync"><a class="viewcode-back" href="../../../../yggdrasil.languages.Python.html#yggdrasil.languages.Python.YggInterface.YggTimesync">[docs]</a><span class="k">def</span> <span class="nf">YggTimesync</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s1">&#39;timesync&#39;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<div class="viewcode-block" id="YggTimesync"><a class="viewcode-back" href="../../../../yggdrasil.languages.Python.html#yggdrasil.interface.YggTimesync">[docs]</a><span class="k">def</span> <span class="nf">YggTimesync</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s1">&#39;timesync&#39;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Get class for handling timestep synchronization requests.</span>
 
 <span class="sd">    Args:</span>
@@ -412,14 +413,14 @@
 <span class="sd">        :class:.ClientComm: Communication object.</span>
 <span class="sd">        </span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="kn">from</span> <span class="nn">yggdrasil.communication</span> <span class="kn">import</span> <span class="n">ClientComm</span>
+    <span class="kn">from</span> <span class="nn">yggdrasil.communication</span> <span class="k">import</span> <span class="n">ClientComm</span>
     <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;comm_class&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">ClientComm</span><span class="o">.</span><span class="n">ClientComm</span>
     <span class="n">kwargs</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s1">&#39;recv_timeout&#39;</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">InterfaceComm</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
 
 
 <span class="c1"># Specialized classes for ascii IO</span>
-<div class="viewcode-block" id="YggAsciiFileInput"><a class="viewcode-back" href="../../../../yggdrasil.languages.Python.html#yggdrasil.languages.Python.YggInterface.YggAsciiFileInput">[docs]</a><span class="k">def</span> <span class="nf">YggAsciiFileInput</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<div class="viewcode-block" id="YggAsciiFileInput"><a class="viewcode-back" href="../../../../yggdrasil.languages.Python.html#yggdrasil.interface.YggAsciiFileInput">[docs]</a><span class="k">def</span> <span class="nf">YggAsciiFileInput</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Get class for generic ASCII input.</span>
 
 <span class="sd">    Args:</span>
@@ -434,7 +435,7 @@
     <span class="k">return</span> <span class="n">YggInput</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="YggAsciiFileOutput"><a class="viewcode-back" href="../../../../yggdrasil.languages.Python.html#yggdrasil.languages.Python.YggInterface.YggAsciiFileOutput">[docs]</a><span class="k">def</span> <span class="nf">YggAsciiFileOutput</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<div class="viewcode-block" id="YggAsciiFileOutput"><a class="viewcode-back" href="../../../../yggdrasil.languages.Python.html#yggdrasil.interface.YggAsciiFileOutput">[docs]</a><span class="k">def</span> <span class="nf">YggAsciiFileOutput</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Get class for generic ASCII output.</span>
 
 <span class="sd">    Args:</span>
@@ -449,7 +450,7 @@
             
 
 <span class="c1"># Specialized classes for ascii table IO</span>
-<div class="viewcode-block" id="YggAsciiTableInput"><a class="viewcode-back" href="../../../../yggdrasil.languages.Python.html#yggdrasil.languages.Python.YggInterface.YggAsciiTableInput">[docs]</a><span class="k">def</span> <span class="nf">YggAsciiTableInput</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">as_array</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<div class="viewcode-block" id="YggAsciiTableInput"><a class="viewcode-back" href="../../../../yggdrasil.languages.Python.html#yggdrasil.interface.YggAsciiTableInput">[docs]</a><span class="k">def</span> <span class="nf">YggAsciiTableInput</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">as_array</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Get class for handling table-like formatted input.</span>
 
 <span class="sd">    Args:</span>
@@ -468,7 +469,7 @@
     <span class="k">return</span> <span class="n">YggInput</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="YggAsciiTableOutput"><a class="viewcode-back" href="../../../../yggdrasil.languages.Python.html#yggdrasil.languages.Python.YggInterface.YggAsciiTableOutput">[docs]</a><span class="k">def</span> <span class="nf">YggAsciiTableOutput</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">fmt</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">as_array</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<div class="viewcode-block" id="YggAsciiTableOutput"><a class="viewcode-back" href="../../../../yggdrasil.languages.Python.html#yggdrasil.interface.YggAsciiTableOutput">[docs]</a><span class="k">def</span> <span class="nf">YggAsciiTableOutput</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">fmt</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">as_array</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Get class for handling table-like formatted output.</span>
 
 <span class="sd">    Args:</span>
@@ -491,7 +492,7 @@
     
 
 <span class="c1"># Specialized classes for ascii table IO arrays</span>
-<div class="viewcode-block" id="YggAsciiArrayInput"><a class="viewcode-back" href="../../../../yggdrasil.languages.Python.html#yggdrasil.languages.Python.YggInterface.YggAsciiArrayInput">[docs]</a><span class="k">def</span> <span class="nf">YggAsciiArrayInput</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<div class="viewcode-block" id="YggAsciiArrayInput"><a class="viewcode-back" href="../../../../yggdrasil.languages.Python.html#yggdrasil.interface.YggAsciiArrayInput">[docs]</a><span class="k">def</span> <span class="nf">YggAsciiArrayInput</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Get class for handling table-like formatted input as arrays.</span>
 
 <span class="sd">    Args:</span>
@@ -507,7 +508,7 @@
     <span class="k">return</span> <span class="n">YggAsciiTableInput</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="YggAsciiArrayOutput"><a class="viewcode-back" href="../../../../yggdrasil.languages.Python.html#yggdrasil.languages.Python.YggInterface.YggAsciiArrayOutput">[docs]</a><span class="k">def</span> <span class="nf">YggAsciiArrayOutput</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">fmt</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<div class="viewcode-block" id="YggAsciiArrayOutput"><a class="viewcode-back" href="../../../../yggdrasil.languages.Python.html#yggdrasil.interface.YggAsciiArrayOutput">[docs]</a><span class="k">def</span> <span class="nf">YggAsciiArrayOutput</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">fmt</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Get class for handling table-like formatted output as arrays.</span>
 
 <span class="sd">    Args:</span>
@@ -527,7 +528,7 @@
 
 
 <span class="c1"># Specialized classes for receiving consolidated arrays</span>
-<div class="viewcode-block" id="YggArrayInput"><a class="viewcode-back" href="../../../../yggdrasil.languages.Python.html#yggdrasil.languages.Python.YggInterface.YggArrayInput">[docs]</a><span class="k">def</span> <span class="nf">YggArrayInput</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<div class="viewcode-block" id="YggArrayInput"><a class="viewcode-back" href="../../../../yggdrasil.languages.Python.html#yggdrasil.interface.YggArrayInput">[docs]</a><span class="k">def</span> <span class="nf">YggArrayInput</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Get class for handling table-like formatted input as arrays.</span>
 
 <span class="sd">    Args:</span>
@@ -543,7 +544,7 @@
     <span class="k">return</span> <span class="n">YggInput</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="YggArrayOutput"><a class="viewcode-back" href="../../../../yggdrasil.languages.Python.html#yggdrasil.languages.Python.YggInterface.YggArrayOutput">[docs]</a><span class="k">def</span> <span class="nf">YggArrayOutput</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<div class="viewcode-block" id="YggArrayOutput"><a class="viewcode-back" href="../../../../yggdrasil.languages.Python.html#yggdrasil.interface.YggArrayOutput">[docs]</a><span class="k">def</span> <span class="nf">YggArrayOutput</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Get class for handling table-like formatted output as arrays.</span>
 
 <span class="sd">    Args:</span>
@@ -559,7 +560,7 @@
 
 
 <span class="c1"># Pickle io (for backwards compatibility)</span>
-<div class="viewcode-block" id="YggPickleInput"><a class="viewcode-back" href="../../../../yggdrasil.languages.Python.html#yggdrasil.languages.Python.YggInterface.YggPickleInput">[docs]</a><span class="k">def</span> <span class="nf">YggPickleInput</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<div class="viewcode-block" id="YggPickleInput"><a class="viewcode-back" href="../../../../yggdrasil.languages.Python.html#yggdrasil.interface.YggPickleInput">[docs]</a><span class="k">def</span> <span class="nf">YggPickleInput</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Get class for handling pickled input.</span>
 
 <span class="sd">    Args:</span>
@@ -574,7 +575,7 @@
     <span class="k">return</span> <span class="n">YggInput</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="YggPickleOutput"><a class="viewcode-back" href="../../../../yggdrasil.languages.Python.html#yggdrasil.languages.Python.YggInterface.YggPickleOutput">[docs]</a><span class="k">def</span> <span class="nf">YggPickleOutput</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<div class="viewcode-block" id="YggPickleOutput"><a class="viewcode-back" href="../../../../yggdrasil.languages.Python.html#yggdrasil.interface.YggPickleOutput">[docs]</a><span class="k">def</span> <span class="nf">YggPickleOutput</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Get class for handling pickled output.</span>
 
 <span class="sd">    Args:</span>
@@ -589,7 +590,7 @@
 
 
 <span class="c1"># Pandas io</span>
-<div class="viewcode-block" id="YggPandasInput"><a class="viewcode-back" href="../../../../yggdrasil.languages.Python.html#yggdrasil.languages.Python.YggInterface.YggPandasInput">[docs]</a><span class="k">def</span> <span class="nf">YggPandasInput</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<div class="viewcode-block" id="YggPandasInput"><a class="viewcode-back" href="../../../../yggdrasil.languages.Python.html#yggdrasil.interface.YggPandasInput">[docs]</a><span class="k">def</span> <span class="nf">YggPandasInput</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Get class for handling Pandas input.</span>
 
 <span class="sd">    Args:</span>
@@ -605,7 +606,7 @@
     <span class="k">return</span> <span class="n">YggInput</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="YggPandasOutput"><a class="viewcode-back" href="../../../../yggdrasil.languages.Python.html#yggdrasil.languages.Python.YggInterface.YggPandasOutput">[docs]</a><span class="k">def</span> <span class="nf">YggPandasOutput</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<div class="viewcode-block" id="YggPandasOutput"><a class="viewcode-back" href="../../../../yggdrasil.languages.Python.html#yggdrasil.interface.YggPandasOutput">[docs]</a><span class="k">def</span> <span class="nf">YggPandasOutput</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Get class for handling Pandas output.</span>
 
 <span class="sd">    Args:</span>
@@ -621,7 +622,7 @@
 
 
 <span class="c1"># Ply io</span>
-<div class="viewcode-block" id="YggPlyInput"><a class="viewcode-back" href="../../../../yggdrasil.languages.Python.html#yggdrasil.languages.Python.YggInterface.YggPlyInput">[docs]</a><span class="k">def</span> <span class="nf">YggPlyInput</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<div class="viewcode-block" id="YggPlyInput"><a class="viewcode-back" href="../../../../yggdrasil.languages.Python.html#yggdrasil.interface.YggPlyInput">[docs]</a><span class="k">def</span> <span class="nf">YggPlyInput</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Get class for handling Ply input.</span>
 
 <span class="sd">    Args:</span>
@@ -637,7 +638,7 @@
     <span class="k">return</span> <span class="n">YggInput</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="YggPlyOutput"><a class="viewcode-back" href="../../../../yggdrasil.languages.Python.html#yggdrasil.languages.Python.YggInterface.YggPlyOutput">[docs]</a><span class="k">def</span> <span class="nf">YggPlyOutput</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<div class="viewcode-block" id="YggPlyOutput"><a class="viewcode-back" href="../../../../yggdrasil.languages.Python.html#yggdrasil.interface.YggPlyOutput">[docs]</a><span class="k">def</span> <span class="nf">YggPlyOutput</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Get class for handling Ply output.</span>
 
 <span class="sd">    Args:</span>
@@ -653,7 +654,7 @@
 
 
 <span class="c1"># Obj io</span>
-<div class="viewcode-block" id="YggObjInput"><a class="viewcode-back" href="../../../../yggdrasil.languages.Python.html#yggdrasil.languages.Python.YggInterface.YggObjInput">[docs]</a><span class="k">def</span> <span class="nf">YggObjInput</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<div class="viewcode-block" id="YggObjInput"><a class="viewcode-back" href="../../../../yggdrasil.languages.Python.html#yggdrasil.interface.YggObjInput">[docs]</a><span class="k">def</span> <span class="nf">YggObjInput</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Get class for handling Obj input.</span>
 
 <span class="sd">    Args:</span>
@@ -669,7 +670,7 @@
     <span class="k">return</span> <span class="n">YggInput</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="YggObjOutput"><a class="viewcode-back" href="../../../../yggdrasil.languages.Python.html#yggdrasil.languages.Python.YggInterface.YggObjOutput">[docs]</a><span class="k">def</span> <span class="nf">YggObjOutput</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<div class="viewcode-block" id="YggObjOutput"><a class="viewcode-back" href="../../../../yggdrasil.languages.Python.html#yggdrasil.interface.YggObjOutput">[docs]</a><span class="k">def</span> <span class="nf">YggObjOutput</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Get class for handling Obj output.</span>
 
 <span class="sd">    Args:</span>

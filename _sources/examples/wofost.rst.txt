@@ -1,0 +1,116 @@
+.. _wofost_rst:
+
+wofost
+=======================
+
+A single model receives input from a WOFOST-style parameter file and sends output to a file. This example demonstrates how to interact with generic data structures containing maps in the compiled languages.
+
+
+C Version
+---------
+
+Model Code:
+
+.. literalinclude:: /../../yggdrasil/examples/wofost/src/wofost.c
+   :language: c
+   :linenos:
+
+
+Model YAML:
+
+.. literalinclude:: /../../yggdrasil/examples/wofost/wofost_c.yml
+   :language: yaml
+   :linenos:
+
+
+
+C++ Version
+-----------
+
+Model Code:
+
+.. literalinclude:: /../../yggdrasil/examples/wofost/src/wofost.cpp
+   :language: c++
+   :linenos:
+
+
+Model YAML:
+
+.. literalinclude:: /../../yggdrasil/examples/wofost/wofost_cpp.yml
+   :language: yaml
+   :linenos:
+
+
+
+Fortran Version
+---------------
+
+Model Code:
+
+.. literalinclude:: /../../yggdrasil/examples/wofost/src/wofost.f90
+   :language: python
+   :linenos:
+
+
+Model YAML:
+
+.. literalinclude:: /../../yggdrasil/examples/wofost/wofost_fortran.yml
+   :language: yaml
+   :linenos:
+
+
+
+Matlab Version
+--------------
+
+Model Code:
+
+.. literalinclude:: /../../yggdrasil/examples/wofost/src/wofost.m
+   :language: matlab
+   :linenos:
+
+
+Model YAML:
+
+.. literalinclude:: /../../yggdrasil/examples/wofost/wofost_matlab.yml
+   :language: yaml
+   :linenos:
+
+
+
+Python Version
+--------------
+
+Model Code:
+
+.. literalinclude:: /../../yggdrasil/examples/wofost/src/wofost.py
+   :language: python
+   :linenos:
+
+
+Model YAML:
+
+.. literalinclude:: /../../yggdrasil/examples/wofost/wofost_python.yml
+   :language: yaml
+   :linenos:
+
+
+
+R Version
+---------
+
+Model Code:
+
+.. literalinclude:: /../../yggdrasil/examples/wofost/src/wofost.R
+   :language: python
+   :linenos:
+
+
+Model YAML:
+
+.. literalinclude:: /../../yggdrasil/examples/wofost/wofost_r.yml
+   :language: yaml
+   :linenos:
+
+
+

@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>&lt;no title&gt; &mdash; yggdrasil v1.6.3 documentation</title>
+  <title>&lt;no title&gt; &mdash; yggdrasil v1.6.3+1.g5570f65a0.dirty documentation</title>
   
 
   
@@ -30,7 +30,6 @@
   
     
       <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
-        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
         <script src="../_static/jquery.js"></script>
         <script src="../_static/underscore.js"></script>
         <script src="../_static/doctools.js"></script>
@@ -180,38 +179,64 @@
            <div itemprop="articleBody">
             
   <p>Model YAML:</p>
-<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="linenos">1</span><span class="nt">model</span><span class="p">:</span>
-<span class="linenos">2</span>  <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">server</span>
-<span class="linenos">3</span>  <span class="nt">language</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">python</span>
-<span class="linenos">4</span>  <span class="nt">args</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">./src/server.py</span>
-<span class="linenos">5</span>  <span class="nt">function</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">model_function</span>
-<span class="linenos">6</span>  <span class="nt">is_server</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">True</span>
-<span class="linenos">7</span>  <span class="nt">copies</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">10</span>
+<div class="highlight-yaml notranslate"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3
+4
+5
+6
+7</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="nt">model</span><span class="p">:</span>
+  <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">server</span>
+  <span class="nt">language</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">python</span>
+  <span class="nt">args</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">./src/server.py</span>
+  <span class="nt">function</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">model_function</span>
+  <span class="nt">is_server</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">True</span>
+  <span class="nt">copies</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">10</span>
 </pre></div>
-</div>
-<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span><span class="nt">model</span><span class="p">:</span>
-<span class="linenos"> 2</span>  <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">client</span>
-<span class="linenos"> 3</span>  <span class="nt">language</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">c</span>
-<span class="linenos"> 4</span>  <span class="nt">args</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">./src/client.c</span>
-<span class="linenos"> 5</span>  <span class="nt">function</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">model_function</span>
-<span class="linenos"> 6</span>  <span class="nt">client_of</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">server</span>
-<span class="linenos"> 7</span>  <span class="nt">compiler_flags</span><span class="p">:</span> <span class="p p-Indicator">[</span><span class="nv">-fopenmp</span><span class="p p-Indicator">]</span>
-<span class="linenos"> 8</span>  <span class="nt">linker_flags</span><span class="p">:</span> <span class="p p-Indicator">[</span><span class="nv">-fopenmp</span><span class="p p-Indicator">]</span>
-<span class="linenos"> 9</span>  <span class="nt">allow_threading</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">true</span>
-<span class="linenos">10</span>  <span class="nt">env</span><span class="p">:</span>
-<span class="linenos">11</span>    <span class="nt">NTHREAD</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">10</span>
-<span class="linenos">12</span>  <span class="nt">inputs</span><span class="p">:</span>
-<span class="linenos">13</span>    <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">in_buf</span>
-<span class="linenos">14</span>    <span class="nt">default_file</span><span class="p">:</span>
-<span class="linenos">15</span>      <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">./Input/input.txt</span>
-<span class="linenos">16</span>      <span class="nt">filetype</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">ascii</span>
-<span class="linenos">17</span>  <span class="nt">outputs</span><span class="p">:</span>
-<span class="linenos">18</span>    <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">out_buf</span>
-<span class="linenos">19</span>    <span class="nt">default_file</span><span class="p">:</span>
-<span class="linenos">20</span>      <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">./client_output.txt</span>
-<span class="linenos">21</span>      <span class="nt">in_temp</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">true</span>
+</td></tr></table></div>
+<div class="highlight-yaml notranslate"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="nt">model</span><span class="p">:</span>
+  <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">client</span>
+  <span class="nt">language</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">c</span>
+  <span class="nt">args</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">./src/client.c</span>
+  <span class="nt">function</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">model_function</span>
+  <span class="nt">client_of</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">server</span>
+  <span class="nt">compiler_flags</span><span class="p">:</span> <span class="p p-Indicator">[</span><span class="nv">-fopenmp</span><span class="p p-Indicator">]</span>
+  <span class="nt">linker_flags</span><span class="p">:</span> <span class="p p-Indicator">[</span><span class="nv">-fopenmp</span><span class="p p-Indicator">]</span>
+  <span class="nt">allow_threading</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">true</span>
+  <span class="nt">env</span><span class="p">:</span>
+    <span class="nt">NTHREAD</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">10</span>
+  <span class="nt">inputs</span><span class="p">:</span>
+    <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">in_buf</span>
+    <span class="nt">default_file</span><span class="p">:</span>
+      <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">./Input/input.txt</span>
+      <span class="nt">filetype</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">ascii</span>
+  <span class="nt">outputs</span><span class="p">:</span>
+    <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">out_buf</span>
+    <span class="nt">default_file</span><span class="p">:</span>
+      <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">./client_output.txt</span>
+      <span class="nt">in_temp</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">true</span>
 </pre></div>
-</div>
+</td></tr></table></div>
 <p>(<a class="reference external" href="examples/rpc_lesson3b.html">Example in other languages</a>)</p>
 
 

@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>yggdrasil.drivers.tests.test_RPCRequestDriver &mdash; yggdrasil v1.6.3 documentation</title>
+  <title>yggdrasil.drivers.tests.test_RPCRequestDriver &mdash; yggdrasil v1.6.3+1.g5570f65a0.dirty documentation</title>
   
 
   
@@ -30,7 +30,6 @@
   
     
       <script type="text/javascript" id="documentation_options" data-url_root="../../../../" src="../../../../_static/documentation_options.js"></script>
-        <script data-url_root="../../../../" id="documentation_options" src="../../../../_static/documentation_options.js"></script>
         <script src="../../../../_static/jquery.js"></script>
         <script src="../../../../_static/underscore.js"></script>
         <script src="../../../../_static/doctools.js"></script>
@@ -162,7 +161,11 @@
         
           <li><a href="../../../index.html">Module code</a> &raquo;</li>
         
+          <li><a href="../../../yggdrasil.html">yggdrasil</a> &raquo;</li>
+        
           <li><a href="../../drivers.html">yggdrasil.drivers</a> &raquo;</li>
+        
+          <li><a href="../tests.html">yggdrasil.drivers.tests</a> &raquo;</li>
         
       <li>yggdrasil.drivers.tests.test_RPCRequestDriver</li>
     
@@ -181,17 +184,17 @@
             
   <h1>Source code for yggdrasil.drivers.tests.test_RPCRequestDriver</h1><div class="highlight"><pre>
 <span></span><span class="kn">import</span> <span class="nn">unittest</span>
-<span class="kn">from</span> <span class="nn">yggdrasil.schema</span> <span class="kn">import</span> <span class="n">get_schema</span>
-<span class="kn">from</span> <span class="nn">yggdrasil.tests</span> <span class="kn">import</span> <span class="n">assert_raises</span><span class="p">,</span> <span class="n">assert_equal</span>
+<span class="kn">from</span> <span class="nn">yggdrasil.schema</span> <span class="k">import</span> <span class="n">get_schema</span>
+<span class="kn">from</span> <span class="nn">yggdrasil.tests</span> <span class="k">import</span> <span class="n">assert_raises</span><span class="p">,</span> <span class="n">assert_equal</span>
 <span class="kn">import</span> <span class="nn">yggdrasil.drivers.tests.test_ConnectionDriver</span> <span class="k">as</span> <span class="nn">parent</span>
-<span class="kn">from</span> <span class="nn">yggdrasil.drivers.tests.test_ConnectionDriver</span> <span class="kn">import</span> <span class="p">(</span>
+<span class="kn">from</span> <span class="nn">yggdrasil.drivers.tests.test_ConnectionDriver</span> <span class="k">import</span> <span class="p">(</span>
     <span class="n">_default_comm</span><span class="p">,</span> <span class="n">_zmq_installed</span><span class="p">,</span> <span class="n">_ipc_installed</span><span class="p">,</span> <span class="n">_rmq_installed</span><span class="p">)</span>
 
 
 <div class="viewcode-block" id="TestRPCRequestParam"><a class="viewcode-back" href="../../../../yggdrasil.drivers.tests.html#yggdrasil.drivers.tests.test_RPCRequestDriver.TestRPCRequestParam">[docs]</a><span class="k">class</span> <span class="nc">TestRPCRequestParam</span><span class="p">(</span><span class="n">parent</span><span class="o">.</span><span class="n">TestConnectionParam</span><span class="p">):</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test parameters for RPCRequestDriver class.&quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">TestRPCRequestParam</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">driver</span> <span class="o">=</span> <span class="s1">&#39;RPCRequestDriver&#39;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">args</span> <span class="o">=</span> <span class="kc">None</span>

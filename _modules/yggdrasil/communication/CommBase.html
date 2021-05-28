@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>yggdrasil.communication.CommBase &mdash; yggdrasil v1.6.3 documentation</title>
+  <title>yggdrasil.communication.CommBase &mdash; yggdrasil v1.6.3+1.g5570f65a0.dirty documentation</title>
   
 
   
@@ -30,7 +30,6 @@
   
     
       <script type="text/javascript" id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
-        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
         <script src="../../../_static/jquery.js"></script>
         <script src="../../../_static/underscore.js"></script>
         <script src="../../../_static/doctools.js"></script>
@@ -162,6 +161,8 @@
         
           <li><a href="../../index.html">Module code</a> &raquo;</li>
         
+          <li><a href="../../yggdrasil.html">yggdrasil</a> &raquo;</li>
+        
           <li><a href="../communication.html">yggdrasil.communication</a> &raquo;</li>
         
       <li>yggdrasil.communication.CommBase</li>
@@ -189,16 +190,16 @@
 <span class="kn">import</span> <span class="nn">time</span>
 <span class="kn">import</span> <span class="nn">collections</span>
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
-<span class="kn">from</span> <span class="nn">yggdrasil</span> <span class="kn">import</span> <span class="n">tools</span><span class="p">,</span> <span class="n">multitasking</span>
-<span class="kn">from</span> <span class="nn">yggdrasil.tools</span> <span class="kn">import</span> <span class="n">YGG_MSG_EOF</span>
-<span class="kn">from</span> <span class="nn">yggdrasil.communication</span> <span class="kn">import</span> <span class="p">(</span>
+<span class="kn">from</span> <span class="nn">yggdrasil</span> <span class="k">import</span> <span class="n">tools</span><span class="p">,</span> <span class="n">multitasking</span>
+<span class="kn">from</span> <span class="nn">yggdrasil.tools</span> <span class="k">import</span> <span class="n">YGG_MSG_EOF</span>
+<span class="kn">from</span> <span class="nn">yggdrasil.communication</span> <span class="k">import</span> <span class="p">(</span>
     <span class="n">new_comm</span><span class="p">,</span> <span class="n">get_comm</span><span class="p">,</span> <span class="n">determine_suffix</span><span class="p">,</span> <span class="n">TemporaryCommunicationError</span><span class="p">,</span>
     <span class="n">import_comm</span><span class="p">)</span>
-<span class="kn">from</span> <span class="nn">yggdrasil.components</span> <span class="kn">import</span> <span class="n">import_component</span><span class="p">,</span> <span class="n">create_component</span>
-<span class="kn">from</span> <span class="nn">yggdrasil.metaschema.datatypes</span> <span class="kn">import</span> <span class="n">MetaschemaTypeError</span><span class="p">,</span> <span class="n">type2numpy</span>
-<span class="kn">from</span> <span class="nn">yggdrasil.metaschema.datatypes.MetaschemaType</span> <span class="kn">import</span> <span class="n">MetaschemaType</span>
-<span class="kn">from</span> <span class="nn">yggdrasil.communication.transforms.TransformBase</span> <span class="kn">import</span> <span class="n">TransformBase</span>
-<span class="kn">from</span> <span class="nn">yggdrasil.serialize</span> <span class="kn">import</span> <span class="n">consolidate_array</span>
+<span class="kn">from</span> <span class="nn">yggdrasil.components</span> <span class="k">import</span> <span class="n">import_component</span><span class="p">,</span> <span class="n">create_component</span>
+<span class="kn">from</span> <span class="nn">yggdrasil.metaschema.datatypes</span> <span class="k">import</span> <span class="n">MetaschemaTypeError</span><span class="p">,</span> <span class="n">type2numpy</span>
+<span class="kn">from</span> <span class="nn">yggdrasil.metaschema.datatypes.MetaschemaType</span> <span class="k">import</span> <span class="n">MetaschemaType</span>
+<span class="kn">from</span> <span class="nn">yggdrasil.communication.transforms.TransformBase</span> <span class="k">import</span> <span class="n">TransformBase</span>
+<span class="kn">from</span> <span class="nn">yggdrasil.serialize</span> <span class="k">import</span> <span class="n">consolidate_array</span>
 
 
 <span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
@@ -256,7 +257,7 @@
                  <span class="s1">&#39;additional_messages&#39;</span><span class="p">,</span> <span class="s1">&#39;worker&#39;</span><span class="p">,</span> <span class="s1">&#39;worker_messages&#39;</span><span class="p">,</span>
                  <span class="s1">&#39;sent&#39;</span><span class="p">,</span> <span class="s1">&#39;finalized&#39;</span><span class="p">,</span> <span class="s1">&#39;singular&#39;</span><span class="p">,</span> <span class="s1">&#39;stype&#39;</span><span class="p">,</span> <span class="s1">&#39;sinfo&#39;</span><span class="p">]</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">msg</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">length</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">flag</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">args</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">header</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">msg</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">length</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">flag</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">args</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">header</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">msg</span> <span class="o">=</span> <span class="n">msg</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">length</span> <span class="o">=</span> <span class="n">length</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">flag</span> <span class="o">=</span> <span class="n">flag</span>
@@ -271,11 +272,11 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">stype</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">sinfo</span> <span class="o">=</span> <span class="kc">None</span>
 
-    <span class="k">def</span> <span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="s1">&#39;CommMessage(flag=</span><span class="si">%s</span><span class="s1">, </span><span class="si">%.100s</span><span class="s1">..., sent=</span><span class="si">%s</span><span class="s1">)&#39;</span> <span class="o">%</span> <span class="p">(</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">flag</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">msg</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">sent</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="s1">&#39;CommMessage(flag=</span><span class="si">%s</span><span class="s1">, </span><span class="si">%.100s</span><span class="s1">..., sent=</span><span class="si">%s</span><span class="s1">)&#39;</span> <span class="o">%</span> <span class="p">(</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">flag</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">msg</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">sent</span><span class="p">)</span>
 
@@ -455,7 +456,7 @@
 <span class="sd">        comm (:class:.CommBase): Comm class that thread is for.</span>
 
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">comm</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">suffix</span><span class="o">=</span><span class="s1">&#39;CommTask&#39;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">comm</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">suffix</span><span class="o">=</span><span class="s1">&#39;CommTask&#39;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">comm</span> <span class="o">=</span> <span class="n">comm</span>
         <span class="k">if</span> <span class="n">name</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">name</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="si">%s</span><span class="s1">.</span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">comm</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">suffix</span><span class="p">)</span>
@@ -484,7 +485,7 @@
 <span class="sd">        cli_count (int): Number of clients that have connected to this server.</span>
 
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">srv_address</span><span class="p">,</span> <span class="n">cli_address</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">srv_address</span><span class="p">,</span> <span class="n">cli_address</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="k">global</span> <span class="n">_registered_servers</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">cli_count</span> <span class="o">=</span> <span class="mi">0</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">srv_count</span> <span class="o">=</span> <span class="mi">0</span>
@@ -764,7 +765,7 @@
                             <span class="s1">&#39;after_prepare_message&#39;</span><span class="p">]</span>
     <span class="n">_finalize_message_kws</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;skip_python2language&#39;</span><span class="p">,</span> <span class="s1">&#39;after_finalize_message&#39;</span><span class="p">]</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">address</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">direction</span><span class="o">=</span><span class="s1">&#39;send&#39;</span><span class="p">,</span> <span class="n">dont_open</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">address</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">direction</span><span class="o">=</span><span class="s1">&#39;send&#39;</span><span class="p">,</span> <span class="n">dont_open</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
                  <span class="n">is_interface</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">language</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">partner_copies</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
                  <span class="n">partner_model</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">partner_language</span><span class="o">=</span><span class="s1">&#39;python&#39;</span><span class="p">,</span>
                  <span class="n">recv_timeout</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">close_on_eof_recv</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">close_on_eof_send</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
@@ -958,7 +959,7 @@
                     <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
                         <span class="n">iv</span> <span class="o">=</span> <span class="kc">None</span>
                 <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">iv</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
-                    <span class="kn">from</span> <span class="nn">yggdrasil.schema</span> <span class="kn">import</span> <span class="n">get_schema</span>
+                    <span class="kn">from</span> <span class="nn">yggdrasil.schema</span> <span class="k">import</span> <span class="n">get_schema</span>
                     <span class="n">transform_schema</span> <span class="o">=</span> <span class="n">get_schema</span><span class="p">()</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;transform&#39;</span><span class="p">)</span>
                     <span class="n">transform_kws</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span>
                         <span class="n">iv</span><span class="p">,</span>
@@ -977,7 +978,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">transform</span> <span class="o">=</span> <span class="p">[</span><span class="n">x</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">transform</span> <span class="k">if</span> <span class="n">x</span><span class="p">]</span>
         <span class="c1"># Set filter</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">filter</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
-            <span class="kn">from</span> <span class="nn">yggdrasil.schema</span> <span class="kn">import</span> <span class="n">get_schema</span>
+            <span class="kn">from</span> <span class="nn">yggdrasil.schema</span> <span class="k">import</span> <span class="n">get_schema</span>
             <span class="n">filter_schema</span> <span class="o">=</span> <span class="n">get_schema</span><span class="p">()</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;filter&#39;</span><span class="p">)</span>
             <span class="n">filter_kws</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">filter</span><span class="p">,</span>
                               <span class="n">subtype</span><span class="o">=</span><span class="n">filter_schema</span><span class="o">.</span><span class="n">identify_subtype</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">filter</span><span class="p">))</span>
@@ -1688,7 +1689,7 @@
 <span class="sd">            bool: True if the object is empty, False otherwise.</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="kn">from</span> <span class="nn">yggdrasil.tests</span> <span class="kn">import</span> <span class="n">assert_equal</span>
+        <span class="kn">from</span> <span class="nn">yggdrasil.tests</span> <span class="k">import</span> <span class="n">assert_equal</span>
         <span class="k">try</span><span class="p">:</span>
             <span class="n">assert_equal</span><span class="p">(</span><span class="n">msg</span><span class="p">,</span> <span class="n">emsg</span><span class="p">,</span> <span class="n">dont_print_diff</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
         <span class="k">except</span> <span class="ne">AssertionError</span><span class="p">:</span>
@@ -2566,11 +2567,11 @@
 
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">direction</span> <span class="o">==</span> <span class="s1">&#39;send&#39;</span><span class="p">:</span>
-            <span class="kn">from</span> <span class="nn">yggdrasil.metaschema.datatypes.JSONArrayMetaschemaType</span> <span class="kn">import</span> <span class="p">(</span>
+            <span class="kn">from</span> <span class="nn">yggdrasil.metaschema.datatypes.JSONArrayMetaschemaType</span> <span class="k">import</span> <span class="p">(</span>
                 <span class="n">JSONArrayMetaschemaType</span><span class="p">)</span>
             <span class="n">TypeClass</span> <span class="o">=</span> <span class="n">JSONArrayMetaschemaType</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="kn">from</span> <span class="nn">yggdrasil.metaschema.datatypes.JSONObjectMetaschemaType</span> <span class="kn">import</span> <span class="p">(</span>
+            <span class="kn">from</span> <span class="nn">yggdrasil.metaschema.datatypes.JSONObjectMetaschemaType</span> <span class="k">import</span> <span class="p">(</span>
                 <span class="n">JSONObjectMetaschemaType</span><span class="p">)</span>
             <span class="n">TypeClass</span> <span class="o">=</span> <span class="n">JSONObjectMetaschemaType</span>
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">serializer</span><span class="o">.</span><span class="n">typedef</span><span class="p">[</span><span class="s1">&#39;type&#39;</span><span class="p">]</span> <span class="o">!=</span> <span class="s1">&#39;array&#39;</span><span class="p">:</span>
