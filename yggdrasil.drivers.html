@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>yggdrasil.drivers package &mdash; yggdrasil v1.6.3+1.g5570f65a0.dirty documentation</title>
+  <title>yggdrasil.drivers package &mdash; yggdrasil v1.6.3+1.g236eabc85.dirty documentation</title>
   
 
   
@@ -111,6 +111,7 @@
 <li class="toctree-l1"><a class="reference internal" href="publications.html">Publications</a></li>
 <li class="toctree-l1"><a class="reference internal" href="hackathon2018/index.html">Welcome to the 2018 Crops in Silico Hackathon!</a></li>
 <li class="toctree-l1"><a class="reference internal" href="hackathon2019/index.html">Welcome to the 2019 Crops in Silico Hackathon!</a></li>
+<li class="toctree-l1"><a class="reference internal" href="hackathon2021/index.html">Welcome to the 2021 Crops in Silico Hackathon!</a></li>
 </ul>
 
             
@@ -8729,7 +8730,7 @@ the precise declaration that should be used.</p></li>
 
 <dl class="py attribute">
 <dt id="yggdrasil.drivers.FortranModelDriver.FortranModelDriver.internal_libraries">
-<code class="sig-name descname">internal_libraries</code><em class="property"> = {'c_wrappers': {'external_dependencies': [('c', 'rapidjson'), ('c', 'python'), ('c', 'numpy')], 'include_dirs': ['/Users/langmm/yggdrasil/yggdrasil/languages/fortran'], 'internal_dependencies': [('c', 'ygg')], 'language': 'c', 'libtype': 'object', 'source': '/Users/langmm/yggdrasil/yggdrasil/languages/fortran/c_wrappers.c'}, 'fygg': {'external_dependencies': [('c', 'rapidjson'), ('c', 'python'), ('c', 'numpy'), 'stdc++'], 'include_dirs': ['/Users/langmm/yggdrasil/yggdrasil/languages/c/communication', '/Users/langmm/yggdrasil/yggdrasil/languages/c/serialize', '/Users/langmm/yggdrasil/yggdrasil/languages/c', '/Users/langmm/yggdrasil/yggdrasil/languages/c'], 'internal_dependencies': [('c', 'regex'), ('c', 'datatypes'), ('c', 'python_wrapper'), ('c', 'ygg'), 'c_wrappers'], 'libtype': 'static', 'source': '/Users/langmm/yggdrasil/yggdrasil/languages/fortran/YggInterface.f90'}}</em><a class="headerlink" href="#yggdrasil.drivers.FortranModelDriver.FortranModelDriver.internal_libraries" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">internal_libraries</code><em class="property"> = {'c_wrappers': {'external_dependencies': [('c', 'rapidjson'), ('c', 'python'), ('c', 'numpy')], 'include_dirs': ['/Users/langmm/yggdrasil/yggdrasil/languages/fortran'], 'internal_dependencies': [('c', 'ygg')], 'language': 'c', 'libtype': 'object', 'source': '/Users/langmm/yggdrasil/yggdrasil/languages/fortran/c_wrappers.c'}, 'fygg': {'external_dependencies': [('c', 'rapidjson'), ('c', 'python'), ('c', 'numpy'), 'stdc++'], 'include_dirs': ['/Users/langmm/yggdrasil/yggdrasil/languages/c/communication', '/Users/langmm/yggdrasil/yggdrasil/languages/c/serialize', '/Users/langmm/yggdrasil/yggdrasil/languages/c'], 'internal_dependencies': [('c', 'regex'), ('c', 'datatypes'), ('c', 'python_wrapper'), ('c', 'ygg'), 'c_wrappers'], 'libtype': 'static', 'source': '/Users/langmm/yggdrasil/yggdrasil/languages/fortran/YggInterface.f90'}}</em><a class="headerlink" href="#yggdrasil.drivers.FortranModelDriver.FortranModelDriver.internal_libraries" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
@@ -9678,7 +9679,7 @@ and which ones are arguments.</p>
 
 <dl class="py attribute">
 <dt id="id15">
-<code class="sig-name descname">paths_to_add</code><em class="property"> = ['/Users/langmm/yggdrasil/yggdrasil', '/Users/langmm/yggdrasil/yggdrasil/languages/python', '/Users/langmm/yggdrasil/yggdrasil/languages/LPy', '/Users/langmm/yggdrasil/yggdrasil/languages/R', '/Users/langmm/yggdrasil/yggdrasil/languages/matlab', '/Users/langmm/yggdrasil/yggdrasil/languages/sbml', '/Users/langmm/yggdrasil/yggdrasil/languages/function']</em><a class="headerlink" href="#id15" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">paths_to_add</code><em class="property"> = ['/Users/langmm/yggdrasil/yggdrasil', '/Users/langmm/yggdrasil/yggdrasil/languages/python', '/Users/langmm/yggdrasil/yggdrasil/languages/R', '/Users/langmm/yggdrasil/yggdrasil/languages/LPy', '/Users/langmm/yggdrasil/yggdrasil/languages/sbml', '/Users/langmm/yggdrasil/yggdrasil/languages/function', '/Users/langmm/yggdrasil/yggdrasil/languages/matlab']</em><a class="headerlink" href="#id15" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
@@ -9827,7 +9828,7 @@ method.</p></li>
 
 <dl class="py attribute">
 <dt id="yggdrasil.drivers.LPyModelDriver.LPyModelDriver.supported_comms">
-<code class="sig-name descname">supported_comms</code><em class="property"> = ['buffer', 'value', 'rmq', 'rmq_async', 'zmq', 'ipc']</em><a class="headerlink" href="#yggdrasil.drivers.LPyModelDriver.LPyModelDriver.supported_comms" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">supported_comms</code><em class="property"> = ['ipc', 'value', 'rmq', 'zmq', 'rmq_async', 'buffer']</em><a class="headerlink" href="#yggdrasil.drivers.LPyModelDriver.LPyModelDriver.supported_comms" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </dd></dl>
@@ -14051,7 +14052,7 @@ method.</p>
 
 <dl class="py attribute">
 <dt id="yggdrasil.drivers.PythonModelDriver.PythonModelDriver.supported_comms">
-<code class="sig-name descname">supported_comms</code><em class="property"> = ['buffer', 'value', 'rmq', 'rmq_async', 'zmq', 'ipc']</em><a class="headerlink" href="#yggdrasil.drivers.PythonModelDriver.PythonModelDriver.supported_comms" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">supported_comms</code><em class="property"> = ['ipc', 'value', 'rmq', 'zmq', 'rmq_async', 'buffer']</em><a class="headerlink" href="#yggdrasil.drivers.PythonModelDriver.PythonModelDriver.supported_comms" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
@@ -14146,7 +14147,7 @@ the compilation executable. Defaults to False.</p></li>
 
 <dl class="py attribute">
 <dt id="yggdrasil.drivers.RModelDriver.RModelDriver.interface_dependencies">
-<code class="sig-name descname">interface_dependencies</code><em class="property"> = ['bit64', 'zeallot', 'Rcpp', 'units', 'reticulate', 'R6']</em><a class="headerlink" href="#yggdrasil.drivers.RModelDriver.RModelDriver.interface_dependencies" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">interface_dependencies</code><em class="property"> = ['reticulate', 'bit64', 'Rcpp', 'units', 'zeallot', 'R6']</em><a class="headerlink" href="#yggdrasil.drivers.RModelDriver.RModelDriver.interface_dependencies" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">

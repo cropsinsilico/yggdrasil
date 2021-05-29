@@ -6,6 +6,8 @@ model_error
 A single model that raises/returns an error.
 
 
+.. contents:: :local:
+
 C Version
 ---------
 

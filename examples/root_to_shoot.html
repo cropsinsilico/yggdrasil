@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>root_to_shoot &mdash; yggdrasil v1.6.3+1.g5570f65a0.dirty documentation</title>
+  <title>root_to_shoot &mdash; yggdrasil v1.6.3+1.g236eabc85.dirty documentation</title>
   
 
   
@@ -111,6 +111,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../publications.html">Publications</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../hackathon2018/index.html">Welcome to the 2018 Crops in Silico Hackathon!</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../hackathon2019/index.html">Welcome to the 2019 Crops in Silico Hackathon!</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../hackathon2021/index.html">Welcome to the 2021 Crops in Silico Hackathon!</a></li>
 </ul>
 
             
@@ -181,8 +182,16 @@
   <div class="section" id="root-to-shoot">
 <span id="root-to-shoot-rst"></span><h1>root_to_shoot<a class="headerlink" href="#root-to-shoot" title="Permalink to this headline">¶</a></h1>
 <p>Two models, a root model and a shoot model, that are both run via wrappers around functions. The root model receives the initial root mass, growth rate, and time steps from files. For each time step, the root model computes the new root mass and sends it to the shoot model. The shoot model receives the initial shoot mass, growth rate, and time steps from files. For each time step, the shoot model receives the new root mass from the root model, calculates the next shoot mass and outputs it to a file.</p>
+<div class="contents local topic" id="contents">
+<ul class="simple">
+<li><p><a class="reference internal" href="#mixed-version" id="id1">Mixed Version</a></p></li>
+<li><p><a class="reference internal" href="#mixed-w-o-matlab-version" id="id2">Mixed w/o Matlab Version</a></p></li>
+<li><p><a class="reference internal" href="#c-version" id="id3">C Version</a></p></li>
+<li><p><a class="reference internal" href="#python-version" id="id4">Python Version</a></p></li>
+</ul>
+</div>
 <div class="section" id="mixed-version">
-<h2>Mixed Version<a class="headerlink" href="#mixed-version" title="Permalink to this headline">¶</a></h2>
+<h2><a class="toc-backref" href="#id1">Mixed Version</a><a class="headerlink" href="#mixed-version" title="Permalink to this headline">¶</a></h2>
 <p>Model Code:</p>
 <div class="highlight-python notranslate"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
  2
@@ -353,7 +362,7 @@
 </td></tr></table></div>
 </div>
 <div class="section" id="mixed-w-o-matlab-version">
-<h2>Mixed w/o Matlab Version<a class="headerlink" href="#mixed-w-o-matlab-version" title="Permalink to this headline">¶</a></h2>
+<h2><a class="toc-backref" href="#id2">Mixed w/o Matlab Version</a><a class="headerlink" href="#mixed-w-o-matlab-version" title="Permalink to this headline">¶</a></h2>
 <p>Model Code:</p>
 <div class="highlight-python notranslate"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
  2
@@ -524,7 +533,7 @@
 </td></tr></table></div>
 </div>
 <div class="section" id="c-version">
-<h2>C Version<a class="headerlink" href="#c-version" title="Permalink to this headline">¶</a></h2>
+<h2><a class="toc-backref" href="#id3">C Version</a><a class="headerlink" href="#c-version" title="Permalink to this headline">¶</a></h2>
 <p>Model Code:</p>
 <p>Model YAML:</p>
 <div class="highlight-yaml notranslate"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
@@ -593,7 +602,7 @@
 </td></tr></table></div>
 </div>
 <div class="section" id="python-version">
-<h2>Python Version<a class="headerlink" href="#python-version" title="Permalink to this headline">¶</a></h2>
+<h2><a class="toc-backref" href="#id4">Python Version</a><a class="headerlink" href="#python-version" title="Permalink to this headline">¶</a></h2>
 <p>Model Code:</p>
 <div class="highlight-python notranslate"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
  2

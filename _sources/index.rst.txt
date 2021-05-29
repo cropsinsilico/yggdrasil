@@ -31,6 +31,7 @@ Welcome to yggdrasil's documentation!
    publications
    hackathon2018/index
    hackathon2019/index
+   hackathon2021/index
    
 Indices and tables
 ==================

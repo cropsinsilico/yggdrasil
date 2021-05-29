@@ -7,7 +7,7 @@ Welcome to the 2021 Crops in Silico Hackathon!
    :caption: Contents:
    
    setup
+   debugging
    intro
-   connections
-   timesync
-   misc
+   notebooks
+   cli

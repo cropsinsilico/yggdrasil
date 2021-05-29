@@ -7,6 +7,8 @@ Two models, A & B, that send/receive strings. Model A receives input from a file
 
 
 
+.. contents:: :local:
+
 C Version
 ---------
 

@@ -6,6 +6,8 @@ gs_lesson1
 A single model without any inputs or outputs.
 
 
+.. contents:: :local:
+
 C Version
 ---------
 

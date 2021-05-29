@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>fakeplant &mdash; yggdrasil v1.6.3+1.g5570f65a0.dirty documentation</title>
+  <title>fakeplant &mdash; yggdrasil v1.6.3+1.g236eabc85.dirty documentation</title>
   
 
   
@@ -111,6 +111,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../publications.html">Publications</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../hackathon2018/index.html">Welcome to the 2018 Crops in Silico Hackathon!</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../hackathon2019/index.html">Welcome to the 2019 Crops in Silico Hackathon!</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../hackathon2021/index.html">Welcome to the 2021 Crops in Silico Hackathon!</a></li>
 </ul>
 
             
@@ -181,8 +182,18 @@
   <div class="section" id="fakeplant">
 <span id="fakeplant-rst"></span><h1>fakeplant<a class="headerlink" href="#fakeplant" title="Permalink to this headline">¶</a></h1>
 <p>Four models that can be run in isolation or as an integration. Each model approximates a simplified model of a process governing plant growth. When run in isolation each model receives input from a file and sends output to a file. In the larger integration, the canopy model receives input from three files (initial structure, time steps, and some growth parameters. For each time step received, the canopy model also receives a growth rate from the growth model, computes the new structure. and send the structure to the light model. The light model receives the ambient light level from a file, calculates the intensity for each element of the structure, and sends the output to the photosynthesis model. The photosynthesis model receives temperature and CO2 from files, calculates the photosynthesis rate, and sends the result to the growth model. The growth model calculates the growth rate and sends the output to the canopy model.</p>
+<div class="contents local topic" id="contents">
+<ul class="simple">
+<li><p><a class="reference internal" href="#mixed-version" id="id2">Mixed Version</a></p></li>
+<li><p><a class="reference internal" href="#mixed-w-o-matlab-version" id="id3">Mixed w/o Matlab Version</a></p></li>
+<li><p><a class="reference internal" href="#c-version" id="id4">C Version</a></p></li>
+<li><p><a class="reference internal" href="#id1" id="id5">C++ Version</a></p></li>
+<li><p><a class="reference internal" href="#matlab-version" id="id6">Matlab Version</a></p></li>
+<li><p><a class="reference internal" href="#python-version" id="id7">Python Version</a></p></li>
+</ul>
+</div>
 <div class="section" id="mixed-version">
-<h2>Mixed Version<a class="headerlink" href="#mixed-version" title="Permalink to this headline">¶</a></h2>
+<h2><a class="toc-backref" href="#id2">Mixed Version</a><a class="headerlink" href="#mixed-version" title="Permalink to this headline">¶</a></h2>
 <p>Model Code:</p>
 <div class="highlight-c++ notranslate"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>  1
   2
@@ -962,7 +973,7 @@
 </td></tr></table></div>
 </div>
 <div class="section" id="mixed-w-o-matlab-version">
-<h2>Mixed w/o Matlab Version<a class="headerlink" href="#mixed-w-o-matlab-version" title="Permalink to this headline">¶</a></h2>
+<h2><a class="toc-backref" href="#id3">Mixed w/o Matlab Version</a><a class="headerlink" href="#mixed-w-o-matlab-version" title="Permalink to this headline">¶</a></h2>
 <p>Model Code:</p>
 <div class="highlight-c++ notranslate"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>  1
   2
@@ -1770,7 +1781,7 @@
 </td></tr></table></div>
 </div>
 <div class="section" id="c-version">
-<h2>C Version<a class="headerlink" href="#c-version" title="Permalink to this headline">¶</a></h2>
+<h2><a class="toc-backref" href="#id4">C Version</a><a class="headerlink" href="#c-version" title="Permalink to this headline">¶</a></h2>
 <p>Model Code:</p>
 <div class="highlight-c notranslate"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
  2
@@ -2000,7 +2011,7 @@
 </td></tr></table></div>
 </div>
 <div class="section" id="id1">
-<h2>C++ Version<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h2>
+<h2><a class="toc-backref" href="#id5">C++ Version</a><a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h2>
 <p>Model Code:</p>
 <div class="highlight-c++ notranslate"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>  1
   2
@@ -2350,7 +2361,7 @@
 </td></tr></table></div>
 </div>
 <div class="section" id="matlab-version">
-<h2>Matlab Version<a class="headerlink" href="#matlab-version" title="Permalink to this headline">¶</a></h2>
+<h2><a class="toc-backref" href="#id6">Matlab Version</a><a class="headerlink" href="#matlab-version" title="Permalink to this headline">¶</a></h2>
 <p>Model Code:</p>
 <div class="highlight-matlab notranslate"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
  2
@@ -2424,7 +2435,7 @@
 </td></tr></table></div>
 </div>
 <div class="section" id="python-version">
-<h2>Python Version<a class="headerlink" href="#python-version" title="Permalink to this headline">¶</a></h2>
+<h2><a class="toc-backref" href="#id7">Python Version</a><a class="headerlink" href="#python-version" title="Permalink to this headline">¶</a></h2>
 <p>Model Code:</p>
 <div class="highlight-python notranslate"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
  2

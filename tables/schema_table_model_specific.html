@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>&lt;no title&gt; &mdash; yggdrasil v1.6.3+1.g5570f65a0.dirty documentation</title>
+  <title>&lt;no title&gt; &mdash; yggdrasil v1.6.3+1.g236eabc85.dirty documentation</title>
   
 
   
@@ -111,6 +111,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../publications.html">Publications</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../hackathon2018/index.html">Welcome to the 2018 Crops in Silico Hackathon!</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../hackathon2019/index.html">Welcome to the 2019 Crops in Silico Hackathon!</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../hackathon2021/index.html">Welcome to the 2021 Crops in Silico Hackathon!</a></li>
 </ul>
 
             
@@ -220,7 +221,7 @@ be relative to working_dir or absolute.</p></td>
 provided, the compiler will be determined based on configuration options for the
 language (if present) and the registered compilers that are available on the
 current operating system.</p></td>
-<td><p>[‘cpp’, ‘fortran’, ‘c++’, ‘c’, ‘make’, ‘cmake’, ‘cxx’]</p></td>
+<td><p>[‘cpp’, ‘make’, ‘cxx’, ‘c’, ‘cmake’, ‘fortran’, ‘c++’]</p></td>
 </tr>
 <tr class="row-odd"><td><p>compiler_flags</p></td>
 <td><p>array</p></td>
@@ -228,7 +229,7 @@ current operating system.</p></td>
 the compiler flags will be determined based on configuration options for the
 language (if present), the compiler defaults, and the default_compiler_flags
 class attribute.</p></td>
-<td><p>[‘cpp’, ‘fortran’, ‘c++’, ‘c’, ‘make’, ‘cmake’, ‘cxx’]</p></td>
+<td><p>[‘cpp’, ‘make’, ‘cxx’, ‘c’, ‘cmake’, ‘fortran’, ‘c++’]</p></td>
 </tr>
 <tr class="row-even"><td><p>configuration</p></td>
 <td><p>string</p></td>
@@ -292,14 +293,14 @@ be determined by the target language driver.</p></td>
 <td><p>Name or path of interpreter executable that should be used to run the model. If
 not provided, the interpreter will be determined based on configuration options
 for the language (if present) and the default_interpreter class attribute.</p></td>
-<td><p>[‘python’, ‘matlab’, ‘function’, ‘r’, ‘sbml’, ‘timesync’, ‘lpy’, ‘R’]</p></td>
+<td><p>[‘sbml’, ‘R’, ‘matlab’, ‘lpy’, ‘r’, ‘python’, ‘timesync’, ‘function’]</p></td>
 </tr>
 <tr class="row-even"><td><p>interpreter_flags</p></td>
 <td><p>array</p></td>
 <td><p>Flags that should be passed to the interpreter when running the model. If not
 provided, the flags are determined based on configuration options for the
 language (if present) and the default_interpreter_flags class attribute.</p></td>
-<td><p>[‘python’, ‘matlab’, ‘function’, ‘r’, ‘sbml’, ‘timesync’, ‘lpy’, ‘R’]</p></td>
+<td><p>[‘sbml’, ‘R’, ‘matlab’, ‘lpy’, ‘r’, ‘python’, ‘timesync’, ‘function’]</p></td>
 </tr>
 <tr class="row-odd"><td><p>linker</p></td>
 <td><p>string</p></td>
@@ -307,7 +308,7 @@ language (if present) and the default_interpreter_flags class attribute.</p></td
 provided, the linker will be determined based on configuration options for the
 language (if present) and the registered linkers that are available on the
 current operating system</p></td>
-<td><p>[‘cpp’, ‘fortran’, ‘c++’, ‘c’, ‘make’, ‘cmake’, ‘cxx’]</p></td>
+<td><p>[‘cpp’, ‘make’, ‘cxx’, ‘c’, ‘cmake’, ‘fortran’, ‘c++’]</p></td>
 </tr>
 <tr class="row-even"><td><p>linker_flags</p></td>
 <td><p>array</p></td>
@@ -315,7 +316,7 @@ current operating system</p></td>
 the linker flags will be determined based on configuration options for the
 language (if present), the linker defaults, and the default_linker_flags class
 attribute.</p></td>
-<td><p>[‘cpp’, ‘fortran’, ‘c++’, ‘c’, ‘make’, ‘cmake’, ‘cxx’]</p></td>
+<td><p>[‘cpp’, ‘make’, ‘cxx’, ‘c’, ‘cmake’, ‘fortran’, ‘c++’]</p></td>
 </tr>
 <tr class="row-odd"><td><p>makedir</p></td>
 <td><p>string</p></td>
@@ -352,7 +353,7 @@ selections will be returned.</p></td>
 <td><p>If True, no interpreter will be added to the arguments. This should only be used
 for subclasses that will not be invoking the model via the command line.
 Defaults to False.</p></td>
-<td><p>[‘python’, ‘matlab’, ‘function’, ‘r’, ‘sbml’, ‘timesync’, ‘lpy’, ‘R’]</p></td>
+<td><p>[‘sbml’, ‘R’, ‘matlab’, ‘lpy’, ‘r’, ‘python’, ‘timesync’, ‘function’]</p></td>
 </tr>
 <tr class="row-odd"><td><p>skip_start_time</p></td>
 <td><p>boolean</p></td>
@@ -365,7 +366,7 @@ False. This option is ignored if only_output_final_step is True.</p></td>
 <td><p>Source files that should be compiled into an executable. Defaults to an empty
 list and the driver will search for a source file based on the model executable
 (the first model argument).</p></td>
-<td><p>[‘cpp’, ‘fortran’, ‘c++’, ‘c’, ‘make’, ‘cmake’, ‘cxx’]</p></td>
+<td><p>[‘cpp’, ‘make’, ‘cxx’, ‘c’, ‘cmake’, ‘fortran’, ‘c++’]</p></td>
 </tr>
 <tr class="row-odd"><td><p>sourcedir</p></td>
 <td><p>string</p></td>

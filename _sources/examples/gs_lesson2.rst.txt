@@ -6,6 +6,8 @@ gs_lesson2
 Two models without any inputs or outputs.
 
 
+.. contents:: :local:
+
 C Version
 ---------
 
