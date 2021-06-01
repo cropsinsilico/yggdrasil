@@ -168,3 +168,47 @@ class PythonModelDriver(InterpretedModelDriver):
                 kwargs['filename'] = os.path.splitext(os.path.basename(fname))[0]
         kwargs['default'] = default
         return super(PythonModelDriver, cls).format_function_param(key, **kwargs)
+
+    @classmethod
+    def write_initialize_iter(cls, var, value=None, **kwargs):
+        r"""Get the lines necessary to initialize an array for iteration
+        output.
+
+        Args:
+            var (dict, str): Name or information dictionary for the variable
+                being initialized.
+            value (str, optional): Value that should be assigned to the
+                variable.
+            **kwargs: Additional keyword arguments are passed to the
+                parent class's method.
+
+        Returns:
+            list: The lines initializing the variable.
+
+        """
+        value = '[None for _ in range(%s)]' % var['iter_var']['end']
+        out = super(PythonModelDriver, cls).write_initialize_iter(
+            var, value=value, **kwargs)
+        return out
+
+    @classmethod
+    def write_finalize_iter(cls, var):
+        r"""Get the lines necessary to finalize an array after iteration.
+
+        Args:
+            var (dict, str): Name or information dictionary for the variable
+                being initialized.
+
+        Returns:
+            list: The lines finalizing the variable.
+
+        """
+        out = super(PythonModelDriver, cls).write_finalize_iter(var)
+        out += ['import numpy as np',
+                'from yggdrasil import units',
+                'dtype = np.dtype(units.get_data({name}[0]))'.format(
+                    name=var['name']),
+                ('{name} = units.add_units(np.array({name}, dtype=dtype),'
+                 'units.get_units({name}[0]))').format(
+                     name=var['name'])]
+        return out

@@ -97,6 +97,9 @@ class ModelDriver(Driver):
             located within the file specified by the source file listed in the
             first argument. If not provided, the model must contain it's own
             calls to the |yggdrasil| interface.
+        iter_function_over (array, optional): Variable(s) that should be
+            received or sent as an array, but iterated over. Defaults to an
+            empty array and is ignored.
         source_products (list, optional): Files created by running the model
             that are source files. These files will be removed without checking
             their extension so users should avoid adding files to this list
@@ -247,6 +250,8 @@ class ModelDriver(Driver):
         process (:class:`yggdrasil.tools.YggPopen`): Process used to run
             the model.
         function (str): The name of the model function that should be wrapped.
+        iter_function_over (array): Variable(s) that should be received or
+            sent as an array, but iterated over.
         is_server (bool, dict): If True, the model is assumed to be a server
             and an instance of :class:`yggdrasil.drivers.ServerDriver` is
             started. If a dict, the input/output channels with the specified
@@ -317,6 +322,8 @@ class ModelDriver(Driver):
         'overwrite': {'type': 'boolean'},
         'preserve_cache': {'type': 'boolean', 'default': False},
         'function': {'type': 'string'},
+        'iter_function_over': {'type': 'array', 'default': [],
+                               'items': {'type': 'string'}},
         'is_server': {'anyOf': [{'type': 'boolean'},
                                 {'type': 'object',
                                  'properties': {'input': {'type': 'string'},
@@ -498,6 +505,7 @@ class ModelDriver(Driver):
                     inputs=self.model_function_inputs,
                     outputs=self.model_function_outputs,
                     outputs_in_inputs=self.model_outputs_in_inputs,
+                    iter_function_over=self.iter_function_over,
                     copies=self.copies)
                 with open(args[0], 'w') as fd:
                     fd.write('\n'.join(lines))
@@ -1829,7 +1837,7 @@ class ModelDriver(Driver):
     @classmethod
     def update_io_from_function(cls, model_file, model_function,
                                 inputs=[], outputs=[], contents=None,
-                                outputs_in_inputs=None):
+                                outputs_in_inputs=None, iter_function_over=[]):
         r"""Update inputs/outputs from the function definition.
 
         Args:
@@ -1845,6 +1853,9 @@ class ModelDriver(Driver):
             outputs_in_inputs (bool, optional): If True, the outputs are
                 presented in the function definition as inputs. Defaults
                 to False.
+            iter_function_over (array, optional): Variable(s) that should be
+                received or sent as an array, but iterated over. Defaults to
+                an empty array and is ignored.
 
         Returns:
             dict, None: Flag variable used by the model. If None, the
@@ -1964,12 +1975,22 @@ class ModelDriver(Driver):
                     for v in x['vars']:
                         if 'native_type' not in v:
                             v['native_type'] = cls.get_native_type(**v)
+            # Update types based on iteration
+            for x in io_var:
+                for v in x.get('vars', [x]):
+                    if v['name'] in iter_function_over:
+                        v['iter_datatype'] = v.pop('datatype', {})
+                        if v['iter_datatype']:
+                            assert(v['iter_datatype']['type'] == 'scalar')
+                            v['datatype'] = copy.deepcopy(v['iter_datatype'])
+                            v['datatype']['type'] = '1darray'
         return flag_var
 
     @classmethod
     def write_model_wrapper(cls, model_file, model_function,
                             inputs=[], outputs=[],
-                            outputs_in_inputs=None, verbose=False, copies=1):
+                            outputs_in_inputs=None, verbose=False, copies=1,
+                            iter_function_over=[]):
         r"""Return the lines required to wrap a model function as an integrated
         model.
 
@@ -1989,6 +2010,9 @@ class ModelDriver(Driver):
             copies (int, optional): Number of times the model driver is
                 duplicated. If more than one, no error will be raised in the
                 event there is never a call the the function. Defaults to 1.
+            iter_function_over (array, optional): Variable(s) that should be
+                received or sent as an array, but iterated over. Defaults to
+                an empty array and is ignored.
 
         Returns:
             list: Lines of code wrapping the provided model with the necessary
@@ -2005,9 +2029,37 @@ class ModelDriver(Driver):
         model_flag = cls.update_io_from_function(
             model_file, model_function,
             inputs=inputs, outputs=outputs,
-            outputs_in_inputs=outputs_in_inputs)
+            outputs_in_inputs=outputs_in_inputs,
+            iter_function_over=iter_function_over)
         if isinstance(model_file, dict):
             model_file = model_file['model_file']
+        # Update types based on iteration
+        iter_function_idx = None
+        if iter_function_over:
+            iter_function_idx = {'name': 'idx_func_iter',
+                                 'datatype': {'type': 'int'}}
+            if cls.zero_based:
+                iter_function_idx['begin'] = int(0)
+            else:
+                iter_function_idx['begin'] = int(1)
+            iter_vars = []
+            for x in inputs:
+                iter_vars += x.get('vars', [x])
+            if not iter_vars:  # pragma: debug
+                raise RuntimeError("The iter_function_over model "
+                                   "parameter must include an input to "
+                                   "iterate over. To expand output arrays "
+                                   "into component elements, use the "
+                                   "'iterate' transformation.")
+            for x in outputs:
+                iter_vars += x.get('vars', [x])
+            if iter_vars[0].get('length_var', False):
+                iter_function_idx['end'] = iter_vars[0]['length_var']
+            else:
+                iter_function_idx['end'] = cls.format_function_param(
+                    'len', variable=iter_vars[0]['name'])
+            for v in iter_vars:
+                v['iter_var'] = iter_function_idx
         # Declare variables and flag, then define flag
         lines = []
         flag_var = {'name': 'flag', 'datatype': {'type': 'flag'}}
@@ -2028,6 +2080,10 @@ class ModelDriver(Driver):
             if model_flag:
                 lines += cls.write_declaration(
                     model_flag, definitions=definitions,
+                    requires_freeing=free_vars)
+            if iter_function_idx:
+                lines += cls.write_declaration(
+                    iter_function_idx, definitions=definitions,
                     requires_freeing=free_vars)
             for x in inputs + outputs:
                 for v in x.get('vars', [x]):
@@ -2069,10 +2125,23 @@ class ModelDriver(Driver):
                                                    flag_var=flag_var,
                                                    iter_var=loop_iter_var,
                                                    allow_failure=True)
+        # Prepare output array
+        if iter_function_over and ('declare' not in cls.function_param):
+            for x in outputs:
+                for v in x.get('vars', [x]):
+                    if v['name'] in iter_function_over:
+                        loop_lines += cls.write_initialize_iter(v)
         # Call model
         loop_lines += cls.write_model_function_call(
             model_function, model_flag, inputs, outputs,
-            outputs_in_inputs=outputs_in_inputs)
+            outputs_in_inputs=outputs_in_inputs,
+            iter_function_idx=iter_function_idx)
+        # Finalize output array
+        if iter_function_over and ('declare' not in cls.function_param):
+            for x in outputs:
+                for v in x.get('vars', [x]):
+                    if v['name'] in iter_function_over:
+                        loop_lines += cls.write_finalize_iter(v)
         # Send outputs
         for x in outputs:
             if not x.get('outside_loop', False):
@@ -2449,7 +2518,8 @@ class ModelDriver(Driver):
     @classmethod
     def write_model_function_call(cls, model_function, flag_var, inputs, outputs,
                                   outputs_in_inputs=None, on_failure=None,
-                                  format_not_flag_cond=None, format_flag_cond=None):
+                                  format_not_flag_cond=None, format_flag_cond=None,
+                                  iter_function_idx=None):
         r"""Write lines necessary to call the model function.
 
         Args:
@@ -2476,9 +2546,8 @@ class ModelDriver(Driver):
                 defaults class's value for 'flag_cond' in function_param is
                 used if it exists. If it does not exist, the flag is
                 directly evaluated as if it were a boolean.
-
-checking if the model flag indicates
-                a failure
+            iter_function_idx (dict, optional): Variable that serves as an
+                index to iterate over variables. Defaults to None.
 
         Returns:
             list: Lines required to carry out a call to a model function in
@@ -2489,6 +2558,16 @@ checking if the model flag indicates
             outputs_in_inputs = cls.outputs_in_inputs
         func_inputs = cls.channels2vars(inputs)
         func_outputs = cls.channels2vars(outputs)
+        if iter_function_idx:
+            for src in [func_inputs, func_outputs]:
+                for i, x in enumerate(src):
+                    if 'iter_datatype' in x:
+                        src[i] = dict(
+                            x, datatype=x['iter_datatype'],
+                            name=('(%s)' % cls.format_function_param(
+                                'index', variable=x['name'],
+                                index=iter_function_idx['name'])),
+                            length_var=False)
         if isinstance(flag_var, dict):
             flag_var = flag_var['name']
         out = cls.write_function_call(
@@ -2512,6 +2591,11 @@ checking if the model flag indicates
                 on_failure = [cls.format_function_param(
                     'error', error_msg="Model call failed.")]
             out += cls.write_if_block(flag_cond, on_failure)
+        if iter_function_idx:
+            out = cls.write_for_loop(iter_function_idx['name'],
+                                     iter_function_idx['begin'],
+                                     iter_function_idx['end'],
+                                     out)
         return out
 
     @classmethod
@@ -3217,6 +3301,79 @@ checking if the model flag indicates
 
         """
         return cls.get_inverse_type_map()[native_type]
+
+    @classmethod
+    def write_initialize_iter(cls, var, value=None, requires_freeing=None):
+        r"""Get the lines necessary to initialize an array for iteration
+        output.
+
+        Args:
+            var (dict, str): Name or information dictionary for the variable
+                being initialized.
+            value (str, optional): Value that should be assigned to the
+                variable.
+            requires_freeing (list, optional): Existing list that variables
+                requiring freeing should be appended to. Defaults to None
+                and is ignored.
+
+        Returns:
+            list: The lines initializing the variable.
+
+        """
+        return cls.write_initialize(var, value=value,
+                                    requires_freeing=requires_freeing)
+
+    @classmethod
+    def write_finalize_iter(cls, var, value=None, requires_freeing=None):
+        r"""Get the lines necessary to finalize an array after iteration.
+
+        Args:
+            var (dict, str): Name or information dictionary for the variable
+                being initialized.
+            value (str, optional): Value that should be assigned to the
+                variable.
+            requires_freeing (list, optional): Existing list of variables
+                requiring freeing. Defaults to None and is ignored.
+
+        Returns:
+            list: The lines finalizing the variable.
+
+        """
+        return []
+
+    @classmethod
+    def write_initialize(cls, var, value=None, requires_freeing=None):
+        r"""Get the code necessary to initialize a variable.
+
+        Args:
+            var (dict, str): Name or information dictionary for the variable
+                being declared.
+            value (str, optional): Value that should be assigned to the
+                variable after it is declared.
+            requires_freeing (list, optional): Existing list that variables
+                requiring freeing should be appended to. Defaults to None
+                and is ignored.
+
+        Returns:
+            list: The lines initializing the variable.
+
+        """
+        out = []
+        if isinstance(var, str):  # pragma: no cover
+            var = {'name': var}
+        if (value is None) and isinstance(var.get('datatype', False), dict):
+            init_type = 'init_%s' % var['datatype']['type']
+            free_type = 'free_%s' % var['datatype']['type']
+            if init_type in cls.function_param:
+                assert(free_type in cls.function_param)
+                # value = cls.format_function_param(init_type, **var['datatype'])
+                value = cls.function_param[init_type]
+                if requires_freeing is not None:
+                    requires_freeing.append(var)
+        if value is not None:
+            out.append(cls.format_function_param(
+                'assign', name=var['name'], value=value))
+        return out
     
     @classmethod
     def write_declaration(cls, var, value=None, requires_freeing=None,
@@ -3255,17 +3412,8 @@ checking if the model flag indicates
             return out
         if definitions is None:
             definitions = out
-        if (value is None) and isinstance(var.get('datatype', False), dict):
-            init_type = 'init_%s' % var['datatype']['type']
-            free_type = 'free_%s' % var['datatype']['type']
-            if init_type in cls.function_param:
-                assert(free_type in cls.function_param)
-                value = cls.function_param[init_type]
-                if requires_freeing is not None:
-                    requires_freeing.append(var)
-        if value is not None:
-            definitions.append(cls.format_function_param(
-                'assign', name=var['name'], value=value))
+        definitions += cls.write_initialize(var, value=value,
+                                            requires_freeing=requires_freeing)
         return out
 
     @classmethod

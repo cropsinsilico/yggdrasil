@@ -2,6 +2,12 @@
 History
 =======
 
+1.6.4 (2021-06-XX) More minor bug fixes
+------------------
+
+* Fixed bug in configuraiton CLI triggered by running as a subcommand
+* Added support for iterating over array variables in automated wrapping via the 'iter_function_over' model parameter
+
 1.6.3 (2021-05-27) Minor bug fixes in preparation for CiS hackathon
 ------------------
 
