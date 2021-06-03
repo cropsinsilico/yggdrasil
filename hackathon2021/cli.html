@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>Command Line Interfaces (CLIs) &mdash; yggdrasil v1.6.3+2.g02efb8538.dirty documentation</title>
+  <title>Command Line Interfaces (CLIs) &mdash; yggdrasil v1.6.3+2.g5f7bdedf2.dirty documentation</title>
   
 
   
@@ -117,7 +117,13 @@
 <li class="toctree-l2"><a class="reference internal" href="debugging.html">Debugging</a></li>
 <li class="toctree-l2"><a class="reference internal" href="intro.html">Introduction to Yggdrasil</a></li>
 <li class="toctree-l2"><a class="reference internal" href="notebooks.html">Introduction to Jupyter Notebooks</a></li>
-<li class="toctree-l2 current"><a class="current reference internal" href="#">Command Line Interfaces (CLIs)</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Command Line Interfaces (CLIs)</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#running-integrations">Running Integrations</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#validating-integration-yaml-s">Validating Integration YAML(s)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#checking-the-installation">Checking the Installation</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#general-cli">General CLI</a></li>
+</ul>
+</li>
 </ul>
 </li>
 </ul>
@@ -191,7 +197,10 @@
             
   <div class="section" id="command-line-interfaces-clis">
 <h1>Command Line Interfaces (CLIs)<a class="headerlink" href="#command-line-interfaces-clis" title="Permalink to this headline">¶</a></h1>
-<p>Although the notebooks run integration via the <code class="docutils literal notranslate"><span class="pre">from</span> <span class="pre">yggdrasil.runner.run</span></code> Python method, the typical method for running integrations is via the command line using yggdrasil’s command line interface (CLI) <code class="docutils literal notranslate"><span class="pre">yggrun</span></code> (or <code class="docutils literal notranslate"><span class="pre">yggdrasil</span> <span class="pre">run</span></code>). You can try out the CLI by opening a terminal from the notebook server (as shown below).</p>
+<p>yggdrasil offers several command line interfaces (CLIs) that can be useful when developing or running an integration.</p>
+<div class="section" id="running-integrations">
+<h2>Running Integrations<a class="headerlink" href="#running-integrations" title="Permalink to this headline">¶</a></h2>
+<p>Although the notebooks run integration via the <code class="docutils literal notranslate"><span class="pre">from</span> <span class="pre">yggdrasil.runner.run</span></code> Python method, the typical method for running integrations is via the command line using the <code class="docutils literal notranslate"><span class="pre">yggrun</span></code> (or <code class="docutils literal notranslate"><span class="pre">yggdrasil</span> <span class="pre">run</span></code>) CLI. You can try out the CLI by opening a terminal from the notebook server (as shown below).</p>
 <img alt="../_images/cmd_open.png" src="../_images/cmd_open.png" />
 <p>Once the terminal is open, you can execute commands just as you would on a local command line.</p>
 <img alt="../_images/cmd_1.png" src="../_images/cmd_1.png" />
@@ -203,6 +212,22 @@
 </div>
 <img alt="../_images/cmd_5.png" src="../_images/cmd_5.png" />
 <p>The <code class="docutils literal notranslate"><span class="pre">--production-run</span></code> flag has the same effect as passing <code class="docutils literal notranslate"><span class="pre">production_run=True</span></code> to the <code class="docutils literal notranslate"><span class="pre">run</span></code> method in the notebook (disables some validation steps in order to improve performance).</p>
+</div>
+<div class="section" id="validating-integration-yaml-s">
+<h2>Validating Integration YAML(s)<a class="headerlink" href="#validating-integration-yaml-s" title="Permalink to this headline">¶</a></h2>
+<p>The <code class="docutils literal notranslate"><span class="pre">yggvalidate</span></code> (or <code class="docutils literal notranslate"><span class="pre">yggdrasil</span> <span class="pre">validate</span></code>) CLI allows users to check if a set of YAML files defining an integration is valid. This includes checking the YAML syntax, options and structure (via conformation to the schema), and connections (that there are not any unconnected inputs/outputs).</p>
+<img alt="../_images/yggvalidate_help.png" src="../_images/yggvalidate_help.png" />
+</div>
+<div class="section" id="checking-the-installation">
+<h2>Checking the Installation<a class="headerlink" href="#checking-the-installation" title="Permalink to this headline">¶</a></h2>
+<p>The <code class="docutils literal notranslate"><span class="pre">ygginfo</span></code> (or <code class="docutils literal notranslate"><span class="pre">yggdrasil</span> <span class="pre">info</span></code>) CLI prints out various information about the yggdrasil installation including versions of dependencies, locations of tools, language status (e.g. missing dependencies, options), etc.</p>
+<img alt="../_images/ygginfo_help.png" src="../_images/ygginfo_help.png" />
+</div>
+<div class="section" id="general-cli">
+<h2>General CLI<a class="headerlink" href="#general-cli" title="Permalink to this headline">¶</a></h2>
+<p>yggdrasil offers several other CLIs that are outside the scope of this introduction, but can be accessed via the <code class="docutils literal notranslate"><span class="pre">yggdrasil</span></code> CLI as subcommands. This is why the CLIs discussed above all have a second method of being run (e.g. <code class="docutils literal notranslate"><span class="pre">ygginfo</span></code> vs <code class="docutils literal notranslate"><span class="pre">yggdrasil</span> <span class="pre">info</span></code>).</p>
+<img alt="../_images/yggdrasil_help.png" src="../_images/yggdrasil_help.png" />
+</div>
 </div>
 
 

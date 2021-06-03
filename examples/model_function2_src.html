@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>&lt;no title&gt; &mdash; yggdrasil v1.6.3+2.g02efb8538.dirty documentation</title>
+  <title>&lt;no title&gt; &mdash; yggdrasil v1.6.3+2.g5f7bdedf2.dirty documentation</title>
   
 
   
@@ -180,60 +180,6 @@
            <div itemprop="articleBody">
             
   <p>Model Code:</p>
-<div class="highlight-c++ notranslate"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
- 2
- 3
- 4
- 5
- 6
- 7
- 8
- 9
-10
-11
-12
-13</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="cp">#include</span> <span class="cpf">&lt;iostream&gt;</span><span class="cp"></span>
-
-<span class="kt">int</span> <span class="nf">model_function</span><span class="p">(</span><span class="kt">char</span> <span class="o">*</span><span class="n">in</span><span class="p">,</span> <span class="kt">uint64_t</span> <span class="n">length_in</span><span class="p">,</span>
-		   <span class="kt">char</span><span class="o">*</span> <span class="o">&amp;</span><span class="n">out</span><span class="p">,</span> <span class="kt">uint64_t</span> <span class="o">&amp;</span><span class="n">length_out</span><span class="p">)</span> <span class="p">{</span>
-
-  <span class="n">length_out</span> <span class="o">=</span> <span class="n">length_in</span><span class="p">;</span>
-  <span class="n">out</span> <span class="o">=</span> <span class="p">(</span><span class="kt">char</span><span class="o">*</span><span class="p">)</span><span class="n">realloc</span><span class="p">(</span><span class="n">out</span><span class="p">,</span> <span class="n">length_in</span><span class="p">);</span>
-  <span class="n">memcpy</span><span class="p">(</span><span class="n">out</span><span class="p">,</span> <span class="n">in</span><span class="p">,</span> <span class="n">length_in</span><span class="p">);</span>
-  <span class="n">out</span><span class="p">[</span><span class="n">length_in</span><span class="p">]</span> <span class="o">=</span> <span class="sc">&#39;\0&#39;</span><span class="p">;</span>
-  <span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="s">&quot;Model A: &quot;</span> <span class="o">&lt;&lt;</span> <span class="n">out</span> <span class="o">&lt;&lt;</span> <span class="s">&quot; (length = &quot;</span> <span class="o">&lt;&lt;</span> <span class="n">length_out</span> <span class="o">&lt;&lt;</span> <span class="s">&quot;)&quot;</span> <span class="o">&lt;&lt;</span> <span class="n">std</span><span class="o">::</span><span class="n">endl</span><span class="p">;</span>
-  <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
-
-<span class="p">}</span>
-</pre></div>
-</td></tr></table></div>
-<div class="highlight-c++ notranslate"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
- 2
- 3
- 4
- 5
- 6
- 7
- 8
- 9
-10
-11
-12
-13</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="cp">#include</span> <span class="cpf">&lt;iostream&gt;</span><span class="cp"></span>
-
-<span class="kt">int</span> <span class="nf">model_function</span><span class="p">(</span><span class="kt">char</span> <span class="o">*</span><span class="n">in</span><span class="p">,</span> <span class="kt">uint64_t</span> <span class="n">length_in</span><span class="p">,</span>
-		   <span class="kt">char</span><span class="o">*</span> <span class="o">&amp;</span><span class="n">out</span><span class="p">,</span> <span class="kt">uint64_t</span> <span class="o">&amp;</span><span class="n">length_out</span><span class="p">)</span> <span class="p">{</span>
-
-  <span class="n">length_out</span> <span class="o">=</span> <span class="n">length_in</span><span class="p">;</span>
-  <span class="n">out</span> <span class="o">=</span> <span class="p">(</span><span class="kt">char</span><span class="o">*</span><span class="p">)</span><span class="n">realloc</span><span class="p">(</span><span class="n">out</span><span class="p">,</span> <span class="n">length_in</span><span class="p">);</span>
-  <span class="n">memcpy</span><span class="p">(</span><span class="n">out</span><span class="p">,</span> <span class="n">in</span><span class="p">,</span> <span class="n">length_in</span><span class="p">);</span>
-  <span class="n">out</span><span class="p">[</span><span class="n">length_in</span><span class="p">]</span> <span class="o">=</span> <span class="sc">&#39;\0&#39;</span><span class="p">;</span>
-  <span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="s">&quot;Model B: &quot;</span> <span class="o">&lt;&lt;</span> <span class="n">out</span> <span class="o">&lt;&lt;</span> <span class="s">&quot; (length = &quot;</span> <span class="o">&lt;&lt;</span> <span class="n">length_out</span> <span class="o">&lt;&lt;</span> <span class="s">&quot;)&quot;</span> <span class="o">&lt;&lt;</span> <span class="n">std</span><span class="o">::</span><span class="n">endl</span><span class="p">;</span>
-  <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
-  
-<span class="p">}</span>
-</pre></div>
-</td></tr></table></div>
 <p>(<a class="reference external" href="examples/model_function2.html">Example in other languages</a>)</p>
 
 

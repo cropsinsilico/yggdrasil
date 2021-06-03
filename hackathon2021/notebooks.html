@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>Introduction to Jupyter Notebooks &mdash; yggdrasil v1.6.3+2.g02efb8538.dirty documentation</title>
+  <title>Introduction to Jupyter Notebooks &mdash; yggdrasil v1.6.3+2.g5f7bdedf2.dirty documentation</title>
   
 
   
@@ -117,7 +117,10 @@
 <li class="toctree-l2"><a class="reference internal" href="setup.html">Setup</a></li>
 <li class="toctree-l2"><a class="reference internal" href="debugging.html">Debugging</a></li>
 <li class="toctree-l2"><a class="reference internal" href="intro.html">Introduction to Yggdrasil</a></li>
-<li class="toctree-l2 current"><a class="current reference internal" href="#">Introduction to Jupyter Notebooks</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Introduction to Jupyter Notebooks</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#some-notes-about-notebooks">Some notes about notebooks</a></li>
+</ul>
+</li>
 <li class="toctree-l2"><a class="reference internal" href="cli.html">Command Line Interfaces (CLIs)</a></li>
 </ul>
 </li>
@@ -228,6 +231,14 @@ differences in the time steps.</p></td>
 </tr>
 </tbody>
 </table>
+<div class="section" id="some-notes-about-notebooks">
+<h2>Some notes about notebooks<a class="headerlink" href="#some-notes-about-notebooks" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><p>Output from cells that is very long will be collapsed to a scrollable box in order to save space. Such outputs can can be expanded by clicking the rectangle on the left side of the output.</p></li>
+<li><p>The notebook server will allow you to execute cells out of order, but the notebooks provided for this hackathon assume that the cells are executed in the order they appear in the notebook. If you execute cells out of order, it is possible that they will fail if they depend on packages or variables defined in cells further up in the notebook.</p></li>
+<li><p>Interrupting the kernel while there is a yggdrasil integration running will only print out the status of the integration. To actually stop it, the interrupt must be performed twice in a short span of time (&lt;5 s). The same is true for interuppting a run on the command line via <code class="docutils literal notranslate"><span class="pre">Ctrl+C</span></code>. This allows users to check the status without constant status messages.</p></li>
+</ul>
+</div>
 </div>
 
 
