@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>Examples &mdash; yggdrasil v1.6.3+1.g236eabc85.dirty documentation</title>
+  <title>Examples &mdash; yggdrasil v1.6.3+2.g02efb8538.dirty documentation</title>
   
 
   
@@ -260,61 +260,64 @@
 <tr class="row-odd"><td><p><a class="reference internal" href="model_error.html#model-error-rst"><span class="std std-ref">model_error</span></a></p></td>
 <td><p>A single model that raises/returns an error.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="model_function.html#model-function-rst"><span class="std std-ref">model_function</span></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="model_function2.html#model-function2-rst"><span class="std std-ref">model_function2</span></a></p></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="model_function.html#model-function-rst"><span class="std std-ref">model_function</span></a></p></td>
 <td><p>Two models, A &amp; B, that send/receive strings. Model A receives input from a file and then sends it’s output to model B. Model B receives input from model A and sends it’s output to a file. Both models are functions that are automatically wrapped by yggdrasil with the appropriate interface calls. This example demonstrates the use of the <cite>function</cite> model YAML parameter and auto-wrapping.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="osr.html#osr-rst"><span class="std std-ref">osr</span></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="osr.html#osr-rst"><span class="std std-ref">osr</span></a></p></td>
 <td><p>Two models run in a time step synchonization pattern where one of the models is the OpenSimRoot simulation code and the other is a dummy stand in. This example demonstrates how to run OSR simulations as part of yggdrasil integrations and the use of the <cite>timesync</cite> model parameter and communication pattern.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="root_to_shoot.html#root-to-shoot-rst"><span class="std std-ref">root_to_shoot</span></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="root_to_shoot.html#root-to-shoot-rst"><span class="std std-ref">root_to_shoot</span></a></p></td>
 <td><p>Two models, a root model and a shoot model, that are both run via wrappers around functions. The root model receives the initial root mass, growth rate, and time steps from files. For each time step, the root model computes the new root mass and sends it to the shoot model. The shoot model receives the initial shoot mass, growth rate, and time steps from files. For each time step, the shoot model receives the new root mass from the root model, calculates the next shoot mass and outputs it to a file.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="rpcFib.html#rpcfib-rst"><span class="std std-ref">rpcFib</span></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="rpcFib.html#rpcfib-rst"><span class="std std-ref">rpcFib</span></a></p></td>
 <td><p>Three models (two clients, one server) run in a client-server, remote procedure call (RPC) communication pattern. The client models (<cite>rpcFibCli</cite> and <cite>rpcFibCliPar</cite>) send requests and receive response to/from the server model <cite>rpcFibSrv</cite>. The <cite>rpcFibCli</cite> model sends &amp; receives requests/responses via the deprecated <cite>rpcCall</cite> method (use <cite>call</cite> instead), while <cite>rpcFibCliPar</cite> uses the separate send/recv methods <cite>rpcSend</cite> and <cite>rpcRecv</cite> (use <cite>send</cite> &amp; <cite>recv</cite> instead). The server model receives requests and send responses. The <cite>rpcFibCli</cite> model also reads text data from and input file and sends each request/response pair to an output file. This example demostrates the RPC pattern through the use of the <cite>client_of</cite> and <cite>is_server</cite> model parameters and the RPC interface classes/functions, including splitting calls into their send/recv components. The models also receive parameters via the command line as specified in the YAML <cite>args</cite> model parameter.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="rpc_lesson1.html#rpc-lesson1-rst"><span class="std std-ref">rpc_lesson1</span></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="rpc_lesson1.html#rpc-lesson1-rst"><span class="std std-ref">rpc_lesson1</span></a></p></td>
 <td><p>Two models run in a client-server, remote procedure call (RPC) communication pattern. The client model <cite>client</cite> sends requests and receives response to/from the server model <cite>server</cite> via the deprecated <cite>call</cite> method. The server model receives requests and send responses. This example demostrates the RPC pattern through the use of the <cite>client_of</cite> and <cite>is_server</cite> model parameters and the RPC interface classes/functions. The <cite>client</cite> model also sends request/response pairs to a file.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="rpc_lesson2.html#rpc-lesson2-rst"><span class="std std-ref">rpc_lesson2</span></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="rpc_lesson2.html#rpc-lesson2-rst"><span class="std std-ref">rpc_lesson2</span></a></p></td>
 <td><p>Three models run in a client-server, remote procedure call (RPC) communication pattern. The two client models (<cite>client1</cite> &amp; <cite>client2</cite>) send requests and receive response to/from the server model <cite>server</cite> via the deprecated <cite>call</cite> method. The server model receives requests and send responses. This example demostrates the RPC pattern through the use of the <cite>client_of</cite> and <cite>is_server</cite> model parameters and the RPC interface classes/functions. The <cite>client1</cite> &amp; <cite>client2</cite> models also send request/response pairs to files in the temporary directory and receive parameters via the command line as specified in the YAML (both model call the same source code). The <cite>server</cite> model receives parameters as input from a file.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="rpc_lesson2b.html#rpc-lesson2b-rst"><span class="std std-ref">rpc_lesson2b</span></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="rpc_lesson2b.html#rpc-lesson2b-rst"><span class="std std-ref">rpc_lesson2b</span></a></p></td>
 <td><p>This example is identical to the <cite>rpc_lesson2</cite> example except that 2 copies of the server are run instead of 1 via the <cite>copies</cite> model parameter.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="rpc_lesson3.html#rpc-lesson3-rst"><span class="std std-ref">rpc_lesson3</span></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="rpc_lesson3.html#rpc-lesson3-rst"><span class="std std-ref">rpc_lesson3</span></a></p></td>
 <td><p>Two models run in a client-server, remote procedure call (RPC) communication pattern. The client model <cite>client</cite> sends requests and receives response to/from the server model <cite>server</cite> via the deprecated <cite>call</cite> method. The server model receives requests and send responses. The <cite>client</cite> model receives request data from a file and send responses to a file. In the case of both models, yggdrasil auto-wraps functions with interface calls at runtime. This example demostrates the RPC pattern through the use of the <cite>client_of</cite> and <cite>is_server</cite> model parameters and the RPC interface classes/functions in conjunction with automated wrapping of model functions, including the use of the <cite>global_scope</cite> interface parameter when autowrapping functions that contain interface calls themselves.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="rpc_lesson3b.html#rpc-lesson3b-rst"><span class="std std-ref">rpc_lesson3b</span></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="rpc_lesson3b.html#rpc-lesson3b-rst"><span class="std std-ref">rpc_lesson3b</span></a></p></td>
 <td><p>This example is identical to the <cite>rpc_lesson3</cite> example except that 10 copies of the <cite>server</cite> model are run via the <cite>copies</cite> model parameter and the <cite>client</cite> model makes calls the server from inside an OpenMP threaded loop. This example demonstrates the use of the RPC communication pattern in conjunction with automated model wrapping, OpenMP threading, and model duplication.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="sbml1.html#sbml1-rst"><span class="std std-ref">sbml1</span></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="sbml1.html#sbml1-rst"><span class="std std-ref">sbml1</span></a></p></td>
 <td><p>A single SBML model runs with input from a files and output to a file.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="sbml2.html#sbml2-rst"><span class="std std-ref">sbml2</span></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="sbml2.html#sbml2-rst"><span class="std std-ref">sbml2</span></a></p></td>
 <td><p>A single SBML model runs with input from a files and output to a series of files. This example demonstrates how to control the SBML integration via model parameters in the YAML (e.g. tolerance, time steps, initial conditions).</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="sbml3.html#sbml3-rst"><span class="std std-ref">sbml3</span></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="sbml3.html#sbml3-rst"><span class="std std-ref">sbml3</span></a></p></td>
 <td><p>A single SBML model runs with input from a files and output to a file. This example demonstrates the use of the <cite>only_output_final_step</cite> model parameter to only get the final output of the simulation.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="timed_pipe.html#timed-pipe-rst"><span class="std std-ref">timed_pipe</span></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="timed_pipe.html#timed-pipe-rst"><span class="std std-ref">timed_pipe</span></a></p></td>
 <td><p>This example is used for gathering performance information about communication between model in yggdrasil integrations and should only be run as part of the timing module.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="timesync1.html#timesync1-rst"><span class="std std-ref">timesync1</span></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="timesync1.html#timesync1-rst"><span class="std std-ref">timesync1</span></a></p></td>
 <td><p>Two models, A &amp; B, run simulations over time and exchange data via a timestep synchronization communication pattern. Both models compute the same variables (<cite>x</cite> and <cite>y</cite>) via the same source code and output data at each time step to a file, but they have different time steps.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="timesync2.html#timesync2-rst"><span class="std std-ref">timesync2</span></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="timesync2.html#timesync2-rst"><span class="std std-ref">timesync2</span></a></p></td>
 <td><p>Two models, A &amp; B, run simulations over time and exchange data via a timestep synchronization communication pattern. The timesync model <cite>statesync</cite> is explicit in the YAML and allows for specific control of the synchronization (e.g. relationship between variables, interpolation, aggregation). The models compute different variables, have different timesteps, and output data at each time step to a file. This example demonstrates more advanced use of the timesync communication pattern and YAML parameters.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="../transformed_io.html#transformed-io-rst"><span class="std std-ref">Transformed I/O</span></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="../transformed_io.html#transformed-io-rst"><span class="std std-ref">Transformed I/O</span></a></p></td>
 <td><p>Three models, A, B, &amp; C, pass messages which are transformed based on YAML parameters. Model A receives input from a tab delimited table and sends output to both models B &amp; C. The output to each model is transformed in different ways controlled by the <cite>transform</cite> comm model parameter. Models B &amp; C both send output to tables.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="transforms.html#transforms-rst"><span class="std std-ref">transforms</span></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="transforms.html#transforms-rst"><span class="std std-ref">transforms</span></a></p></td>
 <td><p>This example is used by yggdrasil to test the support transformations in each of the supported languages and should not be used outside of the tests.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="types.html#types-rst"><span class="std std-ref">types</span></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="types.html#types-rst"><span class="std std-ref">types</span></a></p></td>
 <td><p>This example is used by yggdrasil to test the serialization/deserialization of the supported types between the supported languages and should not be used outside of the <cite>types</cite> test suite (run via <cite>yggtest –test-suite=types</cite>).</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="wofost.html#wofost-rst"><span class="std std-ref">wofost</span></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="wofost.html#wofost-rst"><span class="std std-ref">wofost</span></a></p></td>
 <td><p>A single model receives input from a WOFOST-style parameter file and sends output to a file. This example demonstrates how to interact with generic data structures containing maps in the compiled languages.</p></td>
 </tr>
 </tbody>

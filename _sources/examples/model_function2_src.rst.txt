@@ -1,0 +1,12 @@
+Model Code:
+
+.. literalinclude:: /../../yggdrasil/examples/model_function2/src/model_function_modelA.cpp
+   :language: c++
+   :linenos:
+
+.. literalinclude:: /../../yggdrasil/examples/model_function2/src/model_function_modelB.cpp
+   :language: c++
+   :linenos:
+
+
+(`Example in other languages <examples/model_function2.html>`__)

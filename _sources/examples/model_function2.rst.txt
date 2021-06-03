@@ -1,0 +1,95 @@
+.. _model_function2_rst:
+
+model_function2
+=========================================
+
+.. contents:: :local:
+
+C++ Version
+-----------
+
+Model Code:
+
+.. literalinclude:: /../../yggdrasil/examples/model_function2/src/model_function_modelA.cpp
+   :language: c++
+   :linenos:
+
+.. literalinclude:: /../../yggdrasil/examples/model_function2/src/model_function_modelB.cpp
+   :language: c++
+   :linenos:
+
+
+Model YAML:
+
+.. literalinclude:: /../../yggdrasil/examples/model_function2/model_function2_cpp.yml
+   :language: yaml
+   :linenos:
+
+
+
+Fortran Version
+---------------
+
+Model Code:
+
+.. literalinclude:: /../../yggdrasil/examples/model_function2/src/model_function_modelA.f90
+   :language: python
+   :linenos:
+
+.. literalinclude:: /../../yggdrasil/examples/model_function2/src/model_function_modelB.f90
+   :language: python
+   :linenos:
+
+
+Model YAML:
+
+.. literalinclude:: /../../yggdrasil/examples/model_function2/model_function2_fortran.yml
+   :language: yaml
+   :linenos:
+
+
+
+Matlab Version
+--------------
+
+Model Code:
+
+.. literalinclude:: /../../yggdrasil/examples/model_function2/src/model_function_modelA.m
+   :language: matlab
+   :linenos:
+
+.. literalinclude:: /../../yggdrasil/examples/model_function2/src/model_function_modelB.m
+   :language: matlab
+   :linenos:
+
+
+Model YAML:
+
+.. literalinclude:: /../../yggdrasil/examples/model_function2/model_function2_matlab.yml
+   :language: yaml
+   :linenos:
+
+
+
+R Version
+---------
+
+Model Code:
+
+.. literalinclude:: /../../yggdrasil/examples/model_function2/src/model_function_modelA.R
+   :language: python
+   :linenos:
+
+.. literalinclude:: /../../yggdrasil/examples/model_function2/src/model_function_modelB.R
+   :language: python
+   :linenos:
+
+
+Model YAML:
+
+.. literalinclude:: /../../yggdrasil/examples/model_function2/model_function2_r.yml
+   :language: yaml
+   :linenos:
+
+
+
