@@ -13,3 +13,4 @@ These materials walk through some of the basics to using |yggdrasil| to connect 
    intro
    notebooks
    cli
+   integration
