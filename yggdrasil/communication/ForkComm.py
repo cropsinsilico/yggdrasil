@@ -463,7 +463,8 @@ class ForkComm(CommBase.CommBase):
         if complete():
             if self.pattern == 'cycle':
                 idx, out = next(iter(out_gather.items()))
-                out.args = {idx: copy.deepcopy(out)}
+                args_copy = copy.deepcopy(out)
+                out.args = {idx: args_copy}
             elif self.pattern == 'gather':
                 out = copy.deepcopy(next(iter(out_gather.values())))
                 out.args = {idx: v for idx, v in out_gather.items()}

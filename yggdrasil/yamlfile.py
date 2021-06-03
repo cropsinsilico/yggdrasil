@@ -494,7 +494,8 @@ def parse_model(yml, existing):
     yml['model_index'] = len(existing['model'])
     for io in ['inputs', 'outputs']:
         for x in yml[io]:
-            if yml.get('function', False) and (not x.get('outside_loop', False)):
+            if ((yml.get('function', False) and (not x.get('outside_loop', False))
+                 and yml.get('is_server', False))):
                 x.setdefault('dont_copy', True)
             if yml.get('allow_threading', False) or (
                     (yml.get('copies', 1) > 1)

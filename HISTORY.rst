@@ -2,6 +2,12 @@
 History
 =======
 
+1.6.4 (2021-06-XX) Minor bug fixes
+------------------
+
+* Fixed error in ygginstall when called w/ 'all' (also triggered by yggdevup)
+* Only assume dont_copy should be true for wrapped functions that are called as servers
+
 1.6.3 (2021-05-27) Minor bug fixes in preparation for CiS hackathon
 ------------------
 
