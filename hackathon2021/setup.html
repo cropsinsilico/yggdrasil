@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>Setup &mdash; yggdrasil v1.6.3+3.g94d79515e.dirty documentation</title>
+  <title>Setup &mdash; yggdrasil v1.6.3+3.ge84f31dd0.dirty documentation</title>
   
 
   
@@ -274,13 +274,13 @@
 <li><p><strong>Download and install docker</strong> from <a class="reference external" href="https://docs.docker.com/get-docker/">here</a>.</p></li>
 <li><p><strong>Sign-up for DockerHub</strong> <a class="reference external" href="https://hub.docker.com/">here</a>, start docker, and sign-in using your docker hub credentials (either via the desktop app or the <a class="reference external" href="https://docs.docker.com/engine/reference/commandline/login/">command line</a>).</p></li>
 <li><p><strong>Pull the hackathon image</strong> from <a class="reference external" href="https://hub.docker.com/r/langmm/hackathon2021">docker hub</a>:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">docker</span> <span class="n">pull</span> <span class="n">langmm</span><span class="o">/</span><span class="n">hackathon2021</span><span class="p">:</span><span class="mf">0.0</span><span class="o">.</span><span class="mi">5</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">docker</span> <span class="n">pull</span> <span class="n">langmm</span><span class="o">/</span><span class="n">hackathon2021</span><span class="p">:</span><span class="mf">0.0</span><span class="o">.</span><span class="mi">6</span>
 </pre></div>
 </div>
 </li>
 <li><p><strong>Create a work directory</strong> that the hackathon container will be used to store updates to the notebooks and compilation products. This can be any directory that you have write access to.</p></li>
 <li><p><strong>Start a container</strong> from the hackathon image by running the command below, replacing <code class="docutils literal notranslate"><span class="pre">&lt;some</span> <span class="pre">directory</span> <span class="pre">name&gt;</span></code> with the full path to the directory you wish the image to use:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>docker run -it --rm -p 8888:8888 -e NB_UID=$(id -u) --user root -v &lt;some directory name&gt;:/tmp langmm/hackathon2021:0.0.5
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>docker run -it --rm -p 8888:8888 -e NB_UID=$(id -u) --user root -v &lt;some directory name&gt;:/tmp langmm/hackathon2021:0.0.6
 </pre></div>
 </div>
 </li>
