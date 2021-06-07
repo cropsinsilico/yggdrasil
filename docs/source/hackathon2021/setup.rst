@@ -82,12 +82,12 @@ Docker containers allow developer to package the entire stack (operating system,
 #. **Sign-up for DockerHub** `here <https://hub.docker.com/>`_, start docker, and sign-in using your docker hub credentials (either via the desktop app or the `command line <https://docs.docker.com/engine/reference/commandline/login/>`_).
 #. **Pull the hackathon image** from `docker hub <https://hub.docker.com/r/langmm/hackathon2021>`_::
 
-     docker pull langmm/hackathon2021:0.0.6
+     docker pull langmm/hackathon2021:0.0.7
      
 #. **Create a work directory** that the hackathon container will be used to store updates to the notebooks and compilation products. This can be any directory that you have write access to.
 #. **Start a container** from the hackathon image by running the command below, replacing ``<some directory name>`` with the full path to the directory you wish the image to use::
 
-       docker run -it --rm -p 8888:8888 -e NB_UID=$(id -u) --user root -v <some directory name>:/tmp langmm/hackathon2021:0.0.6
+       docker run -it --rm -p 8888:8888 -e NB_UID=$(id -u) --user root -v <some directory name>:/tmp langmm/hackathon2021:0.0.7
 
    ..
       * Running the `langmm/hackathon2021` from the docker desktop app by clicking the run button shown below
