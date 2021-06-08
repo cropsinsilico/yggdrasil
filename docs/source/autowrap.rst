@@ -13,7 +13,7 @@ In order to allow |yggdrasil| to wrap model functions, the corresponding entry i
 
 	     
 Notes on Autowrapping C/C++ Model Functions
-===========================================
+-------------------------------------------
 
 The autowrapping of C/C++ models differs from other languages in several respects.
 

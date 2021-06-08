@@ -24,3 +24,10 @@ Notebook              Description
 		      differences in the time steps.
 03-misc.ipynb         Calling models as functions from Python.
 ====================  =======================================================
+
+Some notes about notebooks
+==========================
+
+* Output from cells that is very long will be collapsed to a scrollable box in order to save space. Such outputs can can be expanded by clicking the rectangle on the left side of the output.
+* The notebook server will allow you to execute cells out of order, but the notebooks provided for this hackathon assume that the cells are executed in the order they appear in the notebook. If you execute cells out of order, it is possible that they will fail if they depend on packages or variables defined in cells further up in the notebook.
+* Interrupting the kernel while there is a yggdrasil integration running will only print out the status of the integration. To actually stop it, the interrupt must be performed twice in a short span of time (<5 s). The same is true for interuppting a run on the command line via ``Ctrl+C``. This allows users to check the status without constant status messages.

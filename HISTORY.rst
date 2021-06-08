@@ -7,6 +7,8 @@ History
 
 * Fixed bug in configuraiton CLI triggered by running as a subcommand
 * Added support for iterating over array variables in automated wrapping via the 'iter_function_over' model parameter
+* Fixed error in ygginstall when called w/ 'all' (also triggered by yggdevup)
+* Only assume dont_copy should be true for wrapped functions that are called as servers
 
 1.6.3 (2021-05-27) Minor bug fixes in preparation for CiS hackathon
 ------------------
