@@ -1024,12 +1024,17 @@ int comm_recv_multipart(comm_t *x, char **data, const size_t len,
       return -2;
     }
     // Get datatype information from header on first recv
-    dtype_t *updtype;
+    dtype_t *updtype = NULL;
     if (x->type == SERVER_COMM) {
       comm_t *handle = (comm_t*)(x->handle);
       updtype = handle->datatype;
     } else {
       updtype = x->datatype;
+    }
+    if (updtype == NULL) {
+      ygglog_error("comm_recv_multipart(%s): Datatype is NULL.", x->name);
+      destroy_header(&head);
+      return -1;
     }
     if ((!(x->const_flags[0] & COMM_FLAGS_USED)) && (!(x->flags & COMM_FLAG_FILE)) && (updtype->obj == NULL) && (!(head.flags & HEAD_TYPE_IN_DATA))) {
       ygglog_debug("comm_recv_multipart(%s): Updating datatype to '%s'",
@@ -1041,6 +1046,8 @@ int comm_recv_multipart(comm_t *x, char **data, const size_t len,
 	return -1;
       }
     } else if ((!(x->flags & COMM_FLAG_FILE)) && (head.dtype != NULL)) {
+      ygglog_debug("comm_recv_multipart(%s): Updating existing datatype to '%s' from '%s'",
+		   x->name, head.dtype->type, updtype->type);
       ret = update_dtype(updtype, head.dtype);
       if (ret != 0) {
 	ygglog_error("comm_recv_multipart(%s): Error updating existing datatype.", x->name);
@@ -1049,6 +1056,7 @@ int comm_recv_multipart(comm_t *x, char **data, const size_t len,
       }
     }
     if (head.flags & HEAD_FLAG_MULTIPART) {
+      ygglog_debug("comm_recv_multipart(%s): Message is multipart", x->name);
       // Return early if header contained entire message
       if (head.size == head.bodysiz) {
         x->const_flags[0] = x->const_flags[0] | COMM_FLAGS_USED;
@@ -1132,6 +1140,7 @@ int comm_recv_multipart(comm_t *x, char **data, const size_t len,
       }
       free_comm(xmulti);
     } else {
+      ygglog_debug("comm_recv_multipart(%s): Message not multipart", x->name);
       ret = (int)(head.bodysiz);
     }
   }

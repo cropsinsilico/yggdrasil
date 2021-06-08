@@ -468,47 +468,7 @@ class ModelDriver(Driver):
         self.wrapper_products = []
         # Update for function
         if self.function:
-            if self.is_server:
-                assert(isinstance(self.is_server, dict))
-            if self.function_param is None:
-                raise ValueError(("Language %s is not parameterized "
-                                  "and so functions cannot be automatically "
-                                  "wrapped as a model.") % self.language)
-            self.model_function_file = self.get_source_file(args)
-            if not os.path.isfile(self.model_function_file):
-                raise ValueError("Source file does not exist: '%s'"
-                                 % self.model_function_file)
-            model_dir, model_base = os.path.split(self.model_function_file)
-            model_base = os.path.splitext(model_base)[0]
-            args[0] = os.path.join(model_dir, 'ygg_' + model_base
-                                   + self.language_ext[0])
-            # Write file
-            if (not os.path.isfile(args[0])) or self.overwrite:
-                client_comms = ['%s:%s_%s' % (self.name, x, self.name)
-                                for x in self.client_of]
-                self.model_function_inputs = copy.copy(self.inputs)
-                self.model_function_outputs = copy.copy(self.outputs)
-                self.expand_server_io(
-                    self.model_function_inputs, self.model_function_outputs,
-                    client_comms=client_comms)
-                expected_outputs = []
-                for x in self.model_function_outputs:
-                    expected_outputs += x.get('vars', [])
-                self.model_function_info = self.parse_function_definition(
-                    self.model_function_file, self.function,
-                    expected_outputs=expected_outputs)
-                if self.model_outputs_in_inputs is None:
-                    self.model_outputs_in_inputs = self.model_function_info.get(
-                        'outputs_in_inputs', None)
-                lines = self.write_model_wrapper(
-                    self.model_function_info, self.function,
-                    inputs=self.model_function_inputs,
-                    outputs=self.model_function_outputs,
-                    outputs_in_inputs=self.model_outputs_in_inputs,
-                    iter_function_over=self.iter_function_over,
-                    copies=self.copies)
-                with open(args[0], 'w') as fd:
-                    fd.write('\n'.join(lines))
+            args = [self.init_from_function(args)]
         # Parse arguments
         self.debug(str(args))
         self.parse_arguments(args)
@@ -682,6 +642,54 @@ class ModelDriver(Driver):
         self.model_dir = os.path.dirname(self.model_file)
         self.debug("model_file = '%s', model_dir = '%s', model_args = '%s'",
                    self.model_file, self.model_dir, self.model_args)
+
+    def init_from_function(self, args):
+        r"""Initialize model parameters based on the wrapped function."""
+        if self.is_server:
+            assert(isinstance(self.is_server, dict))
+        if self.function_param is None:
+            raise ValueError(("Language %s is not parameterized "
+                              "and so functions cannot be automatically "
+                              "wrapped as a model.") % self.language)
+        self.model_function_file = self.get_source_file(args)
+        if not os.path.isfile(self.model_function_file):
+            raise ValueError("Source file does not exist: '%s'"
+                             % self.model_function_file)
+        model_dir, model_base = os.path.split(self.model_function_file)
+        model_base = os.path.splitext(model_base)[0]
+        wrapper_fname = os.path.join(model_dir, 'ygg_' + model_base
+                                     + self.language_ext[0])
+        # Update input/outputs based on parsed source code
+        client_comms = ['%s:%s_%s' % (self.name, x, self.name)
+                        for x in self.client_of]
+        self.model_function_inputs = copy.copy(self.inputs)
+        self.model_function_outputs = copy.copy(self.outputs)
+        self.expand_server_io(
+            self.model_function_inputs, self.model_function_outputs,
+            client_comms=client_comms)
+        expected_outputs = []
+        for x in self.model_function_outputs:
+            expected_outputs += x.get('vars', [])
+        self.model_function_info = self.parse_function_definition(
+            self.model_function_file, self.function,
+            expected_outputs=expected_outputs)
+        if self.model_outputs_in_inputs is None:
+            self.model_outputs_in_inputs = self.model_function_info.get(
+                'outputs_in_inputs', None)
+        lines = self.write_model_wrapper(
+            self.model_function_info, self.function,
+            inputs=self.model_function_inputs,
+            outputs=self.model_function_outputs,
+            outputs_in_inputs=self.model_outputs_in_inputs,
+            iter_function_over=self.iter_function_over,
+            copies=self.copies)
+        # Update connections?
+        # import pdb; pdb.set_trace()
+        # Write file
+        if (not os.path.isfile(wrapper_fname)) or self.overwrite:
+            with open(wrapper_fname, 'w') as fd:
+                fd.write('\n'.join(lines))
+        return wrapper_fname
 
     @property
     def numeric_logging_level(self):
@@ -1979,18 +1987,19 @@ class ModelDriver(Driver):
             for x in io_var:
                 for v in x.get('vars', [x]):
                     if v['name'] in iter_function_over:
-                        v['iter_datatype'] = v.pop('datatype', {})
-                        if v['iter_datatype']:
-                            assert(v['iter_datatype']['type'] == 'scalar')
-                            v['datatype'] = copy.deepcopy(v['iter_datatype'])
+                        v['iter_datatype'] = copy.deepcopy(v.get('datatype', {}))
+                        if v.get('datatype', {}):
+                            assert(v['datatype']['type'] == 'scalar')
                             v['datatype']['type'] = '1darray'
+                            v.pop('native_type', None)
+                        v['native_type'] = cls.get_native_type(**v)
         return flag_var
 
     @classmethod
     def write_model_wrapper(cls, model_file, model_function,
                             inputs=[], outputs=[],
                             outputs_in_inputs=None, verbose=False, copies=1,
-                            iter_function_over=[]):
+                            iter_function_over=[], verbose_model=False):
         r"""Return the lines required to wrap a model function as an integrated
         model.
 
@@ -2013,6 +2022,8 @@ class ModelDriver(Driver):
             iter_function_over (array, optional): Variable(s) that should be
                 received or sent as an array, but iterated over. Defaults to
                 an empty array and is ignored.
+            verbose_model (bool, optional): If True, print statements will
+                be added after every line in the model. Defaults to False.
 
         Returns:
             list: Lines of code wrapping the provided model with the necessary
@@ -2035,6 +2046,8 @@ class ModelDriver(Driver):
             model_file = model_file['model_file']
         # Update types based on iteration
         iter_function_idx = None
+        iter_ivars = []
+        iter_ovars = []
         if iter_function_over:
             iter_function_idx = {'name': 'idx_func_iter',
                                  'datatype': {'type': 'int'}}
@@ -2042,23 +2055,28 @@ class ModelDriver(Driver):
                 iter_function_idx['begin'] = int(0)
             else:
                 iter_function_idx['begin'] = int(1)
-            iter_vars = []
             for x in inputs:
-                iter_vars += x.get('vars', [x])
-            if not iter_vars:  # pragma: debug
+                iter_ivars += [v for v in x.get('vars', [x])
+                               if v['name'] in iter_function_over]
+            if not iter_ivars:  # pragma: debug
                 raise RuntimeError("The iter_function_over model "
                                    "parameter must include an input to "
                                    "iterate over. To expand output arrays "
                                    "into component elements, use the "
                                    "'iterate' transformation.")
             for x in outputs:
-                iter_vars += x.get('vars', [x])
-            if iter_vars[0].get('length_var', False):
-                iter_function_idx['end'] = iter_vars[0]['length_var']
+                iter_ovars += [v for v in x.get('vars', [x])
+                               if v['name'] in iter_function_over]
+            if iter_ivars[0].get('length_var', False):
+                iter_function_idx['end'] = iter_ivars[0]['length_var']
+                for v in iter_ovars:
+                    v['length_var'] = iter_ivars[0]['length_var']['name']
+                if isinstance(iter_function_idx['end'], dict):
+                    iter_function_idx['end'] = iter_function_idx['end']['name']
             else:
                 iter_function_idx['end'] = cls.format_function_param(
-                    'len', variable=iter_vars[0]['name'])
-            for v in iter_vars:
+                    'len', variable=iter_ivars[0]['name'])
+            for v in iter_ivars + iter_ovars:
                 v['iter_var'] = iter_function_idx
         # Declare variables and flag, then define flag
         lines = []
@@ -2091,6 +2109,7 @@ class ModelDriver(Driver):
                         v, definitions=definitions,
                         requires_freeing=free_vars)
             lines += definitions
+        nline_preamble = len(lines)
         lines.append(cls.format_function_param(
             'assign', name=flag_var['name'],
             value=cls.function_param.get(
@@ -2126,22 +2145,20 @@ class ModelDriver(Driver):
                                                    iter_var=loop_iter_var,
                                                    allow_failure=True)
         # Prepare output array
-        if iter_function_over and ('declare' not in cls.function_param):
-            for x in outputs:
-                for v in x.get('vars', [x]):
-                    if v['name'] in iter_function_over:
-                        loop_lines += cls.write_initialize_iter(v)
+        if iter_function_over:
+            for v in iter_ovars:
+                if v['name'] in iter_function_over:
+                    loop_lines += cls.write_initialize_iter(v)
         # Call model
         loop_lines += cls.write_model_function_call(
             model_function, model_flag, inputs, outputs,
             outputs_in_inputs=outputs_in_inputs,
             iter_function_idx=iter_function_idx)
         # Finalize output array
-        if iter_function_over and ('declare' not in cls.function_param):
-            for x in outputs:
-                for v in x.get('vars', [x]):
-                    if v['name'] in iter_function_over:
-                        loop_lines += cls.write_finalize_iter(v)
+        if iter_function_over:
+            for v in iter_ovars:
+                if v['name'] in iter_function_over:
+                    loop_lines += cls.write_finalize_iter(v)
         # Send outputs
         for x in outputs:
             if not x.get('outside_loop', False):
@@ -2170,6 +2187,16 @@ class ModelDriver(Driver):
         # Free variables
         for x in free_vars:
             lines += cls.write_free(x)
+        # Add prints
+        if verbose_model:  # pragma: debug
+            idx = len(lines) - 1
+            while (idx > nline_preamble):
+                if 'else' not in lines[idx]:
+                    indent = ' ' * (len(lines[idx])
+                                    - len(lines[idx].lstrip()))
+                    lines.insert(idx, indent + cls.format_function_param(
+                        'print', message=("%s: line %d" % (model_file, idx))))
+                idx -= 1
         # Wrap as executable with interface & model import
         prefix = None
         if 'interface' in cls.function_param:
@@ -3278,13 +3305,15 @@ class ModelDriver(Driver):
         if 'native_type' in kwargs:
             return kwargs['native_type']
         assert('json_type' not in kwargs)
-        json_type = kwargs.get('datatype', kwargs.get('type', 'bytes'))
+        json_type = kwargs.get('datatype', kwargs)
         if isinstance(json_type, dict):
-            type_name = json_type['type']
+            type_name = json_type.get('type', 'bytes')
             if type_name == 'scalar':
                 type_name = json_type['subtype']
         else:
             type_name = json_type
+            if type_name == 'scalar':
+                type_name = kwargs['subtype']
         if (type_name == 'flag') and (type_name not in cls.type_map):
             type_name = 'boolean'
         return cls.type_map[type_name]

@@ -451,12 +451,19 @@ class YggRunner(YggClass):
             try:
                 self.modeldrivers[model].setdefault('env', {})
                 self.modeldrivers[model]['env'].update(env)
+                if 'instance' in self.modeldrivers[model]:
+                    self.modeldrivers[model]['instance'].env.update(env)
             except KeyError:
                 model0 = model.split('_copy')[0]
                 if (((model0 in self.modeldrivers)
                      and (self.modeldrivers[model0].get('copies', 0) > 1))):
                     self.modeldrivers[model0].setdefault('env_%s' % model, {})
                     self.modeldrivers[model0]['env_%s' % model].update(env)
+                    if 'instance' in self.modeldrivers[model0]:
+                        for x in self.modeldrivers[model0]['instance'].copies:
+                            if x.name == model:
+                                x.env.update(env)
+                                break
                 else:  # pragma: debug
                     raise
         return drv
@@ -467,14 +474,14 @@ class YggRunner(YggClass):
         self.debug('')
         driver = dict(name='name')
         try:
-            # Create connection drivers
-            self.debug("Loading connection drivers")
-            for driver in self.connectiondrivers.values():
-                self.create_connection_driver(driver)
             # Create model drivers
             self.debug("Loading model drivers")
             for driver in self.modeldrivers.values():
                 self.createModelDriver(driver)
+            # Create connection drivers
+            self.debug("Loading connection drivers")
+            for driver in self.connectiondrivers.values():
+                self.create_connection_driver(driver)
         except BaseException:  # pragma: debug
             self.error("%s could not be created.", driver['name'])
             self.terminate()

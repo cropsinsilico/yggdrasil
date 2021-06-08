@@ -42,4 +42,4 @@ case $1 in
 	;;
 esac
 
-yggrun $yaml
+yggrun $yaml $2

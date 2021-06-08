@@ -1104,8 +1104,10 @@ class CModelDriver(CompiledModelDriver):
         for x in outputs:
             for v in x['vars']:
                 if cls.requires_length_var(v) and (not v.get('length_var', False)):
-                    if v['datatype']['type'] in ['1darray', 'ndarray']:  # pragma: debug
-                        raise RuntimeError("Length must be defined for arrays.")
+                    if v['datatype']['type'] in ['1darray', 'ndarray']:
+                        if 'iter_datatype' not in v:  # pragma: debug
+                            raise RuntimeError("Length must be defined for "
+                                               "arrays.")
                     elif v['datatype'].get('subtype', v['datatype']['type']) == 'bytes':
                         v['length_var'] = 'strlen(%s)' % v['name']
                     else:
@@ -1270,7 +1272,7 @@ class CModelDriver(CompiledModelDriver):
         if not ((out == '*') or ('X' in out) or (out == 'double')):
             return out
         from yggdrasil.metaschema.datatypes import get_type_class
-        json_type = kwargs.get('datatype', kwargs.get('type', 'bytes'))
+        json_type = kwargs.get('datatype', kwargs)
         if isinstance(json_type, str):
             json_type = {'type': json_type}
         # if 'type' in kwargs:
@@ -1444,6 +1446,30 @@ class CModelDriver(CompiledModelDriver):
                 for_yggdrasil=True)
         return super(CModelDriver, cls).write_model_recv(channel, recv_var_str, **kwargs)
             
+    @classmethod
+    def write_initialize_iter(cls, var, value=None, **kwargs):
+        r"""Get the lines necessary to initialize an array for iteration
+        output.
+
+        Args:
+            var (dict, str): Name or information dictionary for the variable
+                being initialized.
+            value (str, optional): Value that should be assigned to the
+                variable.
+            **kwargs: Additional keyword arguments are passed to the
+                parent class's method.
+
+        Returns:
+            list: The lines initializing the variable.
+
+        """
+        value = '({type}*)realloc({name}, {length}*sizeof({type}))'.format(
+            type=cls.get_native_type(**var['iter_datatype']),
+            name=var['name'], length=var['iter_var']['end'])
+        out = super(CModelDriver, cls).write_initialize_iter(
+            var, value=value, **kwargs)
+        return out
+    
     @classmethod
     def write_declaration(cls, var, **kwargs):
         r"""Return the lines required to declare a variable with a certain
