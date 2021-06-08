@@ -41,6 +41,13 @@ The ``ygginfo`` (or ``yggdrasil info``) CLI prints out various information about
 
 .. image:: images/command_line/ygginfo_help.png
 
+Configuring the Installation
+============================
+
+The ``yggconfig`` (or ``yggdrasil config``) CLI allows the user to adjust the |yggdrasil| installation including compiler/linker/interpreter versions, distabling/enabling languages, setting run time defaults, etc.
+
+.. image:: images/command_line/yggconfig_help_1.png
+
 General CLI
 ===========
 
