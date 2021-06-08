@@ -1257,7 +1257,6 @@ class ModelDriver(Driver):
                     out.update(model_env[self.name])
                 elif base_name in model_env:
                     out.update(model_env[base_name])
-                print(self.name, model_env)
         return out
 
     @classmethod
