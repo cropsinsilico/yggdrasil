@@ -989,14 +989,14 @@ def verify_pkg(install_opts=None):
         install_opts['fortran'] = False
     elif (not install_opts['fortran']) and shutil.which('gfortran'):
         install_opts['fortran'] = True
-    if (not install_opts['R']) and shutil.which('Rscript'):
-        if not (_on_gha and _is_linux):
-            # The installation on GHA-ubuntu machines requires sudo
-            # and so installation will not be complete unless it is
-            # enabled explicitly. This does not seem to be True on
-            # GHA-macos builds and R is not installed by default on
-            # Travis/Appveyor.
-            install_opts['R'] = True
+    # if (not install_opts['R']) and shutil.which('Rscript'):
+    #     if not (_on_gha and _is_linux):
+    #         # The installation on GHA-ubuntu machines requires sudo
+    #         # and so installation will not be complete unless it is
+    #         # enabled explicitly. This does not seem to be True on
+    #         # GHA-macos builds and R is not installed by default on
+    #         # Travis/Appveyor.
+    #         install_opts['R'] = True
     if (not install_opts['c']) and shutil.which('gcc') and (not _is_win):
         install_opts['c'] = True
     src_dir = os.path.join(os.getcwd(),
@@ -1036,6 +1036,12 @@ def verify_pkg(install_opts=None):
             errors.append("Language '%s' should be installed, but is not."
                           % name)
         elif (not flag) and is_lang_installed(name):
+            if name in ['R']:
+                # Allow R to be installed even if the settings is not as
+                # packages may be installed from CRAN, unless there is an
+                # error which can occur when a new release of a dependency
+                # comes out but there are not yet binaries available
+                continue
             errors.append("Language '%s' should NOT be installed, but is."
                           % name)
     for name in ['zmq', 'rmq']:
