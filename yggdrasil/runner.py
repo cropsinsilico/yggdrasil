@@ -418,56 +418,6 @@ class YggRunner(YggClass):
             os.chdir(curpath)
         return instance
 
-    def createModelDriver(self, yml):
-        r"""Create a model driver instance from the yaml information.
-
-        Args:
-            yml (yaml): Yaml object containing driver information.
-
-        Returns:
-            object: An instance of the specified driver.
-
-        """
-        drv = self.create_driver(yml)
-        self.debug("Model %s:, env: %s",
-                   yml['name'], pformat(yml['instance'].env))
-        return drv
-
-    def create_connection_driver(self, yml):
-        r"""Create a connection driver instance from the yaml information.
-
-        Args:
-            yml (yaml): Yaml object containing driver information.
-
-        Returns:
-            object: An instance of the specified driver.
-
-        """
-        yml['task_method'] = self.connection_task_method
-        drv = self.create_driver(yml)
-        # Transfer connection addresses to model via env
-        # TODO: Change to server that tracks connections
-        for model, env in drv.model_env.items():
-            try:
-                self.modeldrivers[model].setdefault('env', {})
-                self.modeldrivers[model]['env'].update(env)
-                if 'instance' in self.modeldrivers[model]:
-                    self.modeldrivers[model]['instance'].env.update(env)
-            except KeyError:
-                model0 = model.split('_copy')[0]
-                if (((model0 in self.modeldrivers)
-                     and (self.modeldrivers[model0].get('copies', 0) > 1))):
-                    self.modeldrivers[model0].setdefault('env_%s' % model, {})
-                    self.modeldrivers[model0]['env_%s' % model].update(env)
-                    if 'instance' in self.modeldrivers[model0]:
-                        for x in self.modeldrivers[model0]['instance'].copies:
-                            if x.name == model:
-                                x.env.update(env)
-                                break
-                else:  # pragma: debug
-                    raise
-        return drv
-        
     def loadDrivers(self):
         r"""Load all of the necessary drivers, doing the IO drivers first
         and adding IO driver environmental variables back tot he models."""
@@ -477,11 +427,14 @@ class YggRunner(YggClass):
             # Create model drivers
             self.debug("Loading model drivers")
             for driver in self.modeldrivers.values():
-                self.createModelDriver(driver)
+                self.create_driver(driver)
+                self.debug("Model %s:, env: %s",
+                           driver['name'], pformat(driver['instance'].env))
             # Create connection drivers
             self.debug("Loading connection drivers")
             for driver in self.connectiondrivers.values():
-                self.create_connection_driver(driver)
+                driver['task_method'] = self.connection_task_method
+                self.create_driver(driver)
         except BaseException:  # pragma: debug
             self.error("%s could not be created.", driver['name'])
             self.terminate()

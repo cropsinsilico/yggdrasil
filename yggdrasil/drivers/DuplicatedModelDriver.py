@@ -52,6 +52,8 @@ class DuplicatedModelDriver(Driver):
             iyml = copy.deepcopy(yml)
             iyml['name'] = cls.name_format % (yml['name'], i)
             iyml['copy_index'] = i
+            iyml['input_drivers'] = yml['input_drivers']
+            iyml['output_drivers'] = yml['output_drivers']
             # Update environment to reflect addition of suffix
             iyml['env'] = yml.get('env', {}).copy()
             iyml['env'].update(env_copy_specific.get(iyml['name'], {}))
@@ -67,7 +69,11 @@ class DuplicatedModelDriver(Driver):
     def start(self, *args, **kwargs):
         r"""Start thread/process and print info."""
         # self.delay_start(*args, **kwargs)
+        input_drivers = self.yml.get('input_drivers', [])
+        output_drivers = self.yml.get('output_drivers', [])
         for x in self.copies:
+            x.env.update(x.get_io_env(input_drivers=input_drivers,
+                                      output_drivers=output_drivers))
             x.start(*args, **kwargs)
         super(DuplicatedModelDriver, self).start(*args, **kwargs)
 

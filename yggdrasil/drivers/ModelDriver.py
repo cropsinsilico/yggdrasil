@@ -1228,6 +1228,38 @@ class ModelDriver(Driver):
         """
         return []
 
+    def get_io_env(self, input_drivers=None, output_drivers=None):
+        r"""Get environment variables set by the input/output drivers.
+
+        Args:
+            input_drivers (list, optional): Input drivers. Defaults to the
+                yaml entry if not provided.
+            output_drivers (list, optional): Output drivers. Defaults to the
+                yaml entry if not provided.
+
+        Returns:
+            dict: Environment variables.
+
+        """
+        if input_drivers is None:
+            input_drivers = self.yml.get('input_drivers', [])
+        if output_drivers is None:
+            output_drivers = self.yml.get('output_drivers', [])
+        out = {}
+        if self.copies > 1:
+            base_name = self.name.split('_copy')[0]
+        else:
+            base_name = self.name
+        for x in input_drivers + output_drivers:
+            if 'instance' in x:
+                model_env = x['instance'].model_env
+                if self.name in model_env:
+                    out.update(model_env[self.name])
+                elif base_name in model_env:
+                    out.update(model_env[base_name])
+                print(self.name, model_env)
+        return out
+
     @classmethod
     def set_env_class(cls, existing=None, **kwargs):
         r"""Set environment variables that are instance independent.
@@ -1264,19 +1296,20 @@ class ModelDriver(Driver):
         if existing is None:
             existing = {}
         existing.update(copy.deepcopy(self.env))
+        existing.update(self.get_io_env())
         env = self.set_env_class(existing=existing, **kwargs)
-        env['YGG_SUBPROCESS'] = "True"
-        env['YGG_MODEL_INDEX'] = str(self.model_index)
-        env['YGG_MODEL_LANGUAGE'] = self.language
+        env.update(YGG_SUBPROCESS="True",
+                   YGG_MODEL_INDEX=str(self.model_index),
+                   YGG_MODEL_LANGUAGE=self.language,
+                   YGG_MODEL_COPIES=str(self.copies),
+                   # YGG_PYTHON_EXEC=sys.executable,
+                   YGG_DEFAULT_COMM=tools.get_default_comm(),
+                   YGG_NCLIENTS=str(len(self.clients)))
         if self.copies > 1:
-            env['YGG_MODEL_NAME'] = self.name.split('_copy')[0]
             env['YGG_MODEL_COPY'] = str(self.copy_index)
+            env['YGG_MODEL_NAME'] = self.name.split('_copy')[0]
         else:
             env['YGG_MODEL_NAME'] = self.name
-        env['YGG_MODEL_COPIES'] = str(self.copies)
-        # env['YGG_PYTHON_EXEC'] = sys.executable
-        env['YGG_DEFAULT_COMM'] = tools.get_default_comm()
-        env['YGG_NCLIENTS'] = str(len(self.clients))
         if self.allow_threading or (self.copies > 1):
             env['YGG_THREADING'] = '1'
         if isinstance(self.is_server, dict):
