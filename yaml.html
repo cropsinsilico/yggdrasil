@@ -7,13 +7,12 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>YAML Files &mdash; yggdrasil v1.6.3+4.g907f4ab0d.dirty documentation</title>
+  <title>YAML Files &mdash; yggdrasil v1.6.3+6.gf38abc9d3.dirty documentation</title>
   
 
   
   <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
   <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
-  <link rel="stylesheet" href="_static/theme_overrides.css" type="text/css" />
 
   
   
@@ -645,12 +644,12 @@ languages can be found <a class="reference internal" href="#schema-table-model-s
 <td><p>string</p></td>
 <td><p>Directory where the build should be saved. Defaults to &lt;sourcedir&gt;/build. It can
 be relative to working_dir or absolute.</p></td>
-<td><p>[‘make’, ‘cmake’]</p></td>
+<td><p>[‘cmake’, ‘make’]</p></td>
 </tr>
 <tr class="row-odd"><td><p>buildfile</p></td>
 <td><p>string</p></td>
 <td></td>
-<td><p>[‘make’, ‘cmake’]</p></td>
+<td><p>[‘cmake’, ‘make’]</p></td>
 </tr>
 <tr class="row-even"><td><p>compiler</p></td>
 <td><p>string</p></td>
@@ -658,7 +657,7 @@ be relative to working_dir or absolute.</p></td>
 provided, the compiler will be determined based on configuration options for the
 language (if present) and the registered compilers that are available on the
 current operating system.</p></td>
-<td><p>[‘fortran’, ‘cpp’, ‘make’, ‘cxx’, ‘c’, ‘c++’, ‘cmake’]</p></td>
+<td><p>[‘c’, ‘make’, ‘c++’, ‘cxx’, ‘cmake’, ‘cpp’, ‘fortran’]</p></td>
 </tr>
 <tr class="row-odd"><td><p>compiler_flags</p></td>
 <td><p>array</p></td>
@@ -666,7 +665,7 @@ current operating system.</p></td>
 the compiler flags will be determined based on configuration options for the
 language (if present), the compiler defaults, and the default_compiler_flags
 class attribute.</p></td>
-<td><p>[‘fortran’, ‘cpp’, ‘make’, ‘cxx’, ‘c’, ‘c++’, ‘cmake’]</p></td>
+<td><p>[‘c’, ‘make’, ‘c++’, ‘cxx’, ‘cmake’, ‘cpp’, ‘fortran’]</p></td>
 </tr>
 <tr class="row-even"><td><p>configuration</p></td>
 <td><p>string</p></td>
@@ -686,28 +685,28 @@ relative. Defaults to False.</p></td>
 <td><p>Environment variable where the compiler executable should be stored for use
 within the Makefile. If not provided, this will be determined by the target
 language driver.</p></td>
-<td><p>[‘make’, ‘cmake’]</p></td>
+<td><p>[‘cmake’, ‘make’]</p></td>
 </tr>
 <tr class="row-odd"><td><p>env_compiler_flags</p></td>
 <td><p>string</p></td>
 <td><p>Environment variable where the compiler flags should be stored (including those
 required to compile against the yggdrasil interface). If not provided, this
 will be determined by the target language driver.</p></td>
-<td><p>[‘make’, ‘cmake’]</p></td>
+<td><p>[‘cmake’, ‘make’]</p></td>
 </tr>
 <tr class="row-even"><td><p>env_linker</p></td>
 <td><p>string</p></td>
 <td><p>Environment variable where the linker executable should be stored for use within
 the Makefile. If not provided, this will be determined by the target language
 driver.</p></td>
-<td><p>[‘make’, ‘cmake’]</p></td>
+<td><p>[‘cmake’, ‘make’]</p></td>
 </tr>
 <tr class="row-odd"><td><p>env_linker_flags</p></td>
 <td><p>string</p></td>
 <td><p>Environment variable where the linker flags should be stored (including those
 required to link against the yggdrasil interface). If not provided, this will
 be determined by the target language driver.</p></td>
-<td><p>[‘make’, ‘cmake’]</p></td>
+<td><p>[‘cmake’, ‘make’]</p></td>
 </tr>
 <tr class="row-even"><td><p>integrator</p></td>
 <td><p>string</p></td>
@@ -730,14 +729,14 @@ be determined by the target language driver.</p></td>
 <td><p>Name or path of interpreter executable that should be used to run the model. If
 not provided, the interpreter will be determined based on configuration options
 for the language (if present) and the default_interpreter class attribute.</p></td>
-<td><p>[‘sbml’, ‘function’, ‘R’, ‘timesync’, ‘lpy’, ‘matlab’, ‘r’, ‘python’]</p></td>
+<td><p>[‘function’, ‘sbml’, ‘R’, ‘timesync’, ‘lpy’, ‘r’, ‘python’, ‘matlab’]</p></td>
 </tr>
 <tr class="row-even"><td><p>interpreter_flags</p></td>
 <td><p>array</p></td>
 <td><p>Flags that should be passed to the interpreter when running the model. If not
 provided, the flags are determined based on configuration options for the
 language (if present) and the default_interpreter_flags class attribute.</p></td>
-<td><p>[‘sbml’, ‘function’, ‘R’, ‘timesync’, ‘lpy’, ‘matlab’, ‘r’, ‘python’]</p></td>
+<td><p>[‘function’, ‘sbml’, ‘R’, ‘timesync’, ‘lpy’, ‘r’, ‘python’, ‘matlab’]</p></td>
 </tr>
 <tr class="row-odd"><td><p>linker</p></td>
 <td><p>string</p></td>
@@ -745,7 +744,7 @@ language (if present) and the default_interpreter_flags class attribute.</p></td
 provided, the linker will be determined based on configuration options for the
 language (if present) and the registered linkers that are available on the
 current operating system</p></td>
-<td><p>[‘fortran’, ‘cpp’, ‘make’, ‘cxx’, ‘c’, ‘c++’, ‘cmake’]</p></td>
+<td><p>[‘c’, ‘make’, ‘c++’, ‘cxx’, ‘cmake’, ‘cpp’, ‘fortran’]</p></td>
 </tr>
 <tr class="row-even"><td><p>linker_flags</p></td>
 <td><p>array</p></td>
@@ -753,7 +752,7 @@ current operating system</p></td>
 the linker flags will be determined based on configuration options for the
 language (if present), the linker defaults, and the default_linker_flags class
 attribute.</p></td>
-<td><p>[‘fortran’, ‘cpp’, ‘make’, ‘cxx’, ‘c’, ‘c++’, ‘cmake’]</p></td>
+<td><p>[‘c’, ‘make’, ‘c++’, ‘cxx’, ‘cmake’, ‘cpp’, ‘fortran’]</p></td>
 </tr>
 <tr class="row-odd"><td><p>makedir</p></td>
 <td><p>string</p></td>
@@ -790,7 +789,7 @@ selections will be returned.</p></td>
 <td><p>If True, no interpreter will be added to the arguments. This should only be used
 for subclasses that will not be invoking the model via the command line.
 Defaults to False.</p></td>
-<td><p>[‘sbml’, ‘function’, ‘R’, ‘timesync’, ‘lpy’, ‘matlab’, ‘r’, ‘python’]</p></td>
+<td><p>[‘function’, ‘sbml’, ‘R’, ‘timesync’, ‘lpy’, ‘r’, ‘python’, ‘matlab’]</p></td>
 </tr>
 <tr class="row-odd"><td><p>skip_start_time</p></td>
 <td><p>boolean</p></td>
@@ -803,7 +802,7 @@ False. This option is ignored if only_output_final_step is True.</p></td>
 <td><p>Source files that should be compiled into an executable. Defaults to an empty
 list and the driver will search for a source file based on the model executable
 (the first model argument).</p></td>
-<td><p>[‘fortran’, ‘cpp’, ‘make’, ‘cxx’, ‘c’, ‘c++’, ‘cmake’]</p></td>
+<td><p>[‘c’, ‘make’, ‘c++’, ‘cxx’, ‘cmake’, ‘cpp’, ‘fortran’]</p></td>
 </tr>
 <tr class="row-odd"><td><p>sourcedir</p></td>
 <td><p>string</p></td>
@@ -852,37 +851,37 @@ variable in everything but name and units) or mappings with the keys:</p></td>
 <td><p>string</p></td>
 <td><p>Make target that should be built to create the model executable. Defaults to
 None.</p></td>
-<td><p>[‘make’, ‘cmake’]</p></td>
+<td><p>[‘cmake’, ‘make’]</p></td>
 </tr>
 <tr class="row-odd"><td><p>target_compiler</p></td>
 <td><p>string</p></td>
 <td><p>Compilation tool that should be used to compile the target language. Defaults to
 None and will be set based on the selected language driver.</p></td>
-<td><p>[‘make’, ‘cmake’]</p></td>
+<td><p>[‘cmake’, ‘make’]</p></td>
 </tr>
 <tr class="row-even"><td><p>target_compiler_flags</p></td>
 <td><p>array</p></td>
 <td><p>Compilation flags that should be passed to the target language compiler.
 Defaults to [].</p></td>
-<td><p>[‘make’, ‘cmake’]</p></td>
+<td><p>[‘cmake’, ‘make’]</p></td>
 </tr>
 <tr class="row-odd"><td><p>target_language</p></td>
 <td><p>string</p></td>
 <td><p>Language that the target is written in. Defaults to None and will be set based
 on the source files provided.</p></td>
-<td><p>[‘make’, ‘cmake’]</p></td>
+<td><p>[‘cmake’, ‘make’]</p></td>
 </tr>
 <tr class="row-even"><td><p>target_linker</p></td>
 <td><p>string</p></td>
 <td><p>Compilation tool that should be used to link the target language. Defaults to
 None and will be set based on the selected language driver.</p></td>
-<td><p>[‘make’, ‘cmake’]</p></td>
+<td><p>[‘cmake’, ‘make’]</p></td>
 </tr>
 <tr class="row-odd"><td><p>target_linker_flags</p></td>
 <td><p>array</p></td>
 <td><p>Linking flags that should be passed to the target language linker. Defaults to
 [].</p></td>
-<td><p>[‘make’, ‘cmake’]</p></td>
+<td><p>[‘cmake’, ‘make’]</p></td>
 </tr>
 <tr class="row-even"><td><p>update_interval</p></td>
 <td><p>object</p></td>
@@ -1281,13 +1280,13 @@ for 3D structures.</p></td>
 <tr class="row-even"><td><p>comment</p></td>
 <td><p>string</p></td>
 <td><p>One or more characters indicating a comment. Defaults to ‘# ‘.</p></td>
-<td><p>[‘table’, ‘yaml’, ‘map’, ‘netcdf’, ‘mat’, ‘obj’, ‘ply’, ‘json’, ‘ascii’, ‘pickle’, ‘pandas’, ‘wofost’]</p></td>
+<td><p>[‘obj’, ‘map’, ‘netcdf’, ‘json’, ‘ply’, ‘yaml’, ‘mat’, ‘pandas’, ‘wofost’, ‘pickle’, ‘ascii’, ‘table’]</p></td>
 </tr>
 <tr class="row-odd"><td><p>datatype</p></td>
 <td><p>schema</p></td>
 <td><p>JSON schema defining the type of object that the serializer will be used to
 serialize/deserialize. Defaults to default_datatype.</p></td>
-<td><p>[‘table’, ‘yaml’, ‘map’, ‘netcdf’, ‘mat’, ‘obj’, ‘ply’, ‘json’, ‘ascii’, ‘pickle’, ‘pandas’, ‘wofost’]</p></td>
+<td><p>[‘obj’, ‘map’, ‘netcdf’, ‘json’, ‘ply’, ‘yaml’, ‘mat’, ‘pandas’, ‘wofost’, ‘pickle’, ‘ascii’, ‘table’]</p></td>
 </tr>
 <tr class="row-even"><td><p>default_flow_style</p></td>
 <td><p>boolean</p></td>
@@ -1299,7 +1298,7 @@ they will always be serialized in the flow style. See <a class="reference extern
 <td><p>string</p></td>
 <td><p>Delimiter that should be used to separate name/value pairs in the map. Defaults
 to t.</p></td>
-<td><p>[‘wofost’, ‘table’, ‘pandas’, ‘map’]</p></td>
+<td><p>[‘wofost’, ‘map’, ‘pandas’, ‘table’]</p></td>
 </tr>
 <tr class="row-even"><td><p>encoding</p></td>
 <td><p>string</p></td>
@@ -1315,7 +1314,7 @@ seiralized structure. Defaults to ‘t’.</p></td>
 <tr class="row-even"><td><p>newline</p></td>
 <td><p>string</p></td>
 <td><p>One or more characters indicating a newline. Defaults to ‘n’.</p></td>
-<td><p>[‘table’, ‘yaml’, ‘map’, ‘netcdf’, ‘mat’, ‘obj’, ‘ply’, ‘json’, ‘ascii’, ‘pickle’, ‘pandas’, ‘wofost’]</p></td>
+<td><p>[‘obj’, ‘map’, ‘netcdf’, ‘json’, ‘ply’, ‘yaml’, ‘mat’, ‘pandas’, ‘wofost’, ‘pickle’, ‘ascii’, ‘table’]</p></td>
 </tr>
 <tr class="row-odd"><td><p>no_header</p></td>
 <td><p>boolean</p></td>
@@ -1356,7 +1355,7 @@ to True.</p></td>
 <td><p>boolean</p></td>
 <td><p>If True, the astropy package will be used to serialize/deserialize table.
 Defaults to False.</p></td>
-<td><p>[‘table’, ‘pandas’]</p></td>
+<td><p>[‘pandas’, ‘table’]</p></td>
 </tr>
 <tr class="row-even"><td><p>variables</p></td>
 <td><p>array</p></td>

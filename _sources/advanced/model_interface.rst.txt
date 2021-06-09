@@ -3,6 +3,8 @@
 Model Interface
 ===============
 
+.. include:: ../tables/interface_mapping_table.rst
+
 .. toctree::
    :maxdepth: 4
 

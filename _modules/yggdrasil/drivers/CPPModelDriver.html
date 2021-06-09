@@ -7,13 +7,12 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>yggdrasil.drivers.CPPModelDriver &mdash; yggdrasil v1.6.3+4.g907f4ab0d.dirty documentation</title>
+  <title>yggdrasil.drivers.CPPModelDriver &mdash; yggdrasil v1.6.3+6.gf38abc9d3.dirty documentation</title>
   
 
   
   <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
   <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
-  <link rel="stylesheet" href="../../../_static/theme_overrides.css" type="text/css" />
 
   
   
@@ -345,6 +344,21 @@
     <span class="c1"># To prevent inheritance</span>
     <span class="n">default_compiler</span> <span class="o">=</span> <span class="kc">None</span>
     <span class="n">default_linker</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">interface_map</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s1">&#39;import&#39;</span><span class="p">:</span> <span class="s1">&#39;#include &quot;YggInterface.hpp&quot;&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;input&#39;</span><span class="p">:</span> <span class="s1">&#39;YggInput </span><span class="si">{channel_obj}</span><span class="s1">(&quot;</span><span class="si">{channel_name}</span><span class="s1">&quot;)&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;output&#39;</span><span class="p">:</span> <span class="s1">&#39;YggOutput </span><span class="si">{channel_obj}</span><span class="s1">(&quot;</span><span class="si">{channel_name}</span><span class="s1">&quot;)&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;server&#39;</span><span class="p">:</span> <span class="p">(</span>
+            <span class="s1">&#39;YggRpcServer </span><span class="si">{channel_obj}</span><span class="s1">(&quot;</span><span class="si">{channel_name}</span><span class="s1">&quot;, &#39;</span>
+            <span class="s1">&#39;</span><span class="si">{datatype_in}</span><span class="s1">, </span><span class="si">{datatype_out}</span><span class="s1">)&#39;</span><span class="p">),</span>
+        <span class="s1">&#39;client&#39;</span><span class="p">:</span> <span class="p">(</span>
+            <span class="s1">&#39;YggRpcClient </span><span class="si">{channel_obj}</span><span class="s1">(&quot;</span><span class="si">{channel_name}</span><span class="s1">&quot;, &#39;</span>
+            <span class="s1">&#39;</span><span class="si">{datatype_out}</span><span class="s1">, </span><span class="si">{datatype_in}</span><span class="s1">)&#39;</span><span class="p">),</span>
+        <span class="s1">&#39;timesync&#39;</span><span class="p">:</span> <span class="s1">&#39;YggTimesync </span><span class="si">{channel_obj}</span><span class="s1">(&quot;</span><span class="si">{channel_name}</span><span class="s1">&quot;, &quot;</span><span class="si">{time_units}</span><span class="s1">&quot;)&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;send&#39;</span><span class="p">:</span> <span class="s1">&#39;flag = </span><span class="si">{channel_obj}</span><span class="s1">.send(</span><span class="si">{nargs}</span><span class="s1">, </span><span class="si">{outputs}</span><span class="s1">)&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;recv&#39;</span><span class="p">:</span> <span class="s1">&#39;flag = </span><span class="si">{channel_obj}</span><span class="s1">.recv(</span><span class="si">{nargs}</span><span class="s1">, </span><span class="si">{input_refs}</span><span class="s1">)&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;call&#39;</span><span class="p">:</span> <span class="s1">&#39;flag = </span><span class="si">{channel_obj}</span><span class="s1">.call(</span><span class="si">{nargs}</span><span class="s1">, </span><span class="si">{outputs}</span><span class="s1">, </span><span class="si">{input_refs}</span><span class="s1">)&#39;</span><span class="p">,</span>
+    <span class="p">}</span>
     <span class="n">function_param</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span>
         <span class="n">CModelDriver</span><span class="o">.</span><span class="n">function_param</span><span class="p">,</span>
         <span class="nb">input</span><span class="o">=</span><span class="s1">&#39;YggInput </span><span class="si">{channel}</span><span class="s1">(</span><span class="se">\&quot;</span><span class="si">{channel_name}</span><span class="se">\&quot;</span><span class="s1">, </span><span class="si">{channel_type}</span><span class="s1">);&#39;</span><span class="p">,</span>

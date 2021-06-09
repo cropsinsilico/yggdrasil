@@ -7,13 +7,12 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>yggdrasil.doctools &mdash; yggdrasil v1.6.3+4.g907f4ab0d.dirty documentation</title>
+  <title>yggdrasil.doctools &mdash; yggdrasil v1.6.3+6.gf38abc9d3.dirty documentation</title>
   
 
   
   <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
   <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
-  <link rel="stylesheet" href="../../_static/theme_overrides.css" type="text/css" />
 
   
   
@@ -299,9 +298,65 @@
     <span class="n">kwargs</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s1">&#39;val_column_name&#39;</span><span class="p">,</span> <span class="s1">&#39;notes&#39;</span><span class="p">)</span>
     <span class="n">kwargs</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s1">&#39;prune_empty_columns&#39;</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>
     <span class="n">kwargs</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s1">&#39;last_column&#39;</span><span class="p">,</span> <span class="s1">&#39;notes&#39;</span><span class="p">)</span>
-    <span class="c1"># kwargs.setdefault(&#39;column_order&#39;, [&#39;schema&#39;, &#39;notes&#39;])</span>
     <span class="n">kwargs</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s1">&#39;wrapped_columns&#39;</span><span class="p">,</span> <span class="p">{</span><span class="s1">&#39;notes&#39;</span><span class="p">:</span> <span class="mi">40</span><span class="p">})</span>
     <span class="n">lines</span> <span class="o">=</span> <span class="n">dict2table</span><span class="p">(</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">write_table</span><span class="p">(</span><span class="n">lines</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
+    
+
+<div class="viewcode-block" id="write_interface_mapping_table"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.doctools.write_interface_mapping_table">[docs]</a><span class="k">def</span> <span class="nf">write_interface_mapping_table</span><span class="p">(</span><span class="n">split_table_for_notebook</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Write a table containing mapping of datatypes between different</span>
+<span class="sd">    languages.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        **kwargs: Additional keyword arguments are passed to dict2table and</span>
+<span class="sd">            write_table.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        str, list: Name of file or files created.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="kn">import</span> <span class="nn">copy</span>
+    <span class="kn">from</span> <span class="nn">yggdrasil</span> <span class="k">import</span> <span class="n">tools</span><span class="p">,</span> <span class="n">components</span>
+    <span class="n">kwargs</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s1">&#39;fname_base&#39;</span><span class="p">,</span> <span class="s1">&#39;interface_mapping_table.rst&#39;</span><span class="p">)</span>
+    <span class="n">kwargs</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s1">&#39;style&#39;</span><span class="p">,</span> <span class="s1">&#39;complex&#39;</span><span class="p">)</span>
+    <span class="n">comm_keys</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;import&#39;</span><span class="p">,</span> <span class="s1">&#39;input&#39;</span><span class="p">,</span> <span class="s1">&#39;output&#39;</span><span class="p">,</span> <span class="s1">&#39;server&#39;</span><span class="p">,</span> <span class="s1">&#39;client&#39;</span><span class="p">,</span> <span class="s1">&#39;timesync&#39;</span><span class="p">]</span>
+    <span class="n">meth_keys</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;send&#39;</span><span class="p">,</span> <span class="s1">&#39;recv&#39;</span><span class="p">,</span> <span class="s1">&#39;call&#39;</span><span class="p">]</span>
+    <span class="n">all_keys</span> <span class="o">=</span> <span class="n">comm_keys</span> <span class="o">+</span> <span class="n">meth_keys</span>
+    <span class="k">if</span> <span class="n">split_table_for_notebook</span><span class="p">:</span>
+        <span class="n">keys_part1</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;import&#39;</span><span class="p">,</span> <span class="s1">&#39;input&#39;</span><span class="p">,</span> <span class="s1">&#39;output&#39;</span><span class="p">]</span>
+        <span class="n">keys_part2</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;send&#39;</span><span class="p">,</span> <span class="s1">&#39;recv&#39;</span><span class="p">]</span>
+        <span class="n">keys_part3</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;server&#39;</span><span class="p">,</span> <span class="s1">&#39;client&#39;</span><span class="p">,</span> <span class="s1">&#39;call&#39;</span><span class="p">]</span>
+        <span class="n">keys_part4</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;timesync&#39;</span><span class="p">]</span>
+        <span class="n">keys_list</span> <span class="o">=</span> <span class="p">[</span><span class="n">keys_part1</span><span class="p">,</span> <span class="n">keys_part2</span><span class="p">,</span> <span class="n">keys_part3</span><span class="p">,</span> <span class="n">keys_part4</span><span class="p">]</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">keys_list</span> <span class="o">=</span> <span class="p">[</span><span class="n">all_keys</span><span class="p">]</span>
+    <span class="n">lines</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">kwargs0</span> <span class="o">=</span> <span class="n">kwargs</span>
+    <span class="k">for</span> <span class="n">keys</span> <span class="ow">in</span> <span class="n">keys_list</span><span class="p">:</span>
+        <span class="n">args</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="n">kwargs</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">kwargs0</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">lang</span> <span class="ow">in</span> <span class="n">tools</span><span class="o">.</span><span class="n">get_supported_lang</span><span class="p">():</span>
+            <span class="k">if</span> <span class="n">lang</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;lpy&#39;</span><span class="p">,</span> <span class="s1">&#39;make&#39;</span><span class="p">,</span> <span class="s1">&#39;cmake&#39;</span><span class="p">,</span> <span class="s1">&#39;executable&#39;</span><span class="p">]:</span>
+                <span class="k">continue</span>
+            <span class="k">if</span> <span class="n">lang</span> <span class="o">==</span> <span class="s1">&#39;cpp&#39;</span><span class="p">:</span>
+                <span class="n">lang</span> <span class="o">=</span> <span class="s1">&#39;c++&#39;</span>
+            <span class="n">ldrv</span> <span class="o">=</span> <span class="n">components</span><span class="o">.</span><span class="n">import_component</span><span class="p">(</span><span class="s1">&#39;model&#39;</span><span class="p">,</span> <span class="n">lang</span><span class="p">)</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">ldrv</span><span class="o">.</span><span class="n">full_language</span><span class="p">:</span>
+                <span class="k">continue</span>
+            <span class="n">args</span><span class="p">[</span><span class="n">lang</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;language&#39;</span><span class="p">:</span> <span class="n">lang</span><span class="p">}</span>
+            <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">keys</span><span class="p">:</span>
+                <span class="n">entry</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">ldrv</span><span class="p">,</span> <span class="s1">&#39;interface_map&#39;</span><span class="p">,</span> <span class="p">{})</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">entry</span><span class="p">:</span>
+                    <span class="n">args</span><span class="p">[</span><span class="n">lang</span><span class="p">][</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;``</span><span class="si">%s</span><span class="s1">``&#39;</span> <span class="o">%</span> <span class="n">entry</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">args</span><span class="p">[</span><span class="n">lang</span><span class="p">][</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+        <span class="n">kwargs</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s1">&#39;key_column_name&#39;</span><span class="p">,</span> <span class="s1">&#39;language&#39;</span><span class="p">)</span>
+        <span class="n">kwargs</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s1">&#39;val_column_name&#39;</span><span class="p">,</span> <span class="n">keys</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+        <span class="n">kwargs</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s1">&#39;prune_empty_columns&#39;</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>
+        <span class="n">kwargs</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s1">&#39;wrapped_columns&#39;</span><span class="p">,</span> <span class="p">{})</span>  <span class="c1"># &#39;notes&#39;: 40})</span>
+        <span class="n">kwargs</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s1">&#39;column_order&#39;</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;language&#39;</span><span class="p">]</span> <span class="o">+</span> <span class="n">keys</span><span class="p">)</span>
+        <span class="n">lines</span> <span class="o">+=</span> <span class="n">dict2table</span><span class="p">(</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="n">lines</span> <span class="o">+=</span> <span class="p">[</span><span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">]</span>
     <span class="k">return</span> <span class="n">write_table</span><span class="p">(</span><span class="n">lines</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
     
 
@@ -697,6 +752,7 @@
     <span class="c1"># Create format string</span>
     <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">columns</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
         <span class="n">style</span> <span class="o">=</span> <span class="s1">&#39;complex&#39;</span>
+    <span class="n">hline_sep_header</span> <span class="o">=</span> <span class="kc">None</span>
     <span class="k">if</span> <span class="n">style</span> <span class="o">==</span> <span class="s1">&#39;simple&#39;</span><span class="p">:</span>
         <span class="n">column_beg</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
         <span class="n">column_end</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
@@ -708,6 +764,18 @@
         <span class="n">hline_beg_header</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
         <span class="n">hline_end_header</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
         <span class="n">hline_char_header</span> <span class="o">=</span> <span class="s1">&#39;=&#39;</span>
+    <span class="k">elif</span> <span class="n">style</span> <span class="o">==</span> <span class="s1">&#39;markdown&#39;</span><span class="p">:</span>
+        <span class="n">column_beg</span> <span class="o">=</span> <span class="s1">&#39;| &#39;</span>
+        <span class="n">column_end</span> <span class="o">=</span> <span class="s1">&#39; |&#39;</span>
+        <span class="n">column_sep</span> <span class="o">=</span> <span class="s1">&#39; | &#39;</span>
+        <span class="n">hline_beg</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>  <span class="c1"># &#39;|-&#39;</span>
+        <span class="n">hline_end</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>  <span class="c1"># &#39;-|&#39;</span>
+        <span class="n">hline_char</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>  <span class="c1"># &#39;-&#39;</span>
+        <span class="n">hline_sep</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>  <span class="c1"># &#39;-|-&#39;</span>
+        <span class="n">hline_sep_header</span> <span class="o">=</span> <span class="s1">&#39;-|-&#39;</span>
+        <span class="n">hline_beg_header</span> <span class="o">=</span> <span class="s1">&#39;|-&#39;</span>
+        <span class="n">hline_end_header</span> <span class="o">=</span> <span class="s1">&#39;-|&#39;</span>
+        <span class="n">hline_char_header</span> <span class="o">=</span> <span class="s1">&#39;-&#39;</span>
     <span class="k">else</span><span class="p">:</span>
         <span class="n">column_beg</span> <span class="o">=</span> <span class="s1">&#39;| &#39;</span>
         <span class="n">column_end</span> <span class="o">=</span> <span class="s1">&#39; |&#39;</span>
@@ -727,10 +795,12 @@
                <span class="o">+</span> <span class="n">hline_sep</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="n">hline_char</span> <span class="o">*</span> <span class="n">column_widths</span><span class="p">[</span><span class="n">k</span><span class="p">]</span>
                                  <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">column_order</span><span class="p">])</span>
                <span class="o">+</span> <span class="n">hline_end</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">hline_sep_header</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">hline_sep_header</span> <span class="o">=</span> <span class="n">hline_sep</span>
     <span class="n">divider_header</span> <span class="o">=</span> <span class="p">(</span>
         <span class="n">hline_beg_header</span>
-        <span class="o">+</span> <span class="n">hline_sep</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="n">hline_char_header</span> <span class="o">*</span> <span class="n">column_widths</span><span class="p">[</span><span class="n">k</span><span class="p">]</span>
-                          <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">column_order</span><span class="p">])</span>
+        <span class="o">+</span> <span class="n">hline_sep_header</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="n">hline_char_header</span> <span class="o">*</span> <span class="n">column_widths</span><span class="p">[</span><span class="n">k</span><span class="p">]</span>
+                                 <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">column_order</span><span class="p">])</span>
         <span class="o">+</span> <span class="n">hline_end_header</span><span class="p">)</span>
     <span class="n">header</span> <span class="o">=</span> <span class="n">column_format</span> <span class="o">%</span> <span class="nb">tuple</span><span class="p">([</span><span class="n">k</span><span class="o">.</span><span class="n">title</span><span class="p">()</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">column_order</span><span class="p">])</span>
     <span class="c1"># Table</span>
@@ -738,26 +808,42 @@
         <span class="n">pos</span> <span class="o">=</span> <span class="mi">0</span>
     <span class="k">else</span><span class="p">:</span>
         <span class="n">pos</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">columns</span><span class="p">[</span><span class="nb">list</span><span class="p">(</span><span class="n">columns</span><span class="o">.</span><span class="n">keys</span><span class="p">())[</span><span class="mi">0</span><span class="p">]])</span>
-    <span class="n">lines</span> <span class="o">=</span> <span class="p">[</span><span class="n">divider</span><span class="p">,</span> <span class="n">header</span><span class="p">,</span> <span class="n">divider_header</span><span class="p">]</span>
-    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">pos</span><span class="p">):</span>
-        <span class="n">row</span> <span class="o">=</span> <span class="p">[]</span>
-        <span class="n">max_row_len</span> <span class="o">=</span> <span class="mi">1</span>
-        <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">column_order</span><span class="p">:</span>
-            <span class="k">if</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">wrapped_columns</span><span class="p">:</span>
-                <span class="n">row</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">textwrap</span><span class="o">.</span><span class="n">wrap</span><span class="p">(</span><span class="n">columns</span><span class="p">[</span><span class="n">k</span><span class="p">][</span><span class="n">i</span><span class="p">],</span> <span class="n">wrapped_columns</span><span class="p">[</span><span class="n">k</span><span class="p">]))</span>
-            <span class="k">elif</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">list_columns</span><span class="p">:</span>
-                <span class="n">row</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">columns</span><span class="p">[</span><span class="n">k</span><span class="p">][</span><span class="n">i</span><span class="p">])</span>
-            <span class="k">else</span><span class="p">:</span>
-                <span class="n">row</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="n">columns</span><span class="p">[</span><span class="n">k</span><span class="p">][</span><span class="n">i</span><span class="p">]])</span>
-            <span class="n">max_row_len</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">max_row_len</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">row</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]))</span>
-        <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">row</span><span class="p">)):</span>
-            <span class="n">row</span><span class="p">[</span><span class="n">j</span><span class="p">]</span> <span class="o">+=</span> <span class="p">(</span><span class="n">max_row_len</span> <span class="o">-</span> <span class="nb">len</span><span class="p">(</span><span class="n">row</span><span class="p">[</span><span class="n">j</span><span class="p">]))</span> <span class="o">*</span> <span class="p">[</span><span class="s1">&#39;&#39;</span><span class="p">]</span>
-        <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">max_row_len</span><span class="p">):</span>
-            <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">column_format</span> <span class="o">%</span> <span class="nb">tuple</span><span class="p">([</span><span class="n">row</span><span class="p">[</span><span class="n">j</span><span class="p">][</span><span class="n">k</span><span class="p">]</span> <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">row</span><span class="p">))]))</span>
-        <span class="k">if</span> <span class="n">style</span> <span class="o">!=</span> <span class="s1">&#39;simple&#39;</span><span class="p">:</span>
+    <span class="k">if</span> <span class="n">style</span> <span class="o">==</span> <span class="s1">&#39;list&#39;</span><span class="p">:</span>
+        <span class="n">lines</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;.. list-table::&#39;</span><span class="p">,</span>
+                 <span class="s1">&#39;   :header-rows: 1&#39;</span><span class="p">,</span>
+                 <span class="s1">&#39;&#39;</span><span class="p">,</span>
+                 <span class="s1">&#39;   * - </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">column_order</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">title</span><span class="p">()]</span>
+        <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">column_order</span><span class="p">[</span><span class="mi">1</span><span class="p">:]:</span>
+            <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;     - </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">k</span><span class="o">.</span><span class="n">title</span><span class="p">())</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">lines</span> <span class="o">=</span> <span class="p">[</span><span class="n">header</span><span class="p">,</span> <span class="n">divider_header</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">divider</span><span class="p">:</span>
+            <span class="n">lines</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">divider</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">style</span> <span class="o">==</span> <span class="s1">&#39;list&#39;</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">pos</span><span class="p">):</span>
+            <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;   * - </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">columns</span><span class="p">[</span><span class="n">column_order</span><span class="p">[</span><span class="mi">0</span><span class="p">]][</span><span class="n">i</span><span class="p">])</span>
+            <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">column_order</span><span class="p">[</span><span class="mi">1</span><span class="p">:]:</span>
+                <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;     - </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">columns</span><span class="p">[</span><span class="n">k</span><span class="p">][</span><span class="n">i</span><span class="p">])</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">pos</span><span class="p">):</span>
+            <span class="n">row</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="n">max_row_len</span> <span class="o">=</span> <span class="mi">1</span>
+            <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">column_order</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">wrapped_columns</span><span class="p">:</span>
+                    <span class="n">row</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">textwrap</span><span class="o">.</span><span class="n">wrap</span><span class="p">(</span><span class="n">columns</span><span class="p">[</span><span class="n">k</span><span class="p">][</span><span class="n">i</span><span class="p">],</span> <span class="n">wrapped_columns</span><span class="p">[</span><span class="n">k</span><span class="p">]))</span>
+                <span class="k">elif</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">list_columns</span><span class="p">:</span>
+                    <span class="n">row</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">columns</span><span class="p">[</span><span class="n">k</span><span class="p">][</span><span class="n">i</span><span class="p">])</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">row</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="n">columns</span><span class="p">[</span><span class="n">k</span><span class="p">][</span><span class="n">i</span><span class="p">]])</span>
+                <span class="n">max_row_len</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">max_row_len</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">row</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]))</span>
+            <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">row</span><span class="p">)):</span>
+                <span class="n">row</span><span class="p">[</span><span class="n">j</span><span class="p">]</span> <span class="o">+=</span> <span class="p">(</span><span class="n">max_row_len</span> <span class="o">-</span> <span class="nb">len</span><span class="p">(</span><span class="n">row</span><span class="p">[</span><span class="n">j</span><span class="p">]))</span> <span class="o">*</span> <span class="p">[</span><span class="s1">&#39;&#39;</span><span class="p">]</span>
+            <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">max_row_len</span><span class="p">):</span>
+                <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">column_format</span> <span class="o">%</span> <span class="nb">tuple</span><span class="p">([</span><span class="n">row</span><span class="p">[</span><span class="n">j</span><span class="p">][</span><span class="n">k</span><span class="p">]</span> <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">row</span><span class="p">))]))</span>
+            <span class="k">if</span> <span class="n">style</span> <span class="o">!=</span> <span class="s1">&#39;simple&#39;</span> <span class="ow">and</span> <span class="n">divider</span><span class="p">:</span>
+                <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">divider</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">style</span> <span class="o">==</span> <span class="s1">&#39;simple&#39;</span> <span class="ow">and</span> <span class="n">divider</span><span class="p">:</span>
             <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">divider</span><span class="p">)</span>
-    <span class="k">if</span> <span class="n">style</span> <span class="o">==</span> <span class="s1">&#39;simple&#39;</span><span class="p">:</span>
-        <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">divider</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">lines</span></div>
 
 

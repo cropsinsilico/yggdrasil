@@ -7,13 +7,12 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>Model Interface &mdash; yggdrasil v1.6.3+4.g907f4ab0d.dirty documentation</title>
+  <title>Model Interface &mdash; yggdrasil v1.6.3+6.gf38abc9d3.dirty documentation</title>
   
 
   
   <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
   <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
-  <link rel="stylesheet" href="../_static/theme_overrides.css" type="text/css" />
 
   
   
@@ -200,6 +199,101 @@
             
   <div class="section" id="model-interface">
 <span id="model-interface-rst"></span><h1>Model Interface<a class="headerlink" href="#model-interface" title="Permalink to this headline">¶</a></h1>
+<table class="docutils align-default" id="interface-mapping-table-rst">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 10%" />
+<col style="width: 10%" />
+<col style="width: 10%" />
+<col style="width: 10%" />
+<col style="width: 10%" />
+<col style="width: 10%" />
+<col style="width: 10%" />
+<col style="width: 10%" />
+<col style="width: 10%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Language</p></th>
+<th class="head"><p>Import</p></th>
+<th class="head"><p>Input</p></th>
+<th class="head"><p>Output</p></th>
+<th class="head"><p>Server</p></th>
+<th class="head"><p>Client</p></th>
+<th class="head"><p>Timesync</p></th>
+<th class="head"><p>Send</p></th>
+<th class="head"><p>Recv</p></th>
+<th class="head"><p>Call</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>R</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">library(yggdrasil)</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">YggInterface('YggInput',</span> <span class="pre">'{channel_name}')</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">YggInterface('YggOutput',</span> <span class="pre">'{channel_name}')</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">YggInterface('YggRpcServer',</span> <span class="pre">'{channel_name}')</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">YggInterface('YggRpcClient',</span> <span class="pre">'{channel_name}')</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">YggInterface('YggTimesync',</span> <span class="pre">'{channel_name}')</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">flag</span> <span class="pre">=</span> <span class="pre">{channel_obj}$send({outputs})</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">c(flag,</span> <span class="pre">{inputs})</span> <span class="pre">%&lt;-%</span> <span class="pre">{channel_obj}$recv()</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">c(flag,</span> <span class="pre">{inputs})</span> <span class="pre">%&lt;-%</span> <span class="pre">{channel_obj}$call({outputs})</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p>c</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">#include</span> <span class="pre">&quot;YggInterface.h&quot;</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">yggInputType(&quot;{channel_name}&quot;,</span> <span class="pre">{datatype})</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">yggOutputType(&quot;{channel_name}&quot;,</span> <span class="pre">{datatype})</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">yggRpcServerType(&quot;{channel_name}&quot;,</span> <span class="pre">{datatype_in},</span> <span class="pre">{datatype_out})</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">yggRpcClientType(&quot;{channel_name}&quot;,</span> <span class="pre">{datatype_out},</span> <span class="pre">{datatype_in})</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">yggTimesync(&quot;{channel_name}&quot;,</span> <span class="pre">&quot;{time_units}&quot;)</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">flag</span> <span class="pre">=</span> <span class="pre">yggSend({channel_obj},</span> <span class="pre">{outputs})</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">flag</span> <span class="pre">=</span> <span class="pre">yggRecv({channel_obj},</span> <span class="pre">{input_refs})</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">flag</span> <span class="pre">=</span> <span class="pre">rpcCall({channel_obj},</span> <span class="pre">{outputs},</span> <span class="pre">{inputs})</span></code></p></td>
+</tr>
+<tr class="row-even"><td><p>c++</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">#include</span> <span class="pre">&quot;YggInterface.hpp&quot;</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">YggInput</span> <span class="pre">{channel_obj}(&quot;{channel_name}&quot;)</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">YggOutput</span> <span class="pre">{channel_obj}(&quot;{channel_name}&quot;)</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">YggRpcServer</span> <span class="pre">{channel_obj}(&quot;{channel_name}&quot;,</span> <span class="pre">{datatype_in},</span> <span class="pre">{datatype_out})</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">YggRpcClient</span> <span class="pre">{channel_obj}(&quot;{channel_name}&quot;,</span> <span class="pre">{datatype_out},</span> <span class="pre">{datatype_in})</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">YggTimesync</span> <span class="pre">{channel_obj}(&quot;{channel_name}&quot;,</span> <span class="pre">&quot;{time_units}&quot;)</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">flag</span> <span class="pre">=</span> <span class="pre">{channel_obj}.send({nargs},</span> <span class="pre">{outputs})</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">flag</span> <span class="pre">=</span> <span class="pre">{channel_obj}.recv({nargs},</span> <span class="pre">{input_refs})</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">flag</span> <span class="pre">=</span> <span class="pre">{channel_obj}.call({nargs},</span> <span class="pre">{outputs},</span> <span class="pre">{input_refs})</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p>fortran</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">use</span> <span class="pre">fygg</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">ygg_input_type(&quot;{channel_name}&quot;,</span> <span class="pre">{datatype})</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">ygg_output_type(&quot;{channel_name}&quot;,</span> <span class="pre">{datatype})</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">ygg_rpc_server_type(&quot;{channel_name}&quot;,</span> <span class="pre">{datatype_in},</span> <span class="pre">{datatype_out})</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">ygg_rpc_client_type(&quot;{channel_name}&quot;,</span> <span class="pre">{datatype_out},</span> <span class="pre">{datatype_in})</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">yggTimesync(&quot;{channel_name}&quot;,</span> <span class="pre">&quot;{time_units}&quot;)</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">flag</span> <span class="pre">=</span> <span class="pre">ygg_send_var({channel_obj},</span> <span class="pre">[yggarg({outputs})])</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">flag</span> <span class="pre">=</span> <span class="pre">ygg_recv_var({channel_obj},</span> <span class="pre">[yggarg({inputs})])</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">flag</span> <span class="pre">=</span> <span class="pre">ygg_rpc_call({channel_obj},</span> <span class="pre">[yggarg({outputs})],</span> <span class="pre">[yggarg({inputs})])</span></code></p></td>
+</tr>
+<tr class="row-even"><td><p>matlab</p></td>
+<td></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">YggInterface('YggInput',</span> <span class="pre">'{channel_name}')</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">YggInterface('YggOutput',</span> <span class="pre">'{channel_name}')</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">YggInterface('YggRpcServer',</span> <span class="pre">'{channel_name}')</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">YggInterface('YggRpcClient',</span> <span class="pre">'{channel_name}')</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">YggInterface('YggTimesync',</span> <span class="pre">'{channel_name}')</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">flag</span> <span class="pre">=</span> <span class="pre">{channel_obj}.send({outputs})</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">[flag,</span> <span class="pre">{inputs}]</span> <span class="pre">=</span> <span class="pre">{channel_obj}.recv()</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">[flag,</span> <span class="pre">{inputs}]</span> <span class="pre">=</span> <span class="pre">{channel_obj}.call({outputs})</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p>python</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">from</span> <span class="pre">yggdrasil.languages.Python.YggInterface</span> <span class="pre">import</span> <span class="pre">{commtype}</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">YggInput(&quot;{channel_name}&quot;)</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">YggOutput(&quot;{channel_name}&quot;)</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">YggRpcServer(&quot;{channel_name}&quot;)</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">YggRpcClient(&quot;{channel_name}&quot;)</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">YggTimesync(&quot;{channel_name}&quot;)</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">flag</span> <span class="pre">=</span> <span class="pre">{channel_obj}.send({outputs})</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">flag,</span> <span class="pre">{inputs}</span> <span class="pre">=</span> <span class="pre">{channel_obj}.recv()</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">flag,</span> <span class="pre">{inputs}</span> <span class="pre">=</span> <span class="pre">{channel_obj}.call({outputs})</span></code></p></td>
+</tr>
+</tbody>
+</table>
 <div class="toctree-wrapper compound">
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="interface_py.html">Python Interface</a></li>

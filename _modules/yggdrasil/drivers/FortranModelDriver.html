@@ -7,13 +7,12 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>yggdrasil.drivers.FortranModelDriver &mdash; yggdrasil v1.6.3+4.g907f4ab0d.dirty documentation</title>
+  <title>yggdrasil.drivers.FortranModelDriver &mdash; yggdrasil v1.6.3+6.gf38abc9d3.dirty documentation</title>
   
 
   
   <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
   <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
-  <link rel="stylesheet" href="../../../_static/theme_overrides.css" type="text/css" />
 
   
   
@@ -386,6 +385,23 @@
         <span class="s1">&#39;function&#39;</span><span class="p">:</span> <span class="s1">&#39;yggpyfunc&#39;</span><span class="p">,</span>
         <span class="s1">&#39;instance&#39;</span><span class="p">:</span> <span class="s1">&#39;yggpyinst&#39;</span><span class="p">,</span>
         <span class="s1">&#39;any&#39;</span><span class="p">:</span> <span class="s1">&#39;ygggeneric&#39;</span><span class="p">}</span>
+    <span class="n">interface_map</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s1">&#39;import&#39;</span><span class="p">:</span> <span class="s1">&#39;use fygg&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;input&#39;</span><span class="p">:</span> <span class="s1">&#39;ygg_input_type(&quot;</span><span class="si">{channel_name}</span><span class="s1">&quot;, </span><span class="si">{datatype}</span><span class="s1">)&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;output&#39;</span><span class="p">:</span> <span class="s1">&#39;ygg_output_type(&quot;</span><span class="si">{channel_name}</span><span class="s1">&quot;, </span><span class="si">{datatype}</span><span class="s1">)&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;server&#39;</span><span class="p">:</span> <span class="p">(</span>
+            <span class="s1">&#39;ygg_rpc_server_type(&quot;</span><span class="si">{channel_name}</span><span class="s1">&quot;, </span><span class="si">{datatype_in}</span><span class="s1">, &#39;</span>
+            <span class="s1">&#39;</span><span class="si">{datatype_out}</span><span class="s1">)&#39;</span><span class="p">),</span>
+        <span class="s1">&#39;client&#39;</span><span class="p">:</span> <span class="p">(</span>
+            <span class="s1">&#39;ygg_rpc_client_type(&quot;</span><span class="si">{channel_name}</span><span class="s1">&quot;, </span><span class="si">{datatype_out}</span><span class="s1">, &#39;</span>
+            <span class="s1">&#39;</span><span class="si">{datatype_in}</span><span class="s1">)&#39;</span><span class="p">),</span>
+        <span class="s1">&#39;timesync&#39;</span><span class="p">:</span> <span class="s1">&#39;yggTimesync(&quot;</span><span class="si">{channel_name}</span><span class="s1">&quot;, &quot;</span><span class="si">{time_units}</span><span class="s1">&quot;)&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;send&#39;</span><span class="p">:</span> <span class="s1">&#39;flag = ygg_send_var(</span><span class="si">{channel_obj}</span><span class="s1">, [yggarg(</span><span class="si">{outputs}</span><span class="s1">)])&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;recv&#39;</span><span class="p">:</span> <span class="s1">&#39;flag = ygg_recv_var(</span><span class="si">{channel_obj}</span><span class="s1">, [yggarg(</span><span class="si">{inputs}</span><span class="s1">)])&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;call&#39;</span><span class="p">:</span> <span class="p">(</span>
+            <span class="s1">&#39;flag = ygg_rpc_call(</span><span class="si">{channel_obj}</span><span class="s1">, [yggarg(</span><span class="si">{outputs}</span><span class="s1">)], &#39;</span>
+            <span class="s1">&#39;[yggarg(</span><span class="si">{inputs}</span><span class="s1">)])&#39;</span><span class="p">),</span>
+    <span class="p">}</span>
     <span class="n">function_param</span> <span class="o">=</span> <span class="p">{</span>
         <span class="s1">&#39;import_nofile&#39;</span><span class="p">:</span> <span class="s1">&#39;use </span><span class="si">{function}</span><span class="s1">&#39;</span><span class="p">,</span>
         <span class="s1">&#39;import&#39;</span><span class="p">:</span> <span class="s1">&#39;#include &quot;</span><span class="si">{filename}</span><span class="s1">&quot;&#39;</span><span class="p">,</span>

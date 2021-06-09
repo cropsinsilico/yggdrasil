@@ -7,13 +7,12 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>&lt;no title&gt; &mdash; yggdrasil v1.6.3+4.g907f4ab0d.dirty documentation</title>
+  <title>&lt;no title&gt; &mdash; yggdrasil v1.6.3+6.gf38abc9d3.dirty documentation</title>
   
 
   
   <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
   <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
-  <link rel="stylesheet" href="../_static/theme_overrides.css" type="text/css" />
 
   
   
@@ -196,13 +195,13 @@
 <tr class="row-even"><td><p>comment</p></td>
 <td><p>string</p></td>
 <td><p>One or more characters indicating a comment. Defaults to ‘# ‘.</p></td>
-<td><p>[‘table’, ‘yaml’, ‘map’, ‘netcdf’, ‘mat’, ‘obj’, ‘ply’, ‘json’, ‘ascii’, ‘pickle’, ‘pandas’, ‘wofost’]</p></td>
+<td><p>[‘obj’, ‘map’, ‘netcdf’, ‘json’, ‘ply’, ‘yaml’, ‘mat’, ‘pandas’, ‘wofost’, ‘pickle’, ‘ascii’, ‘table’]</p></td>
 </tr>
 <tr class="row-odd"><td><p>datatype</p></td>
 <td><p>schema</p></td>
 <td><p>JSON schema defining the type of object that the serializer will be used to
 serialize/deserialize. Defaults to default_datatype.</p></td>
-<td><p>[‘table’, ‘yaml’, ‘map’, ‘netcdf’, ‘mat’, ‘obj’, ‘ply’, ‘json’, ‘ascii’, ‘pickle’, ‘pandas’, ‘wofost’]</p></td>
+<td><p>[‘obj’, ‘map’, ‘netcdf’, ‘json’, ‘ply’, ‘yaml’, ‘mat’, ‘pandas’, ‘wofost’, ‘pickle’, ‘ascii’, ‘table’]</p></td>
 </tr>
 <tr class="row-even"><td><p>default_flow_style</p></td>
 <td><p>boolean</p></td>
@@ -214,7 +213,7 @@ they will always be serialized in the flow style. See <a class="reference extern
 <td><p>string</p></td>
 <td><p>Delimiter that should be used to separate name/value pairs in the map. Defaults
 to t.</p></td>
-<td><p>[‘wofost’, ‘table’, ‘pandas’, ‘map’]</p></td>
+<td><p>[‘wofost’, ‘map’, ‘pandas’, ‘table’]</p></td>
 </tr>
 <tr class="row-even"><td><p>encoding</p></td>
 <td><p>string</p></td>
@@ -230,7 +229,7 @@ seiralized structure. Defaults to ‘t’.</p></td>
 <tr class="row-even"><td><p>newline</p></td>
 <td><p>string</p></td>
 <td><p>One or more characters indicating a newline. Defaults to ‘n’.</p></td>
-<td><p>[‘table’, ‘yaml’, ‘map’, ‘netcdf’, ‘mat’, ‘obj’, ‘ply’, ‘json’, ‘ascii’, ‘pickle’, ‘pandas’, ‘wofost’]</p></td>
+<td><p>[‘obj’, ‘map’, ‘netcdf’, ‘json’, ‘ply’, ‘yaml’, ‘mat’, ‘pandas’, ‘wofost’, ‘pickle’, ‘ascii’, ‘table’]</p></td>
 </tr>
 <tr class="row-odd"><td><p>no_header</p></td>
 <td><p>boolean</p></td>
@@ -271,7 +270,7 @@ to True.</p></td>
 <td><p>boolean</p></td>
 <td><p>If True, the astropy package will be used to serialize/deserialize table.
 Defaults to False.</p></td>
-<td><p>[‘table’, ‘pandas’]</p></td>
+<td><p>[‘pandas’, ‘table’]</p></td>
 </tr>
 <tr class="row-even"><td><p>variables</p></td>
 <td><p>array</p></td>

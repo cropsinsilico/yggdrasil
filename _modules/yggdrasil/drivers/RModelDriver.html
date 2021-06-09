@@ -7,13 +7,12 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>yggdrasil.drivers.RModelDriver &mdash; yggdrasil v1.6.3+4.g907f4ab0d.dirty documentation</title>
+  <title>yggdrasil.drivers.RModelDriver &mdash; yggdrasil v1.6.3+6.gf38abc9d3.dirty documentation</title>
   
 
   
   <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
   <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
-  <link rel="stylesheet" href="../../../_static/theme_overrides.css" type="text/css" />
 
   
   
@@ -242,6 +241,17 @@
         <span class="s1">&#39;ply&#39;</span><span class="p">:</span> <span class="s1">&#39;PlyDict&#39;</span><span class="p">,</span>
         <span class="s1">&#39;obj&#39;</span><span class="p">:</span> <span class="s1">&#39;ObjDict&#39;</span><span class="p">,</span>
         <span class="s1">&#39;schema&#39;</span><span class="p">:</span> <span class="s1">&#39;list&#39;</span><span class="p">}</span>
+    <span class="n">interface_map</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s1">&#39;import&#39;</span><span class="p">:</span> <span class="s1">&#39;library(yggdrasil)&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;input&#39;</span><span class="p">:</span> <span class="s1">&#39;YggInterface(</span><span class="se">\&#39;</span><span class="s1">YggInput</span><span class="se">\&#39;</span><span class="s1">, </span><span class="se">\&#39;</span><span class="si">{channel_name}</span><span class="se">\&#39;</span><span class="s1">)&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;output&#39;</span><span class="p">:</span> <span class="s1">&#39;YggInterface(</span><span class="se">\&#39;</span><span class="s1">YggOutput</span><span class="se">\&#39;</span><span class="s1">, </span><span class="se">\&#39;</span><span class="si">{channel_name}</span><span class="se">\&#39;</span><span class="s1">)&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;server&#39;</span><span class="p">:</span> <span class="s1">&#39;YggInterface(</span><span class="se">\&#39;</span><span class="s1">YggRpcServer</span><span class="se">\&#39;</span><span class="s1">, </span><span class="se">\&#39;</span><span class="si">{channel_name}</span><span class="se">\&#39;</span><span class="s1">)&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;client&#39;</span><span class="p">:</span> <span class="s1">&#39;YggInterface(</span><span class="se">\&#39;</span><span class="s1">YggRpcClient</span><span class="se">\&#39;</span><span class="s1">, </span><span class="se">\&#39;</span><span class="si">{channel_name}</span><span class="se">\&#39;</span><span class="s1">)&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;timesync&#39;</span><span class="p">:</span> <span class="s1">&#39;YggInterface(</span><span class="se">\&#39;</span><span class="s1">YggTimesync</span><span class="se">\&#39;</span><span class="s1">, </span><span class="se">\&#39;</span><span class="si">{channel_name}</span><span class="se">\&#39;</span><span class="s1">)&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;send&#39;</span><span class="p">:</span> <span class="s1">&#39;flag = </span><span class="si">{channel_obj}</span><span class="s1">$send(</span><span class="si">{outputs}</span><span class="s1">)&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;recv&#39;</span><span class="p">:</span> <span class="s1">&#39;c(flag, </span><span class="si">{inputs}</span><span class="s1">) %&lt;-% </span><span class="si">{channel_obj}</span><span class="s1">$recv()&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;call&#39;</span><span class="p">:</span> <span class="s1">&#39;c(flag, </span><span class="si">{inputs}</span><span class="s1">) %&lt;-% </span><span class="si">{channel_obj}</span><span class="s1">$call(</span><span class="si">{outputs}</span><span class="s1">)&#39;</span><span class="p">,</span>
+    <span class="p">}</span>
     <span class="n">function_param</span> <span class="o">=</span> <span class="p">{</span>
         <span class="s1">&#39;import&#39;</span><span class="p">:</span> <span class="s1">&#39;source(</span><span class="se">\&quot;</span><span class="si">{filename}</span><span class="se">\&quot;</span><span class="s1">)&#39;</span><span class="p">,</span>
         <span class="s1">&#39;istype&#39;</span><span class="p">:</span> <span class="s1">&#39;is(</span><span class="si">{variable}</span><span class="s1">, </span><span class="se">\&quot;</span><span class="si">{type}</span><span class="se">\&quot;</span><span class="s1">)&#39;</span><span class="p">,</span>

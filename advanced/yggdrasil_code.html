@@ -7,13 +7,12 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>yggdrasil.languages.Python package &mdash; yggdrasil v1.6.3+4.g907f4ab0d.dirty documentation</title>
+  <title>yggdrasil.languages.Python package &mdash; yggdrasil v1.6.3+6.gf38abc9d3.dirty documentation</title>
   
 
   
   <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
   <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
-  <link rel="stylesheet" href="../_static/theme_overrides.css" type="text/css" />
 
   
   
@@ -8048,7 +8047,7 @@ typedef from message metadata.</p>
 
 <dl class="py attribute">
 <dt id="yggdrasil.metaschema.datatypes.ScalarMetaschemaType.ScalarMetaschemaType.python_types">
-<code class="sig-name descname">python_types</code><em class="property"> = (&lt;class 'numpy.complex64'&gt;, &lt;class 'numpy.float32'&gt;, &lt;class 'numpy.uint16'&gt;, &lt;class 'str'&gt;, &lt;class 'numpy.int16'&gt;, &lt;class 'numpy.complex128'&gt;, &lt;class 'numpy.float64'&gt;, &lt;class 'numpy.uint32'&gt;, &lt;class 'bytes'&gt;, &lt;class 'numpy.int32'&gt;, &lt;class 'float'&gt;, &lt;class 'numpy.bytes_'&gt;, &lt;class 'numpy.signedinteger'&gt;, &lt;class 'numpy.complex256'&gt;, &lt;class 'numpy.float128'&gt;, &lt;class 'numpy.uint64'&gt;, &lt;class 'numpy.int64'&gt;, &lt;class 'numpy.str_'&gt;, &lt;class 'int'&gt;, &lt;class 'numpy.unsignedinteger'&gt;, &lt;class 'unyt.array.unyt_quantity'&gt;, &lt;class 'complex'&gt;, &lt;class 'numpy.float16'&gt;, &lt;class 'numpy.uint8'&gt;, &lt;class 'numpy.int8'&gt;)</em><a class="headerlink" href="#yggdrasil.metaschema.datatypes.ScalarMetaschemaType.ScalarMetaschemaType.python_types" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">python_types</code><em class="property"> = (&lt;class 'numpy.complex64'&gt;, &lt;class 'numpy.float32'&gt;, &lt;class 'numpy.uint16'&gt;, &lt;class 'str'&gt;, &lt;class 'numpy.int16'&gt;, &lt;class 'numpy.complex128'&gt;, &lt;class 'numpy.float64'&gt;, &lt;class 'numpy.uint32'&gt;, &lt;class 'bytes'&gt;, &lt;class 'numpy.int32'&gt;, &lt;class 'float'&gt;, &lt;class 'numpy.bytes_'&gt;, &lt;class 'numpy.signedinteger'&gt;, &lt;class 'numpy.complex256'&gt;, &lt;class 'numpy.float128'&gt;, &lt;class 'numpy.uint64'&gt;, &lt;class 'numpy.int64'&gt;, &lt;class 'unyt.array.unyt_quantity'&gt;, &lt;class 'numpy.str_'&gt;, &lt;class 'int'&gt;, &lt;class 'numpy.unsignedinteger'&gt;, &lt;class 'complex'&gt;, &lt;class 'numpy.float16'&gt;, &lt;class 'numpy.uint8'&gt;, &lt;class 'numpy.int8'&gt;)</em><a class="headerlink" href="#yggdrasil.metaschema.datatypes.ScalarMetaschemaType.ScalarMetaschemaType.python_types" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
@@ -10798,6 +10797,11 @@ function definition from an input to an output.</p>
 <dd></dd></dl>
 
 <dl class="py attribute">
+<dt id="yggdrasil.drivers.CModelDriver.CModelDriver.interface_map">
+<code class="sig-name descname">interface_map</code><em class="property"> = {'call': 'flag = rpcCall({channel_obj}, {outputs}, {inputs})', 'client': 'yggRpcClientType(&quot;{channel_name}&quot;, {datatype_out}, {datatype_in})', 'import': '#include &quot;YggInterface.h&quot;', 'input': 'yggInputType(&quot;{channel_name}&quot;, {datatype})', 'output': 'yggOutputType(&quot;{channel_name}&quot;, {datatype})', 'recv': 'flag = yggRecv({channel_obj}, {input_refs})', 'send': 'flag = yggSend({channel_obj}, {outputs})', 'server': 'yggRpcServerType(&quot;{channel_name}&quot;, {datatype_in}, {datatype_out})', 'timesync': 'yggTimesync(&quot;{channel_name}&quot;, &quot;{time_units}&quot;)'}</em><a class="headerlink" href="#yggdrasil.drivers.CModelDriver.CModelDriver.interface_map" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
 <dt id="yggdrasil.drivers.CModelDriver.CModelDriver.internal_libraries">
 <code class="sig-name descname">internal_libraries</code><em class="property"> = {'datatypes': {'directory': '/Users/langmm/yggdrasil/yggdrasil/languages/c/datatypes', 'external_dependencies': ['rapidjson', 'python', 'numpy'], 'include_dirs': [], 'internal_dependencies': ['regex'], 'language': 'c++', 'libtype': 'object'}, 'python_wrapper': {'directory': '/Users/langmm/yggdrasil/yggdrasil/languages/c', 'external_dependencies': ['python', 'numpy'], 'include_dirs': ['/Users/langmm/yggdrasil/yggdrasil/languages/c'], 'language': 'c', 'libtype': 'shared', 'linker_language': 'c', 'source': 'python_wrapper.c'}, 'regex': {'directory': '/Users/langmm/yggdrasil/yggdrasil/languages/c/regex', 'external_dependencies': [], 'internal_dependencies': [], 'language': 'c', 'libtype': 'header_only', 'source': 'regex_posix.h'}, 'regex_posix': {'directory': '/Users/langmm/yggdrasil/yggdrasil/languages/c/regex', 'external_dependencies': [], 'internal_dependencies': [], 'language': 'c', 'libtype': 'header_only', 'source': 'regex_posix.h'}, 'regex_win32': {'directory': '/Users/langmm/yggdrasil/yggdrasil/languages/c/regex', 'external_dependencies': [], 'internal_dependencies': [], 'language': 'c++', 'libtype': 'object', 'source': 'regex_win32.cpp'}, 'ygg': {'compiler_flags': [], 'external_dependencies': ['rapidjson', 'python', 'numpy'], 'include_dirs': ['/Users/langmm/yggdrasil/yggdrasil/languages/c/communication', '/Users/langmm/yggdrasil/yggdrasil/languages/c/serialize', '/Users/langmm/yggdrasil/yggdrasil/languages/c', '/Users/langmm/yggdrasil/yggdrasil/languages/c'], 'internal_dependencies': ['regex', 'datatypes', 'python_wrapper'], 'language': 'c', 'linker_language': 'c++', 'source': '/Users/langmm/yggdrasil/yggdrasil/languages/c/YggInterface.c'}}</em><a class="headerlink" href="#yggdrasil.drivers.CModelDriver.CModelDriver.internal_libraries" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
@@ -12064,6 +12068,11 @@ registration.</p>
 <dl class="py attribute">
 <dt id="yggdrasil.drivers.CPPModelDriver.CPPModelDriver.interface_library">
 <code class="sig-name descname">interface_library</code><em class="property"> = 'ygg++'</em><a class="headerlink" href="#yggdrasil.drivers.CPPModelDriver.CPPModelDriver.interface_library" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="yggdrasil.drivers.CPPModelDriver.CPPModelDriver.interface_map">
+<code class="sig-name descname">interface_map</code><em class="property"> = {'call': 'flag = {channel_obj}.call({nargs}, {outputs}, {input_refs})', 'client': 'YggRpcClient {channel_obj}(&quot;{channel_name}&quot;, {datatype_out}, {datatype_in})', 'import': '#include &quot;YggInterface.hpp&quot;', 'input': 'YggInput {channel_obj}(&quot;{channel_name}&quot;)', 'output': 'YggOutput {channel_obj}(&quot;{channel_name}&quot;)', 'recv': 'flag = {channel_obj}.recv({nargs}, {input_refs})', 'send': 'flag = {channel_obj}.send({nargs}, {outputs})', 'server': 'YggRpcServer {channel_obj}(&quot;{channel_name}&quot;, {datatype_in}, {datatype_out})', 'timesync': 'YggTimesync {channel_obj}(&quot;{channel_name}&quot;, &quot;{time_units}&quot;)'}</em><a class="headerlink" href="#yggdrasil.drivers.CPPModelDriver.CPPModelDriver.interface_map" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
@@ -17362,6 +17371,11 @@ the precise declaration that should be used.</p></li>
 <dd></dd></dl>
 
 <dl class="py attribute">
+<dt id="yggdrasil.drivers.FortranModelDriver.FortranModelDriver.interface_map">
+<code class="sig-name descname">interface_map</code><em class="property"> = {'call': 'flag = ygg_rpc_call({channel_obj}, [yggarg({outputs})], [yggarg({inputs})])', 'client': 'ygg_rpc_client_type(&quot;{channel_name}&quot;, {datatype_out}, {datatype_in})', 'import': 'use fygg', 'input': 'ygg_input_type(&quot;{channel_name}&quot;, {datatype})', 'output': 'ygg_output_type(&quot;{channel_name}&quot;, {datatype})', 'recv': 'flag = ygg_recv_var({channel_obj}, [yggarg({inputs})])', 'send': 'flag = ygg_send_var({channel_obj}, [yggarg({outputs})])', 'server': 'ygg_rpc_server_type(&quot;{channel_name}&quot;, {datatype_in}, {datatype_out})', 'timesync': 'yggTimesync(&quot;{channel_name}&quot;, &quot;{time_units}&quot;)'}</em><a class="headerlink" href="#yggdrasil.drivers.FortranModelDriver.FortranModelDriver.interface_map" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
 <dt id="yggdrasil.drivers.FortranModelDriver.FortranModelDriver.internal_libraries">
 <code class="sig-name descname">internal_libraries</code><em class="property"> = {'c_wrappers': {'external_dependencies': [('c', 'rapidjson'), ('c', 'python'), ('c', 'numpy')], 'include_dirs': ['/Users/langmm/yggdrasil/yggdrasil/languages/fortran'], 'internal_dependencies': [('c', 'ygg')], 'language': 'c', 'libtype': 'object', 'source': '/Users/langmm/yggdrasil/yggdrasil/languages/fortran/c_wrappers.c'}, 'fygg': {'external_dependencies': [('c', 'rapidjson'), ('c', 'python'), ('c', 'numpy'), 'stdc++'], 'include_dirs': ['/Users/langmm/yggdrasil/yggdrasil/languages/c/communication', '/Users/langmm/yggdrasil/yggdrasil/languages/c/serialize', '/Users/langmm/yggdrasil/yggdrasil/languages/c', '/Users/langmm/yggdrasil/yggdrasil/languages/c'], 'internal_dependencies': [('c', 'regex'), ('c', 'datatypes'), ('c', 'python_wrapper'), ('c', 'ygg'), 'c_wrappers'], 'libtype': 'static', 'source': '/Users/langmm/yggdrasil/yggdrasil/languages/fortran/YggInterface.f90'}}</em><a class="headerlink" href="#yggdrasil.drivers.FortranModelDriver.FortranModelDriver.internal_libraries" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
@@ -18312,7 +18326,7 @@ and which ones are arguments.</p>
 
 <dl class="py attribute">
 <dt id="id23">
-<code class="sig-name descname">paths_to_add</code><em class="property"> = ['/Users/langmm/yggdrasil/yggdrasil', '/Users/langmm/yggdrasil/yggdrasil/languages/python', '/Users/langmm/yggdrasil/yggdrasil/languages/R', '/Users/langmm/yggdrasil/yggdrasil/languages/sbml', '/Users/langmm/yggdrasil/yggdrasil/languages/function', '/Users/langmm/yggdrasil/yggdrasil/languages/LPy', '/Users/langmm/yggdrasil/yggdrasil/languages/matlab']</em><a class="headerlink" href="#id23" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">paths_to_add</code><em class="property"> = ['/Users/langmm/yggdrasil/yggdrasil', '/Users/langmm/yggdrasil/yggdrasil/languages/matlab', '/Users/langmm/yggdrasil/yggdrasil/languages/function', '/Users/langmm/yggdrasil/yggdrasil/languages/python', '/Users/langmm/yggdrasil/yggdrasil/languages/R', '/Users/langmm/yggdrasil/yggdrasil/languages/LPy', '/Users/langmm/yggdrasil/yggdrasil/languages/sbml']</em><a class="headerlink" href="#id23" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
@@ -18461,7 +18475,7 @@ method.</p></li>
 
 <dl class="py attribute">
 <dt id="yggdrasil.drivers.LPyModelDriver.LPyModelDriver.supported_comms">
-<code class="sig-name descname">supported_comms</code><em class="property"> = ['rmq', 'buffer', 'ipc', 'zmq', 'value', 'rmq_async']</em><a class="headerlink" href="#yggdrasil.drivers.LPyModelDriver.LPyModelDriver.supported_comms" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">supported_comms</code><em class="property"> = ['value', 'ipc', 'rmq_async', 'rmq', 'buffer', 'zmq']</em><a class="headerlink" href="#yggdrasil.drivers.LPyModelDriver.LPyModelDriver.supported_comms" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </dd></dl>
@@ -19182,6 +19196,11 @@ is not installed, cannot be started, or does not operate as expected.</p>
 </dd>
 </dl>
 </dd></dl>
+
+<dl class="py attribute">
+<dt id="yggdrasil.drivers.MatlabModelDriver.MatlabModelDriver.interface_map">
+<code class="sig-name descname">interface_map</code><em class="property"> = {'call': '[flag, {inputs}] = {channel_obj}.call({outputs})', 'client': &quot;YggInterface('YggRpcClient', '{channel_name}')&quot;, 'import': '', 'input': &quot;YggInterface('YggInput', '{channel_name}')&quot;, 'output': &quot;YggInterface('YggOutput', '{channel_name}')&quot;, 'recv': '[flag, {inputs}] = {channel_obj}.recv()', 'send': 'flag = {channel_obj}.send({outputs})', 'server': &quot;YggInterface('YggRpcServer', '{channel_name}')&quot;, 'timesync': &quot;YggInterface('YggTimesync', '{channel_name}')&quot;}</em><a class="headerlink" href="#yggdrasil.drivers.MatlabModelDriver.MatlabModelDriver.interface_map" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
 
 <dl class="py attribute">
 <dt id="yggdrasil.drivers.MatlabModelDriver.MatlabModelDriver.inverse_type_map">
@@ -22607,6 +22626,11 @@ request function parameter.</p></li>
 <dd></dd></dl>
 
 <dl class="py attribute">
+<dt id="yggdrasil.drivers.PythonModelDriver.PythonModelDriver.interface_map">
+<code class="sig-name descname">interface_map</code><em class="property"> = {'call': 'flag, {inputs} = {channel_obj}.call({outputs})', 'client': 'YggRpcClient(&quot;{channel_name}&quot;)', 'import': 'from yggdrasil.languages.Python.YggInterface import {commtype}', 'input': 'YggInput(&quot;{channel_name}&quot;)', 'output': 'YggOutput(&quot;{channel_name}&quot;)', 'recv': 'flag, {inputs} = {channel_obj}.recv()', 'send': 'flag = {channel_obj}.send({outputs})', 'server': 'YggRpcServer(&quot;{channel_name}&quot;)', 'timesync': 'YggTimesync(&quot;{channel_name}&quot;)'}</em><a class="headerlink" href="#yggdrasil.drivers.PythonModelDriver.PythonModelDriver.interface_map" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
 <dt id="yggdrasil.drivers.PythonModelDriver.PythonModelDriver.inverse_type_map">
 <code class="sig-name descname">inverse_type_map</code><em class="property"> = None</em><a class="headerlink" href="#yggdrasil.drivers.PythonModelDriver.PythonModelDriver.inverse_type_map" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
@@ -22685,7 +22709,7 @@ method.</p>
 
 <dl class="py attribute">
 <dt id="yggdrasil.drivers.PythonModelDriver.PythonModelDriver.supported_comms">
-<code class="sig-name descname">supported_comms</code><em class="property"> = ['rmq', 'buffer', 'ipc', 'zmq', 'value', 'rmq_async']</em><a class="headerlink" href="#yggdrasil.drivers.PythonModelDriver.PythonModelDriver.supported_comms" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">supported_comms</code><em class="property"> = ['value', 'ipc', 'rmq_async', 'rmq', 'buffer', 'zmq']</em><a class="headerlink" href="#yggdrasil.drivers.PythonModelDriver.PythonModelDriver.supported_comms" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
@@ -22780,12 +22804,17 @@ the compilation executable. Defaults to False.</p></li>
 
 <dl class="py attribute">
 <dt id="yggdrasil.drivers.RModelDriver.RModelDriver.interface_dependencies">
-<code class="sig-name descname">interface_dependencies</code><em class="property"> = ['R6', 'Rcpp', 'units', 'reticulate', 'zeallot', 'bit64']</em><a class="headerlink" href="#yggdrasil.drivers.RModelDriver.RModelDriver.interface_dependencies" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">interface_dependencies</code><em class="property"> = ['bit64', 'Rcpp', 'reticulate', 'units', 'zeallot', 'R6']</em><a class="headerlink" href="#yggdrasil.drivers.RModelDriver.RModelDriver.interface_dependencies" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
 <dt id="yggdrasil.drivers.RModelDriver.RModelDriver.interface_library">
 <code class="sig-name descname">interface_library</code><em class="property"> = 'yggdrasil'</em><a class="headerlink" href="#yggdrasil.drivers.RModelDriver.RModelDriver.interface_library" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="yggdrasil.drivers.RModelDriver.RModelDriver.interface_map">
+<code class="sig-name descname">interface_map</code><em class="property"> = {'call': 'c(flag, {inputs}) %&lt;-% {channel_obj}$call({outputs})', 'client': &quot;YggInterface('YggRpcClient', '{channel_name}')&quot;, 'import': 'library(yggdrasil)', 'input': &quot;YggInterface('YggInput', '{channel_name}')&quot;, 'output': &quot;YggInterface('YggOutput', '{channel_name}')&quot;, 'recv': 'c(flag, {inputs}) %&lt;-% {channel_obj}$recv()', 'send': 'flag = {channel_obj}$send({outputs})', 'server': &quot;YggInterface('YggRpcServer', '{channel_name}')&quot;, 'timesync': &quot;YggInterface('YggTimesync', '{channel_name}')&quot;}</em><a class="headerlink" href="#yggdrasil.drivers.RModelDriver.RModelDriver.interface_map" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
