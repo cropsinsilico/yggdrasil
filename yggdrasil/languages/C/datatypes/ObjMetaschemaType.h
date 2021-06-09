@@ -54,6 +54,8 @@ public:
   /*!
     @brief Copy data wrapped in YggGeneric class.
     @param[in] data YggGeneric* Pointer to generic object.
+    @param[in] orig_data Pointer to data that should be copied if different
+    that the data that is wrapped.
     @returns void* Pointer to copy of data.
    */
   void* copy_generic(const YggGeneric* data, void* orig_data=NULL) const override {
@@ -1217,6 +1219,8 @@ public:
     p that should be updated when a line is added to the structure.
     @param[in] iline char* Line that should be parsed for line
     information.
+    @param[in] re_line_vert const char* Pointer to regex for line
+    vertices.
     @param[in] do_texcoords bool If true, texcoords will be extracted
     from the line.
     @returns int -1 if there is an error, 1 otherwise.
@@ -1284,6 +1288,8 @@ public:
     p that should be updated when a face is added to the structure.
     @param[in] iline char* Line that should be parsed for face
     information.
+    @param[in] re_face_vert const char* Pointer to regex for face
+    vertices.
     @param[in] do_texcoords bool If true, texcoords will be extracted
     from the line.
     @param[in] do_normals bool If true, normals will be extracted
@@ -1377,6 +1383,8 @@ public:
     p that should be updated when a surface is added to the structure.
     @param[in] iline char* Line that should be parsed for surface
     information.
+    @param[in] re_surf_vert const char* Pointer to regex for surface
+    vertices.
     @param[in] sind_ptr size_t** Pointer to array containing starting
     indices for subexpressions in the regex for the surface entry.
     @param[in] eind_ptr size_t** Pointer to array containing ending

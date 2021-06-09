@@ -15,6 +15,10 @@ yggdrasil/tests/scripts/Makefile
 *.dylib
 yggdrasil/languages/C/stdint.h
 
+# R build things
+yggdrasil/languages/R/..Rcheck
+yggdrasil/languages/R/man
+
 # Intermediate docs
 docs/build
 docs/source/cis_interface.inc
@@ -25,6 +29,7 @@ docs/source/modules.rst
 docs/source/examples/*.rst
 docs/source/tables
 docs/source/temp
+docs/source/advanced/YggInterface_R.rst
 
 # Dev setup
 requirements_pruned.txt

@@ -780,6 +780,8 @@ public:
   /*!
     @brief Update the instance's subtype.
     @param[in] new_subtype const char * String for new subtype.
+    @param[in] force bool True if the subtype should be updated even if it
+    is not compatible with the existing value.
    */
   void update_subtype(const char* new_subtype, bool force=false) {
     if ((!(force)) && (strcmp(subtype_, new_subtype) != 0)) {
@@ -793,6 +795,8 @@ public:
   }
   /*!
     @brief Determine if two units are compatible.
+    @param[in] x One set of units.
+    @param[in] y Second set of units.
     @returns bool true if they are compat, false otherwise
    */
     bool are_compat_units(const char* x, const char* y) const {
@@ -805,6 +809,8 @@ public:
   /*!
     @brief Update the instance's units.
     @param[in] new_units const char * String for new units.
+    @param[in] force bool True if the units should be updated even if it
+    is not compatible with the existing value.
    */
   void update_units(const char* new_units, bool force=false) {
     if ((!(force)) && (strcmp(units_, new_units) != 0)) {
@@ -823,6 +829,8 @@ public:
   /*!
     @brief Update the instance's precision.
     @param[in] new_precision size_t New precision.
+    @param[in] force bool True if the precision should be updated even if it
+    is not compatible with the existing value.
    */
   void set_precision(const size_t new_precision, bool force=false) {
     if (precision_ != new_precision) {
@@ -1742,6 +1750,8 @@ public:
   /*!
     @brief Update the instance's shape.
     @param[in] new_shape std::vector<size_t> Vector of new array sizes in each dimension.
+    @param[in] force bool True if the shape should be updated even if it
+    is not compatible with the existing value.
    */
   void set_shape(std::vector<size_t> new_shape, bool force=false);
   /*!
@@ -2007,6 +2017,8 @@ class OneDArrayMetaschemaType : public ScalarMetaschemaType {
   /*!
     @brief Update the instance's length.
     @param[in] new_length size_t New length.
+    @param[in] force bool True if the length should be updated even if it
+    is not compatible with the existing value.
    */
   void set_length(size_t new_length, bool force=false) override {
     if (length_ != new_length) {

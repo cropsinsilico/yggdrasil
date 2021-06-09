@@ -302,7 +302,8 @@ def requirements_from_description(fname=None):
                 in_section = True
             elif in_section:
                 if x.startswith('  '):
-                    out.append(x.strip().strip(','))
+                    if not x.strip().startswith('R '):
+                        out.append(x.strip().strip(','))
                 else:
                     in_section = False
     out = list(set(out))

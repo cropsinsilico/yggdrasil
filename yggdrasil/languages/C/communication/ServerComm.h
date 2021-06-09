@@ -195,6 +195,8 @@ comm_t* server_get_comm(requests_t *x, size_t idx) {
   @brief Add a request to the registry.
   @param[in] x requests_t* Structure containing a registry of requests.
   @param[in] request_id const char* ID associated with the request being added.
+  @param[in] response_addres char* Address that should be used for responses
+  to this request.
   @param[in] datatype const dtype_t* Data type that should be copied.
   @returns int -1 if there is an error, 0 otherwise.
 */

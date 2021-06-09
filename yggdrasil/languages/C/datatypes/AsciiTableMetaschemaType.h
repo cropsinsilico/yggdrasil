@@ -152,6 +152,8 @@ public:
   /*!
     @brief Update the instance's as_array flag.
     @param[in] new_as_array const int New as_array flag.
+    @param[in] force bool True if the as_array parameter should be updated
+    even if it is not compatible with the existing value.
    */
   void update_as_array(const int new_as_array, bool force=false) {
     if ((!(force)) && (as_array_ != new_as_array)) {
@@ -244,7 +246,7 @@ public:
     @param[in] allow_realloc int If 1, buf will be reallocated if it is not
     large enough to contain the serialized data. If 0, an error will be raised
     if it is not large enough.
-    @param[in] Pointer to generic wrapper for object being serialized.
+    @param[in] x Pointer to generic wrapper for object being serialized.
     @returns int Size of the serialized data in buf.
    */
   int serialize(char **buf, size_t *buf_siz,

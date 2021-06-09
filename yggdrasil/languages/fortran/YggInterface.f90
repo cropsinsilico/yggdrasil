@@ -4,6 +4,7 @@ module fygg
   use iso_c_binding
   implicit none
 
+#ifndef DOXYGEN_SHOULD_SKIP_THIS
   integer, parameter :: LINE_SIZE_MAX = 2048
   integer, parameter :: YGG_MSG_BUF = 2048
   integer, parameter :: ascii = selected_char_kind ("ascii")
@@ -15,6 +16,7 @@ module fygg
   integer(kind=c_int), bind(c, name="YGG_MSG_MAX_F") :: YGG_MSG_MAX
   real(8),  parameter :: PI_8  = 4 * atan (1.0_8)
   real(16), parameter :: PI_16 = 4 * atan (1.0_16)
+#endif ! DOXYGEN_SHOULD_SKIP_THIS
 
   interface yggarg
      module procedure yggarg_scalar_unsigned1
@@ -372,6 +374,7 @@ module fygg
      module procedure generic_map_get_ndarray_bytes
      module procedure generic_map_get_ndarray_unicode
   end interface generic_map_get
+#ifndef DOXYGEN_SHOULD_SKIP_THIS
   interface yggassign
      module procedure yggassign_yggchar2character
      ! module procedure yggassign_character2yggchar
@@ -419,6 +422,7 @@ module fygg
      module procedure yggassign_logical8_1d_from_array
      ! TODO: ND array
   end interface yggassign
+#endif ! DOXYGEN_SHOULD_SKIP_THIS
   interface yggarr
      module procedure ygggeneric2yggarr
   end interface yggarr
@@ -444,24 +448,50 @@ module fygg
      module procedure yggpython2yggpython
      module procedure yggpyfunc2yggpython
   end interface yggpython
+  !> @brief Send one or more variables 
+  !> @param[in] ygg_q Output/RPC/Timesync comm.
+  !> @param[in] arg/args One or more variables to send.
+  !> @returns flag Success (.true.) or failure (.false.) of the send.
   interface ygg_send_var
      module procedure ygg_send_var_sing
      module procedure ygg_send_var_mult
   end interface ygg_send_var
+  !> @brief Receive data into one or more variables that cannot be resized.
+  !> @param[in] ygg_q Output/RPC/Timesync comm.
+  !> @param[in,out] arg/args One or more variables to receive into.
+  !> @returns flag Success (.true.) or failure (.false.) of the send.
   interface ygg_recv_var
      module procedure ygg_recv_var_sing
      module procedure ygg_recv_var_mult
   end interface ygg_recv_var
+  !> @brief Receive data into one or more variables that can be resized.
+  !> @param[in] ygg_q Output/RPC/Timesync comm.
+  !> @param[in,out] arg/args One or more variables to receive into.
+  !> @returns flag Success (.true.) or failure (.false.) of the send.
   interface ygg_recv_var_realloc
      module procedure ygg_recv_var_realloc_sing
      module procedure ygg_recv_var_realloc_mult
   end interface ygg_recv_var_realloc
+  !> @brief Send a request and receive a response into one or more variables
+  !> that cannot be resized.
+  !> @param[in] ygg_q RPC/Timesync comm.
+  !> @param[in] oarg/oargs One or more variables to send in the request.
+  !> @param[in,out] iarg/iargs One or more variables to receive the response into
+  !> that cannot be resized.
+  !> @returns flag Success (.true.) or failure (.false.) of the call.
   interface ygg_rpc_call
      module procedure ygg_rpc_call_1v1
      module procedure ygg_rpc_call_1vm
      module procedure ygg_rpc_call_mv1
      module procedure ygg_rpc_call_mult
   end interface ygg_rpc_call
+  !> @brief Send a request and receive a response into one or more variables
+  !> that can be resized.
+  !> @param[in] ygg_q RPC/Timesync comm.
+  !> @param[in] oarg/oargs One or more variables to send in the request.
+  !> @param[in,out] iarg/iargs One or more variables to receive the response into
+  !> that can be resized.
+  !> @returns flag Success (.true.) or failure (.false.) of the call.
   interface ygg_rpc_call_realloc
      module procedure ygg_rpc_call_realloc_1v1
      module procedure ygg_rpc_call_realloc_1vm
@@ -856,55 +886,57 @@ module fygg
      type(c_ptr) :: kwargs = c_null_ptr
      type(c_ptr) :: obj = c_null_ptr
   end type yggpython
+  !> @brief Ply structure.
   type, bind(c) :: yggply
-     character(kind=c_char), dimension(100) :: material
-     integer(kind=c_int) :: nvert
-     integer(kind=c_int) :: nface
-     integer(kind=c_int) :: nedge
-     type(c_ptr) :: c_vertices
-     type(c_ptr) :: c_faces
-     type(c_ptr) :: c_edges
-     type(c_ptr) :: c_vertex_colors
-     type(c_ptr) :: c_edge_colors
-     type(c_ptr) :: c_nvert_in_face
+     character(kind=c_char), dimension(100) :: material !> Name of material.
+     integer(kind=c_int) :: nvert !> Number of vertices.
+     integer(kind=c_int) :: nface !> Number of faces.
+     integer(kind=c_int) :: nedge !> Number of edges.
+     type(c_ptr) :: c_vertices !> X, Y, Z positions of vertices.
+     type(c_ptr) :: c_faces !> Indices of the vertices composing each face.
+     type(c_ptr) :: c_edges !> Indices of the vertices composing each edge.
+     type(c_ptr) :: c_vertex_colors !> RGB colors of each vertex.
+     type(c_ptr) :: c_edge_colors !> RGB colors of each edge.
+     type(c_ptr) :: c_nvert_in_face !> Number of vertices in each face.
   end type yggply
+  !> @brief Obj structure.
   type, bind(c) :: yggobj
-     character(kind=c_char), dimension(100) :: material
-     integer(kind=c_int) :: nvert
-     integer(kind=c_int) :: ntexc
-     integer(kind=c_int) :: nnorm
-     integer(kind=c_int) :: nparam
-     integer(kind=c_int) :: npoint
-     integer(kind=c_int) :: nline
-     integer(kind=c_int) :: nface
-     integer(kind=c_int) :: ncurve
-     integer(kind=c_int) :: ncurve2
-     integer(kind=c_int) :: nsurf
-     type(c_ptr) :: c_vertices
-     type(c_ptr) :: c_vertex_colors
-     type(c_ptr) :: c_texcoords
-     type(c_ptr) :: c_normals
-     type(c_ptr) :: c_params
-     type(c_ptr) :: c_points
-     type(c_ptr) :: c_nvert_in_point
-     type(c_ptr) :: c_lines
-     type(c_ptr) :: c_nvert_in_line
-     type(c_ptr) :: c_line_texcoords
-     type(c_ptr) :: c_faces
-     type(c_ptr) :: c_nvert_in_face
-     type(c_ptr) :: c_face_texcoords
-     type(c_ptr) :: c_face_normals
-     type(c_ptr) :: c_curves
-     type(c_ptr) :: c_curve_params
-     type(c_ptr) :: c_nvert_in_curve
-     type(c_ptr) :: c_curves2
-     type(c_ptr) :: c_nparam_in_curve2
-     type(c_ptr) :: c_surfaces
-     type(c_ptr) :: c_nvert_in_surface
-     type(c_ptr) :: c_surface_params_u
-     type(c_ptr) :: c_surface_params_v
-     type(c_ptr) :: c_surface_texcoords
-     type(c_ptr) :: c_surface_normals
+     character(kind=c_char), dimension(100) :: material !> Material that should be used for faces.
+     integer(kind=c_int) :: nvert !> Material that should be used for faces.
+     integer(kind=c_int) :: ntexc !> Number of vertices.
+     integer(kind=c_int) :: nnorm !> Number of texture coordinates.
+     integer(kind=c_int) :: nparam !> Number of normals.
+     integer(kind=c_int) :: npoint !> Number of points.
+     integer(kind=c_int) :: nline !> Number of lines.
+     integer(kind=c_int) :: nface !> Number of faces.
+     integer(kind=c_int) :: ncurve !> Number of curves.
+     integer(kind=c_int) :: ncurve2 !> Number of curv2.
+     integer(kind=c_int) :: nsurf !> Number of surfaces.
+     type(c_ptr) :: c_vertices !> X, Y, Z positions of vertices.
+     type(c_ptr) :: c_vertex_colors !> RGB colors of each vertex.
+     type(c_ptr) :: c_texcoords !> Texture coordinates.
+     type(c_ptr) :: c_normals !> X, Y, Z direction of normals.
+     type(c_ptr) :: c_params !> U, V, W directions of params.
+     type(c_ptr) :: c_points !> Sets of one or more vertex indices.
+     type(c_ptr) :: c_nvert_in_point !> Number of vertex indices in each point set.
+     type(c_ptr) :: c_lines !> Indices of the vertices composing each line.
+     type(c_ptr) :: c_nvert_in_line !> Number of vertex indices in each line.
+     type(c_ptr) :: c_line_texcoords !> Indices of texcoords for each line vertex.
+     type(c_ptr) :: c_faces !> Indices of the vertices composing each face.
+     type(c_ptr) :: c_nvert_in_face !> Number of vertex indices in each face.
+     type(c_ptr) :: c_face_texcoords !> Indices of texcoords for each face vertex.
+     type(c_ptr) :: c_face_normals !> Indices of normals for each face vertex.
+     type(c_ptr) :: c_curves !> Indices of control point vertices for each curve.
+     type(c_ptr) :: c_curve_params !> Starting and ending parameters for each curve.
+     type(c_ptr) :: c_nvert_in_curve !> Number of vertex indices in each curve.
+     type(c_ptr) :: c_curves2 !> Indices of control parameters for each curve.
+     type(c_ptr) :: c_nparam_in_curve2 !> Number of parameter indices in each curve.
+     type(c_ptr) :: c_surfaces !> Indices of control point vertices for each surface.
+     type(c_ptr) :: c_nvert_in_surface !> Number of vertices in each surface.
+     type(c_ptr) :: c_surface_params_u !> Starting and ending parameters for each curve in the u direction.
+     type(c_ptr) :: c_surface_params_v !> Starting and ending parameters for each curve in the v direction.
+     type(c_ptr) :: c_surface_texcoords !> Indices of texcoords for each surface vertex.
+     type(c_ptr) :: c_surface_normals !> Indices of normals for each surface vertex.
   end type yggobj
   type ygguint1
      integer(kind=1) :: x
@@ -926,10 +958,12 @@ module fygg
      module procedure ygguint8_assign
   end interface assignment(=)
 
+#ifndef DOXYGEN_SHOULD_SKIP_THIS
   public :: yggarg, yggchar_r, yggcomm, ygggeneric, &
        yggptr, yggnull, yggarr, yggmap, &
        yggschema, yggpython, yggply, yggobj, yggpyinst, yggpyfunc, &
        LINE_SIZE_MAX
+#endif ! DOXYGEN_SHOULD_SKIP_THIS
 
   include "YggInterface_cdef.f90"
 
@@ -946,6 +980,7 @@ contains
   include "YggInterface_array.f90"
   include "YggInterface_map.f90"
 
+#ifndef DOXYGEN_SHOULD_SKIP_THIS
   subroutine ygguint1_assign(self, other)
     type(ygguint1), intent(inout) :: self
     integer, intent(in) :: other
@@ -966,6 +1001,7 @@ contains
     integer, intent(in) :: other
     self%x = int(other, kind=8)
   end subroutine ygguint8_assign
+#endif ! DOXYGEN_SHOULD_SKIP_THIS
 
 
 #ifndef _WIN32
@@ -1152,6 +1188,12 @@ contains
     end if
   end function is_comm_format_array_type
   
+  !> @brief Constructor for an output comm
+  !> Create a yggcomm structure for an output channel based on a provided name
+  !> that is used to locate a particular comm address stored in an environment
+  !> variable.
+  !> @param[in] name Name of the channel.
+  !> @returns Output comm structure.
   function ygg_output(name) result(channel)
     implicit none
     character(len=*), intent(in) :: name
@@ -1161,6 +1203,12 @@ contains
     channel%comm = ygg_output_c(c_name)
   end function ygg_output
   
+  !> @brief Constructor for an input comm
+  !> Create a yggcomm structure for an input channel based on a provided name
+  !> that is used to locate a particular comm address stored in an environment
+  !> variable.
+  !> @param[in] name Name of the channel.
+  !> @returns Input comm structure.
   function ygg_input(name) result(channel)
     implicit none
     character(len=*), intent(in) :: name
@@ -1170,6 +1218,13 @@ contains
     channel%comm = ygg_input_c(c_name)
   end function ygg_input
 
+  !> @brief Constructor for an output comm that will send a specific data type.
+  !> Create a yggcomm structure for an output channel based on a provided name
+  !> that is used to locate a particular comm address stored in an environment
+  !> variable and a structure defining the datatype of outgoing messages.
+  !> @param[in] name Name of the channel.
+  !> @param[in] datatype Data structure containing type information.
+  !> @returns Output comm structure.
   function ygg_output_type(name, datatype) result(channel)
     implicit none
     character(len=*), intent(in) :: name
@@ -1182,6 +1237,13 @@ contains
     channel%comm = ygg_output_type_c(c_name, c_datatype)
   end function ygg_output_type
   
+  !> @brief Constructor for an input comm that will receive a specific data type.
+  !> Create a yggcomm structure for an input channel based on a provided name
+  !> that is used to locate a particular comm address stored in an environment
+  !> variable and a structure defining the datatype of incoming messages.
+  !> @param[in] name Name of the channel.
+  !> @param[in] datatype Data structure containing type information.
+  !> @returns Input comm structure.
   function ygg_input_type(name, datatype) result(channel)
     implicit none
     character(len=*), intent(in) :: name
@@ -1194,6 +1256,14 @@ contains
     channel%comm = ygg_input_type_c(c_name, c_datatype)
   end function ygg_input_type
   
+  !> @brief Constructor for an output comm with a type specified via a C-style format string.
+  !> Create a yggcomm structure for an output channel based on a provided name
+  !> that is used to locate a particular comm address stored in an environment
+  !> variable and a format string.
+  !> @param[in] name Name of the channel.
+  !> @param[in] fmt C-style format string that should be used to determine the
+  !> type of data that will be sent.
+  !> @returns Output comm structure.
   function ygg_output_fmt(name, fmt) result(channel)
     implicit none
     character(len=*), intent(in) :: name
@@ -1207,6 +1277,14 @@ contains
     channel%comm = ygg_output_fmt_c(c_name, c_fmt)
   end function ygg_output_fmt
   
+  !> @brief Constructor for an input comm with a type specified via a C-style format string.
+  !> Create a yggcomm structure for an input channel based on a provided name
+  !> that is used to locate a particular comm address stored in an environment
+  !> variable and a format string.
+  !> @param[in] name Name of the channel.
+  !> @param[in] fmt C-style format string that should be used to determine the
+  !> type of data that will be received.
+  !> @returns Input comm structure.
   function ygg_input_fmt(name, fmt) result(channel)
     implicit none
     character(len=*), intent(in) :: name
@@ -1220,6 +1298,12 @@ contains
     channel%comm = ygg_input_fmt_c(c_name, c_fmt)
   end function ygg_input_fmt
   
+  !> @brief Constructor for an ASCII file output comm
+  !> Create a yggcomm structure for an output channel based on a provided name
+  !> that is used to locate a particular comm address stored in an environment
+  !> variable. This type of comm sends string output line-by-line.
+  !> @param[in] name Name of the channel.
+  !> @returns Output comm structure.
   function ygg_ascii_file_output(name) result(channel)
     implicit none
     character(len=*), intent(in) :: name
@@ -1229,6 +1313,12 @@ contains
     channel%comm = ygg_ascii_file_output_c(c_name)
   end function ygg_ascii_file_output
   
+  !> @brief Constructor for an ASCII file input comm
+  !> Create a yggcomm structure for an input channel based on a provided name
+  !> that is used to locate a particular comm address stored in an environment
+  !> variable. This type of comm receives string input line-by-line.
+  !> @param[in] name Name of the channel.
+  !> @returns Input comm structure.
   function ygg_ascii_file_input(name) result(channel)
     implicit none
     character(len=*), intent(in) :: name
@@ -1238,6 +1328,15 @@ contains
     channel%comm = ygg_ascii_file_input_c(c_name)
   end function ygg_ascii_file_input
   
+  !> @brief Constructor for an ASCII table output comm
+  !> Create a yggcomm structure for an output channel based on a provided name
+  !> that is used to locate a particular comm address stored in an environment
+  !> variable and a format string. This type of comm outputs table rows
+  !> one at a time and formats them using the provided format_str.
+  !> @param[in] name Name of the channel.
+  !> @param[in] format_str C-style format string that should be used to format
+  !> table rows.
+  !> @returns Output comm structure.
   function ygg_ascii_table_output(name, format_str) result(channel)
     implicit none
     character(len=*), intent(in) :: name
@@ -1251,6 +1350,13 @@ contains
     channel%comm = ygg_ascii_table_output_c(c_name, c_format_str)
   end function ygg_ascii_table_output
   
+  !> @brief Constructor for an ASCII table input comm
+  !> Create a yggcomm structure for an input channel based on a provided name
+  !> that is used to locate a particular comm address stored in an environment
+  !> variable and a format string. This type of comm receives table rows
+  !> one at a time.
+  !> @param[in] name Name of the channel.
+  !> @returns Input comm structure.
   function ygg_ascii_table_input(name) result(channel)
     implicit none
     character(len=*), intent(in) :: name
@@ -1260,6 +1366,15 @@ contains
     channel%comm = ygg_ascii_table_input_c(c_name)
   end function ygg_ascii_table_input
   
+  !> @brief Constructor for an ASCII table array output comm
+  !> Create a yggcomm structure for an output channel based on a provided name
+  !> that is used to locate a particular comm address stored in an environment
+  !> variable and a format string. This type of comm outputs table columns
+  !> as arrays and formats rows using the provided format_str.
+  !> @param[in] name Name of the channel.
+  !> @param[in] format_str C-style format string that should be used to format
+  !> table rows.
+  !> @returns Output comm structure.
   function ygg_ascii_array_output(name, format_str) result(channel)
     implicit none
     character(len=*), intent(in) :: name
@@ -1273,6 +1388,13 @@ contains
     channel%comm = ygg_ascii_array_output_c(c_name, c_format_str)
   end function ygg_ascii_array_output
   
+  !> @brief Constructor for an ASCII table array input comm
+  !> Create a yggcomm structure for an input channel based on a provided name
+  !> that is used to locate a particular comm address stored in an environment
+  !> variable and a format string. This type of comm receives table columns
+  !> as arrays.
+  !> @param[in] name Name of the channel.
+  !> @returns Input comm structure.
   function ygg_ascii_array_input(name) result(channel)
     implicit none
     character(len=*), intent(in) :: name
@@ -1282,6 +1404,12 @@ contains
     channel%comm = ygg_ascii_array_input_c(c_name)
   end function ygg_ascii_array_input
   
+  !> @brief Constructor for an output comm that sends Ply data.
+  !> Create a yggcomm structure for an output channel based on a provided name
+  !> that is used to locate a particular comm address stored in an environment
+  !> variable. This type of comm only sends Ply data contained in yggply structures.
+  !> @param[in] name Name of the channel.
+  !> @returns Output comm structure.
   function ygg_ply_output(name) result(channel)
     implicit none
     character(len=*), intent(in) :: name
@@ -1291,6 +1419,12 @@ contains
     channel%comm = ygg_ply_output_c(c_name)
   end function ygg_ply_output
   
+  !> @brief Constructor for an input comm that receives Ply data.
+  !> Create a yggcomm structure for an input channel based on a provided name
+  !> that is used to locate a particular comm address stored in an environment
+  !> variable. This type of comm only receives Ply data into yggply structures.
+  !> @param[in] name Name of the channel.
+  !> @returns Input comm structure.
   function ygg_ply_input(name) result(channel)
     implicit none
     character(len=*), intent(in) :: name
@@ -1300,6 +1434,12 @@ contains
     channel%comm = ygg_ply_input_c(c_name)
   end function ygg_ply_input
   
+  !> @brief Constructor for an output comm that sends Obj data.
+  !> Create a yggcomm structure for an output channel based on a provided name
+  !> that is used to locate a particular comm address stored in an environment
+  !> variable. This type of comm only sends Obj data contained in yggobj structures.
+  !> @param[in] name Name of the channel.
+  !> @returns Output comm structure.
   function ygg_obj_output(name) result(channel)
     implicit none
     character(len=*), intent(in) :: name
@@ -1309,6 +1449,12 @@ contains
     channel%comm = ygg_obj_output_c(c_name)
   end function ygg_obj_output
   
+  !> @brief Constructor for an input comm that receives Obj data.
+  !> Create a yggcomm structure for an input channel based on a provided name
+  !> that is used to locate a particular comm address stored in an environment
+  !> variable. This type of comm only receives Obj data into yggobj structures.
+  !> @param[in] name Name of the channel.
+  !> @returns Input comm structure.
   function ygg_obj_input(name) result(channel)
     implicit none
     character(len=*), intent(in) :: name
@@ -1318,6 +1464,13 @@ contains
     channel%comm = ygg_obj_input_c(c_name)
   end function ygg_obj_input
 
+  !> @brief Constructor for an output comm that sends generic data.
+  !> Create a yggcomm structure for an output channel based on a provided name
+  !> that is used to locate a particular comm address stored in an environment
+  !> variable. This type of comm can send any type of data as long as it is
+  !> wrapped in an ygggeneric structure.
+  !> @param[in] name Name of the channel.
+  !> @returns Output comm structure.
   function ygg_generic_output(name) result(channel)
     implicit none
     character(len=*), intent(in) :: name
@@ -1327,6 +1480,13 @@ contains
     channel%comm = ygg_generic_output_c(c_name)
   end function ygg_generic_output
   
+  !> @brief Constructor for an input comm that receives generic data.
+  !> Create a yggcomm structure for an input channel based on a provided name
+  !> that is used to locate a particular comm address stored in an environment
+  !> variable. This type of comm can receive any type of data into an
+  !> ygggeneric structure.
+  !> @param[in] name Name of the channel.
+  !> @returns Input comm structure.
   function ygg_generic_input(name) result(channel)
     implicit none
     character(len=*), intent(in) :: name
@@ -1336,6 +1496,13 @@ contains
     channel%comm = ygg_generic_input_c(c_name)
   end function ygg_generic_input
 
+  !> @brief Constructor for an output comm that sends generic data.
+  !> Create a yggcomm structure for an output channel based on a provided name
+  !> that is used to locate a particular comm address stored in an environment
+  !> variable. This type of comm can send any type of data as long as it is
+  !> wrapped in an ygggeneric structure.
+  !> @param[in] name Name of the channel.
+  !> @returns Output comm structure.
   function ygg_any_output(name) result(channel)
     implicit none
     character(len=*), intent(in) :: name
@@ -1345,6 +1512,13 @@ contains
     channel%comm = ygg_any_output_c(c_name)
   end function ygg_any_output
   
+  !> @brief Constructor for an input comm that receives generic data.
+  !> Create a yggcomm structure for an input channel based on a provided name
+  !> that is used to locate a particular comm address stored in an environment
+  !> variable. This type of comm can receive any type of data into an
+  !> ygggeneric structure.
+  !> @param[in] name Name of the channel.
+  !> @returns Input comm structure.
   function ygg_any_input(name) result(channel)
     implicit none
     character(len=*), intent(in) :: name
@@ -1354,6 +1528,13 @@ contains
     channel%comm = ygg_any_input_c(c_name)
   end function ygg_any_input
 
+  !> @brief Constructor for an output comm that sends JSON arrays of generic data.
+  !> Create a yggcomm structure for an output channel based on a provided name
+  !> that is used to locate a particular comm address stored in an environment
+  !> variable. This type of comm can send any type of data as long as it is
+  !> wrapped in an ygggeneric structure.
+  !> @param[in] name Name of the channel.
+  !> @returns Output comm structure.
   function ygg_json_array_output(name) result(channel)
     implicit none
     character(len=*), intent(in) :: name
@@ -1363,6 +1544,13 @@ contains
     channel%comm = ygg_json_array_output_c(c_name)
   end function ygg_json_array_output
   
+  !> @brief Constructor for an input comm that receives JSON arrays of generic data.
+  !> Create a yggcomm structure for an input channel based on a provided name
+  !> that is used to locate a particular comm address stored in an environment
+  !> variable. This type of comm can receive any type of data into an
+  !> ygggeneric structure.
+  !> @param[in] name Name of the channel.
+  !> @returns Input comm structure.
   function ygg_json_array_input(name) result(channel)
     implicit none
     character(len=*), intent(in) :: name
@@ -1372,6 +1560,13 @@ contains
     channel%comm = ygg_json_array_input_c(c_name)
   end function ygg_json_array_input
 
+  !> @brief Constructor for an output comm that sends JSON objects of generic data.
+  !> Create a yggcomm structure for an output channel based on a provided name
+  !> that is used to locate a particular comm address stored in an environment
+  !> variable. This type of comm can send any type of data as long as it is
+  !> wrapped in an ygggeneric structure.
+  !> @param[in] name Name of the channel.
+  !> @returns Output comm structure.
   function ygg_json_object_output(name) result(channel)
     implicit none
     character(len=*), intent(in) :: name
@@ -1381,6 +1576,13 @@ contains
     channel%comm = ygg_json_object_output_c(c_name)
   end function ygg_json_object_output
   
+  !> @brief Constructor for an input comm that receives JSON objects of generic data.
+  !> Create a yggcomm structure for an input channel based on a provided name
+  !> that is used to locate a particular comm address stored in an environment
+  !> variable. This type of comm can receive any type of data into an
+  !> ygggeneric structure.
+  !> @param[in] name Name of the channel.
+  !> @returns Input comm structure.
   function ygg_json_object_input(name) result(channel)
     implicit none
     character(len=*), intent(in) :: name
@@ -1390,6 +1592,16 @@ contains
     channel%comm = ygg_json_object_input_c(c_name)
   end function ygg_json_object_input
 
+  !> @brief Constructor for a client-side RPC comm.
+  !> Create a yggcomm structure for the client side of an RPC channel based
+  !> on a provided name that is used to locate a particular comm address
+  !> stored in an environment variable. Types can be specified by format strings.
+  !> @param[in] name Name of the channel.
+  !> @param[in] out_fmt_in C-style format string defining how client requests
+  !> (outgoing messages) should be formatted.
+  !> @param[in] in_fmt_in C-style format string defining how client responses
+  !> (incoming messages) should be parsed.
+  !> @returns Client comm structure.
   function ygg_rpc_client(name, out_fmt_in, in_fmt_in) result(channel)
     implicit none
     character(len=*), intent(in) :: name
@@ -1421,6 +1633,16 @@ contains
     channel%comm = ygg_rpc_client_c(c_name, c_out_fmt, c_in_fmt)
   end function ygg_rpc_client
 
+  !> @brief Constructor for a server-side RPC comm.
+  !> Create a yggcomm structure for the server side of an RPC channel based
+  !> on a provided name that is used to locate a particular comm address
+  !> stored in an environment variable. Types can be specified by format strings.
+  !> @param[in] name Name of the channel.
+  !> @param[in] in_fmt_in C-style format string defining how requests
+  !> (incoming messages) should be parsed.
+  !> @param[in] out_fmt_in C-style format string defining how responses
+  !> (outgoing messages) should be formatted.
+  !> @returns Server comm structure.
   function ygg_rpc_server(name, in_fmt_in, out_fmt_in) result(channel)
     implicit none
     character(len=*), intent(in) :: name
@@ -1452,6 +1674,17 @@ contains
     channel%comm = ygg_rpc_server_c(c_name, c_in_fmt, c_out_fmt)
   end function ygg_rpc_server
 
+  !> @brief Constructor for a client-side RPC comm with explicit datatypes.
+  !> Create a yggcomm structure for the client side of an RPC channel based
+  !> on a provided name that is used to locate a particular comm address
+  !> stored in an environment variable. Types can be specified by datatype
+  !> structures.
+  !> @param[in] name Name of the channel.
+  !> @param[in] out_type_in Datatype structure containing information on
+  !> the type of data that requests (outgoing messages) will contain.
+  !> @param[in] in_type_in Datatype structure containing information on
+  !> the type of data that responses (incoming messages) will contain.
+  !> @returns Client comm structure.
   function ygg_rpc_client_type(name, out_type_in, in_type_in) result(channel)
     implicit none
     character(len=*), intent(in) :: name
@@ -1475,6 +1708,17 @@ contains
     channel%comm = ygg_rpc_client_type_c(c_name, c_out_type, c_in_type)
   end function ygg_rpc_client_type
 
+  !> @brief Constructor for a server-side RPC comm with explicit datatypes.
+  !> Create a yggcomm structure for the server side of an RPC channel based
+  !> on a provided name that is used to locate a particular comm address
+  !> stored in an environment variable. Types can be specified by datatype
+  !> structures.
+  !> @param[in] name Name of the channel.
+  !> @param[in] in_type_in Datatype structure containing information on
+  !> the type of data that requests (incoming messages) will contain.
+  !> @param[in] out_type_in Datatype structure containing information on
+  !> the type of data that responses (outgoing messages) will contain.
+  !> @returns Server comm structure.
   function ygg_rpc_server_type(name, in_type_in, out_type_in) result(channel)
     implicit none
     character(len=*), intent(in) :: name
@@ -1498,6 +1742,13 @@ contains
     channel%comm = ygg_rpc_server_type_c(c_name, c_in_type, c_out_type)
   end function ygg_rpc_server_type
 
+  !> @brief Constructor for a timesync comm.
+  !> Create a yggcomm structure for a timesync channel based 
+  !> on a provided name that is used to locate a particular comm address
+  !> stored in an environment variable.
+  !> @param[in] name Name of the channel.
+  !> @param[in] units Units that outgoing time steps will be in.
+  !> @returns Timesync comm structure.
   function ygg_timesync(name, units) result(channel)
     implicit none
     character(len=*), intent(in) :: name
@@ -1722,6 +1973,11 @@ contains
   end function create_dtype_any
 
   ! Methods for sending/receiving
+  !> @brief Send raw bytes data from a character array.
+  !> @param[in] ygg_q Output/RPC/Timesync comm.
+  !> @param[in] data Array of bytes to send.
+  !> @param[in] data_len Number of bytes from data to send.
+  !> @returns flag Success (.true.) or failure (.false.) of the send.
   function ygg_send(ygg_q, data, data_len) result (flag)
     implicit none
     type(yggcomm), intent(in) :: ygg_q
@@ -1743,6 +1999,11 @@ contains
     end if
   end function ygg_send
   
+  !> @brief Receive raw bytes data into a character array that cannot be resized.
+  !> @param[in] ygg_q Input/RPC/Timesync comm.
+  !> @param[in] data Array to receive bytes into.
+  !> @param[in] data_len Variable where the size of the received message should be stored.
+  !> @returns flag Success (.true.) or failure (.false.) of the receive.
   function ygg_recv(ygg_q, data, data_len) result (flag)
     implicit none
     type(yggcomm) :: ygg_q
@@ -1766,6 +2027,11 @@ contains
     end if
   end function ygg_recv
 
+  !> @brief Send raw bytes data from a character array.
+  !> @param[in] ygg_q Output/RPC/Timesync comm.
+  !> @param[in] data Array of bytes to send.
+  !> @param[in] data_len Number of bytes from data to send.
+  !> @returns flag Success (.true.) or failure (.false.) of the send.
   function ygg_send_nolimit(ygg_q, data, data_len) result (flag)
     implicit none
     type(yggcomm), intent(in) :: ygg_q
@@ -1777,6 +2043,11 @@ contains
     flag = ygg_send_var(ygg_q, [yggarg(data), yggarg(len_used)])
   end function ygg_send_nolimit
   
+  !> @brief Receive raw bytes data into a character array that can be resized.
+  !> @param[in] ygg_q Input/RPC/Timesync comm.
+  !> @param[in] data Array to receive bytes into.
+  !> @param[in] data_len Variable where the size of the received message should be stored.
+  !> @returns flag Success (.true.) or failure (.false.) of the receive.
   function ygg_recv_nolimit(ygg_q, data, data_len) result (flag)
     implicit none
     type(yggcomm) :: ygg_q

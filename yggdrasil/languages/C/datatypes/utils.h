@@ -251,6 +251,8 @@ public:
   void display(const char* indent="") const;
   /*!
     @brief Get a copy of the data.
+    @param[in] orig_data Pointer to data that should be copied if different
+    that the data that is wrapped.
     @returns void* Pointer to copy of data.
   */
   void* copy_data(void* orig_data=NULL) const;

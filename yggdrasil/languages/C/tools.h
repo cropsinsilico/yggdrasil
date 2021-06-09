@@ -418,6 +418,7 @@ void yggError(const char* fmt, ...) {
   va_end(ap);
 };
 
+#ifndef DOXYGEN_SHOULD_SKIP_THIS
 #ifdef YGG_DEBUG
 #if YGG_DEBUG <= 10
 #define ygglog_error yggError
@@ -441,6 +442,7 @@ void yggError(const char* fmt, ...) {
 #define ygglog_info while (0) yggInfo
 #define ygglog_debug while (0) yggDebug
 #endif
+#endif // DOXYGEN_SHOULD_SKIP_THIS
 
 /*!
   @brief Get the length (in bytes) of a character array containing 4 byte
@@ -588,7 +590,7 @@ va_list_t init_va_ptrs(const int nptrs, void** ptrs) {
   
 
 /*! Finalize a variable argument list.
-  @param[in] va_list_t Variable argument list.
+  @param[in] ap va_list_t Variable argument list.
 */
 static inline
 void end_va_list(va_list_t *ap) {
@@ -599,7 +601,7 @@ void end_va_list(va_list_t *ap) {
 
   
 /*! Copy a variable argument list.
-  @param[in] va_list_t Variable argument list structure to copy.
+  @param[in] ap va_list_t Variable argument list structure to copy.
   @returns va_list_t New variable argument list structure.
 */
 static inline

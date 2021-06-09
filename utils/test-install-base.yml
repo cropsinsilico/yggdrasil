@@ -413,7 +413,7 @@ jobs:
       with:
         python-version: 3.8
     - name: Install dependencies
-      run: python utils/setup_test_env.py install pip
+      run: python utils/setup_test_env.py install conda
     - name: Verify installation
       run: python utils/setup_test_env.py verify
     - name: Build the docs

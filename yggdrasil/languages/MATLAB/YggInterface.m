@@ -1,16 +1,25 @@
 % =============================================================================
 %> @brief A simple wrapper for importing Python classes & functions.
 %>
-%> This function imports the correct class/function from the Python
-%> YggInterface module, calls it with the provided input arguments, and returns
-%> the result.
+%> This function wraps functions from yggdrasil's [Python interface](interface_py.html),
+%> so refer to that documentation for additional details.
 %>
-%> @param type String specifying which class/function to call from
-%> YggInterface.py.
-%> @param varargin Variable number of input arguments passed to specified
-%> python class/function.
+%> @param type The name of the Python interface that should be called
+%>   (e.g. [YggInput](interface_py.html#yggdrasil.languages.Python.YggInput), [YggOutput](interface_py.html#yggdrasil.languages.Python.YggOutput), [YggRpcClient](interface_py.html#yggdrasil.languages.Python.YggRpcClient), [YggRpcServer](interface_py.html#yggdrasil.languages.Python.YggRpcServer), [YggTimesync](interface_py.html#yggdrasil.languages.Python.YggInterface.YggTimesync))
+%> @param varargin Additional parameters will be passed to the Python 
+%>   interface function.
 %>
 %> @return out python object returned by the called class/function.
+%>
+%> ```
+%> in_channel = YggInterface('YggInput', 'input_channel_name');
+%> [flag, input] = in_channel.recv();
+%> ```
+%>
+%> ```
+%> out_channel = YggInterface('YggOutput', 'output_channel_name');
+%> flag = out_channel.send(output1, output2, ...);
+%> ```
 % =============================================================================
 function out = YggInterface(type, varargin)
   YggInterface = py.importlib.import_module('yggdrasil.languages.Python.YggInterface');

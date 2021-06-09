@@ -1,10 +1,11 @@
 Package: yggdrasil
 Title: R interface to yggdrasil framework.
 Version: 0.1
+Author: Meagan Lang
 Authors@R: person("Meagan", "Lang", email = "langmm.astro@gmail.com",
                   role = c("aut", "cre"))
+Maintainer: Meagan Lang <langmm.astro@gmail.com>
 Description: Allows R models to connect to the yggdrasil framework
-Depends: R (>= 3.1.0)
 License: BSD 3-clause
 LazyData: true
 Imports:
@@ -15,4 +16,6 @@ Imports:
     zeallot,
     R6
 Depends:
+    R (>= 3.1.0)
     zeallot
+RoxygenNote: 7.1.1
