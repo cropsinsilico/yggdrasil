@@ -1595,8 +1595,8 @@ class ModelDriver(Driver):
                 inst.cleanup()
 
     @classmethod
-    def format_function_param(cls, key, default=None,
-                              replacement=None, **kwargs):
+    def format_function_param(cls, key, default=None, replacement=None,
+                              ignore_method=False, **kwargs):
         r"""Return the formatted version of the specified key.
 
         Args:
@@ -1619,6 +1619,8 @@ class ModelDriver(Driver):
         """
         if replacement is not None:
             fmt = replacement
+        elif (not ignore_method) and hasattr(cls, 'format_function_param_%s' % key):
+            return getattr(cls, 'format_function_param_%s' % key)(**kwargs)
         else:
             if (key not in cls.function_param) and (default is None):
                 raise NotImplementedError(("Language %s dosn't have an entry in "
@@ -2107,7 +2109,8 @@ class ModelDriver(Driver):
                     iter_function_idx['end'] = iter_function_idx['end']['name']
             else:
                 iter_function_idx['end'] = cls.format_function_param(
-                    'len', variable=iter_ivars[0]['name'])
+                    'len', variable=iter_ivars[0]['name'],
+                    extra=iter_ivars[0])
             for v in iter_ivars + iter_ovars:
                 v['iter_var'] = iter_function_idx
         # Declare variables and flag, then define flag
@@ -2623,9 +2626,10 @@ class ModelDriver(Driver):
                     if 'iter_datatype' in x:
                         src[i] = dict(
                             x, datatype=x['iter_datatype'],
-                            name=('(%s)' % cls.format_function_param(
+                            name=cls.format_function_param(
                                 'index', variable=x['name'],
-                                index=iter_function_idx['name'])),
+                                index=iter_function_idx['name'],
+                                extra=x),
                             length_var=False)
         if isinstance(flag_var, dict):
             flag_var = flag_var['name']
