@@ -162,6 +162,21 @@ class CPPModelDriver(CModelDriver):
     # To prevent inheritance
     default_compiler = None
     default_linker = None
+    interface_map = {
+        'import': '#include "YggInterface.hpp"',
+        'input': 'YggInput {channel_obj}("{channel_name}")',
+        'output': 'YggOutput {channel_obj}("{channel_name}")',
+        'server': (
+            'YggRpcServer {channel_obj}("{channel_name}", '
+            '{datatype_in}, {datatype_out})'),
+        'client': (
+            'YggRpcClient {channel_obj}("{channel_name}", '
+            '{datatype_out}, {datatype_in})'),
+        'timesync': 'YggTimesync {channel_obj}("{channel_name}", "{time_units}")',
+        'send': 'flag = {channel_obj}.send({nargs}, {outputs})',
+        'recv': 'flag = {channel_obj}.recv({nargs}, {input_refs})',
+        'call': 'flag = {channel_obj}.call({nargs}, {outputs}, {input_refs})',
+    }
     function_param = dict(
         CModelDriver.function_param,
         input='YggInput {channel}(\"{channel_name}\", {channel_type});',

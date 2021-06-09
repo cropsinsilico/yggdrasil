@@ -59,6 +59,17 @@ class RModelDriver(InterpretedModelDriver):  # pragma: R
         'ply': 'PlyDict',
         'obj': 'ObjDict',
         'schema': 'list'}
+    interface_map = {
+        'import': 'library(yggdrasil)',
+        'input': 'YggInterface(\'YggInput\', \'{channel_name}\')',
+        'output': 'YggInterface(\'YggOutput\', \'{channel_name}\')',
+        'server': 'YggInterface(\'YggRpcServer\', \'{channel_name}\')',
+        'client': 'YggInterface(\'YggRpcClient\', \'{channel_name}\')',
+        'timesync': 'YggInterface(\'YggTimesync\', \'{channel_name}\')',
+        'send': 'flag = {channel_obj}$send({outputs})',
+        'recv': 'c(flag, {inputs}) %<-% {channel_obj}$recv()',
+        'call': 'c(flag, {inputs}) %<-% {channel_obj}$call({outputs})',
+    }
     function_param = {
         'import': 'source(\"{filename}\")',
         'istype': 'is({variable}, \"{type}\")',

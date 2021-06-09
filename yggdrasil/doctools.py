@@ -118,9 +118,65 @@ def write_datatype_mapping_table(**kwargs):
     kwargs.setdefault('val_column_name', 'notes')
     kwargs.setdefault('prune_empty_columns', False)
     kwargs.setdefault('last_column', 'notes')
-    # kwargs.setdefault('column_order', ['schema', 'notes'])
     kwargs.setdefault('wrapped_columns', {'notes': 40})
     lines = dict2table(args, **kwargs)
+    return write_table(lines, **kwargs)
+    
+
+def write_interface_mapping_table(split_table_for_notebook=False, **kwargs):
+    r"""Write a table containing mapping of datatypes between different
+    languages.
+
+    Args:
+        **kwargs: Additional keyword arguments are passed to dict2table and
+            write_table.
+
+    Returns:
+        str, list: Name of file or files created.
+
+    """
+    import copy
+    from yggdrasil import tools, components
+    kwargs.setdefault('fname_base', 'interface_mapping_table.rst')
+    kwargs.setdefault('style', 'complex')
+    comm_keys = ['import', 'input', 'output', 'server', 'client', 'timesync']
+    meth_keys = ['send', 'recv', 'call']
+    all_keys = comm_keys + meth_keys
+    if split_table_for_notebook:
+        keys_part1 = ['import', 'input', 'output']
+        keys_part2 = ['send', 'recv']
+        keys_part3 = ['server', 'client', 'call']
+        keys_part4 = ['timesync']
+        keys_list = [keys_part1, keys_part2, keys_part3, keys_part4]
+    else:
+        keys_list = [all_keys]
+    lines = []
+    kwargs0 = kwargs
+    for keys in keys_list:
+        args = {}
+        kwargs = copy.deepcopy(kwargs0)
+        for lang in tools.get_supported_lang():
+            if lang in ['lpy', 'make', 'cmake', 'executable']:
+                continue
+            if lang == 'cpp':
+                lang = 'c++'
+            ldrv = components.import_component('model', lang)
+            if not ldrv.full_language:
+                continue
+            args[lang] = {'language': lang}
+            for k in keys:
+                entry = getattr(ldrv, 'interface_map', {}).get(k, '')
+                if entry:
+                    args[lang][k] = '``%s``' % entry
+                else:
+                    args[lang][k] = ''
+        kwargs.setdefault('key_column_name', 'language')
+        kwargs.setdefault('val_column_name', keys[0])
+        kwargs.setdefault('prune_empty_columns', False)
+        kwargs.setdefault('wrapped_columns', {})  # 'notes': 40})
+        kwargs.setdefault('column_order', ['language'] + keys)
+        lines += dict2table(args, **kwargs)
+        lines += ['', '']
     return write_table(lines, **kwargs)
     
 
@@ -516,6 +572,7 @@ def dict2table(args, key_column_name='option', val_column_name='description',
     # Create format string
     if len(columns) == 1:
         style = 'complex'
+    hline_sep_header = None
     if style == 'simple':
         column_beg = ''
         column_end = ''
@@ -527,6 +584,18 @@ def dict2table(args, key_column_name='option', val_column_name='description',
         hline_beg_header = ''
         hline_end_header = ''
         hline_char_header = '='
+    elif style == 'markdown':
+        column_beg = '| '
+        column_end = ' |'
+        column_sep = ' | '
+        hline_beg = ''  # '|-'
+        hline_end = ''  # '-|'
+        hline_char = ''  # '-'
+        hline_sep = ''  # '-|-'
+        hline_sep_header = '-|-'
+        hline_beg_header = '|-'
+        hline_end_header = '-|'
+        hline_char_header = '-'
     else:
         column_beg = '| '
         column_end = ' |'
@@ -546,10 +615,12 @@ def dict2table(args, key_column_name='option', val_column_name='description',
                + hline_sep.join([hline_char * column_widths[k]
                                  for k in column_order])
                + hline_end)
+    if hline_sep_header is None:
+        hline_sep_header = hline_sep
     divider_header = (
         hline_beg_header
-        + hline_sep.join([hline_char_header * column_widths[k]
-                          for k in column_order])
+        + hline_sep_header.join([hline_char_header * column_widths[k]
+                                 for k in column_order])
         + hline_end_header)
     header = column_format % tuple([k.title() for k in column_order])
     # Table
@@ -557,26 +628,42 @@ def dict2table(args, key_column_name='option', val_column_name='description',
         pos = 0
     else:
         pos = len(columns[list(columns.keys())[0]])
-    lines = [divider, header, divider_header]
-    for i in range(pos):
-        row = []
-        max_row_len = 1
-        for k in column_order:
-            if k in wrapped_columns:
-                row.append(textwrap.wrap(columns[k][i], wrapped_columns[k]))
-            elif k in list_columns:
-                row.append(columns[k][i])
-            else:
-                row.append([columns[k][i]])
-            max_row_len = max(max_row_len, len(row[-1]))
-        for j in range(len(row)):
-            row[j] += (max_row_len - len(row[j])) * ['']
-        for k in range(max_row_len):
-            lines.append(column_format % tuple([row[j][k] for j in range(len(row))]))
-        if style != 'simple':
+    if style == 'list':
+        lines = ['.. list-table::',
+                 '   :header-rows: 1',
+                 '',
+                 '   * - %s' % column_order[0].title()]
+        for k in column_order[1:]:
+            lines.append('     - %s' % k.title())
+    else:
+        lines = [header, divider_header]
+        if divider:
+            lines.insert(0, divider)
+    if style == 'list':
+        for i in range(pos):
+            lines.append('   * - %s' % columns[column_order[0]][i])
+            for k in column_order[1:]:
+                lines.append('     - %s' % columns[k][i])
+    else:
+        for i in range(pos):
+            row = []
+            max_row_len = 1
+            for k in column_order:
+                if k in wrapped_columns:
+                    row.append(textwrap.wrap(columns[k][i], wrapped_columns[k]))
+                elif k in list_columns:
+                    row.append(columns[k][i])
+                else:
+                    row.append([columns[k][i]])
+                max_row_len = max(max_row_len, len(row[-1]))
+            for j in range(len(row)):
+                row[j] += (max_row_len - len(row[j])) * ['']
+            for k in range(max_row_len):
+                lines.append(column_format % tuple([row[j][k] for j in range(len(row))]))
+            if style != 'simple' and divider:
+                lines.append(divider)
+        if style == 'simple' and divider:
             lines.append(divider)
-    if style == 'simple':
-        lines.append(divider)
     return lines
 
 
