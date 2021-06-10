@@ -16,6 +16,6 @@ Imports:
     zeallot,
     R6
 Depends:
-    R (>= 3.1.0)
+    R (>= 3.1.0),
     zeallot
 RoxygenNote: 7.1.1
