@@ -1,0 +1,324 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+  <title>R Interface &mdash; yggdrasil v1.6.3+7.ga06bf3c48.dirty documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+
+  
+  
+
+  
+  
+
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/doctools.js"></script>
+    
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Fortran Interface" href="interface_fortran.html" />
+    <link rel="prev" title="Matlab Interface" href="interface_m.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../index.html" class="icon icon-home"> yggdrasil
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                v1.6.3
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../includeme.html">Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../install.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../getting_started.html">Getting started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../formatted_io.html">Formatted I/O</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../server_client_io.html">Server/Client I/O</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../autowrap.html">Autowrapping Model Functions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../conditional_io.html">Conditional I/O</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../transformed_io.html">Transformed I/O</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../timesync_io.html">Timestep Synchronization</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../yaml.html">YAML Files</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../config.html">Configuration Files</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../units.html">Units</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../c_format_strings.html">C-Style Format Strings</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../debugging.html">Debugging</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../threading.html">OpenMP Threading in Models</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../examples/examples_toc.html">Examples</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">Advanced</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="serialization.html">Serialization</a></li>
+<li class="toctree-l2"><a class="reference internal" href="metaschema.html">JSON Metaschema</a></li>
+<li class="toctree-l2"><a class="reference internal" href="schema.html">YAML Validation Schema</a></li>
+<li class="toctree-l2"><a class="reference internal" href="io_drivers.html">Input/Output Drivers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="model_drivers.html">Model Drivers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="model_drivers.html#model-base-classes">Model Base Classes</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="model_interface.html">Model Interface</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="interface_py.html">Python Interface</a></li>
+<li class="toctree-l3"><a class="reference internal" href="interface_c.html">C Interface</a></li>
+<li class="toctree-l3"><a class="reference internal" href="interface_cpp.html">C++ Interface</a></li>
+<li class="toctree-l3"><a class="reference internal" href="interface_m.html">Matlab Interface</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">R Interface</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#ygginterface"><code class="docutils literal notranslate"><span class="pre">YggInterface</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="interface_fortran.html">Fortran Interface</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="code.html">Code</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../development/index.html">Development</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../publications.html">Publications</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../hackathon2018/index.html">Welcome to the 2018 Crops in Silico Hackathon!</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../hackathon2019/index.html">Welcome to the 2019 Crops in Silico Hackathon!</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../hackathon2021/index.html">Welcome to the 2021 Crops in Silico Hackathon!</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">yggdrasil</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
+        
+          <li><a href="index.html">Advanced</a> &raquo;</li>
+        
+          <li><a href="model_interface.html">Model Interface</a> &raquo;</li>
+        
+      <li>R Interface</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+          
+            <a href="../_sources/advanced/interface_r.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="r-interface">
+<span id="id1"></span><h1>R Interface<a class="headerlink" href="#r-interface" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="ygginterface">
+<h2><code class="docutils literal notranslate"><span class="pre">YggInterface</span></code><a class="headerlink" href="#ygginterface" title="Permalink to this headline">¶</a></h2>
+<p>Create an object for sending/receiving messages to/from an yggdrasil
+channel.</p>
+<div class="section" id="description">
+<h3>Description<a class="headerlink" href="#description" title="Permalink to this headline">¶</a></h3>
+<p>This function wraps functions from yggdrasil’s <a class="reference external" href="interface_py.html">Python
+interface</a>, so refer to that documentation for
+additional details.</p>
+</div>
+<div class="section" id="usage">
+<h3>Usage<a class="headerlink" href="#usage" title="Permalink to this headline">¶</a></h3>
+<div class="highlight-r notranslate"><div class="highlight"><pre><span></span><span class="nf">YggInterface</span><span class="p">(</span><span class="n">type</span><span class="p">,</span> <span class="kc">...</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="arguments">
+<h3>Arguments<a class="headerlink" href="#arguments" title="Permalink to this headline">¶</a></h3>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 45%" />
+<col style="width: 55%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Argument</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">type</span></code></p></td>
+<td><p>The name of the Python interface
+that should be called
+(e.
+g. <a class="reference external" href="interface_py.html#yggdrasil.languages.Python.YggInput">YggInput</a>,
+<a class="reference external" href="interface_py.html#yggdrasil.languages.Python.YggOutput">YggOutput</a>,
+<a class="reference external" href="interface_py.html#yggdrasil.languages.Python.YggRpcClient">YggR
+pcClient</a>,
+<a class="reference external" href="interface_py.html#yggdrasil.languages.Python.YggRpcServer">YggR
+pcServer</a>,
+<a class="reference external" href="interface_py.html#yggdrasil.languages.Python.YggInterface.YggTimesync">YggTimesync</a>)</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">...</span></code></p></td>
+<td><p>Additional parameters will be passed
+to the Python interface function.</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="value">
+<h3>Value<a class="headerlink" href="#value" title="Permalink to this headline">¶</a></h3>
+<p>A Python comm that can be used to send/receive messages via send/recv
+methods.</p>
+</div>
+<div class="section" id="examples">
+<h3>Examples<a class="headerlink" href="#examples" title="Permalink to this headline">¶</a></h3>
+<div class="highlight-r notranslate"><div class="highlight"><pre><span></span><span class="n">in_channel</span> <span class="o">=</span> <span class="nf">YggInterface</span><span class="p">(</span><span class="s">&#39;YggInput&#39;</span><span class="p">,</span> <span class="s">&#39;input_channel_name&#39;</span><span class="p">)</span>
+<span class="c1"># Use zeallot &#39;%&lt;-%&#39; syntax to expand multiple variables</span>
+<span class="nf">c</span><span class="p">(</span><span class="n">flag</span><span class="p">,</span> <span class="n">input</span><span class="p">)</span> <span class="o">%&lt;-%</span> <span class="n">in_channel</span><span class="o">$</span><span class="nf">recv</span><span class="p">()</span>
+
+<span class="n">out_channel</span> <span class="o">=</span> <span class="nf">YggInterface</span><span class="p">(</span><span class="s">&#39;YggOutput&#39;</span><span class="p">,</span> <span class="s">&#39;output_channel_name&#39;</span><span class="p">)</span>
+<span class="n">flag</span> <span class="o">&lt;-</span> <span class="n">out_channel</span><span class="o">$</span><span class="nf">send</span><span class="p">(</span><span class="n">output1</span><span class="p">,</span> <span class="n">output2</span><span class="p">,</span> <span class="kc">...</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+        <a href="interface_fortran.html" class="btn btn-neutral float-right" title="Fortran Interface" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="interface_m.html" class="btn btn-neutral float-left" title="Matlab Interface" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &#169; Copyright 2017, Meagan Lang, David Raila.
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

@@ -5,14 +5,14 @@ Option                   Type      Description                                  
 ======================   =======   ================================================================================   =====================================================================
 additional_variables     object                                                                                       ['timesync']                                                         
 aggregation                                                                                                           ['timesync']                                                         
-builddir                 string    Directory where the build should be saved. Defaults to <sourcedir>/build. It can   ['cmake', 'make']                                                    
+builddir                 string    Directory where the build should be saved. Defaults to <sourcedir>/build. It can   ['make', 'cmake']                                                    
                                    be relative to working_dir or absolute.                                                                                                                 
-buildfile                string                                                                                       ['cmake', 'make']                                                    
-compiler                 string    Command or path to executable that should be used to compile the model. If not     ['c', 'make', 'c++', 'cxx', 'cmake', 'cpp', 'fortran']               
+buildfile                string                                                                                       ['make', 'cmake']                                                    
+compiler                 string    Command or path to executable that should be used to compile the model. If not     ['cpp', 'make', 'cxx', 'c++', 'c', 'cmake', 'fortran']               
                                    provided, the compiler will be determined based on configuration options for the                                                                        
                                    language (if present) and the registered compilers that are available on the                                                                            
                                    current operating system.                                                                                                                               
-compiler_flags           array     Flags that should be passed to the compiler during compilation. If nto provided,   ['c', 'make', 'c++', 'cxx', 'cmake', 'cpp', 'fortran']               
+compiler_flags           array     Flags that should be passed to the compiler during compilation. If nto provided,   ['cpp', 'make', 'cxx', 'c++', 'c', 'cmake', 'fortran']               
                                    the compiler flags will be determined based on configuration options for the                                                                            
                                    language (if present), the compiler defaults, and the default_compiler_flags                                                                            
                                    class attribute.                                                                                                                                        
@@ -21,33 +21,33 @@ copy_xml_to_osr          boolean   If True, the XML file(s) will be copied to th
                                    direcitory before running. This is necessary if the XML file(s) use any of the                                                                          
                                    files located there since OSR always assumes the included file paths are                                                                                
                                    relative. Defaults to False.                                                                                                                            
-env_compiler             string    Environment variable where the compiler executable should be stored for use        ['cmake', 'make']                                                    
+env_compiler             string    Environment variable where the compiler executable should be stored for use        ['make', 'cmake']                                                    
                                    within the Makefile. If not provided, this will be determined by the target                                                                             
                                    language driver.                                                                                                                                        
-env_compiler_flags       string    Environment variable where the compiler flags should be stored (including those    ['cmake', 'make']                                                    
+env_compiler_flags       string    Environment variable where the compiler flags should be stored (including those    ['make', 'cmake']                                                    
                                    required to compile against the |yggdrasil| interface). If not provided, this                                                                           
                                    will be determined by the target language driver.                                                                                                       
-env_linker               string    Environment variable where the linker executable should be stored for use within   ['cmake', 'make']                                                    
+env_linker               string    Environment variable where the linker executable should be stored for use within   ['make', 'cmake']                                                    
                                    the Makefile. If not provided, this will be determined by the target language                                                                           
                                    driver.                                                                                                                                                 
-env_linker_flags         string    Environment variable where the linker flags should be stored (including those      ['cmake', 'make']                                                    
+env_linker_flags         string    Environment variable where the linker flags should be stored (including those      ['make', 'cmake']                                                    
                                    required to link against the |yggdrasil| interface). If not provided, this will                                                                         
                                    be determined by the target language driver.                                                                                                            
 integrator               string    Name of integrator that should be used. Valid options include ['cvode',            ['sbml']                                                             
                                    'gillespie', 'rk4', 'rk45']. Defaults to 'cvode'.                                                                                                       
 integrator_settings      object    Settings for the integrator. Defaults to empty dict.                               ['sbml']                                                             
 interpolation                                                                                                         ['timesync']                                                         
-interpreter              string    Name or path of interpreter executable that should be used to run the model. If    ['function', 'sbml', 'R', 'timesync', 'lpy', 'r', 'python', 'matlab']
+interpreter              string    Name or path of interpreter executable that should be used to run the model. If    ['lpy', 'function', 'R', 'sbml', 'r', 'timesync', 'python', 'matlab']
                                    not provided, the interpreter will be determined based on configuration options                                                                         
                                    for the language (if present) and the default_interpreter class attribute.                                                                              
-interpreter_flags        array     Flags that should be passed to the interpreter when running the model. If not      ['function', 'sbml', 'R', 'timesync', 'lpy', 'r', 'python', 'matlab']
+interpreter_flags        array     Flags that should be passed to the interpreter when running the model. If not      ['lpy', 'function', 'R', 'sbml', 'r', 'timesync', 'python', 'matlab']
                                    provided, the flags are determined based on configuration options for the                                                                               
                                    language (if present) and the default_interpreter_flags class attribute.                                                                                
-linker                   string    Command or path to executable that should be used to link the model. If not        ['c', 'make', 'c++', 'cxx', 'cmake', 'cpp', 'fortran']               
+linker                   string    Command or path to executable that should be used to link the model. If not        ['cpp', 'make', 'cxx', 'c++', 'c', 'cmake', 'fortran']               
                                    provided, the linker will be determined based on configuration options for the                                                                          
                                    language (if present) and the registered linkers that are available on the                                                                              
                                    current operating system                                                                                                                                
-linker_flags             array     Flags that should be passed to the linker during compilation. If nto provided,     ['c', 'make', 'c++', 'cxx', 'cmake', 'cpp', 'fortran']               
+linker_flags             array     Flags that should be passed to the linker during compilation. If nto provided,     ['cpp', 'make', 'cxx', 'c++', 'c', 'cmake', 'fortran']               
                                    the linker flags will be determined based on configuration options for the                                                                              
                                    language (if present), the linker defaults, and the default_linker_flags class                                                                          
                                    attribute.                                                                                                                                              
@@ -61,12 +61,12 @@ reset                    boolean   If True, the simulation will be reset to it's
                                    (including the start time). Defaults to False.                                                                                                          
 selections               array     Variables to include in the output. Defaults to None and the time/floating         ['sbml']                                                             
                                    selections will be returned.                                                                                                                            
-skip_interpreter         boolean   If True, no interpreter will be added to the arguments. This should only be used   ['function', 'sbml', 'R', 'timesync', 'lpy', 'r', 'python', 'matlab']
+skip_interpreter         boolean   If True, no interpreter will be added to the arguments. This should only be used   ['lpy', 'function', 'R', 'sbml', 'r', 'timesync', 'python', 'matlab']
                                    for subclasses that will not be invoking the model via the command line.                                                                                
                                    Defaults to False.                                                                                                                                      
 skip_start_time          boolean   If True, the results for the initial time step will not be output. Defaults to     ['sbml']                                                             
                                    False. This option is ignored if only_output_final_step is True.                                                                                        
-source_files             array     Source files that should be compiled into an executable. Defaults to an empty      ['c', 'make', 'c++', 'cxx', 'cmake', 'cpp', 'fortran']               
+source_files             array     Source files that should be compiled into an executable. Defaults to an empty      ['cpp', 'make', 'cxx', 'c++', 'c', 'cmake', 'fortran']               
                                    list and the driver will search for a source file based on the model executable                                                                         
                                    (the first model argument).                                                                                                                             
 sourcedir                string    Source directory to call cmake on. If not provided it is set to working_dir.       ['cmake']                                                            
@@ -84,17 +84,17 @@ synonyms                 object    Mapping from model names to mappings from bas
                                    be converted to the base variable. Values for providing information about                                                                               
                                    alternate variables can either be strings (implies equivalence with the base                                                                            
                                    variable in everything but name and units) or mappings with the keys:                                                                                   
-target                   string    Make target that should be built to create the model executable. Defaults to       ['cmake', 'make']                                                    
+target                   string    Make target that should be built to create the model executable. Defaults to       ['make', 'cmake']                                                    
                                    None.                                                                                                                                                   
-target_compiler          string    Compilation tool that should be used to compile the target language. Defaults to   ['cmake', 'make']                                                    
+target_compiler          string    Compilation tool that should be used to compile the target language. Defaults to   ['make', 'cmake']                                                    
                                    None and will be set based on the selected language driver.                                                                                             
-target_compiler_flags    array     Compilation flags that should be passed to the target language compiler.           ['cmake', 'make']                                                    
+target_compiler_flags    array     Compilation flags that should be passed to the target language compiler.           ['make', 'cmake']                                                    
                                    Defaults to [].                                                                                                                                         
-target_language          string    Language that the target is written in. Defaults to None and will be set based     ['cmake', 'make']                                                    
+target_language          string    Language that the target is written in. Defaults to None and will be set based     ['make', 'cmake']                                                    
                                    on the source files provided.                                                                                                                           
-target_linker            string    Compilation tool that should be used to link the target language. Defaults to      ['cmake', 'make']                                                    
+target_linker            string    Compilation tool that should be used to link the target language. Defaults to      ['make', 'cmake']                                                    
                                    None and will be set based on the selected language driver.                                                                                             
-target_linker_flags      array     Linking flags that should be passed to the target language linker. Defaults to     ['cmake', 'make']                                                    
+target_linker_flags      array     Linking flags that should be passed to the target language linker. Defaults to     ['make', 'cmake']                                                    
                                    [].                                                                                                                                                     
 update_interval          object    Max simulation interval at which synchronization should occur (in days).           ['osr']                                                              
                                    Defaults to 1.0 if not provided. If the XML input file loads additional export                                                                          

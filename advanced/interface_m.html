@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>Matlab Interface &mdash; yggdrasil v1.6.3+6.gf38abc9d3.dirty documentation</title>
+  <title>Matlab Interface &mdash; yggdrasil v1.6.3+7.ga06bf3c48.dirty documentation</title>
   
 
   
@@ -38,7 +38,7 @@
     
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="Code" href="code.html" />
+    <link rel="next" title="R Interface" href="interface_r.html" />
     <link rel="prev" title="C++ Interface" href="interface_cpp.html" /> 
 </head>
 
@@ -118,6 +118,8 @@
 <li class="toctree-l3"><a class="reference internal" href="interface_c.html">C Interface</a></li>
 <li class="toctree-l3"><a class="reference internal" href="interface_cpp.html">C++ Interface</a></li>
 <li class="toctree-l3 current"><a class="current reference internal" href="#">Matlab Interface</a></li>
+<li class="toctree-l3"><a class="reference internal" href="interface_r.html">R Interface</a></li>
+<li class="toctree-l3"><a class="reference internal" href="interface_fortran.html">Fortran Interface</a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="code.html">Code</a></li>
@@ -200,76 +202,36 @@
            <div itemprop="articleBody">
             
   <div class="section" id="matlab-interface">
-<h1>Matlab Interface<a class="headerlink" href="#matlab-interface" title="Permalink to this headline">¶</a></h1>
+<span id="id1"></span><h1>Matlab Interface<a class="headerlink" href="#matlab-interface" title="Permalink to this headline">¶</a></h1>
 <div class="breathe-sectiondef docutils container">
 <p class="breathe-sectiondef-title rubric" id="breathe-section-title-functions">Functions</p>
 <dl class="cpp function">
-<dt>
-<span class="target" id="_ygg_interface_8m_1ac74d0897ff75d18de42c8774f0bd756d"></span><code class="sig-name descname">while (i&lt;=length(varargin))</code></dt>
-<dd></dd></dl>
-
-<dl class="cpp function">
-<dt>
-<span class="target" id="_ygg_interface_8m_1a22940ca16c8276f5830e24beb7e85cf6"></span><code class="sig-name descname">if (ischar(varargin{i}))</code></dt>
-<dd></dd></dl>
-
-<dl class="cpp function">
-<dt>
-<span class="target" id="_ygg_interface_8m_1ae38c6bd6372a322614305597f4820e1e"></span><code class="sig-name descname">if any (strcmp(varargin{i}, keyword_names))</code></dt>
-<dd></dd></dl>
-
-<dl class="cpp function">
-<dt>
-<span class="target" id="_ygg_interface_8m_1af099cbc0b677453c94a08ca6742dabd2"></span><code class="sig-name descname">kwargs (varargin{i})</code></dt>
-<dd></dd></dl>
-
-<dl class="cpp function">
-<dt>
-<span class="target" id="_ygg_interface_8m_1a7028523a410a9bca4d61edf8582f8d82"></span><code class="sig-name descname">if (nargin &gt; 1)</code></dt>
-<dd></dd></dl>
-
+<dt id="_CPPv412YggInterface2in2in">
+<span id="_CPPv312YggInterface2in2in"></span><span id="_CPPv212YggInterface2in2in"></span><span id="YggInterface__in.in"></span><span class="target" id="_ygg_interface_8m_1a882a5d357a695b1fe31111e163516890"></span>function <code class="sig-name descname">YggInterface</code><span class="sig-paren">(</span>in <em>type</em>, in <em>varargin</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv412YggInterface2in2in" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>A simple wrapper for importing Python classes &amp; functions. </p>
+<p>This function wraps functions from yggdrasil’s <a class="reference external" href="interface_py.html">Python interface</a>, so refer to that documentation for additional details.</p>
+<p><div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">in_channel</span> <span class="o">=</span> <span class="n">YggInterface</span><span class="p">(</span><span class="s1">&#39;YggInput&#39;</span><span class="p">,</span> <span class="s1">&#39;input_channel_name&#39;</span><span class="p">);</span>
+<span class="p">[</span><span class="n">flag</span><span class="p">,</span> <span class="nb">input</span><span class="p">]</span> <span class="o">=</span> <span class="n">in_channel</span><span class="o">.</span><span class="n">recv</span><span class="p">();</span>
+</pre></div>
 </div>
-<div class="breathe-sectiondef docutils container">
-<p class="breathe-sectiondef-title rubric" id="breathe-section-title-variables">Variables</p>
-<dl class="cpp var">
-<dt>
-<span class="target" id="_ygg_interface_8m_1ae67dfd822a094c7d9337aec92be9935c"></span><code class="sig-name descname">keyword_names  = {'global_scope', 'format_str', 'infmt', 'outfmt', ...		   'as_array', 'fmt'}</code></dt>
-<dd></dd></dl>
-
-<dl class="cpp var">
-<dt>
-<span class="target" id="_ygg_interface_8m_1a8187411843a6284ffb964ef3fb9fcab3"></span><code class="sig-name descname">args   = {}</code></dt>
-<dd></dd></dl>
-
-<dl class="cpp var">
-<dt>
-<span class="target" id="_ygg_interface_8m_1aca174a4ca5cbfb3d1b2873c5e38f50aa"></span><code class="sig-name descname">kwargs   = containers.Map()</code></dt>
-<dd></dd></dl>
-
-<dl class="cpp var">
-<dt>
-<span class="target" id="_ygg_interface_8m_1a6f6ccfcf58b31cb6412107d9d5281426"></span><code class="sig-name descname">i   = 1</code></dt>
-<dd></dd></dl>
-
-<dl class="cpp var">
-<dt>
-<span class="target" id="_ygg_interface_8m_1a0544c3fe466e421738dae463968b70ba"></span><code class="sig-name descname">else</code></dt>
-<dd></dd></dl>
-
-<dl class="cpp var">
-<dt>
-<span class="target" id="_ygg_interface_8m_1afb358f48b1646c750fb9da6c6585be2b"></span><code class="sig-name descname">end</code></dt>
-<dd></dd></dl>
-
-<dl class="cpp var">
-<dt>
-<span class="target" id="_ygg_interface_8m_1ac20f542425d23d5b71774e61a30c7884"></span><code class="sig-name descname">pyobj  = YggInterface.YggInit(type, matlab2python(args), ...			       matlab2python(kwargs))</code></dt>
-<dd></dd></dl>
-
-<dl class="cpp var">
-<dt>
-<span class="target" id="_ygg_interface_8m_1a2a89187d8e8e8fba509ef9ab5f815d88"></span><code class="sig-name descname">out   = YggInterfaceClass(pyobj)</code></dt>
-<dd></dd></dl>
+</p>
+<p><div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">out_channel</span> <span class="o">=</span> <span class="n">YggInterface</span><span class="p">(</span><span class="s1">&#39;YggOutput&#39;</span><span class="p">,</span> <span class="s1">&#39;output_channel_name&#39;</span><span class="p">);</span>
+<span class="n">flag</span> <span class="o">=</span> <span class="n">out_channel</span><span class="o">.</span><span class="n">send</span><span class="p">(</span><span class="n">output1</span><span class="p">,</span> <span class="n">output2</span><span class="p">,</span> <span class="o">...</span><span class="p">);</span>
+</pre></div>
+</div>
+ </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>type</strong> – The name of the Python interface that should be called (e.g. <a class="reference external" href="interface_py.html#yggdrasil.languages.Python.YggInput">YggInput</a>, <a class="reference external" href="interface_py.html#yggdrasil.languages.Python.YggOutput">YggOutput</a>, <a class="reference external" href="interface_py.html#yggdrasil.languages.Python.YggRpcClient">YggRpcClient</a>, <a class="reference external" href="interface_py.html#yggdrasil.languages.Python.YggRpcServer">YggRpcServer</a>, <a class="reference external" href="interface_py.html#yggdrasil.languages.Python.YggInterface.YggTimesync">YggTimesync</a>) </p></li>
+<li><p><strong>varargin</strong> – Additional parameters will be passed to the Python interface function.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>out python object returned by the called class/function.</p>
+</dd>
+</dl>
+</dd></dl>
 
 </div>
 </div>
@@ -280,7 +242,7 @@
           </div>
           <footer>
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
-        <a href="code.html" class="btn btn-neutral float-right" title="Code" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="interface_r.html" class="btn btn-neutral float-right" title="R Interface" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
         <a href="interface_cpp.html" class="btn btn-neutral float-left" title="C++ Interface" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
     </div>
 

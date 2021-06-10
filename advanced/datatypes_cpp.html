@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>C/C++ Datatypes API &mdash; yggdrasil v1.6.3+6.gf38abc9d3.dirty documentation</title>
+  <title>C/C++ Datatypes API &mdash; yggdrasil v1.6.3+7.ga06bf3c48.dirty documentation</title>
   
 
   
@@ -402,7 +402,10 @@
 <dd><p>C wrapper for the C++ type_from_doc function. </p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>type_doc</strong> – void* Pointer to const rapidjson::Value type doc. </p>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>type_doc</strong> – void* Pointer to const rapidjson::Value type doc. </p></li>
+<li><p><strong>[in] use_generic</strong> – bool If true, serialized/deserialized objects will be expected to be YggGeneric classes. </p></li>
+</ul>
 </dd>
 <dt class="field-even">Returns</dt>
 <dd class="field-even"><p>void* Pointer to <a class="reference internal" href="#class_metaschema_type"><span class="std std-ref">MetaschemaType</span></a> class. </p>
@@ -416,7 +419,10 @@
 <dd><p>C wrapper for the C++ type_from_pyobj function. </p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>type_doc</strong> – void* Pointer to const rapidjson::Value type doc. </p>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>pyboj</strong> – void* Pointer to const rapidjson::Value type doc. </p></li>
+<li><p><strong>[in] use_generic</strong> – bool If true, serialized/deserialized objects will be expected to be YggGeneric classes. </p></li>
+</ul>
 </dd>
 <dt class="field-even">Returns</dt>
 <dd class="field-even"><p>void* Pointer to <a class="reference internal" href="#class_metaschema_type"><span class="std std-ref">MetaschemaType</span></a> class. </p>
@@ -427,10 +433,13 @@
 <dl class="cpp function">
 <dt id="_CPPv421is_dtype_format_arrayP7dtype_t">
 <span id="_CPPv321is_dtype_format_arrayP7dtype_t"></span><span id="_CPPv221is_dtype_format_arrayP7dtype_t"></span><span id="is_dtype_format_array__dtype_tP"></span><span class="target" id="datatypes_8h_1ac7a9678d39d78d75284112d594666aa3"></span>int <code class="sig-name descname">is_dtype_format_array</code><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv47dtype_t" title="dtype_t">dtype_t</a> *<em>type_struct</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv421is_dtype_format_arrayP7dtype_t" title="Permalink to this definition">¶</a><br /></dt>
-<dd><p>Determine if a datatype was created from a format. &#64;params[in] type_struct dtype_t* Datatype structure. </p>
+<dd><p>Determine if a datatype was created from a format. </p>
 <dl class="field-list simple">
-<dt class="field-odd">Returns</dt>
-<dd class="field-odd"><p>int 1 if the datatype was created from a format, 0 if it was not, -1 if there is an error. </p>
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>[in] type_struct</strong> – dtype_t* Datatype structure. </p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>int 1 if the datatype was created from a format, 0 if it was not, -1 if there is an error. </p>
 </dd>
 </dl>
 </dd></dl>
@@ -1864,11 +1873,12 @@
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>[in] x</strong> – <a class="reference internal" href="#structgeneric__t"><span class="std std-ref">generic_t</span></a> Generic object that is presumed to contain an array. </p></li>
 <li><p><strong>[in] index</strong> – size_t Index for value that should be set. </p></li>
-<li><p><strong>[in] value</strong> – void* Pointer to array data. </p></li>
+<li><p><strong>[in] data</strong> – void* Pointer to array data. </p></li>
 <li><p><strong>[in] subtype</strong> – const char* Subtype of array in value. </p></li>
 <li><p><strong>[in] precision</strong> – const size_t Precision of array that is in value. </p></li>
 <li><p><strong>[in] ndim</strong> – size_t Number of dimensions in the array. </p></li>
 <li><p><strong>[in] shape</strong> – size_t* Pointer to array containing the size of the array in each dimension. </p></li>
+<li><p><strong>[in] units</strong> – const char* Units that should be added to the array. </p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
@@ -2263,11 +2273,12 @@
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>[in] x</strong> – <a class="reference internal" href="#structgeneric__t"><span class="std std-ref">generic_t</span></a> Generic object that is presumed to contain a map. </p></li>
 <li><p><strong>[in] key</strong> – const char* Key string for value that should be set. </p></li>
-<li><p><strong>[in] value</strong> – void* Pointer to array data. </p></li>
+<li><p><strong>[in] data</strong> – void* Pointer to array data. </p></li>
 <li><p><strong>[in] subtype</strong> – const char* Subtype of array in value. </p></li>
 <li><p><strong>[in] precision</strong> – const size_t Precision of array that is in value. </p></li>
 <li><p><strong>[in] ndim</strong> – size_t Number of dimensions in the array. </p></li>
 <li><p><strong>[in] shape</strong> – size_t* Pointer to array containing the size of the array in each dimension. </p></li>
+<li><p><strong>[in] units</strong> – const char* Units that should be added to the array. </p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
@@ -2483,7 +2494,10 @@
 <dd><p>Initialize a datatype structure including setting the type string. </p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>[in] dtype</strong> – dtype_t* Type structure/class. </p>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>[in] dtype</strong> – dtype_t* Type structure/class. </p></li>
+<li><p><strong>[in] use_generic</strong> – bool If true, serialized/deserialized objects will be expected to be YggGeneric classes. </p></li>
+</ul>
 </dd>
 <dt class="field-even">Returns</dt>
 <dd class="field-even"><p>dtype_t* Initialized type structure/class. </p>
@@ -2722,7 +2736,11 @@
 <dd><p>Construct an AsciiTable type object. </p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>[in] use_generic</strong> – bool If true, serialized/deserialized objects will be expected to be YggGeneric classes. </p>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>[in] format_str</strong> – const char* C-style format string that will be used to determine the type of elements in arrays that will be serialized/deserialized using the resulting type. </p></li>
+<li><p><strong>[in] as_array</strong> – int If 1, the types will be arrays. Otherwise they will be scalars. </p></li>
+<li><p><strong>[in] use_generic</strong> – bool If true, serialized/deserialized objects will be expected to be YggGeneric classes. </p></li>
+</ul>
 </dd>
 <dt class="field-even">Returns</dt>
 <dd class="field-even"><p>dtype_t* Type structure/class. </p>
@@ -2888,7 +2906,7 @@
 <li><p><strong>[out] buf</strong> – char ** Pointer to buffer where header should be written. </p></li>
 <li><p><strong>[in] buf_siz</strong> – size_t Size of buf. </p></li>
 <li><p><strong>[in] max_header_size</strong> – size_t Maximum size that header can occupy before the type should be moved to the data portion of the message. </p></li>
-<li><p><strong>[in] int</strong> – no_type If 1, type information will not be added to the header. If 0, it will be. </p></li>
+<li><p><strong>[in] no_type</strong> – int If 1, type information will not be added to the header. If 0, it will be. </p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
@@ -3271,6 +3289,7 @@
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>[in] type</strong> – const character pointer to the name of the type. </p></li>
 <li><p><strong>[in] use_generic</strong> – bool If true, serialized/deserialized objects will be expected to be YggGeneric classes. </p></li>
+<li><p><strong>[in] always_generic</strong> – bool If true, the datatype will always be assumed to expect YggGeneric instances. </p></li>
 </ul>
 </dd>
 </dl>
@@ -3285,6 +3304,7 @@
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>[in] type_doc</strong> – rapidjson::Value rapidjson object containing the type definition from a JSON encoded header. </p></li>
 <li><p><strong>[in] use_generic</strong> – bool If true, serialized/deserialized objects will be expected to be YggGeneric classes. </p></li>
+<li><p><strong>[in] always_generic</strong> – bool If true, the datatype will always be assumed to expect YggGeneric instances. </p></li>
 </ul>
 </dd>
 </dl>
@@ -3299,6 +3319,7 @@
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>[in] pyobj</strong> – PyObject* Python object. </p></li>
 <li><p><strong>[in] use_generic</strong> – bool If true, serialized/deserialized objects will be expected to be YggGeneric classes. </p></li>
+<li><p><strong>[in] always_generic</strong> – bool If true, the datatype will always be assumed to expect YggGeneric instances. </p></li>
 </ul>
 </dd>
 </dl>
@@ -3399,7 +3420,10 @@
 <dd><p>Copy data wrapped in YggGeneric class. </p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>[in] data</strong> – YggGeneric* Pointer to generic object. </p>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>[in] data</strong> – YggGeneric* Pointer to generic object. </p></li>
+<li><p><strong>[in] orig_data</strong> – Pointer to data that should be copied if different that the data that is wrapped. </p></li>
+</ul>
 </dd>
 <dt class="field-even">Returns</dt>
 <dd class="field-even"><p>void* Pointer to copy of data. </p>
@@ -3599,7 +3623,10 @@
 <dd><p>Set the type length. </p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>[in] new_length</strong> – size_t New length. </p>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>[in] force</strong> – bool True if the length should be updated even if it is not compatible with the existing value. </p></li>
+<li><p><strong>[in] new_length</strong> – size_t New length. </p></li>
+</ul>
 </dd>
 </dl>
 </dd></dl>
@@ -3827,6 +3854,7 @@
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>[in] nargs</strong> – size_t* Pointer to number of arguments present in ap that will be decremented by 1. </p></li>
 <li><p><strong>[in] ap</strong> – va_list_t Variable argument list. </p></li>
+<li><p><strong>[in] skip_nargs_dec</strong> – bool If true, nargs will be advaced in order to skip the element defining the number of arguments. </p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
@@ -4021,7 +4049,7 @@
 <li><p><strong>[out] buf</strong> – char ** Buffer where serialized data should be written. </p></li>
 <li><p><strong>[inout] buf_siz</strong> – size_t* Size of buf. If buf is reallocated, the new size of the buffer will be assigned to this address. </p></li>
 <li><p><strong>[in] allow_realloc</strong> – int If 1, buf will be reallocated if it is not large enough to contain the serialized data. If 0, an error will be raised if it is not large enough. </p></li>
-<li><p><strong>[in] Pointer</strong> – to generic wrapper for object being serialized. </p></li>
+<li><p><strong>[in] x</strong> – Pointer to generic wrapper for object being serialized. </p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
@@ -4523,7 +4551,10 @@
 <dd><p>Update the instance’s subtype. </p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>[in] new_subtype</strong> – const char * String for new subtype. </p>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>[in] new_subtype</strong> – const char * String for new subtype. </p></li>
+<li><p><strong>[in] force</strong> – bool True if the subtype should be updated even if it is not compatible with the existing value. </p></li>
+</ul>
 </dd>
 </dl>
 </dd></dl>
@@ -4533,8 +4564,14 @@
 <span id="_CPPv3NK20ScalarMetaschemaType16are_compat_unitsEPKcPKc"></span><span id="_CPPv2NK20ScalarMetaschemaType16are_compat_unitsEPKcPKc"></span><span id="ScalarMetaschemaType::are_compat_units__cCP.cCPC"></span><span class="target" id="class_scalar_metaschema_type_1ad6954bc4f4c8a6e79d4f723e5ab4e308"></span><em class="property">inline</em> bool <code class="sig-name descname">are_compat_units</code><span class="sig-paren">(</span><em class="property">const</em> char *<em>x</em>, <em class="property">const</em> char *<em>y</em><span class="sig-paren">)</span> <em class="property">const</em><a class="headerlink" href="#_CPPv4NK20ScalarMetaschemaType16are_compat_unitsEPKcPKc" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Determine if two units are compatible. </p>
 <dl class="field-list simple">
-<dt class="field-odd">Returns</dt>
-<dd class="field-odd"><p>bool true if they are compat, false otherwise </p>
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>[in] x</strong> – One set of units. </p></li>
+<li><p><strong>[in] y</strong> – Second set of units. </p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>bool true if they are compat, false otherwise </p>
 </dd>
 </dl>
 </dd></dl>
@@ -4545,7 +4582,10 @@
 <dd><p>Update the instance’s units. </p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>[in] new_units</strong> – const char * String for new units. </p>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>[in] new_units</strong> – const char * String for new units. </p></li>
+<li><p><strong>[in] force</strong> – bool True if the units should be updated even if it is not compatible with the existing value. </p></li>
+</ul>
 </dd>
 </dl>
 </dd></dl>
@@ -4556,7 +4596,10 @@
 <dd><p>Update the instance’s precision. </p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>[in] new_precision</strong> – size_t New precision. </p>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>[in] new_precision</strong> – size_t New precision. </p></li>
+<li><p><strong>[in] force</strong> – bool True if the precision should be updated even if it is not compatible with the existing value. </p></li>
+</ul>
 </dd>
 </dl>
 </dd></dl>
@@ -4972,7 +5015,10 @@
 <dd><p>Update the instance’s shape. </p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>[in] new_shape</strong> – std::vector&lt;size_t&gt; Vector of new array sizes in each dimension. </p>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>[in] new_shape</strong> – std::vector&lt;size_t&gt; Vector of new array sizes in each dimension. </p></li>
+<li><p><strong>[in] force</strong> – bool True if the shape should be updated even if it is not compatible with the existing value. </p></li>
+</ul>
 </dd>
 </dl>
 </dd></dl>
@@ -5223,7 +5269,10 @@
 <dd><p>Update the instance’s length. </p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>[in] new_length</strong> – size_t New length. </p>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>[in] new_length</strong> – size_t New length. </p></li>
+<li><p><strong>[in] force</strong> – bool True if the length should be updated even if it is not compatible with the existing value. </p></li>
+</ul>
 </dd>
 </dl>
 </dd></dl>
@@ -5450,7 +5499,10 @@
 <dd><p>Copy data wrapped in YggGeneric class. </p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>[in] data</strong> – YggGeneric* Pointer to generic object. </p>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>[in] data</strong> – YggGeneric* Pointer to generic object. </p></li>
+<li><p><strong>[in] orig_data</strong> – Pointer to data that should be copied if different that the data that is wrapped. </p></li>
+</ul>
 </dd>
 <dt class="field-even">Returns</dt>
 <dd class="field-even"><p>void* Pointer to copy of data. </p>
@@ -5958,7 +6010,10 @@
 <dd><p>Copy data wrapped in YggGeneric class. </p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>[in] data</strong> – YggGeneric* Pointer to generic object. </p>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>[in] data</strong> – YggGeneric* Pointer to generic object. </p></li>
+<li><p><strong>[in] orig_data</strong> – Pointer to data that should be copied if different that the data that is wrapped. </p></li>
+</ul>
 </dd>
 <dt class="field-even">Returns</dt>
 <dd class="field-even"><p>void* Pointer to copy of data. </p>
@@ -6468,7 +6523,10 @@
 <dd><p>Update the instance’s as_array flag. </p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>[in] new_as_array</strong> – const int New as_array flag. </p>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>[in] new_as_array</strong> – const int New as_array flag. </p></li>
+<li><p><strong>[in] force</strong> – bool True if the as_array parameter should be updated even if it is not compatible with the existing value. </p></li>
+</ul>
 </dd>
 </dl>
 </dd></dl>
@@ -6538,7 +6596,7 @@
 <li><p><strong>[out] buf</strong> – char ** Buffer where serialized data should be written. </p></li>
 <li><p><strong>[inout] buf_siz</strong> – size_t* Size of buf. If buf is reallocated, the new size of the buffer will be assigned to this address. </p></li>
 <li><p><strong>[in] allow_realloc</strong> – int If 1, buf will be reallocated if it is not large enough to contain the serialized data. If 0, an error will be raised if it is not large enough. </p></li>
-<li><p><strong>[in] Pointer</strong> – to generic wrapper for object being serialized. </p></li>
+<li><p><strong>[in] x</strong> – Pointer to generic wrapper for object being serialized. </p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
@@ -6711,7 +6769,10 @@
 <dd><p>Copy data wrapped in YggGeneric class. </p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>[in] data</strong> – YggGeneric* Pointer to generic object. </p>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>[in] data</strong> – YggGeneric* Pointer to generic object. </p></li>
+<li><p><strong>[in] orig_data</strong> – Pointer to data that should be copied if different that the data that is wrapped. </p></li>
+</ul>
 </dd>
 <dt class="field-even">Returns</dt>
 <dd class="field-even"><p>void* Pointer to copy of data. </p>
@@ -6956,7 +7017,10 @@
 <dd><p>Copy data wrapped in YggGeneric class. </p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>[in] data</strong> – YggGeneric* Pointer to generic object. </p>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>[in] data</strong> – YggGeneric* Pointer to generic object. </p></li>
+<li><p><strong>[in] orig_data</strong> – Pointer to data that should be copied if different that the data that is wrapped. </p></li>
+</ul>
 </dd>
 <dt class="field-even">Returns</dt>
 <dd class="field-even"><p>void* Pointer to copy of data. </p>
@@ -7115,6 +7179,7 @@
 <li><p><strong>[inout] p</strong> – obj_t* Obj struct that should be updated. </p></li>
 <li><p><strong>[inout] cline</strong> – int Reference to count of lines currently in p that should be updated when a line is added to the structure. </p></li>
 <li><p><strong>[in] iline</strong> – char* Line that should be parsed for line information. </p></li>
+<li><p><strong>[in] re_line_vert</strong> – const char* Pointer to regex for line vertices. </p></li>
 <li><p><strong>[in] do_texcoords</strong> – bool If true, texcoords will be extracted from the line. </p></li>
 </ul>
 </dd>
@@ -7134,6 +7199,7 @@
 <li><p><strong>[inout] p</strong> – obj_t* Obj struct that should be updated. </p></li>
 <li><p><strong>[inout] cface</strong> – int Reference to count of faces currently in p that should be updated when a face is added to the structure. </p></li>
 <li><p><strong>[in] iline</strong> – char* Line that should be parsed for face information. </p></li>
+<li><p><strong>[in] re_face_vert</strong> – const char* Pointer to regex for face vertices. </p></li>
 <li><p><strong>[in] do_texcoords</strong> – bool If true, texcoords will be extracted from the line. </p></li>
 <li><p><strong>[in] do_normals</strong> – bool If true, normals will be extracted from the line. </p></li>
 </ul>
@@ -7154,6 +7220,7 @@
 <li><p><strong>[inout] p</strong> – obj_t* Obj struct that should be updated. </p></li>
 <li><p><strong>[inout] csurf</strong> – int Reference to count of surfaces currently in p that should be updated when a surface is added to the structure. </p></li>
 <li><p><strong>[in] iline</strong> – char* Line that should be parsed for surface information. </p></li>
+<li><p><strong>[in] re_surf_vert</strong> – const char* Pointer to regex for surface vertices. </p></li>
 <li><p><strong>[in] sind_ptr</strong> – size_t** Pointer to array containing starting indices for subexpressions in the regex for the surface entry. </p></li>
 <li><p><strong>[in] eind_ptr</strong> – size_t** Pointer to array containing ending indices for subexpressions in the regex for the surface entry. </p></li>
 <li><p><strong>[in] do_texcoords</strong> – bool If true, texcoords will be extracted from the line. </p></li>
@@ -7332,7 +7399,7 @@
 <li><p><strong>[out] buf</strong> – char ** Buffer where serialized data should be written. </p></li>
 <li><p><strong>[inout] buf_siz</strong> – size_t* Size of buf. If buf is reallocated, the new size of the buffer will be assigned to this address. </p></li>
 <li><p><strong>[in] allow_realloc</strong> – int If 1, buf will be reallocated if it is not large enough to contain the serialized data. If 0, an error will be raised if it is not large enough. </p></li>
-<li><p><strong>[in] Pointer</strong> – to generic wrapper for object being serialized. </p></li>
+<li><p><strong>[in] x</strong> – Pointer to generic wrapper for object being serialized. </p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>

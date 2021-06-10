@@ -1,0 +1,64 @@
+``YggInterface``
+================
+
+Create an object for sending/receiving messages to/from an yggdrasil
+channel.
+
+Description
+-----------
+
+This function wraps functions from yggdrasil’s `Python
+interface <interface_py.html>`__, so refer to that documentation for
+additional details.
+
+Usage
+-----
+
+.. code:: r
+
+   YggInterface(type, ...)
+
+Arguments
+---------
+
++-------------------------------+--------------------------------------+
+| Argument                      | Description                          |
++===============================+======================================+
+| ``type``                      | The name of the Python interface     |
+|                               | that should be called                |
+|                               | (e.                                  |
+|                               | g. `YggInput <interface_py.html#yggd |
+|                               | rasil.languages.Python.YggInput>`__, |
+|                               | `YggOutput <interface_py.html#yggdr  |
+|                               | asil.languages.Python.YggOutput>`__, |
+|                               | `YggR                                |
+|                               | pcClient <interface_py.html#yggdrasi |
+|                               | l.languages.Python.YggRpcClient>`__, |
+|                               | `YggR                                |
+|                               | pcServer <interface_py.html#yggdrasi |
+|                               | l.languages.Python.YggRpcServer>`__, |
+|                               | `YggTimesync <in                     |
+|                               | terface_py.html#yggdrasil.languages. |
+|                               | Python.YggInterface.YggTimesync>`__) |
++-------------------------------+--------------------------------------+
+| ``...``                       | Additional parameters will be passed |
+|                               | to the Python interface function.    |
++-------------------------------+--------------------------------------+
+
+Value
+-----
+
+A Python comm that can be used to send/receive messages via send/recv
+methods.
+
+Examples
+--------
+
+.. code:: r
+
+   in_channel = YggInterface('YggInput', 'input_channel_name')
+   # Use zeallot '%<-%' syntax to expand multiple variables
+   c(flag, input) %<-% in_channel$recv()
+
+   out_channel = YggInterface('YggOutput', 'output_channel_name')
+   flag <- out_channel$send(output1, output2, ...)

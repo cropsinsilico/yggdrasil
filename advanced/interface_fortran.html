@@ -1,0 +1,1568 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+  <title>Fortran Interface &mdash; yggdrasil v1.6.3+7.ga06bf3c48.dirty documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+
+  
+  
+
+  
+  
+
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/doctools.js"></script>
+    
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Code" href="code.html" />
+    <link rel="prev" title="R Interface" href="interface_r.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../index.html" class="icon icon-home"> yggdrasil
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                v1.6.3
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../includeme.html">Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../install.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../getting_started.html">Getting started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../formatted_io.html">Formatted I/O</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../server_client_io.html">Server/Client I/O</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../autowrap.html">Autowrapping Model Functions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../conditional_io.html">Conditional I/O</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../transformed_io.html">Transformed I/O</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../timesync_io.html">Timestep Synchronization</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../yaml.html">YAML Files</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../config.html">Configuration Files</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../units.html">Units</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../c_format_strings.html">C-Style Format Strings</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../debugging.html">Debugging</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../threading.html">OpenMP Threading in Models</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../examples/examples_toc.html">Examples</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">Advanced</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="serialization.html">Serialization</a></li>
+<li class="toctree-l2"><a class="reference internal" href="metaschema.html">JSON Metaschema</a></li>
+<li class="toctree-l2"><a class="reference internal" href="schema.html">YAML Validation Schema</a></li>
+<li class="toctree-l2"><a class="reference internal" href="io_drivers.html">Input/Output Drivers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="model_drivers.html">Model Drivers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="model_drivers.html#model-base-classes">Model Base Classes</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="model_interface.html">Model Interface</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="interface_py.html">Python Interface</a></li>
+<li class="toctree-l3"><a class="reference internal" href="interface_c.html">C Interface</a></li>
+<li class="toctree-l3"><a class="reference internal" href="interface_cpp.html">C++ Interface</a></li>
+<li class="toctree-l3"><a class="reference internal" href="interface_m.html">Matlab Interface</a></li>
+<li class="toctree-l3"><a class="reference internal" href="interface_r.html">R Interface</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">Fortran Interface</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="code.html">Code</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../development/index.html">Development</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../publications.html">Publications</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../hackathon2018/index.html">Welcome to the 2018 Crops in Silico Hackathon!</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../hackathon2019/index.html">Welcome to the 2019 Crops in Silico Hackathon!</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../hackathon2021/index.html">Welcome to the 2021 Crops in Silico Hackathon!</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">yggdrasil</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
+        
+          <li><a href="index.html">Advanced</a> &raquo;</li>
+        
+          <li><a href="model_interface.html">Model Interface</a> &raquo;</li>
+        
+      <li>Fortran Interface</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+          
+            <a href="../_sources/advanced/interface_fortran.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="fortran-interface">
+<span id="id1"></span><h1>Fortran Interface<a class="headerlink" href="#fortran-interface" title="Permalink to this headline">¶</a></h1>
+<p>Work in progress</p>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-functions">Functions</p>
+<dl class="cpp function">
+<dt id="_CPPv415ygguint1_assign2in2in">
+<span id="_CPPv315ygguint1_assign2in2in"></span><span id="_CPPv215ygguint1_assign2in2in"></span><span id="ygguint1_assign__in.in"></span><span class="target" id="_ygg_interface_8f90_1a44e01223e04161b255d0f1e27ae23f54"></span>subroutine <code class="sig-name descname">ygguint1_assign</code><span class="sig-paren">(</span>in <em>self</em>, in <em>other</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv415ygguint1_assign2in2in" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt id="_CPPv415ygguint2_assign2in2in">
+<span id="_CPPv315ygguint2_assign2in2in"></span><span id="_CPPv215ygguint2_assign2in2in"></span><span id="ygguint2_assign__in.in"></span><span class="target" id="_ygg_interface_8f90_1aad930dd3c97a0a394f1c5eb6424b6113"></span>subroutine <code class="sig-name descname">ygguint2_assign</code><span class="sig-paren">(</span>in <em>self</em>, in <em>other</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv415ygguint2_assign2in2in" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt id="_CPPv415ygguint4_assign2in2in">
+<span id="_CPPv315ygguint4_assign2in2in"></span><span id="_CPPv215ygguint4_assign2in2in"></span><span id="ygguint4_assign__in.in"></span><span class="target" id="_ygg_interface_8f90_1a158fd593b63ba90d368d1a04ae8b4862"></span>subroutine <code class="sig-name descname">ygguint4_assign</code><span class="sig-paren">(</span>in <em>self</em>, in <em>other</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv415ygguint4_assign2in2in" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt id="_CPPv415ygguint8_assign2in2in">
+<span id="_CPPv315ygguint8_assign2in2in"></span><span id="_CPPv215ygguint8_assign2in2in"></span><span id="ygguint8_assign__in.in"></span><span class="target" id="_ygg_interface_8f90_1aaf7e0848668e12a0f8b4c77377a32510"></span>subroutine <code class="sig-name descname">ygguint8_assign</code><span class="sig-paren">(</span>in <em>self</em>, in <em>other</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv415ygguint8_assign2in2in" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt id="_CPPv46yggarg2in">
+<span id="_CPPv36yggarg2in"></span><span id="_CPPv26yggarg2in"></span><span id="yggarg__in"></span><span class="target" id="_ygg_interface_8f90_1ae2898619fee7a301488965eb5d5e5791"></span>function <code class="sig-name descname">yggarg</code><span class="sig-paren">(</span>in <em>x</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv46yggarg2in" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt id="_CPPv420yggarg_scalar_real162in">
+<span id="_CPPv320yggarg_scalar_real162in"></span><span id="_CPPv220yggarg_scalar_real162in"></span><span id="yggarg_scalar_real16__in"></span><span class="target" id="_ygg_interface_8f90_1af111ab9094aa6f30bd03a29d8fcc825d"></span>function <code class="sig-name descname">yggarg_scalar_real16</code><span class="sig-paren">(</span>in <em>x</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv420yggarg_scalar_real162in" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt id="_CPPv423yggarg_scalar_complex162in">
+<span id="_CPPv323yggarg_scalar_complex162in"></span><span id="_CPPv223yggarg_scalar_complex162in"></span><span id="yggarg_scalar_complex16__in"></span><span class="target" id="_ygg_interface_8f90_1a9ac579640e2a277426a37837292232a7"></span>function <code class="sig-name descname">yggarg_scalar_complex16</code><span class="sig-paren">(</span>in <em>x</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv423yggarg_scalar_complex162in" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt id="_CPPv421yggarg_1darray_real162in2in">
+<span id="_CPPv321yggarg_1darray_real162in2in"></span><span id="_CPPv221yggarg_1darray_real162in2in"></span><span id="yggarg_1darray_real16__in.in"></span><span class="target" id="_ygg_interface_8f90_1a897256854d5af829b27296195e717a58"></span>function <code class="sig-name descname">yggarg_1darray_real16</code><span class="sig-paren">(</span>in <em>x</em>, in <em>x_shape</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv421yggarg_1darray_real162in2in" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt id="_CPPv424yggarg_1darray_complex162in2in">
+<span id="_CPPv324yggarg_1darray_complex162in2in"></span><span id="_CPPv224yggarg_1darray_complex162in2in"></span><span id="yggarg_1darray_complex16__in.in"></span><span class="target" id="_ygg_interface_8f90_1ab22ff5dfde8586c294ca7d1a41a0330d"></span>function <code class="sig-name descname">yggarg_1darray_complex16</code><span class="sig-paren">(</span>in <em>x</em>, in <em>x_shape</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv424yggarg_1darray_complex162in2in" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt id="_CPPv421yggarg_2darray_real162in">
+<span id="_CPPv321yggarg_2darray_real162in"></span><span id="_CPPv221yggarg_2darray_real162in"></span><span id="yggarg_2darray_real16__in"></span><span class="target" id="_ygg_interface_8f90_1a5e5a286cc457726c6845d6980d530d3e"></span>function <code class="sig-name descname">yggarg_2darray_real16</code><span class="sig-paren">(</span>in <em>x</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv421yggarg_2darray_real162in" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt id="_CPPv424yggarg_2darray_complex162in">
+<span id="_CPPv324yggarg_2darray_complex162in"></span><span id="_CPPv224yggarg_2darray_complex162in"></span><span id="yggarg_2darray_complex16__in"></span><span class="target" id="_ygg_interface_8f90_1afdb858092c5ea1886ef38dac0d488d7e"></span>function <code class="sig-name descname">yggarg_2darray_complex16</code><span class="sig-paren">(</span>in <em>x</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv424yggarg_2darray_complex162in" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt id="_CPPv47ygguint2in">
+<span id="_CPPv37ygguint2in"></span><span id="_CPPv27ygguint2in"></span><span id="ygguint__in"></span><span class="target" id="_ygg_interface_8f90_1a86837745dbd3160f7e54600e8de6791a"></span>function <code class="sig-name descname">ygguint</code><span class="sig-paren">(</span>in <em>x</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv47ygguint2in" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt id="_CPPv413init_ygguint12in">
+<span id="_CPPv313init_ygguint12in"></span><span id="_CPPv213init_ygguint12in"></span><span id="init_ygguint1__in"></span><span class="target" id="_ygg_interface_8f90_1a88dfe8658d466cb6117b3e046fd0889b"></span>function <code class="sig-name descname">init_ygguint1</code><span class="sig-paren">(</span>in <em>x</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv413init_ygguint12in" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt id="_CPPv413init_ygguint22in">
+<span id="_CPPv313init_ygguint22in"></span><span id="_CPPv213init_ygguint22in"></span><span id="init_ygguint2__in"></span><span class="target" id="_ygg_interface_8f90_1a9336723808b184d27c2c9bcfcea8faf8"></span>function <code class="sig-name descname">init_ygguint2</code><span class="sig-paren">(</span>in <em>x</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv413init_ygguint22in" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt id="_CPPv413init_ygguint42in">
+<span id="_CPPv313init_ygguint42in"></span><span id="_CPPv213init_ygguint42in"></span><span id="init_ygguint4__in"></span><span class="target" id="_ygg_interface_8f90_1a13cc043829b6fdf3aacb568b50fbc961"></span>function <code class="sig-name descname">init_ygguint4</code><span class="sig-paren">(</span>in <em>x</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv413init_ygguint42in" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt id="_CPPv413init_ygguint82in">
+<span id="_CPPv313init_ygguint82in"></span><span id="_CPPv213init_ygguint82in"></span><span id="init_ygguint8__in"></span><span class="target" id="_ygg_interface_8f90_1a93c7f8f71cdc90c36615f3635d0233a4"></span>function <code class="sig-name descname">init_ygguint8</code><span class="sig-paren">(</span>in <em>x</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv413init_ygguint82in" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt id="_CPPv412display_null2in">
+<span id="_CPPv312display_null2in"></span><span id="_CPPv212display_null2in"></span><span id="display_null__in"></span><span class="target" id="_ygg_interface_8f90_1a0f0fb3ab4cb3f1e7649d35a5675408af"></span>subroutine <code class="sig-name descname">display_null</code><span class="sig-paren">(</span>in <em>x</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv412display_null2in" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt id="_CPPv414fix_format_str2in">
+<span id="_CPPv314fix_format_str2in"></span><span id="_CPPv214fix_format_str2in"></span><span id="fix_format_str__in"></span><span class="target" id="_ygg_interface_8f90_1a1a9f07e4303269149135ee306d2291d6"></span>subroutine <code class="sig-name descname">fix_format_str</code><span class="sig-paren">(</span>in <em>x</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv414fix_format_str2in" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt id="_CPPv411ygglog_info2in">
+<span id="_CPPv311ygglog_info2in"></span><span id="_CPPv211ygglog_info2in"></span><span id="ygglog_info__in"></span><span class="target" id="_ygg_interface_8f90_1a95cd528fb55b48893041121a04771d29"></span>subroutine <code class="sig-name descname">ygglog_info</code><span class="sig-paren">(</span>in <em>fmt</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv411ygglog_info2in" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt id="_CPPv412ygglog_debug2in">
+<span id="_CPPv312ygglog_debug2in"></span><span id="_CPPv212ygglog_debug2in"></span><span id="ygglog_debug__in"></span><span class="target" id="_ygg_interface_8f90_1a0adc609e136204cfa2660c6292ede101"></span>subroutine <code class="sig-name descname">ygglog_debug</code><span class="sig-paren">(</span>in <em>fmt</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv412ygglog_debug2in" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt id="_CPPv412ygglog_error2in">
+<span id="_CPPv312ygglog_error2in"></span><span id="_CPPv212ygglog_error2in"></span><span id="ygglog_error__in"></span><span class="target" id="_ygg_interface_8f90_1a77ddc6ed9db332954670ed7dff3d0d66"></span>subroutine <code class="sig-name descname">ygglog_error</code><span class="sig-paren">(</span>in <em>fmt</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv412ygglog_error2in" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt id="_CPPv425is_comm_format_array_type2in2in">
+<span id="_CPPv325is_comm_format_array_type2in2in"></span><span id="_CPPv225is_comm_format_array_type2in2in"></span><span id="is_comm_format_array_type__in.in"></span><span class="target" id="_ygg_interface_8f90_1aaf829e7c67a1b5002d9a12b53642f21a"></span>function <code class="sig-name descname">is_comm_format_array_type</code><span class="sig-paren">(</span>in <em>x</em>, in <em>args</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv425is_comm_format_array_type2in2in" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt id="_CPPv410ygg_output2in">
+<span id="_CPPv310ygg_output2in"></span><span id="_CPPv210ygg_output2in"></span><span id="ygg_output__in"></span><span class="target" id="_ygg_interface_8f90_1afcc673af452256eb2f443e2d5cbea938"></span>function <code class="sig-name descname">ygg_output</code><span class="sig-paren">(</span>in <em>name</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv410ygg_output2in" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Constructor for an output comm Create a yggcomm structure for an output channel based on a provided name that is used to locate a particular comm address stored in an environment variable. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>[in] name</strong> – Name of the channel. </p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Output comm structure. </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt id="_CPPv49ygg_input2in">
+<span id="_CPPv39ygg_input2in"></span><span id="_CPPv29ygg_input2in"></span><span id="ygg_input__in"></span><span class="target" id="_ygg_interface_8f90_1ab34a6420bda43bde3002eae869ea41c1"></span>function <code class="sig-name descname">ygg_input</code><span class="sig-paren">(</span>in <em>name</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv49ygg_input2in" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Constructor for an input comm Create a yggcomm structure for an input channel based on a provided name that is used to locate a particular comm address stored in an environment variable. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>[in] name</strong> – Name of the channel. </p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Input comm structure. </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt id="_CPPv415ygg_output_type2in2in">
+<span id="_CPPv315ygg_output_type2in2in"></span><span id="_CPPv215ygg_output_type2in2in"></span><span id="ygg_output_type__in.in"></span><span class="target" id="_ygg_interface_8f90_1a9befc2dc50e3f83ad765ed57b430aaf7"></span>function <code class="sig-name descname">ygg_output_type</code><span class="sig-paren">(</span>in <em>name</em>, in <em>datatype</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv415ygg_output_type2in2in" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Constructor for an output comm that will send a specific data type. Create a yggcomm structure for an output channel based on a provided name that is used to locate a particular comm address stored in an environment variable and a structure defining the datatype of outgoing messages. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>[in] name</strong> – Name of the channel. </p></li>
+<li><p><strong>[in] datatype</strong> – Data structure containing type information. </p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Output comm structure. </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt id="_CPPv414ygg_input_type2in2in">
+<span id="_CPPv314ygg_input_type2in2in"></span><span id="_CPPv214ygg_input_type2in2in"></span><span id="ygg_input_type__in.in"></span><span class="target" id="_ygg_interface_8f90_1a1967ea47c792e480a0572aa5d5f5b5db"></span>function <code class="sig-name descname">ygg_input_type</code><span class="sig-paren">(</span>in <em>name</em>, in <em>datatype</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv414ygg_input_type2in2in" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Constructor for an input comm that will receive a specific data type. Create a yggcomm structure for an input channel based on a provided name that is used to locate a particular comm address stored in an environment variable and a structure defining the datatype of incoming messages. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>[in] name</strong> – Name of the channel. </p></li>
+<li><p><strong>[in] datatype</strong> – Data structure containing type information. </p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Input comm structure. </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt id="_CPPv414ygg_output_fmt2in2in">
+<span id="_CPPv314ygg_output_fmt2in2in"></span><span id="_CPPv214ygg_output_fmt2in2in"></span><span id="ygg_output_fmt__in.in"></span><span class="target" id="_ygg_interface_8f90_1a33afd07aad91eaf87c9307dfab7549c3"></span>function <code class="sig-name descname">ygg_output_fmt</code><span class="sig-paren">(</span>in <em>name</em>, in <em>fmt</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv414ygg_output_fmt2in2in" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Constructor for an output comm with a type specified via a C-style format string. Create a yggcomm structure for an output channel based on a provided name that is used to locate a particular comm address stored in an environment variable and a format string. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>[in] name</strong> – Name of the channel. </p></li>
+<li><p><strong>[in] fmt</strong> – C-style format string that should be used to determine the type of data that will be sent. </p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Output comm structure. </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt id="_CPPv413ygg_input_fmt2in2in">
+<span id="_CPPv313ygg_input_fmt2in2in"></span><span id="_CPPv213ygg_input_fmt2in2in"></span><span id="ygg_input_fmt__in.in"></span><span class="target" id="_ygg_interface_8f90_1a34fe579335df4f5c9e10103dfa2c08ee"></span>function <code class="sig-name descname">ygg_input_fmt</code><span class="sig-paren">(</span>in <em>name</em>, in <em>fmt</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv413ygg_input_fmt2in2in" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Constructor for an input comm with a type specified via a C-style format string. Create a yggcomm structure for an input channel based on a provided name that is used to locate a particular comm address stored in an environment variable and a format string. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>[in] name</strong> – Name of the channel. </p></li>
+<li><p><strong>[in] fmt</strong> – C-style format string that should be used to determine the type of data that will be received. </p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Input comm structure. </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt id="_CPPv421ygg_ascii_file_output2in">
+<span id="_CPPv321ygg_ascii_file_output2in"></span><span id="_CPPv221ygg_ascii_file_output2in"></span><span id="ygg_ascii_file_output__in"></span><span class="target" id="_ygg_interface_8f90_1af91c3ae8a8cca9bc48cda97d401418ea"></span>function <code class="sig-name descname">ygg_ascii_file_output</code><span class="sig-paren">(</span>in <em>name</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv421ygg_ascii_file_output2in" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Constructor for an ASCII file output comm Create a yggcomm structure for an output channel based on a provided name that is used to locate a particular comm address stored in an environment variable. This type of comm sends string output line-by-line. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>[in] name</strong> – Name of the channel. </p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Output comm structure. </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt id="_CPPv420ygg_ascii_file_input2in">
+<span id="_CPPv320ygg_ascii_file_input2in"></span><span id="_CPPv220ygg_ascii_file_input2in"></span><span id="ygg_ascii_file_input__in"></span><span class="target" id="_ygg_interface_8f90_1a60af6d152bdb7649c947f0556f49dbbb"></span>function <code class="sig-name descname">ygg_ascii_file_input</code><span class="sig-paren">(</span>in <em>name</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv420ygg_ascii_file_input2in" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Constructor for an ASCII file input comm Create a yggcomm structure for an input channel based on a provided name that is used to locate a particular comm address stored in an environment variable. This type of comm receives string input line-by-line. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>[in] name</strong> – Name of the channel. </p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Input comm structure. </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt id="_CPPv422ygg_ascii_table_output2in2in">
+<span id="_CPPv322ygg_ascii_table_output2in2in"></span><span id="_CPPv222ygg_ascii_table_output2in2in"></span><span id="ygg_ascii_table_output__in.in"></span><span class="target" id="_ygg_interface_8f90_1ad65e7b90b824762396eded6618e5deb2"></span>function <code class="sig-name descname">ygg_ascii_table_output</code><span class="sig-paren">(</span>in <em>name</em>, in <em>format_str</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv422ygg_ascii_table_output2in2in" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Constructor for an ASCII table output comm Create a yggcomm structure for an output channel based on a provided name that is used to locate a particular comm address stored in an environment variable and a format string. This type of comm outputs table rows one at a time and formats them using the provided format_str. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>[in] name</strong> – Name of the channel. </p></li>
+<li><p><strong>[in] format_str</strong> – C-style format string that should be used to format table rows. </p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Output comm structure. </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt id="_CPPv421ygg_ascii_table_input2in">
+<span id="_CPPv321ygg_ascii_table_input2in"></span><span id="_CPPv221ygg_ascii_table_input2in"></span><span id="ygg_ascii_table_input__in"></span><span class="target" id="_ygg_interface_8f90_1a6bb60a63289e37150fee2cd331ab1c91"></span>function <code class="sig-name descname">ygg_ascii_table_input</code><span class="sig-paren">(</span>in <em>name</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv421ygg_ascii_table_input2in" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Constructor for an ASCII table input comm Create a yggcomm structure for an input channel based on a provided name that is used to locate a particular comm address stored in an environment variable and a format string. This type of comm receives table rows one at a time. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>[in] name</strong> – Name of the channel. </p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Input comm structure. </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt id="_CPPv422ygg_ascii_array_output2in2in">
+<span id="_CPPv322ygg_ascii_array_output2in2in"></span><span id="_CPPv222ygg_ascii_array_output2in2in"></span><span id="ygg_ascii_array_output__in.in"></span><span class="target" id="_ygg_interface_8f90_1af367fd2dc1ac00bb69cfb03049f85421"></span>function <code class="sig-name descname">ygg_ascii_array_output</code><span class="sig-paren">(</span>in <em>name</em>, in <em>format_str</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv422ygg_ascii_array_output2in2in" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Constructor for an ASCII table array output comm Create a yggcomm structure for an output channel based on a provided name that is used to locate a particular comm address stored in an environment variable and a format string. This type of comm outputs table columns as arrays and formats rows using the provided format_str. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>[in] name</strong> – Name of the channel. </p></li>
+<li><p><strong>[in] format_str</strong> – C-style format string that should be used to format table rows. </p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Output comm structure. </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt id="_CPPv421ygg_ascii_array_input2in">
+<span id="_CPPv321ygg_ascii_array_input2in"></span><span id="_CPPv221ygg_ascii_array_input2in"></span><span id="ygg_ascii_array_input__in"></span><span class="target" id="_ygg_interface_8f90_1a403684018683e3100be21f80c655075b"></span>function <code class="sig-name descname">ygg_ascii_array_input</code><span class="sig-paren">(</span>in <em>name</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv421ygg_ascii_array_input2in" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Constructor for an ASCII table array input comm Create a yggcomm structure for an input channel based on a provided name that is used to locate a particular comm address stored in an environment variable and a format string. This type of comm receives table columns as arrays. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>[in] name</strong> – Name of the channel. </p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Input comm structure. </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt id="_CPPv414ygg_ply_output2in">
+<span id="_CPPv314ygg_ply_output2in"></span><span id="_CPPv214ygg_ply_output2in"></span><span id="ygg_ply_output__in"></span><span class="target" id="_ygg_interface_8f90_1aaff7a03d348e16452cf32f7a4d06873d"></span>function <code class="sig-name descname">ygg_ply_output</code><span class="sig-paren">(</span>in <em>name</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv414ygg_ply_output2in" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Constructor for an output comm that sends Ply data. Create a yggcomm structure for an output channel based on a provided name that is used to locate a particular comm address stored in an environment variable. This type of comm only sends Ply data contained in yggply structures. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>[in] name</strong> – Name of the channel. </p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Output comm structure. </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt id="_CPPv413ygg_ply_input2in">
+<span id="_CPPv313ygg_ply_input2in"></span><span id="_CPPv213ygg_ply_input2in"></span><span id="ygg_ply_input__in"></span><span class="target" id="_ygg_interface_8f90_1a8a03a24887ec52ef9ad611d10333f27f"></span>function <code class="sig-name descname">ygg_ply_input</code><span class="sig-paren">(</span>in <em>name</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv413ygg_ply_input2in" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Constructor for an input comm that receives Ply data. Create a yggcomm structure for an input channel based on a provided name that is used to locate a particular comm address stored in an environment variable. This type of comm only receives Ply data into yggply structures. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>[in] name</strong> – Name of the channel. </p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Input comm structure. </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt id="_CPPv414ygg_obj_output2in">
+<span id="_CPPv314ygg_obj_output2in"></span><span id="_CPPv214ygg_obj_output2in"></span><span id="ygg_obj_output__in"></span><span class="target" id="_ygg_interface_8f90_1a6e11410dcb690372be2bf5cf742666a3"></span>function <code class="sig-name descname">ygg_obj_output</code><span class="sig-paren">(</span>in <em>name</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv414ygg_obj_output2in" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Constructor for an output comm that sends Obj data. Create a yggcomm structure for an output channel based on a provided name that is used to locate a particular comm address stored in an environment variable. This type of comm only sends Obj data contained in yggobj structures. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>[in] name</strong> – Name of the channel. </p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Output comm structure. </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt id="_CPPv413ygg_obj_input2in">
+<span id="_CPPv313ygg_obj_input2in"></span><span id="_CPPv213ygg_obj_input2in"></span><span id="ygg_obj_input__in"></span><span class="target" id="_ygg_interface_8f90_1a5ba849622464b7d152b808c35455c545"></span>function <code class="sig-name descname">ygg_obj_input</code><span class="sig-paren">(</span>in <em>name</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv413ygg_obj_input2in" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Constructor for an input comm that receives Obj data. Create a yggcomm structure for an input channel based on a provided name that is used to locate a particular comm address stored in an environment variable. This type of comm only receives Obj data into yggobj structures. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>[in] name</strong> – Name of the channel. </p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Input comm structure. </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt id="_CPPv418ygg_generic_output2in">
+<span id="_CPPv318ygg_generic_output2in"></span><span id="_CPPv218ygg_generic_output2in"></span><span id="ygg_generic_output__in"></span><span class="target" id="_ygg_interface_8f90_1afa30ec7d62757ca27a3d4b0a1a479b67"></span>function <code class="sig-name descname">ygg_generic_output</code><span class="sig-paren">(</span>in <em>name</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv418ygg_generic_output2in" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Constructor for an output comm that sends generic data. Create a yggcomm structure for an output channel based on a provided name that is used to locate a particular comm address stored in an environment variable. This type of comm can send any type of data as long as it is wrapped in an ygggeneric structure. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>[in] name</strong> – Name of the channel. </p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Output comm structure. </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt id="_CPPv417ygg_generic_input2in">
+<span id="_CPPv317ygg_generic_input2in"></span><span id="_CPPv217ygg_generic_input2in"></span><span id="ygg_generic_input__in"></span><span class="target" id="_ygg_interface_8f90_1a00cfc5a8f9242029f84054db16e5572e"></span>function <code class="sig-name descname">ygg_generic_input</code><span class="sig-paren">(</span>in <em>name</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv417ygg_generic_input2in" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Constructor for an input comm that receives generic data. Create a yggcomm structure for an input channel based on a provided name that is used to locate a particular comm address stored in an environment variable. This type of comm can receive any type of data into an ygggeneric structure. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>[in] name</strong> – Name of the channel. </p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Input comm structure. </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt id="_CPPv414ygg_any_output2in">
+<span id="_CPPv314ygg_any_output2in"></span><span id="_CPPv214ygg_any_output2in"></span><span id="ygg_any_output__in"></span><span class="target" id="_ygg_interface_8f90_1a21f1939e23b28d05c146189b0832fe94"></span>function <code class="sig-name descname">ygg_any_output</code><span class="sig-paren">(</span>in <em>name</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv414ygg_any_output2in" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Constructor for an output comm that sends generic data. Create a yggcomm structure for an output channel based on a provided name that is used to locate a particular comm address stored in an environment variable. This type of comm can send any type of data as long as it is wrapped in an ygggeneric structure. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>[in] name</strong> – Name of the channel. </p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Output comm structure. </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt id="_CPPv413ygg_any_input2in">
+<span id="_CPPv313ygg_any_input2in"></span><span id="_CPPv213ygg_any_input2in"></span><span id="ygg_any_input__in"></span><span class="target" id="_ygg_interface_8f90_1a48553c174441563d501ebe98799dbc9e"></span>function <code class="sig-name descname">ygg_any_input</code><span class="sig-paren">(</span>in <em>name</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv413ygg_any_input2in" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Constructor for an input comm that receives generic data. Create a yggcomm structure for an input channel based on a provided name that is used to locate a particular comm address stored in an environment variable. This type of comm can receive any type of data into an ygggeneric structure. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>[in] name</strong> – Name of the channel. </p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Input comm structure. </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt id="_CPPv421ygg_json_array_output2in">
+<span id="_CPPv321ygg_json_array_output2in"></span><span id="_CPPv221ygg_json_array_output2in"></span><span id="ygg_json_array_output__in"></span><span class="target" id="_ygg_interface_8f90_1a6a0f8d3e67b0aee815ed76ee43d6c366"></span>function <code class="sig-name descname">ygg_json_array_output</code><span class="sig-paren">(</span>in <em>name</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv421ygg_json_array_output2in" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Constructor for an output comm that sends JSON arrays of generic data. Create a yggcomm structure for an output channel based on a provided name that is used to locate a particular comm address stored in an environment variable. This type of comm can send any type of data as long as it is wrapped in an ygggeneric structure. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>[in] name</strong> – Name of the channel. </p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Output comm structure. </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt id="_CPPv420ygg_json_array_input2in">
+<span id="_CPPv320ygg_json_array_input2in"></span><span id="_CPPv220ygg_json_array_input2in"></span><span id="ygg_json_array_input__in"></span><span class="target" id="_ygg_interface_8f90_1a344592efaa46164323d406baf368d273"></span>function <code class="sig-name descname">ygg_json_array_input</code><span class="sig-paren">(</span>in <em>name</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv420ygg_json_array_input2in" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Constructor for an input comm that receives JSON arrays of generic data. Create a yggcomm structure for an input channel based on a provided name that is used to locate a particular comm address stored in an environment variable. This type of comm can receive any type of data into an ygggeneric structure. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>[in] name</strong> – Name of the channel. </p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Input comm structure. </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt id="_CPPv422ygg_json_object_output2in">
+<span id="_CPPv322ygg_json_object_output2in"></span><span id="_CPPv222ygg_json_object_output2in"></span><span id="ygg_json_object_output__in"></span><span class="target" id="_ygg_interface_8f90_1aa4a8072c342b51d31c78a0a446696021"></span>function <code class="sig-name descname">ygg_json_object_output</code><span class="sig-paren">(</span>in <em>name</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv422ygg_json_object_output2in" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Constructor for an output comm that sends JSON objects of generic data. Create a yggcomm structure for an output channel based on a provided name that is used to locate a particular comm address stored in an environment variable. This type of comm can send any type of data as long as it is wrapped in an ygggeneric structure. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>[in] name</strong> – Name of the channel. </p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Output comm structure. </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt id="_CPPv421ygg_json_object_input2in">
+<span id="_CPPv321ygg_json_object_input2in"></span><span id="_CPPv221ygg_json_object_input2in"></span><span id="ygg_json_object_input__in"></span><span class="target" id="_ygg_interface_8f90_1a6bcf48c17cd45596dc556b0ab561c078"></span>function <code class="sig-name descname">ygg_json_object_input</code><span class="sig-paren">(</span>in <em>name</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv421ygg_json_object_input2in" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Constructor for an input comm that receives JSON objects of generic data. Create a yggcomm structure for an input channel based on a provided name that is used to locate a particular comm address stored in an environment variable. This type of comm can receive any type of data into an ygggeneric structure. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>[in] name</strong> – Name of the channel. </p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Input comm structure. </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt id="_CPPv414ygg_rpc_client2in2in2in">
+<span id="_CPPv314ygg_rpc_client2in2in2in"></span><span id="_CPPv214ygg_rpc_client2in2in2in"></span><span id="ygg_rpc_client__in.in.in"></span><span class="target" id="_ygg_interface_8f90_1adeda5771f473a610f7d593f0f699d84f"></span>function <code class="sig-name descname">ygg_rpc_client</code><span class="sig-paren">(</span>in <em>name</em>, in <em>out_fmt_in</em>, in <em>in_fmt_in</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv414ygg_rpc_client2in2in2in" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Constructor for a client-side RPC comm. Create a yggcomm structure for the client side of an RPC channel based on a provided name that is used to locate a particular comm address stored in an environment variable. Types can be specified by format strings. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>[in] name</strong> – Name of the channel. </p></li>
+<li><p><strong>[in] out_fmt_in</strong> – C-style format string defining how client requests (outgoing messages) should be formatted. </p></li>
+<li><p><strong>[in] in_fmt_in</strong> – C-style format string defining how client responses (incoming messages) should be parsed. </p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Client comm structure. </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt id="_CPPv414ygg_rpc_server2in2in2in">
+<span id="_CPPv314ygg_rpc_server2in2in2in"></span><span id="_CPPv214ygg_rpc_server2in2in2in"></span><span id="ygg_rpc_server__in.in.in"></span><span class="target" id="_ygg_interface_8f90_1a86730e7a72218c52d51d8cb1bcb82202"></span>function <code class="sig-name descname">ygg_rpc_server</code><span class="sig-paren">(</span>in <em>name</em>, in <em>in_fmt_in</em>, in <em>out_fmt_in</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv414ygg_rpc_server2in2in2in" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Constructor for a server-side RPC comm. Create a yggcomm structure for the server side of an RPC channel based on a provided name that is used to locate a particular comm address stored in an environment variable. Types can be specified by format strings. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>[in] name</strong> – Name of the channel. </p></li>
+<li><p><strong>[in] in_fmt_in</strong> – C-style format string defining how requests (incoming messages) should be parsed. </p></li>
+<li><p><strong>[in] out_fmt_in</strong> – C-style format string defining how responses (outgoing messages) should be formatted. </p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Server comm structure. </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt id="_CPPv419ygg_rpc_client_type2in2in2in">
+<span id="_CPPv319ygg_rpc_client_type2in2in2in"></span><span id="_CPPv219ygg_rpc_client_type2in2in2in"></span><span id="ygg_rpc_client_type__in.in.in"></span><span class="target" id="_ygg_interface_8f90_1aa5f73dcef2f880c58d365470eaa673ee"></span>function <code class="sig-name descname">ygg_rpc_client_type</code><span class="sig-paren">(</span>in <em>name</em>, in <em>out_type_in</em>, in <em>in_type_in</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv419ygg_rpc_client_type2in2in2in" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Constructor for a client-side RPC comm with explicit datatypes. Create a yggcomm structure for the client side of an RPC channel based on a provided name that is used to locate a particular comm address stored in an environment variable. Types can be specified by datatype structures. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>[in] name</strong> – Name of the channel. </p></li>
+<li><p><strong>[in] out_type_in</strong> – Datatype structure containing information on the type of data that requests (outgoing messages) will contain. </p></li>
+<li><p><strong>[in] in_type_in</strong> – Datatype structure containing information on the type of data that responses (incoming messages) will contain. </p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Client comm structure. </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt id="_CPPv419ygg_rpc_server_type2in2in2in">
+<span id="_CPPv319ygg_rpc_server_type2in2in2in"></span><span id="_CPPv219ygg_rpc_server_type2in2in2in"></span><span id="ygg_rpc_server_type__in.in.in"></span><span class="target" id="_ygg_interface_8f90_1ab5fdd1d1b46593d1efb649e41382f231"></span>function <code class="sig-name descname">ygg_rpc_server_type</code><span class="sig-paren">(</span>in <em>name</em>, in <em>in_type_in</em>, in <em>out_type_in</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv419ygg_rpc_server_type2in2in2in" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Constructor for a server-side RPC comm with explicit datatypes. Create a yggcomm structure for the server side of an RPC channel based on a provided name that is used to locate a particular comm address stored in an environment variable. Types can be specified by datatype structures. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>[in] name</strong> – Name of the channel. </p></li>
+<li><p><strong>[in] in_type_in</strong> – Datatype structure containing information on the type of data that requests (incoming messages) will contain. </p></li>
+<li><p><strong>[in] out_type_in</strong> – Datatype structure containing information on the type of data that responses (outgoing messages) will contain. </p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Server comm structure. </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt id="_CPPv412ygg_timesync2in2in">
+<span id="_CPPv312ygg_timesync2in2in"></span><span id="_CPPv212ygg_timesync2in2in"></span><span id="ygg_timesync__in.in"></span><span class="target" id="_ygg_interface_8f90_1a66d13570caad0f7a3a397ea7063bc2a4"></span>function <code class="sig-name descname">ygg_timesync</code><span class="sig-paren">(</span>in <em>name</em>, in <em>units</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv412ygg_timesync2in2in" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Constructor for a timesync comm. Create a yggcomm structure for a timesync channel based on a provided name that is used to locate a particular comm address stored in an environment variable. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>[in] name</strong> – Name of the channel. </p></li>
+<li><p><strong>[in] units</strong> – Units that outgoing time steps will be in. </p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Timesync comm structure. </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt id="_CPPv421is_dtype_format_array2in">
+<span id="_CPPv321is_dtype_format_array2in"></span><span id="_CPPv221is_dtype_format_array2in"></span><span id="is_dtype_format_array__in"></span><span class="target" id="_ygg_interface_8f90_1ade9347561232bc3042c845ab357af71a"></span>function <code class="sig-name descname">is_dtype_format_array</code><span class="sig-paren">(</span>in <em>type_struct</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv421is_dtype_format_array2in" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt id="_CPPv418create_dtype_empty2in">
+<span id="_CPPv318create_dtype_empty2in"></span><span id="_CPPv218create_dtype_empty2in"></span><span id="create_dtype_empty__in"></span><span class="target" id="_ygg_interface_8f90_1a3bcae00c5f7c411f83ed7827fcca068c"></span>function <code class="sig-name descname">create_dtype_empty</code><span class="sig-paren">(</span>in <em>use_generic</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv418create_dtype_empty2in" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt id="_CPPv419create_dtype_python2in2in">
+<span id="_CPPv319create_dtype_python2in2in"></span><span id="_CPPv219create_dtype_python2in2in"></span><span id="create_dtype_python__in.in"></span><span class="target" id="_ygg_interface_8f90_1a08e98849b9ec6839a94eb576e33b39e5"></span>function <code class="sig-name descname">create_dtype_python</code><span class="sig-paren">(</span>in <em>pyobj</em>, in <em>use_generic</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv419create_dtype_python2in2in" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt id="_CPPv419create_dtype_direct2in">
+<span id="_CPPv319create_dtype_direct2in"></span><span id="_CPPv219create_dtype_direct2in"></span><span id="create_dtype_direct__in"></span><span class="target" id="_ygg_interface_8f90_1aa7c87fe42165af8fb91771ecdf489ba2"></span>function <code class="sig-name descname">create_dtype_direct</code><span class="sig-paren">(</span>in <em>use_generic</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv419create_dtype_direct2in" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt id="_CPPv420create_dtype_default2in2in">
+<span id="_CPPv320create_dtype_default2in2in"></span><span id="_CPPv220create_dtype_default2in2in"></span><span id="create_dtype_default__in.in"></span><span class="target" id="_ygg_interface_8f90_1a5035c880fe98c9c0f7bd178080bb5496"></span>function <code class="sig-name descname">create_dtype_default</code><span class="sig-paren">(</span>in <em>typename</em>, in <em>use_generic</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv420create_dtype_default2in2in" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt id="_CPPv419create_dtype_scalar2in2in2in2in">
+<span id="_CPPv319create_dtype_scalar2in2in2in2in"></span><span id="_CPPv219create_dtype_scalar2in2in2in2in"></span><span id="create_dtype_scalar__in.in.in.in"></span><span class="target" id="_ygg_interface_8f90_1a2733d8cf703b425ad8184c402bba78c9"></span>function <code class="sig-name descname">create_dtype_scalar</code><span class="sig-paren">(</span>in <em>subtype</em>, in <em>precision</em>, in <em>units</em>, in<span class="sig-paren">)</span><a class="headerlink" href="#_CPPv419create_dtype_scalar2in2in2in2in" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt id="_CPPv420create_dtype_1darray2in2in2in2in">
+<span id="_CPPv320create_dtype_1darray2in2in2in2in"></span><span id="_CPPv220create_dtype_1darray2in2in2in2in"></span><span id="create_dtype_1darray__in.in.in.in"></span><span class="target" id="_ygg_interface_8f90_1aab229224583c1f70ef2443615a50be33"></span>function <code class="sig-name descname">create_dtype_1darray</code><span class="sig-paren">(</span>in <em>subtype</em>, in <em>precision</em>, in <em>length</em>, in<span class="sig-paren">)</span><a class="headerlink" href="#_CPPv420create_dtype_1darray2in2in2in2in" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt id="_CPPv420create_dtype_ndarray2in2in2in2in">
+<span id="_CPPv320create_dtype_ndarray2in2in2in2in"></span><span id="_CPPv220create_dtype_ndarray2in2in2in2in"></span><span id="create_dtype_ndarray__in.in.in.in"></span><span class="target" id="_ygg_interface_8f90_1abdf1abeb3165cce647fbd0358e00dde7"></span>function <code class="sig-name descname">create_dtype_ndarray</code><span class="sig-paren">(</span>in <em>subtype</em>, in <em>precision</em>, in <em>ndim</em>, in<span class="sig-paren">)</span><a class="headerlink" href="#_CPPv420create_dtype_ndarray2in2in2in2in" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt id="_CPPv423create_dtype_json_array2in2in2in">
+<span id="_CPPv323create_dtype_json_array2in2in2in"></span><span id="_CPPv223create_dtype_json_array2in2in2in"></span><span id="create_dtype_json_array__in.in.in"></span><span class="target" id="_ygg_interface_8f90_1a3b3805bceb16d07fc65d4833d97a0f2d"></span>function <code class="sig-name descname">create_dtype_json_array</code><span class="sig-paren">(</span>in <em>nitems</em>, in <em>items</em>, in <em>use_generic</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv423create_dtype_json_array2in2in2in" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt id="_CPPv424create_dtype_json_object2in2in2in2in">
+<span id="_CPPv324create_dtype_json_object2in2in2in2in"></span><span id="_CPPv224create_dtype_json_object2in2in2in2in"></span><span id="create_dtype_json_object__in.in.in.in"></span><span class="target" id="_ygg_interface_8f90_1aa72c532c56ae77c0917f4dd6d762ecc8"></span>function <code class="sig-name descname">create_dtype_json_object</code><span class="sig-paren">(</span>in <em>nitems</em>, in <em>keys</em>, in <em>values</em>, in <em>use_generic</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv424create_dtype_json_object2in2in2in2in" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt id="_CPPv416create_dtype_ply2in">
+<span id="_CPPv316create_dtype_ply2in"></span><span id="_CPPv216create_dtype_ply2in"></span><span id="create_dtype_ply__in"></span><span class="target" id="_ygg_interface_8f90_1a8925e476098c7d23fbf77e38ed89f012"></span>function <code class="sig-name descname">create_dtype_ply</code><span class="sig-paren">(</span>in <em>use_generic</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv416create_dtype_ply2in" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt id="_CPPv416create_dtype_obj2in">
+<span id="_CPPv316create_dtype_obj2in"></span><span id="_CPPv216create_dtype_obj2in"></span><span id="create_dtype_obj__in"></span><span class="target" id="_ygg_interface_8f90_1adc1e7c677d6d3a09dab61ab7afac0dfd"></span>function <code class="sig-name descname">create_dtype_obj</code><span class="sig-paren">(</span>in <em>use_generic</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv416create_dtype_obj2in" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt id="_CPPv419create_dtype_format2in2in2in">
+<span id="_CPPv319create_dtype_format2in2in2in"></span><span id="_CPPv219create_dtype_format2in2in2in"></span><span id="create_dtype_format__in.in.in"></span><span class="target" id="_ygg_interface_8f90_1a1314258f2789d1e39c6a50b908ce3ed2"></span>function <code class="sig-name descname">create_dtype_format</code><span class="sig-paren">(</span>in <em>format_str</em>, in <em>as_array</em>, in <em>use_generic</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv419create_dtype_format2in2in2in" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt id="_CPPv418create_dtype_pyobj2in2in">
+<span id="_CPPv318create_dtype_pyobj2in2in"></span><span id="_CPPv218create_dtype_pyobj2in2in"></span><span id="create_dtype_pyobj__in.in"></span><span class="target" id="_ygg_interface_8f90_1a70ada6885adb2131ad7abd95398594fb"></span>function <code class="sig-name descname">create_dtype_pyobj</code><span class="sig-paren">(</span>in <em>typename</em>, in <em>use_generic</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv418create_dtype_pyobj2in2in" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt id="_CPPv419create_dtype_schema2in">
+<span id="_CPPv319create_dtype_schema2in"></span><span id="_CPPv219create_dtype_schema2in"></span><span id="create_dtype_schema__in"></span><span class="target" id="_ygg_interface_8f90_1a59db7f613d83e48c02830a1f882412b0"></span>function <code class="sig-name descname">create_dtype_schema</code><span class="sig-paren">(</span>in <em>use_generic</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv419create_dtype_schema2in" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt id="_CPPv416create_dtype_any2in">
+<span id="_CPPv316create_dtype_any2in"></span><span id="_CPPv216create_dtype_any2in"></span><span id="create_dtype_any__in"></span><span class="target" id="_ygg_interface_8f90_1afd0a4c989e37b531a02a8e8a4fa2e455"></span>function <code class="sig-name descname">create_dtype_any</code><span class="sig-paren">(</span>in <em>use_generic</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv416create_dtype_any2in" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt id="_CPPv48ygg_send2in2in2in">
+<span id="_CPPv38ygg_send2in2in2in"></span><span id="_CPPv28ygg_send2in2in2in"></span><span id="ygg_send__in.in.in"></span><span class="target" id="_ygg_interface_8f90_1a4bc6e25dc1995528ff5afb0d34cbdcd3"></span>function <code class="sig-name descname">ygg_send</code><span class="sig-paren">(</span>in <em>ygg_q</em>, in <em>data</em>, in <em>data_len</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv48ygg_send2in2in2in" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Send raw bytes data from a character array. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>[in] ygg_q</strong> – Output/RPC/Timesync comm. </p></li>
+<li><p><strong>[in] data</strong> – Array of bytes to send. </p></li>
+<li><p><strong>[in] data_len</strong> – Number of bytes from data to send. </p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>flag Success (.true.) or failure (.false.) of the send. </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt id="_CPPv48ygg_recv2in2in2in">
+<span id="_CPPv38ygg_recv2in2in2in"></span><span id="_CPPv28ygg_recv2in2in2in"></span><span id="ygg_recv__in.in.in"></span><span class="target" id="_ygg_interface_8f90_1aec202d795103f20b590b3ab5221e6020"></span>function <code class="sig-name descname">ygg_recv</code><span class="sig-paren">(</span>in <em>ygg_q</em>, in <em>data</em>, in <em>data_len</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv48ygg_recv2in2in2in" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Receive raw bytes data into a character array that cannot be resized. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>[in] ygg_q</strong> – Input/RPC/Timesync comm. </p></li>
+<li><p><strong>[in] data</strong> – Array to receive bytes into. </p></li>
+<li><p><strong>[in] data_len</strong> – Variable where the size of the received message should be stored. </p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>flag Success (.true.) or failure (.false.) of the receive. </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt id="_CPPv416ygg_send_nolimit2in2in2in">
+<span id="_CPPv316ygg_send_nolimit2in2in2in"></span><span id="_CPPv216ygg_send_nolimit2in2in2in"></span><span id="ygg_send_nolimit__in.in.in"></span><span class="target" id="_ygg_interface_8f90_1a883e2f3644b61e3ac092b5130bfc07bb"></span>function <code class="sig-name descname">ygg_send_nolimit</code><span class="sig-paren">(</span>in <em>ygg_q</em>, in <em>data</em>, in <em>data_len</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv416ygg_send_nolimit2in2in2in" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Send raw bytes data from a character array. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>[in] ygg_q</strong> – Output/RPC/Timesync comm. </p></li>
+<li><p><strong>[in] data</strong> – Array of bytes to send. </p></li>
+<li><p><strong>[in] data_len</strong> – Number of bytes from data to send. </p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>flag Success (.true.) or failure (.false.) of the send. </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt id="_CPPv416ygg_recv_nolimit2in2in2in">
+<span id="_CPPv316ygg_recv_nolimit2in2in2in"></span><span id="_CPPv216ygg_recv_nolimit2in2in2in"></span><span id="ygg_recv_nolimit__in.in.in"></span><span class="target" id="_ygg_interface_8f90_1a9a8d7c9c1195ad3b4ff877367b81fa69"></span>function <code class="sig-name descname">ygg_recv_nolimit</code><span class="sig-paren">(</span>in <em>ygg_q</em>, in <em>data</em>, in <em>data_len</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv416ygg_recv_nolimit2in2in2in" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Receive raw bytes data into a character array that can be resized. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>[in] ygg_q</strong> – Input/RPC/Timesync comm. </p></li>
+<li><p><strong>[in] data</strong> – Array to receive bytes into. </p></li>
+<li><p><strong>[in] data_len</strong> – Variable where the size of the received message should be stored. </p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>flag Success (.true.) or failure (.false.) of the receive. </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt id="_CPPv412ygg_send_var2in2in">
+<span id="_CPPv312ygg_send_var2in2in"></span><span id="_CPPv212ygg_send_var2in2in"></span><span id="ygg_send_var__in.in"></span><span class="target" id="_ygg_interface_8f90_1a83fe4b83e49d995ef19f9d3b48e62438"></span>function <code class="sig-name descname">ygg_send_var</code><span class="sig-paren">(</span>in <em>ygg_q</em>, in <em>arg</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv412ygg_send_var2in2in" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Send one or more variables. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>[in] ygg_q</strong> – Output/RPC/Timesync comm. </p></li>
+<li><p><strong>[in] arg/args</strong> – One or more variables to send. </p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>flag Success (.true.) or failure (.false.) of the send. </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt id="_CPPv417ygg_send_var_sing2in2in">
+<span id="_CPPv317ygg_send_var_sing2in2in"></span><span id="_CPPv217ygg_send_var_sing2in2in"></span><span id="ygg_send_var_sing__in.in"></span><span class="target" id="_ygg_interface_8f90_1a5957bbf0ad84c1cdd08403c46056a6bd"></span>function <code class="sig-name descname">ygg_send_var_sing</code><span class="sig-paren">(</span>in <em>ygg_q</em>, in <em>arg</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv417ygg_send_var_sing2in2in" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Send one or more variables. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>[in] ygg_q</strong> – Output/RPC/Timesync comm. </p></li>
+<li><p><strong>[in] arg/args</strong> – One or more variables to send. </p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>flag Success (.true.) or failure (.false.) of the send. </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt id="_CPPv417ygg_send_var_mult2in2in">
+<span id="_CPPv317ygg_send_var_mult2in2in"></span><span id="_CPPv217ygg_send_var_mult2in2in"></span><span id="ygg_send_var_mult__in.in"></span><span class="target" id="_ygg_interface_8f90_1af68d9d9f1506a5bc11b66fc456f14142"></span>function <code class="sig-name descname">ygg_send_var_mult</code><span class="sig-paren">(</span>in <em>ygg_q</em>, in <em>args</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv417ygg_send_var_mult2in2in" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Send one or more variables. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>[in] ygg_q</strong> – Output/RPC/Timesync comm. </p></li>
+<li><p><strong>[in] arg/args</strong> – One or more variables to send. </p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>flag Success (.true.) or failure (.false.) of the send. </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt id="_CPPv414is_next_size_t2in2in2in">
+<span id="_CPPv314is_next_size_t2in2in2in"></span><span id="_CPPv214is_next_size_t2in2in2in"></span><span id="is_next_size_t__in.in.in"></span><span class="target" id="_ygg_interface_8f90_1aaaa01b7e2b2a4f0c684017f72dd66ef0"></span>function <code class="sig-name descname">is_next_size_t</code><span class="sig-paren">(</span>in <em>args</em>, in <em>i</em>, in <em>req_array</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv414is_next_size_t2in2in2in" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt id="_CPPv49is_size_t2in2in">
+<span id="_CPPv39is_size_t2in2in"></span><span id="_CPPv29is_size_t2in2in"></span><span id="is_size_t__in.in"></span><span class="target" id="_ygg_interface_8f90_1a987511744a981ebd266aa147fa9406ec"></span>function <code class="sig-name descname">is_size_t</code><span class="sig-paren">(</span>in <em>arg</em>, in <em>req_array_in</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv49is_size_t2in2in" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt id="_CPPv48pre_send2in2in2in">
+<span id="_CPPv38pre_send2in2in2in"></span><span id="_CPPv28pre_send2in2in2in"></span><span id="pre_send__in.in.in"></span><span class="target" id="_ygg_interface_8f90_1a2166798b1e68075dcd7561a9f2e33a03"></span>function <code class="sig-name descname">pre_send</code><span class="sig-paren">(</span>in <em>args</em>, in <em>c_args</em>, in <em>is_format</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv48pre_send2in2in2in" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt id="_CPPv48pre_recv2in2in2in">
+<span id="_CPPv38pre_recv2in2in2in"></span><span id="_CPPv28pre_recv2in2in2in"></span><span id="pre_recv__in.in.in"></span><span class="target" id="_ygg_interface_8f90_1a66345197134849227615da6c18db2934"></span>function <code class="sig-name descname">pre_recv</code><span class="sig-paren">(</span>in <em>args</em>, in <em>c_args</em>, in <em>is_format</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv48pre_recv2in2in2in" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt id="_CPPv49post_recv2in2in2in2in2in">
+<span id="_CPPv39post_recv2in2in2in2in2in"></span><span id="_CPPv29post_recv2in2in2in2in2in"></span><span id="post_recv__in.in.in.in.in"></span><span class="target" id="_ygg_interface_8f90_1ad2022138084224be19b467e6465369f1"></span>subroutine <code class="sig-name descname">post_recv</code><span class="sig-paren">(</span>in <em>args</em>, in <em>c_args</em>, in <em>flag</em>, in <em>realloc</em>, in <em>is_format</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv49post_recv2in2in2in2in2in" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt id="_CPPv49post_send2in2in2in">
+<span id="_CPPv39post_send2in2in2in"></span><span id="_CPPv29post_send2in2in2in"></span><span id="post_send__in.in.in"></span><span class="target" id="_ygg_interface_8f90_1ac36e327a9799aa8e5eb120eee815a4b8"></span>subroutine <code class="sig-name descname">post_send</code><span class="sig-paren">(</span>in <em>args</em>, in <em>c_args</em>, in <em>flag</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv49post_send2in2in2in" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt id="_CPPv412ygg_rpc_call2in2in2in">
+<span id="_CPPv312ygg_rpc_call2in2in2in"></span><span id="_CPPv212ygg_rpc_call2in2in2in"></span><span id="ygg_rpc_call__in.in.in"></span><span class="target" id="_ygg_interface_8f90_1a6d9f3bd090b8586d06994e27b85ef227"></span>function <code class="sig-name descname">ygg_rpc_call</code><span class="sig-paren">(</span>in <em>ygg_q</em>, in <em>oarg</em>, in <em>iarg</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv412ygg_rpc_call2in2in2in" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Send a request and receive a response into one or more variables that cannot be resized. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>[in] ygg_q</strong> – RPC/Timesync comm. </p></li>
+<li><p><strong>[in] oarg/oargs</strong> – One or more variables to send in the request. </p></li>
+<li><p><strong>[inout] iarg/iargs</strong> – One or more variables to receive the response into that cannot be resized. </p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>flag Success (.true.) or failure (.false.) of the call. </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt id="_CPPv416ygg_rpc_call_1v12in2in2in">
+<span id="_CPPv316ygg_rpc_call_1v12in2in2in"></span><span id="_CPPv216ygg_rpc_call_1v12in2in2in"></span><span id="ygg_rpc_call_1v1__in.in.in"></span><span class="target" id="_ygg_interface_8f90_1a0b9539db1616980f553e30e6bccee2b7"></span>function <code class="sig-name descname">ygg_rpc_call_1v1</code><span class="sig-paren">(</span>in <em>ygg_q</em>, in <em>oarg</em>, in <em>iarg</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv416ygg_rpc_call_1v12in2in2in" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Send a request and receive a response into one or more variables that cannot be resized. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>[in] ygg_q</strong> – RPC/Timesync comm. </p></li>
+<li><p><strong>[in] oarg/oargs</strong> – One or more variables to send in the request. </p></li>
+<li><p><strong>[inout] iarg/iargs</strong> – One or more variables to receive the response into that cannot be resized. </p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>flag Success (.true.) or failure (.false.) of the call. </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt id="_CPPv416ygg_rpc_call_1vm2in2in2in">
+<span id="_CPPv316ygg_rpc_call_1vm2in2in2in"></span><span id="_CPPv216ygg_rpc_call_1vm2in2in2in"></span><span id="ygg_rpc_call_1vm__in.in.in"></span><span class="target" id="_ygg_interface_8f90_1abedd3bb6f5211326eb5446027da1a544"></span>function <code class="sig-name descname">ygg_rpc_call_1vm</code><span class="sig-paren">(</span>in <em>ygg_q</em>, in <em>oarg</em>, in <em>iargs</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv416ygg_rpc_call_1vm2in2in2in" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Send a request and receive a response into one or more variables that cannot be resized. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>[in] ygg_q</strong> – RPC/Timesync comm. </p></li>
+<li><p><strong>[in] oarg/oargs</strong> – One or more variables to send in the request. </p></li>
+<li><p><strong>[inout] iarg/iargs</strong> – One or more variables to receive the response into that cannot be resized. </p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>flag Success (.true.) or failure (.false.) of the call. </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt id="_CPPv416ygg_rpc_call_mv12in2in2in">
+<span id="_CPPv316ygg_rpc_call_mv12in2in2in"></span><span id="_CPPv216ygg_rpc_call_mv12in2in2in"></span><span id="ygg_rpc_call_mv1__in.in.in"></span><span class="target" id="_ygg_interface_8f90_1a81d5c582c8d132f638a204e85ca75930"></span>function <code class="sig-name descname">ygg_rpc_call_mv1</code><span class="sig-paren">(</span>in <em>ygg_q</em>, in <em>oargs</em>, in <em>iarg</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv416ygg_rpc_call_mv12in2in2in" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Send a request and receive a response into one or more variables that cannot be resized. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>[in] ygg_q</strong> – RPC/Timesync comm. </p></li>
+<li><p><strong>[in] oarg/oargs</strong> – One or more variables to send in the request. </p></li>
+<li><p><strong>[inout] iarg/iargs</strong> – One or more variables to receive the response into that cannot be resized. </p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>flag Success (.true.) or failure (.false.) of the call. </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt id="_CPPv417ygg_rpc_call_mult2in2in2in">
+<span id="_CPPv317ygg_rpc_call_mult2in2in2in"></span><span id="_CPPv217ygg_rpc_call_mult2in2in2in"></span><span id="ygg_rpc_call_mult__in.in.in"></span><span class="target" id="_ygg_interface_8f90_1a2a23f3a7145668f7248d22907f452ffb"></span>function <code class="sig-name descname">ygg_rpc_call_mult</code><span class="sig-paren">(</span>in <em>ygg_q</em>, in <em>oargs</em>, in <em>iargs</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv417ygg_rpc_call_mult2in2in2in" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Send a request and receive a response into one or more variables that cannot be resized. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>[in] ygg_q</strong> – RPC/Timesync comm. </p></li>
+<li><p><strong>[in] oarg/oargs</strong> – One or more variables to send in the request. </p></li>
+<li><p><strong>[inout] iarg/iargs</strong> – One or more variables to receive the response into that cannot be resized. </p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>flag Success (.true.) or failure (.false.) of the call. </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt id="_CPPv420ygg_rpc_call_realloc2in2in2in">
+<span id="_CPPv320ygg_rpc_call_realloc2in2in2in"></span><span id="_CPPv220ygg_rpc_call_realloc2in2in2in"></span><span id="ygg_rpc_call_realloc__in.in.in"></span><span class="target" id="_ygg_interface_8f90_1ad63c175bc56a1281b5539f5274821463"></span>function <code class="sig-name descname">ygg_rpc_call_realloc</code><span class="sig-paren">(</span>in <em>ygg_q</em>, in <em>oarg</em>, in <em>iarg</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv420ygg_rpc_call_realloc2in2in2in" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Send a request and receive a response into one or more variables that can be resized. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>[in] ygg_q</strong> – RPC/Timesync comm. </p></li>
+<li><p><strong>[in] oarg/oargs</strong> – One or more variables to send in the request. </p></li>
+<li><p><strong>[inout] iarg/iargs</strong> – One or more variables to receive the response into that can be resized. </p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>flag Success (.true.) or failure (.false.) of the call. </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt id="_CPPv424ygg_rpc_call_realloc_1v12in2in2in">
+<span id="_CPPv324ygg_rpc_call_realloc_1v12in2in2in"></span><span id="_CPPv224ygg_rpc_call_realloc_1v12in2in2in"></span><span id="ygg_rpc_call_realloc_1v1__in.in.in"></span><span class="target" id="_ygg_interface_8f90_1a8ef9a1f93bf554f9f8cce60dbee64fd8"></span>function <code class="sig-name descname">ygg_rpc_call_realloc_1v1</code><span class="sig-paren">(</span>in <em>ygg_q</em>, in <em>oarg</em>, in <em>iarg</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv424ygg_rpc_call_realloc_1v12in2in2in" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Send a request and receive a response into one or more variables that can be resized. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>[in] ygg_q</strong> – RPC/Timesync comm. </p></li>
+<li><p><strong>[in] oarg/oargs</strong> – One or more variables to send in the request. </p></li>
+<li><p><strong>[inout] iarg/iargs</strong> – One or more variables to receive the response into that can be resized. </p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>flag Success (.true.) or failure (.false.) of the call. </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt id="_CPPv424ygg_rpc_call_realloc_1vm2in2in2in">
+<span id="_CPPv324ygg_rpc_call_realloc_1vm2in2in2in"></span><span id="_CPPv224ygg_rpc_call_realloc_1vm2in2in2in"></span><span id="ygg_rpc_call_realloc_1vm__in.in.in"></span><span class="target" id="_ygg_interface_8f90_1a57314350b6dc5d2ca7b13a2c2f998831"></span>function <code class="sig-name descname">ygg_rpc_call_realloc_1vm</code><span class="sig-paren">(</span>in <em>ygg_q</em>, in <em>oarg</em>, in <em>iargs</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv424ygg_rpc_call_realloc_1vm2in2in2in" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Send a request and receive a response into one or more variables that can be resized. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>[in] ygg_q</strong> – RPC/Timesync comm. </p></li>
+<li><p><strong>[in] oarg/oargs</strong> – One or more variables to send in the request. </p></li>
+<li><p><strong>[inout] iarg/iargs</strong> – One or more variables to receive the response into that can be resized. </p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>flag Success (.true.) or failure (.false.) of the call. </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt id="_CPPv424ygg_rpc_call_realloc_mv12in2in2in">
+<span id="_CPPv324ygg_rpc_call_realloc_mv12in2in2in"></span><span id="_CPPv224ygg_rpc_call_realloc_mv12in2in2in"></span><span id="ygg_rpc_call_realloc_mv1__in.in.in"></span><span class="target" id="_ygg_interface_8f90_1a5f64c2fb4f5af7bd0de4f991911a2ddf"></span>function <code class="sig-name descname">ygg_rpc_call_realloc_mv1</code><span class="sig-paren">(</span>in <em>ygg_q</em>, in <em>oargs</em>, in <em>iarg</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv424ygg_rpc_call_realloc_mv12in2in2in" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Send a request and receive a response into one or more variables that can be resized. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>[in] ygg_q</strong> – RPC/Timesync comm. </p></li>
+<li><p><strong>[in] oarg/oargs</strong> – One or more variables to send in the request. </p></li>
+<li><p><strong>[inout] iarg/iargs</strong> – One or more variables to receive the response into that can be resized. </p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>flag Success (.true.) or failure (.false.) of the call. </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt id="_CPPv425ygg_rpc_call_realloc_mult2in2in2in">
+<span id="_CPPv325ygg_rpc_call_realloc_mult2in2in2in"></span><span id="_CPPv225ygg_rpc_call_realloc_mult2in2in2in"></span><span id="ygg_rpc_call_realloc_mult__in.in.in"></span><span class="target" id="_ygg_interface_8f90_1aeb88d9cbe13327cb0d56027c76687c83"></span>function <code class="sig-name descname">ygg_rpc_call_realloc_mult</code><span class="sig-paren">(</span>in <em>ygg_q</em>, in <em>oargs</em>, in <em>iargs</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv425ygg_rpc_call_realloc_mult2in2in2in" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Send a request and receive a response into one or more variables that can be resized. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>[in] ygg_q</strong> – RPC/Timesync comm. </p></li>
+<li><p><strong>[in] oarg/oargs</strong> – One or more variables to send in the request. </p></li>
+<li><p><strong>[inout] iarg/iargs</strong> – One or more variables to receive the response into that can be resized. </p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>flag Success (.true.) or failure (.false.) of the call. </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt id="_CPPv412ygg_recv_var2in2in">
+<span id="_CPPv312ygg_recv_var2in2in"></span><span id="_CPPv212ygg_recv_var2in2in"></span><span id="ygg_recv_var__in.in"></span><span class="target" id="_ygg_interface_8f90_1a6e1daec86013131bb1d42f571f73e1f5"></span>function <code class="sig-name descname">ygg_recv_var</code><span class="sig-paren">(</span>in <em>ygg_q</em>, in <em>arg</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv412ygg_recv_var2in2in" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Receive data into one or more variables that cannot be resized. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>[in] ygg_q</strong> – Output/RPC/Timesync comm. </p></li>
+<li><p><strong>[inout] arg/args</strong> – One or more variables to receive into. </p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>flag Success (.true.) or failure (.false.) of the send. </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt id="_CPPv417ygg_recv_var_sing2in2in">
+<span id="_CPPv317ygg_recv_var_sing2in2in"></span><span id="_CPPv217ygg_recv_var_sing2in2in"></span><span id="ygg_recv_var_sing__in.in"></span><span class="target" id="_ygg_interface_8f90_1a43902a0b8f14a89bb8cdbe6a97eb767b"></span>function <code class="sig-name descname">ygg_recv_var_sing</code><span class="sig-paren">(</span>in <em>ygg_q</em>, in <em>arg</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv417ygg_recv_var_sing2in2in" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Receive data into one or more variables that cannot be resized. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>[in] ygg_q</strong> – Output/RPC/Timesync comm. </p></li>
+<li><p><strong>[inout] arg/args</strong> – One or more variables to receive into. </p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>flag Success (.true.) or failure (.false.) of the send. </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt id="_CPPv417ygg_recv_var_mult2in2in">
+<span id="_CPPv317ygg_recv_var_mult2in2in"></span><span id="_CPPv217ygg_recv_var_mult2in2in"></span><span id="ygg_recv_var_mult__in.in"></span><span class="target" id="_ygg_interface_8f90_1a3291d7cf53b0327daaed91e1b2c4128c"></span>function <code class="sig-name descname">ygg_recv_var_mult</code><span class="sig-paren">(</span>in <em>ygg_q</em>, in <em>args</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv417ygg_recv_var_mult2in2in" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Receive data into one or more variables that cannot be resized. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>[in] ygg_q</strong> – Output/RPC/Timesync comm. </p></li>
+<li><p><strong>[inout] arg/args</strong> – One or more variables to receive into. </p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>flag Success (.true.) or failure (.false.) of the send. </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt id="_CPPv420ygg_recv_var_realloc2in2in">
+<span id="_CPPv320ygg_recv_var_realloc2in2in"></span><span id="_CPPv220ygg_recv_var_realloc2in2in"></span><span id="ygg_recv_var_realloc__in.in"></span><span class="target" id="_ygg_interface_8f90_1a2fd55a6c925a8bd9aead6f1e4a385561"></span>function <code class="sig-name descname">ygg_recv_var_realloc</code><span class="sig-paren">(</span>in <em>ygg_q</em>, in <em>arg</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv420ygg_recv_var_realloc2in2in" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Receive data into one or more variables that can be resized. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>[in] ygg_q</strong> – Output/RPC/Timesync comm. </p></li>
+<li><p><strong>[inout] arg/args</strong> – One or more variables to receive into. </p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>flag Success (.true.) or failure (.false.) of the send. </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt id="_CPPv425ygg_recv_var_realloc_sing2in2in">
+<span id="_CPPv325ygg_recv_var_realloc_sing2in2in"></span><span id="_CPPv225ygg_recv_var_realloc_sing2in2in"></span><span id="ygg_recv_var_realloc_sing__in.in"></span><span class="target" id="_ygg_interface_8f90_1afa24bb31972cedb90aabca80b8e165c0"></span>function <code class="sig-name descname">ygg_recv_var_realloc_sing</code><span class="sig-paren">(</span>in <em>ygg_q</em>, in <em>arg</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv425ygg_recv_var_realloc_sing2in2in" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Receive data into one or more variables that can be resized. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>[in] ygg_q</strong> – Output/RPC/Timesync comm. </p></li>
+<li><p><strong>[inout] arg/args</strong> – One or more variables to receive into. </p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>flag Success (.true.) or failure (.false.) of the send. </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt id="_CPPv425ygg_recv_var_realloc_mult2in2in">
+<span id="_CPPv325ygg_recv_var_realloc_mult2in2in"></span><span id="_CPPv225ygg_recv_var_realloc_mult2in2in"></span><span id="ygg_recv_var_realloc_mult__in.in"></span><span class="target" id="_ygg_interface_8f90_1a4216ea2b32110f48825d258b4fc0d0f5"></span>function <code class="sig-name descname">ygg_recv_var_realloc_mult</code><span class="sig-paren">(</span>in <em>ygg_q</em>, in <em>args</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv425ygg_recv_var_realloc_mult2in2in" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Receive data into one or more variables that can be resized. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>[in] ygg_q</strong> – Output/RPC/Timesync comm. </p></li>
+<li><p><strong>[inout] arg/args</strong> – One or more variables to receive into. </p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>flag Success (.true.) or failure (.false.) of the send. </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt id="_CPPv48init_plyv">
+<span id="_CPPv38init_plyv"></span><span id="_CPPv28init_plyv"></span><span id="init_ply"></span><span class="target" id="_ygg_interface_8f90_1a46c6c18e803c94a05139a99d780e6749"></span>function <code class="sig-name descname">init_ply</code><span class="sig-paren">(</span><span class="sig-paren">)</span><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt id="_CPPv48free_ply2in">
+<span id="_CPPv38free_ply2in"></span><span id="_CPPv28free_ply2in"></span><span id="free_ply__in"></span><span class="target" id="_ygg_interface_8f90_1a0965a5776eb99ab11793d0617c234ef5"></span>subroutine <code class="sig-name descname">free_ply</code><span class="sig-paren">(</span>in <em>p</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv48free_ply2in" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt id="_CPPv48copy_ply2in">
+<span id="_CPPv38copy_ply2in"></span><span id="_CPPv28copy_ply2in"></span><span id="copy_ply__in"></span><span class="target" id="_ygg_interface_8f90_1abca3fbb1164d594cef89f0e165561899"></span>function <code class="sig-name descname">copy_ply</code><span class="sig-paren">(</span>in <em>p</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv48copy_ply2in" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt id="_CPPv418display_ply_indent2in2in">
+<span id="_CPPv318display_ply_indent2in2in"></span><span id="_CPPv218display_ply_indent2in2in"></span><span id="display_ply_indent__in.in"></span><span class="target" id="_ygg_interface_8f90_1a6187b897fff63724c76f5b42bc47feb2"></span>subroutine <code class="sig-name descname">display_ply_indent</code><span class="sig-paren">(</span>in <em>p</em>, in <em>indent</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv418display_ply_indent2in2in" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt id="_CPPv411display_ply2in">
+<span id="_CPPv311display_ply2in"></span><span id="_CPPv211display_ply2in"></span><span id="display_ply__in"></span><span class="target" id="_ygg_interface_8f90_1a3fa5a04256ea9977fc152643b6fb8caa"></span>subroutine <code class="sig-name descname">display_ply</code><span class="sig-paren">(</span>in <em>p</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv411display_ply2in" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt id="_CPPv48init_objv">
+<span id="_CPPv38init_objv"></span><span id="_CPPv28init_objv"></span><span id="init_obj"></span><span class="target" id="_ygg_interface_8f90_1ab1df20ec5be5b6fb6ebefe289e351039"></span>function <code class="sig-name descname">init_obj</code><span class="sig-paren">(</span><span class="sig-paren">)</span><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt id="_CPPv48free_obj2in">
+<span id="_CPPv38free_obj2in"></span><span id="_CPPv28free_obj2in"></span><span id="free_obj__in"></span><span class="target" id="_ygg_interface_8f90_1a44a29ed119f27902c43cea4023cbc975"></span>subroutine <code class="sig-name descname">free_obj</code><span class="sig-paren">(</span>in <em>p</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv48free_obj2in" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt id="_CPPv48copy_obj2in">
+<span id="_CPPv38copy_obj2in"></span><span id="_CPPv28copy_obj2in"></span><span id="copy_obj__in"></span><span class="target" id="_ygg_interface_8f90_1a63807e5a6cfd7e994f8499913d156eef"></span>function <code class="sig-name descname">copy_obj</code><span class="sig-paren">(</span>in <em>p</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv48copy_obj2in" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt id="_CPPv418display_obj_indent2in2in">
+<span id="_CPPv318display_obj_indent2in2in"></span><span id="_CPPv218display_obj_indent2in2in"></span><span id="display_obj_indent__in.in"></span><span class="target" id="_ygg_interface_8f90_1af022dcd7e141575941f1f7fb084cd780"></span>subroutine <code class="sig-name descname">display_obj_indent</code><span class="sig-paren">(</span>in <em>p</em>, in <em>indent</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv418display_obj_indent2in2in" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt id="_CPPv411display_obj2in">
+<span id="_CPPv311display_obj2in"></span><span id="_CPPv211display_obj2in"></span><span id="display_obj__in"></span><span class="target" id="_ygg_interface_8f90_1a0df2352fd1dbdf52768e9a1b95c89ed5"></span>subroutine <code class="sig-name descname">display_obj</code><span class="sig-paren">(</span>in <em>p</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv411display_obj2in" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt id="_CPPv412init_genericv">
+<span id="_CPPv312init_genericv"></span><span id="_CPPv212init_genericv"></span><span id="init_generic"></span><span class="target" id="_ygg_interface_8f90_1ac0f3b25e964787019b62f8447202fa80"></span>function <code class="sig-name descname">init_generic</code><span class="sig-paren">(</span><span class="sig-paren">)</span><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt id="_CPPv418init_generic_arrayv">
+<span id="_CPPv318init_generic_arrayv"></span><span id="_CPPv218init_generic_arrayv"></span><span id="init_generic_array"></span><span class="target" id="_ygg_interface_8f90_1a7280afbdcff9ff46de95c91f3cf6be53"></span>function <code class="sig-name descname">init_generic_array</code><span class="sig-paren">(</span><span class="sig-paren">)</span><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt id="_CPPv416init_generic_mapv">
+<span id="_CPPv316init_generic_mapv"></span><span id="_CPPv216init_generic_mapv"></span><span id="init_generic_map"></span><span class="target" id="_ygg_interface_8f90_1a62194af5b165d43c3d4b2703b2bd319b"></span>function <code class="sig-name descname">init_generic_map</code><span class="sig-paren">(</span><span class="sig-paren">)</span><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt id="_CPPv414create_generic2in2in">
+<span id="_CPPv314create_generic2in2in"></span><span id="_CPPv214create_generic2in2in"></span><span id="create_generic__in.in"></span><span class="target" id="_ygg_interface_8f90_1ac26350a69d68b50af951809419cbc86d"></span>function <code class="sig-name descname">create_generic</code><span class="sig-paren">(</span>in <em>type_class</em>, in <em>data</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv414create_generic2in2in" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt id="_CPPv412free_generic2in">
+<span id="_CPPv312free_generic2in"></span><span id="_CPPv212free_generic2in"></span><span id="free_generic__in"></span><span class="target" id="_ygg_interface_8f90_1aab0d8a81005eeb36ae92cf1825118e0f"></span>subroutine <code class="sig-name descname">free_generic</code><span class="sig-paren">(</span>in <em>x</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv412free_generic2in" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt id="_CPPv415is_generic_init2in">
+<span id="_CPPv315is_generic_init2in"></span><span id="_CPPv215is_generic_init2in"></span><span id="is_generic_init__in"></span><span class="target" id="_ygg_interface_8f90_1ac85c7d34f6eba291de648b9a00722fdc"></span>function <code class="sig-name descname">is_generic_init</code><span class="sig-paren">(</span>in <em>x</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv415is_generic_init2in" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt id="_CPPv412copy_generic2in">
+<span id="_CPPv312copy_generic2in"></span><span id="_CPPv212copy_generic2in"></span><span id="copy_generic__in"></span><span class="target" id="_ygg_interface_8f90_1a18f9a0af60c63e65ea83809dc3d56707"></span>function <code class="sig-name descname">copy_generic</code><span class="sig-paren">(</span>in <em>src</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv412copy_generic2in" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt id="_CPPv415display_generic2in">
+<span id="_CPPv315display_generic2in"></span><span id="_CPPv215display_generic2in"></span><span id="display_generic__in"></span><span class="target" id="_ygg_interface_8f90_1a6e1e680d322404a79ca54f26caa5fda3"></span>subroutine <code class="sig-name descname">display_generic</code><span class="sig-paren">(</span>in <em>x</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv415display_generic2in" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt id="_CPPv417add_generic_array2in2in">
+<span id="_CPPv317add_generic_array2in2in"></span><span id="_CPPv217add_generic_array2in2in"></span><span id="add_generic_array__in.in"></span><span class="target" id="_ygg_interface_8f90_1abd07194190df9150fb0864adec74e1e7"></span>function <code class="sig-name descname">add_generic_array</code><span class="sig-paren">(</span>in <em>arr</em>, in <em>x</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv417add_generic_array2in2in" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt id="_CPPv417set_generic_array2in2in2in">
+<span id="_CPPv317set_generic_array2in2in2in"></span><span id="_CPPv217set_generic_array2in2in2in"></span><span id="set_generic_array__in.in.in"></span><span class="target" id="_ygg_interface_8f90_1aec8c90cce894a7874dd4f273796184c9"></span>function <code class="sig-name descname">set_generic_array</code><span class="sig-paren">(</span>in <em>arr</em>, in <em>i</em>, in <em>x</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv417set_generic_array2in2in2in" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt id="_CPPv417get_generic_array2in2in2in">
+<span id="_CPPv317get_generic_array2in2in2in"></span><span id="_CPPv217get_generic_array2in2in2in"></span><span id="get_generic_array__in.in.in"></span><span class="target" id="_ygg_interface_8f90_1aac36a62f38fe6a598ef1a33c6895ec13"></span>function <code class="sig-name descname">get_generic_array</code><span class="sig-paren">(</span>in <em>arr</em>, in <em>i</em>, in <em>x</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv417get_generic_array2in2in2in" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt id="_CPPv418set_generic_object2in2in2in">
+<span id="_CPPv318set_generic_object2in2in2in"></span><span id="_CPPv218set_generic_object2in2in2in"></span><span id="set_generic_object__in.in.in"></span><span class="target" id="_ygg_interface_8f90_1ad79130c1a97dce5fac0ef4b36e080ee0"></span>function <code class="sig-name descname">set_generic_object</code><span class="sig-paren">(</span>in <em>arr</em>, in <em>k</em>, in <em>x</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv418set_generic_object2in2in2in" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt id="_CPPv418get_generic_object2in2in2in">
+<span id="_CPPv318get_generic_object2in2in2in"></span><span id="_CPPv218get_generic_object2in2in2in"></span><span id="get_generic_object__in.in.in"></span><span class="target" id="_ygg_interface_8f90_1ab58aa7b7f136a3606a63ba1dcdac06c0"></span>function <code class="sig-name descname">get_generic_object</code><span class="sig-paren">(</span>in <em>arr</em>, in <em>k</em>, in <em>x</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv418get_generic_object2in2in2in" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt id="_CPPv411init_pythonv">
+<span id="_CPPv311init_pythonv"></span><span id="_CPPv211init_pythonv"></span><span id="init_python"></span><span class="target" id="_ygg_interface_8f90_1a96221e81ec544d5c4640ec797c78f487"></span>function <code class="sig-name descname">init_python</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv411init_pythonv" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt id="_CPPv411free_python2in">
+<span id="_CPPv311free_python2in"></span><span id="_CPPv211free_python2in"></span><span id="free_python__in"></span><span class="target" id="_ygg_interface_8f90_1a551bf1174ea2e1d72f2b3150682885a3"></span>subroutine <code class="sig-name descname">free_python</code><span class="sig-paren">(</span>in <em>x</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv411free_python2in" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt id="_CPPv411copy_python2in">
+<span id="_CPPv311copy_python2in"></span><span id="_CPPv211copy_python2in"></span><span id="copy_python__in"></span><span class="target" id="_ygg_interface_8f90_1a16c8c42f371bb90d42681063f972ee53"></span>function <code class="sig-name descname">copy_python</code><span class="sig-paren">(</span>in <em>x</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv411copy_python2in" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt id="_CPPv414display_python2in">
+<span id="_CPPv314display_python2in"></span><span id="_CPPv214display_python2in"></span><span id="display_python__in"></span><span class="target" id="_ygg_interface_8f90_1a3905cfa2045ceba88f4aadc6565c26c2"></span>subroutine <code class="sig-name descname">display_python</code><span class="sig-paren">(</span>in <em>x</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv414display_python2in" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt id="_CPPv422generic_array_get_size2in">
+<span id="_CPPv322generic_array_get_size2in"></span><span id="_CPPv222generic_array_get_size2in"></span><span id="generic_array_get_size__in"></span><span class="target" id="_ygg_interface_8f90_1a938564041961f491e14c5e3c19077efc"></span>function <code class="sig-name descname">generic_array_get_size</code><span class="sig-paren">(</span>in <em>x</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv422generic_array_get_size2in" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt id="_CPPv422generic_array_get_item2in2in2in">
+<span id="_CPPv322generic_array_get_item2in2in2in"></span><span id="_CPPv222generic_array_get_item2in2in2in"></span><span id="generic_array_get_item__in.in.in"></span><span class="target" id="_ygg_interface_8f90_1ac81c5e28d2fab76eab67d63df93ac5e5"></span>function <code class="sig-name descname">generic_array_get_item</code><span class="sig-paren">(</span>in <em>x</em>, in <em>index</em>, in <em>typename</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv422generic_array_get_item2in2in2in" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt id="_CPPv429generic_array_get_item_nbytes2in2in">
+<span id="_CPPv329generic_array_get_item_nbytes2in2in"></span><span id="_CPPv229generic_array_get_item_nbytes2in2in"></span><span id="generic_array_get_item_nbytes__in.in"></span><span class="target" id="_ygg_interface_8f90_1ad15424852fb531c2055045e0ca4a289b"></span>function <code class="sig-name descname">generic_array_get_item_nbytes</code><span class="sig-paren">(</span>in <em>x</em>, in <em>index</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv429generic_array_get_item_nbytes2in2in" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt id="_CPPv424generic_array_get_scalar2in2in2in2in">
+<span id="_CPPv324generic_array_get_scalar2in2in2in2in"></span><span id="_CPPv224generic_array_get_scalar2in2in2in2in"></span><span id="generic_array_get_scalar__in.in.in.in"></span><span class="target" id="_ygg_interface_8f90_1a15fd299db9b17bc1a6768f68043425eb"></span>function <code class="sig-name descname">generic_array_get_scalar</code><span class="sig-paren">(</span>in <em>x</em>, in <em>index</em>, in <em>subtype</em>, in <em>precision</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv424generic_array_get_scalar2in2in2in2in" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt id="_CPPv425generic_array_get_1darray2in2in2in2in2in">
+<span id="_CPPv325generic_array_get_1darray2in2in2in2in2in"></span><span id="_CPPv225generic_array_get_1darray2in2in2in2in2in"></span><span id="generic_array_get_1darray__in.in.in.in.in"></span><span class="target" id="_ygg_interface_8f90_1a2b2f547b3ccbb4569433a74aecd13123"></span>function <code class="sig-name descname">generic_array_get_1darray</code><span class="sig-paren">(</span>in <em>x</em>, in <em>index</em>, in <em>subtype</em>, in <em>precision</em>, in <em>data</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv425generic_array_get_1darray2in2in2in2in2in" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt id="_CPPv425generic_array_get_ndarray2in2in2in2in2in">
+<span id="_CPPv325generic_array_get_ndarray2in2in2in2in2in"></span><span id="_CPPv225generic_array_get_ndarray2in2in2in2in2in"></span><span id="generic_array_get_ndarray__in.in.in.in.in"></span><span class="target" id="_ygg_interface_8f90_1aed21eb12f23c4362408d2f8ba7de3d99"></span>function <code class="sig-name descname">generic_array_get_ndarray</code><span class="sig-paren">(</span>in <em>x</em>, in <em>index</em>, in <em>subtype</em>, in <em>precision</em>, in<span class="sig-paren">)</span><a class="headerlink" href="#_CPPv425generic_array_get_ndarray2in2in2in2in2in" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt id="_CPPv422generic_array_set_item2in2in2in2in">
+<span id="_CPPv322generic_array_set_item2in2in2in2in"></span><span id="_CPPv222generic_array_set_item2in2in2in2in"></span><span id="generic_array_set_item__in.in.in.in"></span><span class="target" id="_ygg_interface_8f90_1a5717ebd14b4b70045e8050387435e8a1"></span>subroutine <code class="sig-name descname">generic_array_set_item</code><span class="sig-paren">(</span>in <em>x</em>, in <em>index</em>, in <em>typename</em>, in <em>val</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv422generic_array_set_item2in2in2in2in" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt id="_CPPv424generic_array_set_scalar2in2in2in2in2in">
+<span id="_CPPv324generic_array_set_scalar2in2in2in2in2in"></span><span id="_CPPv224generic_array_set_scalar2in2in2in2in2in"></span><span id="generic_array_set_scalar__in.in.in.in.in"></span><span class="target" id="_ygg_interface_8f90_1aadd49bb20d3ce07f0cb3fcee69ba3641"></span>subroutine <code class="sig-name descname">generic_array_set_scalar</code><span class="sig-paren">(</span>in <em>x</em>, in <em>index</em>, in <em>val</em>, in <em>subtype</em>, in<span class="sig-paren">)</span><a class="headerlink" href="#_CPPv424generic_array_set_scalar2in2in2in2in2in" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt id="_CPPv425generic_array_set_1darray2in2in2in2in2in">
+<span id="_CPPv325generic_array_set_1darray2in2in2in2in2in"></span><span id="_CPPv225generic_array_set_1darray2in2in2in2in2in"></span><span id="generic_array_set_1darray__in.in.in.in.in"></span><span class="target" id="_ygg_interface_8f90_1a56261e2d6660925d651f8818c846dcce"></span>subroutine <code class="sig-name descname">generic_array_set_1darray</code><span class="sig-paren">(</span>in <em>x</em>, in <em>index</em>, in <em>val</em>, in <em>subtype</em>, in<span class="sig-paren">)</span><a class="headerlink" href="#_CPPv425generic_array_set_1darray2in2in2in2in2in" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt id="_CPPv425generic_array_set_ndarray2in2in2in2in2in">
+<span id="_CPPv325generic_array_set_ndarray2in2in2in2in2in"></span><span id="_CPPv225generic_array_set_ndarray2in2in2in2in2in"></span><span id="generic_array_set_ndarray__in.in.in.in.in"></span><span class="target" id="_ygg_interface_8f90_1a61e33aeda6ca341d2a7ff593ac46fd54"></span>subroutine <code class="sig-name descname">generic_array_set_ndarray</code><span class="sig-paren">(</span>in <em>x</em>, in <em>index</em>, in <em>data</em>, in <em>subtype</em>, in<span class="sig-paren">)</span><a class="headerlink" href="#_CPPv425generic_array_set_ndarray2in2in2in2in2in" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt id="_CPPv420generic_map_get_size2in">
+<span id="_CPPv320generic_map_get_size2in"></span><span id="_CPPv220generic_map_get_size2in"></span><span id="generic_map_get_size__in"></span><span class="target" id="_ygg_interface_8f90_1a72157b130a903caff96ff9e73f9eeb85"></span>function <code class="sig-name descname">generic_map_get_size</code><span class="sig-paren">(</span>in <em>x</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv420generic_map_get_size2in" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt id="_CPPv420generic_map_get_keys2in2in">
+<span id="_CPPv320generic_map_get_keys2in2in"></span><span id="_CPPv220generic_map_get_keys2in2in"></span><span id="generic_map_get_keys__in.in"></span><span class="target" id="_ygg_interface_8f90_1a1182bf22d3059d741a1802222c421108"></span>subroutine <code class="sig-name descname">generic_map_get_keys</code><span class="sig-paren">(</span>in <em>x</em>, in <em>keys</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv420generic_map_get_keys2in2in" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt id="_CPPv420generic_map_get_item2in2in2in">
+<span id="_CPPv320generic_map_get_item2in2in2in"></span><span id="_CPPv220generic_map_get_item2in2in2in"></span><span id="generic_map_get_item__in.in.in"></span><span class="target" id="_ygg_interface_8f90_1a114913d1697e668d2ff9c2403c935a5f"></span>function <code class="sig-name descname">generic_map_get_item</code><span class="sig-paren">(</span>in <em>x</em>, in <em>key</em>, in <em>typename</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv420generic_map_get_item2in2in2in" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt id="_CPPv427generic_map_get_item_nbytes2in2in">
+<span id="_CPPv327generic_map_get_item_nbytes2in2in"></span><span id="_CPPv227generic_map_get_item_nbytes2in2in"></span><span id="generic_map_get_item_nbytes__in.in"></span><span class="target" id="_ygg_interface_8f90_1a22581e0291c4fdc047a92074fdf3b2da"></span>function <code class="sig-name descname">generic_map_get_item_nbytes</code><span class="sig-paren">(</span>in <em>x</em>, in <em>key</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv427generic_map_get_item_nbytes2in2in" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt id="_CPPv422generic_map_get_scalar2in2in2in2in">
+<span id="_CPPv322generic_map_get_scalar2in2in2in2in"></span><span id="_CPPv222generic_map_get_scalar2in2in2in2in"></span><span id="generic_map_get_scalar__in.in.in.in"></span><span class="target" id="_ygg_interface_8f90_1a666e116f1586b39e5f17a36d701ebd2a"></span>function <code class="sig-name descname">generic_map_get_scalar</code><span class="sig-paren">(</span>in <em>x</em>, in <em>key</em>, in <em>subtype</em>, in <em>precision</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv422generic_map_get_scalar2in2in2in2in" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt id="_CPPv423generic_map_get_1darray2in2in2in2in2in">
+<span id="_CPPv323generic_map_get_1darray2in2in2in2in2in"></span><span id="_CPPv223generic_map_get_1darray2in2in2in2in2in"></span><span id="generic_map_get_1darray__in.in.in.in.in"></span><span class="target" id="_ygg_interface_8f90_1ac5923467fe010bd566d340d85d9985ab"></span>function <code class="sig-name descname">generic_map_get_1darray</code><span class="sig-paren">(</span>in <em>x</em>, in <em>key</em>, in <em>subtype</em>, in <em>precision</em>, in <em>data</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv423generic_map_get_1darray2in2in2in2in2in" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt id="_CPPv423generic_map_get_ndarray2in2in2in2in2in">
+<span id="_CPPv323generic_map_get_ndarray2in2in2in2in2in"></span><span id="_CPPv223generic_map_get_ndarray2in2in2in2in2in"></span><span id="generic_map_get_ndarray__in.in.in.in.in"></span><span class="target" id="_ygg_interface_8f90_1a9988f40dbb5ad0638b0303d2ac3073e2"></span>function <code class="sig-name descname">generic_map_get_ndarray</code><span class="sig-paren">(</span>in <em>x</em>, in <em>key</em>, in <em>subtype</em>, in <em>precision</em>, in <em>data</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv423generic_map_get_ndarray2in2in2in2in2in" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt id="_CPPv420generic_map_set_item2in2in2in2in">
+<span id="_CPPv320generic_map_set_item2in2in2in2in"></span><span id="_CPPv220generic_map_set_item2in2in2in2in"></span><span id="generic_map_set_item__in.in.in.in"></span><span class="target" id="_ygg_interface_8f90_1ac007339e9a3128a5b9e9b16adf7b5318"></span>subroutine <code class="sig-name descname">generic_map_set_item</code><span class="sig-paren">(</span>in <em>x</em>, in <em>key</em>, in <em>typename</em>, in <em>val</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv420generic_map_set_item2in2in2in2in" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt id="_CPPv422generic_map_set_scalar2in2in2in2in2in2in">
+<span id="_CPPv322generic_map_set_scalar2in2in2in2in2in2in"></span><span id="_CPPv222generic_map_set_scalar2in2in2in2in2in2in"></span><span id="generic_map_set_scalar__in.in.in.in.in.in"></span><span class="target" id="_ygg_interface_8f90_1aa6095209933f56db72d8ae56e390b196"></span>subroutine <code class="sig-name descname">generic_map_set_scalar</code><span class="sig-paren">(</span>in <em>x</em>, in <em>key</em>, in <em>val</em>, in <em>subtype</em>, in <em>precision</em>, in<span class="sig-paren">)</span><a class="headerlink" href="#_CPPv422generic_map_set_scalar2in2in2in2in2in2in" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt id="_CPPv423generic_map_set_1darray2in2in2in2in2in">
+<span id="_CPPv323generic_map_set_1darray2in2in2in2in2in"></span><span id="_CPPv223generic_map_set_1darray2in2in2in2in2in"></span><span id="generic_map_set_1darray__in.in.in.in.in"></span><span class="target" id="_ygg_interface_8f90_1a8660b79bc35a63dd4ffe3c6ad9027a47"></span>subroutine <code class="sig-name descname">generic_map_set_1darray</code><span class="sig-paren">(</span>in <em>x</em>, in <em>key</em>, in <em>val</em>, in <em>subtype</em>, in<span class="sig-paren">)</span><a class="headerlink" href="#_CPPv423generic_map_set_1darray2in2in2in2in2in" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt id="_CPPv423generic_map_set_ndarray2in2in2in2in2in">
+<span id="_CPPv323generic_map_set_ndarray2in2in2in2in2in"></span><span id="_CPPv223generic_map_set_ndarray2in2in2in2in2in"></span><span id="generic_map_set_ndarray__in.in.in.in.in"></span><span class="target" id="_ygg_interface_8f90_1a3392a2baadefb07bc284105a0064daf1"></span>subroutine <code class="sig-name descname">generic_map_set_ndarray</code><span class="sig-paren">(</span>in <em>x</em>, in <em>key</em>, in <em>data</em>, in <em>subtype</em>, in<span class="sig-paren">)</span><a class="headerlink" href="#_CPPv423generic_map_set_ndarray2in2in2in2in2in" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+        <a href="code.html" class="btn btn-neutral float-right" title="Code" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="interface_r.html" class="btn btn-neutral float-left" title="R Interface" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &#169; Copyright 2017, Meagan Lang, David Raila.
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>
