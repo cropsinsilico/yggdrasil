@@ -1,4 +1,4 @@
-#ifndef DOXYGEN_SHOULD_SKIP_THIS
+  ! BEGIN DOXYGEN_SHOULD_SKIP_THIS
   interface
      ! Utilities
      subroutine c_free(x) bind(c, name="ygg_c_free")

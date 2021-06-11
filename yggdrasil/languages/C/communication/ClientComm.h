@@ -15,7 +15,7 @@ extern "C" {
 // Info is response
 static unsigned _client_rand_seeded = 0;
 
-// @brief Structure for storing requests/responses
+/*! @brief Structure for storing requests/responses. */
 typedef struct responses_t {
   comm_t* comm; //!< Response comm.
   size_t nreq; //!< Number of requests sent.

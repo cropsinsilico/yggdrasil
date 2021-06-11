@@ -1572,7 +1572,17 @@ public:
     }
     }
   }
-  
+
+  /*!
+    @brief Cast raw bytes as the type described by this object.
+    @param[in,out] bytes Pointer to memory contain raw bytes to cast. The
+       cast version will be stored here after any necessary changes have
+       been made.
+    @param[in] nbytes The size of the memory pointed to by bytes. An
+       error will be raised if the bytes cannot be cast because they
+       would exceed this size.
+    @returns The size of the re-cast bytes.
+   */
   size_t cast_bytes(unsigned char **bytes, const size_t nbytes) const {
     bool raise_error = false;
     size_t from_precision = precision_;

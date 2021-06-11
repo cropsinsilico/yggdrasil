@@ -104,7 +104,7 @@ void* type_from_doc_c(const void* type_doc, const bool use_generic);
 
 /*!
   @brief C wrapper for the C++ type_from_pyobj function.
-  @param pyboj void* Pointer to const rapidjson::Value type doc.
+  @param pyobj void* Pointer to const rapidjson::Value type doc.
   @param[in] use_generic bool If true, serialized/deserialized
   objects will be expected to be YggGeneric classes.
   @returns void* Pointer to MetaschemaType class.
@@ -296,6 +296,12 @@ size_t generic_array_get_size(generic_t x);
  */
 void* generic_array_get_item(generic_t x, const size_t index,
 			   const char *type);
+/*!
+  @brief Get the size of an item from an array in bytes.
+  @param[in] x Generic object that is presumed to contain an array.
+  @param[in] index Index for value that the size should be returned for.
+  @returns Size of the item in bytes.
+ */
 int generic_array_get_item_nbytes(generic_t x, const size_t index);
 bool generic_array_get_bool(generic_t x, const size_t index);
 int generic_array_get_integer(generic_t x, const size_t index);

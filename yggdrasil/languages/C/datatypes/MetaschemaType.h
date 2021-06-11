@@ -1491,6 +1491,7 @@ public:
     return 0;
   }
 
+#ifndef DOXYGEN_SHOULD_SKIP_THIS
 private:
   const char *type_;
   const int type_code_;
@@ -1503,6 +1504,7 @@ protected:
   bool always_generic_;
   std::vector<size_t> skip_before_;
   std::vector<size_t> skip_after_;
+#endif // DOXYGEN_SHOULD_SKIP_THIS
 };
 
 

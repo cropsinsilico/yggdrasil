@@ -77,13 +77,19 @@ filter_source_method = os.path.abspath(os.path.join(doxydir, '..',
                                                     'filter_source.py'))
 breathe_doxygen_config_options = {
     'EXTENSION_MAPPING': 'm=C++ f90=C++',
+    # 'EXTENSION_MAPPING': 'm=C++ f90=FortranFree',
     'FILTER_PATTERNS': '*.m=%s *.f90=%s' % (filter_method, filter_method),
+    # 'FILTER_PATTERNS': '*.m=%s' % (filter_method),
     'FILTER_SOURCE_FILES': 'YES',
     'FILTER_SOURCE_PATTERNS': '*.m=%s *.f90=%s' % (filter_source_method,
                                                    filter_source_method),
+    # 'FILTER_SOURCE_PATTERNS': '*.m=%s' % (filter_source_method),
     'SOURCE_BROWSER': 'YES',
     'ENABLE_PREPROCESSING': 'YES',
     'PREDEFINED': 'DOXYGEN_SHOULD_SKIP_THIS'}
+# 'EXCLUDE': ('../../yggdrasil/rapidjson '
+#             '../../yggdrasil/languages/C/serialize/base64.h '
+#             '../../yggdrasil/examples')
 
 # Napoleon settings
 napoleon_google_docstring = True

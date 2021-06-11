@@ -1,4 +1,4 @@
-/*! @brief Flag for checking if YggInterface.h has already been included.*/
+// Flag for checking if YggInterface.h has already been included
 #ifndef YGGINTERFACE_H_
 #define YGGINTERFACE_H_
 
@@ -12,10 +12,13 @@
 extern "C" {
 #endif
 
-/*! @brief Aliases to preserve names of original structures. */
+/*! @brief Pointer to an output comm. */
 #define yggOutput_t comm_t*
+/*! @brief Pointer to an input comm. */
 #define yggInput_t comm_t*
+/*! @brief Aliases to method for freeing comms. */
 #define ygg_free free_comm
+/*! @brief Initialize a comm object. */
 #define yggComm init_comm
 
 // Forward declaration of server interface to allow replacemnt
@@ -28,20 +31,32 @@ comm_t* yggRpcServerType_global(const char *name, dtype_t *inType, dtype_t *outT
 
   Output Usage:
       1. One-time: Create output channel (store in named variables)
+            ```
             yggOutput_t output_channel = yggOutput("out_name");
+            ```
       2. Prepare: Format data to a character array buffer.
+            ```
             char buffer[YGG_MSG_BUF]; 
 	    sprintf(buffer, "a=%d, b=%d", 1, 2);
+            ```
       3. Send:
+            ```
 	    ret = ygg_send(output_channel, buffer, strlen(buffer));
+            ```
 
   Input Usage:
       1. One-time: Create output channel (store in named variables)
+            ```
             yggInput_t input_channel = yggInput("in_name");
+            ```
       2. Prepare: Allocate a character array buffer.
+            ```
             char buffer[YGG_MSG_BUF];
+            ```
       3. Receive:
+            ```
             int ret = ygg_recv(input_channel, buffer, YGG_MSG_BUF);
+            ```
 */
 //==============================================================================
 
@@ -296,19 +311,31 @@ int ygg_recv_nolimit(yggInput_t yggQ, char **data, const size_t len){
 
   Output Usage:
       1. One-time: Create output channel with format specifier.
+            ```
             yggOutput_t output_channel = yggOutputFmt("out_name", "a=%d, b=%d");
+            ```
       2. Send:
+            ```
 	    ret = yggSend(output_channel, 1, 2);
+            ```
       3. Free:
+            ```
             ygg_free(&output_channel);
+            ```
 
   Input Usage:
       1. One-time: Create output channel with format specifier.
+            ```
             yggInput_t input_channel = yggInput("in_name", "a=%d, b=%d");
+            ```
       2. Prepare: Allocate space for recovered variables.
+            ```
             int a, b;
+            ```
       3. Receive:
+            ```
             int ret = yggRecv(input_channel, &a, &b);
+            ```
 */
 //==============================================================================
 
@@ -357,26 +384,42 @@ int ygg_recv_nolimit(yggInput_t yggQ, char **data, const size_t len){
   Server Usage:
       1. One-time: Create server channels with format specifiers for input and
          output.
+            ```
             yggRpc_t srv = yggRpcServer("srv_name", "%d", "%d %d");
+            ```
       2. Prepare: Allocate space for recovered variables from request.
+            ```
             int a;
+            ```
       3. Receive request:
+            ```
             int ret = rpcRecv(srv, &a);
+            ```
       4. Process: Do tasks the server should do with input to produce output.
+            ```
             int b = 2*a;
 	    int c = 3*a;
+            ```
       5. Send response:
+            ```
 	    ret = rpcSend(srv, b, c);
+            ```
 
   Client Usage:
       1. One-time: Create client channels to desired server with format
          specifiers for output and input (should be the same arguments as for
 	 the server except for name).
+            ```
 	    yggRpc_t cli = yggRpcClient("cli_name", "%d", "%d %d"); 
+            ```
       2. Prepare: Allocate space for recovered variables from response.
+            ```
             int b, c;
+            ```
       3. Call server:
+            ```
             int ret = rpcCall(cli, 1, &b, &c);
+            ```
 
    Clients can also send several requests at once before receiving any
    responses. This allows the server to be processing the next requests
@@ -654,22 +697,27 @@ int vrpcCallBase(yggRpc_t rpc, const int allow_realloc,
 #define vrpcCallRealloc(rpc, nargs, ap) vrpcCallBase(rpc, 1, nargs, ap)
 
 /*!
-  @brief Send request to an RPC server from the client and wait for a response.
-  Format arguments using the output queue format string, send the message to the
-  output queue, receive a response from the input queue, and assign arguments
-  from the message using the input queue format string to parse it.
+  @brief Send request to an RPC server from the client and wait for a 
+    response. Format arguments using the output queue format string, send 
+    the message to the output queue, receive a response from the input 
+    queue, and assign arguments from the message using the input queue 
+    format string to parse it.
   @param[in] rpc yggRpc_t structure with RPC information.
-  @param[in] allow_realloc int If 1, output arguments are assumed to be pointers
-  to pointers such that they can be reallocated as necessary to receive incoming
-  data. If 0, output arguments are assumed to be preallocated.
+  @param[in] allow_realloc int If 1, output arguments are assumed to be 
+    pointers to pointers such that they can be reallocated as necessary to 
+    receive incoming data. If 0, output arguments are assumed to be 
+    preallocated.
   @param[in] nargs size_t Number of arguments contained in ap including both
-  input and output arguments.
+    input and output arguments.
   @param[in,out] ... mixed arguments that include those that should be
-  formatted using the output format string, followed by those that should be
-  assigned parameters extracted using the input format string. These that will
-  be assigned should be pointers to memory that has already been allocated.
-  @return integer specifying if the receive was succesful. Values >= 0 indicate
-  success.
+    formatted using the output format string, followed by those that should 
+    be assigned parameters extracted using the input format string. If 
+    allow_realloc is 0, those arguments that will be assigned should be
+    pointers to memory that has already been allocated. If allow_realloc is
+    1, those arguments that will be assigned should be pointers to pointers
+    for memory that can be reallocated.
+  @return integer specifying if the receive was succesful. Values >= 0 
+    indicate success.
  */
 static inline
 int nrpcCallBase(yggRpc_t rpc, const int allow_realloc, size_t nargs, ...){
@@ -680,7 +728,11 @@ int nrpcCallBase(yggRpc_t rpc, const int allow_realloc, size_t nargs, ...){
   end_va_list(&ap);
   return ret;
 };
+  
+/*! @brief Macro to call nrpcCallBase with allow_realloc=0 and the argument count. */
 #define rpcCall(rpc, ...) nrpcCallBase(rpc, 0, COUNT_VARARGS(__VA_ARGS__), __VA_ARGS__)
+
+/*! @brief Macro to call nrpcCallBase with allow_realloc=1 and the argument count. */
 #define rpcCallRealloc(rpc, ...) nrpcCallBase(rpc, 1, COUNT_VARARGS(__VA_ARGS__), __VA_ARGS__)
 
 
@@ -692,34 +744,47 @@ int nrpcCallBase(yggRpc_t rpc, const int allow_realloc, size_t nargs, ...){
 
   Input Usage:
       1. One-time: Create file interface by providing a channel name.
+            ```
 	    comm_t* fin = yggAsciiFileInput("file_channel");
+            ```
       2. Prepare: Get pointer for line.
+            ```
             char *line;
+            ```
       3. Receive each line, terminating when receive returns -1 (EOF or channel
          closed).
+            ```
 	    int ret = 1;
 	    while (ret > 0) {
 	      ret = yggRecv(fin, &line); // line will be realloced to fit message
 	      // Do something with the line
 	    }
+            ```
       4. Cleanup. Call functions to deallocate structures.
+            ```
             free(line);
+            ```
 
   Output Usage:
       1. One-time: Create file interface by providing a channel name.
+            ```
 	    comm_t* fout = yggAsciiFileOutput("file_channel");
+            ```
       2. Send lines to the file. If return value is not 0, the send was not
           succesfull.
+            ```
             int ret;
 	    ret = yggSend(fin, "Line 1\n");
 	    ret = yggSend(fout, "Line 1\n");
 	    ret = yggSend(fout, "Line 2\n");
+            ```
 
 */
 //==============================================================================
 
-/*! @brief Definitions for file sturctures. */
+/*! @brief Pointer to an input comm for an ASCII file. */
 #define yggAsciiFileInput_t comm_t*
+/*! @brief Pointer to an output comm for an ASCII file. */
 #define yggAsciiFileOutput_t comm_t*
 
 /*!
@@ -756,29 +821,39 @@ comm_t* yggAsciiFileInput(const char *name) {
 
   Input by Row Usage:
       1. One-time: Create file interface by providing a channel name.
+            ```
 	    comm_t* fin = yggAsciiTableInput("file_channel");
+            ```
       2. Prepare: Allocate space for variables in row (the format in this
          example is "%5s %d %f\n" like the output example below).
+            ```
 	    char a[5];
 	    int b;
 	    double c;
+            ```
       3. Receive each row, terminating when receive returns -1 (EOF or channel
          closed).
+            ```
 	    int ret = 1;
 	    while (ret > 0) {
 	      ret = yggRecv(fin, &a, &b, &c);
 	      // Do something with the row
 	    }
+            ```
 
   Output by Row Usage:
       1. One-time: Create file interface by providing a channel name and a
          format string for rows.
+            ```
 	    comm_t* fout = yggAsciiTableOutput("file_channel", "%5s %d %f\n");
+            ```
       2. Send rows to the file by providing entries. Formatting is handled by
          the interface. If return value is not 0, the send was not succesful.
+            ```
             int ret;
 	    ret = yggSend(fout, "one", 1, 1.0);
 	    ret = yggSend(fout, "two", 2, 2.0);
+            ```
 
   Array
   =====
@@ -788,37 +863,50 @@ comm_t* yggAsciiFileInput(const char *name) {
 	    comm_t* fin = yggAsciiArrayInput("file_channel");
       2. Prepare: Declare pointers for table columns (they will be allocated by
          the interface once the number of rows is known).
+            ```
 	    char *aCol;
 	    int *bCol;
 	    double *cCol;
+            ```
       3. Receive entire table as columns. Return value will be the number of
          elements in each column (the number of table rows). Negative values
 	 indicate errors.
+            ```
             int ret = yggRecv(fin, &a, &b, &c);
+            ```
       4. Cleanup. Call functions to deallocate structures.
+            ```
             free(a);
             free(b);
             free(c);
+            ```
 
   Output by Array Usage:
       1. One-time: Create file interface by providing a channel name and a
          format string for rows.
+            ```
 	    comm_t* fout = yggAsciiArrayOutput("file_channel", "%5s %d %f\n");
+            ```
       2. Send columns to the file by providing pointers (or arrays). Formatting
          is handled by the interface. If return value is not 0, the send was not
 	 succesful.
+            ```
 	    char aCol[] = {"one  ", "two  ", "three"}; \\ Each str is of len 5
 	    int bCol[3] = {1, 2, 3};
 	    float cCol[3] = {1.0, 2.0, 3.0};
             int ret = yggSend(fout, a, b, c);
+            ```
 
 */
 //==============================================================================
 
-/*! @brief Definitions for table sturctures. */
+/*! @brief Pointer to an input comm for an ASCII table. */
 #define yggAsciiTableInput_t comm_t*
+/*! @brief Pointer to an output comm for an ASCII table. */
 #define yggAsciiTableOutput_t comm_t*
+/*! @brief Pointer to an input comm for an ASCII table passed as arrays. */
 #define yggAsciiArrayInput_t comm_t*
+/*! @brief Pointer to an output comm for an ASCII table passed as arrays. */
 #define yggAsciiArrayOutput_t comm_t*
 
 /*!
@@ -874,33 +962,44 @@ comm_t* yggAsciiArrayInput(const char *name) {
 
   Input Usage:
       1. One-time: Create file interface by providing a channel name.
+            ```
 	    comm_t* fin = yggPlyInput("file_channel");  // channel
+            ```
       2. Prepare: Allocate ply structure.
+            ```
             ply_t p;
+            ```
       3. Receive each structure, terminating when receive returns -1 (EOF or channel
          closed).
+            ```
 	    int ret = 1;
 	    while (ret > 0) {
 	      ret = yggRecv(fin, &p);
 	      // Do something with the ply structure
 	    }
+            ```
 
   Output by Usage:
       1. One-time: Create file interface by providing a channel name.
+            ```
 	    comm_t* fout = yggPlyOutput("file_channel");  // channel
+            ```
       2. Send structure to the file by providing entries. Formatting is handled by
          the interface. If return value is not 0, the send was not succesful.
+            ```
             int ret;
 	    ply_t p;
 	    // Populate the structure
 	    ret = yggSend(fout, p);
 	    ret = yggSend(fout, p);
+            ```
 
 */
 //==============================================================================
 
-/*! @brief Definitions for ply structures. */
+/*! @brief Pointer to an input comm for ply meshes. */
 #define yggPlyInput_t comm_t*
+/*! @brief Pointer to an output comm for ply meshes. */
 #define yggPlyOutput_t comm_t*
 
 /*!
@@ -936,33 +1035,44 @@ comm_t* yggPlyInput(const char *name) {
 
   Input Usage:
       1. One-time: Create file interface by providing a channel name.
+            ```
 	    comm_t* fin = yggObjInput("file_channel");  // channel
+            ```
       2. Prepare: Allocate obj structure.
+            ```
             obj_t p;
+            ```
       3. Receive each structure, terminating when receive returns -1 (EOF or channel
          closed).
+            ```
 	    int ret = 1;
 	    while (ret > 0) {
 	      ret = yggRecv(fin, &p);
 	      // Do something with the obj structure
 	    }
+            ```
 
   Output by Usage:
       1. One-time: Create file interface by providing a channel name.
+            ```
 	    comm_t* fout = yggObjOutput("file_channel");  // channel
+            ```
       2. Send structure to the file by providing entries. Formatting is handled by
          the interface. If return value is not 0, the send was not succesful.
+            ```
             int ret;
 	    obj_t p;
 	    // Populate the structure
 	    ret = yggSend(fout, p);
 	    ret = yggSend(fout, p);
+            ```
 
 */
 //==============================================================================
 
-/*! @brief Definitions for obj structures. */
+/*! @brief Pointer to an input comm for obj meshes. */
 #define yggObjInput_t comm_t*
+/*! @brief Pointer to an output comm for obj meshes. */
 #define yggObjOutput_t comm_t*
 
 /*!
@@ -998,26 +1108,36 @@ comm_t* yggObjInput(const char *name) {
 
   Input Usage:
       1. One-time: Create interface by providing a channel name.
+            ```
 	    comm_t* fin = yggGenericInput("file_channel");  // channel
+            ```
       2. Prepare: Allocate generic structure.
+            ```
             generic_t p;
+            ```
       3. Receive each structure, terminating when receive returns -1 (EOF or channel
          closed).
+            ```
 	    int ret = 1;
 	    while (ret > 0) {
 	      ret = yggRecv(fin, &p);
 	      // Do something with the generic structure
 	    }
+            ```
 
   Output by Usage:
       1. One-time: Create file interface by providing a channel name.
+            ```
 	    comm_t* fout = yggGenericOutput("file_channel");  // channel
+            ```
       2. Send structure to the file by providing entries. Formatting is handled by
          the interface. If return value is not 0, the send was not succesful.
+            ```
             int ret;
 	    generic_t p;
 	    // Populate the structure
 	    ret = yggSend(fout, p);
+            ```
 
 */
 //==============================================================================
@@ -1051,26 +1171,36 @@ comm_t* yggGenericInput(const char *name) {
 
   Input Usage:
       1. One-time: Create interface by providing a channel name.
+            ```
 	    comm_t* fin = yggAnyInput("file_channel");  // channel
+            ```
       2. Prepare: Allocate generic structure.
+            ```
             generic_t p;
+            ```
       3. Receive each structure, terminating when receive returns -1 (EOF or channel
          closed).
+            ```
 	    int ret = 1;
 	    while (ret > 0) {
 	      ret = yggRecv(fin, &p);
 	      // Do something with the generic structure
 	    }
+            ```
 
   Output by Usage:
       1. One-time: Create file interface by providing a channel name.
+            ```
 	    comm_t* fout = yggAnyOutput("file_channel");  // channel
+            ```
       2. Send structure to the file by providing entries. Formatting is handled by
          the interface. If return value is not 0, the send was not succesful.
+            ```
             int ret;
 	    generic_t p;
 	    // Populate the structure
 	    ret = yggSend(fout, p);
+            ```
 
 */
 //==============================================================================
@@ -1112,26 +1242,36 @@ comm_t* yggAnyInput(const char *name) {
 
   Input Usage:
       1. One-time: Create interface by providing a channel name.
+            ```
 	    comm_t* fin = yggJSONArrayInput("file_channel");  // channel
+            ```
       2. Prepare: Allocate vector structure.
+            ```
             json_array_t p;
+            ```
       3. Receive each structure, terminating when receive returns -1 (EOF or channel
          closed).
+            ```
 	    int ret = 1;
 	    while (ret > 0) {
 	      ret = yggRecv(fin, &p);
 	      // Do something with the vector structure
 	    }
+            ```
 
-  Output by Usage:
+  Output Usage:
       1. One-time: Create file interface by providing a channel name.
+            ```
 	    comm_t* fout = yggJSONArrayOutput("file_channel");  // channel
+            ```
       2. Send structure to the file by providing entries. Formatting is handled by
          the interface. If return value is not 0, the send was not succesful.
+            ```
             int ret;
 	    json_array_t p;
 	    // Populate the structure
 	    ret = yggSend(fout, p);
+            ```
 
 */
 //==============================================================================
@@ -1164,7 +1304,9 @@ comm_t* yggJSONArrayInput(const char *name) {
   return out;
 };
 
+/*! @brief An alias for yggJSONArrayOutput. */
 #define yggVectorOutput yggJSONArrayOutput
+/*! @brief An alias for yggJSONArrayInput. */
 #define yggVectorInput yggJSONArrayInput
   
 
@@ -1176,26 +1318,36 @@ comm_t* yggJSONArrayInput(const char *name) {
 
   Input Usage:
       1. One-time: Create interface by providing a channel name.
+            ```
 	    comm_t* fin = yggJSONObjectInput("file_channel");  // channel
+            ```
       2. Prepare: Allocate map structure.
+            ```
             json_object_t p;
+            ```
       3. Receive each structure, terminating when receive returns -1 (EOF or channel
          closed).
+            ```
 	    int ret = 1;
 	    while (ret > 0) {
 	      ret = yggRecv(fin, &p);
 	      // Do something with the map structure
 	    }
+            ```
 
   Output by Usage:
       1. One-time: Create file interface by providing a channel name.
+            ```
 	    comm_t* fout = yggJSONObjectOutput("file_channel");  // channel
+            ```
       2. Send structure to the file by providing entries. Formatting is handled by
          the interface. If return value is not 0, the send was not succesful.
+            ```
             int ret;
 	    json_object_t p;
 	    // Populate the structure
 	    ret = yggSend(fout, p);
+            ```
 
 */
 //==============================================================================
@@ -1228,7 +1380,9 @@ comm_t* yggJSONObjectInput(const char *name) {
   return out;
 };
 
+/*! @brief An alias for yggJSONObjectOutput. */
 #define yggMapOutput yggJSONObjectOutput
+/*! @brief An alias for yggJSONObjectInput. */
 #define yggMapInput yggJSONObjectInput
 
 
