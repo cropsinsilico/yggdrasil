@@ -8,4 +8,3 @@ Subpackages
    
    interface_cpp
    datatypes_cpp
-   dataio_cpp

@@ -74,7 +74,11 @@ YggInterfaceClass <- R6::R6Class("YggInterfaceClass", list(
 #' so refer to that documentation for additional details.
 #'
 #' @param type The name of the Python interface that should be called
-#'   (e.g. [YggInput](interface_py.html#yggdrasil.languages.Python.YggInput), [YggOutput](interface_py.html#yggdrasil.languages.Python.YggOutput), [YggRpcClient](interface_py.html#yggdrasil.languages.Python.YggRpcClient), [YggRpcServer](interface_py.html#yggdrasil.languages.Python.YggRpcServer), [YggTimesync](interface_py.html#yggdrasil.languages.Python.YggInterface.YggTimesync))
+#'   (e.g. [YggInput](interface_py.html#yggdrasil.languages.Python.YggInterface.YggInput),
+#'   [YggOutput](interface_py.html#yggdrasil.languages.Python.YggInterface.YggOutput),
+#'   [YggRpcClient](interface_py.html#yggdrasil.languages.Python.YggInterface.YggRpcClient),
+#'   [YggRpcServer](interface_py.html#yggdrasil.languages.Python.YggInterface.YggRpcServer),
+#'   [YggTimesync](interface_py.html#yggdrasil.languages.Python.YggInterface.YggTimesync))
 #' @param ... Additional parameters will be passed to the Python interface
 #'   function.
 #'

@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 import sys
 import re
+import copy
 
 outfile = sys.stdout
 blocks = {}
@@ -16,13 +17,153 @@ def strip_comments(s, re_comments):
         return s
 
 
-def format_argument(arg, typename, dim, as_fortran=False):
-    if as_fortran:
-        return arg
-    out = '%s %s' % (typename, arg)
+def format_dims_as_cpp(dim):
+    out = ''
     if dim:
-        out += '(%s)' % dim
+        for x in dim.split(','):
+            if x.strip() in [':', '*']:
+                out += '[]'
+            else:
+                out += '[%s]' % x.strip()
     return out
+
+
+def format_argument(add_mods=False, as_fortran=False, **arg):
+    if as_fortran:
+        return arg['name']
+    typename = arg.get('type', 'in')
+    if add_mods and arg.get('type_mods', None):
+        if (add_mods == 'cpp'):
+            typename += '<%s>' % arg['type_mods'].strip('()').strip()
+        else:
+            typename += arg['type_mods']
+    out = '%s %s' % (typename, arg['name'])
+    if (not add_mods) or (add_mods == 'cpp'):
+        dims = []
+        if (not add_mods) and arg.get('len', None):
+            dims.append(arg['len'])
+        if arg.get('dim', None):
+            dims.append(arg['dim'])
+        out += format_dims_as_cpp(','.join(dims))
+    return out
+
+
+def format_function_str(name=None, args=None, arg_props={}, result_props={},
+                        as_fortran=False, add_mods=False, **kwargs):
+    if args:
+        arglist = args.split(',')
+        args = ''
+        for arg in arglist:
+            if args:
+                args += ', '
+            iarg_props = arg_props.get(arg, {})
+            iarg_props.setdefault('name', arg)
+            args += format_argument(add_mods=add_mods, as_fortran=as_fortran,
+                                    **iarg_props)
+    if as_fortran:
+        out = "%s %s(%s)" % (kwargs['type'], name, args)
+        if kwargs.get('type', None) in ['function', 'FUNCTION']:
+            out += ' result(%s)' % result_props['name']
+        return out
+    if not result_props.get('type', None):
+        result_props['type'] = kwargs.get('type', None)
+    result_props['name'] = name
+    result_name = format_argument(add_mods=add_mods, as_fortran=as_fortran,
+                                  **result_props)
+    return "%s(%s)" % (result_name, args)
+
+
+def write_interface(interface, keep_original_code=False):
+    global doxy_char
+    interface['doxy'] += ['%s\n%s Interface members:\n%s ```\n'
+                          % (doxy_char, doxy_char, doxy_char)]
+    keys_to_join = {'type': 'in',
+                    'name': '',
+                    'mods': '',
+                    'dim': '',
+                    'len': ''}
+    args0 = None
+    args = []
+    joined_args = {}
+    joined_result = {k: [] for k in keys_to_join.keys()}
+    for x in interface['members'].values():
+        iargs = x['args'].split(',')
+        if args0 is None:
+            args0 = copy.deepcopy(iargs)
+            args = [[a] for a in args0]
+            for a in args0:
+                joined_args[a] = {k: [] for k in keys_to_join.keys()}
+        assert(len(iargs) == len(args0))
+        for i, a in enumerate(iargs):
+            args[i].append(a)
+        for a0, a in zip(args0, iargs):
+            for k, default in keys_to_join.items():
+                joined_args[a0][k].append(x['arg_props'][a].get(k, default))
+        for k, default in keys_to_join.items():
+            joined_result[k].append(x['result_props'].get(k, default))
+        interface['doxy'].append(
+            '%s   %s\n' % (doxy_char,
+                           format_function_str(add_mods=True, **x)))
+    interface['doxy'] += ['%s```\n' % doxy_char]
+    # Join types
+    args = [list(set(a)) for a in args]
+    joined_args = {a: {k: list(set(v)) for k, v in akw.items()}
+                   for a, akw in joined_args.items()}
+    joined_result = {k: list(set(v)) for k, v in joined_result.items()}
+    interface['args'] = args0
+    interface['arg_props'] = {}
+    for a, akw in joined_args.items():
+        interface['arg_props'][a] = {'name': a}
+        for k, default in keys_to_join.items():
+            if len(akw[k]) == 1:
+                interface['arg_props'][a][k] = akw[k][0]
+            elif default:
+                interface['arg_props'][a][k] = default
+            else:
+                interface['arg_props'][a][k] = None
+    interface['result_props'] = {}
+    for k, default in keys_to_join.items():
+        if len(joined_result[k]) == 1:
+            interface['result_props'][k] = joined_result[k][0]
+        elif default:
+            interface['result_props'][k] = default
+        else:
+            interface['result_props'][k] = None
+    if interface['result_props']['type'] == 'in':
+        interface['result_props']['type'] = next(
+            iter(interface['members'].values()))['type']
+    interface['result_props']['name'] = interface['name']
+    interface['type'] = 'interface'
+    interface['args'] = ','.join(interface['args'])
+    write_function(interface, keep_original_code=keep_original_code)
+
+
+def write_function(in_function, keep_original_code=False):
+    global outfile
+    if keep_original_code:
+        pass
+    else:
+        for x in in_function['doxy']:
+            outfile.write(x)
+        if not in_function.get('interface', False):
+            outfile.write("%s;\n\n" % format_function_str(**in_function))
+
+
+def write_typedef(typedef, keep_original_code=False):
+    global outfile
+    if keep_original_code:
+        pass
+    else:
+        for x in typedef['doxy']:
+            outfile.write(x)
+        outfile.write("struct %s {\n" % typedef['name'])
+        for x in typedef['members'].values():
+            outfile.write('  %s;' % (
+                format_argument(add_mods='cpp', **x)))
+            if x['doxy']:
+                outfile.write(' //!<%s' % x['doxy'])
+            outfile.write('\n')
+        outfile.write("};\n\n")
 
 
 def on_interface_begin(line, m, doxy, keep_original_code=False):
@@ -43,9 +184,6 @@ def on_interface_member(x, line, m, keep_original_code=False):
     if m:
         blocks['interface'][x['name']]['member_list'].append(m.group('name'))
         interface_members[m.group('name')] = x['name']
-    # else:
-    #     print(line)
-    #     import pdb; pdb.set_trace()
 
 
 def on_function_begin(line, m, doxy, keep_original_code=False):
@@ -77,18 +215,15 @@ def on_function_member(x, line, m, keep_original_code=False):
         io_var = parse_io(m)
         if x['args'] and any([a in x['args'].split(',')
                               for a in io_var['args']]):
-            x.setdefault('arg_types', {})
-            x.setdefault('arg_dims', {})
+            x.setdefault('arg_props', {})
             for a in x['args'].split(','):
                 if a in io_var['args']:
-                    x['arg_types'][a] = io_var['type']
-                    if io_var['dim']:
-                        x['arg_dims'][a] = io_var['dim']
+                    x['arg_props'][a] = io_var
+                    x['arg_props'][a]['name'] = a
                     break
         elif x['result'] and (x['result'] in io_var['args']):
-            x['result_type'] = io_var['type']
-            if io_var['dim']:
-                x['result_dim'] = io_var['dim']
+            x['result_props'] = io_var
+            x['result_props']['name'] = x['name']
 
 
 def on_typedef_begin(line, m, doxy, keep_original_code=False):
@@ -113,130 +248,6 @@ def on_typedef_member(x, line, m, keep_original_code=False):
     #     import pdb; pdb.set_trace()
 
 
-def format_function_str(name, args, arg_types={}, arg_dims={},
-                        method_type=None,
-                        result_name=None, result_type=None, result_dim=None,
-                        as_fortran=False):
-    if args:
-        arglist = args.split(',')
-        args = ''
-        for arg in arglist:
-            if args:
-                args += ', '
-            args += format_argument(arg,
-                                    typename=arg_types.get(arg, 'in'),
-                                    dim=arg_dims.get(arg, None),
-                                    as_fortran=as_fortran)
-    if result_type is None:
-        result_type = method_type
-    if result_dim:
-        result_type += '(%s)' % result_dim
-    if as_fortran:
-        out = "%s %s(%s)" % (method_type, name, args)
-        if method_type in ['function', 'FUNCTION']:
-            out += ' result(%s)' % result_name
-        return out
-    return "%s %s(%s)" % (result_type, name, args)
-
-
-def write_interface(interface, keep_original_code=False):
-    global doxy_char
-    interface['doxy'] += ['%s\n%s Interface members:\n%s```\n'
-                          % (doxy_char, doxy_char, doxy_char)]
-    args = None
-    arg_types = None
-    arg_dims = None
-    result_type = None
-    result_dim = None
-    for x in interface['members'].values():
-        iargs = x['args'].split(',')
-        if args is None:
-            args = [[a] for a in iargs]
-            arg_types = [[x.get('arg_types', {}).get(a, 'in')]
-                         for a in iargs]
-            arg_dims = [[x.get('arg_dims', {}).get(a, '')] for a in iargs]
-            result_type = [x.get('result_type', x['type'])]
-            result_dim = [x.get('result_dim', '')]
-        else:
-            assert(len(iargs) == len(args))
-            for i, a in enumerate(iargs):
-                args[i].append(a)
-                arg_types[i].append(x.get('arg_types', {}).get(a, 'in'))
-                arg_dims[i].append(x.get('arg_dims', {}).get(a, ''))
-            result_type.append(x.get('result_type', x['type']))
-            result_dim.append(x.get('result_dim', x['type']))
-        interface['doxy'].append(
-            '%s   %s\n' % (doxy_char, format_function_str(
-                x['name'], x['args'], arg_types=x.get('arg_types', {}),
-                arg_dims=x.get('arg_dims', {}), method_type=x['type'],
-                result_type=x.get('result_type', x['type']),
-                result_dim=x.get('result_dim', None))))
-    interface['doxy'] += ['%s```\n' % doxy_char]
-    # Join types
-    args = [list(set(a)) for a in args]
-    arg_types = [list(set(a)) for a in arg_types]
-    arg_dims = [list(set(a)) for a in arg_dims]
-    result_type = list(set(result_type))
-    result_dim = list(set(result_dim))
-    interface['args'] = [a[0] for a in args]
-    interface['arg_types'] = {}
-    for k, v in zip(interface['args'], arg_types):
-        if len(v) == 1:
-            interface['arg_types'][k] = v[0]
-        else:
-            interface['arg_types'][k] = 'in'
-    interface['arg_dims'] = {}
-    for k, v in zip(interface['args'], arg_dims):
-        if len(v) == 1:
-            interface['arg_dims'][k] = v[0]
-        else:
-            interface['arg_dims'][k] = None
-    if len(result_type) == 1:
-        interface['result_type'] = result_type[0]
-    else:
-        interface['result_type'] = next(iter(interface['members'].values()))['type']
-    if len(result_dim) == 1:
-        interface['result_dim'] = result_dim[0]
-    else:
-        interface['result_dim'] = None
-    interface['type'] = 'interface'
-    interface['args'] = ','.join(interface['args'])
-    write_function(interface, keep_original_code=keep_original_code)
-
-
-def write_function(in_function, keep_original_code=False):
-    global outfile
-    if keep_original_code:
-        pass
-    else:
-        for x in in_function['doxy']:
-            outfile.write(x)
-        outfile.write("%s;\n\n" % format_function_str(
-            in_function['name'], in_function['args'],
-            arg_types=in_function.get('arg_types', {}),
-            arg_dims=in_function.get('arg_dims', {}),
-            method_type=in_function['type'],
-            result_type=in_function.get('result_type', in_function['type']),
-            result_dim=in_function.get('result_dim', None)))
-
-
-def write_typedef(typedef, keep_original_code=False):
-    global outfile
-    if keep_original_code:
-        pass
-    else:
-        for x in typedef['doxy']:
-            outfile.write(x)
-        outfile.write("type struct %s {\n" % typedef['name'])
-        for x in typedef['members'].values():
-            outfile.write('  %s;' % (
-                format_argument(x['name'], x['type'], x['dim'])))
-            if x['doxy']:
-                outfile.write(' //!<%s' % x['doxy'])
-            outfile.write('\n')
-        outfile.write("} %s;\n\n" % typedef['name'])
-
-
 def parse_io(m):
     out = m.groupdict()
     typename = m.group('type')
@@ -244,16 +255,18 @@ def parse_io(m):
         typename = 'any'
     mods = []
     dim = ''
-    # if m.group('kind'):
-    #     mods.append('kind=%s' % m.group('kind'))
-    # if m.group('len'):
-    #     mods.append('len=%s' % m.group('len'))
-    # if m.group('dim'):
-    #     dim = m.group('dim')
-    # elif m.group('dim2'):
-    #     dim = m.group('dim2')
+    if m.group('kind'):
+        mods.append('kind=%s' % m.group('kind'))
+    if m.group('len'):
+        mods.append('len=%s' % m.group('len'))
+    if m.group('dim'):
+        dim = m.group('dim')
+    elif m.group('dim2'):
+        dim = m.group('dim2')
+    # elif m.group('len'):
+    #     dim = m.group('len')
     if mods:
-        typename += '(%s)' % ','.join(mods)
+        out['type_mods'] = '(%s)' % ','.join(mods)
     out.update(type=typename, dim=dim,
                args=[x.strip() for x in m.group('name').split(',')])
     out['name'] = ','.join(out['args'])
@@ -342,7 +355,7 @@ def get_regex(filename):
                 r"pointer|POINTER)"
                 r"))*"
                 r"\s+\:\:\s+(?P<name>[.\w\d_\, ]+)(?:\((?P<dim2>[\:\,]+)\))?"
-                r"(?:\s*(?:\=|\=\>)\s*(?P<val>.+))?\s*"
+                r"(?:\s*(?:\=|\=\>)\s*(?P<val>[\.\w\d_\(\)]+))?\s*"
                 r"(?:\!\<(?P<doxy>.*))?\s*$"),
             interface_begin=re.compile(
                 r"\s*(?:interface|INTERFACE)\s+(?P<name>[.\w\d_]+)\s*$"),

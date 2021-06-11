@@ -613,10 +613,12 @@ module fygg
      real(kind=8), dimension(:), pointer :: x => null() !< Wrapped array
   end type real8_1d
 #ifdef _WIN32
+  ! BEGIN DOXYGEN_SHOULD_SKIP_THIS
   !> @brief Wrapper for a reallocatable 1D array of 16 byte real.
   type :: real16_1d
      real(kind=8), dimension(:), pointer :: x => null() !< Wrapped array
   end type real16_1d
+  ! END DOXYGEN_SHOULD_SKIP_THIS
 #else
   !> @brief Wrapper for a reallocatable 1D array of 16 byte real.
   type :: real16_1d
@@ -636,10 +638,12 @@ module fygg
      complex(kind=8), dimension(:), pointer :: x => null() !< Wrapped array
   end type complex8_1d
 #ifdef _WIN32
+  ! BEGIN DOXYGEN_SHOULD_SKIP_THIS
   !> @brief Wrapper for a reallocatable 1D array of 16 byte complex.
   type :: complex16_1d
      complex(kind=8), dimension(:), pointer :: x => null() !< Wrapped array
   end type complex16_1d
+  ! END DOXYGEN_SHOULD_SKIP_THIS
 #else
   !> @brief Wrapper for a reallocatable 1D array of 16 byte complex.
   type :: complex16_1d
@@ -730,14 +734,16 @@ module fygg
      real(kind=8), dimension(:), pointer :: x => null() !< Wrapped array
      integer(kind=c_size_t), dimension(:), pointer :: shape => null() !< Shape of the array
   end type real8_nd
-  !> @brief Wrapper for a reallocatable ND array of 16 byte real.
 #ifdef _WIN32
+  ! BEGIN DOXYGEN_SHOULD_SKIP_THIS
+  !> @brief Wrapper for a reallocatable ND array of 16 byte real.
   type :: real16_nd
      real(kind=8), dimension(:), pointer :: x => null() !< Wrapped array
      integer(kind=c_size_t), dimension(:), pointer :: shape => null() !< Shape of the array
   end type real16_nd
-#endif
-#ifndef _WIN32
+  ! END DOXYGEN_SHOULD_SKIP_THIS
+#else
+  !> @brief Wrapper for a reallocatable ND array of 16 byte real.
   type :: real16_nd
      real(kind=16), dimension(:), pointer :: x => null() !< Wrapped array
      integer(kind=c_size_t), dimension(:), pointer :: shape => null() !< Shape of the array
@@ -759,13 +765,14 @@ module fygg
      integer(kind=c_size_t), dimension(:), pointer :: shape => null() !< Shape of the array
   end type complex8_nd
 #ifdef _WIN32
+  ! BEGIN DOXYGEN_SHOULD_SKIP_THIS
   !> @brief Wrapper for a reallocatable ND array of 16 byte complex.
   type :: complex16_nd
      complex(kind=8), dimension(:), pointer :: x => null() !< Wrapped array
      integer(kind=c_size_t), dimension(:), pointer :: shape => null() !< Shape of the array
   end type complex16_nd
-#endif
-#ifndef _WIN32
+  ! END DOXYGEN_SHOULD_SKIP_THIS
+#else
   !> @brief Wrapper for a reallocatable ND array of 16 byte complex.
   type :: complex16_nd
      complex(kind=16), dimension(:), pointer :: x => null() !< Wrapped array
@@ -872,13 +879,16 @@ module fygg
      real(kind=8), dimension(:, :), pointer :: x => null() !< Wrapped array
      integer(kind=c_size_t), dimension(:), pointer :: shape => null() !< Shape of the array
   end type real8_2d
-  !> @brief Wrapper for a reallocatable 2D array of 16 byte real.
 #ifdef _WIN32
+  ! BEGIN DOXYGEN_SHOULD_SKIP_THIS
+  !> @brief Wrapper for a reallocatable 2D array of 16 byte real.
   type :: real16_2d
      real(kind=8), dimension(:, :), pointer :: x => null() !< Wrapped array
      integer(kind=c_size_t), dimension(:), pointer :: shape => null() !< Shape of the array
   end type real16_2d
+  ! END DOXYGEN_SHOULD_SKIP_THIS
 #else
+  !> @brief Wrapper for a reallocatable 2D array of 16 byte real.
   type :: real16_2d
      real(kind=16), dimension(:, :), pointer :: x => null() !< Wrapped array
      integer(kind=c_size_t), dimension(:), pointer :: shape => null() !< Shape of the array
@@ -900,11 +910,13 @@ module fygg
      integer(kind=c_size_t), dimension(:), pointer :: shape => null() !< Shape of the array
   end type complex8_2d
 #ifdef _WIN32
+  ! BEGIN DOXYGEN_SHOULD_SKIP_THIS
   !> @brief Wrapper for a reallocatable 2D array of 16 byte complex.
   type :: complex16_2d
      complex(kind=8), dimension(:, :), pointer :: x => null() !< Wrapped array
      integer(kind=c_size_t), dimension(:), pointer :: shape => null() !< Shape of the array
   end type complex16_2d
+  ! END DOXYGEN_SHOULD_SKIP_THIS
 #else
   !> @brief Wrapper for a reallocatable 2D array of 16 byte complex.
   type :: complex16_2d
