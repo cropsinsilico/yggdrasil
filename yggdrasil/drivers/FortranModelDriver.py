@@ -203,6 +203,23 @@ class FortranModelDriver(CompiledModelDriver):
         'function': 'yggpyfunc',
         'instance': 'yggpyinst',
         'any': 'ygggeneric'}
+    interface_map = {
+        'import': 'use fygg',
+        'input': 'ygg_input_type("{channel_name}", {datatype})',
+        'output': 'ygg_output_type("{channel_name}", {datatype})',
+        'server': (
+            'ygg_rpc_server_type("{channel_name}", {datatype_in}, '
+            '{datatype_out})'),
+        'client': (
+            'ygg_rpc_client_type("{channel_name}", {datatype_out}, '
+            '{datatype_in})'),
+        'timesync': 'yggTimesync("{channel_name}", "{time_units}")',
+        'send': 'flag = ygg_send_var({channel_obj}, [yggarg({outputs})])',
+        'recv': 'flag = ygg_recv_var({channel_obj}, [yggarg({inputs})])',
+        'call': (
+            'flag = ygg_rpc_call({channel_obj}, [yggarg({outputs})], '
+            '[yggarg({inputs})])'),
+    }
     function_param = {
         'import_nofile': 'use {function}',
         'import': '#include "{filename}"',

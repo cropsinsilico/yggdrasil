@@ -455,6 +455,17 @@ class MatlabModelDriver(InterpretedModelDriver):  # pragma: matlab
         'ply': 'containers.Map',
         'obj': 'containers.Map',
         'schema': 'containers.Map'}
+    interface_map = {
+        'import': '',  # Added to path
+        'input': 'YggInterface(\'YggInput\', \'{channel_name}\')',
+        'output': 'YggInterface(\'YggOutput\', \'{channel_name}\')',
+        'server': 'YggInterface(\'YggRpcServer\', \'{channel_name}\')',
+        'client': 'YggInterface(\'YggRpcClient\', \'{channel_name}\')',
+        'timesync': 'YggInterface(\'YggTimesync\', \'{channel_name}\')',
+        'send': 'flag = {channel_obj}.send({outputs})',
+        'recv': '[flag, {inputs}] = {channel_obj}.recv()',
+        'call': '[flag, {inputs}] = {channel_obj}.call({outputs})',
+    }
     function_param = {
         'istype': 'isa({variable}, \'{type}\')',
         'len': 'length({variable})',

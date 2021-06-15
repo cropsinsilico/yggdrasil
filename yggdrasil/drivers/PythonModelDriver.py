@@ -36,6 +36,17 @@ class PythonModelDriver(InterpretedModelDriver):
         'ply': 'PlyDict',
         'obj': 'ObjDict',
         'schema': 'dict'}
+    interface_map = {
+        'import': 'from yggdrasil.languages.Python.YggInterface import {commtype}',
+        'input': 'YggInput("{channel_name}")',
+        'output': 'YggOutput("{channel_name}")',
+        'server': 'YggRpcServer("{channel_name}")',
+        'client': 'YggRpcClient("{channel_name}")',
+        'timesync': 'YggTimesync("{channel_name}")',
+        'send': 'flag = {channel_obj}.send({outputs})',
+        'recv': 'flag, {inputs} = {channel_obj}.recv()',
+        'call': 'flag, {inputs} = {channel_obj}.call({outputs})',
+    }
     function_param = {
         'import_nofile': 'import {function}',
         'import': 'from {filename} import {function}',

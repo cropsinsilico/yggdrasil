@@ -599,6 +599,17 @@ class CModelDriver(CompiledModelDriver):
         'function': 'python_function_t',
         'instance': 'python_instance_t',
         'any': 'generic_t'}
+    interface_map = {
+        'import': '#include "YggInterface.h"',
+        'input': 'yggInputType("{channel_name}", {datatype})',
+        'output': 'yggOutputType("{channel_name}", {datatype})',
+        'server': 'yggRpcServerType("{channel_name}", {datatype_in}, {datatype_out})',
+        'client': 'yggRpcClientType("{channel_name}", {datatype_out}, {datatype_in})',
+        'timesync': 'yggTimesync("{channel_name}", "{time_units}")',
+        'send': 'flag = yggSend({channel_obj}, {outputs})',
+        'recv': 'flag = yggRecv({channel_obj}, {input_refs})',
+        'call': 'flag = rpcCall({channel_obj}, {outputs}, {inputs})',
+    }
     type_class_map = {}
     function_param = {
         'import': '#include \"{filename}\"',
