@@ -424,17 +424,17 @@ class YggRunner(YggClass):
         self.debug('')
         driver = dict(name='name')
         try:
+            # Create connection drivers
+            self.debug("Loading connection drivers")
+            for driver in self.connectiondrivers.values():
+                driver['task_method'] = self.connection_task_method
+                self.create_driver(driver)
             # Create model drivers
             self.debug("Loading model drivers")
             for driver in self.modeldrivers.values():
                 self.create_driver(driver)
                 self.debug("Model %s:, env: %s",
                            driver['name'], pformat(driver['instance'].env))
-            # Create connection drivers
-            self.debug("Loading connection drivers")
-            for driver in self.connectiondrivers.values():
-                driver['task_method'] = self.connection_task_method
-                self.create_driver(driver)
         except BaseException:  # pragma: debug
             self.error("%s could not be created.", driver['name'])
             self.terminate()
