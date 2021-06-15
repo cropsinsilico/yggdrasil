@@ -621,6 +621,13 @@ def itemize_deps(method, for_development=False,
         out['requirements'].append('requirements_documentation.txt')
         if not fallback_to_conda:
             out['os'].append("doxygen")
+            if install_opts['os'] == 'linux':
+                out['os'] += ["pandoc"]
+            elif install_opts['os'] == 'osx':
+                out['os'] += ["pandoc-citeproc", "Caskroom/cask/mactex"]
+            else:
+                NotImplementedError("Could not determine "
+                                    "pandoc installation method.")
     if install_opts['sbml'] and fallback_to_conda:
         # Until the sbml package is updated to allow numpy != 1.19.3,
         # sbml will need to be installed separately without deps in order
