@@ -38,7 +38,7 @@ doxy:
 
 .PHONY: roxy
 roxy:
-	cd $(ROXYDIR) ; sudo Rscript -e "install.packages(\"roxygen2\", repos=\"http://cloud.r-project.org\", INSTALL_opts=c(\"--no-multiarch\")); roxygen2::roxygenise(); install.packages(\"Rd2md\", repos=\"http://cloud.r-project.org\", INSTALL_opts=c(\"--no-multiarch\")); library(Rd2md); Rd2markdown(\"man/YggInterface.Rd\", \"man/YggInterface.md\");" ; python -c "import pypandoc; pypandoc.convert_file('man/YggInterface.md', 'rst', outputfile='man/YggInterface.rst')"
+	cd $(ROXYDIR) ; Rscript -e "library(roxygen2); roxygen2::roxygenise(); library(Rd2md); Rd2markdown(\"man/YggInterface.Rd\", \"man/YggInterface.md\");" ; python -c "import pypandoc; pypandoc.convert_file('man/YggInterface.md', 'rst', outputfile='man/YggInterface.rst')"
 	rm $(ROXYDIR)/man/YggInterface.md
 	mv $(ROXYDIR)/man/YggInterface.rst $(SOURCEDIR)/advanced/YggInterface_R.rst
 
