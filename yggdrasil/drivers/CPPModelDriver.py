@@ -1,4 +1,5 @@
 import os
+import re
 import copy
 from yggdrasil import platform
 from yggdrasil.drivers.CModelDriver import (
@@ -205,7 +206,8 @@ class CPPModelDriver(CModelDriver):
         outputs_def_regex=(
             r'\s*(?P<native_type>(?:[^\s])+)(\s+)?'
             r'(\()?(?P<ref>\&)(?(1)(?:\s*)|(?:\s+))'
-            r'(?P<name>.+?)(?(2)(?:\)|(?:)))(?P<shape>(?:\[.+?\])+)?\s*(?:,|$)(?:\n)?'))
+            r'(?P<name>.+?)(?(2)(?:\)|(?:)))(?P<shape>(?:\[.+?\])+)?\s*(?:,|$)(?:\n)?'),
+        vector_regex=r'(?:std\:\:)?vector\<\s*(?P<type>.*)\s*\>')
     include_arg_count = True
     include_channel_obj = False
     dont_declare_channel = True
@@ -287,6 +289,165 @@ class CPPModelDriver(CModelDriver):
             try_contents, except_contents, **kwargs)
 
     @classmethod
+    def finalize_function_io(cls, direction, x):
+        r"""Finalize info for an input/output channel following function
+        parsing.
+
+        Args:
+            direction (str): Direction of channel ('input' or 'output')
+            x (dict): Channel info.
+
+        """
+        if direction == 'input':
+            for v in x['vars']:
+                grp_vect = cls.is_vector(v)
+                if grp_vect:
+                    v['ptr_var'] = dict(v, name=(v['name'] + '_ptr'))
+                    v['ptr_var'].pop('native_type')
+                    if not cls.allows_realloc(v):
+                        v['length_var'] = v['name'] + '.size()'
+        elif direction == 'output':
+            for v in x['vars']:
+                if (not v.get('length_var', False)) and cls.is_vector(v):
+                    v['length_var'] = v['name'] + '.size()'
+                    v['ptr_var'] = v['name'] + '.data()'
+        super(CPPModelDriver, cls).finalize_function_io(direction, x)
+        if direction == 'input':
+            for v in x['vars']:
+                if 'ptr_var' in v:
+                    v['ptr_var']['length_var'] = v['length_var']
+        
+    @classmethod
+    def is_vector(cls, var):
+        r"""Determine if a variable uses a vector.
+
+        Args:
+            var (dict): Variable.
+
+        Returns:
+            bool: True if it is a vector, False otherwise.
+
+        """
+        if 'vector' in var.get('native_type', ''):
+            return re.fullmatch(cls.function_param['vector_regex'],
+                                var['native_type'])
+        return False
+    
+    @classmethod
+    def requires_length_var(cls, var):
+        r"""Determine if a variable requires a separate length variable.
+
+        Args:
+            var (dict): Dictionary of variable properties.
+
+        Returns:
+            bool: True if a length variable is required, False otherwise.
+
+        """
+        if cls.is_vector(var):
+            return True
+        return super(CPPModelDriver, cls).requires_length_var(var)
+
+    @classmethod
+    def write_declaration(cls, var, **kwargs):
+        r"""Return the lines required to declare a variable with a certain
+        type.
+
+        Args:
+            var (dict, str): Name or information dictionary for the variable
+                being declared.
+            **kwargs: Additional keyword arguments are passed to the
+                parent class's method.
+
+        Returns:
+            list: The lines declaring the variable.
+
+        """
+        out = []
+        if 'ptr_var' in var:
+            var_copy = copy.deepcopy(var)
+            if isinstance(var['ptr_var'], dict):
+                out += super(CPPModelDriver, cls).write_declaration(
+                    var['ptr_var'], **kwargs)
+            out += super(CModelDriver, cls).write_declaration(var_copy,
+                                                              **kwargs)
+            return out
+        out += super(CPPModelDriver, cls).write_declaration(var, **kwargs)
+        return out
+        
+    @classmethod
+    def write_model_recv(cls, channel, recv_var, **kwargs):
+        r"""Write a model receive call include checking the return flag.
+
+        Args:
+            channel (str): Name of variable that the channel being received
+                from was stored in.
+            recv_var (dict, list): Information of one or more variables that
+                receieved information should be stored in.
+            **kwargs: Additional keyword arguments are passed to the parent
+                class's method.
+
+        Returns:
+            list: Lines required to carry out a receive call in this language.
+
+        """
+        recv_var_str = recv_var
+        out_after = []
+        if not isinstance(recv_var, str):
+            recv_var_par = cls.channels2vars(recv_var)
+            new_recv_var_par = []
+            for i, v in enumerate(recv_var_par):
+                if cls.allows_realloc(v) and cls.is_vector(v):
+                    assert(v.get('ptr_var', False))
+                    out_after.append(
+                        '{var}.assign({ptr_var}, {ptr_var} + {len_var});'.format(
+                            var=v['name'], ptr_var=v['ptr_var']['name'],
+                            len_var=v['length_var']['name']))
+                    v = v['ptr_var']
+                new_recv_var_par.append(v)
+            recv_var_par = new_recv_var_par
+            recv_var_str = cls.prepare_output_variables(
+                recv_var_par, in_inputs=cls.outputs_in_inputs,
+                for_yggdrasil=True)
+        out = super(CPPModelDriver, cls).write_model_recv(
+            channel, recv_var_str, **kwargs)
+        return out + out_after
+
+    @classmethod
+    def write_model_send(cls, channel, send_var, **kwargs):
+        r"""Write a model send call include checking the return flag.
+
+        Args:
+            channel (str): Name of variable that the channel being sent to
+                was stored in.
+            send_var (dict, list): Information on one or more variables
+                containing information that will be sent.
+            flag_var (str, optional): Name of flag variable that the flag
+                should be stored in. Defaults to 'flag',
+            allow_failure (bool, optional): If True, the returned lines will
+                call a break if the flag is False. Otherwise, the returned
+                lines will issue an error. Defaults to False.
+
+        Returns:
+            list: Lines required to carry out a send call in this language.
+
+        """
+        send_var_str = send_var
+        out_before = []
+        if not isinstance(send_var, str):
+            send_var_par = []
+            for v in cls.channels2vars(send_var):
+                if cls.is_vector(v):
+                    send_var_par += [v['ptr_var'], v['length_var']]
+                else:
+                    send_var_par.append(v)
+            send_var_str = cls.prepare_input_variables(
+                send_var_par, for_yggdrasil=True)
+        out = super(CPPModelDriver, cls).write_model_send(
+            channel, send_var_str, **kwargs)
+        return out_before + out
+    
+    @classmethod
     def output2input(cls, var, in_definition=True):
         r"""Perform conversion necessary to turn an output variable
         into an corresponding input that can be used to format a
@@ -315,4 +476,28 @@ class CPPModelDriver(CModelDriver):
                 if not (out.get('ref', False)
                         or out.get('is_length_var', False)):
                     out = dict(out, name='&' + out['name'])
+        return out
+
+    @classmethod
+    def get_json_type(cls, native_type):
+        r"""Get the JSON type from the native language type.
+
+        Args:
+            native_type (str): The native language type.
+
+        Returns:
+            str, dict: The JSON type.
+
+        """
+        regex_vect = r'(?:std\:\:)?vector\<\s*(?P<type>.*)\s*\>'
+        grp_vect = re.fullmatch(regex_vect, native_type)
+        if grp_vect:
+            out = cls.get_json_type(grp_vect.group('type'))
+            if out['type'] == 'scalar':
+                out['type'] = '1darray'
+            else:  # pragma: debug
+                raise ValueError("Type not currently supported: %s -> %s"
+                                 % (native_type, out))
+        else:
+            out = super(CPPModelDriver, cls).get_json_type(native_type)
         return out

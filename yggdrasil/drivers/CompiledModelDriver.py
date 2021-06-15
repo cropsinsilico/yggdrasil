@@ -2236,23 +2236,30 @@ class CompiledModelDriver(ModelDriver):
         """
         return self.language
 
-    def get_source_file(self, args):
-        r"""Determine the source file based on arguments.
+    @classmethod
+    def identify_source_files(cls, args=None, working_dir=None,
+                              source_files=None, **kwargs):
+        r"""Determine the source file based on model arguments.
 
         Args:
-            args (list): Arguments provided.
+            args (list, optional): Arguments provided.
+            working_dir (str, optional): Working directory.
+            source_files (list, optional): Source files in the model.
+            **kwargs: Additional keyword arguments are ignored.
 
         Returns:
-            str: Full path to source file select.
+            list: Source files.
 
         """
-        out = args[0]
-        if (not self.is_source_file(out)) and self.source_files:
-            assert(isinstance(self.source_files, list))
-            out = self.source_files[0]
-        out = super(CompiledModelDriver, self).get_source_file([out])
+        out = []
+        if source_files:
+            out += source_files
+        if not out:
+            out = super(CompiledModelDriver, cls).identify_source_files(
+                args=args, working_dir=working_dir,
+                source_files=source_files, **kwargs)
         return out
-
+        
     def write_wrappers(self, **kwargs):
         r"""Write any wrappers needed to compile and/or run a model.
 

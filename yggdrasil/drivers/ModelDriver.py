@@ -427,8 +427,9 @@ class ModelDriver(Driver):
                            'event_process_kill_complete'])
 
     def __init__(self, name, args, model_index=0, copy_index=-1, clients=[],
-                 **kwargs):
-        self.model_outputs_in_inputs = kwargs.pop('outputs_in_inputs', None)
+                 preparsed_function=None, outputs_in_inputs=None, **kwargs):
+        self.model_outputs_in_inputs = outputs_in_inputs
+        self.preparsed_function = preparsed_function
         super(ModelDriver, self).__init__(name, **kwargs)
         if self.overwrite is None:
             self.overwrite = (not self.preserve_cache)
@@ -645,46 +646,29 @@ class ModelDriver(Driver):
 
     def init_from_function(self, args):
         r"""Initialize model parameters based on the wrapped function."""
-        if self.is_server:
-            assert(isinstance(self.is_server, dict))
-        if self.function_param is None:
-            raise ValueError(("Language %s is not parameterized "
-                              "and so functions cannot be automatically "
-                              "wrapped as a model.") % self.language)
-        self.model_function_file = self.get_source_file(args)
-        if not os.path.isfile(self.model_function_file):
-            raise ValueError("Source file does not exist: '%s'"
-                             % self.model_function_file)
+        if not self.preparsed_function:
+            yml_mock = dict(self.yml,
+                            name=self.name,
+                            args=self.args,
+                            function=self.function,
+                            is_server=self.is_server,
+                            client_of=self.client_of,
+                            inputs=self.inputs,
+                            outputs=self.outputs,
+                            iter_function_over=self.iter_function_over,
+                            copies=self.copies)
+            self.preparse_function(yml_mock)
+            self.preparsed_function = yml_mock['preparsed_function']
+        self.model_function_info = self.preparsed_function['model_file']
+        self.model_function_file = self.model_function_info['model_file']
+        self.model_function_inputs = self.preparsed_function['inputs']
+        self.model_function_outputs = self.preparsed_function['outputs']
+        self.model_outputs_in_inputs = self.preparsed_function['outputs_in_inputs']
         model_dir, model_base = os.path.split(self.model_function_file)
         model_base = os.path.splitext(model_base)[0]
         wrapper_fname = os.path.join(model_dir, 'ygg_' + model_base
                                      + self.language_ext[0])
-        # Update input/outputs based on parsed source code
-        client_comms = ['%s:%s_%s' % (self.name, x, self.name)
-                        for x in self.client_of]
-        self.model_function_inputs = copy.copy(self.inputs)
-        self.model_function_outputs = copy.copy(self.outputs)
-        self.expand_server_io(
-            self.model_function_inputs, self.model_function_outputs,
-            client_comms=client_comms)
-        expected_outputs = []
-        for x in self.model_function_outputs:
-            expected_outputs += x.get('vars', [])
-        self.model_function_info = self.parse_function_definition(
-            self.model_function_file, self.function,
-            expected_outputs=expected_outputs)
-        if self.model_outputs_in_inputs is None:
-            self.model_outputs_in_inputs = self.model_function_info.get(
-                'outputs_in_inputs', None)
-        lines = self.write_model_wrapper(
-            self.model_function_info, self.function,
-            inputs=self.model_function_inputs,
-            outputs=self.model_function_outputs,
-            outputs_in_inputs=self.model_outputs_in_inputs,
-            iter_function_over=self.iter_function_over,
-            copies=self.copies)
-        # Update connections?
-        # import pdb; pdb.set_trace()
+        lines = self.write_model_wrapper(**self.preparsed_function)
         # Write file
         if (not os.path.isfile(wrapper_fname)) or self.overwrite:
             with open(wrapper_fname, 'w') as fd:
@@ -995,24 +979,31 @@ class ModelDriver(Driver):
                 out = False
         return out
 
-    def get_source_file(self, args):
-        r"""Determine the source file based on arguments.
+    @classmethod
+    def identify_source_files(cls, args=None, working_dir=None, **kwargs):
+        r"""Determine the source file based on model arguments.
 
         Args:
-            args (list): Arguments provided.
+            args (list, optional): Arguments provided.
+            working_dir (str, optional): Working directory.
+            **kwargs: Additional keyword arguments are ignored.
 
         Returns:
-            str: Full path to source file select.
+            list: Source files.
 
         """
-        out = args[0]
-        if (((not self.is_source_file(out))
-             and (self.language_ext is not None)
-             and (os.path.splitext(out)[-1]
-                  not in self.get_all_language_ext()))):
-            out = os.path.splitext(out)[0] + self.language_ext[0]
-        if not os.path.isabs(out):
-            out = os.path.normpath(os.path.join(self.working_dir, out))
+        out = []
+        if args:
+            src = args[0]
+            if (((not cls.is_source_file(src))
+                 and (cls.language_ext is not None)
+                 and (os.path.splitext(src)[-1]
+                      not in cls.get_all_language_ext()))):
+                src = os.path.splitext(src)[0] + cls.language_ext[0]
+            if working_dir and (not os.path.isabs(src)):
+                src = os.path.normpath(os.path.join(working_dir, src))
+            if os.path.isfile(src):
+                out.append(src)
         return out
 
     @classmethod
@@ -1875,6 +1866,66 @@ class ModelDriver(Driver):
                       if x['name'] in client_comms]
         for i in rm_outputs[::-1]:
             outputs.pop(i)
+
+    @classmethod
+    def preparse_function(cls, yml):
+        r"""Extract information about inputs and outputs based on the
+        function being wrapped.
+
+        Args:
+            yml (dict): Options that will be used to initialize the model.
+
+        """
+        if 'function' not in yml:
+            return
+        if yml.get('is_server', False):
+            assert(isinstance(yml['is_server'], dict))
+        if cls.function_param is None:
+            raise ValueError(("Language %s is not parameterized "
+                              "and so functions cannot be automatically "
+                              "wrapped as a model.") % cls.language)
+        source_files = cls.identify_source_files(**yml)
+        if not source_files:  # pragma: debug
+            raise ValueError("Could not identify any source files.")
+        model_function_file = source_files[0]
+        if not os.path.isfile(model_function_file):
+            raise ValueError("Source file does not exist: '%s'"
+                             % model_function_file)
+        
+        # Update input/outputs based on parsed source code
+        client_comms = ['%s:%s_%s' % (yml['name'], x, yml['name'])
+                        for x in yml.get('client_of', [])]
+        model_function_inputs = copy.copy(yml.get('inputs', []))
+        model_function_outputs = copy.copy(yml.get('outputs', []))
+        cls.expand_server_io(
+            model_function_inputs, model_function_outputs,
+            client_comms=client_comms)
+        expected_outputs = []
+        for x in model_function_outputs:
+            expected_outputs += x.get('vars', [])
+        model_outputs_in_inputs = yml.get('outputs_in_inputs', None)
+        model_function_info = cls.parse_function_definition(
+            model_function_file, yml['function'],
+            expected_outputs=expected_outputs,
+            outputs_in_inputs=model_outputs_in_inputs)
+        if model_outputs_in_inputs is None:
+            model_outputs_in_inputs = model_function_info.get(
+                'outputs_in_inputs', None)
+        model_flag = cls.update_io_from_function(
+            model_function_info, yml['function'],
+            inputs=model_function_inputs,
+            outputs=model_function_outputs,
+            iter_function_over=yml.get('iter_function_over', []))
+        yml['preparsed_function'] = {
+            'model_file': model_function_info,
+            'model_function': yml['function'],
+            'inputs': model_function_inputs,
+            'outputs': model_function_outputs,
+            'model_flag': model_flag,
+            'outputs_in_inputs': model_outputs_in_inputs,
+            'copies': yml.get('copies', 1),
+            'iter_function_over': yml.get('iter_function_over', []),
+            'skip_update_io': True}
     
     @classmethod
     def update_io_from_function(cls, model_file, model_function,
@@ -1904,8 +1955,6 @@ class ModelDriver(Driver):
                 model does not use a flag variable.
 
         """
-        if outputs_in_inputs is None:  # pragma: debug
-            outputs_in_inputs = cls.outputs_in_inputs
         # Read info from the source code
         if (((isinstance(model_file, str) and os.path.isfile(model_file))
              or (contents is not None))):  # pragma: debug
@@ -1922,6 +1971,9 @@ class ModelDriver(Driver):
             info = model_file
         else:
             info = {"inputs": [], "outputs": []}
+        if outputs_in_inputs is None:  # pragma: debug
+            outputs_in_inputs = info.get('outputs_in_inputs',
+                                         cls.outputs_in_inputs)
         info_map = {io: OrderedDict([(x['name'], x) for x in info.get(io, [])])
                     for io in ['inputs', 'outputs']}
         # Determine flag variable
@@ -2027,13 +2079,30 @@ class ModelDriver(Driver):
                             v['datatype']['type'] = '1darray'
                             v.pop('native_type', None)
                         v['native_type'] = cls.get_native_type(**v)
+        # Finalize io variables
+        for x in inputs:
+            cls.finalize_function_io('input', x)
+        for x in outputs:
+            cls.finalize_function_io('output', x)
         return flag_var
 
     @classmethod
+    def finalize_function_io(cls, direction, x):
+        r"""Finalize info for an input/output channel following function
+        parsing.
+
+        Args:
+            direction (str): Direction of channel ('input' or 'output')
+
+        """
+        assert(direction in ['input', 'output'])
+
+    @classmethod
     def write_model_wrapper(cls, model_file, model_function,
-                            inputs=[], outputs=[],
+                            inputs=[], outputs=[], model_flag=None,
                             outputs_in_inputs=None, verbose=False, copies=1,
-                            iter_function_over=[], verbose_model=False):
+                            iter_function_over=[], verbose_model=False,
+                            skip_update_io=False):
         r"""Return the lines required to wrap a model function as an integrated
         model.
 
@@ -2045,6 +2114,11 @@ class ModelDriver(Driver):
                 Defaults to [].
             outputs (list, optional): List of model outputs including types.
                 Defaults to [].
+            model_flag (dict, optional): Information about the flag that
+                should be used to track the success of yggdrasil send/recv
+                calls. This should only be provided if update_io_from_function
+                has already been called. Defaults to None and is determined
+                by update_io_from_function.
             outputs_in_inputs (bool, optional): If True, the outputs are
                 presented in the function definition as inputs. Defaults
                 to the class attribute outputs_in_inputs.
@@ -2056,6 +2130,8 @@ class ModelDriver(Driver):
             iter_function_over (array, optional): Variable(s) that should be
                 received or sent as an array, but iterated over. Defaults to
                 an empty array and is ignored.
+            skip_update_io (bool, optional): If True, update_io_from_function
+                will not be called. Defaults to False.
             verbose_model (bool, optional): If True, print statements will
                 be added after every line in the model. Defaults to False.
 
@@ -2064,18 +2140,19 @@ class ModelDriver(Driver):
                 code to run it as part of an integration.
 
         """
+        if outputs_in_inputs is None:
+            outputs_in_inputs = cls.outputs_in_inputs
         # TODO: Determine how to encode dependencies on external variables in models
         if cls.function_param is None:
             raise NotImplementedError("function_param attribute not set for"
                                       "language '%s'" % cls.language)
-        if outputs_in_inputs is None:
-            outputs_in_inputs = cls.outputs_in_inputs
         # Update types based on the function definition for typed languages
-        model_flag = cls.update_io_from_function(
-            model_file, model_function,
-            inputs=inputs, outputs=outputs,
-            outputs_in_inputs=outputs_in_inputs,
-            iter_function_over=iter_function_over)
+        if not skip_update_io:
+            model_flag = cls.update_io_from_function(
+                model_file, model_function,
+                inputs=inputs, outputs=outputs,
+                outputs_in_inputs=outputs_in_inputs,
+                iter_function_over=iter_function_over)
         if isinstance(model_file, dict):
             model_file = model_file['model_file']
         # Update types based on iteration

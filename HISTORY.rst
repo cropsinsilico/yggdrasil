@@ -9,6 +9,7 @@ History
 * Added support for iterating over array variables in automated wrapping via the 'iter_function_over' model parameter
 * Fixed error in ygginstall when called w/ 'all' (also triggered by yggdevup)
 * Only assume dont_copy should be true for wrapped functions that are called as servers
+* Added support for auto-wrapping C++ functions that take vectors as inputs
 
 1.6.3 (2021-05-27) Minor bug fixes in preparation for CiS hackathon
 ------------------

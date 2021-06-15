@@ -1061,31 +1061,18 @@ class CModelDriver(CompiledModelDriver):
         return out
         
     @classmethod
-    def update_io_from_function(cls, model_file, model_function,
-                                inputs=[], outputs=[], **kwargs):
-        r"""Update inputs/outputs from the function definition.
+    def finalize_function_io(cls, direction, x):
+        r"""Finalize info for an input/output channel following function
+        parsing.
 
         Args:
-            model_file (str): Full path to the file containing the model
-                function's declaration.
-            model_function (str): Name of the model function.
-            inputs (list, optional): List of model inputs including types.
-                Defaults to [].
-            outputs (list, optional): List of model outputs including types.
-                Defaults to [].
-            **kwargs: Additional keyword arguments are passed to the parent
-                class's method.
-
-        Returns:
-            dict, None: Flag variable used by the model. If None, the
-                model does not use a flag variable.
+            direction (str): Direction of channel ('input' or 'output')
+            x (dict): Channel info.
 
         """
-        flag_var = super(CModelDriver, cls).update_io_from_function(
-            model_file, model_function, inputs=inputs,
-            outputs=outputs, **kwargs)
-        # Add length_vars if missing for use by yggdrasil
-        for x in inputs:
+        super(CModelDriver, cls).finalize_function_io(direction, x)
+        if direction == 'input':
+            # Add length_vars if missing for use by yggdrasil
             for v in x['vars']:
                 if cls.requires_length_var(v) and (not v.get('length_var', False)):
                     v['length_var'] = {'name': v['name'] + '_length',
@@ -1112,7 +1099,21 @@ class CModelDriver(CompiledModelDriver):
                     #                      'precision': 64},
                     #         'is_length_var': True,
                     #         'dependent': True}
-        for x in outputs:
+            # Flag input variables for reallocation
+            allows_realloc = [cls.allows_realloc(v) for v in x['vars']]
+            if all(allows_realloc):
+                for v in x['vars']:
+                    if (((v['native_type'] not in ['char*', 'string_t',
+                                                   'bytes_t', 'unicode_t'])
+                         and (not v.get('is_length_var', False))
+                         and (v['datatype']['type'] not in
+                              ['any', 'object', 'array', 'schema',
+                               'instance', '1darray', 'ndarray'])
+                         and (cls.function_param['recv_function']
+                              == cls.function_param['recv_heap']))):
+                        v['allow_realloc'] = True
+        elif direction == 'output':
+            # Add length_vars if missing for use by yggdrasil
             for v in x['vars']:
                 if cls.requires_length_var(v) and (not v.get('length_var', False)):
                     if v['datatype']['type'] in ['1darray', 'ndarray']:
@@ -1127,31 +1128,15 @@ class CModelDriver(CompiledModelDriver):
                       and not (v.get('ndim_var', False)
                                and v.get('shape_var', False))):  # pragma: debug
                     raise RuntimeError("Shape must be defined for ND arrays.")
-        # Flag input variables for reallocation
-        for x in inputs:
-            allows_realloc = [cls.allows_realloc(v) for v in x['vars']]
-            if all(allows_realloc):
-                for v in x['vars']:
-                    if (((v['native_type'] not in ['char*', 'string_t',
-                                                   'bytes_t', 'unicode_t'])
-                         and (not v.get('is_length_var', False))
-                         and (v['datatype']['type'] not in
-                              ['any', 'object', 'array', 'schema',
-                               'instance', '1darray', 'ndarray'])
-                         and (cls.function_param['recv_function']
-                              == cls.function_param['recv_heap']))):
-                        v['allow_realloc'] = True
-        for x in inputs + outputs:
-            if x['datatype']['type'] == 'array':
-                nvars_items = len(x['datatype'].get('items', []))
-                nvars = sum([(not ix.get('is_length_var', False))
-                             for ix in x['vars']])
-                if nvars_items == nvars:
-                    x['use_generic'] = False
-                else:
-                    x['use_generic'] = True
-        return flag_var
-        
+        if x['datatype']['type'] == 'array':
+            nvars_items = len(x['datatype'].get('items', []))
+            nvars = sum([(not ix.get('is_length_var', False))
+                         for ix in x['vars']])
+            if nvars_items == nvars:
+                x['use_generic'] = False
+            else:
+                x['use_generic'] = True
+
     @classmethod
     def input2output(cls, var):
         r"""Perform conversion necessary to turn a variable extracted from a

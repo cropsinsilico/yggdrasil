@@ -13,6 +13,7 @@ from yggdrasil.tools import YggClass
 from yggdrasil.config import ygg_cfg, cfg_environment, temp_config
 from yggdrasil import platform, yamlfile
 from yggdrasil.drivers import create_driver, DuplicatedModelDriver
+from yggdrasil.components import import_component
 
 
 COLOR_TRACE = '\033[30;43;22m'
@@ -392,7 +393,7 @@ class YggRunner(YggClass):
         """
         return self.connectiondrivers.values()
 
-    def create_driver(self, yml):
+    def create_driver(self, yml, **kwargs):
         r"""Create a driver instance from the yaml information.
 
         Args:
@@ -409,10 +410,11 @@ class YggRunner(YggClass):
         try:
             if yml.get('copies', 1) > 1:
                 instance = DuplicatedModelDriver.DuplicatedModelDriver(
-                    yml, namespace=self.namespace, rank=self.rank)
+                    yml, namespace=self.namespace, rank=self.rank, **kwargs)
             else:
+                kwargs = dict(yml, **kwargs)
                 instance = create_driver(yml=yml, namespace=self.namespace,
-                                         rank=self.rank, **yml)
+                                         rank=self.rank, **kwargs)
             yml['instance'] = instance
         finally:
             os.chdir(curpath)
@@ -424,6 +426,13 @@ class YggRunner(YggClass):
         self.debug('')
         driver = dict(name='name')
         try:
+            # Preparse model drivers first so that the input/output
+            # channels are updated for wrapped functions
+            self.debug("Preparsing model functions")
+            for driver in self.modeldrivers.values():
+                driver_cls = import_component('model', driver['driver'],
+                                              without_schema=True)
+                driver_cls.preparse_function(driver)
             # Create connection drivers
             self.debug("Loading connection drivers")
             for driver in self.connectiondrivers.values():

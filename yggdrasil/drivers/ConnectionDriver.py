@@ -304,6 +304,9 @@ class ConnectionDriver(Driver):
                 for k in ForkComm.ForkComm.child_keys:
                     comm_list[i].pop(k, None)
         comm_kws['commtype'] = copy.deepcopy(comm_list)
+        for x in comm_kws['commtype']:
+            if x.get('datatype', {}) == {'type': 'any'}:
+                x['datatype'] = {'type': 'bytes'}
         self.debug('%s comm_kws:\n%s', attr_comm, self.pprint(comm_kws, 1))
         setattr(self, attr_comm, new_comm(**comm_kws))
         setattr(self, '%s_kws' % attr_comm, comm_kws)
