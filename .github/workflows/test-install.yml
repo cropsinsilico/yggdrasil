@@ -258,17 +258,18 @@ jobs:
     - name: Run MPI tests
       if: env.INSTALLMPI == 1 && matrix.os != 'windows-latest'
       id: mpi
-      run: 'export YGG_DEBUG=INFO
+      run: '# export YGG_DEBUG=INFO
 
-        export YGG_CLIENT_DEBUG=INFO
+        # export YGG_CLIENT_DEBUG=INFO
 
-        export YGG_ENABLE_EXAMPLE_TESTS=true
+        # export YGG_ENABLE_EXAMPLE_TESTS=true
 
-        mpiexec -n 2 /Users/langmm/miniconda3/envs/conda36/bin/python -m pytest --with-mpi
-        -v --cov=/Users/langmm/yggdrasil/yggdrasil -c setup.cfg --cov-config=.coveragerc
-        --ignore=yggdrasil/rapidjson/ --rootdir=/Users/langmm/yggdrasil/yggdrasil
+        # mpiexec -n 2 python -m pytest --with-mpi -v --cov=yggdrasil -c setup.cfg
+        --cov-config=.coveragerc --ignore=yggdrasil/rapidjson/ --rootdir=/Users/langmm/yggdrasil/yggdrasil
         --cov-append --reruns=2 --reruns-delay=1 --timeout=900 /Users/langmm/yggdrasil/yggdrasil/communication/tests/test_MPIComm.py
         /Users/langmm/yggdrasil/yggdrasil/examples/tests/test_gs_lesson4.py /Users/langmm/yggdrasil/yggdrasil/examples/tests/test_rpc_lesson3b.py
+
+        run: yggtest --ci --cov-append --test-suite=mpi
 
         '
     - name: Combine coverage reports
@@ -552,17 +553,18 @@ jobs:
     - name: Run MPI tests
       if: env.INSTALLMPI == 1 && matrix.os != 'windows-latest'
       id: mpi
-      run: 'export YGG_DEBUG=INFO
+      run: '# export YGG_DEBUG=INFO
 
-        export YGG_CLIENT_DEBUG=INFO
+        # export YGG_CLIENT_DEBUG=INFO
 
-        export YGG_ENABLE_EXAMPLE_TESTS=true
+        # export YGG_ENABLE_EXAMPLE_TESTS=true
 
-        mpiexec -n 2 /Users/langmm/miniconda3/envs/conda36/bin/python -m pytest --with-mpi
-        -v --cov=/Users/langmm/yggdrasil/yggdrasil -c setup.cfg --cov-config=.coveragerc
-        --ignore=yggdrasil/rapidjson/ --rootdir=/Users/langmm/yggdrasil/yggdrasil
+        # mpiexec -n 2 python -m pytest --with-mpi -v --cov=yggdrasil -c setup.cfg
+        --cov-config=.coveragerc --ignore=yggdrasil/rapidjson/ --rootdir=/Users/langmm/yggdrasil/yggdrasil
         --cov-append --reruns=2 --reruns-delay=1 --timeout=900 /Users/langmm/yggdrasil/yggdrasil/communication/tests/test_MPIComm.py
         /Users/langmm/yggdrasil/yggdrasil/examples/tests/test_gs_lesson4.py /Users/langmm/yggdrasil/yggdrasil/examples/tests/test_rpc_lesson3b.py
+
+        run: yggtest --ci --cov-append --test-suite=mpi
 
         '
     - name: Combine coverage reports
@@ -826,17 +828,18 @@ jobs:
     - name: Run MPI tests
       if: env.INSTALLMPI == 1 && matrix.os != 'windows-latest'
       id: mpi
-      run: 'export YGG_DEBUG=INFO
+      run: '# export YGG_DEBUG=INFO
 
-        export YGG_CLIENT_DEBUG=INFO
+        # export YGG_CLIENT_DEBUG=INFO
 
-        export YGG_ENABLE_EXAMPLE_TESTS=true
+        # export YGG_ENABLE_EXAMPLE_TESTS=true
 
-        mpiexec -n 2 /Users/langmm/miniconda3/envs/conda36/bin/python -m pytest --with-mpi
-        -v --cov=/Users/langmm/yggdrasil/yggdrasil -c setup.cfg --cov-config=.coveragerc
-        --ignore=yggdrasil/rapidjson/ --rootdir=/Users/langmm/yggdrasil/yggdrasil
+        # mpiexec -n 2 python -m pytest --with-mpi -v --cov=yggdrasil -c setup.cfg
+        --cov-config=.coveragerc --ignore=yggdrasil/rapidjson/ --rootdir=/Users/langmm/yggdrasil/yggdrasil
         --cov-append --reruns=2 --reruns-delay=1 --timeout=900 /Users/langmm/yggdrasil/yggdrasil/communication/tests/test_MPIComm.py
         /Users/langmm/yggdrasil/yggdrasil/examples/tests/test_gs_lesson4.py /Users/langmm/yggdrasil/yggdrasil/examples/tests/test_rpc_lesson3b.py
+
+        run: yggtest --ci --cov-append --test-suite=mpi
 
         '
     - name: Combine coverage reports
@@ -1102,17 +1105,18 @@ jobs:
     - name: Run MPI tests
       if: env.INSTALLMPI == 1 && matrix.os != 'windows-latest'
       id: mpi
-      run: 'export YGG_DEBUG=INFO
+      run: '# export YGG_DEBUG=INFO
 
-        export YGG_CLIENT_DEBUG=INFO
+        # export YGG_CLIENT_DEBUG=INFO
 
-        export YGG_ENABLE_EXAMPLE_TESTS=true
+        # export YGG_ENABLE_EXAMPLE_TESTS=true
 
-        mpiexec -n 2 /Users/langmm/miniconda3/envs/conda36/bin/python -m pytest --with-mpi
-        -v --cov=/Users/langmm/yggdrasil/yggdrasil -c setup.cfg --cov-config=.coveragerc
-        --ignore=yggdrasil/rapidjson/ --rootdir=/Users/langmm/yggdrasil/yggdrasil
+        # mpiexec -n 2 python -m pytest --with-mpi -v --cov=yggdrasil -c setup.cfg
+        --cov-config=.coveragerc --ignore=yggdrasil/rapidjson/ --rootdir=/Users/langmm/yggdrasil/yggdrasil
         --cov-append --reruns=2 --reruns-delay=1 --timeout=900 /Users/langmm/yggdrasil/yggdrasil/communication/tests/test_MPIComm.py
         /Users/langmm/yggdrasil/yggdrasil/examples/tests/test_gs_lesson4.py /Users/langmm/yggdrasil/yggdrasil/examples/tests/test_rpc_lesson3b.py
+
+        run: yggtest --ci --cov-append --test-suite=mpi
 
         '
     - name: Combine coverage reports
@@ -1376,17 +1380,18 @@ jobs:
     - name: Run MPI tests
       if: env.INSTALLMPI == 1 && matrix.os != 'windows-latest'
       id: mpi
-      run: 'export YGG_DEBUG=INFO
+      run: '# export YGG_DEBUG=INFO
 
-        export YGG_CLIENT_DEBUG=INFO
+        # export YGG_CLIENT_DEBUG=INFO
 
-        export YGG_ENABLE_EXAMPLE_TESTS=true
+        # export YGG_ENABLE_EXAMPLE_TESTS=true
 
-        mpiexec -n 2 /Users/langmm/miniconda3/envs/conda36/bin/python -m pytest --with-mpi
-        -v --cov=/Users/langmm/yggdrasil/yggdrasil -c setup.cfg --cov-config=.coveragerc
-        --ignore=yggdrasil/rapidjson/ --rootdir=/Users/langmm/yggdrasil/yggdrasil
+        # mpiexec -n 2 python -m pytest --with-mpi -v --cov=yggdrasil -c setup.cfg
+        --cov-config=.coveragerc --ignore=yggdrasil/rapidjson/ --rootdir=/Users/langmm/yggdrasil/yggdrasil
         --cov-append --reruns=2 --reruns-delay=1 --timeout=900 /Users/langmm/yggdrasil/yggdrasil/communication/tests/test_MPIComm.py
         /Users/langmm/yggdrasil/yggdrasil/examples/tests/test_gs_lesson4.py /Users/langmm/yggdrasil/yggdrasil/examples/tests/test_rpc_lesson3b.py
+
+        run: yggtest --ci --cov-append --test-suite=mpi
 
         '
     - name: Combine coverage reports

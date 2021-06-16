@@ -1414,7 +1414,9 @@ class run_tsts(SubCommand):
             argv += ['-r', args.additional_info]
         argv += args.extra
         # Run test command and perform cleanup before logging any errors
-        logger.info("Running %s from %s", argv, os.getcwd())
+        logger.info("Running \'%s\' from %s", ' '.join(argv), os.getcwd())
+        if args.ci and args.with_mpi:
+            raise Exception
         new_config = {}
         # pth_file = 'ygg_coverage.pth'
         # assert(not os.path.isfile(pth_file))
