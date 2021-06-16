@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>C/C++ Datatypes API &mdash; yggdrasil v1.6.3+7.ga06bf3c48.dirty documentation</title>
+  <title>C/C++ Datatypes API &mdash; yggdrasil v1.6.3+17.g7c138fa48.dirty documentation</title>
   
 
   
@@ -122,6 +122,8 @@
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="code_matlab.html">Matlab Code</a></li>
+<li class="toctree-l3"><a class="reference internal" href="code_r.html">R Code</a></li>
+<li class="toctree-l3"><a class="reference internal" href="code_fortran.html">Fortran Code</a></li>
 </ul>
 </li>
 </ul>
@@ -420,7 +422,7 @@
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>pyboj</strong> – void* Pointer to const rapidjson::Value type doc. </p></li>
+<li><p><strong>pyobj</strong> – void* Pointer to const rapidjson::Value type doc. </p></li>
 <li><p><strong>[in] use_generic</strong> – bool If true, serialized/deserialized objects will be expected to be YggGeneric classes. </p></li>
 </ul>
 </dd>
@@ -754,7 +756,19 @@
 <dl class="cpp function">
 <dt id="_CPPv429generic_array_get_item_nbytes9generic_tK6size_t">
 <span id="_CPPv329generic_array_get_item_nbytes9generic_tK6size_t"></span><span id="_CPPv229generic_array_get_item_nbytes9generic_tK6size_t"></span><span id="generic_array_get_item_nbytes__generic_t.sC"></span><span class="target" id="datatypes_8h_1a693a2dffae42bea397421f0a9386e3e4"></span>int <code class="sig-name descname">generic_array_get_item_nbytes</code><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv49generic_t" title="generic_t">generic_t</a> <em>x</em>, <em class="property">const</em> size_t <em>index</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv429generic_array_get_item_nbytes9generic_tK6size_t" title="Permalink to this definition">¶</a><br /></dt>
-<dd></dd></dl>
+<dd><p>Get the size of an item from an array in bytes. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>[in] x</strong> – Generic object that is presumed to contain an array. </p></li>
+<li><p><strong>[in] index</strong> – Index for value that the size should be returned for. </p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Size of the item in bytes. </p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="cpp function">
 <dt id="_CPPv422generic_array_get_bool9generic_tK6size_t">
@@ -4190,52 +4204,6 @@
 </dd></dl>
 
 </div>
-<div class="breathe-sectiondef docutils container">
-<p class="breathe-sectiondef-title rubric" id="breathe-section-title-protected-attributes">Protected Attributes</p>
-<dl class="cpp var">
-<dt id="_CPPv4N14MetaschemaType8updated_E">
-<span id="_CPPv3N14MetaschemaType8updated_E"></span><span id="_CPPv2N14MetaschemaType8updated_E"></span><span id="MetaschemaType::updated___b"></span><span class="target" id="class_metaschema_type_1ae34b9792af79551888267696e38cbd00"></span>bool <code class="sig-name descname">updated_</code><a class="headerlink" href="#_CPPv4N14MetaschemaType8updated_E" title="Permalink to this definition">¶</a><br /></dt>
-<dd></dd></dl>
-
-<dl class="cpp var">
-<dt id="_CPPv4N14MetaschemaType15always_generic_E">
-<span id="_CPPv3N14MetaschemaType15always_generic_E"></span><span id="_CPPv2N14MetaschemaType15always_generic_E"></span><span id="MetaschemaType::always_generic___b"></span><span class="target" id="class_metaschema_type_1a74a711a35d8c6c63152ee4a87374d351"></span>bool <code class="sig-name descname">always_generic_</code><a class="headerlink" href="#_CPPv4N14MetaschemaType15always_generic_E" title="Permalink to this definition">¶</a><br /></dt>
-<dd></dd></dl>
-
-<dl class="cpp var">
-<dt id="_CPPv4N14MetaschemaType12skip_before_E">
-<span id="_CPPv3N14MetaschemaType12skip_before_E"></span><span id="_CPPv2N14MetaschemaType12skip_before_E"></span><span id="MetaschemaType::skip_before___std::vector:s:"></span><span class="target" id="class_metaschema_type_1a5150b08e1fa888536be5f6934875e5d8"></span>std::vector&lt;size_t&gt; <code class="sig-name descname">skip_before_</code><a class="headerlink" href="#_CPPv4N14MetaschemaType12skip_before_E" title="Permalink to this definition">¶</a><br /></dt>
-<dd></dd></dl>
-
-<dl class="cpp var">
-<dt id="_CPPv4N14MetaschemaType11skip_after_E">
-<span id="_CPPv3N14MetaschemaType11skip_after_E"></span><span id="_CPPv2N14MetaschemaType11skip_after_E"></span><span id="MetaschemaType::skip_after___std::vector:s:"></span><span class="target" id="class_metaschema_type_1a679ec62fef2f856467164d7e03c8ff98"></span>std::vector&lt;size_t&gt; <code class="sig-name descname">skip_after_</code><a class="headerlink" href="#_CPPv4N14MetaschemaType11skip_after_E" title="Permalink to this definition">¶</a><br /></dt>
-<dd></dd></dl>
-
-</div>
-<div class="breathe-sectiondef docutils container">
-<p class="breathe-sectiondef-title rubric" id="breathe-section-title-private-members">Private Members</p>
-<dl class="cpp var">
-<dt id="_CPPv4N14MetaschemaType5type_E">
-<span id="_CPPv3N14MetaschemaType5type_E"></span><span id="_CPPv2N14MetaschemaType5type_E"></span><span id="MetaschemaType::type___cCP"></span><span class="target" id="class_metaschema_type_1a7ad8b9f87c0fc36e71fd72453d9c1459"></span><em class="property">const</em> char *<code class="sig-name descname">type_</code><a class="headerlink" href="#_CPPv4N14MetaschemaType5type_E" title="Permalink to this definition">¶</a><br /></dt>
-<dd></dd></dl>
-
-<dl class="cpp var">
-<dt id="_CPPv4N14MetaschemaType10type_code_E">
-<span id="_CPPv3N14MetaschemaType10type_code_E"></span><span id="_CPPv2N14MetaschemaType10type_code_E"></span><span id="MetaschemaType::type_code___iC"></span><span class="target" id="class_metaschema_type_1afc347202c7e39d7c65eb826be80177ae"></span><em class="property">const</em> int <code class="sig-name descname">type_code_</code><a class="headerlink" href="#_CPPv4N14MetaschemaType10type_code_E" title="Permalink to this definition">¶</a><br /></dt>
-<dd></dd></dl>
-
-<dl class="cpp var">
-<dt id="_CPPv4N14MetaschemaType7nbytes_E">
-<span id="_CPPv3N14MetaschemaType7nbytes_E"></span><span id="_CPPv2N14MetaschemaType7nbytes_E"></span><span id="MetaschemaType::nbytes___iC"></span><span class="target" id="class_metaschema_type_1a5fbe48cff7c71da99fe46f0db3b37796"></span><em class="property">const</em> int <code class="sig-name descname">nbytes_</code><a class="headerlink" href="#_CPPv4N14MetaschemaType7nbytes_E" title="Permalink to this definition">¶</a><br /></dt>
-<dd></dd></dl>
-
-<dl class="cpp var">
-<dt id="_CPPv4N14MetaschemaType12use_generic_E">
-<span id="_CPPv3N14MetaschemaType12use_generic_E"></span><span id="_CPPv2N14MetaschemaType12use_generic_E"></span><span id="MetaschemaType::use_generic___bC"></span><span class="target" id="class_metaschema_type_1a0c36249880d1977296e5626c90d69817"></span><em class="property">const</em> bool <code class="sig-name descname">use_generic_</code><a class="headerlink" href="#_CPPv4N14MetaschemaType12use_generic_E" title="Permalink to this definition">¶</a><br /></dt>
-<dd></dd></dl>
-
-</div>
 </dd></dl>
 
 <dl class="cpp class">
@@ -4742,7 +4710,19 @@
 <dl class="cpp function">
 <dt id="_CPPv4NK20ScalarMetaschemaType10cast_bytesEPPhK6size_t">
 <span id="_CPPv3NK20ScalarMetaschemaType10cast_bytesEPPhK6size_t"></span><span id="_CPPv2NK20ScalarMetaschemaType10cast_bytesEPPhK6size_t"></span><span id="ScalarMetaschemaType::cast_bytes__unsigned-cPP.sCC"></span><span class="target" id="class_scalar_metaschema_type_1a746eff5a6b30dd7e1fff78e25510dd0e"></span><em class="property">inline</em> size_t <code class="sig-name descname">cast_bytes</code><span class="sig-paren">(</span>unsigned char **<em>bytes</em>, <em class="property">const</em> size_t <em>nbytes</em><span class="sig-paren">)</span> <em class="property">const</em><a class="headerlink" href="#_CPPv4NK20ScalarMetaschemaType10cast_bytesEPPhK6size_t" title="Permalink to this definition">¶</a><br /></dt>
-<dd></dd></dl>
+<dd><p>Cast raw bytes as the type described by this object. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>[inout] bytes</strong> – Pointer to memory contain raw bytes to cast. The cast version will be stored here after any necessary changes have been made. </p></li>
+<li><p><strong>[in] nbytes</strong> – The size of the memory pointed to by bytes. An error will be raised if the bytes cannot be cast because they would exceed this size. </p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>The size of the re-cast bytes. </p>
+</dd>
+</dl>
+</dd></dl>
 
 </div>
 <div class="breathe-sectiondef docutils container">

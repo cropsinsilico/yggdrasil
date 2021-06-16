@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>yggdrasil.languages.Python package &mdash; yggdrasil v1.6.3+7.ga06bf3c48.dirty documentation</title>
+  <title>yggdrasil.languages.Python package &mdash; yggdrasil v1.6.3+17.g7c138fa48.dirty documentation</title>
   
 
   
@@ -143,6 +143,8 @@
 <li class="toctree-l3"><a class="reference internal" href="code_c.html">C Code</a></li>
 <li class="toctree-l3"><a class="reference internal" href="code_cpp.html">C++ Code</a></li>
 <li class="toctree-l3"><a class="reference internal" href="code_matlab.html">Matlab Code</a></li>
+<li class="toctree-l3"><a class="reference internal" href="code_r.html">R Code</a></li>
+<li class="toctree-l3"><a class="reference internal" href="code_fortran.html">Fortran Code</a></li>
 </ul>
 </li>
 </ul>
@@ -8047,7 +8049,7 @@ typedef from message metadata.</p>
 
 <dl class="py attribute">
 <dt id="yggdrasil.metaschema.datatypes.ScalarMetaschemaType.ScalarMetaschemaType.python_types">
-<code class="sig-name descname">python_types</code><em class="property"> = (&lt;class 'numpy.complex64'&gt;, &lt;class 'numpy.float32'&gt;, &lt;class 'numpy.uint16'&gt;, &lt;class 'str'&gt;, &lt;class 'numpy.int16'&gt;, &lt;class 'numpy.complex128'&gt;, &lt;class 'numpy.float64'&gt;, &lt;class 'numpy.uint32'&gt;, &lt;class 'bytes'&gt;, &lt;class 'numpy.int32'&gt;, &lt;class 'float'&gt;, &lt;class 'numpy.bytes_'&gt;, &lt;class 'numpy.signedinteger'&gt;, &lt;class 'numpy.complex256'&gt;, &lt;class 'numpy.float128'&gt;, &lt;class 'numpy.uint64'&gt;, &lt;class 'numpy.int64'&gt;, &lt;class 'numpy.str_'&gt;, &lt;class 'int'&gt;, &lt;class 'numpy.unsignedinteger'&gt;, &lt;class 'unyt.array.unyt_quantity'&gt;, &lt;class 'complex'&gt;, &lt;class 'numpy.float16'&gt;, &lt;class 'numpy.uint8'&gt;, &lt;class 'numpy.int8'&gt;)</em><a class="headerlink" href="#yggdrasil.metaschema.datatypes.ScalarMetaschemaType.ScalarMetaschemaType.python_types" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">python_types</code><em class="property"> = (&lt;class 'numpy.complex64'&gt;, &lt;class 'numpy.float32'&gt;, &lt;class 'numpy.uint16'&gt;, &lt;class 'str'&gt;, &lt;class 'numpy.int16'&gt;, &lt;class 'numpy.complex128'&gt;, &lt;class 'numpy.float64'&gt;, &lt;class 'numpy.uint32'&gt;, &lt;class 'bytes'&gt;, &lt;class 'numpy.int32'&gt;, &lt;class 'float'&gt;, &lt;class 'numpy.bytes_'&gt;, &lt;class 'numpy.signedinteger'&gt;, &lt;class 'numpy.complex256'&gt;, &lt;class 'unyt.array.unyt_quantity'&gt;, &lt;class 'numpy.float128'&gt;, &lt;class 'numpy.uint64'&gt;, &lt;class 'numpy.int64'&gt;, &lt;class 'numpy.str_'&gt;, &lt;class 'int'&gt;, &lt;class 'numpy.unsignedinteger'&gt;, &lt;class 'complex'&gt;, &lt;class 'numpy.float16'&gt;, &lt;class 'numpy.uint8'&gt;, &lt;class 'numpy.int8'&gt;)</em><a class="headerlink" href="#yggdrasil.metaschema.datatypes.ScalarMetaschemaType.ScalarMetaschemaType.python_types" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
@@ -18326,7 +18328,7 @@ and which ones are arguments.</p>
 
 <dl class="py attribute">
 <dt id="id23">
-<code class="sig-name descname">paths_to_add</code><em class="property"> = ['/Users/langmm/yggdrasil/yggdrasil', '/Users/langmm/yggdrasil/yggdrasil/languages/matlab', '/Users/langmm/yggdrasil/yggdrasil/languages/python', '/Users/langmm/yggdrasil/yggdrasil/languages/R', '/Users/langmm/yggdrasil/yggdrasil/languages/function', '/Users/langmm/yggdrasil/yggdrasil/languages/LPy', '/Users/langmm/yggdrasil/yggdrasil/languages/sbml']</em><a class="headerlink" href="#id23" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">paths_to_add</code><em class="property"> = ['/Users/langmm/yggdrasil/yggdrasil', '/Users/langmm/yggdrasil/yggdrasil/languages/sbml', '/Users/langmm/yggdrasil/yggdrasil/languages/function', '/Users/langmm/yggdrasil/yggdrasil/languages/matlab', '/Users/langmm/yggdrasil/yggdrasil/languages/python', '/Users/langmm/yggdrasil/yggdrasil/languages/LPy', '/Users/langmm/yggdrasil/yggdrasil/languages/R']</em><a class="headerlink" href="#id23" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
@@ -18475,7 +18477,7 @@ method.</p></li>
 
 <dl class="py attribute">
 <dt id="yggdrasil.drivers.LPyModelDriver.LPyModelDriver.supported_comms">
-<code class="sig-name descname">supported_comms</code><em class="property"> = ['zmq', 'buffer', 'rmq', 'rmq_async', 'value', 'ipc']</em><a class="headerlink" href="#yggdrasil.drivers.LPyModelDriver.LPyModelDriver.supported_comms" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">supported_comms</code><em class="property"> = ['rmq', 'zmq', 'value', 'ipc', 'rmq_async', 'buffer']</em><a class="headerlink" href="#yggdrasil.drivers.LPyModelDriver.LPyModelDriver.supported_comms" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </dd></dl>
@@ -22709,7 +22711,7 @@ method.</p>
 
 <dl class="py attribute">
 <dt id="yggdrasil.drivers.PythonModelDriver.PythonModelDriver.supported_comms">
-<code class="sig-name descname">supported_comms</code><em class="property"> = ['zmq', 'buffer', 'rmq', 'rmq_async', 'value', 'ipc']</em><a class="headerlink" href="#yggdrasil.drivers.PythonModelDriver.PythonModelDriver.supported_comms" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">supported_comms</code><em class="property"> = ['rmq', 'zmq', 'value', 'ipc', 'rmq_async', 'buffer']</em><a class="headerlink" href="#yggdrasil.drivers.PythonModelDriver.PythonModelDriver.supported_comms" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
@@ -22804,7 +22806,7 @@ the compilation executable. Defaults to False.</p></li>
 
 <dl class="py attribute">
 <dt id="yggdrasil.drivers.RModelDriver.RModelDriver.interface_dependencies">
-<code class="sig-name descname">interface_dependencies</code><em class="property"> = ['units', 'zeallot', 'bit64', 'reticulate', 'R6', 'Rcpp']</em><a class="headerlink" href="#yggdrasil.drivers.RModelDriver.RModelDriver.interface_dependencies" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">interface_dependencies</code><em class="property"> = ['R6', 'bit64', 'units', 'Rcpp', 'reticulate', 'zeallot']</em><a class="headerlink" href="#yggdrasil.drivers.RModelDriver.RModelDriver.interface_dependencies" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">

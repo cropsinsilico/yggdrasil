@@ -26,17 +26,18 @@ Arguments
 +===============================+======================================+
 | ``type``                      | The name of the Python interface     |
 |                               | that should be called                |
-|                               | (e.                                  |
-|                               | g. `YggInput <interface_py.html#yggd |
-|                               | rasil.languages.Python.YggInput>`__, |
-|                               | `YggOutput <interface_py.html#yggdr  |
-|                               | asil.languages.Python.YggOutput>`__, |
-|                               | `YggR                                |
-|                               | pcClient <interface_py.html#yggdrasi |
-|                               | l.languages.Python.YggRpcClient>`__, |
-|                               | `YggR                                |
-|                               | pcServer <interface_py.html#yggdrasi |
-|                               | l.languages.Python.YggRpcServer>`__, |
+|                               | (e.g. `YggInput                      |
+|                               | <interface_py.html#yggdrasil.languag |
+|                               | es.Python.YggInterface.YggInput>`__, |
+|                               | `YggOutput <                         |
+|                               | interface_py.html#yggdrasil.language |
+|                               | s.Python.YggInterface.YggOutput>`__, |
+|                               | `YggRpcClient <int                   |
+|                               | erface_py.html#yggdrasil.languages.P |
+|                               | ython.YggInterface.YggRpcClient>`__, |
+|                               | `YggRpcServer <int                   |
+|                               | erface_py.html#yggdrasil.languages.P |
+|                               | ython.YggInterface.YggRpcServer>`__, |
 |                               | `YggTimesync <in                     |
 |                               | terface_py.html#yggdrasil.languages. |
 |                               | Python.YggInterface.YggTimesync>`__) |

@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>C Interface &mdash; yggdrasil v1.6.3+7.ga06bf3c48.dirty documentation</title>
+  <title>C Interface &mdash; yggdrasil v1.6.3+17.g7c138fa48.dirty documentation</title>
   
 
   
@@ -208,47 +208,67 @@
 <dl class="cpp macro">
 <dt id="c.yggOutput_t">
 <span class="target" id="_ygg_interface_8h_1ab773ec0611a063e87e6cd8159fc88e36"></span><code class="sig-name descname">yggOutput_t</code><a class="headerlink" href="#c.yggOutput_t" title="Permalink to this definition">¶</a><br /></dt>
-<dd><p>Flag for checking if YggInterface.h has already been included. </p>
-<p>Aliases to preserve names of original structures. </p>
+<dd><p>Pointer to an output comm. </p>
 </dd></dl>
 
 <dl class="cpp macro">
 <dt id="c.yggInput_t">
 <span class="target" id="_ygg_interface_8h_1a06c14c09443eb4175088a4e4a2e1c986"></span><code class="sig-name descname">yggInput_t</code><a class="headerlink" href="#c.yggInput_t" title="Permalink to this definition">¶</a><br /></dt>
-<dd></dd></dl>
+<dd><p>Pointer to an input comm. </p>
+</dd></dl>
 
 <dl class="cpp macro">
 <dt id="c.ygg_free">
 <span class="target" id="_ygg_interface_8h_1ab35f9ca990573a81baeb0dbae4edd8f4"></span><code class="sig-name descname">ygg_free</code><a class="headerlink" href="#c.ygg_free" title="Permalink to this definition">¶</a><br /></dt>
-<dd></dd></dl>
+<dd><p>Aliases to method for freeing comms. </p>
+</dd></dl>
 
 <dl class="cpp macro">
 <dt id="c.yggComm">
 <span class="target" id="_ygg_interface_8h_1aadcc9f73223dfbb4af6a3ef9870a98e2"></span><code class="sig-name descname">yggComm</code><a class="headerlink" href="#c.yggComm" title="Permalink to this definition">¶</a><br /></dt>
-<dd></dd></dl>
+<dd><p>Initialize a comm object. </p>
+</dd></dl>
 
 <dl class="cpp macro">
 <dt id="c.yggSend">
 <span class="target" id="_ygg_interface_8h_1a5ff7082d1a97c49d32545e4c8c97d1c8"></span><code class="sig-name descname">yggSend</code><a class="headerlink" href="#c.yggSend" title="Permalink to this definition">¶</a><br /></dt>
-<dd><p>Send arguments as a small formatted message to an output queue. Use the format string to create a message from the input arguments that is then sent to the specified output queue. If the message is larger than YGG_MSG_MAX or cannot be encoded, it will not be sent. </p>
+<dd><p>Send arguments as a small formatted message to an output queue. Use the associated data type to format the message from the input arguments. </p>
 <p>Formatted IO</p>
 <p>Output Usage:<ol class="loweralpha simple">
-<li><p>One-time: Create output channel with format specifier. yggOutput_t output_channel = yggOutputFmt(“out_name”, “a=%d, b=%d”);</p></li>
-<li><p>Send: ret = yggSend(output_channel, 1, 2);</p></li>
-<li><p>Free: ygg_free(&amp;output_channel);</p></li>
+<li><p>One-time: Create output channel with format specifier. <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">yggOutput_t</span> <span class="n">output_channel</span> <span class="o">=</span> <span class="n">yggOutputFmt</span><span class="p">(</span><span class="s2">&quot;out_name&quot;</span><span class="p">,</span> <span class="s2">&quot;a=</span><span class="si">%d</span><span class="s2">, b=</span><span class="si">%d</span><span class="s2">&quot;</span><span class="p">);</span>
+</pre></div>
+</div>
+</p></li>
+<li><p>Send: <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">ret</span> <span class="o">=</span> <span class="n">yggSend</span><span class="p">(</span><span class="n">output_channel</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">);</span>
+</pre></div>
+</div>
+</p></li>
+<li><p>Free: <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">ygg_free</span><span class="p">(</span><span class="o">&amp;</span><span class="n">output_channel</span><span class="p">);</span>
+</pre></div>
+</div>
+</p></li>
 </ol>
 </p>
 <p>Input Usage:<ol class="loweralpha simple">
-<li><p>One-time: Create output channel with format specifier. yggInput_t input_channel = yggInput(“in_name”, “a=%d, b=%d”);</p></li>
-<li><p>Prepare: Allocate space for recovered variables. int a, b;</p></li>
-<li><p>Receive: int ret = yggRecv(input_channel, &amp;a, &amp;b);</p></li>
+<li><p>One-time: Create output channel with format specifier. <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">yggInput_t</span> <span class="n">input_channel</span> <span class="o">=</span> <span class="n">yggInput</span><span class="p">(</span><span class="s2">&quot;in_name&quot;</span><span class="p">,</span> <span class="s2">&quot;a=</span><span class="si">%d</span><span class="s2">, b=</span><span class="si">%d</span><span class="s2">&quot;</span><span class="p">);</span>
+</pre></div>
+</div>
+</p></li>
+<li><p>Prepare: Allocate space for recovered variables. <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="nb">int</span> <span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">;</span>
+</pre></div>
+</div>
+</p></li>
+<li><p>Receive: <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="nb">int</span> <span class="n">ret</span> <span class="o">=</span> <span class="n">yggRecv</span><span class="p">(</span><span class="n">input_channel</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">a</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">b</span><span class="p">);</span>
+</pre></div>
+</div>
+</p></li>
 </ol>
 </p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>yggQ</strong> (<em>[in]</em>) – yggOutput_t structure that queue should be sent to. </p></li>
-<li><p><strong>...</strong> (<em>[in]</em>) – arguments to be formatted into a message using sprintf. </p></li>
+<li><p><strong>yggQ</strong> (<em>[in]</em>) – Output or RPC comm structure that queue should be sent to. </p></li>
+<li><p><strong>...</strong> (<em>[in]</em>) – Variables to be formatted into a message based on the data type associated with the comm. </p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
@@ -260,16 +280,16 @@
 <dl class="cpp macro">
 <dt id="c.yggRecv">
 <span class="target" id="_ygg_interface_8h_1a05cd3bd265a5a40ff231fc565a8ef91a"></span><code class="sig-name descname">yggRecv</code><a class="headerlink" href="#c.yggRecv" title="Permalink to this definition">¶</a><br /></dt>
-<dd><p>Assign arguments by receiving and parsing a message from an input queue. Receive a message smaller than YGG_MSG_MAX bytes from an input queue and parse it using the associated format string. </p>
+<dd><p>Receive a message from a comm into variables passed as arguments. If received message data will exceed the bounds of provided variables, an error will be returned. </p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>yggQ</strong> (<em>[in]</em>) – yggOutput_t structure that message should be sent to. </p></li>
-<li><p><strong>...</strong> (<em>[out]</em>) – arguments that should be assigned by parsing the received message using sscanf. As these are being assigned, they should be pointers to memory that has already been allocated. </p></li>
+<li><p><strong>...</strong> (<em>[out]</em>) – Pointers to variables that should be assigned by parsing the received message using the associated data type. If no data type has been added to the comm, one will be created from the data types of the first received message. As these are being assigned, they should be pointers to memory that has already been allocated (heap or stack). </p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
-<dd class="field-even"><p>int -1 if message could not be received or could not be parsed. Length of the received message if message was received and parsed. </p>
+<dd class="field-even"><p>int -1 if message could not be received or could not be parsed, length of the received message if message was received and parsed. </p>
 </dd>
 </dl>
 </dd></dl>
@@ -277,57 +297,63 @@
 <dl class="cpp macro">
 <dt id="c.yggRecvRealloc">
 <span class="target" id="_ygg_interface_8h_1a1b9b4af013b9fe98df891c30e97a5ca2"></span><code class="sig-name descname">yggRecvRealloc</code><a class="headerlink" href="#c.yggRecvRealloc" title="Permalink to this definition">¶</a><br /></dt>
-<dd></dd></dl>
-
-<dl class="cpp macro">
-<dt id="c.vyggSend">
-<span class="target" id="_ygg_interface_8h_1ad98250140649c48b4f1574f958e73ed3"></span><code class="sig-name descname">vyggSend</code><a class="headerlink" href="#c.vyggSend" title="Permalink to this definition">¶</a><br /></dt>
-<dd><p>Definitions for symmetry, but there is no difference. </p>
+<dd><p>Receive a message from a comm into variables passed as arguments. If received message data will exceed the bounds of provided variables, the variables will be reallocated. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>yggQ</strong> (<em>[in]</em>) – yggOutput_t structure that message should be sent to. </p></li>
+<li><p><strong>...</strong> (<em>[out]</em>) – Pointers to variables that should be assigned to by parsing the received message using the associated data type. If no data type has been added to the comm, one will be created from the data types of the first received message. As these are being assigned and possibly reallocated, they should be pointers to memory addresses that can be reallocated (heap). </p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>int -1 if message could not be received or could not be parsed, length of the received message if the message was received and parsed. </p>
+</dd>
+</dl>
 </dd></dl>
-
-<dl class="cpp macro">
-<dt id="c.vyggRecv">
-<span class="target" id="_ygg_interface_8h_1a49bfdad21c411fdd610b79d03b237521"></span><code class="sig-name descname">vyggRecv</code><a class="headerlink" href="#c.vyggRecv" title="Permalink to this definition">¶</a><br /></dt>
-<dd></dd></dl>
-
-<dl class="cpp macro">
-<dt id="c.vyggSend_nolimit">
-<span class="target" id="_ygg_interface_8h_1a91afa729c22c20e1abf18fccc4b440f4"></span><code class="sig-name descname">vyggSend_nolimit</code><a class="headerlink" href="#c.vyggSend_nolimit" title="Permalink to this definition">¶</a><br /></dt>
-<dd></dd></dl>
-
-<dl class="cpp macro">
-<dt id="c.vyggRecv_nolimit">
-<span class="target" id="_ygg_interface_8h_1a9912b11112c52fb57bac405bf8ecf5fd"></span><code class="sig-name descname">vyggRecv_nolimit</code><a class="headerlink" href="#c.vyggRecv_nolimit" title="Permalink to this definition">¶</a><br /></dt>
-<dd></dd></dl>
-
-<dl class="cpp macro">
-<dt id="c.yggSend_nolimit">
-<span class="target" id="_ygg_interface_8h_1aec6276eca942a416ad39d2529f4f24dc"></span><code class="sig-name descname">yggSend_nolimit</code><a class="headerlink" href="#c.yggSend_nolimit" title="Permalink to this definition">¶</a><br /></dt>
-<dd></dd></dl>
-
-<dl class="cpp macro">
-<dt id="c.yggRecv_nolimit">
-<span class="target" id="_ygg_interface_8h_1aef5b1f679ee45a7fb86dfa64ab4d7ba4"></span><code class="sig-name descname">yggRecv_nolimit</code><a class="headerlink" href="#c.yggRecv_nolimit" title="Permalink to this definition">¶</a><br /></dt>
-<dd></dd></dl>
 
 <dl class="cpp macro">
 <dt id="c.yggRpc_t">
 <span class="target" id="_ygg_interface_8h_1ab0b3337d54a2c580a80ba374c29590cf"></span><code class="sig-name descname">yggRpc_t</code><a class="headerlink" href="#c.yggRpc_t" title="Permalink to this definition">¶</a><br /></dt>
-<dd><p>Remote Procedure Call (RPC) structure. Contains information required to coordinate sending/receiving response/requests from/to an RPC server/client. </p>
+<dd><p>Remote Procedure Call (RPC) alias for a comm_t pointer. Contains information required to coordinate sending/receiving response/requests from/to an RPC server/client. </p>
 <p>Remote Procedure Call (RPC) IO</p>
 <p>Handle IO case of a server receiving input from clients, performing some calculation, and then sending a response back to the client.</p>
 <p>Server Usage:<ol class="loweralpha simple">
-<li><p>One-time: Create server channels with format specifiers for input and output. yggRpc_t srv = yggRpcServer(“srv_name”, “%d”, “%d %d”);</p></li>
-<li><p>Prepare: Allocate space for recovered variables from request. int a;</p></li>
-<li><p>Receive request: int ret = rpcRecv(srv, &amp;a);</p></li>
-<li><p>Process: Do tasks the server should do with input to produce output. int b = 2*a; int c = 3*a;</p></li>
-<li><p>Send response: ret = rpcSend(srv, b, c);</p></li>
+<li><p>One-time: Create server channels with format specifiers for input and output. <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">yggRpc_t</span> <span class="n">srv</span> <span class="o">=</span> <span class="n">yggRpcServer</span><span class="p">(</span><span class="s2">&quot;srv_name&quot;</span><span class="p">,</span> <span class="s2">&quot;</span><span class="si">%d</span><span class="s2">&quot;</span><span class="p">,</span> <span class="s2">&quot;</span><span class="si">%d</span><span class="s2"> </span><span class="si">%d</span><span class="s2">&quot;</span><span class="p">);</span>
+</pre></div>
+</div>
+</p></li>
+<li><p>Prepare: Allocate space for recovered variables from request. <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="nb">int</span> <span class="n">a</span><span class="p">;</span>
+</pre></div>
+</div>
+</p></li>
+<li><p>Receive request: <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="nb">int</span> <span class="n">ret</span> <span class="o">=</span> <span class="n">rpcRecv</span><span class="p">(</span><span class="n">srv</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">a</span><span class="p">);</span>
+</pre></div>
+</div>
+</p></li>
+<li><p>Process: Do tasks the server should do with input to produce output. <div class="highlight-default notranslate"><div class="highlight"><pre><span></span>    <span class="nb">int</span> <span class="n">b</span> <span class="o">=</span> <span class="mi">2</span><span class="o">*</span><span class="n">a</span><span class="p">;</span>
+<span class="nb">int</span> <span class="n">c</span> <span class="o">=</span> <span class="mi">3</span><span class="o">*</span><span class="n">a</span><span class="p">;</span>
+</pre></div>
+</div>
+</p></li>
+<li><p>Send response: <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">ret</span> <span class="o">=</span> <span class="n">rpcSend</span><span class="p">(</span><span class="n">srv</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">c</span><span class="p">);</span>
+</pre></div>
+</div>
+</p></li>
 </ol>
 </p>
 <p>Client Usage:<ol class="loweralpha simple">
-<li><p>One-time: Create client channels to desired server with format specifiers for output and input (should be the same arguments as for the server except for name). yggRpc_t cli = yggRpcClient(“cli_name”, “%d”, “%d %d”);</p></li>
-<li><p>Prepare: Allocate space for recovered variables from response. int b, c;</p></li>
-<li><p>Call server: int ret = rpcCall(cli, 1, &amp;b, &amp;c);</p></li>
+<li><p>One-time: Create client channels to desired server with format specifiers for output and input (should be the same arguments as for the server except for name). <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">yggRpc_t</span> <span class="n">cli</span> <span class="o">=</span> <span class="n">yggRpcClient</span><span class="p">(</span><span class="s2">&quot;cli_name&quot;</span><span class="p">,</span> <span class="s2">&quot;</span><span class="si">%d</span><span class="s2">&quot;</span><span class="p">,</span> <span class="s2">&quot;</span><span class="si">%d</span><span class="s2"> </span><span class="si">%d</span><span class="s2">&quot;</span><span class="p">);</span> 
+</pre></div>
+</div>
+</p></li>
+<li><p>Prepare: Allocate space for recovered variables from response. <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="nb">int</span> <span class="n">b</span><span class="p">,</span> <span class="n">c</span><span class="p">;</span>
+</pre></div>
+</div>
+</p></li>
+<li><p>Call server: <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="nb">int</span> <span class="n">ret</span> <span class="o">=</span> <span class="n">rpcCall</span><span class="p">(</span><span class="n">cli</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">b</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">c</span><span class="p">);</span>
+</pre></div>
+</div>
+</p></li>
 </ol>
 </p>
 <p>Clients can also send several requests at once before receiving any responses. This allows the server to be processing the next requests while the client handles the previous response, thereby increasing efficiency. The responses are assumed to be in the same order as the generating requests (i.e. first come, first served). </p>
@@ -353,13 +379,13 @@
 <dl class="cpp macro">
 <dt id="c.vrpcRecv">
 <span class="target" id="_ygg_interface_8h_1afeac902932aa1cfa08d07504d93247f0"></span><code class="sig-name descname">vrpcRecv</code><span class="sig-paren">(</span><em>rpc</em>, <em>nargs</em>, <em>ap</em><span class="sig-paren">)</span><a class="headerlink" href="#c.vrpcRecv" title="Permalink to this definition">¶</a><br /></dt>
-<dd><p>Receive and parse a message from an RPC input queue. Receive a message from the input queue under the assumption that it is larger than the maximum message size. Then parse the message using the input queue format string to extract parameters and assign them to the arguments. </p>
+<dd><p>Receive a message from a comm into variables in a variable argument list. If received message data will exceed the bounds of provided variables, an error will be returned. </p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>rpc</strong> (<em>[in]</em>) – yggRpc_t structure with RPC information. </p></li>
-<li><p><strong>nargs</strong> (<em>[in]</em>) – int Number of arguments contained in ap. </p></li>
-<li><p><strong>ap</strong> (<em>[out]</em>) – va_list variable list of arguments that should be assigned parameters extracted using the format string. Since these will be assigned, they should be pointers to memory that has already been allocated. </p></li>
+<li><p><strong>rpc</strong> (<em>[in]</em>) – RPC comm structure that message should be sent to. </p></li>
+<li><p><strong>nargs</strong> (<em>[in]</em>) – Number of arguments contained in ap. </p></li>
+<li><p><strong>ap</strong> (<em>[out]</em>) – Variable list of arguments that should be assigned parameters extracted using the associated data type. Since these will be assigned, they should be pointers to memory that has already been allocated (heap or stack). </p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
@@ -371,7 +397,20 @@
 <dl class="cpp macro">
 <dt id="c.vrpcRecvRealloc">
 <span class="target" id="_ygg_interface_8h_1a80b8fe73f32501f9995c66f2305485fa"></span><code class="sig-name descname">vrpcRecvRealloc</code><span class="sig-paren">(</span><em>rpc</em>, <em>nargs</em>, <em>ap</em><span class="sig-paren">)</span><a class="headerlink" href="#c.vrpcRecvRealloc" title="Permalink to this definition">¶</a><br /></dt>
-<dd></dd></dl>
+<dd><p>Receive a message from a comm into variables in a variable argument list. If received message data will exceed the bounds of provided variables, the variables will be reallocated. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>rpc</strong> (<em>[in]</em>) – RPC comm structure that message should be sent to. </p></li>
+<li><p><strong>nargs</strong> (<em>[in]</em>) – Number of arguments contained in ap. </p></li>
+<li><p><strong>ap</strong> (<em>[out]</em>) – Variable list of arguments that should be assigned parameters extracted using the associated data type. Since these will be assigned and possibly reallocated, they should be pointers to memory addresses that can be reallocated (heap). </p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>integer specifying if the receive was succesful. Values &gt;= 0 indicate success. </p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="cpp macro">
 <dt id="c.rpcSend">
@@ -397,7 +436,7 @@
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>rpc</strong> (<em>[in]</em>) – yggRpc_t structure with RPC information. </p></li>
+<li><p><strong>rpc</strong> (<em>[in]</em>) – RPC comm structure that message should be sent to. </p></li>
 <li><p><strong>...</strong> (<em>[out]</em>) – mixed arguments that should be assigned parameters extracted using the format string. Since these will be assigned, they should be pointers to memory that has already been allocated. </p></li>
 </ul>
 </dd>
@@ -410,44 +449,73 @@
 <dl class="cpp macro">
 <dt id="c.rpcRecvRealloc">
 <span class="target" id="_ygg_interface_8h_1aaed1b3d36767ebba8623f1eba67948c0"></span><code class="sig-name descname">rpcRecvRealloc</code><a class="headerlink" href="#c.rpcRecvRealloc" title="Permalink to this definition">¶</a><br /></dt>
-<dd></dd></dl>
-
-<dl class="cpp macro">
-<dt id="c.vrpcCall">
-<span class="target" id="_ygg_interface_8h_1aec917202f485fbe570338df7a51e85a1"></span><code class="sig-name descname">vrpcCall</code><span class="sig-paren">(</span><em>rpc</em>, <em>nargs</em>, <em>ap</em><span class="sig-paren">)</span><a class="headerlink" href="#c.vrpcCall" title="Permalink to this definition">¶</a><br /></dt>
-<dd></dd></dl>
-
-<dl class="cpp macro">
-<dt id="c.vrpcCallRealloc">
-<span class="target" id="_ygg_interface_8h_1ad7ff6c764c98d7b6cf7e91462ecd13e2"></span><code class="sig-name descname">vrpcCallRealloc</code><span class="sig-paren">(</span><em>rpc</em>, <em>nargs</em>, <em>ap</em><span class="sig-paren">)</span><a class="headerlink" href="#c.vrpcCallRealloc" title="Permalink to this definition">¶</a><br /></dt>
-<dd></dd></dl>
+<dd><p>Receive a message from a comm into variables passed as arguments. If received message data will exceed the bounds of provided variables, the variables will be reallocated. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>rpc</strong> (<em>[in]</em>) – RPC comm structure that message should be sent to. </p></li>
+<li><p><strong>...</strong> (<em>[out]</em>) – Pointers to variables that should be assigned to by parsing the received message using the associated data type. If no data type has been added to the comm, one will be created from the data types of the first received message. As these are being assigned and possibly reallocated, they should be pointers to memory addresses that can be reallocated (heap). </p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>int -1 if message could not be received or could not be parsed, length of the received message if the message was received and parsed. </p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="cpp macro">
 <dt id="c.rpcCall">
 <span class="target" id="_ygg_interface_8h_1aeb0908a4a0988f574bacec28c7c9b171"></span><code class="sig-name descname">rpcCall</code><span class="sig-paren">(</span><em>rpc</em>, ...<span class="sig-paren">)</span><a class="headerlink" href="#c.rpcCall" title="Permalink to this definition">¶</a><br /></dt>
-<dd></dd></dl>
+<dd><p>Macro to call nrpcCallBase with allow_realloc=0 and the argument count. </p>
+</dd></dl>
 
 <dl class="cpp macro">
 <dt id="c.rpcCallRealloc">
 <span class="target" id="_ygg_interface_8h_1a1c07d8a58f5c9896bea745ec6e8df613"></span><code class="sig-name descname">rpcCallRealloc</code><span class="sig-paren">(</span><em>rpc</em>, ...<span class="sig-paren">)</span><a class="headerlink" href="#c.rpcCallRealloc" title="Permalink to this definition">¶</a><br /></dt>
-<dd></dd></dl>
+<dd><p>Macro to call nrpcCallBase with allow_realloc=1 and the argument count. </p>
+</dd></dl>
 
 <dl class="cpp macro">
 <dt id="c.yggAsciiFileInput_t">
 <span class="target" id="_ygg_interface_8h_1aa5e0636b4895d53315e4fe064959c778"></span><code class="sig-name descname">yggAsciiFileInput_t</code><a class="headerlink" href="#c.yggAsciiFileInput_t" title="Permalink to this definition">¶</a><br /></dt>
-<dd><p>Definitions for file sturctures. </p>
+<dd><p>Pointer to an input comm for an ASCII file. </p>
 <p>File IO</p>
 <p>Handle I/O from/to a file line by line.</p>
 <p>Input Usage:<ol class="loweralpha simple">
-<li><p>One-time: Create file interface by providing a channel name. comm_t* fin = yggAsciiFileInput(“file_channel”);</p></li>
-<li><p>Prepare: Get pointer for line. char *line;</p></li>
-<li><p>Receive each line, terminating when receive returns -1 (EOF or channel closed). int ret = 1; while (ret &gt; 0) { ret = yggRecv(fin, &amp;line); // line will be realloced to fit message Do something with the line }</p></li>
-<li><p>Cleanup. Call functions to deallocate structures. free(line);</p></li>
+<li><p>One-time: Create file interface by providing a channel name. <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">comm_t</span><span class="o">*</span> <span class="n">fin</span> <span class="o">=</span> <span class="n">yggAsciiFileInput</span><span class="p">(</span><span class="s2">&quot;file_channel&quot;</span><span class="p">);</span>
+</pre></div>
+</div>
+</p></li>
+<li><p>Prepare: Get pointer for line. <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">char</span> <span class="o">*</span><span class="n">line</span><span class="p">;</span>
+</pre></div>
+</div>
+</p></li>
+<li><p>Receive each line, terminating when receive returns -1 (EOF or channel closed). <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="nb">int</span> <span class="n">ret</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span>
+<span class="k">while</span> <span class="p">(</span><span class="n">ret</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
+  <span class="n">ret</span> <span class="o">=</span> <span class="n">yggRecv</span><span class="p">(</span><span class="n">fin</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">line</span><span class="p">);</span> <span class="o">//</span> <span class="n">line</span> <span class="n">will</span> <span class="n">be</span> <span class="n">realloced</span> <span class="n">to</span> <span class="n">fit</span> <span class="n">message</span>
+  <span class="o">//</span> <span class="n">Do</span> <span class="n">something</span> <span class="k">with</span> <span class="n">the</span> <span class="n">line</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</p></li>
+<li><p>Cleanup. Call functions to deallocate structures. <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">free</span><span class="p">(</span><span class="n">line</span><span class="p">);</span>
+</pre></div>
+</div>
+</p></li>
 </ol>
 </p>
 <p>Output Usage:<ol class="loweralpha simple">
-<li><p>One-time: Create file interface by providing a channel name. comm_t* fout = yggAsciiFileOutput(“file_channel”);</p></li>
-<li><p>Send lines to the file. If return value is not 0, the send was not succesfull. int ret; ret = yggSend(fin, “Line 1\n”); ret = yggSend(fout, “Line 1\n”); ret = yggSend(fout, “Line 2\n”); </p></li>
+<li><p>One-time: Create file interface by providing a channel name. <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">comm_t</span><span class="o">*</span> <span class="n">fout</span> <span class="o">=</span> <span class="n">yggAsciiFileOutput</span><span class="p">(</span><span class="s2">&quot;file_channel&quot;</span><span class="p">);</span>
+</pre></div>
+</div>
+</p></li>
+<li><p>Send lines to the file. If return value is not 0, the send was not succesfull. <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="nb">int</span> <span class="n">ret</span><span class="p">;</span>
+<span class="n">ret</span> <span class="o">=</span> <span class="n">yggSend</span><span class="p">(</span><span class="n">fin</span><span class="p">,</span> <span class="s2">&quot;Line 1</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">);</span>
+<span class="n">ret</span> <span class="o">=</span> <span class="n">yggSend</span><span class="p">(</span><span class="n">fout</span><span class="p">,</span> <span class="s2">&quot;Line 1</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">);</span>
+<span class="n">ret</span> <span class="o">=</span> <span class="n">yggSend</span><span class="p">(</span><span class="n">fout</span><span class="p">,</span> <span class="s2">&quot;Line 2</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">);</span>
+</pre></div>
+</div>
+ </p></li>
 </ol>
 </p>
 </dd></dl>
@@ -455,25 +523,49 @@
 <dl class="cpp macro">
 <dt id="c.yggAsciiFileOutput_t">
 <span class="target" id="_ygg_interface_8h_1a4ed51dda758e9e2d7650d97f52b9e31a"></span><code class="sig-name descname">yggAsciiFileOutput_t</code><a class="headerlink" href="#c.yggAsciiFileOutput_t" title="Permalink to this definition">¶</a><br /></dt>
-<dd></dd></dl>
+<dd><p>Pointer to an output comm for an ASCII file. </p>
+</dd></dl>
 
 <dl class="cpp macro">
 <dt id="c.yggAsciiTableInput_t">
 <span class="target" id="_ygg_interface_8h_1aebb3ede6c4eab9bc8657b9126f691417"></span><code class="sig-name descname">yggAsciiTableInput_t</code><a class="headerlink" href="#c.yggAsciiTableInput_t" title="Permalink to this definition">¶</a><br /></dt>
-<dd><p>Definitions for table sturctures. </p>
+<dd><p>Pointer to an input comm for an ASCII table. </p>
 <p>Table IO</p>
 <p>Handle I/O from/to an ASCII table either line-by-line or as an array.</p>
 <div class="section" id="_ygg_interface_8h_1autotoc_md0">
 <h2>Row-by-Row<a class="headerlink" href="#_ygg_interface_8h_1autotoc_md0" title="Permalink to this headline">¶</a></h2>
 <p id="_ygg_interface_8h_1autotoc_md0">Input by Row Usage:<ol class="loweralpha simple">
-<li><p>One-time: Create file interface by providing a channel name. comm_t* fin = yggAsciiTableInput(“file_channel”);</p></li>
-<li><p>Prepare: Allocate space for variables in row (the format in this example is “%5s %d %f\n” like the output example below). char a[5]; int b; double c;</p></li>
-<li><p>Receive each row, terminating when receive returns -1 (EOF or channel closed). int ret = 1; while (ret &gt; 0) { ret = yggRecv(fin, &amp;a, &amp;b, &amp;c); Do something with the row }</p></li>
+<li><p>One-time: Create file interface by providing a channel name. <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">comm_t</span><span class="o">*</span> <span class="n">fin</span> <span class="o">=</span> <span class="n">yggAsciiTableInput</span><span class="p">(</span><span class="s2">&quot;file_channel&quot;</span><span class="p">);</span>
+</pre></div>
+</div>
+</p></li>
+<li><p>Prepare: Allocate space for variables in row (the format in this example is “%5s %d %f\n” like the output example below). <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">char</span> <span class="n">a</span><span class="p">[</span><span class="mi">5</span><span class="p">];</span>
+<span class="nb">int</span> <span class="n">b</span><span class="p">;</span>
+<span class="n">double</span> <span class="n">c</span><span class="p">;</span>
+</pre></div>
+</div>
+</p></li>
+<li><p>Receive each row, terminating when receive returns -1 (EOF or channel closed). <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="nb">int</span> <span class="n">ret</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span>
+<span class="k">while</span> <span class="p">(</span><span class="n">ret</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
+  <span class="n">ret</span> <span class="o">=</span> <span class="n">yggRecv</span><span class="p">(</span><span class="n">fin</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">a</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">b</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">c</span><span class="p">);</span>
+  <span class="o">//</span> <span class="n">Do</span> <span class="n">something</span> <span class="k">with</span> <span class="n">the</span> <span class="n">row</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</p></li>
 </ol>
 </p>
 <p>Output by Row Usage:<ol class="loweralpha simple">
-<li><p>One-time: Create file interface by providing a channel name and a format string for rows. comm_t* fout = yggAsciiTableOutput(“file_channel”, “%5s %d %f\n”);</p></li>
-<li><p>Send rows to the file by providing entries. Formatting is handled by the interface. If return value is not 0, the send was not succesful. int ret; ret = yggSend(fout, “one”, 1, 1.0); ret = yggSend(fout, “two”, 2, 2.0);</p></li>
+<li><p>One-time: Create file interface by providing a channel name and a format string for rows. <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">comm_t</span><span class="o">*</span> <span class="n">fout</span> <span class="o">=</span> <span class="n">yggAsciiTableOutput</span><span class="p">(</span><span class="s2">&quot;file_channel&quot;</span><span class="p">,</span> <span class="s2">&quot;</span><span class="si">%5s</span><span class="s2"> </span><span class="si">%d</span><span class="s2"> </span><span class="si">%f</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">);</span>
+</pre></div>
+</div>
+</p></li>
+<li><p>Send rows to the file by providing entries. Formatting is handled by the interface. If return value is not 0, the send was not succesful. <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="nb">int</span> <span class="n">ret</span><span class="p">;</span>
+<span class="n">ret</span> <span class="o">=</span> <span class="n">yggSend</span><span class="p">(</span><span class="n">fout</span><span class="p">,</span> <span class="s2">&quot;one&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">);</span>
+<span class="n">ret</span> <span class="o">=</span> <span class="n">yggSend</span><span class="p">(</span><span class="n">fout</span><span class="p">,</span> <span class="s2">&quot;two&quot;</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mf">2.0</span><span class="p">);</span>
+</pre></div>
+</div>
+</p></li>
 </ol>
 </p>
 </div>
@@ -481,14 +573,36 @@
 <h2>Array<a class="headerlink" href="#_ygg_interface_8h_1autotoc_md1" title="Permalink to this headline">¶</a></h2>
 <p id="_ygg_interface_8h_1autotoc_md1">Input by Array Usage:<ol class="loweralpha simple">
 <li><p>One-time: Create file interface by providing a channel name. comm_t* fin = yggAsciiArrayInput(“file_channel”);</p></li>
-<li><p>Prepare: Declare pointers for table columns (they will be allocated by the interface once the number of rows is known). char *aCol; int *bCol; double *cCol;</p></li>
-<li><p>Receive entire table as columns. Return value will be the number of elements in each column (the number of table rows). Negative values indicate errors. int ret = yggRecv(fin, &amp;a, &amp;b, &amp;c);</p></li>
-<li><p>Cleanup. Call functions to deallocate structures. free(a); free(b); free(c);</p></li>
+<li><p>Prepare: Declare pointers for table columns (they will be allocated by the interface once the number of rows is known). <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">char</span> <span class="o">*</span><span class="n">aCol</span><span class="p">;</span>
+<span class="nb">int</span> <span class="o">*</span><span class="n">bCol</span><span class="p">;</span>
+<span class="n">double</span> <span class="o">*</span><span class="n">cCol</span><span class="p">;</span>
+</pre></div>
+</div>
+</p></li>
+<li><p>Receive entire table as columns. Return value will be the number of elements in each column (the number of table rows). Negative values indicate errors. <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="nb">int</span> <span class="n">ret</span> <span class="o">=</span> <span class="n">yggRecv</span><span class="p">(</span><span class="n">fin</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">a</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">b</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">c</span><span class="p">);</span>
+</pre></div>
+</div>
+</p></li>
+<li><p>Cleanup. Call functions to deallocate structures. <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">free</span><span class="p">(</span><span class="n">a</span><span class="p">);</span>
+<span class="n">free</span><span class="p">(</span><span class="n">b</span><span class="p">);</span>
+<span class="n">free</span><span class="p">(</span><span class="n">c</span><span class="p">);</span>
+</pre></div>
+</div>
+</p></li>
 </ol>
 </p>
 <p>Output by Array Usage:<ol class="loweralpha simple">
-<li><p>One-time: Create file interface by providing a channel name and a format string for rows. comm_t* fout = yggAsciiArrayOutput(“file_channel”, “%5s %d %f\n”);</p></li>
-<li><p>Send columns to the file by providing pointers (or arrays). Formatting is handled by the interface. If return value is not 0, the send was not succesful. char aCol[] = {“one  “, “two  “, “three”}; \ Each str is of len 5 int bCol[3] = {1, 2, 3}; float cCol[3] = {1.0, 2.0, 3.0}; int ret = yggSend(fout, a, b, c); </p></li>
+<li><p>One-time: Create file interface by providing a channel name and a format string for rows. <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">comm_t</span><span class="o">*</span> <span class="n">fout</span> <span class="o">=</span> <span class="n">yggAsciiArrayOutput</span><span class="p">(</span><span class="s2">&quot;file_channel&quot;</span><span class="p">,</span> <span class="s2">&quot;</span><span class="si">%5s</span><span class="s2"> </span><span class="si">%d</span><span class="s2"> </span><span class="si">%f</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">);</span>
+</pre></div>
+</div>
+</p></li>
+<li><p>Send columns to the file by providing pointers (or arrays). Formatting is handled by the interface. If return value is not 0, the send was not succesful. <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">char</span> <span class="n">aCol</span><span class="p">[]</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;one  &quot;</span><span class="p">,</span> <span class="s2">&quot;two  &quot;</span><span class="p">,</span> <span class="s2">&quot;three&quot;</span><span class="p">};</span> \\ <span class="n">Each</span> <span class="nb">str</span> <span class="ow">is</span> <span class="n">of</span> <span class="nb">len</span> <span class="mi">5</span>
+<span class="nb">int</span> <span class="n">bCol</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">};</span>
+<span class="nb">float</span> <span class="n">cCol</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">2.0</span><span class="p">,</span> <span class="mf">3.0</span><span class="p">};</span>
+    <span class="nb">int</span> <span class="n">ret</span> <span class="o">=</span> <span class="n">yggSend</span><span class="p">(</span><span class="n">fout</span><span class="p">,</span> <span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">c</span><span class="p">);</span>
+</pre></div>
+</div>
+ </p></li>
 </ol>
 </p>
 </div>
@@ -497,33 +611,59 @@
 <dl class="cpp macro">
 <dt id="c.yggAsciiTableOutput_t">
 <span class="target" id="_ygg_interface_8h_1a349953af8d7e67d33e58e4688af2cd50"></span><code class="sig-name descname">yggAsciiTableOutput_t</code><a class="headerlink" href="#c.yggAsciiTableOutput_t" title="Permalink to this definition">¶</a><br /></dt>
-<dd></dd></dl>
+<dd><p>Pointer to an output comm for an ASCII table. </p>
+</dd></dl>
 
 <dl class="cpp macro">
 <dt id="c.yggAsciiArrayInput_t">
 <span class="target" id="_ygg_interface_8h_1ac4403c44853004d0d54edd6d2ac5beae"></span><code class="sig-name descname">yggAsciiArrayInput_t</code><a class="headerlink" href="#c.yggAsciiArrayInput_t" title="Permalink to this definition">¶</a><br /></dt>
-<dd></dd></dl>
+<dd><p>Pointer to an input comm for an ASCII table passed as arrays. </p>
+</dd></dl>
 
 <dl class="cpp macro">
 <dt id="c.yggAsciiArrayOutput_t">
 <span class="target" id="_ygg_interface_8h_1ac7b4f75530d9481e38cf95ae14462cdb"></span><code class="sig-name descname">yggAsciiArrayOutput_t</code><a class="headerlink" href="#c.yggAsciiArrayOutput_t" title="Permalink to this definition">¶</a><br /></dt>
-<dd></dd></dl>
+<dd><p>Pointer to an output comm for an ASCII table passed as arrays. </p>
+</dd></dl>
 
 <dl class="cpp macro">
 <dt id="c.yggPlyInput_t">
 <span class="target" id="_ygg_interface_8h_1ab02f4ec2d29e21c952b69ab105183d8e"></span><code class="sig-name descname">yggPlyInput_t</code><a class="headerlink" href="#c.yggPlyInput_t" title="Permalink to this definition">¶</a><br /></dt>
-<dd><p>Definitions for ply structures. </p>
+<dd><p>Pointer to an input comm for ply meshes. </p>
 <p>Ply IO</p>
 <p>Handle I/O from/to a Ply file.</p>
 <p>Input Usage:<ol class="loweralpha simple">
-<li><p>One-time: Create file interface by providing a channel name. comm_t* fin = yggPlyInput(“file_channel”); // channel</p></li>
-<li><p>Prepare: Allocate ply structure. <a class="reference internal" href="serialize_c.html#structply__t"><span class="std std-ref">ply_t</span></a> p;</p></li>
-<li><p>Receive each structure, terminating when receive returns -1 (EOF or channel closed). int ret = 1; while (ret &gt; 0) { ret = yggRecv(fin, &amp;p); Do something with the ply structure }</p></li>
+<li><p>One-time: Create file interface by providing a channel name. <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">comm_t</span><span class="o">*</span> <span class="n">fin</span> <span class="o">=</span> <span class="n">yggPlyInput</span><span class="p">(</span><span class="s2">&quot;file_channel&quot;</span><span class="p">);</span>  <span class="o">//</span> <span class="n">channel</span>
+</pre></div>
+</div>
+</p></li>
+<li><p>Prepare: Allocate ply structure. <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">ply_t</span> <span class="n">p</span><span class="p">;</span>
+</pre></div>
+</div>
+</p></li>
+<li><p>Receive each structure, terminating when receive returns -1 (EOF or channel closed). <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="nb">int</span> <span class="n">ret</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span>
+<span class="k">while</span> <span class="p">(</span><span class="n">ret</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
+  <span class="n">ret</span> <span class="o">=</span> <span class="n">yggRecv</span><span class="p">(</span><span class="n">fin</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">p</span><span class="p">);</span>
+  <span class="o">//</span> <span class="n">Do</span> <span class="n">something</span> <span class="k">with</span> <span class="n">the</span> <span class="n">ply</span> <span class="n">structure</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</p></li>
 </ol>
 </p>
 <p>Output by Usage:<ol class="loweralpha simple">
-<li><p>One-time: Create file interface by providing a channel name. comm_t* fout = yggPlyOutput(“file_channel”); // channel</p></li>
-<li><p>Send structure to the file by providing entries. Formatting is handled by the interface. If return value is not 0, the send was not succesful. int ret; <a class="reference internal" href="serialize_c.html#structply__t"><span class="std std-ref">ply_t</span></a> p; Populate the structure ret = yggSend(fout, p); ret = yggSend(fout, p); </p></li>
+<li><p>One-time: Create file interface by providing a channel name. <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">comm_t</span><span class="o">*</span> <span class="n">fout</span> <span class="o">=</span> <span class="n">yggPlyOutput</span><span class="p">(</span><span class="s2">&quot;file_channel&quot;</span><span class="p">);</span>  <span class="o">//</span> <span class="n">channel</span>
+</pre></div>
+</div>
+</p></li>
+<li><p>Send structure to the file by providing entries. Formatting is handled by the interface. If return value is not 0, the send was not succesful. <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="nb">int</span> <span class="n">ret</span><span class="p">;</span>
+<span class="n">ply_t</span> <span class="n">p</span><span class="p">;</span>
+<span class="o">//</span> <span class="n">Populate</span> <span class="n">the</span> <span class="n">structure</span>
+<span class="n">ret</span> <span class="o">=</span> <span class="n">yggSend</span><span class="p">(</span><span class="n">fout</span><span class="p">,</span> <span class="n">p</span><span class="p">);</span>
+<span class="n">ret</span> <span class="o">=</span> <span class="n">yggSend</span><span class="p">(</span><span class="n">fout</span><span class="p">,</span> <span class="n">p</span><span class="p">);</span>
+</pre></div>
+</div>
+ </p></li>
 </ol>
 </p>
 </dd></dl>
@@ -531,23 +671,47 @@
 <dl class="cpp macro">
 <dt id="c.yggPlyOutput_t">
 <span class="target" id="_ygg_interface_8h_1acf9ee3034e698672b2d161df32b7f55c"></span><code class="sig-name descname">yggPlyOutput_t</code><a class="headerlink" href="#c.yggPlyOutput_t" title="Permalink to this definition">¶</a><br /></dt>
-<dd></dd></dl>
+<dd><p>Pointer to an output comm for ply meshes. </p>
+</dd></dl>
 
 <dl class="cpp macro">
 <dt id="c.yggObjInput_t">
 <span class="target" id="_ygg_interface_8h_1ae6261feebfad23850846b8bb000a82df"></span><code class="sig-name descname">yggObjInput_t</code><a class="headerlink" href="#c.yggObjInput_t" title="Permalink to this definition">¶</a><br /></dt>
-<dd><p>Definitions for obj structures. </p>
+<dd><p>Pointer to an input comm for obj meshes. </p>
 <p>Obj IO</p>
 <p>Handle I/O from/to a Obj file.</p>
 <p>Input Usage:<ol class="loweralpha simple">
-<li><p>One-time: Create file interface by providing a channel name. comm_t* fin = yggObjInput(“file_channel”); // channel</p></li>
-<li><p>Prepare: Allocate obj structure. <a class="reference internal" href="serialize_c.html#structobj__t"><span class="std std-ref">obj_t</span></a> p;</p></li>
-<li><p>Receive each structure, terminating when receive returns -1 (EOF or channel closed). int ret = 1; while (ret &gt; 0) { ret = yggRecv(fin, &amp;p); Do something with the obj structure }</p></li>
+<li><p>One-time: Create file interface by providing a channel name. <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">comm_t</span><span class="o">*</span> <span class="n">fin</span> <span class="o">=</span> <span class="n">yggObjInput</span><span class="p">(</span><span class="s2">&quot;file_channel&quot;</span><span class="p">);</span>  <span class="o">//</span> <span class="n">channel</span>
+</pre></div>
+</div>
+</p></li>
+<li><p>Prepare: Allocate obj structure. <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">obj_t</span> <span class="n">p</span><span class="p">;</span>
+</pre></div>
+</div>
+</p></li>
+<li><p>Receive each structure, terminating when receive returns -1 (EOF or channel closed). <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="nb">int</span> <span class="n">ret</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span>
+<span class="k">while</span> <span class="p">(</span><span class="n">ret</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
+  <span class="n">ret</span> <span class="o">=</span> <span class="n">yggRecv</span><span class="p">(</span><span class="n">fin</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">p</span><span class="p">);</span>
+  <span class="o">//</span> <span class="n">Do</span> <span class="n">something</span> <span class="k">with</span> <span class="n">the</span> <span class="n">obj</span> <span class="n">structure</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</p></li>
 </ol>
 </p>
 <p>Output by Usage:<ol class="loweralpha simple">
-<li><p>One-time: Create file interface by providing a channel name. comm_t* fout = yggObjOutput(“file_channel”); // channel</p></li>
-<li><p>Send structure to the file by providing entries. Formatting is handled by the interface. If return value is not 0, the send was not succesful. int ret; <a class="reference internal" href="serialize_c.html#structobj__t"><span class="std std-ref">obj_t</span></a> p; Populate the structure ret = yggSend(fout, p); ret = yggSend(fout, p); </p></li>
+<li><p>One-time: Create file interface by providing a channel name. <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">comm_t</span><span class="o">*</span> <span class="n">fout</span> <span class="o">=</span> <span class="n">yggObjOutput</span><span class="p">(</span><span class="s2">&quot;file_channel&quot;</span><span class="p">);</span>  <span class="o">//</span> <span class="n">channel</span>
+</pre></div>
+</div>
+</p></li>
+<li><p>Send structure to the file by providing entries. Formatting is handled by the interface. If return value is not 0, the send was not succesful. <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="nb">int</span> <span class="n">ret</span><span class="p">;</span>
+<span class="n">obj_t</span> <span class="n">p</span><span class="p">;</span>
+<span class="o">//</span> <span class="n">Populate</span> <span class="n">the</span> <span class="n">structure</span>
+<span class="n">ret</span> <span class="o">=</span> <span class="n">yggSend</span><span class="p">(</span><span class="n">fout</span><span class="p">,</span> <span class="n">p</span><span class="p">);</span>
+<span class="n">ret</span> <span class="o">=</span> <span class="n">yggSend</span><span class="p">(</span><span class="n">fout</span><span class="p">,</span> <span class="n">p</span><span class="p">);</span>
+</pre></div>
+</div>
+ </p></li>
 </ol>
 </p>
 </dd></dl>
@@ -555,27 +719,32 @@
 <dl class="cpp macro">
 <dt id="c.yggObjOutput_t">
 <span class="target" id="_ygg_interface_8h_1ad5cf4cfadcc85a3933cf43b47ce94630"></span><code class="sig-name descname">yggObjOutput_t</code><a class="headerlink" href="#c.yggObjOutput_t" title="Permalink to this definition">¶</a><br /></dt>
-<dd></dd></dl>
+<dd><p>Pointer to an output comm for obj meshes. </p>
+</dd></dl>
 
 <dl class="cpp macro">
 <dt id="c.yggVectorOutput">
 <span class="target" id="_ygg_interface_8h_1a11102792cb5c190a6c757953b55bb12c"></span><code class="sig-name descname">yggVectorOutput</code><a class="headerlink" href="#c.yggVectorOutput" title="Permalink to this definition">¶</a><br /></dt>
-<dd></dd></dl>
+<dd><p>An alias for yggJSONArrayOutput. </p>
+</dd></dl>
 
 <dl class="cpp macro">
 <dt id="c.yggVectorInput">
 <span class="target" id="_ygg_interface_8h_1af3ddc3b6d3d753d29da9e57a22c06ecd"></span><code class="sig-name descname">yggVectorInput</code><a class="headerlink" href="#c.yggVectorInput" title="Permalink to this definition">¶</a><br /></dt>
-<dd></dd></dl>
+<dd><p>An alias for yggJSONArrayInput. </p>
+</dd></dl>
 
 <dl class="cpp macro">
 <dt id="c.yggMapOutput">
 <span class="target" id="_ygg_interface_8h_1a704546fd3d81b353b9ba0feea427e48f"></span><code class="sig-name descname">yggMapOutput</code><a class="headerlink" href="#c.yggMapOutput" title="Permalink to this definition">¶</a><br /></dt>
-<dd></dd></dl>
+<dd><p>An alias for yggJSONObjectOutput. </p>
+</dd></dl>
 
 <dl class="cpp macro">
 <dt id="c.yggMapInput">
 <span class="target" id="_ygg_interface_8h_1ac785dfff31d59cb822e4ac87e926cb37"></span><code class="sig-name descname">yggMapInput</code><a class="headerlink" href="#c.yggMapInput" title="Permalink to this definition">¶</a><br /></dt>
-<dd></dd></dl>
+<dd><p>An alias for yggJSONObjectInput. </p>
+</dd></dl>
 
 </div>
 <div class="breathe-sectiondef docutils container">
@@ -604,15 +773,34 @@
 <dd><p>Constructor for yggOutput_t structure with explicit data type. Create a yggOutput_t structure based on a provided name that is used to locate a particular comm address stored in the environment variable name and a structure definining the datatype of outgoing messages for the queue. </p>
 <p>Basic IO</p>
 <p>Output Usage:<ol class="loweralpha simple">
-<li><p>One-time: Create output channel (store in named variables) yggOutput_t output_channel = yggOutput(“out_name”);</p></li>
-<li><p>Prepare: Format data to a character array buffer. char buffer[YGG_MSG_BUF]; sprintf(buffer, “a=%d, b=%d”, 1, 2);</p></li>
-<li><p>Send: ret = ygg_send(output_channel, buffer, strlen(buffer));</p></li>
+<li><p>One-time: Create output channel (store in named variables) <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">yggOutput_t</span> <span class="n">output_channel</span> <span class="o">=</span> <span class="n">yggOutput</span><span class="p">(</span><span class="s2">&quot;out_name&quot;</span><span class="p">);</span>
+</pre></div>
+</div>
+</p></li>
+<li><p>Prepare: Format data to a character array buffer. <div class="highlight-default notranslate"><div class="highlight"><pre><span></span>    <span class="n">char</span> <span class="n">buffer</span><span class="p">[</span><span class="n">YGG_MSG_BUF</span><span class="p">];</span> 
+<span class="n">sprintf</span><span class="p">(</span><span class="n">buffer</span><span class="p">,</span> <span class="s2">&quot;a=</span><span class="si">%d</span><span class="s2">, b=</span><span class="si">%d</span><span class="s2">&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">);</span>
+</pre></div>
+</div>
+</p></li>
+<li><p>Send: <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">ret</span> <span class="o">=</span> <span class="n">ygg_send</span><span class="p">(</span><span class="n">output_channel</span><span class="p">,</span> <span class="n">buffer</span><span class="p">,</span> <span class="n">strlen</span><span class="p">(</span><span class="n">buffer</span><span class="p">));</span>
+</pre></div>
+</div>
+</p></li>
 </ol>
 </p>
 <p>Input Usage:<ol class="loweralpha simple">
-<li><p>One-time: Create output channel (store in named variables) yggInput_t input_channel = yggInput(“in_name”);</p></li>
-<li><p>Prepare: Allocate a character array buffer. char buffer[YGG_MSG_BUF];</p></li>
-<li><p>Receive: int ret = ygg_recv(input_channel, buffer, YGG_MSG_BUF);</p></li>
+<li><p>One-time: Create output channel (store in named variables) <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">yggInput_t</span> <span class="n">input_channel</span> <span class="o">=</span> <span class="n">yggInput</span><span class="p">(</span><span class="s2">&quot;in_name&quot;</span><span class="p">);</span>
+</pre></div>
+</div>
+</p></li>
+<li><p>Prepare: Allocate a character array buffer. <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">char</span> <span class="n">buffer</span><span class="p">[</span><span class="n">YGG_MSG_BUF</span><span class="p">];</span>
+</pre></div>
+</div>
+</p></li>
+<li><p>Receive: <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="nb">int</span> <span class="n">ret</span> <span class="o">=</span> <span class="n">ygg_recv</span><span class="p">(</span><span class="n">input_channel</span><span class="p">,</span> <span class="n">buffer</span><span class="p">,</span> <span class="n">YGG_MSG_BUF</span><span class="p">);</span>
+</pre></div>
+</div>
+</p></li>
 </ol>
 </p>
 <dl class="field-list simple">
@@ -925,7 +1113,7 @@
 <li><p><strong>[in] rpc</strong> – yggRpc_t structure with RPC information. </p></li>
 <li><p><strong>[in] allow_realloc</strong> – int If 1, output arguments are assumed to be pointers to pointers such that they can be reallocated as necessary to receive incoming data. If 0, output arguments are assumed to be preallocated. </p></li>
 <li><p><strong>[in] nargs</strong> – size_t Number of arguments contained in ap including both input and output arguments. </p></li>
-<li><p><strong>[inout] ...</strong> – mixed arguments that include those that should be formatted using the output format string, followed by those that should be assigned parameters extracted using the input format string. These that will be assigned should be pointers to memory that has already been allocated. </p></li>
+<li><p><strong>[inout] ...</strong> – mixed arguments that include those that should be formatted using the output format string, followed by those that should be assigned parameters extracted using the input format string. If allow_realloc is 0, those arguments that will be assigned should be pointers to memory that has already been allocated. If allow_realloc is 1, those arguments that will be assigned should be pointers to pointers for memory that can be reallocated. </p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
@@ -1087,14 +1275,36 @@
 <p>Generic object I/O.</p>
 <p>Handle I/O from/to a generic object.</p>
 <p>Input Usage:<ol class="loweralpha simple">
-<li><p>One-time: Create interface by providing a channel name. comm_t* fin = yggGenericInput(“file_channel”); // channel</p></li>
-<li><p>Prepare: Allocate generic structure. <a class="reference internal" href="datatypes_cpp.html#structgeneric__t"><span class="std std-ref">generic_t</span></a> p;</p></li>
-<li><p>Receive each structure, terminating when receive returns -1 (EOF or channel closed). int ret = 1; while (ret &gt; 0) { ret = yggRecv(fin, &amp;p); Do something with the generic structure }</p></li>
+<li><p>One-time: Create interface by providing a channel name. <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">comm_t</span><span class="o">*</span> <span class="n">fin</span> <span class="o">=</span> <span class="n">yggGenericInput</span><span class="p">(</span><span class="s2">&quot;file_channel&quot;</span><span class="p">);</span>  <span class="o">//</span> <span class="n">channel</span>
+</pre></div>
+</div>
+</p></li>
+<li><p>Prepare: Allocate generic structure. <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">generic_t</span> <span class="n">p</span><span class="p">;</span>
+</pre></div>
+</div>
+</p></li>
+<li><p>Receive each structure, terminating when receive returns -1 (EOF or channel closed). <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="nb">int</span> <span class="n">ret</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span>
+<span class="k">while</span> <span class="p">(</span><span class="n">ret</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
+  <span class="n">ret</span> <span class="o">=</span> <span class="n">yggRecv</span><span class="p">(</span><span class="n">fin</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">p</span><span class="p">);</span>
+  <span class="o">//</span> <span class="n">Do</span> <span class="n">something</span> <span class="k">with</span> <span class="n">the</span> <span class="n">generic</span> <span class="n">structure</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</p></li>
 </ol>
 </p>
 <p>Output by Usage:<ol class="loweralpha simple">
-<li><p>One-time: Create file interface by providing a channel name. comm_t* fout = yggGenericOutput(“file_channel”); // channel</p></li>
-<li><p>Send structure to the file by providing entries. Formatting is handled by the interface. If return value is not 0, the send was not succesful. int ret; <a class="reference internal" href="datatypes_cpp.html#structgeneric__t"><span class="std std-ref">generic_t</span></a> p; Populate the structure ret = yggSend(fout, p);</p></li>
+<li><p>One-time: Create file interface by providing a channel name. <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">comm_t</span><span class="o">*</span> <span class="n">fout</span> <span class="o">=</span> <span class="n">yggGenericOutput</span><span class="p">(</span><span class="s2">&quot;file_channel&quot;</span><span class="p">);</span>  <span class="o">//</span> <span class="n">channel</span>
+</pre></div>
+</div>
+</p></li>
+<li><p>Send structure to the file by providing entries. Formatting is handled by the interface. If return value is not 0, the send was not succesful. <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="nb">int</span> <span class="n">ret</span><span class="p">;</span>
+<span class="n">generic_t</span> <span class="n">p</span><span class="p">;</span>
+<span class="o">//</span> <span class="n">Populate</span> <span class="n">the</span> <span class="n">structure</span>
+<span class="n">ret</span> <span class="o">=</span> <span class="n">yggSend</span><span class="p">(</span><span class="n">fout</span><span class="p">,</span> <span class="n">p</span><span class="p">);</span>
+</pre></div>
+</div>
+</p></li>
 </ol>
 </p>
 <dl class="field-list simple">
@@ -1128,14 +1338,36 @@
 <p>Generic object I/O of any type.</p>
 <p>Handle I/O from/to a generic object of any type.</p>
 <p>Input Usage:<ol class="loweralpha simple">
-<li><p>One-time: Create interface by providing a channel name. comm_t* fin = yggAnyInput(“file_channel”); // channel</p></li>
-<li><p>Prepare: Allocate generic structure. <a class="reference internal" href="datatypes_cpp.html#structgeneric__t"><span class="std std-ref">generic_t</span></a> p;</p></li>
-<li><p>Receive each structure, terminating when receive returns -1 (EOF or channel closed). int ret = 1; while (ret &gt; 0) { ret = yggRecv(fin, &amp;p); Do something with the generic structure }</p></li>
+<li><p>One-time: Create interface by providing a channel name. <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">comm_t</span><span class="o">*</span> <span class="n">fin</span> <span class="o">=</span> <span class="n">yggAnyInput</span><span class="p">(</span><span class="s2">&quot;file_channel&quot;</span><span class="p">);</span>  <span class="o">//</span> <span class="n">channel</span>
+</pre></div>
+</div>
+</p></li>
+<li><p>Prepare: Allocate generic structure. <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">generic_t</span> <span class="n">p</span><span class="p">;</span>
+</pre></div>
+</div>
+</p></li>
+<li><p>Receive each structure, terminating when receive returns -1 (EOF or channel closed). <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="nb">int</span> <span class="n">ret</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span>
+<span class="k">while</span> <span class="p">(</span><span class="n">ret</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
+  <span class="n">ret</span> <span class="o">=</span> <span class="n">yggRecv</span><span class="p">(</span><span class="n">fin</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">p</span><span class="p">);</span>
+  <span class="o">//</span> <span class="n">Do</span> <span class="n">something</span> <span class="k">with</span> <span class="n">the</span> <span class="n">generic</span> <span class="n">structure</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</p></li>
 </ol>
 </p>
 <p>Output by Usage:<ol class="loweralpha simple">
-<li><p>One-time: Create file interface by providing a channel name. comm_t* fout = yggAnyOutput(“file_channel”); // channel</p></li>
-<li><p>Send structure to the file by providing entries. Formatting is handled by the interface. If return value is not 0, the send was not succesful. int ret; <a class="reference internal" href="datatypes_cpp.html#structgeneric__t"><span class="std std-ref">generic_t</span></a> p; Populate the structure ret = yggSend(fout, p);</p></li>
+<li><p>One-time: Create file interface by providing a channel name. <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">comm_t</span><span class="o">*</span> <span class="n">fout</span> <span class="o">=</span> <span class="n">yggAnyOutput</span><span class="p">(</span><span class="s2">&quot;file_channel&quot;</span><span class="p">);</span>  <span class="o">//</span> <span class="n">channel</span>
+</pre></div>
+</div>
+</p></li>
+<li><p>Send structure to the file by providing entries. Formatting is handled by the interface. If return value is not 0, the send was not succesful. <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="nb">int</span> <span class="n">ret</span><span class="p">;</span>
+<span class="n">generic_t</span> <span class="n">p</span><span class="p">;</span>
+<span class="o">//</span> <span class="n">Populate</span> <span class="n">the</span> <span class="n">structure</span>
+<span class="n">ret</span> <span class="o">=</span> <span class="n">yggSend</span><span class="p">(</span><span class="n">fout</span><span class="p">,</span> <span class="n">p</span><span class="p">);</span>
+</pre></div>
+</div>
+</p></li>
 </ol>
 </p>
 <dl class="field-list simple">
@@ -1169,14 +1401,36 @@
 <p>JSON array IO</p>
 <p>Handle I/O from/to a JSON array.</p>
 <p>Input Usage:<ol class="loweralpha simple">
-<li><p>One-time: Create interface by providing a channel name. comm_t* fin = yggJSONArrayInput(“file_channel”); // channel</p></li>
-<li><p>Prepare: Allocate vector structure. json_array_t p;</p></li>
-<li><p>Receive each structure, terminating when receive returns -1 (EOF or channel closed). int ret = 1; while (ret &gt; 0) { ret = yggRecv(fin, &amp;p); Do something with the vector structure }</p></li>
+<li><p>One-time: Create interface by providing a channel name. <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">comm_t</span><span class="o">*</span> <span class="n">fin</span> <span class="o">=</span> <span class="n">yggJSONArrayInput</span><span class="p">(</span><span class="s2">&quot;file_channel&quot;</span><span class="p">);</span>  <span class="o">//</span> <span class="n">channel</span>
+</pre></div>
+</div>
+</p></li>
+<li><p>Prepare: Allocate vector structure. <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">json_array_t</span> <span class="n">p</span><span class="p">;</span>
+</pre></div>
+</div>
+</p></li>
+<li><p>Receive each structure, terminating when receive returns -1 (EOF or channel closed). <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="nb">int</span> <span class="n">ret</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span>
+<span class="k">while</span> <span class="p">(</span><span class="n">ret</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
+  <span class="n">ret</span> <span class="o">=</span> <span class="n">yggRecv</span><span class="p">(</span><span class="n">fin</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">p</span><span class="p">);</span>
+  <span class="o">//</span> <span class="n">Do</span> <span class="n">something</span> <span class="k">with</span> <span class="n">the</span> <span class="n">vector</span> <span class="n">structure</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</p></li>
 </ol>
 </p>
-<p>Output by Usage:<ol class="loweralpha simple">
-<li><p>One-time: Create file interface by providing a channel name. comm_t* fout = yggJSONArrayOutput(“file_channel”); // channel</p></li>
-<li><p>Send structure to the file by providing entries. Formatting is handled by the interface. If return value is not 0, the send was not succesful. int ret; json_array_t p; Populate the structure ret = yggSend(fout, p);</p></li>
+<p>Output Usage:<ol class="loweralpha simple">
+<li><p>One-time: Create file interface by providing a channel name. <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">comm_t</span><span class="o">*</span> <span class="n">fout</span> <span class="o">=</span> <span class="n">yggJSONArrayOutput</span><span class="p">(</span><span class="s2">&quot;file_channel&quot;</span><span class="p">);</span>  <span class="o">//</span> <span class="n">channel</span>
+</pre></div>
+</div>
+</p></li>
+<li><p>Send structure to the file by providing entries. Formatting is handled by the interface. If return value is not 0, the send was not succesful. <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="nb">int</span> <span class="n">ret</span><span class="p">;</span>
+<span class="n">json_array_t</span> <span class="n">p</span><span class="p">;</span>
+<span class="o">//</span> <span class="n">Populate</span> <span class="n">the</span> <span class="n">structure</span>
+<span class="n">ret</span> <span class="o">=</span> <span class="n">yggSend</span><span class="p">(</span><span class="n">fout</span><span class="p">,</span> <span class="n">p</span><span class="p">);</span>
+</pre></div>
+</div>
+</p></li>
 </ol>
 </p>
 <dl class="field-list simple">
@@ -1210,14 +1464,36 @@
 <p>JSON object IO</p>
 <p>Handle I/O from/to a JSON object.</p>
 <p>Input Usage:<ol class="loweralpha simple">
-<li><p>One-time: Create interface by providing a channel name. comm_t* fin = yggJSONObjectInput(“file_channel”); // channel</p></li>
-<li><p>Prepare: Allocate map structure. json_object_t p;</p></li>
-<li><p>Receive each structure, terminating when receive returns -1 (EOF or channel closed). int ret = 1; while (ret &gt; 0) { ret = yggRecv(fin, &amp;p); Do something with the map structure }</p></li>
+<li><p>One-time: Create interface by providing a channel name. <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">comm_t</span><span class="o">*</span> <span class="n">fin</span> <span class="o">=</span> <span class="n">yggJSONObjectInput</span><span class="p">(</span><span class="s2">&quot;file_channel&quot;</span><span class="p">);</span>  <span class="o">//</span> <span class="n">channel</span>
+</pre></div>
+</div>
+</p></li>
+<li><p>Prepare: Allocate map structure. <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">json_object_t</span> <span class="n">p</span><span class="p">;</span>
+</pre></div>
+</div>
+</p></li>
+<li><p>Receive each structure, terminating when receive returns -1 (EOF or channel closed). <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="nb">int</span> <span class="n">ret</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span>
+<span class="k">while</span> <span class="p">(</span><span class="n">ret</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
+  <span class="n">ret</span> <span class="o">=</span> <span class="n">yggRecv</span><span class="p">(</span><span class="n">fin</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">p</span><span class="p">);</span>
+  <span class="o">//</span> <span class="n">Do</span> <span class="n">something</span> <span class="k">with</span> <span class="n">the</span> <span class="nb">map</span> <span class="n">structure</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</p></li>
 </ol>
 </p>
 <p>Output by Usage:<ol class="loweralpha simple">
-<li><p>One-time: Create file interface by providing a channel name. comm_t* fout = yggJSONObjectOutput(“file_channel”); // channel</p></li>
-<li><p>Send structure to the file by providing entries. Formatting is handled by the interface. If return value is not 0, the send was not succesful. int ret; json_object_t p; Populate the structure ret = yggSend(fout, p);</p></li>
+<li><p>One-time: Create file interface by providing a channel name. <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">comm_t</span><span class="o">*</span> <span class="n">fout</span> <span class="o">=</span> <span class="n">yggJSONObjectOutput</span><span class="p">(</span><span class="s2">&quot;file_channel&quot;</span><span class="p">);</span>  <span class="o">//</span> <span class="n">channel</span>
+</pre></div>
+</div>
+</p></li>
+<li><p>Send structure to the file by providing entries. Formatting is handled by the interface. If return value is not 0, the send was not succesful. <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="nb">int</span> <span class="n">ret</span><span class="p">;</span>
+<span class="n">json_object_t</span> <span class="n">p</span><span class="p">;</span>
+<span class="o">//</span> <span class="n">Populate</span> <span class="n">the</span> <span class="n">structure</span>
+<span class="n">ret</span> <span class="o">=</span> <span class="n">yggSend</span><span class="p">(</span><span class="n">fout</span><span class="p">,</span> <span class="n">p</span><span class="p">);</span>
+</pre></div>
+</div>
+</p></li>
 </ol>
 </p>
 <dl class="field-list simple">

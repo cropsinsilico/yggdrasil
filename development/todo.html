@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>TODO &mdash; yggdrasil v1.6.3+7.ga06bf3c48.dirty documentation</title>
+  <title>TODO &mdash; yggdrasil v1.6.3+17.g7c138fa48.dirty documentation</title>
   
 
   
@@ -207,11 +207,9 @@
 <li><p>Docs on how nested data objects are represented in C/C++.</p></li>
 <li><p>Regenerate metaschema with $schema entry</p></li>
 <li><p>Refence metaschema on website in $id or $schema?</p></li>
-<li><p>autodoc for R</p></li>
-<li><p>Add papers section for listing publication using yggdrasil</p></li>
 <li><p>Expand development section into contributing guide</p></li>
 <li><p>Add section on command line utilities</p></li>
-<li><p>Add model API documentation for R &amp; Fortran to Hackathon 2018 docs?</p></li>
+<li><p>Go through and update/prune interface documentation</p></li>
 <li><p>Mark hackathon 2019 docs as deprecated since the UI is no longer live</p></li>
 </ul>
 </div>
@@ -230,7 +228,6 @@
 <li><p>Change C client/server use of direction/serializer info to be more transparent</p></li>
 <li><p>Split drivers into separate directories for model drivers and connection drivers</p></li>
 <li><p>Change how CLI arguments are added to the arg parser for the language installer to use subparsers</p></li>
-<li><p>Add support for more than one filter</p></li>
 </ul>
 </div>
 <div class="section" id="new-feature-example">
@@ -247,13 +244,10 @@
 <li><p>Create a set of fundamental tests that every language implementation needs to pass including files containing serialized data that needs to be deserialized and then serialized.</p></li>
 <li><p>Changes ‘bytes’ type to ‘ascii’ since that is really what it means</p></li>
 <li><p>Change name of C MetaschemaType to schema?</p></li>
-<li><p>Add flag to turn off validation</p></li>
-<li><p>Add ‘production’ flag that turns off debug message, validation, and debug compilation flags for performance</p></li>
 <li><p>Allow use of different ‘default’ communication mechanisms on different connections based on the languages involved</p></li>
 <li><p>Add automated deprecation marker for schema options</p></li>
 <li><p>Split ld off as its own linker</p></li>
 <li><p>Add comm for using files as temporary storage in passing information between models</p></li>
-<li><p>Run connections on separate processes instead of threads</p></li>
 <li><p>Assign meanings to error codes and implement across languages (e.g. missing comm class)</p></li>
 <li><p>Add parameters constraining valid values for inputs/outputs (e.g. range) using JSON paramaters</p></li>
 <li><p>Allow users to select from list of multiple possiblities when locating libraries to avoid conflict</p></li>
@@ -272,7 +266,6 @@
 <h2>Testing<a class="headerlink" href="#testing" title="Permalink to this headline">¶</a></h2>
 <ul class="simple">
 <li><p>Try to setup comm/connection testing at class level so that comms only created once</p></li>
-<li><p>Test outside of conda on windows?</p></li>
 <li><p>Update base test class for comm and connection drivers to use comm installation bool for generating unittest skip errors</p></li>
 <li><p>testing for R native functions</p></li>
 </ul>

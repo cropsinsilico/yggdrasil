@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>yggdrasil.communication.CommBase &mdash; yggdrasil v1.6.3+7.ga06bf3c48.dirty documentation</title>
+  <title>yggdrasil.communication.CommBase &mdash; yggdrasil v1.6.3+17.g7c138fa48.dirty documentation</title>
   
 
   
@@ -1473,7 +1473,8 @@
             <span class="n">direction</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">direction</span>
         <span class="n">T</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">start_timeout</span><span class="p">(</span><span class="n">t</span><span class="o">=</span><span class="n">timeout</span><span class="p">,</span> <span class="n">key_suffix</span><span class="o">=</span><span class="s1">&#39;.wait_for_confirm&#39;</span><span class="p">)</span>
         <span class="n">flag</span> <span class="o">=</span> <span class="kc">False</span>
-        <span class="k">while</span> <span class="p">(</span><span class="ow">not</span> <span class="n">T</span><span class="o">.</span><span class="n">is_out</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="ow">not</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;is_confirmed_</span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">direction</span><span class="p">)):</span>
+        <span class="k">while</span> <span class="p">((</span><span class="ow">not</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;is_confirmed_</span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">direction</span><span class="p">))</span>
+               <span class="ow">and</span> <span class="p">(</span><span class="ow">not</span> <span class="n">T</span><span class="o">.</span><span class="n">is_out</span><span class="p">)):</span>  <span class="c1"># pragma: intermittent</span>
             <span class="k">if</span> <span class="n">active_confirm</span><span class="p">:</span>
                 <span class="n">flag</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">confirm</span><span class="p">(</span><span class="n">direction</span><span class="o">=</span><span class="n">direction</span><span class="p">,</span> <span class="n">noblock</span><span class="o">=</span><span class="n">noblock</span><span class="p">)</span>
                 <span class="k">if</span> <span class="n">flag</span><span class="p">:</span>

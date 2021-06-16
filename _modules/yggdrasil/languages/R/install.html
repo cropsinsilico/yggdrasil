@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>yggdrasil.languages.R.install &mdash; yggdrasil v1.6.3+7.ga06bf3c48.dirty documentation</title>
+  <title>yggdrasil.languages.R.install &mdash; yggdrasil v1.6.3+17.g7c138fa48.dirty documentation</title>
   
 
   
@@ -548,6 +548,8 @@
             <span class="c1">#     restore_makevars(makevars, old_makevars)</span>
             <span class="c1">#     return False</span>
             <span class="n">requirements</span> <span class="o">=</span> <span class="n">requirements_from_description</span><span class="p">()</span>
+            <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;BUILDDOCS&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">)</span> <span class="o">==</span> <span class="s1">&#39;1&#39;</span><span class="p">:</span>
+                <span class="n">requirements</span> <span class="o">+=</span> <span class="p">[</span><span class="s1">&#39;roxygen2&#39;</span><span class="p">,</span> <span class="s1">&#39;Rd2md&#39;</span><span class="p">]</span>
             <span class="k">if</span> <span class="ow">not</span> <span class="n">install_packages</span><span class="p">(</span><span class="n">requirements</span><span class="p">,</span> <span class="n">update</span><span class="o">=</span><span class="n">update_requirements</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
                 <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;Failed to install dependencies&quot;</span><span class="p">)</span>
                 <span class="n">restore_makevars</span><span class="p">(</span><span class="n">makevars</span><span class="p">,</span> <span class="n">old_makevars</span><span class="p">)</span>
