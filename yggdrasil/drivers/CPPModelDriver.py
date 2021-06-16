@@ -328,7 +328,7 @@ class CPPModelDriver(CModelDriver):
             bool: True if it is a vector, False otherwise.
 
         """
-        if 'vector' in var.get('native_type', ''):
+        if isinstance(var, dict) and ('vector' in var.get('native_type', '')):
             return re.fullmatch(cls.function_param['vector_regex'],
                                 var['native_type'])
         return False
