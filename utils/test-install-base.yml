@@ -253,11 +253,8 @@ jobs:
       if: env.INSTALLMPI == 1 && matrix.os != 'windows-latest'
       id: mpi
       run: |
-        # export YGG_DEBUG=INFO
-        # export YGG_CLIENT_DEBUG=INFO
-        # export YGG_ENABLE_EXAMPLE_TESTS=true
-        # mpiexec -n 2 python -m pytest --with-mpi -v --cov=yggdrasil -c setup.cfg --cov-config=.coveragerc --ignore=yggdrasil/rapidjson/ --rootdir=/Users/langmm/yggdrasil/yggdrasil --cov-append --reruns=2 --reruns-delay=1 --timeout=900 /Users/langmm/yggdrasil/yggdrasil/communication/tests/test_MPIComm.py /Users/langmm/yggdrasil/yggdrasil/examples/tests/test_gs_lesson4.py /Users/langmm/yggdrasil/yggdrasil/examples/tests/test_rpc_lesson3b.py
-        run: yggtest --ci --cov-append --test-suite=mpi
+        yggtest --ci --cov-append --test-suite=mpi --write-script=run_mpi.sh
+        ./run_mpi.sh
     # - name: Start SSH session
     #   uses: luchihoratiu/debug-via-ssh@main
     #   if: ${{ failure() && matrix.os == 'ubuntu-latest' }}

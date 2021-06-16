@@ -1218,7 +1218,10 @@ class run_tsts(SubCommand):
           'help': 'Display additional info for test results.'}),
         (('--with-mpi', '--mpi-nproc'),
          {'type': int, 'default': 1,
-          'help': 'Number of MPI processes to run tests on.'})]
+          'help': 'Number of MPI processes to run tests on.'}),
+        (('--write-script', ),
+         {'type': str,
+          'help': 'Name of script that should be created to run tests.'})]
     allow_unknown = True
 
     @classmethod
@@ -1243,6 +1246,9 @@ class run_tsts(SubCommand):
             args.ignore.append('yggdrasil/rapidjson/')
             args.rootdir = package_dir
             extra += ['--reruns=2', '--reruns-delay=1', '--timeout=900']
+        if args.write_script:
+            if not os.path.isabs(args.write_script):
+                args.write_script = os.path.abspath(args.write_script)
         # Separate out paths from options
         test_paths = []
         if args.test_suites:
@@ -1380,6 +1386,34 @@ class run_tsts(SubCommand):
         return 0
 
     @classmethod
+    def write_script(cls, args, argv, cfg_env):
+        r"""Write a script to run the pytest command.
+
+        """
+        import stat
+        from yggdrasil import platform
+        assert(not platform._is_win)
+        lines = ['#!/bin/bash']
+        for k, v in cfg_env.new_env.items():
+            if '"' in v:
+                lines.append('export %s=\'%s\'' % (k, v))
+            else:
+                lines.append('export %s=%s' % (k, v))
+        lines.append(' '.join(argv))
+        for k, v in cfg_env.old_env.items():
+            if v is None:
+                lines.append('unset %s' % k)
+            elif '"' in v:
+                lines.append('export %s=\'%s\'' % (k, v))
+            else:
+                lines.append('export %s=%s' % (k, v))
+        with open(args.write_script, 'w') as fd:
+            fd.write('\n'.join(lines))
+        os.chmod(args.write_script, (stat.S_IRWXU
+                                     | stat.S_IRGRP | stat.S_IXGRP
+                                     | stat.S_IROTH | stat.S_IXOTH))
+                                     
+    @classmethod
     def func(cls, args):
         from yggdrasil import config
         argv = [sys.executable, '-m', 'pytest']
@@ -1415,8 +1449,6 @@ class run_tsts(SubCommand):
         argv += args.extra
         # Run test command and perform cleanup before logging any errors
         logger.info("Running \'%s\' from %s", ' '.join(argv), os.getcwd())
-        if args.ci and args.with_mpi:
-            raise Exception
         new_config = {}
         # pth_file = 'ygg_coverage.pth'
         # assert(not os.path.isfile(pth_file))
@@ -1427,7 +1459,7 @@ class run_tsts(SubCommand):
         #         fd.write("import coverage; coverage.process_startup()")
         initial_dir = os.getcwd()
         error_code = 0
-        with config.parser_config(args, **new_config):
+        with config.parser_config(args, **new_config) as cfg_env:
             try:
                 # Perform CI specific pretest operations
                 if args.ci:
@@ -1465,12 +1497,15 @@ class run_tsts(SubCommand):
                     subprocess.check_call(["yggdrasil", "info",
                                            "--verbose"])
                 error_code = 0
-                for x in range(args.count):
-                    x_error_code = subprocess.call(argv)
-                    if x_error_code != 0:
-                        error_code = x_error_code
-                        if args.stop:
-                            break
+                if args.write_script:
+                    cls.write_script(args, argv, cfg_env)
+                else:
+                    for x in range(args.count):
+                        x_error_code = subprocess.call(argv)
+                        if x_error_code != 0:
+                            error_code = x_error_code
+                            if args.stop:
+                                break
             # except BaseException:
             #     logger.exception('Error in running test.')
             #     error_code = -1
