@@ -2066,6 +2066,7 @@ class ModelDriver(Driver):
                             x['datatype'] = {
                                 'type': 'array',
                                 'items': [v['datatype'] for v in non_length]}
+                        x['datatype']['from_function'] = True
                     for v in x['vars']:
                         if 'native_type' not in v:
                             v['native_type'] = cls.get_native_type(**v)
@@ -2258,9 +2259,12 @@ class ModelDriver(Driver):
                                                    allow_failure=True)
         # Prepare output array
         if iter_function_over:
+            for v in iter_ivars:
+                if v['name'] in iter_function_over:
+                    loop_lines += cls.write_finalize_iiter(v)
             for v in iter_ovars:
                 if v['name'] in iter_function_over:
-                    loop_lines += cls.write_initialize_iter(v)
+                    loop_lines += cls.write_initialize_oiter(v)
         # Call model
         loop_lines += cls.write_model_function_call(
             model_function, model_flag, inputs, outputs,
@@ -2270,7 +2274,7 @@ class ModelDriver(Driver):
         if iter_function_over:
             for v in iter_ovars:
                 if v['name'] in iter_function_over:
-                    loop_lines += cls.write_finalize_iter(v)
+                    loop_lines += cls.write_finalize_oiter(v)
         # Send outputs
         for x in outputs:
             if not x.get('outside_loop', False):
@@ -3445,7 +3449,21 @@ class ModelDriver(Driver):
         return cls.get_inverse_type_map()[native_type]
 
     @classmethod
-    def write_initialize_iter(cls, var, value=None, requires_freeing=None):
+    def write_finalize_iiter(cls, var):
+        r"""Get the lines necessary to finalize an input array for iteration.
+
+        Args:
+            var (dict, str): Name or information dictionary for the variable
+                finalized.
+
+        Returns:
+            list: The lines finalizing the variable.
+
+        """
+        return []
+
+    @classmethod
+    def write_initialize_oiter(cls, var, value=None, requires_freeing=None):
         r"""Get the lines necessary to initialize an array for iteration
         output.
 
@@ -3466,7 +3484,7 @@ class ModelDriver(Driver):
                                     requires_freeing=requires_freeing)
 
     @classmethod
-    def write_finalize_iter(cls, var, value=None, requires_freeing=None):
+    def write_finalize_oiter(cls, var, value=None, requires_freeing=None):
         r"""Get the lines necessary to finalize an array after iteration.
 
         Args:

@@ -952,7 +952,7 @@ class FortranModelDriver(CompiledModelDriver):
         return False
         
     @classmethod
-    def write_initialize_iter(cls, var, value=None, **kwargs):
+    def write_initialize_oiter(cls, var, value=None, **kwargs):
         r"""Get the lines necessary to initialize an array for iteration
         output.
 

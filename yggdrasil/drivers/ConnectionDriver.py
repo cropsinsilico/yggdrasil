@@ -305,8 +305,11 @@ class ConnectionDriver(Driver):
                     comm_list[i].pop(k, None)
         comm_kws['commtype'] = copy.deepcopy(comm_list)
         for x in comm_kws['commtype']:
-            if x.get('datatype', {}) == {'type': 'any'}:
+            if ((x.get('datatype', {}).get('from_function', False)
+                 and (x.get('datatype', {}).get('type', None)
+                      in ['any', 'instance']))):
                 x['datatype'] = {'type': 'bytes'}
+            x.get('datatype', {}).pop('from_function', False)
         self.debug('%s comm_kws:\n%s', attr_comm, self.pprint(comm_kws, 1))
         setattr(self, attr_comm, new_comm(**comm_kws))
         setattr(self, '%s_kws' % attr_comm, comm_kws)

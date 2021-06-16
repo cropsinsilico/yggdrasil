@@ -181,7 +181,7 @@ class PythonModelDriver(InterpretedModelDriver):
         return super(PythonModelDriver, cls).format_function_param(key, **kwargs)
 
     @classmethod
-    def write_initialize_iter(cls, var, value=None, **kwargs):
+    def write_initialize_oiter(cls, var, value=None, **kwargs):
         r"""Get the lines necessary to initialize an array for iteration
         output.
 
@@ -198,12 +198,12 @@ class PythonModelDriver(InterpretedModelDriver):
 
         """
         value = '[None for _ in range(%s)]' % var['iter_var']['end']
-        out = super(PythonModelDriver, cls).write_initialize_iter(
+        out = super(PythonModelDriver, cls).write_initialize_oiter(
             var, value=value, **kwargs)
         return out
 
     @classmethod
-    def write_finalize_iter(cls, var):
+    def write_finalize_oiter(cls, var):
         r"""Get the lines necessary to finalize an array after iteration.
 
         Args:
@@ -214,7 +214,7 @@ class PythonModelDriver(InterpretedModelDriver):
             list: The lines finalizing the variable.
 
         """
-        out = super(PythonModelDriver, cls).write_finalize_iter(var)
+        out = super(PythonModelDriver, cls).write_finalize_oiter(var)
         out += ['import numpy as np',
                 'from yggdrasil import units',
                 'dtype = np.dtype(units.get_data({name}[0]))'.format(

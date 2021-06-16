@@ -2,7 +2,7 @@
 History
 =======
 
-1.6.4 (2021-06-XX) More minor bug fixes
+1.6.4 (2021-06-XX) More minor bug fixes & Automated iteration
 ------------------
 
 * Fixed bug in configuraiton CLI triggered by running as a subcommand
@@ -11,6 +11,7 @@ History
 * Only assume dont_copy should be true for wrapped functions that are called as servers
 * Added support for auto-wrapping C++ functions that take vectors as inputs
 * Integrated the use of Roxygen for documenting R interface
+* Fixed a bug in the Matlab driver where the -nodisplay flag in the method to get the Matlab version was causing an error on Windows where -nodisplay is not guaranteed to work
 
 1.6.3 (2021-05-27) Minor bug fixes in preparation for CiS hackathon
 ------------------

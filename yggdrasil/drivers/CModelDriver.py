@@ -1443,7 +1443,7 @@ class CModelDriver(CompiledModelDriver):
         return super(CModelDriver, cls).write_model_recv(channel, recv_var_str, **kwargs)
             
     @classmethod
-    def write_initialize_iter(cls, var, value=None, **kwargs):
+    def write_initialize_oiter(cls, var, value=None, **kwargs):
         r"""Get the lines necessary to initialize an array for iteration
         output.
 
@@ -1462,7 +1462,7 @@ class CModelDriver(CompiledModelDriver):
         value = '({type}*)realloc({name}, {length}*sizeof({type}))'.format(
             type=cls.get_native_type(**var['iter_datatype']),
             name=var['name'], length=var['iter_var']['end'])
-        out = super(CModelDriver, cls).write_initialize_iter(
+        out = super(CModelDriver, cls).write_initialize_oiter(
             var, value=value, **kwargs)
         return out
     

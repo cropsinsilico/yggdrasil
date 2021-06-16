@@ -547,6 +547,16 @@ class MatlabModelDriver(InterpretedModelDriver):  # pragma: matlab
         self.mlprocess = None
 
     @staticmethod
+    def before_registration(cls):
+        r"""Operations that should be performed to modify class attributes prior
+        to registration including things like platform dependent properties and
+        checking environment variables for default settings.
+        """
+        if platform._is_win and ('-nodisplay' in cls.default_interpreter_flags):
+            cls.default_interpreter_flags.remove('-nodisplay')
+        InterpretedModelDriver.before_registration(cls)
+        
+    @staticmethod
     def after_registration(cls, **kwargs):
         r"""Operations that should be performed to modify class attributes after
         registration. For compiled languages this includes selecting the
@@ -816,6 +826,12 @@ class MatlabModelDriver(InterpretedModelDriver):  # pragma: matlab
                     cfg.set(cls.language, k, opts[k][1])
                 else:
                     out.append((cls.language, k, opts[k][0]))
+        if platform._is_win:  # pragma: windows
+            if (disable_engine is not None) and (not disable_engine):
+                logger.warning("Using Python engine for matlab is not "
+                               "currently supported as it requires the use "
+                               "of the '-nodisplay' command line option.")
+            disable_engine = True
         if disable_engine is not None:
             cfg.set(cls._language, 'disable_engine', str(disable_engine))
         if hide_matlab_libiomp is not None:
@@ -867,7 +883,7 @@ class MatlabModelDriver(InterpretedModelDriver):  # pragma: matlab
         """
         mtl_id = '=MATLABROOT='
         cmd = ("fprintf('" + mtl_id + "%s" + mtl_id + "R%s" + mtl_id + "'"
-               + ",matlabroot,version('-release'));")
+               + ",matlabroot,version('-release')); quit;")
         mtl_proc = cls.run_executable([cmd])
         if mtl_id not in mtl_proc:  # pragma: debug
             raise RuntimeError(("Could not locate ID string (%s) in "
@@ -1061,4 +1077,90 @@ class MatlabModelDriver(InterpretedModelDriver):  # pragma: matlab
         out = format_str_bytes.decode('unicode-escape')
         if not as_str:
             out = out.encode("utf-8")
+        return out
+
+    @classmethod
+    def write_finalize_iiter(cls, var, **kwargs):
+        r"""Get the lines necessary to initialize an array for iteration
+        output.
+
+        Args:
+            var (dict, str): Name or information dictionary for the variable
+                being initialized.
+            value (str, optional): Value that should be assigned to the
+                variable.
+            **kwargs: Additional keyword arguments are passed to the
+                parent class's method.
+
+        Returns:
+            list: The lines initializing the variable.
+
+        """
+        out = [
+            'if (isa({name}, \'sym\'))'.format(name=var['name']),
+            '  [{name}, {name}_units] = separateUnits(simplify({name}));'.format(
+                name=var['name']),
+            'else;',
+            '  {name}_units = NaN;'.format(name=var['name']),
+            'end;',
+            'if (not (isa({name}, \'cell\')))'.format(name=var['name']),
+            '  {name} = num2cell({name});'.format(name=var['name']),
+            'end;',
+            'if (not (isnan({name}_units)))'.format(name=var['name']),
+            '  for i = 1:length({name})'.format(name=var['name']),
+            '    {name}{{i}} = {name}{{i}} * str2symunit({name}_units);'.format(
+                name=var['name']),
+            '  end;',
+            'end;',
+        ]
+        return out
+
+    @classmethod
+    def write_initialize_oiter(cls, var, value=None, **kwargs):
+        r"""Get the lines necessary to initialize an array for iteration
+        output.
+
+        Args:
+            var (dict, str): Name or information dictionary for the variable
+                being initialized.
+            value (str, optional): Value that should be assigned to the
+                variable.
+            **kwargs: Additional keyword arguments are passed to the
+                parent class's method.
+
+        Returns:
+            list: The lines initializing the variable.
+
+        """
+        value = 'cell(%s)' % var['iter_var']['end']
+        out = super(MatlabModelDriver, cls).write_initialize_oiter(
+            var, value=value, **kwargs)
+        return out
+
+    @classmethod
+    def write_finalize_oiter(cls, var):
+        r"""Get the lines necessary to finalize an array after iteration.
+
+        Args:
+            var (dict, str): Name or information dictionary for the variable
+                being initialized.
+
+        Returns:
+            list: The lines finalizing the variable.
+
+        """
+        out = super(MatlabModelDriver, cls).write_finalize_oiter(var)
+        out += [
+            'if (isa({name}{{1}}, \'sym\'))'.format(name=var['name']),
+            '  [{name}, {name}_units] = separateUnits(simplify({name}));'.format(
+                name=var['name']),
+            'else;',
+            '  {name}_units = NaN;'.format(name=var['name']),
+            'end;',
+            '{name} = cell2mat({name});'.format(name=var['name']),
+            'if (not (isnan({name}_units)))'.format(name=var['name']),
+            '  {name} = {name} * str2symunit({name}_units);'.format(
+                name=var['name']),
+            'end;',
+        ]
         return out
