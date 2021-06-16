@@ -16,7 +16,9 @@
  */
 class YggInput {
 public:
+#ifndef DOXYGEN_SHOULD_SKIP_THIS
   yggInput_t _pi;
+#endif // DOXYGEN_SHOULD_SKIP_THIS
 
   /*!
     @brief Constructor for YggInput.
@@ -189,7 +191,9 @@ public:
   an IPC queue.
  */
 class YggOutput {
+#ifndef DOXYGEN_SHOULD_SKIP_THIS
   yggOutput_t _pi;
+#endif // DOXYGEN_SHOULD_SKIP_THIS
 public:
   
   /*!
@@ -341,7 +345,9 @@ public:
   queues.
  */
 class YggRpc {
+#ifndef DOXYGEN_SHOULD_SKIP_THIS
   yggRpc_t _pi;
+#endif // DOXYGEN_SHOULD_SKIP_THIS
 public:
 
   /*! @brief Empty constructor for inheritance. */

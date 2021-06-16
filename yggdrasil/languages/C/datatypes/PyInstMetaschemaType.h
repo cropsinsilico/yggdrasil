@@ -266,6 +266,7 @@ public:
   /*!
     @brief Update the instance's class name.
     @param[in] new_class_name const char * String for new class name.
+    @param[in] force bool If true, the class name will be updated reguardless of if it is compatible or not. Defaults to false.
    */
   void update_class_name(const char* new_class_name, bool force=false) {
     if (new_class_name == NULL) {
@@ -279,7 +280,7 @@ public:
   }
   /*!
     @brief update the instance's args type.
-    @param[in] new_args JSONArrayMetaschemaType* New args type.
+    @param[in] new_args_type JSONArrayMetaschemaType* New args type.
     @param[in] force bool If true, the args type will be updated reguardless of if it is compatible or not. Defaults to false.
    */
   void update_args_type(const JSONArrayMetaschemaType* new_args_type,
@@ -298,7 +299,7 @@ public:
   }
   /*!
     @brief update the instance's kwargs type.
-    @param[in] new_kwargs JSONObjectMetaschemaType* New kwargs type.
+    @param[in] new_kwargs_type JSONObjectMetaschemaType* New kwargs type.
     @param[in] force bool If true, the kwargs type will be updated reguardless of if it is compatible or not. Defaults to false.
    */
   void update_kwargs_type(const JSONObjectMetaschemaType* new_kwargs_type,

@@ -1,3 +1,4 @@
+  ! BEGIN DOXYGEN_SHOULD_SKIP_THIS
   interface
      ! Utilities
      subroutine c_free(x) bind(c, name="ygg_c_free")
@@ -975,3 +976,4 @@
      end function generic_map_set_ndarray_c
 
   end interface
+#endif ! DOXYGEN_SHOULD_SKIP_THIS

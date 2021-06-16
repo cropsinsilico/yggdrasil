@@ -44,7 +44,7 @@ typedef enum comm_enum comm_type;
  */
 typedef struct comm_t {
   comm_type type; //!< Comm type.
-  void *other;
+  void *other; //!< Pointer to additional information for the comm.
   char name[COMM_NAME_SIZE]; //!< Comm name.
   char address[COMM_ADDRESS_SIZE]; //!< Comm address.
   char direction[COMM_DIR_SIZE]; //!< send or recv for direction messages will go.
@@ -62,6 +62,10 @@ typedef struct comm_t {
 } comm_t;
 
 
+/*!
+  @brief Display the comm in the other field for a comm.
+  @param[in] x Comm to display other field of.
+ */
 static inline
 void display_other(comm_t *x) {
   if (x->other != NULL) {

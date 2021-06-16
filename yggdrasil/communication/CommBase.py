@@ -1291,7 +1291,8 @@ class CommBase(tools.YggClass):
             direction = self.direction
         T = self.start_timeout(t=timeout, key_suffix='.wait_for_confirm')
         flag = False
-        while (not T.is_out) and (not getattr(self, 'is_confirmed_%s' % direction)):
+        while ((not getattr(self, 'is_confirmed_%s' % direction))
+               and (not T.is_out)):  # pragma: intermittent
             if active_confirm:
                 flag = self.confirm(direction=direction, noblock=noblock)
                 if flag:

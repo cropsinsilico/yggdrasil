@@ -54,6 +54,8 @@ public:
   /*!
     @brief Copy data wrapped in YggGeneric class.
     @param[in] data YggGeneric* Pointer to generic object.
+    @param[in] orig_data Pointer to data that should be copied if different
+    that the data that is wrapped.
     @returns void* Pointer to copy of data.
    */
   void* copy_generic(const YggGeneric* data, void* orig_data=NULL) const override {

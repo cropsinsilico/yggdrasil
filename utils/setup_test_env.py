@@ -20,7 +20,6 @@ _on_appveyor = bool(os.environ.get('APPVEYOR_BUILD_FOLDER', False))
 _on_ci = (_on_gha or _on_travis or _on_appveyor)
 _utils_dir = os.path.dirname(os.path.abspath(__file__))
 _pkg_dir = os.path.dirname(_utils_dir)
-BUILDDOCS = (os.environ.get('BUILDDOCS', '0') == '1')
 CONDA_ENV = os.environ.get('CONDA_DEFAULT_ENV', None)
 CONDA_PREFIX = os.environ.get('CONDA_PREFIX', None)
 CONDA_INDEX = None
@@ -216,6 +215,7 @@ def get_install_opts(old=None):
             'trimesh': (os.environ.get('INSTALLTRIMESH', '0') == '1'),
             'pygments': (os.environ.get('INSTALLPYGMENTS', '0') == '1'),
             'omp': (os.environ.get('INSTALLOMP', '0') == '1'),
+            'docs': (os.environ.get('BUILDDOCS', '0') == '1'),
         }
         if not _is_win:
             new['c'] = True  # c compiler usually installed by default
@@ -232,6 +232,7 @@ def get_install_opts(old=None):
             'trimesh': True,
             'pygments': True,
             'omp': False,
+            'docs': False,
         }
     if _is_win:
         new['os'] = 'win'
@@ -247,6 +248,8 @@ def get_install_opts(old=None):
         out.setdefault(k, v)
     if not out['c']:
         out.update(fortran=False, zmq=False)
+    if out['docs']:
+        out['R'] = True  # Allow roxygen
     return out
 
 
@@ -614,10 +617,17 @@ def itemize_deps(method, for_development=False,
         else:
             raise NotImplementedError("Could not determine "
                                       "ZeroMQ installation method.")
-    if include_doc_deps or BUILDDOCS:
+    if include_doc_deps or install_opts['docs']:
         out['requirements'].append('requirements_documentation.txt')
         if not fallback_to_conda:
             out['os'].append("doxygen")
+            if install_opts['os'] == 'linux':
+                out['os'] += ["pandoc"]
+            elif install_opts['os'] == 'osx':
+                out['os'] += ["pandoc-citeproc", "Caskroom/cask/mactex"]
+            else:
+                NotImplementedError("Could not determine "
+                                    "pandoc installation method.")
     if install_opts['sbml'] and fallback_to_conda:
         # Until the sbml package is updated to allow numpy != 1.19.3,
         # sbml will need to be installed separately without deps in order

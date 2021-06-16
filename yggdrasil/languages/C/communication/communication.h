@@ -97,7 +97,7 @@ void set_sent_eof(const comm_t* x) {
 
 /*!
   @brief Retrieve a registered global comm if it exists.
-  @param[in] const char* name Name that comm might be registered under.
+  @param[in] name const char* name Name that comm might be registered under.
   @returns comm_t* Pointer to registered comm. NULL if one does not exist
   with the specified name.
  */
@@ -158,7 +158,7 @@ int is_comm_format_array_type(const comm_t *x) {
 
 /*!
   @brief Determine if the current thread can use a comm registered by another.
-  @param[in] int Thread that created the comm.
+  @param[in] thread_id int Thread that created the comm.
   @returns int 1 if the current thread can use the comm, 0 otherwise.
  */
 static

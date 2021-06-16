@@ -1,5 +1,7 @@
 #include "c_wrappers.h"
 
+#ifndef DOXYGEN_SHOULD_SKIP_THIS
+
 // Utilities
 void ygg_c_free(void *x) {
   if (x != NULL) {
@@ -561,3 +563,4 @@ int generic_map_set_ndarray_f(generic_t x, const char* key,
   return generic_map_set_ndarray(x, key, data, subtype, precision,
 				 ndim, (const size_t*)shape, units);
 }
+#endif // DOXYGEN_SHOULD_SKIP_THIS

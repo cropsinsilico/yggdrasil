@@ -302,7 +302,8 @@ def requirements_from_description(fname=None):
                 in_section = True
             elif in_section:
                 if x.startswith('  '):
-                    out.append(x.strip().strip(','))
+                    if not x.strip().startswith('R '):
+                        out.append(x.strip().strip(','))
                 else:
                     in_section = False
     out = list(set(out))
@@ -365,6 +366,8 @@ def install(args=None, with_sudo=None, skip_requirements=None,
             #     restore_makevars(makevars, old_makevars)
             #     return False
             requirements = requirements_from_description()
+            if os.environ.get('BUILDDOCS', '') == '1':
+                requirements += ['roxygen2', 'Rd2md']
             if not install_packages(requirements, update=update_requirements, **kwargs):
                 logger.error("Failed to install dependencies")
                 restore_makevars(makevars, old_makevars)

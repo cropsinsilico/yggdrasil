@@ -68,6 +68,37 @@ YggInterfaceClass <- R6::R6Class("YggInterfaceClass", list(
   )
 )
 
+#' Create an object for sending/receiving messages to/from an yggdrasil channel.
+#'
+#' This function wraps functions from yggdrasil's [Python interface](interface_py.html), 
+#' so refer to that documentation for additional details.
+#'
+#' @param type The name of the Python interface that should be called
+#'   (e.g. [YggInput](interface_py.html#yggdrasil.languages.Python.YggInterface.YggInput),
+#'   [YggOutput](interface_py.html#yggdrasil.languages.Python.YggInterface.YggOutput),
+#'   [YggRpcClient](interface_py.html#yggdrasil.languages.Python.YggInterface.YggRpcClient),
+#'   [YggRpcServer](interface_py.html#yggdrasil.languages.Python.YggInterface.YggRpcServer),
+#'   [YggTimesync](interface_py.html#yggdrasil.languages.Python.YggInterface.YggTimesync))
+#' @param ... Additional parameters will be passed to the Python interface
+#'   function.
+#'
+#' @returns A Python comm that can be used to send/receive messages via
+#'   send/recv methods.
+#'
+#' @export
+#'
+#' @examples
+#'
+#' \dontrun{
+#'    in_channel = YggInterface('YggInput', 'input_channel_name')
+#'    # Use zeallot '%<-%' syntax to expand multiple variables
+#'    c(flag, input) %<-% in_channel$recv()
+#' }
+#'
+#' \dontrun{
+#'    out_channel = YggInterface('YggOutput', 'output_channel_name')
+#'    flag <- out_channel$send(output1, output2, ...)
+#' }
 YggInterface <- function(type, ...) {
   # print(reticulate::py_config())
   if (!exists("ygg")) {

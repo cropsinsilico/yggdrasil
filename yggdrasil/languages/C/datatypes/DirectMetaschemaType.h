@@ -151,7 +151,7 @@ public:
     @param[in] allow_realloc int If 1, buf will be reallocated if it is not
     large enough to contain the serialized data. If 0, an error will be raised
     if it is not large enough.
-    @param[in] Pointer to generic wrapper for object being serialized.
+    @param[in] x Pointer to generic wrapper for object being serialized.
     @returns int Size of the serialized data in buf.
    */
   int serialize(char **buf, size_t *buf_siz,

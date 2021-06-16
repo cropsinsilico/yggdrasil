@@ -1,9 +1,9 @@
-Matlab Code
-===========
+R Code
+======
 
 Subpackages
 -----------
 
 .. toctree::
    
-   interface_m
+   interface_r
