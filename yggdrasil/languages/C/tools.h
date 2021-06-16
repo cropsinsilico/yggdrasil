@@ -109,17 +109,20 @@ extern "C" {
 #include <numpy/npy_common.h>
 #endif
   
+/*! @brief Wrapper for a complex number with float components. */
 typedef struct complex_float_t {
-  float re;
-  float im;
+  float re; //!< Real component
+  float im; //!< Imaginary component
 } complex_float_t;
+/*! @brief Wrapper for a complex number with double components. */
 typedef struct complex_double_t {
-  double re;
-  double im;
+  double re; //!< Real component
+  double im; //!< Imaginary component
 } complex_double_t;
+/*! @brief Wrapper for a complex number with long double components. */
 typedef struct complex_long_double_t {
-  long double re;
-  long double im;
+  long double re; //!< Real component
+  long double im; //!< Imaginary component
 } complex_long_double_t;
 // Platform specific
 #ifdef _WIN32
@@ -212,21 +215,21 @@ unsigned long ptr2seed(void *ptr) {
 @param va va_list Wrapped variable argument list.
 */
 typedef struct va_list_t {
-  va_list va;
-  int using_ptrs;
-  void **ptrs;
-  int nptrs;
-  int iptr;
-  int for_fortran;
+  va_list va;  //!< Traditional variable argument list.
+  int using_ptrs; //!< Flag that is 1 if the arguments are stored using pointers.
+  void **ptrs; //!< Variable arguments stored as pointers.
+  int nptrs; //!< The number of variable arguments stored as pointers.
+  int iptr; //!< The index of the current variable argument pointer.
+  int for_fortran; //!< Flag that is 1 if this structure will be accessed by fortran.
 } va_list_t;
 
 
 /*! @brief Structure used to wrap Python objects. */
 typedef struct python_t {
-  char name[PYTHON_NAME_SIZE];
-  void *args;
-  void *kwargs;
-  PyObject *obj;
+  char name[PYTHON_NAME_SIZE]; //!<Name of the Python class/type/function.
+  void *args; //!< Arguments used in creating a Python instance.
+  void *kwargs; //!< Keyword arguments used in creating a Python instance.
+  PyObject *obj; //!< Python object.
 } python_t;
 
 
@@ -418,6 +421,7 @@ void yggError(const char* fmt, ...) {
   va_end(ap);
 };
 
+#ifndef DOXYGEN_SHOULD_SKIP_THIS
 #ifdef YGG_DEBUG
 #if YGG_DEBUG <= 10
 #define ygglog_error yggError
@@ -441,6 +445,7 @@ void yggError(const char* fmt, ...) {
 #define ygglog_info while (0) yggInfo
 #define ygglog_debug while (0) yggDebug
 #endif
+#endif // DOXYGEN_SHOULD_SKIP_THIS
 
 /*!
   @brief Get the length (in bytes) of a character array containing 4 byte
@@ -588,7 +593,7 @@ va_list_t init_va_ptrs(const int nptrs, void** ptrs) {
   
 
 /*! Finalize a variable argument list.
-  @param[in] va_list_t Variable argument list.
+  @param[in] ap va_list_t Variable argument list.
 */
 static inline
 void end_va_list(va_list_t *ap) {
@@ -599,7 +604,7 @@ void end_va_list(va_list_t *ap) {
 
   
 /*! Copy a variable argument list.
-  @param[in] va_list_t Variable argument list structure to copy.
+  @param[in] ap va_list_t Variable argument list structure to copy.
   @returns va_list_t New variable argument list structure.
 */
 static inline

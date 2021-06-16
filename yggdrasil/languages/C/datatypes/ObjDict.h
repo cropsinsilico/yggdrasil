@@ -44,7 +44,7 @@ typedef struct obj_t {
   int *nvert_in_surface; //!< Number of vertices in each surface.
   float **surface_params_u; //!< Starting and ending parameters for each curve in the u direction.
   float **surface_params_v; //!< Starting and ending parameters for each curve in the v direction.
-  int **surface_texcoords; // !< Indices of texcoords for each surface vertex.
+  int **surface_texcoords; //!< Indices of texcoords for each surface vertex.
   int **surface_normals; //!< Indices of normals for each surface vertex.
 } obj_t;
 

@@ -95,6 +95,8 @@ typedef struct comm_head_t {
 /*!
   @brief C wrapper for the C++ type_from_doc function.
   @param type_doc void* Pointer to const rapidjson::Value type doc.
+  @param[in] use_generic bool If true, serialized/deserialized
+  objects will be expected to be YggGeneric classes.
   @returns void* Pointer to MetaschemaType class.
  */
 void* type_from_doc_c(const void* type_doc, const bool use_generic);
@@ -102,7 +104,9 @@ void* type_from_doc_c(const void* type_doc, const bool use_generic);
 
 /*!
   @brief C wrapper for the C++ type_from_pyobj function.
-  @param type_doc void* Pointer to const rapidjson::Value type doc.
+  @param pyobj void* Pointer to const rapidjson::Value type doc.
+  @param[in] use_generic bool If true, serialized/deserialized
+  objects will be expected to be YggGeneric classes.
   @returns void* Pointer to MetaschemaType class.
  */
 void* type_from_pyobj_c(PyObject* pyobj, const bool use_generic);
@@ -110,7 +114,7 @@ void* type_from_pyobj_c(PyObject* pyobj, const bool use_generic);
 
 /*!
   @brief Determine if a datatype was created from a format.
-  @params[in] type_struct dtype_t* Datatype structure.
+  @param[in] type_struct dtype_t* Datatype structure.
   @returns int 1 if the datatype was created from a format, 0 if it
   was not, -1 if there is an error.
  */
@@ -292,6 +296,12 @@ size_t generic_array_get_size(generic_t x);
  */
 void* generic_array_get_item(generic_t x, const size_t index,
 			   const char *type);
+/*!
+  @brief Get the size of an item from an array in bytes.
+  @param[in] x Generic object that is presumed to contain an array.
+  @param[in] index Index for value that the size should be returned for.
+  @returns Size of the item in bytes.
+ */
 int generic_array_get_item_nbytes(generic_t x, const size_t index);
 bool generic_array_get_bool(generic_t x, const size_t index);
 int generic_array_get_integer(generic_t x, const size_t index);
@@ -665,12 +675,13 @@ int generic_array_set_1darray_unicode(generic_t x, const size_t index,
   @brief Set a nd array value from an array.
   @param[in] x generic_t Generic object that is presumed to contain an array.
   @param[in] index size_t Index for value that should be set.
-  @param[in] value void* Pointer to array data.
+  @param[in] data void* Pointer to array data.
   @param[in] subtype const char* Subtype of array in value.
   @param[in] precision const size_t Precision of array that is in value.
   @param[in] ndim size_t Number of dimensions in the array.
   @param[in] shape size_t* Pointer to array containing the size of
   the array in each dimension.
+  @param[in] units const char* Units that should be added to the array.
   @returns int -1 if there is an error, 0 otherwise.
  */
 int generic_array_set_ndarray(generic_t x, const size_t index,
@@ -865,12 +876,13 @@ int generic_map_set_1darray_unicode(generic_t x, const char* key,
   @brief Set a nd array value in a map.
   @param[in] x generic_t Generic object that is presumed to contain a map.
   @param[in] key const char* Key string for value that should be set.
-  @param[in] value void* Pointer to array data.
+  @param[in] data void* Pointer to array data.
   @param[in] subtype const char* Subtype of array in value.
   @param[in] precision const size_t Precision of array that is in value.
   @param[in] ndim size_t Number of dimensions in the array.
   @param[in] shape size_t* Pointer to array containing the size of
   the array in each dimension.
+  @param[in] units const char* Units that should be added to the array.
   @returns int -1 if there is an error, 0 otherwise.
  */
 int generic_map_set_ndarray(generic_t x, const char* key,
@@ -999,6 +1011,8 @@ const size_t dtype_precision(const dtype_t* type_class);
 /*!
   @brief Initialize a datatype structure including setting the type string.
   @param[in] dtype dtype_t* Type structure/class.
+  @param[in] use_generic bool If true, serialized/deserialized
+  objects will be expected to be YggGeneric classes.
   @returns dtype_t* Initialized type structure/class.
 */
 dtype_t* complete_dtype(dtype_t *dtype, const bool use_generic);
@@ -1164,6 +1178,11 @@ dtype_t* create_dtype_obj(const bool use_generic);
 
 /*!
   @brief Construct an AsciiTable type object.
+  @param[in] format_str const char* C-style format string that will be used to determine
+  the type of elements in arrays that will be serialized/deserialized using
+  the resulting type.
+  @param[in] as_array int If 1, the types will be arrays. Otherwise they will be
+  scalars.
   @param[in] use_generic bool If true, serialized/deserialized
   objects will be expected to be YggGeneric classes.
   @returns dtype_t* Type structure/class.
@@ -1365,7 +1384,7 @@ int split_head_body(const char *buf, const size_t buf_siz,
   @param[in] buf_siz size_t Size of buf.
   @param[in] max_header_size size_t Maximum size that header can occupy
   before the type should be moved to the data portion of the message.
-  @param[in] int no_type If 1, type information will not be added to
+  @param[in] no_type int If 1, type information will not be added to
   the header. If 0, it will be.
   @returns: int Size of header written.
 */

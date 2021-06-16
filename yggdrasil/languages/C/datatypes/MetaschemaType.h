@@ -27,6 +27,8 @@ public:
     @param[in] type const character pointer to the name of the type.
     @param[in] use_generic bool If true, serialized/deserialized
     objects will be expected to be YggGeneric classes.
+    @param[in] always_generic bool If true, the datatype will always be
+    assumed to expect YggGeneric instances.
    */
   MetaschemaType(const char* type, const bool use_generic=false,
 		 const bool always_generic=false) :
@@ -42,6 +44,8 @@ public:
     the type definition from a JSON encoded header.
     @param[in] use_generic bool If true, serialized/deserialized
     objects will be expected to be YggGeneric classes.
+    @param[in] always_generic bool If true, the datatype will always be
+    assumed to expect YggGeneric instances.
    */
   MetaschemaType(const rapidjson::Value &type_doc,
 		 const bool use_generic=false,
@@ -63,6 +67,8 @@ public:
     @param[in] pyobj PyObject* Python object.
     @param[in] use_generic bool If true, serialized/deserialized
     objects will be expected to be YggGeneric classes.
+    @param[in] always_generic bool If true, the datatype will always be
+    assumed to expect YggGeneric instances.
    */
   MetaschemaType(PyObject* pyobj, const bool use_generic=false,
 		 const bool always_generic=false) :
@@ -152,6 +158,8 @@ public:
   /*!
     @brief Copy data wrapped in YggGeneric class.
     @param[in] data YggGeneric* Pointer to generic object.
+    @param[in] orig_data Pointer to data that should be copied if different
+    that the data that is wrapped.
     @returns void* Pointer to copy of data.
    */
   virtual void* copy_generic(const YggGeneric* data, void* orig_data=NULL) const {
@@ -407,6 +415,8 @@ public:
   }
   /*!
     @brief Set the type length.
+    @param[in] force bool True if the length should be updated even if it
+    is not compatible with the existing value.
     @param[in] new_length size_t New length.
    */
   virtual void set_length(size_t new_length, bool force=false) {
@@ -747,6 +757,8 @@ public:
     @param[in] nargs size_t* Pointer to number of arguments present in ap
     that will be decremented by 1.
     @param[in] ap va_list_t Variable argument list.
+    @param[in] skip_nargs_dec bool If true, nargs will be advaced in order
+    to skip the element defining the number of arguments.
     @returns generic_t Generic structure if one is present.
   */
   generic_t pop_generic(size_t* nargs, va_list_t &ap, bool skip_nargs_dec=false) const {
@@ -1097,7 +1109,7 @@ public:
     @param[in] allow_realloc int If 1, buf will be reallocated if it is not
     large enough to contain the serialized data. If 0, an error will be raised
     if it is not large enough.
-    @param[in] Pointer to generic wrapper for object being serialized.
+    @param[in] x Pointer to generic wrapper for object being serialized.
     @returns int Size of the serialized data in buf.
    */
   virtual int serialize(char **buf, size_t *buf_siz,
@@ -1479,6 +1491,7 @@ public:
     return 0;
   }
 
+#ifndef DOXYGEN_SHOULD_SKIP_THIS
 private:
   const char *type_;
   const int type_code_;
@@ -1491,6 +1504,7 @@ protected:
   bool always_generic_;
   std::vector<size_t> skip_before_;
   std::vector<size_t> skip_after_;
+#endif // DOXYGEN_SHOULD_SKIP_THIS
 };
 
 

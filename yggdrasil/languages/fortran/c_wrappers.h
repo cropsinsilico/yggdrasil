@@ -7,6 +7,8 @@
 extern "C" {
 #endif
 
+#ifndef DOXYGEN_SHOULD_SKIP_THIS
+
 const int YGG_MSG_MAX_F = YGG_MSG_MAX;
 
 // Utilities
@@ -176,9 +178,10 @@ int generic_map_set_ndarray_f(generic_t x, const char* key,
 			      const size_t ndim, const void* shape,
 			      const char* units);
 
+#endif // DOXYGEN_SHOULD_SKIP_THIS
+
 #ifdef __cplusplus /* If this is a C++ compiler, end C linkage */
 }
 #endif
-
 
 #endif /*YGG_FC_WRAPPERS_H_*/

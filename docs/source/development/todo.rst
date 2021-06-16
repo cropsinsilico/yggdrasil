@@ -12,11 +12,9 @@ Documentation
 * Docs on how nested data objects are represented in C/C++.
 * Regenerate metaschema with $schema entry
 * Refence metaschema on website in $id or $schema?
-* autodoc for R
-* Add papers section for listing publication using yggdrasil
 * Expand development section into contributing guide
 * Add section on command line utilities
-* Add model API documentation for R & Fortran to Hackathon 2018 docs?
+* Go through and update/prune interface documentation
 * Mark hackathon 2019 docs as deprecated since the UI is no longer live
   
 Performance
@@ -33,7 +31,6 @@ Refactor
 * Change C client/server use of direction/serializer info to be more transparent
 * Split drivers into separate directories for model drivers and connection drivers
 * Change how CLI arguments are added to the arg parser for the language installer to use subparsers
-* Add support for more than one filter
 
 New feature/example
 -------------------
@@ -49,13 +46,10 @@ New feature/example
 * Create a set of fundamental tests that every language implementation needs to pass including files containing serialized data that needs to be deserialized and then serialized.
 * Changes 'bytes' type to 'ascii' since that is really what it means
 * Change name of C MetaschemaType to schema?
-* Add flag to turn off validation
-* Add 'production' flag that turns off debug message, validation, and debug compilation flags for performance
 * Allow use of different 'default' communication mechanisms on different connections based on the languages involved
 * Add automated deprecation marker for schema options
 * Split ld off as its own linker
 * Add comm for using files as temporary storage in passing information between models
-* Run connections on separate processes instead of threads
 * Assign meanings to error codes and implement across languages (e.g. missing comm class)
 * Add parameters constraining valid values for inputs/outputs (e.g. range) using JSON paramaters
 * Allow users to select from list of multiple possiblities when locating libraries to avoid conflict
@@ -72,6 +66,5 @@ Testing
 -------
   
 * Try to setup comm/connection testing at class level so that comms only created once
-* Test outside of conda on windows?
 * Update base test class for comm and connection drivers to use comm installation bool for generating unittest skip errors
 * testing for R native functions

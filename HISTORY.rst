@@ -7,6 +7,7 @@ History
 
 * Fixed error in ygginstall when called w/ 'all' (also triggered by yggdevup)
 * Only assume dont_copy should be true for wrapped functions that are called as servers
+* Integrated the use of Roxygen for documenting R interface
 
 1.6.3 (2021-05-27) Minor bug fixes in preparation for CiS hackathon
 ------------------
