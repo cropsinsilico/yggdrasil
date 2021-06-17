@@ -391,26 +391,36 @@ class CPPModelDriver(CModelDriver):
             list: Lines required to carry out a receive call in this language.
 
         """
-        recv_var_str = recv_var
         out_after = []
         if not isinstance(recv_var, str):
             recv_var_par = cls.channels2vars(recv_var)
-            new_recv_var_par = []
-            for i, v in enumerate(recv_var_par):
-                if cls.allows_realloc(v) and cls.is_vector(v):
-                    assert(v.get('ptr_var', False))
-                    out_after.append(
-                        '{var}.assign({ptr_var}, {ptr_var} + {len_var});'.format(
-                            var=v['name'], ptr_var=v['ptr_var']['name'],
-                            len_var=v['length_var']['name']))
-                    v = v['ptr_var']
-                new_recv_var_par.append(v)
-            recv_var_par = new_recv_var_par
-            recv_var_str = cls.prepare_output_variables(
-                recv_var_par, in_inputs=cls.outputs_in_inputs,
-                for_yggdrasil=True)
+            allows_realloc = [cls.allows_realloc(v)
+                              for v in recv_var_par]
+            is_vector = [cls.is_vector(v) for v in recv_var_par]
+            if any(is_vector):
+                if all(allows_realloc):
+                    kwargs.setdefault('alt_recv_function',
+                                      cls.function_param['recv_heap'])
+                else:
+                    kwargs.setdefault('alt_recv_function',
+                                      cls.function_param['recv_stack'])
+                new_recv_var_par = []
+                for i, v in enumerate(recv_var_par):
+                    if cls.allows_realloc(v) and cls.is_vector(v):
+                        assert(v.get('ptr_var', False))
+                        out_after.append(
+                            '{var}.assign({ptr_var}, '
+                            '{ptr_var} + {len_var});'.format(
+                                var=v['name'], ptr_var=v['ptr_var']['name'],
+                                len_var=v['length_var']['name']))
+                        v = v['ptr_var']
+                    new_recv_var_par.append(v)
+                recv_var_par = new_recv_var_par
+                recv_var = cls.prepare_output_variables(
+                    recv_var_par, in_inputs=cls.outputs_in_inputs,
+                    for_yggdrasil=True)
         out = super(CPPModelDriver, cls).write_model_recv(
-            channel, recv_var_str, **kwargs)
+            channel, recv_var, **kwargs)
         return out + out_after
 
     @classmethod
