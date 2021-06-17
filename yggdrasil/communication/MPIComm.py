@@ -1,6 +1,6 @@
 import logging
 import numpy as np
-from yggdrasil.multitasking import _on_mpi, MPI
+from yggdrasil.multitasking import _on_mpi, MPI, RLock
 from yggdrasil.communication import (
     CommBase, NoMessages)
 logger = logging.getLogger(__name__)
@@ -133,8 +133,10 @@ class MPIComm(CommBase.CommBase):
         if kwargs.get('partner_mpi_ranks', []):
             assert(kwargs.get('address', 'generate') == 'generate')
             kwargs['address'] = kwargs['partner_mpi_ranks']
+        self._request_lock = RLock(task_method='thread')
         self.requests = []
-        self.tag = tag_start
+        self.unused_tags = []
+        self._tag = tag_start
         self.tag_start = tag_start
         self.tag_stride = tag_stride
         self.requires_disconnect = False
@@ -150,6 +152,20 @@ class MPIComm(CommBase.CommBase):
         if 'address' not in kwargs:
             kwargs.setdefault('address', 'generate')
         return args, kwargs
+
+    @property
+    def tag(self):
+        r"""int: Tag for the next message."""
+        if self.unused_tags:
+            return self.unused_tags[0]
+        return self._tag
+
+    def advance_tag(self):
+        r"""Advance to the next tag."""
+        if self.unused_tags:
+            self.unused_tags.pop(0)
+            return
+        self._tag += self.tag_stride
 
     def bind(self):
         r"""Bind to random queue if address is generate."""
@@ -217,15 +233,24 @@ class MPIComm(CommBase.CommBase):
             
     def _close(self, linger=False):
         r"""Close the queue."""
-        for x in self.requests:
-            if not x.complete:
-                x.cancel()
-                self.tag -= self.tag_stride
+        self.cancel_requests()
         if self.requires_disconnect and self.is_open:
             self.mpi_comm.Disconnect()
         self.mpi_comm = None
         super(MPIComm, self)._close(linger=linger)
-        
+
+    def cancel_requests(self):
+        r"""Cancel requests that have not yet been completed."""
+        with self._request_lock:
+            complete_requests = []
+            for x in self.requests:
+                if x.complete:
+                    complete_requests.append(x)
+                else:
+                    self.unused_tags.append(x.tag)
+                    x.cancel()
+            self.requests = complete_requests
+
     @property
     def is_open(self):
         r"""bool: True if the queue is not None."""
@@ -254,24 +279,27 @@ class MPIComm(CommBase.CommBase):
     @property
     def n_msg_recv(self):
         r"""int: Number of messages in the queue to recv."""
-        if self.is_open and (not self.requests):
-            self.add_request()
+        if self.is_open:
+            self.add_request(on_empty=True)
         if self.is_open and self.requests:
             return sum([x.complete for x in self.requests])
         else:
             return 0
 
-    def add_request(self, **kwargs):
+    def add_request(self, on_empty=False, **kwargs):
         r"""Add a request to the queue."""
-        args = (self.mpi_comm, self.direction, self.address, self.tag)
-        if (len(self.address) == 1) or (self.direction == 'send'):
-            cls = MPIRequest
-        else:
-            if self.last_request:
-                kwargs['previous_requests'] = self.last_request.remainder
-            cls = MPIMultiRequest
-        self.requests.append(cls(*args, **kwargs))
-        self.tag += self.tag_stride
+        with self._request_lock:
+            if on_empty and self.requests:
+                return
+            args = (self.mpi_comm, self.direction, self.address, self.tag)
+            if (len(self.address) == 1) or (self.direction == 'send'):
+                cls = MPIRequest
+            else:
+                if self.last_request:
+                    kwargs['previous_requests'] = self.last_request.remainder
+                cls = MPIMultiRequest
+            self.requests.append(cls(*args, **kwargs))
+            self.advance_tag()
 
     def _send(self, payload):
         r"""Send a message.
@@ -294,15 +322,17 @@ class MPIComm(CommBase.CommBase):
                 and the message received.
 
         """
-        if not self.requests:
-            self.add_request()
-        if not self.requests[0].complete:
-            raise NoMessages("No messages in communicator.")
-        self.last_request = self.requests.pop(0)
-        return (True, self.last_request.data)
+        with self._request_lock:
+            self.add_request(on_empty=True)
+            if not self.requests[0].complete:
+                raise NoMessages("No messages in communicator.")
+            self.last_request = self.requests.pop(0)
+            return (True, self.last_request.data)
 
     def purge(self):
         r"""Purge all messages from the comm."""
         super(MPIComm, self).purge()
-        while self.n_msg_recv > 0:
-            self._recv()
+        with self._request_lock:
+            self.cancel_requests()
+            while self.n_msg_recv > 0:
+                self._recv()

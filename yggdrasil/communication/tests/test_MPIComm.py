@@ -97,7 +97,7 @@ class TestMPIComm(test_CommBase.TestCommBase):
         all_tag = self.sync(get_tags=True)
         if self.instance.direction == 'send':
             for _ in range(max(all_tag) - all_tag[self.mpi_rank]):
-                self.instance.tag += 1
+                self.instance._tag += 1
                 # self.instance.send_eof()
             if self.use_async:
                 self.instance.wait_for_confirm(timeout=60.0)

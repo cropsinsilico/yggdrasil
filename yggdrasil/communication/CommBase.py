@@ -11,7 +11,7 @@ from yggdrasil import tools, multitasking
 from yggdrasil.tools import YGG_MSG_EOF
 from yggdrasil.communication import (
     new_comm, get_comm, determine_suffix, TemporaryCommunicationError,
-    import_comm)
+    import_comm, check_env_for_address)
 from yggdrasil.components import import_component, create_component
 from yggdrasil.metaschema.datatypes import MetaschemaTypeError, type2numpy
 from yggdrasil.metaschema.datatypes.MetaschemaType import MetaschemaType
@@ -619,18 +619,7 @@ class CommBase(tools.YggClass):
                 prefix = '%s:' % model_name
                 if model_name and (not self.name.startswith(prefix)):
                     self._name = prefix + self.name
-                if (((self.name not in self.env)
-                     and (self.name.replace(':', '__COLON__')
-                          not in self.env))):
-                    import pprint
-                    env_str = pprint.pformat(self.env)
-                    raise RuntimeError(
-                        'Cannot see %s in env (model = %s). Env:\n%s' %
-                        (self.name, model_name, env_str))
-            try:
-                self.address = self.env[self.name]
-            except KeyError:
-                self.address = self.env[self.name.replace(':', '__COLON__')]
+            self.address = check_env_for_address(self.env, self.name)
         else:
             self.address = address
         self.direction = direction
