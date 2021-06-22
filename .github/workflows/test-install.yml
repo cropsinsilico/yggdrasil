@@ -257,7 +257,7 @@ jobs:
         --debug
     - name: Run MPI tests (macos)
       if: env.INSTALLMPI == 1 && matrix.os == 'macos-latest'
-      id: mpi
+      id: mpi_macos
       run: 'yggtest --ci --cov-append --test-suite=mpi --write-script=run_mpi.sh
 
         ./run_mpi.sh
@@ -265,7 +265,7 @@ jobs:
         '
     - name: Run MPI tests (ubuntu)
       if: env.INSTALLMPI == 1 && matrix.os == 'ubuntu-latest'
-      id: mpi
+      id: mpi_ubuntu
       run: 'yggtest --ci --cov-append --with-mpi=2 yggdrasil/communication/tests/test_MPIComm.py::TestMPICommAsync::test_eof_no_close
         --write-script=run_mpi.sh --nocapture --debug
 
@@ -552,7 +552,7 @@ jobs:
         --debug
     - name: Run MPI tests (macos)
       if: env.INSTALLMPI == 1 && matrix.os == 'macos-latest'
-      id: mpi
+      id: mpi_macos
       run: 'yggtest --ci --cov-append --test-suite=mpi --write-script=run_mpi.sh
 
         ./run_mpi.sh
@@ -560,7 +560,7 @@ jobs:
         '
     - name: Run MPI tests (ubuntu)
       if: env.INSTALLMPI == 1 && matrix.os == 'ubuntu-latest'
-      id: mpi
+      id: mpi_ubuntu
       run: 'yggtest --ci --cov-append --with-mpi=2 yggdrasil/communication/tests/test_MPIComm.py::TestMPICommAsync::test_eof_no_close
         --write-script=run_mpi.sh --nocapture --debug
 
@@ -827,7 +827,7 @@ jobs:
         --debug
     - name: Run MPI tests (macos)
       if: env.INSTALLMPI == 1 && matrix.os == 'macos-latest'
-      id: mpi
+      id: mpi_macos
       run: 'yggtest --ci --cov-append --test-suite=mpi --write-script=run_mpi.sh
 
         ./run_mpi.sh
@@ -835,7 +835,7 @@ jobs:
         '
     - name: Run MPI tests (ubuntu)
       if: env.INSTALLMPI == 1 && matrix.os == 'ubuntu-latest'
-      id: mpi
+      id: mpi_ubuntu
       run: 'yggtest --ci --cov-append --with-mpi=2 yggdrasil/communication/tests/test_MPIComm.py::TestMPICommAsync::test_eof_no_close
         --write-script=run_mpi.sh --nocapture --debug
 
@@ -1104,7 +1104,7 @@ jobs:
         --debug
     - name: Run MPI tests (macos)
       if: env.INSTALLMPI == 1 && matrix.os == 'macos-latest'
-      id: mpi
+      id: mpi_macos
       run: 'yggtest --ci --cov-append --test-suite=mpi --write-script=run_mpi.sh
 
         ./run_mpi.sh
@@ -1112,7 +1112,7 @@ jobs:
         '
     - name: Run MPI tests (ubuntu)
       if: env.INSTALLMPI == 1 && matrix.os == 'ubuntu-latest'
-      id: mpi
+      id: mpi_ubuntu
       run: 'yggtest --ci --cov-append --with-mpi=2 yggdrasil/communication/tests/test_MPIComm.py::TestMPICommAsync::test_eof_no_close
         --write-script=run_mpi.sh --nocapture --debug
 
@@ -1379,7 +1379,7 @@ jobs:
         --debug
     - name: Run MPI tests (macos)
       if: env.INSTALLMPI == 1 && matrix.os == 'macos-latest'
-      id: mpi
+      id: mpi_macos
       run: 'yggtest --ci --cov-append --test-suite=mpi --write-script=run_mpi.sh
 
         ./run_mpi.sh
@@ -1387,7 +1387,7 @@ jobs:
         '
     - name: Run MPI tests (ubuntu)
       if: env.INSTALLMPI == 1 && matrix.os == 'ubuntu-latest'
-      id: mpi
+      id: mpi_ubuntu
       run: 'yggtest --ci --cov-append --with-mpi=2 yggdrasil/communication/tests/test_MPIComm.py::TestMPICommAsync::test_eof_no_close
         --write-script=run_mpi.sh --nocapture --debug
 
