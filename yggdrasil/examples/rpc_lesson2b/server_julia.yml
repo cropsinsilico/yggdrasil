@@ -1,0 +1,8 @@
+---
+
+model:
+  name: server
+  language: julia
+  args: ./src/server.jl
+  is_server: True  # Creates a RPC server queue called "server"
+  copies: 2

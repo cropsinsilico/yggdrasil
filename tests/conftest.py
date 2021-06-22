@@ -604,7 +604,8 @@ def scripts():
         ('r', 'r_model.R'),
         ('fortran', ['hellofunc.f90', 'fortran_model.f90']),
         ('sbml', 'sbml_model.xml'),
-        ('osr', 'osr_model.xml')]
+        ('osr', 'osr_model.xml'),
+        ('julia', 'julia_model.jl')]
     scripts = {}
     for k, v in script_list:
         if isinstance(v, list):

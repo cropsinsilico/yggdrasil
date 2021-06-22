@@ -16,7 +16,7 @@ class JuliaModelDriver(InterpretedModelDriver):  # pragma: Julia
         'int': 'Int',
         'float': 'Float',
         'string': 'String',
-        'array': 'Array{Any}',
+        'array': 'Array',
         'object': 'Dict{AbstractString,Any}',
         'boolean': 'Bool',
         'null': 'Nothing',
@@ -29,12 +29,24 @@ class JuliaModelDriver(InterpretedModelDriver):  # pragma: Julia
         'ply': 'PlyDict',
         'obj': 'ObjDict',
         'schema': 'Dict'}
+    interface_map = {
+        'import': 'import Yggdrasil: commtype',
+        'input': 'Yggdrasil.YggInterface("YggInput", "{channel_name}")',
+        'output': 'Yggdrasil.YggInterface("YggOutput", "{channel_name}")',
+        'server': 'Yggdrasil.YggInterface("YggRpcServer", "{channel_name}")',
+        'client': 'Yggdrasil.YggInterface("YggRpcClient", "{channel_name}")',
+        'timesync': 'Yggdrasil.YggInterface("YggTimesync", "{channel_name}")',
+        'send': 'flag = {channel_obj}.send({outputs})',
+        'recv': 'flag, {inputs} = {channel_obj}.recv()',
+        'call': 'flag, {inputs} = {channel_obj}.call({outputs})',
+    }
     function_param = {
         'import_nofile': 'using {function}',
-        'import': 'using {filename}: {function}',
+        'import': 'include("{filename}")',  # "{function}")',
         'istype': '{variable} isa {type}',
         'len': 'length({variable})',
         'index': '{variable}[{index}]',
+        'first_index': 1,
         'interface': 'using {interface_library}',
         'input': ('{channel} = Yggdrasil.YggInterface(\"YggInput\", '
                   '\"{channel_name}\")'),
@@ -68,15 +80,16 @@ class JuliaModelDriver(InterpretedModelDriver):  # pragma: Julia
         'break': 'break',
         'try_begin': 'try',
         'try_except': 'catch',
-        'assign': '{name} = {value}',
+        'assign': 'global {name} = {value}',
         'function_def_begin': 'function {function_name}({input_var})',
         'return': 'return {output_var}',
         'function_def_regex': (
             r'\n?( *)function +{function_name}'
-            r'(?P<outtype>\:\:.+)?'
-            r' *\((?P<inputs>(?:.|\n)*?)\) *'
-            r'(?P<body>(?:\1(?:    )+(?!return).*\n)|(?: *\n))*'
-            r'(?:\1(?:    )+(?:return )?(?P<outputs>.*)\n)?'),
+            r'(?P<outtype>\:\:[^\(]+?)?'
+            r' *\((?P<inputs>(?:[^\)]+?)?)\) *'
+            r'(?P<body>(?:(?:\1(?: *)(?!return)[^ ].*?\n)|(?: *\n))*)'
+            r'(?:\1(?: *)'
+            r'(?:return *)?(?P<outputs>.*?) *\n)?'),
         'inputs_def_regex': r'\s*(?P<name>.+?)\s*(?:,|$)',
         'outputs_def_regex': r'\s*(?P<name>.+?)\s*(?:,|$)'}
     zero_based = False
@@ -111,4 +124,61 @@ class JuliaModelDriver(InterpretedModelDriver):  # pragma: Julia
         """
         out = super(JuliaModelDriver, self).set_env(**kwargs)
         out['PYTHON'] = PythonModelDriver.get_interpreter()
+        return out
+
+    @classmethod
+    def write_initialize_oiter(cls, var, value=None, **kwargs):
+        r"""Get the lines necessary to initialize an array for iteration
+        output.
+
+        Args:
+            var (dict, str): Name or information dictionary for the variable
+                being initialized.
+            value (str, optional): Value that should be assigned to the
+                variable.
+            **kwargs: Additional keyword arguments are passed to the
+                parent class's method.
+
+        Returns:
+            list: The lines initializing the variable.
+
+        """
+        value = 'Array{Any, 1}(undef, %s)' % var['iter_var']['end']
+        out = super(JuliaModelDriver, cls).write_initialize_oiter(
+            var, value=value, **kwargs)
+        return out
+    
+    @classmethod
+    def write_finalize_oiter(cls, var):
+        r"""Get the lines necessary to finalize an array after iteration.
+
+        Args:
+            var (dict, str): Name or information dictionary for the variable
+                being initialized.
+
+        Returns:
+            list: The lines finalizing the variable.
+
+        """
+        out = super(JuliaModelDriver, cls).write_finalize_oiter(var)
+        out += [f"{var['name']}_type = typeof({var['name']}[1])",
+                f"global {var['name']} = Array{{{var['name']}_type}}({var['name']})"]
+        return out
+    
+    @classmethod
+    def get_testing_options(cls, **kwargs):
+        r"""Method to return a dictionary of testing options for this class.
+
+        Args:
+            **kwargs: Additional keyword arguments are passed to the parent
+                class.
+
+        Returns:
+            dict: Dictionary of variables to use for testing. Key/value pairs:
+                kwargs (dict): Keyword arguments for driver instance.
+                deps (list): Dependencies to install.
+
+        """
+        out = super(JuliaModelDriver, cls).get_testing_options(**kwargs)
+        out.setdefault('invalid_libraries', ['invalid_unicorn'])
         return out

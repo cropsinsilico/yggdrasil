@@ -343,6 +343,24 @@
         }
       ]
     },
+    "julia": [
+      {
+        "julia": [
+          {
+            "method": "apt"
+          },
+          {
+            "method": "brew"
+          },
+          {
+            "method": "choco"
+          },
+          {
+            "method": "conda"
+          }
+        ]
+      }
+    ],
     "mpi": [
       "mpi4py",
       {

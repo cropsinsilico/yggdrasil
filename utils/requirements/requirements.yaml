@@ -169,9 +169,15 @@ extras:
             from_src_on_travis: true
         - method: vcpkg
   julia:
+    # - juliaup:
+    #     - method: conda
+    #     - method: brew
     - julia:
-        - name: julia>=1.1.1
-          method: conda
+        - method: apt
+        - method: brew
+        - method: choco
+        # fails currently on Mac M1, but PR in progress to fix it
+        - method: conda
   mpi:
     - mpi4py
     - mpi:

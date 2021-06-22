@@ -68,6 +68,28 @@ def convert_from_pandas_timedelta(x):
     return add_units(x.total_seconds(), 's')
 
 
+def convert_julia_unit_string(in_str):  # pragma: julia
+    r"""Convert unit string to version that julia Unitful package can
+    understand.
+
+    Args:
+        in_str (str): String unit to convert.
+
+    Returns:
+        str: Converted string.
+
+    """
+    replacements = [('**', '^'),
+                    ('days', 'd'),
+                    ('day', 'd'),
+                    ('degC', '°C'),
+                    ('degF', '°F')]
+    out = in_str
+    for a, b in replacements:
+        out = out.replace(a, b)
+    return out
+
+
 def convert_matlab_unit_string(m_str):  # pragma: matlab
     r"""Convert Matlab unit string to string that the Python package
     can understand.

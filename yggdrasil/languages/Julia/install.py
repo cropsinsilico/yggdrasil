@@ -75,11 +75,11 @@ def install_packages(package_list, update=False, **kwargs):
         else:
             req_nover.append(out['name'])
     if req_nover:
-        req_list = ', '.join(['\"%s\"' % x for x in req_nover])
-        if update:
-            julia_cmd += ['Pkg.update(%s)' % req_list]
-        else:
-            julia_cmd += ['Pkg.add(%s)' % req_list]
+        for x in req_nover:
+            if update:
+                julia_cmd += [f'Pkg.update("{x}")']
+            else:
+                julia_cmd += [f'Pkg.add("{x}")']
     if req_ver:
         for x in req_ver:
             name = "\"%s\"" % x['name']
@@ -170,7 +170,7 @@ def requirements_from_project_toml(fname=None):
     """
     if fname is None:
         fname = proj_file
-    assert(os.path.isfile(fname))
+    assert os.path.isfile(fname)
     contents = toml.load(fname)
     return list(contents['deps'].keys())
 
@@ -224,7 +224,7 @@ def install(args=None, skip_requirements=None,
     logger.info("Built Julia interface.")
     # Install package
     julia_cmd = ['using Pkg',
-                 'Pkg.develop(PackageSpec(path="%s"))' % os.path.dirname(pkg_dir)]
+                 f'Pkg.develop(PackageSpec(path="{pkg_dir}"))']
     if not call_julia(julia_cmd, **kwargs):
         logger.error("Error installing Julia interface.")
         return False

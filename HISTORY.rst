@@ -2,13 +2,16 @@
 History
 =======
 
-X.X.X (XXXX-XX-XX) Add support for Julia
+X.X.X (XXXX-XX-XX) Add support for models written in Julia
 ------------------
 
-* Added interface to Julia
+* Added Julia interface with units implemented via Unitful
+* Added Julia versions of examples SaM, osr, rpc_lesson3b
 
 TODO:
-* Add Julia version of examples
+~~~~~
+
+* Add Julia version of missing examples
 * Add Julia to docs
   
 2.0.0 (2023-XX-XX) Migrate to using extended version of rapidjson/python-rapidjson

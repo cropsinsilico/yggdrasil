@@ -1997,8 +1997,9 @@ class ModelDriver(Driver):
                 inst.cleanup()
 
     @classmethod
-    def format_function_param(cls, key, default=None, replacement=None,
-                              ignore_method=False, **kwargs):
+    def format_function_param(cls, key, default=None, default_key=None,
+                              replacement=None, ignore_method=False,
+                              **kwargs):
         r"""Return the formatted version of the specified key.
 
         Args:
@@ -2006,6 +2007,8 @@ class ModelDriver(Driver):
                 formatted.
             default (str, optional): Format that should be returned if key
                 is not in cls.function_param. Defaults to None.
+            default_key (str, optional): Key that should be used in place
+                of the provided on if it does not exist. Defaults to None.
             replacement (str, optional): Format that should be used instead
                 of the one in cls.function_param. Defaults to None.
             **kwargs: Additional keyword arguments are used in formatting the
@@ -2024,6 +2027,8 @@ class ModelDriver(Driver):
         elif (not ignore_method) and hasattr(cls, 'format_function_param_%s' % key):
             return getattr(cls, 'format_function_param_%s' % key)(**kwargs)
         else:
+            if key not in cls.function_param and default_key:
+                key = default_key
             if (key not in cls.function_param) and (default is None):
                 raise NotImplementedError(("Language %s dosn't have an entry in "
                                            "function_param for key '%s'")
@@ -2475,7 +2480,7 @@ class ModelDriver(Driver):
                         assert len(x['datatype']['items']) == len(non_length)
                         for v, t in zip(non_length, x['datatype']['items']):
                             v['datatype'] = t
-                elif any('datatype' in x for x in non_length):
+                elif any(xx.get('datatype', None) for xx in non_length):
                     if (len(non_length) == 1):
                         x['datatype'] = non_length[0]['datatype']
                     else:
@@ -3215,9 +3220,6 @@ class ModelDriver(Driver):
         else:
             recv_var_par = cls.split_variables(recv_var_str)
         expanded_recv_var = None
-        if (len(recv_var_par) > 1) and ('multiple_outputs' in cls.function_param):
-            expanded_recv_var = recv_var_str
-            recv_var_str = 'temp_%s' % recv_var_par[0]['name']
         if isinstance(flag_var, dict):
             flag_var = flag_var['name']
         if isinstance(iter_var, dict):
@@ -3226,6 +3228,10 @@ class ModelDriver(Driver):
             inputs = [recv_var_str]
             outputs = [flag_var]
         else:
+            if (len(recv_var_par) > 1):
+                # and ('multiple_outputs' in cls.function_param):
+                expanded_recv_var = recv_var_str
+                recv_var_str = 'temp_%s' % recv_var_par[0]['name']
             inputs = []
             outputs = [flag_var, recv_var_str]
         if cls.include_channel_obj:

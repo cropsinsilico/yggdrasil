@@ -149,6 +149,17 @@ outputs:
         - czmq
         - lz4
         - zeromq
+  - name: yggdrasil.julia
+    build:
+      string: py{{ PY_VER_MAJOR }}{{ PY_VER_MINOR }}h{{ PKG_HASH }}_{{ PKG_BUILDNUM }}
+      run_exports:
+        - {{ pin_subpackage('yggdrasil.julia') }}
+    requirements:
+      host:
+        - python
+      run:
+        - {{ pin_subpackage('yggdrasil', exact=True) }}
+        - julia
   - name: yggdrasil.mpi
     build:
       string: py{{ PY_VER_MAJOR }}{{ PY_VER_MINOR }}h{{ PKG_HASH }}_{{ PKG_BUILDNUM }}

@@ -1,0 +1,9 @@
+---
+
+model:
+  name: server
+  language: julia
+  args: ./src/server.jl
+  function: model_function
+  is_server: True  # Creates a RPC server queue called "server"
+  copies: 5

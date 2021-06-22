@@ -1984,6 +1984,7 @@ definitions:
           - ExecutableModelDriver
           - FortranModelDriver
           - GCCModelDriver
+          - JuliaModelDriver
           - LPyModelDriver
           - MPIPartnerModel
           - MakeModelDriver
@@ -2895,6 +2896,12 @@ definitions:
       - additionalProperties: true
         description: Schema for model component ['julia'] subtype.
         properties:
+          driver:
+            deprecated: true
+            description: '[DEPRECATED] Name of driver class that should be used.'
+            enum:
+            - JuliaModelDriver
+            type: string
           interpreter:
             description: Name or path of interpreter executable that should be used
               to run the model. If not provided, the interpreter will be determined
@@ -2911,7 +2918,7 @@ definitions:
               type: string
             type: array
           language:
-            default: executable
+            default: julia
             description: Model is written in Julia.
             enum:
             - julia
@@ -2922,6 +2929,8 @@ definitions:
               should only be used for subclasses that will not be invoking the model
               via the command line. Defaults to False.
             type: boolean
+        required:
+        - language
         title: yggdrasil.drivers.JuliaModelDriver.JuliaModelDriver
         type: object
       - additionalProperties: true
