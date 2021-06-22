@@ -58,7 +58,7 @@ def register_example(example_dir):
         lang_avail += ['all', 'all_nomatlab', 'c', 'cpp', 'matlab', 'python']
     elif example_base in ['types', 'transforms']:
         lang_avail += tools.get_supported_lang()
-        for k in ['cmake', 'make', 'lpy', 'executable']:
+        for k in ['cmake', 'make', 'lpy', 'executable', 'mpi']:
             lang_avail.remove(k)
     elif example_base.startswith('sbml'):
         lang_avail = ['sbml']
