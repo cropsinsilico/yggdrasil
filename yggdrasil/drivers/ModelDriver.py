@@ -657,8 +657,7 @@ class ModelDriver(Driver):
                             outputs=self.outputs,
                             iter_function_over=self.iter_function_over,
                             copies=self.copies)
-            self.preparse_function(yml_mock)
-            self.preparsed_function = yml_mock['preparsed_function']
+            self.preparsed_function = self.preparse_function(yml_mock)
         self.model_function_info = self.preparsed_function['model_file']
         self.model_function_file = self.model_function_info['model_file']
         self.model_function_inputs = self.preparsed_function['inputs']
@@ -1875,6 +1874,9 @@ class ModelDriver(Driver):
         Args:
             yml (dict): Options that will be used to initialize the model.
 
+        Returns:
+            dict: Information about the parsed function.
+
         """
         if 'function' not in yml:
             return
@@ -1888,7 +1890,7 @@ class ModelDriver(Driver):
         if not source_files:  # pragma: debug
             raise ValueError("Could not identify any source files.")
         model_function_file = source_files[0]
-        if not os.path.isfile(model_function_file):
+        if not os.path.isfile(model_function_file):  # pragma: debug
             raise ValueError("Source file does not exist: '%s'"
                              % model_function_file)
         
@@ -1926,6 +1928,7 @@ class ModelDriver(Driver):
             'copies': yml.get('copies', 1),
             'iter_function_over': yml.get('iter_function_over', []),
             'skip_update_io': True}
+        return yml['preparsed_function']
     
     @classmethod
     def update_io_from_function(cls, model_file, model_function,
@@ -3425,12 +3428,11 @@ class ModelDriver(Driver):
         json_type = kwargs.get('datatype', kwargs)
         if isinstance(json_type, dict):
             type_name = json_type.get('type', 'bytes')
-            if type_name == 'scalar':
-                type_name = json_type['subtype']
         else:
             type_name = json_type
-            if type_name == 'scalar':
-                type_name = kwargs['subtype']
+            json_type = kwargs
+        if type_name == 'scalar':
+            type_name = json_type['subtype']
         if (type_name == 'flag') and (type_name not in cls.type_map):
             type_name = 'boolean'
         return cls.type_map[type_name]

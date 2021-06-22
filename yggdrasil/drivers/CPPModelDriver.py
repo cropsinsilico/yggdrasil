@@ -304,8 +304,6 @@ class CPPModelDriver(CModelDriver):
                 if grp_vect:
                     v['ptr_var'] = dict(v, name=(v['name'] + '_ptr'))
                     v['ptr_var'].pop('native_type')
-                    if not cls.allows_realloc(v):
-                        v['length_var'] = v['name'] + '.size()'
         elif direction == 'output':
             for v in x['vars']:
                 if (not v.get('length_var', False)) and cls.is_vector(v):
@@ -401,9 +399,11 @@ class CPPModelDriver(CModelDriver):
                 if all(allows_realloc):
                     kwargs.setdefault('alt_recv_function',
                                       cls.function_param['recv_heap'])
-                else:
-                    kwargs.setdefault('alt_recv_function',
-                                      cls.function_param['recv_stack'])
+                else:  # pragma: debug
+                    # kwargs.setdefault('alt_recv_function',
+                    #                   cls.function_param['recv_stack'])
+                    raise RuntimeError("Mixing vectors with stack allocated "
+                                       "arrays is not get supported.")
                 new_recv_var_par = []
                 for i, v in enumerate(recv_var_par):
                     if cls.allows_realloc(v) and cls.is_vector(v):

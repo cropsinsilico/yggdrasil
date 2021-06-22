@@ -197,6 +197,8 @@ class TestModelDriverNoInit(TestModelParam, parent.TestDriverNoInit):
         else:
             kwargs['args'] = ['invalid']
             self.assert_raises(ValueError, self.import_cls, **kwargs)
+            kwargs['source_files'] = ['invalid']
+            self.assert_raises(ValueError, self.import_cls, **kwargs)
                                
     def test_get_native_type(self):
         r"""Test translation to native type."""
