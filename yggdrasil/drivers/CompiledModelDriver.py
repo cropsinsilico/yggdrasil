@@ -2181,7 +2181,7 @@ class CompiledModelDriver(ModelDriver):
             if not os.path.isabs(src):
                 src = os.path.normpath(os.path.join(self.working_dir, src))
             source_files.append(src)
-        self.source_files = []
+        self.source_files = source_files
         super(CompiledModelDriver, self).parse_arguments(args, **kwargs)
         # Handle case where provided argument is source and not executable
         # and case where provided argument is executable, but source files are
