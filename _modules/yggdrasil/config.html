@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>yggdrasil.config &mdash; yggdrasil v1.6.3+17.g7c138fa48.dirty documentation</title>
+  <title>yggdrasil.config &mdash; yggdrasil v1.6.3+18.g537444084.dirty documentation</title>
   
 
   
@@ -802,7 +802,6 @@
             <span class="n">v</span> <span class="o">=</span> <span class="p">[</span><span class="n">import_component</span><span class="p">(</span><span class="s1">&#39;model&#39;</span><span class="p">,</span> <span class="n">x</span><span class="p">)</span><span class="o">.</span><span class="n">language</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">v</span><span class="p">]</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
             <span class="n">v</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">v</span><span class="p">)</span>
-        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">%s</span><span class="s1">: </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">k_env</span><span class="p">,</span> <span class="n">v</span><span class="p">))</span>    
         <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="n">k_env</span><span class="p">]</span> <span class="o">=</span> <span class="n">v</span>
     <span class="k">if</span> <span class="n">new_env</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;loglevel&#39;</span><span class="p">,</span> <span class="kc">False</span><span class="p">):</span>
         <span class="n">set_ygg_loglevel</span><span class="p">(</span><span class="n">new_env</span><span class="p">[</span><span class="s1">&#39;loglevel&#39;</span><span class="p">])</span>

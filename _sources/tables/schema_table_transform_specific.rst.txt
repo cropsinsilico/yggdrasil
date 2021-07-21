@@ -3,7 +3,7 @@
 ================   ========   ================================================================================   ============================
 Option             Type       Description                                                                        Valid For 'Transformtype' Of
 ================   ========   ================================================================================   ============================
-field_names        array                                                                                         ['pandas', 'array']         
+field_names        array                                                                                         ['array', 'pandas']         
 filter                                                                                                           ['filter']                  
 function           function   The handle for a callable Python object (e.g. function) that should be used to     ['function']                
                               transform messages or a string of the form "<function file>:<function name>"                                   
