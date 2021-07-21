@@ -190,24 +190,6 @@ class ForkComm(CommBase.CommBase):
         return min([x.maxMsgSize for x in self.comm_list])
 
     @classmethod
-    def split_comm(cls, comm, copies):
-        r"""Split yaml representation of a comm into multiple copies.
-
-        Args:
-            comm (dict): Comm yaml representation.
-            copies (int): Number of times to duplicate comm.
-
-        """
-        comm['commtype'] = [
-            dict(comm,
-                 partner_model=('%s_copy%d' % (comm['partner_model'], idx)))
-            for idx in range(copies)]
-        comm['dont_copy'] = True
-        for k in cls.child_keys:
-            comm.pop(k, None)
-        return comm
-
-    @classmethod
     def new_comm_kwargs(cls, name, *args, **kwargs):
         r"""Get keyword arguments for new comm."""
         if 'address' not in kwargs:
@@ -245,18 +227,18 @@ class ForkComm(CommBase.CommBase):
                 out[k].update(v)
         return out
 
-    @property
-    def mpi_model_kws(self):
-        r"""dict: Mapping between model name and opposite comm keyword
-        arguments that need to be provided to the model for the MPI
-        connection."""
-        out = {}
-        for x in self.comm_list:
-            iout = x.mpi_model_kws
-            for k, v in iout.items():
-                out.setdefault(k, [])
-                out[k] += v
-        return out
+    # @property
+    # def mpi_model_kws(self):
+    #     r"""dict: Mapping between model name and opposite comm keyword
+    #     arguments that need to be provided to the model for the MPI
+    #     connection."""
+    #     out = {}
+    #     for x in self.comm_list:
+    #         iout = x.mpi_model_kws
+    #         for k, v in iout.items():
+    #             out.setdefault(k, [])
+    #             out[k] += v
+    #     return out
 
     @property
     def opp_comms(self):

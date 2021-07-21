@@ -1081,12 +1081,12 @@ class CommBase(tools.YggClass):
             out[self.partner_model] = self.opp_comms
         return out
 
-    @property
-    def mpi_model_kws(self):
-        r"""dict: Mapping between model name and opposite comm keyword
-        arguments that need to be provided to the model for the MPI
-        connection."""
-        return {}
+    # @property
+    # def mpi_model_kws(self):
+    #     r"""dict: Mapping between model name and opposite comm keyword
+    #     arguments that need to be provided to the model for the MPI
+    #     connection."""
+    #     return {}
 
     @property
     def opp_name(self):

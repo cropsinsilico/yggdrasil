@@ -66,7 +66,7 @@ class TestMPIComm(test_CommBase.TestCommBase):
         if self.mpi_rank == 0:
             recv_kws = self.instance.opp_comm_kwargs()
             self.mpi_comm.send(recv_kws, dest=1, tag=init_tag)
-        if sleep_after_connect:
+        if sleep_after_connect:  # pragma: testing
             self.instance.sleep()
         assert(self.instance.is_open)
         if self.instance.direction == 'recv':
@@ -225,7 +225,7 @@ class TestMPIComm(test_CommBase.TestCommBase):
             flag = fsend_meth(*send_args, **send_kwargs)
             assert(flag)
         # Wait for send to close
-        if is_eof_send and close_on_send_eof:
+        if is_eof_send and close_on_send_eof:  # pragma: testing
             T = send_instance.start_timeout(self.timeout, key_suffix=tkey)
             while (not T.is_out) and (not send_instance.is_closed):  # pragma: debug
                 send_instance.sleep()

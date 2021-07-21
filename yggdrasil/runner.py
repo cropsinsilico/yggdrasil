@@ -580,11 +580,13 @@ class YggRunner(YggClass):
         r"""Start a server driver."""
         if self.mpi_comm and (self.rank != 0):
             return
-        if name in self.modelcopies:
-            assert(name not in self.modeldrivers)
-            for cpy in self.modelcopies[name]:
-                self.start_server(cpy)
-            return
+        # This is required if modelcopies are not joined before drivers
+        # are started
+        # if name in self.modelcopies:
+        #     assert(name not in self.modeldrivers)
+        #     for cpy in self.modelcopies[name]:
+        #         self.start_server(cpy)
+        #     return
         x = self.modeldrivers[name]['instance']
         if not x.was_started:
             self.debug("Starting server '%s' before client", x.name)
@@ -592,16 +594,19 @@ class YggRunner(YggClass):
 
     def stop_server(self, name):
         r"""Stop a server driver."""
-        if name in self.modelcopies:
-            assert(name not in self.modeldrivers)
-            for cpy in self.modelcopies[name]:
-                self.stop_server(cpy)
-            return
+        # This is required if modelcopies are not joined before drivers
+        # are started
+        # if name in self.modelcopies:
+        #     assert(name not in self.modeldrivers)
+        #     for cpy in self.modelcopies[name]:
+        #         self.stop_server(cpy)
+        #     return
         x = self.modeldrivers[name]['instance']
         x.stop()
 
     def startDrivers(self):
         r"""Start drivers, starting with the IO drivers."""
+        assert(not self.modelcopies)
         self.info('Starting I/O drivers and models on system '
                   + '{} in namespace {} with rank {}'.format(
                       self.host, self.namespace, self.rank))

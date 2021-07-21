@@ -346,7 +346,9 @@ class ExampleTstBase(YggTestBase, tools.YggClass):
                 ipcrm_queues()
         # Run
         os.environ.update(self.env)
-        if self.iter_param.get('mpi', False) and (not _on_mpi):
+        if self.iter_param.get('mpi', False) and (not _on_mpi):  # pragma: testing
+            # This method for running tests will not be run unless MPI is
+            # enabled for all tests and mpi is added as an iteration parameter
             try:
                 nproc = 2
                 args = ['mpiexec', '-n', str(nproc), sys.executable,
@@ -416,7 +418,9 @@ class ExampleTstBase(YggTestBase, tools.YggClass):
         assert(not self.iter_param)
         self.iter_param = {}
 
-    def setup_iteration_mpi(self, mpi=None):
+    # This method can be used if mpi is toggled via an iteration variable,
+    # but the current test setup runs the mpi enabled versions separately
+    def setup_iteration_mpi(self, mpi=None):  # pragma: testing
         r"""Perform setup associated with an MPI iteration."""
         if mpi:
             try:
