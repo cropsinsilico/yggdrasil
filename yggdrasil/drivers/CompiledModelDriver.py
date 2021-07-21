@@ -2175,6 +2175,13 @@ class CompiledModelDriver(ModelDriver):
                 setattr(self, '%s_tool' % k, False)
             else:
                 setattr(self, '%s_tool' % k, self.get_tool_instance(k))
+        # Ensure source files are absolute paths
+        source_files = []
+        for src in self.source_files:
+            if not os.path.isabs(src):
+                src = os.path.normpath(os.path.join(self.working_dir, src))
+            source_files.append(src)
+        self.source_files = []
         super(CompiledModelDriver, self).parse_arguments(args, **kwargs)
         # Handle case where provided argument is source and not executable
         # and case where provided argument is executable, but source files are
@@ -2252,8 +2259,12 @@ class CompiledModelDriver(ModelDriver):
 
         """
         out = []
-        if source_files:
-            out += source_files
+        if isinstance(source_files, list):
+            for src in source_files:
+                if working_dir and (not os.path.isabs(src)):
+                    src = os.path.normpath(os.path.join(working_dir, src))
+                if os.path.isfile(src):
+                    out.append(src)
         if not out:
             out = super(CompiledModelDriver, cls).identify_source_files(
                 args=args, working_dir=working_dir,
