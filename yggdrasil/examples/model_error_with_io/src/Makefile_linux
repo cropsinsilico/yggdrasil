@@ -1,0 +1,23 @@
+IDIR = .
+CC ?= gcc
+CFLAGS += -I$(IDIR)
+
+ODIR = .
+
+LIBS = -lm $(LDFLAGS)
+
+.PHONY: all
+all: model_error_with_io_modelA model_error_with_io_modelB
+
+$(ODIR)/%.o: %.c
+	$(CC) -c $(CFLAGS) $< -o $@
+
+model_error_with_io_modelA: $(ODIR)/model_error_with_io_modelA.o
+	$(CC) -o $@ $^ $(CFLAGS) $(LIBS)
+
+model_error_with_io_modelB: $(ODIR)/model_error_with_io_modelB.o
+	$(CC) -o $@ $^ $(CFLAGS) $(LIBS)
+
+.PHONY: clean
+clean:
+	rm -f $(ODIR)/*.o *~ model_error_with_io_modelA model_error_with_io_modelB $(IDIR)/*~ 

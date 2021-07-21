@@ -688,6 +688,10 @@ class YggRunner(YggClass):
             self.error('One or more models generated errors.')
             self.printStatus()
             self.terminate()
+        if self.mpi_comm:
+            allcode = self.mpi_comm.allreduce(self.error_flag, op=MPI.SUM)
+            if not self.error_flag:
+                self.error_flag = allcode
         self.debug('Returning')
 
     # def do_model_exits(self, model):
