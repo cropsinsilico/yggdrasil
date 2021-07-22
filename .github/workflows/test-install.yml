@@ -1168,6 +1168,7 @@ jobs:
       INSTALLRMQ: 0
       INSTALLTRIMESH: 0
       INSTALLPYGMENTS: 0
+      INSTALLMPI: 0
       YGG_GHA_JOB_ID_SUFFIX: -stripped
     strategy:
       matrix:
