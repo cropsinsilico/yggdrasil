@@ -1,12 +1,15 @@
 import pytest
+import unittest
 from yggdrasil.tests import assert_equal
-from yggdrasil.communication import CommBase
+from yggdrasil.communication import CommBase, MPIComm
 from yggdrasil.communication.tests import test_CommBase
 
 
 _tag = 0
+_mpi_installed = MPIComm.MPIComm.is_installed(language='python')
 
 
+@unittest.skipIf(not _mpi_installed, "MPI library not installed")
 @pytest.mark.mpi(min_size=2)
 class TestMPIComm(test_CommBase.TestCommBase):
     r"""Test class for MPIComm."""
