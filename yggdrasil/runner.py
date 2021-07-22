@@ -13,6 +13,7 @@ from yggdrasil.tools import YggClass
 from yggdrasil.config import ygg_cfg, cfg_environment, temp_config
 from yggdrasil import platform, yamlfile
 from yggdrasil.drivers import create_driver, DuplicatedModelDriver
+from yggdrasil.components import import_component
 
 
 COLOR_TRACE = '\033[30;43;22m'
@@ -392,7 +393,7 @@ class YggRunner(YggClass):
         """
         return self.connectiondrivers.values()
 
-    def create_driver(self, yml):
+    def create_driver(self, yml, **kwargs):
         r"""Create a driver instance from the yaml information.
 
         Args:
@@ -409,72 +410,40 @@ class YggRunner(YggClass):
         try:
             if yml.get('copies', 1) > 1:
                 instance = DuplicatedModelDriver.DuplicatedModelDriver(
-                    yml, namespace=self.namespace, rank=self.rank)
+                    yml, namespace=self.namespace, rank=self.rank, **kwargs)
             else:
+                kwargs = dict(yml, **kwargs)
                 instance = create_driver(yml=yml, namespace=self.namespace,
-                                         rank=self.rank, **yml)
+                                         rank=self.rank, **kwargs)
             yml['instance'] = instance
         finally:
             os.chdir(curpath)
         return instance
 
-    def createModelDriver(self, yml):
-        r"""Create a model driver instance from the yaml information.
-
-        Args:
-            yml (yaml): Yaml object containing driver information.
-
-        Returns:
-            object: An instance of the specified driver.
-
-        """
-        drv = self.create_driver(yml)
-        self.debug("Model %s:, env: %s",
-                   yml['name'], pformat(yml['instance'].env))
-        return drv
-
-    def create_connection_driver(self, yml):
-        r"""Create a connection driver instance from the yaml information.
-
-        Args:
-            yml (yaml): Yaml object containing driver information.
-
-        Returns:
-            object: An instance of the specified driver.
-
-        """
-        yml['task_method'] = self.connection_task_method
-        drv = self.create_driver(yml)
-        # Transfer connection addresses to model via env
-        # TODO: Change to server that tracks connections
-        for model, env in drv.model_env.items():
-            try:
-                self.modeldrivers[model].setdefault('env', {})
-                self.modeldrivers[model]['env'].update(env)
-            except KeyError:
-                model0 = model.split('_copy')[0]
-                if (((model0 in self.modeldrivers)
-                     and (self.modeldrivers[model0].get('copies', 0) > 1))):
-                    self.modeldrivers[model0].setdefault('env_%s' % model, {})
-                    self.modeldrivers[model0]['env_%s' % model].update(env)
-                else:  # pragma: debug
-                    raise
-        return drv
-        
     def loadDrivers(self):
         r"""Load all of the necessary drivers, doing the IO drivers first
         and adding IO driver environmental variables back tot he models."""
         self.debug('')
         driver = dict(name='name')
         try:
+            # Preparse model drivers first so that the input/output
+            # channels are updated for wrapped functions
+            self.debug("Preparsing model functions")
+            for driver in self.modeldrivers.values():
+                driver_cls = import_component('model', driver['driver'],
+                                              without_schema=True)
+                driver_cls.preparse_function(driver)
             # Create connection drivers
             self.debug("Loading connection drivers")
             for driver in self.connectiondrivers.values():
-                self.create_connection_driver(driver)
+                driver['task_method'] = self.connection_task_method
+                self.create_driver(driver)
             # Create model drivers
             self.debug("Loading model drivers")
             for driver in self.modeldrivers.values():
-                self.createModelDriver(driver)
+                self.create_driver(driver)
+                self.debug("Model %s:, env: %s",
+                           driver['name'], pformat(driver['instance'].env))
         except BaseException:  # pragma: debug
             self.error("%s could not be created.", driver['name'])
             self.terminate()

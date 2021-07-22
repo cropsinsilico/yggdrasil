@@ -223,6 +223,7 @@ class FortranModelDriver(CompiledModelDriver):
     function_param = {
         'import_nofile': 'use {function}',
         'import': '#include "{filename}"',
+        'len': 'size({variable},1)',
         'index': '{variable}({index})',
         'interface': 'use fygg',
         'input': ('{channel} = ygg_input_type('
@@ -951,6 +952,31 @@ class FortranModelDriver(CompiledModelDriver):
         return False
         
     @classmethod
+    def write_initialize_oiter(cls, var, value=None, **kwargs):
+        r"""Get the lines necessary to initialize an array for iteration
+        output.
+
+        Args:
+            var (dict, str): Name or information dictionary for the variable
+                being initialized.
+            value (str, optional): Value that should be assigned to the
+                variable.
+            **kwargs: Additional keyword arguments are passed to the
+                parent class's method.
+
+        Returns:
+            list: The lines initializing the variable.
+
+        """
+        out = [
+            'if (associated({name}%x)) then'.format(name=var['name']),
+            '   deallocate({name}%x)'.format(name=var['name']),
+            'end if',
+            'allocate({name}%x({size}))'.format(name=var['name'],
+                                                size=var['iter_var']['end'])]
+        return out
+    
+    @classmethod
     def write_declaration(cls, var, **kwargs):
         r"""Return the lines required to declare a variable with a certain
         type.
@@ -1136,3 +1162,39 @@ class FortranModelDriver(CompiledModelDriver):
         out = super(FortranModelDriver, cls).write_type_decl(
             name, datatype, **kwargs)
         return out
+    
+    @classmethod
+    def format_function_param_len(cls, extra=None, **kwargs):
+        r"""Return the formatted version of the len key.
+
+        Args:
+            extra (dict, optional): Variable dictionary specifying the
+                variable name, datatype, etc. Defaults to None and is ignored.
+            **kwargs: Additional keyword arguments are used in formatting the
+                request function parameter.
+
+        Returns:
+            str: Formatted string.
+
+        """
+        if (extra is not None) and cls.allows_realloc(extra):
+            kwargs['variable'] = "%s%%x" % extra['name']
+        return cls.format_function_param('len', ignore_method=True, **kwargs)
+
+    @classmethod
+    def format_function_param_index(cls, extra=None, **kwargs):
+        r"""Return the formatted version of the index key.
+
+        Args:
+            extra (dict, optional): Variable dictionary specifying the
+                variable name, datatype, etc. Defaults to None and is ignored.
+            **kwargs: Additional keyword arguments are used in formatting the
+                request function parameter.
+
+        Returns:
+            str: Formatted string.
+
+        """
+        if (extra is not None) and cls.allows_realloc(extra):
+            kwargs['variable'] = "%s%%x" % extra['name']
+        return cls.format_function_param('index', ignore_method=True, **kwargs)

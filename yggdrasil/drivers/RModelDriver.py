@@ -428,3 +428,53 @@ class RModelDriver(InterpretedModelDriver):  # pragma: R
             os.remove(makevar)
             if os.path.isfile(makevar_copy):
                 shutil.move(makevar_copy, makevar)
+
+    @classmethod
+    def write_initialize_oiter(cls, var, value=None, **kwargs):
+        r"""Get the lines necessary to initialize an array for iteration
+        output.
+
+        Args:
+            var (dict, str): Name or information dictionary for the variable
+                being initialized.
+            value (str, optional): Value that should be assigned to the
+                variable.
+            **kwargs: Additional keyword arguments are passed to the
+                parent class's method.
+
+        Returns:
+            list: The lines initializing the variable.
+
+        """
+        value = 'vector(mode = "list", length = %s)' % var['iter_var']['end']
+        out = super(RModelDriver, cls).write_initialize_oiter(
+            var, value=value, **kwargs)
+        return out
+
+    @classmethod
+    def write_finalize_oiter(cls, var):
+        r"""Get the lines necessary to finalize an array after iteration.
+
+        Args:
+            var (dict, str): Name or information dictionary for the variable
+                being initialized.
+
+        Returns:
+            list: The lines finalizing the variable.
+
+        """
+        out = super(RModelDriver, cls).write_finalize_oiter(var)
+        out += [
+            'if (is({name}[[1]], "units")) {{'.format(name=var['name']),
+            '  {name}_units = units::deparse_unit({name}[[1]])'.format(
+                name=var['name']),
+            '} else {',
+            '  {name}_units = NULL'.format(name=var['name']),
+            '}',
+            '{name} = array(as.numeric(unlist({name})))'.format(name=var['name']),
+            'if (!(is.null({name}_units))) {{'.format(name=var['name']),
+            ('  {name} = units::set_units({name}, {name}_units, '
+             ' mode="standard")').format(name=var['name']),
+            '}',
+        ]
+        return out

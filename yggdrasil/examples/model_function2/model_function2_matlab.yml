@@ -1,0 +1,30 @@
+models:
+  - name: matlab_modelA
+    language: matlab
+    args: ./src/model_function_modelA.m
+    function: model_function_modelA
+    iter_function_over: [x, y]
+    inputs:
+      name: x
+      default_file:
+        name: ./Input/input.txt
+        filetype: table
+        as_array: true
+    outputs: y
+  - name: matlab_modelB
+    language: matlab
+    args: ./src/model_function_modelB.m
+    function: model_function_modelB
+    inputs: x
+    outputs:
+      name: y
+      default_file:
+        name: ./output.txt
+        filetype: table
+        as_array: true
+        field_names: [mass]
+        field_units: [g]
+
+connections:
+  - input: matlab_modelA:y  # Connection between model A output & model B input
+    output: matlab_modelB:x

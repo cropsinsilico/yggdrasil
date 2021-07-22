@@ -1,0 +1,30 @@
+models:
+  - name: c_modelA
+    language: c
+    args: ./src/model_function_modelA.c
+    function: model_function
+    iter_function_over: [x, y]
+    inputs:
+      name: x
+      default_file:
+        name: ./Input/input.txt
+        filetype: table
+        as_array: true
+    outputs: y
+  - name: c_modelB
+    language: c
+    args: ./src/model_function_modelB.c
+    function: model_function
+    inputs: x
+    outputs:
+      name: y
+      default_file:
+        name: ./output.txt
+        filetype: table
+        as_array: true
+        field_names: [mass]
+        field_units: [g]
+
+connections:
+  - input: c_modelA:y  # Connection between model A output & model B input
+    output: c_modelB:x

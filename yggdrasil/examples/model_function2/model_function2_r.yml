@@ -1,0 +1,29 @@
+models:
+  - name: r_modelA
+    language: R
+    args: ./src/model_function_modelA.R
+    function: model_function
+    iter_function_over: [x, y]
+    inputs:
+      name: x
+      default_file:
+        name: ./Input/input.txt
+        filetype: table
+        as_array: true
+    outputs: y
+  - name: r_modelB
+    language: R
+    args: ./src/model_function_modelB.R
+    function: model_function
+    inputs: x
+    outputs:
+      name: y
+      default_file:
+        name: ./output.txt
+        filetype: table
+        as_array: true
+        field_names: [mass]
+
+connections:
+  - input: r_modelA:y  # Connection between model A output & model B input
+    output: r_modelB:x

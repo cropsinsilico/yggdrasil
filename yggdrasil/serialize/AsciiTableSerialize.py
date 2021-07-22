@@ -164,7 +164,8 @@ class AsciiTableSerialize(DefaultSerialize):
             out = serialize.table_to_array(msg, self.format_str,
                                            use_astropy=self.use_astropy,
                                            names=self.get_field_names(as_bytes=True))
-            out = self.datatype.coerce_type(out)
+            out = self.datatype.coerce_type(out, typedef=self.typedef)
+            out = self.datatype.transform_type(out, typedef=self.typedef)
         else:
             out = list(serialize.process_message(msg, self.format_str))
         field_units = self.get_field_units()

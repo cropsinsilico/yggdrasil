@@ -2175,6 +2175,13 @@ class CompiledModelDriver(ModelDriver):
                 setattr(self, '%s_tool' % k, False)
             else:
                 setattr(self, '%s_tool' % k, self.get_tool_instance(k))
+        # Ensure source files are absolute paths
+        source_files = []
+        for src in self.source_files:
+            if not os.path.isabs(src):
+                src = os.path.normpath(os.path.join(self.working_dir, src))
+            source_files.append(src)
+        self.source_files = source_files
         super(CompiledModelDriver, self).parse_arguments(args, **kwargs)
         # Handle case where provided argument is source and not executable
         # and case where provided argument is executable, but source files are
@@ -2183,8 +2190,13 @@ class CompiledModelDriver(ModelDriver):
         model_is_source = self.is_source_file(self.model_file)
         if model_is_source:
             self.model_src = self.model_file
-            if len(self.source_files) == 0:
-                self.source_files.append(self.model_file)
+            try:
+                idx = self.source_files.index(self.model_function_file)
+                self.source_files[idx] = self.model_src
+            except ValueError:
+                pass
+            if not self.source_files:
+                self.source_files.append(self.model_src)
         else:
             if len(model_ext) == 0:
                 self.model_file += self.get_tool_instance('linker').executable_ext
@@ -2236,23 +2248,34 @@ class CompiledModelDriver(ModelDriver):
         """
         return self.language
 
-    def get_source_file(self, args):
-        r"""Determine the source file based on arguments.
+    @classmethod
+    def identify_source_files(cls, args=None, working_dir=None,
+                              source_files=None, **kwargs):
+        r"""Determine the source file based on model arguments.
 
         Args:
-            args (list): Arguments provided.
+            args (list, optional): Arguments provided.
+            working_dir (str, optional): Working directory.
+            source_files (list, optional): Source files in the model.
+            **kwargs: Additional keyword arguments are ignored.
 
         Returns:
-            str: Full path to source file select.
+            list: Source files.
 
         """
-        out = args[0]
-        if (not self.is_source_file(out)) and self.source_files:
-            assert(isinstance(self.source_files, list))
-            out = self.source_files[0]
-        out = super(CompiledModelDriver, self).get_source_file([out])
+        out = []
+        if isinstance(source_files, list):
+            for src in source_files:
+                if working_dir and (not os.path.isabs(src)):
+                    src = os.path.normpath(os.path.join(working_dir, src))
+                if os.path.isfile(src):
+                    out.append(src)
+        if not out:
+            out = super(CompiledModelDriver, cls).identify_source_files(
+                args=args, working_dir=working_dir,
+                source_files=source_files, **kwargs)
         return out
-
+        
     def write_wrappers(self, **kwargs):
         r"""Write any wrappers needed to compile and/or run a model.
 

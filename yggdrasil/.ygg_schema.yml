@@ -135,8 +135,8 @@ definitions:
           type: array
       required:
       - name
-      - datatype
       - commtype
+      - datatype
       title: comm_base
       type: object
     - anyOf:
@@ -609,8 +609,8 @@ definitions:
           type: string
       required:
       - name
-      - filetype
       - working_dir
+      - filetype
       title: file_base
       type: object
     - anyOf:
@@ -1350,6 +1350,13 @@ definitions:
             channel''s send method is called once for each time the co-opted input
             channel''s recv method is called. If used with the `function` parameter,
             `is_server` must be a dictionary. Defaults to False.'
+        iter_function_over:
+          default: []
+          description: Variable(s) that should be received or sent as an array, but
+            iterated over. Defaults to an empty array and is ignored.
+          items:
+            type: string
+          type: array
         language:
           default: executable
           description: The programming language that the model is written in. A list

@@ -2,6 +2,7 @@ models:
   - name: c_modelA
     language: c
     args: ./src/model_function_modelA.c
+    source_files: [./src/model_function_modelA.c]  # can be explicit
     function: model_function
     inputs: inputA
     outputs: outputA

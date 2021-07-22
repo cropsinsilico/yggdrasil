@@ -1,0 +1,29 @@
+models:
+  - name: python_modelA
+    language: python
+    args: ./src/model_function_modelA.py
+    function: model_function
+    iter_function_over: [x, y]
+    inputs:
+      name: x
+      default_file:
+        name: ./Input/input.txt
+        filetype: table
+        as_array: true
+    outputs: y
+  - name: python_modelB
+    language: python
+    args: ./src/model_function_modelB.py
+    function: model_function
+    inputs: x
+    outputs:
+      name: y
+      default_file:
+        name: ./output.txt
+        filetype: table
+        as_array: true
+        field_names: [mass]
+
+connections:
+  - input: python_modelA:y  # Connection between model A output & model B input
+    output: python_modelB:x
