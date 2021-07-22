@@ -684,7 +684,8 @@ class ModelDriver(Driver):
         wrapper_fname = os.path.join(model_dir,
                                      'ygg_%s_%s%s' % (model_base, self.name,
                                                       self.language_ext[0]))
-        lines = self.write_model_wrapper(**self.preparsed_function)
+        lines = self.write_model_wrapper(model_name=self.name,
+                                         **self.preparsed_function)
         # Write file
         if (not os.path.isfile(wrapper_fname)) or self.overwrite:
             with open(wrapper_fname, 'w') as fd:
@@ -2038,7 +2039,6 @@ class ModelDriver(Driver):
             outputs=model_function_outputs,
             iter_function_over=yml.get('iter_function_over', []))
         yml['preparsed_function'] = {
-            'model_name': yml['name'],
             'model_file': model_function_info,
             'model_function': yml['function'],
             'inputs': model_function_inputs,
