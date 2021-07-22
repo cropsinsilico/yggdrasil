@@ -136,7 +136,7 @@ class TestBase(YggTestClassInfo):
     
     def __init__(self, *args, **kwargs):
         super(TestBase, self).__init__(*args, **kwargs)
-        self.name = 'test' + self.uuid
+        self.name = 'test' + self.uuid.split('-')[0]
         self.model1 = 'model1'
         self.model2 = 'model2'
         self.language = None
