@@ -2195,7 +2195,7 @@ class CompiledModelDriver(ModelDriver):
                 self.source_files[idx] = self.model_src
             except ValueError:
                 pass
-            if self.model_src not in self.source_files:
+            if not self.source_files:
                 self.source_files.append(self.model_src)
         else:
             if len(model_ext) == 0:
