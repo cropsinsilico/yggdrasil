@@ -2190,8 +2190,13 @@ class CompiledModelDriver(ModelDriver):
         model_is_source = self.is_source_file(self.model_file)
         if model_is_source:
             self.model_src = self.model_file
-            if len(self.source_files) == 0:
-                self.source_files.append(self.model_file)
+            try:
+                idx = self.source_files.index(self.model_function_file)
+                self.source_files[idx] = self.model_src
+            except ValueError:
+                pass
+            if self.model_src not in self.source_files:
+                self.source_files.append(self.model_src)
         else:
             if len(model_ext) == 0:
                 self.model_file += self.get_tool_instance('linker').executable_ext
