@@ -18,9 +18,13 @@ class TestMPIComm(test_CommBase.TestCommBase):
     test_invalid_direction = None
 
     def __init__(self, *args, **kwargs):
-        from mpi4py import MPI
-        self.mpi_comm = MPI.COMM_WORLD
-        self.mpi_rank = self.mpi_comm.Get_rank()
+        try:
+            from mpi4py import MPI
+            self.mpi_comm = MPI.COMM_WORLD
+            self.mpi_rank = self.mpi_comm.Get_rank()
+        except ImportError:
+            self.mpi_comm = None
+            self.mpi_rank = 0
         self._recv_kws = {}
         super(TestMPIComm, self).__init__(*args, **kwargs)
 
