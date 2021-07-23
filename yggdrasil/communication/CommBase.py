@@ -614,12 +614,14 @@ class CommBase(tools.YggClass):
         self.suffix = suffix
         self._name = name + suffix
         if address is None:
-            if self.name not in self.env:
+            try:
+                self.address = check_env_for_address(self.env, self.name)
+            except RuntimeError:
                 model_name = self.model_name
                 prefix = '%s:' % model_name
                 if model_name and (not self.name.startswith(prefix)):
                     self._name = prefix + self.name
-            self.address = check_env_for_address(self.env, self.name)
+                self.address = check_env_for_address(self.env, self.name)
         else:
             self.address = address
         self.direction = direction
