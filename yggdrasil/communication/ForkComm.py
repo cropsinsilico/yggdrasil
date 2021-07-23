@@ -157,12 +157,16 @@ class ForkComm(CommBase.CommBase):
             x.disconnect()
         super(ForkComm, self).disconnect()
         
-    def printStatus(self, nindent=0, **kwargs):
+    def printStatus(self, nindent=0, return_str=False, **kwargs):
         r"""Print status of the communicator."""
-        super(ForkComm, self).printStatus(nindent=nindent,
-                                          **kwargs)
+        out = super(ForkComm, self).printStatus(nindent=nindent,
+                                                return_str=return_str,
+                                                **kwargs)
         for x in self.comm_list:
-            x.printStatus(nindent=nindent + 1)
+            x_out = x.printStatus(nindent=nindent + 1, return_str=return_str)
+            if return_str:
+                out += '\n' + x_out
+        return out
 
     def __len__(self):
         return len(self.comm_list)

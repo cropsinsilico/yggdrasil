@@ -1,17 +1,13 @@
+import copy
 from yggdrasil.drivers.InterpretedModelDriver import InterpretedModelDriver
 
 
-class FunctionModelDriver(InterpretedModelDriver):
-    r"""Class that acts as a functional interface to input/output channels
-    that are not connected.
-
-    Args:
-
-    Attributes:
-
-    """
+class DummyModelDriver(InterpretedModelDriver):
+    r"""Class that stands-in to act as a model utilizing unmatched
+    input/output channels."""
+    
     executable_type = 'other'
-    language = 'function'
+    language = 'dummy'
     full_language = False
     base_languages = ['python']
     language_ext = []
@@ -67,3 +63,20 @@ class FunctionModelDriver(InterpretedModelDriver):
     def run_loop(self):
         r"""Loop to check if model is still running and forward output."""
         pass
+
+    @property
+    def connections(self):
+        r"""dict: Mapping of environment variables for connections this
+        model will use."""
+        out = {'inputs': {},
+               'outputs': {}}
+        dir2opp = {'input': 'output', 'output': 'input'}
+        for io1, io2 in dir2opp.items():
+            for drv in self.yml['%s_drivers' % io1]:
+                name = drv[io1 + 's'][0]['name']
+                out[io1 + 's'][name] = copy.deepcopy(drv[io1 + 's'][0])
+                comm = getattr(drv['instance'], '%scomm' % io2[0])
+                out[io1 + 's'][name]['env'] = {
+                    k.replace('dummy_%s' % name, name): v
+                    for k, v in comm.model_env.items()}
+        return out

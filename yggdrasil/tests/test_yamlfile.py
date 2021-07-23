@@ -140,14 +140,14 @@ class YamlTestBase(YggTestClass):
         r"""Disabled: Create a new instance of the class."""
         return None
 
-    def test_parse_yaml(self, as_function=False):
+    def test_parse_yaml(self, complete_partial=False):
         r"""Test successfully reading & parsing yaml."""
         if self.nfiles == 0:
             pass
         elif self.nfiles == 1:
-            yamlfile.parse_yaml(self.files[0], as_function=as_function)
+            yamlfile.parse_yaml(self.files[0], complete_partial=complete_partial)
         else:
-            yamlfile.parse_yaml(self.files, as_function=as_function)
+            yamlfile.parse_yaml(self.files, complete_partial=complete_partial)
 
 
 class YamlTestBaseError(YamlTestBase):
@@ -621,7 +621,7 @@ class TestYamlModelFunction(YamlTestBase):
     
     def test_parse_yaml(self, *args, **kwargs):
         r"""Test successfully reading & parsing yaml."""
-        kwargs.setdefault('as_function', True)
+        kwargs.setdefault('complete_partial', True)
         super(TestYamlModelFunction, self).test_parse_yaml(*args, **kwargs)
 
 

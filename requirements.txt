@@ -1,3 +1,4 @@
+flask
 jsonschema>=3
 matplotlib
 numpy>=1.13.0
@@ -8,6 +9,7 @@ pystache
 python-rapidjson
 pyyaml
 pyzmq
+requests
 scipy
 six
 sysv_ipc; platform_system != 'Windows'

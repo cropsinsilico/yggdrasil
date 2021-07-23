@@ -46,12 +46,12 @@ class YggFunction(YggClass):
             YggInput, YggOutput, YggRpcClient)
         super(YggFunction, self).__init__()
         # Create and start runner in another process
-        self.runner = YggRunner(model_yaml, as_function=True, **kwargs)
+        self.runner = YggRunner(model_yaml, complete_partial=True, **kwargs)
         # Start the drivers
         self.runner.run()
-        self.model_driver = self.runner.modeldrivers['function_model']
+        self.model_driver = self.runner.modeldrivers['dummy_model']
         for k in self.runner.modeldrivers.keys():
-            if k != 'function_model':
+            if k != 'dummy_model':
                 self.__name__ = k
                 break
         self.debug("run started")
@@ -204,7 +204,7 @@ class YggFunction(YggClass):
         print("Models: %s\nInputs:\n%s\nOutputs:\n%s\n"
               % (', '.join([x['name'] for x in
                             self.runner.modeldrivers.values()
-                            if x['name'] != 'function_model']),
+                            if x['name'] != 'dummy_model']),
                  '\n'.join(['\t%s (vars=%s)' % (k, v['vars'])
                             for k, v in self.inputs.items()]),
                  '\n'.join(['\t%s (vars=%s)' % (k, v['vars'])
@@ -231,8 +231,9 @@ class YggRunner(YggClass):
             Defaults to environment variable 'RMQ_DEBUG'.
         ygg_debug_prefix (str, optional): Prefix for Ygg debug messages.
             Defaults to namespace.
-        as_function (bool, optional): If True, the missing input/output channels
-            will be created for using model(s) as a function. Defaults to False.
+        complete_partial (bool, optional): If True, unpaired input/output
+            channels are allowed and reserved for use (e.g. for calling the
+            model as a function). Defaults to False.
 
     Attributes:
         namespace (str): Name that should be used to uniquely identify any RMQ
@@ -250,7 +251,7 @@ class YggRunner(YggClass):
     def __init__(self, modelYmls, namespace=None, host=None, rank=0,
                  ygg_debug_level=None, rmq_debug_level=None,
                  ygg_debug_prefix=None, connection_task_method='thread',
-                 as_function=False, production_run=False,
+                 complete_partial=False, production_run=False,
                  mpi_tag_start=None):
         self.mpi_comm = None
         name = 'runner'
@@ -277,7 +278,7 @@ class YggRunner(YggClass):
         self._old_handlers = {}
         self.production_run = production_run
         self.error_flag = False
-        self.as_function = as_function
+        self.complete_partial = complete_partial
         self.debug("Running in %s with path %s namespace %s rank %d",
                    os.getcwd(), sys.path, namespace, rank)
         # Update environment based on config
@@ -287,7 +288,8 @@ class YggRunner(YggClass):
         if self.mpi_comm and (self.rank > 0):
             pass
         else:
-            self.drivers = yamlfile.parse_yaml(modelYmls, as_function=as_function)
+            self.drivers = yamlfile.parse_yaml(modelYmls,
+                                               complete_partial=complete_partial)
             self.connectiondrivers = self.drivers['connection']
             self.modeldrivers = self.drivers['model']
 
@@ -344,11 +346,12 @@ class YggRunner(YggClass):
         """
         if signal_handler is None:
             signal_handler = self.signal_handler
-        self._swap_handler(signal.SIGINT, signal_handler)
-        if not platform._is_win:
-            self._swap_handler(signal.SIGTERM, signal_handler)
-        else:  # pragma: windows
-            self._swap_handler(signal.SIGBREAK, signal_handler)
+        if signal_handler:
+            self._swap_handler(signal.SIGINT, signal_handler)
+            if not platform._is_win:
+                self._swap_handler(signal.SIGTERM, signal_handler)
+            else:  # pragma: windows
+                self._swap_handler(signal.SIGBREAK, signal_handler)
 
     def reset_signal_handler(self):
         r"""Reset signal handlers to old ones."""
@@ -384,7 +387,7 @@ class YggRunner(YggClass):
             self.startDrivers()
             times['start drivers'] = timer()
             self.set_signal_handler(signal_handler)
-            if not self.as_function:
+            if not self.complete_partial:
                 self.waitModels()
                 times['run models'] = timer()
                 self.atexit()
@@ -774,6 +777,15 @@ class YggRunner(YggClass):
             self.mpi_comm.barrier()
         self.debug('ALL DRIVERS STARTED')
 
+    @property
+    def is_alive(self):
+        r"""bool: True if all of the models are still running, False
+        otherwise."""
+        for drv in self.modeldrivers.values():
+            if (not drv['instance'].is_alive()) or drv['instance'].errors:
+                return False
+        return True
+
     def waitModels(self, timeout=False):
         r"""Wait for all model drivers to finish. When a model finishes,
         join the thread and perform exits for associated IO drivers."""
@@ -908,12 +920,16 @@ class YggRunner(YggClass):
         # self.outputdrivers = {}
         # self.modeldrivers = {}
 
-    def printStatus(self):
+    def printStatus(self, return_str=False):
         r"""Print the status of all drivers, starting with the IO drivers."""
         self.debug('')
+        out = []
         for driver in self.all_drivers:
             if 'instance' in driver:
-                driver['instance'].printStatus()
+                out.append(
+                    driver['instance'].printStatus(return_str=return_str))
+        if return_str:
+            return '\n'.join(out)
 
     def closeChannels(self, force_stop=False):
         r"""Stop IO drivers and join the threads.

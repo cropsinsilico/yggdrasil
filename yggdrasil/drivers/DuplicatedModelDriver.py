@@ -147,9 +147,13 @@ class DuplicatedModelDriver(Driver):
 
     def printStatus(self, *args, **kwargs):
         r"""Print the class status."""
+        out_copies = []
         for x in self.copies:
-            x.printStatus(*args, **kwargs)
-        super(DuplicatedModelDriver, self).printStatus(*args, **kwargs)
+            out_copies.append(x.printStatus(*args, **kwargs))
+        out = super(DuplicatedModelDriver, self).printStatus(*args, **kwargs)
+        if kwargs.get('return_str', False):
+            out = '\n'.join(out_copies + [out])
+        return out
 
     @property
     def io_errors(self):

@@ -159,20 +159,21 @@ def prep_yaml(files):
     return yml_all
 
 
-def parse_yaml(files, as_function=False):
+def parse_yaml(files, complete_partial=False):
     r"""Parse list of yaml files.
 
     Args:
         files (str, list): Either the path to a single yaml file or a list of
             yaml files.
-        as_function (bool, optional): If True, the missing input/output channels
-            will be created for using model(s) as a function. Defaults to False.
+        complete_partial (bool, optional): If True, unpaired input/output
+            channels are allowed and reserved for use (e.g. for calling the
+            model as a function). Defaults to False.
 
     Raises:
-        ValueError: If the yml dictionary is missing a required keyword or has
-            an invalid value.
-        RuntimeError: If one of the I/O channels is not initialized with driver
-            information.
+        ValueError: If the yml dictionary is missing a required keyword or
+            has an invalid value.
+        RuntimeError: If one of the I/O channels is not initialized with
+            driver information.
 
     Returns:
         dict: Dictionary of information parsed from the yamls.
@@ -221,9 +222,9 @@ def parse_yaml(files, as_function=False):
     for k in ['models', 'connections']:
         for yml in yml_norm[k]:
             existing = parse_component(yml, k[:-1], existing=existing)
-    # Add stand-in for function that will call to remote models
-    if as_function:
-        existing = add_model_function(existing)
+    # Add stand-in model that uses unpaired channels
+    if complete_partial:
+        existing = complete_partial_integration(existing)
     # Create server/client connections
     for srv, srv_info in existing['server'].items():
         clients = srv_info['clients']
@@ -305,8 +306,8 @@ def parse_yaml(files, as_function=False):
     return existing
 
 
-def add_model_function(existing):
-    r"""Patch input/output channels that are not connected to a function model.
+def complete_partial_integration(existing):
+    r"""Patch input/output channels that are not connected to a stand-in model.
 
     Args:
         existing (dict): Dictionary of existing components.
@@ -315,9 +316,9 @@ def add_model_function(existing):
         dict: Updated dictionary of components.
 
     """
-    new_model = {'name': 'function_model',
-                 'language': 'function',
-                 'args': 'function',
+    new_model = {'name': 'dummy_model',
+                 'language': 'dummy',
+                 'args': 'dummy',
                  'working_dir': os.getcwd(),
                  'inputs': [],
                  'outputs': []}
@@ -338,14 +339,14 @@ def add_model_function(existing):
     #             for x in conn[io1 + 's']:
     #                 if x in miss[io2]:
     #                     miss[io2].remove(x)
-    # Create connections to function model
+    # Create connections to dummy model
     for io1, io2 in dir2opp.items():
         for i in miss[io1]:
-            function_channel = 'function_%s' % i
-            function_comm = copy.deepcopy(existing[io1][i])
-            function_comm['name'] = function_channel
-            new_model[io2 + 's'].append(function_comm)
-            new_connections.append({io1 + 's': [{'name': function_channel}],
+            dummy_channel = 'dummy_%s' % i
+            dummy_comm = copy.deepcopy(existing[io1][i])
+            dummy_comm['name'] = dummy_channel
+            new_model[io2 + 's'].append(dummy_comm)
+            new_connections.append({io1 + 's': [{'name': dummy_channel}],
                                     io2 + 's': [{'name': i}]})
     # Parse new components
     existing = parse_component(new_model, 'model', existing=existing)

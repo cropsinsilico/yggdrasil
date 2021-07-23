@@ -85,9 +85,12 @@ class RPCRequestDriver(ConnectionDriver):
             
     def printStatus(self, *args, **kwargs):
         r"""Also print response drivers."""
-        super(RPCRequestDriver, self).printStatus(*args, **kwargs)
+        out = super(RPCRequestDriver, self).printStatus(*args, **kwargs)
         for x in self.response_drivers.values():
-            x.printStatus(*args, **kwargs)
+            x_out = x.printStatus(*args, **kwargs)
+            if kwargs.get('return_str', False):
+                out += x_out
+        return out
 
     @run_remotely
     def remove_model(self, direction, name):

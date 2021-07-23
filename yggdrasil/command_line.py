@@ -233,7 +233,8 @@ class main(SubCommand):
                   ygginstall, update_config,
                   regen_metaschema, regen_schema,
                   yggmodelform, yggdevup, run_tsts,
-                  timing_plots, generate_gha_workflow]:
+                  timing_plots, generate_gha_workflow,
+                  model_service_manager]:
             x.add_subparser(subparsers, args=kwargs.get('args', None))
             parser._ygg_subparsers[x.name] = x
         return parser
@@ -269,7 +270,11 @@ class yggrun(SubCommand):
           'help': 'Number of MPI processes to run on.'}),
         (('--mpi-tag-start', ),
          {'type': int, 'default': 0,
-          'help': 'Tag that MPI communications should start at.'})]
+          'help': 'Tag that MPI communications should start at.'}),
+        (('--as-service', ),
+         {'help': ("Run the model in the background as a service "
+                   "that other models can connect to via RabbitMQ "
+                   "connections.")})]
 
     @classmethod
     def add_arguments(cls, parser, **kwargs):
@@ -291,12 +296,47 @@ class yggrun(SubCommand):
                     new_args.append(x)
                 i += 1
             return subprocess.check_call(new_args)
-        from yggdrasil import runner, config
-        prog = sys.argv[0].split(os.path.sep)[-1]
-        with config.parser_config(args):
-            runner.run(args.yamlfile, ygg_debug_prefix=prog,
-                       production_run=args.production_run,
-                       mpi_tag_start=args.mpi_tag_start)
+        # TODO: Handle mpi_tag_start on service?
+        if args.as_service:
+            from yggdrasil.services import ModelManager
+            # TODO: command line options for service manager
+            cli = ModelManager(for_request=True)
+            cli.send_request(args.yamlfile, action='start')
+        else:
+            from yggdrasil import runner, config
+            prog = sys.argv[0].split(os.path.sep)[-1]
+            with config.parser_config(args):
+                runner.run(args.yamlfile, ygg_debug_prefix=prog,
+                           production_run=args.production_run,
+                           mpi_tag_start=args.mpi_tag_start)
+
+
+class model_service_manager(SubCommand):
+    r"""Start or manage the yggdrasil service manager."""
+
+    name = "model-service-manager"
+    help = "Start or manage a model service manager."
+    arguments = [
+        (('--name', ),
+         {'help': "Name that will be used to identify the service manager."}),
+        (('--service-type', ),
+         {'default': 'flask', 'choices': ['flask', 'rmq'],
+          'help': "Type of service that should be started."}),
+        (('--shutdown', ),
+         {'action': 'store_true',
+          'help': ("Shutdown the service manager and all of the models "
+                   "running as services.")})]
+
+    @classmethod
+    def func(cls, args):
+        from yggdrasil.services import ModelManager
+        # TODO: Additional arguments
+        x = ModelManager(name=args.name,
+                         service_type=args.service_type)
+        if args.shutdown:
+            x.stop_server()
+        else:
+            x.run_server()
 
 
 class ygginfo(SubCommand):

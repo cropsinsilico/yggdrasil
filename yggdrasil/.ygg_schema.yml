@@ -135,9 +135,9 @@ definitions:
             type: string
           type: array
       required:
-      - name
       - datatype
       - commtype
+      - name
       title: comm_base
       type: object
     - anyOf:
@@ -300,8 +300,8 @@ definitions:
             - $ref: '#/definitions/transform'
           type: array
       required:
-      - inputs
       - outputs
+      - inputs
       title: connection_base
       type: object
     - anyOf:
@@ -621,8 +621,8 @@ definitions:
           type: string
       required:
       - name
-      - filetype
       - working_dir
+      - filetype
       title: file_base
       type: object
     - anyOf:
@@ -1380,9 +1380,9 @@ definitions:
           - cmake
           - cpp
           - cxx
+          - dummy
           - executable
           - fortran
-          - function
           - lpy
           - make
           - matlab
@@ -1706,45 +1706,12 @@ definitions:
           type: string
       required:
       - name
-      - args
-      - working_dir
       - language
+      - working_dir
+      - args
       title: model_base
       type: object
     - anyOf:
-      - additionalProperties: true
-        description: Schema for model component ['function'] subtype.
-        properties:
-          interpreter:
-            description: Name or path of interpreter executable that should be used
-              to run the model. If not provided, the interpreter will be determined
-              based on configuration options for the language (if present) and the
-              default_interpreter class attribute.
-            type: string
-          interpreter_flags:
-            default: []
-            description: Flags that should be passed to the interpreter when running
-              the model. If not provided, the flags are determined based on configuration
-              options for the language (if present) and the default_interpreter_flags
-              class attribute.
-            items:
-              type: string
-            type: array
-          language:
-            default: executable
-            description: The programming language that the model is written in. A
-              list of available languages can be found :ref:`here <schema_table_model_subtype_rst>`.
-            enum:
-            - function
-            type: string
-          skip_interpreter:
-            default: false
-            description: If True, no interpreter will be added to the arguments. This
-              should only be used for subclasses that will not be invoking the model
-              via the command line. Defaults to False.
-            type: boolean
-        title: FunctionModelDriver
-        type: object
       - additionalProperties: true
         description: Schema for model component ['make'] subtype.
         properties:
@@ -2504,6 +2471,39 @@ definitions:
             - f2008
             type: string
         title: FortranModelDriver
+        type: object
+      - additionalProperties: true
+        description: Schema for model component ['dummy'] subtype.
+        properties:
+          interpreter:
+            description: Name or path of interpreter executable that should be used
+              to run the model. If not provided, the interpreter will be determined
+              based on configuration options for the language (if present) and the
+              default_interpreter class attribute.
+            type: string
+          interpreter_flags:
+            default: []
+            description: Flags that should be passed to the interpreter when running
+              the model. If not provided, the flags are determined based on configuration
+              options for the language (if present) and the default_interpreter_flags
+              class attribute.
+            items:
+              type: string
+            type: array
+          language:
+            default: executable
+            description: The programming language that the model is written in. A
+              list of available languages can be found :ref:`here <schema_table_model_subtype_rst>`.
+            enum:
+            - dummy
+            type: string
+          skip_interpreter:
+            default: false
+            description: If True, no interpreter will be added to the arguments. This
+              should only be used for subclasses that will not be invoking the model
+              via the command line. Defaults to False.
+            type: boolean
+        title: DummyModelDriver
         type: object
     description: Schema for model components.
     title: model

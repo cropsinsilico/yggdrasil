@@ -1244,10 +1244,14 @@ class YggTask(YggClass):
             self.info('Thread alive at exit')
             self.cleanup()
 
-    def printStatus(self):
+    def printStatus(self, return_str=False):
         r"""Print the class status."""
-        self.logger.info('%s(%s): state: %s', self.__module__,
-                         self.print_name, self.state)
+        fmt = '%s(%s): state: %s'
+        args = (self.__module__, self.print_name, self.state)
+        if return_str:
+            msg, _ = self.logger.process(fmt, {})
+            return msg % args
+        self.logger.info(fmt, *args)
 
     def cleanup(self):
         r"""Actions to perform to clean up the thread after it has stopped."""
