@@ -235,9 +235,7 @@ def get_install_opts(old=None):
             'no_sudo': False,
             'mpi': (os.environ.get('INSTALLMPI', '0') == '1'),
         }
-        if _is_win:
-            new['mpi'] = False
-        else:
+        if not _is_win:
             new['c'] = True  # c compiler usually installed by default
     else:
         new = {
