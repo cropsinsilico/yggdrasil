@@ -261,6 +261,7 @@ class MSVCCompiler(CCompilerBase):
     # of complex types. Use '/TC' instead of '/TP' for strictly C
     default_flags = ['/W4',      # Display all errors
                      '/Zi',      # Symbolic debug in .pdb (implies debug)
+                     '/FS',      # Allow synchronous write to .pdb
                      # '/MD',
                      # '/MTd',     # Use LIBCMTD.lib to create multithreaded .exe
                      # '/Z7',      # Symbolic debug in .obj (implies debug)
