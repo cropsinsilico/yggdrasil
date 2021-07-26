@@ -272,6 +272,14 @@ jobs:
         ./run_mpi.sh
 
         '
+    - name: Run MPI tests
+      if: env.INSTALLMPI == 1 && matrix.os != 'windows-latest'
+      id: mpi
+      run: 'yggtest --ci --cov-append --test-suite=mpi --write-script=run_mpi.sh
+
+        ./run_mpi.sh
+
+        '
     - name: Combine coverage reports
       continue-on-error: true
       run: '# ls .*
@@ -567,6 +575,14 @@ jobs:
         ./run_mpi.sh
 
         '
+    - name: Run MPI tests
+      if: env.INSTALLMPI == 1 && matrix.os != 'windows-latest'
+      id: mpi
+      run: 'yggtest --ci --cov-append --test-suite=mpi --write-script=run_mpi.sh
+
+        ./run_mpi.sh
+
+        '
     - name: Combine coverage reports
       continue-on-error: true
       run: '# ls .*
@@ -838,6 +854,14 @@ jobs:
       id: mpi_ubuntu
       run: 'yggtest --ci --cov-append --with-mpi=2 yggdrasil/communication/tests/test_MPIComm.py::TestMPICommAsync::test_eof_no_close
         --write-script=run_mpi.sh --nocapture --debug
+
+        ./run_mpi.sh
+
+        '
+    - name: Run MPI tests
+      if: env.INSTALLMPI == 1 && matrix.os != 'windows-latest'
+      id: mpi
+      run: 'yggtest --ci --cov-append --test-suite=mpi --write-script=run_mpi.sh
 
         ./run_mpi.sh
 
@@ -1119,6 +1143,14 @@ jobs:
         ./run_mpi.sh
 
         '
+    - name: Run MPI tests
+      if: env.INSTALLMPI == 1 && matrix.os != 'windows-latest'
+      id: mpi
+      run: 'yggtest --ci --cov-append --test-suite=mpi --write-script=run_mpi.sh
+
+        ./run_mpi.sh
+
+        '
     - name: Combine coverage reports
       continue-on-error: true
       run: '# ls .*
@@ -1391,6 +1423,14 @@ jobs:
       id: mpi_ubuntu
       run: 'yggtest --ci --cov-append --with-mpi=2 yggdrasil/communication/tests/test_MPIComm.py::TestMPICommAsync::test_eof_no_close
         --write-script=run_mpi.sh --nocapture --debug
+
+        ./run_mpi.sh
+
+        '
+    - name: Run MPI tests
+      if: env.INSTALLMPI == 1 && matrix.os != 'windows-latest'
+      id: mpi
+      run: 'yggtest --ci --cov-append --test-suite=mpi --write-script=run_mpi.sh
 
         ./run_mpi.sh
 
