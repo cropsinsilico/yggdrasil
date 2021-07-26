@@ -261,8 +261,8 @@ jobs:
       run: |
         yggtest --ci --cov-append --with-mpi=2 yggdrasil/communication/tests/test_MPIComm.py::TestMPICommAsync::test_eof_no_close --write-script=run_mpi.sh --nocapture --debug
         ./run_mpi.sh
-    - name: Run MPI tests
-      if: env.INSTALLMPI == 1 && matrix.os != 'windows-latest'
+    - name: Run MPI tests (windows)
+      if: env.INSTALLMPI == 1 && matrix.os == 'windows-latest'
       id: mpi
       run: |
         yggtest --ci --cov-append --test-suite=mpi --write-script=run_mpi.sh
