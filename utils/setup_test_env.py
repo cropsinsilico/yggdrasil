@@ -105,34 +105,50 @@ def call_script(lines, force_bash=False):
     """
     if not lines:
         return
-    if _is_win and (not force_bash):  # pragma: windows
-        script_ext = '.bat'
-        error_check = 'if %errorlevel% neq 0 exit /b %errorlevel%'
-        for i in range(len(lines), 0, -1):
-            lines.insert(i, error_check)
-    else:
-        script_ext = '.sh'
-        if lines[0] != '#!/bin/bash':
-            lines.insert(0, '#!/bin/bash')
-        error_check = 'set -e'
-        if error_check not in lines:
-            lines.insert(1, error_check)
-    fname = 'ci_script_%s%s' % (str(uuid.uuid4()), script_ext)
-    try:
-        pprint.pprint(lines)
-        with open(fname, 'w') as fd:
-            fd.write('\n'.join(lines))
-            
-        call_kws = {}
-        if _is_win:  # pragma: windows
-            call_cmd = [fname]
+    # Split lines that should be allowed to fail
+    line_sets = []
+    idx = 0
+    for i, line in enumerate(lines):
+        if line.endswith('# [ALLOW FAIL]'):
+            line_sets.append(lines[idx:i])
+            line_sets.append([lines[i]])
+            idx = i + 1
+    line_sets.append(lines[idx:])
+    for lines in line_sets:
+        allow_failure = lines[0].endswith('# [ALLOW FAIL]')
+        if allow_failure:
+            lines = [lines[0].split('#')[0].strip()]
+        if _is_win and (not force_bash):  # pragma: windows
+            script_ext = '.bat'
+            error_check = 'if %errorlevel% neq 0 exit /b %errorlevel%'
+            for i in range(len(lines), 0, -1):
+                lines.insert(i, error_check)
         else:
-            call_cmd = ['./%s' % fname]
-            os.chmod(fname, 0o755)
-        subprocess.check_call(call_cmd, **call_kws)
-    finally:
-        if os.path.isfile(fname):
-            os.remove(fname)
+            script_ext = '.sh'
+            if lines[0] != '#!/bin/bash':
+                lines.insert(0, '#!/bin/bash')
+            error_check = 'set -e'
+            if error_check not in lines:
+                lines.insert(1, error_check)
+        fname = 'ci_script_%s%s' % (str(uuid.uuid4()), script_ext)
+        try:
+            pprint.pprint(lines)
+            with open(fname, 'w') as fd:
+                fd.write('\n'.join(lines))
+                
+            call_kws = {}
+            if _is_win:  # pragma: windows
+                call_cmd = [os.environ['COMSPEC'], '/c', 'call', fname]
+            else:
+                call_cmd = ['./%s' % fname]
+                os.chmod(fname, 0o755)
+            subprocess.check_call(call_cmd, **call_kws)
+        except subprocess.CalledProcessError:
+            if not allow_failure:
+                raise
+        finally:
+            if os.path.isfile(fname):
+                os.remove(fname)
 
 
 def conda_env_exists(name):
@@ -594,6 +610,10 @@ def itemize_deps(method, for_development=False,
             out['os'].append('openmpi')
         elif install_opts['os'] == 'win':
             pass
+    elif (install_opts['os'] == 'win') and install_opts['mpi']:
+        # Force mpi4py to be installed last on Windows to avoid
+        # conflicts
+        out['skip'].append('mpi4py')
     if install_opts['fortran'] and (not fallback_to_conda):
         # Fortran is not installed via conda on linux/macos
         if install_opts['os'] == 'linux':
@@ -860,6 +880,18 @@ def install_deps(method, return_commands=False, verbose=False,
             raise RuntimeError("Could not detect conda environment. "
                                "Cannot proceed with a conda deployment "
                                "(required for LPy).")
+    # if _is_win and install_opts['mpi'] and fallback_to_conda:
+    #     if verbose:
+    #         install_flags = '-vvv'
+    #     else:
+    #         install_flags = '-q'
+    #     install_flags = '-vv'
+    #     install_flags += conda_flags
+    #     # This is required as the install script for mpi4py aborts without
+    #     # an error message when called inside a Python subprocess. This seems
+    #     # to occur during cleanup for the installation process as the mpi4py
+    #     # installation is functional. Possibly triggered by the activation script?
+    #     cmds += ["%s install %s mpi4py # [ALLOW FAIL]" % (CONDA_CMD, install_flags)]
     if return_commands:
         return cmds
     cmds = SUMMARY_CMDS + cmds + SUMMARY_CMDS
@@ -971,6 +1003,8 @@ def install_pkg(method, python=None, without_build=False,
             # "%s install %s --update-deps -c %s yggdrasil \"blas=*=openblas\"" % (
             #     CONDA_CMD, install_flags, index_channel)
         ]
+        if _is_win and install_opts['mpi']:
+            cmds[-1] = cmds[-1] + ' mpi4py # [ALLOW FAIL]'
     elif method == 'pip':
         if verbose:
             install_flags = '--verbose'

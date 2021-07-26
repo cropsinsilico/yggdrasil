@@ -1,5 +1,5 @@
 # DO NOT MODIFY THIS FILE, IT IS GENERATED.
-# To make changes, modify '.git/../utils/test-install-base.yml'
+# To make changes, modify 'utils\test-install-base.yml'
 # and run 'ygggha'
 name: Test of package installation & execution
 'on':
@@ -272,8 +272,8 @@ jobs:
         ./run_mpi.sh
 
         '
-    - name: Run MPI tests
-      if: env.INSTALLMPI == 1 && matrix.os != 'windows-latest'
+    - name: Run MPI tests (windows)
+      if: env.INSTALLMPI == 1 && matrix.os == 'windows-latest'
       id: mpi
       run: 'yggtest --ci --cov-append --test-suite=mpi --write-script=run_mpi.sh
 
@@ -575,8 +575,8 @@ jobs:
         ./run_mpi.sh
 
         '
-    - name: Run MPI tests
-      if: env.INSTALLMPI == 1 && matrix.os != 'windows-latest'
+    - name: Run MPI tests (windows)
+      if: env.INSTALLMPI == 1 && matrix.os == 'windows-latest'
       id: mpi
       run: 'yggtest --ci --cov-append --test-suite=mpi --write-script=run_mpi.sh
 
@@ -858,8 +858,8 @@ jobs:
         ./run_mpi.sh
 
         '
-    - name: Run MPI tests
-      if: env.INSTALLMPI == 1 && matrix.os != 'windows-latest'
+    - name: Run MPI tests (windows)
+      if: env.INSTALLMPI == 1 && matrix.os == 'windows-latest'
       id: mpi
       run: 'yggtest --ci --cov-append --test-suite=mpi --write-script=run_mpi.sh
 
@@ -1143,8 +1143,8 @@ jobs:
         ./run_mpi.sh
 
         '
-    - name: Run MPI tests
-      if: env.INSTALLMPI == 1 && matrix.os != 'windows-latest'
+    - name: Run MPI tests (windows)
+      if: env.INSTALLMPI == 1 && matrix.os == 'windows-latest'
       id: mpi
       run: 'yggtest --ci --cov-append --test-suite=mpi --write-script=run_mpi.sh
 
@@ -1427,8 +1427,8 @@ jobs:
         ./run_mpi.sh
 
         '
-    - name: Run MPI tests
-      if: env.INSTALLMPI == 1 && matrix.os != 'windows-latest'
+    - name: Run MPI tests (windows)
+      if: env.INSTALLMPI == 1 && matrix.os == 'windows-latest'
       id: mpi
       run: 'yggtest --ci --cov-append --test-suite=mpi --write-script=run_mpi.sh
 

@@ -1602,7 +1602,7 @@ class generate_gha_workflow(SubCommand):
         class NoAliasDumper(yaml.SafeDumper):
             def ignore_aliases(self, data):
                 return True
-        if gitdir is None:
+        if (args.base is None or args.dest is None) and (gitdir is None):
             try:
                 gitdir = subprocess.check_output(
                     ["git", "rev-parse", "--git-dir"],
