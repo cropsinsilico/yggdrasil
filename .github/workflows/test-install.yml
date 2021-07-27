@@ -279,7 +279,9 @@ jobs:
     - name: Run MPI tests (windows)
       if: env.INSTALLMPI == 1 && matrix.os == 'windows-latest'
       id: mpi_windows
-      run: 'yggtest --ci --cov-append --test-suite=mpi
+      run: 'yggtest --ci --test-suite=mpi
+
+        coverage combine --append
 
         # ./run_mpi.sh
 
@@ -586,7 +588,9 @@ jobs:
     - name: Run MPI tests (windows)
       if: env.INSTALLMPI == 1 && matrix.os == 'windows-latest'
       id: mpi_windows
-      run: 'yggtest --ci --cov-append --test-suite=mpi
+      run: 'yggtest --ci --test-suite=mpi
+
+        coverage combine --append
 
         # ./run_mpi.sh
 
@@ -873,7 +877,9 @@ jobs:
     - name: Run MPI tests (windows)
       if: env.INSTALLMPI == 1 && matrix.os == 'windows-latest'
       id: mpi_windows
-      run: 'yggtest --ci --cov-append --test-suite=mpi
+      run: 'yggtest --ci --test-suite=mpi
+
+        coverage combine --append
 
         # ./run_mpi.sh
 
@@ -1162,7 +1168,9 @@ jobs:
     - name: Run MPI tests (windows)
       if: env.INSTALLMPI == 1 && matrix.os == 'windows-latest'
       id: mpi_windows
-      run: 'yggtest --ci --cov-append --test-suite=mpi
+      run: 'yggtest --ci --test-suite=mpi
+
+        coverage combine --append
 
         # ./run_mpi.sh
 
@@ -1450,7 +1458,9 @@ jobs:
     - name: Run MPI tests (windows)
       if: env.INSTALLMPI == 1 && matrix.os == 'windows-latest'
       id: mpi_windows
-      run: 'yggtest --ci --cov-append --test-suite=mpi
+      run: 'yggtest --ci --test-suite=mpi
+
+        coverage combine --append
 
         # ./run_mpi.sh
 
