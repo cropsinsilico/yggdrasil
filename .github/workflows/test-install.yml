@@ -230,12 +230,39 @@ jobs:
       run: python utils/setup_test_env.py verify
     - name: Compile libraries
       run: yggcompile
+    - name: Run MPI tests (macos)
+      if: env.INSTALLMPI == 1 && matrix.os == 'macos-latest'
+      id: mpi_macos
+      run: 'yggtest --ci --cov-append --test-suite=mpi --write-script=run_mpi.sh
+
+        ./run_mpi.sh
+
+        '
+    - name: Run MPI tests (ubuntu)
+      if: env.INSTALLMPI == 1 && matrix.os == 'ubuntu-latest'
+      id: mpi_ubuntu
+      run: 'yggtest --ci --cov-append --with-mpi=2 yggdrasil/communication/tests/test_MPIComm.py::TestMPICommAsync::test_eof_no_close
+        --write-script=run_mpi.sh --nocapture --debug
+
+        ./run_mpi.sh
+
+        '
+    - name: Run MPI tests (windows)
+      if: env.INSTALLMPI == 1 && matrix.os == 'windows-latest'
+      id: mpi_windows
+      run: 'yggtest --ci --test-suite=mpi
+
+        coverage combine
+
+        # ./run_mpi.sh
+
+        '
     - name: Run cmake test in command prompt
       if: matrix.os == 'windows-latest'
       shell: cmd /C CALL {0}
       run: 'cmake -h
 
-        yggtest --ci --nocapture drivers/tests/test_CMakeModelDriver.py
+        yggtest --ci --cov-append --nocapture drivers/tests/test_CMakeModelDriver.py
 
         '
     - name: Run tests (1st)
@@ -259,33 +286,6 @@ jobs:
       if: ${{ steps.test2.outcome == 'failure' }}
       run: yggtest --ci --cov-append ${{ matrix.test-flags2 }} --last-failed --last-failed-no-failures=none
         --debug
-    - name: Run MPI tests (macos)
-      if: env.INSTALLMPI == 1 && matrix.os == 'macos-latest'
-      id: mpi_macos
-      run: 'yggtest --ci --cov-append --test-suite=mpi --write-script=run_mpi.sh
-
-        ./run_mpi.sh
-
-        '
-    - name: Run MPI tests (ubuntu)
-      if: env.INSTALLMPI == 1 && matrix.os == 'ubuntu-latest'
-      id: mpi_ubuntu
-      run: 'yggtest --ci --cov-append --with-mpi=2 yggdrasil/communication/tests/test_MPIComm.py::TestMPICommAsync::test_eof_no_close
-        --write-script=run_mpi.sh --nocapture --debug
-
-        ./run_mpi.sh
-
-        '
-    - name: Run MPI tests (windows)
-      if: env.INSTALLMPI == 1 && matrix.os == 'windows-latest'
-      id: mpi_windows
-      run: 'yggtest --ci --test-suite=mpi
-
-        coverage combine --append
-
-        # ./run_mpi.sh
-
-        '
     - name: Combine coverage reports
       continue-on-error: true
       run: '# ls .*
@@ -539,12 +539,39 @@ jobs:
       run: python utils/setup_test_env.py verify
     - name: Compile libraries
       run: yggcompile
+    - name: Run MPI tests (macos)
+      if: env.INSTALLMPI == 1 && matrix.os == 'macos-latest'
+      id: mpi_macos
+      run: 'yggtest --ci --cov-append --test-suite=mpi --write-script=run_mpi.sh
+
+        ./run_mpi.sh
+
+        '
+    - name: Run MPI tests (ubuntu)
+      if: env.INSTALLMPI == 1 && matrix.os == 'ubuntu-latest'
+      id: mpi_ubuntu
+      run: 'yggtest --ci --cov-append --with-mpi=2 yggdrasil/communication/tests/test_MPIComm.py::TestMPICommAsync::test_eof_no_close
+        --write-script=run_mpi.sh --nocapture --debug
+
+        ./run_mpi.sh
+
+        '
+    - name: Run MPI tests (windows)
+      if: env.INSTALLMPI == 1 && matrix.os == 'windows-latest'
+      id: mpi_windows
+      run: 'yggtest --ci --test-suite=mpi
+
+        coverage combine
+
+        # ./run_mpi.sh
+
+        '
     - name: Run cmake test in command prompt
       if: matrix.os == 'windows-latest'
       shell: cmd /C CALL {0}
       run: 'cmake -h
 
-        yggtest --ci --nocapture drivers/tests/test_CMakeModelDriver.py
+        yggtest --ci --cov-append --nocapture drivers/tests/test_CMakeModelDriver.py
 
         '
     - name: Run tests (1st)
@@ -568,33 +595,6 @@ jobs:
       if: ${{ steps.test2.outcome == 'failure' }}
       run: yggtest --ci --cov-append ${{ matrix.test-flags2 }} --last-failed --last-failed-no-failures=none
         --debug
-    - name: Run MPI tests (macos)
-      if: env.INSTALLMPI == 1 && matrix.os == 'macos-latest'
-      id: mpi_macos
-      run: 'yggtest --ci --cov-append --test-suite=mpi --write-script=run_mpi.sh
-
-        ./run_mpi.sh
-
-        '
-    - name: Run MPI tests (ubuntu)
-      if: env.INSTALLMPI == 1 && matrix.os == 'ubuntu-latest'
-      id: mpi_ubuntu
-      run: 'yggtest --ci --cov-append --with-mpi=2 yggdrasil/communication/tests/test_MPIComm.py::TestMPICommAsync::test_eof_no_close
-        --write-script=run_mpi.sh --nocapture --debug
-
-        ./run_mpi.sh
-
-        '
-    - name: Run MPI tests (windows)
-      if: env.INSTALLMPI == 1 && matrix.os == 'windows-latest'
-      id: mpi_windows
-      run: 'yggtest --ci --test-suite=mpi
-
-        coverage combine --append
-
-        # ./run_mpi.sh
-
-        '
     - name: Combine coverage reports
       continue-on-error: true
       run: '# ls .*
@@ -828,12 +828,39 @@ jobs:
       run: python utils/setup_test_env.py verify
     - name: Compile libraries
       run: yggcompile
+    - name: Run MPI tests (macos)
+      if: env.INSTALLMPI == 1 && matrix.os == 'macos-latest'
+      id: mpi_macos
+      run: 'yggtest --ci --cov-append --test-suite=mpi --write-script=run_mpi.sh
+
+        ./run_mpi.sh
+
+        '
+    - name: Run MPI tests (ubuntu)
+      if: env.INSTALLMPI == 1 && matrix.os == 'ubuntu-latest'
+      id: mpi_ubuntu
+      run: 'yggtest --ci --cov-append --with-mpi=2 yggdrasil/communication/tests/test_MPIComm.py::TestMPICommAsync::test_eof_no_close
+        --write-script=run_mpi.sh --nocapture --debug
+
+        ./run_mpi.sh
+
+        '
+    - name: Run MPI tests (windows)
+      if: env.INSTALLMPI == 1 && matrix.os == 'windows-latest'
+      id: mpi_windows
+      run: 'yggtest --ci --test-suite=mpi
+
+        coverage combine
+
+        # ./run_mpi.sh
+
+        '
     - name: Run cmake test in command prompt
       if: matrix.os == 'windows-latest'
       shell: cmd /C CALL {0}
       run: 'cmake -h
 
-        yggtest --ci --nocapture drivers/tests/test_CMakeModelDriver.py
+        yggtest --ci --cov-append --nocapture drivers/tests/test_CMakeModelDriver.py
 
         '
     - name: Run tests (1st)
@@ -857,33 +884,6 @@ jobs:
       if: ${{ steps.test2.outcome == 'failure' }}
       run: yggtest --ci --cov-append ${{ matrix.test-flags2 }} --last-failed --last-failed-no-failures=none
         --debug
-    - name: Run MPI tests (macos)
-      if: env.INSTALLMPI == 1 && matrix.os == 'macos-latest'
-      id: mpi_macos
-      run: 'yggtest --ci --cov-append --test-suite=mpi --write-script=run_mpi.sh
-
-        ./run_mpi.sh
-
-        '
-    - name: Run MPI tests (ubuntu)
-      if: env.INSTALLMPI == 1 && matrix.os == 'ubuntu-latest'
-      id: mpi_ubuntu
-      run: 'yggtest --ci --cov-append --with-mpi=2 yggdrasil/communication/tests/test_MPIComm.py::TestMPICommAsync::test_eof_no_close
-        --write-script=run_mpi.sh --nocapture --debug
-
-        ./run_mpi.sh
-
-        '
-    - name: Run MPI tests (windows)
-      if: env.INSTALLMPI == 1 && matrix.os == 'windows-latest'
-      id: mpi_windows
-      run: 'yggtest --ci --test-suite=mpi
-
-        coverage combine --append
-
-        # ./run_mpi.sh
-
-        '
     - name: Combine coverage reports
       continue-on-error: true
       run: '# ls .*
@@ -1119,12 +1119,39 @@ jobs:
       run: python utils/setup_test_env.py verify
     - name: Compile libraries
       run: yggcompile
+    - name: Run MPI tests (macos)
+      if: env.INSTALLMPI == 1 && matrix.os == 'macos-latest'
+      id: mpi_macos
+      run: 'yggtest --ci --cov-append --test-suite=mpi --write-script=run_mpi.sh
+
+        ./run_mpi.sh
+
+        '
+    - name: Run MPI tests (ubuntu)
+      if: env.INSTALLMPI == 1 && matrix.os == 'ubuntu-latest'
+      id: mpi_ubuntu
+      run: 'yggtest --ci --cov-append --with-mpi=2 yggdrasil/communication/tests/test_MPIComm.py::TestMPICommAsync::test_eof_no_close
+        --write-script=run_mpi.sh --nocapture --debug
+
+        ./run_mpi.sh
+
+        '
+    - name: Run MPI tests (windows)
+      if: env.INSTALLMPI == 1 && matrix.os == 'windows-latest'
+      id: mpi_windows
+      run: 'yggtest --ci --test-suite=mpi
+
+        coverage combine
+
+        # ./run_mpi.sh
+
+        '
     - name: Run cmake test in command prompt
       if: matrix.os == 'windows-latest'
       shell: cmd /C CALL {0}
       run: 'cmake -h
 
-        yggtest --ci --nocapture drivers/tests/test_CMakeModelDriver.py
+        yggtest --ci --cov-append --nocapture drivers/tests/test_CMakeModelDriver.py
 
         '
     - name: Run tests (1st)
@@ -1148,33 +1175,6 @@ jobs:
       if: ${{ steps.test2.outcome == 'failure' }}
       run: yggtest --ci --cov-append ${{ matrix.test-flags2 }} --last-failed --last-failed-no-failures=none
         --debug
-    - name: Run MPI tests (macos)
-      if: env.INSTALLMPI == 1 && matrix.os == 'macos-latest'
-      id: mpi_macos
-      run: 'yggtest --ci --cov-append --test-suite=mpi --write-script=run_mpi.sh
-
-        ./run_mpi.sh
-
-        '
-    - name: Run MPI tests (ubuntu)
-      if: env.INSTALLMPI == 1 && matrix.os == 'ubuntu-latest'
-      id: mpi_ubuntu
-      run: 'yggtest --ci --cov-append --with-mpi=2 yggdrasil/communication/tests/test_MPIComm.py::TestMPICommAsync::test_eof_no_close
-        --write-script=run_mpi.sh --nocapture --debug
-
-        ./run_mpi.sh
-
-        '
-    - name: Run MPI tests (windows)
-      if: env.INSTALLMPI == 1 && matrix.os == 'windows-latest'
-      id: mpi_windows
-      run: 'yggtest --ci --test-suite=mpi
-
-        coverage combine --append
-
-        # ./run_mpi.sh
-
-        '
     - name: Combine coverage reports
       continue-on-error: true
       run: '# ls .*
@@ -1409,12 +1409,39 @@ jobs:
       run: python utils/setup_test_env.py verify
     - name: Compile libraries
       run: yggcompile
+    - name: Run MPI tests (macos)
+      if: env.INSTALLMPI == 1 && matrix.os == 'macos-latest'
+      id: mpi_macos
+      run: 'yggtest --ci --cov-append --test-suite=mpi --write-script=run_mpi.sh
+
+        ./run_mpi.sh
+
+        '
+    - name: Run MPI tests (ubuntu)
+      if: env.INSTALLMPI == 1 && matrix.os == 'ubuntu-latest'
+      id: mpi_ubuntu
+      run: 'yggtest --ci --cov-append --with-mpi=2 yggdrasil/communication/tests/test_MPIComm.py::TestMPICommAsync::test_eof_no_close
+        --write-script=run_mpi.sh --nocapture --debug
+
+        ./run_mpi.sh
+
+        '
+    - name: Run MPI tests (windows)
+      if: env.INSTALLMPI == 1 && matrix.os == 'windows-latest'
+      id: mpi_windows
+      run: 'yggtest --ci --test-suite=mpi
+
+        coverage combine
+
+        # ./run_mpi.sh
+
+        '
     - name: Run cmake test in command prompt
       if: matrix.os == 'windows-latest'
       shell: cmd /C CALL {0}
       run: 'cmake -h
 
-        yggtest --ci --nocapture drivers/tests/test_CMakeModelDriver.py
+        yggtest --ci --cov-append --nocapture drivers/tests/test_CMakeModelDriver.py
 
         '
     - name: Run tests (1st)
@@ -1438,33 +1465,6 @@ jobs:
       if: ${{ steps.test2.outcome == 'failure' }}
       run: yggtest --ci --cov-append ${{ matrix.test-flags2 }} --last-failed --last-failed-no-failures=none
         --debug
-    - name: Run MPI tests (macos)
-      if: env.INSTALLMPI == 1 && matrix.os == 'macos-latest'
-      id: mpi_macos
-      run: 'yggtest --ci --cov-append --test-suite=mpi --write-script=run_mpi.sh
-
-        ./run_mpi.sh
-
-        '
-    - name: Run MPI tests (ubuntu)
-      if: env.INSTALLMPI == 1 && matrix.os == 'ubuntu-latest'
-      id: mpi_ubuntu
-      run: 'yggtest --ci --cov-append --with-mpi=2 yggdrasil/communication/tests/test_MPIComm.py::TestMPICommAsync::test_eof_no_close
-        --write-script=run_mpi.sh --nocapture --debug
-
-        ./run_mpi.sh
-
-        '
-    - name: Run MPI tests (windows)
-      if: env.INSTALLMPI == 1 && matrix.os == 'windows-latest'
-      id: mpi_windows
-      run: 'yggtest --ci --test-suite=mpi
-
-        coverage combine --append
-
-        # ./run_mpi.sh
-
-        '
     - name: Combine coverage reports
       continue-on-error: true
       run: '# ls .*

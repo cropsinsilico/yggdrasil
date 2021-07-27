@@ -229,29 +229,6 @@ jobs:
       run: python utils/setup_test_env.py verify
     - name: Compile libraries
       run: yggcompile
-    - name: Run cmake test in command prompt
-      if: matrix.os == 'windows-latest'
-      shell: cmd /C CALL {0}
-      run: |
-        cmake -h
-        yggtest --ci --nocapture drivers/tests/test_CMakeModelDriver.py
-    - name: Run tests (1st)
-      id: test1
-      run: |
-        yggtest --ci --cov-append ${{ matrix.test-flags1 }}
-      continue-on-error: true
-    - name: Re-run test failures (1st)
-      if: ${{ steps.test1.outcome == 'failure' }}
-      run: |
-        yggtest --ci --cov-append ${{ matrix.test-flags1 }} --last-failed --last-failed-no-failures=none --debug
-    - name: Run tests (2nd)
-      if: matrix.test-flags2 != ''
-      id: test2
-      run: yggtest --ci --cov-append ${{ matrix.test-flags2 }}
-      continue-on-error: true
-    - name: Re-run test failures (2nd)
-      if: ${{ steps.test2.outcome == 'failure' }}
-      run: yggtest --ci --cov-append ${{ matrix.test-flags2 }} --last-failed --last-failed-no-failures=none --debug
     - name: Run MPI tests (macos)
       if: env.INSTALLMPI == 1 && matrix.os == 'macos-latest'
       id: mpi_macos
@@ -269,8 +246,31 @@ jobs:
       id: mpi_windows
       run: |
         yggtest --ci --test-suite=mpi
-        coverage combine --append
+        coverage combine
         # ./run_mpi.sh
+    - name: Run cmake test in command prompt
+      if: matrix.os == 'windows-latest'
+      shell: cmd /C CALL {0}
+      run: |
+        cmake -h
+        yggtest --ci --cov-append --nocapture drivers/tests/test_CMakeModelDriver.py
+    - name: Run tests (1st)
+      id: test1
+      run: |
+        yggtest --ci --cov-append ${{ matrix.test-flags1 }}
+      continue-on-error: true
+    - name: Re-run test failures (1st)
+      if: ${{ steps.test1.outcome == 'failure' }}
+      run: |
+        yggtest --ci --cov-append ${{ matrix.test-flags1 }} --last-failed --last-failed-no-failures=none --debug
+    - name: Run tests (2nd)
+      if: matrix.test-flags2 != ''
+      id: test2
+      run: yggtest --ci --cov-append ${{ matrix.test-flags2 }}
+      continue-on-error: true
+    - name: Re-run test failures (2nd)
+      if: ${{ steps.test2.outcome == 'failure' }}
+      run: yggtest --ci --cov-append ${{ matrix.test-flags2 }} --last-failed --last-failed-no-failures=none --debug
     # - name: Start SSH session
     #   uses: luchihoratiu/debug-via-ssh@main
     #   if: ${{ failure() && matrix.os == 'ubuntu-latest' }}
