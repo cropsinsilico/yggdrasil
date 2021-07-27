@@ -263,9 +263,9 @@ jobs:
         ./run_mpi.sh
     - name: Run MPI tests (windows)
       if: env.INSTALLMPI == 1 && matrix.os == 'windows-latest'
-      id: mpi
+      id: mpi_windows
       run: |
-        yggtest --ci --cov-append --test-suite=mpi --write-script=run_mpi.sh
+        yggtest --ci --cov-append --test-suite=mpi
         ./run_mpi.sh
     # - name: Start SSH session
     #   uses: luchihoratiu/debug-via-ssh@main
