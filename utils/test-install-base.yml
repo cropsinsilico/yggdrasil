@@ -269,7 +269,7 @@ jobs:
       id: mpi_windows
       run: |
         yggtest --ci --cov-append --test-suite=mpi
-        ./run_mpi.sh
+        # ./run_mpi.sh
     # - name: Start SSH session
     #   uses: luchihoratiu/debug-via-ssh@main
     #   if: ${{ failure() && matrix.os == 'ubuntu-latest' }}

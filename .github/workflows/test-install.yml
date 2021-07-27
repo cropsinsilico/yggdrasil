@@ -281,7 +281,7 @@ jobs:
       id: mpi_windows
       run: 'yggtest --ci --cov-append --test-suite=mpi
 
-        ./run_mpi.sh
+        # ./run_mpi.sh
 
         '
     - name: Combine coverage reports
@@ -588,7 +588,7 @@ jobs:
       id: mpi_windows
       run: 'yggtest --ci --cov-append --test-suite=mpi
 
-        ./run_mpi.sh
+        # ./run_mpi.sh
 
         '
     - name: Combine coverage reports
@@ -875,7 +875,7 @@ jobs:
       id: mpi_windows
       run: 'yggtest --ci --cov-append --test-suite=mpi
 
-        ./run_mpi.sh
+        # ./run_mpi.sh
 
         '
     - name: Combine coverage reports
@@ -1164,7 +1164,7 @@ jobs:
       id: mpi_windows
       run: 'yggtest --ci --cov-append --test-suite=mpi
 
-        ./run_mpi.sh
+        # ./run_mpi.sh
 
         '
     - name: Combine coverage reports
@@ -1452,7 +1452,7 @@ jobs:
       id: mpi_windows
       run: 'yggtest --ci --cov-append --test-suite=mpi
 
-        ./run_mpi.sh
+        # ./run_mpi.sh
 
         '
     - name: Combine coverage reports
