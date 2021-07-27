@@ -610,7 +610,8 @@ def itemize_deps(method, for_development=False,
             out['os'].append('openmpi')
         elif install_opts['os'] == 'win':
             pass
-    elif (install_opts['os'] == 'win') and install_opts['mpi']:
+    elif ((install_opts['os'] == 'win') and install_opts['mpi']
+          and (method == 'conda')):
         # Force mpi4py to be installed last on Windows to avoid
         # conflicts
         out['skip'].append('mpi4py')

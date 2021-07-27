@@ -1,5 +1,5 @@
 # DO NOT MODIFY THIS FILE, IT IS GENERATED.
-# To make changes, modify 'utils\test-install-base.yml'
+# To make changes, modify '.git/../utils/test-install-base.yml'
 # and run 'ygggha'
 name: Test of package installation & execution
 'on':
@@ -91,6 +91,10 @@ jobs:
         == 1
       with:
         toolset: 14.0
+    - name: (WINDOWS,PIP) Set up MSMPI
+      uses: mpi4py/setup-mpi@v1
+      if: matrix.os == 'windows-latest' && matrix.install-method == 'pip' && env.INSTALLMPI
+        == 1
     - name: Install R
       uses: r-lib/actions/setup-r@v1
       if: matrix.os == 'windows-latest' && matrix.install-method == 'pip' && env.INSTALLR
@@ -394,6 +398,10 @@ jobs:
         == 1
       with:
         toolset: 14.0
+    - name: (WINDOWS,PIP) Set up MSMPI
+      uses: mpi4py/setup-mpi@v1
+      if: matrix.os == 'windows-latest' && matrix.install-method == 'pip' && env.INSTALLMPI
+        == 1
     - name: Install R
       uses: r-lib/actions/setup-r@v1
       if: matrix.os == 'windows-latest' && matrix.install-method == 'pip' && env.INSTALLR
@@ -677,6 +685,10 @@ jobs:
         == 1
       with:
         toolset: 14.0
+    - name: (WINDOWS,PIP) Set up MSMPI
+      uses: mpi4py/setup-mpi@v1
+      if: matrix.os == 'windows-latest' && matrix.install-method == 'pip' && env.INSTALLMPI
+        == 1
     - name: Install R
       uses: r-lib/actions/setup-r@v1
       if: matrix.os == 'windows-latest' && matrix.install-method == 'pip' && env.INSTALLR
@@ -962,6 +974,10 @@ jobs:
         == 1
       with:
         toolset: 14.0
+    - name: (WINDOWS,PIP) Set up MSMPI
+      uses: mpi4py/setup-mpi@v1
+      if: matrix.os == 'windows-latest' && matrix.install-method == 'pip' && env.INSTALLMPI
+        == 1
     - name: Install R
       uses: r-lib/actions/setup-r@v1
       if: matrix.os == 'windows-latest' && matrix.install-method == 'pip' && env.INSTALLR
@@ -1246,6 +1262,10 @@ jobs:
         == 1
       with:
         toolset: 14.0
+    - name: (WINDOWS,PIP) Set up MSMPI
+      uses: mpi4py/setup-mpi@v1
+      if: matrix.os == 'windows-latest' && matrix.install-method == 'pip' && env.INSTALLMPI
+        == 1
     - name: Install R
       uses: r-lib/actions/setup-r@v1
       if: matrix.os == 'windows-latest' && matrix.install-method == 'pip' && env.INSTALLR
