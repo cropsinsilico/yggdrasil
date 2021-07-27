@@ -6,8 +6,8 @@ try:
     import pika
     _rmq_installed = True
     _pika_version_maj = int(float(pika.__version__.split('.')[0]))
-    if _pika_version_maj >= 1:  # pragma: debug
-        raise ImportError("pika version 1.0 not yet supported.")
+    if _pika_version_maj < 1:  # pragma: debug
+        raise ImportError("pika version <1.0 no longer supported.")
 except ImportError:
     logger.debug("Could not import pika. "
                  + "RabbitMQ support will be disabled.")
@@ -44,6 +44,7 @@ def check_rmq_server(url=None, **kwargs):
     if not _rmq_installed:
         return False
     if url is not None:
+        print('url', url)
         parameters = pika.URLParameters(url)
     else:
         username = kwargs.get('username', ygg_cfg.get('rmq', 'user', 'guest'))
@@ -223,6 +224,8 @@ class RMQComm(CommBase.CommBase):
             passive = True
         else:
             passive = False
+        if self.direction == 'send':
+            self.channel.confirm_delivery()
         res = self.channel.queue_declare(queue=self.queue,
                                          exclusive=exclusive,
                                          passive=passive,
@@ -284,7 +287,7 @@ class RMQComm(CommBase.CommBase):
                 self.channel.close()
             except (pika.exceptions.ChannelClosed,
                     pika.exceptions.ConnectionClosed,
-                    pika.exceptions.ChannelAlreadyClosing):  # pragma: debug
+                    pika.exceptions.ChannelWrongStateError):  # pragma: debug
                 pass
         self.channel = None
 
@@ -295,7 +298,7 @@ class RMQComm(CommBase.CommBase):
                 self.connection.close()
             except (pika.exceptions.ChannelClosed,
                     pika.exceptions.ConnectionClosed,
-                    pika.exceptions.ChannelAlreadyClosing):  # pragma: debug
+                    pika.exceptions.ChannelWrongStateError):  # pragma: debug
                 pass
             except AttributeError:  # pragma: debug
                 pass
@@ -308,12 +311,12 @@ class RMQComm(CommBase.CommBase):
         if self.channel is None or self.connection is None:
             return False
         if self.connection.is_open:
-            if self.connection.is_closing:  # pragma: debug
+            if getattr(self.connection, 'is_closing', False):  # pragma: debug
                 return False
         else:  # pragma: debug
             return False
         if self.channel.is_open:
-            if self.channel.is_closing:  # pragma: debug
+            if getattr(self.channel, 'is_closing', False):  # pragma: debug
                 return False
         else:  # pragma: debug
             return False
@@ -397,8 +400,11 @@ class RMQComm(CommBase.CommBase):
         if routing_key is None:
             routing_key = self.queue
         kwargs.setdefault('mandatory', True)
-        out = self.channel.basic_publish(exchange, routing_key, msg, **kwargs)
-        return out
+        try:
+            self.channel.basic_publish(exchange, routing_key, msg, **kwargs)
+        except pika.exceptions.UnroutableError:
+            return False
+        return True
 
     def _recv(self):
         r"""Receive a message.
@@ -409,7 +415,7 @@ class RMQComm(CommBase.CommBase):
 
         """
         method_frame, props, msg = self.channel.basic_get(
-            queue=self.queue, no_ack=False)
+            queue=self.queue, auto_ack=False)
         if method_frame:
             self.channel.basic_ack(method_frame.delivery_tag)
         else:  # pragma: debug

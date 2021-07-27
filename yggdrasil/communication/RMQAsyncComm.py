@@ -111,6 +111,7 @@ class RMQAsyncComm(RMQComm.RMQComm):
         super(RMQAsyncComm, self).open()
         T = self.start_timeout()
         while (not T.is_out) and self._opening:  # pragma: debug
+            self.info("Waiting for connection to open")
             self.sleep()
         self.stop_timeout()
 
@@ -255,8 +256,6 @@ class RMQAsyncComm(RMQComm.RMQComm):
         parameters = pika.URLParameters(self.url)
         kwargs = dict(on_open_callback=self.on_connection_open,
                       on_open_error_callback=self.on_connection_open_error)
-        if RMQComm._pika_version_maj < 1:
-            kwargs['stop_ioloop_on_close'] = False
         self.connection = pika.SelectConnection(parameters, **kwargs)
 
     def on_connection_open(self, connection):
@@ -266,38 +265,28 @@ class RMQAsyncComm(RMQComm.RMQComm):
         connection.add_on_close_callback(self.on_connection_closed)
         self.open_channel()
 
-    def on_connection_open_error(self, unused_connection):  # pragma: debug
+    def on_connection_open_error(self, unused_connection, err):  # pragma: debug
         r"""Actions that must be taken when the connection fails to open."""
         self.debug('::Connection could not be opened')
         self.close()
-        raise Exception('Could not connect.')
+        raise Exception('Could not connect: %s.' % err)
 
-    def on_connection_closed(self, connection, *args):
+    def on_connection_closed(self, connection, reason):
         r"""Actions that must be taken when the connection is closed. Set the
         channel to None. If the connection is meant to be closing, stop the
         IO loop. Otherwise, wait 5 seconds and try to reconnect."""
-        if RMQComm._pika_version_maj < 1:
-            reply_code = args[0]
-            reply_text = args[1]
-        # else:
-        #     reply_code = 0
-        #     reply_text = args[0]
         with self.rmq_lock:
-            self.debug('::on_connection_closed code %s (code = %d)', reply_text,
-                       reply_code)
-            if self._closing or reply_code == 200:
+            self.info('::on_connection_closed code %s', reason)
+            if self._closing or (reason.reply_code == 200):
                 connection.ioloop.stop()
                 self.connection = None
                 self._closing = False
                 self._qres_event.set()
             else:
-                self.warning('Connection closed, reopening in %f seconds: (%s) %s',
-                             self.sleeptime, reply_code, reply_text)
+                self.warning('Connection closed, reopening in %f seconds: %s',
+                             self.sleeptime, reason)
                 self._reconnecting = True
-                if RMQComm._pika_version_maj < 1:
-                    connection.add_timeout(self.sleeptime, self.reconnect)
-                # else:
-                #     connection.ioloop.call_later(self.sleeptime, self.reconnect)
+                connection.ioloop.call_later(self.sleeptime, self.reconnect)
 
     def reconnect(self):
         r"""Try to re-establish a connection and resume a new IO loop."""
@@ -346,19 +335,11 @@ class RMQAsyncComm(RMQComm.RMQComm):
         channel.add_on_close_callback(self.on_channel_closed)
         self.setup_exchange(self.exchange)
 
-    def on_channel_closed(self, channel, *args):
+    def on_channel_closed(self, channel, reason):
         r"""Actions to perform when the channel is closed. Close the
         connection."""
         with self.rmq_lock:
-            if RMQComm._pika_version_maj < 1:
-                reply_code = args[0]
-                reply_text = args[1]
-                self.debug('::channel %i was closed: (%s) %s',
-                           channel, reply_code, reply_text)
-            # else:
-            #     reason = args[0]
-            #     self.debug('::channel %i was closed: %s',
-            #                channel, reason)
+            self.debug('::channel %i was closed: %s', channel, reason)
             if not (channel.connection.is_closing or channel.connection.is_closed):
                 channel.connection.close()
             self.channel = None
@@ -418,8 +399,6 @@ class RMQAsyncComm(RMQComm.RMQComm):
         if self.direction == 'recv':
             kwargs = dict(on_message_callback=self.on_message,
                           queue=self.queue)
-            if RMQComm._pika_version_maj < 1:
-                kwargs['consumer_callback'] = kwargs.pop('on_message_callback')
             self.consumer_tag = self.channel.basic_consume(**kwargs)
         with self.rmq_lock:
             self._opening = False
