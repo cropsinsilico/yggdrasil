@@ -349,6 +349,8 @@ class RMQComm(CommBase.CommBase):
                     res = self.get_queue_result()
                 except (pika.exceptions.ChannelClosed,
                         pika.exceptions.ConnectionClosed,
+                        pika.exceptions.ChannelWrongStateError,
+                        pika.exceptions.ConnectionWrongStateError,
                         pika.exceptions.StreamLostError,
                         AttributeError):  # pragma: debug
                     self._close()
