@@ -275,7 +275,8 @@ class RMQComm(CommBase.CommBase):
                 self.channel.queue_delete(queue=self.queue)
             except (pika.exceptions.ChannelClosed,
                     pika.exceptions.ConnectionClosed,
-                    pika.exceptions.ChannelWrongStateError):  # pragma: debug
+                    pika.exceptions.ChannelWrongStateError,
+                    pika.exceptions.ConnectionWrongStateError):  # pragma: debug
                 pass
             except AttributeError:  # pragma: debug
                 if self.channel is not None:
@@ -288,7 +289,8 @@ class RMQComm(CommBase.CommBase):
                 self.channel.close()
             except (pika.exceptions.ChannelClosed,
                     pika.exceptions.ConnectionClosed,
-                    pika.exceptions.ChannelWrongStateError):  # pragma: debug
+                    pika.exceptions.ChannelWrongStateError,
+                    pika.exceptions.ConnectionWrongStateError):  # pragma: debug
                 pass
         self.channel = None
 
@@ -299,7 +301,8 @@ class RMQComm(CommBase.CommBase):
                 self.connection.close()
             except (pika.exceptions.ChannelClosed,
                     pika.exceptions.ConnectionClosed,
-                    pika.exceptions.ChannelWrongStateError):  # pragma: debug
+                    pika.exceptions.ChannelWrongStateError,
+                    pika.exceptions.ConnectionWrongStateError):  # pragma: debug
                 pass
             except AttributeError:  # pragma: debug
                 pass
@@ -336,6 +339,7 @@ class RMQComm(CommBase.CommBase):
                 res = self.get_queue_result()
             except (pika.exceptions.ChannelClosed,
                     pika.exceptions.ConnectionClosed,
+                    pika.exceptions.StreamLostError,
                     AttributeError):  # pragma: debug
                 self._close()
         return res
