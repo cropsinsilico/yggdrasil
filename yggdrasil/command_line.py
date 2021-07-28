@@ -1310,9 +1310,11 @@ class run_tsts(SubCommand):
                         os.path.join('examples', 'tests',
                                      'test_gs_lesson4.py'),
                         os.path.join('examples', 'tests',
-                                     'test_rpc_lesson3b.py'),
-                        os.path.join('examples', 'tests',
-                                     'test_model_error_with_io.py')]
+                                     'test_rpc_lesson3b.py')]
+                    if not platform._is_win:
+                        test_paths += [
+                            os.path.join('examples', 'tests',
+                                         'test_model_error_with_io.py')]
         if (not test_paths) and all(x.startswith('-') for x in extra):
             test_paths.append(package_dir)
         # Get expanded tests to allow for paths that are relative to
