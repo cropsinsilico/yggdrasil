@@ -292,6 +292,9 @@ class YggRunner(YggClass):
                                                complete_partial=complete_partial)
             self.connectiondrivers = self.drivers['connection']
             self.modeldrivers = self.drivers['model']
+            for x in self.modeldrivers.values():
+                if x['driver'] == 'DummyModelDriver':
+                    x['runner'] = self
 
     def pprint(self, *args):
         r"""Print with color."""

@@ -8,12 +8,13 @@ History
 * Added option to return printStatus string via return_str keyword
 * Added classes for managing models as services via Flask or RabbitMQ
 * Transitioned from as_function to complete_partial keyword in parse_yaml that can be used for services as well as functions
+* Added client side instrumentation for connecting to remote model services and tests
 
 TODO:
 ~~~~~
 
 * Add keyword to specify what type of connection should be used to connect to services
-* Add client side instrumentation for connecting to remote model services and tests
+* Add support for a registry of local integrations on the host machine that can be run as services
 
 
 1.7.0 (2021-08-26) Support for MPI communicators, MPI execution, and pika >= 1.0.0

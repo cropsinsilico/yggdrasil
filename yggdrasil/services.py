@@ -6,7 +6,7 @@ import traceback
 import threading
 from yggdrasil import runner
 from yggdrasil import platform
-from yggdrasil.tools import sleep, TimeOut
+from yggdrasil.tools import sleep, TimeOut, YggClass
 
 
 class ClientError(BaseException):
@@ -19,14 +19,27 @@ class ServerError(BaseException):
     pass
 
 
-class ServiceBase(object):
-    r"""Base class for sending/responding to service requests."""
+class ServiceBase(YggClass):
+    r"""Base class for sending/responding to service requests.
+
+    Args:
+        name (str): Name that should be used to initialize an address for the
+            service.
+        for_request (bool, optional): If True, a client-side connection is
+            initialized. If False a server-side connection is initialized.
+            Defaults to False.
+        *args: Additional arguments are used to initialize the client/server
+            connection.
+        **kwargs: Additional keyword arguments are used to initialize the
+            client/server connection.
+
+    """
 
     def __init__(self, name, *args, **kwargs):
+        self.for_request = kwargs.pop('for_request', False)
         self._args = args
         self._kwargs = kwargs
-        self.name = name
-        self.for_request = kwargs.pop('for_request', False)
+        super(ServiceBase, self).__init__(name, *args, **kwargs)
         if self.for_request:
             self.setup_client(*args, **kwargs)
         else:
@@ -42,6 +55,25 @@ class ServiceBase(object):
         r"""bool: True if the server is running."""
         return True
     
+    def wait_for_server(self, timeout=10.0):
+        r"""Wait for a service to start running.
+
+        Args:
+            timeout (float, optional): Time (in seconds) that should be waited
+                for the server to start. Defaults to 10.
+
+        Raises:
+            RuntimeError: If the time limit is reached and the server still
+                hasn't started.
+
+        """
+        T = TimeOut(timeout)
+        while (not self.is_running) and (not T.is_out):
+            self.debug("Waiting for server to start")
+            sleep(1)
+        if not self.is_running:  # pragma: debug
+            raise RuntimeError("Server never started")
+
     def setup_server(self, *args, **kwargs):
         r"""Set up the machinery for receiving requests."""
         raise NotImplementedError
@@ -63,40 +95,101 @@ class ServiceBase(object):
         raise NotImplementedError
 
     def process_request(self, request, **kwargs):
-        r"""Process a request and return a response."""
+        r"""Process a request and return a response.
+
+        Args:
+            request (str): Serialized request that should be processed.
+            **kwargs: Additional keyword arguments are passed to the respond
+                method.
+
+        Returns:
+            str: Serialized response.
+
+        """
         request = self.deserialize_request(request)
         response = self.respond(request, **kwargs)
         return self.serialize_response(response)
 
     def process_response(self, response):
-        r"""Process a response."""
+        r"""Process a response.
+
+        Args:
+            response (str): Serialized response that should be processed.
+        
+        Returns:
+            object: The deserialized, processed response.
+
+        """
         return self.deserialize(response)
 
     def deserialize(self, msg):
-        r"""Deserialize a message."""
+        r"""Deserialize a message.
+
+        Args:
+            msg (str): Message to deserialize.
+
+        Returns:
+            object: Deserialized message.
+
+        """
         return json.loads(msg)
 
     def serialize(self, msg):
-        r"""Serialize a message."""
+        r"""Serialize a message.
+
+        Args:
+            msg (object): Message to serialize.
+
+        Returns:
+            str: Serialized message.
+
+        """
         return json.dumps(msg)
 
     def deserialize_request(self, request):
-        r"""Deserialize a request message."""
+        r"""Deserialize a request message.
+
+        Args:
+            request (str): Serialized request.
+
+        Returns:
+            object: Deserialized request.
+
+        """
         return self.deserialize(request)
 
     def serialize_response(self, response):
-        r"""Serialize a response message."""
+        r"""Serialize a response message.
+
+        Args:
+            request (object): Request to serialize.
+
+        Returns:
+            str: Serialized request.
+
+        """
         return self.serialize(response)
 
-    def call(self, request, **kwargs):
+    def call(self, *args, **kwargs):
         r"""Send a request."""
         raise NotImplementedError
 
     def send_request(self, request, **kwargs):
-        r"""Send a request."""
+        r"""Send a request.
+
+        Args:
+            request (object): Request to send.
+            **kwargs: Additional keyword arguments are passed to the call
+                method.
+
+        Returns:
+            object: Response.
+
+        """
         request_str = self.serialize(request)
         if not self.for_request:
-            x = self.__class__(*self._args, **self._kwargs, for_request=True)
+            x = self.__class__(self.name, *self._args,
+                               **self._kwargs, for_request=True)
         else:
             x = self
         return self.process_response(x.call(request_str, **kwargs))
@@ -115,7 +208,13 @@ class FlaskService(ServiceBase):
             return False
 
     def setup_server(self, *args, **kwargs):
-        r"""Set up the machinery for receiving requests."""
+        r"""Set up the machinery for receiving requests.
+
+        Args:
+            *args: Arguments are ignored.
+            **kwargs: Keyword arguments are ignored.
+
+        """
         from flask import Flask
         from flask import request
         from flask import jsonify
@@ -128,7 +227,13 @@ class FlaskService(ServiceBase):
             return self.process_request(self.request.json, args=req_args)
         
     def setup_client(self, *args, **kwargs):
-        r"""Set up the machinery for sending requests."""
+        r"""Set up the machinery for sending requests.
+
+        Args:
+            *args: Arguments are ignored.
+            **kwargs: Keyword arguments are ignored.
+
+        """
         self.address = 'http://localhost:5000/' + self.name
         
     def run_server(self):
@@ -143,19 +248,52 @@ class FlaskService(ServiceBase):
         func()
         
     def deserialize(self, msg):
-        r"""Deserialize a message."""
+        r"""Deserialize a message.
+
+        Args:
+            msg (str): Message to deserialize.
+
+        Returns:
+            object: Deserialized message.
+
+        """
         return msg  # should already be deserialized
 
     def serialize(self, msg):
-        r"""Serialize a message."""
+        r"""Serialize a message.
+
+        Args:
+            msg (object): Message to serialize.
+
+        Returns:
+            str: Serialized message.
+
+        """
         return msg  # should already be serialized
     
     def serialize_response(self, response):
-        r"""Serialize a response message."""
+        r"""Serialize a response message.
+
+        Args:
+            request (object): Request to serialize.
+
+        Returns:
+            str: Serialized request.
+
+        """
         return self.jsonify(response)
 
     def call(self, request, **kwargs):
-        r"""Send a request."""
+        r"""Send a request.
+
+        Args:
+            request (object): JSON serializable request.
+            **kwargs: Keyword arguments are ignored.
+
+        Returns:
+            object: Response.
+
+        """
         import requests
         try:
             r = requests.post(self.address, json=request)
@@ -175,7 +313,10 @@ class RMQService(ServiceBase):
 
     def _init_rmq(self, *args, **kwargs):
         from yggdrasil.communication.RMQComm import pika, get_rmq_parameters
+        
         self.pika = pika
+        if 'address' in kwargs:
+            kwargs['url'] = kwargs.pop('address')
         self.url, self.exchange, self.queue = get_rmq_parameters(
             *args, **kwargs)
         self.queue = self.name
@@ -186,8 +327,21 @@ class RMQService(ServiceBase):
         self.connection = pika.BlockingConnection(parameters)
         self.channel = self.connection.channel()
 
+    @property
+    def address(self):
+        r"""str: RabbitMQ broker address."""
+        return self.url
+
     def setup_server(self, *args, **kwargs):
-        r"""Set up the machinery for receiving requests."""
+        r"""Set up the machinery for receiving requests.
+
+        Args:
+            *args: Arguments are used to initialize the RabbitMQ connections
+                via _init_rmq.
+            **kwargs: Keyword arguments are used to initialize the RabbitMQ
+                connections via _init_rmq.
+
+        """
         self._init_rmq(*args, **kwargs)
         if self.exchange:
             self.channel.exchange_declare(exchange=self.exchange,
@@ -199,7 +353,15 @@ class RMQService(ServiceBase):
             on_message_callback=self._on_request)
     
     def setup_client(self, *args, **kwargs):
-        r"""Set up the machinery for sending requests."""
+        r"""Set up the machinery for sending requests.
+
+        Args:
+            *args: Arguments are used to initialize the RabbitMQ connections
+                via _init_rmq.
+            **kwargs: Keyword arguments are used to initialize the RabbitMQ
+                connections via _init_rmq.
+
+        """
         self._init_rmq(*args, **kwargs)
         result = self.channel.queue_declare(queue='', exclusive=True)
         self.callback_queue = result.method.queue
@@ -256,7 +418,18 @@ class RMQService(ServiceBase):
             return False
 
     def call(self, request, timeout=10.0, **kwargs):
-        r"""Send a request."""
+        r"""Send a request.
+
+        Args:
+            request (str): Serialized request.
+            timeout (float, optional): Time (in seconds) that should be waited
+                for a response to be returned. Defaults to 10.
+            **kwargs: Keyword arguments are ignored.
+
+        Returns:
+            str: Serialized response.
+
+        """
         self.response = None
         self.corr_id = str(uuid.uuid4())
         try:
@@ -277,15 +450,15 @@ class RMQService(ServiceBase):
         return self.response
 
 
-def create_model_manager_class(service_type=FlaskService):
-    r"""Create a model manager service with the specified base.
+def create_service_manager_class(service_type=FlaskService):
+    r"""Create an integration manager service with the specified base.
 
     Args:
         service_type (ServiceBase, str, optional): Base class that should be
             used. Defaults to FlaskService.
 
     Returns:
-        type: Subclass of ServiceBase to handle starting/stopping models
+        type: Subclass of ServiceBase to handle starting/stopping integrations
             running as services.
 
     """
@@ -293,32 +466,37 @@ def create_model_manager_class(service_type=FlaskService):
         cls_map = {'flask': FlaskService, 'rmq': RMQService}
         service_type = cls_map[service_type]
 
-    class ModelManager(service_type):
-        r"""Manager to track running models."""
+    class IntegrationServiceManager(service_type):
+        r"""Manager to track running integrations."""
 
         def __init__(self, name=None, **kwargs):
             if name is None:
-                name = 'ygg_models'
-            self.models = {}
-            super(ModelManager, self).__init__(name, **kwargs)
+                name = 'ygg_integrations'
+            self.integrations = {}
+            super(IntegrationServiceManager, self).__init__(name, **kwargs)
 
-        def send_request(self, models=None, action='start', **kwargs):
+        def send_request(self, name=None, yamls=None, action='start', **kwargs):
             r"""Send a request.
 
             Args:
-                models (list, str): One or more YAML files defining a set of
-                    models to run as a service.
+                name (str, tuple, optional): A hashable object that will be
+                    used to reference the integration. If not provided,
+                    the yamls keyword will be used.
+                yamls (list, str, optional): One or more YAML files defining
+                    a network of models to run as a service. Defaults to None.
                 action (str, optional): Action that is being requested.
                     Defaults to 'start'.
                 **kwargs: Additional keyword arguments are passed to the call
                     method.
 
             """
-            if not isinstance(models, (list, tuple, type(None))):
-                models = [models]
-            request = {'models': models,
-                       'action': action}
-            return super(ModelManager, self).send_request(request, **kwargs)
+            if isinstance(yamls, str):
+                yamls = [yamls]
+            if name is None:
+                name = yamls
+            request = dict(name=name, yamls=yamls, action=action)
+            return super(IntegrationServiceManager, self).send_request(
+                request, **kwargs)
 
         def stop_server(self):
             r"""Stop the server from the client-side."""
@@ -332,37 +510,78 @@ def create_model_manager_class(service_type=FlaskService):
                 sig = signal.SIGKILL
             os.kill(response['pid'], sig)
 
-        def start_model(self, x):
-            r"""Start a model integration."""
-            if (x in self.models) and (not self.models[x].is_alive):
-                self.stop_model(x)
-            if x not in self.models:
-                self.models[x] = runner.get_runner(list(x),
-                                                   complete_partial=True)
-                self.models[x].run(signal_handler=False)
+        def start_integration(self, x, yamls):
+            r"""Start an integration if it is not already running.
 
-        def stop_model(self, x):
-            r"""Stop a model from running."""
+            Args:
+                x (str, tuple): Hashable object that should be used to
+                    identify the integration being started in the registry of
+                    running integrations.
+                yamls (list): Set of YAML specification files defining the
+                    integration that should be run as as service.
+
+            """
+            if (x in self.integrations) and (not self.integrations[x].is_alive):
+                self.stop_integration(x)
+            if x not in self.integrations:
+                self.integrations[x] = runner.get_runner(
+                    yamls, complete_partial=True)
+                self.integrations[x].run(signal_handler=False)
+
+        def stop_integration(self, x):
+            r"""Stop a running integration.
+
+            Args:
+                x (str, tuple): Hashable object associated with the
+                    integration service that should be stopped. If None,
+                    all of the running integrations are stopped.
+
+            Raises:
+                KeyError: If there is not a running integration associated
+                    with the specified hashable object.
+
+            """
             if x is None:
-                for k in list(self.models.keys()):
-                    self.stop_model(k)
+                for k in list(self.integrations.keys()):
+                    self.stop_integration(k)
                 return
-            if x not in self.models:
+            if x not in self.integrations:
                 raise KeyError(f"Integration defined by {x} not running")
-            m = self.models.pop(x)
+            m = self.integrations.pop(x)
             m.terminate()
             m.atexit()
 
-        def model_info(self, x):
-            if x not in self.models:
+        def integration_info(self, x):
+            r"""Get information about an integration and how to connect to it.
+
+            Args:
+                x (str, tuple): Hashable object associated with the
+                    integration to get information on.
+
+            Returns:
+                dict: Information about the integration.
+
+            Raises:
+                KeyError: If there is not a running integration associated
+                    with the specified hashable object.
+
+            """
+            if x not in self.integrations:
                 raise KeyError(f"Integration defined by {x} not running")
-            m = self.models[x].modeldrivers['dummy_model']
-            return m['instance'].connections
+            m = self.integrations[x].modeldrivers['dummy_model']
+            out = m['instance'].connections
+            name = 'dummy'
+            if isinstance(x, str) and (not os.path.isfile(x)):
+                name = x
+            out.update(name=name,
+                       args=name,
+                       language='dummy')
+            return out
 
         @property
         def is_running(self):
             r"""bool: True if the server is running."""
-            if not super(ModelManager, self).is_running:
+            if not super(IntegrationServiceManager, self).is_running:
                 return False
             try:
                 response = self.send_request(action='ping')
@@ -371,33 +590,52 @@ def create_model_manager_class(service_type=FlaskService):
                 return False
 
         def respond(self, request, **kwargs):
-            r"""Create a response to the request."""
+            r"""Create a response to the request.
+
+            Args:
+                request (dict): Request to respond to.
+                **kwargs: Additional keyword arguments are ignored.
+
+            Returns:
+                dict: Response to the request.
+
+            """
             try:
+                name = request['name']
                 action = request['action']
-                models = request['models']
-                if isinstance(models, list):
-                    models = tuple(models)
+                yamls = request['yamls']
+                if isinstance(name, list):
+                    name = tuple(name)
                 if action == 'start':
-                    if models is None:
-                        raise RuntimeError("No model specified.")
-                    self.start_model(models)
+                    if yamls is None:
+                        # TODO: Check registry
+                        if isinstance(name, tuple):
+                            yamls = list(name)
+                        elif isinstance(name, str) and os.path.isfile(name):
+                            yamls = [name]
+                        else:
+                            raise RuntimeError("No YAML files specified.")
+                    self.start_integration(name, yamls)
                     response = {'status': 'started'}
-                    response.update(self.model_info(models))
+                    response.update(self.integration_info(name))
                 elif action == 'stop':
-                    self.stop_model(models)
+                    self.stop_integration(name)
                     response = {'status': 'stopped'}
                 elif action == 'shutdown':
-                    self.stop_model(None)
+                    self.stop_integration(None)
                     tobj = threading.Timer(1, self.shutdown)
                     tobj.start()
                     response = {'status': 'shutting down',
                                 'pid': os.getpid()}
-                elif action == 'info':
+                elif action == 'status':
                     response = {'status': 'done'}
-                    if models is None:
-                        response['models'] = list(self.models.keys())
+                    if name is None:
+                        response['integrations'] = list(self.integrations.keys())
+                        for k, v in self.integrations.items():
+                            response[k] = v.printStatus(return_str=True)
                     else:
-                        self.models[models].printStatus(return_str=True)
+                        response['status'] = self.integrations[name].printStatus(
+                            return_str=True)
                 elif action == 'ping':
                     response = {'status': 'running'}
                 else:
@@ -408,18 +646,31 @@ def create_model_manager_class(service_type=FlaskService):
             return response
 
         def process_response(self, response):
-            r"""Process a response."""
-            response = super(ModelManager, self).process_response(response)
+            r"""Process a response.
+
+            Args:
+                response (str): Serialized response that should be processed.
+
+            Returns:
+                object: The deserialized, processed response.
+
+            Raises:
+                ServerError: If the response indicates there was an error on
+                    the server during the creation of the response.
+
+            """
+            response = super(
+                IntegrationServiceManager, self).process_response(response)
             if 'error' in response:
                 raise ServerError('%s\n%s' % (response['traceback'],
                                               response['error']))
             return response
             
-    return ModelManager
+    return IntegrationServiceManager
 
 
-def ModelManager(service_type=FlaskService, **kwargs):
-    r"""Start a model management service to track running models.
+def IntegrationServiceManager(service_type=FlaskService, **kwargs):
+    r"""Start a management service to track running integrations.
 
     Args:
         service_type (ServiceBase, str, optional): Base class that should be
@@ -428,12 +679,12 @@ def ModelManager(service_type=FlaskService, **kwargs):
             manager class instance.
 
     """
-    cls = create_model_manager_class(service_type=service_type)
+    cls = create_service_manager_class(service_type=service_type)
     return cls(**kwargs)
 
 
-def start_model_manager(service_type=FlaskService, **kwargs):
-    r"""Start a model management service to track running models.
+def start_integration_manager(service_type=FlaskService, **kwargs):
+    r"""Start a management service to track running integrations.
 
     Args:
         service_type (ServiceBase, str, optional): Base class that should be
@@ -442,5 +693,5 @@ def start_model_manager(service_type=FlaskService, **kwargs):
             manager class instance.
 
     """
-    x = ModelManager(service_type=FlaskService, **kwargs)
+    x = IntegrationServiceManager(service_type=FlaskService, **kwargs)
     x.run_server()

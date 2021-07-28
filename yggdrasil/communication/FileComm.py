@@ -252,15 +252,20 @@ class FileComm(CommBase.CommBase):
             io_mode += 'b'
         return io_mode
 
-    def opp_comm_kwargs(self):
+    def opp_comm_kwargs(self, for_yaml=False):
         r"""Get keyword arguments to initialize communication with opposite
         comm object.
+
+        Args:
+            for_yaml (bool, optional): If True, the returned dict will only
+                contain values that can be specified in a YAML file. Defaults
+                to False.
 
         Returns:
             dict: Keyword arguments for opposite comm object.
 
         """
-        kwargs = super(FileComm, self).opp_comm_kwargs()
+        kwargs = super(FileComm, self).opp_comm_kwargs(for_yaml=for_yaml)
         kwargs['is_series'] = self.is_series
         return kwargs
 

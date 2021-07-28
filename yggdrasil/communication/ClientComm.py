@@ -146,15 +146,20 @@ class ClientComm(CommBase.CommBase):
         out.update(**self.ocomm.opp_comms)
         return out
 
-    def opp_comm_kwargs(self):
+    def opp_comm_kwargs(self, for_yaml=False):
         r"""Get keyword arguments to initialize communication with opposite
         comm object.
+
+        Args:
+            for_yaml (bool, optional): If True, the returned dict will only
+                contain values that can be specified in a YAML file. Defaults
+                to False.
 
         Returns:
             dict: Keyword arguments for opposite comm object.
 
         """
-        kwargs = super(ClientComm, self).opp_comm_kwargs()
+        kwargs = super(ClientComm, self).opp_comm_kwargs(for_yaml=for_yaml)
         kwargs['commtype'] = "server"
         kwargs['request_commtype'] = self.ocomm._commtype
         kwargs['response_kwargs'] = self.response_kwargs

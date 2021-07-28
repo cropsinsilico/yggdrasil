@@ -8,6 +8,10 @@ definitions:
         - args
       description: Base schema for all subtypes of comm components.
       properties:
+        address:
+          description: Communication info. Default to None and address is taken from
+            the environment variable.
+          type: string
         args:
           description: '[DEPRECATED] Arguments that should be provided to the driver.'
           type: string
@@ -136,8 +140,8 @@ definitions:
           type: array
       required:
       - datatype
-      - commtype
       - name
+      - commtype
       title: comm_base
       type: object
     - anyOf:
@@ -300,8 +304,8 @@ definitions:
             - $ref: '#/definitions/transform'
           type: array
       required:
-      - outputs
       - inputs
+      - outputs
       title: connection_base
       type: object
     - anyOf:
@@ -388,6 +392,10 @@ definitions:
         - args
       description: Base schema for all subtypes of file components.
       properties:
+        address:
+          description: Communication info. Default to None and address is taken from
+            the environment variable.
+          type: string
         append:
           default: false
           description: If True and writing, file is openned in append mode. If True
@@ -620,8 +628,8 @@ definitions:
             is used.
           type: string
       required:
-      - name
       - working_dir
+      - name
       - filetype
       title: file_base
       type: object
@@ -1705,10 +1713,10 @@ definitions:
             is used.
           type: string
       required:
-      - name
       - language
       - working_dir
       - args
+      - name
       title: model_base
       type: object
     - anyOf:

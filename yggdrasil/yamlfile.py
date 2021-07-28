@@ -10,6 +10,7 @@ from yggdrasil.schema import standardize, get_schema
 from urllib.parse import urlparse
 from yaml.constructor import (
     ConstructorError, BaseConstructor, Constructor, SafeConstructor)
+from yggdrasil.services import IntegrationServiceManager
 
 
 class YAMLSpecificationError(RuntimeError):
@@ -132,6 +133,7 @@ def prep_yaml(files):
         files = [files]
     yamls = [load_yaml(f) for f in files]
     # Load files pointed to
+    services = []
     for y in yamls:
         if 'include' in y:
             new_files = y.pop('include')
@@ -141,6 +143,25 @@ def prep_yaml(files):
                 if not os.path.isabs(f):
                     f = os.path.join(y['working_dir'], f)
                 yamls.append(load_yaml(f))
+    # Replace references to services with service descriptions
+    for i, y in enumerate(yamls):
+        services = y.pop('services', [])
+        if 'service' in y:
+            services.append(y.pop('service'))
+        y.setdefault('models', [])
+        if 'model' in y:
+            y['models'].append(y.pop('model'))
+        for x in services:
+            request = {'action': 'start'}
+            for k in ['name', 'yamls']:
+                if k in x:
+                    request[k] = x.pop(k)
+            if 'type' in x:
+                x.setdefault('service_type', x.pop('type'))
+            cli = IntegrationServiceManager(**x)
+            response = cli.send_request(**request)
+            assert(response.pop('status') == 'started')
+            y['models'].append(response)
     # Standardize format of models and connections to be lists and
     # add working_dir to each
     comp_keys = ['models', 'connections']

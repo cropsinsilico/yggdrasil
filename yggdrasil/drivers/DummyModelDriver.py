@@ -1,4 +1,3 @@
-import copy
 from yggdrasil.drivers.InterpretedModelDriver import InterpretedModelDriver
 
 
@@ -13,6 +12,10 @@ class DummyModelDriver(InterpretedModelDriver):
     language_ext = []
     no_executable = True
     comms_implicit = True
+
+    def __init__(self, *args, **kwargs):
+        self.runner = kwargs['runner']
+        super(DummyModelDriver, self).__init__(*args, **kwargs)
 
     @classmethod
     def is_language_installed(self):
@@ -62,21 +65,27 @@ class DummyModelDriver(InterpretedModelDriver):
 
     def run_loop(self):
         r"""Loop to check if model is still running and forward output."""
-        pass
+        for drv in self.runner.modeldrivers.values():
+            if (drv['name'] != self.name) and drv['instance'].is_alive():
+                self.sleep(1)
+                return
+        self.set_break_flag()
 
     @property
     def connections(self):
         r"""dict: Mapping of environment variables for connections this
         model will use."""
-        out = {'inputs': {},
-               'outputs': {}}
+        out = {'inputs': [],
+               'outputs': []}
         dir2opp = {'input': 'output', 'output': 'input'}
         for io1, io2 in dir2opp.items():
             for drv in self.yml['%s_drivers' % io1]:
                 name = drv[io1 + 's'][0]['name']
-                out[io1 + 's'][name] = copy.deepcopy(drv[io1 + 's'][0])
                 comm = getattr(drv['instance'], '%scomm' % io2[0])
-                out[io1 + 's'][name]['env'] = {
-                    k.replace('dummy_%s' % name, name): v
-                    for k, v in comm.model_env.items()}
+                x = comm.opp_comm_kwargs(for_yaml=True)
+                x['name'] = name.split(
+                    drv[io1 + 's'][0]['partner_model'] + ':')[-1]
+                out[io2 + 's'].append(x)
+            if not out[io2 + 's']:
+                out.pop(io2 + 's')
         return out

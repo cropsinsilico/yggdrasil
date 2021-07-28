@@ -234,7 +234,7 @@ class main(SubCommand):
                   regen_metaschema, regen_schema,
                   yggmodelform, yggdevup, run_tsts,
                   timing_plots, generate_gha_workflow,
-                  model_service_manager]:
+                  integration_service_manager]:
             x.add_subparser(subparsers, args=kwargs.get('args', None))
             parser._ygg_subparsers[x.name] = x
         return parser
@@ -298,9 +298,9 @@ class yggrun(SubCommand):
             return subprocess.check_call(new_args)
         # TODO: Handle mpi_tag_start on service?
         if args.as_service:
-            from yggdrasil.services import ModelManager
+            from yggdrasil.services import IntegrationServiceManager
             # TODO: command line options for service manager
-            cli = ModelManager(for_request=True)
+            cli = IntegrationServiceManager(for_request=True)
             cli.send_request(args.yamlfile, action='start')
         else:
             from yggdrasil import runner, config
@@ -311,11 +311,11 @@ class yggrun(SubCommand):
                            mpi_tag_start=args.mpi_tag_start)
 
 
-class model_service_manager(SubCommand):
+class integration_service_manager(SubCommand):
     r"""Start or manage the yggdrasil service manager."""
 
-    name = "model-service-manager"
-    help = "Start or manage a model service manager."
+    name = "integration-service-manager"
+    help = "Start or manage a integration service manager."
     arguments = [
         (('--name', ),
          {'help': "Name that will be used to identify the service manager."}),
@@ -324,15 +324,15 @@ class model_service_manager(SubCommand):
           'help': "Type of service that should be started."}),
         (('--shutdown', ),
          {'action': 'store_true',
-          'help': ("Shutdown the service manager and all of the models "
+          'help': ("Shutdown the service manager and all of the integrations "
                    "running as services.")})]
 
     @classmethod
     def func(cls, args):
-        from yggdrasil.services import ModelManager
+        from yggdrasil.services import IntegrationServiceManager
         # TODO: Additional arguments
-        x = ModelManager(name=args.name,
-                         service_type=args.service_type)
+        x = IntegrationServiceManager(name=args.name,
+                                      service_type=args.service_type)
         if args.shutdown:
             x.stop_server()
         else:

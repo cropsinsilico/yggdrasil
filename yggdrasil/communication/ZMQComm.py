@@ -655,23 +655,30 @@ class ZMQComm(CommBase.CommBase):
         else:
             return self.address
 
-    def opp_comm_kwargs(self):
+    def opp_comm_kwargs(self, for_yaml=False):
         r"""Get keyword arguments to initialize communication with opposite
         comm object.
+
+        Args:
+            for_yaml (bool, optional): If True, the returned dict will only
+                contain values that can be specified in a YAML file. Defaults
+                to False.
 
         Returns:
             dict: Keyword arguments for opposite comm object.
 
         """
-        kwargs = super(ZMQComm, self).opp_comm_kwargs()
-        kwargs['socket_type'] = get_socket_type_mate(self.socket_type_name)
+        kwargs = super(ZMQComm, self).opp_comm_kwargs(for_yaml=for_yaml)
+        if not for_yaml:
+            kwargs['socket_type'] = get_socket_type_mate(self.socket_type_name)
         if self.is_client:
             kwargs['is_server'] = True
         elif self.is_server:
             kwargs['is_client'] = True
-        if kwargs['socket_type'] in ['DEALER', 'ROUTER']:
+        if kwargs.get('socket_type', None) in ['DEALER', 'ROUTER']:
             kwargs['dealer_identity'] = self.dealer_identity
-        kwargs['context'] = self.context
+        if not for_yaml:
+            kwargs['context'] = self.context
         return kwargs
 
     @property

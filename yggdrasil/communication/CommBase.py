@@ -526,6 +526,7 @@ class CommBase(tools.YggClass):
     _schema_required = ['name', 'commtype', 'datatype']
     _schema_properties = {
         'name': {'type': 'string'},
+        'address': {'type': 'string'},
         'commtype': {'type': 'string', 'default': 'default',
                      'description': ('Communication mechanism '
                                      'that should be used.')},
@@ -1103,9 +1104,14 @@ class CommBase(tools.YggClass):
         r"""dict: Name/address pairs for opposite comms."""
         return {self.opp_name: self.opp_address}
 
-    def opp_comm_kwargs(self):
+    def opp_comm_kwargs(self, for_yaml=False):
         r"""Get keyword arguments to initialize communication with opposite
         comm object.
+
+        Args:
+            for_yaml (bool, optional): If True, the returned dict will only
+                contain values that can be specified in a YAML file. Defaults
+                to False.
 
         Returns:
             dict: Keyword arguments for opposite comm object.
@@ -1114,13 +1120,19 @@ class CommBase(tools.YggClass):
         kwargs = {'commtype': self._commtype, 'use_async': self.is_async,
                   'allow_multiple_comms': self.allow_multiple_comms}
         kwargs['address'] = self.opp_address
-        kwargs['serializer'] = self.serializer
+        if not for_yaml:
+            kwargs['serializer'] = self.serializer
+        kwargs.update(self.serializer.input_kwargs)
         # TODO: Pass copies/partner_copies in kwargs?
         if self.direction == 'send':
             kwargs['direction'] = 'recv'
         else:
             kwargs['direction'] = 'send'
-        kwargs.update(self.serializer.input_kwargs)
+        if for_yaml:
+            kwargs['datatype'] = kwargs['datatype']._typedef
+            for k in ['use_async', 'allow_multiple_comms', 'direction',
+                      'comment', 'newline', 'seritype']:
+                kwargs.pop(k, None)
         return kwargs
 
     def bind(self):
