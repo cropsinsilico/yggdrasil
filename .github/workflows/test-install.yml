@@ -252,9 +252,11 @@ jobs:
       id: mpi_windows
       run: 'yggtest --ci --test-suite=mpi
 
-        coverage combine
-
-        # ./run_mpi.sh
+        '
+      continue-on-error: true
+    - name: Re-run MPI test failures (windows)
+      if: ${{ steps.mpi_windows.outcome == 'failure' }}
+      run: 'yggtest --ci --test-suite=mpi --debug
 
         '
     - name: Run cmake test in command prompt
@@ -561,9 +563,11 @@ jobs:
       id: mpi_windows
       run: 'yggtest --ci --test-suite=mpi
 
-        coverage combine
-
-        # ./run_mpi.sh
+        '
+      continue-on-error: true
+    - name: Re-run MPI test failures (windows)
+      if: ${{ steps.mpi_windows.outcome == 'failure' }}
+      run: 'yggtest --ci --test-suite=mpi --debug
 
         '
     - name: Run cmake test in command prompt
@@ -850,9 +854,11 @@ jobs:
       id: mpi_windows
       run: 'yggtest --ci --test-suite=mpi
 
-        coverage combine
-
-        # ./run_mpi.sh
+        '
+      continue-on-error: true
+    - name: Re-run MPI test failures (windows)
+      if: ${{ steps.mpi_windows.outcome == 'failure' }}
+      run: 'yggtest --ci --test-suite=mpi --debug
 
         '
     - name: Run cmake test in command prompt
@@ -1141,9 +1147,11 @@ jobs:
       id: mpi_windows
       run: 'yggtest --ci --test-suite=mpi
 
-        coverage combine
-
-        # ./run_mpi.sh
+        '
+      continue-on-error: true
+    - name: Re-run MPI test failures (windows)
+      if: ${{ steps.mpi_windows.outcome == 'failure' }}
+      run: 'yggtest --ci --test-suite=mpi --debug
 
         '
     - name: Run cmake test in command prompt
@@ -1431,9 +1439,11 @@ jobs:
       id: mpi_windows
       run: 'yggtest --ci --test-suite=mpi
 
-        coverage combine
-
-        # ./run_mpi.sh
+        '
+      continue-on-error: true
+    - name: Re-run MPI test failures (windows)
+      if: ${{ steps.mpi_windows.outcome == 'failure' }}
+      run: 'yggtest --ci --test-suite=mpi --debug
 
         '
     - name: Run cmake test in command prompt
