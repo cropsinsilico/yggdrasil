@@ -274,7 +274,8 @@ class RMQComm(CommBase.CommBase):
                                           exchange=self.exchange)
                 self.channel.queue_delete(queue=self.queue)
             except (pika.exceptions.ChannelClosed,
-                    pika.exceptions.ConnectionClosed):  # pragma: debug
+                    pika.exceptions.ConnectionClosed,
+                    pika.exceptions.ChannelWrongStateError):  # pragma: debug
                 pass
             except AttributeError:  # pragma: debug
                 if self.channel is not None:
