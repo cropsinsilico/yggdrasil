@@ -662,6 +662,7 @@ class ConnectionDriver(Driver):
         """
         msg = beg_msg
         msg += '%-50s' % (self.__module__.split('.')[-1] + '(' + self.name + '): ')
+        msg += '\n\t'
         msg += '%-30s' % ('last action: ' + self.state)
         msg += '%-25s' % ('is_open(%s, %s), ' % (self.icomm.is_open,
                                                  self.ocomm.is_open))

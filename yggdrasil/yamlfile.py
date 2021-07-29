@@ -133,7 +133,6 @@ def prep_yaml(files):
         files = [files]
     yamls = [load_yaml(f) for f in files]
     # Load files pointed to
-    services = []
     for y in yamls:
         if 'include' in y:
             new_files = y.pop('include')
@@ -148,9 +147,10 @@ def prep_yaml(files):
         services = y.pop('services', [])
         if 'service' in y:
             services.append(y.pop('service'))
-        y.setdefault('models', [])
-        if 'model' in y:
-            y['models'].append(y.pop('model'))
+        if services:
+            y.setdefault('models', [])
+            if 'model' in y:
+                y['models'].append(y.pop('model'))
         for x in services:
             request = {'action': 'start'}
             for k in ['name', 'yamls']:
@@ -180,7 +180,7 @@ def prep_yaml(files):
     return yml_all
 
 
-def parse_yaml(files, complete_partial=False):
+def parse_yaml(files, complete_partial=False, partial_commtype=None):
     r"""Parse list of yaml files.
 
     Args:
@@ -189,6 +189,9 @@ def parse_yaml(files, complete_partial=False):
         complete_partial (bool, optional): If True, unpaired input/output
             channels are allowed and reserved for use (e.g. for calling the
             model as a function). Defaults to False.
+        partial_commtype (str, optional): Communicator type that should be
+            be used for the connections to the unpaired channels when
+            complete_partial is True. Defaults to None and will be ignored.
 
     Raises:
         ValueError: If the yml dictionary is missing a required keyword or
@@ -245,7 +248,8 @@ def parse_yaml(files, complete_partial=False):
             existing = parse_component(yml, k[:-1], existing=existing)
     # Add stand-in model that uses unpaired channels
     if complete_partial:
-        existing = complete_partial_integration(existing)
+        existing = complete_partial_integration(
+            existing, partial_commtype=partial_commtype)
     # Create server/client connections
     for srv, srv_info in existing['server'].items():
         clients = srv_info['clients']
@@ -327,11 +331,14 @@ def parse_yaml(files, complete_partial=False):
     return existing
 
 
-def complete_partial_integration(existing):
+def complete_partial_integration(existing, partial_commtype=None):
     r"""Patch input/output channels that are not connected to a stand-in model.
 
     Args:
         existing (dict): Dictionary of existing components.
+        partial_commtype (str, optional): Communicator type that should be
+            be used for the connections to the unpaired channels. Defaults to
+            None and will be ignored.
 
     Returns:
         dict: Updated dictionary of components.
@@ -366,6 +373,8 @@ def complete_partial_integration(existing):
             dummy_channel = 'dummy_%s' % i
             dummy_comm = copy.deepcopy(existing[io1][i])
             dummy_comm['name'] = dummy_channel
+            if partial_commtype is not None:
+                dummy_comm['commtype'] = partial_commtype
             new_model[io2 + 's'].append(dummy_comm)
             new_connections.append({io1 + 's': [{'name': dummy_channel}],
                                     io2 + 's': [{'name': i}]})

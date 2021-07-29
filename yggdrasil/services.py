@@ -39,6 +39,7 @@ class ServiceBase(YggClass):
 
     def __init__(self, name, *args, **kwargs):
         self.for_request = kwargs.pop('for_request', False)
+        self.address = kwargs.pop('address', None)
         self._args = args
         self._kwargs = kwargs
         super(ServiceBase, self).__init__(name, *args, **kwargs)
@@ -209,6 +210,13 @@ class FlaskService(ServiceBase):
         except ImportError:
             return False
 
+    def __init__(self, *args, **kwargs):
+        if kwargs.get('address', None) is None:
+            kwargs['address'] = 'http://localhost:5000'
+        if not kwargs['address'].endswith('/'):
+            kwargs['address'] += '/'
+        super(FlaskService, self).__init__(*args, **kwargs)
+
     def setup_server(self, *args, **kwargs):
         r"""Set up the machinery for receiving requests.
 
@@ -229,15 +237,9 @@ class FlaskService(ServiceBase):
             return self.process_request(self.request.json, args=req_args)
         
     def setup_client(self, *args, **kwargs):
-        r"""Set up the machinery for sending requests.
+        r"""Set up the machinery for sending requests."""
+        pass
 
-        Args:
-            *args: Arguments are ignored.
-            **kwargs: Keyword arguments are ignored.
-
-        """
-        self.address = 'http://localhost:5000/' + self.name
-        
     def run_server(self):
         r"""Begin listening for requests."""
         self.app.run()
@@ -298,7 +300,7 @@ class FlaskService(ServiceBase):
         """
         import requests
         try:
-            r = requests.post(self.address, json=request)
+            r = requests.post(self.address + self.name, json=request)
         except BaseException as e:
             raise ClientError(e)
         return r.json()
@@ -315,24 +317,16 @@ class RMQService(ServiceBase):
 
     def _init_rmq(self, *args, **kwargs):
         from yggdrasil.communication.RMQComm import pika, get_rmq_parameters
-        
         self.pika = pika
-        if 'address' in kwargs:
-            kwargs['url'] = kwargs.pop('address')
-        self.url, self.exchange, self.queue = get_rmq_parameters(
-            *args, **kwargs)
+        if not self.address:
+            self.address, _, _ = get_rmq_parameters(*args, **kwargs)
         self.queue = self.name
         # Unclear why using a non-default exchange prevents the server
         # from starting
         self.exchange = ''
-        parameters = pika.URLParameters(self.url)
+        parameters = pika.URLParameters(self.address)
         self.connection = pika.BlockingConnection(parameters)
         self.channel = self.connection.channel()
-
-    @property
-    def address(self):
-        r"""str: RabbitMQ broker address."""
-        return self.url
 
     def setup_server(self, *args, **kwargs):
         r"""Set up the machinery for receiving requests.
@@ -469,13 +463,25 @@ def create_service_manager_class(service_type=FlaskService):
         service_type = cls_map[service_type]
 
     class IntegrationServiceManager(service_type):
-        r"""Manager to track running integrations."""
+        r"""Manager to track running integrations.
 
-        def __init__(self, name=None, **kwargs):
+        Args:
+            name (str): Name that should be used to initialize an address for
+                the service. Defaults to 'ygg_integrations'.
+            commtype (str, optional): Communicator type that should be used
+                for the connections to services. Defaulst to None and is
+                ignored.
+            **kwargs: Additional keyword arguments are passed to the __init__
+                method for the service_type class.
+
+        """
+
+        def __init__(self, name=None, commtype=None, **kwargs):
             if name is None:
                 name = 'ygg_integrations'
             self.integrations = {}
             self.registry = IntegrationServiceRegistry()
+            self.commtype = commtype
             super(IntegrationServiceManager, self).__init__(name, **kwargs)
 
         def send_request(self, name=None, yamls=None, action='start', **kwargs):
@@ -529,7 +535,8 @@ def create_service_manager_class(service_type=FlaskService):
                 self.stop_integration(x)
             if x not in self.integrations:
                 self.integrations[x] = runner.get_runner(
-                    yamls, complete_partial=True, **kwargs)
+                    yamls, complete_partial=True,
+                    partial_commtype=self.commtype, **kwargs)
                 self.integrations[x].run(signal_handler=False)
 
         def stop_integration(self, x):
@@ -613,7 +620,6 @@ def create_service_manager_class(service_type=FlaskService):
                 if action == 'start':
                     if yamls is None:
                         reg = self.registry.registry.get(name, None)
-                        # TODO: Check registry
                         if isinstance(name, tuple):
                             yamls = list(name)
                         elif isinstance(name, str) and os.path.isfile(name):
@@ -675,6 +681,25 @@ def create_service_manager_class(service_type=FlaskService):
                 raise ServerError('%s\n%s' % (response['traceback'],
                                               response['error']))
             return response
+
+        def printStatus(self, level='info', return_str=False):
+            r"""Print the status of the service manager including available
+            and running services."""
+            status = self.send_request(action='status')
+            fmt = ('Address: %s\n'
+                   'Available Services:\n%s\n'
+                   'Running Services:\n%s')
+            registry_str = '\t' + '\n\t'.join(
+                pprint.pformat(self.registry.registry).splitlines())
+            running_str = ''
+            for k in status['integrations']:
+                running_str += '\t%s:\n\t\t%s' % (
+                    k, '\n\t\t'.join(status[k].splitlines()))
+            args = (self.address, registry_str, running_str)
+            if return_str:
+                msg, _ = self.logger.process(fmt, {})
+                return msg % args
+            getattr(self.logger, level)(fmt, *args)
             
     return IntegrationServiceManager
 
@@ -691,20 +716,6 @@ def IntegrationServiceManager(service_type=FlaskService, **kwargs):
     """
     cls = create_service_manager_class(service_type=service_type)
     return cls(**kwargs)
-
-
-def start_integration_manager(service_type=FlaskService, **kwargs):
-    r"""Start a management service to track running integrations.
-
-    Args:
-        service_type (ServiceBase, str, optional): Base class that should be
-            used. Defaults to FlaskService.
-        **kwargs: Additional keyword arguments are used to intialized the
-            manager class instance.
-
-    """
-    x = IntegrationServiceManager(service_type=FlaskService, **kwargs)
-    x.run_server()
 
 
 class IntegrationServiceRegistry(object):

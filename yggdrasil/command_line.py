@@ -270,11 +270,7 @@ class yggrun(SubCommand):
           'help': 'Number of MPI processes to run on.'}),
         (('--mpi-tag-start', ),
          {'type': int, 'default': 0,
-          'help': 'Tag that MPI communications should start at.'}),
-        (('--as-service', ),
-         {'help': ("Run the model in the background as a service "
-                   "that other models can connect to via RabbitMQ "
-                   "connections.")})]
+          'help': 'Tag that MPI communications should start at.'})]
 
     @classmethod
     def add_arguments(cls, parser, **kwargs):
@@ -296,19 +292,12 @@ class yggrun(SubCommand):
                     new_args.append(x)
                 i += 1
             return subprocess.check_call(new_args)
-        # TODO: Handle mpi_tag_start on service?
-        if args.as_service:
-            from yggdrasil.services import IntegrationServiceManager
-            # TODO: command line options for service manager
-            cli = IntegrationServiceManager(for_request=True)
-            cli.send_request(args.yamlfile, action='start')
-        else:
-            from yggdrasil import runner, config
-            prog = sys.argv[0].split(os.path.sep)[-1]
-            with config.parser_config(args):
-                runner.run(args.yamlfile, ygg_debug_prefix=prog,
-                           production_run=args.production_run,
-                           mpi_tag_start=args.mpi_tag_start)
+        from yggdrasil import runner, config
+        prog = sys.argv[0].split(os.path.sep)[-1]
+        with config.parser_config(args):
+            runner.run(args.yamlfile, ygg_debug_prefix=prog,
+                       production_run=args.production_run,
+                       mpi_tag_start=args.mpi_tag_start)
 
 
 class integration_service_manager(SubCommand):
@@ -317,26 +306,121 @@ class integration_service_manager(SubCommand):
     name = "integration-service-manager"
     help = "Start or manage a integration service manager."
     arguments = [
-        (('--name', ),
+        (('--manager-name', ),
          {'help': "Name that will be used to identify the service manager."}),
         (('--service-type', ),
          {'default': 'flask', 'choices': ['flask', 'rmq'],
           'help': "Type of service that should be started."}),
-        (('--shutdown', ),
-         {'action': 'store_true',
-          'help': ("Shutdown the service manager and all of the integrations "
-                   "running as services.")})]
+        (('--commtype', ),
+         {'type': str,
+          'help': ("Type of communicator that should be used for connections "
+                   "to services.")}),
+        (('--address', ),
+         {'type': str,
+          'help': ('URL for requests to the service manager. '
+                   'For a service-type of \'flask\', this should be the '
+                   'http address with the port that should be used '
+                   'and the default will be \'http://localhost:5000\'. '
+                   'For a service-type of \'rmq\', this should be an '
+                   'amqp broker address and the default will be '
+                   '\'amqp://guest:guest@localhost:5672/%%2f\'.')}),
+        ArgumentSubparser(
+            title='action', dest='action',
+            description='Management action to take.',
+            parsers=[
+                ArgumentParser(
+                    name='start',
+                    help=('Start an integration service manager and/or '
+                          'integration service.'),
+                    arguments=[
+                        (('--integration-name', ),
+                         {'default': None,
+                          'help': ('Name of integration to start. If not '
+                                   'provided, a service manager will be '
+                                   'started.')}),
+                        (('--integration-yamls', ),
+                         {'nargs': '+',
+                          'help': ('One or more YAML specification files '
+                                   'defining the integration. This argument '
+                                   'may be omitted if \'name\' refers to a '
+                                   'registered integration.')})]),
+                ArgumentParser(
+                    name='stop',
+                    help=('Stop an integration service manager or '
+                          'an integration service.'),
+                    arguments=[
+                        (('--integration-name', ),
+                         {'default': None,
+                          'help': ('Name of integration to stop. If not '
+                                   'provided, the service manager will be '
+                                   'stopped as will all of the running '
+                                   'services.')})]),
+                ArgumentParser(
+                    name='status',
+                    help=('Get list of available services and the status '
+                          'of any running services.')),
+                ArgumentParser(
+                    name='register',
+                    help='Register an integration with the service manager.',
+                    arguments=[
+                        (('integration-name', ),
+                         {'type': str,
+                          'help': ('The name that the integration should be '
+                                   'registered under.')}),
+                        (('integration-yamls', ),
+                         {'nargs': '+',
+                          'help': ('One or more YAML specification files '
+                                   'defining the integration.')})]),
+                ArgumentParser(
+                    name='unregister',
+                    help='Unregister an integration with the service manager.',
+                    arguments=[
+                        (('integration-name', ),
+                         {'type': str,
+                          'help': ('The name of the integration to remove '
+                                   'from the registry.')})]),
+            ])]
 
     @classmethod
     def func(cls, args):
         from yggdrasil.services import IntegrationServiceManager
-        # TODO: Additional arguments
-        x = IntegrationServiceManager(name=args.name,
-                                      service_type=args.service_type)
-        if args.shutdown:
-            x.stop_server()
+        integration_name = getattr(args, 'integration-name',
+                                   getattr(args, 'integration_name', None))
+        for_request = (
+            (args.action in ['status', 'register', 'unregister'])
+            or (integration_name is not None))
+        x = IntegrationServiceManager(name=args.manager_name,
+                                      service_type=args.service_type,
+                                      commtype=args.commtype,
+                                      address=args.address,
+                                      for_request=for_request)
+        if args.action in ['start', None]:
+            if integration_name is None:
+                if not x.is_running:
+                    x.run_server()
+            else:
+                x.send_request(integration_name,
+                               yamls=args.integration_yamls,
+                               action='start')
+        elif args.action == 'stop':
+            if integration_name is None:
+                x.stop_server()
+            else:
+                x.send_request(integration_name, action='stop')
+        elif args.action == 'status':
+            x.printStatus()
+        elif args.action == 'register':
+            yamls = []
+            for yml in getattr(args, 'integration-yamls'):
+                if not os.path.isabs(yml):
+                    yml = os.path.abspath(yml)
+                yamls.append(yml)
+            x.registry.add(name=integration_name,
+                           yamls=yamls)
+        elif args.action == 'unregister':
+            x.registry.remove(name=integration_name)
         else:
-            x.run_server()
+            raise NotImplementedError(args.action)
 
 
 class ygginfo(SubCommand):

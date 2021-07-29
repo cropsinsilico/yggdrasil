@@ -7,18 +7,23 @@ from yggdrasil.services import (
 from yggdrasil.examples import yamls as ex_yamls
 from yggdrasil.tests import assert_raises
 from yggdrasil import runner
+from yggdrasil.tools import is_comm_installed
 
 
 @pytest.mark.parametrize("service_type", ['flask', 'rmq'])
-def test_integration_service(service_type):
+@pytest.mark.parametrize("partial_commtype", ['zmq', 'rmq'])
+def test_integration_service(service_type, partial_commtype):
     r"""Test starting/stopping an integration service via flask/rmq."""
+    if not is_comm_installed(partial_commtype, language='python'):
+        pytest.skip(f"Communicator type '{partial_commtype}' not installed.")
     cls = create_service_manager_class(service_type=service_type)
     if not cls.is_installed():
         pytest.skip("Service type not installed.")
     name = 'ygg_integrations_test'
     test_yml = ex_yamls['fakeplant']['python']
     args = ["yggdrasil", "integration-service-manager",
-            f"--name={name}", f"--service-type={service_type}"]
+            f"--manager-name={name}", f"--service-type={service_type}",
+            f"--commtype={partial_commtype}"]
     cli = IntegrationServiceManager(name=name, service_type=service_type,
                                     for_request=True)
     assert(not cli.is_running)
@@ -48,7 +53,7 @@ def test_registered_service(service_type):
     name = 'ygg_integrations_test'
     test_yml = ex_yamls['fakeplant']['python']
     args = ["yggdrasil", "integration-service-manager",
-            f"--name={name}", f"--service-type={service_type}"]
+            f"--manager-name={name}", f"--service-type={service_type}"]
     cli = IntegrationServiceManager(name=name, service_type=service_type,
                                     for_request=True)
     assert(not cli.is_running)
@@ -71,18 +76,22 @@ def test_registered_service(service_type):
 
 
 @pytest.mark.parametrize("service_type", ['flask', 'rmq'])
-def test_calling_integration_service(service_type):
+@pytest.mark.parametrize("partial_commtype", ['zmq', 'rmq'])
+def test_calling_integration_service(service_type, partial_commtype):
     r"""Test calling an integrations as a service in an integration."""
+    if not is_comm_installed(partial_commtype, language='python'):
+        pytest.skip(f"Communicator type '{partial_commtype}' not installed.")
     cls = create_service_manager_class(service_type=service_type)
     if not cls.is_installed():
-        pytest.skip("Service type not installed.")
+        pytest.skip(f"Service type '{service_type}' not installed.")
     test_yml = ex_yamls['fakeplant']['python']
     remote_yml = '_remote'.join(os.path.splitext(test_yml))
     yamls = copy.copy(ex_yamls['fakeplant']['all_nomatlab'])
     yamls.remove(test_yml)
     yamls.append(remote_yml)
     args = ["yggdrasil", "integration-service-manager",
-            f"--service-type={service_type}"]
+            f"--service-type={service_type}",
+            f"--commtype={partial_commtype}"]
     cli = IntegrationServiceManager(service_type=service_type,
                                     for_request=True)
     assert(not cli.is_running)

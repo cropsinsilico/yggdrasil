@@ -234,6 +234,9 @@ class YggRunner(YggClass):
         complete_partial (bool, optional): If True, unpaired input/output
             channels are allowed and reserved for use (e.g. for calling the
             model as a function). Defaults to False.
+        partial_commtype (str, optional): Communicator type that should be
+            be used for the connections to the unpaired channels when
+            complete_partial is True. Defaults to None and will be ignored.
 
     Attributes:
         namespace (str): Name that should be used to uniquely identify any RMQ
@@ -251,8 +254,8 @@ class YggRunner(YggClass):
     def __init__(self, modelYmls, namespace=None, host=None, rank=0,
                  ygg_debug_level=None, rmq_debug_level=None,
                  ygg_debug_prefix=None, connection_task_method='thread',
-                 complete_partial=False, production_run=False,
-                 mpi_tag_start=None):
+                 complete_partial=False, partial_commtype=None,
+                 production_run=False, mpi_tag_start=None):
         self.mpi_comm = None
         name = 'runner'
         if MPI is not None:
@@ -279,6 +282,7 @@ class YggRunner(YggClass):
         self.production_run = production_run
         self.error_flag = False
         self.complete_partial = complete_partial
+        self.partial_commtype = partial_commtype
         self.debug("Running in %s with path %s namespace %s rank %d",
                    os.getcwd(), sys.path, namespace, rank)
         # Update environment based on config
@@ -288,8 +292,9 @@ class YggRunner(YggClass):
         if self.mpi_comm and (self.rank > 0):
             pass
         else:
-            self.drivers = yamlfile.parse_yaml(modelYmls,
-                                               complete_partial=complete_partial)
+            self.drivers = yamlfile.parse_yaml(
+                modelYmls, complete_partial=complete_partial,
+                partial_commtype=partial_commtype)
             self.connectiondrivers = self.drivers['connection']
             self.modeldrivers = self.drivers['model']
             for x in self.modeldrivers.values():
