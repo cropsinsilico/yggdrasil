@@ -9,12 +9,12 @@ History
 * Added classes for managing models as services via Flask or RabbitMQ
 * Transitioned from as_function to complete_partial keyword in parse_yaml that can be used for services as well as functions
 * Added client side instrumentation for connecting to remote model services and tests
+* Added support for registering integrations that can be called locally as services
 
 TODO:
 ~~~~~
 
 * Add keyword to specify what type of connection should be used to connect to services
-* Add support for a registry of local integrations on the host machine that can be run as services
 
 
 1.7.0 (2021-08-26) Support for MPI communicators, MPI execution, and pika >= 1.0.0

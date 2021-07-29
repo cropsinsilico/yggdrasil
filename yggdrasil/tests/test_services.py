@@ -39,6 +39,37 @@ def test_integration_service(service_type):
         p.terminate()
 
 
+@pytest.mark.parametrize("service_type", ['flask'])
+def test_registered_service(service_type):
+    r"""Test registering an integration service."""
+    cls = create_service_manager_class(service_type=service_type)
+    if not cls.is_installed():
+        pytest.skip("Service type not installed.")
+    name = 'ygg_integrations_test'
+    test_yml = ex_yamls['fakeplant']['python']
+    args = ["yggdrasil", "integration-service-manager",
+            f"--name={name}", f"--service-type={service_type}"]
+    cli = IntegrationServiceManager(name=name, service_type=service_type,
+                                    for_request=True)
+    assert(not cli.is_running)
+    p = subprocess.Popen(args)
+    try:
+        cli.wait_for_server()
+        assert_raises(KeyError, cli.registry.remove, 'test')
+        assert_raises(ServerError, cli.send_request, 'test')
+        cli.registry.add('test', test_yml)
+        print(cli.send_request('test'))
+        assert_raises(ValueError, cli.registry.add, 'test', [])
+        cli.send_request('test', action='stop')
+        cli.stop_server()
+        cli.registry.remove('test')
+        assert_raises(KeyError, cli.registry.remove, 'test')
+        assert(not cli.is_running)
+        p.wait(10)
+    finally:
+        p.terminate()
+
+
 @pytest.mark.parametrize("service_type", ['flask', 'rmq'])
 def test_calling_integration_service(service_type):
     r"""Test calling an integrations as a service in an integration."""

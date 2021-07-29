@@ -4,6 +4,8 @@ import uuid
 import json
 import traceback
 import threading
+import yaml
+import pprint
 from yggdrasil import runner
 from yggdrasil import platform
 from yggdrasil.tools import sleep, TimeOut, YggClass
@@ -473,6 +475,7 @@ def create_service_manager_class(service_type=FlaskService):
             if name is None:
                 name = 'ygg_integrations'
             self.integrations = {}
+            self.registry = IntegrationServiceRegistry()
             super(IntegrationServiceManager, self).__init__(name, **kwargs)
 
         def send_request(self, name=None, yamls=None, action='start', **kwargs):
@@ -510,7 +513,7 @@ def create_service_manager_class(service_type=FlaskService):
                 sig = signal.SIGKILL
             os.kill(response['pid'], sig)
 
-        def start_integration(self, x, yamls):
+        def start_integration(self, x, yamls, **kwargs):
             r"""Start an integration if it is not already running.
 
             Args:
@@ -519,13 +522,14 @@ def create_service_manager_class(service_type=FlaskService):
                     running integrations.
                 yamls (list): Set of YAML specification files defining the
                     integration that should be run as as service.
+                **kwargs: Additional keyword arguments are passed to get_runner.
 
             """
             if (x in self.integrations) and (not self.integrations[x].is_alive):
                 self.stop_integration(x)
             if x not in self.integrations:
                 self.integrations[x] = runner.get_runner(
-                    yamls, complete_partial=True)
+                    yamls, complete_partial=True, **kwargs)
                 self.integrations[x].run(signal_handler=False)
 
         def stop_integration(self, x):
@@ -601,21 +605,27 @@ def create_service_manager_class(service_type=FlaskService):
 
             """
             try:
-                name = request['name']
-                action = request['action']
-                yamls = request['yamls']
+                name = request.pop('name')
+                action = request.pop('action')
+                yamls = request.pop('yamls')
                 if isinstance(name, list):
                     name = tuple(name)
                 if action == 'start':
                     if yamls is None:
+                        reg = self.registry.registry.get(name, None)
                         # TODO: Check registry
                         if isinstance(name, tuple):
                             yamls = list(name)
                         elif isinstance(name, str) and os.path.isfile(name):
                             yamls = [name]
+                        elif reg is not None:
+                            yamls = reg['yamls']
+                            for k, v in reg.items():
+                                if k not in ['name', 'yamls']:
+                                    request.setdefault(k, v)
                         else:
                             raise RuntimeError("No YAML files specified.")
-                    self.start_integration(name, yamls)
+                    self.start_integration(name, yamls, **request)
                     response = {'status': 'started'}
                     response.update(self.integration_info(name))
                 elif action == 'stop':
@@ -695,3 +705,92 @@ def start_integration_manager(service_type=FlaskService, **kwargs):
     """
     x = IntegrationServiceManager(service_type=FlaskService, **kwargs)
     x.run_server()
+
+
+class IntegrationServiceRegistry(object):
+    r"""Class for managing integration services.
+
+    Args:
+        filename (str, optional): File where the registry will be/is stored.
+            Defaults to '~/.yggdrasil_services.yml'.
+
+    """
+
+    def __init__(self, filename=os.path.join('~', '.yggdrasil_services.yml')):
+        self.filename = os.path.expanduser(filename)
+
+    @property
+    def registry(self):
+        r"""dict: Existing registry of integrations."""
+        return self.load()
+
+    def load(self):
+        r"""Load the dictionary of existing integrations that have been
+        registered.
+
+        Returns:
+            dict: Existing registry of integrations.
+
+        """
+        if os.path.isfile(self.filename):
+            with open(self.filename, 'r') as fd:
+                return yaml.safe_load(fd)
+        return {}
+
+    def save(self, registry):
+        r"""Save the registry to self.filename.
+
+        Args:
+            registry (dict): Dictionary of integrations to save.
+
+        """
+        with open(self.filename, 'w') as fd:
+            yaml.dump(registry, fd)
+
+    def remove(self, name):
+        r"""Remove an integration service from the registry.
+
+        Args:
+            name (str): Name associated with the integration service that
+                should be removed from the registry.
+
+        Raises:
+            KeyError: If there is not an integration service associated with
+                the specified name.
+
+        """
+        registry = self.load()
+        if name not in registry:
+            keys = list(self.registry.keys())
+            raise KeyError(f"There is not an integration service registered "
+                           f"under the name '{name}'. Existing services are "
+                           f"{keys}")
+        registry.pop(name)
+        self.save(registry)
+
+    def add(self, name, yamls, **kwargs):
+        r"""Add an integration service to the registry.
+
+        Args:
+            name (str): Name that will be used to access the integration
+                service when starting or stopping it.
+            yamls (str, list): Set of one or more YAML specification files
+                defining the integration.
+            **kwargs: Additional keyword arguments are added to the new entry.
+
+        Raises:
+            ValueError: If there is already an integration with the specified
+                name.
+
+        """
+        entry = dict(kwargs, name=name, yamls=yamls)
+        registry = self.load()
+        if name in registry:
+            old = pprint.pformat(registry[name])
+            new = pprint.pformat(entry)
+            raise ValueError(f"There is an registry integration associated "
+                             f"with the name '{name}'. Remote the registry "
+                             f"entry before adding a new one.\n"
+                             f"    Registry:\n{old}\n    New:\n{new}")
+        registry[name] = entry
+        self.save(registry)
