@@ -5,8 +5,8 @@ import subprocess
 from yggdrasil.services import (
     IntegrationServiceManager, create_service_manager_class, ServerError)
 from yggdrasil.examples import yamls as ex_yamls
-from yggdrasil.tests import assert_raises
-from yggdrasil import runner
+from yggdrasil.tests import assert_raises, requires_language
+from yggdrasil import runner, import_as_function
 from yggdrasil.tools import is_comm_installed
 
 
@@ -75,6 +75,8 @@ def test_registered_service(service_type):
         p.terminate()
 
 
+@requires_language('c')
+@requires_language('c++')
 @pytest.mark.parametrize("service_type", ['flask', 'rmq'])
 @pytest.mark.parametrize("partial_commtype", ['zmq', 'rmq'])
 def test_calling_integration_service(service_type, partial_commtype):
@@ -113,4 +115,46 @@ def test_calling_integration_service(service_type, partial_commtype):
     finally:
         if os.path.isfile(remote_yml):
             os.remove(remote_yml)
+        p.terminate()
+
+
+@pytest.mark.parametrize("service_type", ['flask', 'rmq'])
+@pytest.mark.parametrize("partial_commtype", ['zmq'])
+def test_calling_service_as_function(service_type, partial_commtype):
+    r"""Test calling an integrations as a service in an integration."""
+    if not is_comm_installed(partial_commtype, language='python'):
+        pytest.skip(f"Communicator type '{partial_commtype}' not installed.")
+    cls = create_service_manager_class(service_type=service_type)
+    if not cls.is_installed():
+        pytest.skip(f"Service type '{service_type}' not installed.")
+    name = 'test'
+    test_yml = ex_yamls['fakeplant']['python']
+    args = ["yggdrasil", "integration-service-manager",
+            f"--service-type={service_type}",
+            f"--commtype={partial_commtype}"]
+    cli = IntegrationServiceManager(service_type=service_type,
+                                    for_request=True)
+    assert(not cli.is_running)
+    p = subprocess.Popen(args)
+    try:
+        cli.wait_for_server()
+        cli.registry.add(name, test_yml)
+        fmodel = import_as_function(name, cli.address)
+        input_args = {}
+        for x in fmodel.arguments:
+            input_args[x] = 1.0
+        fmodel.model_info()
+        result = fmodel(**input_args)
+        for x in fmodel.returns:
+            assert(x in result)
+        result = fmodel(*list(input_args.values()))
+        for x in fmodel.returns:
+            assert(x in result)
+        fmodel.stop()
+        fmodel.stop()
+        cli.stop_server()
+        assert(not cli.is_running)
+        p.wait(10)
+    finally:
+        cli.registry.remove(name)
         p.terminate()

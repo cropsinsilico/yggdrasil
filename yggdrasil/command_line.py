@@ -309,16 +309,24 @@ class integration_service_manager(SubCommand):
         (('--manager-name', ),
          {'help': "Name that will be used to identify the service manager."}),
         (('--service-type', ),
-         {'default': 'flask', 'choices': ['flask', 'rmq'],
-          'help': "Type of service that should be started."}),
+         {'choices': ['flask', 'rmq'],
+          'help': ("Type of service that should be started. If not "
+                   "provided, the default will be the (\'services\', "
+                   "\'default_type\') configuration option, if set, and "
+                   "will otherwise be \'flask\'.")}),
         (('--commtype', ),
          {'type': str,
           'help': ("Type of communicator that should be used for connections "
-                   "to services.")}),
+                   "to services. If not provided, the default will be "
+                   "determined by the (\'services\', \'default_comm\') "
+                   "configuration option, if set.")}),
         (('--address', ),
          {'type': str,
           'help': ('URL for requests to the service manager. '
-                   'For a service-type of \'flask\', this should be the '
+                   'If not provided, the default will be determined by the '
+                   '(\'services\', \'default_type\') configuration option, '
+                   'if set, and based on the selected \'service-type\', if '
+                   'not. For a service-type of \'flask\', this should be the '
                    'http address with the port that should be used '
                    'and the default will be \'http://localhost:5000\'. '
                    'For a service-type of \'rmq\', this should be an '
@@ -383,12 +391,28 @@ class integration_service_manager(SubCommand):
 
     @classmethod
     def func(cls, args):
-        from yggdrasil.services import IntegrationServiceManager
+        from yggdrasil.services import (
+            IntegrationServiceManager, _default_service_type,
+            _default_commtype, _default_address)
         integration_name = getattr(args, 'integration-name',
                                    getattr(args, 'integration_name', None))
+        integration_yamls0 = getattr(args, 'integration-yamls',
+                                     getattr(args, 'integration_yamls', None))
+        integration_yamls = []
+        if integration_yamls0:
+            for yml in integration_yamls0:
+                if not os.path.isabs(yml):
+                    yml = os.path.abspath(yml)
+                integration_yamls.append(yml)
         for_request = (
             (args.action in ['status', 'register', 'unregister'])
             or (integration_name is not None))
+        if not args.service_type:
+            args.service_type = _default_service_type
+        if not args.commtype:
+            args.commtype = _default_commtype
+        if not args.address:
+            args.address = _default_address
         x = IntegrationServiceManager(name=args.manager_name,
                                       service_type=args.service_type,
                                       commtype=args.commtype,
@@ -400,7 +424,7 @@ class integration_service_manager(SubCommand):
                     x.run_server()
             else:
                 x.send_request(integration_name,
-                               yamls=args.integration_yamls,
+                               yamls=integration_yamls,
                                action='start')
         elif args.action == 'stop':
             if integration_name is None:
@@ -410,13 +434,8 @@ class integration_service_manager(SubCommand):
         elif args.action == 'status':
             x.printStatus()
         elif args.action == 'register':
-            yamls = []
-            for yml in getattr(args, 'integration-yamls'):
-                if not os.path.isabs(yml):
-                    yml = os.path.abspath(yml)
-                yamls.append(yml)
             x.registry.add(name=integration_name,
-                           yamls=yamls)
+                           yamls=integration_yamls)
         elif args.action == 'unregister':
             x.registry.remove(name=integration_name)
         else:

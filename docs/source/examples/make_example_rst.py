@@ -18,7 +18,7 @@ lang2print = {'python': 'Python',
               'fortran': 'Fortran',
               'sbml': 'SBML',
               'osr': 'OpenSimRoot',
-              'function': 'Function',
+              'dummy': 'Dummy',
               'timesync': 'Timesync'}
 _default_lang = ['python', 'cpp', 'c', 'R', 'fortran', 'matlab', 'sbml']
 
@@ -215,14 +215,7 @@ def write_yml(fd, k, lang, upone=False):
                         replacements=replacements)
 
         
-rst_examples = source.keys()  # all examples
-# rst_examples = ['gs_lesson%d' % x for x in range(1, 5)]
-# rst_examples.append('gs_lesson4b')  # Special case
-# rst_examples += ['formatted_io%d' % x for x in range(1, 10)]
-# rst_examples += ['rpc_lesson%d' % x for x in range(1, 4)]
-# rst_examples += ['rpc_lesson%db' % x for x in range(2, 4)]
-# rst_examples += ['model_function', 'conditional_io', 'transformed_io']
-# rst_examples += ['timesync%d' % x for x in range(1, 3)]
+rst_examples = source.keys()
 make_toc_file(rst_examples)
 for k in rst_examples:
     if not yamls[k]:

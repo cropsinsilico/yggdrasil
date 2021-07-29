@@ -28,9 +28,14 @@ class YggFunction(YggClass):
     r"""This class wraps function-like behavior around a model.
 
     Args:
-        model_yaml (str, list): Full path to one or more yaml files containing
-            model information including the location of the source code and any
-            input(s)/output(s).
+        model_yaml (str, list): Full path to one or more YAML specification
+            files containing information defining a partial integration. If
+            service_address is set, this should be the name of a service
+            registered with the service manager running at the provided
+            address.
+        service_address (str, optional): Address for service manager that is
+            capable of running the specified integration. Defaults to None
+            and is ignored.
         **kwargs: Additional keyword arguments are passed to the YggRunner
             constructor.
 
@@ -41,17 +46,28 @@ class YggFunction(YggClass):
 
     """
     
-    def __init__(self, model_yaml, **kwargs):
+    def __init__(self, model_yaml, service_address=None, **kwargs):
+        import uuid
         from yggdrasil.languages.Python.YggInterface import (
             YggInput, YggOutput, YggRpcClient)
         super(YggFunction, self).__init__()
         # Create and start runner in another process
-        self.runner = YggRunner(model_yaml, complete_partial=True, **kwargs)
+        self.dummy_name = 'func' + str(uuid.uuid4()).split('-')[0]
+        kwargs['complete_partial'] = self.dummy_name
+        if service_address:
+            # Temporary YAML describing the service
+            contents = (f'service:\n'
+                        f'    name: {model_yaml}\n'
+                        f'    address: {service_address}\n')
+            model_yaml = os.path.join(os.getcwd(), self.dummy_name + '.yml')
+            with open(model_yaml, 'w') as fd:
+                fd.write(contents)
+        self.runner = YggRunner(model_yaml, **kwargs)
         # Start the drivers
         self.runner.run()
-        self.model_driver = self.runner.modeldrivers['dummy_model']
+        self.model_driver = self.runner.modeldrivers[self.dummy_name]
         for k in self.runner.modeldrivers.keys():
-            if k != 'dummy_model':
+            if k != self.dummy_name:
                 self.__name__ = k
                 break
         self.debug("run started")
@@ -118,6 +134,8 @@ class YggFunction(YggClass):
             self.returns += v['vars']
         self.debug("arguments: %s, returns: %s", self.arguments, self.returns)
         self.runner.pause()
+        if service_address:
+            os.remove(model_yaml)
 
     # def widget_function(self, *args, **kwargs):
     #     # import matplotlib.pyplot as plt
@@ -204,7 +222,7 @@ class YggFunction(YggClass):
         print("Models: %s\nInputs:\n%s\nOutputs:\n%s\n"
               % (', '.join([x['name'] for x in
                             self.runner.modeldrivers.values()
-                            if x['name'] != 'dummy_model']),
+                            if x['name'] != self.dummy_name]),
                  '\n'.join(['\t%s (vars=%s)' % (k, v['vars'])
                             for k, v in self.inputs.items()]),
                  '\n'.join(['\t%s (vars=%s)' % (k, v['vars'])

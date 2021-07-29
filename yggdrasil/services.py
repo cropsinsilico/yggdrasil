@@ -9,6 +9,12 @@ import pprint
 from yggdrasil import runner
 from yggdrasil import platform
 from yggdrasil.tools import sleep, TimeOut, YggClass
+from yggdrasil.config import ygg_cfg
+
+
+_default_service_type = ygg_cfg.get('services', 'default_type', 'flask')
+_default_commtype = ygg_cfg.get('services', 'default_comm', None)
+_default_address = ygg_cfg.get('services', 'address', None)
 
 
 class ClientError(BaseException):
@@ -30,6 +36,9 @@ class ServiceBase(YggClass):
         for_request (bool, optional): If True, a client-side connection is
             initialized. If False a server-side connection is initialized.
             Defaults to False.
+        address (str, optional): The address that the service can be accessed
+            from. Defaults to ('services', 'address') configuration option, if
+            set, and None if not.
         *args: Additional arguments are used to initialize the client/server
             connection.
         **kwargs: Additional keyword arguments are used to initialize the
@@ -40,6 +49,8 @@ class ServiceBase(YggClass):
     def __init__(self, name, *args, **kwargs):
         self.for_request = kwargs.pop('for_request', False)
         self.address = kwargs.pop('address', None)
+        if self.address is None:
+            self.address = _default_address
         self._args = args
         self._kwargs = kwargs
         super(ServiceBase, self).__init__(name, *args, **kwargs)
@@ -211,11 +222,11 @@ class FlaskService(ServiceBase):
             return False
 
     def __init__(self, *args, **kwargs):
-        if kwargs.get('address', None) is None:
-            kwargs['address'] = 'http://localhost:5000'
-        if not kwargs['address'].endswith('/'):
-            kwargs['address'] += '/'
         super(FlaskService, self).__init__(*args, **kwargs)
+        if self.address is None:
+            self.address = 'http://localhost:5000'
+        if not self.address.endswith('/'):
+            self.address += '/'
 
     def setup_server(self, *args, **kwargs):
         r"""Set up the machinery for receiving requests.
@@ -446,12 +457,13 @@ class RMQService(ServiceBase):
         return self.response
 
 
-def create_service_manager_class(service_type=FlaskService):
+def create_service_manager_class(service_type=_default_service_type):
     r"""Create an integration manager service with the specified base.
 
     Args:
         service_type (ServiceBase, str, optional): Base class that should be
-            used. Defaults to FlaskService.
+            used. Defaults to ('services', 'default_type') configuration
+            options, if set, and 'flask' if not.
 
     Returns:
         type: Subclass of ServiceBase to handle starting/stopping integrations
@@ -469,14 +481,14 @@ def create_service_manager_class(service_type=FlaskService):
             name (str): Name that should be used to initialize an address for
                 the service. Defaults to 'ygg_integrations'.
             commtype (str, optional): Communicator type that should be used
-                for the connections to services. Defaulst to None and is
-                ignored.
+                for the connections to services. Defaults to ('services',
+                'default_comm') configuration option, if set, and None if not.
             **kwargs: Additional keyword arguments are passed to the __init__
                 method for the service_type class.
 
         """
 
-        def __init__(self, name=None, commtype=None, **kwargs):
+        def __init__(self, name=None, commtype=_default_commtype, **kwargs):
             if name is None:
                 name = 'ygg_integrations'
             self.integrations = {}
@@ -704,16 +716,27 @@ def create_service_manager_class(service_type=FlaskService):
     return IntegrationServiceManager
 
 
-def IntegrationServiceManager(service_type=FlaskService, **kwargs):
+def IntegrationServiceManager(service_type=None, **kwargs):
     r"""Start a management service to track running integrations.
 
     Args:
         service_type (ServiceBase, str, optional): Base class that should be
-            used. Defaults to FlaskService.
+            used. Defaults to ('services', 'default_type') configuration
+            options, if set, and 'flask' if not. If there is an address
+            provided, the service type will be determined by parsing the
+            address.
         **kwargs: Additional keyword arguments are used to intialized the
             manager class instance.
 
     """
+    if service_type is None:
+        if kwargs.get('address', None):
+            if kwargs['address'].startswith('amqp://'):
+                service_type = 'rmq'
+            else:
+                service_type = 'flask'
+        else:
+            service_type = _default_service_type
     cls = create_service_manager_class(service_type=service_type)
     return cls(**kwargs)
 
@@ -800,7 +823,7 @@ class IntegrationServiceRegistry(object):
             old = pprint.pformat(registry[name])
             new = pprint.pformat(entry)
             raise ValueError(f"There is an registry integration associated "
-                             f"with the name '{name}'. Remote the registry "
+                             f"with the name '{name}'. Remove the registry "
                              f"entry before adding a new one.\n"
                              f"    Registry:\n{old}\n    New:\n{new}")
         registry[name] = entry

@@ -11,12 +11,11 @@ History
 * Added client side instrumentation for connecting to remote model services and tests
 * Added support for registering integrations that can be called locally as services
 * Added 'integration-service-manager' CLI for managing service managers
+* Added configuration options for services
 
 TODO:
 ~~~~~
 
-* Add service configuration options (default commtype, exposed ports, etc.)
-* Add test for connecting to service via import as function
 * Add test for server/wrapped function service
 
 

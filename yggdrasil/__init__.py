@@ -27,12 +27,18 @@ if not os.path.isfile(config.usr_config_file):  # pragma: config
         config.update_language_config(verbose=True)
 
 
-def import_as_function(model_yaml, **kwargs):
+def import_as_function(model_yaml, service_address=None, **kwargs):
     r"""Import a model as a function from a yaml specification file.
 
     Args:
-        model_yaml (str, list): Full path to model yaml describing
-            the model(s) and an inputs or outputs.
+        model_yaml (str, list): Full path to one or more YAML specification
+            files containing information defining a partial integration. If
+            service_address is set, this should be the name of a service
+            registered with the service manager running at the provided
+            address.
+        service_address (str, optional): Address for service manager that is
+            capable of running the specified integration. Defaults to None
+            and is ignored.
         **kwargs: Additional keyword arguments are passed to the
             YggFunction constructor.
 
@@ -40,7 +46,7 @@ def import_as_function(model_yaml, **kwargs):
         YggFunction: Callable wrapper for model.
 
     """
-    return YggFunction(model_yaml, **kwargs)
+    return YggFunction(model_yaml, service_address=service_address, **kwargs)
 
 
 __all__ = []

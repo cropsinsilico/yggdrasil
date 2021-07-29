@@ -249,7 +249,7 @@ def parse_yaml(files, complete_partial=False, partial_commtype=None):
     # Add stand-in model that uses unpaired channels
     if complete_partial:
         existing = complete_partial_integration(
-            existing, partial_commtype=partial_commtype)
+            existing, complete_partial, partial_commtype=partial_commtype)
     # Create server/client connections
     for srv, srv_info in existing['server'].items():
         clients = srv_info['clients']
@@ -331,11 +331,12 @@ def parse_yaml(files, complete_partial=False, partial_commtype=None):
     return existing
 
 
-def complete_partial_integration(existing, partial_commtype=None):
+def complete_partial_integration(existing, name, partial_commtype=None):
     r"""Patch input/output channels that are not connected to a stand-in model.
 
     Args:
         existing (dict): Dictionary of existing components.
+        name (str): Name that should be given to the new model.
         partial_commtype (str, optional): Communicator type that should be
             be used for the connections to the unpaired channels. Defaults to
             None and will be ignored.
@@ -344,7 +345,9 @@ def complete_partial_integration(existing, partial_commtype=None):
         dict: Updated dictionary of components.
 
     """
-    new_model = {'name': 'dummy_model',
+    if isinstance(name, bool):
+        name = 'dummy_model'
+    new_model = {'name': name,
                  'language': 'dummy',
                  'args': 'dummy',
                  'working_dir': os.getcwd(),
@@ -372,6 +375,7 @@ def complete_partial_integration(existing, partial_commtype=None):
         for i in miss[io1]:
             dummy_channel = 'dummy_%s' % i
             dummy_comm = copy.deepcopy(existing[io1][i])
+            dummy_comm.pop('address', None)
             dummy_comm['name'] = dummy_channel
             if partial_commtype is not None:
                 dummy_comm['commtype'] = partial_commtype
