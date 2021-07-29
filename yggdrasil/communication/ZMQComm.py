@@ -757,7 +757,7 @@ class ZMQComm(CommBase.CommBase):
         if not hasattr(self, 'socket_lock'):
             return
         with self.socket_lock:
-            if self._connected:
+            if getattr(self, '_connected', False):
                 self.debug('Disconnecting from %s' % self.address)
                 try:
                     self.socket.disconnect(self.address)

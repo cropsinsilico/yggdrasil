@@ -1315,6 +1315,7 @@ class run_tsts(SubCommand):
                         test_paths += [
                             os.path.join('examples', 'tests',
                                          'test_model_error_with_io.py')]
+                    extra += ['-p', 'no:flaky']
         if (not test_paths) and all(x.startswith('-') for x in extra):
             test_paths.append(package_dir)
         # Get expanded tests to allow for paths that are relative to
