@@ -250,7 +250,7 @@ jobs:
     - name: Re-run MPI test failures (windows)
       if: ${{ steps.mpi_windows.outcome == 'failure' }}
       run: |
-        yggtest --ci --test-suite=mpi --debug
+        yggtest --ci --test-suite=mpi --debug --nocapture
     - name: Run cmake test in command prompt
       if: matrix.os == 'windows-latest'
       shell: cmd /C CALL {0}

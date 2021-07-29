@@ -256,7 +256,7 @@ jobs:
       continue-on-error: true
     - name: Re-run MPI test failures (windows)
       if: ${{ steps.mpi_windows.outcome == 'failure' }}
-      run: 'yggtest --ci --test-suite=mpi --debug
+      run: 'yggtest --ci --test-suite=mpi --debug --nocapture
 
         '
     - name: Run cmake test in command prompt
@@ -567,7 +567,7 @@ jobs:
       continue-on-error: true
     - name: Re-run MPI test failures (windows)
       if: ${{ steps.mpi_windows.outcome == 'failure' }}
-      run: 'yggtest --ci --test-suite=mpi --debug
+      run: 'yggtest --ci --test-suite=mpi --debug --nocapture
 
         '
     - name: Run cmake test in command prompt
@@ -858,7 +858,7 @@ jobs:
       continue-on-error: true
     - name: Re-run MPI test failures (windows)
       if: ${{ steps.mpi_windows.outcome == 'failure' }}
-      run: 'yggtest --ci --test-suite=mpi --debug
+      run: 'yggtest --ci --test-suite=mpi --debug --nocapture
 
         '
     - name: Run cmake test in command prompt
@@ -1151,7 +1151,7 @@ jobs:
       continue-on-error: true
     - name: Re-run MPI test failures (windows)
       if: ${{ steps.mpi_windows.outcome == 'failure' }}
-      run: 'yggtest --ci --test-suite=mpi --debug
+      run: 'yggtest --ci --test-suite=mpi --debug --nocapture
 
         '
     - name: Run cmake test in command prompt
@@ -1443,7 +1443,7 @@ jobs:
       continue-on-error: true
     - name: Re-run MPI test failures (windows)
       if: ${{ steps.mpi_windows.outcome == 'failure' }}
-      run: 'yggtest --ci --test-suite=mpi --debug
+      run: 'yggtest --ci --test-suite=mpi --debug --nocapture
 
         '
     - name: Run cmake test in command prompt
