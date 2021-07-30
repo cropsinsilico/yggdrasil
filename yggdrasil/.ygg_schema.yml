@@ -71,6 +71,9 @@ definitions:
           type: array
         filter:
           $ref: '#/definitions/filter'
+        for_service:
+          default: false
+          type: boolean
         format_str:
           description: String that should be used to format/parse messages. Default
             to None.
@@ -474,6 +477,9 @@ definitions:
           type: string
         filter:
           $ref: '#/definitions/filter'
+        for_service:
+          default: false
+          type: boolean
         format_str:
           description: String that should be used to format/parse messages. Default
             to None.
@@ -628,9 +634,9 @@ definitions:
             is used.
           type: string
       required:
-      - working_dir
       - name
       - filetype
+      - working_dir
       title: file_base
       type: object
     - anyOf:
@@ -1713,10 +1719,10 @@ definitions:
             is used.
           type: string
       required:
-      - language
-      - working_dir
       - args
+      - language
       - name
+      - working_dir
       title: model_base
       type: object
     - anyOf:

@@ -249,6 +249,9 @@ class YggRunner(YggClass):
             Defaults to environment variable 'RMQ_DEBUG'.
         ygg_debug_prefix (str, optional): Prefix for Ygg debug messages.
             Defaults to namespace.
+        as_service (bool, optional): If True, the integration is running as a
+            service. If True, complete_partial is set to True. Defaults to
+            False.
         complete_partial (bool, optional): If True, unpaired input/output
             channels are allowed and reserved for use (e.g. for calling the
             model as a function). Defaults to False.
@@ -272,8 +275,9 @@ class YggRunner(YggClass):
     def __init__(self, modelYmls, namespace=None, host=None, rank=0,
                  ygg_debug_level=None, rmq_debug_level=None,
                  ygg_debug_prefix=None, connection_task_method='thread',
-                 complete_partial=False, partial_commtype=None,
-                 production_run=False, mpi_tag_start=None):
+                 as_service=False, complete_partial=False,
+                 partial_commtype=None, production_run=False,
+                 mpi_tag_start=None):
         self.mpi_comm = None
         name = 'runner'
         if MPI is not None:
@@ -287,6 +291,8 @@ class YggRunner(YggClass):
             namespace = ygg_cfg.get('rmq', 'namespace', False)
         if not namespace:  # pragma: debug
             raise Exception('rmq:namespace not set in config file')
+        if as_service:
+            complete_partial = True
         self.namespace = namespace
         self.host = host
         self.rank = rank
@@ -318,6 +324,13 @@ class YggRunner(YggClass):
             for x in self.modeldrivers.values():
                 if x['driver'] == 'DummyModelDriver':
                     x['runner'] = self
+                    if as_service:
+                        for io in x['output_drivers']:
+                            for comm in io['inputs']:
+                                comm['for_service'] = True
+                        for io in x['input_drivers']:
+                            for comm in io['outputs']:
+                                comm['for_service'] = True
 
     def pprint(self, *args):
         r"""Print with color."""

@@ -428,7 +428,7 @@ class ZMQComm(CommBase.CommBase):
         # Client/Server things
         if self.allow_multiple_comms:
             socket_type = 'DEALER'
-            if self.create_proxy or self.is_interface:
+            if self.create_proxy or self.is_interface or self.for_service:
                 socket_action = 'connect'
             else:
                 socket_action = 'bind'

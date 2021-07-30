@@ -467,6 +467,9 @@ class CommBase(tools.YggClass):
         default_value (object, optional): Value that should be returned in
             the event that a yaml does not pair the comm with another
             model comm or a file.
+        for_service (bool, optional): If True, this comm bridges the gap to
+            an integration running as a service, possibly on a remote machine.
+            Defaults to False.
         **kwargs: Additional keywords arguments are passed to parent class.
 
     Class Attributes:
@@ -570,7 +573,8 @@ class CommBase(tools.YggClass):
                          'default': False},
         'dont_copy': {'type': 'boolean', 'default': False},
         'default_file': {'$ref': '#/definitions/file'},
-        'default_value': {'type': 'any'}}
+        'default_value': {'type': 'any'},
+        'for_service': {'type': 'boolean', 'default': False}}
     _schema_excluded_from_class = ['name']
     _default_serializer = 'default'
     _default_serializer_class = None
@@ -676,7 +680,8 @@ class CommBase(tools.YggClass):
         self.allow_multiple_comms = allow_multiple_comms
         if (((not self.single_use)
              and ((self.is_interface and self.env.get('YGG_THREADING', False))
-                  or (self.model_copies > 1) or (self.partner_copies > 1)))):
+                  or (self.model_copies > 1) or (self.partner_copies > 1)
+                  or self.for_service))):
             self.allow_multiple_comms = True
         if self.single_use and (not self.is_response_server):
             self._send_serializer = False
@@ -1133,6 +1138,8 @@ class CommBase(tools.YggClass):
             for k in ['use_async', 'allow_multiple_comms', 'direction',
                       'comment', 'newline', 'seritype']:
                 kwargs.pop(k, None)
+        if self.for_service:
+            kwargs['for_service'] = True
         return kwargs
 
     def bind(self):

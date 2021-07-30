@@ -72,11 +72,10 @@ class DummyModelDriver(InterpretedModelDriver):
         self.set_break_flag()
 
     @property
-    def connections(self):
-        r"""dict: Mapping of environment variables for connections this
-        model will use."""
-        out = {'inputs': [],
-               'outputs': []}
+    def service_partner(self):
+        r"""dict: YAML representation of the dummy model that should
+        stand-in for the model client-side."""
+        out = {'inputs': [], 'outputs': []}
         dir2opp = {'input': 'output', 'output': 'input'}
         for io1, io2 in dir2opp.items():
             for drv in self.yml['%s_drivers' % io1]:
@@ -86,6 +85,12 @@ class DummyModelDriver(InterpretedModelDriver):
                 x['name'] = name.split(
                     drv[io1 + 's'][0]['partner_model'] + ':')[-1]
                 out[io2 + 's'].append(x)
+                if drv['instance']._connection_type.startswith('rpc_'):
+                    assert(io2 == 'input')
+                    out[io1 + 's'].append({'name': x['name'] + '_response'})
+                    out['is_server'] = {io2: x['name'],
+                                        io1: x['name'] + '_response'}
+        for io1, io2 in dir2opp.items():
             if not out[io2 + 's']:
                 out.pop(io2 + 's')
         return out

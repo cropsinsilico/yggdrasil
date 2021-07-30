@@ -13,10 +13,11 @@ History
 * Added 'integration-service-manager' CLI for managing service managers
 * Added configuration options for services
 
-TODO:
-~~~~~
+TODO
+....
 
-* Add test for server/wrapped function service
+* Add tutorial on setting up a service
+  
 
 
 1.7.0 (2021-08-26) Support for MPI communicators, MPI execution, and pika >= 1.0.0

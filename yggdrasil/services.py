@@ -547,7 +547,7 @@ def create_service_manager_class(service_type=_default_service_type):
                 self.stop_integration(x)
             if x not in self.integrations:
                 self.integrations[x] = runner.get_runner(
-                    yamls, complete_partial=True,
+                    yamls, complete_partial=True, as_service=True,
                     partial_commtype=self.commtype, **kwargs)
                 self.integrations[x].run(signal_handler=False)
 
@@ -592,7 +592,7 @@ def create_service_manager_class(service_type=_default_service_type):
             if x not in self.integrations:
                 raise KeyError(f"Integration defined by {x} not running")
             m = self.integrations[x].modeldrivers['dummy_model']
-            out = m['instance'].connections
+            out = m['instance'].service_partner
             name = 'dummy'
             if isinstance(x, str) and (not os.path.isfile(x)):
                 name = x

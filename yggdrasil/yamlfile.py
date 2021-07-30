@@ -359,11 +359,13 @@ def complete_partial_integration(existing, name, partial_commtype=None):
     dir2opp = {'input': 'output', 'output': 'input'}
     for io in dir2opp.keys():
         miss[io] = [k for k in existing[io].keys()
-                    if not ((io == 'input') and (k in existing['server']))]
+                    if not (((io == 'input') and (k in existing['server']))
+                            or existing[io][k].get('is_default', False))]
     for srv_info in existing['server'].values():
         if not srv_info['clients']:
             new_model.setdefault('client_of', [])
             new_model['client_of'].append(srv_info['model_name'])
+    # TODO: Check that there arn't any missing servers
     # for conn in existing['connection'].values():
     #     for io1, io2 in dir2opp.items():
     #         if ((io1 + 's') in conn):
@@ -375,7 +377,8 @@ def complete_partial_integration(existing, name, partial_commtype=None):
         for i in miss[io1]:
             dummy_channel = 'dummy_%s' % i
             dummy_comm = copy.deepcopy(existing[io1][i])
-            dummy_comm.pop('address', None)
+            for k in ['address', 'for_service', 'commtype']:
+                dummy_comm.pop(k, None)
             dummy_comm['name'] = dummy_channel
             if partial_commtype is not None:
                 dummy_comm['commtype'] = partial_commtype
