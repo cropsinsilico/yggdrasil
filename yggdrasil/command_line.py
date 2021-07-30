@@ -1236,16 +1236,23 @@ class run_tsts(SubCommand):
         args = super(run_tsts, cls).parse_args(*args, **kwargs)
         extra = args._extra_commands
         if args.ci:
+            requires_mpi = (
+                (args.test_suites and ('mpi' in args.test_suites))
+                or (args.with_mpi > 1))
             args.verbose = True
             args.withcoverage = True
             args.setup_cfg = 'setup.cfg'
             args.pytest_config = args.setup_cfg
-            args.cov_config = '.coveragerc'
+            if requires_mpi:
+                args.cov_config = '.coveragerc_parallel'
+            else:
+                args.cov_config = '.coveragerc'
             if not args.ignore:
                 args.ignore = []
             args.ignore.append('yggdrasil/rapidjson/')
             args.rootdir = package_dir
-            extra += ['--reruns=2', '--reruns-delay=1', '--timeout=900']
+            if not requires_mpi:
+                extra += ['--reruns=2', '--reruns-delay=1', '--timeout=900']
         if args.write_script:
             if not os.path.isabs(args.write_script):
                 args.write_script = os.path.abspath(args.write_script)
