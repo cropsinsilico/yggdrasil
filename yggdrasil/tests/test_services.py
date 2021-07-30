@@ -25,6 +25,7 @@ def test_integration_service(service_type, partial_commtype):
             f"--manager-name={name}", f"--service-type={service_type}",
             f"--commtype={partial_commtype}"]
     cli = IntegrationServiceManager(name=name, service_type=service_type,
+                                    commtype=partial_commtype,
                                     for_request=True)
     assert(not cli.is_running)
     p = subprocess.Popen(args)
@@ -95,6 +96,7 @@ def test_calling_integration_service(service_type, partial_commtype):
             f"--service-type={service_type}",
             f"--commtype={partial_commtype}"]
     cli = IntegrationServiceManager(service_type=service_type,
+                                    commtype=partial_commtype,
                                     for_request=True)
     assert(not cli.is_running)
     p = subprocess.Popen(args)
@@ -133,6 +135,7 @@ def test_calling_service_as_function(service_type, partial_commtype):
             f"--service-type={service_type}",
             f"--commtype={partial_commtype}"]
     cli = IntegrationServiceManager(service_type=service_type,
+                                    commtype=partial_commtype,
                                     for_request=True)
     assert(not cli.is_running)
     p = subprocess.Popen(args)
