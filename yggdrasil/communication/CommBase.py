@@ -600,7 +600,9 @@ class CommBase(tools.YggClass):
         if isinstance(kwargs.get('datatype', None), MetaschemaType):
             self.datatype = kwargs.pop('datatype')
         super(CommBase, self).__init__(name, **kwargs)
-        if not self.__class__.is_installed(language='python'):  # pragma: debug
+        if (((not is_interface)
+             and (not self.__class__.is_installed(
+                 language='python')))):  # pragma: debug
             raise RuntimeError("Comm class %s not installed" % self.__class__)
         if (partner_model is None) and (not is_interface):
             no_suffix = True
