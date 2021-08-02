@@ -250,15 +250,11 @@ jobs:
     - name: Run MPI tests (windows)
       if: env.INSTALLMPI == 1 && matrix.os == 'windows-latest'
       id: mpi_windows
-      run: 'yggtest --ci --test-suite=mpi
-
-        '
+      run: yggtest --ci --test-suite=mpi
       continue-on-error: true
     - name: Re-run MPI test failures (windows)
       if: ${{ steps.mpi_windows.outcome == 'failure' }}
-      run: 'yggtest --ci --test-suite=mpi --debug --nocapture
-
-        '
+      run: yggtest --ci --test-suite=mpi --debug --nocapture
     - name: Run cmake test in command prompt
       if: matrix.os == 'windows-latest'
       shell: cmd /C CALL {0}
@@ -269,16 +265,12 @@ jobs:
         '
     - name: Run tests (1st)
       id: test1
-      run: 'yggtest --ci --cov-append ${{ matrix.test-flags1 }}
-
-        '
+      run: yggtest --ci --cov-append ${{ matrix.test-flags1 }}
       continue-on-error: true
     - name: Re-run test failures (1st)
       if: ${{ steps.test1.outcome == 'failure' }}
-      run: 'yggtest --ci --cov-append ${{ matrix.test-flags1 }} --last-failed --last-failed-no-failures=none
+      run: yggtest --ci --cov-append ${{ matrix.test-flags1 }} --last-failed --last-failed-no-failures=none
         --debug
-
-        '
     - name: Run tests (2nd)
       if: matrix.test-flags2 != ''
       id: test2
@@ -561,15 +553,11 @@ jobs:
     - name: Run MPI tests (windows)
       if: env.INSTALLMPI == 1 && matrix.os == 'windows-latest'
       id: mpi_windows
-      run: 'yggtest --ci --test-suite=mpi
-
-        '
+      run: yggtest --ci --test-suite=mpi
       continue-on-error: true
     - name: Re-run MPI test failures (windows)
       if: ${{ steps.mpi_windows.outcome == 'failure' }}
-      run: 'yggtest --ci --test-suite=mpi --debug --nocapture
-
-        '
+      run: yggtest --ci --test-suite=mpi --debug --nocapture
     - name: Run cmake test in command prompt
       if: matrix.os == 'windows-latest'
       shell: cmd /C CALL {0}
@@ -580,16 +568,12 @@ jobs:
         '
     - name: Run tests (1st)
       id: test1
-      run: 'yggtest --ci --cov-append ${{ matrix.test-flags1 }}
-
-        '
+      run: yggtest --ci --cov-append ${{ matrix.test-flags1 }}
       continue-on-error: true
     - name: Re-run test failures (1st)
       if: ${{ steps.test1.outcome == 'failure' }}
-      run: 'yggtest --ci --cov-append ${{ matrix.test-flags1 }} --last-failed --last-failed-no-failures=none
+      run: yggtest --ci --cov-append ${{ matrix.test-flags1 }} --last-failed --last-failed-no-failures=none
         --debug
-
-        '
     - name: Run tests (2nd)
       if: matrix.test-flags2 != ''
       id: test2
@@ -852,15 +836,11 @@ jobs:
     - name: Run MPI tests (windows)
       if: env.INSTALLMPI == 1 && matrix.os == 'windows-latest'
       id: mpi_windows
-      run: 'yggtest --ci --test-suite=mpi
-
-        '
+      run: yggtest --ci --test-suite=mpi
       continue-on-error: true
     - name: Re-run MPI test failures (windows)
       if: ${{ steps.mpi_windows.outcome == 'failure' }}
-      run: 'yggtest --ci --test-suite=mpi --debug --nocapture
-
-        '
+      run: yggtest --ci --test-suite=mpi --debug --nocapture
     - name: Run cmake test in command prompt
       if: matrix.os == 'windows-latest'
       shell: cmd /C CALL {0}
@@ -871,16 +851,12 @@ jobs:
         '
     - name: Run tests (1st)
       id: test1
-      run: 'yggtest --ci --cov-append ${{ matrix.test-flags1 }}
-
-        '
+      run: yggtest --ci --cov-append ${{ matrix.test-flags1 }}
       continue-on-error: true
     - name: Re-run test failures (1st)
       if: ${{ steps.test1.outcome == 'failure' }}
-      run: 'yggtest --ci --cov-append ${{ matrix.test-flags1 }} --last-failed --last-failed-no-failures=none
+      run: yggtest --ci --cov-append ${{ matrix.test-flags1 }} --last-failed --last-failed-no-failures=none
         --debug
-
-        '
     - name: Run tests (2nd)
       if: matrix.test-flags2 != ''
       id: test2
@@ -1145,15 +1121,11 @@ jobs:
     - name: Run MPI tests (windows)
       if: env.INSTALLMPI == 1 && matrix.os == 'windows-latest'
       id: mpi_windows
-      run: 'yggtest --ci --test-suite=mpi
-
-        '
+      run: yggtest --ci --test-suite=mpi
       continue-on-error: true
     - name: Re-run MPI test failures (windows)
       if: ${{ steps.mpi_windows.outcome == 'failure' }}
-      run: 'yggtest --ci --test-suite=mpi --debug --nocapture
-
-        '
+      run: yggtest --ci --test-suite=mpi --debug --nocapture
     - name: Run cmake test in command prompt
       if: matrix.os == 'windows-latest'
       shell: cmd /C CALL {0}
@@ -1164,16 +1136,12 @@ jobs:
         '
     - name: Run tests (1st)
       id: test1
-      run: 'yggtest --ci --cov-append ${{ matrix.test-flags1 }}
-
-        '
+      run: yggtest --ci --cov-append ${{ matrix.test-flags1 }}
       continue-on-error: true
     - name: Re-run test failures (1st)
       if: ${{ steps.test1.outcome == 'failure' }}
-      run: 'yggtest --ci --cov-append ${{ matrix.test-flags1 }} --last-failed --last-failed-no-failures=none
+      run: yggtest --ci --cov-append ${{ matrix.test-flags1 }} --last-failed --last-failed-no-failures=none
         --debug
-
-        '
     - name: Run tests (2nd)
       if: matrix.test-flags2 != ''
       id: test2
@@ -1437,15 +1405,11 @@ jobs:
     - name: Run MPI tests (windows)
       if: env.INSTALLMPI == 1 && matrix.os == 'windows-latest'
       id: mpi_windows
-      run: 'yggtest --ci --test-suite=mpi
-
-        '
+      run: yggtest --ci --test-suite=mpi
       continue-on-error: true
     - name: Re-run MPI test failures (windows)
       if: ${{ steps.mpi_windows.outcome == 'failure' }}
-      run: 'yggtest --ci --test-suite=mpi --debug --nocapture
-
-        '
+      run: yggtest --ci --test-suite=mpi --debug --nocapture
     - name: Run cmake test in command prompt
       if: matrix.os == 'windows-latest'
       shell: cmd /C CALL {0}
@@ -1456,16 +1420,12 @@ jobs:
         '
     - name: Run tests (1st)
       id: test1
-      run: 'yggtest --ci --cov-append ${{ matrix.test-flags1 }}
-
-        '
+      run: yggtest --ci --cov-append ${{ matrix.test-flags1 }}
       continue-on-error: true
     - name: Re-run test failures (1st)
       if: ${{ steps.test1.outcome == 'failure' }}
-      run: 'yggtest --ci --cov-append ${{ matrix.test-flags1 }} --last-failed --last-failed-no-failures=none
+      run: yggtest --ci --cov-append ${{ matrix.test-flags1 }} --last-failed --last-failed-no-failures=none
         --debug
-
-        '
     - name: Run tests (2nd)
       if: matrix.test-flags2 != ''
       id: test2
