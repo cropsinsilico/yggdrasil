@@ -1243,10 +1243,7 @@ class run_tsts(SubCommand):
             args.withcoverage = True
             args.setup_cfg = 'setup.cfg'
             args.pytest_config = args.setup_cfg
-            if requires_mpi:
-                args.cov_config = '.coveragerc_parallel'
-            else:
-                args.cov_config = '.coveragerc'
+            args.cov_config = '.coveragerc'
             if not args.ignore:
                 args.ignore = []
             args.ignore.append('yggdrasil/rapidjson/')

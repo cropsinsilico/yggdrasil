@@ -71,7 +71,6 @@ def create_coveragerc(installed_languages):
     # covdir = os.path.dirname(__file__)
     covdir = os.getcwd()
     covrc = os.path.join(covdir, '.coveragerc')
-    covrc_parallel = covrc + '_parallel'
     cp = HandyConfigParser("")
     # Read from existing .coveragerc
     if os.path.isfile(covrc):
@@ -145,12 +144,6 @@ def create_coveragerc(installed_languages):
     cp.set('report', 'exclude_lines', '\n' + '\n'.join(excl_list))
     # Write
     with open(covrc, 'w') as fd:
-        cp.write(fd)
-    # Write copy with parallel options enabled
-    if not cp.has_option('coverage:run', 'parallel'):
-        cp.set('run', 'parallel', 'true')
-        cp.set('run', 'concurrency', 'thread, multiprocessing')
-    with open(covrc_parallel, 'w') as fd:
         cp.write(fd)
     return True
 

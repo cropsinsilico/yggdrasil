@@ -3,10 +3,51 @@ import unittest
 from yggdrasil.tests import assert_equal
 from yggdrasil.communication import CommBase, MPIComm
 from yggdrasil.communication.tests import test_CommBase
+from yggdrasil.multitasking import MPI
 
 
 _tag = 0
 _mpi_installed = MPIComm.MPIComm.is_installed(language='python')
+
+
+# Monkey patch pytest-cov plugin with MPI Barriers to prevent multiple
+# MPI processes from attempting to modify the .coverage data file at
+# the same time and limit the coverage output to the rank 0 process
+@pytest.fixture(scope="session", autouse=True)
+def finalize_mpi(request):
+    """Slow down the exit on MPI processes to prevent collision in access
+    to .coverage file."""
+    if _mpi_installed:
+        comm = MPI.COMM_WORLD
+        rank = comm.Get_rank()
+        size = comm.Get_size()
+        manager = request.config.pluginmanager
+        plugin_class = manager.get_plugin('pytest_cov').CovPlugin
+        plugin = None
+        for x in manager.get_plugins():
+            if isinstance(x, plugin_class):
+                plugin = x
+                break
+        if not plugin:
+            return
+        old_finish = getattr(plugin.cov_controller, 'finish')
+        
+        def new_finish():
+            comm.Barrier()
+            for _ in range(rank):
+                comm.Barrier()
+            old_finish()
+            for _ in range(rank, size):
+                comm.Barrier()
+            comm.Barrier()
+            
+        plugin.cov_controller.finish = new_finish
+        if rank != 0:
+            
+            def new_is_worker(session):
+                return True
+            
+            plugin._is_worker = new_is_worker
 
 
 @unittest.skipIf(not _mpi_installed, "MPI library not installed")
