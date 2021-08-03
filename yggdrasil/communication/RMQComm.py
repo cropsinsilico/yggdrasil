@@ -61,7 +61,7 @@ def check_rmq_server(url=None, **kwargs):
     try:
         connection = pika.BlockingConnection(parameters)
         if not connection.is_open:  # pragma: debug
-            raise BaseException("Connection was not openned.")
+            raise BaseException("Connection was not opened.")
         connection.close()
     except BaseException as e:  # pragma: debug
         print("Error when attempting to connect to the RabbitMQ server: "
@@ -117,8 +117,9 @@ class RMQComm(CommBase.CommBase):
             self.rmq_lock = multitasking.RLock()
         self.connection = None
         self.channel = None
-        self._is_open = False
-        self._bound = False
+        self._opening = multitasking.ProcessEvent()
+        self._closing = multitasking.ProcessEvent()
+        self._closing.started.add_callback(self._opening.stop)
         self._server_class = RMQServer
         super(RMQComm, self)._init_before_open(**kwargs)
 
@@ -210,44 +211,37 @@ class RMQComm(CommBase.CommBase):
 
     def bind(self):
         r"""Declare queue to get random new queue."""
-        if self.is_open or self._bound:
+        if self._opening.has_started() or self._closing.has_started():
             return
-        self._bound = True
-        parameters = pika.URLParameters(self.url)
+        self._opening.start()
         with self.rmq_lock:
-            self.connection = pika.BlockingConnection(parameters)
+            if self.connection is None:
+                parameters = pika.URLParameters(self.url)
+                self.connection = pika.BlockingConnection(parameters)
+                self.original_queue = self.queue
             self.channel = self.connection.channel()
             self.channel.exchange_declare(exchange=self.exchange,
                                           auto_delete=True)
-            if self.direction == 'recv' and not self.queue:
-                exclusive = False  # True
-            else:
-                exclusive = False
-            if self.queue.startswith('amq.'):
-                passive = True
-            else:
-                passive = False
             if self.direction == 'send':
                 self.channel.confirm_delivery()
-            res = self.channel.queue_declare(queue=self.queue,
-                                             exclusive=exclusive,
-                                             passive=passive,
-                                             auto_delete=True)
+            res = self.channel.queue_declare(
+                queue=self.queue, exclusive=False, auto_delete=True,
+                passive=self.original_queue.startswith('amq.'))
             if not self.queue:
                 self.address += res.method.queue
             self.channel.queue_bind(exchange=self.exchange,
-                                    # routing_key=self.routing_key,
                                     queue=self.queue)
             self.register_comm(self.address, (self.connection, self.channel))
             super(RMQComm, self).bind()
+        self._opening.stop()
 
-    def open(self):
-        r"""Open connection and bind/connect to queue as necessary."""
-        super(RMQComm, self).open()
-        if not self.is_open:
+    def reopen_channel(self):
+        r"""Re-open the channel."""
+        with self.rmq_lock:
+            self.unregister_comm(self.address, dont_close=True)
+            self._opening.started.clear()
+            self._opening.stopped.clear()
             self.bind()
-            self._is_open = True
-            self._bound = False
 
     def _close(self, linger=False):
         r"""Close the connection.
@@ -257,26 +251,26 @@ class RMQComm(CommBase.CommBase):
                 comm. Defaults to False.
 
         """
-        self._is_open = False
-        self._bound = False
-        with self.rmq_lock:
-            if self.direction == 'recv':
-                self.close_queue()
-            self.close_channel()
-            self.close_connection()
-            if not self.is_client:
-                self.unregister_comm(self.address)
-            self.connection = None
-            self.channel = None
+        if self._closing.has_started():  # pragma: debug
+            return
+        self._closing.start()
+        if self.direction == 'recv':
+            self.close_queue()
+        self.close_channel()
+        self.close_connection()
+        if not self.is_client:
+            self.unregister_comm(self.address)
         super(RMQComm, self)._close(linger=linger)
+        self._closing.stop()
 
-    def close_queue(self):
+    def close_queue(self, skip_unbind=False):
         r"""Close the queue if the channel exists."""
         with self.rmq_lock:
             if self.channel and (not self.is_client):
                 try:
-                    self.channel.queue_unbind(queue=self.queue,
-                                              exchange=self.exchange)
+                    if not skip_unbind:
+                        self.channel.queue_unbind(queue=self.queue,
+                                                  exchange=self.exchange)
                     self.channel.queue_delete(queue=self.queue)
                 except (pika.exceptions.ChannelClosed,
                         pika.exceptions.ConnectionClosed,
@@ -303,7 +297,7 @@ class RMQComm(CommBase.CommBase):
     def close_connection(self):
         r"""Close the connection."""
         with self.rmq_lock:
-            if self.connection:
+            if self.connection and (not self.connection.is_closed):
                 try:
                     self.connection.close()
                 except (pika.exceptions.ChannelClosed,
@@ -319,41 +313,36 @@ class RMQComm(CommBase.CommBase):
     def is_open(self):
         r"""bool: True if the connection and channel are open."""
         with self.rmq_lock:
-            # with self._closing_thread.lock:
             if self.channel is None or self.connection is None:
                 return False
-            if self.connection.is_open:
-                if getattr(self.connection, 'is_closing', False):  # pragma: debug
-                    return False
-            else:  # pragma: debug
+            if not self.connection.is_open:
                 return False
-            if self.channel.is_open:
-                if getattr(self.channel, 'is_closing', False):  # pragma: debug
-                    return False
-            else:  # pragma: debug
+            if not self.channel.is_open:
                 return False
-            return self._is_open
+            return (self._opening.has_stopped()
+                    and (not self._closing.has_started()))
 
     def get_queue_result(self):
         r"""Get the fram from passive queue declare."""
         with self.rmq_lock:
             res = None
             if self.is_open:
-                # TODO: Re-open connection & channel on failure
                 try:
                     res = self.channel.queue_declare(queue=self.queue,
                                                      auto_delete=True,
                                                      passive=True)
-                except BlockingIOError:  # pragma: debug
-                    self.sleep()
-                    res = self.get_queue_result()
-                except (pika.exceptions.ChannelClosed,
-                        pika.exceptions.ConnectionClosed,
-                        pika.exceptions.ChannelWrongStateError,
-                        pika.exceptions.ConnectionWrongStateError,
-                        pika.exceptions.StreamLostError,
-                        AttributeError):  # pragma: debug
+                except pika.exceptions.ChannelClosedByBroker:
                     self._close()
+                # except BlockingIOError:  # pragma: debug
+                #     self.sleep()
+                #     res = self.get_queue_result()
+                # except (pika.exceptions.ChannelClosed,
+                #         pika.exceptions.ConnectionClosed,
+                #         pika.exceptions.ChannelWrongStateError,
+                #         pika.exceptions.ConnectionWrongStateError,
+                #         pika.exceptions.StreamLostError,
+                #         AttributeError):  # pragma: debug
+                #     self._close()
             return res
         
     @property
@@ -365,11 +354,9 @@ class RMQComm(CommBase.CommBase):
     def n_msg_send(self):
         r"""int: Number of messages in the queue."""
         out = 0
-        # with self._closing_thread.lock:
-        if self.is_open:
-            res = self.get_queue_result()
-            if res is not None:
-                out = res.method.message_count
+        res = self.get_queue_result()
+        if res is not None:
+            out = res.method.message_count
         return out
 
     @property
@@ -445,6 +432,6 @@ class RMQComm(CommBase.CommBase):
         r"""Remove all messages from the associated queue."""
         with self.rmq_lock:
             with self._closing_thread.lock:
-                if self.channel:
+                if self.is_open:
                     self.channel.queue_purge(queue=self.queue)
         super(RMQComm, self).purge()

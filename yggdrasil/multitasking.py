@@ -465,6 +465,35 @@ class DummyEvent(DummyContextObject):  # pragma: no cover
         raise AliasDisconnectError("DummyEvent will never change to True.")
 
 
+class ProcessEvent(object):
+    r"""Multiprocessing/threading event associated with a process that has
+    a discreet start and end."""
+
+    def __init__(self, *args, **kwargs):
+        self.started = Event(*args, **kwargs)
+        self.stopped = Event(task_context=self.started.context)
+
+    def start(self):
+        r"""Set the started event."""
+        self.started.set()
+
+    def stop(self):
+        r"""Set the stopped event."""
+        self.stopped.set()
+
+    def has_started(self):
+        r"""bool: True if the process has started."""
+        return self.started.is_set()
+
+    def has_stopped(self):
+        r"""bool: True if the process has stopped."""
+        return self.stopped.is_set()
+
+    def is_running(self):
+        r"""bool: True if the processes has started, but hasn't stopped."""
+        return (self.has_started() and (not self.has_stopped))
+
+
 class Event(ContextObject):
     r"""Multiprocessing/threading event."""
 
@@ -489,6 +518,57 @@ class Event(ContextObject):
             if val:
                 state['_base'].set()
         super(Event, self).__setstate__(state)
+
+    @classmethod
+    def from_event_set(cls, *events):
+        r"""Create an event that is triggered when any one of the provided
+        events is set.
+
+        Args:
+            *events: One or more events that will trigger this event.
+
+        """
+        # Modified version of https://stackoverflow.com/questions/12317940/
+        # python-threading-can-i-sleep-on-two-threading-events-simultaneously/
+        # 36661113
+        or_event = cls()
+
+        def changed():
+            bools = [e.is_set() for e in events]
+            if any(bools):
+                or_event.set()
+            else:
+                or_event.clear()
+        for e in events:
+            e.add_callback(changed, trigger='set')
+            e.add_callback(changed, trigger='clear')
+        return or_event
+
+    def add_callback(self, callback, args=(), kwargs={}, trigger='set'):
+        r"""Add a callback that will be called when set or clear is invoked.
+
+        Args:
+            callback (callable): Callable executed when set is called.
+            args (tuple, optional): Arguments to pass to the callback.
+            kwargs (dict, optional): Keyword arguments to pass to the
+                callback.
+            trigger (str, optional): Action triggering the set call.
+                Options are 'set' or 'clear'. Defaults to 'set'.
+
+        """
+        if not hasattr(self, f'_{trigger}_callbacks'):
+            assert(trigger in ['set', 'clear'])
+            setattr(self, f'_{trigger}_callbacks', [])
+            setattr(self, f'_{trigger}', getattr(self._base, trigger))
+            
+            def callback_method(self):
+                getattr(self, f'_{trigger}')()
+                for (x, a, k) in getattr(self, f'_{trigger}_callbacks'):
+                    x(*a, **k)
+
+            setattr(self._base, trigger, lambda: callback_method(self))
+        getattr(self, f'_{trigger}_callbacks').append(
+            (callback, args, kwargs))
 
 
 class DummyTask(DummyContextObject):  # pragma: no cover
