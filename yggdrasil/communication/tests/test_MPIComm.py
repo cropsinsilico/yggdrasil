@@ -10,14 +10,14 @@ _tag = 0
 _mpi_installed = MPIComm.MPIComm.is_installed(language='python')
 
 
-# Monkey patch pytest-cov plugin with MPI Barriers to prevent multiple
-# MPI processes from attempting to modify the .coverage data file at
-# the same time and limit the coverage output to the rank 0 process
-@pytest.fixture(scope="session", autouse=True)
-def finalize_mpi(request):
-    """Slow down the exit on MPI processes to prevent collision in access
-    to .coverage file."""
-    if _mpi_installed:
+if _mpi_installed:
+    # Monkey patch pytest-cov plugin with MPI Barriers to prevent multiple
+    # MPI processes from attempting to modify the .coverage data file at
+    # the same time and limit the coverage output to the rank 0 process
+    @pytest.fixture(scope="session", autouse=True)
+    def finalize_mpi(request):
+        """Slow down the exit on MPI processes to prevent collision in access
+        to .coverage file."""
         comm = MPI.COMM_WORLD
         rank = comm.Get_rank()
         size = comm.Get_size()
@@ -31,7 +31,7 @@ def finalize_mpi(request):
         if not plugin:
             return
         old_finish = getattr(plugin.cov_controller, 'finish')
-        
+
         def new_finish():
             comm.Barrier()
             for _ in range(rank):
@@ -40,13 +40,13 @@ def finalize_mpi(request):
             for _ in range(rank, size):
                 comm.Barrier()
             comm.Barrier()
-            
+
         plugin.cov_controller.finish = new_finish
         if rank != 0:
-            
+
             def new_is_worker(session):
                 return True
-            
+
             plugin._is_worker = new_is_worker
 
 
