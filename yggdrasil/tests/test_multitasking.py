@@ -35,6 +35,8 @@ def test_TaskThread():
     q.start()
     q._base._errored.wait(1.0)
     assert(q._base._errored.is_set())
+    q.join(60.0)
+    assert(not q.is_alive())
 
 
 def test_TaskProcess():
