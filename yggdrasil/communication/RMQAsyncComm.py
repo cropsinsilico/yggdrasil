@@ -1,6 +1,7 @@
 import functools
 from yggdrasil import tools, multitasking
-from yggdrasil.communication import RMQComm, NoMessages
+from yggdrasil.communication import (
+    RMQComm, NoMessages, TemporaryCommunicationError)
 from yggdrasil.communication.RMQComm import pika
 
 
@@ -36,7 +37,9 @@ class RMQAsyncComm(RMQComm.RMQComm):
         self._reconnecting = multitasking.ProcessEvent()
         self._reconnect_delay = 0
         self._prefetch_count = 2
-        self._buffered_messages = []
+        self._buffered_messages = multitasking.Queue()
+        self._deliveries = multitasking.LockedDict()
+        # self._publish_interval = 0
         self._acked = 0
         self._nacked = 0
         self._message_number = 0
@@ -70,7 +73,8 @@ class RMQAsyncComm(RMQComm.RMQComm):
         self._closing.stopped.clear()
         self._consumer_tag = None
         if self.direction == 'send':
-            self._buffered_messages = []
+            for k in list(self._deliveries.keys()):
+                self._deliveries.pop(k)
 
     def run_thread(self):
         r"""Connect to the connection and begin the IO loop."""
@@ -109,7 +113,7 @@ class RMQAsyncComm(RMQComm.RMQComm):
             self.stop()
             raise Exception("Connection ioloop could not be established.")
         if not self.is_open:  # pragma: debug
-            self.stop()
+            self.stop(call_on_thread=True)
             raise RuntimeError("Connection never finished opening ")
 
     def bind(self):
@@ -132,20 +136,23 @@ class RMQAsyncComm(RMQComm.RMQComm):
                 comm. Defaults to False.
 
         """
-        self.stop()
+        self.stop(call_on_thread=True)
         self._closing.stopped.wait(self.timeout)
         if not self._closing.has_stopped():
+            if self.connection is not None:
+                self.connection.ioloop.stop()
             self.error("Closing has not completed")
         if not self.is_client:
             self.unregister_comm(self.address)
         with self.rmq_lock:
             self.channel = None
             self.connection = None
-        super(RMQAsyncComm, self)._close(linger=linger)
+        super(RMQComm.RMQComm, self)._close(linger=linger)
         if self.rmq_thread.is_alive():  # pragma: debug
             self.rmq_thread.join(self.timeout)
             if self.rmq_thread.is_alive():
-                raise RuntimeError("Thread still running.")
+                raise RuntimeError(
+                    self.logger.process("Thread still running.", {})[0])
 
     @property
     def is_open(self):
@@ -158,10 +165,15 @@ class RMQAsyncComm(RMQComm.RMQComm):
     def n_msg_recv(self):
         r"""int: Number of messages in the queue."""
         if self.is_open:
-            return len(self._buffered_messages)
+            return self._buffered_messages.qsize()
         return 0
 
-    def _send(self, msg, exchange=None, routing_key=None, **kwargs):
+    @property
+    def n_msg_send(self):
+        r"""int: Number of messages in the queue."""
+        return self.n_msg_recv  # + len(self._deliveries)
+        
+    def _send(self, msg, **kwargs):
         r"""Send a message.
 
         Args:
@@ -177,17 +189,25 @@ class RMQAsyncComm(RMQComm.RMQComm):
             bool: Success or failure of send.
 
         """
-        with self.rmq_lock:
-            if self.is_closed:  # pragma: debug
-                return False
-            out = super(RMQAsyncComm, self)._send(msg, exchange=exchange,
-                                                  routing_key=routing_key,
-                                                  **kwargs)
-            if out:
-                self._message_number += 1
-                self._buffered_messages.append(self._message_number)
-                self.debug("Sent message %d", self._message_number)
-        return out
+        try:
+            self._buffered_messages.put((msg, kwargs), block=False)
+            self.connection.ioloop.add_callback_threadsafe(
+                self.publish_message)
+        except multitasking.queue.Full:
+            raise TemporaryCommunicationError("Queue full.")
+        return True
+        # with self.rmq_lock:
+        #     if self.is_closed:  # pragma: debug
+        #         return False
+        #     out = super(RMQAsyncComm, self)._send(msg, exchange=exchange,
+        #                                           routing_key=routing_key,
+        #                                           **kwargs)
+        #     if out:
+        #         self._message_number += 1
+        #         self._buffered_messages.put(self._message_number,
+        #                                     block=False)
+        #         self.debug("Sent message %d", self._message_number)
+        # return out
 
     def _recv(self):
         r"""Receive a message.
@@ -197,10 +217,10 @@ class RMQAsyncComm(RMQComm.RMQComm):
                 message.
 
         """
-        with self.rmq_lock:
-            if len(self._buffered_messages) == 0:
-                raise NoMessages("No messages in buffer.")
-            return (True, self._buffered_messages.pop(0))
+        try:
+            return (True, self._buffered_messages.get(block=False))
+        except multitasking.queue.Empty:
+            raise NoMessages("No messages in buffer.")
 
     def close_channel(self):
         r"""Close the channel if it exists."""
@@ -253,8 +273,12 @@ class RMQAsyncComm(RMQComm.RMQComm):
                 self.debug('Connection closed, reconnect necessary: %s', reason)
                 self.reconnect()
 
-    def stop(self):
+    def stop(self, call_on_thread=False):
         r"""Stop the ioloop."""
+        if call_on_thread:
+            if self.connection is not None:
+                self.connection.ioloop.add_callback_threadsafe(self.stop)
+            return
         if not self._closing.has_started():
             self._closing.start()
             self.debug('Stopping')
@@ -362,8 +386,7 @@ class RMQAsyncComm(RMQComm.RMQComm):
         if self.direction == 'recv':
             self.set_qos()
         else:
-            self.enable_delivery_confirmations()
-            self._opening.stop()  # Ready for sending
+            self.start_publishing()
             self.debug('Finished opening producer')
 
     # CONSUMER (RECV) SPECIFIC
@@ -403,8 +426,7 @@ class RMQAsyncComm(RMQComm.RMQComm):
         self.debug('Received message # %s from %s: %.100s',
                    basic_deliver.delivery_tag, properties.app_id, body)
         body = tools.str2bytes(body)
-        with self.rmq_lock:
-            self._buffered_messages.append(body)
+        self._buffered_messages.put(body)
         # Not required because auto_ack is True
         # self.acknowledge_message(basic_deliver.delivery_tag)
 
@@ -429,6 +451,13 @@ class RMQAsyncComm(RMQComm.RMQComm):
         self.close_channel()
 
     # PUBLISHER (SEND) SPECIFIC
+    def start_publishing(self):
+        r"""Enable confirmations and begin sending messages."""
+        self.debug('Issuing consumer related RPC commands')
+        self.enable_delivery_confirmations()
+        # self.schedule_next_message()
+        self._opening.stop()  # Ready for sending
+    
     def enable_delivery_confirmations(self):
         r"""Turn on delivery confirmations."""
         self.debug('Issuing Confirm.Select RPC command')
@@ -443,8 +472,36 @@ class RMQAsyncComm(RMQComm.RMQComm):
             self._acked += 1
         elif confirmation_type == 'nack':
             self._nacked += 1
-        self._buffered_messages.remove(method_frame.method.delivery_tag)
+        self._deliveries.pop(method_frame.method.delivery_tag)
         self.debug(
             'Published %i messages, %i have yet to be confirmed, '
             '%i were acked and %i were nacked', self._message_number,
-            len(self._buffered_messages), self._acked, self._nacked)
+            len(self._deliveries), self._acked, self._nacked)
+
+    # def schedule_next_message(self):
+    #     r"""Schedule a new send."""
+    #     self.debug('Scheduling next message for %0.1f seconds',
+    #                self._publish_interval)
+    #     self.connection.ioloop.call_later(self._publish_interval,
+    #                                       self.publish_message)
+
+    def publish_message(self):
+        r"""Publish the next message in the list."""
+        try:
+            msg, kwargs = self._buffered_messages.get(block=False)
+        except multitasking.queue.Empty:
+            # self.schedule_next_message()
+            return
+        exchange = kwargs.pop('exchange', self.exchange)
+        routing_key = kwargs.pop('routing_key', self.queue)
+        kwargs.setdefault('mandatory', True)
+        try:
+            self.channel.basic_publish(exchange, routing_key, msg, **kwargs)
+        except pika.exceptions.UnroutableError:
+            self.error("Failed to publish message")
+            self.stop()
+            return
+        self._message_number += 1
+        self._deliveries[self._message_number] = (msg, kwargs)
+        self.debug('Published message # %i', self._message_number)
+        # self.schedule_next_message()
