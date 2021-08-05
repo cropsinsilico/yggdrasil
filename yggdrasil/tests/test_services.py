@@ -3,6 +3,7 @@ import copy
 import pytest
 import unittest
 import subprocess
+import itertools
 from contextlib import contextmanager
 from yggdrasil.services import (
     IntegrationServiceManager, create_service_manager_class, ServerError)
@@ -10,7 +11,6 @@ from yggdrasil.examples import yamls as ex_yamls
 from yggdrasil.tests import assert_raises, requires_language
 from yggdrasil import runner, import_as_function
 from yggdrasil.tools import is_comm_installed
-# TODO: Move into classes so that servers only need to be started once
 
 
 def get_skips(service_type, partial_commtype=None, check_running=False):
@@ -88,18 +88,34 @@ def running_service(service_type, partial_commtype=None,
         assert(not cli.is_running)
         p.wait(10)
     finally:
-        p.terminate()
+        if p.returncode is None:
+            p.terminate()
 
 
-def call_integration_service(service_type, partial_commtype,
-                             yamls, test_yml, name='test'):
-    r"""Call an integration that includes a service."""
-    remote_yml = '_remote'.join(os.path.splitext(test_yml))
-    yamls = copy.copy(yamls)
-    yamls.remove(test_yml)
-    yamls.append(remote_yml)
-    try:
-        with running_service(service_type, partial_commtype) as cli:
+def _make_ids(ids):
+    return ','.join([str(x) for x in ids])
+
+        
+class TestServices(object):
+    r"""Class to test integration services."""
+
+    @pytest.fixture(params=itertools.product(['flask', 'rmq'], [None, 'rmq']),
+                    ids=_make_ids, scope="class", autouse=True)
+    def running_service(self, request):
+        print("starting service")
+        with running_service(request.param[0], request.param[1]) as cli:
+            self.cli = cli
+            yield cli
+            self.cli = None
+
+    def call_integration_service(self, cli, yamls, test_yml, name='test'):
+        r"""Call an integration that includes a service."""
+        remote_yml = '_remote'.join(os.path.splitext(test_yml))
+        yamls = copy.copy(yamls)
+        yamls.remove(test_yml)
+        yamls.append(remote_yml)
+        service_type = cli.service_type
+        try:
             address = cli.address
             with open(remote_yml, 'w') as fd:
                 fd.write('\n'.join(['service:',
@@ -110,19 +126,14 @@ def call_integration_service(service_type, partial_commtype,
             r = runner.get_runner(yamls)
             r.run()
             assert(not r.error_flag)
-    finally:
-        if os.path.isfile(remote_yml):
-            os.remove(remote_yml)
+        finally:
+            if os.path.isfile(remote_yml):
+                os.remove(remote_yml)
 
-
-@pytest.mark.parametrize("service_type", ['flask', 'rmq'])
-@pytest.mark.parametrize("partial_commtype", ['zmq', 'rmq'])
-def test_integration_service(service_type, partial_commtype):
-    r"""Test starting/stopping an integration service via flask/rmq."""
-    name = 'ygg_integrations_test'
-    test_yml = ex_yamls['fakeplant']['python']
-    with running_service(service_type, partial_commtype,
-                         manager_name=name) as cli:
+    def test_integration_service(self, running_service):
+        r"""Test starting/stopping an integration service via flask/rmq."""
+        cli = running_service
+        test_yml = ex_yamls['fakeplant']['python']
         assert_raises(ServerError, cli.send_request,
                       test_yml, action='invalid')
         print(cli.send_request(test_yml))
@@ -131,62 +142,58 @@ def test_integration_service(service_type, partial_commtype):
         cli.send_request(test_yml, action='stop')
         cli.send_request(action='status')
 
-
-@pytest.mark.parametrize("service_type", ['flask'])
-def test_registered_service(service_type):
-    r"""Test registering an integration service."""
-    name = 'ygg_integrations_test'
-    test_yml = ex_yamls['fakeplant']['python']
-    with running_service(service_type, partial_commtype=None,
-                         manager_name=name) as cli:
+    def test_registered_service(self, running_service):
+        r"""Test registering an integration service."""
+        if (((running_service.commtype != 'rest')
+             or (running_service.service_type != 'flask'))):
+            pytest.skip("redundent test")
+        cli = running_service
+        test_yml = ex_yamls['fakeplant']['python']
         assert_raises(KeyError, cli.registry.remove, 'test')
         assert_raises(ServerError, cli.send_request, 'test')
         cli.registry.add('test', test_yml)
         print(cli.send_request('test'))
         assert_raises(ValueError, cli.registry.add, 'test', [])
         cli.send_request('test', action='stop')
-        cli.stop_server()
+        # cli.stop_server()
         cli.registry.remove('test')
         assert_raises(KeyError, cli.registry.remove, 'test')
 
+    @requires_language('c')
+    @requires_language('c++')
+    def test_calling_integration_service(self, running_service):
+        r"""Test calling an integrations as a service in an integration."""
+        self.call_integration_service(
+            running_service,
+            ex_yamls['fakeplant']['all_nomatlab'],
+            ex_yamls['fakeplant']['python'])
 
-@requires_language('c')
-@requires_language('c++')
-@pytest.mark.parametrize("service_type", ['flask', 'rmq'])
-@pytest.mark.parametrize("partial_commtype", ['zmq', 'rmq'])
-def test_calling_integration_service(service_type, partial_commtype):
-    r"""Test calling an integrations as a service in an integration."""
-    call_integration_service(service_type, partial_commtype,
-                             ex_yamls['fakeplant']['all_nomatlab'],
-                             ex_yamls['fakeplant']['python'])
+    @requires_language('c')
+    @requires_language('c++')
+    def test_calling_server_as_service(self, running_service):
+        r"""Test calling an integration service that is a server in an
+        integration."""
+        if (((running_service.commtype != 'rest')
+             or (running_service.service_type != 'flask'))):
+            pytest.skip("redundent test")
+        os.environ.update(FIB_ITERATIONS='3',
+                          FIB_SERVER_SLEEP_SECONDS='0.01')
+        yamls = ex_yamls['rpcFib']['all_nomatlab']
+        service = None
+        for x in yamls:
+            if 'Srv' in x:
+                service = x
+                break
+        self.call_integration_service(running_service, yamls, service,
+                                      name='rpcFibSrv')
 
-
-@requires_language('c')
-@requires_language('c++')
-@pytest.mark.parametrize("service_type", ['flask'])
-@pytest.mark.parametrize("partial_commtype", ['zmq'])
-def test_calling_server_as_service(service_type, partial_commtype):
-    r"""Test calling an integration service that is a server in an
-    integration."""
-    os.environ.update(FIB_ITERATIONS='3',
-                      FIB_SERVER_SLEEP_SECONDS='0.01')
-    yamls = ex_yamls['rpcFib']['all_nomatlab']
-    service = None
-    for x in yamls:
-        if 'Srv' in x:
-            service = x
-            break
-    call_integration_service(service_type, partial_commtype, yamls, service,
-                             name='rpcFibSrv')
-
-
-@pytest.mark.parametrize("service_type", ['flask', 'rmq'])
-@pytest.mark.parametrize("partial_commtype", ['zmq'])
-def test_calling_service_as_function(service_type, partial_commtype):
-    r"""Test calling an integrations as a service in an integration."""
-    name = 'test'
-    test_yml = ex_yamls['fakeplant']['python']
-    with running_service(service_type, partial_commtype) as cli:
+    def test_calling_service_as_function(self, running_service):
+        r"""Test calling an integrations as a service in an integration."""
+        # if running_service.commtype != None:
+        #     pytest.skip("redundent test")
+        cli = running_service
+        name = 'test'
+        test_yml = ex_yamls['fakeplant']['python']
         try:
             cli.registry.add(name, test_yml)
             fmodel = import_as_function(name, cli.address)

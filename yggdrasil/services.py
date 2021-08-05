@@ -212,6 +212,7 @@ class ServiceBase(YggClass):
 class FlaskService(ServiceBase):
     r"""Flask based service."""
 
+    service_type = 'flask'
     default_commtype = 'rest'
 
     @classmethod
@@ -324,6 +325,7 @@ class FlaskService(ServiceBase):
 class RMQService(ServiceBase):
     r"""RabbitMQ based service."""
 
+    service_type = 'rmq'
     default_commtype = 'rmq'
 
     @classmethod
