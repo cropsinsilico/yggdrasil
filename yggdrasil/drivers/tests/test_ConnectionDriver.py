@@ -7,7 +7,7 @@ from yggdrasil.components import import_component
 from yggdrasil.drivers.tests import test_Driver as parent
 from yggdrasil.drivers.ConnectionDriver import ConnectionDriver
 from yggdrasil.communication import (
-    new_comm, CommBase, ZMQComm, IPCComm, RMQComm, MPIComm)
+    new_comm, CommBase, ZMQComm, IPCComm, RMQComm, MPIComm, RESTComm)
 
 
 _default_comm = tools.get_default_comm()
@@ -15,6 +15,7 @@ _zmq_installed = ZMQComm.ZMQComm.is_installed(language='python')
 _ipc_installed = IPCComm.IPCComm.is_installed(language='python')
 _rmq_installed = RMQComm.RMQComm.is_installed(language='python')
 _mpi_installed = MPIComm.MPIComm.is_installed(language='python')
+_rest_installed = RESTComm.RESTComm.is_installed(language='python')
 
 
 @unittest.skipIf(platform._is_win, ("Temp skip connection tests on windows for "
@@ -536,16 +537,26 @@ comm_types = s['comm'].subtypes
 for k in comm_types:
     if k in _default_comm:  # pragma: debug
         continue
+    base_class = TestConnectionDriver
+    if k in ['RESTComm', 'rest']:
+        from yggdrasil.tests.test_services import running_service
+        
+        class BaseRESTClass(TestConnectionDriver):
+            @pytest.fixture(scope="class", autouse=True)
+            def running_service(self):
+                with running_service('flask') as cli:
+                    yield cli
+        base_class = BaseRESTClass
     # Output
     ocls = type('Test%sOutputDriver' % k.title(),
-                (TestConnectionDriver, ), {'ocomm_name': k,
-                                           'driver': 'OutputDriver',
-                                           'args': 'test'})
+                (base_class, ), {'ocomm_name': k,
+                                 'driver': 'OutputDriver',
+                                 'args': 'test'})
     # Input
     icls = type('Test%sInputDriver' % k.title(),
-                (TestConnectionDriver, ), {'icomm_name': k,
-                                           'driver': 'InputDriver',
-                                           'args': 'test'})
+                (base_class, ), {'icomm_name': k,
+                                 'driver': 'InputDriver',
+                                 'args': 'test'})
     # Flags
     flag_func = None
     if k in ['RMQComm', 'RMQAsyncComm', 'rmq', 'rmq_async']:
@@ -563,6 +574,9 @@ for k in comm_types:
                      unittest.skipIf(not _mpi_installed,
                                      "MPI library not installed"),
                      pytest.mark.mpi(min_size=2)]
+    elif k in ['RESTComm', 'rest']:
+        flag_func = unittest.skipIf(not _rest_installed,
+                                    "REST library not installed")
     if flag_func is not None:
         if not isinstance(flag_func, list):
             flag_func = [flag_func]
@@ -573,4 +587,6 @@ for k in comm_types:
     if k != 'value':
         globals()[ocls.__name__] = ocls
     globals()[icls.__name__] = icls
-    del ocls, icls
+    del ocls, icls, base_class
+    if k in ['RESTComm', 'rest']:
+        del BaseRESTClass

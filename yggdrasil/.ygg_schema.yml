@@ -29,11 +29,15 @@ definitions:
           - default
           - ipc
           - mpi
+          - rest
           - rmq
           - rmq_async
           - value
           - zmq
           type: string
+        cookies:
+          description: Cookies to send to the server. Defaults to None and is ignored.
+          type: object
         count:
           default: 1
           type: integer
@@ -92,6 +96,10 @@ definitions:
         outside_loop:
           default: false
           type: boolean
+        params:
+          description: Parameters that should be passed via URL. Defaults to None
+            and is ignored.
+          type: object
         recv_converter:
           anyOf:
           - $ref: '#/definitions/transform'
@@ -142,9 +150,9 @@ definitions:
             type: string
           type: array
       required:
+      - commtype
       - datatype
       - name
-      - commtype
       title: comm_base
       type: object
     - anyOf:
@@ -180,6 +188,24 @@ definitions:
             - buffer
             type: string
         title: BufferComm
+        type: object
+      - additionalProperties: true
+        description: Schema for comm component ['rest'] subtype.
+        properties:
+          commtype:
+            default: default
+            description: RESTful API.
+            enum:
+            - rest
+            type: string
+          cookies:
+            description: Cookies to send to the server. Defaults to None and is ignored.
+            type: object
+          params:
+            description: Parameters that should be passed via URL. Defaults to None
+              and is ignored.
+            type: object
+        title: RESTComm
         type: object
       - additionalProperties: true
         description: Schema for comm component ['value'] subtype.
@@ -634,8 +660,8 @@ definitions:
             is used.
           type: string
       required:
-      - name
       - filetype
+      - name
       - working_dir
       title: file_base
       type: object
@@ -1719,8 +1745,8 @@ definitions:
             is used.
           type: string
       required:
-      - args
       - language
+      - args
       - name
       - working_dir
       title: model_base

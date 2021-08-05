@@ -69,12 +69,12 @@ class ServiceBase(YggClass):
         r"""bool: True if the server is running."""
         return True
     
-    def wait_for_server(self, timeout=10.0):
+    def wait_for_server(self, timeout=15.0):
         r"""Wait for a service to start running.
 
         Args:
             timeout (float, optional): Time (in seconds) that should be waited
-                for the server to start. Defaults to 10.
+                for the server to start. Defaults to 15.
 
         Raises:
             RuntimeError: If the time limit is reached and the server still
@@ -84,7 +84,7 @@ class ServiceBase(YggClass):
         T = TimeOut(timeout)
         while (not self.is_running) and (not T.is_out):
             self.debug("Waiting for server to start")
-            sleep(1)
+            sleep(0.1)
         if not self.is_running:  # pragma: debug
             raise RuntimeError("Server never started")
 
@@ -212,6 +212,8 @@ class ServiceBase(YggClass):
 class FlaskService(ServiceBase):
     r"""Flask based service."""
 
+    default_commtype = 'rest'
+
     @classmethod
     def is_installed(cls):
         r"""bool: True if the class is fully installed, False otherwise."""
@@ -239,6 +241,7 @@ class FlaskService(ServiceBase):
         from flask import Flask
         from flask import request
         from flask import jsonify
+        self.queue = {}
         self.request = request
         self.jsonify = jsonify
         self.app = Flask(__name__)
@@ -246,7 +249,7 @@ class FlaskService(ServiceBase):
         @self.app.route('/' + self.name, methods=['POST'])
         def _target(*req_args):
             return self.process_request(self.request.json, args=req_args)
-        
+
     def setup_client(self, *args, **kwargs):
         r"""Set up the machinery for sending requests."""
         pass
@@ -312,6 +315,7 @@ class FlaskService(ServiceBase):
         import requests
         try:
             r = requests.post(self.address + self.name, json=request)
+            r.raise_for_status()
         except BaseException as e:
             raise ClientError(e)
         return r.json()
@@ -319,6 +323,8 @@ class FlaskService(ServiceBase):
 
 class RMQService(ServiceBase):
     r"""RabbitMQ based service."""
+
+    default_commtype = 'rmq'
 
     @classmethod
     def is_installed(cls):
@@ -495,6 +501,8 @@ def create_service_manager_class(service_type=_default_service_type):
             self.registry = IntegrationServiceRegistry()
             self.commtype = commtype
             super(IntegrationServiceManager, self).__init__(name, **kwargs)
+            if self.commtype is None:
+                self.commtype = self.default_commtype
 
         def send_request(self, name=None, yamls=None, action='start', **kwargs):
             r"""Send a request.
@@ -519,6 +527,13 @@ def create_service_manager_class(service_type=_default_service_type):
             return super(IntegrationServiceManager, self).send_request(
                 request, **kwargs)
 
+        def setup_server(self, *args, **kwargs):
+            r"""Set up the machinery for receiving requests."""
+            super(IntegrationServiceManager, self).setup_server(*args, **kwargs)
+            if service_type == FlaskService:
+                from yggdrasil.communication import RESTComm
+                RESTComm.add_comm_server_to_app(self.app)
+            
         def stop_server(self):
             r"""Stop the server from the client-side."""
             try:

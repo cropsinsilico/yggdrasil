@@ -12,6 +12,7 @@ History
 * Added support for registering integrations that can be called locally as services
 * Added 'integration-service-manager' CLI for managing service managers
 * Added configuration options for services
+* Added communicator for use with REST API
 
 TODO
 ....
