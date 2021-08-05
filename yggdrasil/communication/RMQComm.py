@@ -236,14 +236,6 @@ class RMQComm(CommBase.CommBase):
             super(RMQComm, self).bind()
         self._opening.stop()
 
-    def reopen_channel(self):
-        r"""Re-open the channel."""
-        with self.rmq_lock:
-            self.unregister_comm(self.address, dont_close=True)
-            self._opening.started.clear()
-            self._opening.stopped.clear()
-            self.bind()
-
     def _close(self, linger=False):
         r"""Close the connection.
 
@@ -321,7 +313,7 @@ class RMQComm(CommBase.CommBase):
                     res = self.channel.queue_declare(queue=self.queue,
                                                      auto_delete=True,
                                                      passive=True)
-                except pika.exceptions.ChannelClosedByBroker:
+                except pika.exceptions.ChannelClosedByBroker:  # pragma: debug
                     self._close()
                 # except BlockingIOError:  # pragma: debug
                 #     self.sleep()

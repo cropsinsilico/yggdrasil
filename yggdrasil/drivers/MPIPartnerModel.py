@@ -77,11 +77,8 @@ class MPIPartnerModel(ModelDriver):
             str: Version of compiler/interpreter for this language.
 
         """
-        try:
-            import mpi4py
-            return 'mpi4py %s' % mpi4py.__version__
-        except ImportError:
-            return '0'
+        import mpi4py
+        return 'mpi4py %s' % mpi4py.__version__
     
     @classmethod
     def language_executable(cls, **kwargs):
@@ -135,7 +132,7 @@ class MPIPartnerModel(ModelDriver):
     def kill_process(self):
         r"""Kill the process running the model, checking return code."""
         self.set_break_flag()
-        if not self.model_process_complete:
+        if not self.model_process_complete:  # pragma: debug
             self._mpi_requests['stopped']['result'] = True
         super(MPIPartnerModel, self).kill_process()
         

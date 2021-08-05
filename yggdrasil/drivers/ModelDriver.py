@@ -1407,8 +1407,9 @@ class ModelDriver(Driver):
         r"""Send an MPI message."""
         self.debug("%d: %s (blocking=%s)", self._mpi_tag + tag, msg, dont_block)
         kws = {'dest': self._mpi_partner_rank, 'tag': (self._mpi_tag + tag)}
-        if dont_block:
-            return self._mpi_comm.isend(msg, **kws)
+        if dont_block:  # pragma: debug
+            # return self._mpi_comm.isend(msg, **kws)
+            raise NotImplementedError("Non-blocking MPI send not tested.")
         else:
             return self._mpi_comm.send(msg, **kws)
 

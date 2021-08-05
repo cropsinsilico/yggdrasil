@@ -30,6 +30,7 @@ class RMQAsyncComm(RMQComm.RMQComm):
 
     def _init_before_open(self, **kwargs):
         r"""Initialize null variables and RMQ async thread."""
+        self.original_queue = None
         self.times_connected = 0
         self.rmq_thread_count = 0
         self.rmq_thread = self.new_run_thread()
@@ -157,9 +158,8 @@ class RMQAsyncComm(RMQComm.RMQComm):
     @property
     def is_open(self):
         r"""bool: True if the connection and channel are open."""
-        if self._reconnecting.is_running():
-            return True
-        return super(RMQAsyncComm, self).is_open
+        return (super(RMQAsyncComm, self).is_open
+                or self._reconnecting.is_running())
 
     @property
     def n_msg_recv(self):
@@ -193,21 +193,9 @@ class RMQAsyncComm(RMQComm.RMQComm):
             self._buffered_messages.put((msg, kwargs), block=False)
             self.connection.ioloop.add_callback_threadsafe(
                 self.publish_message)
-        except multitasking.queue.Full:
+        except multitasking.queue.Full:  # pragma: debug
             raise TemporaryCommunicationError("Queue full.")
         return True
-        # with self.rmq_lock:
-        #     if self.is_closed:  # pragma: debug
-        #         return False
-        #     out = super(RMQAsyncComm, self)._send(msg, exchange=exchange,
-        #                                           routing_key=routing_key,
-        #                                           **kwargs)
-        #     if out:
-        #         self._message_number += 1
-        #         self._buffered_messages.put(self._message_number,
-        #                                     block=False)
-        #         self.debug("Sent message %d", self._message_number)
-        # return out
 
     def _recv(self):
         r"""Receive a message.
@@ -231,7 +219,8 @@ class RMQAsyncComm(RMQComm.RMQComm):
         
     def close_connection(self):
         r"""Close the connection."""
-        self._consuming.stop()
+        if self.direction == 'recv':
+            self._consuming.stop()
         if self.connection is not None:
             if self.connection.is_closing or self.connection.is_closed:
                 self.debug('Connection is closing or already closed')
@@ -299,11 +288,17 @@ class RMQAsyncComm(RMQComm.RMQComm):
         r"""Try to re-establish a connection and resume a new IO loop."""
         # Stop the old IOLoop, create a new connection and start a new IOLoop
         self.debug('')
+        if not self.original_queue:  # pragma: debug
+            self.error("Cannot reconnect to a queue with a generated name.")
+            self.connection.ioloop.stop()
+            self._closing.start()
+            self._closing.stop()
+            return
         self._reconnecting.started.clear()
         self._reconnecting.stopped.clear()
         self._reconnecting.start()  # stopped by re-opening
+        self._opening.stopped.clear()
         if self.direction == 'recv':
-            self._opening.stopped.clear()
             self.stop()
         else:
             self.connection.ioloop.call_later(
@@ -338,7 +333,8 @@ class RMQAsyncComm(RMQComm.RMQComm):
         else:
             self.channel = None
             if not self._closing.has_started():
-                self.connection.close()
+                self.close_connection()
+                # self.connection.close()
 
     # EXCHANGE
     def setup_exchange(self, exchange_name):
@@ -360,11 +356,14 @@ class RMQAsyncComm(RMQComm.RMQComm):
     # QUEUE
     def setup_queue(self, queue_name):
         r"""Set up the message queue."""
-        self.debug('Declaring queue %s', queue_name)
+        if self.original_queue is None:
+            self.original_queue = queue_name
+        passive = ((self.direction == 'recv')
+                   or self.original_queue.startswith('amq.'))
+        self.debug('Declaring queue %s (passive=%s)', queue_name, passive)
         cb = functools.partial(self.on_queue_declareok, userdata=queue_name)
         self.channel.queue_declare(queue=queue_name, callback=cb,
-                                   exclusive=False,
-                                   passive=self.queue.startswith('amq.'))
+                                   exclusive=False, passive=passive)
 
     def on_queue_declareok(self, method_frame, userdata):
         r"""Actions to perform once the queue is succesfully declared. Bind
@@ -453,7 +452,7 @@ class RMQAsyncComm(RMQComm.RMQComm):
     # PUBLISHER (SEND) SPECIFIC
     def start_publishing(self):
         r"""Enable confirmations and begin sending messages."""
-        self.debug('Issuing consumer related RPC commands')
+        self.debug('Issuing publisher related RPC commands')
         self.enable_delivery_confirmations()
         # self.schedule_next_message()
         self._opening.stop()  # Ready for sending
@@ -470,7 +469,7 @@ class RMQAsyncComm(RMQComm.RMQComm):
                    method_frame.method.delivery_tag)
         if confirmation_type == 'ack':
             self._acked += 1
-        elif confirmation_type == 'nack':
+        elif confirmation_type == 'nack':  # pragma: intermittent
             self._nacked += 1
         self._deliveries.pop(method_frame.method.delivery_tag)
         self.debug(
@@ -489,7 +488,7 @@ class RMQAsyncComm(RMQComm.RMQComm):
         r"""Publish the next message in the list."""
         try:
             msg, kwargs = self._buffered_messages.get(block=False)
-        except multitasking.queue.Empty:
+        except multitasking.queue.Empty:  # pragma: intermittent
             # self.schedule_next_message()
             return
         exchange = kwargs.pop('exchange', self.exchange)
@@ -497,7 +496,7 @@ class RMQAsyncComm(RMQComm.RMQComm):
         kwargs.setdefault('mandatory', True)
         try:
             self.channel.basic_publish(exchange, routing_key, msg, **kwargs)
-        except pika.exceptions.UnroutableError:
+        except pika.exceptions.UnroutableError:  # pragma: debug
             self.error("Failed to publish message")
             self.stop()
             return

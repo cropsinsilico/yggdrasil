@@ -27,12 +27,10 @@ class DuplicatedModelDriver(Driver):
         self.copies = []
         if duplicates is not None:
             for x in duplicates:
-                if isinstance(x, Driver):
-                    self.copies.append(x)
-                else:
-                    ikws = copy.deepcopy(kwargs)
-                    ikws.update(x)
-                    self.copies.append(create_driver(yml=x, **ikws))
+                assert(isinstance(x, dict))
+                ikws = copy.deepcopy(kwargs)
+                ikws.update(x)
+                self.copies.append(create_driver(yml=x, **ikws))
         else:
             for iyml in self.get_yaml_copies(yml):
                 ikws = copy.deepcopy(kwargs)

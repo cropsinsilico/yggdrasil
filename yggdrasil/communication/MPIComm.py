@@ -13,12 +13,6 @@ class MPIRequest(object):
                  'req', 'size', 'data', '_complete']
 
     def __init__(self, comm, direction, address, tag, **kwargs):
-        if isinstance(address, (list, tuple)):
-            if len(address) == 1:
-                address = address[0]
-            else:
-                assert(direction == 'send')
-                address = address[tag % len(address)]
         self.comm = comm
         self.address = address
         self.direction = direction
@@ -87,7 +81,7 @@ class MPIMultiRequest(MPIRequest):
             out = {}
         for x in self.address:
             if x not in out:
-                out[x] = MPIRequest(comm, self.direction, x, self.tag)
+                out[x] = MPIRequest(comm, self.direction, x, self.tag[x])
         return out
 
     @property
@@ -135,8 +129,8 @@ class MPIComm(CommBase.CommBase):
             kwargs['address'] = kwargs['partner_mpi_ranks']
         self._request_lock = RLock(task_method='thread')
         self.requests = []
-        self.unused_tags = []
-        self._tag = tag_start
+        self.unused_tags = {}
+        self.tags = {}
         self.tag_start = tag_start
         self.tag_stride = tag_stride
         self.requires_disconnect = False
@@ -149,21 +143,59 @@ class MPIComm(CommBase.CommBase):
     @property
     def tag(self):
         r"""int: Tag for the next message."""
-        if self.unused_tags:
-            return self.unused_tags[0]
-        return self._tag
+        return self.get_tag(max(self.address, key=self.get_tag))
 
-    def advance_tag(self):
-        r"""Advance to the next tag."""
-        if self.unused_tags:
-            self.unused_tags.pop(0)
+    def get_tag(self, address):
+        r"""Get the next tag for an address.
+
+        Args:
+            address (int): Address to get tag for.
+
+        Returns:
+            int: Tag that should be used next for the address.
+
+        """
+        if self.unused_tags.get(address, []):
+            return self.unused_tags[address][0]
+        return self.tags[address]
+
+    def advance_tag(self, request):
+        r"""Advance to the next tag.
+
+        Args:
+            request (MPIRequest, MPIMultiRequest): Request advancing the tag.
+
+        """
+        if isinstance(request, MPIMultiRequest):
+            for v in request.req.values():
+                self.advance_tag(v)
             return
-        self._tag += self.tag_stride
+        if request.tag in self.unused_tags.get(request.address, []):
+            self.unused_tags[request.address].remove(request.tag)
+            return
+        self.tags[request.address] = max(self.tags[request.address],
+                                         request.tag + self.tag_stride)
+
+    def cache_tag(self, request):
+        r"""Store a tag for an uncompleted request.
+
+        Args:
+            request (MPIRequest, MPIMultiRequest): Request to cache.
+
+        """
+        if isinstance(request, MPIMultiRequest):
+            for v in request.req.values():
+                self.cache_tag(v)
+            return
+        self.unused_tags.setdefault(request.address, [])
+        self.unused_tags[request.address].append(request.tag)
 
     def bind(self):
         r"""Bind to random queue if address is generate."""
         if isinstance(self.address, str):
             self.address = tuple([int(x) for x in self.address.split(',')])
+        if not self.tags:
+            self.tags = {x: self.tag_start for x in self.address}
         super(MPIComm, self).bind()
 
     @property
@@ -218,7 +250,7 @@ class MPIComm(CommBase.CommBase):
         
     def open(self):
         r"""Open the queue."""
-        # TODO: Handle group
+        # TODO: Handle group?
         super(MPIComm, self).open()
         if not self.is_open:
             self._is_open = True
@@ -240,8 +272,9 @@ class MPIComm(CommBase.CommBase):
                 if x.complete:
                     complete_requests.append(x)
                 else:
-                    self.unused_tags.append(x.tag)
+                    self.cache_tag(x)
                     x.cancel()
+            # Cancel uncompleted partial request for multi-receive?
             self.requests = complete_requests
 
     @property
@@ -284,16 +317,42 @@ class MPIComm(CommBase.CommBase):
         with self._request_lock:
             if on_empty and self.requests:
                 return
-            args = (self.mpi_comm, self.direction, self.address, self.tag)
-            if (len(self.address) == 1) or (self.direction == 'send'):
+            address = self.address
+            if len(self.address) == 1:
                 cls = MPIRequest
+                address = address[0]
+                tag = self.get_tag(address)
+            elif self.direction == 'send':
+                cls = MPIRequest
+                address = min(address, key=self.get_tag)
+                tag = self.get_tag(address)
             else:
                 if self.last_request:
                     kwargs['previous_requests'] = self.last_request.remainder
                 cls = MPIMultiRequest
-            self.requests.append(cls(*args, **kwargs))
-            self.advance_tag()
+                tag = {x: self.get_tag(x) for x in address}
+            args = (self.mpi_comm, self.direction, address, tag)
+            req = cls(*args, **kwargs)
+            self.requests.append(req)
+            self.advance_tag(req)
 
+    def send_message(self, msg, **kwargs):
+        r"""Send a message encapsulated in a CommMessage object.
+
+        Args:
+            msg (CommMessage): Message to be sent.
+            **kwargs: Additional keyword arguments are passed to _safe_send.
+
+        Returns:
+            bool: Success or failure of send.
+        
+        """
+        if (msg.flag == CommBase.FLAG_EOF) and (msg.args != 'DONT_RECURSE'):
+            for _ in range(len(self.address) - 1):
+                msg.add_message(msg=msg.msg, length=msg.length, flag=msg.flag,
+                                args='DONT_RECURSE', header=msg.header)
+        return super(MPIComm, self).send_message(msg, **kwargs)
+        
     def _send(self, payload):
         r"""Send a message.
 

@@ -28,7 +28,7 @@ if _mpi_installed:
             if isinstance(x, plugin_class):
                 plugin = x
                 break
-        if not plugin:
+        if not plugin:  # pragma: no cover
             return
         old_finish = getattr(plugin.cov_controller, 'finish')
 
@@ -37,14 +37,15 @@ if _mpi_installed:
             for _ in range(rank):
                 comm.Barrier()
             old_finish()
-            for _ in range(rank, size):
-                comm.Barrier()
-            comm.Barrier()
+            # These lines come after coverage collection
+            for _ in range(rank, size):  # pragma: testing
+                comm.Barrier()  # pragma: testing
+            comm.Barrier()  # pragma: testing
 
         plugin.cov_controller.finish = new_finish
         if rank != 0:
 
-            def new_is_worker(session):
+            def new_is_worker(session):  # pragma: testing
                 return True
 
             plugin._is_worker = new_is_worker
@@ -54,7 +55,7 @@ if _mpi_installed:
 @pytest.mark.mpi(min_size=2)
 class TestMPIComm(test_CommBase.TestCommBase):
     r"""Test class for MPIComm."""
-    # Rank 0 sends, rank 1 receives
+    # Rank 0 sends, rank 1+ receives
 
     comm = 'MPIComm'
     test_error_send = None
@@ -66,9 +67,11 @@ class TestMPIComm(test_CommBase.TestCommBase):
             from mpi4py import MPI
             self.mpi_comm = MPI.COMM_WORLD
             self.mpi_rank = self.mpi_comm.Get_rank()
-        except ImportError:
+            self.mpi_size = self.mpi_comm.Get_size()
+        except ImportError:  # pragma: debug
             self.mpi_comm = None
             self.mpi_rank = 0
+            self.mpi_size = 1
         self._recv_kws = {}
         super(TestMPIComm, self).__init__(*args, **kwargs)
 
@@ -79,8 +82,8 @@ class TestMPIComm(test_CommBase.TestCommBase):
         if self.mpi_rank == 0:
             out = self.send_inst_kwargs
             out['start_tag'] = _tag
-            out['partner_mpi_ranks'] = [1]
-        elif self.mpi_rank == 1:
+            out['partner_mpi_ranks'] = list(range(1, self.mpi_size))
+        else:
             out = self._recv_kws
             out['start_tag'] = _tag
             out['commtype'] = self.commtype
@@ -90,7 +93,7 @@ class TestMPIComm(test_CommBase.TestCommBase):
     @property
     def recv_instance(self):
         r"""Alias for instance."""
-        if self.mpi_rank == 1:
+        if self.mpi_rank > 0:
             return self.instance
 
     @property
@@ -108,12 +111,13 @@ class TestMPIComm(test_CommBase.TestCommBase):
         kwargs.setdefault('nprev_fd', self.fd_count)
         init_tag = _tag
         _tag += 1
-        if self.mpi_rank == 1:
+        if self.mpi_rank > 0:
             self._recv_kws = self.mpi_comm.recv(source=0, tag=init_tag)
         super(test_CommBase.TestCommBase, self).setup(*args, **kwargs)
         if self.mpi_rank == 0:
             recv_kws = self.instance.opp_comm_kwargs()
-            self.mpi_comm.send(recv_kws, dest=1, tag=init_tag)
+            for i in self.instance.address:
+                self.mpi_comm.send(recv_kws, dest=i, tag=init_tag)
         if sleep_after_connect:  # pragma: testing
             self.instance.sleep()
         assert(self.instance.is_open)
@@ -145,7 +149,7 @@ class TestMPIComm(test_CommBase.TestCommBase):
         all_tag = self.sync(get_tags=True)
         if self.instance.direction == 'send':
             for _ in range(max(all_tag) - all_tag[self.mpi_rank]):
-                self.instance._tag += 1
+                self.instance.tags[self.instance.address[0]] += 1
                 # self.instance.send_eof()
             if self.use_async:
                 self.instance.wait_for_confirm(timeout=60.0)
@@ -261,6 +265,7 @@ class TestMPIComm(test_CommBase.TestCommBase):
         if is_eof_send:
             send_args = tuple()
         else:
+            n_send *= len(self.send_instance.address)
             send_args = (msg_send,)
         self.assert_equal(getattr(self.send_instance, n_msg_send_meth), n_send_init)
         self.sync()
@@ -302,7 +307,7 @@ class TestMPIComm(test_CommBase.TestCommBase):
                 close_on_recv_eof=None, no_recv=False, recv_timeout=None,
                 n_recv_init=0, is_eof_send=False):
         r"""Generic recv of a message."""
-        assert(self.mpi_rank == 1)
+        assert(self.mpi_rank > 0)
         tkey = '.do_send_recv'
         is_eof_recv = (is_eof_send or self.recv_instance.is_eof(msg_recv))
         if recv_timeout is None:
@@ -390,7 +395,8 @@ class TestMPIComm(test_CommBase.TestCommBase):
             return msg
 
         if self.instance.direction == 'send':
-            assert(self.send_instance.send(self.test_msg))
+            for _ in range(len(self.send_instance.address)):
+                assert(self.send_instance.send(self.test_msg))
         else:
             msg = self.recv_instance.recv(
                 timeout=60.0, skip_deserialization=True,
@@ -409,7 +415,8 @@ class TestMPIComm(test_CommBase.TestCommBase):
             if self.send_instance.is_async:
                 self.assert_equal(self.send_instance.n_msg_direct, 0)
             self.sync()
-            flag = self.send_instance.send(self.test_msg)
+            for _ in range(len(self.send_instance.address)):
+                flag = self.send_instance.send(self.test_msg)
             assert(flag)
             # self.send_instance.purge()
             # self.assert_equal(self.send_instance.n_msg, 0)

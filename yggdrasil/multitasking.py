@@ -519,30 +519,30 @@ class Event(ContextObject):
                 state['_base'].set()
         super(Event, self).__setstate__(state)
 
-    @classmethod
-    def from_event_set(cls, *events):
-        r"""Create an event that is triggered when any one of the provided
-        events is set.
+    # @classmethod
+    # def from_event_set(cls, *events):
+    #     r"""Create an event that is triggered when any one of the provided
+    #     events is set.
 
-        Args:
-            *events: One or more events that will trigger this event.
+    #     Args:
+    #         *events: One or more events that will trigger this event.
 
-        """
-        # Modified version of https://stackoverflow.com/questions/12317940/
-        # python-threading-can-i-sleep-on-two-threading-events-simultaneously/
-        # 36661113
-        or_event = cls()
+    #     """
+    #     # Modified version of https://stackoverflow.com/questions/12317940/
+    #     # python-threading-can-i-sleep-on-two-threading-events-simultaneously/
+    #     # 36661113
+    #     or_event = cls()
 
-        def changed():
-            bools = [e.is_set() for e in events]
-            if any(bools):
-                or_event.set()
-            else:
-                or_event.clear()
-        for e in events:
-            e.add_callback(changed, trigger='set')
-            e.add_callback(changed, trigger='clear')
-        return or_event
+    #     def changed():
+    #         bools = [e.is_set() for e in events]
+    #         if any(bools):
+    #             or_event.set()
+    #         else:
+    #             or_event.clear()
+    #     for e in events:
+    #         e.add_callback(changed, trigger='set')
+    #         e.add_callback(changed, trigger='clear')
+    #     return or_event
 
     def add_callback(self, callback, args=(), kwargs={}, trigger='set'):
         r"""Add a callback that will be called when set or clear is invoked.
