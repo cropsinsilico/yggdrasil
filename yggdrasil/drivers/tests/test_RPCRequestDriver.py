@@ -5,7 +5,7 @@ from yggdrasil.tests import assert_raises, assert_equal
 import yggdrasil.drivers.tests.test_ConnectionDriver as parent
 from yggdrasil.drivers.tests.test_ConnectionDriver import (
     _default_comm, _zmq_installed, _ipc_installed, _rmq_installed,
-    _mpi_installed)
+    _mpi_installed, _rest_installed)
 
 
 class TestRPCRequestParam(parent.TestConnectionParam):
@@ -104,11 +104,21 @@ for k in comm_types:
     if k in [_default_comm, 'ValueComm', 'value',
              'BufferComm', 'buffer']:  # pragma: debug
         continue
+    base_class = TestRPCRequestDriver
+    if k in ['RESTComm', 'rest']:
+        from yggdrasil.tests.test_services import running_service
+        
+        class BaseRESTClass(TestRPCRequestDriver):
+            @pytest.fixture(scope="class", autouse=True)
+            def running_service(self):
+                with running_service('flask') as cli:
+                    yield cli
+        base_class = BaseRESTClass
     tcls = type('Test%sRPCRequestDriver' % k,
-                (TestRPCRequestDriver, ), {'ocomm_name': k,
-                                           'icomm_name': k,
-                                           'driver': 'RPCRequestDriver',
-                                           'args': 'test'})
+                (base_class, ), {'ocomm_name': k,
+                                 'icomm_name': k,
+                                 'driver': 'RPCRequestDriver',
+                                 'args': 'test'})
     # Flags
     flag_func = None
     if k in ['RMQComm', 'RMQAsyncComm', 'rmq', 'rmq_async']:
@@ -126,6 +136,9 @@ for k in comm_types:
                      unittest.skipIf(not _mpi_installed,
                                      "MPI library not installed"),
                      pytest.mark.mpi(min_size=2)]
+    elif k in ['RESTComm', 'rest']:
+        flag_func = unittest.skipIf(not _rest_installed,
+                                    "REST library not installed")
     if flag_func is not None:
         if not isinstance(flag_func, list):
             flag_func = [flag_func]
@@ -133,4 +146,6 @@ for k in comm_types:
             tcls = x(tcls)
     # Add class to globals
     globals()[tcls.__name__] = tcls
-    del tcls
+    del tcls, base_class
+    if k in ['RESTComm', 'rest']:
+        del BaseRESTClass
