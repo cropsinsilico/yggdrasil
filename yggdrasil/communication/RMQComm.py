@@ -110,6 +110,8 @@ class RMQComm(CommBase.CommBase):
                            "``exchange`` is the name of the exchange on the queue "
                            "that should be used, and ``queue`` is the name of "
                            "the queue.")
+    _disconnect_attr = (CommBase.CommBase._disconnect_attr
+                        + ['_opening', '_closing'])
     
     def _init_before_open(self, **kwargs):
         r"""Set null connection and channel."""
@@ -119,7 +121,6 @@ class RMQComm(CommBase.CommBase):
         self.channel = None
         self._opening = multitasking.ProcessEvent()
         self._closing = multitasking.ProcessEvent()
-        self._closing.started.add_callback(self._opening.stop)
         self._server_class = RMQServer
         super(RMQComm, self)._init_before_open(**kwargs)
 
@@ -260,6 +261,9 @@ class RMQComm(CommBase.CommBase):
         self.close_connection()
         if not self.is_client:
             self.unregister_comm(self.address)
+        with self.rmq_lock:
+            self.channel = None
+            self.connection = None
         super(RMQComm, self)._close(linger=linger)
         self._closing.stop()
 
@@ -284,30 +288,16 @@ class RMQComm(CommBase.CommBase):
     def close_channel(self):
         r"""Close the channel if it exists."""
         with self.rmq_lock:
-            if self.channel:
-                try:
-                    self.channel.close()
-                except (pika.exceptions.ChannelClosed,
-                        pika.exceptions.ConnectionClosed,
-                        pika.exceptions.ChannelWrongStateError,
-                        pika.exceptions.ConnectionWrongStateError):  # pragma: debug
-                    pass
-            self.channel = None
+            if self.channel is not None:
+                self.debug('Closing the channel')
+                self.channel.close()
 
     def close_connection(self):
         r"""Close the connection."""
         with self.rmq_lock:
-            if self.connection and (not self.connection.is_closed):
-                try:
-                    self.connection.close()
-                except (pika.exceptions.ChannelClosed,
-                        pika.exceptions.ConnectionClosed,
-                        pika.exceptions.ChannelWrongStateError,
-                        pika.exceptions.ConnectionWrongStateError):  # pragma: debug
-                    pass
-                except AttributeError:  # pragma: debug
-                    pass
-            self.connection = None
+            if self.connection is not None:
+                self.debug('Closing connection')
+                self.connection.close()
 
     @property
     def is_open(self):
@@ -348,16 +338,16 @@ class RMQComm(CommBase.CommBase):
     @property
     def n_msg_recv(self):
         r"""int: Number of messages in the queue."""
-        return self.n_msg_send
-
-    @property
-    def n_msg_send(self):
-        r"""int: Number of messages in the queue."""
         out = 0
         res = self.get_queue_result()
         if res is not None:
             out = res.method.message_count
         return out
+
+    @property
+    def n_msg_send(self):
+        r"""int: Number of messages in the queue."""
+        return 0
 
     @property
     def is_confirmed_send(self):

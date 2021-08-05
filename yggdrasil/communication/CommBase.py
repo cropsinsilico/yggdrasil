@@ -709,7 +709,8 @@ class CommBase(tools.YggClass):
         else:
             self.open()
         self.logger._instance_name += (
-            '=>%s' % str(self.address).replace('%', '%%'))
+            '=>%s[%s]' % (str(self.address).replace('%', '%%'),
+                          self.direction.upper()))
 
     def __getstate__(self):
         if self.is_open and (self._commtype != 'buffer'):  # pragma: debug

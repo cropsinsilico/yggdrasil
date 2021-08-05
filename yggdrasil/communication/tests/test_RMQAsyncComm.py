@@ -24,10 +24,11 @@ class TestRMQAsyncComm(parent.TestRMQComm):
         r"""Test reconnect after unexpected disconnect."""
         self.recv_instance.connection.close(reply_code=100,
                                             reply_text="Test shutdown")
-        T = self.recv_instance.start_timeout(5.0)
-        while (not T.is_out) and (self.recv_instance.times_connected == 1):
-            self.instance.sleep()
-        self.instance.stop_timeout()
+        self.recv_instance._reconnecting.started.wait(5)
+        self.recv_instance._reconnecting.stopped.wait(5)
+        assert(self.recv_instance.times_connected > 1)
+        assert(self.recv_instance._reconnecting.has_stopped())
+        self.do_send_recv(print_status=True)
         
 
 @unittest.skipIf(_rmq_installed, "RMQ Server running")

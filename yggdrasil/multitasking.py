@@ -491,7 +491,7 @@ class ProcessEvent(object):
 
     def is_running(self):
         r"""bool: True if the processes has started, but hasn't stopped."""
-        return (self.has_started() and (not self.has_stopped))
+        return (self.has_started() and (not self.has_stopped()))
 
 
 class Event(ContextObject):
