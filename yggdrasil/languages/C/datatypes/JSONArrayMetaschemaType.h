@@ -71,6 +71,11 @@ public:
       items.push_back(iitem);
     }
     update_items(items, true);
+    for (i = 0; i < items.size(); i++) {
+      delete items[i];
+      items[i] = NULL;
+    }
+    items.clear();
   }
   /*!
     @brief Constructor for JSONArrayMetaschemaType from Python dictionary.
@@ -116,7 +121,7 @@ public:
     @brief Destructor for JSONArrayMetaschemaType.
     Free the type string malloc'd during constructor.
    */
-  ~JSONArrayMetaschemaType() {
+  virtual ~JSONArrayMetaschemaType() {
     free_items();
   }
   /*!
@@ -798,7 +803,7 @@ public:
 private:
   char item_key_[100];
   MetaschemaTypeVector items_;
-  char format_str_[1000];
+  char format_str_[1001];
 };
 
 #ifndef __cplusplus /* If this is a C compiler, end C++ linkage */

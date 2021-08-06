@@ -52,7 +52,7 @@ MetaschemaType* type_from_doc(const rapidjson::Value &type_doc,
       return new MetaschemaType(type_doc, use_generic);
       // Enhanced types
     case T_ARRAY: {
-      char format_str[1000] = "";
+      char format_str[1001] = "";
       if (header_doc != NULL) {
 	if (header_doc->HasMember("format_str")) {
 	  if (!((*header_doc)["format_str"].IsString()))
@@ -947,12 +947,12 @@ extern "C" {
 	  return_generic = true;
 	  use_generic = true;
 	  MetaschemaTypeVector new_items = MetaschemaTypeVector();
-	  char new_format_str[100] = "";
+	  char new_format_str[1000] = "";
 	  const MetaschemaType* item_type0 = x_obj->get_type()->get_item_type(index);
 	  if (item_type0->type_code() == T_ARRAY) {
 	    const JSONArrayMetaschemaType* item_type0_cast = static_cast<const JSONArrayMetaschemaType*>(item_type0);
 	    new_items = item_type0_cast->items();
-	    strcpy(new_format_str, item_type0_cast->format_str());
+	    strncpy(new_format_str, item_type0_cast->format_str(), 1000);
 	  }
 	  item_type = new JSONArrayMetaschemaType(new_items,
 						  new_format_str,
@@ -1426,12 +1426,12 @@ extern "C" {
 	  return_generic = true;
 	  use_generic = true;
 	  MetaschemaTypeVector new_items = MetaschemaTypeVector();
-	  char new_format_str[100] = "";
+	  char new_format_str[1000] = "";
 	  const MetaschemaType* item_type0 = x_obj->get_type()->get_property_type(key);
 	  if (item_type0->type_code() == T_ARRAY) {
 	    const JSONArrayMetaschemaType* item_type0_cast = static_cast<const JSONArrayMetaschemaType*>(item_type0);
 	    new_items = item_type0_cast->items();
-	    strcpy(new_format_str, item_type0_cast->format_str());
+	    strncpy(new_format_str, item_type0_cast->format_str(), 1000);
 	  }
 	  item_type = new JSONArrayMetaschemaType(new_items,
 						  new_format_str,

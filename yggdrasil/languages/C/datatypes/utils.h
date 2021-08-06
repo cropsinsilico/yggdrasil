@@ -170,13 +170,14 @@ struct strcomp : public std::binary_function<const char*, const char*, bool>
 };
 
 /*! @brief Global type map to be filled. */
-static std::map<const char*, int, strcomp> global_type_map;
+// static std::map<const char*, int, strcomp> global_type_map;
 
 /*!
   @brief Return the global type map, populating it as necessary.
   @returns std::map<const char*, int, strcomp> mapping  from type name to code.
 */
 std::map<const char*, int, strcomp> get_type_map() {
+  std::map<const char*, int, strcomp> global_type_map;
   if (global_type_map.empty()) {
     // Standard types
     global_type_map["boolean"] = T_BOOLEAN;

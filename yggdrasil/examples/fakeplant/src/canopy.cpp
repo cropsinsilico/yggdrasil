@@ -42,7 +42,8 @@ int main(int argc, char *argv[]) {
   }
 
   // Receive layout and initial structure
-  int ret = 0, npatch = 0;
+  int ret = 0;
+  int64_t npatch = 0;
   ret = in_layout.recv(3, layout, layout + 1, layout + 2);
   if (ret < 0) {
     printf("canopy: Error receiving layout.\n");
@@ -134,6 +135,7 @@ int main(int argc, char *argv[]) {
     if (x3[i] != NULL) free(x3[i]);
   }
   free(layout);
+  free(growth_rate);
   free(x1);
   free(x2);
   free(x3);

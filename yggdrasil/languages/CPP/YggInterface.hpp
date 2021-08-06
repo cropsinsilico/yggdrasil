@@ -79,10 +79,16 @@ public:
     @brief Alias to allow freeing of underlying C struct at the class level.
   */
   void _destroy_pi() {
-    if (!(_pi->flags & COMM_FLAG_GLOBAL)) {
-      ygg_free(_pi);
+    if (_pi != NULL) {
+      ygglog_debug("_destroy_pi(%s): starting", _pi->name);
+      if (!(_pi->flags & COMM_FLAG_GLOBAL)) {
+	ygg_free(_pi);
+      }
+      ygglog_debug("_destroy_pi: done");
+      _pi = NULL;
+    } else {
+      ygglog_debug("_destroy_pi: comm already destroyed");
     }
-    _pi = NULL;
   }
   
   /*!
@@ -253,10 +259,16 @@ public:
     @brief Alias to allow freeing of underlying C struct at the class level.
   */
   void _destroy_pi() {
-    if (!(_pi->flags & COMM_FLAG_GLOBAL)) {
-      ygg_free(_pi);
+    if (_pi != NULL) {
+      ygglog_debug("_destroy_pi(%s): starting", _pi->name);
+      if (!(_pi->flags & COMM_FLAG_GLOBAL)) {
+	ygg_free(_pi);
+      }
+      ygglog_debug("_destroy_pi: done");
+      _pi = NULL;
+    } else {
+      ygglog_debug("_destroy_pi: comm already destroyed");
     }
-    _pi = NULL;
   }
   
   /*!

@@ -93,6 +93,13 @@ typedef struct comm_head_t {
 
 
 /*!
+  @brief C wrapper for the C++ delete_dtype_class function.
+  @param x void* Pointer to MetaschemaType subclass that should be deleted.
+ */
+void delete_dtype_class_c(void* x);
+
+
+/*!
   @brief C wrapper for the C++ type_from_doc function.
   @param type_doc void* Pointer to const rapidjson::Value type doc.
   @param[in] use_generic bool If true, serialized/deserialized

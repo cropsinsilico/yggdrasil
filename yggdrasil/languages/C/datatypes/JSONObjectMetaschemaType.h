@@ -112,7 +112,7 @@ public:
     @brief Destructor for JSONObjectMetaschemaType.
     Free the type string malloc'd during constructor.
    */
-  ~JSONObjectMetaschemaType() {
+  virtual ~JSONObjectMetaschemaType() {
     free_properties();
   }
   /*!

@@ -55,7 +55,7 @@ int main(int argc,char *argv[]){
   size_t name_siz = BSIZE;
   size_t * const p_name_siz = &name_siz; // Required in C++ to get name size
   char name[BSIZE];
-  int number;
+  int64_t number;
   double value;
   std::complex<double> comp;
   ret = 0;
@@ -68,7 +68,7 @@ int main(int argc,char *argv[]){
     if (ret >= 0) {
       // If the receive was succesful, send the values to output. Formatting
       // is taken care of on the output driver side.
-      printf("Table: %.5s, %d, %3.1f, %3.1lf%+3.1lfj\n", name, number, value,
+      printf("Table: %.5s, %ld, %3.1f, %3.1lf%+3.1lfj\n", name, number, value,
   	     std::real(comp), std::imag(comp));
       ret = TableOutput.send(5, name, name_siz, number, value, comp);
       if (ret < 0) {

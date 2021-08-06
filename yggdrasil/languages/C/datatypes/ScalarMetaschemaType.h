@@ -1684,6 +1684,7 @@ public:
     @param[in] other NDArrayMetaschemaType* Instance to copy.
    */
   NDArrayMetaschemaType(const NDArrayMetaschemaType &other);
+  virtual ~NDArrayMetaschemaType();
   /*!
     @brief Equivalence operator.
     @param[in] Ref MetaschemaType instance to compare against.
@@ -1870,6 +1871,7 @@ class OneDArrayMetaschemaType : public ScalarMetaschemaType {
     OneDArrayMetaschemaType(other.subtype(), other.precision(),
 			    other.length(), other.units(),
 			    other.use_generic()) {}
+  virtual ~OneDArrayMetaschemaType() {}
   /*!
     @brief Equivalence operator.
     @param[in] Ref MetaschemaType instance to compare against.
@@ -2118,6 +2120,7 @@ private:
   bool _variable_length;
 };
 
+NDArrayMetaschemaType::~NDArrayMetaschemaType() {};
 
 NDArrayMetaschemaType::NDArrayMetaschemaType(const char *subtype, const size_t precision,
 					     const std::vector<size_t> shape,
