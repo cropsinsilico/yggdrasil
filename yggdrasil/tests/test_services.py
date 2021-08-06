@@ -102,7 +102,6 @@ class TestServices(object):
     @pytest.fixture(params=itertools.product(['flask', 'rmq'], [None, 'rmq']),
                     ids=_make_ids, scope="class", autouse=True)
     def running_service(self, request):
-        print("starting service")
         with running_service(request.param[0], request.param[1]) as cli:
             self.cli = cli
             yield cli

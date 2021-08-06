@@ -1668,7 +1668,10 @@ class run_tsts(SubCommand):
                     cls.write_script(args, argv, cfg_env)
                 else:
                     for x in range(args.count):
-                        x_error_code = subprocess.call(argv)
+                        try:
+                            x_error_code = subprocess.call(argv)
+                        except KeyboardInterrupt:
+                            x_error_code = 0
                         if x_error_code != 0:
                             error_code = x_error_code
                             if args.stop:
