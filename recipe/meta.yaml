@@ -55,6 +55,7 @@ requirements:
     - cmake  # [not win]
     - czmq
     - flaky
+    - flask
     - git
     - GitPython
     - jsonschema
@@ -75,6 +76,7 @@ requirements:
     - r-reticulate
     - r-units
     - r-zeallot
+    - requests
     - scipy
     - six
     - sysv_ipc  # [unix]
