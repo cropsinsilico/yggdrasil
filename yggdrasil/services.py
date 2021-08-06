@@ -543,7 +543,7 @@ def create_service_manager_class(service_type=_default_service_type):
             except ClientError:
                 return
             if platform._is_win:  # pragma: windows
-                sig = signal.CTRL_C_EVENT
+                sig = signal.SIGINT
             else:
                 sig = signal.SIGKILL
             os.kill(response['pid'], sig)
