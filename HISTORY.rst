@@ -2,7 +2,7 @@
 History
 =======
 
-1.6.4 (2021-06-XX) More minor bug fixes & Automated iteration
+1.6.4 (2021-08-10) More minor bug fixes & Automated iteration
 ------------------
 
 * Fixed bug in configuraiton CLI triggered by running as a subcommand
