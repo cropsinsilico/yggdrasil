@@ -17,6 +17,7 @@ from yggdrasil.drivers import create_driver
 from yggdrasil.components import import_component
 from yggdrasil.multitasking import MPI
 from yggdrasil.drivers.DuplicatedModelDriver import DuplicatedModelDriver
+from yggdrasil.drivers.ModelDriver import ModelDriver
 
 
 COLOR_TRACE = '\033[30;43;22m'
@@ -436,16 +437,8 @@ class YggRunner(YggClass):
             os.chdir(curpath)
         return instance
 
-    def create_connection_driver(self, yml):
-        r"""Create a connection driver instance from the yaml information.
-
-        Args:
-            yml (yaml): Yaml object containing driver information.
-
-        Returns:
-            object: An instance of the specified driver.
-
-        """
+    def bridge_mpi_connections(self, yml):
+        r"""Bridge connections over MPI processes."""
         # Add MPI ranks
         if self.mpi_comm and (self.rank == 0):
             for io in ['inputs', 'outputs']:
@@ -460,7 +453,21 @@ class YggRunner(YggClass):
                             ranks.append(self.modeldrivers[cpy]['mpi_rank'])
                     else:
                         ranks.append(self.modeldrivers[model]['mpi_rank'])
-                    x['partner_mpi_ranks'] = set(ranks)
+                    x['partner_mpi_ranks'] = list(set(ranks))
+                    # if any(rank > 0 for rank in ranks):
+                    #     x['commtype'] = 'mpi'
+                    #     self._mpi_comms.append(x)
+
+    def create_connection_driver(self, yml):
+        r"""Create a connection driver instance from the yaml information.
+
+        Args:
+            yml (yaml): Yaml object containing driver information.
+
+        Returns:
+            object: An instance of the specified driver.
+
+        """
         yml['task_method'] = self.connection_task_method
         drv = self.create_driver(yml)
         # Transfer connection addresses to model via env
@@ -478,6 +485,21 @@ class YggRunner(YggClass):
             for x in models:
                 x.setdefault(env_key, {})
                 x[env_key].update(env)
+        dir_map = {'input': 'output', 'output': 'input'}
+        if self.mpi_comm and (self.rank == 0):
+            for io, io_opp in dir_map.items():
+                for model, drvs in getattr(drv, 'mpi_%ss' % io).items():
+                    if model in self.modelcopies:
+                        models = [self.modeldrivers[cpy] for cpy
+                                  in self.modelcopies[model]]
+                    elif model in self.modeldrivers:
+                        models = [self.modeldrivers[model]]
+                    else:
+                        models = [self.modeldrivers[model.split('_copy')[0]]]
+                        assert(models[0].get('copies', 0) > 1)
+                    for x in models:
+                        x.setdefault('mpi_%s_drivers' % io_opp, [])
+                        x['mpi_%s_drivers' % io_opp] += drvs
         return drv
         
     def loadDrivers(self):
@@ -512,6 +534,16 @@ class YggRunner(YggClass):
                 for i, v in enumerate(self.modeldrivers.values()):
                     v['mpi_rank'] = (i + 1) % size
                     v['model_index'] = i
+                # Split the connections bridging MPI processes
+                self.debug("Splitting connection drivers over MPI")
+                self._mpi_comms = []
+                for driver in self.connectiondrivers.values():
+                    self.bridge_mpi_connections(driver)
+                tag_start = len(ModelDriver._mpi_tags) * len(self.modeldrivers)
+                tag_stride = len(self._mpi_comms)
+                for i, x in enumerate(self._mpi_comms):
+                    x['tag_start'] = tag_start + i
+                    x['tag_stride'] = tag_stride
             # Create connection drivers
             self.debug("Loading connection drivers")
             for driver in self.connectiondrivers.values():
@@ -541,8 +573,14 @@ class YggRunner(YggClass):
                 self.modeldrivers = dict(
                     [x for x in self.mpi_comm.scatter(models, root=0)
                      if (x is not None)])
+                self.modelcopies = self.mpi_comm.bcast(self.modelcopies,
+                                                       root=0)
                 self.info("Models on MPI process %d: %s", self.rank,
                           list(self.modeldrivers.keys()))
+                if self.rank != 0:
+                    for k, v in self.modelcopies.items():
+                        self.modelcopies[k] = [iv for iv in v
+                                               if iv in self.modeldrivers]
                 # Add dummy drivers on root process to monitor remote ones
                 # and re-group copies into duplicate model w/ duplicate models
                 # before non-duplicate to allow them to start before starting
@@ -565,6 +603,16 @@ class YggRunner(YggClass):
                                 x[k2] = base[k2]
                         self.modeldrivers[k] = base
                     self.modeldrivers.update(temp)
+                else:
+                    for v in self.modeldrivers.values():
+                        v['input_drivers'] = v.get('mpi_input_drivers', [])
+                        v['output_drivers'] = v.get('mpi_output_drivers', [])
+                        for x in v['input_drivers'] + v['output_drivers']:
+                            self.connectiondrivers[x['name']] = x
+                    self.debug("Loading MPI connection drivers")
+                    for driver in self.connectiondrivers.values():
+                        driver['task_method'] = self.connection_task_method
+                        self.create_connection_driver(driver)
             # Create model drivers
             self.debug("Loading model drivers")
             for driver in self.modeldrivers.values():
@@ -606,7 +654,8 @@ class YggRunner(YggClass):
 
     def startDrivers(self):
         r"""Start drivers, starting with the IO drivers."""
-        assert(not self.modelcopies)
+        if not self.mpi_comm or (self.rank == 0):
+            assert(not self.modelcopies)
         self.info('Starting I/O drivers and models on system '
                   + '{} in namespace {} with rank {}'.format(
                       self.host, self.namespace, self.rank))
@@ -633,8 +682,8 @@ class YggRunner(YggClass):
                     self.start_server(n2)
                 if not d.was_started:
                     d.start()
-        except BaseException:  # pragma: debug
-            self.error("%s did not start", driver['name'])
+        except BaseException as e:  # pragma: debug
+            self.error("%s did not start: %s(%s)", driver['name'], type(e), e)
             self.terminate()
             raise
         self.debug('ALL DRIVERS STARTED')

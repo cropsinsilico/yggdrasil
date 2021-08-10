@@ -125,7 +125,8 @@ class MPIComm(CommBase.CommBase):
     def __init__(self, *args, tag_start=0, tag_stride=1, **kwargs):
         assert(_on_mpi)
         if kwargs.get('partner_mpi_ranks', []):
-            assert(kwargs.get('address', 'generate') == 'generate')
+            assert(kwargs.get('address', 'generate') in ['generate',
+                                                         'address'])
             kwargs['address'] = kwargs['partner_mpi_ranks']
         self._request_lock = RLock(task_method='thread')
         self.requests = []
@@ -204,31 +205,31 @@ class MPIComm(CommBase.CommBase):
         environment variables that need to be provided to the model."""
         return {}
     
-    # @property
-    # def mpi_model_kws(self):
-    #     r"""dict: Mapping between model name and opposite comm keyword
-    #     arguments that need to be provided to the model for the MPI
-    #     connection."""
-    #     out = {}
-    #     if self.partner_model is not None:
-    #         out[self.partner_model] = [
-    #             {'name': '%s_mpi_%s' % (self.name, self.direction),
-    #              'driver': 'ConnectionDriver'}]
-    #         opp = self.opp_comm_kwargs()
-    #         opp['env'] = self.opp_comms
-    #         if opp['direction'] == 'recv':
-    #             out[self.partner_model][0]['inputs'] = [opp]
-    #             out[self.partner_model][0]['outputs'] = [
-    #                 {'name': self.name,
-    #                  'partner_model': self.partner_model,
-    #                  'partner_language': self.partner_language}]
-    #         else:
-    #             out[self.partner_model][0]['outputs'] = [opp]
-    #             out[self.partner_model][0]['inputs'] = [
-    #                 {'name': self.name,
-    #                  'partner_model': self.partner_model,
-    #                  'partner_language': self.partner_language}]
-    #     return out
+    @property
+    def mpi_model_kws(self):
+        r"""dict: Mapping between model name and opposite comm keyword
+        arguments that need to be provided to the model for the MPI
+        connection."""
+        out = {}
+        if self.partner_model is not None:
+            out[self.partner_model] = [
+                {'name': '%s_mpi_%s' % (self.name, self.direction),
+                 'driver': 'ConnectionDriver'}]
+            opp = self.opp_comm_kwargs()
+            opp['env'] = self.opp_comms
+            if opp['direction'] == 'recv':
+                out[self.partner_model][0]['inputs'] = [opp]
+                out[self.partner_model][0]['outputs'] = [
+                    {'name': self.name,
+                     'partner_model': self.partner_model,
+                     'partner_language': self.partner_language}]
+            else:
+                out[self.partner_model][0]['outputs'] = [opp]
+                out[self.partner_model][0]['inputs'] = [
+                    {'name': self.name,
+                     'partner_model': self.partner_model,
+                     'partner_language': self.partner_language}]
+        return out
         
     @property
     def opp_address(self):

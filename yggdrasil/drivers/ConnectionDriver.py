@@ -305,11 +305,12 @@ class ConnectionDriver(Driver):
                     comm_list[i].pop(k, None)
         comm_kws['commtype'] = copy.deepcopy(comm_list)
         for x in comm_kws['commtype']:
-            if ((x.get('datatype', {}).get('from_function', False)
-                 and (x.get('datatype', {}).get('type', None)
-                      in ['any', 'instance']))):
-                x['datatype'] = {'type': 'bytes'}
-            x.get('datatype', {}).pop('from_function', False)
+            if isinstance(x.get('datatype', {}), dict):
+                if ((x.get('datatype', {}).get('from_function', False)
+                     and (x.get('datatype', {}).get('type', None)
+                          in ['any', 'instance']))):
+                    x['datatype'] = {'type': 'bytes'}
+                x.get('datatype', {}).pop('from_function', False)
         self.debug('%s comm_kws:\n%s', attr_comm, self.pprint(comm_kws, 1))
         setattr(self, attr_comm, new_comm(**comm_kws))
         setattr(self, '%s_kws' % attr_comm, comm_kws)
@@ -333,19 +334,19 @@ class ConnectionDriver(Driver):
         if self.as_process:
             self.task_thread.connection = self
 
-    # @property
-    # def mpi_inputs(self):
-    #     r"""dict: Mapping between model name and opposite comm
-    #     environment variables that need to be provided to the model
-    #     for input comms connected via MPI."""
-    #     return self.icomm.mpi_model_kws
+    @property
+    def mpi_inputs(self):
+        r"""dict: Mapping between model name and opposite comm
+        environment variables that need to be provided to the model
+        for input comms connected via MPI."""
+        return self.icomm.mpi_model_kws
 
-    # @property
-    # def mpi_outputs(self):
-    #     r"""dict: Mapping between model name and opposite comm
-    #     environment variables that need to be provided to the model
-    #     for output comms connected via MPI."""
-    #     return self.ocomm.mpi_model_kws
+    @property
+    def mpi_outputs(self):
+        r"""dict: Mapping between model name and opposite comm
+        environment variables that need to be provided to the model
+        for output comms connected via MPI."""
+        return self.ocomm.mpi_model_kws
 
     @property
     def model_env(self):
