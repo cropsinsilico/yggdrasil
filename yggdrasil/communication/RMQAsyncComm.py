@@ -358,8 +358,7 @@ class RMQAsyncComm(RMQComm.RMQComm):
         r"""Set up the message queue."""
         if self.original_queue is None:
             self.original_queue = queue_name
-        passive = ((self.direction == 'recv')
-                   or self.original_queue.startswith('amq.'))
+        passive = self.original_queue.startswith('amq.')
         self.debug('Declaring queue %s (passive=%s)', queue_name, passive)
         cb = functools.partial(self.on_queue_declareok, userdata=queue_name)
         self.channel.queue_declare(queue=queue_name, callback=cb,

@@ -1,4 +1,3 @@
-import pytest
 import unittest
 from yggdrasil import tools, platform
 from yggdrasil.tests import MagicTestError, assert_raises, timeout
@@ -557,10 +556,10 @@ for k in comm_types:
     elif k in ['IPCComm', 'ipc']:
         flag_func = unittest.skipIf(not _ipc_installed,
                                     "IPC library not installed")
-    elif k in ['MPIComm', 'mpi']:
-        flag_func = [unittest.skipIf(not _mpi_installed,
-                                     "MPI library not installed"),
-                     pytest.mark.mpi(min_size=2)]
+    # elif k in ['MPIComm', 'mpi']:
+    #     flag_func = [unittest.skipIf(not _mpi_installed,
+    #                                  "MPI library not installed"),
+    #                  pytest.mark.mpi(min_size=2)]
     if flag_func is not None:
         if not isinstance(flag_func, list):
             flag_func = [flag_func]
