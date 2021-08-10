@@ -1,9 +1,11 @@
+import pytest
 import unittest
 from yggdrasil.schema import get_schema
 from yggdrasil.tests import assert_raises, assert_equal
 import yggdrasil.drivers.tests.test_ConnectionDriver as parent
 from yggdrasil.drivers.tests.test_ConnectionDriver import (
-    _default_comm, _zmq_installed, _ipc_installed, _rmq_installed)
+    _default_comm, _zmq_installed, _ipc_installed, _rmq_installed,
+    _mpi_installed)
 
 
 class TestRPCRequestParam(parent.TestConnectionParam):
@@ -118,10 +120,12 @@ for k in comm_types:
     elif k in ['IPCComm', 'ipc']:
         flag_func = unittest.skipIf(not _ipc_installed,
                                     "IPC library not installed")
-    # elif k in ['MPIComm', 'mpi']:
-    #     flag_func = [unittest.skipIf(not _mpi_installed,
-    #                                  "MPI library not installed"),
-    #                  pytest.mark.mpi(min_size=2)]
+    elif k in ['MPIComm', 'mpi']:
+        flag_func = [unittest.skipIf(True,
+                                     "No MPI RPCRequestDriver test"),
+                     unittest.skipIf(not _mpi_installed,
+                                     "MPI library not installed"),
+                     pytest.mark.mpi(min_size=2)]
     if flag_func is not None:
         if not isinstance(flag_func, list):
             flag_func = [flag_func]
