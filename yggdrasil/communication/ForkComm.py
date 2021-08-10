@@ -148,7 +148,7 @@ class ForkComm(CommBase.CommBase):
         super(ForkComm, self).__init__(name, is_async=is_async, **kwargs)
         assert(not self.single_use)
         assert(not self.is_server)
-        assert(not self.is_client)
+        assert(not (self.is_client and (self.pattern != 'cycle')))
 
     def disconnect(self):
         r"""Disconnect attributes that are aliases."""

@@ -34,7 +34,8 @@ class RPCRequestDriver(ConnectionDriver):
         self.response_kwargs = response_kwargs
         # Parent and attributes
         super(RPCRequestDriver, self).__init__(model_request_name, **kwargs)
-        self.response_kwargs.setdefault('commtype', self.ocomm._commtype)
+        for k, v in self.ocomm.get_response_comm_kwargs.items():
+            self.response_kwargs.setdefault(k, v)
         self.response_drivers = {}
         self._block_response = False
 

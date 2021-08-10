@@ -122,16 +122,19 @@ class MPIComm(CommBase.CommBase):
     _schema_subtype_description = 'MPI communicator.'
     address_description = "The partner communicator ID(s)."
 
-    def __init__(self, *args, tag_start=0, tag_stride=1, **kwargs):
+    def __init__(self, *args, ranks=[], tag_start=0, tag_stride=1, **kwargs):
         assert(_on_mpi)
         if kwargs.get('partner_mpi_ranks', []):
             assert(kwargs.get('address', 'generate') in ['generate',
                                                          'address'])
-            kwargs['address'] = kwargs['partner_mpi_ranks']
+            ranks = kwargs['partner_mpi_ranks']
+        if ranks and (kwargs.get('address', None) is None):
+            kwargs['address'] = 'generate'
         self._request_lock = RLock(task_method='thread')
         self.requests = []
         self.unused_tags = {}
         self.tags = {}
+        self.ranks = ranks
         self.tag_start = tag_start
         self.tag_stride = tag_stride
         self.requires_disconnect = False
@@ -141,24 +144,57 @@ class MPIComm(CommBase.CommBase):
         kwargs['no_suffix'] = True
         super(MPIComm, self).__init__(*args, **kwargs)
 
+    @classmethod
+    def format_address(cls, ranks, tag_start, tag_stride):
+        r"""Format an MPI address.
+
+        Args:
+            ranks (tuple): Ranks of the partner MPI processes.
+            tag_start (int): Tag that the comm starts at.
+            tag_stride (int): Tag that the comm advances by.
+
+        Returns:
+            str: Formatted address.
+
+        """
+        rank_str = '-'.join([str(x) for x in ranks])
+        return f'{rank_str}_MPI_{tag_start}_MPI_{tag_stride}'
+
+    @classmethod
+    def parse_address(cls, address):
+        r"""Parse an MPI address for information about the partner process
+        ranks and how the tags should be iterated.
+
+        Args:
+            address (str): Address to parse.
+
+        Returns:
+            tuple: The ranks, starting tag, and tag stride contained in the
+                address.
+
+        """
+        rank_str, tag_start, tag_stride = address.split('_MPI_')
+        ranks = tuple([int(x) for x in rank_str.split('-')])
+        return ranks, int(tag_start), int(tag_stride)
+
     @property
     def tag(self):
         r"""int: Tag for the next message."""
-        return self.get_tag(max(self.address, key=self.get_tag))
+        return self.get_tag(max(self.ranks, key=self.get_tag))
 
-    def get_tag(self, address):
-        r"""Get the next tag for an address.
+    def get_tag(self, rank):
+        r"""Get the next tag for a rank.
 
         Args:
-            address (int): Address to get tag for.
+            rank (int): Rank to get tag for.
 
         Returns:
-            int: Tag that should be used next for the address.
+            int: Tag that should be used next for the rank.
 
         """
-        if self.unused_tags.get(address, []):
-            return self.unused_tags[address][0]
-        return self.tags[address]
+        if self.unused_tags.get(rank, []):
+            return self.unused_tags[rank][0]
+        return self.tags[rank]
 
     def advance_tag(self, request):
         r"""Advance to the next tag.
@@ -193,10 +229,16 @@ class MPIComm(CommBase.CommBase):
 
     def bind(self):
         r"""Bind to random queue if address is generate."""
-        if isinstance(self.address, str):
-            self.address = tuple([int(x) for x in self.address.split(',')])
+        assert(isinstance(self.address, str))
+        if self.address in ['generate', 'address']:
+            assert(self.ranks)
+            self.address = self.format_address(self.ranks, self.tag_start,
+                                               self.tag_stride)
+        else:
+            self.ranks, self.tag_start, self.tag_stride = self.parse_address(
+                self.address)
         if not self.tags:
-            self.tags = {x: self.tag_start for x in self.address}
+            self.tags = {x: self.tag_start for x in self.ranks}
         super(MPIComm, self).bind()
 
     @property
@@ -206,56 +248,32 @@ class MPIComm(CommBase.CommBase):
         return {}
     
     @property
-    def mpi_model_kws(self):
-        r"""dict: Mapping between model name and opposite comm keyword
-        arguments that need to be provided to the model for the MPI
-        connection."""
-        out = {}
-        if self.partner_model is not None:
-            out[self.partner_model] = [
-                {'name': '%s_mpi_%s' % (self.name, self.direction),
-                 'driver': 'ConnectionDriver'}]
-            opp = self.opp_comm_kwargs()
-            opp['env'] = self.opp_comms
-            if opp['direction'] == 'recv':
-                out[self.partner_model][0]['inputs'] = [opp]
-                out[self.partner_model][0]['outputs'] = [
-                    {'name': self.name,
-                     'partner_model': self.partner_model,
-                     'partner_language': self.partner_language}]
-            else:
-                out[self.partner_model][0]['outputs'] = [opp]
-                out[self.partner_model][0]['inputs'] = [
-                    {'name': self.name,
-                     'partner_model': self.partner_model,
-                     'partner_language': self.partner_language}]
-        return out
-        
-    @property
     def opp_address(self):
         r"""str: Address for opposite comm."""
-        return str(self.mpi_comm.Get_rank())
+        return self.format_address([self.mpi_comm.Get_rank()],
+                                   self.tag_start, self.tag_stride)
         
-    def opp_comm_kwargs(self):
-        r"""Get keyword arguments to initialize communication with opposite
-        comm object.
-
-        Returns:
-            dict: Keyword arguments for opposite comm object.
-
-        """
-        out = super(MPIComm, self).opp_comm_kwargs()
-        out['tag_start'] = self.tag_start
-        out['tag_stride'] = self.tag_stride
+    @property
+    def get_response_comm_kwargs(self):
+        r"""dict: Keyword arguments to use for a response comm."""
+        out = super(MPIComm, self).get_response_comm_kwargs
+        out['address'] = self.address
         return out
-        
+
+    @property
+    def create_work_comm_kwargs(self):
+        r"""dict: Keyword arguments for a new work comm."""
+        out = super(MPIComm, self).create_work_comm_kwargs
+        out['address'] = self.address
+        return out
+    
     def open(self):
         r"""Open the queue."""
         # TODO: Handle group?
         super(MPIComm, self).open()
         if not self.is_open:
             self._is_open = True
-            assert(self.mpi_comm.Get_rank() not in self.address)
+            assert(self.mpi_comm.Get_rank() not in self.ranks)
             
     def _close(self, linger=False):
         r"""Close the queue."""
@@ -318,8 +336,8 @@ class MPIComm(CommBase.CommBase):
         with self._request_lock:
             if on_empty and self.requests:
                 return
-            address = self.address
-            if len(self.address) == 1:
+            address = self.ranks
+            if len(self.ranks) == 1:
                 cls = MPIRequest
                 address = address[0]
                 tag = self.get_tag(address)
@@ -349,7 +367,7 @@ class MPIComm(CommBase.CommBase):
         
         """
         if (msg.flag == CommBase.FLAG_EOF) and (msg.args != 'DONT_RECURSE'):
-            for _ in range(len(self.address) - 1):
+            for _ in range(len(self.ranks) - 1):
                 msg.add_message(msg=msg.msg, length=msg.length, flag=msg.flag,
                                 args='DONT_RECURSE', header=msg.header)
         return super(MPIComm, self).send_message(msg, **kwargs)

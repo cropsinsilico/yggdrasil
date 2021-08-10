@@ -646,7 +646,7 @@ class CommBase(tools.YggClass):
         if self.partner_language:
             self.partner_language_driver = import_component(
                 'model', self.partner_language)
-        self.partner_mpi_ranks = partner_mpi_ranks
+        self.partner_mpi_ranks = copy.copy(partner_mpi_ranks)
         self.language_driver = import_component('model', self.language)
         self.touches_model = (self.partner_model is not None)
         self.is_client = is_client
@@ -1085,13 +1085,6 @@ class CommBase(tools.YggClass):
         if self.partner_model is not None:
             out[self.partner_model] = self.opp_comms
         return out
-
-    @property
-    def mpi_model_kws(self):
-        r"""dict: Mapping between model name and opposite comm keyword
-        arguments that need to be provided to the model for the MPI
-        connection."""
-        return {}
 
     @property
     def opp_name(self):
@@ -1634,6 +1627,11 @@ class CommBase(tools.YggClass):
                 self._server = None
 
     # TEMP COMMS
+    @property
+    def get_response_comm_kwargs(self):
+        r"""dict: Keyword arguments to use for a response comm."""
+        return dict(commtype=self._commtype)
+    
     @property
     def get_work_comm_kwargs(self):
         r"""dict: Keyword arguments for an existing work comm."""

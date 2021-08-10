@@ -27,7 +27,10 @@ class DuplicatedModelDriver(Driver):
         self.copies = []
         if duplicates is not None:
             for x in duplicates:
-                assert(isinstance(x, dict))
+                ienv = copy.deepcopy(yml.get('env', {}))
+                ienv.update(yml.pop('env_%s' % x['name'], {}))
+                ienv.update(x.pop('env', {}))
+                x['env'] = ienv
                 ikws = copy.deepcopy(kwargs)
                 ikws.update(x)
                 self.copies.append(create_driver(yml=x, **ikws))
@@ -37,6 +40,19 @@ class DuplicatedModelDriver(Driver):
                 ikws.update(iyml)
                 self.copies.append(create_driver(yml=iyml, **ikws))
         super(DuplicatedModelDriver, self).__init__(**kwargs)
+
+    @classmethod
+    def get_base_name(cls, name):
+        r"""Get the name of the base model.
+
+        Args:
+            name (str): Model name.
+
+        Returns:
+            str: Base model name.
+
+        """
+        return name.split('_copy')[0]
 
     @classmethod
     def get_yaml_copies(cls, yml):

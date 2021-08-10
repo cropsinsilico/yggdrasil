@@ -1,3 +1,4 @@
+import copy
 import shutil
 from yggdrasil.drivers.ModelDriver import ModelDriver
 from yggdrasil.drivers.CMakeModelDriver import get_buildfile_lock
@@ -103,7 +104,9 @@ class MPIPartnerModel(ModelDriver):
         
     def init_mpi(self):
         r"""Initialize MPI communicator."""
-        self.send_mpi('START', tag=self._mpi_tags['START'])
+        env = copy.deepcopy(self.env)
+        env.update(self.get_io_env())
+        self.send_mpi(env, tag=self._mpi_tags['START'])
         self._mpi_requests['stopped'] = {
             'request': self.recv_mpi(tag=self._mpi_tags['STOP_RANK0'],
                                      dont_block=True)}

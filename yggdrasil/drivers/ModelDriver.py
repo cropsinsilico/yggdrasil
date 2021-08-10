@@ -1345,6 +1345,8 @@ class ModelDriver(Driver):
             **kwargs: Keyword arguments are pased to run_model.
 
         """
+        if multitasking._on_mpi:
+            self.init_mpi()
         self.model_process = self.run_model(**kwargs)
         # Start thread to queue output
         if not no_queue_thread:
@@ -1352,8 +1354,6 @@ class ModelDriver(Driver):
                 target=self.enqueue_output_loop,
                 name=self.name + '.EnqueueLoop')
             self.queue_thread.start()
-        if multitasking._on_mpi:
-            self.init_mpi()
 
     def queue_close(self):
         r"""Close the queue for messages from the model process."""
@@ -1398,7 +1398,7 @@ class ModelDriver(Driver):
         if self._mpi_rank == 0:
             self._mpi_comm = None
         else:
-            self.recv_mpi(tag=self._mpi_tags['START'])
+            self.env = self.recv_mpi(tag=self._mpi_tags['START'])
             self._mpi_requests['stopped'] = {
                 'request': self.recv_mpi(tag=self._mpi_tags['STOP_RANKX'],
                                          dont_block=True)}

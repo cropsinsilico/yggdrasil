@@ -116,7 +116,7 @@ class TestMPIComm(test_CommBase.TestCommBase):
         super(test_CommBase.TestCommBase, self).setup(*args, **kwargs)
         if self.mpi_rank == 0:
             recv_kws = self.instance.opp_comm_kwargs()
-            for i in self.instance.address:
+            for i in self.instance.ranks:
                 self.mpi_comm.send(recv_kws, dest=i, tag=init_tag)
         if sleep_after_connect:  # pragma: testing
             self.instance.sleep()
@@ -149,7 +149,7 @@ class TestMPIComm(test_CommBase.TestCommBase):
         all_tag = self.sync(get_tags=True)
         if self.instance.direction == 'send':
             for _ in range(max(all_tag) - all_tag[self.mpi_rank]):
-                self.instance.tags[self.instance.address[0]] += 1
+                self.instance.tags[self.instance.ranks[0]] += 1
                 # self.instance.send_eof()
             if self.use_async:
                 self.instance.wait_for_confirm(timeout=60.0)
@@ -265,7 +265,7 @@ class TestMPIComm(test_CommBase.TestCommBase):
         if is_eof_send:
             send_args = tuple()
         else:
-            n_send *= len(self.send_instance.address)
+            n_send *= len(self.send_instance.ranks)
             send_args = (msg_send,)
         self.assert_equal(getattr(self.send_instance, n_msg_send_meth), n_send_init)
         self.sync()
@@ -395,7 +395,7 @@ class TestMPIComm(test_CommBase.TestCommBase):
             return msg
 
         if self.instance.direction == 'send':
-            for _ in range(len(self.send_instance.address)):
+            for _ in range(len(self.send_instance.ranks)):
                 assert(self.send_instance.send(self.test_msg))
         else:
             msg = self.recv_instance.recv(
@@ -415,7 +415,7 @@ class TestMPIComm(test_CommBase.TestCommBase):
             if self.send_instance.is_async:
                 self.assert_equal(self.send_instance.n_msg_direct, 0)
             self.sync()
-            for _ in range(len(self.send_instance.address)):
+            for _ in range(len(self.send_instance.ranks)):
                 flag = self.send_instance.send(self.test_msg)
             assert(flag)
             # self.send_instance.purge()
