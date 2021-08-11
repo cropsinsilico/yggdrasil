@@ -7,12 +7,14 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>&lt;no title&gt; &mdash; yggdrasil v1.6.3+18.g537444084.dirty documentation</title>
+  <title>&lt;no title&gt; &mdash; yggdrasil v1.6.4 documentation</title>
   
 
   
   <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
   <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
 
   
   
@@ -29,6 +31,7 @@
   
     
       <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
         <script src="../_static/jquery.js"></script>
         <script src="../_static/underscore.js"></script>
         <script src="../_static/doctools.js"></script>
@@ -61,7 +64,7 @@
             
             
               <div class="version">
-                v1.6.3
+                v1.6.4
               </div>
             
           
@@ -86,7 +89,7 @@
               
             
             
-              <p class="caption"><span class="caption-text">Contents:</span></p>
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../includeme.html">Overview</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../install.html">Installation</a></li>
@@ -209,7 +212,7 @@ they will always be serialized in the flow style. See <a class="reference extern
 <td><p>string</p></td>
 <td><p>Delimiter that should be used to separate name/value pairs in the map. Defaults
 to t.</p></td>
-<td><p>[‘pandas’, ‘map’, ‘table’, ‘wofost’]</p></td>
+<td><p>[‘map’, ‘table’, ‘wofost’, ‘pandas’]</p></td>
 </tr>
 <tr class="row-odd"><td><p>encoded_datatype</p></td>
 <td><p>schema</p></td>
@@ -228,20 +231,20 @@ in order to serialize non-bytes objects.</p></td>
 <td><p>array</p></td>
 <td><p>The names of fields in the format string. If not provided, names are set based
 on the order of the fields in the format string.</p></td>
-<td><p>[‘pandas’, ‘table’]</p></td>
+<td><p>[‘table’, ‘pandas’]</p></td>
 </tr>
 <tr class="row-even"><td><p>field_units</p></td>
 <td><p>array</p></td>
 <td><p>The units of fields in the format string. If not provided, all fields are
 assumed to be dimensionless.</p></td>
-<td><p>[‘pandas’, ‘table’]</p></td>
+<td><p>[‘table’, ‘pandas’]</p></td>
 </tr>
 <tr class="row-odd"><td><p>format_str</p></td>
 <td><p>string</p></td>
 <td><p>If provided, this string will be used to format messages from a list of
 arguments and parse messages to get a list of arguments in C printf/scanf style.
 Defaults to None and messages are assumed to already be bytes.</p></td>
-<td><p>[‘pandas’, ‘table’]</p></td>
+<td><p>[‘table’, ‘pandas’]</p></td>
 </tr>
 <tr class="row-even"><td><p>func_deserialize</p></td>
 <td><p>function</p></td>
@@ -261,7 +264,7 @@ serialization for encoded_datatype will be used.</p></td>
 <td><p>[‘string’, ‘int’]</p></td>
 <td><p>String or number of spaces that should be used to indent each level within the
 seiralized structure. Defaults to ‘t’.</p></td>
-<td><p>[‘yaml’, ‘json’]</p></td>
+<td><p>[‘json’, ‘yaml’]</p></td>
 </tr>
 <tr class="row-odd"><td><p>no_header</p></td>
 <td><p>boolean</p></td>
@@ -284,7 +287,7 @@ to True.</p></td>
 <td><p>boolean</p></td>
 <td><p>If True, the astropy package will be used to serialize/deserialize table.
 Defaults to False.</p></td>
-<td><p>[‘pandas’, ‘table’]</p></td>
+<td><p>[‘table’, ‘pandas’]</p></td>
 </tr>
 </tbody>
 </table>

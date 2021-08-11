@@ -7,12 +7,14 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>backwards &mdash; yggdrasil v1.6.3+18.g537444084.dirty documentation</title>
+  <title>backwards &mdash; yggdrasil v1.6.4 documentation</title>
   
 
   
   <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
   <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
 
   
   
@@ -29,6 +31,7 @@
   
     
       <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
         <script src="../_static/jquery.js"></script>
         <script src="../_static/underscore.js"></script>
         <script src="../_static/doctools.js"></script>
@@ -61,7 +64,7 @@
             
             
               <div class="version">
-                v1.6.3
+                v1.6.4
               </div>
             
           
@@ -86,7 +89,7 @@
               
             
             
-              <p class="caption"><span class="caption-text">Contents:</span></p>
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../includeme.html">Overview</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../install.html">Installation</a></li>
@@ -179,7 +182,6 @@
             
   <div class="section" id="backwards">
 <span id="backwards-rst"></span><h1>backwards<a class="headerlink" href="#backwards" title="Permalink to this headline">¶</a></h1>
-<p>A single model using the deprecated “Cis” versions of the interface.</p>
 <div class="contents local topic" id="contents">
 <ul class="simple">
 <li><p><a class="reference internal" href="#c-version" id="id2">C Version</a></p></li>
@@ -194,1354 +196,727 @@
 <div class="section" id="c-version">
 <h2><a class="toc-backref" href="#id2">C Version</a><a class="headerlink" href="#c-version" title="Permalink to this headline">¶</a></h2>
 <p>Model Code:</p>
-<div class="highlight-c notranslate"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
- 2
- 3
- 4
- 5
- 6
- 7
- 8
- 9
-10
-11
-12
-13
-14
-15
-16
-17
-18
-19
-20
-21
-22
-23
-24
-25
-26
-27
-28
-29
-30
-31
-32
-33
-34
-35
-36
-37
-38
-39
-40
-41
-42
-43</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="cp">#include</span> <span class="cpf">&lt;stdio.h&gt;</span><span class="cp"></span>
-<span class="c1">// Include methods for input/output channels</span>
-<span class="cp">#include</span> <span class="cpf">&quot;CisInterface.h&quot;</span><span class="cp"></span>
-
-<span class="cp">#define MYBUFSIZ 1000</span>
-
-<span class="kt">int</span> <span class="nf">main</span><span class="p">(</span><span class="kt">int</span> <span class="n">argc</span><span class="p">,</span> <span class="kt">char</span> <span class="o">*</span><span class="n">argv</span><span class="p">[])</span> <span class="p">{</span>
-  <span class="c1">// Initialize input/output channels</span>
-  <span class="n">cisInput_t</span> <span class="n">in_channel</span> <span class="o">=</span> <span class="n">cisInput</span><span class="p">(</span><span class="s">&quot;inputA&quot;</span><span class="p">);</span>
-  <span class="n">cisOutput_t</span> <span class="n">out_channel</span> <span class="o">=</span> <span class="n">cisOutput</span><span class="p">(</span><span class="s">&quot;outputA&quot;</span><span class="p">);</span>
-
-  <span class="c1">// Declare resulting variables and create buffer for received message</span>
-  <span class="kt">int</span> <span class="n">flag</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span>
-  <span class="kt">char</span> <span class="n">buf</span><span class="p">[</span><span class="n">MYBUFSIZ</span><span class="p">];</span>
-
-  <span class="c1">// Loop until there is no longer input or the queues are closed</span>
-  <span class="k">while</span> <span class="p">(</span><span class="n">flag</span> <span class="o">&gt;=</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
-  
-    <span class="c1">// Receive input from input channel</span>
-    <span class="c1">// If there is an error, the flag will be negative</span>
-    <span class="c1">// Otherwise, it is the size of the received message</span>
-    <span class="n">flag</span> <span class="o">=</span> <span class="n">cis_recv</span><span class="p">(</span><span class="n">in_channel</span><span class="p">,</span> <span class="n">buf</span><span class="p">,</span> <span class="n">MYBUFSIZ</span><span class="p">);</span>
-    <span class="k">if</span> <span class="p">(</span><span class="n">flag</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
-      <span class="n">printf</span><span class="p">(</span><span class="s">&quot;Model A: No more input.</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">);</span>
-      <span class="k">break</span><span class="p">;</span>
-    <span class="p">}</span>
-
-    <span class="c1">// Print received message</span>
-    <span class="n">printf</span><span class="p">(</span><span class="s">&quot;Model A: %s</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span> <span class="n">buf</span><span class="p">);</span>
-
-    <span class="c1">// Send output to output channel</span>
-    <span class="c1">// If there is an error, the flag will be negative</span>
-    <span class="n">flag</span> <span class="o">=</span> <span class="n">cis_send</span><span class="p">(</span><span class="n">out_channel</span><span class="p">,</span> <span class="n">buf</span><span class="p">,</span> <span class="n">flag</span><span class="p">);</span>
-    <span class="k">if</span> <span class="p">(</span><span class="n">flag</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
-      <span class="n">printf</span><span class="p">(</span><span class="s">&quot;Model A: Error sending output.</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">);</span>
-      <span class="k">break</span><span class="p">;</span>
-    <span class="p">}</span>
-
-  <span class="p">}</span>
-  
-  <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
-<span class="p">}</span>
-
+<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span><span class="cp">#include</span> <span class="cpf">&lt;stdio.h&gt;</span><span class="cp"></span>
+<span class="linenos"> 2</span><span class="c1">// Include methods for input/output channels</span>
+<span class="linenos"> 3</span><span class="cp">#include</span> <span class="cpf">&quot;CisInterface.h&quot;</span><span class="cp"></span>
+<span class="linenos"> 4</span>
+<span class="linenos"> 5</span><span class="cp">#define MYBUFSIZ 1000</span>
+<span class="linenos"> 6</span>
+<span class="linenos"> 7</span><span class="kt">int</span> <span class="nf">main</span><span class="p">(</span><span class="kt">int</span> <span class="n">argc</span><span class="p">,</span> <span class="kt">char</span> <span class="o">*</span><span class="n">argv</span><span class="p">[])</span> <span class="p">{</span>
+<span class="linenos"> 8</span>  <span class="c1">// Initialize input/output channels</span>
+<span class="linenos"> 9</span>  <span class="n">cisInput_t</span> <span class="n">in_channel</span> <span class="o">=</span> <span class="n">cisInput</span><span class="p">(</span><span class="s">&quot;inputA&quot;</span><span class="p">);</span>
+<span class="linenos">10</span>  <span class="n">cisOutput_t</span> <span class="n">out_channel</span> <span class="o">=</span> <span class="n">cisOutput</span><span class="p">(</span><span class="s">&quot;outputA&quot;</span><span class="p">);</span>
+<span class="linenos">11</span>
+<span class="linenos">12</span>  <span class="c1">// Declare resulting variables and create buffer for received message</span>
+<span class="linenos">13</span>  <span class="kt">int</span> <span class="n">flag</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span>
+<span class="linenos">14</span>  <span class="kt">char</span> <span class="n">buf</span><span class="p">[</span><span class="n">MYBUFSIZ</span><span class="p">];</span>
+<span class="linenos">15</span>
+<span class="linenos">16</span>  <span class="c1">// Loop until there is no longer input or the queues are closed</span>
+<span class="linenos">17</span>  <span class="k">while</span> <span class="p">(</span><span class="n">flag</span> <span class="o">&gt;=</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
+<span class="linenos">18</span>  
+<span class="linenos">19</span>    <span class="c1">// Receive input from input channel</span>
+<span class="linenos">20</span>    <span class="c1">// If there is an error, the flag will be negative</span>
+<span class="linenos">21</span>    <span class="c1">// Otherwise, it is the size of the received message</span>
+<span class="linenos">22</span>    <span class="n">flag</span> <span class="o">=</span> <span class="n">cis_recv</span><span class="p">(</span><span class="n">in_channel</span><span class="p">,</span> <span class="n">buf</span><span class="p">,</span> <span class="n">MYBUFSIZ</span><span class="p">);</span>
+<span class="linenos">23</span>    <span class="k">if</span> <span class="p">(</span><span class="n">flag</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
+<span class="linenos">24</span>      <span class="n">printf</span><span class="p">(</span><span class="s">&quot;Model A: No more input.</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">);</span>
+<span class="linenos">25</span>      <span class="k">break</span><span class="p">;</span>
+<span class="linenos">26</span>    <span class="p">}</span>
+<span class="linenos">27</span>
+<span class="linenos">28</span>    <span class="c1">// Print received message</span>
+<span class="linenos">29</span>    <span class="n">printf</span><span class="p">(</span><span class="s">&quot;Model A: %s</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span> <span class="n">buf</span><span class="p">);</span>
+<span class="linenos">30</span>
+<span class="linenos">31</span>    <span class="c1">// Send output to output channel</span>
+<span class="linenos">32</span>    <span class="c1">// If there is an error, the flag will be negative</span>
+<span class="linenos">33</span>    <span class="n">flag</span> <span class="o">=</span> <span class="n">cis_send</span><span class="p">(</span><span class="n">out_channel</span><span class="p">,</span> <span class="n">buf</span><span class="p">,</span> <span class="n">flag</span><span class="p">);</span>
+<span class="linenos">34</span>    <span class="k">if</span> <span class="p">(</span><span class="n">flag</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
+<span class="linenos">35</span>      <span class="n">printf</span><span class="p">(</span><span class="s">&quot;Model A: Error sending output.</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">);</span>
+<span class="linenos">36</span>      <span class="k">break</span><span class="p">;</span>
+<span class="linenos">37</span>    <span class="p">}</span>
+<span class="linenos">38</span>
+<span class="linenos">39</span>  <span class="p">}</span>
+<span class="linenos">40</span>  
+<span class="linenos">41</span>  <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+<span class="linenos">42</span><span class="p">}</span>
+<span class="linenos">43</span>
 </pre></div>
-</td></tr></table></div>
-<div class="highlight-c notranslate"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
- 2
- 3
- 4
- 5
- 6
- 7
- 8
- 9
-10
-11
-12
-13
-14
-15
-16
-17
-18
-19
-20
-21
-22
-23
-24
-25
-26
-27
-28
-29
-30
-31
-32
-33
-34
-35
-36
-37
-38
-39
-40
-41
-42
-43</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="cp">#include</span> <span class="cpf">&lt;stdio.h&gt;</span><span class="cp"></span>
-<span class="c1">// Include methods for input/output channels</span>
-<span class="cp">#include</span> <span class="cpf">&quot;CisInterface.h&quot;</span><span class="cp"></span>
-
-<span class="cp">#define MYBUFSIZ 1000</span>
-
-<span class="kt">int</span> <span class="nf">main</span><span class="p">(</span><span class="kt">int</span> <span class="n">argc</span><span class="p">,</span> <span class="kt">char</span> <span class="o">*</span><span class="n">argv</span><span class="p">[])</span> <span class="p">{</span>
-  <span class="c1">// Initialize input/output channels</span>
-  <span class="n">cisInput_t</span> <span class="n">in_channel</span> <span class="o">=</span> <span class="n">cisInput</span><span class="p">(</span><span class="s">&quot;inputB&quot;</span><span class="p">);</span>
-  <span class="n">cisOutput_t</span> <span class="n">out_channel</span> <span class="o">=</span> <span class="n">cisOutput</span><span class="p">(</span><span class="s">&quot;outputB&quot;</span><span class="p">);</span>
-
-  <span class="c1">// Declare resulting variables and create buffer for received message</span>
-  <span class="kt">int</span> <span class="n">flag</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span>
-  <span class="kt">char</span> <span class="n">buf</span><span class="p">[</span><span class="n">MYBUFSIZ</span><span class="p">];</span>
-
-  <span class="c1">// Loop until there is no longer input or the queues are closed</span>
-  <span class="k">while</span> <span class="p">(</span><span class="n">flag</span> <span class="o">&gt;=</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
-  
-    <span class="c1">// Receive input from input channel</span>
-    <span class="c1">// If there is an error, the flag will be negative</span>
-    <span class="c1">// Otherwise, it is the size of the received message</span>
-    <span class="n">flag</span> <span class="o">=</span> <span class="n">cis_recv</span><span class="p">(</span><span class="n">in_channel</span><span class="p">,</span> <span class="n">buf</span><span class="p">,</span> <span class="n">MYBUFSIZ</span><span class="p">);</span>
-    <span class="k">if</span> <span class="p">(</span><span class="n">flag</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
-      <span class="n">printf</span><span class="p">(</span><span class="s">&quot;Model B: No more input.</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">);</span>
-      <span class="k">break</span><span class="p">;</span>
-    <span class="p">}</span>
-
-    <span class="c1">// Print received message</span>
-    <span class="n">printf</span><span class="p">(</span><span class="s">&quot;Model B: %s</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span> <span class="n">buf</span><span class="p">);</span>
-
-    <span class="c1">// Send output to output channel</span>
-    <span class="c1">// If there is an error, the flag will be negative</span>
-    <span class="n">flag</span> <span class="o">=</span> <span class="n">cis_send</span><span class="p">(</span><span class="n">out_channel</span><span class="p">,</span> <span class="n">buf</span><span class="p">,</span> <span class="n">flag</span><span class="p">);</span>
-    <span class="k">if</span> <span class="p">(</span><span class="n">flag</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
-      <span class="n">printf</span><span class="p">(</span><span class="s">&quot;Model B: Error sending output.</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">);</span>
-      <span class="k">break</span><span class="p">;</span>
-    <span class="p">}</span>
-
-  <span class="p">}</span>
-  
-  <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
-<span class="p">}</span>
-
+</div>
+<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span><span class="cp">#include</span> <span class="cpf">&lt;stdio.h&gt;</span><span class="cp"></span>
+<span class="linenos"> 2</span><span class="c1">// Include methods for input/output channels</span>
+<span class="linenos"> 3</span><span class="cp">#include</span> <span class="cpf">&quot;CisInterface.h&quot;</span><span class="cp"></span>
+<span class="linenos"> 4</span>
+<span class="linenos"> 5</span><span class="cp">#define MYBUFSIZ 1000</span>
+<span class="linenos"> 6</span>
+<span class="linenos"> 7</span><span class="kt">int</span> <span class="nf">main</span><span class="p">(</span><span class="kt">int</span> <span class="n">argc</span><span class="p">,</span> <span class="kt">char</span> <span class="o">*</span><span class="n">argv</span><span class="p">[])</span> <span class="p">{</span>
+<span class="linenos"> 8</span>  <span class="c1">// Initialize input/output channels</span>
+<span class="linenos"> 9</span>  <span class="n">cisInput_t</span> <span class="n">in_channel</span> <span class="o">=</span> <span class="n">cisInput</span><span class="p">(</span><span class="s">&quot;inputB&quot;</span><span class="p">);</span>
+<span class="linenos">10</span>  <span class="n">cisOutput_t</span> <span class="n">out_channel</span> <span class="o">=</span> <span class="n">cisOutput</span><span class="p">(</span><span class="s">&quot;outputB&quot;</span><span class="p">);</span>
+<span class="linenos">11</span>
+<span class="linenos">12</span>  <span class="c1">// Declare resulting variables and create buffer for received message</span>
+<span class="linenos">13</span>  <span class="kt">int</span> <span class="n">flag</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span>
+<span class="linenos">14</span>  <span class="kt">char</span> <span class="n">buf</span><span class="p">[</span><span class="n">MYBUFSIZ</span><span class="p">];</span>
+<span class="linenos">15</span>
+<span class="linenos">16</span>  <span class="c1">// Loop until there is no longer input or the queues are closed</span>
+<span class="linenos">17</span>  <span class="k">while</span> <span class="p">(</span><span class="n">flag</span> <span class="o">&gt;=</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
+<span class="linenos">18</span>  
+<span class="linenos">19</span>    <span class="c1">// Receive input from input channel</span>
+<span class="linenos">20</span>    <span class="c1">// If there is an error, the flag will be negative</span>
+<span class="linenos">21</span>    <span class="c1">// Otherwise, it is the size of the received message</span>
+<span class="linenos">22</span>    <span class="n">flag</span> <span class="o">=</span> <span class="n">cis_recv</span><span class="p">(</span><span class="n">in_channel</span><span class="p">,</span> <span class="n">buf</span><span class="p">,</span> <span class="n">MYBUFSIZ</span><span class="p">);</span>
+<span class="linenos">23</span>    <span class="k">if</span> <span class="p">(</span><span class="n">flag</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
+<span class="linenos">24</span>      <span class="n">printf</span><span class="p">(</span><span class="s">&quot;Model B: No more input.</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">);</span>
+<span class="linenos">25</span>      <span class="k">break</span><span class="p">;</span>
+<span class="linenos">26</span>    <span class="p">}</span>
+<span class="linenos">27</span>
+<span class="linenos">28</span>    <span class="c1">// Print received message</span>
+<span class="linenos">29</span>    <span class="n">printf</span><span class="p">(</span><span class="s">&quot;Model B: %s</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span> <span class="n">buf</span><span class="p">);</span>
+<span class="linenos">30</span>
+<span class="linenos">31</span>    <span class="c1">// Send output to output channel</span>
+<span class="linenos">32</span>    <span class="c1">// If there is an error, the flag will be negative</span>
+<span class="linenos">33</span>    <span class="n">flag</span> <span class="o">=</span> <span class="n">cis_send</span><span class="p">(</span><span class="n">out_channel</span><span class="p">,</span> <span class="n">buf</span><span class="p">,</span> <span class="n">flag</span><span class="p">);</span>
+<span class="linenos">34</span>    <span class="k">if</span> <span class="p">(</span><span class="n">flag</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
+<span class="linenos">35</span>      <span class="n">printf</span><span class="p">(</span><span class="s">&quot;Model B: Error sending output.</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">);</span>
+<span class="linenos">36</span>      <span class="k">break</span><span class="p">;</span>
+<span class="linenos">37</span>    <span class="p">}</span>
+<span class="linenos">38</span>
+<span class="linenos">39</span>  <span class="p">}</span>
+<span class="linenos">40</span>  
+<span class="linenos">41</span>  <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+<span class="linenos">42</span><span class="p">}</span>
+<span class="linenos">43</span>
 </pre></div>
-</td></tr></table></div>
+</div>
 <p>Model YAML:</p>
-<div class="highlight-yaml notranslate"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
- 2
- 3
- 4
- 5
- 6
- 7
- 8
- 9
-10
-11
-12
-13
-14
-15
-16
-17
-18
-19
-20</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="nt">models</span><span class="p">:</span>
-  <span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">c_modelA</span>
-    <span class="nt">language</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">c</span>
-    <span class="nt">args</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">./src/backwards_modelA.c</span>
-    <span class="nt">inputs</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">inputA</span>
-    <span class="nt">outputs</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">outputA</span>
-
-  <span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">c_modelB</span>
-    <span class="nt">language</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">c</span>
-    <span class="nt">args</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">./src/backwards_modelB.c</span>
-    <span class="nt">inputs</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">inputB</span>
-    <span class="nt">outputs</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">outputB</span>
-
-<span class="nt">connections</span><span class="p">:</span>
-  <span class="p p-Indicator">-</span> <span class="nt">input</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">outputA</span>  <span class="c1"># Connection between model A output &amp; model B input</span>
-    <span class="nt">output</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">inputB</span>
-  <span class="p p-Indicator">-</span> <span class="nt">input</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">./Input/input.txt</span>  <span class="c1"># Connection between file and model A input</span>
-    <span class="nt">output</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">inputA</span>
-  <span class="p p-Indicator">-</span> <span class="nt">input</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">outputB</span>  <span class="c1"># Connection between model B output and file</span>
-    <span class="nt">output</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">./output.txt</span>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span><span class="nt">models</span><span class="p">:</span>
+<span class="linenos"> 2</span>  <span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">c_modelA</span>
+<span class="linenos"> 3</span>    <span class="nt">language</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">c</span>
+<span class="linenos"> 4</span>    <span class="nt">args</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">./src/backwards_modelA.c</span>
+<span class="linenos"> 5</span>    <span class="nt">inputs</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">inputA</span>
+<span class="linenos"> 6</span>    <span class="nt">outputs</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">outputA</span>
+<span class="linenos"> 7</span>
+<span class="linenos"> 8</span>  <span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">c_modelB</span>
+<span class="linenos"> 9</span>    <span class="nt">language</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">c</span>
+<span class="linenos">10</span>    <span class="nt">args</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">./src/backwards_modelB.c</span>
+<span class="linenos">11</span>    <span class="nt">inputs</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">inputB</span>
+<span class="linenos">12</span>    <span class="nt">outputs</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">outputB</span>
+<span class="linenos">13</span>
+<span class="linenos">14</span><span class="nt">connections</span><span class="p">:</span>
+<span class="linenos">15</span>  <span class="p p-Indicator">-</span> <span class="nt">input</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">outputA</span>  <span class="c1"># Connection between model A output &amp; model B input</span>
+<span class="linenos">16</span>    <span class="nt">output</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">inputB</span>
+<span class="linenos">17</span>  <span class="p p-Indicator">-</span> <span class="nt">input</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">./Input/input.txt</span>  <span class="c1"># Connection between file and model A input</span>
+<span class="linenos">18</span>    <span class="nt">output</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">inputA</span>
+<span class="linenos">19</span>  <span class="p p-Indicator">-</span> <span class="nt">input</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">outputB</span>  <span class="c1"># Connection between model B output and file</span>
+<span class="linenos">20</span>    <span class="nt">output</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">./output.txt</span>
 </pre></div>
-</td></tr></table></div>
+</div>
 </div>
 <div class="section" id="cmake-version">
 <h2><a class="toc-backref" href="#id3">CMake Version</a><a class="headerlink" href="#cmake-version" title="Permalink to this headline">¶</a></h2>
 <p>Model Code:</p>
-<div class="highlight-c++ notranslate"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
- 2
- 3
- 4
- 5
- 6
- 7
- 8
- 9
-10
-11
-12
-13
-14
-15
-16
-17
-18
-19
-20
-21
-22
-23
-24
-25
-26
-27
-28
-29
-30
-31
-32
-33
-34
-35
-36
-37
-38
-39
-40
-41
-42</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="cp">#include</span> <span class="cpf">&lt;iostream&gt;</span><span class="cp"></span>
-<span class="c1">// Include methods for input/output channels</span>
-<span class="cp">#include</span> <span class="cpf">&quot;CisInterface.hpp&quot;</span><span class="cp"></span>
-
-<span class="cp">#define MYBUFSIZ 1000</span>
-
-<span class="kt">int</span> <span class="nf">main</span><span class="p">(</span><span class="kt">int</span> <span class="n">argc</span><span class="p">,</span> <span class="kt">char</span> <span class="o">*</span><span class="n">argv</span><span class="p">[])</span> <span class="p">{</span>
-  <span class="c1">// Initialize input/output channels</span>
-  <span class="n">CisInput</span> <span class="n">in_channel</span><span class="p">(</span><span class="s">&quot;inputA&quot;</span><span class="p">);</span>
-  <span class="n">CisOutput</span> <span class="n">out_channel</span><span class="p">(</span><span class="s">&quot;outputA&quot;</span><span class="p">);</span>
-
-  <span class="c1">// Declare resulting variables and create buffer for received message</span>
-  <span class="kt">int</span> <span class="n">flag</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span>
-  <span class="kt">char</span> <span class="n">buf</span><span class="p">[</span><span class="n">MYBUFSIZ</span><span class="p">];</span>
-
-  <span class="c1">// Loop until there is no longer input or the queues are closed</span>
-  <span class="k">while</span> <span class="p">(</span><span class="n">flag</span> <span class="o">&gt;=</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
-  
-    <span class="c1">// Receive input from input channel</span>
-    <span class="c1">// If there is an error, the flag will be negative</span>
-    <span class="c1">// Otherwise, it is the size of the received message</span>
-    <span class="n">flag</span> <span class="o">=</span> <span class="n">in_channel</span><span class="p">.</span><span class="n">recv</span><span class="p">(</span><span class="n">buf</span><span class="p">,</span> <span class="n">MYBUFSIZ</span><span class="p">);</span>
-    <span class="k">if</span> <span class="p">(</span><span class="n">flag</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
-      <span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="s">&quot;Model A: No more input.&quot;</span> <span class="o">&lt;&lt;</span> <span class="n">std</span><span class="o">::</span><span class="n">endl</span><span class="p">;</span>
-      <span class="k">break</span><span class="p">;</span>
-    <span class="p">}</span>
-
-    <span class="c1">// Print received message</span>
-    <span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="s">&quot;Model A: &quot;</span> <span class="o">&lt;&lt;</span> <span class="n">buf</span> <span class="o">&lt;&lt;</span> <span class="n">std</span><span class="o">::</span><span class="n">endl</span><span class="p">;</span>
-
-    <span class="c1">// Send output to output channel</span>
-    <span class="c1">// If there is an error, the flag will be negative</span>
-    <span class="n">flag</span> <span class="o">=</span> <span class="n">out_channel</span><span class="p">.</span><span class="n">send</span><span class="p">(</span><span class="n">buf</span><span class="p">,</span> <span class="n">flag</span><span class="p">);</span>
-    <span class="k">if</span> <span class="p">(</span><span class="n">flag</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
-      <span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="s">&quot;Model A: Error sending output.&quot;</span> <span class="o">&lt;&lt;</span> <span class="n">std</span><span class="o">::</span><span class="n">endl</span><span class="p">;</span>
-      <span class="k">break</span><span class="p">;</span>
-    <span class="p">}</span>
-
-  <span class="p">}</span>
-  
-  <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
-<span class="p">}</span>
+<div class="highlight-c++ notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span><span class="cp">#include</span> <span class="cpf">&lt;iostream&gt;</span><span class="cp"></span>
+<span class="linenos"> 2</span><span class="c1">// Include methods for input/output channels</span>
+<span class="linenos"> 3</span><span class="cp">#include</span> <span class="cpf">&quot;CisInterface.hpp&quot;</span><span class="cp"></span>
+<span class="linenos"> 4</span>
+<span class="linenos"> 5</span><span class="cp">#define MYBUFSIZ 1000</span>
+<span class="linenos"> 6</span>
+<span class="linenos"> 7</span><span class="kt">int</span> <span class="nf">main</span><span class="p">(</span><span class="kt">int</span> <span class="n">argc</span><span class="p">,</span> <span class="kt">char</span> <span class="o">*</span><span class="n">argv</span><span class="p">[])</span> <span class="p">{</span>
+<span class="linenos"> 8</span>  <span class="c1">// Initialize input/output channels</span>
+<span class="linenos"> 9</span>  <span class="n">CisInput</span> <span class="n">in_channel</span><span class="p">(</span><span class="s">&quot;inputA&quot;</span><span class="p">);</span>
+<span class="linenos">10</span>  <span class="n">CisOutput</span> <span class="n">out_channel</span><span class="p">(</span><span class="s">&quot;outputA&quot;</span><span class="p">);</span>
+<span class="linenos">11</span>
+<span class="linenos">12</span>  <span class="c1">// Declare resulting variables and create buffer for received message</span>
+<span class="linenos">13</span>  <span class="kt">int</span> <span class="n">flag</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span>
+<span class="linenos">14</span>  <span class="kt">char</span> <span class="n">buf</span><span class="p">[</span><span class="n">MYBUFSIZ</span><span class="p">];</span>
+<span class="linenos">15</span>
+<span class="linenos">16</span>  <span class="c1">// Loop until there is no longer input or the queues are closed</span>
+<span class="linenos">17</span>  <span class="k">while</span> <span class="p">(</span><span class="n">flag</span> <span class="o">&gt;=</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
+<span class="linenos">18</span>  
+<span class="linenos">19</span>    <span class="c1">// Receive input from input channel</span>
+<span class="linenos">20</span>    <span class="c1">// If there is an error, the flag will be negative</span>
+<span class="linenos">21</span>    <span class="c1">// Otherwise, it is the size of the received message</span>
+<span class="linenos">22</span>    <span class="n">flag</span> <span class="o">=</span> <span class="n">in_channel</span><span class="p">.</span><span class="n">recv</span><span class="p">(</span><span class="n">buf</span><span class="p">,</span> <span class="n">MYBUFSIZ</span><span class="p">);</span>
+<span class="linenos">23</span>    <span class="k">if</span> <span class="p">(</span><span class="n">flag</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
+<span class="linenos">24</span>      <span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="s">&quot;Model A: No more input.&quot;</span> <span class="o">&lt;&lt;</span> <span class="n">std</span><span class="o">::</span><span class="n">endl</span><span class="p">;</span>
+<span class="linenos">25</span>      <span class="k">break</span><span class="p">;</span>
+<span class="linenos">26</span>    <span class="p">}</span>
+<span class="linenos">27</span>
+<span class="linenos">28</span>    <span class="c1">// Print received message</span>
+<span class="linenos">29</span>    <span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="s">&quot;Model A: &quot;</span> <span class="o">&lt;&lt;</span> <span class="n">buf</span> <span class="o">&lt;&lt;</span> <span class="n">std</span><span class="o">::</span><span class="n">endl</span><span class="p">;</span>
+<span class="linenos">30</span>
+<span class="linenos">31</span>    <span class="c1">// Send output to output channel</span>
+<span class="linenos">32</span>    <span class="c1">// If there is an error, the flag will be negative</span>
+<span class="linenos">33</span>    <span class="n">flag</span> <span class="o">=</span> <span class="n">out_channel</span><span class="p">.</span><span class="n">send</span><span class="p">(</span><span class="n">buf</span><span class="p">,</span> <span class="n">flag</span><span class="p">);</span>
+<span class="linenos">34</span>    <span class="k">if</span> <span class="p">(</span><span class="n">flag</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
+<span class="linenos">35</span>      <span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="s">&quot;Model A: Error sending output.&quot;</span> <span class="o">&lt;&lt;</span> <span class="n">std</span><span class="o">::</span><span class="n">endl</span><span class="p">;</span>
+<span class="linenos">36</span>      <span class="k">break</span><span class="p">;</span>
+<span class="linenos">37</span>    <span class="p">}</span>
+<span class="linenos">38</span>
+<span class="linenos">39</span>  <span class="p">}</span>
+<span class="linenos">40</span>  
+<span class="linenos">41</span>  <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+<span class="linenos">42</span><span class="p">}</span>
 </pre></div>
-</td></tr></table></div>
-<div class="highlight-c++ notranslate"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
- 2
- 3
- 4
- 5
- 6
- 7
- 8
- 9
-10
-11
-12
-13
-14
-15
-16
-17
-18
-19
-20
-21
-22
-23
-24
-25
-26
-27
-28
-29
-30
-31
-32
-33
-34
-35
-36
-37
-38
-39
-40
-41
-42</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="cp">#include</span> <span class="cpf">&lt;iostream&gt;</span><span class="cp"></span>
-<span class="c1">// Include methods for input/output channels</span>
-<span class="cp">#include</span> <span class="cpf">&quot;CisInterface.hpp&quot;</span><span class="cp"></span>
-
-<span class="cp">#define MYBUFSIZ 1000</span>
-
-<span class="kt">int</span> <span class="nf">main</span><span class="p">(</span><span class="kt">int</span> <span class="n">argc</span><span class="p">,</span> <span class="kt">char</span> <span class="o">*</span><span class="n">argv</span><span class="p">[])</span> <span class="p">{</span>
-  <span class="c1">// Initialize input/output channels</span>
-  <span class="n">CisInput</span> <span class="n">in_channel</span><span class="p">(</span><span class="s">&quot;inputB&quot;</span><span class="p">);</span>
-  <span class="n">CisOutput</span> <span class="n">out_channel</span><span class="p">(</span><span class="s">&quot;outputB&quot;</span><span class="p">);</span>
-
-  <span class="c1">// Declare resulting variables and create buffer for received message</span>
-  <span class="kt">int</span> <span class="n">flag</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span>
-  <span class="kt">char</span> <span class="n">buf</span><span class="p">[</span><span class="n">MYBUFSIZ</span><span class="p">];</span>
-
-  <span class="c1">// Loop until there is no longer input or the queues are closed</span>
-  <span class="k">while</span> <span class="p">(</span><span class="n">flag</span> <span class="o">&gt;=</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
-  
-    <span class="c1">// Receive input from input channel</span>
-    <span class="c1">// If there is an error, the flag will be negative</span>
-    <span class="c1">// Otherwise, it is the size of the received message</span>
-    <span class="n">flag</span> <span class="o">=</span> <span class="n">in_channel</span><span class="p">.</span><span class="n">recv</span><span class="p">(</span><span class="n">buf</span><span class="p">,</span> <span class="n">MYBUFSIZ</span><span class="p">);</span>
-    <span class="k">if</span> <span class="p">(</span><span class="n">flag</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
-      <span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="s">&quot;Model B: No more input.&quot;</span> <span class="o">&lt;&lt;</span> <span class="n">std</span><span class="o">::</span><span class="n">endl</span><span class="p">;</span>
-      <span class="k">break</span><span class="p">;</span>
-    <span class="p">}</span>
-
-    <span class="c1">// Print received message</span>
-    <span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="s">&quot;Model B: &quot;</span> <span class="o">&lt;&lt;</span> <span class="n">buf</span> <span class="o">&lt;&lt;</span> <span class="n">std</span><span class="o">::</span><span class="n">endl</span><span class="p">;</span>
-
-    <span class="c1">// Send output to output channel</span>
-    <span class="c1">// If there is an error, the flag will be negative</span>
-    <span class="n">flag</span> <span class="o">=</span> <span class="n">out_channel</span><span class="p">.</span><span class="n">send</span><span class="p">(</span><span class="n">buf</span><span class="p">,</span> <span class="n">flag</span><span class="p">);</span>
-    <span class="k">if</span> <span class="p">(</span><span class="n">flag</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
-      <span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="s">&quot;Model B: Error sending output.&quot;</span> <span class="o">&lt;&lt;</span> <span class="n">std</span><span class="o">::</span><span class="n">endl</span><span class="p">;</span>
-      <span class="k">break</span><span class="p">;</span>
-    <span class="p">}</span>
-
-  <span class="p">}</span>
-  
-  <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
-<span class="p">}</span>
+</div>
+<div class="highlight-c++ notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span><span class="cp">#include</span> <span class="cpf">&lt;iostream&gt;</span><span class="cp"></span>
+<span class="linenos"> 2</span><span class="c1">// Include methods for input/output channels</span>
+<span class="linenos"> 3</span><span class="cp">#include</span> <span class="cpf">&quot;CisInterface.hpp&quot;</span><span class="cp"></span>
+<span class="linenos"> 4</span>
+<span class="linenos"> 5</span><span class="cp">#define MYBUFSIZ 1000</span>
+<span class="linenos"> 6</span>
+<span class="linenos"> 7</span><span class="kt">int</span> <span class="nf">main</span><span class="p">(</span><span class="kt">int</span> <span class="n">argc</span><span class="p">,</span> <span class="kt">char</span> <span class="o">*</span><span class="n">argv</span><span class="p">[])</span> <span class="p">{</span>
+<span class="linenos"> 8</span>  <span class="c1">// Initialize input/output channels</span>
+<span class="linenos"> 9</span>  <span class="n">CisInput</span> <span class="n">in_channel</span><span class="p">(</span><span class="s">&quot;inputB&quot;</span><span class="p">);</span>
+<span class="linenos">10</span>  <span class="n">CisOutput</span> <span class="n">out_channel</span><span class="p">(</span><span class="s">&quot;outputB&quot;</span><span class="p">);</span>
+<span class="linenos">11</span>
+<span class="linenos">12</span>  <span class="c1">// Declare resulting variables and create buffer for received message</span>
+<span class="linenos">13</span>  <span class="kt">int</span> <span class="n">flag</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span>
+<span class="linenos">14</span>  <span class="kt">char</span> <span class="n">buf</span><span class="p">[</span><span class="n">MYBUFSIZ</span><span class="p">];</span>
+<span class="linenos">15</span>
+<span class="linenos">16</span>  <span class="c1">// Loop until there is no longer input or the queues are closed</span>
+<span class="linenos">17</span>  <span class="k">while</span> <span class="p">(</span><span class="n">flag</span> <span class="o">&gt;=</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
+<span class="linenos">18</span>  
+<span class="linenos">19</span>    <span class="c1">// Receive input from input channel</span>
+<span class="linenos">20</span>    <span class="c1">// If there is an error, the flag will be negative</span>
+<span class="linenos">21</span>    <span class="c1">// Otherwise, it is the size of the received message</span>
+<span class="linenos">22</span>    <span class="n">flag</span> <span class="o">=</span> <span class="n">in_channel</span><span class="p">.</span><span class="n">recv</span><span class="p">(</span><span class="n">buf</span><span class="p">,</span> <span class="n">MYBUFSIZ</span><span class="p">);</span>
+<span class="linenos">23</span>    <span class="k">if</span> <span class="p">(</span><span class="n">flag</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
+<span class="linenos">24</span>      <span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="s">&quot;Model B: No more input.&quot;</span> <span class="o">&lt;&lt;</span> <span class="n">std</span><span class="o">::</span><span class="n">endl</span><span class="p">;</span>
+<span class="linenos">25</span>      <span class="k">break</span><span class="p">;</span>
+<span class="linenos">26</span>    <span class="p">}</span>
+<span class="linenos">27</span>
+<span class="linenos">28</span>    <span class="c1">// Print received message</span>
+<span class="linenos">29</span>    <span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="s">&quot;Model B: &quot;</span> <span class="o">&lt;&lt;</span> <span class="n">buf</span> <span class="o">&lt;&lt;</span> <span class="n">std</span><span class="o">::</span><span class="n">endl</span><span class="p">;</span>
+<span class="linenos">30</span>
+<span class="linenos">31</span>    <span class="c1">// Send output to output channel</span>
+<span class="linenos">32</span>    <span class="c1">// If there is an error, the flag will be negative</span>
+<span class="linenos">33</span>    <span class="n">flag</span> <span class="o">=</span> <span class="n">out_channel</span><span class="p">.</span><span class="n">send</span><span class="p">(</span><span class="n">buf</span><span class="p">,</span> <span class="n">flag</span><span class="p">);</span>
+<span class="linenos">34</span>    <span class="k">if</span> <span class="p">(</span><span class="n">flag</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
+<span class="linenos">35</span>      <span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="s">&quot;Model B: Error sending output.&quot;</span> <span class="o">&lt;&lt;</span> <span class="n">std</span><span class="o">::</span><span class="n">endl</span><span class="p">;</span>
+<span class="linenos">36</span>      <span class="k">break</span><span class="p">;</span>
+<span class="linenos">37</span>    <span class="p">}</span>
+<span class="linenos">38</span>
+<span class="linenos">39</span>  <span class="p">}</span>
+<span class="linenos">40</span>  
+<span class="linenos">41</span>  <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+<span class="linenos">42</span><span class="p">}</span>
 </pre></div>
-</td></tr></table></div>
+</div>
 <p>Model YAML:</p>
-<div class="highlight-yaml notranslate"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
- 2
- 3
- 4
- 5
- 6
- 7
- 8
- 9
-10
-11
-12
-13
-14
-15
-16
-17
-18
-19
-20
-21
-22</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="nt">models</span><span class="p">:</span>
-  <span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">cmake_modelA</span>
-    <span class="nt">language</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">cmake</span>
-    <span class="nt">args</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">./src/backwards_modelA.cpp</span>
-    <span class="nt">target</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">backwards_modelA</span>
-    <span class="nt">inputs</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">inputA</span>
-    <span class="nt">outputs</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">outputA</span>
-
-  <span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">cmake_modelB</span>
-    <span class="nt">language</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">cmake</span>
-    <span class="nt">args</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">./src/backwards_modelB.cpp</span>
-    <span class="nt">target</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">backwards_modelB</span>
-    <span class="nt">inputs</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">inputB</span>
-    <span class="nt">outputs</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">outputB</span>
-
-<span class="nt">connections</span><span class="p">:</span>
-  <span class="p p-Indicator">-</span> <span class="nt">input</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">outputA</span>  <span class="c1"># Connection between model A output &amp; model B input</span>
-    <span class="nt">output</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">inputB</span>
-  <span class="p p-Indicator">-</span> <span class="nt">input</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">./Input/input.txt</span>  <span class="c1"># Connection between file and model A input</span>
-    <span class="nt">output</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">inputA</span>
-  <span class="p p-Indicator">-</span> <span class="nt">input</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">outputB</span>  <span class="c1"># Connection between model B output and file</span>
-    <span class="nt">output</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">./output.txt</span>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span><span class="nt">models</span><span class="p">:</span>
+<span class="linenos"> 2</span>  <span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">cmake_modelA</span>
+<span class="linenos"> 3</span>    <span class="nt">language</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">cmake</span>
+<span class="linenos"> 4</span>    <span class="nt">args</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">./src/backwards_modelA.cpp</span>
+<span class="linenos"> 5</span>    <span class="nt">target</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">backwards_modelA</span>
+<span class="linenos"> 6</span>    <span class="nt">inputs</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">inputA</span>
+<span class="linenos"> 7</span>    <span class="nt">outputs</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">outputA</span>
+<span class="linenos"> 8</span>
+<span class="linenos"> 9</span>  <span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">cmake_modelB</span>
+<span class="linenos">10</span>    <span class="nt">language</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">cmake</span>
+<span class="linenos">11</span>    <span class="nt">args</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">./src/backwards_modelB.cpp</span>
+<span class="linenos">12</span>    <span class="nt">target</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">backwards_modelB</span>
+<span class="linenos">13</span>    <span class="nt">inputs</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">inputB</span>
+<span class="linenos">14</span>    <span class="nt">outputs</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">outputB</span>
+<span class="linenos">15</span>
+<span class="linenos">16</span><span class="nt">connections</span><span class="p">:</span>
+<span class="linenos">17</span>  <span class="p p-Indicator">-</span> <span class="nt">input</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">outputA</span>  <span class="c1"># Connection between model A output &amp; model B input</span>
+<span class="linenos">18</span>    <span class="nt">output</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">inputB</span>
+<span class="linenos">19</span>  <span class="p p-Indicator">-</span> <span class="nt">input</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">./Input/input.txt</span>  <span class="c1"># Connection between file and model A input</span>
+<span class="linenos">20</span>    <span class="nt">output</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">inputA</span>
+<span class="linenos">21</span>  <span class="p p-Indicator">-</span> <span class="nt">input</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">outputB</span>  <span class="c1"># Connection between model B output and file</span>
+<span class="linenos">22</span>    <span class="nt">output</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">./output.txt</span>
 </pre></div>
-</td></tr></table></div>
+</div>
 </div>
 <div class="section" id="id1">
 <h2><a class="toc-backref" href="#id4">C++ Version</a><a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h2>
 <p>Model Code:</p>
-<div class="highlight-c++ notranslate"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
- 2
- 3
- 4
- 5
- 6
- 7
- 8
- 9
-10
-11
-12
-13
-14
-15
-16
-17
-18
-19
-20
-21
-22
-23
-24
-25
-26
-27
-28
-29
-30
-31
-32
-33
-34
-35
-36
-37
-38
-39
-40
-41
-42</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="cp">#include</span> <span class="cpf">&lt;iostream&gt;</span><span class="cp"></span>
-<span class="c1">// Include methods for input/output channels</span>
-<span class="cp">#include</span> <span class="cpf">&quot;CisInterface.hpp&quot;</span><span class="cp"></span>
-
-<span class="cp">#define MYBUFSIZ 1000</span>
-
-<span class="kt">int</span> <span class="nf">main</span><span class="p">(</span><span class="kt">int</span> <span class="n">argc</span><span class="p">,</span> <span class="kt">char</span> <span class="o">*</span><span class="n">argv</span><span class="p">[])</span> <span class="p">{</span>
-  <span class="c1">// Initialize input/output channels</span>
-  <span class="n">CisInput</span> <span class="n">in_channel</span><span class="p">(</span><span class="s">&quot;inputA&quot;</span><span class="p">);</span>
-  <span class="n">CisOutput</span> <span class="n">out_channel</span><span class="p">(</span><span class="s">&quot;outputA&quot;</span><span class="p">);</span>
-
-  <span class="c1">// Declare resulting variables and create buffer for received message</span>
-  <span class="kt">int</span> <span class="n">flag</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span>
-  <span class="kt">char</span> <span class="n">buf</span><span class="p">[</span><span class="n">MYBUFSIZ</span><span class="p">];</span>
-
-  <span class="c1">// Loop until there is no longer input or the queues are closed</span>
-  <span class="k">while</span> <span class="p">(</span><span class="n">flag</span> <span class="o">&gt;=</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
-  
-    <span class="c1">// Receive input from input channel</span>
-    <span class="c1">// If there is an error, the flag will be negative</span>
-    <span class="c1">// Otherwise, it is the size of the received message</span>
-    <span class="n">flag</span> <span class="o">=</span> <span class="n">in_channel</span><span class="p">.</span><span class="n">recv</span><span class="p">(</span><span class="n">buf</span><span class="p">,</span> <span class="n">MYBUFSIZ</span><span class="p">);</span>
-    <span class="k">if</span> <span class="p">(</span><span class="n">flag</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
-      <span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="s">&quot;Model A: No more input.&quot;</span> <span class="o">&lt;&lt;</span> <span class="n">std</span><span class="o">::</span><span class="n">endl</span><span class="p">;</span>
-      <span class="k">break</span><span class="p">;</span>
-    <span class="p">}</span>
-
-    <span class="c1">// Print received message</span>
-    <span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="s">&quot;Model A: &quot;</span> <span class="o">&lt;&lt;</span> <span class="n">buf</span> <span class="o">&lt;&lt;</span> <span class="n">std</span><span class="o">::</span><span class="n">endl</span><span class="p">;</span>
-
-    <span class="c1">// Send output to output channel</span>
-    <span class="c1">// If there is an error, the flag will be negative</span>
-    <span class="n">flag</span> <span class="o">=</span> <span class="n">out_channel</span><span class="p">.</span><span class="n">send</span><span class="p">(</span><span class="n">buf</span><span class="p">,</span> <span class="n">flag</span><span class="p">);</span>
-    <span class="k">if</span> <span class="p">(</span><span class="n">flag</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
-      <span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="s">&quot;Model A: Error sending output.&quot;</span> <span class="o">&lt;&lt;</span> <span class="n">std</span><span class="o">::</span><span class="n">endl</span><span class="p">;</span>
-      <span class="k">break</span><span class="p">;</span>
-    <span class="p">}</span>
-
-  <span class="p">}</span>
-  
-  <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
-<span class="p">}</span>
+<div class="highlight-c++ notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span><span class="cp">#include</span> <span class="cpf">&lt;iostream&gt;</span><span class="cp"></span>
+<span class="linenos"> 2</span><span class="c1">// Include methods for input/output channels</span>
+<span class="linenos"> 3</span><span class="cp">#include</span> <span class="cpf">&quot;CisInterface.hpp&quot;</span><span class="cp"></span>
+<span class="linenos"> 4</span>
+<span class="linenos"> 5</span><span class="cp">#define MYBUFSIZ 1000</span>
+<span class="linenos"> 6</span>
+<span class="linenos"> 7</span><span class="kt">int</span> <span class="nf">main</span><span class="p">(</span><span class="kt">int</span> <span class="n">argc</span><span class="p">,</span> <span class="kt">char</span> <span class="o">*</span><span class="n">argv</span><span class="p">[])</span> <span class="p">{</span>
+<span class="linenos"> 8</span>  <span class="c1">// Initialize input/output channels</span>
+<span class="linenos"> 9</span>  <span class="n">CisInput</span> <span class="n">in_channel</span><span class="p">(</span><span class="s">&quot;inputA&quot;</span><span class="p">);</span>
+<span class="linenos">10</span>  <span class="n">CisOutput</span> <span class="n">out_channel</span><span class="p">(</span><span class="s">&quot;outputA&quot;</span><span class="p">);</span>
+<span class="linenos">11</span>
+<span class="linenos">12</span>  <span class="c1">// Declare resulting variables and create buffer for received message</span>
+<span class="linenos">13</span>  <span class="kt">int</span> <span class="n">flag</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span>
+<span class="linenos">14</span>  <span class="kt">char</span> <span class="n">buf</span><span class="p">[</span><span class="n">MYBUFSIZ</span><span class="p">];</span>
+<span class="linenos">15</span>
+<span class="linenos">16</span>  <span class="c1">// Loop until there is no longer input or the queues are closed</span>
+<span class="linenos">17</span>  <span class="k">while</span> <span class="p">(</span><span class="n">flag</span> <span class="o">&gt;=</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
+<span class="linenos">18</span>  
+<span class="linenos">19</span>    <span class="c1">// Receive input from input channel</span>
+<span class="linenos">20</span>    <span class="c1">// If there is an error, the flag will be negative</span>
+<span class="linenos">21</span>    <span class="c1">// Otherwise, it is the size of the received message</span>
+<span class="linenos">22</span>    <span class="n">flag</span> <span class="o">=</span> <span class="n">in_channel</span><span class="p">.</span><span class="n">recv</span><span class="p">(</span><span class="n">buf</span><span class="p">,</span> <span class="n">MYBUFSIZ</span><span class="p">);</span>
+<span class="linenos">23</span>    <span class="k">if</span> <span class="p">(</span><span class="n">flag</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
+<span class="linenos">24</span>      <span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="s">&quot;Model A: No more input.&quot;</span> <span class="o">&lt;&lt;</span> <span class="n">std</span><span class="o">::</span><span class="n">endl</span><span class="p">;</span>
+<span class="linenos">25</span>      <span class="k">break</span><span class="p">;</span>
+<span class="linenos">26</span>    <span class="p">}</span>
+<span class="linenos">27</span>
+<span class="linenos">28</span>    <span class="c1">// Print received message</span>
+<span class="linenos">29</span>    <span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="s">&quot;Model A: &quot;</span> <span class="o">&lt;&lt;</span> <span class="n">buf</span> <span class="o">&lt;&lt;</span> <span class="n">std</span><span class="o">::</span><span class="n">endl</span><span class="p">;</span>
+<span class="linenos">30</span>
+<span class="linenos">31</span>    <span class="c1">// Send output to output channel</span>
+<span class="linenos">32</span>    <span class="c1">// If there is an error, the flag will be negative</span>
+<span class="linenos">33</span>    <span class="n">flag</span> <span class="o">=</span> <span class="n">out_channel</span><span class="p">.</span><span class="n">send</span><span class="p">(</span><span class="n">buf</span><span class="p">,</span> <span class="n">flag</span><span class="p">);</span>
+<span class="linenos">34</span>    <span class="k">if</span> <span class="p">(</span><span class="n">flag</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
+<span class="linenos">35</span>      <span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="s">&quot;Model A: Error sending output.&quot;</span> <span class="o">&lt;&lt;</span> <span class="n">std</span><span class="o">::</span><span class="n">endl</span><span class="p">;</span>
+<span class="linenos">36</span>      <span class="k">break</span><span class="p">;</span>
+<span class="linenos">37</span>    <span class="p">}</span>
+<span class="linenos">38</span>
+<span class="linenos">39</span>  <span class="p">}</span>
+<span class="linenos">40</span>  
+<span class="linenos">41</span>  <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+<span class="linenos">42</span><span class="p">}</span>
 </pre></div>
-</td></tr></table></div>
-<div class="highlight-c++ notranslate"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
- 2
- 3
- 4
- 5
- 6
- 7
- 8
- 9
-10
-11
-12
-13
-14
-15
-16
-17
-18
-19
-20
-21
-22
-23
-24
-25
-26
-27
-28
-29
-30
-31
-32
-33
-34
-35
-36
-37
-38
-39
-40
-41
-42</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="cp">#include</span> <span class="cpf">&lt;iostream&gt;</span><span class="cp"></span>
-<span class="c1">// Include methods for input/output channels</span>
-<span class="cp">#include</span> <span class="cpf">&quot;CisInterface.hpp&quot;</span><span class="cp"></span>
-
-<span class="cp">#define MYBUFSIZ 1000</span>
-
-<span class="kt">int</span> <span class="nf">main</span><span class="p">(</span><span class="kt">int</span> <span class="n">argc</span><span class="p">,</span> <span class="kt">char</span> <span class="o">*</span><span class="n">argv</span><span class="p">[])</span> <span class="p">{</span>
-  <span class="c1">// Initialize input/output channels</span>
-  <span class="n">CisInput</span> <span class="n">in_channel</span><span class="p">(</span><span class="s">&quot;inputB&quot;</span><span class="p">);</span>
-  <span class="n">CisOutput</span> <span class="n">out_channel</span><span class="p">(</span><span class="s">&quot;outputB&quot;</span><span class="p">);</span>
-
-  <span class="c1">// Declare resulting variables and create buffer for received message</span>
-  <span class="kt">int</span> <span class="n">flag</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span>
-  <span class="kt">char</span> <span class="n">buf</span><span class="p">[</span><span class="n">MYBUFSIZ</span><span class="p">];</span>
-
-  <span class="c1">// Loop until there is no longer input or the queues are closed</span>
-  <span class="k">while</span> <span class="p">(</span><span class="n">flag</span> <span class="o">&gt;=</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
-  
-    <span class="c1">// Receive input from input channel</span>
-    <span class="c1">// If there is an error, the flag will be negative</span>
-    <span class="c1">// Otherwise, it is the size of the received message</span>
-    <span class="n">flag</span> <span class="o">=</span> <span class="n">in_channel</span><span class="p">.</span><span class="n">recv</span><span class="p">(</span><span class="n">buf</span><span class="p">,</span> <span class="n">MYBUFSIZ</span><span class="p">);</span>
-    <span class="k">if</span> <span class="p">(</span><span class="n">flag</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
-      <span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="s">&quot;Model B: No more input.&quot;</span> <span class="o">&lt;&lt;</span> <span class="n">std</span><span class="o">::</span><span class="n">endl</span><span class="p">;</span>
-      <span class="k">break</span><span class="p">;</span>
-    <span class="p">}</span>
-
-    <span class="c1">// Print received message</span>
-    <span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="s">&quot;Model B: &quot;</span> <span class="o">&lt;&lt;</span> <span class="n">buf</span> <span class="o">&lt;&lt;</span> <span class="n">std</span><span class="o">::</span><span class="n">endl</span><span class="p">;</span>
-
-    <span class="c1">// Send output to output channel</span>
-    <span class="c1">// If there is an error, the flag will be negative</span>
-    <span class="n">flag</span> <span class="o">=</span> <span class="n">out_channel</span><span class="p">.</span><span class="n">send</span><span class="p">(</span><span class="n">buf</span><span class="p">,</span> <span class="n">flag</span><span class="p">);</span>
-    <span class="k">if</span> <span class="p">(</span><span class="n">flag</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
-      <span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="s">&quot;Model B: Error sending output.&quot;</span> <span class="o">&lt;&lt;</span> <span class="n">std</span><span class="o">::</span><span class="n">endl</span><span class="p">;</span>
-      <span class="k">break</span><span class="p">;</span>
-    <span class="p">}</span>
-
-  <span class="p">}</span>
-  
-  <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
-<span class="p">}</span>
+</div>
+<div class="highlight-c++ notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span><span class="cp">#include</span> <span class="cpf">&lt;iostream&gt;</span><span class="cp"></span>
+<span class="linenos"> 2</span><span class="c1">// Include methods for input/output channels</span>
+<span class="linenos"> 3</span><span class="cp">#include</span> <span class="cpf">&quot;CisInterface.hpp&quot;</span><span class="cp"></span>
+<span class="linenos"> 4</span>
+<span class="linenos"> 5</span><span class="cp">#define MYBUFSIZ 1000</span>
+<span class="linenos"> 6</span>
+<span class="linenos"> 7</span><span class="kt">int</span> <span class="nf">main</span><span class="p">(</span><span class="kt">int</span> <span class="n">argc</span><span class="p">,</span> <span class="kt">char</span> <span class="o">*</span><span class="n">argv</span><span class="p">[])</span> <span class="p">{</span>
+<span class="linenos"> 8</span>  <span class="c1">// Initialize input/output channels</span>
+<span class="linenos"> 9</span>  <span class="n">CisInput</span> <span class="n">in_channel</span><span class="p">(</span><span class="s">&quot;inputB&quot;</span><span class="p">);</span>
+<span class="linenos">10</span>  <span class="n">CisOutput</span> <span class="n">out_channel</span><span class="p">(</span><span class="s">&quot;outputB&quot;</span><span class="p">);</span>
+<span class="linenos">11</span>
+<span class="linenos">12</span>  <span class="c1">// Declare resulting variables and create buffer for received message</span>
+<span class="linenos">13</span>  <span class="kt">int</span> <span class="n">flag</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span>
+<span class="linenos">14</span>  <span class="kt">char</span> <span class="n">buf</span><span class="p">[</span><span class="n">MYBUFSIZ</span><span class="p">];</span>
+<span class="linenos">15</span>
+<span class="linenos">16</span>  <span class="c1">// Loop until there is no longer input or the queues are closed</span>
+<span class="linenos">17</span>  <span class="k">while</span> <span class="p">(</span><span class="n">flag</span> <span class="o">&gt;=</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
+<span class="linenos">18</span>  
+<span class="linenos">19</span>    <span class="c1">// Receive input from input channel</span>
+<span class="linenos">20</span>    <span class="c1">// If there is an error, the flag will be negative</span>
+<span class="linenos">21</span>    <span class="c1">// Otherwise, it is the size of the received message</span>
+<span class="linenos">22</span>    <span class="n">flag</span> <span class="o">=</span> <span class="n">in_channel</span><span class="p">.</span><span class="n">recv</span><span class="p">(</span><span class="n">buf</span><span class="p">,</span> <span class="n">MYBUFSIZ</span><span class="p">);</span>
+<span class="linenos">23</span>    <span class="k">if</span> <span class="p">(</span><span class="n">flag</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
+<span class="linenos">24</span>      <span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="s">&quot;Model B: No more input.&quot;</span> <span class="o">&lt;&lt;</span> <span class="n">std</span><span class="o">::</span><span class="n">endl</span><span class="p">;</span>
+<span class="linenos">25</span>      <span class="k">break</span><span class="p">;</span>
+<span class="linenos">26</span>    <span class="p">}</span>
+<span class="linenos">27</span>
+<span class="linenos">28</span>    <span class="c1">// Print received message</span>
+<span class="linenos">29</span>    <span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="s">&quot;Model B: &quot;</span> <span class="o">&lt;&lt;</span> <span class="n">buf</span> <span class="o">&lt;&lt;</span> <span class="n">std</span><span class="o">::</span><span class="n">endl</span><span class="p">;</span>
+<span class="linenos">30</span>
+<span class="linenos">31</span>    <span class="c1">// Send output to output channel</span>
+<span class="linenos">32</span>    <span class="c1">// If there is an error, the flag will be negative</span>
+<span class="linenos">33</span>    <span class="n">flag</span> <span class="o">=</span> <span class="n">out_channel</span><span class="p">.</span><span class="n">send</span><span class="p">(</span><span class="n">buf</span><span class="p">,</span> <span class="n">flag</span><span class="p">);</span>
+<span class="linenos">34</span>    <span class="k">if</span> <span class="p">(</span><span class="n">flag</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
+<span class="linenos">35</span>      <span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="s">&quot;Model B: Error sending output.&quot;</span> <span class="o">&lt;&lt;</span> <span class="n">std</span><span class="o">::</span><span class="n">endl</span><span class="p">;</span>
+<span class="linenos">36</span>      <span class="k">break</span><span class="p">;</span>
+<span class="linenos">37</span>    <span class="p">}</span>
+<span class="linenos">38</span>
+<span class="linenos">39</span>  <span class="p">}</span>
+<span class="linenos">40</span>  
+<span class="linenos">41</span>  <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+<span class="linenos">42</span><span class="p">}</span>
 </pre></div>
-</td></tr></table></div>
+</div>
 <p>Model YAML:</p>
-<div class="highlight-yaml notranslate"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
- 2
- 3
- 4
- 5
- 6
- 7
- 8
- 9
-10
-11
-12
-13
-14
-15
-16
-17
-18
-19
-20</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="nt">models</span><span class="p">:</span>
-  <span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">cpp_modelA</span>
-    <span class="nt">language</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">c++</span>
-    <span class="nt">args</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">./src/backwards_modelA.cpp</span>
-    <span class="nt">inputs</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">inputA</span>
-    <span class="nt">outputs</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">outputA</span>
-
-  <span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">cpp_modelB</span>
-    <span class="nt">language</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">c++</span>
-    <span class="nt">args</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">./src/backwards_modelB.cpp</span>
-    <span class="nt">inputs</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">inputB</span>
-    <span class="nt">outputs</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">outputB</span>
-
-<span class="nt">connections</span><span class="p">:</span>
-  <span class="p p-Indicator">-</span> <span class="nt">input</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">outputA</span>  <span class="c1"># Connection between model A output &amp; model B input</span>
-    <span class="nt">output</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">inputB</span>
-  <span class="p p-Indicator">-</span> <span class="nt">input</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">./Input/input.txt</span>  <span class="c1"># Connection between file and model A input</span>
-    <span class="nt">output</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">inputA</span>
-  <span class="p p-Indicator">-</span> <span class="nt">input</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">outputB</span>  <span class="c1"># Connection between model B output and file</span>
-    <span class="nt">output</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">./output.txt</span>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span><span class="nt">models</span><span class="p">:</span>
+<span class="linenos"> 2</span>  <span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">cpp_modelA</span>
+<span class="linenos"> 3</span>    <span class="nt">language</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">c++</span>
+<span class="linenos"> 4</span>    <span class="nt">args</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">./src/backwards_modelA.cpp</span>
+<span class="linenos"> 5</span>    <span class="nt">inputs</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">inputA</span>
+<span class="linenos"> 6</span>    <span class="nt">outputs</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">outputA</span>
+<span class="linenos"> 7</span>
+<span class="linenos"> 8</span>  <span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">cpp_modelB</span>
+<span class="linenos"> 9</span>    <span class="nt">language</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">c++</span>
+<span class="linenos">10</span>    <span class="nt">args</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">./src/backwards_modelB.cpp</span>
+<span class="linenos">11</span>    <span class="nt">inputs</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">inputB</span>
+<span class="linenos">12</span>    <span class="nt">outputs</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">outputB</span>
+<span class="linenos">13</span>
+<span class="linenos">14</span><span class="nt">connections</span><span class="p">:</span>
+<span class="linenos">15</span>  <span class="p p-Indicator">-</span> <span class="nt">input</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">outputA</span>  <span class="c1"># Connection between model A output &amp; model B input</span>
+<span class="linenos">16</span>    <span class="nt">output</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">inputB</span>
+<span class="linenos">17</span>  <span class="p p-Indicator">-</span> <span class="nt">input</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">./Input/input.txt</span>  <span class="c1"># Connection between file and model A input</span>
+<span class="linenos">18</span>    <span class="nt">output</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">inputA</span>
+<span class="linenos">19</span>  <span class="p p-Indicator">-</span> <span class="nt">input</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">outputB</span>  <span class="c1"># Connection between model B output and file</span>
+<span class="linenos">20</span>    <span class="nt">output</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">./output.txt</span>
 </pre></div>
-</td></tr></table></div>
+</div>
 </div>
 <div class="section" id="make-version">
 <h2><a class="toc-backref" href="#id5">Make Version</a><a class="headerlink" href="#make-version" title="Permalink to this headline">¶</a></h2>
 <p>Model Code:</p>
-<div class="highlight-c++ notranslate"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
- 2
- 3
- 4
- 5
- 6
- 7
- 8
- 9
-10
-11
-12
-13
-14
-15
-16
-17
-18
-19
-20
-21
-22
-23
-24
-25
-26
-27
-28
-29
-30
-31
-32
-33
-34
-35
-36
-37
-38
-39
-40
-41
-42</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="cp">#include</span> <span class="cpf">&lt;iostream&gt;</span><span class="cp"></span>
-<span class="c1">// Include methods for input/output channels</span>
-<span class="cp">#include</span> <span class="cpf">&quot;CisInterface.hpp&quot;</span><span class="cp"></span>
-
-<span class="cp">#define MYBUFSIZ 1000</span>
-
-<span class="kt">int</span> <span class="nf">main</span><span class="p">(</span><span class="kt">int</span> <span class="n">argc</span><span class="p">,</span> <span class="kt">char</span> <span class="o">*</span><span class="n">argv</span><span class="p">[])</span> <span class="p">{</span>
-  <span class="c1">// Initialize input/output channels</span>
-  <span class="n">CisInput</span> <span class="n">in_channel</span><span class="p">(</span><span class="s">&quot;inputA&quot;</span><span class="p">);</span>
-  <span class="n">CisOutput</span> <span class="n">out_channel</span><span class="p">(</span><span class="s">&quot;outputA&quot;</span><span class="p">);</span>
-
-  <span class="c1">// Declare resulting variables and create buffer for received message</span>
-  <span class="kt">int</span> <span class="n">flag</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span>
-  <span class="kt">char</span> <span class="n">buf</span><span class="p">[</span><span class="n">MYBUFSIZ</span><span class="p">];</span>
-
-  <span class="c1">// Loop until there is no longer input or the queues are closed</span>
-  <span class="k">while</span> <span class="p">(</span><span class="n">flag</span> <span class="o">&gt;=</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
-  
-    <span class="c1">// Receive input from input channel</span>
-    <span class="c1">// If there is an error, the flag will be negative</span>
-    <span class="c1">// Otherwise, it is the size of the received message</span>
-    <span class="n">flag</span> <span class="o">=</span> <span class="n">in_channel</span><span class="p">.</span><span class="n">recv</span><span class="p">(</span><span class="n">buf</span><span class="p">,</span> <span class="n">MYBUFSIZ</span><span class="p">);</span>
-    <span class="k">if</span> <span class="p">(</span><span class="n">flag</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
-      <span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="s">&quot;Model A: No more input.&quot;</span> <span class="o">&lt;&lt;</span> <span class="n">std</span><span class="o">::</span><span class="n">endl</span><span class="p">;</span>
-      <span class="k">break</span><span class="p">;</span>
-    <span class="p">}</span>
-
-    <span class="c1">// Print received message</span>
-    <span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="s">&quot;Model A: &quot;</span> <span class="o">&lt;&lt;</span> <span class="n">buf</span> <span class="o">&lt;&lt;</span> <span class="n">std</span><span class="o">::</span><span class="n">endl</span><span class="p">;</span>
-
-    <span class="c1">// Send output to output channel</span>
-    <span class="c1">// If there is an error, the flag will be negative</span>
-    <span class="n">flag</span> <span class="o">=</span> <span class="n">out_channel</span><span class="p">.</span><span class="n">send</span><span class="p">(</span><span class="n">buf</span><span class="p">,</span> <span class="n">flag</span><span class="p">);</span>
-    <span class="k">if</span> <span class="p">(</span><span class="n">flag</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
-      <span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="s">&quot;Model A: Error sending output.&quot;</span> <span class="o">&lt;&lt;</span> <span class="n">std</span><span class="o">::</span><span class="n">endl</span><span class="p">;</span>
-      <span class="k">break</span><span class="p">;</span>
-    <span class="p">}</span>
-
-  <span class="p">}</span>
-  
-  <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
-<span class="p">}</span>
+<div class="highlight-c++ notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span><span class="cp">#include</span> <span class="cpf">&lt;iostream&gt;</span><span class="cp"></span>
+<span class="linenos"> 2</span><span class="c1">// Include methods for input/output channels</span>
+<span class="linenos"> 3</span><span class="cp">#include</span> <span class="cpf">&quot;CisInterface.hpp&quot;</span><span class="cp"></span>
+<span class="linenos"> 4</span>
+<span class="linenos"> 5</span><span class="cp">#define MYBUFSIZ 1000</span>
+<span class="linenos"> 6</span>
+<span class="linenos"> 7</span><span class="kt">int</span> <span class="nf">main</span><span class="p">(</span><span class="kt">int</span> <span class="n">argc</span><span class="p">,</span> <span class="kt">char</span> <span class="o">*</span><span class="n">argv</span><span class="p">[])</span> <span class="p">{</span>
+<span class="linenos"> 8</span>  <span class="c1">// Initialize input/output channels</span>
+<span class="linenos"> 9</span>  <span class="n">CisInput</span> <span class="n">in_channel</span><span class="p">(</span><span class="s">&quot;inputA&quot;</span><span class="p">);</span>
+<span class="linenos">10</span>  <span class="n">CisOutput</span> <span class="n">out_channel</span><span class="p">(</span><span class="s">&quot;outputA&quot;</span><span class="p">);</span>
+<span class="linenos">11</span>
+<span class="linenos">12</span>  <span class="c1">// Declare resulting variables and create buffer for received message</span>
+<span class="linenos">13</span>  <span class="kt">int</span> <span class="n">flag</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span>
+<span class="linenos">14</span>  <span class="kt">char</span> <span class="n">buf</span><span class="p">[</span><span class="n">MYBUFSIZ</span><span class="p">];</span>
+<span class="linenos">15</span>
+<span class="linenos">16</span>  <span class="c1">// Loop until there is no longer input or the queues are closed</span>
+<span class="linenos">17</span>  <span class="k">while</span> <span class="p">(</span><span class="n">flag</span> <span class="o">&gt;=</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
+<span class="linenos">18</span>  
+<span class="linenos">19</span>    <span class="c1">// Receive input from input channel</span>
+<span class="linenos">20</span>    <span class="c1">// If there is an error, the flag will be negative</span>
+<span class="linenos">21</span>    <span class="c1">// Otherwise, it is the size of the received message</span>
+<span class="linenos">22</span>    <span class="n">flag</span> <span class="o">=</span> <span class="n">in_channel</span><span class="p">.</span><span class="n">recv</span><span class="p">(</span><span class="n">buf</span><span class="p">,</span> <span class="n">MYBUFSIZ</span><span class="p">);</span>
+<span class="linenos">23</span>    <span class="k">if</span> <span class="p">(</span><span class="n">flag</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
+<span class="linenos">24</span>      <span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="s">&quot;Model A: No more input.&quot;</span> <span class="o">&lt;&lt;</span> <span class="n">std</span><span class="o">::</span><span class="n">endl</span><span class="p">;</span>
+<span class="linenos">25</span>      <span class="k">break</span><span class="p">;</span>
+<span class="linenos">26</span>    <span class="p">}</span>
+<span class="linenos">27</span>
+<span class="linenos">28</span>    <span class="c1">// Print received message</span>
+<span class="linenos">29</span>    <span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="s">&quot;Model A: &quot;</span> <span class="o">&lt;&lt;</span> <span class="n">buf</span> <span class="o">&lt;&lt;</span> <span class="n">std</span><span class="o">::</span><span class="n">endl</span><span class="p">;</span>
+<span class="linenos">30</span>
+<span class="linenos">31</span>    <span class="c1">// Send output to output channel</span>
+<span class="linenos">32</span>    <span class="c1">// If there is an error, the flag will be negative</span>
+<span class="linenos">33</span>    <span class="n">flag</span> <span class="o">=</span> <span class="n">out_channel</span><span class="p">.</span><span class="n">send</span><span class="p">(</span><span class="n">buf</span><span class="p">,</span> <span class="n">flag</span><span class="p">);</span>
+<span class="linenos">34</span>    <span class="k">if</span> <span class="p">(</span><span class="n">flag</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
+<span class="linenos">35</span>      <span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="s">&quot;Model A: Error sending output.&quot;</span> <span class="o">&lt;&lt;</span> <span class="n">std</span><span class="o">::</span><span class="n">endl</span><span class="p">;</span>
+<span class="linenos">36</span>      <span class="k">break</span><span class="p">;</span>
+<span class="linenos">37</span>    <span class="p">}</span>
+<span class="linenos">38</span>
+<span class="linenos">39</span>  <span class="p">}</span>
+<span class="linenos">40</span>  
+<span class="linenos">41</span>  <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+<span class="linenos">42</span><span class="p">}</span>
 </pre></div>
-</td></tr></table></div>
-<div class="highlight-c++ notranslate"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
- 2
- 3
- 4
- 5
- 6
- 7
- 8
- 9
-10
-11
-12
-13
-14
-15
-16
-17
-18
-19
-20
-21
-22
-23
-24
-25
-26
-27
-28
-29
-30
-31
-32
-33
-34
-35
-36
-37
-38
-39
-40
-41
-42</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="cp">#include</span> <span class="cpf">&lt;iostream&gt;</span><span class="cp"></span>
-<span class="c1">// Include methods for input/output channels</span>
-<span class="cp">#include</span> <span class="cpf">&quot;CisInterface.hpp&quot;</span><span class="cp"></span>
-
-<span class="cp">#define MYBUFSIZ 1000</span>
-
-<span class="kt">int</span> <span class="nf">main</span><span class="p">(</span><span class="kt">int</span> <span class="n">argc</span><span class="p">,</span> <span class="kt">char</span> <span class="o">*</span><span class="n">argv</span><span class="p">[])</span> <span class="p">{</span>
-  <span class="c1">// Initialize input/output channels</span>
-  <span class="n">CisInput</span> <span class="n">in_channel</span><span class="p">(</span><span class="s">&quot;inputB&quot;</span><span class="p">);</span>
-  <span class="n">CisOutput</span> <span class="n">out_channel</span><span class="p">(</span><span class="s">&quot;outputB&quot;</span><span class="p">);</span>
-
-  <span class="c1">// Declare resulting variables and create buffer for received message</span>
-  <span class="kt">int</span> <span class="n">flag</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span>
-  <span class="kt">char</span> <span class="n">buf</span><span class="p">[</span><span class="n">MYBUFSIZ</span><span class="p">];</span>
-
-  <span class="c1">// Loop until there is no longer input or the queues are closed</span>
-  <span class="k">while</span> <span class="p">(</span><span class="n">flag</span> <span class="o">&gt;=</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
-  
-    <span class="c1">// Receive input from input channel</span>
-    <span class="c1">// If there is an error, the flag will be negative</span>
-    <span class="c1">// Otherwise, it is the size of the received message</span>
-    <span class="n">flag</span> <span class="o">=</span> <span class="n">in_channel</span><span class="p">.</span><span class="n">recv</span><span class="p">(</span><span class="n">buf</span><span class="p">,</span> <span class="n">MYBUFSIZ</span><span class="p">);</span>
-    <span class="k">if</span> <span class="p">(</span><span class="n">flag</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
-      <span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="s">&quot;Model B: No more input.&quot;</span> <span class="o">&lt;&lt;</span> <span class="n">std</span><span class="o">::</span><span class="n">endl</span><span class="p">;</span>
-      <span class="k">break</span><span class="p">;</span>
-    <span class="p">}</span>
-
-    <span class="c1">// Print received message</span>
-    <span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="s">&quot;Model B: &quot;</span> <span class="o">&lt;&lt;</span> <span class="n">buf</span> <span class="o">&lt;&lt;</span> <span class="n">std</span><span class="o">::</span><span class="n">endl</span><span class="p">;</span>
-
-    <span class="c1">// Send output to output channel</span>
-    <span class="c1">// If there is an error, the flag will be negative</span>
-    <span class="n">flag</span> <span class="o">=</span> <span class="n">out_channel</span><span class="p">.</span><span class="n">send</span><span class="p">(</span><span class="n">buf</span><span class="p">,</span> <span class="n">flag</span><span class="p">);</span>
-    <span class="k">if</span> <span class="p">(</span><span class="n">flag</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
-      <span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="s">&quot;Model B: Error sending output.&quot;</span> <span class="o">&lt;&lt;</span> <span class="n">std</span><span class="o">::</span><span class="n">endl</span><span class="p">;</span>
-      <span class="k">break</span><span class="p">;</span>
-    <span class="p">}</span>
-
-  <span class="p">}</span>
-  
-  <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
-<span class="p">}</span>
+</div>
+<div class="highlight-c++ notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span><span class="cp">#include</span> <span class="cpf">&lt;iostream&gt;</span><span class="cp"></span>
+<span class="linenos"> 2</span><span class="c1">// Include methods for input/output channels</span>
+<span class="linenos"> 3</span><span class="cp">#include</span> <span class="cpf">&quot;CisInterface.hpp&quot;</span><span class="cp"></span>
+<span class="linenos"> 4</span>
+<span class="linenos"> 5</span><span class="cp">#define MYBUFSIZ 1000</span>
+<span class="linenos"> 6</span>
+<span class="linenos"> 7</span><span class="kt">int</span> <span class="nf">main</span><span class="p">(</span><span class="kt">int</span> <span class="n">argc</span><span class="p">,</span> <span class="kt">char</span> <span class="o">*</span><span class="n">argv</span><span class="p">[])</span> <span class="p">{</span>
+<span class="linenos"> 8</span>  <span class="c1">// Initialize input/output channels</span>
+<span class="linenos"> 9</span>  <span class="n">CisInput</span> <span class="n">in_channel</span><span class="p">(</span><span class="s">&quot;inputB&quot;</span><span class="p">);</span>
+<span class="linenos">10</span>  <span class="n">CisOutput</span> <span class="n">out_channel</span><span class="p">(</span><span class="s">&quot;outputB&quot;</span><span class="p">);</span>
+<span class="linenos">11</span>
+<span class="linenos">12</span>  <span class="c1">// Declare resulting variables and create buffer for received message</span>
+<span class="linenos">13</span>  <span class="kt">int</span> <span class="n">flag</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span>
+<span class="linenos">14</span>  <span class="kt">char</span> <span class="n">buf</span><span class="p">[</span><span class="n">MYBUFSIZ</span><span class="p">];</span>
+<span class="linenos">15</span>
+<span class="linenos">16</span>  <span class="c1">// Loop until there is no longer input or the queues are closed</span>
+<span class="linenos">17</span>  <span class="k">while</span> <span class="p">(</span><span class="n">flag</span> <span class="o">&gt;=</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
+<span class="linenos">18</span>  
+<span class="linenos">19</span>    <span class="c1">// Receive input from input channel</span>
+<span class="linenos">20</span>    <span class="c1">// If there is an error, the flag will be negative</span>
+<span class="linenos">21</span>    <span class="c1">// Otherwise, it is the size of the received message</span>
+<span class="linenos">22</span>    <span class="n">flag</span> <span class="o">=</span> <span class="n">in_channel</span><span class="p">.</span><span class="n">recv</span><span class="p">(</span><span class="n">buf</span><span class="p">,</span> <span class="n">MYBUFSIZ</span><span class="p">);</span>
+<span class="linenos">23</span>    <span class="k">if</span> <span class="p">(</span><span class="n">flag</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
+<span class="linenos">24</span>      <span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="s">&quot;Model B: No more input.&quot;</span> <span class="o">&lt;&lt;</span> <span class="n">std</span><span class="o">::</span><span class="n">endl</span><span class="p">;</span>
+<span class="linenos">25</span>      <span class="k">break</span><span class="p">;</span>
+<span class="linenos">26</span>    <span class="p">}</span>
+<span class="linenos">27</span>
+<span class="linenos">28</span>    <span class="c1">// Print received message</span>
+<span class="linenos">29</span>    <span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="s">&quot;Model B: &quot;</span> <span class="o">&lt;&lt;</span> <span class="n">buf</span> <span class="o">&lt;&lt;</span> <span class="n">std</span><span class="o">::</span><span class="n">endl</span><span class="p">;</span>
+<span class="linenos">30</span>
+<span class="linenos">31</span>    <span class="c1">// Send output to output channel</span>
+<span class="linenos">32</span>    <span class="c1">// If there is an error, the flag will be negative</span>
+<span class="linenos">33</span>    <span class="n">flag</span> <span class="o">=</span> <span class="n">out_channel</span><span class="p">.</span><span class="n">send</span><span class="p">(</span><span class="n">buf</span><span class="p">,</span> <span class="n">flag</span><span class="p">);</span>
+<span class="linenos">34</span>    <span class="k">if</span> <span class="p">(</span><span class="n">flag</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
+<span class="linenos">35</span>      <span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="s">&quot;Model B: Error sending output.&quot;</span> <span class="o">&lt;&lt;</span> <span class="n">std</span><span class="o">::</span><span class="n">endl</span><span class="p">;</span>
+<span class="linenos">36</span>      <span class="k">break</span><span class="p">;</span>
+<span class="linenos">37</span>    <span class="p">}</span>
+<span class="linenos">38</span>
+<span class="linenos">39</span>  <span class="p">}</span>
+<span class="linenos">40</span>  
+<span class="linenos">41</span>  <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+<span class="linenos">42</span><span class="p">}</span>
 </pre></div>
-</td></tr></table></div>
+</div>
 <p>Model YAML:</p>
-<div class="highlight-yaml notranslate"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
- 2
- 3
- 4
- 5
- 6
- 7
- 8
- 9
-10
-11
-12
-13
-14
-15
-16
-17
-18
-19
-20
-21
-22</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="nt">models</span><span class="p">:</span>
-  <span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">make_modelA</span>
-    <span class="nt">language</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">make</span>
-    <span class="nt">args</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">./src/backwards_modelA.c</span>
-    <span class="nt">target</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">backwards_modelA</span>
-    <span class="nt">inputs</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">inputA</span>
-    <span class="nt">outputs</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">outputA</span>
-
-  <span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">make_modelB</span>
-    <span class="nt">language</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">make</span>
-    <span class="nt">args</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">./src/backwards_modelB.c</span>
-    <span class="nt">target</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">backwards_modelB</span>
-    <span class="nt">inputs</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">inputB</span>
-    <span class="nt">outputs</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">outputB</span>
-
-<span class="nt">connections</span><span class="p">:</span>
-  <span class="p p-Indicator">-</span> <span class="nt">input</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">outputA</span>  <span class="c1"># Connection between model A output &amp; model B input</span>
-    <span class="nt">output</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">inputB</span>
-  <span class="p p-Indicator">-</span> <span class="nt">input</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">./Input/input.txt</span>  <span class="c1"># Connection between file and model A input</span>
-    <span class="nt">output</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">inputA</span>
-  <span class="p p-Indicator">-</span> <span class="nt">input</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">outputB</span>  <span class="c1"># Connection between model B output and file</span>
-    <span class="nt">output</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">./output.txt</span>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span><span class="nt">models</span><span class="p">:</span>
+<span class="linenos"> 2</span>  <span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">make_modelA</span>
+<span class="linenos"> 3</span>    <span class="nt">language</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">make</span>
+<span class="linenos"> 4</span>    <span class="nt">args</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">./src/backwards_modelA.c</span>
+<span class="linenos"> 5</span>    <span class="nt">target</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">backwards_modelA</span>
+<span class="linenos"> 6</span>    <span class="nt">inputs</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">inputA</span>
+<span class="linenos"> 7</span>    <span class="nt">outputs</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">outputA</span>
+<span class="linenos"> 8</span>
+<span class="linenos"> 9</span>  <span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">make_modelB</span>
+<span class="linenos">10</span>    <span class="nt">language</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">make</span>
+<span class="linenos">11</span>    <span class="nt">args</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">./src/backwards_modelB.c</span>
+<span class="linenos">12</span>    <span class="nt">target</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">backwards_modelB</span>
+<span class="linenos">13</span>    <span class="nt">inputs</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">inputB</span>
+<span class="linenos">14</span>    <span class="nt">outputs</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">outputB</span>
+<span class="linenos">15</span>
+<span class="linenos">16</span><span class="nt">connections</span><span class="p">:</span>
+<span class="linenos">17</span>  <span class="p p-Indicator">-</span> <span class="nt">input</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">outputA</span>  <span class="c1"># Connection between model A output &amp; model B input</span>
+<span class="linenos">18</span>    <span class="nt">output</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">inputB</span>
+<span class="linenos">19</span>  <span class="p p-Indicator">-</span> <span class="nt">input</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">./Input/input.txt</span>  <span class="c1"># Connection between file and model A input</span>
+<span class="linenos">20</span>    <span class="nt">output</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">inputA</span>
+<span class="linenos">21</span>  <span class="p p-Indicator">-</span> <span class="nt">input</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">outputB</span>  <span class="c1"># Connection between model B output and file</span>
+<span class="linenos">22</span>    <span class="nt">output</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">./output.txt</span>
 </pre></div>
-</td></tr></table></div>
+</div>
 </div>
 <div class="section" id="matlab-version">
 <h2><a class="toc-backref" href="#id6">Matlab Version</a><a class="headerlink" href="#matlab-version" title="Permalink to this headline">¶</a></h2>
 <p>Model Code:</p>
-<div class="highlight-matlab notranslate"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
- 2
- 3
- 4
- 5
- 6
- 7
- 8
- 9
-10
-11
-12
-13
-14
-15
-16
-17
-18
-19
-20
-21
-22
-23
-24
-25
-26
-27
-28
-29</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="c">% Initialize input/output channels </span>
-<span class="n">in_channel</span> <span class="p">=</span> <span class="n">CisInterface</span><span class="p">(</span><span class="s">&#39;CisInput&#39;</span><span class="p">,</span> <span class="s">&#39;inputA&#39;</span><span class="p">);</span>
-<span class="n">out_channel</span> <span class="p">=</span> <span class="n">CisInterface</span><span class="p">(</span><span class="s">&#39;CisOutput&#39;</span><span class="p">,</span> <span class="s">&#39;outputA&#39;</span><span class="p">);</span>
-
-<span class="n">flag</span> <span class="p">=</span> <span class="n">true</span><span class="p">;</span>
-
-<span class="c">% Loop until there is no longer input or the queues are closed</span>
-<span class="k">while</span> <span class="n">flag</span>
-
-  <span class="c">% Receive input from input channel</span>
-  <span class="c">% If there is an error, the flag will be False.</span>
-  <span class="p">[</span><span class="n">flag</span><span class="p">,</span> <span class="n">msg</span><span class="p">]</span> <span class="p">=</span> <span class="n">in_channel</span><span class="p">.</span><span class="n">recv</span><span class="p">();</span>
-  <span class="k">if</span> <span class="p">(</span><span class="o">~</span><span class="n">flag</span><span class="p">)</span>
-    <span class="nb">disp</span><span class="p">(</span><span class="s">&#39;Model A: No more input.&#39;</span><span class="p">);</span>
-    <span class="k">break</span><span class="p">;</span>
-  <span class="k">end</span><span class="p">;</span>
-
-  <span class="c">% Print received message</span>
-  <span class="n">fprintf</span><span class="p">(</span><span class="s">&#39;Model A: %s\n&#39;</span><span class="p">,</span> <span class="n">char</span><span class="p">(</span><span class="n">msg</span><span class="p">));</span>
-
-  <span class="c">% Send output to output channel</span>
-  <span class="c">% If there is an error, the flag will be False</span>
-  <span class="n">flag</span> <span class="p">=</span> <span class="n">out_channel</span><span class="p">.</span><span class="n">send</span><span class="p">(</span><span class="n">msg</span><span class="p">);</span>
-  <span class="k">if</span> <span class="p">(</span><span class="o">~</span><span class="n">flag</span><span class="p">)</span>
-    <span class="n">error</span><span class="p">(</span><span class="s">&#39;Model A: Error sending output.&#39;</span><span class="p">);</span>
-    <span class="k">break</span><span class="p">;</span>
-  <span class="k">end</span><span class="p">;</span>
-  
-<span class="k">end</span><span class="p">;</span>
+<div class="highlight-matlab notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span><span class="c">% Initialize input/output channels </span><span class="w"></span>
+<span class="linenos"> 2</span><span class="n">in_channel</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="n">CisInterface</span><span class="p">(</span><span class="s">&#39;CisInput&#39;</span><span class="p">,</span><span class="w"> </span><span class="s">&#39;inputA&#39;</span><span class="p">);</span><span class="w"></span>
+<span class="linenos"> 3</span><span class="n">out_channel</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="n">CisInterface</span><span class="p">(</span><span class="s">&#39;CisOutput&#39;</span><span class="p">,</span><span class="w"> </span><span class="s">&#39;outputA&#39;</span><span class="p">);</span><span class="w"></span>
+<span class="linenos"> 4</span>
+<span class="linenos"> 5</span><span class="nb">flag</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="nb">true</span><span class="p">;</span><span class="w"></span>
+<span class="linenos"> 6</span>
+<span class="linenos"> 7</span><span class="c">% Loop until there is no longer input or the queues are closed</span><span class="w"></span>
+<span class="linenos"> 8</span><span class="k">while</span><span class="w"> </span><span class="nb">flag</span><span class="w"></span>
+<span class="linenos"> 9</span>
+<span class="linenos">10</span><span class="w">  </span><span class="c">% Receive input from input channel</span><span class="w"></span>
+<span class="linenos">11</span><span class="w">  </span><span class="c">% If there is an error, the flag will be False.</span><span class="w"></span>
+<span class="linenos">12</span><span class="w">  </span><span class="p">[</span><span class="nb">flag</span><span class="p">,</span><span class="w"> </span><span class="n">msg</span><span class="p">]</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="n">in_channel</span><span class="p">.</span><span class="n">recv</span><span class="p">();</span><span class="w"></span>
+<span class="linenos">13</span><span class="w">  </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="o">~</span><span class="nb">flag</span><span class="p">)</span><span class="w"></span>
+<span class="linenos">14</span><span class="w">    </span><span class="nb">disp</span><span class="p">(</span><span class="s">&#39;Model A: No more input.&#39;</span><span class="p">);</span><span class="w"></span>
+<span class="linenos">15</span><span class="w">    </span><span class="k">break</span><span class="p">;</span><span class="w"></span>
+<span class="linenos">16</span><span class="w">  </span><span class="k">end</span><span class="p">;</span><span class="w"></span>
+<span class="linenos">17</span>
+<span class="linenos">18</span><span class="w">  </span><span class="c">% Print received message</span><span class="w"></span>
+<span class="linenos">19</span><span class="w">  </span><span class="nb">fprintf</span><span class="p">(</span><span class="s">&#39;Model A: %s\n&#39;</span><span class="p">,</span><span class="w"> </span><span class="nb">char</span><span class="p">(</span><span class="n">msg</span><span class="p">));</span><span class="w"></span>
+<span class="linenos">20</span>
+<span class="linenos">21</span><span class="w">  </span><span class="c">% Send output to output channel</span><span class="w"></span>
+<span class="linenos">22</span><span class="w">  </span><span class="c">% If there is an error, the flag will be False</span><span class="w"></span>
+<span class="linenos">23</span><span class="w">  </span><span class="nb">flag</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="n">out_channel</span><span class="p">.</span><span class="n">send</span><span class="p">(</span><span class="n">msg</span><span class="p">);</span><span class="w"></span>
+<span class="linenos">24</span><span class="w">  </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="o">~</span><span class="nb">flag</span><span class="p">)</span><span class="w"></span>
+<span class="linenos">25</span><span class="w">    </span><span class="nb">error</span><span class="p">(</span><span class="s">&#39;Model A: Error sending output.&#39;</span><span class="p">);</span><span class="w"></span>
+<span class="linenos">26</span><span class="w">    </span><span class="k">break</span><span class="p">;</span><span class="w"></span>
+<span class="linenos">27</span><span class="w">  </span><span class="k">end</span><span class="p">;</span><span class="w"></span>
+<span class="linenos">28</span><span class="w">  </span>
+<span class="linenos">29</span><span class="k">end</span><span class="p">;</span><span class="w"></span>
 </pre></div>
-</td></tr></table></div>
-<div class="highlight-matlab notranslate"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
- 2
- 3
- 4
- 5
- 6
- 7
- 8
- 9
-10
-11
-12
-13
-14
-15
-16
-17
-18
-19
-20
-21
-22
-23
-24
-25
-26
-27
-28
-29</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="c">% Initialize input/output channels </span>
-<span class="n">in_channel</span> <span class="p">=</span> <span class="n">CisInterface</span><span class="p">(</span><span class="s">&#39;CisInput&#39;</span><span class="p">,</span> <span class="s">&#39;inputB&#39;</span><span class="p">);</span>
-<span class="n">out_channel</span> <span class="p">=</span> <span class="n">CisInterface</span><span class="p">(</span><span class="s">&#39;CisOutput&#39;</span><span class="p">,</span> <span class="s">&#39;outputB&#39;</span><span class="p">);</span>
-
-<span class="n">flag</span> <span class="p">=</span> <span class="n">true</span><span class="p">;</span>
-
-<span class="c">% Loop until there is no longer input or the queues are closed</span>
-<span class="k">while</span> <span class="n">flag</span>
-
-  <span class="c">% Receive input from input channel</span>
-  <span class="c">% If there is an error, the flag will be False.</span>
-  <span class="p">[</span><span class="n">flag</span><span class="p">,</span> <span class="n">msg</span><span class="p">]</span> <span class="p">=</span> <span class="n">in_channel</span><span class="p">.</span><span class="n">recv</span><span class="p">();</span>
-  <span class="k">if</span> <span class="p">(</span><span class="o">~</span><span class="n">flag</span><span class="p">)</span>
-    <span class="nb">disp</span><span class="p">(</span><span class="s">&#39;Model B: No more input.&#39;</span><span class="p">);</span>
-    <span class="k">break</span><span class="p">;</span>
-  <span class="k">end</span><span class="p">;</span>
-
-  <span class="c">% Print received message</span>
-  <span class="n">fprintf</span><span class="p">(</span><span class="s">&#39;Model B: %s\n&#39;</span><span class="p">,</span> <span class="n">char</span><span class="p">(</span><span class="n">msg</span><span class="p">));</span>
-
-  <span class="c">% Send output to output channel</span>
-  <span class="c">% If there is an error, the flag will be False</span>
-  <span class="n">flag</span> <span class="p">=</span> <span class="n">out_channel</span><span class="p">.</span><span class="n">send</span><span class="p">(</span><span class="n">msg</span><span class="p">);</span>
-  <span class="k">if</span> <span class="p">(</span><span class="o">~</span><span class="n">flag</span><span class="p">)</span>
-    <span class="n">error</span><span class="p">(</span><span class="s">&#39;Model B: Error sending output.&#39;</span><span class="p">);</span>
-    <span class="k">break</span><span class="p">;</span>
-  <span class="k">end</span><span class="p">;</span>
-  
-<span class="k">end</span><span class="p">;</span>
+</div>
+<div class="highlight-matlab notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span><span class="c">% Initialize input/output channels </span><span class="w"></span>
+<span class="linenos"> 2</span><span class="n">in_channel</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="n">CisInterface</span><span class="p">(</span><span class="s">&#39;CisInput&#39;</span><span class="p">,</span><span class="w"> </span><span class="s">&#39;inputB&#39;</span><span class="p">);</span><span class="w"></span>
+<span class="linenos"> 3</span><span class="n">out_channel</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="n">CisInterface</span><span class="p">(</span><span class="s">&#39;CisOutput&#39;</span><span class="p">,</span><span class="w"> </span><span class="s">&#39;outputB&#39;</span><span class="p">);</span><span class="w"></span>
+<span class="linenos"> 4</span>
+<span class="linenos"> 5</span><span class="nb">flag</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="nb">true</span><span class="p">;</span><span class="w"></span>
+<span class="linenos"> 6</span>
+<span class="linenos"> 7</span><span class="c">% Loop until there is no longer input or the queues are closed</span><span class="w"></span>
+<span class="linenos"> 8</span><span class="k">while</span><span class="w"> </span><span class="nb">flag</span><span class="w"></span>
+<span class="linenos"> 9</span>
+<span class="linenos">10</span><span class="w">  </span><span class="c">% Receive input from input channel</span><span class="w"></span>
+<span class="linenos">11</span><span class="w">  </span><span class="c">% If there is an error, the flag will be False.</span><span class="w"></span>
+<span class="linenos">12</span><span class="w">  </span><span class="p">[</span><span class="nb">flag</span><span class="p">,</span><span class="w"> </span><span class="n">msg</span><span class="p">]</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="n">in_channel</span><span class="p">.</span><span class="n">recv</span><span class="p">();</span><span class="w"></span>
+<span class="linenos">13</span><span class="w">  </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="o">~</span><span class="nb">flag</span><span class="p">)</span><span class="w"></span>
+<span class="linenos">14</span><span class="w">    </span><span class="nb">disp</span><span class="p">(</span><span class="s">&#39;Model B: No more input.&#39;</span><span class="p">);</span><span class="w"></span>
+<span class="linenos">15</span><span class="w">    </span><span class="k">break</span><span class="p">;</span><span class="w"></span>
+<span class="linenos">16</span><span class="w">  </span><span class="k">end</span><span class="p">;</span><span class="w"></span>
+<span class="linenos">17</span>
+<span class="linenos">18</span><span class="w">  </span><span class="c">% Print received message</span><span class="w"></span>
+<span class="linenos">19</span><span class="w">  </span><span class="nb">fprintf</span><span class="p">(</span><span class="s">&#39;Model B: %s\n&#39;</span><span class="p">,</span><span class="w"> </span><span class="nb">char</span><span class="p">(</span><span class="n">msg</span><span class="p">));</span><span class="w"></span>
+<span class="linenos">20</span>
+<span class="linenos">21</span><span class="w">  </span><span class="c">% Send output to output channel</span><span class="w"></span>
+<span class="linenos">22</span><span class="w">  </span><span class="c">% If there is an error, the flag will be False</span><span class="w"></span>
+<span class="linenos">23</span><span class="w">  </span><span class="nb">flag</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="n">out_channel</span><span class="p">.</span><span class="n">send</span><span class="p">(</span><span class="n">msg</span><span class="p">);</span><span class="w"></span>
+<span class="linenos">24</span><span class="w">  </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="o">~</span><span class="nb">flag</span><span class="p">)</span><span class="w"></span>
+<span class="linenos">25</span><span class="w">    </span><span class="nb">error</span><span class="p">(</span><span class="s">&#39;Model B: Error sending output.&#39;</span><span class="p">);</span><span class="w"></span>
+<span class="linenos">26</span><span class="w">    </span><span class="k">break</span><span class="p">;</span><span class="w"></span>
+<span class="linenos">27</span><span class="w">  </span><span class="k">end</span><span class="p">;</span><span class="w"></span>
+<span class="linenos">28</span><span class="w">  </span>
+<span class="linenos">29</span><span class="k">end</span><span class="p">;</span><span class="w"></span>
 </pre></div>
-</td></tr></table></div>
+</div>
 <p>Model YAML:</p>
-<div class="highlight-yaml notranslate"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
- 2
- 3
- 4
- 5
- 6
- 7
- 8
- 9
-10
-11
-12
-13
-14
-15
-16
-17
-18
-19
-20</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="nt">models</span><span class="p">:</span>
-  <span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">matlab_modelA</span>
-    <span class="nt">language</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">matlab</span>
-    <span class="nt">args</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">./src/backwards_modelA.m</span>
-    <span class="nt">inputs</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">inputA</span>
-    <span class="nt">outputs</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">outputA</span>
-
-  <span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">matlab_modelB</span>
-    <span class="nt">language</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">matlab</span>
-    <span class="nt">args</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">./src/backwards_modelB.m</span>
-    <span class="nt">inputs</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">inputB</span>
-    <span class="nt">outputs</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">outputB</span>
-
-<span class="nt">connections</span><span class="p">:</span>
-  <span class="p p-Indicator">-</span> <span class="nt">input</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">outputA</span>  <span class="c1"># Connection between model A output &amp; model B input</span>
-    <span class="nt">output</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">inputB</span>
-  <span class="p p-Indicator">-</span> <span class="nt">input</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">./Input/input.txt</span>  <span class="c1"># Connection between file and model A input</span>
-    <span class="nt">output</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">inputA</span>
-  <span class="p p-Indicator">-</span> <span class="nt">input</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">outputB</span>  <span class="c1"># Connection between model B output and file</span>
-    <span class="nt">output</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">./output.txt</span>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span><span class="nt">models</span><span class="p">:</span>
+<span class="linenos"> 2</span>  <span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">matlab_modelA</span>
+<span class="linenos"> 3</span>    <span class="nt">language</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">matlab</span>
+<span class="linenos"> 4</span>    <span class="nt">args</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">./src/backwards_modelA.m</span>
+<span class="linenos"> 5</span>    <span class="nt">inputs</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">inputA</span>
+<span class="linenos"> 6</span>    <span class="nt">outputs</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">outputA</span>
+<span class="linenos"> 7</span>
+<span class="linenos"> 8</span>  <span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">matlab_modelB</span>
+<span class="linenos"> 9</span>    <span class="nt">language</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">matlab</span>
+<span class="linenos">10</span>    <span class="nt">args</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">./src/backwards_modelB.m</span>
+<span class="linenos">11</span>    <span class="nt">inputs</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">inputB</span>
+<span class="linenos">12</span>    <span class="nt">outputs</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">outputB</span>
+<span class="linenos">13</span>
+<span class="linenos">14</span><span class="nt">connections</span><span class="p">:</span>
+<span class="linenos">15</span>  <span class="p p-Indicator">-</span> <span class="nt">input</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">outputA</span>  <span class="c1"># Connection between model A output &amp; model B input</span>
+<span class="linenos">16</span>    <span class="nt">output</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">inputB</span>
+<span class="linenos">17</span>  <span class="p p-Indicator">-</span> <span class="nt">input</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">./Input/input.txt</span>  <span class="c1"># Connection between file and model A input</span>
+<span class="linenos">18</span>    <span class="nt">output</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">inputA</span>
+<span class="linenos">19</span>  <span class="p p-Indicator">-</span> <span class="nt">input</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">outputB</span>  <span class="c1"># Connection between model B output and file</span>
+<span class="linenos">20</span>    <span class="nt">output</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">./output.txt</span>
 </pre></div>
-</td></tr></table></div>
+</div>
 </div>
 <div class="section" id="python-version">
 <h2><a class="toc-backref" href="#id7">Python Version</a><a class="headerlink" href="#python-version" title="Permalink to this headline">¶</a></h2>
 <p>Model Code:</p>
-<div class="highlight-python notranslate"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
- 2
- 3
- 4
- 5
- 6
- 7
- 8
- 9
-10
-11
-12
-13
-14
-15
-16
-17
-18
-19
-20
-21
-22
-23
-24
-25</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="c1"># Import classes for input/output channels</span>
-<span class="kn">from</span> <span class="nn">yggdrasil.interface.CisInterface</span> <span class="kn">import</span> <span class="n">CisInput</span><span class="p">,</span> <span class="n">CisOutput</span>
-
-<span class="c1"># Initialize input/output channels</span>
-<span class="n">in_channel</span> <span class="o">=</span> <span class="n">CisInput</span><span class="p">(</span><span class="s1">&#39;inputA&#39;</span><span class="p">)</span>
-<span class="n">out_channel</span> <span class="o">=</span> <span class="n">CisOutput</span><span class="p">(</span><span class="s1">&#39;outputA&#39;</span><span class="p">)</span>
-
-<span class="c1"># Loop until there is no longer input or the queues are closed</span>
-<span class="k">while</span> <span class="bp">True</span><span class="p">:</span>
-
-    <span class="c1"># Receive input from input channel</span>
-    <span class="c1"># If there is an error, the flag will be False</span>
-    <span class="n">flag</span><span class="p">,</span> <span class="n">msg</span> <span class="o">=</span> <span class="n">in_channel</span><span class="o">.</span><span class="n">recv</span><span class="p">()</span>
-    <span class="k">if</span> <span class="ow">not</span> <span class="n">flag</span><span class="p">:</span>
-        <span class="k">print</span><span class="p">(</span><span class="s2">&quot;Model A: No more input.&quot;</span><span class="p">)</span>
-        <span class="k">break</span>
-
-    <span class="c1"># Print received message</span>
-    <span class="k">print</span><span class="p">(</span><span class="s1">&#39;Model A: </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">msg</span><span class="p">)</span>
-
-    <span class="c1"># Send output to output channel</span>
-    <span class="c1"># If there is an error, the flag will be False</span>
-    <span class="n">flag</span> <span class="o">=</span> <span class="n">out_channel</span><span class="o">.</span><span class="n">send</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
-    <span class="k">if</span> <span class="ow">not</span> <span class="n">flag</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">&quot;Model A: Error sending output.&quot;</span><span class="p">)</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span><span class="c1"># Import classes for input/output channels</span>
+<span class="linenos"> 2</span><span class="kn">from</span> <span class="nn">yggdrasil.interface.CisInterface</span> <span class="kn">import</span> <span class="n">CisInput</span><span class="p">,</span> <span class="n">CisOutput</span>
+<span class="linenos"> 3</span>
+<span class="linenos"> 4</span><span class="c1"># Initialize input/output channels</span>
+<span class="linenos"> 5</span><span class="n">in_channel</span> <span class="o">=</span> <span class="n">CisInput</span><span class="p">(</span><span class="s1">&#39;inputA&#39;</span><span class="p">)</span>
+<span class="linenos"> 6</span><span class="n">out_channel</span> <span class="o">=</span> <span class="n">CisOutput</span><span class="p">(</span><span class="s1">&#39;outputA&#39;</span><span class="p">)</span>
+<span class="linenos"> 7</span>
+<span class="linenos"> 8</span><span class="c1"># Loop until there is no longer input or the queues are closed</span>
+<span class="linenos"> 9</span><span class="k">while</span> <span class="kc">True</span><span class="p">:</span>
+<span class="linenos">10</span>
+<span class="linenos">11</span>    <span class="c1"># Receive input from input channel</span>
+<span class="linenos">12</span>    <span class="c1"># If there is an error, the flag will be False</span>
+<span class="linenos">13</span>    <span class="n">flag</span><span class="p">,</span> <span class="n">msg</span> <span class="o">=</span> <span class="n">in_channel</span><span class="o">.</span><span class="n">recv</span><span class="p">()</span>
+<span class="linenos">14</span>    <span class="k">if</span> <span class="ow">not</span> <span class="n">flag</span><span class="p">:</span>
+<span class="linenos">15</span>        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Model A: No more input.&quot;</span><span class="p">)</span>
+<span class="linenos">16</span>        <span class="k">break</span>
+<span class="linenos">17</span>
+<span class="linenos">18</span>    <span class="c1"># Print received message</span>
+<span class="linenos">19</span>    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Model A: </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">msg</span><span class="p">)</span>
+<span class="linenos">20</span>
+<span class="linenos">21</span>    <span class="c1"># Send output to output channel</span>
+<span class="linenos">22</span>    <span class="c1"># If there is an error, the flag will be False</span>
+<span class="linenos">23</span>    <span class="n">flag</span> <span class="o">=</span> <span class="n">out_channel</span><span class="o">.</span><span class="n">send</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+<span class="linenos">24</span>    <span class="k">if</span> <span class="ow">not</span> <span class="n">flag</span><span class="p">:</span>
+<span class="linenos">25</span>        <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">&quot;Model A: Error sending output.&quot;</span><span class="p">)</span>
 </pre></div>
-</td></tr></table></div>
-<div class="highlight-python notranslate"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
- 2
- 3
- 4
- 5
- 6
- 7
- 8
- 9
-10
-11
-12
-13
-14
-15
-16
-17
-18
-19
-20
-21
-22
-23
-24
-25</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="c1"># Import classes for input/output channels</span>
-<span class="kn">from</span> <span class="nn">yggdrasil.interface.CisInterface</span> <span class="kn">import</span> <span class="n">CisInput</span><span class="p">,</span> <span class="n">CisOutput</span>
-
-<span class="c1"># Initialize input/output channels</span>
-<span class="n">in_channel</span> <span class="o">=</span> <span class="n">CisInput</span><span class="p">(</span><span class="s1">&#39;inputB&#39;</span><span class="p">)</span>
-<span class="n">out_channel</span> <span class="o">=</span> <span class="n">CisOutput</span><span class="p">(</span><span class="s1">&#39;outputB&#39;</span><span class="p">)</span>
-
-<span class="c1"># Loop until there is no longer input or the queues are closed</span>
-<span class="k">while</span> <span class="bp">True</span><span class="p">:</span>
-
-    <span class="c1"># Receive input from input channel</span>
-    <span class="c1"># If there is an error, the flag will be False</span>
-    <span class="n">flag</span><span class="p">,</span> <span class="n">msg</span> <span class="o">=</span> <span class="n">in_channel</span><span class="o">.</span><span class="n">recv</span><span class="p">()</span>
-    <span class="k">if</span> <span class="ow">not</span> <span class="n">flag</span><span class="p">:</span>
-        <span class="k">print</span><span class="p">(</span><span class="s2">&quot;Model B: No more input.&quot;</span><span class="p">)</span>
-        <span class="k">break</span>
-
-    <span class="c1"># Print received message</span>
-    <span class="k">print</span><span class="p">(</span><span class="s1">&#39;Model B: </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">msg</span><span class="p">)</span>
-
-    <span class="c1"># Send output to output channel</span>
-    <span class="c1"># If there is an error, the flag will be False</span>
-    <span class="n">flag</span> <span class="o">=</span> <span class="n">out_channel</span><span class="o">.</span><span class="n">send</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
-    <span class="k">if</span> <span class="ow">not</span> <span class="n">flag</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">&quot;Model B: Error sending output.&quot;</span><span class="p">)</span>
+</div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span><span class="c1"># Import classes for input/output channels</span>
+<span class="linenos"> 2</span><span class="kn">from</span> <span class="nn">yggdrasil.interface.CisInterface</span> <span class="kn">import</span> <span class="n">CisInput</span><span class="p">,</span> <span class="n">CisOutput</span>
+<span class="linenos"> 3</span>
+<span class="linenos"> 4</span><span class="c1"># Initialize input/output channels</span>
+<span class="linenos"> 5</span><span class="n">in_channel</span> <span class="o">=</span> <span class="n">CisInput</span><span class="p">(</span><span class="s1">&#39;inputB&#39;</span><span class="p">)</span>
+<span class="linenos"> 6</span><span class="n">out_channel</span> <span class="o">=</span> <span class="n">CisOutput</span><span class="p">(</span><span class="s1">&#39;outputB&#39;</span><span class="p">)</span>
+<span class="linenos"> 7</span>
+<span class="linenos"> 8</span><span class="c1"># Loop until there is no longer input or the queues are closed</span>
+<span class="linenos"> 9</span><span class="k">while</span> <span class="kc">True</span><span class="p">:</span>
+<span class="linenos">10</span>
+<span class="linenos">11</span>    <span class="c1"># Receive input from input channel</span>
+<span class="linenos">12</span>    <span class="c1"># If there is an error, the flag will be False</span>
+<span class="linenos">13</span>    <span class="n">flag</span><span class="p">,</span> <span class="n">msg</span> <span class="o">=</span> <span class="n">in_channel</span><span class="o">.</span><span class="n">recv</span><span class="p">()</span>
+<span class="linenos">14</span>    <span class="k">if</span> <span class="ow">not</span> <span class="n">flag</span><span class="p">:</span>
+<span class="linenos">15</span>        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Model B: No more input.&quot;</span><span class="p">)</span>
+<span class="linenos">16</span>        <span class="k">break</span>
+<span class="linenos">17</span>
+<span class="linenos">18</span>    <span class="c1"># Print received message</span>
+<span class="linenos">19</span>    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Model B: </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">msg</span><span class="p">)</span>
+<span class="linenos">20</span>
+<span class="linenos">21</span>    <span class="c1"># Send output to output channel</span>
+<span class="linenos">22</span>    <span class="c1"># If there is an error, the flag will be False</span>
+<span class="linenos">23</span>    <span class="n">flag</span> <span class="o">=</span> <span class="n">out_channel</span><span class="o">.</span><span class="n">send</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+<span class="linenos">24</span>    <span class="k">if</span> <span class="ow">not</span> <span class="n">flag</span><span class="p">:</span>
+<span class="linenos">25</span>        <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">&quot;Model B: Error sending output.&quot;</span><span class="p">)</span>
 </pre></div>
-</td></tr></table></div>
+</div>
 <p>Model YAML:</p>
-<div class="highlight-yaml notranslate"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
- 2
- 3
- 4
- 5
- 6
- 7
- 8
- 9
-10
-11
-12
-13
-14
-15
-16
-17
-18
-19
-20</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="nt">models</span><span class="p">:</span>
-  <span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">python_modelA</span>
-    <span class="nt">language</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">python</span>
-    <span class="nt">args</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">./src/backwards_modelA.py</span>
-    <span class="nt">inputs</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">inputA</span>
-    <span class="nt">outputs</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">outputA</span>
-
-  <span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">python_modelB</span>
-    <span class="nt">language</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">python</span>
-    <span class="nt">args</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">./src/backwards_modelB.py</span>
-    <span class="nt">inputs</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">inputB</span>
-    <span class="nt">outputs</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">outputB</span>
-
-<span class="nt">connections</span><span class="p">:</span>
-  <span class="p p-Indicator">-</span> <span class="nt">input</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">outputA</span>  <span class="c1"># Connection between model A output &amp; model B input</span>
-    <span class="nt">output</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">inputB</span>
-  <span class="p p-Indicator">-</span> <span class="nt">input</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">./Input/input.txt</span>  <span class="c1"># Connection between file and model A input</span>
-    <span class="nt">output</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">inputA</span>
-  <span class="p p-Indicator">-</span> <span class="nt">input</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">outputB</span>  <span class="c1"># Connection between model B output and file</span>
-    <span class="nt">output</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">./output.txt</span>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span><span class="nt">models</span><span class="p">:</span>
+<span class="linenos"> 2</span>  <span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">python_modelA</span>
+<span class="linenos"> 3</span>    <span class="nt">language</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">python</span>
+<span class="linenos"> 4</span>    <span class="nt">args</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">./src/backwards_modelA.py</span>
+<span class="linenos"> 5</span>    <span class="nt">inputs</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">inputA</span>
+<span class="linenos"> 6</span>    <span class="nt">outputs</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">outputA</span>
+<span class="linenos"> 7</span>
+<span class="linenos"> 8</span>  <span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">python_modelB</span>
+<span class="linenos"> 9</span>    <span class="nt">language</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">python</span>
+<span class="linenos">10</span>    <span class="nt">args</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">./src/backwards_modelB.py</span>
+<span class="linenos">11</span>    <span class="nt">inputs</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">inputB</span>
+<span class="linenos">12</span>    <span class="nt">outputs</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">outputB</span>
+<span class="linenos">13</span>
+<span class="linenos">14</span><span class="nt">connections</span><span class="p">:</span>
+<span class="linenos">15</span>  <span class="p p-Indicator">-</span> <span class="nt">input</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">outputA</span>  <span class="c1"># Connection between model A output &amp; model B input</span>
+<span class="linenos">16</span>    <span class="nt">output</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">inputB</span>
+<span class="linenos">17</span>  <span class="p p-Indicator">-</span> <span class="nt">input</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">./Input/input.txt</span>  <span class="c1"># Connection between file and model A input</span>
+<span class="linenos">18</span>    <span class="nt">output</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">inputA</span>
+<span class="linenos">19</span>  <span class="p p-Indicator">-</span> <span class="nt">input</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">outputB</span>  <span class="c1"># Connection between model B output and file</span>
+<span class="linenos">20</span>    <span class="nt">output</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">./output.txt</span>
 </pre></div>
-</td></tr></table></div>
+</div>
 </div>
 <div class="section" id="r-version">
 <h2><a class="toc-backref" href="#id8">R Version</a><a class="headerlink" href="#r-version" title="Permalink to this headline">¶</a></h2>
 <p>Model Code:</p>
-<div class="highlight-python notranslate"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
- 2
- 3
- 4
- 5
- 6
- 7
- 8
- 9
-10
-11
-12
-13
-14
-15
-16
-17
-18
-19
-20
-21
-22
-23
-24
-25
-26
-27
-28
-29</pre></div></td><td class="code"><div class="highlight"><pre><span></span># Import library for input/output
-library(yggdrasil)
-
-# Initialize input/output channels
-in_channel &lt;- YggInterface(&#39;YggInput&#39;, &#39;inputA&#39;)
-out_channel &lt;- YggInterface(&#39;YggOutput&#39;, &#39;outputA&#39;)
-
-# Loop until there is no longer input or the queues are closed
-while(TRUE) {
-
-  # Receive input from input channel
-  # If there is an error, the flag will be False
-  c(flag, msg) %&lt;-% in_channel$recv()
-  if (!flag) {
-    print(&#39;Model A: No more input.&#39;)
-    break
-  }
-
-  # Print received message
-  fprintf(&#39;Model A: %s&#39;, msg)
-
-  # Send output to output channel
-  # If there is an error, the flag will be False
-  flag = out_channel$send(msg)
-  if (!flag) {
-    stop(&#39;Model A: Error sending output.&#39;)
-  }
-
-}
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span># Import library for input/output
+<span class="linenos"> 2</span>library(yggdrasil)
+<span class="linenos"> 3</span>
+<span class="linenos"> 4</span># Initialize input/output channels
+<span class="linenos"> 5</span>in_channel &lt;- YggInterface(&#39;YggInput&#39;, &#39;inputA&#39;)
+<span class="linenos"> 6</span>out_channel &lt;- YggInterface(&#39;YggOutput&#39;, &#39;outputA&#39;)
+<span class="linenos"> 7</span>
+<span class="linenos"> 8</span># Loop until there is no longer input or the queues are closed
+<span class="linenos"> 9</span>while(TRUE) {
+<span class="linenos">10</span>
+<span class="linenos">11</span>  # Receive input from input channel
+<span class="linenos">12</span>  # If there is an error, the flag will be False
+<span class="linenos">13</span>  c(flag, msg) %&lt;-% in_channel$recv()
+<span class="linenos">14</span>  if (!flag) {
+<span class="linenos">15</span>    print(&#39;Model A: No more input.&#39;)
+<span class="linenos">16</span>    break
+<span class="linenos">17</span>  }
+<span class="linenos">18</span>
+<span class="linenos">19</span>  # Print received message
+<span class="linenos">20</span>  fprintf(&#39;Model A: %s&#39;, msg)
+<span class="linenos">21</span>
+<span class="linenos">22</span>  # Send output to output channel
+<span class="linenos">23</span>  # If there is an error, the flag will be False
+<span class="linenos">24</span>  flag = out_channel$send(msg)
+<span class="linenos">25</span>  if (!flag) {
+<span class="linenos">26</span>    stop(&#39;Model A: Error sending output.&#39;)
+<span class="linenos">27</span>  }
+<span class="linenos">28</span>
+<span class="linenos">29</span>}
 </pre></div>
-</td></tr></table></div>
-<div class="highlight-python notranslate"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
- 2
- 3
- 4
- 5
- 6
- 7
- 8
- 9
-10
-11
-12
-13
-14
-15
-16
-17
-18
-19
-20
-21
-22
-23
-24
-25
-26
-27
-28
-29</pre></div></td><td class="code"><div class="highlight"><pre><span></span># Import library for input/output
-library(yggdrasil)
-
-# Initialize input/output channels
-in_channel &lt;- YggInterface(&#39;YggInput&#39;, &#39;inputB&#39;)
-out_channel &lt;- YggInterface(&#39;YggOutput&#39;, &#39;outputB&#39;)
-
-# Loop until there is no longer input or the queues are closed
-while(TRUE) {
-
-  # Receive input from input channel
-  # If there is an error, the flag will be False
-  c(flag, msg) %&lt;-% in_channel$recv()
-  if (!flag) {
-    print(&#39;Model B: No more input.&#39;)
-    break
-  }
-
-  # Print received message
-  fprintf(&#39;Model B: %s&#39;, msg)
-
-  # Send output to output channel
-  # If there is an error, the flag will be False
-  flag = out_channel$send(msg)
-  if (!flag) {
-    stop(&#39;Model B: Error sending output.&#39;)
-  }
-
-}
+</div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span># Import library for input/output
+<span class="linenos"> 2</span>library(yggdrasil)
+<span class="linenos"> 3</span>
+<span class="linenos"> 4</span># Initialize input/output channels
+<span class="linenos"> 5</span>in_channel &lt;- YggInterface(&#39;YggInput&#39;, &#39;inputB&#39;)
+<span class="linenos"> 6</span>out_channel &lt;- YggInterface(&#39;YggOutput&#39;, &#39;outputB&#39;)
+<span class="linenos"> 7</span>
+<span class="linenos"> 8</span># Loop until there is no longer input or the queues are closed
+<span class="linenos"> 9</span>while(TRUE) {
+<span class="linenos">10</span>
+<span class="linenos">11</span>  # Receive input from input channel
+<span class="linenos">12</span>  # If there is an error, the flag will be False
+<span class="linenos">13</span>  c(flag, msg) %&lt;-% in_channel$recv()
+<span class="linenos">14</span>  if (!flag) {
+<span class="linenos">15</span>    print(&#39;Model B: No more input.&#39;)
+<span class="linenos">16</span>    break
+<span class="linenos">17</span>  }
+<span class="linenos">18</span>
+<span class="linenos">19</span>  # Print received message
+<span class="linenos">20</span>  fprintf(&#39;Model B: %s&#39;, msg)
+<span class="linenos">21</span>
+<span class="linenos">22</span>  # Send output to output channel
+<span class="linenos">23</span>  # If there is an error, the flag will be False
+<span class="linenos">24</span>  flag = out_channel$send(msg)
+<span class="linenos">25</span>  if (!flag) {
+<span class="linenos">26</span>    stop(&#39;Model B: Error sending output.&#39;)
+<span class="linenos">27</span>  }
+<span class="linenos">28</span>
+<span class="linenos">29</span>}
 </pre></div>
-</td></tr></table></div>
+</div>
 <p>Model YAML:</p>
-<div class="highlight-yaml notranslate"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
- 2
- 3
- 4
- 5
- 6
- 7
- 8
- 9
-10
-11
-12
-13
-14
-15
-16
-17
-18
-19
-20</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="nt">models</span><span class="p">:</span>
-  <span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">R_modelA</span>
-    <span class="nt">language</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">R</span>
-    <span class="nt">args</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">./src/backwards_modelA.R</span>
-    <span class="nt">inputs</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">inputA</span>
-    <span class="nt">outputs</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">outputA</span>
-
-  <span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">R_modelB</span>
-    <span class="nt">language</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">R</span>
-    <span class="nt">args</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">./src/backwards_modelB.R</span>
-    <span class="nt">inputs</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">inputB</span>
-    <span class="nt">outputs</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">outputB</span>
-
-<span class="nt">connections</span><span class="p">:</span>
-  <span class="p p-Indicator">-</span> <span class="nt">input</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">outputA</span>  <span class="c1"># Connection between model A output &amp; model B input</span>
-    <span class="nt">output</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">inputB</span>
-  <span class="p p-Indicator">-</span> <span class="nt">input</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">./Input/input.txt</span>  <span class="c1"># Connection between file and model A input</span>
-    <span class="nt">output</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">inputA</span>
-  <span class="p p-Indicator">-</span> <span class="nt">input</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">outputB</span>  <span class="c1"># Connection between model B output and file</span>
-    <span class="nt">output</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">./output.txt</span>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span><span class="nt">models</span><span class="p">:</span>
+<span class="linenos"> 2</span>  <span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">R_modelA</span>
+<span class="linenos"> 3</span>    <span class="nt">language</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">R</span>
+<span class="linenos"> 4</span>    <span class="nt">args</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">./src/backwards_modelA.R</span>
+<span class="linenos"> 5</span>    <span class="nt">inputs</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">inputA</span>
+<span class="linenos"> 6</span>    <span class="nt">outputs</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">outputA</span>
+<span class="linenos"> 7</span>
+<span class="linenos"> 8</span>  <span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">R_modelB</span>
+<span class="linenos"> 9</span>    <span class="nt">language</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">R</span>
+<span class="linenos">10</span>    <span class="nt">args</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">./src/backwards_modelB.R</span>
+<span class="linenos">11</span>    <span class="nt">inputs</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">inputB</span>
+<span class="linenos">12</span>    <span class="nt">outputs</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">outputB</span>
+<span class="linenos">13</span>
+<span class="linenos">14</span><span class="nt">connections</span><span class="p">:</span>
+<span class="linenos">15</span>  <span class="p p-Indicator">-</span> <span class="nt">input</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">outputA</span>  <span class="c1"># Connection between model A output &amp; model B input</span>
+<span class="linenos">16</span>    <span class="nt">output</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">inputB</span>
+<span class="linenos">17</span>  <span class="p p-Indicator">-</span> <span class="nt">input</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">./Input/input.txt</span>  <span class="c1"># Connection between file and model A input</span>
+<span class="linenos">18</span>    <span class="nt">output</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">inputA</span>
+<span class="linenos">19</span>  <span class="p p-Indicator">-</span> <span class="nt">input</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">outputB</span>  <span class="c1"># Connection between model B output and file</span>
+<span class="linenos">20</span>    <span class="nt">output</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">./output.txt</span>
 </pre></div>
-</td></tr></table></div>
+</div>
 </div>
 </div>
 

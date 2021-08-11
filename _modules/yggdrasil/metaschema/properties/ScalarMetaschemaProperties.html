@@ -7,12 +7,14 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>yggdrasil.metaschema.properties.ScalarMetaschemaProperties &mdash; yggdrasil v1.6.3+18.g537444084.dirty documentation</title>
+  <title>yggdrasil.metaschema.properties.ScalarMetaschemaProperties &mdash; yggdrasil v1.6.4 documentation</title>
   
 
   
   <link rel="stylesheet" href="../../../../_static/css/theme.css" type="text/css" />
   <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../../../_static/css/theme.css" type="text/css" />
 
   
   
@@ -29,6 +31,7 @@
   
     
       <script type="text/javascript" id="documentation_options" data-url_root="../../../../" src="../../../../_static/documentation_options.js"></script>
+        <script data-url_root="../../../../" id="documentation_options" src="../../../../_static/documentation_options.js"></script>
         <script src="../../../../_static/jquery.js"></script>
         <script src="../../../../_static/underscore.js"></script>
         <script src="../../../../_static/doctools.js"></script>
@@ -61,7 +64,7 @@
             
             
               <div class="version">
-                v1.6.3
+                v1.6.4
               </div>
             
           
@@ -86,7 +89,7 @@
               
             
             
-              <p class="caption"><span class="caption-text">Contents:</span></p>
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../../../includeme.html">Overview</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../install.html">Installation</a></li>
@@ -160,8 +163,6 @@
         
           <li><a href="../../../index.html">Module code</a> &raquo;</li>
         
-          <li><a href="../../../yggdrasil.html">yggdrasil</a> &raquo;</li>
-        
           <li><a href="../../metaschema.html">yggdrasil.metaschema</a> &raquo;</li>
         
           <li><a href="../properties.html">yggdrasil.metaschema.properties</a> &raquo;</li>
@@ -183,10 +184,10 @@
             
   <h1>Source code for yggdrasil.metaschema.properties.ScalarMetaschemaProperties</h1><div class="highlight"><pre>
 <span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
-<span class="kn">from</span> <span class="nn">yggdrasil</span> <span class="k">import</span> <span class="n">units</span><span class="p">,</span> <span class="n">platform</span>
-<span class="kn">from</span> <span class="nn">yggdrasil.metaschema.datatypes</span> <span class="k">import</span> <span class="n">MetaschemaTypeError</span>
-<span class="kn">from</span> <span class="nn">yggdrasil.metaschema.properties.MetaschemaProperty</span> <span class="k">import</span> <span class="n">MetaschemaProperty</span>
-<span class="kn">from</span> <span class="nn">collections</span> <span class="k">import</span> <span class="n">OrderedDict</span>
+<span class="kn">from</span> <span class="nn">yggdrasil</span> <span class="kn">import</span> <span class="n">units</span><span class="p">,</span> <span class="n">platform</span>
+<span class="kn">from</span> <span class="nn">yggdrasil.metaschema.datatypes</span> <span class="kn">import</span> <span class="n">MetaschemaTypeError</span>
+<span class="kn">from</span> <span class="nn">yggdrasil.metaschema.properties.MetaschemaProperty</span> <span class="kn">import</span> <span class="n">MetaschemaProperty</span>
+<span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">OrderedDict</span>
 
 
 <span class="n">_valid_numpy_types</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;int&#39;</span><span class="p">,</span> <span class="s1">&#39;uint&#39;</span><span class="p">,</span> <span class="s1">&#39;float&#39;</span><span class="p">,</span> <span class="s1">&#39;complex&#39;</span><span class="p">]</span>

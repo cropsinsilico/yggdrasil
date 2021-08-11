@@ -1,6 +1,6 @@
 Model YAML:
 
-.. literalinclude:: /../../yggdrasil/examples/fakeplant/photosynthesis.yml
+.. literalinclude:: /../../../../../../../opt/hostedtoolcache/Python/3.8.11/x64/lib/python3.8/site-packages/yggdrasil/examples/fakeplant/photosynthesis.yml
    :language: yaml
    :linenos:
 

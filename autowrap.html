@@ -7,12 +7,14 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>Autowrapping Model Functions &mdash; yggdrasil v1.6.3+18.g537444084.dirty documentation</title>
+  <title>Autowrapping Model Functions &mdash; yggdrasil v1.6.4 documentation</title>
   
 
   
   <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
   <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
 
   
   
@@ -29,6 +31,7 @@
   
     
       <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
         <script src="_static/jquery.js"></script>
         <script src="_static/underscore.js"></script>
         <script src="_static/doctools.js"></script>
@@ -63,7 +66,7 @@
             
             
               <div class="version">
-                v1.6.3
+                v1.6.4
               </div>
             
           
@@ -88,7 +91,7 @@
               
             
             
-              <p class="caption"><span class="caption-text">Contents:</span></p>
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="includeme.html">Overview</a></li>
 <li class="toctree-l1"><a class="reference internal" href="install.html">Installation</a></li>
@@ -186,72 +189,45 @@
 <span id="autowrap-rst"></span><h1>Autowrapping Model Functions<a class="headerlink" href="#autowrapping-model-functions" title="Permalink to this headline">¶</a></h1>
 <p>If your model can be expressed as a function in one of the supported languages, yggdrasil can automatically create the wrapper to make calls to the interface. In the example below, the two models being connected are just functions with one input and one output.</p>
 <p>Model Code:</p>
-<div class="highlight-python notranslate"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
-2
-3
-4</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">model_function</span><span class="p">(</span><span class="n">in_buf</span><span class="p">):</span>
-    <span class="k">print</span><span class="p">(</span><span class="s2">&quot;Model A: </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">in_buf</span><span class="p">)</span>
-    <span class="n">out_buf</span> <span class="o">=</span> <span class="n">in_buf</span>
-    <span class="k">return</span> <span class="n">out_buf</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="linenos">1</span><span class="k">def</span> <span class="nf">model_function</span><span class="p">(</span><span class="n">in_buf</span><span class="p">):</span>
+<span class="linenos">2</span>    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Model A: </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">in_buf</span><span class="p">)</span>
+<span class="linenos">3</span>    <span class="n">out_buf</span> <span class="o">=</span> <span class="n">in_buf</span>
+<span class="linenos">4</span>    <span class="k">return</span> <span class="n">out_buf</span>
 </pre></div>
-</td></tr></table></div>
-<div class="highlight-python notranslate"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
-2
-3
-4</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">model_function</span><span class="p">(</span><span class="n">in_buf</span><span class="p">):</span>
-    <span class="k">print</span><span class="p">(</span><span class="s2">&quot;Model B: </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">in_buf</span><span class="p">)</span>
-    <span class="n">out_buf</span> <span class="o">=</span> <span class="n">in_buf</span>
-    <span class="k">return</span> <span class="n">out_buf</span>
+</div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="linenos">1</span><span class="k">def</span> <span class="nf">model_function</span><span class="p">(</span><span class="n">in_buf</span><span class="p">):</span>
+<span class="linenos">2</span>    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Model B: </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">in_buf</span><span class="p">)</span>
+<span class="linenos">3</span>    <span class="n">out_buf</span> <span class="o">=</span> <span class="n">in_buf</span>
+<span class="linenos">4</span>    <span class="k">return</span> <span class="n">out_buf</span>
 </pre></div>
-</td></tr></table></div>
+</div>
 <p>(<a class="reference external" href="examples/model_function.html">Example in other languages</a>)</p>
 <p>In order to allow yggdrasil to wrap model functions, the corresponding entry in the YAML specification file should include a value for the <code class="docutils literal notranslate"><span class="pre">function</span></code> parameter which should be the name of the model function within the model file (provided via the <code class="docutils literal notranslate"><span class="pre">args</span></code> parameter). If no inputs or outputs are provided, yggdrasil will attempt to parse the definition for the target model function in order to determine the model’s inputs and outputs. If inputs and/or outputs are provided in the YAML they must either match the number of inputs and/or outputs in the function defintion (as below) or there must only be one and all of the model’s inputs and/or outputs will be bundled as an array.</p>
 <p>Model YAML:</p>
-<div class="highlight-yaml notranslate"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
- 2
- 3
- 4
- 5
- 6
- 7
- 8
- 9
-10
-11
-12
-13
-14
-15
-16
-17
-18
-19
-20
-21
-22</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="nt">models</span><span class="p">:</span>
-  <span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">python_modelA</span>
-    <span class="nt">language</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">python</span>
-    <span class="nt">args</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">./src/model_function_modelA.py</span>
-    <span class="nt">function</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">model_function</span>
-    <span class="nt">inputs</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">inputA</span>
-    <span class="nt">outputs</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">outputA</span>
-
-  <span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">python_modelB</span>
-    <span class="nt">language</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">python</span>
-    <span class="nt">args</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">./src/model_function_modelB.py</span>
-    <span class="nt">function</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">model_function</span>
-    <span class="nt">inputs</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">inputB</span>
-    <span class="nt">outputs</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">outputB</span>
-
-<span class="nt">connections</span><span class="p">:</span>
-  <span class="p p-Indicator">-</span> <span class="nt">input</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">outputA</span>  <span class="c1"># Connection between model A output &amp; model B input</span>
-    <span class="nt">output</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">inputB</span>
-  <span class="p p-Indicator">-</span> <span class="nt">input</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">./Input/input.txt</span>  <span class="c1"># Connection between file and model A input</span>
-    <span class="nt">output</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">inputA</span>
-  <span class="p p-Indicator">-</span> <span class="nt">input</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">outputB</span>  <span class="c1"># Connection between model B output and file</span>
-    <span class="nt">output</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">./output.txt</span>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span><span class="nt">models</span><span class="p">:</span>
+<span class="linenos"> 2</span>  <span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">python_modelA</span>
+<span class="linenos"> 3</span>    <span class="nt">language</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">python</span>
+<span class="linenos"> 4</span>    <span class="nt">args</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">./src/model_function_modelA.py</span>
+<span class="linenos"> 5</span>    <span class="nt">function</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">model_function</span>
+<span class="linenos"> 6</span>    <span class="nt">inputs</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">inputA</span>
+<span class="linenos"> 7</span>    <span class="nt">outputs</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">outputA</span>
+<span class="linenos"> 8</span>
+<span class="linenos"> 9</span>  <span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">python_modelB</span>
+<span class="linenos">10</span>    <span class="nt">language</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">python</span>
+<span class="linenos">11</span>    <span class="nt">args</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">./src/model_function_modelB.py</span>
+<span class="linenos">12</span>    <span class="nt">function</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">model_function</span>
+<span class="linenos">13</span>    <span class="nt">inputs</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">inputB</span>
+<span class="linenos">14</span>    <span class="nt">outputs</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">outputB</span>
+<span class="linenos">15</span>
+<span class="linenos">16</span><span class="nt">connections</span><span class="p">:</span>
+<span class="linenos">17</span>  <span class="p p-Indicator">-</span> <span class="nt">input</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">outputA</span>  <span class="c1"># Connection between model A output &amp; model B input</span>
+<span class="linenos">18</span>    <span class="nt">output</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">inputB</span>
+<span class="linenos">19</span>  <span class="p p-Indicator">-</span> <span class="nt">input</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">./Input/input.txt</span>  <span class="c1"># Connection between file and model A input</span>
+<span class="linenos">20</span>    <span class="nt">output</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">inputA</span>
+<span class="linenos">21</span>  <span class="p p-Indicator">-</span> <span class="nt">input</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">outputB</span>  <span class="c1"># Connection between model B output and file</span>
+<span class="linenos">22</span>    <span class="nt">output</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">./output.txt</span>
 </pre></div>
-</td></tr></table></div>
+</div>
 <p>(<a class="reference external" href="examples/model_function.html">Example in other languages</a>)</p>
 <div class="section" id="notes-on-autowrapping-c-c-model-functions">
 <h2>Notes on Autowrapping C/C++ Model Functions<a class="headerlink" href="#notes-on-autowrapping-c-c-model-functions" title="Permalink to this headline">¶</a></h2>

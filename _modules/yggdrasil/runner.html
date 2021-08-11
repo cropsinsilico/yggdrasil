@@ -7,12 +7,14 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>yggdrasil.runner &mdash; yggdrasil v1.6.3+18.g537444084.dirty documentation</title>
+  <title>yggdrasil.runner &mdash; yggdrasil v1.6.4 documentation</title>
   
 
   
   <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
   <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
 
   
   
@@ -29,6 +31,7 @@
   
     
       <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+        <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
         <script src="../../_static/jquery.js"></script>
         <script src="../../_static/underscore.js"></script>
         <script src="../../_static/doctools.js"></script>
@@ -61,7 +64,7 @@
             
             
               <div class="version">
-                v1.6.3
+                v1.6.4
               </div>
             
           
@@ -86,7 +89,7 @@
               
             
             
-              <p class="caption"><span class="caption-text">Contents:</span></p>
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../includeme.html">Overview</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../install.html">Installation</a></li>
@@ -160,8 +163,6 @@
         
           <li><a href="../index.html">Module code</a> &raquo;</li>
         
-          <li><a href="../yggdrasil.html">yggdrasil</a> &raquo;</li>
-        
       <li>yggdrasil.runner</li>
     
     
@@ -185,14 +186,15 @@
 <span class="kn">import</span> <span class="nn">signal</span>
 <span class="kn">import</span> <span class="nn">traceback</span>
 <span class="kn">import</span> <span class="nn">atexit</span>
-<span class="kn">from</span> <span class="nn">pprint</span> <span class="k">import</span> <span class="n">pformat</span>
-<span class="kn">from</span> <span class="nn">itertools</span> <span class="k">import</span> <span class="n">chain</span>
+<span class="kn">from</span> <span class="nn">pprint</span> <span class="kn">import</span> <span class="n">pformat</span>
+<span class="kn">from</span> <span class="nn">itertools</span> <span class="kn">import</span> <span class="n">chain</span>
 <span class="kn">import</span> <span class="nn">socket</span>
-<span class="kn">from</span> <span class="nn">collections</span> <span class="k">import</span> <span class="n">OrderedDict</span>
-<span class="kn">from</span> <span class="nn">yggdrasil.tools</span> <span class="k">import</span> <span class="n">YggClass</span>
-<span class="kn">from</span> <span class="nn">yggdrasil.config</span> <span class="k">import</span> <span class="n">ygg_cfg</span><span class="p">,</span> <span class="n">cfg_environment</span><span class="p">,</span> <span class="n">temp_config</span>
-<span class="kn">from</span> <span class="nn">yggdrasil</span> <span class="k">import</span> <span class="n">platform</span><span class="p">,</span> <span class="n">yamlfile</span>
-<span class="kn">from</span> <span class="nn">yggdrasil.drivers</span> <span class="k">import</span> <span class="n">create_driver</span><span class="p">,</span> <span class="n">DuplicatedModelDriver</span>
+<span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">OrderedDict</span>
+<span class="kn">from</span> <span class="nn">yggdrasil.tools</span> <span class="kn">import</span> <span class="n">YggClass</span>
+<span class="kn">from</span> <span class="nn">yggdrasil.config</span> <span class="kn">import</span> <span class="n">ygg_cfg</span><span class="p">,</span> <span class="n">cfg_environment</span><span class="p">,</span> <span class="n">temp_config</span>
+<span class="kn">from</span> <span class="nn">yggdrasil</span> <span class="kn">import</span> <span class="n">platform</span><span class="p">,</span> <span class="n">yamlfile</span>
+<span class="kn">from</span> <span class="nn">yggdrasil.drivers</span> <span class="kn">import</span> <span class="n">create_driver</span><span class="p">,</span> <span class="n">DuplicatedModelDriver</span>
+<span class="kn">from</span> <span class="nn">yggdrasil.components</span> <span class="kn">import</span> <span class="n">import_component</span>
 
 
 <span class="n">COLOR_TRACE</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="se">\033</span><span class="s1">[30;43;22m&#39;</span>
@@ -216,8 +218,8 @@
 
 <span class="sd">    &quot;&quot;&quot;</span>
     
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">model_yaml</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="kn">from</span> <span class="nn">yggdrasil.languages.Python.YggInterface</span> <span class="k">import</span> <span class="p">(</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">model_yaml</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="kn">from</span> <span class="nn">yggdrasil.languages.Python.YggInterface</span> <span class="kn">import</span> <span class="p">(</span>
             <span class="n">YggInput</span><span class="p">,</span> <span class="n">YggOutput</span><span class="p">,</span> <span class="n">YggRpcClient</span><span class="p">)</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">YggFunction</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
         <span class="c1"># Create and start runner in another process</span>
@@ -306,7 +308,7 @@
     <span class="c1">#     from ipywidgets import interact_manual</span>
     <span class="c1">#     return interact_manual(self.widget_function, *args, **kwargs)</span>
         
-<div class="viewcode-block" id="YggFunction.__call__"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.runner.YggFunction.__call__">[docs]</a>    <span class="k">def</span> <span class="nf">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<div class="viewcode-block" id="YggFunction.__call__"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.runner.YggFunction.__call__">[docs]</a>    <span class="k">def</span> <span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Call the model as a function by sending variables.</span>
 
 <span class="sd">        Args:</span>
@@ -422,7 +424,7 @@
 <span class="sd">    ..todo:: namespace, host, and rank do not seem strictly necessary.</span>
 
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">modelYmls</span><span class="p">,</span> <span class="n">namespace</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">host</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">rank</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">modelYmls</span><span class="p">,</span> <span class="n">namespace</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">host</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">rank</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
                  <span class="n">ygg_debug_level</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">rmq_debug_level</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
                  <span class="n">ygg_debug_prefix</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">connection_task_method</span><span class="o">=</span><span class="s1">&#39;thread&#39;</span><span class="p">,</span>
                  <span class="n">as_function</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">production_run</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
@@ -572,7 +574,7 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">connectiondrivers</span><span class="o">.</span><span class="n">values</span><span class="p">()</span></div>
 
-<div class="viewcode-block" id="YggRunner.create_driver"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.runner.YggRunner.create_driver">[docs]</a>    <span class="k">def</span> <span class="nf">create_driver</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">yml</span><span class="p">):</span>
+<div class="viewcode-block" id="YggRunner.create_driver"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.runner.YggRunner.create_driver">[docs]</a>    <span class="k">def</span> <span class="nf">create_driver</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">yml</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Create a driver instance from the yaml information.</span>
 
 <span class="sd">        Args:</span>
@@ -589,72 +591,40 @@
         <span class="k">try</span><span class="p">:</span>
             <span class="k">if</span> <span class="n">yml</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;copies&#39;</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
                 <span class="n">instance</span> <span class="o">=</span> <span class="n">DuplicatedModelDriver</span><span class="o">.</span><span class="n">DuplicatedModelDriver</span><span class="p">(</span>
-                    <span class="n">yml</span><span class="p">,</span> <span class="n">namespace</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">namespace</span><span class="p">,</span> <span class="n">rank</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">rank</span><span class="p">)</span>
+                    <span class="n">yml</span><span class="p">,</span> <span class="n">namespace</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">namespace</span><span class="p">,</span> <span class="n">rank</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">rank</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
             <span class="k">else</span><span class="p">:</span>
+                <span class="n">kwargs</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">yml</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
                 <span class="n">instance</span> <span class="o">=</span> <span class="n">create_driver</span><span class="p">(</span><span class="n">yml</span><span class="o">=</span><span class="n">yml</span><span class="p">,</span> <span class="n">namespace</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">namespace</span><span class="p">,</span>
-                                         <span class="n">rank</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">rank</span><span class="p">,</span> <span class="o">**</span><span class="n">yml</span><span class="p">)</span>
+                                         <span class="n">rank</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">rank</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
             <span class="n">yml</span><span class="p">[</span><span class="s1">&#39;instance&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">instance</span>
         <span class="k">finally</span><span class="p">:</span>
             <span class="n">os</span><span class="o">.</span><span class="n">chdir</span><span class="p">(</span><span class="n">curpath</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">instance</span></div>
 
-<div class="viewcode-block" id="YggRunner.createModelDriver"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.runner.YggRunner.createModelDriver">[docs]</a>    <span class="k">def</span> <span class="nf">createModelDriver</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">yml</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Create a model driver instance from the yaml information.</span>
-
-<span class="sd">        Args:</span>
-<span class="sd">            yml (yaml): Yaml object containing driver information.</span>
-
-<span class="sd">        Returns:</span>
-<span class="sd">            object: An instance of the specified driver.</span>
-
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">drv</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">create_driver</span><span class="p">(</span><span class="n">yml</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Model </span><span class="si">%s</span><span class="s2">:, env: </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span>
-                   <span class="n">yml</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">],</span> <span class="n">pformat</span><span class="p">(</span><span class="n">yml</span><span class="p">[</span><span class="s1">&#39;instance&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">env</span><span class="p">))</span>
-        <span class="k">return</span> <span class="n">drv</span></div>
-
-<div class="viewcode-block" id="YggRunner.create_connection_driver"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.runner.YggRunner.create_connection_driver">[docs]</a>    <span class="k">def</span> <span class="nf">create_connection_driver</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">yml</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Create a connection driver instance from the yaml information.</span>
-
-<span class="sd">        Args:</span>
-<span class="sd">            yml (yaml): Yaml object containing driver information.</span>
-
-<span class="sd">        Returns:</span>
-<span class="sd">            object: An instance of the specified driver.</span>
-
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">yml</span><span class="p">[</span><span class="s1">&#39;task_method&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">connection_task_method</span>
-        <span class="n">drv</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">create_driver</span><span class="p">(</span><span class="n">yml</span><span class="p">)</span>
-        <span class="c1"># Transfer connection addresses to model via env</span>
-        <span class="c1"># TODO: Change to server that tracks connections</span>
-        <span class="k">for</span> <span class="n">model</span><span class="p">,</span> <span class="n">env</span> <span class="ow">in</span> <span class="n">drv</span><span class="o">.</span><span class="n">model_env</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
-            <span class="k">try</span><span class="p">:</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">modeldrivers</span><span class="p">[</span><span class="n">model</span><span class="p">]</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s1">&#39;env&#39;</span><span class="p">,</span> <span class="p">{})</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">modeldrivers</span><span class="p">[</span><span class="n">model</span><span class="p">][</span><span class="s1">&#39;env&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">env</span><span class="p">)</span>
-            <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
-                <span class="n">model0</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;_copy&#39;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
-                <span class="k">if</span> <span class="p">(((</span><span class="n">model0</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">modeldrivers</span><span class="p">)</span>
-                     <span class="ow">and</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">modeldrivers</span><span class="p">[</span><span class="n">model0</span><span class="p">]</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;copies&#39;</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">))):</span>
-                    <span class="bp">self</span><span class="o">.</span><span class="n">modeldrivers</span><span class="p">[</span><span class="n">model0</span><span class="p">]</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s1">&#39;env_</span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">model</span><span class="p">,</span> <span class="p">{})</span>
-                    <span class="bp">self</span><span class="o">.</span><span class="n">modeldrivers</span><span class="p">[</span><span class="n">model0</span><span class="p">][</span><span class="s1">&#39;env_</span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">model</span><span class="p">]</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">env</span><span class="p">)</span>
-                <span class="k">else</span><span class="p">:</span>  <span class="c1"># pragma: debug</span>
-                    <span class="k">raise</span>
-        <span class="k">return</span> <span class="n">drv</span></div>
-        
 <div class="viewcode-block" id="YggRunner.loadDrivers"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.runner.YggRunner.loadDrivers">[docs]</a>    <span class="k">def</span> <span class="nf">loadDrivers</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Load all of the necessary drivers, doing the IO drivers first</span>
 <span class="sd">        and adding IO driver environmental variables back tot he models.&quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;&#39;</span><span class="p">)</span>
         <span class="n">driver</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s1">&#39;name&#39;</span><span class="p">)</span>
         <span class="k">try</span><span class="p">:</span>
+            <span class="c1"># Preparse model drivers first so that the input/output</span>
+            <span class="c1"># channels are updated for wrapped functions</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Preparsing model functions&quot;</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">driver</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">modeldrivers</span><span class="o">.</span><span class="n">values</span><span class="p">():</span>
+                <span class="n">driver_cls</span> <span class="o">=</span> <span class="n">import_component</span><span class="p">(</span><span class="s1">&#39;model&#39;</span><span class="p">,</span> <span class="n">driver</span><span class="p">[</span><span class="s1">&#39;driver&#39;</span><span class="p">],</span>
+                                              <span class="n">without_schema</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+                <span class="n">driver_cls</span><span class="o">.</span><span class="n">preparse_function</span><span class="p">(</span><span class="n">driver</span><span class="p">)</span>
             <span class="c1"># Create connection drivers</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Loading connection drivers&quot;</span><span class="p">)</span>
             <span class="k">for</span> <span class="n">driver</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">connectiondrivers</span><span class="o">.</span><span class="n">values</span><span class="p">():</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">create_connection_driver</span><span class="p">(</span><span class="n">driver</span><span class="p">)</span>
+                <span class="n">driver</span><span class="p">[</span><span class="s1">&#39;task_method&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">connection_task_method</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">create_driver</span><span class="p">(</span><span class="n">driver</span><span class="p">)</span>
             <span class="c1"># Create model drivers</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Loading model drivers&quot;</span><span class="p">)</span>
             <span class="k">for</span> <span class="n">driver</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">modeldrivers</span><span class="o">.</span><span class="n">values</span><span class="p">():</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">createModelDriver</span><span class="p">(</span><span class="n">driver</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">create_driver</span><span class="p">(</span><span class="n">driver</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Model </span><span class="si">%s</span><span class="s2">:, env: </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span>
+                           <span class="n">driver</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">],</span> <span class="n">pformat</span><span class="p">(</span><span class="n">driver</span><span class="p">[</span><span class="s1">&#39;instance&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">env</span><span class="p">))</span>
         <span class="k">except</span> <span class="ne">BaseException</span><span class="p">:</span>  <span class="c1"># pragma: debug</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">%s</span><span class="s2"> could not be created.&quot;</span><span class="p">,</span> <span class="n">driver</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">])</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">terminate</span><span class="p">()</span>

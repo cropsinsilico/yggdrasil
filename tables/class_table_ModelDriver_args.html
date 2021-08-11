@@ -7,12 +7,14 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>&lt;no title&gt; &mdash; yggdrasil v1.6.3+18.g537444084.dirty documentation</title>
+  <title>&lt;no title&gt; &mdash; yggdrasil v1.6.4 documentation</title>
   
 
   
   <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
   <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
 
   
   
@@ -29,6 +31,7 @@
   
     
       <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
         <script src="../_static/jquery.js"></script>
         <script src="../_static/underscore.js"></script>
         <script src="../_static/doctools.js"></script>
@@ -61,7 +64,7 @@
             
             
               <div class="version">
-                v1.6.3
+                v1.6.4
               </div>
             
           
@@ -86,7 +89,7 @@
               
             
             
-              <p class="caption"><span class="caption-text">Contents:</span></p>
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../includeme.html">Overview</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../install.html">Installation</a></li>
@@ -180,7 +183,7 @@
   <table class="docutils align-default" id="class-table-modeldriver-args-rst">
 <colgroup>
 <col style="width: 15%" />
-<col style="width: 69%" />
+<col style="width: 68%" />
 <col style="width: 7%" />
 <col style="width: 9%" />
 </colgroup>
@@ -254,19 +257,25 @@ each time the co-opted input channel’s recv method is called. If used with the
 <td></td>
 <td><p>bool, dict</p></td>
 </tr>
-<tr class="row-even"><td><p>logging_level</p></td>
+<tr class="row-even"><td><p>iter_function_over</p></td>
+<td><p>Variable(s) that should be received or sent as an array, but iterated over.
+Defaults to an empty array and is ignored.</p></td>
+<td></td>
+<td><p>array</p></td>
+</tr>
+<tr class="row-odd"><td><p>logging_level</p></td>
 <td><p>The level of logging messages that should be displayed by the model. Defaults to
 the logging level as determined by the configuration file and environment
 variables.</p></td>
 <td></td>
 <td><p>str</p></td>
 </tr>
-<tr class="row-odd"><td><p>model_index</p></td>
+<tr class="row-even"><td><p>model_index</p></td>
 <td><p>Index of model in list of models being run. Defaults to 0.</p></td>
 <td></td>
 <td><p>int</p></td>
 </tr>
-<tr class="row-even"><td><p>outputs_in_inputs</p></td>
+<tr class="row-odd"><td><p>outputs_in_inputs</p></td>
 <td><p>If True, outputs from wrapped model functions are passed by pointer as inputs
 for modification and the return value will be a flag. If False, outputs are
 limited to return values. Defaults to the value of the class attribute
@@ -274,7 +283,7 @@ outputs_in_inputs.</p></td>
 <td></td>
 <td><p>bool</p></td>
 </tr>
-<tr class="row-odd"><td><p>overwrite</p></td>
+<tr class="row-even"><td><p>overwrite</p></td>
 <td><p>If True, any existing model products (compilation products, wrapper scripts,
 etc.) are removed prior to the run. If False, the products are not removed.
 Defaults to True. Setting this to False can improve the performance,
@@ -285,32 +294,32 @@ or not products are removed after a run.</p></td>
 <td></td>
 <td><p>bool</p></td>
 </tr>
-<tr class="row-even"><td><p>preserve_cache</p></td>
+<tr class="row-odd"><td><p>preserve_cache</p></td>
 <td><p>If True model products will be kept following the run, otherwise all products
 will be cleaned up. Defaults to False. This keyword is superceeded by overwrite.</p></td>
 <td></td>
 <td><p>bool</p></td>
 </tr>
-<tr class="row-odd"><td><p>products</p></td>
+<tr class="row-even"><td><p>products</p></td>
 <td><p>Paths to files created by the model that should be cleaned up when the model
 exits. Entries can be absolute paths or paths relative to the working directory.
 Defaults to [].</p></td>
 <td></td>
 <td><p>list</p></td>
 </tr>
-<tr class="row-even"><td><p>source_products</p></td>
+<tr class="row-odd"><td><p>source_products</p></td>
 <td><p>Files created by running the model that are source files. These files will be
 removed without checking their extension so users should avoid adding files to
 this list unless they are sure they should be deleted. Defaults to [].</p></td>
 <td></td>
 <td><p>list</p></td>
 </tr>
-<tr class="row-odd"><td><p>strace_flags</p></td>
+<tr class="row-even"><td><p>strace_flags</p></td>
 <td><p>Flags to pass to strace (or dtrace). Defaults to [].</p></td>
 <td></td>
 <td><p>list</p></td>
 </tr>
-<tr class="row-even"><td><p>timesync</p></td>
+<tr class="row-odd"><td><p>timesync</p></td>
 <td><p>If set, the model is assumed to call a send then receive of the state at each
 timestep for syncronization with other models that are also integrating in time.
 If a string is provided, it is assumed to be the name of the server that will
@@ -319,18 +328,18 @@ server will be assumed to be ‘timestep’. Defaults to False.</p></td>
 <td></td>
 <td><p>bool, str</p></td>
 </tr>
-<tr class="row-odd"><td><p>valgrind_flags</p></td>
+<tr class="row-even"><td><p>valgrind_flags</p></td>
 <td><p>Flags to pass to valgrind. Defaults to [].</p></td>
 <td></td>
 <td><p>list</p></td>
 </tr>
-<tr class="row-even"><td><p>with_strace</p></td>
+<tr class="row-odd"><td><p>with_strace</p></td>
 <td><p>If True, the command is run with strace (on Linux) or dtrace (on MacOS).
 Defaults to False.</p></td>
 <td></td>
 <td><p>bool</p></td>
 </tr>
-<tr class="row-odd"><td><p>with_valgrind</p></td>
+<tr class="row-even"><td><p>with_valgrind</p></td>
 <td><p>If True, the command is run with valgrind. Defaults to False.</p></td>
 <td></td>
 <td><p>bool</p></td>

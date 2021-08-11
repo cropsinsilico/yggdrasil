@@ -7,12 +7,14 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>yggdrasil.metaschema.datatypes.PlyMetaschemaType &mdash; yggdrasil v1.6.3+18.g537444084.dirty documentation</title>
+  <title>yggdrasil.metaschema.datatypes.PlyMetaschemaType &mdash; yggdrasil v1.6.4 documentation</title>
   
 
   
   <link rel="stylesheet" href="../../../../_static/css/theme.css" type="text/css" />
   <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../../../_static/css/theme.css" type="text/css" />
 
   
   
@@ -29,6 +31,7 @@
   
     
       <script type="text/javascript" id="documentation_options" data-url_root="../../../../" src="../../../../_static/documentation_options.js"></script>
+        <script data-url_root="../../../../" id="documentation_options" src="../../../../_static/documentation_options.js"></script>
         <script src="../../../../_static/jquery.js"></script>
         <script src="../../../../_static/underscore.js"></script>
         <script src="../../../../_static/doctools.js"></script>
@@ -61,7 +64,7 @@
             
             
               <div class="version">
-                v1.6.3
+                v1.6.4
               </div>
             
           
@@ -86,7 +89,7 @@
               
             
             
-              <p class="caption"><span class="caption-text">Contents:</span></p>
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../../../includeme.html">Overview</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../install.html">Installation</a></li>
@@ -160,8 +163,6 @@
         
           <li><a href="../../../index.html">Module code</a> &raquo;</li>
         
-          <li><a href="../../../yggdrasil.html">yggdrasil</a> &raquo;</li>
-        
           <li><a href="../../metaschema.html">yggdrasil.metaschema</a> &raquo;</li>
         
           <li><a href="../datatypes.html">yggdrasil.metaschema.datatypes</a> &raquo;</li>
@@ -186,10 +187,10 @@
 <span class="kn">import</span> <span class="nn">copy</span>
 <span class="kn">import</span> <span class="nn">warnings</span>
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
-<span class="kn">from</span> <span class="nn">yggdrasil</span> <span class="k">import</span> <span class="n">tools</span>
-<span class="kn">from</span> <span class="nn">yggdrasil.metaschema.encoder</span> <span class="k">import</span> <span class="n">encode_json</span><span class="p">,</span> <span class="n">decode_json</span>
-<span class="kn">from</span> <span class="nn">yggdrasil.metaschema.datatypes</span> <span class="k">import</span> <span class="n">_schema_dir</span>
-<span class="kn">from</span> <span class="nn">yggdrasil.metaschema.datatypes.JSONObjectMetaschemaType</span> <span class="k">import</span> <span class="p">(</span>
+<span class="kn">from</span> <span class="nn">yggdrasil</span> <span class="kn">import</span> <span class="n">tools</span>
+<span class="kn">from</span> <span class="nn">yggdrasil.metaschema.encoder</span> <span class="kn">import</span> <span class="n">encode_json</span><span class="p">,</span> <span class="n">decode_json</span>
+<span class="kn">from</span> <span class="nn">yggdrasil.metaschema.datatypes</span> <span class="kn">import</span> <span class="n">_schema_dir</span>
+<span class="kn">from</span> <span class="nn">yggdrasil.metaschema.datatypes.JSONObjectMetaschemaType</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">JSONObjectMetaschemaType</span><span class="p">)</span>
 <span class="k">try</span><span class="p">:</span>
     <span class="kn">import</span> <span class="nn">trimesh</span>
@@ -444,7 +445,7 @@
 <div class="viewcode-block" id="PlyDict"><a class="viewcode-back" href="../../../../yggdrasil.metaschema.datatypes.html#yggdrasil.metaschema.datatypes.PlyMetaschemaType.PlyDict">[docs]</a><span class="k">class</span> <span class="nc">PlyDict</span><span class="p">(</span><span class="nb">dict</span><span class="p">):</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Enhanced dictionary class for storing Ply information.&quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">PlyDict</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s1">&#39;vertices&#39;</span><span class="p">,</span> <span class="p">[])</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s1">&#39;faces&#39;</span><span class="p">,</span> <span class="p">[])</span>
@@ -686,7 +687,7 @@
 
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="n">d</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="kn">from</span> <span class="nn">openalea.plantgl.all</span> <span class="k">import</span> <span class="n">Tesselator</span>
+            <span class="kn">from</span> <span class="nn">openalea.plantgl.all</span> <span class="kn">import</span> <span class="n">Tesselator</span>
             <span class="n">d</span> <span class="o">=</span> <span class="n">Tesselator</span><span class="p">()</span>
         <span class="n">out</span> <span class="o">=</span> <span class="bp">cls</span><span class="p">()</span>
         <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">shapes</span> <span class="ow">in</span> <span class="n">scene</span><span class="o">.</span><span class="n">todict</span><span class="p">()</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
@@ -858,8 +859,8 @@
 <span class="sd">            dict: Ply with updated vertex colors.</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="kn">from</span> <span class="nn">matplotlib</span> <span class="k">import</span> <span class="n">cm</span>
-        <span class="kn">from</span> <span class="nn">matplotlib</span> <span class="k">import</span> <span class="n">colors</span> <span class="k">as</span> <span class="n">mpl_colors</span>
+        <span class="kn">from</span> <span class="nn">matplotlib</span> <span class="kn">import</span> <span class="n">cm</span>
+        <span class="kn">from</span> <span class="nn">matplotlib</span> <span class="kn">import</span> <span class="n">colors</span> <span class="k">as</span> <span class="n">mpl_colors</span>
         <span class="c1"># Scale by area</span>
         <span class="k">if</span> <span class="n">scale_by_area</span><span class="p">:</span>
             <span class="n">scalar_arr</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">scalar_arr</span><span class="p">)</span>

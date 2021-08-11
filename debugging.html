@@ -7,12 +7,14 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>Debugging &mdash; yggdrasil v1.6.3+18.g537444084.dirty documentation</title>
+  <title>Debugging &mdash; yggdrasil v1.6.4 documentation</title>
   
 
   
   <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
   <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
 
   
   
@@ -29,6 +31,7 @@
   
     
       <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
         <script src="_static/jquery.js"></script>
         <script src="_static/underscore.js"></script>
         <script src="_static/doctools.js"></script>
@@ -63,7 +66,7 @@
             
             
               <div class="version">
-                v1.6.3
+                v1.6.4
               </div>
             
           
@@ -88,7 +91,7 @@
               
             
             
-              <p class="caption"><span class="caption-text">Contents:</span></p>
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="includeme.html">Overview</a></li>
 <li class="toctree-l1"><a class="reference internal" href="install.html">Installation</a></li>
@@ -250,7 +253,7 @@
 <h3>MacOS Errors<a class="headerlink" href="#macos-errors" title="Permalink to this headline">¶</a></h3>
 <ul>
 <li><p>You get <code class="docutils literal notranslate"><span class="pre">Undefined</span> <span class="pre">symbol</span></code> errors following a warning similar to:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">ld</span><span class="p">:</span> <span class="n">warning</span><span class="p">:</span> <span class="n">ignoring</span> <span class="n">file</span> <span class="o">/</span><span class="n">Library</span><span class="o">/</span><span class="n">Developer</span><span class="o">/</span><span class="n">CommandLineTools</span><span class="o">/</span><span class="n">SDKs</span><span class="o">/</span><span class="n">MacOSX10</span><span class="o">.</span><span class="mf">14.</span><span class="n">sdk</span><span class="o">/</span><span class="n">usr</span><span class="o">/</span><span class="n">lib</span><span class="o">/</span><span class="n">libSystem</span><span class="o">.</span><span class="n">tbd</span><span class="p">,</span> <span class="n">file</span> <span class="n">was</span> <span class="n">built</span> <span class="k">for</span> <span class="n">unsupported</span> <span class="n">file</span> <span class="nb">format</span> <span class="p">(</span> <span class="mh">0x2D</span> <span class="mh">0x2D</span> <span class="mh">0x2D</span> <span class="mh">0x20</span> <span class="mh">0x21</span> <span class="mh">0x74</span> <span class="mh">0x61</span> <span class="mh">0x70</span> <span class="mh">0x69</span> <span class="mh">0x2D</span> <span class="mh">0x74</span> <span class="mh">0x62</span> <span class="mh">0x64</span> <span class="mh">0x2D</span> <span class="mh">0x76</span> <span class="mh">0x33</span> <span class="p">)</span> <span class="n">which</span> <span class="ow">is</span> <span class="ow">not</span> <span class="n">the</span> <span class="n">architecture</span> <span class="n">being</span> <span class="n">linked</span> <span class="p">(</span><span class="n">x86_64</span><span class="p">):</span> <span class="o">/</span><span class="n">Library</span><span class="o">/</span><span class="n">Developer</span><span class="o">/</span><span class="n">CommandLineTools</span><span class="o">/</span><span class="n">SDKs</span><span class="o">/</span><span class="n">MacOSX10</span><span class="o">.</span><span class="mf">14.</span><span class="n">sdk</span><span class="o">/</span><span class="n">usr</span><span class="o">/</span><span class="n">lib</span><span class="o">/</span><span class="n">libSystem</span><span class="o">.</span><span class="n">tbd</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">ld</span><span class="p">:</span> <span class="n">warning</span><span class="p">:</span> <span class="n">ignoring</span> <span class="n">file</span> <span class="o">/</span><span class="n">Library</span><span class="o">/</span><span class="n">Developer</span><span class="o">/</span><span class="n">CommandLineTools</span><span class="o">/</span><span class="n">SDKs</span><span class="o">/</span><span class="n">MacOSX10</span><span class="mf">.14</span><span class="o">.</span><span class="n">sdk</span><span class="o">/</span><span class="n">usr</span><span class="o">/</span><span class="n">lib</span><span class="o">/</span><span class="n">libSystem</span><span class="o">.</span><span class="n">tbd</span><span class="p">,</span> <span class="n">file</span> <span class="n">was</span> <span class="n">built</span> <span class="k">for</span> <span class="n">unsupported</span> <span class="n">file</span> <span class="nb">format</span> <span class="p">(</span> <span class="mh">0x2D</span> <span class="mh">0x2D</span> <span class="mh">0x2D</span> <span class="mh">0x20</span> <span class="mh">0x21</span> <span class="mh">0x74</span> <span class="mh">0x61</span> <span class="mh">0x70</span> <span class="mh">0x69</span> <span class="mh">0x2D</span> <span class="mh">0x74</span> <span class="mh">0x62</span> <span class="mh">0x64</span> <span class="mh">0x2D</span> <span class="mh">0x76</span> <span class="mh">0x33</span> <span class="p">)</span> <span class="n">which</span> <span class="ow">is</span> <span class="ow">not</span> <span class="n">the</span> <span class="n">architecture</span> <span class="n">being</span> <span class="n">linked</span> <span class="p">(</span><span class="n">x86_64</span><span class="p">):</span> <span class="o">/</span><span class="n">Library</span><span class="o">/</span><span class="n">Developer</span><span class="o">/</span><span class="n">CommandLineTools</span><span class="o">/</span><span class="n">SDKs</span><span class="o">/</span><span class="n">MacOSX10</span><span class="mf">.14</span><span class="o">.</span><span class="n">sdk</span><span class="o">/</span><span class="n">usr</span><span class="o">/</span><span class="n">lib</span><span class="o">/</span><span class="n">libSystem</span><span class="o">.</span><span class="n">tbd</span>
 </pre></div>
 </div>
 <blockquote>

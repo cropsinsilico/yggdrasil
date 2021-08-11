@@ -7,12 +7,14 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>&lt;no title&gt; &mdash; yggdrasil v1.6.3+18.g537444084.dirty documentation</title>
+  <title>&lt;no title&gt; &mdash; yggdrasil v1.6.4 documentation</title>
   
 
   
   <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
   <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
 
   
   
@@ -29,6 +31,7 @@
   
     
       <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
         <script src="../_static/jquery.js"></script>
         <script src="../_static/underscore.js"></script>
         <script src="../_static/doctools.js"></script>
@@ -61,7 +64,7 @@
             
             
               <div class="version">
-                v1.6.3
+                v1.6.4
               </div>
             
           
@@ -86,7 +89,7 @@
               
             
             
-              <p class="caption"><span class="caption-text">Contents:</span></p>
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../includeme.html">Overview</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../install.html">Installation</a></li>
@@ -178,171 +181,90 @@
            <div itemprop="articleBody">
             
   <p>Model Code:</p>
-<div class="highlight-python notranslate"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
- 2
- 3
- 4
- 5
- 6
- 7
- 8
- 9
-10
-11
-12
-13
-14
-15
-16
-17
-18
-19
-20
-21
-22
-23
-24
-25
-26
-27
-28
-29
-30
-31
-32
-33
-34
-35
-36
-37
-38
-39
-40
-41
-42
-43
-44
-45
-46
-47
-48
-49
-50
-51
-52
-53
-54
-55
-56
-57
-58
-59
-60
-61
-62
-63
-64
-65
-66
-67
-68
-69
-70
-71
-72
-73
-74
-75
-76
-77
-78
-79
-80
-81
-82</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">sys</span>
-<span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
-<span class="kn">from</span> <span class="nn">yggdrasil</span> <span class="kn">import</span> <span class="n">units</span>
-<span class="kn">from</span> <span class="nn">yggdrasil.interface.YggInterface</span> <span class="kn">import</span> <span class="p">(</span>
-    <span class="n">YggTimesync</span><span class="p">,</span> <span class="n">YggOutput</span><span class="p">)</span>
-
-
-<span class="k">def</span> <span class="nf">timestep_calc</span><span class="p">(</span><span class="n">t</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Updates the state based on the time where x is a sine wave</span>
-<span class="sd">    with period of 10 days and y is a cosine wave with a period of 5 days.</span>
-
-<span class="sd">    Args:</span>
-<span class="sd">        t (float): Current time.</span>
-
-<span class="sd">    Returns:</span>
-<span class="sd">        dict: Map of state parameters.</span>
-
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">state</span> <span class="o">=</span> <span class="p">{</span>
-        <span class="s1">&#39;x&#39;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="mf">2.0</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span> <span class="o">*</span> <span class="n">t</span> <span class="o">/</span> <span class="n">units</span><span class="o">.</span><span class="n">add_units</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="s1">&#39;day&#39;</span><span class="p">)),</span>
-        <span class="s1">&#39;y&#39;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="mf">2.0</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span> <span class="o">*</span> <span class="n">t</span> <span class="o">/</span> <span class="n">units</span><span class="o">.</span><span class="n">add_units</span><span class="p">(</span><span class="mi">5</span><span class="p">,</span> <span class="s1">&#39;day&#39;</span><span class="p">))}</span>
-    <span class="k">return</span> <span class="n">state</span>
-
-
-<span class="k">def</span> <span class="nf">main</span><span class="p">(</span><span class="n">t_step</span><span class="p">,</span> <span class="n">t_units</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Function to execute integration.</span>
-
-<span class="sd">    Args:</span>
-<span class="sd">        t_step (float): The time step that should be used.</span>
-<span class="sd">        t_units (str): Units of the time step.</span>
-
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">print</span><span class="p">(</span><span class="s1">&#39;Hello from Python timesync: timestep = </span><span class="si">%s</span><span class="s1"> </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">t_step</span><span class="p">,</span> <span class="n">t_units</span><span class="p">))</span>
-    <span class="n">t_step</span> <span class="o">=</span> <span class="n">units</span><span class="o">.</span><span class="n">add_units</span><span class="p">(</span><span class="n">t_step</span><span class="p">,</span> <span class="n">t_units</span><span class="p">)</span>
-    <span class="n">t_start</span> <span class="o">=</span> <span class="n">units</span><span class="o">.</span><span class="n">add_units</span><span class="p">(</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">t_units</span><span class="p">)</span>
-    <span class="n">t_end</span> <span class="o">=</span> <span class="n">units</span><span class="o">.</span><span class="n">add_units</span><span class="p">(</span><span class="mf">5.0</span><span class="p">,</span> <span class="s1">&#39;day&#39;</span><span class="p">)</span>
-    <span class="n">state</span> <span class="o">=</span> <span class="n">timestep_calc</span><span class="p">(</span><span class="n">t_start</span><span class="p">)</span>
-
-    <span class="c1"># Set up connections matching yaml</span>
-    <span class="c1"># Timestep synchonization connection will default to &#39;timesync&#39;</span>
-    <span class="n">timesync</span> <span class="o">=</span> <span class="n">YggTimesync</span><span class="p">(</span><span class="s1">&#39;timesync&#39;</span><span class="p">)</span>
-    <span class="n">out</span> <span class="o">=</span> <span class="n">YggOutput</span><span class="p">(</span><span class="s1">&#39;output&#39;</span><span class="p">)</span>
-
-    <span class="c1"># Initialize state and synchronize with other models</span>
-    <span class="n">t</span> <span class="o">=</span> <span class="n">t_start</span>
-    <span class="n">ret</span><span class="p">,</span> <span class="n">state</span> <span class="o">=</span> <span class="n">timesync</span><span class="o">.</span><span class="n">call</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">state</span><span class="p">)</span>
-    <span class="k">if</span> <span class="ow">not</span> <span class="n">ret</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">&quot;timesync(Python): Initial sync failed.&quot;</span><span class="p">)</span>
-    <span class="k">print</span><span class="p">(</span><span class="s1">&#39;timesync(Python): t = </span><span class="si">% 8s</span><span class="s1">, x = </span><span class="si">%+ 5.2f</span><span class="s1">, y = </span><span class="si">%+ 5.2f</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span>
-        <span class="n">t</span><span class="p">,</span> <span class="n">state</span><span class="p">[</span><span class="s1">&#39;x&#39;</span><span class="p">],</span> <span class="n">state</span><span class="p">[</span><span class="s1">&#39;y&#39;</span><span class="p">]))</span>
-
-    <span class="c1"># Send initial state to output</span>
-    <span class="n">flag</span> <span class="o">=</span> <span class="n">out</span><span class="o">.</span><span class="n">send</span><span class="p">(</span><span class="nb">dict</span><span class="p">(</span><span class="n">state</span><span class="p">,</span> <span class="n">time</span><span class="o">=</span><span class="n">t</span><span class="p">))</span>
-    <span class="k">if</span> <span class="ow">not</span> <span class="n">flag</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">&quot;timesync(Python): Failed to send &quot;</span>
-                           <span class="s2">&quot;initial output for t=</span><span class="si">%s</span><span class="s2">.&quot;</span> <span class="o">%</span> <span class="n">t</span><span class="p">)</span>
-    
-    <span class="c1"># Iterate until end</span>
-    <span class="k">while</span> <span class="n">t</span> <span class="o">&lt;</span> <span class="n">t_end</span><span class="p">:</span>
-
-        <span class="c1"># Perform calculations to update the state</span>
-        <span class="n">t</span> <span class="o">=</span> <span class="n">t</span> <span class="o">+</span> <span class="n">t_step</span>
-        <span class="n">state</span> <span class="o">=</span> <span class="n">timestep_calc</span><span class="p">(</span><span class="n">t</span><span class="p">)</span>
-
-        <span class="c1"># Synchronize the state</span>
-        <span class="n">ret</span><span class="p">,</span> <span class="n">state</span> <span class="o">=</span> <span class="n">timesync</span><span class="o">.</span><span class="n">call</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">state</span><span class="p">)</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="n">ret</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">&quot;timesync(Python): sync for t=</span><span class="si">%f</span><span class="s2"> failed.&quot;</span> <span class="o">%</span> <span class="n">t</span><span class="p">)</span>
-        <span class="k">print</span><span class="p">(</span><span class="s1">&#39;timesync(Python): t = </span><span class="si">% 8s</span><span class="s1">, x = </span><span class="si">%+ 5.2f</span><span class="s1">, y = </span><span class="si">%+ 5.2f</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span>
-            <span class="n">t</span><span class="p">,</span> <span class="n">state</span><span class="p">[</span><span class="s1">&#39;x&#39;</span><span class="p">],</span> <span class="n">state</span><span class="p">[</span><span class="s1">&#39;y&#39;</span><span class="p">]))</span>
-
-        <span class="c1"># Send output</span>
-        <span class="n">flag</span> <span class="o">=</span> <span class="n">out</span><span class="o">.</span><span class="n">send</span><span class="p">(</span><span class="nb">dict</span><span class="p">(</span><span class="n">state</span><span class="p">,</span> <span class="n">time</span><span class="o">=</span><span class="n">t</span><span class="p">))</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="n">flag</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">&quot;timesync(Python): Failed to send output for t=</span><span class="si">%s</span><span class="s2">.&quot;</span> <span class="o">%</span> <span class="n">t</span><span class="p">)</span>
-
-    <span class="k">print</span><span class="p">(</span><span class="s1">&#39;Goodbye from Python timesync&#39;</span><span class="p">)</span>
-
-
-<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s1">&#39;__main__&#39;</span><span class="p">:</span>
-    <span class="c1"># Take time step from the first argument</span>
-    <span class="n">main</span><span class="p">(</span><span class="nb">float</span><span class="p">(</span><span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">[</span><span class="mi">1</span><span class="p">]),</span> <span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">[</span><span class="mi">2</span><span class="p">])</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span><span class="kn">import</span> <span class="nn">sys</span>
+<span class="linenos"> 2</span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="linenos"> 3</span><span class="kn">from</span> <span class="nn">yggdrasil</span> <span class="kn">import</span> <span class="n">units</span>
+<span class="linenos"> 4</span><span class="kn">from</span> <span class="nn">yggdrasil.interface.YggInterface</span> <span class="kn">import</span> <span class="p">(</span>
+<span class="linenos"> 5</span>    <span class="n">YggTimesync</span><span class="p">,</span> <span class="n">YggOutput</span><span class="p">)</span>
+<span class="linenos"> 6</span>
+<span class="linenos"> 7</span>
+<span class="linenos"> 8</span><span class="k">def</span> <span class="nf">timestep_calc</span><span class="p">(</span><span class="n">t</span><span class="p">):</span>
+<span class="linenos"> 9</span>    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Updates the state based on the time where x is a sine wave</span>
+<span class="linenos">10</span><span class="sd">    with period of 10 days and y is a cosine wave with a period of 5 days.</span>
+<span class="linenos">11</span>
+<span class="linenos">12</span><span class="sd">    Args:</span>
+<span class="linenos">13</span><span class="sd">        t (float): Current time.</span>
+<span class="linenos">14</span>
+<span class="linenos">15</span><span class="sd">    Returns:</span>
+<span class="linenos">16</span><span class="sd">        dict: Map of state parameters.</span>
+<span class="linenos">17</span>
+<span class="linenos">18</span><span class="sd">    &quot;&quot;&quot;</span>
+<span class="linenos">19</span>    <span class="n">state</span> <span class="o">=</span> <span class="p">{</span>
+<span class="linenos">20</span>        <span class="s1">&#39;x&#39;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="mf">2.0</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span> <span class="o">*</span> <span class="n">t</span> <span class="o">/</span> <span class="n">units</span><span class="o">.</span><span class="n">add_units</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="s1">&#39;day&#39;</span><span class="p">)),</span>
+<span class="linenos">21</span>        <span class="s1">&#39;y&#39;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="mf">2.0</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span> <span class="o">*</span> <span class="n">t</span> <span class="o">/</span> <span class="n">units</span><span class="o">.</span><span class="n">add_units</span><span class="p">(</span><span class="mi">5</span><span class="p">,</span> <span class="s1">&#39;day&#39;</span><span class="p">))}</span>
+<span class="linenos">22</span>    <span class="k">return</span> <span class="n">state</span>
+<span class="linenos">23</span>
+<span class="linenos">24</span>
+<span class="linenos">25</span><span class="k">def</span> <span class="nf">main</span><span class="p">(</span><span class="n">t_step</span><span class="p">,</span> <span class="n">t_units</span><span class="p">):</span>
+<span class="linenos">26</span>    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Function to execute integration.</span>
+<span class="linenos">27</span>
+<span class="linenos">28</span><span class="sd">    Args:</span>
+<span class="linenos">29</span><span class="sd">        t_step (float): The time step that should be used.</span>
+<span class="linenos">30</span><span class="sd">        t_units (str): Units of the time step.</span>
+<span class="linenos">31</span>
+<span class="linenos">32</span><span class="sd">    &quot;&quot;&quot;</span>
+<span class="linenos">33</span>    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Hello from Python timesync: timestep = </span><span class="si">%s</span><span class="s1"> </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">t_step</span><span class="p">,</span> <span class="n">t_units</span><span class="p">))</span>
+<span class="linenos">34</span>    <span class="n">t_step</span> <span class="o">=</span> <span class="n">units</span><span class="o">.</span><span class="n">add_units</span><span class="p">(</span><span class="n">t_step</span><span class="p">,</span> <span class="n">t_units</span><span class="p">)</span>
+<span class="linenos">35</span>    <span class="n">t_start</span> <span class="o">=</span> <span class="n">units</span><span class="o">.</span><span class="n">add_units</span><span class="p">(</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">t_units</span><span class="p">)</span>
+<span class="linenos">36</span>    <span class="n">t_end</span> <span class="o">=</span> <span class="n">units</span><span class="o">.</span><span class="n">add_units</span><span class="p">(</span><span class="mf">5.0</span><span class="p">,</span> <span class="s1">&#39;day&#39;</span><span class="p">)</span>
+<span class="linenos">37</span>    <span class="n">state</span> <span class="o">=</span> <span class="n">timestep_calc</span><span class="p">(</span><span class="n">t_start</span><span class="p">)</span>
+<span class="linenos">38</span>
+<span class="linenos">39</span>    <span class="c1"># Set up connections matching yaml</span>
+<span class="linenos">40</span>    <span class="c1"># Timestep synchonization connection will default to &#39;timesync&#39;</span>
+<span class="linenos">41</span>    <span class="n">timesync</span> <span class="o">=</span> <span class="n">YggTimesync</span><span class="p">(</span><span class="s1">&#39;timesync&#39;</span><span class="p">)</span>
+<span class="linenos">42</span>    <span class="n">out</span> <span class="o">=</span> <span class="n">YggOutput</span><span class="p">(</span><span class="s1">&#39;output&#39;</span><span class="p">)</span>
+<span class="linenos">43</span>
+<span class="linenos">44</span>    <span class="c1"># Initialize state and synchronize with other models</span>
+<span class="linenos">45</span>    <span class="n">t</span> <span class="o">=</span> <span class="n">t_start</span>
+<span class="linenos">46</span>    <span class="n">ret</span><span class="p">,</span> <span class="n">state</span> <span class="o">=</span> <span class="n">timesync</span><span class="o">.</span><span class="n">call</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">state</span><span class="p">)</span>
+<span class="linenos">47</span>    <span class="k">if</span> <span class="ow">not</span> <span class="n">ret</span><span class="p">:</span>
+<span class="linenos">48</span>        <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">&quot;timesync(Python): Initial sync failed.&quot;</span><span class="p">)</span>
+<span class="linenos">49</span>    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;timesync(Python): t = </span><span class="si">% 8s</span><span class="s1">, x = </span><span class="si">%+ 5.2f</span><span class="s1">, y = </span><span class="si">%+ 5.2f</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span>
+<span class="linenos">50</span>        <span class="n">t</span><span class="p">,</span> <span class="n">state</span><span class="p">[</span><span class="s1">&#39;x&#39;</span><span class="p">],</span> <span class="n">state</span><span class="p">[</span><span class="s1">&#39;y&#39;</span><span class="p">]))</span>
+<span class="linenos">51</span>
+<span class="linenos">52</span>    <span class="c1"># Send initial state to output</span>
+<span class="linenos">53</span>    <span class="n">flag</span> <span class="o">=</span> <span class="n">out</span><span class="o">.</span><span class="n">send</span><span class="p">(</span><span class="nb">dict</span><span class="p">(</span><span class="n">state</span><span class="p">,</span> <span class="n">time</span><span class="o">=</span><span class="n">t</span><span class="p">))</span>
+<span class="linenos">54</span>    <span class="k">if</span> <span class="ow">not</span> <span class="n">flag</span><span class="p">:</span>
+<span class="linenos">55</span>        <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">&quot;timesync(Python): Failed to send &quot;</span>
+<span class="linenos">56</span>                           <span class="s2">&quot;initial output for t=</span><span class="si">%s</span><span class="s2">.&quot;</span> <span class="o">%</span> <span class="n">t</span><span class="p">)</span>
+<span class="linenos">57</span>    
+<span class="linenos">58</span>    <span class="c1"># Iterate until end</span>
+<span class="linenos">59</span>    <span class="k">while</span> <span class="n">t</span> <span class="o">&lt;</span> <span class="n">t_end</span><span class="p">:</span>
+<span class="linenos">60</span>
+<span class="linenos">61</span>        <span class="c1"># Perform calculations to update the state</span>
+<span class="linenos">62</span>        <span class="n">t</span> <span class="o">=</span> <span class="n">t</span> <span class="o">+</span> <span class="n">t_step</span>
+<span class="linenos">63</span>        <span class="n">state</span> <span class="o">=</span> <span class="n">timestep_calc</span><span class="p">(</span><span class="n">t</span><span class="p">)</span>
+<span class="linenos">64</span>
+<span class="linenos">65</span>        <span class="c1"># Synchronize the state</span>
+<span class="linenos">66</span>        <span class="n">ret</span><span class="p">,</span> <span class="n">state</span> <span class="o">=</span> <span class="n">timesync</span><span class="o">.</span><span class="n">call</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">state</span><span class="p">)</span>
+<span class="linenos">67</span>        <span class="k">if</span> <span class="ow">not</span> <span class="n">ret</span><span class="p">:</span>
+<span class="linenos">68</span>            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">&quot;timesync(Python): sync for t=</span><span class="si">%f</span><span class="s2"> failed.&quot;</span> <span class="o">%</span> <span class="n">t</span><span class="p">)</span>
+<span class="linenos">69</span>        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;timesync(Python): t = </span><span class="si">% 8s</span><span class="s1">, x = </span><span class="si">%+ 5.2f</span><span class="s1">, y = </span><span class="si">%+ 5.2f</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span>
+<span class="linenos">70</span>            <span class="n">t</span><span class="p">,</span> <span class="n">state</span><span class="p">[</span><span class="s1">&#39;x&#39;</span><span class="p">],</span> <span class="n">state</span><span class="p">[</span><span class="s1">&#39;y&#39;</span><span class="p">]))</span>
+<span class="linenos">71</span>
+<span class="linenos">72</span>        <span class="c1"># Send output</span>
+<span class="linenos">73</span>        <span class="n">flag</span> <span class="o">=</span> <span class="n">out</span><span class="o">.</span><span class="n">send</span><span class="p">(</span><span class="nb">dict</span><span class="p">(</span><span class="n">state</span><span class="p">,</span> <span class="n">time</span><span class="o">=</span><span class="n">t</span><span class="p">))</span>
+<span class="linenos">74</span>        <span class="k">if</span> <span class="ow">not</span> <span class="n">flag</span><span class="p">:</span>
+<span class="linenos">75</span>            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">&quot;timesync(Python): Failed to send output for t=</span><span class="si">%s</span><span class="s2">.&quot;</span> <span class="o">%</span> <span class="n">t</span><span class="p">)</span>
+<span class="linenos">76</span>
+<span class="linenos">77</span>    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Goodbye from Python timesync&#39;</span><span class="p">)</span>
+<span class="linenos">78</span>
+<span class="linenos">79</span>
+<span class="linenos">80</span><span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s1">&#39;__main__&#39;</span><span class="p">:</span>
+<span class="linenos">81</span>    <span class="c1"># Take time step from the first argument</span>
+<span class="linenos">82</span>    <span class="n">main</span><span class="p">(</span><span class="nb">float</span><span class="p">(</span><span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">[</span><span class="mi">1</span><span class="p">]),</span> <span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">[</span><span class="mi">2</span><span class="p">])</span>
 </pre></div>
-</td></tr></table></div>
+</div>
 <p>(<a class="reference external" href="examples/timesync1.html">Example in other languages</a>)</p>
 
 

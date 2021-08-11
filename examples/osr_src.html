@@ -7,12 +7,14 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>&lt;no title&gt; &mdash; yggdrasil v1.6.3+18.g537444084.dirty documentation</title>
+  <title>&lt;no title&gt; &mdash; yggdrasil v1.6.4 documentation</title>
   
 
   
   <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
   <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
 
   
   
@@ -29,6 +31,7 @@
   
     
       <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
         <script src="../_static/jquery.js"></script>
         <script src="../_static/underscore.js"></script>
         <script src="../_static/doctools.js"></script>
@@ -61,7 +64,7 @@
             
             
               <div class="version">
-                v1.6.3
+                v1.6.4
               </div>
             
           
@@ -86,7 +89,7 @@
               
             
             
-              <p class="caption"><span class="caption-text">Contents:</span></p>
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../includeme.html">Overview</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../install.html">Installation</a></li>
@@ -178,404 +181,208 @@
            <div itemprop="articleBody">
             
   <p>Model Code:</p>
-<div class="highlight-python notranslate"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
- 2
- 3
- 4
- 5
- 6
- 7
- 8
- 9
-10
-11
-12
-13
-14
-15
-16
-17
-18
-19
-20
-21
-22
-23
-24
-25
-26
-27
-28
-29
-30
-31
-32
-33
-34
-35
-36
-37
-38
-39
-40
-41
-42
-43
-44
-45
-46
-47
-48
-49
-50
-51
-52
-53
-54
-55
-56
-57
-58
-59
-60
-61
-62
-63
-64
-65
-66
-67
-68
-69
-70
-71
-72
-73
-74
-75
-76
-77
-78
-79
-80
-81
-82
-83
-84</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">sys</span>
-<span class="kn">from</span> <span class="nn">yggdrasil</span> <span class="kn">import</span> <span class="n">units</span>
-<span class="kn">from</span> <span class="nn">yggdrasil.interface.YggInterface</span> <span class="kn">import</span> <span class="p">(</span>
-    <span class="n">YggTimesync</span><span class="p">,</span> <span class="n">YggOutput</span><span class="p">)</span>
-
-
-<span class="k">def</span> <span class="nf">timestep_calc</span><span class="p">(</span><span class="n">t</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Updates the state based on the time where x is a sine wave</span>
-<span class="sd">    with period of 10 days and y is a cosine wave with a period of 5 days.</span>
-
-<span class="sd">    Args:</span>
-<span class="sd">        t (float): Current time.</span>
-
-<span class="sd">    Returns:</span>
-<span class="sd">        dict: Map of state parameters.</span>
-
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">state</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;carbonAllocation2Roots&quot;</span><span class="p">:</span> <span class="n">units</span><span class="o">.</span><span class="n">add_units</span><span class="p">(</span><span class="mf">10.0</span><span class="p">,</span> <span class="s1">&#39;g&#39;</span><span class="p">),</span>
-             <span class="s2">&quot;saturatedConductivity&quot;</span><span class="p">:</span> <span class="n">units</span><span class="o">.</span><span class="n">add_units</span><span class="p">(</span><span class="mf">10.0</span><span class="p">,</span> <span class="s1">&#39;cm/day&#39;</span><span class="p">)}</span>
-    <span class="k">return</span> <span class="n">state</span>
-
-
-<span class="k">def</span> <span class="nf">main</span><span class="p">(</span><span class="n">t_step</span><span class="p">,</span> <span class="n">t_units</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Function to execute integration.</span>
-
-<span class="sd">    Args:</span>
-<span class="sd">        t_step (float): The time step that should be used.</span>
-<span class="sd">        t_units (str): Units of the time step.</span>
-
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">print</span><span class="p">(</span><span class="s1">&#39;Hello from Python other_model: timestep = </span><span class="si">%s</span><span class="s1"> </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">t_step</span><span class="p">,</span> <span class="n">t_units</span><span class="p">))</span>
-    <span class="n">t_step</span> <span class="o">=</span> <span class="n">units</span><span class="o">.</span><span class="n">add_units</span><span class="p">(</span><span class="n">t_step</span><span class="p">,</span> <span class="n">t_units</span><span class="p">)</span>
-    <span class="n">t_start</span> <span class="o">=</span> <span class="n">units</span><span class="o">.</span><span class="n">add_units</span><span class="p">(</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">t_units</span><span class="p">)</span>
-    <span class="n">t_end</span> <span class="o">=</span> <span class="n">units</span><span class="o">.</span><span class="n">add_units</span><span class="p">(</span><span class="mf">1.0</span><span class="p">,</span> <span class="s1">&#39;day&#39;</span><span class="p">)</span>
-    <span class="n">state</span> <span class="o">=</span> <span class="n">timestep_calc</span><span class="p">(</span><span class="n">t_start</span><span class="p">)</span>
-
-    <span class="c1"># Set up connections matching yaml</span>
-    <span class="c1"># Timestep synchonization connection will default to &#39;timesync&#39;</span>
-    <span class="n">timesync</span> <span class="o">=</span> <span class="n">YggTimesync</span><span class="p">(</span><span class="s1">&#39;timesync&#39;</span><span class="p">)</span>
-    <span class="n">out</span> <span class="o">=</span> <span class="n">YggOutput</span><span class="p">(</span><span class="s1">&#39;output&#39;</span><span class="p">)</span>
-
-    <span class="c1"># Initialize state and synchronize with other models</span>
-    <span class="n">t</span> <span class="o">=</span> <span class="n">t_start</span>
-    <span class="n">ret</span><span class="p">,</span> <span class="n">state</span> <span class="o">=</span> <span class="n">timesync</span><span class="o">.</span><span class="n">call</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">state</span><span class="p">)</span>
-    <span class="k">if</span> <span class="ow">not</span> <span class="n">ret</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">&quot;other_model(Python): Initial sync failed.&quot;</span><span class="p">)</span>
-    <span class="k">print</span><span class="p">(</span><span class="s1">&#39;other_model(Python): t = </span><span class="si">% 8s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">t</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">)</span>
-    <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">state</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
-        <span class="k">print</span><span class="p">(</span><span class="s1">&#39;, </span><span class="si">%s</span><span class="s1"> = </span><span class="si">%+ 5.2f</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="n">v</span><span class="p">),</span> <span class="n">end</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">)</span>
-    <span class="k">print</span><span class="p">(</span><span class="s1">&#39;&#39;</span><span class="p">)</span>
-
-    <span class="c1"># Send initial state to output</span>
-    <span class="n">flag</span> <span class="o">=</span> <span class="n">out</span><span class="o">.</span><span class="n">send</span><span class="p">(</span><span class="nb">dict</span><span class="p">(</span><span class="n">state</span><span class="p">,</span> <span class="n">time</span><span class="o">=</span><span class="n">t</span><span class="p">))</span>
-    <span class="k">if</span> <span class="ow">not</span> <span class="n">flag</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">&quot;other_model(Python): Failed to send &quot;</span>
-                           <span class="s2">&quot;initial output for t=</span><span class="si">%s</span><span class="s2">.&quot;</span> <span class="o">%</span> <span class="n">t</span><span class="p">)</span>
-    
-    <span class="c1"># Iterate until end</span>
-    <span class="k">while</span> <span class="n">t</span> <span class="o">&lt;</span> <span class="n">t_end</span><span class="p">:</span>
-
-        <span class="c1"># Perform calculations to update the state</span>
-        <span class="n">t</span> <span class="o">=</span> <span class="n">t</span> <span class="o">+</span> <span class="n">t_step</span>
-        <span class="n">state</span> <span class="o">=</span> <span class="n">timestep_calc</span><span class="p">(</span><span class="n">t</span><span class="p">)</span>
-
-        <span class="c1"># Synchronize the state</span>
-        <span class="n">ret</span><span class="p">,</span> <span class="n">state</span> <span class="o">=</span> <span class="n">timesync</span><span class="o">.</span><span class="n">call</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">state</span><span class="p">)</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="n">ret</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">&quot;other_model(Python): sync for t=</span><span class="si">%f</span><span class="s2"> failed.&quot;</span> <span class="o">%</span> <span class="n">t</span><span class="p">)</span>
-        <span class="k">print</span><span class="p">(</span><span class="s1">&#39;other_model(Python): t = </span><span class="si">% 8s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">t</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">)</span>
-        <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">state</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
-            <span class="k">print</span><span class="p">(</span><span class="s1">&#39;, </span><span class="si">%s</span><span class="s1"> = </span><span class="si">%+ 5.2f</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="n">v</span><span class="p">),</span> <span class="n">end</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">)</span>
-        <span class="k">print</span><span class="p">(</span><span class="s1">&#39;&#39;</span><span class="p">)</span>
-
-        <span class="c1"># Send output</span>
-        <span class="n">flag</span> <span class="o">=</span> <span class="n">out</span><span class="o">.</span><span class="n">send</span><span class="p">(</span><span class="nb">dict</span><span class="p">(</span><span class="n">state</span><span class="p">,</span> <span class="n">time</span><span class="o">=</span><span class="n">t</span><span class="p">))</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="n">flag</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">&quot;other_model(Python): Failed to send output for t=</span><span class="si">%s</span><span class="s2">.&quot;</span> <span class="o">%</span> <span class="n">t</span><span class="p">)</span>
-
-    <span class="k">print</span><span class="p">(</span><span class="s1">&#39;Goodbye from Python other_model&#39;</span><span class="p">)</span>
-
-
-<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s1">&#39;__main__&#39;</span><span class="p">:</span>
-    <span class="c1"># Take time step from the first argument</span>
-    <span class="n">main</span><span class="p">(</span><span class="nb">float</span><span class="p">(</span><span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">[</span><span class="mi">1</span><span class="p">]),</span> <span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">[</span><span class="mi">2</span><span class="p">])</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span><span class="kn">import</span> <span class="nn">sys</span>
+<span class="linenos"> 2</span><span class="kn">from</span> <span class="nn">yggdrasil</span> <span class="kn">import</span> <span class="n">units</span>
+<span class="linenos"> 3</span><span class="kn">from</span> <span class="nn">yggdrasil.interface.YggInterface</span> <span class="kn">import</span> <span class="p">(</span>
+<span class="linenos"> 4</span>    <span class="n">YggTimesync</span><span class="p">,</span> <span class="n">YggOutput</span><span class="p">)</span>
+<span class="linenos"> 5</span>
+<span class="linenos"> 6</span>
+<span class="linenos"> 7</span><span class="k">def</span> <span class="nf">timestep_calc</span><span class="p">(</span><span class="n">t</span><span class="p">):</span>
+<span class="linenos"> 8</span>    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Updates the state based on the time where x is a sine wave</span>
+<span class="linenos"> 9</span><span class="sd">    with period of 10 days and y is a cosine wave with a period of 5 days.</span>
+<span class="linenos">10</span>
+<span class="linenos">11</span><span class="sd">    Args:</span>
+<span class="linenos">12</span><span class="sd">        t (float): Current time.</span>
+<span class="linenos">13</span>
+<span class="linenos">14</span><span class="sd">    Returns:</span>
+<span class="linenos">15</span><span class="sd">        dict: Map of state parameters.</span>
+<span class="linenos">16</span>
+<span class="linenos">17</span><span class="sd">    &quot;&quot;&quot;</span>
+<span class="linenos">18</span>    <span class="n">state</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;carbonAllocation2Roots&quot;</span><span class="p">:</span> <span class="n">units</span><span class="o">.</span><span class="n">add_units</span><span class="p">(</span><span class="mf">10.0</span><span class="p">,</span> <span class="s1">&#39;g&#39;</span><span class="p">),</span>
+<span class="linenos">19</span>             <span class="s2">&quot;saturatedConductivity&quot;</span><span class="p">:</span> <span class="n">units</span><span class="o">.</span><span class="n">add_units</span><span class="p">(</span><span class="mf">10.0</span><span class="p">,</span> <span class="s1">&#39;cm/day&#39;</span><span class="p">)}</span>
+<span class="linenos">20</span>    <span class="k">return</span> <span class="n">state</span>
+<span class="linenos">21</span>
+<span class="linenos">22</span>
+<span class="linenos">23</span><span class="k">def</span> <span class="nf">main</span><span class="p">(</span><span class="n">t_step</span><span class="p">,</span> <span class="n">t_units</span><span class="p">):</span>
+<span class="linenos">24</span>    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Function to execute integration.</span>
+<span class="linenos">25</span>
+<span class="linenos">26</span><span class="sd">    Args:</span>
+<span class="linenos">27</span><span class="sd">        t_step (float): The time step that should be used.</span>
+<span class="linenos">28</span><span class="sd">        t_units (str): Units of the time step.</span>
+<span class="linenos">29</span>
+<span class="linenos">30</span><span class="sd">    &quot;&quot;&quot;</span>
+<span class="linenos">31</span>    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Hello from Python other_model: timestep = </span><span class="si">%s</span><span class="s1"> </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">t_step</span><span class="p">,</span> <span class="n">t_units</span><span class="p">))</span>
+<span class="linenos">32</span>    <span class="n">t_step</span> <span class="o">=</span> <span class="n">units</span><span class="o">.</span><span class="n">add_units</span><span class="p">(</span><span class="n">t_step</span><span class="p">,</span> <span class="n">t_units</span><span class="p">)</span>
+<span class="linenos">33</span>    <span class="n">t_start</span> <span class="o">=</span> <span class="n">units</span><span class="o">.</span><span class="n">add_units</span><span class="p">(</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">t_units</span><span class="p">)</span>
+<span class="linenos">34</span>    <span class="n">t_end</span> <span class="o">=</span> <span class="n">units</span><span class="o">.</span><span class="n">add_units</span><span class="p">(</span><span class="mf">1.0</span><span class="p">,</span> <span class="s1">&#39;day&#39;</span><span class="p">)</span>
+<span class="linenos">35</span>    <span class="n">state</span> <span class="o">=</span> <span class="n">timestep_calc</span><span class="p">(</span><span class="n">t_start</span><span class="p">)</span>
+<span class="linenos">36</span>
+<span class="linenos">37</span>    <span class="c1"># Set up connections matching yaml</span>
+<span class="linenos">38</span>    <span class="c1"># Timestep synchonization connection will default to &#39;timesync&#39;</span>
+<span class="linenos">39</span>    <span class="n">timesync</span> <span class="o">=</span> <span class="n">YggTimesync</span><span class="p">(</span><span class="s1">&#39;timesync&#39;</span><span class="p">)</span>
+<span class="linenos">40</span>    <span class="n">out</span> <span class="o">=</span> <span class="n">YggOutput</span><span class="p">(</span><span class="s1">&#39;output&#39;</span><span class="p">)</span>
+<span class="linenos">41</span>
+<span class="linenos">42</span>    <span class="c1"># Initialize state and synchronize with other models</span>
+<span class="linenos">43</span>    <span class="n">t</span> <span class="o">=</span> <span class="n">t_start</span>
+<span class="linenos">44</span>    <span class="n">ret</span><span class="p">,</span> <span class="n">state</span> <span class="o">=</span> <span class="n">timesync</span><span class="o">.</span><span class="n">call</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">state</span><span class="p">)</span>
+<span class="linenos">45</span>    <span class="k">if</span> <span class="ow">not</span> <span class="n">ret</span><span class="p">:</span>
+<span class="linenos">46</span>        <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">&quot;other_model(Python): Initial sync failed.&quot;</span><span class="p">)</span>
+<span class="linenos">47</span>    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;other_model(Python): t = </span><span class="si">% 8s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">t</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">)</span>
+<span class="linenos">48</span>    <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">state</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+<span class="linenos">49</span>        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;, </span><span class="si">%s</span><span class="s1"> = </span><span class="si">%+ 5.2f</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="n">v</span><span class="p">),</span> <span class="n">end</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">)</span>
+<span class="linenos">50</span>    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;&#39;</span><span class="p">)</span>
+<span class="linenos">51</span>
+<span class="linenos">52</span>    <span class="c1"># Send initial state to output</span>
+<span class="linenos">53</span>    <span class="n">flag</span> <span class="o">=</span> <span class="n">out</span><span class="o">.</span><span class="n">send</span><span class="p">(</span><span class="nb">dict</span><span class="p">(</span><span class="n">state</span><span class="p">,</span> <span class="n">time</span><span class="o">=</span><span class="n">t</span><span class="p">))</span>
+<span class="linenos">54</span>    <span class="k">if</span> <span class="ow">not</span> <span class="n">flag</span><span class="p">:</span>
+<span class="linenos">55</span>        <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">&quot;other_model(Python): Failed to send &quot;</span>
+<span class="linenos">56</span>                           <span class="s2">&quot;initial output for t=</span><span class="si">%s</span><span class="s2">.&quot;</span> <span class="o">%</span> <span class="n">t</span><span class="p">)</span>
+<span class="linenos">57</span>    
+<span class="linenos">58</span>    <span class="c1"># Iterate until end</span>
+<span class="linenos">59</span>    <span class="k">while</span> <span class="n">t</span> <span class="o">&lt;</span> <span class="n">t_end</span><span class="p">:</span>
+<span class="linenos">60</span>
+<span class="linenos">61</span>        <span class="c1"># Perform calculations to update the state</span>
+<span class="linenos">62</span>        <span class="n">t</span> <span class="o">=</span> <span class="n">t</span> <span class="o">+</span> <span class="n">t_step</span>
+<span class="linenos">63</span>        <span class="n">state</span> <span class="o">=</span> <span class="n">timestep_calc</span><span class="p">(</span><span class="n">t</span><span class="p">)</span>
+<span class="linenos">64</span>
+<span class="linenos">65</span>        <span class="c1"># Synchronize the state</span>
+<span class="linenos">66</span>        <span class="n">ret</span><span class="p">,</span> <span class="n">state</span> <span class="o">=</span> <span class="n">timesync</span><span class="o">.</span><span class="n">call</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">state</span><span class="p">)</span>
+<span class="linenos">67</span>        <span class="k">if</span> <span class="ow">not</span> <span class="n">ret</span><span class="p">:</span>
+<span class="linenos">68</span>            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">&quot;other_model(Python): sync for t=</span><span class="si">%f</span><span class="s2"> failed.&quot;</span> <span class="o">%</span> <span class="n">t</span><span class="p">)</span>
+<span class="linenos">69</span>        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;other_model(Python): t = </span><span class="si">% 8s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">t</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">)</span>
+<span class="linenos">70</span>        <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">state</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+<span class="linenos">71</span>            <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;, </span><span class="si">%s</span><span class="s1"> = </span><span class="si">%+ 5.2f</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="n">v</span><span class="p">),</span> <span class="n">end</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">)</span>
+<span class="linenos">72</span>        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;&#39;</span><span class="p">)</span>
+<span class="linenos">73</span>
+<span class="linenos">74</span>        <span class="c1"># Send output</span>
+<span class="linenos">75</span>        <span class="n">flag</span> <span class="o">=</span> <span class="n">out</span><span class="o">.</span><span class="n">send</span><span class="p">(</span><span class="nb">dict</span><span class="p">(</span><span class="n">state</span><span class="p">,</span> <span class="n">time</span><span class="o">=</span><span class="n">t</span><span class="p">))</span>
+<span class="linenos">76</span>        <span class="k">if</span> <span class="ow">not</span> <span class="n">flag</span><span class="p">:</span>
+<span class="linenos">77</span>            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">&quot;other_model(Python): Failed to send output for t=</span><span class="si">%s</span><span class="s2">.&quot;</span> <span class="o">%</span> <span class="n">t</span><span class="p">)</span>
+<span class="linenos">78</span>
+<span class="linenos">79</span>    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Goodbye from Python other_model&#39;</span><span class="p">)</span>
+<span class="linenos">80</span>
+<span class="linenos">81</span>
+<span class="linenos">82</span><span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s1">&#39;__main__&#39;</span><span class="p">:</span>
+<span class="linenos">83</span>    <span class="c1"># Take time step from the first argument</span>
+<span class="linenos">84</span>    <span class="n">main</span><span class="p">(</span><span class="nb">float</span><span class="p">(</span><span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">[</span><span class="mi">1</span><span class="p">]),</span> <span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">[</span><span class="mi">2</span><span class="p">])</span>
 </pre></div>
-</td></tr></table></div>
-<div class="highlight-python notranslate"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>  1
-  2
-  3
-  4
-  5
-  6
-  7
-  8
-  9
- 10
- 11
- 12
- 13
- 14
- 15
- 16
- 17
- 18
- 19
- 20
- 21
- 22
- 23
- 24
- 25
- 26
- 27
- 28
- 29
- 30
- 31
- 32
- 33
- 34
- 35
- 36
- 37
- 38
- 39
- 40
- 41
- 42
- 43
- 44
- 45
- 46
- 47
- 48
- 49
- 50
- 51
- 52
- 53
- 54
- 55
- 56
- 57
- 58
- 59
- 60
- 61
- 62
- 63
- 64
- 65
- 66
- 67
- 68
- 69
- 70
- 71
- 72
- 73
- 74
- 75
- 76
- 77
- 78
- 79
- 80
- 81
- 82
- 83
- 84
- 85
- 86
- 87
- 88
- 89
- 90
- 91
- 92
- 93
- 94
- 95
- 96
- 97
- 98
- 99
-100
-101
-102
-103
-104
-105
-106
-107
-108
-109
-110
-111
-112
-113
-114</pre></div></td><td class="code"><div class="highlight"><pre><span></span>&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot; standalone=&quot;no&quot;?&gt;
-&lt;!--
-	Simulation file for SimRoot version 5. This development version, build July 2007
-	Author: Jouke Postma
-	Note: 
-	
-	PLEASE KEEP THIS HEADER UP TO DATE! LIST BELOW WHO YOU ARE, WHEN AND WHAT CHANGES YOU MADE AND WHY. LIST YOUR SOURCE AS MUCH AS POSSIBLE!
-
-	change log: 
-	11-july-07 added support for include files. 
-	
-	
---&gt;
-&lt;!--STYLE SHEET SECTION: feel free to attach any stylesheet of your choosing--&gt;
-&lt;!--?xml-stylesheet type=&quot;text/xsl&quot; href=&quot;tree-view2.xsl&quot;?--&gt;
-&lt;?xml-stylesheet type=&quot;text/xsl&quot; href=&quot;XML/treeview.xsl&quot;?&gt;
-
-&lt;!--SIMULATION MODEL--&gt;
-&lt;SimulationModel xmlns:xsi=&quot;http://www.w3.org/2001/XMLSchema-instance&quot; xsi:noNamespaceSchemaLocation=&quot;../scripts/XML/SimulaXMLSchema.xsd&quot;&gt;
-  
-	&lt;SimulaBase name=&quot;soil&quot;&gt;
-	&lt;/SimulaBase&gt;	
-
-	
-	&lt;SimulaBase name=&quot;plants&quot;&gt;
-		&lt;SimulaBase name=&quot;maize&quot; objectGenerator=&quot;seedling&quot;&gt;
-			&lt;SimulaConstant name=&quot;plantType&quot; type=&quot;string&quot;&gt;
-			&lt;!-- 	H99 w64a 36H56 noRCAinLaterals maize-aerenchyma--&gt; 
-				maize-aerenchyma
-			&lt;/SimulaConstant&gt;	
-			&lt;SimulaConstant name=&quot;plantingTime&quot;  unit=&quot;day&quot; type=&quot;time&quot;&gt;
-				0
-			&lt;/SimulaConstant&gt;	
-			&lt;SimulaConstant name=&quot;plantPosition&quot; type=&quot;coordinate&quot;&gt;
-					0 -2 0
-			&lt;/SimulaConstant&gt;
-		&lt;/SimulaBase&gt;	
-	&lt;/SimulaBase&gt;	
-
-	&lt;!-- &lt;SimulaIncludeFile fileName=&quot;plantParameters/Maize/Maize/simulationControlParameters.xml&quot;/&gt; --&gt;
-	&lt;SimulaBase name=&quot;simulationControls&quot;&gt;
-		&lt;SimulaBase name=&quot;outputParameters&quot;&gt;
-			&lt;SimulaBase name=&quot;defaults&quot;&gt;
-			&lt;!-- optional section - if an export module section does not list end/start/interval times than you can specify a default here--&gt;
-				&lt;SimulaConstant
-					name=&quot;startTime&quot;
-					type=&quot;time&quot;&gt; 0.&lt;/SimulaConstant&gt;
-				&lt;SimulaConstant
-					name=&quot;endTime&quot;
-					type=&quot;time&quot;&gt; 1&lt;/SimulaConstant&gt;
-				&lt;SimulaConstant
-					name=&quot;timeInterval&quot;
-					type=&quot;time&quot;&gt; 1.&lt;/SimulaConstant&gt;
-			&lt;/SimulaBase&gt;
-			&lt;SimulaBase name=&quot;probeAllObjects&quot;&gt;
-				&lt;SimulaConstant
-					name=&quot;run&quot;
-					type=&quot;bool&quot;&gt;
-					1 &lt;!--this does not result in any output, just tries to run the code for debugging purposes--&gt;
-				&lt;/SimulaConstant&gt;
-				&lt;SimulaConstant
-					name=&quot;timeInterval&quot;
-					type=&quot;time&quot;&gt;1&lt;/SimulaConstant&gt;
-				&lt;SimulaConstant
-					name=&quot;requestedVariables&quot;
-					type=&quot;string&quot;&gt; carbonAllocation2Roots, saturatedWaterContent,
-				&lt;/SimulaConstant&gt;
-			&lt;/SimulaBase&gt;	
-			&lt;SimulaBase name=&quot;table&quot;&gt;
-				&lt;SimulaConstant
-					name=&quot;run&quot;
-					type=&quot;bool&quot;&gt; 1&lt;/SimulaConstant&gt;
-				&lt;!--SimulaConstant name=&quot;timeInterval&quot; type=&quot;time&quot;&gt; 1.0	&lt;/SimulaConstant--&gt;
-				&lt;SimulaConstant
-					name=&quot;searchingDepth&quot;
-					type=&quot;integer&quot;&gt; 5&lt;/SimulaConstant&gt;
-				&lt;SimulaConstant
-					name=&quot;skipTheseVariables&quot;
-					type=&quot;string&quot;&gt; primaryRoot, hypocotyl,
-				&lt;/SimulaConstant&gt;
-			&lt;/SimulaBase&gt;
-		&lt;/SimulaBase&gt;
-	&lt;/SimulaBase&gt;
-	
-	&lt;SimulaIncludeFile fileName=&quot;templates/plantTemplateFullModel.xml&quot;/&gt;
-	&lt;!-- SimulaIncludeFile fileName=&quot;environments/Rocksprings/Rocksprings-maize.xml&quot;/--&gt;
-	&lt;SimulaIncludeFile fileName=&quot;environments/WageningseBovenBuurt/WageningseBovenBuurt-maize.xml&quot;/&gt;
-
-	&lt;SimulaIncludeFile fileName=&quot;templates/plantTemplate.IncludeGeometry.xml&quot; /&gt;
-	&lt;SimulaIncludeFile fileName=&quot;templates/plantTemplate.IncludeDryweight.xml&quot; /&gt;
-
-	&lt;!--SimulaIncludeFile fileName=&quot;templates/plantTemplate.IncludePhosphorusBC.xml&quot; /--&gt;
-	&lt;!--SimulaIncludeFile fileName=&quot;templates/plantTemplate.IncludePhosphorus3D.xml&quot; /--&gt;
-	&lt;!--SimulaIncludeFile fileName=&quot;templates/plantTemplate.IncludeNitrateBasic.xml&quot;/--&gt;
-	&lt;!--SimulaIncludeFile fileName=&quot;templates/plantTemplate.IncludeWaterModule.xml&quot;/&gt;
-	&lt;SimulaIncludeFile fileName=&quot;templates/plantTemplate.IncludeNitrate3D.xml&quot;/--&gt;
-	&lt;!--SimulaIncludeFile fileName=&quot;templates/plantTemplate.IncludePotassium3D.xml&quot; /--&gt;
-
-	&lt;SimulaIncludeFile fileName=&quot;templates/configurationCarbon.xml&quot;/&gt;
-	&lt;SimulaIncludeFile fileName=&quot;templates/plantTemplate.IncludeStress.xml&quot;/&gt;
-	&lt;SimulaIncludeFile fileName=&quot;templates/plantTemplate.IncludeRootHairs.xml&quot;/&gt;
-	&lt;SimulaIncludeFile fileName=&quot;templates/plantTemplate.IncludeAerenchyma.xml&quot;/&gt;
-	&lt;SimulaIncludeFile fileName=&quot;templates/plantTemplate.IncludeRootLengthProfile.xml&quot;/&gt;
-	&lt;!--SimulaIncludeFile fileName=&quot;templates/plantTemplate.IncludeLocalNutrientResponses.xml&quot;/--&gt;
-
-	&lt;SimulaBase name=&quot;rootTypeParameters&quot; &gt;
-	  &lt;!--SimulaIncludeFile fileName=&quot;plantParameters/Maize/H99/maize.xml&quot;/&gt;
-		&lt;SimulaIncludeFile fileName=&quot;plantParameters/Maize/W64a/maize.xml&quot;/&gt;
-		&lt;SimulaIncludeFile fileName=&quot;plantParameters/Maize/36H56/maize.xml&quot;/--&gt;
-	  &lt;SimulaIncludeFile fileName=&quot;plantParameters/Maize/Maize/maize.xml&quot;/&gt;
-	&lt;/SimulaBase&gt;
-&lt;/SimulationModel&gt;
-
-
+</div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="linenos">  1</span>&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot; standalone=&quot;no&quot;?&gt;
+<span class="linenos">  2</span>&lt;!--
+<span class="linenos">  3</span>	Simulation file for SimRoot version 5. This development version, build July 2007
+<span class="linenos">  4</span>	Author: Jouke Postma
+<span class="linenos">  5</span>	Note: 
+<span class="linenos">  6</span>	
+<span class="linenos">  7</span>	PLEASE KEEP THIS HEADER UP TO DATE! LIST BELOW WHO YOU ARE, WHEN AND WHAT CHANGES YOU MADE AND WHY. LIST YOUR SOURCE AS MUCH AS POSSIBLE!
+<span class="linenos">  8</span>
+<span class="linenos">  9</span>	change log: 
+<span class="linenos"> 10</span>	11-july-07 added support for include files. 
+<span class="linenos"> 11</span>	
+<span class="linenos"> 12</span>	
+<span class="linenos"> 13</span>--&gt;
+<span class="linenos"> 14</span>&lt;!--STYLE SHEET SECTION: feel free to attach any stylesheet of your choosing--&gt;
+<span class="linenos"> 15</span>&lt;!--?xml-stylesheet type=&quot;text/xsl&quot; href=&quot;tree-view2.xsl&quot;?--&gt;
+<span class="linenos"> 16</span>&lt;?xml-stylesheet type=&quot;text/xsl&quot; href=&quot;XML/treeview.xsl&quot;?&gt;
+<span class="linenos"> 17</span>
+<span class="linenos"> 18</span>&lt;!--SIMULATION MODEL--&gt;
+<span class="linenos"> 19</span>&lt;SimulationModel xmlns:xsi=&quot;http://www.w3.org/2001/XMLSchema-instance&quot; xsi:noNamespaceSchemaLocation=&quot;../scripts/XML/SimulaXMLSchema.xsd&quot;&gt;
+<span class="linenos"> 20</span>  
+<span class="linenos"> 21</span>	&lt;SimulaBase name=&quot;soil&quot;&gt;
+<span class="linenos"> 22</span>	&lt;/SimulaBase&gt;	
+<span class="linenos"> 23</span>
+<span class="linenos"> 24</span>	
+<span class="linenos"> 25</span>	&lt;SimulaBase name=&quot;plants&quot;&gt;
+<span class="linenos"> 26</span>		&lt;SimulaBase name=&quot;maize&quot; objectGenerator=&quot;seedling&quot;&gt;
+<span class="linenos"> 27</span>			&lt;SimulaConstant name=&quot;plantType&quot; type=&quot;string&quot;&gt;
+<span class="linenos"> 28</span>			&lt;!-- 	H99 w64a 36H56 noRCAinLaterals maize-aerenchyma--&gt; 
+<span class="linenos"> 29</span>				maize-aerenchyma
+<span class="linenos"> 30</span>			&lt;/SimulaConstant&gt;	
+<span class="linenos"> 31</span>			&lt;SimulaConstant name=&quot;plantingTime&quot;  unit=&quot;day&quot; type=&quot;time&quot;&gt;
+<span class="linenos"> 32</span>				0
+<span class="linenos"> 33</span>			&lt;/SimulaConstant&gt;	
+<span class="linenos"> 34</span>			&lt;SimulaConstant name=&quot;plantPosition&quot; type=&quot;coordinate&quot;&gt;
+<span class="linenos"> 35</span>					0 -2 0
+<span class="linenos"> 36</span>			&lt;/SimulaConstant&gt;
+<span class="linenos"> 37</span>		&lt;/SimulaBase&gt;	
+<span class="linenos"> 38</span>	&lt;/SimulaBase&gt;	
+<span class="linenos"> 39</span>
+<span class="linenos"> 40</span>	&lt;!-- &lt;SimulaIncludeFile fileName=&quot;plantParameters/Maize/Maize/simulationControlParameters.xml&quot;/&gt; --&gt;
+<span class="linenos"> 41</span>	&lt;SimulaBase name=&quot;simulationControls&quot;&gt;
+<span class="linenos"> 42</span>		&lt;SimulaBase name=&quot;outputParameters&quot;&gt;
+<span class="linenos"> 43</span>			&lt;SimulaBase name=&quot;defaults&quot;&gt;
+<span class="linenos"> 44</span>			&lt;!-- optional section - if an export module section does not list end/start/interval times than you can specify a default here--&gt;
+<span class="linenos"> 45</span>				&lt;SimulaConstant
+<span class="linenos"> 46</span>					name=&quot;startTime&quot;
+<span class="linenos"> 47</span>					type=&quot;time&quot;&gt; 0.&lt;/SimulaConstant&gt;
+<span class="linenos"> 48</span>				&lt;SimulaConstant
+<span class="linenos"> 49</span>					name=&quot;endTime&quot;
+<span class="linenos"> 50</span>					type=&quot;time&quot;&gt; 1&lt;/SimulaConstant&gt;
+<span class="linenos"> 51</span>				&lt;SimulaConstant
+<span class="linenos"> 52</span>					name=&quot;timeInterval&quot;
+<span class="linenos"> 53</span>					type=&quot;time&quot;&gt; 1.&lt;/SimulaConstant&gt;
+<span class="linenos"> 54</span>			&lt;/SimulaBase&gt;
+<span class="linenos"> 55</span>			&lt;SimulaBase name=&quot;probeAllObjects&quot;&gt;
+<span class="linenos"> 56</span>				&lt;SimulaConstant
+<span class="linenos"> 57</span>					name=&quot;run&quot;
+<span class="linenos"> 58</span>					type=&quot;bool&quot;&gt;
+<span class="linenos"> 59</span>					1 &lt;!--this does not result in any output, just tries to run the code for debugging purposes--&gt;
+<span class="linenos"> 60</span>				&lt;/SimulaConstant&gt;
+<span class="linenos"> 61</span>				&lt;SimulaConstant
+<span class="linenos"> 62</span>					name=&quot;timeInterval&quot;
+<span class="linenos"> 63</span>					type=&quot;time&quot;&gt;1&lt;/SimulaConstant&gt;
+<span class="linenos"> 64</span>				&lt;SimulaConstant
+<span class="linenos"> 65</span>					name=&quot;requestedVariables&quot;
+<span class="linenos"> 66</span>					type=&quot;string&quot;&gt; carbonAllocation2Roots, saturatedWaterContent,
+<span class="linenos"> 67</span>				&lt;/SimulaConstant&gt;
+<span class="linenos"> 68</span>			&lt;/SimulaBase&gt;	
+<span class="linenos"> 69</span>			&lt;SimulaBase name=&quot;table&quot;&gt;
+<span class="linenos"> 70</span>				&lt;SimulaConstant
+<span class="linenos"> 71</span>					name=&quot;run&quot;
+<span class="linenos"> 72</span>					type=&quot;bool&quot;&gt; 1&lt;/SimulaConstant&gt;
+<span class="linenos"> 73</span>				&lt;!--SimulaConstant name=&quot;timeInterval&quot; type=&quot;time&quot;&gt; 1.0	&lt;/SimulaConstant--&gt;
+<span class="linenos"> 74</span>				&lt;SimulaConstant
+<span class="linenos"> 75</span>					name=&quot;searchingDepth&quot;
+<span class="linenos"> 76</span>					type=&quot;integer&quot;&gt; 5&lt;/SimulaConstant&gt;
+<span class="linenos"> 77</span>				&lt;SimulaConstant
+<span class="linenos"> 78</span>					name=&quot;skipTheseVariables&quot;
+<span class="linenos"> 79</span>					type=&quot;string&quot;&gt; primaryRoot, hypocotyl,
+<span class="linenos"> 80</span>				&lt;/SimulaConstant&gt;
+<span class="linenos"> 81</span>			&lt;/SimulaBase&gt;
+<span class="linenos"> 82</span>		&lt;/SimulaBase&gt;
+<span class="linenos"> 83</span>	&lt;/SimulaBase&gt;
+<span class="linenos"> 84</span>	
+<span class="linenos"> 85</span>	&lt;SimulaIncludeFile fileName=&quot;templates/plantTemplateFullModel.xml&quot;/&gt;
+<span class="linenos"> 86</span>	&lt;!-- SimulaIncludeFile fileName=&quot;environments/Rocksprings/Rocksprings-maize.xml&quot;/--&gt;
+<span class="linenos"> 87</span>	&lt;SimulaIncludeFile fileName=&quot;environments/WageningseBovenBuurt/WageningseBovenBuurt-maize.xml&quot;/&gt;
+<span class="linenos"> 88</span>
+<span class="linenos"> 89</span>	&lt;SimulaIncludeFile fileName=&quot;templates/plantTemplate.IncludeGeometry.xml&quot; /&gt;
+<span class="linenos"> 90</span>	&lt;SimulaIncludeFile fileName=&quot;templates/plantTemplate.IncludeDryweight.xml&quot; /&gt;
+<span class="linenos"> 91</span>
+<span class="linenos"> 92</span>	&lt;!--SimulaIncludeFile fileName=&quot;templates/plantTemplate.IncludePhosphorusBC.xml&quot; /--&gt;
+<span class="linenos"> 93</span>	&lt;!--SimulaIncludeFile fileName=&quot;templates/plantTemplate.IncludePhosphorus3D.xml&quot; /--&gt;
+<span class="linenos"> 94</span>	&lt;!--SimulaIncludeFile fileName=&quot;templates/plantTemplate.IncludeNitrateBasic.xml&quot;/--&gt;
+<span class="linenos"> 95</span>	&lt;!--SimulaIncludeFile fileName=&quot;templates/plantTemplate.IncludeWaterModule.xml&quot;/&gt;
+<span class="linenos"> 96</span>	&lt;SimulaIncludeFile fileName=&quot;templates/plantTemplate.IncludeNitrate3D.xml&quot;/--&gt;
+<span class="linenos"> 97</span>	&lt;!--SimulaIncludeFile fileName=&quot;templates/plantTemplate.IncludePotassium3D.xml&quot; /--&gt;
+<span class="linenos"> 98</span>
+<span class="linenos"> 99</span>	&lt;SimulaIncludeFile fileName=&quot;templates/configurationCarbon.xml&quot;/&gt;
+<span class="linenos">100</span>	&lt;SimulaIncludeFile fileName=&quot;templates/plantTemplate.IncludeStress.xml&quot;/&gt;
+<span class="linenos">101</span>	&lt;SimulaIncludeFile fileName=&quot;templates/plantTemplate.IncludeRootHairs.xml&quot;/&gt;
+<span class="linenos">102</span>	&lt;SimulaIncludeFile fileName=&quot;templates/plantTemplate.IncludeAerenchyma.xml&quot;/&gt;
+<span class="linenos">103</span>	&lt;SimulaIncludeFile fileName=&quot;templates/plantTemplate.IncludeRootLengthProfile.xml&quot;/&gt;
+<span class="linenos">104</span>	&lt;!--SimulaIncludeFile fileName=&quot;templates/plantTemplate.IncludeLocalNutrientResponses.xml&quot;/--&gt;
+<span class="linenos">105</span>
+<span class="linenos">106</span>	&lt;SimulaBase name=&quot;rootTypeParameters&quot; &gt;
+<span class="linenos">107</span>	  &lt;!--SimulaIncludeFile fileName=&quot;plantParameters/Maize/H99/maize.xml&quot;/&gt;
+<span class="linenos">108</span>		&lt;SimulaIncludeFile fileName=&quot;plantParameters/Maize/W64a/maize.xml&quot;/&gt;
+<span class="linenos">109</span>		&lt;SimulaIncludeFile fileName=&quot;plantParameters/Maize/36H56/maize.xml&quot;/--&gt;
+<span class="linenos">110</span>	  &lt;SimulaIncludeFile fileName=&quot;plantParameters/Maize/Maize/maize.xml&quot;/&gt;
+<span class="linenos">111</span>	&lt;/SimulaBase&gt;
+<span class="linenos">112</span>&lt;/SimulationModel&gt;
+<span class="linenos">113</span>
+<span class="linenos">114</span>
 </pre></div>
-</td></tr></table></div>
+</div>
 <p>(<a class="reference external" href="examples/osr.html">Example in other languages</a>)</p>
 
 

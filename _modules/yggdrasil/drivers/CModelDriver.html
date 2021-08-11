@@ -7,12 +7,14 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>yggdrasil.drivers.CModelDriver &mdash; yggdrasil v1.6.3+18.g537444084.dirty documentation</title>
+  <title>yggdrasil.drivers.CModelDriver &mdash; yggdrasil v1.6.4 documentation</title>
   
 
   
   <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
   <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
 
   
   
@@ -29,6 +31,7 @@
   
     
       <script type="text/javascript" id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
+        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
         <script src="../../../_static/jquery.js"></script>
         <script src="../../../_static/underscore.js"></script>
         <script src="../../../_static/doctools.js"></script>
@@ -61,7 +64,7 @@
             
             
               <div class="version">
-                v1.6.3
+                v1.6.4
               </div>
             
           
@@ -86,7 +89,7 @@
               
             
             
-              <p class="caption"><span class="caption-text">Contents:</span></p>
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../../includeme.html">Overview</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../install.html">Installation</a></li>
@@ -160,8 +163,6 @@
         
           <li><a href="../../index.html">Module code</a> &raquo;</li>
         
-          <li><a href="../../yggdrasil.html">yggdrasil</a> &raquo;</li>
-        
           <li><a href="../drivers.html">yggdrasil.drivers</a> &raquo;</li>
         
       <li>yggdrasil.drivers.CModelDriver</li>
@@ -188,16 +189,16 @@
 <span class="kn">import</span> <span class="nn">subprocess</span>
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="kn">import</span> <span class="nn">sysconfig</span>
-<span class="kn">from</span> <span class="nn">collections</span> <span class="k">import</span> <span class="n">OrderedDict</span>
-<span class="kn">from</span> <span class="nn">yggdrasil</span> <span class="k">import</span> <span class="n">platform</span><span class="p">,</span> <span class="n">tools</span>
-<span class="kn">from</span> <span class="nn">yggdrasil.drivers.CompiledModelDriver</span> <span class="k">import</span> <span class="p">(</span>
+<span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">OrderedDict</span>
+<span class="kn">from</span> <span class="nn">yggdrasil</span> <span class="kn">import</span> <span class="n">platform</span><span class="p">,</span> <span class="n">tools</span>
+<span class="kn">from</span> <span class="nn">yggdrasil.drivers.CompiledModelDriver</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">CompiledModelDriver</span><span class="p">,</span> <span class="n">CompilerBase</span><span class="p">,</span> <span class="n">LinkerBase</span><span class="p">,</span> <span class="n">ArchiverBase</span><span class="p">,</span>
     <span class="n">get_compilation_tool</span><span class="p">)</span>
-<span class="kn">from</span> <span class="nn">yggdrasil.metaschema.properties.ScalarMetaschemaProperties</span> <span class="k">import</span> <span class="p">(</span>
+<span class="kn">from</span> <span class="nn">yggdrasil.metaschema.properties.ScalarMetaschemaProperties</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">_valid_types</span><span class="p">)</span>
-<span class="kn">from</span> <span class="nn">yggdrasil.languages</span> <span class="k">import</span> <span class="n">get_language_dir</span>
-<span class="kn">from</span> <span class="nn">yggdrasil.config</span> <span class="k">import</span> <span class="n">ygg_cfg</span>
-<span class="kn">from</span> <span class="nn">numpy</span> <span class="k">import</span> <span class="n">distutils</span> <span class="k">as</span> <span class="n">numpy_distutils</span>
+<span class="kn">from</span> <span class="nn">yggdrasil.languages</span> <span class="kn">import</span> <span class="n">get_language_dir</span>
+<span class="kn">from</span> <span class="nn">yggdrasil.config</span> <span class="kn">import</span> <span class="n">ygg_cfg</span>
+<span class="kn">from</span> <span class="nn">numpy</span> <span class="kn">import</span> <span class="n">distutils</span> <span class="k">as</span> <span class="n">numpy_distutils</span>
 
 
 <span class="n">_default_internal_libtype</span> <span class="o">=</span> <span class="s1">&#39;object&#39;</span>
@@ -1242,32 +1243,19 @@
                     <span class="n">x</span><span class="p">[</span><span class="s1">&#39;datatype&#39;</span><span class="p">][</span><span class="s1">&#39;type&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;ndarray&#39;</span>
         <span class="k">return</span> <span class="n">out</span></div>
         
-<div class="viewcode-block" id="CModelDriver.update_io_from_function"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.CModelDriver.CModelDriver.update_io_from_function">[docs]</a>    <span class="nd">@classmethod</span>
-    <span class="k">def</span> <span class="nf">update_io_from_function</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">model_file</span><span class="p">,</span> <span class="n">model_function</span><span class="p">,</span>
-                                <span class="n">inputs</span><span class="o">=</span><span class="p">[],</span> <span class="n">outputs</span><span class="o">=</span><span class="p">[],</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Update inputs/outputs from the function definition.</span>
+<div class="viewcode-block" id="CModelDriver.finalize_function_io"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.CModelDriver.CModelDriver.finalize_function_io">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">finalize_function_io</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">direction</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Finalize info for an input/output channel following function</span>
+<span class="sd">        parsing.</span>
 
 <span class="sd">        Args:</span>
-<span class="sd">            model_file (str): Full path to the file containing the model</span>
-<span class="sd">                function&#39;s declaration.</span>
-<span class="sd">            model_function (str): Name of the model function.</span>
-<span class="sd">            inputs (list, optional): List of model inputs including types.</span>
-<span class="sd">                Defaults to [].</span>
-<span class="sd">            outputs (list, optional): List of model outputs including types.</span>
-<span class="sd">                Defaults to [].</span>
-<span class="sd">            **kwargs: Additional keyword arguments are passed to the parent</span>
-<span class="sd">                class&#39;s method.</span>
-
-<span class="sd">        Returns:</span>
-<span class="sd">            dict, None: Flag variable used by the model. If None, the</span>
-<span class="sd">                model does not use a flag variable.</span>
+<span class="sd">            direction (str): Direction of channel (&#39;input&#39; or &#39;output&#39;)</span>
+<span class="sd">            x (dict): Channel info.</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">flag_var</span> <span class="o">=</span> <span class="nb">super</span><span class="p">(</span><span class="n">CModelDriver</span><span class="p">,</span> <span class="bp">cls</span><span class="p">)</span><span class="o">.</span><span class="n">update_io_from_function</span><span class="p">(</span>
-            <span class="n">model_file</span><span class="p">,</span> <span class="n">model_function</span><span class="p">,</span> <span class="n">inputs</span><span class="o">=</span><span class="n">inputs</span><span class="p">,</span>
-            <span class="n">outputs</span><span class="o">=</span><span class="n">outputs</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
-        <span class="c1"># Add length_vars if missing for use by yggdrasil</span>
-        <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">inputs</span><span class="p">:</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">CModelDriver</span><span class="p">,</span> <span class="bp">cls</span><span class="p">)</span><span class="o">.</span><span class="n">finalize_function_io</span><span class="p">(</span><span class="n">direction</span><span class="p">,</span> <span class="n">x</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">direction</span> <span class="o">==</span> <span class="s1">&#39;input&#39;</span><span class="p">:</span>
+            <span class="c1"># Add length_vars if missing for use by yggdrasil</span>
             <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">x</span><span class="p">[</span><span class="s1">&#39;vars&#39;</span><span class="p">]:</span>
                 <span class="k">if</span> <span class="bp">cls</span><span class="o">.</span><span class="n">requires_length_var</span><span class="p">(</span><span class="n">v</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="ow">not</span> <span class="n">v</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;length_var&#39;</span><span class="p">,</span> <span class="kc">False</span><span class="p">)):</span>
                     <span class="n">v</span><span class="p">[</span><span class="s1">&#39;length_var&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="n">v</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">]</span> <span class="o">+</span> <span class="s1">&#39;_length&#39;</span><span class="p">,</span>
@@ -1294,21 +1282,7 @@
                     <span class="c1">#                      &#39;precision&#39;: 64},</span>
                     <span class="c1">#         &#39;is_length_var&#39;: True,</span>
                     <span class="c1">#         &#39;dependent&#39;: True}</span>
-        <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">outputs</span><span class="p">:</span>
-            <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">x</span><span class="p">[</span><span class="s1">&#39;vars&#39;</span><span class="p">]:</span>
-                <span class="k">if</span> <span class="bp">cls</span><span class="o">.</span><span class="n">requires_length_var</span><span class="p">(</span><span class="n">v</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="ow">not</span> <span class="n">v</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;length_var&#39;</span><span class="p">,</span> <span class="kc">False</span><span class="p">)):</span>
-                    <span class="k">if</span> <span class="n">v</span><span class="p">[</span><span class="s1">&#39;datatype&#39;</span><span class="p">][</span><span class="s1">&#39;type&#39;</span><span class="p">]</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;1darray&#39;</span><span class="p">,</span> <span class="s1">&#39;ndarray&#39;</span><span class="p">]:</span>  <span class="c1"># pragma: debug</span>
-                        <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">&quot;Length must be defined for arrays.&quot;</span><span class="p">)</span>
-                    <span class="k">elif</span> <span class="n">v</span><span class="p">[</span><span class="s1">&#39;datatype&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;subtype&#39;</span><span class="p">,</span> <span class="n">v</span><span class="p">[</span><span class="s1">&#39;datatype&#39;</span><span class="p">][</span><span class="s1">&#39;type&#39;</span><span class="p">])</span> <span class="o">==</span> <span class="s1">&#39;bytes&#39;</span><span class="p">:</span>
-                        <span class="n">v</span><span class="p">[</span><span class="s1">&#39;length_var&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;strlen(</span><span class="si">%s</span><span class="s1">)&#39;</span> <span class="o">%</span> <span class="n">v</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">]</span>
-                    <span class="k">else</span><span class="p">:</span>
-                        <span class="n">v</span><span class="p">[</span><span class="s1">&#39;length_var&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;strlen4(</span><span class="si">%s</span><span class="s1">)&#39;</span> <span class="o">%</span> <span class="n">v</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">]</span>
-                <span class="k">elif</span> <span class="p">(</span><span class="bp">cls</span><span class="o">.</span><span class="n">requires_shape_var</span><span class="p">(</span><span class="n">v</span><span class="p">)</span>
-                      <span class="ow">and</span> <span class="ow">not</span> <span class="p">(</span><span class="n">v</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;ndim_var&#39;</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>
-                               <span class="ow">and</span> <span class="n">v</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;shape_var&#39;</span><span class="p">,</span> <span class="kc">False</span><span class="p">))):</span>  <span class="c1"># pragma: debug</span>
-                    <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">&quot;Shape must be defined for ND arrays.&quot;</span><span class="p">)</span>
-        <span class="c1"># Flag input variables for reallocation</span>
-        <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">inputs</span><span class="p">:</span>
+            <span class="c1"># Flag input variables for reallocation</span>
             <span class="n">allows_realloc</span> <span class="o">=</span> <span class="p">[</span><span class="bp">cls</span><span class="o">.</span><span class="n">allows_realloc</span><span class="p">(</span><span class="n">v</span><span class="p">)</span> <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">x</span><span class="p">[</span><span class="s1">&#39;vars&#39;</span><span class="p">]]</span>
             <span class="k">if</span> <span class="nb">all</span><span class="p">(</span><span class="n">allows_realloc</span><span class="p">):</span>
                 <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">x</span><span class="p">[</span><span class="s1">&#39;vars&#39;</span><span class="p">]:</span>
@@ -1321,17 +1295,31 @@
                          <span class="ow">and</span> <span class="p">(</span><span class="bp">cls</span><span class="o">.</span><span class="n">function_param</span><span class="p">[</span><span class="s1">&#39;recv_function&#39;</span><span class="p">]</span>
                               <span class="o">==</span> <span class="bp">cls</span><span class="o">.</span><span class="n">function_param</span><span class="p">[</span><span class="s1">&#39;recv_heap&#39;</span><span class="p">]))):</span>
                         <span class="n">v</span><span class="p">[</span><span class="s1">&#39;allow_realloc&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
-        <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">inputs</span> <span class="o">+</span> <span class="n">outputs</span><span class="p">:</span>
-            <span class="k">if</span> <span class="n">x</span><span class="p">[</span><span class="s1">&#39;datatype&#39;</span><span class="p">][</span><span class="s1">&#39;type&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;array&#39;</span><span class="p">:</span>
-                <span class="n">nvars_items</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">x</span><span class="p">[</span><span class="s1">&#39;datatype&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;items&#39;</span><span class="p">,</span> <span class="p">[]))</span>
-                <span class="n">nvars</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">([(</span><span class="ow">not</span> <span class="n">ix</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;is_length_var&#39;</span><span class="p">,</span> <span class="kc">False</span><span class="p">))</span>
-                             <span class="k">for</span> <span class="n">ix</span> <span class="ow">in</span> <span class="n">x</span><span class="p">[</span><span class="s1">&#39;vars&#39;</span><span class="p">]])</span>
-                <span class="k">if</span> <span class="n">nvars_items</span> <span class="o">==</span> <span class="n">nvars</span><span class="p">:</span>
-                    <span class="n">x</span><span class="p">[</span><span class="s1">&#39;use_generic&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">False</span>
-                <span class="k">else</span><span class="p">:</span>
-                    <span class="n">x</span><span class="p">[</span><span class="s1">&#39;use_generic&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
-        <span class="k">return</span> <span class="n">flag_var</span></div>
-        
+        <span class="k">elif</span> <span class="n">direction</span> <span class="o">==</span> <span class="s1">&#39;output&#39;</span><span class="p">:</span>
+            <span class="c1"># Add length_vars if missing for use by yggdrasil</span>
+            <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">x</span><span class="p">[</span><span class="s1">&#39;vars&#39;</span><span class="p">]:</span>
+                <span class="k">if</span> <span class="bp">cls</span><span class="o">.</span><span class="n">requires_length_var</span><span class="p">(</span><span class="n">v</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="ow">not</span> <span class="n">v</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;length_var&#39;</span><span class="p">,</span> <span class="kc">False</span><span class="p">)):</span>
+                    <span class="k">if</span> <span class="n">v</span><span class="p">[</span><span class="s1">&#39;datatype&#39;</span><span class="p">][</span><span class="s1">&#39;type&#39;</span><span class="p">]</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;1darray&#39;</span><span class="p">,</span> <span class="s1">&#39;ndarray&#39;</span><span class="p">]:</span>
+                        <span class="k">if</span> <span class="s1">&#39;iter_datatype&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">v</span><span class="p">:</span>  <span class="c1"># pragma: debug</span>
+                            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">&quot;Length must be defined for &quot;</span>
+                                               <span class="s2">&quot;arrays.&quot;</span><span class="p">)</span>
+                    <span class="k">elif</span> <span class="n">v</span><span class="p">[</span><span class="s1">&#39;datatype&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;subtype&#39;</span><span class="p">,</span> <span class="n">v</span><span class="p">[</span><span class="s1">&#39;datatype&#39;</span><span class="p">][</span><span class="s1">&#39;type&#39;</span><span class="p">])</span> <span class="o">==</span> <span class="s1">&#39;bytes&#39;</span><span class="p">:</span>
+                        <span class="n">v</span><span class="p">[</span><span class="s1">&#39;length_var&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;strlen(</span><span class="si">%s</span><span class="s1">)&#39;</span> <span class="o">%</span> <span class="n">v</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">]</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="n">v</span><span class="p">[</span><span class="s1">&#39;length_var&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;strlen4(</span><span class="si">%s</span><span class="s1">)&#39;</span> <span class="o">%</span> <span class="n">v</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">]</span>
+                <span class="k">elif</span> <span class="p">(</span><span class="bp">cls</span><span class="o">.</span><span class="n">requires_shape_var</span><span class="p">(</span><span class="n">v</span><span class="p">)</span>
+                      <span class="ow">and</span> <span class="ow">not</span> <span class="p">(</span><span class="n">v</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;ndim_var&#39;</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>
+                               <span class="ow">and</span> <span class="n">v</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;shape_var&#39;</span><span class="p">,</span> <span class="kc">False</span><span class="p">))):</span>  <span class="c1"># pragma: debug</span>
+                    <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">&quot;Shape must be defined for ND arrays.&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">x</span><span class="p">[</span><span class="s1">&#39;datatype&#39;</span><span class="p">][</span><span class="s1">&#39;type&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;array&#39;</span><span class="p">:</span>
+            <span class="n">nvars_items</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">x</span><span class="p">[</span><span class="s1">&#39;datatype&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;items&#39;</span><span class="p">,</span> <span class="p">[]))</span>
+            <span class="n">nvars</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">([(</span><span class="ow">not</span> <span class="n">ix</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;is_length_var&#39;</span><span class="p">,</span> <span class="kc">False</span><span class="p">))</span>
+                         <span class="k">for</span> <span class="n">ix</span> <span class="ow">in</span> <span class="n">x</span><span class="p">[</span><span class="s1">&#39;vars&#39;</span><span class="p">]])</span>
+            <span class="k">if</span> <span class="n">nvars_items</span> <span class="o">==</span> <span class="n">nvars</span><span class="p">:</span>
+                <span class="n">x</span><span class="p">[</span><span class="s1">&#39;use_generic&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">False</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">x</span><span class="p">[</span><span class="s1">&#39;use_generic&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span></div>
+
 <div class="viewcode-block" id="CModelDriver.input2output"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.CModelDriver.CModelDriver.input2output">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">input2output</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">var</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Perform conversion necessary to turn a variable extracted from a</span>
@@ -1462,8 +1450,8 @@
         <span class="n">out</span> <span class="o">=</span> <span class="nb">super</span><span class="p">(</span><span class="n">CModelDriver</span><span class="p">,</span> <span class="bp">cls</span><span class="p">)</span><span class="o">.</span><span class="n">get_native_type</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="p">((</span><span class="n">out</span> <span class="o">==</span> <span class="s1">&#39;*&#39;</span><span class="p">)</span> <span class="ow">or</span> <span class="p">(</span><span class="s1">&#39;X&#39;</span> <span class="ow">in</span> <span class="n">out</span><span class="p">)</span> <span class="ow">or</span> <span class="p">(</span><span class="n">out</span> <span class="o">==</span> <span class="s1">&#39;double&#39;</span><span class="p">)):</span>
             <span class="k">return</span> <span class="n">out</span>
-        <span class="kn">from</span> <span class="nn">yggdrasil.metaschema.datatypes</span> <span class="k">import</span> <span class="n">get_type_class</span>
-        <span class="n">json_type</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;datatype&#39;</span><span class="p">,</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;type&#39;</span><span class="p">,</span> <span class="s1">&#39;bytes&#39;</span><span class="p">))</span>
+        <span class="kn">from</span> <span class="nn">yggdrasil.metaschema.datatypes</span> <span class="kn">import</span> <span class="n">get_type_class</span>
+        <span class="n">json_type</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;datatype&#39;</span><span class="p">,</span> <span class="n">kwargs</span><span class="p">)</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">json_type</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
             <span class="n">json_type</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="n">json_type</span><span class="p">}</span>
         <span class="c1"># if &#39;type&#39; in kwargs:</span>
@@ -1637,6 +1625,30 @@
                 <span class="n">for_yggdrasil</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
         <span class="k">return</span> <span class="nb">super</span><span class="p">(</span><span class="n">CModelDriver</span><span class="p">,</span> <span class="bp">cls</span><span class="p">)</span><span class="o">.</span><span class="n">write_model_recv</span><span class="p">(</span><span class="n">channel</span><span class="p">,</span> <span class="n">recv_var_str</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
             
+<div class="viewcode-block" id="CModelDriver.write_initialize_oiter"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.CModelDriver.CModelDriver.write_initialize_oiter">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">write_initialize_oiter</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">var</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Get the lines necessary to initialize an array for iteration</span>
+<span class="sd">        output.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            var (dict, str): Name or information dictionary for the variable</span>
+<span class="sd">                being initialized.</span>
+<span class="sd">            value (str, optional): Value that should be assigned to the</span>
+<span class="sd">                variable.</span>
+<span class="sd">            **kwargs: Additional keyword arguments are passed to the</span>
+<span class="sd">                parent class&#39;s method.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            list: The lines initializing the variable.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">value</span> <span class="o">=</span> <span class="s1">&#39;(</span><span class="si">{type}</span><span class="s1">*)realloc(</span><span class="si">{name}</span><span class="s1">, </span><span class="si">{length}</span><span class="s1">*sizeof(</span><span class="si">{type}</span><span class="s1">))&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+            <span class="nb">type</span><span class="o">=</span><span class="bp">cls</span><span class="o">.</span><span class="n">get_native_type</span><span class="p">(</span><span class="o">**</span><span class="n">var</span><span class="p">[</span><span class="s1">&#39;iter_datatype&#39;</span><span class="p">]),</span>
+            <span class="n">name</span><span class="o">=</span><span class="n">var</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">],</span> <span class="n">length</span><span class="o">=</span><span class="n">var</span><span class="p">[</span><span class="s1">&#39;iter_var&#39;</span><span class="p">][</span><span class="s1">&#39;end&#39;</span><span class="p">])</span>
+        <span class="n">out</span> <span class="o">=</span> <span class="nb">super</span><span class="p">(</span><span class="n">CModelDriver</span><span class="p">,</span> <span class="bp">cls</span><span class="p">)</span><span class="o">.</span><span class="n">write_initialize_oiter</span><span class="p">(</span>
+            <span class="n">var</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="n">value</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">out</span></div>
+    
 <div class="viewcode-block" id="CModelDriver.write_declaration"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.CModelDriver.CModelDriver.write_declaration">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">write_declaration</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">var</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Return the lines required to declare a variable with a certain</span>

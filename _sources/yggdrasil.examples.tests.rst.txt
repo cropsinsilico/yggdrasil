@@ -188,6 +188,14 @@ yggdrasil.examples.tests.test\_model\_function module
    :undoc-members:
    :show-inheritance:
 
+yggdrasil.examples.tests.test\_model\_function2 module
+------------------------------------------------------
+
+.. automodule:: yggdrasil.examples.tests.test_model_function2
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 yggdrasil.examples.tests.test\_osr module
 -----------------------------------------
 

@@ -7,12 +7,14 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>&lt;no title&gt; &mdash; yggdrasil v1.6.3+18.g537444084.dirty documentation</title>
+  <title>&lt;no title&gt; &mdash; yggdrasil v1.6.4 documentation</title>
   
 
   
   <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
   <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
 
   
   
@@ -29,6 +31,7 @@
   
     
       <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
         <script src="../_static/jquery.js"></script>
         <script src="../_static/underscore.js"></script>
         <script src="../_static/doctools.js"></script>
@@ -61,7 +64,7 @@
             
             
               <div class="version">
-                v1.6.3
+                v1.6.4
               </div>
             
           
@@ -86,7 +89,7 @@
               
             
             
-              <p class="caption"><span class="caption-text">Contents:</span></p>
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../includeme.html">Overview</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../install.html">Installation</a></li>
@@ -178,45 +181,27 @@
            <div itemprop="articleBody">
             
   <p>Model Code:</p>
-<div class="highlight-python notranslate"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
- 2
- 3
- 4
- 5
- 6
- 7
- 8
- 9
-10
-11
-12
-13
-14
-15
-16
-17
-18
-19</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">time</span>
-
-
-<span class="k">def</span> <span class="nf">calc_shoot_mass</span><span class="p">(</span><span class="n">r_s</span><span class="p">,</span> <span class="n">dt</span><span class="p">,</span> <span class="n">S_t</span><span class="p">,</span> <span class="n">R_t</span><span class="p">,</span> <span class="n">R_tp1</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Calculate the shoot mass.</span>
-
-<span class="sd">    Args:</span>
-<span class="sd">        r_s (float): Relative shoot growth rate.</span>
-<span class="sd">        dt (float): The time step.</span>
-<span class="sd">        S_t (float): Previous shoot mass.</span>
-<span class="sd">        R_t (float): Previous root mass.</span>
-<span class="sd">        R_tp1 (float): Root mass at the next timestep.</span>
-
-<span class="sd">    Returns:</span>
-<span class="sd">        float: Shoot mass at the next timestep.</span>
-
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mf">0.1</span><span class="p">)</span>  <span class="c1"># To simulate a longer calculation</span>
-    <span class="k">return</span> <span class="p">(</span><span class="n">S_t</span> <span class="o">*</span> <span class="n">r_s</span> <span class="o">*</span> <span class="n">dt</span><span class="p">)</span> <span class="o">+</span> <span class="n">S_t</span> <span class="o">-</span> <span class="p">(</span><span class="n">R_tp1</span> <span class="o">-</span> <span class="n">R_t</span><span class="p">)</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span><span class="kn">import</span> <span class="nn">time</span>
+<span class="linenos"> 2</span>
+<span class="linenos"> 3</span>
+<span class="linenos"> 4</span><span class="k">def</span> <span class="nf">calc_shoot_mass</span><span class="p">(</span><span class="n">r_s</span><span class="p">,</span> <span class="n">dt</span><span class="p">,</span> <span class="n">S_t</span><span class="p">,</span> <span class="n">R_t</span><span class="p">,</span> <span class="n">R_tp1</span><span class="p">):</span>
+<span class="linenos"> 5</span>    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Calculate the shoot mass.</span>
+<span class="linenos"> 6</span>
+<span class="linenos"> 7</span><span class="sd">    Args:</span>
+<span class="linenos"> 8</span><span class="sd">        r_s (float): Relative shoot growth rate.</span>
+<span class="linenos"> 9</span><span class="sd">        dt (float): The time step.</span>
+<span class="linenos">10</span><span class="sd">        S_t (float): Previous shoot mass.</span>
+<span class="linenos">11</span><span class="sd">        R_t (float): Previous root mass.</span>
+<span class="linenos">12</span><span class="sd">        R_tp1 (float): Root mass at the next timestep.</span>
+<span class="linenos">13</span>
+<span class="linenos">14</span><span class="sd">    Returns:</span>
+<span class="linenos">15</span><span class="sd">        float: Shoot mass at the next timestep.</span>
+<span class="linenos">16</span>
+<span class="linenos">17</span><span class="sd">    &quot;&quot;&quot;</span>
+<span class="linenos">18</span>    <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mf">0.1</span><span class="p">)</span>  <span class="c1"># To simulate a longer calculation</span>
+<span class="linenos">19</span>    <span class="k">return</span> <span class="p">(</span><span class="n">S_t</span> <span class="o">*</span> <span class="n">r_s</span> <span class="o">*</span> <span class="n">dt</span><span class="p">)</span> <span class="o">+</span> <span class="n">S_t</span> <span class="o">-</span> <span class="p">(</span><span class="n">R_tp1</span> <span class="o">-</span> <span class="n">R_t</span><span class="p">)</span>
 </pre></div>
-</td></tr></table></div>
+</div>
 <p>(<a class="reference external" href="examples/root_to_shoot.html">Example in other languages</a>)</p>
 
 

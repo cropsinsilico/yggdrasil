@@ -7,12 +7,14 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>yggdrasil.drivers.RModelDriver &mdash; yggdrasil v1.6.3+18.g537444084.dirty documentation</title>
+  <title>yggdrasil.drivers.RModelDriver &mdash; yggdrasil v1.6.4 documentation</title>
   
 
   
   <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
   <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
 
   
   
@@ -29,6 +31,7 @@
   
     
       <script type="text/javascript" id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
+        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
         <script src="../../../_static/jquery.js"></script>
         <script src="../../../_static/underscore.js"></script>
         <script src="../../../_static/doctools.js"></script>
@@ -61,7 +64,7 @@
             
             
               <div class="version">
-                v1.6.3
+                v1.6.4
               </div>
             
           
@@ -86,7 +89,7 @@
               
             
             
-              <p class="caption"><span class="caption-text">Contents:</span></p>
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../../includeme.html">Overview</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../install.html">Installation</a></li>
@@ -160,8 +163,6 @@
         
           <li><a href="../../index.html">Module code</a> &raquo;</li>
         
-          <li><a href="../../yggdrasil.html">yggdrasil</a> &raquo;</li>
-        
           <li><a href="../drivers.html">yggdrasil.drivers</a> &raquo;</li>
         
       <li>yggdrasil.drivers.RModelDriver</li>
@@ -185,12 +186,12 @@
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
 <span class="kn">import</span> <span class="nn">logging</span>
-<span class="kn">from</span> <span class="nn">collections</span> <span class="k">import</span> <span class="n">OrderedDict</span>
-<span class="kn">from</span> <span class="nn">yggdrasil</span> <span class="k">import</span> <span class="n">serialize</span><span class="p">,</span> <span class="n">platform</span><span class="p">,</span> <span class="n">constants</span>
-<span class="kn">from</span> <span class="nn">yggdrasil.drivers.InterpretedModelDriver</span> <span class="k">import</span> <span class="n">InterpretedModelDriver</span>
-<span class="kn">from</span> <span class="nn">yggdrasil.drivers.PythonModelDriver</span> <span class="k">import</span> <span class="n">PythonModelDriver</span>
-<span class="kn">from</span> <span class="nn">yggdrasil.drivers.CModelDriver</span> <span class="k">import</span> <span class="n">CModelDriver</span>
-<span class="kn">from</span> <span class="nn">yggdrasil.languages.R</span> <span class="k">import</span> <span class="n">install</span>
+<span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">OrderedDict</span>
+<span class="kn">from</span> <span class="nn">yggdrasil</span> <span class="kn">import</span> <span class="n">serialize</span><span class="p">,</span> <span class="n">platform</span><span class="p">,</span> <span class="n">constants</span>
+<span class="kn">from</span> <span class="nn">yggdrasil.drivers.InterpretedModelDriver</span> <span class="kn">import</span> <span class="n">InterpretedModelDriver</span>
+<span class="kn">from</span> <span class="nn">yggdrasil.drivers.PythonModelDriver</span> <span class="kn">import</span> <span class="n">PythonModelDriver</span>
+<span class="kn">from</span> <span class="nn">yggdrasil.drivers.CModelDriver</span> <span class="kn">import</span> <span class="n">CModelDriver</span>
+<span class="kn">from</span> <span class="nn">yggdrasil.languages.R</span> <span class="kn">import</span> <span class="n">install</span>
 
 
 <span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
@@ -525,7 +526,7 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="kn">import</span> <span class="nn">shutil</span>
         <span class="kn">import</span> <span class="nn">subprocess</span>
-        <span class="kn">from</span> <span class="nn">yggdrasil.components</span> <span class="k">import</span> <span class="n">import_component</span>
+        <span class="kn">from</span> <span class="nn">yggdrasil.components</span> <span class="kn">import</span> <span class="n">import_component</span>
         <span class="k">if</span> <span class="n">flags</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">flags</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">package_dir</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
@@ -609,7 +610,57 @@
         <span class="k">finally</span><span class="p">:</span>
             <span class="n">os</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">makevar</span><span class="p">)</span>
             <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">makevar_copy</span><span class="p">):</span>
-                <span class="n">shutil</span><span class="o">.</span><span class="n">move</span><span class="p">(</span><span class="n">makevar_copy</span><span class="p">,</span> <span class="n">makevar</span><span class="p">)</span></div></div>
+                <span class="n">shutil</span><span class="o">.</span><span class="n">move</span><span class="p">(</span><span class="n">makevar_copy</span><span class="p">,</span> <span class="n">makevar</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="RModelDriver.write_initialize_oiter"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.RModelDriver.RModelDriver.write_initialize_oiter">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">write_initialize_oiter</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">var</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Get the lines necessary to initialize an array for iteration</span>
+<span class="sd">        output.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            var (dict, str): Name or information dictionary for the variable</span>
+<span class="sd">                being initialized.</span>
+<span class="sd">            value (str, optional): Value that should be assigned to the</span>
+<span class="sd">                variable.</span>
+<span class="sd">            **kwargs: Additional keyword arguments are passed to the</span>
+<span class="sd">                parent class&#39;s method.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            list: The lines initializing the variable.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">value</span> <span class="o">=</span> <span class="s1">&#39;vector(mode = &quot;list&quot;, length = </span><span class="si">%s</span><span class="s1">)&#39;</span> <span class="o">%</span> <span class="n">var</span><span class="p">[</span><span class="s1">&#39;iter_var&#39;</span><span class="p">][</span><span class="s1">&#39;end&#39;</span><span class="p">]</span>
+        <span class="n">out</span> <span class="o">=</span> <span class="nb">super</span><span class="p">(</span><span class="n">RModelDriver</span><span class="p">,</span> <span class="bp">cls</span><span class="p">)</span><span class="o">.</span><span class="n">write_initialize_oiter</span><span class="p">(</span>
+            <span class="n">var</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="n">value</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">out</span></div>
+
+<div class="viewcode-block" id="RModelDriver.write_finalize_oiter"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.RModelDriver.RModelDriver.write_finalize_oiter">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">write_finalize_oiter</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">var</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Get the lines necessary to finalize an array after iteration.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            var (dict, str): Name or information dictionary for the variable</span>
+<span class="sd">                being initialized.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            list: The lines finalizing the variable.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">out</span> <span class="o">=</span> <span class="nb">super</span><span class="p">(</span><span class="n">RModelDriver</span><span class="p">,</span> <span class="bp">cls</span><span class="p">)</span><span class="o">.</span><span class="n">write_finalize_oiter</span><span class="p">(</span><span class="n">var</span><span class="p">)</span>
+        <span class="n">out</span> <span class="o">+=</span> <span class="p">[</span>
+            <span class="s1">&#39;if (is(</span><span class="si">{name}</span><span class="s1">[[1]], &quot;units&quot;)) {{&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="n">var</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">]),</span>
+            <span class="s1">&#39;  </span><span class="si">{name}</span><span class="s1">_units = units::deparse_unit(</span><span class="si">{name}</span><span class="s1">[[1]])&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                <span class="n">name</span><span class="o">=</span><span class="n">var</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">]),</span>
+            <span class="s1">&#39;} else {&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;  </span><span class="si">{name}</span><span class="s1">_units = NULL&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="n">var</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">]),</span>
+            <span class="s1">&#39;}&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;</span><span class="si">{name}</span><span class="s1"> = array(as.numeric(unlist(</span><span class="si">{name}</span><span class="s1">)))&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="n">var</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">]),</span>
+            <span class="s1">&#39;if (!(is.null(</span><span class="si">{name}</span><span class="s1">_units))) {{&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="n">var</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">]),</span>
+            <span class="p">(</span><span class="s1">&#39;  </span><span class="si">{name}</span><span class="s1"> = units::set_units(</span><span class="si">{name}</span><span class="s1">, </span><span class="si">{name}</span><span class="s1">_units, &#39;</span>
+             <span class="s1">&#39; mode=&quot;standard&quot;)&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="n">var</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">]),</span>
+            <span class="s1">&#39;}&#39;</span><span class="p">,</span>
+        <span class="p">]</span>
+        <span class="k">return</span> <span class="n">out</span></div></div>
 </pre></div>
 
            </div>

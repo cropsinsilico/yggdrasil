@@ -7,12 +7,14 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>root_to_shoot &mdash; yggdrasil v1.6.3+18.g537444084.dirty documentation</title>
+  <title>root_to_shoot &mdash; yggdrasil v1.6.4 documentation</title>
   
 
   
   <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
   <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
 
   
   
@@ -29,6 +31,7 @@
   
     
       <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
         <script src="../_static/jquery.js"></script>
         <script src="../_static/underscore.js"></script>
         <script src="../_static/doctools.js"></script>
@@ -61,7 +64,7 @@
             
             
               <div class="version">
-                v1.6.3
+                v1.6.4
               </div>
             
           
@@ -86,7 +89,7 @@
               
             
             
-              <p class="caption"><span class="caption-text">Contents:</span></p>
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../includeme.html">Overview</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../install.html">Installation</a></li>
@@ -179,7 +182,6 @@
             
   <div class="section" id="root-to-shoot">
 <span id="root-to-shoot-rst"></span><h1>root_to_shoot<a class="headerlink" href="#root-to-shoot" title="Permalink to this headline">¶</a></h1>
-<p>Two models, a root model and a shoot model, that are both run via wrappers around functions. The root model receives the initial root mass, growth rate, and time steps from files. For each time step, the root model computes the new root mass and sends it to the shoot model. The shoot model receives the initial shoot mass, growth rate, and time steps from files. For each time step, the shoot model receives the new root mass from the root model, calculates the next shoot mass and outputs it to a file.</p>
 <div class="contents local topic" id="contents">
 <ul class="simple">
 <li><p><a class="reference internal" href="#mixed-version" id="id1">Mixed Version</a></p></li>
@@ -191,531 +193,296 @@
 <div class="section" id="mixed-version">
 <h2><a class="toc-backref" href="#id1">Mixed Version</a><a class="headerlink" href="#mixed-version" title="Permalink to this headline">¶</a></h2>
 <p>Model Code:</p>
-<div class="highlight-python notranslate"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
- 2
- 3
- 4
- 5
- 6
- 7
- 8
- 9
-10
-11
-12
-13
-14
-15
-16
-17
-18
-19</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">time</span>
-
-
-<span class="k">def</span> <span class="nf">calc_shoot_mass</span><span class="p">(</span><span class="n">r_s</span><span class="p">,</span> <span class="n">dt</span><span class="p">,</span> <span class="n">S_t</span><span class="p">,</span> <span class="n">R_t</span><span class="p">,</span> <span class="n">R_tp1</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Calculate the shoot mass.</span>
-
-<span class="sd">    Args:</span>
-<span class="sd">        r_s (float): Relative shoot growth rate.</span>
-<span class="sd">        dt (float): The time step.</span>
-<span class="sd">        S_t (float): Previous shoot mass.</span>
-<span class="sd">        R_t (float): Previous root mass.</span>
-<span class="sd">        R_tp1 (float): Root mass at the next timestep.</span>
-
-<span class="sd">    Returns:</span>
-<span class="sd">        float: Shoot mass at the next timestep.</span>
-
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mf">0.1</span><span class="p">)</span>  <span class="c1"># To simulate a longer calculation</span>
-    <span class="k">return</span> <span class="p">(</span><span class="n">S_t</span> <span class="o">*</span> <span class="n">r_s</span> <span class="o">*</span> <span class="n">dt</span><span class="p">)</span> <span class="o">+</span> <span class="n">S_t</span> <span class="o">-</span> <span class="p">(</span><span class="n">R_tp1</span> <span class="o">-</span> <span class="n">R_t</span><span class="p">)</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span><span class="kn">import</span> <span class="nn">time</span>
+<span class="linenos"> 2</span>
+<span class="linenos"> 3</span>
+<span class="linenos"> 4</span><span class="k">def</span> <span class="nf">calc_shoot_mass</span><span class="p">(</span><span class="n">r_s</span><span class="p">,</span> <span class="n">dt</span><span class="p">,</span> <span class="n">S_t</span><span class="p">,</span> <span class="n">R_t</span><span class="p">,</span> <span class="n">R_tp1</span><span class="p">):</span>
+<span class="linenos"> 5</span>    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Calculate the shoot mass.</span>
+<span class="linenos"> 6</span>
+<span class="linenos"> 7</span><span class="sd">    Args:</span>
+<span class="linenos"> 8</span><span class="sd">        r_s (float): Relative shoot growth rate.</span>
+<span class="linenos"> 9</span><span class="sd">        dt (float): The time step.</span>
+<span class="linenos">10</span><span class="sd">        S_t (float): Previous shoot mass.</span>
+<span class="linenos">11</span><span class="sd">        R_t (float): Previous root mass.</span>
+<span class="linenos">12</span><span class="sd">        R_tp1 (float): Root mass at the next timestep.</span>
+<span class="linenos">13</span>
+<span class="linenos">14</span><span class="sd">    Returns:</span>
+<span class="linenos">15</span><span class="sd">        float: Shoot mass at the next timestep.</span>
+<span class="linenos">16</span>
+<span class="linenos">17</span><span class="sd">    &quot;&quot;&quot;</span>
+<span class="linenos">18</span>    <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mf">0.1</span><span class="p">)</span>  <span class="c1"># To simulate a longer calculation</span>
+<span class="linenos">19</span>    <span class="k">return</span> <span class="p">(</span><span class="n">S_t</span> <span class="o">*</span> <span class="n">r_s</span> <span class="o">*</span> <span class="n">dt</span><span class="p">)</span> <span class="o">+</span> <span class="n">S_t</span> <span class="o">-</span> <span class="p">(</span><span class="n">R_tp1</span> <span class="o">-</span> <span class="n">R_t</span><span class="p">)</span>
 </pre></div>
-</td></tr></table></div>
+</div>
 <p>Model YAML:</p>
-<div class="highlight-yaml notranslate"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
- 2
- 3
- 4
- 5
- 6
- 7
- 8
- 9
-10
-11
-12
-13
-14</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="nt">model</span><span class="p">:</span>
-  <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">RootModel</span>
-  <span class="nt">language</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">c</span>
-  <span class="nt">args</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">./src/root_wrapper.c</span>
-  <span class="nt">inputs</span><span class="p">:</span>
-    <span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">root_growth_rate</span>
-      <span class="nt">units</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">hr**-1</span>
-    <span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">init_root_mass</span>
-      <span class="nt">units</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">g</span>
-    <span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">root_time_step</span>
-      <span class="nt">units</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">hr</span>
-  <span class="nt">outputs</span><span class="p">:</span>
-    <span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">next_root_mass</span>
-      <span class="nt">units</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">g</span>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span><span class="nt">model</span><span class="p">:</span>
+<span class="linenos"> 2</span>  <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">RootModel</span>
+<span class="linenos"> 3</span>  <span class="nt">language</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">c</span>
+<span class="linenos"> 4</span>  <span class="nt">args</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">./src/root_wrapper.c</span>
+<span class="linenos"> 5</span>  <span class="nt">inputs</span><span class="p">:</span>
+<span class="linenos"> 6</span>    <span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">root_growth_rate</span>
+<span class="linenos"> 7</span>      <span class="nt">units</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">hr**-1</span>
+<span class="linenos"> 8</span>    <span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">init_root_mass</span>
+<span class="linenos"> 9</span>      <span class="nt">units</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">g</span>
+<span class="linenos">10</span>    <span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">root_time_step</span>
+<span class="linenos">11</span>      <span class="nt">units</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">hr</span>
+<span class="linenos">12</span>  <span class="nt">outputs</span><span class="p">:</span>
+<span class="linenos">13</span>    <span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">next_root_mass</span>
+<span class="linenos">14</span>      <span class="nt">units</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">g</span>
 </pre></div>
-</td></tr></table></div>
-<div class="highlight-yaml notranslate"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
- 2
- 3
- 4
- 5
- 6
- 7
- 8
- 9
-10
-11
-12
-13
-14
-15
-16</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="nt">model</span><span class="p">:</span>
-  <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">ShootModel</span>
-  <span class="nt">language</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">python</span>
-  <span class="nt">args</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">./src/shoot_wrapper.py</span>
-  <span class="nt">inputs</span><span class="p">:</span>
-    <span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">shoot_growth_rate</span>
-      <span class="nt">units</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">d**-1</span>
-    <span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">init_shoot_mass</span>
-      <span class="nt">units</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">kg</span>
-    <span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">shoot_time_step</span>
-      <span class="nt">units</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">d</span>
-    <span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">next_root_mass</span>
-      <span class="nt">units</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">kg</span>
-  <span class="nt">outputs</span><span class="p">:</span>
-    <span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">next_shoot_mass</span>
-      <span class="nt">units</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">kg</span>
+</div>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span><span class="nt">model</span><span class="p">:</span>
+<span class="linenos"> 2</span>  <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">ShootModel</span>
+<span class="linenos"> 3</span>  <span class="nt">language</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">python</span>
+<span class="linenos"> 4</span>  <span class="nt">args</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">./src/shoot_wrapper.py</span>
+<span class="linenos"> 5</span>  <span class="nt">inputs</span><span class="p">:</span>
+<span class="linenos"> 6</span>    <span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">shoot_growth_rate</span>
+<span class="linenos"> 7</span>      <span class="nt">units</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">d**-1</span>
+<span class="linenos"> 8</span>    <span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">init_shoot_mass</span>
+<span class="linenos"> 9</span>      <span class="nt">units</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">kg</span>
+<span class="linenos">10</span>    <span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">shoot_time_step</span>
+<span class="linenos">11</span>      <span class="nt">units</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">d</span>
+<span class="linenos">12</span>    <span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">next_root_mass</span>
+<span class="linenos">13</span>      <span class="nt">units</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">kg</span>
+<span class="linenos">14</span>  <span class="nt">outputs</span><span class="p">:</span>
+<span class="linenos">15</span>    <span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">next_shoot_mass</span>
+<span class="linenos">16</span>      <span class="nt">units</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">kg</span>
 </pre></div>
-</td></tr></table></div>
-<div class="highlight-yaml notranslate"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
- 2
- 3
- 4
- 5
- 6
- 7
- 8
- 9
-10
-11
-12
-13
-14
-15
-16
-17
-18
-19
-20
-21
-22
-23
-24
-25
-26
-27
-28
-29
-30
-31
-32</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="nt">connections</span><span class="p">:</span>
-  <span class="c1"># Root input connections</span>
-  <span class="p p-Indicator">-</span> <span class="nt">input</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">./Input/root_growth_rate.txt</span>
-    <span class="nt">output</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">root_growth_rate</span>
-    <span class="nt">filetype</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">table</span>
-  <span class="p p-Indicator">-</span> <span class="nt">input</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">./Input/init_root_mass.txt</span>
-    <span class="nt">output</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">init_root_mass</span>
-    <span class="nt">filetype</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">table</span>
-  <span class="p p-Indicator">-</span> <span class="nt">input</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">./Input/timesteps.txt</span>
-    <span class="nt">output</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">root_time_step</span>
-    <span class="nt">filetype</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">table</span>
-
-  <span class="c1"># Root-to-shoot connection</span>
-  <span class="p p-Indicator">-</span> <span class="nt">input</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">next_root_mass</span>
-    <span class="nt">output</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">next_root_mass</span>
-
-  <span class="c1"># Shoot input connections</span>
-  <span class="p p-Indicator">-</span> <span class="nt">input</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">./Input/shoot_growth_rate.txt</span>
-    <span class="nt">output</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">shoot_growth_rate</span>
-    <span class="nt">filetype</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">table</span>
-  <span class="p p-Indicator">-</span> <span class="nt">input</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">./Input/init_shoot_mass.txt</span>
-    <span class="nt">output</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">init_shoot_mass</span>
-    <span class="nt">filetype</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">table</span>
-  <span class="p p-Indicator">-</span> <span class="nt">input</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">./Input/timesteps.txt</span>
-    <span class="nt">output</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">shoot_time_step</span>
-    <span class="nt">filetype</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">table</span>
-
-  <span class="c1"># Shoot output connection</span>
-  <span class="p p-Indicator">-</span> <span class="nt">input</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">next_shoot_mass</span>
-    <span class="nt">output</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">./Output/shoot_output.txt</span>
-    <span class="nt">filetype</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">table</span>
-    <span class="nt">field_names</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">shoot_mass</span>
+</div>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span><span class="nt">connections</span><span class="p">:</span>
+<span class="linenos"> 2</span>  <span class="c1"># Root input connections</span>
+<span class="linenos"> 3</span>  <span class="p p-Indicator">-</span> <span class="nt">input</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">./Input/root_growth_rate.txt</span>
+<span class="linenos"> 4</span>    <span class="nt">output</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">root_growth_rate</span>
+<span class="linenos"> 5</span>    <span class="nt">filetype</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">table</span>
+<span class="linenos"> 6</span>  <span class="p p-Indicator">-</span> <span class="nt">input</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">./Input/init_root_mass.txt</span>
+<span class="linenos"> 7</span>    <span class="nt">output</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">init_root_mass</span>
+<span class="linenos"> 8</span>    <span class="nt">filetype</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">table</span>
+<span class="linenos"> 9</span>  <span class="p p-Indicator">-</span> <span class="nt">input</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">./Input/timesteps.txt</span>
+<span class="linenos">10</span>    <span class="nt">output</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">root_time_step</span>
+<span class="linenos">11</span>    <span class="nt">filetype</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">table</span>
+<span class="linenos">12</span>
+<span class="linenos">13</span>  <span class="c1"># Root-to-shoot connection</span>
+<span class="linenos">14</span>  <span class="p p-Indicator">-</span> <span class="nt">input</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">next_root_mass</span>
+<span class="linenos">15</span>    <span class="nt">output</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">next_root_mass</span>
+<span class="linenos">16</span>
+<span class="linenos">17</span>  <span class="c1"># Shoot input connections</span>
+<span class="linenos">18</span>  <span class="p p-Indicator">-</span> <span class="nt">input</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">./Input/shoot_growth_rate.txt</span>
+<span class="linenos">19</span>    <span class="nt">output</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">shoot_growth_rate</span>
+<span class="linenos">20</span>    <span class="nt">filetype</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">table</span>
+<span class="linenos">21</span>  <span class="p p-Indicator">-</span> <span class="nt">input</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">./Input/init_shoot_mass.txt</span>
+<span class="linenos">22</span>    <span class="nt">output</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">init_shoot_mass</span>
+<span class="linenos">23</span>    <span class="nt">filetype</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">table</span>
+<span class="linenos">24</span>  <span class="p p-Indicator">-</span> <span class="nt">input</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">./Input/timesteps.txt</span>
+<span class="linenos">25</span>    <span class="nt">output</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">shoot_time_step</span>
+<span class="linenos">26</span>    <span class="nt">filetype</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">table</span>
+<span class="linenos">27</span>
+<span class="linenos">28</span>  <span class="c1"># Shoot output connection</span>
+<span class="linenos">29</span>  <span class="p p-Indicator">-</span> <span class="nt">input</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">next_shoot_mass</span>
+<span class="linenos">30</span>    <span class="nt">output</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">./Output/shoot_output.txt</span>
+<span class="linenos">31</span>    <span class="nt">filetype</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">table</span>
+<span class="linenos">32</span>    <span class="nt">field_names</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">shoot_mass</span>
 </pre></div>
-</td></tr></table></div>
+</div>
 </div>
 <div class="section" id="mixed-w-o-matlab-version">
 <h2><a class="toc-backref" href="#id2">Mixed w/o Matlab Version</a><a class="headerlink" href="#mixed-w-o-matlab-version" title="Permalink to this headline">¶</a></h2>
 <p>Model Code:</p>
-<div class="highlight-python notranslate"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
- 2
- 3
- 4
- 5
- 6
- 7
- 8
- 9
-10
-11
-12
-13
-14
-15
-16
-17
-18
-19</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">time</span>
-
-
-<span class="k">def</span> <span class="nf">calc_shoot_mass</span><span class="p">(</span><span class="n">r_s</span><span class="p">,</span> <span class="n">dt</span><span class="p">,</span> <span class="n">S_t</span><span class="p">,</span> <span class="n">R_t</span><span class="p">,</span> <span class="n">R_tp1</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Calculate the shoot mass.</span>
-
-<span class="sd">    Args:</span>
-<span class="sd">        r_s (float): Relative shoot growth rate.</span>
-<span class="sd">        dt (float): The time step.</span>
-<span class="sd">        S_t (float): Previous shoot mass.</span>
-<span class="sd">        R_t (float): Previous root mass.</span>
-<span class="sd">        R_tp1 (float): Root mass at the next timestep.</span>
-
-<span class="sd">    Returns:</span>
-<span class="sd">        float: Shoot mass at the next timestep.</span>
-
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mf">0.1</span><span class="p">)</span>  <span class="c1"># To simulate a longer calculation</span>
-    <span class="k">return</span> <span class="p">(</span><span class="n">S_t</span> <span class="o">*</span> <span class="n">r_s</span> <span class="o">*</span> <span class="n">dt</span><span class="p">)</span> <span class="o">+</span> <span class="n">S_t</span> <span class="o">-</span> <span class="p">(</span><span class="n">R_tp1</span> <span class="o">-</span> <span class="n">R_t</span><span class="p">)</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span><span class="kn">import</span> <span class="nn">time</span>
+<span class="linenos"> 2</span>
+<span class="linenos"> 3</span>
+<span class="linenos"> 4</span><span class="k">def</span> <span class="nf">calc_shoot_mass</span><span class="p">(</span><span class="n">r_s</span><span class="p">,</span> <span class="n">dt</span><span class="p">,</span> <span class="n">S_t</span><span class="p">,</span> <span class="n">R_t</span><span class="p">,</span> <span class="n">R_tp1</span><span class="p">):</span>
+<span class="linenos"> 5</span>    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Calculate the shoot mass.</span>
+<span class="linenos"> 6</span>
+<span class="linenos"> 7</span><span class="sd">    Args:</span>
+<span class="linenos"> 8</span><span class="sd">        r_s (float): Relative shoot growth rate.</span>
+<span class="linenos"> 9</span><span class="sd">        dt (float): The time step.</span>
+<span class="linenos">10</span><span class="sd">        S_t (float): Previous shoot mass.</span>
+<span class="linenos">11</span><span class="sd">        R_t (float): Previous root mass.</span>
+<span class="linenos">12</span><span class="sd">        R_tp1 (float): Root mass at the next timestep.</span>
+<span class="linenos">13</span>
+<span class="linenos">14</span><span class="sd">    Returns:</span>
+<span class="linenos">15</span><span class="sd">        float: Shoot mass at the next timestep.</span>
+<span class="linenos">16</span>
+<span class="linenos">17</span><span class="sd">    &quot;&quot;&quot;</span>
+<span class="linenos">18</span>    <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mf">0.1</span><span class="p">)</span>  <span class="c1"># To simulate a longer calculation</span>
+<span class="linenos">19</span>    <span class="k">return</span> <span class="p">(</span><span class="n">S_t</span> <span class="o">*</span> <span class="n">r_s</span> <span class="o">*</span> <span class="n">dt</span><span class="p">)</span> <span class="o">+</span> <span class="n">S_t</span> <span class="o">-</span> <span class="p">(</span><span class="n">R_tp1</span> <span class="o">-</span> <span class="n">R_t</span><span class="p">)</span>
 </pre></div>
-</td></tr></table></div>
+</div>
 <p>Model YAML:</p>
-<div class="highlight-yaml notranslate"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
- 2
- 3
- 4
- 5
- 6
- 7
- 8
- 9
-10
-11
-12
-13
-14</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="nt">model</span><span class="p">:</span>
-  <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">RootModel</span>
-  <span class="nt">language</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">c</span>
-  <span class="nt">args</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">./src/root_wrapper.c</span>
-  <span class="nt">inputs</span><span class="p">:</span>
-    <span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">root_growth_rate</span>
-      <span class="nt">units</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">hr**-1</span>
-    <span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">init_root_mass</span>
-      <span class="nt">units</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">g</span>
-    <span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">root_time_step</span>
-      <span class="nt">units</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">hr</span>
-  <span class="nt">outputs</span><span class="p">:</span>
-    <span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">next_root_mass</span>
-      <span class="nt">units</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">g</span>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span><span class="nt">model</span><span class="p">:</span>
+<span class="linenos"> 2</span>  <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">RootModel</span>
+<span class="linenos"> 3</span>  <span class="nt">language</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">c</span>
+<span class="linenos"> 4</span>  <span class="nt">args</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">./src/root_wrapper.c</span>
+<span class="linenos"> 5</span>  <span class="nt">inputs</span><span class="p">:</span>
+<span class="linenos"> 6</span>    <span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">root_growth_rate</span>
+<span class="linenos"> 7</span>      <span class="nt">units</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">hr**-1</span>
+<span class="linenos"> 8</span>    <span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">init_root_mass</span>
+<span class="linenos"> 9</span>      <span class="nt">units</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">g</span>
+<span class="linenos">10</span>    <span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">root_time_step</span>
+<span class="linenos">11</span>      <span class="nt">units</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">hr</span>
+<span class="linenos">12</span>  <span class="nt">outputs</span><span class="p">:</span>
+<span class="linenos">13</span>    <span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">next_root_mass</span>
+<span class="linenos">14</span>      <span class="nt">units</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">g</span>
 </pre></div>
-</td></tr></table></div>
-<div class="highlight-yaml notranslate"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
- 2
- 3
- 4
- 5
- 6
- 7
- 8
- 9
-10
-11
-12
-13
-14
-15
-16</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="nt">model</span><span class="p">:</span>
-  <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">ShootModel</span>
-  <span class="nt">language</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">python</span>
-  <span class="nt">args</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">./src/shoot_wrapper.py</span>
-  <span class="nt">inputs</span><span class="p">:</span>
-    <span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">shoot_growth_rate</span>
-      <span class="nt">units</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">d**-1</span>
-    <span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">init_shoot_mass</span>
-      <span class="nt">units</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">kg</span>
-    <span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">shoot_time_step</span>
-      <span class="nt">units</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">d</span>
-    <span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">next_root_mass</span>
-      <span class="nt">units</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">kg</span>
-  <span class="nt">outputs</span><span class="p">:</span>
-    <span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">next_shoot_mass</span>
-      <span class="nt">units</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">kg</span>
+</div>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span><span class="nt">model</span><span class="p">:</span>
+<span class="linenos"> 2</span>  <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">ShootModel</span>
+<span class="linenos"> 3</span>  <span class="nt">language</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">python</span>
+<span class="linenos"> 4</span>  <span class="nt">args</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">./src/shoot_wrapper.py</span>
+<span class="linenos"> 5</span>  <span class="nt">inputs</span><span class="p">:</span>
+<span class="linenos"> 6</span>    <span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">shoot_growth_rate</span>
+<span class="linenos"> 7</span>      <span class="nt">units</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">d**-1</span>
+<span class="linenos"> 8</span>    <span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">init_shoot_mass</span>
+<span class="linenos"> 9</span>      <span class="nt">units</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">kg</span>
+<span class="linenos">10</span>    <span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">shoot_time_step</span>
+<span class="linenos">11</span>      <span class="nt">units</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">d</span>
+<span class="linenos">12</span>    <span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">next_root_mass</span>
+<span class="linenos">13</span>      <span class="nt">units</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">kg</span>
+<span class="linenos">14</span>  <span class="nt">outputs</span><span class="p">:</span>
+<span class="linenos">15</span>    <span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">next_shoot_mass</span>
+<span class="linenos">16</span>      <span class="nt">units</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">kg</span>
 </pre></div>
-</td></tr></table></div>
-<div class="highlight-yaml notranslate"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
- 2
- 3
- 4
- 5
- 6
- 7
- 8
- 9
-10
-11
-12
-13
-14
-15
-16
-17
-18
-19
-20
-21
-22
-23
-24
-25
-26
-27
-28
-29
-30
-31
-32</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="nt">connections</span><span class="p">:</span>
-  <span class="c1"># Root input connections</span>
-  <span class="p p-Indicator">-</span> <span class="nt">input</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">./Input/root_growth_rate.txt</span>
-    <span class="nt">output</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">root_growth_rate</span>
-    <span class="nt">filetype</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">table</span>
-  <span class="p p-Indicator">-</span> <span class="nt">input</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">./Input/init_root_mass.txt</span>
-    <span class="nt">output</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">init_root_mass</span>
-    <span class="nt">filetype</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">table</span>
-  <span class="p p-Indicator">-</span> <span class="nt">input</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">./Input/timesteps.txt</span>
-    <span class="nt">output</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">root_time_step</span>
-    <span class="nt">filetype</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">table</span>
-
-  <span class="c1"># Root-to-shoot connection</span>
-  <span class="p p-Indicator">-</span> <span class="nt">input</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">next_root_mass</span>
-    <span class="nt">output</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">next_root_mass</span>
-
-  <span class="c1"># Shoot input connections</span>
-  <span class="p p-Indicator">-</span> <span class="nt">input</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">./Input/shoot_growth_rate.txt</span>
-    <span class="nt">output</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">shoot_growth_rate</span>
-    <span class="nt">filetype</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">table</span>
-  <span class="p p-Indicator">-</span> <span class="nt">input</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">./Input/init_shoot_mass.txt</span>
-    <span class="nt">output</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">init_shoot_mass</span>
-    <span class="nt">filetype</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">table</span>
-  <span class="p p-Indicator">-</span> <span class="nt">input</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">./Input/timesteps.txt</span>
-    <span class="nt">output</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">shoot_time_step</span>
-    <span class="nt">filetype</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">table</span>
-
-  <span class="c1"># Shoot output connection</span>
-  <span class="p p-Indicator">-</span> <span class="nt">input</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">next_shoot_mass</span>
-    <span class="nt">output</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">./Output/shoot_output.txt</span>
-    <span class="nt">filetype</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">table</span>
-    <span class="nt">field_names</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">shoot_mass</span>
+</div>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span><span class="nt">connections</span><span class="p">:</span>
+<span class="linenos"> 2</span>  <span class="c1"># Root input connections</span>
+<span class="linenos"> 3</span>  <span class="p p-Indicator">-</span> <span class="nt">input</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">./Input/root_growth_rate.txt</span>
+<span class="linenos"> 4</span>    <span class="nt">output</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">root_growth_rate</span>
+<span class="linenos"> 5</span>    <span class="nt">filetype</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">table</span>
+<span class="linenos"> 6</span>  <span class="p p-Indicator">-</span> <span class="nt">input</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">./Input/init_root_mass.txt</span>
+<span class="linenos"> 7</span>    <span class="nt">output</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">init_root_mass</span>
+<span class="linenos"> 8</span>    <span class="nt">filetype</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">table</span>
+<span class="linenos"> 9</span>  <span class="p p-Indicator">-</span> <span class="nt">input</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">./Input/timesteps.txt</span>
+<span class="linenos">10</span>    <span class="nt">output</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">root_time_step</span>
+<span class="linenos">11</span>    <span class="nt">filetype</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">table</span>
+<span class="linenos">12</span>
+<span class="linenos">13</span>  <span class="c1"># Root-to-shoot connection</span>
+<span class="linenos">14</span>  <span class="p p-Indicator">-</span> <span class="nt">input</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">next_root_mass</span>
+<span class="linenos">15</span>    <span class="nt">output</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">next_root_mass</span>
+<span class="linenos">16</span>
+<span class="linenos">17</span>  <span class="c1"># Shoot input connections</span>
+<span class="linenos">18</span>  <span class="p p-Indicator">-</span> <span class="nt">input</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">./Input/shoot_growth_rate.txt</span>
+<span class="linenos">19</span>    <span class="nt">output</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">shoot_growth_rate</span>
+<span class="linenos">20</span>    <span class="nt">filetype</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">table</span>
+<span class="linenos">21</span>  <span class="p p-Indicator">-</span> <span class="nt">input</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">./Input/init_shoot_mass.txt</span>
+<span class="linenos">22</span>    <span class="nt">output</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">init_shoot_mass</span>
+<span class="linenos">23</span>    <span class="nt">filetype</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">table</span>
+<span class="linenos">24</span>  <span class="p p-Indicator">-</span> <span class="nt">input</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">./Input/timesteps.txt</span>
+<span class="linenos">25</span>    <span class="nt">output</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">shoot_time_step</span>
+<span class="linenos">26</span>    <span class="nt">filetype</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">table</span>
+<span class="linenos">27</span>
+<span class="linenos">28</span>  <span class="c1"># Shoot output connection</span>
+<span class="linenos">29</span>  <span class="p p-Indicator">-</span> <span class="nt">input</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">next_shoot_mass</span>
+<span class="linenos">30</span>    <span class="nt">output</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">./Output/shoot_output.txt</span>
+<span class="linenos">31</span>    <span class="nt">filetype</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">table</span>
+<span class="linenos">32</span>    <span class="nt">field_names</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">shoot_mass</span>
 </pre></div>
-</td></tr></table></div>
+</div>
 </div>
 <div class="section" id="c-version">
 <h2><a class="toc-backref" href="#id3">C Version</a><a class="headerlink" href="#c-version" title="Permalink to this headline">¶</a></h2>
 <p>Model Code:</p>
 <p>Model YAML:</p>
-<div class="highlight-yaml notranslate"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
- 2
- 3
- 4
- 5
- 6
- 7
- 8
- 9
-10
-11
-12
-13
-14</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="nt">model</span><span class="p">:</span>
-  <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">RootModel</span>
-  <span class="nt">language</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">c</span>
-  <span class="nt">args</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">./src/root_wrapper.c</span>
-  <span class="nt">inputs</span><span class="p">:</span>
-    <span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">root_growth_rate</span>
-      <span class="nt">units</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">hr**-1</span>
-    <span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">init_root_mass</span>
-      <span class="nt">units</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">g</span>
-    <span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">root_time_step</span>
-      <span class="nt">units</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">hr</span>
-  <span class="nt">outputs</span><span class="p">:</span>
-    <span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">next_root_mass</span>
-      <span class="nt">units</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">g</span>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span><span class="nt">model</span><span class="p">:</span>
+<span class="linenos"> 2</span>  <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">RootModel</span>
+<span class="linenos"> 3</span>  <span class="nt">language</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">c</span>
+<span class="linenos"> 4</span>  <span class="nt">args</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">./src/root_wrapper.c</span>
+<span class="linenos"> 5</span>  <span class="nt">inputs</span><span class="p">:</span>
+<span class="linenos"> 6</span>    <span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">root_growth_rate</span>
+<span class="linenos"> 7</span>      <span class="nt">units</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">hr**-1</span>
+<span class="linenos"> 8</span>    <span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">init_root_mass</span>
+<span class="linenos"> 9</span>      <span class="nt">units</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">g</span>
+<span class="linenos">10</span>    <span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">root_time_step</span>
+<span class="linenos">11</span>      <span class="nt">units</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">hr</span>
+<span class="linenos">12</span>  <span class="nt">outputs</span><span class="p">:</span>
+<span class="linenos">13</span>    <span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">next_root_mass</span>
+<span class="linenos">14</span>      <span class="nt">units</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">g</span>
 </pre></div>
-</td></tr></table></div>
-<div class="highlight-yaml notranslate"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
- 2
- 3
- 4
- 5
- 6
- 7
- 8
- 9
-10
-11
-12
-13
-14
-15
-16
-17</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="nt">connections</span><span class="p">:</span>
-  <span class="c1"># Input connections</span>
-  <span class="p p-Indicator">-</span> <span class="nt">input</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">./Input/root_growth_rate.txt</span>
-    <span class="nt">output</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">root_growth_rate</span>
-    <span class="nt">filetype</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">table</span>
-  <span class="p p-Indicator">-</span> <span class="nt">input</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">./Input/init_root_mass.txt</span>
-    <span class="nt">output</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">init_root_mass</span>
-    <span class="nt">filetype</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">table</span>
-  <span class="p p-Indicator">-</span> <span class="nt">input</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">./Input/timesteps.txt</span>
-    <span class="nt">output</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">root_time_step</span>
-    <span class="nt">filetype</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">table</span>
-
-  <span class="c1"># Output connections</span>
-  <span class="p p-Indicator">-</span> <span class="nt">input</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">next_root_mass</span>
-    <span class="nt">output</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">./Output/root_output.txt</span>
-    <span class="nt">filetype</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">table</span>
-    <span class="nt">field_names</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">root_mass</span>
+</div>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span><span class="nt">connections</span><span class="p">:</span>
+<span class="linenos"> 2</span>  <span class="c1"># Input connections</span>
+<span class="linenos"> 3</span>  <span class="p p-Indicator">-</span> <span class="nt">input</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">./Input/root_growth_rate.txt</span>
+<span class="linenos"> 4</span>    <span class="nt">output</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">root_growth_rate</span>
+<span class="linenos"> 5</span>    <span class="nt">filetype</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">table</span>
+<span class="linenos"> 6</span>  <span class="p p-Indicator">-</span> <span class="nt">input</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">./Input/init_root_mass.txt</span>
+<span class="linenos"> 7</span>    <span class="nt">output</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">init_root_mass</span>
+<span class="linenos"> 8</span>    <span class="nt">filetype</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">table</span>
+<span class="linenos"> 9</span>  <span class="p p-Indicator">-</span> <span class="nt">input</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">./Input/timesteps.txt</span>
+<span class="linenos">10</span>    <span class="nt">output</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">root_time_step</span>
+<span class="linenos">11</span>    <span class="nt">filetype</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">table</span>
+<span class="linenos">12</span>
+<span class="linenos">13</span>  <span class="c1"># Output connections</span>
+<span class="linenos">14</span>  <span class="p p-Indicator">-</span> <span class="nt">input</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">next_root_mass</span>
+<span class="linenos">15</span>    <span class="nt">output</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">./Output/root_output.txt</span>
+<span class="linenos">16</span>    <span class="nt">filetype</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">table</span>
+<span class="linenos">17</span>    <span class="nt">field_names</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">root_mass</span>
 </pre></div>
-</td></tr></table></div>
+</div>
 </div>
 <div class="section" id="python-version">
 <h2><a class="toc-backref" href="#id4">Python Version</a><a class="headerlink" href="#python-version" title="Permalink to this headline">¶</a></h2>
 <p>Model Code:</p>
-<div class="highlight-python notranslate"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
- 2
- 3
- 4
- 5
- 6
- 7
- 8
- 9
-10
-11
-12
-13
-14
-15
-16
-17
-18
-19</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">time</span>
-
-
-<span class="k">def</span> <span class="nf">calc_shoot_mass</span><span class="p">(</span><span class="n">r_s</span><span class="p">,</span> <span class="n">dt</span><span class="p">,</span> <span class="n">S_t</span><span class="p">,</span> <span class="n">R_t</span><span class="p">,</span> <span class="n">R_tp1</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Calculate the shoot mass.</span>
-
-<span class="sd">    Args:</span>
-<span class="sd">        r_s (float): Relative shoot growth rate.</span>
-<span class="sd">        dt (float): The time step.</span>
-<span class="sd">        S_t (float): Previous shoot mass.</span>
-<span class="sd">        R_t (float): Previous root mass.</span>
-<span class="sd">        R_tp1 (float): Root mass at the next timestep.</span>
-
-<span class="sd">    Returns:</span>
-<span class="sd">        float: Shoot mass at the next timestep.</span>
-
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mf">0.1</span><span class="p">)</span>  <span class="c1"># To simulate a longer calculation</span>
-    <span class="k">return</span> <span class="p">(</span><span class="n">S_t</span> <span class="o">*</span> <span class="n">r_s</span> <span class="o">*</span> <span class="n">dt</span><span class="p">)</span> <span class="o">+</span> <span class="n">S_t</span> <span class="o">-</span> <span class="p">(</span><span class="n">R_tp1</span> <span class="o">-</span> <span class="n">R_t</span><span class="p">)</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span><span class="kn">import</span> <span class="nn">time</span>
+<span class="linenos"> 2</span>
+<span class="linenos"> 3</span>
+<span class="linenos"> 4</span><span class="k">def</span> <span class="nf">calc_shoot_mass</span><span class="p">(</span><span class="n">r_s</span><span class="p">,</span> <span class="n">dt</span><span class="p">,</span> <span class="n">S_t</span><span class="p">,</span> <span class="n">R_t</span><span class="p">,</span> <span class="n">R_tp1</span><span class="p">):</span>
+<span class="linenos"> 5</span>    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Calculate the shoot mass.</span>
+<span class="linenos"> 6</span>
+<span class="linenos"> 7</span><span class="sd">    Args:</span>
+<span class="linenos"> 8</span><span class="sd">        r_s (float): Relative shoot growth rate.</span>
+<span class="linenos"> 9</span><span class="sd">        dt (float): The time step.</span>
+<span class="linenos">10</span><span class="sd">        S_t (float): Previous shoot mass.</span>
+<span class="linenos">11</span><span class="sd">        R_t (float): Previous root mass.</span>
+<span class="linenos">12</span><span class="sd">        R_tp1 (float): Root mass at the next timestep.</span>
+<span class="linenos">13</span>
+<span class="linenos">14</span><span class="sd">    Returns:</span>
+<span class="linenos">15</span><span class="sd">        float: Shoot mass at the next timestep.</span>
+<span class="linenos">16</span>
+<span class="linenos">17</span><span class="sd">    &quot;&quot;&quot;</span>
+<span class="linenos">18</span>    <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mf">0.1</span><span class="p">)</span>  <span class="c1"># To simulate a longer calculation</span>
+<span class="linenos">19</span>    <span class="k">return</span> <span class="p">(</span><span class="n">S_t</span> <span class="o">*</span> <span class="n">r_s</span> <span class="o">*</span> <span class="n">dt</span><span class="p">)</span> <span class="o">+</span> <span class="n">S_t</span> <span class="o">-</span> <span class="p">(</span><span class="n">R_tp1</span> <span class="o">-</span> <span class="n">R_t</span><span class="p">)</span>
 </pre></div>
-</td></tr></table></div>
+</div>
 <p>Model YAML:</p>
-<div class="highlight-yaml notranslate"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
- 2
- 3
- 4
- 5
- 6
- 7
- 8
- 9
-10
-11
-12
-13
-14
-15
-16</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="nt">model</span><span class="p">:</span>
-  <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">ShootModel</span>
-  <span class="nt">language</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">python</span>
-  <span class="nt">args</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">./src/shoot_wrapper.py</span>
-  <span class="nt">inputs</span><span class="p">:</span>
-    <span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">shoot_growth_rate</span>
-      <span class="nt">units</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">d**-1</span>
-    <span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">init_shoot_mass</span>
-      <span class="nt">units</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">kg</span>
-    <span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">shoot_time_step</span>
-      <span class="nt">units</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">d</span>
-    <span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">next_root_mass</span>
-      <span class="nt">units</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">kg</span>
-  <span class="nt">outputs</span><span class="p">:</span>
-    <span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">next_shoot_mass</span>
-      <span class="nt">units</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">kg</span>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span><span class="nt">model</span><span class="p">:</span>
+<span class="linenos"> 2</span>  <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">ShootModel</span>
+<span class="linenos"> 3</span>  <span class="nt">language</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">python</span>
+<span class="linenos"> 4</span>  <span class="nt">args</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">./src/shoot_wrapper.py</span>
+<span class="linenos"> 5</span>  <span class="nt">inputs</span><span class="p">:</span>
+<span class="linenos"> 6</span>    <span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">shoot_growth_rate</span>
+<span class="linenos"> 7</span>      <span class="nt">units</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">d**-1</span>
+<span class="linenos"> 8</span>    <span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">init_shoot_mass</span>
+<span class="linenos"> 9</span>      <span class="nt">units</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">kg</span>
+<span class="linenos">10</span>    <span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">shoot_time_step</span>
+<span class="linenos">11</span>      <span class="nt">units</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">d</span>
+<span class="linenos">12</span>    <span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">next_root_mass</span>
+<span class="linenos">13</span>      <span class="nt">units</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">kg</span>
+<span class="linenos">14</span>  <span class="nt">outputs</span><span class="p">:</span>
+<span class="linenos">15</span>    <span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">next_shoot_mass</span>
+<span class="linenos">16</span>      <span class="nt">units</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">kg</span>
 </pre></div>
-</td></tr></table></div>
-<div class="highlight-yaml notranslate"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
- 2
- 3
- 4
- 5
- 6
- 7
- 8
- 9
-10
-11
-12
-13
-14
-15
-16
-17
-18
-19
-20</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="nt">connections</span><span class="p">:</span>
-  <span class="c1"># Input connections</span>
-  <span class="p p-Indicator">-</span> <span class="nt">input</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">./Input/shoot_growth_rate.txt</span>
-    <span class="nt">output</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">shoot_growth_rate</span>
-    <span class="nt">filetype</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">table</span>
-  <span class="p p-Indicator">-</span> <span class="nt">input</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">./Input/init_shoot_mass.txt</span>
-    <span class="nt">output</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">init_shoot_mass</span>
-    <span class="nt">filetype</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">table</span>
-  <span class="p p-Indicator">-</span> <span class="nt">input</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">./Input/timesteps.txt</span>
-    <span class="nt">output</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">shoot_time_step</span>
-    <span class="nt">filetype</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">table</span>
-  <span class="p p-Indicator">-</span> <span class="nt">input</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">./Input/root_output.txt</span>
-    <span class="nt">output</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">next_root_mass</span>
-    <span class="nt">filetype</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">table</span>
-
-  <span class="c1"># Output connections</span>
-  <span class="p p-Indicator">-</span> <span class="nt">input</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">next_shoot_mass</span>
-    <span class="nt">output</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">./Output/shoot_output.txt</span>
-    <span class="nt">filetype</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">table</span>
-    <span class="nt">field_names</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">shoot_mass</span>
+</div>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span><span class="nt">connections</span><span class="p">:</span>
+<span class="linenos"> 2</span>  <span class="c1"># Input connections</span>
+<span class="linenos"> 3</span>  <span class="p p-Indicator">-</span> <span class="nt">input</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">./Input/shoot_growth_rate.txt</span>
+<span class="linenos"> 4</span>    <span class="nt">output</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">shoot_growth_rate</span>
+<span class="linenos"> 5</span>    <span class="nt">filetype</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">table</span>
+<span class="linenos"> 6</span>  <span class="p p-Indicator">-</span> <span class="nt">input</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">./Input/init_shoot_mass.txt</span>
+<span class="linenos"> 7</span>    <span class="nt">output</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">init_shoot_mass</span>
+<span class="linenos"> 8</span>    <span class="nt">filetype</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">table</span>
+<span class="linenos"> 9</span>  <span class="p p-Indicator">-</span> <span class="nt">input</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">./Input/timesteps.txt</span>
+<span class="linenos">10</span>    <span class="nt">output</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">shoot_time_step</span>
+<span class="linenos">11</span>    <span class="nt">filetype</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">table</span>
+<span class="linenos">12</span>  <span class="p p-Indicator">-</span> <span class="nt">input</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">./Input/root_output.txt</span>
+<span class="linenos">13</span>    <span class="nt">output</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">next_root_mass</span>
+<span class="linenos">14</span>    <span class="nt">filetype</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">table</span>
+<span class="linenos">15</span>
+<span class="linenos">16</span>  <span class="c1"># Output connections</span>
+<span class="linenos">17</span>  <span class="p p-Indicator">-</span> <span class="nt">input</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">next_shoot_mass</span>
+<span class="linenos">18</span>    <span class="nt">output</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">./Output/shoot_output.txt</span>
+<span class="linenos">19</span>    <span class="nt">filetype</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">table</span>
+<span class="linenos">20</span>    <span class="nt">field_names</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">shoot_mass</span>
 </pre></div>
-</td></tr></table></div>
+</div>
 </div>
 </div>
 

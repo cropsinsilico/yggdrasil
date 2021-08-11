@@ -3,9 +3,6 @@
 maxMsg
 =======================
 
-Two models run in a client-server, remote procedure call (RPC) communication pattern. The client model `maxMsgCli` sends requests and receives response to/from the server model `maxMsgSrv` via the deprecated `rpcCall` method (use `call` instead). The server model receives requests and send responses. This example demostrates the RPC pattern through the use of the `client_of` and `is_server` model parameters and the RPC interface classes/functions.
-
-
 .. contents:: :local:
 
 Mixed Version
@@ -13,22 +10,22 @@ Mixed Version
 
 Model Code:
 
-.. literalinclude:: /../../yggdrasil/examples/maxMsg/src/maxMsgCli.py
+.. literalinclude:: /../../../../../../../opt/hostedtoolcache/Python/3.8.11/x64/lib/python3.8/site-packages/yggdrasil/examples/maxMsg/src/maxMsgCli.py
    :language: python
    :linenos:
 
-.. literalinclude:: /../../yggdrasil/examples/maxMsg/src/maxMsgSrv.m
+.. literalinclude:: /../../../../../../../opt/hostedtoolcache/Python/3.8.11/x64/lib/python3.8/site-packages/yggdrasil/examples/maxMsg/src/maxMsgSrv.m
    :language: matlab
    :linenos:
 
 
 Model YAML:
 
-.. literalinclude:: /../../yggdrasil/examples/maxMsg/maxMsgCli_python.yml
+.. literalinclude:: /../../../../../../../opt/hostedtoolcache/Python/3.8.11/x64/lib/python3.8/site-packages/yggdrasil/examples/maxMsg/maxMsgCli_python.yml
    :language: yaml
    :linenos:
 
-.. literalinclude:: /../../yggdrasil/examples/maxMsg/maxMsgSrv_matlab.yml
+.. literalinclude:: /../../../../../../../opt/hostedtoolcache/Python/3.8.11/x64/lib/python3.8/site-packages/yggdrasil/examples/maxMsg/maxMsgSrv_matlab.yml
    :language: yaml
    :linenos:
 
@@ -39,22 +36,22 @@ Mixed w/o Matlab Version
 
 Model Code:
 
-.. literalinclude:: /../../yggdrasil/examples/maxMsg/src/maxMsgCli.py
+.. literalinclude:: /../../../../../../../opt/hostedtoolcache/Python/3.8.11/x64/lib/python3.8/site-packages/yggdrasil/examples/maxMsg/src/maxMsgCli.py
    :language: python
    :linenos:
 
-.. literalinclude:: /../../yggdrasil/examples/maxMsg/src/maxMsgSrv.c
+.. literalinclude:: /../../../../../../../opt/hostedtoolcache/Python/3.8.11/x64/lib/python3.8/site-packages/yggdrasil/examples/maxMsg/src/maxMsgSrv.c
    :language: c
    :linenos:
 
 
 Model YAML:
 
-.. literalinclude:: /../../yggdrasil/examples/maxMsg/maxMsgCli_python.yml
+.. literalinclude:: /../../../../../../../opt/hostedtoolcache/Python/3.8.11/x64/lib/python3.8/site-packages/yggdrasil/examples/maxMsg/maxMsgCli_python.yml
    :language: yaml
    :linenos:
 
-.. literalinclude:: /../../yggdrasil/examples/maxMsg/maxMsgSrv_c.yml
+.. literalinclude:: /../../../../../../../opt/hostedtoolcache/Python/3.8.11/x64/lib/python3.8/site-packages/yggdrasil/examples/maxMsg/maxMsgSrv_c.yml
    :language: yaml
    :linenos:
 
@@ -65,22 +62,22 @@ C Version
 
 Model Code:
 
-.. literalinclude:: /../../yggdrasil/examples/maxMsg/src/maxMsgCli.c
+.. literalinclude:: /../../../../../../../opt/hostedtoolcache/Python/3.8.11/x64/lib/python3.8/site-packages/yggdrasil/examples/maxMsg/src/maxMsgCli.c
    :language: c
    :linenos:
 
-.. literalinclude:: /../../yggdrasil/examples/maxMsg/src/maxMsgSrv.c
+.. literalinclude:: /../../../../../../../opt/hostedtoolcache/Python/3.8.11/x64/lib/python3.8/site-packages/yggdrasil/examples/maxMsg/src/maxMsgSrv.c
    :language: c
    :linenos:
 
 
 Model YAML:
 
-.. literalinclude:: /../../yggdrasil/examples/maxMsg/maxMsgCli_c.yml
+.. literalinclude:: /../../../../../../../opt/hostedtoolcache/Python/3.8.11/x64/lib/python3.8/site-packages/yggdrasil/examples/maxMsg/maxMsgCli_c.yml
    :language: yaml
    :linenos:
 
-.. literalinclude:: /../../yggdrasil/examples/maxMsg/maxMsgSrv_c.yml
+.. literalinclude:: /../../../../../../../opt/hostedtoolcache/Python/3.8.11/x64/lib/python3.8/site-packages/yggdrasil/examples/maxMsg/maxMsgSrv_c.yml
    :language: yaml
    :linenos:
 
@@ -91,22 +88,22 @@ C++ Version
 
 Model Code:
 
-.. literalinclude:: /../../yggdrasil/examples/maxMsg/src/maxMsgCli.cpp
+.. literalinclude:: /../../../../../../../opt/hostedtoolcache/Python/3.8.11/x64/lib/python3.8/site-packages/yggdrasil/examples/maxMsg/src/maxMsgCli.cpp
    :language: c++
    :linenos:
 
-.. literalinclude:: /../../yggdrasil/examples/maxMsg/src/maxMsgSrv.cpp
+.. literalinclude:: /../../../../../../../opt/hostedtoolcache/Python/3.8.11/x64/lib/python3.8/site-packages/yggdrasil/examples/maxMsg/src/maxMsgSrv.cpp
    :language: c++
    :linenos:
 
 
 Model YAML:
 
-.. literalinclude:: /../../yggdrasil/examples/maxMsg/maxMsgCli_cpp.yml
+.. literalinclude:: /../../../../../../../opt/hostedtoolcache/Python/3.8.11/x64/lib/python3.8/site-packages/yggdrasil/examples/maxMsg/maxMsgCli_cpp.yml
    :language: yaml
    :linenos:
 
-.. literalinclude:: /../../yggdrasil/examples/maxMsg/maxMsgSrv_cpp.yml
+.. literalinclude:: /../../../../../../../opt/hostedtoolcache/Python/3.8.11/x64/lib/python3.8/site-packages/yggdrasil/examples/maxMsg/maxMsgSrv_cpp.yml
    :language: yaml
    :linenos:
 
@@ -117,22 +114,22 @@ Fortran Version
 
 Model Code:
 
-.. literalinclude:: /../../yggdrasil/examples/maxMsg/src/maxMsgCli.f90
+.. literalinclude:: /../../../../../../../opt/hostedtoolcache/Python/3.8.11/x64/lib/python3.8/site-packages/yggdrasil/examples/maxMsg/src/maxMsgCli.f90
    :language: python
    :linenos:
 
-.. literalinclude:: /../../yggdrasil/examples/maxMsg/src/maxMsgSrv.f90
+.. literalinclude:: /../../../../../../../opt/hostedtoolcache/Python/3.8.11/x64/lib/python3.8/site-packages/yggdrasil/examples/maxMsg/src/maxMsgSrv.f90
    :language: python
    :linenos:
 
 
 Model YAML:
 
-.. literalinclude:: /../../yggdrasil/examples/maxMsg/maxMsgCli_fortran.yml
+.. literalinclude:: /../../../../../../../opt/hostedtoolcache/Python/3.8.11/x64/lib/python3.8/site-packages/yggdrasil/examples/maxMsg/maxMsgCli_fortran.yml
    :language: yaml
    :linenos:
 
-.. literalinclude:: /../../yggdrasil/examples/maxMsg/maxMsgSrv_fortran.yml
+.. literalinclude:: /../../../../../../../opt/hostedtoolcache/Python/3.8.11/x64/lib/python3.8/site-packages/yggdrasil/examples/maxMsg/maxMsgSrv_fortran.yml
    :language: yaml
    :linenos:
 
@@ -143,22 +140,22 @@ Matlab Version
 
 Model Code:
 
-.. literalinclude:: /../../yggdrasil/examples/maxMsg/src/maxMsgCli.m
+.. literalinclude:: /../../../../../../../opt/hostedtoolcache/Python/3.8.11/x64/lib/python3.8/site-packages/yggdrasil/examples/maxMsg/src/maxMsgCli.m
    :language: matlab
    :linenos:
 
-.. literalinclude:: /../../yggdrasil/examples/maxMsg/src/maxMsgSrv.m
+.. literalinclude:: /../../../../../../../opt/hostedtoolcache/Python/3.8.11/x64/lib/python3.8/site-packages/yggdrasil/examples/maxMsg/src/maxMsgSrv.m
    :language: matlab
    :linenos:
 
 
 Model YAML:
 
-.. literalinclude:: /../../yggdrasil/examples/maxMsg/maxMsgCli_matlab.yml
+.. literalinclude:: /../../../../../../../opt/hostedtoolcache/Python/3.8.11/x64/lib/python3.8/site-packages/yggdrasil/examples/maxMsg/maxMsgCli_matlab.yml
    :language: yaml
    :linenos:
 
-.. literalinclude:: /../../yggdrasil/examples/maxMsg/maxMsgSrv_matlab.yml
+.. literalinclude:: /../../../../../../../opt/hostedtoolcache/Python/3.8.11/x64/lib/python3.8/site-packages/yggdrasil/examples/maxMsg/maxMsgSrv_matlab.yml
    :language: yaml
    :linenos:
 
@@ -169,22 +166,22 @@ Python Version
 
 Model Code:
 
-.. literalinclude:: /../../yggdrasil/examples/maxMsg/src/maxMsgCli.py
+.. literalinclude:: /../../../../../../../opt/hostedtoolcache/Python/3.8.11/x64/lib/python3.8/site-packages/yggdrasil/examples/maxMsg/src/maxMsgCli.py
    :language: python
    :linenos:
 
-.. literalinclude:: /../../yggdrasil/examples/maxMsg/src/maxMsgSrv.py
+.. literalinclude:: /../../../../../../../opt/hostedtoolcache/Python/3.8.11/x64/lib/python3.8/site-packages/yggdrasil/examples/maxMsg/src/maxMsgSrv.py
    :language: python
    :linenos:
 
 
 Model YAML:
 
-.. literalinclude:: /../../yggdrasil/examples/maxMsg/maxMsgCli_python.yml
+.. literalinclude:: /../../../../../../../opt/hostedtoolcache/Python/3.8.11/x64/lib/python3.8/site-packages/yggdrasil/examples/maxMsg/maxMsgCli_python.yml
    :language: yaml
    :linenos:
 
-.. literalinclude:: /../../yggdrasil/examples/maxMsg/maxMsgSrv_python.yml
+.. literalinclude:: /../../../../../../../opt/hostedtoolcache/Python/3.8.11/x64/lib/python3.8/site-packages/yggdrasil/examples/maxMsg/maxMsgSrv_python.yml
    :language: yaml
    :linenos:
 
@@ -195,22 +192,22 @@ R Version
 
 Model Code:
 
-.. literalinclude:: /../../yggdrasil/examples/maxMsg/src/maxMsgCli.R
+.. literalinclude:: /../../../../../../../opt/hostedtoolcache/Python/3.8.11/x64/lib/python3.8/site-packages/yggdrasil/examples/maxMsg/src/maxMsgCli.R
    :language: python
    :linenos:
 
-.. literalinclude:: /../../yggdrasil/examples/maxMsg/src/maxMsgSrv.R
+.. literalinclude:: /../../../../../../../opt/hostedtoolcache/Python/3.8.11/x64/lib/python3.8/site-packages/yggdrasil/examples/maxMsg/src/maxMsgSrv.R
    :language: python
    :linenos:
 
 
 Model YAML:
 
-.. literalinclude:: /../../yggdrasil/examples/maxMsg/maxMsgCli_r.yml
+.. literalinclude:: /../../../../../../../opt/hostedtoolcache/Python/3.8.11/x64/lib/python3.8/site-packages/yggdrasil/examples/maxMsg/maxMsgCli_r.yml
    :language: yaml
    :linenos:
 
-.. literalinclude:: /../../yggdrasil/examples/maxMsg/maxMsgSrv_r.yml
+.. literalinclude:: /../../../../../../../opt/hostedtoolcache/Python/3.8.11/x64/lib/python3.8/site-packages/yggdrasil/examples/maxMsg/maxMsgSrv_r.yml
    :language: yaml
    :linenos:
 

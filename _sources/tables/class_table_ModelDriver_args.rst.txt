@@ -1,69 +1,71 @@
 .. _class_table_ModelDriver_args_rst:
 
-=================   ================================================================================   ========   ===========
-Option              Description                                                                        Required   Type       
-=================   ================================================================================   ========   ===========
-args                The full path to the file containing the model program that will be run by the     X          str or list
-                    driver or a list starting with the program file and including any arguments that                         
-                    should be passed as input to the program.                                                                
-name                Unique name used to identify the model. This will be used to report errors         X          str        
-                    associated with the model.                                                                               
-allow_threading     If True, comm connections will be set up so that the model-side comms can be                  bool       
-                    used by more than one thread. Defaults to False.                                                         
-client_of           The names of one or more models that this model will call as a server. If there               str, list  
-                    are more than one, this should be specified as a sequence collection (list). The                         
-                    corresponding channel(s) that should be passed to the yggdrasil API will be the                          
-                    name of the server model joined with the name of the client model with an                                
-                    underscore `<server_model>_<client_model>`. There will be one channel created                            
-                    for each server the model is a client of. Defaults to empty list. Use of                                 
-                    `client_of` with `function` is not currently supported.                                                  
-copies              The number of copies of the model that should be created. Defaults to 1.                      int        
-copy_index          Index of model in set of copies. Defaults to -1 indicating there is only one                  int        
-                    copy of the model.                                                                                       
-function            If provided, an integrated model is created by wrapping the function named here.              str        
-                    The function must be located within the file specified by the source file listed                         
-                    in the first argument. If not provided, the model must contain it's own calls to                         
-                    the |yggdrasil| interface.                                                                               
-is_server           If `True`, the model is assumed to be a server for one or more client models and              bool, dict 
-                    an instance of :class:`yggdrasil.drivers.ServerDriver` is started. The                                   
-                    corresponding channel that should be passed to the yggdrasil API will be the                             
-                    name of the model. If is_server is a dictionary, it should contain an 'input'                            
-                    key and an 'output' key. These are required to be the names of existing input                            
-                    and output channels in the model that will be co-opted by the server. (Note:                             
-                    This requires that the co-opted output channel's send method is called once for                          
-                    each time the co-opted input channel's recv method is called. If used with the                           
-                    `function` parameter, `is_server` must be a dictionary. Defaults to False.                               
-logging_level       The level of logging messages that should be displayed by the model. Defaults to              str        
-                    the logging level as determined by the configuration file and environment                                
-                    variables.                                                                                               
-model_index         Index of model in list of models being run. Defaults to 0.                                    int        
-outputs_in_inputs   If True, outputs from wrapped model functions are passed by pointer as inputs                 bool       
-                    for modification and the return value will be a flag. If False, outputs are                              
-                    limited to return values. Defaults to the value of the class attribute                                   
-                    outputs_in_inputs.                                                                                       
-overwrite           If True, any existing model products (compilation products, wrapper scripts,                  bool       
-                    etc.) are removed prior to the run. If False, the products are not removed.                              
-                    Defaults to True. Setting this to False can improve the performance,                                     
-                    particularly for models that take a long time to compile, but this should only                           
-                    be done once the model has been fully debugged to ensure that each run is tested                         
-                    on a clean copy of the model. The value of this keyword also determines whether                          
-                    or not products are removed after a run.                                                                 
-preserve_cache      If True model products will be kept following the run, otherwise all products                 bool       
-                    will be cleaned up. Defaults to False. This keyword is superceeded by overwrite.                         
-products            Paths to files created by the model that should be cleaned up when the model                  list       
-                    exits. Entries can be absolute paths or paths relative to the working directory.                         
-                    Defaults to [].                                                                                          
-source_products     Files created by running the model that are source files. These files will be                 list       
-                    removed without checking their extension so users should avoid adding files to                           
-                    this list unless they are sure they should be deleted. Defaults to [].                                   
-strace_flags        Flags to pass to strace (or dtrace). Defaults to [].                                          list       
-timesync            If set, the model is assumed to call a send then receive of the state at each                 bool, str  
-                    timestep for syncronization with other models that are also integrating in time.                         
-                    If a string is provided, it is assumed to be the name of the server that will                            
-                    handle timestep synchronization. If a boolean is provided, the name of the                               
-                    server will be assumed to be 'timestep'. Defaults to False.                                              
-valgrind_flags      Flags to pass to valgrind. Defaults to [].                                                    list       
-with_strace         If True, the command is run with strace (on Linux) or dtrace (on MacOS).                      bool       
-                    Defaults to False.                                                                                       
-with_valgrind       If True, the command is run with valgrind. Defaults to False.                                 bool       
-=================   ================================================================================   ========   ===========
+==================   ================================================================================   ========   ===========
+Option               Description                                                                        Required   Type       
+==================   ================================================================================   ========   ===========
+args                 The full path to the file containing the model program that will be run by the     X          str or list
+                     driver or a list starting with the program file and including any arguments that                         
+                     should be passed as input to the program.                                                                
+name                 Unique name used to identify the model. This will be used to report errors         X          str        
+                     associated with the model.                                                                               
+allow_threading      If True, comm connections will be set up so that the model-side comms can be                  bool       
+                     used by more than one thread. Defaults to False.                                                         
+client_of            The names of one or more models that this model will call as a server. If there               str, list  
+                     are more than one, this should be specified as a sequence collection (list). The                         
+                     corresponding channel(s) that should be passed to the yggdrasil API will be the                          
+                     name of the server model joined with the name of the client model with an                                
+                     underscore `<server_model>_<client_model>`. There will be one channel created                            
+                     for each server the model is a client of. Defaults to empty list. Use of                                 
+                     `client_of` with `function` is not currently supported.                                                  
+copies               The number of copies of the model that should be created. Defaults to 1.                      int        
+copy_index           Index of model in set of copies. Defaults to -1 indicating there is only one                  int        
+                     copy of the model.                                                                                       
+function             If provided, an integrated model is created by wrapping the function named here.              str        
+                     The function must be located within the file specified by the source file listed                         
+                     in the first argument. If not provided, the model must contain it's own calls to                         
+                     the |yggdrasil| interface.                                                                               
+is_server            If `True`, the model is assumed to be a server for one or more client models and              bool, dict 
+                     an instance of :class:`yggdrasil.drivers.ServerDriver` is started. The                                   
+                     corresponding channel that should be passed to the yggdrasil API will be the                             
+                     name of the model. If is_server is a dictionary, it should contain an 'input'                            
+                     key and an 'output' key. These are required to be the names of existing input                            
+                     and output channels in the model that will be co-opted by the server. (Note:                             
+                     This requires that the co-opted output channel's send method is called once for                          
+                     each time the co-opted input channel's recv method is called. If used with the                           
+                     `function` parameter, `is_server` must be a dictionary. Defaults to False.                               
+iter_function_over   Variable(s) that should be received or sent as an array, but iterated over.                   array      
+                     Defaults to an empty array and is ignored.                                                               
+logging_level        The level of logging messages that should be displayed by the model. Defaults to              str        
+                     the logging level as determined by the configuration file and environment                                
+                     variables.                                                                                               
+model_index          Index of model in list of models being run. Defaults to 0.                                    int        
+outputs_in_inputs    If True, outputs from wrapped model functions are passed by pointer as inputs                 bool       
+                     for modification and the return value will be a flag. If False, outputs are                              
+                     limited to return values. Defaults to the value of the class attribute                                   
+                     outputs_in_inputs.                                                                                       
+overwrite            If True, any existing model products (compilation products, wrapper scripts,                  bool       
+                     etc.) are removed prior to the run. If False, the products are not removed.                              
+                     Defaults to True. Setting this to False can improve the performance,                                     
+                     particularly for models that take a long time to compile, but this should only                           
+                     be done once the model has been fully debugged to ensure that each run is tested                         
+                     on a clean copy of the model. The value of this keyword also determines whether                          
+                     or not products are removed after a run.                                                                 
+preserve_cache       If True model products will be kept following the run, otherwise all products                 bool       
+                     will be cleaned up. Defaults to False. This keyword is superceeded by overwrite.                         
+products             Paths to files created by the model that should be cleaned up when the model                  list       
+                     exits. Entries can be absolute paths or paths relative to the working directory.                         
+                     Defaults to [].                                                                                          
+source_products      Files created by running the model that are source files. These files will be                 list       
+                     removed without checking their extension so users should avoid adding files to                           
+                     this list unless they are sure they should be deleted. Defaults to [].                                   
+strace_flags         Flags to pass to strace (or dtrace). Defaults to [].                                          list       
+timesync             If set, the model is assumed to call a send then receive of the state at each                 bool, str  
+                     timestep for syncronization with other models that are also integrating in time.                         
+                     If a string is provided, it is assumed to be the name of the server that will                            
+                     handle timestep synchronization. If a boolean is provided, the name of the                               
+                     server will be assumed to be 'timestep'. Defaults to False.                                              
+valgrind_flags       Flags to pass to valgrind. Defaults to [].                                                    list       
+with_strace          If True, the command is run with strace (on Linux) or dtrace (on MacOS).                      bool       
+                     Defaults to False.                                                                                       
+with_valgrind        If True, the command is run with valgrind. Defaults to False.                                 bool       
+==================   ================================================================================   ========   ===========

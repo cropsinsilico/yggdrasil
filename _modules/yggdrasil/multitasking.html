@@ -7,12 +7,14 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>yggdrasil.multitasking &mdash; yggdrasil v1.6.3+18.g537444084.dirty documentation</title>
+  <title>yggdrasil.multitasking &mdash; yggdrasil v1.6.4 documentation</title>
   
 
   
   <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
   <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
 
   
   
@@ -29,6 +31,7 @@
   
     
       <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+        <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
         <script src="../../_static/jquery.js"></script>
         <script src="../../_static/underscore.js"></script>
         <script src="../../_static/doctools.js"></script>
@@ -61,7 +64,7 @@
             
             
               <div class="version">
-                v1.6.3
+                v1.6.4
               </div>
             
           
@@ -86,7 +89,7 @@
               
             
             
-              <p class="caption"><span class="caption-text">Contents:</span></p>
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../includeme.html">Overview</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../install.html">Installation</a></li>
@@ -160,8 +163,6 @@
         
           <li><a href="../index.html">Module code</a> &raquo;</li>
         
-          <li><a href="../yggdrasil.html">yggdrasil</a> &raquo;</li>
-        
       <li>yggdrasil.multitasking</li>
     
     
@@ -187,7 +188,7 @@
 <span class="kn">import</span> <span class="nn">threading</span>
 <span class="kn">import</span> <span class="nn">queue</span>
 <span class="kn">import</span> <span class="nn">multiprocessing</span>
-<span class="kn">from</span> <span class="nn">yggdrasil.tools</span> <span class="k">import</span> <span class="n">YggClass</span>
+<span class="kn">from</span> <span class="nn">yggdrasil.tools</span> <span class="kn">import</span> <span class="n">YggClass</span>
 
 
 <span class="n">mp_ctx</span> <span class="o">=</span> <span class="n">multiprocessing</span><span class="o">.</span><span class="n">get_context</span><span class="p">()</span>
@@ -235,7 +236,7 @@
 
 <div class="viewcode-block" id="check_sockets"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.multitasking.check_sockets">[docs]</a><span class="k">def</span> <span class="nf">check_sockets</span><span class="p">():</span>  <span class="c1"># pragma: debug</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Check registered sockets.&quot;&quot;&quot;</span>
-    <span class="kn">from</span> <span class="nn">yggdrasil.communication</span> <span class="k">import</span> <span class="n">cleanup_comms</span>
+    <span class="kn">from</span> <span class="nn">yggdrasil.communication</span> <span class="kn">import</span> <span class="n">cleanup_comms</span>
     <span class="n">count</span> <span class="o">=</span> <span class="n">cleanup_comms</span><span class="p">(</span><span class="s1">&#39;ZMQComm&#39;</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">count</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
         <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">%d</span><span class="s2"> sockets closed.&quot;</span> <span class="o">%</span> <span class="n">count</span><span class="p">)</span></div>
@@ -263,7 +264,7 @@
 <div class="viewcode-block" id="SafeThread"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.multitasking.SafeThread">[docs]</a><span class="k">class</span> <span class="nc">SafeThread</span><span class="p">(</span><span class="n">threading</span><span class="o">.</span><span class="n">Thread</span><span class="p">):</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Thread that sets Event on error.&quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_errored</span> <span class="o">=</span> <span class="n">threading</span><span class="o">.</span><span class="n">Event</span><span class="p">()</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">SafeThread</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
 
@@ -348,7 +349,7 @@
 <div class="viewcode-block" id="AliasMeta"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.multitasking.AliasMeta">[docs]</a><span class="k">class</span> <span class="nc">AliasMeta</span><span class="p">(</span><span class="nb">type</span><span class="p">):</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Meta class for adding aliased methods to the class.&quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="nf">__new__</span><span class="p">(</span><span class="n">meta</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">bases</span><span class="p">,</span> <span class="n">class_dict</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__new__</span><span class="p">(</span><span class="n">meta</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">bases</span><span class="p">,</span> <span class="n">class_dict</span><span class="p">):</span>
         <span class="bp">cls</span> <span class="o">=</span> <span class="nb">type</span><span class="o">.</span><span class="fm">__new__</span><span class="p">(</span><span class="n">meta</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">bases</span><span class="p">,</span> <span class="n">class_dict</span><span class="p">)</span>
         <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="bp">cls</span><span class="o">.</span><span class="n">_base_meth</span><span class="p">:</span>
             <span class="k">assert</span><span class="p">(</span><span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">k</span><span class="p">))</span>
@@ -377,7 +378,7 @@
     <span class="n">_base_locked</span> <span class="o">=</span> <span class="kc">False</span>
     <span class="n">_unlocked_attr</span> <span class="o">=</span> <span class="p">[]</span>
 
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="n">dont_initialize_base</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="n">dont_initialize_base</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_base</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="k">if</span> <span class="p">(</span><span class="ow">not</span> <span class="n">dont_initialize_base</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_base_class</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">):</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_base</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_base_class</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
@@ -420,7 +421,7 @@
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_base</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_base</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dummy_copy</span></div>
 
-    <span class="k">def</span> <span class="nf">__del__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__del__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">disconnect</span><span class="p">()</span></div>
 
         
@@ -428,7 +429,7 @@
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Concurrent/parallel processing object using either threads</span>
 <span class="sd">    or processes.&quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="n">task_method</span><span class="o">=</span><span class="s2">&quot;threading&quot;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="n">task_method</span><span class="o">=</span><span class="s2">&quot;threading&quot;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">task_method</span> <span class="o">=</span> <span class="n">task_method</span>
         <span class="k">if</span> <span class="n">task_method</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;thread&quot;</span><span class="p">,</span> <span class="s2">&quot;threading&quot;</span><span class="p">,</span> <span class="s2">&quot;concurrent&quot;</span><span class="p">]:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">parallel</span> <span class="o">=</span> <span class="kc">False</span>
@@ -443,7 +444,7 @@
 <div class="viewcode-block" id="Context"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.multitasking.Context">[docs]</a><span class="k">class</span> <span class="nc">Context</span><span class="p">(</span><span class="n">MultiObject</span><span class="p">):</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Context for managing threads/processes.&quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">task_method</span><span class="o">=</span><span class="s1">&#39;thread&#39;</span><span class="p">,</span> <span class="n">dont_initialize_base</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">task_method</span><span class="o">=</span><span class="s1">&#39;thread&#39;</span><span class="p">,</span> <span class="n">dont_initialize_base</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">Context</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">dont_initialize_base</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
                                       <span class="n">task_method</span><span class="o">=</span><span class="n">task_method</span><span class="p">)</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">dont_initialize_base</span><span class="p">:</span>
@@ -527,7 +528,7 @@
 <div class="viewcode-block" id="ContextObject"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.multitasking.ContextObject">[docs]</a><span class="k">class</span> <span class="nc">ContextObject</span><span class="p">(</span><span class="n">MultiObject</span><span class="p">):</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Base class for object intialized in a context.&quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="n">task_method</span><span class="o">=</span><span class="s1">&#39;threading&#39;</span><span class="p">,</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="n">task_method</span><span class="o">=</span><span class="s1">&#39;threading&#39;</span><span class="p">,</span>
                  <span class="n">task_context</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_managed_context</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="k">if</span> <span class="n">task_context</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
@@ -580,10 +581,10 @@
 <div class="viewcode-block" id="DummyRLock.release"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.multitasking.DummyRLock.release">[docs]</a>    <span class="k">def</span> <span class="nf">release</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="k">pass</span></div>
 
-    <span class="k">def</span> <span class="nf">__enter__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__enter__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">self</span>
 
-    <span class="k">def</span> <span class="nf">__exit__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__exit__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="k">pass</span></div>
     
 
@@ -613,7 +614,7 @@
 
 <div class="viewcode-block" id="DummyEvent"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.multitasking.DummyEvent">[docs]</a><span class="k">class</span> <span class="nc">DummyEvent</span><span class="p">(</span><span class="n">DummyContextObject</span><span class="p">):</span>  <span class="c1"># pragma: no cover</span>
 
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_value</span> <span class="o">=</span> <span class="n">value</span>
 
 <div class="viewcode-block" id="DummyEvent.is_set"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.multitasking.DummyEvent.is_set">[docs]</a>    <span class="k">def</span> <span class="nf">is_set</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -659,7 +660,7 @@
 
 <div class="viewcode-block" id="DummyTask"><a class="viewcode-back" href="../../advanced/code_python.html#yggdrasil.multitasking.DummyTask">[docs]</a><span class="k">class</span> <span class="nc">DummyTask</span><span class="p">(</span><span class="n">DummyContextObject</span><span class="p">):</span>  <span class="c1"># pragma: no cover</span>
 
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="n">exitcode</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">daemon</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="n">exitcode</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">daemon</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="n">name</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">exitcode</span> <span class="o">=</span> <span class="n">exitcode</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">daemon</span> <span class="o">=</span> <span class="n">daemon</span>
@@ -903,7 +904,7 @@
 
     <span class="n">_base_locked</span> <span class="o">=</span> <span class="kc">True</span>
     
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="n">task_method</span><span class="o">=</span><span class="s1">&#39;process&#39;</span><span class="p">,</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="n">task_method</span><span class="o">=</span><span class="s1">&#39;process&#39;</span><span class="p">,</span>
                  <span class="n">task_context</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">lock</span> <span class="o">=</span> <span class="n">RLock</span><span class="p">(</span><span class="n">task_method</span><span class="o">=</span><span class="n">task_method</span><span class="p">,</span>
                           <span class="n">task_context</span><span class="o">=</span><span class="n">task_context</span><span class="p">)</span>
@@ -972,7 +973,7 @@
                         <span class="o">+</span> <span class="p">[</span><span class="s1">&#39;context&#39;</span><span class="p">,</span> <span class="s1">&#39;lock&#39;</span><span class="p">,</span> <span class="s1">&#39;process_instance&#39;</span><span class="p">,</span>
                            <span class="s1">&#39;error_flag&#39;</span><span class="p">,</span> <span class="s1">&#39;start_flag&#39;</span><span class="p">,</span> <span class="s1">&#39;terminate_flag&#39;</span><span class="p">])</span>
     
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">target</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">args</span><span class="o">=</span><span class="p">(),</span> <span class="n">kwargs</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">target</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">args</span><span class="o">=</span><span class="p">(),</span> <span class="n">kwargs</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
                  <span class="n">daemon</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">group</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">task_method</span><span class="o">=</span><span class="s1">&#39;thread&#39;</span><span class="p">,</span>
                  <span class="n">context</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">with_pipe</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="o">**</span><span class="n">ygg_kwargs</span><span class="p">):</span>
         <span class="k">if</span> <span class="n">kwargs</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
@@ -1251,7 +1252,7 @@
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Special exception that can be raised by the target function</span>
 <span class="sd">    for a loop in order to break the loop.&quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="kn">import</span> <span class="nn">traceback</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">break_stack</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">traceback</span><span class="o">.</span><span class="n">format_stack</span><span class="p">())</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">BreakLoopException</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
@@ -1268,7 +1269,7 @@
     <span class="n">_disconnect_attr</span> <span class="o">=</span> <span class="p">(</span><span class="n">YggTask</span><span class="o">.</span><span class="n">_disconnect_attr</span>
                         <span class="o">+</span> <span class="p">[</span><span class="s1">&#39;break_flag&#39;</span><span class="p">,</span> <span class="s1">&#39;loop_flag&#39;</span><span class="p">])</span>
 
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">YggTaskLoop</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_1st_main_terminated</span> <span class="o">=</span> <span class="kc">False</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_loop_count</span> <span class="o">=</span> <span class="mi">0</span>

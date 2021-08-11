@@ -1,6 +1,6 @@
 Model Code:
 
-.. literalinclude:: /../../yggdrasil/examples/ascii_io/src/ascii_io.py
+.. literalinclude:: /../../../../../../../opt/hostedtoolcache/Python/3.8.11/x64/lib/python3.8/site-packages/yggdrasil/examples/ascii_io/src/ascii_io.py
    :language: python
    :linenos:
 

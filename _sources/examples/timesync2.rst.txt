@@ -3,9 +3,6 @@
 timesync2
 =============================
 
-Two models, A & B, run simulations over time and exchange data via a timestep synchronization communication pattern. The timesync model `statesync` is explicit in the YAML and allows for specific control of the synchronization (e.g. relationship between variables, interpolation, aggregation). The models compute different variables, have different timesteps, and output data at each time step to a file. This example demonstrates more advanced use of the timesync communication pattern and YAML parameters.
-
-
 .. contents:: :local:
 
 C Version
@@ -13,7 +10,7 @@ C Version
 
 Model Code:
 
-.. literalinclude:: /../../yggdrasil/examples/timesync2/src/timesync.c
+.. literalinclude:: /../../../../../../../opt/hostedtoolcache/Python/3.8.11/x64/lib/python3.8/site-packages/yggdrasil/examples/timesync2/src/timesync.c
    :language: c
    :linenos:
 
@@ -31,7 +28,7 @@ C++ Version
 
 Model Code:
 
-.. literalinclude:: /../../yggdrasil/examples/timesync2/src/timesync.cpp
+.. literalinclude:: /../../../../../../../opt/hostedtoolcache/Python/3.8.11/x64/lib/python3.8/site-packages/yggdrasil/examples/timesync2/src/timesync.cpp
    :language: c++
    :linenos:
 
@@ -49,7 +46,7 @@ Fortran Version
 
 Model Code:
 
-.. literalinclude:: /../../yggdrasil/examples/timesync2/src/timesync.f90
+.. literalinclude:: /../../../../../../../opt/hostedtoolcache/Python/3.8.11/x64/lib/python3.8/site-packages/yggdrasil/examples/timesync2/src/timesync.f90
    :language: python
    :linenos:
 
@@ -67,7 +64,7 @@ Matlab Version
 
 Model Code:
 
-.. literalinclude:: /../../yggdrasil/examples/timesync2/src/timesync.m
+.. literalinclude:: /../../../../../../../opt/hostedtoolcache/Python/3.8.11/x64/lib/python3.8/site-packages/yggdrasil/examples/timesync2/src/timesync.m
    :language: matlab
    :linenos:
 
@@ -85,7 +82,7 @@ Python Version
 
 Model Code:
 
-.. literalinclude:: /../../yggdrasil/examples/timesync2/src/timesync.py
+.. literalinclude:: /../../../../../../../opt/hostedtoolcache/Python/3.8.11/x64/lib/python3.8/site-packages/yggdrasil/examples/timesync2/src/timesync.py
    :language: python
    :linenos:
 
@@ -103,7 +100,7 @@ R Version
 
 Model Code:
 
-.. literalinclude:: /../../yggdrasil/examples/timesync2/src/timesync.R
+.. literalinclude:: /../../../../../../../opt/hostedtoolcache/Python/3.8.11/x64/lib/python3.8/site-packages/yggdrasil/examples/timesync2/src/timesync.R
    :language: python
    :linenos:
 

@@ -7,12 +7,14 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>yggdrasil.drivers.ConnectionDriver &mdash; yggdrasil v1.6.3+18.g537444084.dirty documentation</title>
+  <title>yggdrasil.drivers.ConnectionDriver &mdash; yggdrasil v1.6.4 documentation</title>
   
 
   
   <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
   <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
 
   
   
@@ -29,6 +31,7 @@
   
     
       <script type="text/javascript" id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
+        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
         <script src="../../../_static/jquery.js"></script>
         <script src="../../../_static/underscore.js"></script>
         <script src="../../../_static/doctools.js"></script>
@@ -61,7 +64,7 @@
             
             
               <div class="version">
-                v1.6.3
+                v1.6.4
               </div>
             
           
@@ -86,7 +89,7 @@
               
             
             
-              <p class="caption"><span class="caption-text">Contents:</span></p>
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../../includeme.html">Overview</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../install.html">Installation</a></li>
@@ -160,8 +163,6 @@
         
           <li><a href="../../index.html">Module code</a> &raquo;</li>
         
-          <li><a href="../../yggdrasil.html">yggdrasil</a> &raquo;</li>
-        
           <li><a href="../drivers.html">yggdrasil.drivers</a> &raquo;</li>
         
       <li>yggdrasil.drivers.ConnectionDriver</li>
@@ -186,10 +187,10 @@
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="kn">import</span> <span class="nn">functools</span>
 <span class="kn">import</span> <span class="nn">queue</span>
-<span class="kn">from</span> <span class="nn">yggdrasil</span> <span class="k">import</span> <span class="n">multitasking</span>
-<span class="kn">from</span> <span class="nn">yggdrasil.communication</span> <span class="k">import</span> <span class="n">new_comm</span><span class="p">,</span> <span class="n">CommBase</span>
-<span class="kn">from</span> <span class="nn">yggdrasil.drivers.Driver</span> <span class="k">import</span> <span class="n">Driver</span>
-<span class="kn">from</span> <span class="nn">yggdrasil.components</span> <span class="k">import</span> <span class="n">create_component</span><span class="p">,</span> <span class="n">isinstance_component</span>
+<span class="kn">from</span> <span class="nn">yggdrasil</span> <span class="kn">import</span> <span class="n">multitasking</span>
+<span class="kn">from</span> <span class="nn">yggdrasil.communication</span> <span class="kn">import</span> <span class="n">new_comm</span><span class="p">,</span> <span class="n">CommBase</span>
+<span class="kn">from</span> <span class="nn">yggdrasil.drivers.Driver</span> <span class="kn">import</span> <span class="n">Driver</span>
+<span class="kn">from</span> <span class="nn">yggdrasil.components</span> <span class="kn">import</span> <span class="n">create_component</span><span class="p">,</span> <span class="n">isinstance_component</span>
 
 
 <span class="k">def</span> <span class="nf">_translate_list2element</span><span class="p">(</span><span class="n">arr</span><span class="p">):</span>
@@ -223,7 +224,7 @@
     <span class="n">_disconnect_attr</span> <span class="o">=</span> <span class="p">(</span><span class="n">multitasking</span><span class="o">.</span><span class="n">YggTaskLoop</span><span class="o">.</span><span class="n">_disconnect_attr</span>
                         <span class="o">+</span> <span class="p">[</span><span class="s1">&#39;q_tasks&#39;</span><span class="p">,</span> <span class="s1">&#39;q_results&#39;</span><span class="p">])</span>
 
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">connection</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">connection</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">connection</span> <span class="o">=</span> <span class="n">connection</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">q_tasks</span> <span class="o">=</span> <span class="n">multitasking</span><span class="o">.</span><span class="n">Queue</span><span class="p">(</span>
             <span class="n">task_method</span><span class="o">=</span><span class="s1">&#39;process&#39;</span><span class="p">,</span>
@@ -395,7 +396,7 @@
     <span class="n">_disconnect_attr</span> <span class="o">=</span> <span class="n">Driver</span><span class="o">.</span><span class="n">_disconnect_attr</span> <span class="o">+</span> <span class="p">[</span>
         <span class="s1">&#39;_comm_closed&#39;</span><span class="p">,</span> <span class="s1">&#39;_skip_after_loop&#39;</span><span class="p">,</span> <span class="s1">&#39;shared&#39;</span><span class="p">,</span> <span class="s1">&#39;task_thread&#39;</span><span class="p">]</span>
 
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">translator</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">single_use</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">onexit</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">translator</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">single_use</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">onexit</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="c1"># kwargs[&#39;method&#39;] = &#39;process&#39;</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">ConnectionDriver</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
         <span class="c1"># Shared attributes (set once or synced using events)</span>
@@ -476,7 +477,7 @@
                  <span class="ow">and</span> <span class="p">(</span><span class="ow">not</span> <span class="n">comm_list</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;is_client&#39;</span><span class="p">,</span> <span class="kc">False</span><span class="p">))</span>
                  <span class="ow">and</span> <span class="p">(</span><span class="n">direction</span> <span class="o">==</span> <span class="s1">&#39;send&#39;</span><span class="p">)</span>
                  <span class="ow">and</span> <span class="p">(</span><span class="ow">not</span> <span class="n">comm_list</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;dont_copy&#39;</span><span class="p">,</span> <span class="kc">False</span><span class="p">)))):</span>
-                <span class="kn">from</span> <span class="nn">yggdrasil.communication</span> <span class="k">import</span> <span class="n">ForkComm</span>
+                <span class="kn">from</span> <span class="nn">yggdrasil.communication</span> <span class="kn">import</span> <span class="n">ForkComm</span>
                 <span class="c1"># TODO: Handle recv?</span>
                 <span class="n">comm_list</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="s1">&#39;commtype&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span>
                     <span class="nb">dict</span><span class="p">(</span><span class="n">comm_list</span><span class="p">[</span><span class="n">i</span><span class="p">],</span>
@@ -486,6 +487,12 @@
                 <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">ForkComm</span><span class="o">.</span><span class="n">ForkComm</span><span class="o">.</span><span class="n">child_keys</span><span class="p">:</span>
                     <span class="n">comm_list</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
         <span class="n">comm_kws</span><span class="p">[</span><span class="s1">&#39;commtype&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">comm_list</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">comm_kws</span><span class="p">[</span><span class="s1">&#39;commtype&#39;</span><span class="p">]:</span>
+            <span class="k">if</span> <span class="p">((</span><span class="n">x</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;datatype&#39;</span><span class="p">,</span> <span class="p">{})</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;from_function&#39;</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>
+                 <span class="ow">and</span> <span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;datatype&#39;</span><span class="p">,</span> <span class="p">{})</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;type&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+                      <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;any&#39;</span><span class="p">,</span> <span class="s1">&#39;instance&#39;</span><span class="p">]))):</span>
+                <span class="n">x</span><span class="p">[</span><span class="s1">&#39;datatype&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;bytes&#39;</span><span class="p">}</span>
+            <span class="n">x</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;datatype&#39;</span><span class="p">,</span> <span class="p">{})</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;from_function&#39;</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">%s</span><span class="s1"> comm_kws:</span><span class="se">\n</span><span class="si">%s</span><span class="s1">&#39;</span><span class="p">,</span> <span class="n">attr_comm</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">pprint</span><span class="p">(</span><span class="n">comm_kws</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span>
         <span class="nb">setattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">attr_comm</span><span class="p">,</span> <span class="n">new_comm</span><span class="p">(</span><span class="o">**</span><span class="n">comm_kws</span><span class="p">))</span>
         <span class="nb">setattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;</span><span class="si">%s</span><span class="s1">_kws&#39;</span> <span class="o">%</span> <span class="n">attr_comm</span><span class="p">,</span> <span class="n">comm_kws</span><span class="p">)</span>
