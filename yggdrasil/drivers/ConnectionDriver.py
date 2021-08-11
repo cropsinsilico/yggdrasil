@@ -213,7 +213,8 @@ class ConnectionDriver(Driver):
     _disconnect_attr = Driver._disconnect_attr + [
         '_comm_closed', '_skip_after_loop', 'shared', 'task_thread']
 
-    def __init__(self, name, translator=None, single_use=False, onexit=None, **kwargs):
+    def __init__(self, name, translator=None, single_use=False, onexit=None,
+                 models=None, **kwargs):
         # kwargs['method'] = 'process'
         super(ConnectionDriver, self).__init__(name, **kwargs)
         # Shared attributes (set once or synced using events)
@@ -249,17 +250,19 @@ class ConnectionDriver(Driver):
         self.onexit = onexit
         # Add comms and print debug info
         self._init_comms(name, **kwargs)
-        self.models = {'input': list(self.icomm.model_env.keys()),
-                       'output': list(self.ocomm.model_env.keys())}
+        self.models = models
+        if self.models is None:
+            self.models = {'input': list(self.icomm.model_env.keys()),
+                           'output': list(self.ocomm.model_env.keys())}
         self.models_recvd = {}
         # self.debug('    env: %s', str(self.env))
         self.debug(('\n' + 80 * '=' + '\n'
                     + 'class = %s\n'
-                    + '    input: name = %s, address = %s\n'
-                    + '    output: name = %s, address = %s\n'
+                    + '    input: name = %s, address = %s, models=%s\n'
+                    + '    output: name = %s, address = %s, models=%s\n'
                     + (80 * '=')), self.__class__,
-                   self.icomm.name, self.icomm.address,
-                   self.ocomm.name, self.ocomm.address)
+                   self.icomm.name, self.icomm.address, self.models['input'],
+                   self.ocomm.name, self.ocomm.address, self.models['output'])
 
     def _init_single_comm(self, io, comm_list):
         r"""Parse keyword arguments for input/output comm."""
@@ -802,6 +805,8 @@ class ConnectionDriver(Driver):
         if msg.header and ('model' in msg.header):
             self.models_recvd.setdefault(msg.header['model'], 0)
             self.models_recvd[msg.header['model']] += 1
+            if msg.header['model'] not in self.models['input']:
+                self.models['input'].append(msg.header['model'])
         if msg.flag == CommBase.FLAG_EOF:
             return self.on_eof(msg)
         if msg.flag == CommBase.FLAG_SUCCESS:
@@ -923,7 +928,7 @@ class ConnectionDriver(Driver):
             self.debug("1st send succeded")
         return flag
 
-    def send_eof(self):
+    def send_eof(self, **kwargs):
         r"""Send EOF message.
 
         Returns:
@@ -938,7 +943,7 @@ class ConnectionDriver(Driver):
         self.debug('Sent EOF')
         msg = CommBase.CommMessage(flag=CommBase.FLAG_EOF,
                                    args=self.ocomm.eof_msg)
-        return self.send_message(msg)
+        return self.send_message(msg, **kwargs)
 
     def send_message(self, msg, **kwargs):
         r"""Send a single message.

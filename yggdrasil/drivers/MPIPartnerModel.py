@@ -101,12 +101,16 @@ class MPIPartnerModel(ModelDriver):
         r"""Actions to perform before the run starts."""
         kwargs['no_queue_thread'] = True
         super(MPIPartnerModel, self).before_start(**kwargs)
+
+    def init_mpi_env(self):
+        r"""Send env information to the partner model."""
+        env = copy.deepcopy(self.env)
+        env.update(self.get_io_env())
+        self.send_mpi(env, tag=self._mpi_tags['ENV'])
         
     def init_mpi(self):
         r"""Initialize MPI communicator."""
-        env = copy.deepcopy(self.env)
-        env.update(self.get_io_env())
-        self.send_mpi(env, tag=self._mpi_tags['START'])
+        self.send_mpi('START', tag=self._mpi_tags['START'])
         self._mpi_requests['stopped'] = {
             'request': self.recv_mpi(tag=self._mpi_tags['STOP_RANK0'],
                                      dont_block=True)}

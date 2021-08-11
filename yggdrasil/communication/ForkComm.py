@@ -264,6 +264,12 @@ class ForkComm(CommBase.CommBase):
                 kwargs['pattern'] = pair[(pair.index(self.pattern) + 1) % 2]
         return kwargs
 
+    @property
+    def get_response_comm_kwargs(self):
+        r"""dict: Keyword arguments to use for a response comm."""
+        assert(self.pattern == 'cycle')
+        return self.curr_comm.get_response_comm_kwargs
+        
     def bind(self):
         r"""Bind in place of open."""
         for x in self.comm_list:

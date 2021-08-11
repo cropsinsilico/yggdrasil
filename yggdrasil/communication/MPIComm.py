@@ -6,6 +6,10 @@ from yggdrasil.communication import (
 logger = logging.getLogger(__name__)
 
 
+class MPIClosedError(BaseException):
+    r"""Exception to raise when the MPI connection has been closed."""
+
+
 class MPIRequest(object):
     r"""Container for MPI request."""
 
@@ -121,6 +125,8 @@ class MPIComm(CommBase.CommBase):
     _commtype = 'mpi'
     _schema_subtype_description = 'MPI communicator.'
     address_description = "The partner communicator ID(s)."
+    _spacer_tags = 10
+    _max_response = 10
 
     def __init__(self, *args, ranks=[], tag_start=0, tag_stride=1, **kwargs):
         assert(_on_mpi)
@@ -141,6 +147,7 @@ class MPIComm(CommBase.CommBase):
         self.last_request = None
         self.mpi_comm = MPI.COMM_WORLD
         self._is_open = False
+        self.response_tags = []
         kwargs['no_suffix'] = True
         super(MPIComm, self).__init__(*args, **kwargs)
 
@@ -182,7 +189,16 @@ class MPIComm(CommBase.CommBase):
         r"""int: Tag for the next message."""
         return self.get_tag(max(self.ranks, key=self.get_tag))
 
-    def get_tag(self, rank):
+    def next_rank(self):
+        r"""Get the rank that should be used next."""
+        if len(self.ranks) == 1:
+            return self.ranks[0]
+        elif self.direction == 'send':
+            return min(self.ranks, key=self.get_tag)
+        else:
+            return self.ranks
+
+    def get_tag(self, rank=None):
         r"""Get the next tag for a rank.
 
         Args:
@@ -192,6 +208,10 @@ class MPIComm(CommBase.CommBase):
             int: Tag that should be used next for the rank.
 
         """
+        if rank is None:
+            rank = self.next_rank()
+        if isinstance(rank, list):
+            return {x: self.get_tag(x) for x in rank}
         if self.unused_tags.get(rank, []):
             return self.unused_tags[rank][0]
         return self.tags[rank]
@@ -257,19 +277,28 @@ class MPIComm(CommBase.CommBase):
     def get_response_comm_kwargs(self):
         r"""dict: Keyword arguments to use for a response comm."""
         out = super(MPIComm, self).get_response_comm_kwargs
-        out['address'] = self.address
+        # tag = self.tag_start + len(self.response_tags) + 2
+        # tag_stride = self.tag_stride
+        # if (tag - self.tag_start) >= self._max_response:
+        #     raise Exception("Starting tag for next response comm "
+        #                     "exceeds the maximum and may conflict with "
+        #                     "other messages this comm will send.")
+        tag = self.get_tag()
+        tag_stride = 0
+        assert(tag not in self.response_tags)
+        self.response_tags.append(tag)
+        out['address'] = self.format_address(self.ranks, tag, tag_stride)
         return out
 
     @property
     def create_work_comm_kwargs(self):
         r"""dict: Keyword arguments for a new work comm."""
         out = super(MPIComm, self).create_work_comm_kwargs
-        out['address'] = self.address
+        out['address'] = self.format_address(self.ranks, self.get_tag(), 0)
         return out
     
     def open(self):
         r"""Open the queue."""
-        # TODO: Handle group?
         super(MPIComm, self).open()
         if not self.is_open:
             self._is_open = True
@@ -325,7 +354,10 @@ class MPIComm(CommBase.CommBase):
     def n_msg_recv(self):
         r"""int: Number of messages in the queue to recv."""
         if self.is_open:
-            self.add_request(on_empty=True)
+            try:
+                self.add_request(on_empty=True)
+            except MPIClosedError:  # pragma: intermittent
+                return 0
         if self.is_open and self.requests:
             return sum([x.complete for x in self.requests])
         else:
@@ -336,20 +368,15 @@ class MPIComm(CommBase.CommBase):
         with self._request_lock:
             if on_empty and self.requests:
                 return
-            address = self.ranks
-            if len(self.ranks) == 1:
-                cls = MPIRequest
-                address = address[0]
-                tag = self.get_tag(address)
-            elif self.direction == 'send':
-                cls = MPIRequest
-                address = min(address, key=self.get_tag)
-                tag = self.get_tag(address)
-            else:
+            cls = MPIRequest
+            address = self.next_rank()
+            tag = self.get_tag(address)
+            if isinstance(address, (list, tuple)):
                 if self.last_request:
                     kwargs['previous_requests'] = self.last_request.remainder
                 cls = MPIMultiRequest
-                tag = {x: self.get_tag(x) for x in address}
+            if self.mpi_comm is None:  # pragma: intermittent
+                raise MPIClosedError
             args = (self.mpi_comm, self.direction, address, tag)
             req = cls(*args, **kwargs)
             self.requests.append(req)

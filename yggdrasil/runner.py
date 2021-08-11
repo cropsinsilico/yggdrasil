@@ -459,7 +459,12 @@ class YggRunner(YggClass):
 
     def bridge_mpi_connections(self, yml):
         r"""Bridge connections over MPI processes."""
+        from yggdrasil.communication.MPIComm import MPIComm
         io_map = {'inputs': 'outputs', 'outputs': 'inputs'}
+        models = {}
+        for io in io_map.keys():
+            models[io[:-1]] = [x.get('partner_model', None) for x in yml[io]
+                               if x.get('partner_model', None)]
         for io, io_opp in io_map.items():
             for x in yml[io]:
                 model = x.get('partner_model', None)
@@ -471,22 +476,32 @@ class YggRunner(YggClass):
                     rank_map[m['mpi_rank']].append(m)
                 if not any(rank > 0 for rank in rank_map.keys()):
                     continue
+                if 'models' not in yml:
+                    yml['models'] = models
                 comms = []
                 for rank in rank_map.keys():
+                    x_copy = dict(copy.deepcopy(x),
+                                  partner_copies=len(rank_map[rank]))
                     if rank == 0:
-                        icomm = copy.deepcopy(x)
+                        icomm = x_copy
                     else:
-                        icomm = {'commtype': 'mpi',
-                                 'ranks': [rank],
-                                 'mpi_index': len(self._mpi_comms),
-                                 'mpi_direction': io_opp,
-                                 'mpi_driver': {
-                                     io_opp: [{'commtype': 'mpi',
-                                               'ranks': [0]}],
-                                     io: [copy.deepcopy(x)],
-                                     'driver': yml['driver'],
-                                     'name': '%s_mpi%s_%s' % (
-                                         yml['name'], rank, io)}}
+                        icomm = dict(
+                            commtype='mpi',
+                            ranks=[rank],
+                            mpi_index=len(self._mpi_comms),
+                            mpi_direction=io_opp,
+                            mpi_stride=1,
+                            mpi_driver={
+                                io_opp: [{'commtype': 'mpi', 'ranks': [0]}],
+                                io: [x_copy],
+                                'driver': yml['driver'],
+                                'name': (
+                                    '%s_mpi%s_%s' % (yml['name'], rank, io)),
+                                'models': {
+                                    io_opp[:-1]: models[io_opp[:-1]],
+                                    io[:-1]: [model]}})
+                        if yml['driver'].startswith('RPC'):
+                            icomm['mpi_stride'] += MPIComm._max_response
                         self._mpi_comms.append(icomm)
                         for m in rank_map[rank]:
                             drv_key = 'mpi_%s_drivers' % io_opp[:-1]
@@ -500,7 +515,8 @@ class YggRunner(YggClass):
                     # TODO: Move to connection level?
                     x.clear()
                     x['commtype'] = comms
-                    x['pattern'] = 'cycle'
+                    if yml['driver'].startswith('RPC'):
+                        x['pattern'] = 'cycle'
 
     def create_connection_driver(self, yml):
         r"""Create a connection driver instance from the yaml information.
@@ -529,6 +545,7 @@ class YggRunner(YggClass):
         r"""Distribute models between MPI processes."""
         size = self.mpi_comm.Get_size()
         if self.rank == 0:
+            from yggdrasil.communication.MPIComm import MPIComm
             self.expand_duplicates()
             # Set the rank and index for each model
             for i, v in enumerate(self.modeldrivers.values()):
@@ -538,13 +555,13 @@ class YggRunner(YggClass):
             self.debug("Splitting connection drivers over MPI")
             self.all_connectiondrivers = self.connectiondrivers
             self._mpi_comms = []
-            # for driver in self.connectiondrivers.values():
-            #     self.bridge_mpi_connections(driver)
-            tag_start = len(ModelDriver._mpi_tags) * len(self.modeldrivers)
-            tag_stride = len(self._mpi_comms)
+            for driver in self.connectiondrivers.values():
+                self.bridge_mpi_connections(driver)
+            tag_start = len(ModelDriver._mpi_tags) * len(self.modeldrivers) * 5
+            tag_stride = sum([x.pop('mpi_stride') for x in self._mpi_comms])
             connections = [[] for _ in range(size)]
             for x in self._mpi_comms:
-                x['tag_start'] = tag_start + x.pop('mpi_index')
+                x['tag_start'] = tag_start + x.pop('mpi_index') * MPIComm._spacer_tags
                 x['tag_stride'] = tag_stride
                 io = x.pop('mpi_direction')
                 drv = x.pop('mpi_driver')

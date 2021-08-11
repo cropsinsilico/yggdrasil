@@ -1752,7 +1752,7 @@ class CommBase(tools.YggClass):
 
         """
         header = kwargs
-        header['address'] = work_comm.address
+        header['address'] = work_comm.opp_address
         header['id'] = work_comm.uuid
         return header
 

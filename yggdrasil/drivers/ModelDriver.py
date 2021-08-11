@@ -425,11 +425,12 @@ class ModelDriver(Driver):
                         + ['queue', 'queue_thread',
                            'event_process_kill_called',
                            'event_process_kill_complete'])
-    _mpi_tags = {'START': 1,
-                 'STOP_RANK0': 2,  # Stopped by partner
-                 'STOP_RANKX': 3,  # Stopped by root
-                 'CMAKE_FILE': 4,
-                 'CMAKE_COMPILED': 5}
+    _mpi_tags = {'ENV': 1,
+                 'START': 2,
+                 'STOP_RANK0': 3,  # Stopped by partner
+                 'STOP_RANKX': 4,  # Stopped by root
+                 'CMAKE_FILE': 5,
+                 'CMAKE_COMPILED': 6}
 
     def __init__(self, name, args, model_index=0, copy_index=-1, clients=[],
                  preparsed_function=None, outputs_in_inputs=None,
@@ -1345,8 +1346,8 @@ class ModelDriver(Driver):
             **kwargs: Keyword arguments are pased to run_model.
 
         """
-        if multitasking._on_mpi:
-            self.init_mpi()
+        # if multitasking._on_mpi:
+        #     self.init_mpi_env()
         self.model_process = self.run_model(**kwargs)
         # Start thread to queue output
         if not no_queue_thread:
@@ -1354,6 +1355,8 @@ class ModelDriver(Driver):
                 target=self.enqueue_output_loop,
                 name=self.name + '.EnqueueLoop')
             self.queue_thread.start()
+        if multitasking._on_mpi:
+            self.init_mpi()
 
     def queue_close(self):
         r"""Close the queue for messages from the model process."""
@@ -1393,12 +1396,16 @@ class ModelDriver(Driver):
                    self.model_command(), os.getcwd(), self.working_dir,
                    pformat(self.env))
 
+    def init_mpi_env(self):
+        r"""Receive env information to the partner model."""
+        self.env = self.recv_mpi(tag=self._mpi_tags['ENV'])
+        
     def init_mpi(self):
         r"""Initialize MPI communicator."""
         if self._mpi_rank == 0:
             self._mpi_comm = None
         else:
-            self.env = self.recv_mpi(tag=self._mpi_tags['START'])
+            self.recv_mpi(tag=self._mpi_tags['START'])
             self._mpi_requests['stopped'] = {
                 'request': self.recv_mpi(tag=self._mpi_tags['STOP_RANKX'],
                                          dont_block=True)}
