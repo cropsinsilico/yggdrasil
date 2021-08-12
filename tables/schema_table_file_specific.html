@@ -198,13 +198,13 @@
 <tr class="row-even"><td><p>comment</p></td>
 <td><p>string</p></td>
 <td><p>One or more characters indicating a comment. Defaults to ‘# ‘.</p></td>
-<td><p>[‘map’, ‘json’, ‘netcdf’, ‘pandas’, ‘table’, ‘obj’, ‘pickle’, ‘mat’, ‘yaml’, ‘wofost’, ‘ascii’, ‘ply’]</p></td>
+<td><p>[‘netcdf’, ‘table’, ‘ascii’, ‘obj’, ‘pandas’, ‘wofost’, ‘json’, ‘mat’, ‘ply’, ‘yaml’, ‘map’, ‘pickle’]</p></td>
 </tr>
 <tr class="row-odd"><td><p>datatype</p></td>
 <td><p>schema</p></td>
 <td><p>JSON schema defining the type of object that the serializer will be used to
 serialize/deserialize. Defaults to default_datatype.</p></td>
-<td><p>[‘map’, ‘json’, ‘netcdf’, ‘pandas’, ‘table’, ‘obj’, ‘pickle’, ‘mat’, ‘yaml’, ‘wofost’, ‘ascii’, ‘ply’]</p></td>
+<td><p>[‘netcdf’, ‘table’, ‘ascii’, ‘obj’, ‘pandas’, ‘wofost’, ‘json’, ‘mat’, ‘ply’, ‘yaml’, ‘map’, ‘pickle’]</p></td>
 </tr>
 <tr class="row-even"><td><p>default_flow_style</p></td>
 <td><p>boolean</p></td>
@@ -216,7 +216,7 @@ they will always be serialized in the flow style. See <a class="reference extern
 <td><p>string</p></td>
 <td><p>Delimiter that should be used to separate name/value pairs in the map. Defaults
 to t.</p></td>
-<td><p>[‘map’, ‘table’, ‘wofost’, ‘pandas’]</p></td>
+<td><p>[‘pandas’, ‘map’, ‘wofost’, ‘table’]</p></td>
 </tr>
 <tr class="row-even"><td><p>encoding</p></td>
 <td><p>string</p></td>
@@ -232,7 +232,7 @@ seiralized structure. Defaults to ‘t’.</p></td>
 <tr class="row-even"><td><p>newline</p></td>
 <td><p>string</p></td>
 <td><p>One or more characters indicating a newline. Defaults to ‘n’.</p></td>
-<td><p>[‘map’, ‘json’, ‘netcdf’, ‘pandas’, ‘table’, ‘obj’, ‘pickle’, ‘mat’, ‘yaml’, ‘wofost’, ‘ascii’, ‘ply’]</p></td>
+<td><p>[‘netcdf’, ‘table’, ‘ascii’, ‘obj’, ‘pandas’, ‘wofost’, ‘json’, ‘mat’, ‘ply’, ‘yaml’, ‘map’, ‘pickle’]</p></td>
 </tr>
 <tr class="row-odd"><td><p>no_header</p></td>
 <td><p>boolean</p></td>
@@ -273,7 +273,7 @@ to True.</p></td>
 <td><p>boolean</p></td>
 <td><p>If True, the astropy package will be used to serialize/deserialize table.
 Defaults to False.</p></td>
-<td><p>[‘table’, ‘pandas’]</p></td>
+<td><p>[‘pandas’, ‘table’]</p></td>
 </tr>
 <tr class="row-even"><td><p>variables</p></td>
 <td><p>array</p></td>

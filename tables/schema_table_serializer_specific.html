@@ -212,7 +212,7 @@ they will always be serialized in the flow style. See <a class="reference extern
 <td><p>string</p></td>
 <td><p>Delimiter that should be used to separate name/value pairs in the map. Defaults
 to t.</p></td>
-<td><p>[‘map’, ‘table’, ‘wofost’, ‘pandas’]</p></td>
+<td><p>[‘pandas’, ‘map’, ‘wofost’, ‘table’]</p></td>
 </tr>
 <tr class="row-odd"><td><p>encoded_datatype</p></td>
 <td><p>schema</p></td>
@@ -231,20 +231,20 @@ in order to serialize non-bytes objects.</p></td>
 <td><p>array</p></td>
 <td><p>The names of fields in the format string. If not provided, names are set based
 on the order of the fields in the format string.</p></td>
-<td><p>[‘table’, ‘pandas’]</p></td>
+<td><p>[‘pandas’, ‘table’]</p></td>
 </tr>
 <tr class="row-even"><td><p>field_units</p></td>
 <td><p>array</p></td>
 <td><p>The units of fields in the format string. If not provided, all fields are
 assumed to be dimensionless.</p></td>
-<td><p>[‘table’, ‘pandas’]</p></td>
+<td><p>[‘pandas’, ‘table’]</p></td>
 </tr>
 <tr class="row-odd"><td><p>format_str</p></td>
 <td><p>string</p></td>
 <td><p>If provided, this string will be used to format messages from a list of
 arguments and parse messages to get a list of arguments in C printf/scanf style.
 Defaults to None and messages are assumed to already be bytes.</p></td>
-<td><p>[‘table’, ‘pandas’]</p></td>
+<td><p>[‘pandas’, ‘table’]</p></td>
 </tr>
 <tr class="row-even"><td><p>func_deserialize</p></td>
 <td><p>function</p></td>
@@ -287,7 +287,7 @@ to True.</p></td>
 <td><p>boolean</p></td>
 <td><p>If True, the astropy package will be used to serialize/deserialize table.
 Defaults to False.</p></td>
-<td><p>[‘table’, ‘pandas’]</p></td>
+<td><p>[‘pandas’, ‘table’]</p></td>
 </tr>
 </tbody>
 </table>
