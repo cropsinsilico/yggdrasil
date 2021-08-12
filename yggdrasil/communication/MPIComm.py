@@ -63,7 +63,7 @@ class MPIRequest(object):
     def cancel(self):
         r"""Cancel a request."""
         if not self._complete:
-            if self.direction == 'send':
+            if self.direction == 'send':  # pragma: intermittent
                 self.size_req.Cancel()
             self.req.Cancel()
             self._complete = True
@@ -78,14 +78,14 @@ class MPIMultiRequest(MPIRequest):
         self.remainder = {}
         super(MPIMultiRequest, self).__init__(*args, **kwargs)
 
-    def make_request(self, comm, previous_requests=None):
+    def make_request(self, previous_requests=None):
         r"""Complete a request."""
         out = previous_requests
         if out is None:
             out = {}
         for x in self.address:
             if x not in out:
-                out[x] = MPIRequest(comm, self.direction, x, self.tag[x])
+                out[x] = MPIRequest(self.comm, self.direction, x, self.tag[x])
         return out
 
     @property
@@ -96,11 +96,19 @@ class MPIMultiRequest(MPIRequest):
                 if v.complete:
                     self._complete = True
                     self.data = v.data
+                    self.address = k
                     for k2, v2 in self.req.items():
                         if k2 != k:
                             self.remainder[k2] = v2
                     break
         return self._complete
+
+    def cancel(self):
+        r"""Cancel a request."""
+        if not self._complete:
+            for k, v in self.req.items():
+                v.cancel()
+            self._complete = True
 
 
 class MPIComm(CommBase.CommBase):
@@ -127,6 +135,10 @@ class MPIComm(CommBase.CommBase):
     address_description = "The partner communicator ID(s)."
     _spacer_tags = 10
     _max_response = 10
+    # Based on limit of 32bit int, this could be 2**30 - 1, but this is
+    # too large for stack allocation in C so 2**20 will be used in case a
+    # C implementation of the MPIComm is added in the future.
+    _maxMsgSize = 2**20
 
     def __init__(self, *args, ranks=[], tag_start=0, tag_stride=1, **kwargs):
         assert(_on_mpi)
@@ -148,8 +160,10 @@ class MPIComm(CommBase.CommBase):
         self.mpi_comm = MPI.COMM_WORLD
         self._is_open = False
         self.response_tags = []
+        self.eof_recv = {}
         kwargs['no_suffix'] = True
         super(MPIComm, self).__init__(*args, **kwargs)
+        self.eof_recv = {x: 0 for x in self.ranks}
 
     @classmethod
     def format_address(cls, ranks, tag_start, tag_stride):
@@ -287,14 +301,16 @@ class MPIComm(CommBase.CommBase):
         tag_stride = 0
         assert(tag not in self.response_tags)
         self.response_tags.append(tag)
-        out['address'] = self.format_address(self.ranks, tag, tag_stride)
+        out['address'] = self.format_address(
+            [self.next_rank()], tag, tag_stride)
         return out
 
     @property
     def create_work_comm_kwargs(self):
         r"""dict: Keyword arguments for a new work comm."""
         out = super(MPIComm, self).create_work_comm_kwargs
-        out['address'] = self.format_address(self.ranks, self.get_tag(), 0)
+        out['address'] = self.format_address(
+            [self.next_rank()], self.get_tag(), 0)
         return out
     
     def open(self):
@@ -307,8 +323,11 @@ class MPIComm(CommBase.CommBase):
     def _close(self, linger=False):
         r"""Close the queue."""
         self.cancel_requests()
-        if self.requires_disconnect and self.is_open:
-            self.mpi_comm.Disconnect()
+        # Disconnect will only be required if a subset of processes is used,
+        # but that is not currently supported. This should be uncommented if
+        # support for dynamic processes management is added.
+        # if self.requires_disconnect and self.is_open:
+        #     self.mpi_comm.Disconnect()
         self.mpi_comm = None
         super(MPIComm, self)._close(linger=linger)
 
@@ -398,6 +417,26 @@ class MPIComm(CommBase.CommBase):
                 msg.add_message(msg=msg.msg, length=msg.length, flag=msg.flag,
                                 args='DONT_RECURSE', header=msg.header)
         return super(MPIComm, self).send_message(msg, **kwargs)
+
+    def recv_message(self, *args, **kwargs):
+        r"""Receive a message.
+
+        Args:
+            *args: Arguments are passed to the forked comm's recv_message method.
+            **kwargs: Keyword arguments are passed to the forked comm's recv_message
+                method.
+
+        Returns:
+            CommMessage: Received message.
+
+        """
+        out = super(MPIComm, self).recv_message(*args, **kwargs)
+        self.sleep()
+        if out.flag == CommBase.FLAG_EOF:
+            self.eof_recv[self.last_request.address] = 1
+            if not all(self.eof_recv.values()):
+                out = self.recv_message(*args, **kwargs)
+        return out
         
     def _send(self, payload):
         r"""Send a message.
@@ -432,5 +471,5 @@ class MPIComm(CommBase.CommBase):
         super(MPIComm, self).purge()
         with self._request_lock:
             self.cancel_requests()
-            while self.n_msg_recv > 0:
+            while self.n_msg_recv > 0:  # pragma: intermittent
                 self._recv()

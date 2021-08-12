@@ -61,6 +61,7 @@ class TestMPIComm(test_CommBase.TestCommBase):
     test_error_send = None
     test_error_recv = None
     test_invalid_direction = None
+    root_direction = 'send'
 
     def __init__(self, *args, **kwargs):
         try:
@@ -72,19 +73,38 @@ class TestMPIComm(test_CommBase.TestCommBase):
             self.mpi_comm = None
             self.mpi_rank = 0
             self.mpi_size = 1
-        self._recv_kws = {}
+        self._rank_kws = {}
         super(TestMPIComm, self).__init__(*args, **kwargs)
+
+    @property
+    def rank_direction(self):
+        r"""str: MPI rank of the direction this processes is handling
+        messages."""
+        if self.mpi_rank == 0:
+            return self.root_direction
+        elif self.root_direction == 'recv':
+            return 'send'
+        else:
+            return 'recv'
+
+    @property
+    def root_inst_kwargs(self):
+        r"""dict: Keyword arguments for the tested class on the rank == 0
+        process."""
+        out = self.send_inst_kwargs
+        out['direction'] = self.root_direction
+        return out
 
     @property
     def inst_kwargs(self):
         r"""dict: Keyword arguments for tested class."""
         global _tag
         if self.mpi_rank == 0:
-            out = self.send_inst_kwargs
+            out = self.root_inst_kwargs
             out['start_tag'] = _tag
             out['partner_mpi_ranks'] = list(range(1, self.mpi_size))
         else:
-            out = self._recv_kws
+            out = self._rank_kws
             out['start_tag'] = _tag
             out['commtype'] = self.commtype
         _tag += 1
@@ -93,13 +113,13 @@ class TestMPIComm(test_CommBase.TestCommBase):
     @property
     def recv_instance(self):
         r"""Alias for instance."""
-        if self.mpi_rank > 0:
+        if self.rank_direction == 'recv':
             return self.instance
 
     @property
     def send_instance(self):
         r"""Alias for instance."""
-        if self.mpi_rank == 0:
+        if self.rank_direction == 'send':
             return self.instance
         
     def setup(self, *args, **kwargs):
@@ -112,12 +132,12 @@ class TestMPIComm(test_CommBase.TestCommBase):
         init_tag = _tag
         _tag += 1
         if self.mpi_rank > 0:
-            self._recv_kws = self.mpi_comm.recv(source=0, tag=init_tag)
+            self._rank_kws = self.mpi_comm.recv(source=0, tag=init_tag)
         super(test_CommBase.TestCommBase, self).setup(*args, **kwargs)
         if self.mpi_rank == 0:
-            recv_kws = self.instance.opp_comm_kwargs()
+            rank_kws = self.instance.opp_comm_kwargs()
             for i in self.instance.ranks:
-                self.mpi_comm.send(recv_kws, dest=i, tag=init_tag)
+                self.mpi_comm.send(rank_kws, dest=i, tag=init_tag)
         if sleep_after_connect:  # pragma: testing
             self.instance.sleep()
         assert(self.instance.is_open)
@@ -258,7 +278,6 @@ class TestMPIComm(test_CommBase.TestCommBase):
                 send_kwargs=None, n_send=1, print_status=False,
                 close_on_send_eof=None, n_send_init=0, is_eof_send=False):
         r"""Generic send of a message."""
-        assert(self.mpi_rank == 0)
         tkey = '.do_send'
         if send_kwargs is None:
             send_kwargs = dict()
@@ -307,13 +326,14 @@ class TestMPIComm(test_CommBase.TestCommBase):
                 close_on_recv_eof=None, no_recv=False, recv_timeout=None,
                 n_recv_init=0, is_eof_send=False):
         r"""Generic recv of a message."""
-        assert(self.mpi_rank > 0)
         tkey = '.do_send_recv'
         is_eof_recv = (is_eof_send or self.recv_instance.is_eof(msg_recv))
         if recv_timeout is None:
             recv_timeout = self.timeout
         if recv_kwargs is None:
             recv_kwargs = dict()
+        if (not is_eof_recv) and (msg_recv != b''):
+            n_recv *= len(self.recv_instance.ranks)
         self.assert_equal(getattr(self.recv_instance, n_msg_recv_meth), n_recv_init)
         self.sync()
         recv_instance = self.recv_instance
@@ -398,15 +418,17 @@ class TestMPIComm(test_CommBase.TestCommBase):
             for _ in range(len(self.send_instance.ranks)):
                 assert(self.send_instance.send(self.test_msg))
         else:
-            msg = self.recv_instance.recv(
-                timeout=60.0, skip_deserialization=True,
-                return_message_object=True, after_finalize_message=[dummy])
-            assert(msg.finalized)
-            assert_equal(self.recv_instance.finalize_message(msg), msg)
-            msg.finalized = False
-            assert(self.recv_instance.is_empty_recv(msg.args))
-            msg = self.recv_instance.finalize_message(msg)
-            assert_equal(msg.flag, CommBase.FLAG_EMPTY)
+            for _ in range(len(self.recv_instance.ranks)):
+                msg = self.recv_instance.recv(
+                    timeout=60.0, skip_deserialization=True,
+                    return_message_object=True,
+                    after_finalize_message=[dummy])
+                assert(msg.finalized)
+                assert_equal(self.recv_instance.finalize_message(msg), msg)
+                msg.finalized = False
+                assert(self.recv_instance.is_empty_recv(msg.args))
+                msg = self.recv_instance.finalize_message(msg)
+                assert_equal(msg.flag, CommBase.FLAG_EMPTY)
 
     def test_purge(self, nrecv=1, nrecv_init=0, nsend_init=0):
         r"""Test purging messages from the comm."""
@@ -451,3 +473,11 @@ class TestMPICommAsync(TestMPIComm):
     r"""Test class for asynchronous MPIComm."""
 
     use_async = True
+
+
+@unittest.skipIf(not _mpi_installed, "MPI library not installed")
+@pytest.mark.mpi(min_size=3)
+class TestMPICommMultipleRecv(TestMPIComm):
+    r"""Test class for MPIComm with comm receiving from multiple processes."""
+
+    root_direction = 'recv'

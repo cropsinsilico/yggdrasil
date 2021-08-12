@@ -1441,7 +1441,7 @@ class ModelDriver(Driver):
             if tag is None:
                 tag = self._mpi_tags['STOP_RANK0']
             if msg is None:
-                if self.errors:
+                if self.errors or self.model_process_returncode:
                     msg = 'ERROR'
                 else:
                     msg = 'STOPPING'
@@ -1495,6 +1495,8 @@ class ModelDriver(Driver):
     def run_loop(self):
         r"""Loop to check if model is still running and forward output."""
         # Continue reading until there is not any output
+        if self.model_process_returncode:
+            self.errors.append(self.model_process_returncode)
         if self.check_mpi_request('stopped'):
             self.debug("Stop requested by MPI partner.")
             self.set_break_flag()
@@ -1570,6 +1572,12 @@ class ModelDriver(Driver):
             return True
         return (self.model_process.poll() is not None)
 
+    @property
+    def model_process_returncode(self):
+        if self.model_process_complete and (self.model_process is not None):
+            return self.model_process.returncode
+        return 0
+
     def wait_process(self, timeout=None, key=None, key_suffix=None):
         r"""Wait for some amount of time for the process to finish.
 
@@ -1617,12 +1625,11 @@ class ModelDriver(Driver):
                 if not self.has_sent_messages:
                     ignore_error_code = True
             assert(self.model_process_complete)
-            if (((self.model_process is not None)
-                 and (self.model_process.returncode != 0)
+            if (((self.model_process_returncode != 0)
                  and (not ignore_error_code))):
                 self.error(("return code of %s indicates model error. "
                             "(sent messages: %s)"),
-                           str(self.model_process.returncode),
+                           str(self.model_process_returncode),
                            self.n_sent_messages)
             self.event_process_kill_complete.set()
             if self.queue_thread is not None:
