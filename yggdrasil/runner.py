@@ -453,7 +453,8 @@ class YggRunner(YggClass):
         elif name in self.modeldrivers:
             models = [self.modeldrivers[name]]
         else:
-            models = [self.modeldrivers[name.split('_copy')[0]]]
+            models = [self.modeldrivers[
+                DuplicatedModelDriver.get_base_name(name)]]
             assert(models[0].get('copies', 0) > 1)
         return models
 

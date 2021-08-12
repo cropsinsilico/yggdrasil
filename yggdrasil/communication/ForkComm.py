@@ -87,7 +87,8 @@ class ForkComm(CommBase.CommBase):
     _commtype = 'fork'
     _dont_register = True
     child_keys = ['serializer_class', 'serializer_kwargs',
-                  'format_str', 'field_names', 'field_units', 'as_array']
+                  'format_str', 'field_names', 'field_units', 'as_array',
+                  'partner_copies']
     noprop_keys = ['send_converter', 'recv_converter', 'filter', 'transform']
     
     def __init__(self, name, comm_list=None, is_async=False,

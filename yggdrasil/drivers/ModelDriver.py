@@ -1260,7 +1260,9 @@ class ModelDriver(Driver):
             output_drivers = self.yml.get('output_drivers', [])
         out = {}
         if self.copies > 1:
-            base_name = self.name.split('_copy')[0]
+            from yggdrasil.drivers.DuplicatedModelDriver import (
+                DuplicatedModelDriver)
+            base_name = DuplicatedModelDriver.get_base_name(self.name)
         else:
             base_name = self.name
         for x in input_drivers + output_drivers:
@@ -1320,8 +1322,11 @@ class ModelDriver(Driver):
         if multitasking._on_mpi:
             env['YGG_MPI_RANK'] = str(multitasking._mpi_rank)
         if self.copies > 1:
+            from yggdrasil.drivers.DuplicatedModelDriver import (
+                DuplicatedModelDriver)
             env['YGG_MODEL_COPY'] = str(self.copy_index)
-            env['YGG_MODEL_NAME'] = self.name.split('_copy')[0]
+            env['YGG_MODEL_NAME'] = DuplicatedModelDriver.get_base_name(
+                self.name)
         else:
             env['YGG_MODEL_NAME'] = self.name
         if self.allow_threading or (self.copies > 1):
@@ -1397,9 +1402,9 @@ class ModelDriver(Driver):
                    self.model_command(), os.getcwd(), self.working_dir,
                    pformat(self.env))
 
-    def init_mpi_env(self):
-        r"""Receive env information to the partner model."""
-        self.env = self.recv_mpi(tag=self._mpi_tags['ENV'])
+    # def init_mpi_env(self):
+    #     r"""Receive env information to the partner model."""
+    #     self.env = self.recv_mpi(tag=self._mpi_tags['ENV'])
         
     def init_mpi(self):
         r"""Initialize MPI communicator."""

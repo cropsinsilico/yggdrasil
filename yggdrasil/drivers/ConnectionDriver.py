@@ -8,6 +8,7 @@ from yggdrasil import multitasking
 from yggdrasil.communication import new_comm, CommBase
 from yggdrasil.drivers.Driver import Driver
 from yggdrasil.components import create_component, isinstance_component
+from yggdrasil.drivers.DuplicatedModelDriver import DuplicatedModelDriver
 
 
 def _translate_list2element(arr):
@@ -301,8 +302,8 @@ class ConnectionDriver(Driver):
                 # TODO: Handle recv?
                 comm_list[i]['commtype'] = [
                     dict(comm_list[i],
-                         partner_model=(
-                             '%s_copy%d' % (comm_list[i]['partner_model'], idx)))
+                         partner_model=DuplicatedModelDriver.name_format % (
+                             comm_list[i]['partner_model'], idx))
                     for idx in range(comm_list[i]['partner_copies'])]
                 for k in ForkComm.ForkComm.child_keys:
                     comm_list[i].pop(k, None)
@@ -960,6 +961,9 @@ class ConnectionDriver(Driver):
         self.debug('')
         with self.lock:
             self._used = True
+        if (msg.header is not None) and ('model' in msg.header):
+            kwargs.setdefault('header_kwargs', {})
+            kwargs['header_kwargs'].setdefault('model', msg.header['model'])
         kws_prepare = {k: kwargs.pop(k) for k in self.ocomm._prepare_message_kws
                        if k in kwargs}
         msg_out = self.ocomm.prepare_message(msg.args, **kws_prepare)

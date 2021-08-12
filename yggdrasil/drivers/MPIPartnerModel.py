@@ -1,4 +1,3 @@
-import copy
 import shutil
 from yggdrasil.drivers.ModelDriver import ModelDriver
 from yggdrasil.drivers.CMakeModelDriver import get_buildfile_lock
@@ -104,11 +103,11 @@ class MPIPartnerModel(ModelDriver):
         kwargs['no_queue_thread'] = True
         super(MPIPartnerModel, self).before_start(**kwargs)
 
-    def init_mpi_env(self):
-        r"""Send env information to the partner model."""
-        env = copy.deepcopy(self.env)
-        env.update(self.get_io_env())
-        self.send_mpi(env, tag=self._mpi_tags['ENV'])
+    # def init_mpi_env(self):
+    #     r"""Send env information to the partner model."""
+    #     env = copy.deepcopy(self.env)
+    #     env.update(self.get_io_env())
+    #     self.send_mpi(env, tag=self._mpi_tags['ENV'])
         
     def init_mpi(self):
         r"""Initialize MPI communicator."""

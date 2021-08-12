@@ -2000,18 +2000,18 @@ class CommBase(tools.YggClass):
                 msg.args = msg.args[0]
                 msg.singular = True
             # 3. Check if the message is EOF or YGG_CLIENT_EOF
-            once_per_partner = False
             if self.is_eof(msg.args):
                 msg.flag = FLAG_EOF
-                once_per_partner = True
-            elif isinstance(msg.args, bytes) and (msg.args == YGG_CLIENT_EOF):
-                once_per_partner = True
-            if once_per_partner and (self.partner_copies > 1):
-                self.debug("Sending %s to %d model(s)", msg.args,
-                           self.partner_copies)
-                for i in range(self.partner_copies - 1):
-                    msg.add_message(args=msg.args,
-                                    header=copy.deepcopy(msg.header))
+        # Make duplicates
+        once_per_partner = ((msg.flag == FLAG_EOF)
+                            or (isinstance(msg.args, bytes)
+                                and (msg.args == YGG_CLIENT_EOF)))
+        if once_per_partner and (self.partner_copies > 1):
+            self.debug("Sending %s to %d model(s)", msg.args,
+                       self.partner_copies)
+            for i in range(self.partner_copies - 1):
+                msg.add_message(args=msg.args,
+                                header=copy.deepcopy(msg.header))
         if not skip_processing:
             # 4. Check if the message should be filtered
             if msg.flag not in [FLAG_SKIP, FLAG_EOF]:
