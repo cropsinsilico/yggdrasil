@@ -28,6 +28,8 @@ class MPIPartnerModel(ModelDriver):
             self.buildfile_lock = get_buildfile_lock(self.buildfile,
                                                      self.context)
             with self.buildfile_lock:
+                self.send_mpi('COMPILE',
+                              tag=self._mpi_tags['CMAKE_COMPILING'])
                 self.recv_mpi(tag=self._mpi_tags['CMAKE_COMPILED'])
 
     @classmethod

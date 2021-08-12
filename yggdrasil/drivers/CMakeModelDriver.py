@@ -1056,6 +1056,8 @@ class CMakeModelDriver(BuildModelDriver):
                                     allow_error=True, **kwargs)
         if not kwargs.get('dry_run', False):
             self.buildfile_lock.acquire()
+            if self._mpi_rank > 0:
+                self.recv_mpi(tag=self._mpi_tags['CMAKE_COMPILING'])
         out = None
         try:
             default_kwargs = dict(target=target,

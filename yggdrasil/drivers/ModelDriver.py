@@ -430,7 +430,8 @@ class ModelDriver(Driver):
                  'STOP_RANK0': 3,  # Stopped by partner
                  'STOP_RANKX': 4,  # Stopped by root
                  'CMAKE_FILE': 5,
-                 'CMAKE_COMPILED': 6}
+                 'CMAKE_COMPILING': 6,
+                 'CMAKE_COMPILED': 7}
 
     def __init__(self, name, args, model_index=0, copy_index=-1, clients=[],
                  preparsed_function=None, outputs_in_inputs=None,
