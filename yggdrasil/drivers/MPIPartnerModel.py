@@ -1,7 +1,7 @@
 import shutil
 from yggdrasil.drivers.ModelDriver import ModelDriver
 from yggdrasil.drivers.CMakeModelDriver import get_buildfile_lock
-from yggdrasil.multitasking import MPI
+from yggdrasil.multitasking import MPI, MPIRequestWrapper
 
 
 class MPIPartnerModel(ModelDriver):
@@ -112,9 +112,8 @@ class MPIPartnerModel(ModelDriver):
     def init_mpi(self):
         r"""Initialize MPI communicator."""
         self.send_mpi('START', tag=self._mpi_tags['START'])
-        self._mpi_requests['stopped'] = {
-            'request': self.recv_mpi(tag=self._mpi_tags['STOP_RANK0'],
-                                     dont_block=True)}
+        self._mpi_requests['stopped'] = MPIRequestWrapper(
+            self.recv_mpi(tag=self._mpi_tags['STOP_RANK0'], dont_block=True))
 
     def stop_mpi_partner(self, **kwargs):
         r"""Send a message to stop the MPI partner model on the main process."""
@@ -141,7 +140,7 @@ class MPIPartnerModel(ModelDriver):
         r"""Kill the process running the model, checking return code."""
         self.set_break_flag()
         if not self.model_process_complete:  # pragma: debug
-            self._mpi_requests['stopped']['result'] = True
+            self._mpi_requests['stopped'].completed = True
         super(MPIPartnerModel, self).kill_process()
         
     @property

@@ -8,6 +8,7 @@ import subprocess
 import shutil
 import uuid
 import tempfile
+import asyncio
 from collections import OrderedDict
 from pprint import pformat
 from yggdrasil import platform, tools, languages, multitasking
@@ -436,6 +437,7 @@ class ModelDriver(Driver):
     def __init__(self, name, args, model_index=0, copy_index=-1, clients=[],
                  preparsed_function=None, outputs_in_inputs=None,
                  mpi_rank=0, **kwargs):
+        self._inv_mpi_tags = {v: k for k, v in self._mpi_tags.items()}
         self.model_outputs_in_inputs = outputs_in_inputs
         self.preparsed_function = preparsed_function
         super(ModelDriver, self).__init__(name, **kwargs)
@@ -706,7 +708,7 @@ class ModelDriver(Driver):
     def n_sent_messages(self):
         r"""dict: Number of messages sent by the model via each connection."""
         if (self._mpi_rank > 0) and self.check_mpi_request('stopped'):
-            out = self.check_mpi_request('stopped')
+            out = self._mpi_requests['stopped'].result
             return out
         out = {}
         for x in self.yml.get('output_drivers', []):
@@ -1412,13 +1414,15 @@ class ModelDriver(Driver):
             self._mpi_comm = None
         else:
             self.recv_mpi(tag=self._mpi_tags['START'])
-            self._mpi_requests['stopped'] = {
-                'request': self.recv_mpi(tag=self._mpi_tags['STOP_RANKX'],
-                                         dont_block=True)}
+            self._mpi_requests['stopped'] = multitasking.MPIRequestWrapper(
+                self.recv_mpi(tag=self._mpi_tags['STOP_RANKX'],
+                              dont_block=True))
 
     def send_mpi(self, msg, tag=0, dont_block=False):
         r"""Send an MPI message."""
-        self.debug("%d: %s (blocking=%s)", self._mpi_tag + tag, msg, dont_block)
+        self.debug("send %d (%d) [%s]: %s (blocking=%s)", tag,
+                   self._mpi_tag + tag, self._inv_mpi_tags[tag],
+                   msg, not dont_block)
         kws = {'dest': self._mpi_partner_rank, 'tag': (self._mpi_tag + tag)}
         if dont_block:  # pragma: debug
             # return self._mpi_comm.isend(msg, **kws)
@@ -1428,7 +1432,9 @@ class ModelDriver(Driver):
 
     def recv_mpi(self, tag=0, dont_block=False):
         r"""Receive an MPI message."""
-        self.debug('%d (blocking=%s)', self._mpi_tag + tag, dont_block)
+        self.debug('recv %d (%d) [%s] (blocking=%s)', tag,
+                   self._mpi_tag + tag, self._inv_mpi_tags[tag],
+                   not dont_block)
         kws = {'source': self._mpi_partner_rank, 'tag': (self._mpi_tag + tag)}
         if dont_block:
             return self._mpi_comm.irecv(**kws)
@@ -1445,9 +1451,10 @@ class ModelDriver(Driver):
                     msg = 'ERROR'
                 else:
                     msg = 'STOPPING'
-            self._mpi_requests['stopping'] = {
-                'result': True,  # Don't call test()
-                'request': self.send_mpi(msg, tag=tag)}
+            self.debug("stop_mpi_partner: %d, %s", tag, msg)
+            # Don't call test()
+            self._mpi_requests['stopping'] = multitasking.MPIRequestWrapper(
+                self.send_mpi(msg, tag=tag), completed=True)
 
     def wait_on_mpi_request(self, name, timeout=False):
         r"""Wait for a request to be completed.
@@ -1460,11 +1467,11 @@ class ModelDriver(Driver):
                 exist or is not complete.
 
         """
-        Tout = self.start_timeout(t=timeout, key_suffix=('.%s' % name))
-        while (not self.check_mpi_request(name)) and (not Tout.is_out):
-            self.sleep()
-        self.stop_timeout(key_suffix=('.%s' % name))
-        return self.check_mpi_request(name)
+        self.debug("Waiting on '%s' (timeout=%s)", name, timeout)
+        try:
+            return self._mpi_requests[name].wait(timeout=timeout)
+        except asyncio.TimeoutError:
+            self.info("Timeout for MPI '%s' request", name)
 
     def check_mpi_request(self, name):
         r"""Check if a request has been completed.
@@ -1478,13 +1485,7 @@ class ModelDriver(Driver):
 
         """
         if self._mpi_comm and (name in self._mpi_requests):
-            if 'result' not in self._mpi_requests[name]:
-                result = self._mpi_requests[name]['request'].test()
-                if result[0]:
-                    self._mpi_requests[name]['result'] = result[1]
-                    if result[1] == 'ERROR':
-                        self.errors.append(result[1])
-            return self._mpi_requests[name].get('result', False)
+            return self._mpi_requests[name].test()[0]
         return False
 
     def set_break_flag(self, *args, **kwargs):
@@ -1574,6 +1575,8 @@ class ModelDriver(Driver):
 
     @property
     def model_process_returncode(self):
+        r"""int: Return code for the model process where non-zero values
+        indicate that there was an error."""
         if self.model_process_complete and (self.model_process is not None):
             return self.model_process.returncode
         return 0

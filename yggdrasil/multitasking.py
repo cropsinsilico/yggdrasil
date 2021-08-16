@@ -7,6 +7,7 @@ import logging
 import threading
 import queue
 import multiprocessing
+import asyncio
 from yggdrasil.tools import YggClass
 MPI = None
 _on_mpi = False
@@ -860,6 +861,51 @@ class LockedDict(LockedObject):
         except BaseException:  # pragma: debug
             out = {}
         return out
+
+
+class MPIRequestWrapper(object):
+    r"""Wrapper for an MPI request."""
+
+    def __init__(self, request, completed=False, poll_time=0.1):
+        self.request = request
+        self.completed = completed
+        self._result = None
+        self.poll_time = poll_time
+
+    @property
+    def result(self):
+        r"""object: The result of the MPI request."""
+        if not self.completed:
+            self.test()
+        return self._result
+
+    def test(self):
+        r"""Test to see if the request has completed."""
+        if not self.completed:
+            self.completed, self._result = self.request.test()
+        return (self.completed, self._result)
+
+    async def custom_await(self):
+        r"""Coroutine to wait for the request to be completed."""
+        while not self.completed:
+            await asyncio.sleep(self.poll_time)
+            self.test()
+        return self._result
+    
+    def wait(self, timeout=None):
+        r"""Wait for the request to be completed.
+
+        Args:
+            timeout (float, optional): Time (in seconds) that should be
+                waited for the process to finish. A value of None will wait
+                indefinitely. Defaults to None.
+
+        Returns:
+            object: The result of the request.
+
+        """
+        return asyncio.get_event_loop().run_until_complete(
+            asyncio.wait_for(self.custom_await(), timeout))
 
 
 # class LockedWeakValueDict(LockedDict):

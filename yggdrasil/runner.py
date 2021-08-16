@@ -438,17 +438,24 @@ class YggRunner(YggClass):
             os.chdir(curpath)
         return instance
 
-    def get_models(self, name):
+    def get_models(self, name, rank=None):
         r"""Get the set of drivers referenced by a model name.
 
         Args:
-            name (str): Name of model.
+            name (str, list): Name of model(s).
+            rank (int, optional): If provided, only models that will run on
+                MPI processes with this rank will be returned. Defaults to
+                None and is ignored.
 
         Returns:
             list: Set of drivers for a model.
 
         """
-        if name in self.modelcopies:
+        if isinstance(name, list):
+            models = []
+            for x in name:
+                models += self.get_models(x, rank=rank)
+        elif name in self.modelcopies:
             models = [self.modeldrivers[cpy] for cpy in self.modelcopies[name]]
         elif name in self.modeldrivers:
             models = [self.modeldrivers[name]]
@@ -456,6 +463,8 @@ class YggRunner(YggClass):
             models = [self.modeldrivers[
                 DuplicatedModelDriver.get_base_name(name)]]
             assert(models[0].get('copies', 0) > 1)
+        if rank is not None:
+            models = [x for x in models if (x['mpi_rank'] == rank)]
         return models
 
     def bridge_mpi_connections(self, yml):
@@ -464,8 +473,9 @@ class YggRunner(YggClass):
         io_map = {'inputs': 'outputs', 'outputs': 'inputs'}
         models = {}
         for io in io_map.keys():
-            models[io[:-1]] = [x.get('partner_model', None) for x in yml[io]
-                               if x.get('partner_model', None)]
+            models[io[:-1]] = [x['name'] for x in self.get_models(
+                [x.get('partner_model', None) for x in yml[io]
+                 if x.get('partner_model', None)])]
         for io, io_opp in io_map.items():
             for x in yml[io]:
                 model = x.get('partner_model', None)
@@ -500,7 +510,8 @@ class YggRunner(YggClass):
                                     '%s_mpi%s_%s' % (yml['name'], rank, io)),
                                 'models': {
                                     io_opp[:-1]: models[io_opp[:-1]],
-                                    io[:-1]: [model]}})
+                                    io[:-1]: [m['name'] for m in
+                                              rank_map[rank]]}})
                         if yml['driver'].startswith('RPC'):
                             icomm['mpi_stride'] += MPIComm._max_response
                         self._mpi_comms.append(icomm)
