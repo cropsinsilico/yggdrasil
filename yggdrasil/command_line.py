@@ -118,16 +118,20 @@ class SubCommand(metaclass=SubCommandMeta):
     allow_unknown = False
 
     @classmethod
-    def parse_args(cls, parser, args=None, allow_unknown=False):
+    def parse_args(cls, parser, args=None, allow_unknown=False,
+                   namespace=None):
         # TODO: Check choices for positional arguments that can
         # have more than one element
         if isinstance(args, argparse.Namespace):
             return args
+        kws = dict(args=args)
+        if namespace is not None:
+            kws['namespace'] = namespace
         if cls.allow_unknown or allow_unknown:
-            args, extra = parser.parse_known_args(args=args)
+            args, extra = parser.parse_known_args(**kws)
             args._extra_commands = extra
         else:
-            args = parser.parse_args(args=args)
+            args = parser.parse_args(**kws)
         for k in ['language', 'languages']:
             v = getattr(args, k, None)
             if isinstance(v, list):
@@ -144,9 +148,9 @@ class SubCommand(metaclass=SubCommandMeta):
         raise NotImplementedError
 
     @classmethod
-    def call(cls, args=None, **kwargs):
+    def call(cls, args=None, namespace=None, **kwargs):
         parser = cls.get_parser(args=args)
-        args = cls.parse_args(parser, args=args)
+        args = cls.parse_args(parser, args=args, namespace=namespace)
         return cls.func(args, **kwargs)
 
     @classmethod
@@ -1221,7 +1225,11 @@ class run_tsts(SubCommand):
           'help': 'Number of MPI processes to run tests on.'}),
         (('--write-script', ),
          {'type': str,
-          'help': 'Name of script that should be created to run tests.'})]
+          'help': 'Name of script that should be created to run tests.'}),
+        (('--separate-test', '--separate-tests'),
+         {'nargs': '+', 'action': 'extend', 'type': str,
+          'help': 'Flags defining tests that should be run separately.',
+          'dest': 'separate_tests'})]
     allow_unknown = True
 
     @classmethod
@@ -1424,7 +1432,7 @@ class run_tsts(SubCommand):
                                      
     @classmethod
     def func(cls, args):
-        from yggdrasil import config
+        from yggdrasil import config, platform
         argv = [sys.executable, '-m', 'pytest']
         # test_paths = args.test_paths
         if args.with_mpi > 1:
@@ -1506,7 +1514,7 @@ class run_tsts(SubCommand):
                     subprocess.check_call(["yggdrasil", "info",
                                            "--verbose"])
                 error_code = 0
-                if args.write_script:
+                if args.write_script and (not platform._is_win):
                     cls.write_script(args, argv, cfg_env)
                 else:
                     for x in range(args.count):
@@ -1522,6 +1530,15 @@ class run_tsts(SubCommand):
                 os.chdir(initial_dir)
                 # if os.path.isfile(pth_file):
                 #     os.remove(pth_file)
+        if args.separate_tests and (not error_code):
+            args.test_suites = []
+            args.extra = []
+            args.separate_tests = []
+            for iargs in args.separate_tests:
+                if error_code:
+                    break
+                error_code = cls.call(args=iargs.split(),
+                                      namespace=copy.copy(args))
         return error_code
 
 
