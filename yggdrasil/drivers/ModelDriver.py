@@ -1562,10 +1562,14 @@ class ModelDriver(Driver):
                        self.yml.get('output_drivers', [])]))
         for drv in self.yml.get('input_drivers', []):
             if 'instance' in drv:
+                if self.language == 'mpi':
+                    drv['instance'].wait(self.timeout)
                 drv['instance'].on_model_exit('output', self.name,
                                               errors=self.errors)
         for drv in self.yml.get('output_drivers', []):
             if 'instance' in drv:
+                if self.language == 'mpi':
+                    drv['instance'].wait(self.timeout)
                 drv['instance'].on_model_exit('input', self.name,
                                               errors=self.errors)
 
@@ -1612,11 +1616,9 @@ class ModelDriver(Driver):
         """
         if not self.was_started:  # pragma: debug
             return True
-        T = self.start_timeout(timeout, key_level=1, key=key, key_suffix=key_suffix)
-        while ((not T.is_out) and (not self.model_process_complete)):  # pragma: debug
-            self.sleep()
-        self.stop_timeout(key_level=1, key=key, key_suffix=key_suffix)
-        return self.model_process_complete
+        return self.wait_on_function(lambda: self.model_process_complete,
+                                     timeout=timeout, key_level=1, key=key,
+                                     key_suffix=key_suffix)
 
     def kill_process(self):
         r"""Kill the process running the model, checking return code."""

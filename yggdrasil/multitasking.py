@@ -863,14 +863,111 @@ class LockedDict(LockedObject):
         return out
 
 
-class MPIRequestWrapper(object):
+class TimeoutError(asyncio.TimeoutError):
+    r"""Error to raise when a wait times out."""
+
+    def __init__(self, msg, function_value):
+        self.function_value = function_value
+        super(TimeoutError, self).__init__(msg)
+    
+
+class WaitableFunction(object):
+    r"""Create an object that can be waited on until a function returns True.
+
+    Args:
+        function (callable): Callable function that takes no arguments and
+            returns a boolean.
+        polling_interval (float, optional): Time (in seconds) that should be
+            waited in between function calls. Defaults to 0.1 seconds.
+
+    """
+
+    def __init__(self, function, polling_interval=0.1):
+        self.function = function
+        self.polling_interval = polling_interval
+
+    async def await_function(self):
+        r"""Coroutine to wait for the function to return True."""
+        while not self.function():
+            await asyncio.sleep(self.polling_interval)
+        return self.function()
+
+    def wait(self, timeout=None, on_timeout=False):
+        r"""Wait for the function to return True.
+
+        Args:
+            timeout (float, optional): Time (in seconds) that should be
+                waited for the process to finish. A value of None will wait
+                indefinitely. Defaults to None.
+            on_timeout (callable, bool, str, optional): Object indicating
+                what action should be taken in the event that the timeout is
+                reached. If a callable is provided, it will be called. A
+                value of False will cause a TimeoutError to be raised. A
+                value of True will cause the function value to be returned.
+                A string will be used as the error message for a raised
+                timeout error. Defaults to False.
+
+        Returns:
+            object: The result of the function call.
+
+        """
+        loop = asyncio.new_event_loop()
+        try:
+            return loop.run_until_complete(
+                asyncio.wait_for(self.await_function(), timeout))
+        except asyncio.TimeoutError as e:
+            if on_timeout is False:
+                raise TimeoutError(e, self.function())
+            elif on_timeout is True:
+                return self.function()
+            elif isinstance(on_timeout, str):
+                raise TimeoutError(on_timeout, self.function())
+            else:
+                return on_timeout()
+        finally:
+            try:
+                loop.run_until_complete(loop.shutdown_asyncgens())
+            finally:
+                loop.close()
+
+
+def wait_on_function(function, timeout=None, on_timeout=False,
+                     polling_interval=0.1):
+    r"""Wait for the function to return True.
+
+    Args:
+        function (callable): Callable function that takes no arguments and
+            returns a boolean.
+        timeout (float, optional): Time (in seconds) that should be
+            waited for the process to finish. A value of None will wait
+            indefinitely. Defaults to None.
+        on_timeout (callable, bool, str, optional): Object indicating
+            what action should be taken in the event that the timeout is
+            reached. If a callable is provided, it will be called. A
+            value of False will cause a TimeoutError to be raised. A
+            value of True will cause the function value to be returned.
+            A string will be used as the error message for a raised
+            timeout error. Defaults to False.
+        polling_interval (float, optional): Time (in seconds) that should be
+            waited in between function calls. Defaults to 0.1 seconds.
+
+    Returns:
+        object: The result of the function call.
+
+    """
+    x = WaitableFunction(function, polling_interval=polling_interval)
+    return x.wait(timeout=timeout, on_timeout=on_timeout)
+
+
+class MPIRequestWrapper(WaitableFunction):
     r"""Wrapper for an MPI request."""
 
-    def __init__(self, request, completed=False, poll_time=0.1):
+    def __init__(self, request, completed=False, **kwargs):
         self.request = request
         self.completed = completed
         self._result = None
-        self.poll_time = poll_time
+        super(MPIRequestWrapper, self).__init__(lambda: self.test()[0],
+                                                **kwargs)
 
     @property
     def result(self):
@@ -885,27 +982,28 @@ class MPIRequestWrapper(object):
             self.completed, self._result = self.request.test()
         return (self.completed, self._result)
 
-    async def custom_await(self):
-        r"""Coroutine to wait for the request to be completed."""
-        while not self.completed:
-            await asyncio.sleep(self.poll_time)
-            self.test()
-        return self._result
-    
-    def wait(self, timeout=None):
+    def wait(self, timeout=None, on_timeout=False):
         r"""Wait for the request to be completed.
 
         Args:
             timeout (float, optional): Time (in seconds) that should be
                 waited for the process to finish. A value of None will wait
                 indefinitely. Defaults to None.
+            on_timeout (callable, bool, str, optional): Object indicating
+                what action should be taken in the event that the timeout is
+                reached. If a callable is provided, it will be called. A
+                value of False will cause a TimeoutError to be raised. A
+                value of True will cause the function value to be returned.
+                A string will be used as the error message for a raised
+                timeout error. Defaults to False.
 
         Returns:
             object: The result of the request.
 
         """
-        return asyncio.get_event_loop().run_until_complete(
-            asyncio.wait_for(self.custom_await(), timeout))
+        super(MPIRequestWrapper, self).wait(timeout=timeout,
+                                            on_timeout=on_timeout)
+        return self._result
 
 
 # class LockedWeakValueDict(LockedDict):
@@ -1199,12 +1297,8 @@ class YggTask(YggClass):
                 Defaults to None and is set based on the stack trace.
 
         """
-        T = self.start_timeout(timeout, key_level=1, key=key)
-        while self.is_alive() and not T.is_out:
-            self.verbose_debug('Waiting for %s to finish...',
-                               self.context.task_method)
-            self.sleep()
-        self.stop_timeout(key_level=1, key=key)
+        self.wait_on_function(lambda: not self.is_alive(),
+                              timeout=timeout, key_level=1, key=key)
 
 
 class BreakLoopException(BaseException):
@@ -1303,12 +1397,10 @@ class YggTaskLoop(YggTask):
                 before breaking. Defaults to 0.
 
         """
-        T = self.start_timeout(timeout, key_level=1, key=key)
-        while (((not self.was_loop) or (self.loop_count < nloop))
-               and self.is_alive() and (not T.is_out)):  # pragma: debug
-            self.verbose_debug('Waiting for thread/process to enter loop...')
-            self.sleep()
-        self.stop_timeout(key_level=1, key=key)
+        self.wait_on_function(
+            lambda: (self.was_loop and (self.loop_count >= nloop)
+                     or (not self.is_alive())),
+            timeout=timeout, key=key, key_level=1)
 
     def before_loop(self):
         r"""Actions performed before the loop."""
