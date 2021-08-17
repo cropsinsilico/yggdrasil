@@ -49,8 +49,8 @@ jobs:
         - pip
         test-flags1:
         - --long-running --test-suite=timing --test-suite=demos --test-suite=top
-        - --test-suite=examples --separate-test=\'--test-suite=mpi --write-script=run_mpi.sh
-          --with-mpi=3\'
+        - --test-suite=examples --separate-test='--test-suite=mpi --write-script=run_mpi.sh
+          --with-mpi=3'
         - --test-suite=types --skip-languages c c++
         - --test-suite=types --languages c cpp
         test-flags2:
@@ -335,7 +335,7 @@ jobs:
         install-method:
         - conda
         test-flags1:
-        - --long-running --separate-test=\'--test-suite=mpi --write-script=run_mpi.sh\'
+        - --long-running --separate-test='--test-suite=mpi --write-script=run_mpi.sh'
         test-flags2:
         - --with-examples examples/tests/test_backwards.py
         install-c:

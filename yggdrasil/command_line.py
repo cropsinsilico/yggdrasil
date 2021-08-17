@@ -1530,12 +1530,13 @@ class run_tsts(SubCommand):
                 os.chdir(initial_dir)
                 # if os.path.isfile(pth_file):
                 #     os.remove(pth_file)
-        if args.separate_tests and (not error_code):
+        if args.separate_tests and (error_code == 0):
             assert(not args.write_script)
+            new_args = args.separate_tests
             args.test_suites = []
             args.extra = []
             args.separate_tests = []
-            for iargs in args.separate_tests:
+            for iargs in new_args:
                 if error_code:
                     break
                 error_code = cls.call(args=iargs.split(),
