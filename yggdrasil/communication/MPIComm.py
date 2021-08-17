@@ -41,7 +41,7 @@ class MPIRequest(object):
             method = 'Irecv'
             args = ([self.size, MPI.INT], )
             kwargs['source'] = self.address
-        logger.debug("rank = %d, method = %s, args = %s, kwargs = %s",
+        logger.debug("rank = %d, method = %s, args = %.100s, kwargs = %.100s",
                      self.comm.Get_rank(), method, args, kwargs)
         return getattr(self.comm, method)(*args, **kwargs)
 

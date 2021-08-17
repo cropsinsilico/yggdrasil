@@ -1,6 +1,6 @@
 import shutil
+from yggdrasil.components import import_component
 from yggdrasil.drivers.ModelDriver import ModelDriver
-from yggdrasil.drivers.CMakeModelDriver import get_buildfile_lock
 from yggdrasil.multitasking import MPI, MPIRequestWrapper
 
 
@@ -21,15 +21,15 @@ class MPIPartnerModel(ModelDriver):
     def __init__(self, *args, **kwargs):
         kwargs.pop('function', None)
         super(MPIPartnerModel, self).__init__(*args, **kwargs)
-        self.buildfile_lock = None
-        if self.yml['partner_driver'] == 'CMakeModelDriver':
-            self.buildfile = self.recv_mpi(tag=self._mpi_tags['CMAKE_FILE'])
-            self.buildfile_lock = get_buildfile_lock(self.buildfile,
-                                                     self.context)
-            with self.buildfile_lock:
-                self.send_mpi('COMPILE',
-                              tag=self._mpi_tags['CMAKE_COMPILING'])
-                self.recv_mpi(tag=self._mpi_tags['CMAKE_COMPILED'])
+        self.partner_driver = import_component('model',
+                                               self.yml['partner_driver'],
+                                               without_schema=True)
+        self.partner_driver.mpi_partner_init(self)
+
+    def cleanup(self, *args, **kwargs):
+        r"""Remove compile executable."""
+        self.partner_driver.mpi_partner_cleanup(self)
+        super(MPIPartnerModel, self).cleanup(*args, **kwargs)
 
     @classmethod
     def is_language_installed(self):

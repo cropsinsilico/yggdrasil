@@ -430,9 +430,9 @@ class ModelDriver(Driver):
                  'START': 2,
                  'STOP_RANK0': 3,  # Stopped by partner
                  'STOP_RANKX': 4,  # Stopped by root
-                 'CMAKE_FILE': 5,
-                 'CMAKE_COMPILING': 6,
-                 'CMAKE_COMPILED': 7}
+                 'BUILDFILE': 5,
+                 'LOCK_BUILDFILE': 6,
+                 'UNLOCK_BUILDFILE': 7}
 
     def __init__(self, name, args, model_index=0, copy_index=-1, clients=[],
                  preparsed_function=None, outputs_in_inputs=None,
@@ -553,6 +553,16 @@ class ModelDriver(Driver):
             if x not in _map_language_ext:
                 _map_language_ext[x] = []
             _map_language_ext[x].append(cls.language)
+
+    @classmethod
+    def mpi_partner_init(cls, self):
+        r"""Actions initializing an MPIPartnerModel."""
+        pass
+
+    @classmethod
+    def mpi_partner_cleanup(cls, self):
+        r"""Actions cleaning up an MPIPartnerModel."""
+        pass
 
     @classmethod
     def get_inverse_type_map(cls):

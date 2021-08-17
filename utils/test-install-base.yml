@@ -239,7 +239,8 @@ jobs:
       if: env.INSTALLMPI == 1 && matrix.os == 'ubuntu-latest'
       id: mpi_ubuntu
       run: |
-        yggtest --ci --with-mpi=3 yggdrasil/communication/tests/test_MPIComm.py --write-script=run_mpi.sh --nocapture --debug
+        yggtest --ci --with-mpi=3 --test-suite=mpi --write-script=run_mpi.sh
+        # yggtest --ci --with-mpi=3 yggdrasil/communication/tests/test_MPIComm.py --write-script=run_mpi.sh --nocapture --debug
         ./run_mpi.sh
     - name: Run MPI tests (windows)
       if: env.INSTALLMPI == 1 && matrix.os == 'windows-latest'

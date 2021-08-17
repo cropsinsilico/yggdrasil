@@ -430,6 +430,7 @@ class ConnectionDriver(Driver):
         r"""Wait until messages have been routed."""
         T = self.start_timeout(timeout, key_suffix='.route')
         while ((not T.is_out)
+               and (self.icomm.n_msg > 0)
                and (self.nrecv != self.nsent)):  # pragma: debug
             self.sleep()
         self.stop_timeout(key_suffix='.route')

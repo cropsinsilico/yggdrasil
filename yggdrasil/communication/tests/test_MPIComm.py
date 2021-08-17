@@ -58,10 +58,11 @@ class TestMPIComm(test_CommBase.TestCommBase):
     # Rank 0 sends, rank 1+ receives
 
     comm = 'MPIComm'
+    root_direction = 'send'
     test_error_send = None
     test_error_recv = None
     test_invalid_direction = None
-    root_direction = 'send'
+    test_work_comm = None
 
     def __init__(self, *args, **kwargs):
         try:
@@ -200,36 +201,35 @@ class TestMPIComm(test_CommBase.TestCommBase):
         self.instance.opp_comm_kwargs()
         assert(not self.import_cls.is_installed(language='invalid'))
 
-    def test_work_comm(self):
-        r"""Test creating/removing a work comm."""
-        pass
-        # wc_send = self.instance.create_work_comm()
-        # self.assert_raises(KeyError, self.instance.add_work_comm, wc_send)
-        # # Create recv instance in way that tests new_comm
-        # header_recv = dict(id=self.uuid + '1', address=wc_send.address)
-        # recv_kwargs = self.instance.get_work_comm_kwargs
-        # recv_kwargs.pop('async_recv_kwargs', None)
-        # recv_kwargs['work_comm_name'] = 'test_worker_%s' % header_recv['id']
-        # recv_kwargs['commtype'] = wc_send._commtype
-        # if isinstance(wc_send.opp_address, str):
-        #     os.environ[recv_kwargs['work_comm_name']] = wc_send.opp_address
-        # else:
-        #     recv_kwargs['address'] = wc_send.opp_address
-        # wc_recv = self.instance.create_work_comm(**recv_kwargs)
-        # # wc_recv = self.instance.get_work_comm(header_recv)
-        # flag = wc_send.send(self.test_msg)
-        # assert(flag)
-        # flag, msg_recv = wc_recv.recv(self.timeout)
-        # assert(flag)
-        # self.assert_equal(msg_recv, self.test_msg)
-        # # Assert errors on second attempt
-        # # self.assert_raises(RuntimeError, wc_send.send, self.test_msg)
-        # self.assert_raises(RuntimeError, wc_recv.recv)
-        # self.instance.remove_work_comm(wc_send.uuid)
-        # self.instance.remove_work_comm(wc_recv.uuid)
-        # self.instance.remove_work_comm(wc_recv.uuid)
-        # # Create work comm that should be cleaned up on teardown
-        # self.instance.create_work_comm()
+    # def test_work_comm(self):
+    #     r"""Test creating/removing a work comm."""
+    #     wc_send = self.instance.create_work_comm()
+    #     self.assert_raises(KeyError, self.instance.add_work_comm, wc_send)
+    #     # Create recv instance in way that tests new_comm
+    #     header_recv = dict(id=self.uuid + '1', address=wc_send.address)
+    #     recv_kwargs = self.instance.get_work_comm_kwargs
+    #     recv_kwargs.pop('async_recv_kwargs', None)
+    #     recv_kwargs['work_comm_name'] = 'test_worker_%s' % header_recv['id']
+    #     recv_kwargs['commtype'] = wc_send._commtype
+    #     if isinstance(wc_send.opp_address, str):
+    #         os.environ[recv_kwargs['work_comm_name']] = wc_send.opp_address
+    #     else:
+    #         recv_kwargs['address'] = wc_send.opp_address
+    #     wc_recv = self.instance.create_work_comm(**recv_kwargs)
+    #     # wc_recv = self.instance.get_work_comm(header_recv)
+    #     flag = wc_send.send(self.test_msg)
+    #     assert(flag)
+    #     flag, msg_recv = wc_recv.recv(self.timeout)
+    #     assert(flag)
+    #     self.assert_equal(msg_recv, self.test_msg)
+    #     # Assert errors on second attempt
+    #     # self.assert_raises(RuntimeError, wc_send.send, self.test_msg)
+    #     self.assert_raises(RuntimeError, wc_recv.recv)
+    #     self.instance.remove_work_comm(wc_send.uuid)
+    #     self.instance.remove_work_comm(wc_recv.uuid)
+    #     self.instance.remove_work_comm(wc_recv.uuid)
+    #     # Create work comm that should be cleaned up on teardown
+    #     self.instance.create_work_comm()
 
     def assert_msg_equal(self, x, y):
         r"""Assert that two messages are equivalent."""

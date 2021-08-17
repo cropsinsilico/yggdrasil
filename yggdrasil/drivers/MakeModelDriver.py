@@ -199,6 +199,12 @@ class MakeModelDriver(BuildModelDriver):
         if platform._is_win:  # pragma: windows
             cls.default_compiler = 'nmake'
         
+    @classmethod
+    def mpi_partner_cleanup(cls, self):
+        r"""Actions cleaning up an MPIPartnerModel."""
+        super(MakeModelDriver, cls).mpi_partner_cleanup(self)
+        cls.partner_buildfile_lock(self)
+        
     def parse_arguments(self, args, **kwargs):
         r"""Sort arguments based on their syntax to determine if an argument
         is a source file, compilation flag, or runtime option/flag that should
@@ -253,10 +259,12 @@ class MakeModelDriver(BuildModelDriver):
         if target is None:
             target = self.target
         if target == 'clean':
-            return self.call_compiler([], target=target,
-                                      out=target, overwrite=True,
-                                      makefile=self.buildfile,
-                                      working_dir=self.working_dir, **kwargs)
+            with self.buildfile_locked(dry_run=kwargs.get('dry_run', False)):
+                return self.call_compiler([], target=target,
+                                          out=target, overwrite=True,
+                                          makefile=self.buildfile,
+                                          working_dir=self.working_dir,
+                                          **kwargs)
         else:
             default_kwargs = dict(skip_interface_flags=True,
                                   # source_files=[],  # Unknown source files, use target

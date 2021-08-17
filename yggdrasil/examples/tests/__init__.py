@@ -299,6 +299,13 @@ class ExampleTstBase(YggTestBase, tools.YggClass):
             out.append(self.read_file(fname))
         return out
 
+    @property
+    def mpi_rank(self):
+        r"""int: MPI process rank."""
+        if self.runner.mpi_comm:
+            return self.runner.rank
+        return 0
+
     def check_results(self):
         r"""This should be overridden with checks for the result."""
         if self.output_files is None:
@@ -369,7 +376,7 @@ class ExampleTstBase(YggTestBase, tools.YggClass):
                                             production_run=True)
             self.runner.run()
             self.runner.printStatus()
-            if self.runner.mpi_comm and (self.runner.rank != 0):
+            if self.mpi_rank != 0:
                 return
             if self.expects_error:
                 assert(self.runner.error_flag)
@@ -384,8 +391,7 @@ class ExampleTstBase(YggTestBase, tools.YggClass):
         finally:
             self.example_cleanup()
             # Remove copied makefile
-            if (((self.language == 'make')
-                 and (not (self.runner.mpi_comm and (self.runner.rank != 0))))):
+            if (self.language == 'make') and (self.mpi_rank == 0):
                 makefile = os.path.join(self.yamldir, 'src', 'Makefile')
                 if os.path.isfile(makefile):
                     self.runner.info("Removing makefile")

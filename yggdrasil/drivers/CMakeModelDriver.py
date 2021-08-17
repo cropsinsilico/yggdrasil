@@ -5,7 +5,6 @@ import copy
 import shutil
 import logging
 import sysconfig
-import threading
 from collections import OrderedDict
 from yggdrasil import platform, constants
 from yggdrasil.components import import_component
@@ -17,27 +16,6 @@ from yggdrasil.drivers import CModelDriver
 
 
 logger = logging.getLogger(__name__)
-_buildfile_locks_lock = threading.RLock()
-_buildfile_locks = {}
-
-
-def get_buildfile_lock(fname, context):
-    r"""Get a lock for a buildfile to prevent simultaneous access,
-    creating one as necessary.
-
-    Args:
-        name (str): Build file.
-        context (threading.Context): Threading context.
-
-    Returns:
-        threading.RLock: Lock for the buildfile.
-
-    """
-    global _buildfile_locks
-    with _buildfile_locks_lock:
-        if fname not in _buildfile_locks:
-            _buildfile_locks[fname] = context.RLock()
-    return _buildfile_locks[fname]
 
 
 class CMakeConfigure(BuildToolBase):
@@ -772,6 +750,12 @@ class CMakeModelDriver(BuildModelDriver):
     use_env_vars = False
     buildfile_base = 'CMakeLists.txt'
 
+    @classmethod
+    def mpi_partner_init(cls, self):
+        r"""Actions initializing an MPIPartnerModel."""
+        super(CMakeModelDriver, cls).mpi_partner_init(self)
+        cls.partner_buildfile_lock(self)
+        
     def parse_arguments(self, args, **kwargs):
         r"""Sort arguments based on their syntax to determine if an argument
         is a source file, compilation flag, or runtime option/flag that should
@@ -788,9 +772,6 @@ class CMakeModelDriver(BuildModelDriver):
         else:
             self.builddir_base = 'build_%s' % self.target
         super(CMakeModelDriver, self).parse_arguments(args, **kwargs)
-        self.buildfile_lock = get_buildfile_lock(self.buildfile, self.context)
-        if self._mpi_rank > 0:
-            self.send_mpi(self.buildfile, tag=self._mpi_tags['CMAKE_FILE'])
 
     @property
     def buildfile_orig(self):
@@ -1054,12 +1035,8 @@ class CMakeModelDriver(BuildModelDriver):
             return self.call_linker(self.builddir, target=target, out=target,
                                     overwrite=True, working_dir=self.working_dir,
                                     allow_error=True, **kwargs)
-        if not kwargs.get('dry_run', False):
-            self.buildfile_lock.acquire()
-            if self._mpi_rank > 0:
-                self.recv_mpi(tag=self._mpi_tags['CMAKE_COMPILING'])
         out = None
-        try:
+        with self.buildfile_locked(kwargs.get('dry_run', False)):
             default_kwargs = dict(target=target,
                                   sourcedir=self.sourcedir,
                                   builddir=self.builddir,
@@ -1074,12 +1051,6 @@ class CMakeModelDriver(BuildModelDriver):
                                                 self.buildfile))
                 shutil.copy2(self.buildfile_ygg, self.buildfile)
             out = super(CMakeModelDriver, self).compile_model(**kwargs)
-        finally:
-            if not kwargs.get('dry_run', False):
-                if self._mpi_rank > 0:
-                    self.send_mpi('CMAKE_FINISHED_COMPILE',
-                                  tag=self._mpi_tags['CMAKE_COMPILED'])
-                self.buildfile_lock.release()
         return out
 
     @classmethod
