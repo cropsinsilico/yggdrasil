@@ -512,10 +512,10 @@ class YggRunner(YggClass):
                                     io_opp[:-1]: models[io_opp[:-1]],
                                     io[:-1]: [m['name'] for m in
                                               rank_map[rank]]}})
-                        if io == 'inputs':
-                            icomm['mpi_driver'][io_opp][0]['close_on_eof_send'] = False
-                        else:
-                            icomm['close_on_eof_send'] = False
+                        # if io == 'inputs':
+                        #     icomm['mpi_driver'][io_opp][0]['close_on_eof_send'] = False
+                        # else:
+                        #     icomm['close_on_eof_send'] = False
                         if yml['driver'].startswith('RPC'):
                             icomm['mpi_stride'] += MPIComm._max_response
                         self._mpi_comms.append(icomm)

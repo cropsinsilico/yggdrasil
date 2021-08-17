@@ -1479,7 +1479,10 @@ class ModelDriver(Driver):
         """
         self.debug("Waiting on '%s' (timeout=%s)", name, timeout)
         try:
-            return self._mpi_requests[name].wait(timeout=timeout)
+            out = self._mpi_requests[name].wait(timeout=timeout)
+            if out == 'ERROR':  # pragma: debug
+                self.errors.append(out)
+            return out
         except asyncio.TimeoutError:
             self.info("Timeout for MPI '%s' request", name)
 
@@ -1495,7 +1498,10 @@ class ModelDriver(Driver):
 
         """
         if self._mpi_comm and (name in self._mpi_requests):
-            return self._mpi_requests[name].test()[0]
+            out, msg = self._mpi_requests[name].test()
+            if out and (msg == 'ERROR'):  # pragma: debug
+                self.errors.append(msg)
+            return out
         return False
 
     def set_break_flag(self, *args, **kwargs):

@@ -1531,6 +1531,7 @@ class run_tsts(SubCommand):
                 # if os.path.isfile(pth_file):
                 #     os.remove(pth_file)
         if args.separate_tests and (not error_code):
+            assert(not args.write_script)
             args.test_suites = []
             args.extra = []
             args.separate_tests = []
