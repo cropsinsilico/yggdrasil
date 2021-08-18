@@ -2,10 +2,8 @@ import pytest
 try:
     from mpi4py import MPI
     _on_mpi = (MPI.COMM_WORLD.Get_size() > 1)
-    _mpi_rank = MPI.COMM_WORLD.Get_rank()
 except ImportError:
     _on_mpi = False
-    _mpi_rank = 0
 
 
 if _on_mpi:

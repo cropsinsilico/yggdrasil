@@ -5,11 +5,6 @@ History
 X.X.X (XXXX-XX-XX)
 ------------------
 
-* Update the required version of pika to be >=1.0.0 and update the RMQComm/RMQAsyncComm code to use the updated API
-
-X.X.X (XXXX-XX-XX)
-------------------
-
 * Added C, C++, Fortran, Matlab, R versions of server in rpc_lesson1 example
 * Added C, C++, Fortran, Matlab, R versions of server in rpc_lesson2 example
 * Added C, C++, Fortran, Matlab, R versions of server in rpc_lesson2b example
@@ -20,6 +15,7 @@ X.X.X (XXXX-XX-XX)
 * Enhance debug information w/ task status
 * Allow models to be run on distributed processes via MPI (WIP)
 * Added support for MPI based comms
+* Update the required version of pika to be >=1.0.0 and update the RMQComm/RMQAsyncComm code to use the updated API
 
 1.6.4 (2021-08-10) More minor bug fixes & Automated iteration
 ------------------

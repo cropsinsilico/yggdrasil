@@ -322,13 +322,13 @@ class MPIComm(CommBase.CommBase):
             
     def _close(self, linger=False):
         r"""Close the queue."""
-        self.cancel_requests()
         # Disconnect will only be required if a subset of processes is used,
         # but that is not currently supported. This should be uncommented if
         # support for dynamic processes management is added.
         # if self.requires_disconnect and self.is_open:
         #     self.mpi_comm.Disconnect()
         self.mpi_comm = None
+        self.cancel_requests()
         super(MPIComm, self)._close(linger=linger)
 
     def cancel_requests(self):
