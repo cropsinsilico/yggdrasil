@@ -257,6 +257,7 @@ jobs:
         cmake -h
         yggtest --ci --cov-append --nocapture drivers/tests/test_CMakeModelDriver.py
     - name: Run tests (1st)
+      if: ${{ matrix.os == 'windows-latest' || !contains(matrix.test-flags1, '--write-script') }}
       id: test1
       run: yggtest --ci --cov-append ${{ matrix.test-flags1 }}
       continue-on-error: true
@@ -266,14 +267,16 @@ jobs:
     - name: Run generated test script (1st)
       if: ${{ matrix.os != 'windows-latest' && contains(matrix.test-flags1, '--write-script') }}
       id: test1_script
-      run: ./run_mpi.sh
+      run: |
+        yggtest --ci --cov-append ${{ matrix.test-flags1 }}
+        ./run_mpi.sh
     - name: Re-run test script failures (1st)
       if: ${{ steps.test1_script.outcome == 'failure' }}
       run: |
         yggtest --ci --cov-append ${{ matrix.test-flags1 }} --last-failed --last-failed-no-failures=none --debug
         ./run_mpi.sh
     - name: Run tests (2nd)
-      if: matrix.test-flags2 != ''
+      if: ${{ matrix.test-flags2 != '' && (matrix.os == 'windows-latest' || !contains(matrix.test-flags2, '--write-script')) }}
       id: test2
       run: yggtest --ci --cov-append ${{ matrix.test-flags2 }}
       continue-on-error: true
@@ -281,9 +284,11 @@ jobs:
       if: ${{ steps.test2.outcome == 'failure' }}
       run: yggtest --ci --cov-append ${{ matrix.test-flags2 }} --last-failed --last-failed-no-failures=none --debug
     - name: Run generated test script (2nd)
-      if: ${{ matrix.os != 'windows-latest' && contains(matrix.test-flags2, '--write-script') }}
+      if: ${{ matrix.test-flags2 != '' && (matrix.os != 'windows-latest' && contains(matrix.test-flags2, '--write-script')) }}
       id: test2_script
-      run: ./run_mpi.sh
+      run: |
+        yggtest --ci --cov-append ${{ matrix.test-flags2 }}
+        ./run_mpi.sh
     - name: Re-run test script failures (2nd)
       if: ${{ steps.test2_script.outcome == 'failure' }}
       run: |

@@ -1692,6 +1692,8 @@ class YggClass(ComponentBase):
         from yggdrasil import multitasking
         if timeout is None:
             timeout = self.timeout
+        elif timeout is False:
+            timeout = None
         if polling_interval is None:
             polling_interval = self.sleeptime
         if key is None:
