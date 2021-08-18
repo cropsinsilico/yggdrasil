@@ -498,12 +498,14 @@ class YggRunner(YggClass):
                     else:
                         icomm = dict(
                             commtype='mpi',
+                            daemon=True,
                             ranks=[rank],
                             mpi_index=len(self._mpi_comms),
                             mpi_direction=io_opp,
                             mpi_stride=1,
                             mpi_driver={
-                                io_opp: [{'commtype': 'mpi', 'ranks': [0]}],
+                                io_opp: [{'commtype': 'mpi', 'ranks': [0],
+                                          'daemon': True}],
                                 io: [x_copy],
                                 'driver': yml['driver'],
                                 'name': (

@@ -37,13 +37,13 @@ class AsyncComm(ProxyObject, ComponentBaseUnregistered):
                  '_backlog_received_eof', '_used', '_closed',
                  'async_recv_method', 'async_send_method',
                  'async_recv_kwargs', 'async_send_kwargs',
-                 '_error_registry']
+                 '_error_registry', 'daemon']
     __overrides__ = ['_input_args', '_input_kwargs']
     _disconnect_attr = ['backlog_ready', '_backlog_thread', '_wrapped']
     _async_kws = ['async_recv_method', 'async_send_method',
-                  'async_recv_kwargs', 'async_send_kwargs']
+                  'async_recv_kwargs', 'async_send_kwargs', 'daemon']
 
-    def __init__(self, wrapped,
+    def __init__(self, wrapped, daemon=False,
                  async_recv_method='recv', async_send_method='send_message',
                  async_recv_kwargs=None, async_send_kwargs=None):
         self._backlog_buffer = []
@@ -55,6 +55,7 @@ class AsyncComm(ProxyObject, ComponentBaseUnregistered):
         self._closed = False
         self._backlog_received_eof = False
         self._error_registry = {}
+        self.daemon = daemon
         self.async_recv_method = async_recv_method
         self.async_send_method = async_send_method
         if async_recv_kwargs is None:
@@ -104,10 +105,12 @@ class AsyncComm(ProxyObject, ComponentBaseUnregistered):
         if self._backlog_thread is None:
             if self.direction == 'send':
                 self._backlog_thread = CommBase.CommTaskLoop(
-                    self, target=self.run_backlog_send, suffix='SendBacklog')
+                    self, target=self.run_backlog_send,
+                    daemon=self.daemon, suffix='SendBacklog')
             else:
                 self._backlog_thread = CommBase.CommTaskLoop(
-                    self, target=self.run_backlog_recv, suffix='RecvBacklog')
+                    self, target=self.run_backlog_recv,
+                    deamon=self.daemon, suffix='RecvBacklog')
         return self._backlog_thread
 
     @property
