@@ -32,9 +32,9 @@ To run an integration using |yggdrasil|, you must be able to install |yggdrasil|
 Writing the Job Script
 ----------------------
 
-Many of the specifics of how you would set up your jobs script will depend on the scheduler used by the cluster you are targeting, but there are some general tips.
+Many of the specifics of how you would set up your job script will depend on the scheduler used by the cluster you are targeting (e.g. SLURM, Torque), but there are some general tips:
 
-* Make sure that the YAML files defining the integration and the model codes are located in a directory accessible on compute nodes (usualy your home directory or a dedicated drive).
+* Make sure that the YAML files defining the integration and the model codes are located in a directory accessible on compute nodes (usually your home directory or a dedicated drive).
 * Activate/load packages you will need that are provided by the cluster package manager (e.g. conda, Python, MPI).
 * If you used conda to install |yggdrasil|, activate the environment that |yggdrasil| was installed in before calling ``mpiexec/mpirun/srun``.
 
