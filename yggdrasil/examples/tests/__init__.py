@@ -308,10 +308,10 @@ class ExampleTstBase(YggTestBase, tools.YggClass):
 
     def check_results(self):
         r"""This should be overridden with checks for the result."""
-        if self.output_files is None:
-            return
         res_list = self.results
         out_list = self.output_files
+        if (out_list is None) or (res_list is None):
+            return
         assert(res_list is not None)
         assert(out_list is not None)
         self.assert_equal(len(res_list), len(out_list))

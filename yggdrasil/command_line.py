@@ -1335,6 +1335,7 @@ class run_tsts(SubCommand):
         # directory
         args = config.resolve_config_parser(args)
         args.extra = []
+        args.added_paths = test_paths
         cls.expand_and_add(extra + test_paths, args.extra,
                            [package_dir, os.getcwd()],
                            add_on_nomatch=True)
@@ -1429,6 +1430,8 @@ class run_tsts(SubCommand):
         os.chmod(args.write_script, (stat.S_IRWXU
                                      | stat.S_IRGRP | stat.S_IXGRP
                                      | stat.S_IROTH | stat.S_IXOTH))
+        print("Wrote test script to '%s':\n\t%s"
+              % (args.write_script, '\n\t'.join(lines)))
                                      
     @classmethod
     def func(cls, args):
@@ -1531,15 +1534,21 @@ class run_tsts(SubCommand):
                 # if os.path.isfile(pth_file):
                 #     os.remove(pth_file)
         if args.separate_tests and (error_code == 0):
+            import re
             assert(not args.write_script)
             new_args = args.separate_tests
             args.test_suites = []
-            args.extra = []
             args.separate_tests = []
+            paths = []
+            cls.expand_and_add(args.added_paths, paths,
+                               [package_dir, os.getcwd()])
+            args.extra = [x for x in args.extra if
+                          ((x not in paths)
+                           and (not re.match(r".*test\_.*\.py.*", x)))]
             for iargs in new_args:
                 if error_code:
                     break
-                error_code = cls.call(args=iargs.split(),
+                error_code = cls.call(args=(iargs.split() + args.extra),
                                       namespace=copy.copy(args))
         return error_code
 

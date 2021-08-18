@@ -10,6 +10,11 @@ class TestExampleModelErrorWithIO(ExampleTstBase):
     expects_error = True
 
     @property
+    def output_files(self):
+        r"""list: Output files for the run."""
+        return [os.path.join(self.yamldir, 'output.txt')]
+        
+    @property
     def core_dump(self):
         r"""str: Pattern for core dump that may be produced."""
         if self.yamldir is None:  # pragma: no cover
