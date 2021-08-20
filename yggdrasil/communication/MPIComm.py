@@ -14,7 +14,7 @@ class MPIRequest(object):
     r"""Container for MPI request."""
 
     __slots__ = ['comm', 'address', 'direction', 'tag', 'size_req',
-                 'req', 'size', 'data', '_complete']
+                 'req', 'size', 'data', '_complete', '_complete_size']
 
     def __init__(self, comm, direction, address, tag, **kwargs):
         self.comm = comm
@@ -22,6 +22,7 @@ class MPIRequest(object):
         self.direction = direction
         self.tag = tag
         self._complete = False
+        self._complete_size = False
         self.size = np.zeros(1, dtype='i')
         self.data = None
         self.size_req = None
@@ -37,35 +38,46 @@ class MPIRequest(object):
             # Send size of message
             self.size[0] = len(payload)
             self.size_req = self.comm.Isend([self.size, MPI.INT], **kwargs)
+            out = self.comm.Isend([payload, MPI.CHAR], **kwargs)
         else:
             method = 'Irecv'
             args = ([self.size, MPI.INT], )
             kwargs['source'] = self.address
+            self.size_req = self.comm.Irecv([self.size, MPI.INT], **kwargs)
+            out = None
         logger.debug("rank = %d, method = %s, args = %.100s, kwargs = %.100s",
                      self.comm.Get_rank(), method, args, kwargs)
-        return getattr(self.comm, method)(*args, **kwargs)
+        return out  # getattr(self.comm, method)(*args, **kwargs)
 
     @property
     def complete(self):
         r"""bool: True if the request has been completed, False otherwise."""
-        if not self._complete:
+        if not self._complete_size:
+            data = self.size_req.test()
+            if data[0]:
+                if self.direction == 'recv':
+                    self.data = np.zeros(self.size[0], dtype='c')
+                    self.req = self.comm.Irecv([self.data, MPI.CHAR],
+                                               source=self.address,
+                                               tag=self.tag)
+                self._complete_size = True
+        if self._complete_size and (not self._complete):
             data = self.req.test()
             if data[0]:
                 if self.direction == 'recv':
-                    buf = np.zeros(self.size[0], dtype='c')
-                    self.comm.Recv([buf, MPI.CHAR],
-                                   source=self.address, tag=self.tag)
-                    data = (data[0], buf.tobytes())
+                    data = (data[0], self.data.tobytes())
                 self._complete = True
                 self.data = data[1]
         return self._complete
 
     def cancel(self):
         r"""Cancel a request."""
+        if not self._complete_size:
+            self.size_req.Cancel()
+            self._complete_size = True
         if not self._complete:
-            if self.direction == 'send':  # pragma: intermittent
-                self.size_req.Cancel()
-            self.req.Cancel()
+            if self.req is not None:
+                self.req.Cancel()
             self._complete = True
 
 
@@ -327,8 +339,9 @@ class MPIComm(CommBase.CommBase):
         # support for dynamic processes management is added.
         # if self.requires_disconnect and self.is_open:
         #     self.mpi_comm.Disconnect()
-        self.mpi_comm = None
-        self.cancel_requests()
+        with self._request_lock:
+            self.mpi_comm = None
+            self.cancel_requests()
         super(MPIComm, self)._close(linger=linger)
 
     def cancel_requests(self):

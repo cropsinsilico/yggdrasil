@@ -4,7 +4,7 @@
 High Performance Computing (HPC)
 ================================
 
-|yggdrasil| includes support for running integrations (networks of models) on High Performance Computing (HPC) clusters via MPI (either `OpenMPI <https://www.open-mpi.org/>`_ or `MPICH <https://www.mpich.org/>`_) and `mpi4py <https://mpi4py.readthedocs.io/en/stable/>`_. |yggdrasil| will distribute models in an integration evenly amongst the available processes and coordinate message passing between them.
+As of version 1.7, |yggdrasil| includes support for running integrations (networks of models) on High Performance Computing (HPC) clusters via MPI (either `OpenMPI <https://www.open-mpi.org/>`_ or `MPICH <https://www.mpich.org/>`_) and `mpi4py <https://mpi4py.readthedocs.io/en/stable/>`_. |yggdrasil| will distribute models in an integration evenly amongst the available processes and coordinate message passing between them.
 
 You can run a |yggdrasil| integration using MPI, by passing the usual ``yggrun`` command to ``mpiexec/mpirun/srun`` e.g.::
 
