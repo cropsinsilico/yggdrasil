@@ -23,6 +23,7 @@ Welcome to yggdrasil's documentation!
    config
    units
    hpc
+   remote
    c_format_strings
    debugging
    threading

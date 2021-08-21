@@ -18,6 +18,8 @@ TODO
 ....
 
 * Add tutorial on setting up a service
+* Add method for running a production Flask app
+* Add method for specifying the port to use via the command line
   
 
 
