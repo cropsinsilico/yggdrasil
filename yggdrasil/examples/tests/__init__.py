@@ -353,6 +353,10 @@ class ExampleTstBase(YggTestBase, tools.YggClass):
                 ipcrm_queues()
         # Run
         os.environ.update(self.env)
+        mpi_tag_start = None
+        if ((self.iter_param.get('mpi', False) and (not _on_mpi)) or _on_mpi):
+            from yggdrasil.communication.tests.conftest import adv_global_mpi_tag
+            mpi_tag_start = adv_global_mpi_tag(1000)
         if self.iter_param.get('mpi', False) and (not _on_mpi):  # pragma: testing
             # This method for running tests will not be run unless MPI is
             # enabled for all tests and mpi is added as an iteration parameter
@@ -365,7 +369,8 @@ class ExampleTstBase(YggTestBase, tools.YggClass):
                 else:
                     args += self.yaml
                 args += ['--namespace=%s' % self.namespace,
-                         '--production-run']
+                         '--production-run',
+                         '--mpi-tag-start=%s' % mpi_tag_start]
                 subprocess.check_call(args)
                 assert(not self.expects_error)
             except subprocess.CalledProcessError:
@@ -373,7 +378,8 @@ class ExampleTstBase(YggTestBase, tools.YggClass):
                     raise
         else:
             self.runner = runner.get_runner(self.yaml, namespace=self.namespace,
-                                            production_run=True)
+                                            production_run=True,
+                                            mpi_tag_start=mpi_tag_start)
             self.runner.run()
             self.runner.printStatus()
             if self.mpi_rank != 0:

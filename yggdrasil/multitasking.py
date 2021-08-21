@@ -969,6 +969,11 @@ class MPIRequestWrapper(WaitableFunction):
         super(MPIRequestWrapper, self).__init__(lambda: self.test()[0],
                                                 **kwargs)
 
+    def cancel(self):
+        r"""Cancel the request."""
+        if not self.test()[0]:
+            return self.request.Cancel()
+
     @property
     def result(self):
         r"""object: The result of the MPI request."""
@@ -1001,10 +1006,178 @@ class MPIRequestWrapper(WaitableFunction):
             object: The result of the request.
 
         """
-        super(MPIRequestWrapper, self).wait(timeout=timeout,
-                                            on_timeout=on_timeout)
+        if not self.test()[0]:
+            super(MPIRequestWrapper, self).wait(timeout=timeout,
+                                                on_timeout=on_timeout)
         return self._result
 
+
+class MPIPartnerError(Exception):
+    r"""Error raised when there is an error on another process."""
+    pass
+
+
+class MPIErrorExchange(object):
+    r"""Set of MPI messages to check for errors."""
+
+    tags = {'ERROR_ON_RANK0': 1,
+            'ERROR_ON_RANKX': 2}
+    closing_messages = ['ERROR', 'COMPLETE']
+
+    def __init__(self, global_tag=0):
+        self.comm = MPI.COMM_WORLD
+        self.rank = self.comm.Get_rank()
+        self.size = self.comm.Get_size()
+        if self.rank == 0:
+            self.partner_ranks = list(range(1, self.size))
+        else:
+            self.partner_ranks = [0]
+        self.reset(global_tag=global_tag)
+        self._first_use = True
+
+    def reset(self, global_tag=0):
+        r"""Rest comms for the next test."""
+        global_tag = max(self.comm.alltoall([global_tag] * self.size))
+        self.global_tag = global_tag + max(self.tags.values()) + 1
+        if self.rank == 0:
+            self.incoming_tag = self.tags['ERROR_ON_RANKX'] + global_tag
+            self.outgoing_tag = self.tags['ERROR_ON_RANK0'] + global_tag
+        else:
+            self.incoming_tag = self.tags['ERROR_ON_RANK0'] + global_tag
+            self.outgoing_tag = self.tags['ERROR_ON_RANKX'] + global_tag
+        self.outgoing = None
+        self.incoming = [
+            MPIRequestWrapper(
+                self.comm.irecv(source=i, tag=self.incoming_tag),
+                polling_interval=0)
+            for i in self.partner_ranks]
+        self._first_use = False
+        
+    def cancel(self):
+        r"""Cancel requests."""
+        for x in self.incoming:
+            x.cancel()
+
+    def recv(self, wait=False):
+        r"""Check for response to receive request."""
+        results = []
+        for i, x in enumerate(self.incoming):
+            if wait:
+                x.wait()
+            completed, result = x.test()
+            
+            if ((completed
+                 and ((self.rank != 0)
+                      or (result[1] not in self.closing_messages)))):
+                self.incoming[i] = MPIRequestWrapper(
+                    self.comm.irecv(
+                        source=self.partner_ranks[i],
+                        tag=self.incoming_tag),
+                    polling_interval=0)
+            results.append((completed, result))
+        return results
+
+    def send(self, msg):
+        r"""Send a message."""
+        if (self.rank == 0) or (self.outgoing is None):
+            for i in self.partner_ranks:
+                self.comm.send(msg, dest=i, tag=self.outgoing_tag)
+            if (self.rank != 0) and (msg[1] in self.closing_messages):
+                self.outgoing = msg
+
+    def check_for_error(self, wait=False):
+        r"""Check if there was an error."""
+        out = any((x[0] and (x[1][1] == 'ERROR'))
+                  for x in self.recv(wait=wait))
+        if out and (self.rank == 0):
+            self.broadcast_error()
+        return out
+
+    def wait(self):
+        r"""Wait for all async calls to complete."""
+        for x in self.incoming:
+            x.wait()
+
+    def finalize(self, failure):
+        r"""Finalize an instance by waiting for completions.
+
+        Args:
+            failure (bool): True if there was an error.
+
+        """
+        complete = True
+        try:
+            complete = self.sync(msg='COMPLETE',
+                                 local_error=failure,
+                                 check_complete=True,
+                                 sync_tag=True)
+        finally:
+            while not complete:
+                complete = self.sync(msg='COMPLETE',
+                                     local_error=failure,
+                                     check_complete=True,
+                                     dont_raise=True,
+                                     sync_tag=True)
+
+    def sync(self, local_tag=None, msg=None, get_tags=False,
+             check_equal=False,
+             dont_raise=False, local_error=False, sync_tag=False,
+             check_complete=False):
+        r"""Synchronize processes.
+
+        Args:
+            local_tag (int): Next tag that will be used by the local MPI comm.
+            get_tags (bool, optional): If True, tags will be exchanged between
+                all processes. Defaults to False.
+            check_equal (bool, optional): If True, tags will be checked to be
+                equal. Defaults to False.
+            dont_raise (bool, optional): If True and a MPIPartnerError were
+                to be raised, the sync will abort. Defaults to False.
+
+        Raises:
+            MPIPartnerError: If there was an error on one of the other MPI
+                processes.
+            AssertionError: If check_equal is True and the tags are not
+                equivalent.
+
+        """
+        if local_tag is None:
+            local_tag = self.global_tag
+        remote_error = False
+        if msg is None:
+            msg = 'TAG'
+        if local_error:
+            msg = 'ERROR'
+        if self.outgoing is not None:
+            msg = self.outgoing
+        if self.rank != 0:
+            self.send((local_tag, msg))
+            out = self.recv(wait=True)
+            complete, results = out[0]  # self.recv(wait=True)[0]
+            assert(complete)
+        else:
+            if (self.outgoing is None) and (msg in self.closing_messages):
+                self.outgoing = msg
+            results = [(True, (local_tag, msg))] + self.recv(wait=True)
+            # TODO: Check for completion (instead of error)
+            self.send(results)
+        remote_error = any((x[0] and (x[1][1] == 'ERROR'))
+                           for x in results)
+        all_tag = [x[1][0] for x in results]
+        if sync_tag:
+            self.global_tag = max(all_tag)
+        else:
+            self.global_tag = local_tag
+        if remote_error and (not local_error) and (not dont_raise):
+            raise MPIPartnerError("Error on another process.")
+        if check_equal and not (remote_error or local_error):
+            assert(all((x == local_tag) for x in all_tag))
+        if check_complete:
+            return all(x[1][1] in self.closing_messages
+                       for x in results)
+        if get_tags:
+            return all_tag
+            
 
 # class LockedWeakValueDict(LockedDict):
 #     r"""Dictionary of weakrefs that can be shared between threads."""

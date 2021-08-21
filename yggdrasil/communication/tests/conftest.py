@@ -4,9 +4,35 @@ try:
     _on_mpi = (MPI.COMM_WORLD.Get_size() > 1)
 except ImportError:
     _on_mpi = False
+_mpi_error_exchange = None
 
 
 if _on_mpi:
+    from yggdrasil.multitasking import MPIErrorExchange
+    _global_tag = 0
+
+    def new_mpi_exchange():
+        global _mpi_error_exchange
+        global _global_tag
+        if _mpi_error_exchange is None:
+            _mpi_error_exchange = MPIErrorExchange(global_tag=_global_tag)
+        else:
+            _global_tag = _mpi_error_exchange.global_tag
+            _mpi_error_exchange.reset(global_tag=_global_tag)
+        return _mpi_error_exchange
+
+    def adv_global_mpi_tag(value=1):
+        global _mpi_error_exchange
+        assert(_mpi_error_exchange is not None)
+        out = _mpi_error_exchange.global_tag
+        _mpi_error_exchange.global_tag += value
+        return out
+
+    def sync_mpi_exchange(*args, **kwargs):
+        global _mpi_error_exchange
+        assert(_mpi_error_exchange is not None)
+        return _mpi_error_exchange.sync(*args, **kwargs)
+
     # Method of raising errors when other process fails
     # https://docs.pytest.org/en/latest/example/simple.html#
     # making-test-result-information-available-in-fixtures
@@ -20,16 +46,15 @@ if _on_mpi:
         setattr(item, "rep_" + rep.when, rep)
 
     @pytest.fixture(autouse=True)
-    def sync_result(request):
+    def sync_mpi_result(request):
         r"""Synchronize results between MPI ranks."""
-        comm = MPI.COMM_WORLD
-        size = comm.Get_size()
+        global _global_tag
+        mpi_exchange = new_mpi_exchange()
+        mpi_exchange.sync()
         yield
         failure = (request.node.rep_setup.failed
                    or request.node.rep_call.failed)
-        all_failure = comm.alltoall([failure] * size)
-        if (not failure) and any(all_failure):
-            raise Exception("Failure occured on another MPI process.")
+        mpi_exchange.finalize(failure)
 
     # Monkey patch pytest-cov plugin with MPI Barriers to prevent multiple
     # MPI processes from attempting to modify the .coverage data file at

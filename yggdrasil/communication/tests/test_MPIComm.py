@@ -5,7 +5,6 @@ from yggdrasil.communication import CommBase, MPIComm
 from yggdrasil.communication.tests import test_CommBase
 
 
-_tag = 0
 _mpi_installed = MPIComm.MPIComm.is_installed(language='python')
 
 
@@ -57,16 +56,15 @@ class TestMPIComm(test_CommBase.TestCommBase):
     @property
     def inst_kwargs(self):
         r"""dict: Keyword arguments for tested class."""
-        global _tag
+        tag = self.get_next_tag()
         if self.mpi_rank == 0:
             out = self.root_inst_kwargs
-            out['start_tag'] = _tag
+            out['tag_start'] = tag
             out['partner_mpi_ranks'] = list(range(1, self.mpi_size))
         else:
             out = self._rank_kws
-            out['start_tag'] = _tag
+            out['tag_start'] = tag
             out['commtype'] = self.commtype
-        _tag += 1
         return out
     
     @property
@@ -83,13 +81,11 @@ class TestMPIComm(test_CommBase.TestCommBase):
         
     def setup(self, *args, **kwargs):
         r"""Initialize comm object pair."""
-        global _tag
         assert(self.is_installed)
         sleep_after_connect = kwargs.pop('sleep_after_connect', False)
         kwargs.setdefault('nprev_comm', self.comm_count)
         kwargs.setdefault('nprev_fd', self.fd_count)
-        init_tag = _tag
-        _tag += 1
+        init_tag = self.get_next_tag()
         if self.mpi_rank > 0:
             self._rank_kws = self.mpi_comm.recv(source=0, tag=init_tag)
         super(test_CommBase.TestCommBase, self).setup(*args, **kwargs)
@@ -102,25 +98,20 @@ class TestMPIComm(test_CommBase.TestCommBase):
         assert(self.instance.is_open)
         if self.instance.direction == 'recv':
             self.instance.drain_server_signon_messages()
+        self.sync()
 
-    def sync(self, get_tags=False, check_equal=False):
-        global _tag
-        if check_equal or get_tags:
-            all_tag = self.mpi_comm.alltoall(
-                [self.instance.tag] * self.mpi_comm.Get_size())
-            if check_equal:
-                assert(all((x == self.instance.tag) for x in all_tag))
-            _tag = all_tag[self.mpi_rank]
-            return all_tag
-        else:
-            _tag = self.instance.tag
-            self.mpi_comm.Barrier()
+    def get_next_tag(self):
+        from yggdrasil.communication.tests.conftest import adv_global_mpi_tag
+        return adv_global_mpi_tag()
+
+    def sync(self, **kwargs):
+        from yggdrasil.communication.tests.conftest import sync_mpi_exchange
+        return sync_mpi_exchange(self.instance.tag, **kwargs)
 
     def teardown(self, *args, **kwargs):
         r"""Destroy comm object pair."""
         # Even up send/recv calls since the same comm will be used for
         # subsequent tests
-        global _tag
         if self.use_async and (self.instance.direction == 'recv'):
             # Don't keep receiving or there will never be a balence
             # between receive requests and sent messages
@@ -129,7 +120,6 @@ class TestMPIComm(test_CommBase.TestCommBase):
         if self.instance.direction == 'send':
             for _ in range(max(all_tag) - all_tag[self.mpi_rank]):
                 self.instance.tags[self.instance.ranks[0]] += 1
-                # self.instance.send_eof()
             if self.use_async:
                 self.instance.wait_for_confirm(timeout=60.0)
         self.sync(check_equal=True)
@@ -146,6 +136,17 @@ class TestMPIComm(test_CommBase.TestCommBase):
         elif self.instance.direction == 'recv':
             flag, msg_recv = self.instance.recv()
         assert(not flag)
+
+    def test_send_after_close(self):
+        r"""Sending a message after the receive comm has closed."""
+        if self.instance.direction == 'recv':
+            self.instance.close()
+            for i in self.instance.tags.keys():
+                self.instance.tags[i] += 1
+        self.sync()
+        if self.instance.direction == 'send':
+            flag = self.instance.send(self.test_msg)
+            assert(flag)
 
     def test_attributes(self):
         r"""Assert that the instance has all of the required attributes."""
@@ -431,6 +432,7 @@ class TestMPICommAsync(TestMPIComm):
     r"""Test class for asynchronous MPIComm."""
 
     use_async = True
+    test_send_after_close = None
 
 
 @unittest.skipIf(not _mpi_installed, "MPI library not installed")

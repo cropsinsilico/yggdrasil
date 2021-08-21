@@ -250,7 +250,8 @@ class YggRunner(YggClass):
     def __init__(self, modelYmls, namespace=None, host=None, rank=0,
                  ygg_debug_level=None, rmq_debug_level=None,
                  ygg_debug_prefix=None, connection_task_method='thread',
-                 as_function=False, production_run=False):
+                 as_function=False, production_run=False,
+                 mpi_tag_start=None):
         self.mpi_comm = None
         name = 'runner'
         if MPI is not None:
@@ -282,6 +283,7 @@ class YggRunner(YggClass):
         # Update environment based on config
         cfg_environment()
         # Parse yamls
+        self.mpi_tag_start = mpi_tag_start
         if self.mpi_comm and (self.rank > 0):
             pass
         else:
@@ -569,6 +571,7 @@ class YggRunner(YggClass):
             for i, v in enumerate(self.modeldrivers.values()):
                 v['mpi_rank'] = (i + 1) % size
                 v['model_index'] = i
+                v['mpi_tag_start'] = self.mpi_tag_start
             # Split the connections bridging MPI processes
             self.debug("Splitting connection drivers over MPI")
             self.all_connectiondrivers = self.connectiondrivers
@@ -576,6 +579,8 @@ class YggRunner(YggClass):
             for driver in self.connectiondrivers.values():
                 self.bridge_mpi_connections(driver)
             tag_start = len(ModelDriver._mpi_tags) * len(self.modeldrivers) * 5
+            if self.mpi_tag_start is not None:
+                tag_start += self.mpi_tag_start
             tag_stride = sum([x.pop('mpi_stride') for x in self._mpi_comms])
             connections = [[] for _ in range(size)]
             for x in self._mpi_comms:

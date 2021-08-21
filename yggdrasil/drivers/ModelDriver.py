@@ -436,7 +436,7 @@ class ModelDriver(Driver):
 
     def __init__(self, name, args, model_index=0, copy_index=-1, clients=[],
                  preparsed_function=None, outputs_in_inputs=None,
-                 mpi_rank=0, **kwargs):
+                 mpi_rank=0, mpi_tag_start=None, **kwargs):
         self._inv_mpi_tags = {v: k for k, v in self._mpi_tags.items()}
         self.model_outputs_in_inputs = outputs_in_inputs
         self.preparsed_function = preparsed_function
@@ -482,6 +482,8 @@ class ModelDriver(Driver):
         self._mpi_size = 1
         self._mpi_requests = {}
         self._mpi_tag = (len(self._mpi_tags) * self.model_index)
+        if mpi_tag_start is not None:
+            self._mpi_tag += mpi_tag_start
         if multitasking._on_mpi:
             self._mpi_comm = multitasking.MPI.COMM_WORLD
             self._mpi_rank = self._mpi_comm.Get_rank()

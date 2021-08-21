@@ -266,7 +266,10 @@ class yggrun(SubCommand):
           'help': "One or more yaml specification files."}),
         (('--with-mpi', '--mpi-nproc'),
          {'type': int, 'default': 1,
-          'help': 'Number of MPI processes to run on.'})]
+          'help': 'Number of MPI processes to run on.'}),
+        (('--mpi-tag-start', ),
+         {'type': int, 'default': 0,
+          'help': 'Tag that MPI communications should start at.'})]
 
     @classmethod
     def add_arguments(cls, parser, **kwargs):
@@ -292,7 +295,8 @@ class yggrun(SubCommand):
         prog = sys.argv[0].split(os.path.sep)[-1]
         with config.parser_config(args):
             runner.run(args.yamlfile, ygg_debug_prefix=prog,
-                       production_run=args.production_run)
+                       production_run=args.production_run,
+                       mpi_tag_start=args.mpi_tag_start)
 
 
 class ygginfo(SubCommand):
