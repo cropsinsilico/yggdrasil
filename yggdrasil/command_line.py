@@ -374,9 +374,13 @@ class integration_service_manager(SubCommand):
                         (('integration-name', ),
                          {'type': str,
                           'help': ('The name that the integration should be '
-                                   'registered under.')}),
+                                   'registered under or the path to a YAML '
+                                   'file containing a list of one or more '
+                                   'mappings between name and YAML '
+                                   'specification files for integrations '
+                                   'that should be registered.')}),
                         (('integration-yamls', ),
-                         {'nargs': '+',
+                         {'nargs': '*',
                           'help': ('One or more YAML specification files '
                                    'defining the integration.')})]),
                 ArgumentParser(
@@ -386,7 +390,12 @@ class integration_service_manager(SubCommand):
                         (('integration-name', ),
                          {'type': str,
                           'help': ('The name of the integration to remove '
-                                   'from the registry.')})]),
+                                   'from the registry or the path to a YAML '
+                                   'file containing a list of one or more '
+                                   'mappings between integration name and '
+                                   'YAML specification files for '
+                                   'integrations that should be '
+                                   'unregistered.')})]),
             ])]
 
     @classmethod
@@ -404,6 +413,10 @@ class integration_service_manager(SubCommand):
                 if not os.path.isabs(yml):
                     yml = os.path.abspath(yml)
                 integration_yamls.append(yml)
+        elif integration_name:
+            assert(os.path.isfile(integration_name))
+            if not os.path.isabs(integration_name):
+                integration_name = os.path.abspath(integration_name)
         for_request = (
             (args.action in ['status', 'register', 'unregister'])
             or (integration_name is not None))

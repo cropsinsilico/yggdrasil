@@ -798,6 +798,24 @@ class IntegrationServiceRegistry(object):
         with open(self.filename, 'w') as fd:
             yaml.dump(registry, fd)
 
+    def load_collection(self, name):
+        r"""Read a collection of integration registry entries from an YAML.
+
+        Args:
+            name (str): Full path to a YAML file containing one or more
+                registry entries mapping between integration name and YAML
+                specification files.
+
+        Returns:
+            dict: Loaded registry entries.
+
+        """
+        with open(name, 'r') as fd:
+            out = yaml.safe_load(fd.read())
+        assert(isinstance(out, dict))
+        # TODO: Normalize YAML paths?
+        return out
+
     def remove(self, name):
         r"""Remove an integration service from the registry.
 
@@ -811,15 +829,20 @@ class IntegrationServiceRegistry(object):
 
         """
         registry = self.load()
-        if name not in registry:
-            keys = list(self.registry.keys())
-            raise KeyError(f"There is not an integration service registered "
-                           f"under the name '{name}'. Existing services are "
-                           f"{keys}")
-        registry.pop(name)
+        if os.path.isfile(name):
+            names = list(self.load_collection(name).keys())
+        else:
+            names = [name]
+        for k in names:
+            if k not in registry:
+                keys = list(self.registry.keys())
+                raise KeyError(f"There is not an integration service "
+                               f"registered under the name '{k}'. Existing "
+                               f"services are {keys}")
+            registry.pop(k)
         self.save(registry)
 
-    def add(self, name, yamls, **kwargs):
+    def add(self, name, yamls=None, **kwargs):
         r"""Add an integration service to the registry.
 
         Args:
@@ -834,14 +857,22 @@ class IntegrationServiceRegistry(object):
                 name.
 
         """
-        entry = dict(kwargs, name=name, yamls=yamls)
         registry = self.load()
-        if name in registry:
-            old = pprint.pformat(registry[name])
-            new = pprint.pformat(entry)
-            raise ValueError(f"There is an registry integration associated "
-                             f"with the name '{name}'. Remove the registry "
-                             f"entry before adding a new one.\n"
-                             f"    Registry:\n{old}\n    New:\n{new}")
-        registry[name] = entry
+        if os.path.isfile(name):
+            assert(not yamls)
+            collection = {k: dict(kwargs, name=k, yamls=v)
+                          for k, v in self.load_collection(name).items()}
+        else:
+            assert(yamls)
+            collection = {name: dict(kwargs, name=name, yamls=yamls)}
+        for k, v in collection.items():
+            if k in registry:
+                old = pprint.pformat(registry[k])
+                new = pprint.pformat(v)
+                raise ValueError(f"There is an registry integration "
+                                 f"associated with the name '{k}'. Remove "
+                                 f"the registry entry before adding a new "
+                                 f"one.\n"
+                                 f"    Registry:\n{old}\n    New:\n{new}")
+            registry[k] = v
         self.save(registry)

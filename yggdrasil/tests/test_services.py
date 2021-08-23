@@ -152,11 +152,25 @@ class TestServices(object):
         assert_raises(ServerError, cli.send_request, 'test')
         cli.registry.add('test', test_yml)
         print(cli.send_request('test'))
-        assert_raises(ValueError, cli.registry.add, 'test', [])
+        assert_raises(ValueError, cli.registry.add, 'test', [test_yml])
         cli.send_request('test', action='stop')
         # cli.stop_server()
         cli.registry.remove('test')
         assert_raises(KeyError, cli.registry.remove, 'test')
+        # Register from file
+        reg_coll = 'registry_collection.yml'
+        with open(reg_coll, 'w') as fd:
+            fd.write(f'photosynthesis:\n  - {test_yml}')
+        try:
+            cli.registry.add(reg_coll)
+            print(cli.send_request('photosynthesis'))
+            assert_raises(ValueError, cli.registry.add,
+                          'photosynthesis', [test_yml])
+            cli.send_request('photosynthesis', action='stop')
+            cli.registry.remove(reg_coll)
+            assert_raises(KeyError, cli.registry.remove, 'photosynthesis')
+        finally:
+            os.remove(reg_coll)
 
     @requires_language('c')
     @requires_language('c++')
