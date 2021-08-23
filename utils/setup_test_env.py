@@ -216,6 +216,7 @@ def get_install_opts(old=None):
             'pygments': (os.environ.get('INSTALLPYGMENTS', '0') == '1'),
             'omp': (os.environ.get('INSTALLOMP', '0') == '1'),
             'docs': (os.environ.get('BUILDDOCS', '0') == '1'),
+            'no_sudo': False,
         }
         if not _is_win:
             new['c'] = True  # c compiler usually installed by default
@@ -233,6 +234,7 @@ def get_install_opts(old=None):
             'pygments': True,
             'omp': False,
             'docs': False,
+            'no_sudo': False,
         }
     if _is_win:
         new['os'] = 'win'
@@ -262,6 +264,11 @@ def add_install_opts_args(parser):
     """
     for k, v in install_opts.items():
         if k in ['os']:
+            continue
+        elif k == 'no_sudo':
+            parser.add_argument(
+                '--no-sudo', action='store_true',
+                help="Don't use sudo during installation.")
             continue
         if v:
             parser.add_argument(
@@ -739,11 +746,18 @@ def install_deps(method, return_commands=False, verbose=False,
         # TODO: Test split installation where r-base is installed from
         # conda and the R dependencies are installed from CRAN?
         if _is_linux:
-            cmds += [
-                ("sudo add-apt-repository 'deb https://cloud"
-                 ".r-project.org/bin/linux/ubuntu xenial-cran35/'"),
-                ("sudo apt-key adv --keyserver keyserver.ubuntu.com "
-                 "--recv-keys E298A3A825C0D65DFD57CBB651716619E084DAB9")]
+            if install_opts['no_sudo']:
+                cmds += [
+                    ("add-apt-repository 'deb https://cloud"
+                     ".r-project.org/bin/linux/ubuntu xenial-cran35/'"),
+                    ("apt-key adv --keyserver keyserver.ubuntu.com "
+                     "--recv-keys E298A3A825C0D65DFD57CBB651716619E084DAB9")]
+            else:
+                cmds += [
+                    ("sudo add-apt-repository 'deb https://cloud"
+                     ".r-project.org/bin/linux/ubuntu xenial-cran35/'"),
+                    ("sudo apt-key adv --keyserver keyserver.ubuntu.com "
+                     "--recv-keys E298A3A825C0D65DFD57CBB651716619E084DAB9")]
     # if install_opts['zmq'] and (not fallback_to_conda):
     #     cmds.append("echo Installing ZeroMQ...")
     #     if _is_linux:
@@ -770,8 +784,12 @@ def install_deps(method, return_commands=False, verbose=False,
     # Install dependencies using package manager(s)
     if not only_python:
         if pkgs['apt']:
-            cmds += ["sudo apt update"]
-            cmds += ["sudo apt-get install %s" % ' '.join(pkgs['apt'])]
+            if install_opts['no_sudo']:
+                cmds += ["apt update"]
+                cmds += ["apt-get install %s" % ' '.join(pkgs['apt'])]
+            else:
+                cmds += ["sudo apt update"]
+                cmds += ["sudo apt-get install %s" % ' '.join(pkgs['apt'])]
         if pkgs['brew']:
             if 'gcc' in pkgs['brew']:
                 cmds += ["brew reinstall gcc"]
@@ -977,7 +995,10 @@ def install_pkg(method, python=None, without_build=False,
     # Follow up if on Unix as R installation may require sudo
     if install_opts['R'] and _is_unix:
         # cmds.append('ygginstall r --sudoR')
-        subprocess.check_call(["ygginstall", "r", "--sudoR"])
+        R_cmd = ["ygginstall", "r"]
+        if not install_opts['no_sudo']:
+            R_cmd.append("--sudoR")
+        subprocess.check_call(R_cmd)
     if method == 'conda':
         src_dir = os.path.join(os.getcwd(),
                                os.path.dirname(os.path.dirname(__file__)))
@@ -1278,7 +1299,9 @@ if __name__ == "__main__":
     if args.operation in ['deps', 'install', 'verify', 'env-yaml']:
         new_opts = {}
         for k, v in install_opts.items():
-            if v and getattr(args, 'dont_install_%s' % k, False):
+            if k == 'no_sudo':
+                new_opts[k] = bool(getattr(args, k, False))
+            elif v and getattr(args, 'dont_install_%s' % k, False):
                 new_opts[k] = False
             elif (not v) and getattr(args, 'install_%s' % k, False):
                 new_opts[k] = True
