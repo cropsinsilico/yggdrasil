@@ -7,4 +7,4 @@
 	branch = no-submodule
 [submodule "yggdrasil/demos/CiS2021-hackathon"]
 	path = yggdrasil/demos/CiS2021-hackathon
-	url = git@github.com:cropsinsilico/CiS2021-hackathon.git
+	url = https://github.com/cropsinsilico/CiS2021-hackathon
