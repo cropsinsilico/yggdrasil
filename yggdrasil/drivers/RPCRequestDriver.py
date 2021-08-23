@@ -169,7 +169,7 @@ class RPCRequestDriver(ConnectionDriver):
         if msg.flag != CommBase.FLAG_EOF:
             # Remove client that signed off
             if ((msg.header.get('raw', False)
-                 and (msg.args == CommBase.YGG_CLIENT_EOF))):
+                 and (msg.args == CommBase.YGG_CLIENT_EOF))):  # pragma: intermittent
                 self.remove_model('input', msg.header['model'])
                 return True
             with self.lock:

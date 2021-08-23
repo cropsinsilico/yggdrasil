@@ -1,6 +1,6 @@
 import logging
 import numpy as np
-from yggdrasil.multitasking import _on_mpi, MPI, RLock
+from yggdrasil.multitasking import _on_mpi, MPI, RLock, MPIRequestWrapper
 from yggdrasil.communication import (
     CommBase, NoMessages)
 logger = logging.getLogger(__name__)
@@ -14,19 +14,24 @@ class MPIRequest(object):
     r"""Container for MPI request."""
 
     __slots__ = ['comm', 'address', 'direction', 'tag', 'size_req',
-                 'req', 'size', 'data', '_complete', '_complete_size']
+                 'req', 'size', '_data']
 
     def __init__(self, comm, direction, address, tag, **kwargs):
         self.comm = comm
         self.address = address
         self.direction = direction
         self.tag = tag
-        self._complete = False
-        self._complete_size = False
         self.size = np.zeros(1, dtype='i')
-        self.data = None
+        self._data = None
         self.size_req = None
         self.req = self.make_request(**kwargs)
+
+    @property
+    def data(self):
+        r"""object: Data returned by a request."""
+        if (self.direction == 'recv') and isinstance(self._data, np.ndarray):
+            self._data = self._data.tobytes()
+        return self._data
 
     def make_request(self, payload=None):
         r"""Complete a request."""
@@ -37,13 +42,16 @@ class MPIRequest(object):
             kwargs['dest'] = self.address
             # Send size of message
             self.size[0] = len(payload)
-            self.size_req = self.comm.Isend([self.size, MPI.INT], **kwargs)
-            out = self.comm.Isend([payload, MPI.CHAR], **kwargs)
+            self.size_req = MPIRequestWrapper(
+                self.comm.Isend([self.size, MPI.INT], **kwargs))
+            out = MPIRequestWrapper(
+                self.comm.Isend([payload, MPI.CHAR], **kwargs))
         else:
             method = 'Irecv'
             args = ([self.size, MPI.INT], )
             kwargs['source'] = self.address
-            self.size_req = self.comm.Irecv([self.size, MPI.INT], **kwargs)
+            self.size_req = MPIRequestWrapper(
+                self.comm.Irecv([self.size, MPI.INT], **kwargs))
             out = None
         logger.debug("rank = %d, method = %s, args = %.100s, kwargs = %.100s",
                      self.comm.Get_rank(), method, args, kwargs)
@@ -52,33 +60,22 @@ class MPIRequest(object):
     @property
     def complete(self):
         r"""bool: True if the request has been completed, False otherwise."""
-        if not self._complete_size:
-            data = self.size_req.test()
-            if data[0]:
-                if self.direction == 'recv':
-                    self.data = np.zeros(self.size[0], dtype='c')
-                    self.req = self.comm.Irecv([self.data, MPI.CHAR],
-                                               source=self.address,
-                                               tag=self.tag)
-                self._complete_size = True
-        if self._complete_size and (not self._complete):
-            data = self.req.test()
-            if data[0]:
-                if self.direction == 'recv':
-                    data = (data[0], self.data.tobytes())
-                self._complete = True
-                self.data = data[1]
-        return self._complete
+        if self.direction == 'recv':
+            if self.size_req.test()[0] and (self.req is None):
+                self._data = np.zeros(self.size[0], dtype='c')
+                self.req = MPIRequestWrapper(
+                    self.comm.Irecv([self._data, MPI.CHAR],
+                                    source=self.address,
+                                    tag=self.tag))
+        return (((self.req is not None)
+                 and (self.req.test()[0] or self.req.canceled))
+                or self.size_req.canceled)
 
     def cancel(self):
         r"""Cancel a request."""
-        if not self._complete_size:
-            self.size_req.Cancel()
-            self._complete_size = True
-        if not self._complete:
-            if self.req is not None:
-                self.req.Cancel()
-            self._complete = True
+        self.size_req.cancel()
+        if self.req is not None:
+            self.req.cancel()
 
 
 class MPIMultiRequest(MPIRequest):
@@ -103,24 +100,21 @@ class MPIMultiRequest(MPIRequest):
     @property
     def complete(self):
         r"""bool: True if the request has been completed, False otherwise."""
-        if not self._complete:
+        if not self.remainder:
             for k, v in self.req.items():
                 if v.complete:
-                    self._complete = True
-                    self.data = v.data
+                    self._data = v.data
                     self.address = k
                     for k2, v2 in self.req.items():
                         if k2 != k:
                             self.remainder[k2] = v2
                     break
-        return self._complete
+        return bool(self.remainder)
 
     def cancel(self):
         r"""Cancel a request."""
-        if not self._complete:
-            for k, v in self.req.items():
-                v.cancel()
-            self._complete = True
+        for k, v in self.req.items():
+            v.cancel()
 
 
 class MPIComm(CommBase.CommBase):

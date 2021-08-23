@@ -1485,7 +1485,7 @@ class ModelDriver(Driver):
             if out == 'ERROR':  # pragma: debug
                 self.errors.append(out)
             return out
-        except asyncio.TimeoutError:
+        except asyncio.TimeoutError:  # pragma: debug
             self.info("Timeout for MPI '%s' request", name)
 
     def check_mpi_request(self, name):

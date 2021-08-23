@@ -301,6 +301,14 @@ class TestYggClass(YggTestClass):
         self.instance.language_info([])(1)
         self.instance.language_info('python')(1)
 
+    def test_wait_on_function(self):
+        r"""Test functionality of async wait on function."""
+        def func():
+            return False
+        self.instance.wait_on_function(func, timeout=0.0,
+                                       polling_interval=0.0,
+                                       quiet=True)
+
     def test_timeout(self):
         r"""Test functionality of timeout."""
         # Test w/o timeout

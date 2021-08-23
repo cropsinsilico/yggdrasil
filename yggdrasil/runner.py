@@ -465,8 +465,9 @@ class YggRunner(YggClass):
             models = [self.modeldrivers[
                 DuplicatedModelDriver.get_base_name(name)]]
             assert(models[0].get('copies', 0) > 1)
-        if rank is not None:
-            models = [x for x in models if (x['mpi_rank'] == rank)]
+        if rank is not None:  # pragma: debug
+            # models = [x for x in models if (x['mpi_rank'] == rank)]
+            raise NotImplementedError
         return models
 
     def bridge_mpi_connections(self, yml):
@@ -516,10 +517,6 @@ class YggRunner(YggClass):
                                     io_opp[:-1]: models[io_opp[:-1]],
                                     io[:-1]: [m['name'] for m in
                                               rank_map[rank]]}})
-                        # if io == 'inputs':
-                        #     icomm['mpi_driver'][io_opp][0]['close_on_eof_send'] = False
-                        # else:
-                        #     icomm['close_on_eof_send'] = False
                         if yml['driver'].startswith('RPC'):
                             icomm['mpi_stride'] += MPIComm._max_response
                         self._mpi_comms.append(icomm)

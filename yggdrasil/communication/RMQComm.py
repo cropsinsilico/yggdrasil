@@ -389,7 +389,7 @@ class RMQComm(CommBase.CommBase):
         with self.rmq_lock:
             try:
                 self.channel.basic_publish(exchange, routing_key, msg, **kwargs)
-            except pika.exceptions.UnroutableError:
+            except pika.exceptions.UnroutableError:  # pragma: debug
                 return False
         return True
 

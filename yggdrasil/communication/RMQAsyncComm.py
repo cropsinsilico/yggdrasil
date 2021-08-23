@@ -73,7 +73,7 @@ class RMQAsyncComm(RMQComm.RMQComm):
         self._closing.started.clear()
         self._closing.stopped.clear()
         self._consumer_tag = None
-        if self.direction == 'send':
+        if self.direction == 'send':  # pragma: intermittent
             for k in list(self._deliveries.keys()):
                 self._deliveries.pop(k)
 
@@ -85,7 +85,7 @@ class RMQAsyncComm(RMQComm.RMQComm):
                 self.connect()
                 self.connection.ioloop.start()
                 self.debug("returning")
-            except BaseException as e:
+            except BaseException as e:  # pragma: debug
                 self.error("Error in RMQ thread %s: %s", type(e), e)
                 self.stop()
                 break
@@ -139,7 +139,7 @@ class RMQAsyncComm(RMQComm.RMQComm):
         """
         self.stop(call_on_thread=True)
         self._closing.stopped.wait(self.timeout)
-        if not self._closing.has_stopped():
+        if not self._closing.has_stopped():  # pragma: debug
             if self.connection is not None:
                 self.connection.ioloop.stop()
             self.error("Closing has not completed")
@@ -411,7 +411,7 @@ class RMQAsyncComm(RMQComm.RMQComm):
         self.debug('Adding consumer cancellation callback')
         self.channel.add_on_cancel_callback(self.on_consumer_cancelled)
 
-    def on_consumer_cancelled(self, method_frame):
+    def on_consumer_cancelled(self, method_frame):  # pragma: debug
         self.debug('Consumer was cancelled remotely, shutting down: %r',
                    method_frame)
         self.close_channel()

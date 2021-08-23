@@ -52,9 +52,8 @@ class DuplicatedModelDriver(Driver):
             str: Base model name.
 
         """
-        if '_copy' in name:
-            return name.split('_copy')[0]
-        return name
+        assert('_copy' in name)
+        return name.split('_copy')[0]
 
     @classmethod
     def get_yaml_copies(cls, yml):

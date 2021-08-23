@@ -22,6 +22,7 @@ class TestRMQAsyncComm(parent.TestRMQComm):
 
     def test_reconnect_recv(self):
         r"""Test reconnect after unexpected disconnect of recv comm."""
+        self.do_send_recv(print_status=True)
         self.recv_instance.connection.close(reply_code=100,
                                             reply_text="Test shutdown")
         self.recv_instance._reconnecting.started.wait(5)
@@ -68,6 +69,8 @@ class TestRMQAsyncCommNamedQueue(TestRMQAsyncComm):
     
     def test_reconnect_send(self):
         r"""Test reconnect after unexpected disconnect of send comm."""
+        self.send_instance.start_run_thread()
+        self.do_send_recv(print_status=True)
         self.send_instance.connection.close(reply_code=100,
                                             reply_text="Test shutdown")
         self.send_instance._reconnecting.started.wait(5)

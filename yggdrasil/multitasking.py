@@ -882,6 +882,8 @@ class WaitableFunction(object):
 
     """
 
+    __slots__ = ["function", "polling_interval"]
+
     def __init__(self, function, polling_interval=0.1):
         self.function = function
         self.polling_interval = polling_interval
@@ -962,16 +964,20 @@ def wait_on_function(function, timeout=None, on_timeout=False,
 class MPIRequestWrapper(WaitableFunction):
     r"""Wrapper for an MPI request."""
 
+    __slots__ = ["request", "completed", "canceled", "_result"]
+
     def __init__(self, request, completed=False, **kwargs):
         self.request = request
         self.completed = completed
+        self.canceled = False
         self._result = None
-        super(MPIRequestWrapper, self).__init__(lambda: self.test()[0],
-                                                **kwargs)
+        super(MPIRequestWrapper, self).__init__(
+            lambda: self.test()[0] or self.canceled, **kwargs)
 
     def cancel(self):
         r"""Cancel the request."""
         if not self.test()[0]:
+            self.canceled = True
             return self.request.Cancel()
 
     @property
@@ -1053,11 +1059,6 @@ class MPIErrorExchange(object):
             for i in self.partner_ranks]
         self._first_use = False
         
-    def cancel(self):
-        r"""Cancel requests."""
-        for x in self.incoming:
-            x.cancel()
-
     def recv(self, wait=False):
         r"""Check for response to receive request."""
         results = []
@@ -1084,19 +1085,6 @@ class MPIErrorExchange(object):
                 self.comm.send(msg, dest=i, tag=self.outgoing_tag)
             if (self.rank != 0) and (msg[1] in self.closing_messages):
                 self.outgoing = msg
-
-    def check_for_error(self, wait=False):
-        r"""Check if there was an error."""
-        out = any((x[0] and (x[1][1] == 'ERROR'))
-                  for x in self.recv(wait=wait))
-        if out and (self.rank == 0):
-            self.broadcast_error()
-        return out
-
-    def wait(self):
-        r"""Wait for all async calls to complete."""
-        for x in self.incoming:
-            x.wait()
 
     def finalize(self, failure):
         r"""Finalize an instance by waiting for completions.
