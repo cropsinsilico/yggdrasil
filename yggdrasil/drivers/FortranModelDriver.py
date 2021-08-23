@@ -407,7 +407,7 @@ class FortranModelDriver(CompiledModelDriver):
                     # GNU takes precedence when present
                     cxx_lib = 'stdc++'
                     add_cxx_lib = cxx_lib
-            if add_cxx_lib not in cls.external_libraries:
+            if add_cxx_lib and (add_cxx_lib not in cls.external_libraries):
                 cls.external_libraries[add_cxx_lib] = copy.deepcopy(cxx_orig)
                 cls.internal_libraries['fygg']['external_dependencies'].append(
                     add_cxx_lib)
