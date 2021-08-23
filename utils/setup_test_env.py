@@ -815,8 +815,8 @@ def install_deps(method, return_commands=False, verbose=False,
     if not only_python:
         if pkgs['apt']:
             if install_opts['no_sudo']:
-                cmds += ["apt update"]
-                cmds += ["apt-get install %s" % ' '.join(pkgs['apt'])]
+                cmds += ["apt -y update"]
+                cmds += ["apt-get -y install %s" % ' '.join(pkgs['apt'])]
             else:
                 cmds += ["sudo apt update"]
                 cmds += ["sudo apt-get install %s" % ' '.join(pkgs['apt'])]
