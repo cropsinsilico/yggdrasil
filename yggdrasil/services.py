@@ -261,7 +261,7 @@ class FlaskService(ServiceBase):
 
     def run_server(self):
         r"""Begin listening for requests."""
-        self.app.run()
+        self.app.run(host='0.0.0.0')
 
     def shutdown(self):
         r"""Shutdown the process from the server."""

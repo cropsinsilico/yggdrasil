@@ -413,8 +413,7 @@ class integration_service_manager(SubCommand):
                 if not os.path.isabs(yml):
                     yml = os.path.abspath(yml)
                 integration_yamls.append(yml)
-        elif integration_name:
-            assert(os.path.isfile(integration_name))
+        elif integration_name and os.path.isfile(integration_name):
             if not os.path.isabs(integration_name):
                 integration_name = os.path.abspath(integration_name)
         for_request = (
