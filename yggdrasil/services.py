@@ -246,6 +246,10 @@ class FlaskService(ServiceBase):
         self.request = request
         self.jsonify = jsonify
         self.app = Flask(__name__)
+
+        @self.app.route('/')
+        def root():
+            return 'yggdrasil service'
         
         @self.app.route('/' + self.name, methods=['POST'])
         def _target(*req_args):
