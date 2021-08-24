@@ -733,7 +733,7 @@ def create_service_manager_class(service_type=_default_service_type):
             if return_str:
                 msg, _ = self.logger.process(status['status'], {})
                 return msg
-            getattr(self.logger, level)(msg)
+            getattr(self.logger, level)(status['status'])
             
     return IntegrationServiceManager
 
