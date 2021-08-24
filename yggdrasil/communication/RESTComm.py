@@ -145,12 +145,15 @@ class RESTComm(CommBase.CommBase):
     @property
     def n_msg_recv(self):
         r"""int: The number of incoming messages in the connection."""
-        r = requests.get(
-            self.address + '/size',
-            params=self.params,
-            cookies=self.cookies)
-        r.raise_for_status()
-        return int(r.content)
+        try:
+            r = requests.get(
+                self.address + '/size',
+                params=self.params,
+                cookies=self.cookies)
+            r.raise_for_status()
+            return int(r.content)
+        except requests.exceptions.RequestException:  # pragma: debug
+            return 0
 
     @property
     def n_msg_send(self):
