@@ -247,10 +247,6 @@ class FlaskService(ServiceBase):
         self.jsonify = jsonify
         self.app = Flask(__name__)
 
-        @self.app.route('/')
-        def root():
-            return 'yggdrasil service'
-        
         @self.app.route('/' + self.name, methods=['POST'])
         def _target(*req_args):
             return self.process_request(self.request.json, args=req_args)
@@ -537,6 +533,12 @@ def create_service_manager_class(service_type=_default_service_type):
             r"""Set up the machinery for receiving requests."""
             super(IntegrationServiceManager, self).setup_server(*args, **kwargs)
             if service_type == FlaskService:
+                @self.app.route('/')
+                def landing_page():
+                    return self.respond({'action': 'status',
+                                         'name': None,
+                                         'yamls': None})
+                
                 from yggdrasil.communication import RESTComm
                 RESTComm.add_comm_server_to_app(self.app)
             
@@ -679,9 +681,18 @@ def create_service_manager_class(service_type=_default_service_type):
                 elif action == 'status':
                     response = {'status': 'done'}
                     if name is None:
-                        response['integrations'] = list(self.integrations.keys())
+                        fmt = ('Address: %s\n'
+                               'Available Services:\n%s\n'
+                               'Running Services:\n%s')
+                        registry_str = '\t' + '\n\t'.join(
+                            pprint.pformat(self.registry.registry).splitlines())
+                        running_str = ''
                         for k, v in self.integrations.items():
-                            response[k] = v.printStatus(return_str=True)
+                            running_str += '\t%s:\n\t\t%s' % (
+                                k, '\n\t\t'.join(v.printStatus(
+                                    return_str=True).splitlines()))
+                        args = (self.address, registry_str, running_str)
+                        response['status'] = fmt % args
                     else:
                         response['status'] = self.integrations[name].printStatus(
                             return_str=True)
@@ -719,20 +730,10 @@ def create_service_manager_class(service_type=_default_service_type):
             r"""Print the status of the service manager including available
             and running services."""
             status = self.send_request(action='status')
-            fmt = ('Address: %s\n'
-                   'Available Services:\n%s\n'
-                   'Running Services:\n%s')
-            registry_str = '\t' + '\n\t'.join(
-                pprint.pformat(self.registry.registry).splitlines())
-            running_str = ''
-            for k in status['integrations']:
-                running_str += '\t%s:\n\t\t%s' % (
-                    k, '\n\t\t'.join(status[k].splitlines()))
-            args = (self.address, registry_str, running_str)
             if return_str:
-                msg, _ = self.logger.process(fmt, {})
-                return msg % args
-            getattr(self.logger, level)(fmt, *args)
+                msg, _ = self.logger.process(status['status'], {})
+                return msg
+            getattr(self.logger, level)(msg)
             
     return IntegrationServiceManager
 
