@@ -43,6 +43,7 @@ jobs:
         test-flags1: [--long-running --test-suite=timing --test-suite=demos --test-suite=top, --test-suite=examples --separate-test='--test-suite=mpi --write-script=run_mpi.sh --with-mpi=3', --test-suite=types --skip-languages c c++, --test-suite=types --languages c cpp]
         test-flags2: [""]
         install-c: [true]
+        install-mpi: [true]
         include:
           - os: windows-latest
             python-version: 3.6
@@ -50,6 +51,7 @@ jobs:
             test-flags1: --long-running --languages cpp
             test-flags2: --long-running --skip-languages c++
             install-c: false
+            install-mpi: false
       fail-fast: false
 
     steps: &steps
@@ -59,6 +61,10 @@ jobs:
     - name: Set C installation based on matrix value
       if: matrix.install-c != true && matrix.install-method != 'conda'
       run: echo "INSTALLC=0" >> $GITHUB_ENV
+      shell: bash -l {0}
+    - name: Set MPI installation based on matrix value
+      if: matrix.install-mpi != true
+      run: echo "INSTALLMPI=0" >> $GITHUB_ENV
       shell: bash -l {0}
     - name: Store an ID string for the job
       run: echo "YGG_GHA_JOB_ID=${{ matrix.os }}-${{ matrix.install-method }}-py${{ matrix.python-version }}-C${{ env.INSTALLC }}-RMQ${{ env.INSTALLRMQ }}${{ env.YGG_GHA_JOB_ID_SUFFIX }}" >> $GITHUB_ENV
@@ -345,6 +351,7 @@ jobs:
         test-flags1: [--long-running --separate-test='--test-suite=mpi --write-script=run_mpi.sh']
         test-flags2: [--with-examples examples/tests/test_backwards.py]
         install-c: [true]
+        install-mpi: [true]
         include:
           - os: ubuntu-latest
             python-version: 3.7
@@ -352,24 +359,28 @@ jobs:
             test-flags1: --long-running
             test-flags2: ""
             install-c: true
+            install-mpi: false
           - os: ubuntu-latest
             python-version: 3.8
             install-method: conda
             test-flags1: --long-running
             test-flags2: ""
             install-c: true
+            install-mpi: false
           - os: ubuntu-latest
             python-version: 3.9
             install-method: conda
             test-flags1: --long-running
             test-flags2: ""
             install-c: true
+            install-mpi: false
           - os: macos-latest
             python-version: 3.8
             install-method: conda
             test-flags1: tests/test_tools.py --with-examples examples/tests/test_rpc_lesson3.py
             test-flags2: ""
             install-c: true
+            install-mpi: false
       fail-fast: false
     defaults:
       run:
@@ -392,6 +403,7 @@ jobs:
         test-flags1: [--long-running --languages python R matlab]
         test-flags2: [""]
         install-c: [true]
+        install-mpi: [false]
       fail-fast: false
     services: &rmq_services
       rabbitmq:
@@ -416,6 +428,7 @@ jobs:
         test-flags1: [--long-running --languages python R matlab]
         test-flags2: [""]
         install-c: [true]
+        install-mpi: [false]
       fail-fast: false
     services: *rmq_services
     defaults:
@@ -445,6 +458,7 @@ jobs:
         test-flags1: [--long-running]
         test-flags2: [""]
         install-c: [false]
+        install-mpi: [false]
       fail-fast: false
     steps: *steps
 

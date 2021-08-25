@@ -24,7 +24,7 @@ To run an integration using |yggdrasil|, you must be able to install |yggdrasil|
     $ wget https://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.sh -O miniconda.sh
     $ bash miniconda.sh -b -p $HOME/miniconda export PATH="$HOME/miniconda/bin:$PATH"
 
-* If conda is not installed and you cannot install via conda due to limitation on downloads for cluster users, you can install |yggdrasil| via pip as a user package. If the target cluster uses a package manager, you may need to activate/load a Python installation (version 3.6 or higher).::
+* If conda is not installed and you cannot install conda due to limitations on packages for cluster users, but Python and pip are installed, you can install |yggdrasil| via pip as a user package. If the target cluster uses a package manager, you may need to activate/load a Python installation (version 3.6 or higher). You will need to complete additional installation steps for non-Python languages as described for the normal :ref:`pip-based installation <manual_install_rst>`::
 
     $ python -m pip install yggdrasil-framework --user
 
