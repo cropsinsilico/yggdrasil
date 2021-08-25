@@ -28,6 +28,16 @@ def test_LockedAttr():
                   getattr, z, 'x')
 
 
+def test_WaitableFunction():
+    r"""Test WaitableFunction."""
+    def always_false():
+        return False
+    x = multitasking.WaitableFunction(always_false, polling_interval=0.0)
+    assert(not x.wait(timeout=0.0, on_timeout=True))
+    assert_raises(multitasking.TimeoutError, x.wait,
+                  timeout=0.0, on_timeout="Error message")
+
+
 def test_TaskThread():
     r"""Test thread based Task."""
     q = multitasking.Task(target=target)

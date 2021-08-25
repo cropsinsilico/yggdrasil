@@ -983,7 +983,7 @@ class MPIRequestWrapper(WaitableFunction):
     @property
     def result(self):
         r"""object: The result of the MPI request."""
-        if not self.completed:
+        if not self.completed:  # pragma: intermittent
             self.test()
         return self._result
 
