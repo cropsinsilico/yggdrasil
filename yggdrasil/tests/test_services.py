@@ -137,6 +137,10 @@ class TestServices(object):
                       test_yml, action='invalid')
         print(cli.send_request(test_yml))
         cli.send_request(action='status')
+        if cli.service_type == 'flask':
+            import requests
+            r = requests.get(cli.address)
+            r.raise_for_status()
         cli.send_request(test_yml, action='status')
         cli.send_request(test_yml, action='stop')
         cli.send_request(action='status')

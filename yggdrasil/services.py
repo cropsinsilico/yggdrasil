@@ -548,7 +548,7 @@ def create_service_manager_class(service_type=_default_service_type):
                 def landing_page():
                     return self.respond({'action': 'status',
                                          'name': None,
-                                         'yamls': None})
+                                         'yamls': None})['status']
                 
                 from yggdrasil.communication import RESTComm
                 RESTComm.add_comm_server_to_app(self.app)
