@@ -226,8 +226,13 @@ class FlaskService(ServiceBase):
 
     def __init__(self, *args, **kwargs):
         super(FlaskService, self).__init__(*args, **kwargs)
+        self.port = int(os.environ.get("PORT", 5000))
         if self.address is None:
-            self.address = 'http://localhost:5000'
+            self.address = 'http://localhost:%d' % self.port
+        else:
+            parts = self.address.split(':')
+            if parts[-1].strip('/').isdigit():
+                self.port = int(parts[-1].strip('/'))
         if not self.address.endswith('/'):
             self.address += '/'
 
@@ -257,7 +262,7 @@ class FlaskService(ServiceBase):
 
     def run_server(self):
         r"""Begin listening for requests."""
-        self.app.run(host='0.0.0.0')
+        self.app.run(host='0.0.0.0', port=self.port)
 
     def shutdown(self):
         r"""Shutdown the process from the server."""
