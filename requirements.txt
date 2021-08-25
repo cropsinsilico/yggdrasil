@@ -1,4 +1,5 @@
 flask
+gunicorn
 jsonschema>=3
 matplotlib
 numpy>=1.13.0
