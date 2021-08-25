@@ -828,7 +828,14 @@ class IntegrationServiceRegistry(object):
         with open(name, 'r') as fd:
             out = yaml.safe_load(fd.read())
         assert(isinstance(out, dict))
-        # TODO: Normalize YAML paths?
+        base_dir = os.path.dirname(name)
+        for k in out.keys():
+            v = out.get(k, [])
+            out[k] = []
+            for x in v:
+                if not os.path.isabs(x):
+                    x = os.path.join(base_dir, x)
+                out[k].append(x)
         return out
 
     def remove(self, name):
