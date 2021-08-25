@@ -45,17 +45,17 @@ class MPIRequest(object):
             self.size_req = MPIRequestWrapper(
                 self.comm.Isend([self.size, MPI.INT], **kwargs))
             out = MPIRequestWrapper(
-                self.comm.Isend([payload, MPI.CHAR], **kwargs))
+                self.comm.Isend(*args, **kwargs))
         else:
             method = 'Irecv'
             args = ([self.size, MPI.INT], )
             kwargs['source'] = self.address
             self.size_req = MPIRequestWrapper(
-                self.comm.Irecv([self.size, MPI.INT], **kwargs))
+                self.comm.Irecv(*args, **kwargs))
             out = None
         logger.debug("rank = %d, method = %s, args = %.100s, kwargs = %.100s",
                      self.comm.Get_rank(), method, args, kwargs)
-        return out  # getattr(self.comm, method)(*args, **kwargs)
+        return out
 
     @property
     def complete(self):
@@ -74,7 +74,7 @@ class MPIRequest(object):
     def cancel(self):
         r"""Cancel a request."""
         self.size_req.cancel()
-        if self.req is not None:
+        if self.req is not None:  # pragma: intermittent
             self.req.cancel()
 
 

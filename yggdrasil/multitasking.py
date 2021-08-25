@@ -1100,7 +1100,7 @@ class MPIErrorExchange(object):
                                  check_complete=True,
                                  sync_tag=True)
         finally:
-            while not complete:
+            while not complete:  # pragma: debug
                 complete = self.sync(msg='COMPLETE',
                                      local_error=failure,
                                      check_complete=True,
@@ -1134,9 +1134,9 @@ class MPIErrorExchange(object):
         remote_error = False
         if msg is None:
             msg = 'TAG'
-        if local_error:
+        if local_error:  # pragma: debug
             msg = 'ERROR'
-        if self.outgoing is not None:
+        if self.outgoing is not None:  # pragma: debug
             msg = self.outgoing
         if self.rank != 0:
             self.send((local_tag, msg))
@@ -1156,7 +1156,7 @@ class MPIErrorExchange(object):
             self.global_tag = max(all_tag)
         else:
             self.global_tag = local_tag
-        if remote_error and (not local_error) and (not dont_raise):
+        if remote_error and (not local_error) and (not dont_raise):  # pragma: debug
             raise MPIPartnerError("Error on another process.")
         if check_equal and not (remote_error or local_error):
             assert(all((x == local_tag) for x in all_tag))
