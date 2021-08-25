@@ -688,7 +688,7 @@ class CommBase(tools.YggClass):
         self.create_proxy = ((self.is_client or self.allow_multiple_comms)
                              and (not self.is_interface)
                              and (self.direction != 'recv')
-                             and (self._commtype != 'mpi'))
+                             and (self._commtype not in ['mpi', 'rest']))
         # Add interface tag
         if self.is_interface:
             self._name += '_I'
