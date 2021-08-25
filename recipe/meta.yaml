@@ -58,7 +58,6 @@ requirements:
     - flask
     - git
     - GitPython
-    - gunicorn
     - jsonschema
     - matplotlib-base
     - numpy >=1.13.0
