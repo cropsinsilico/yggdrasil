@@ -59,6 +59,11 @@ class ServiceBase(YggClass):
         else:
             self.setup_server(*args, **kwargs)
 
+    @property
+    def opp_address(self):
+        r"""str: Opposite address."""
+        return self.address
+
     @classmethod
     def is_installed(cls):
         r"""bool: True if the class is fully installed, False otherwise."""
@@ -203,7 +208,8 @@ class ServiceBase(YggClass):
         request_str = self.serialize(request)
         if not self.for_request:
             x = self.__class__(self.name, *self._args,
-                               **self._kwargs, for_request=True)
+                               **self._kwargs, for_request=True,
+                               address=self.opp_address)
         else:
             x = self
         return self.process_response(x.call(request_str, **kwargs))
@@ -633,6 +639,7 @@ def create_service_manager_class(service_type=_default_service_type):
             out.update(name=name,
                        args=name,
                        language='dummy')
+            # TODO: For flask, update the address to use the full URL
             return out
 
         @property
@@ -657,6 +664,9 @@ def create_service_manager_class(service_type=_default_service_type):
                 dict: Response to the request.
 
             """
+            name = None
+            action = None
+            yamls = None
             try:
                 name = request.pop('name')
                 action = request.pop('action')
@@ -713,6 +723,8 @@ def create_service_manager_class(service_type=_default_service_type):
             except BaseException as e:
                 tb = traceback.format_exc()
                 response = {'error': str(e), 'traceback': tb}
+                if action == 'start':  # pragma: intermittent
+                    self.respond({'name': name, 'action': 'stop', 'yamls': None})
             return response
 
         def process_response(self, response):

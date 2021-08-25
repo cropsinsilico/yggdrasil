@@ -95,6 +95,36 @@ def running_service(service_type, partial_commtype=None,
 def _make_ids(ids):
     return ','.join([str(x) for x in ids])
 
+
+@pytest.mark.skip
+def test_call_integration_remote():
+    r"""Test with remote integration service."""
+    name = 'photosynthesis'
+    test_yml = ex_yamls['fakeplant']['python']
+    remote_yml = '_remote'.join(os.path.splitext(test_yml))
+    yamls = copy.copy(ex_yamls['fakeplant']['all_nomatlab'])
+    yamls.remove(test_yml)
+    yamls.append(remote_yml)
+    address = 'https://model-service-demo.herokuapp.com/'
+    service_type = 'flask'
+    cli = IntegrationServiceManager(service_type=service_type,
+                                    for_request=True,
+                                    address=address)
+    if not cli.is_running:
+        pytest.skip("Heroku app is not running.")
+    try:
+        with open(remote_yml, 'w') as fd:
+            fd.write('\n'.join(['service:',
+                                f'    name: {name}',
+                                f'    type: {service_type}',
+                                f'    address: {address}']))
+        r = runner.get_runner(yamls)
+        r.run()
+        assert(not r.error_flag)
+    finally:
+        if os.path.isfile(remote_yml):
+            os.remove(remote_yml)
+        
         
 class TestServices(object):
     r"""Class to test integration services."""

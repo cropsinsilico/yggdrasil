@@ -158,6 +158,7 @@ def prep_yaml(files):
                     request[k] = x.pop(k)
             if 'type' in x:
                 x.setdefault('service_type', x.pop('type'))
+            x.setdefault('for_request', True)
             cli = IntegrationServiceManager(**x)
             response = cli.send_request(**request)
             assert(response.pop('status') == 'started')
