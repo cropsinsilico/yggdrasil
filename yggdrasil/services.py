@@ -3,9 +3,9 @@ import signal
 import uuid
 import json
 import traceback
-import threading
 import yaml
 import pprint
+import functools
 from yggdrasil import runner
 from yggdrasil import platform
 from yggdrasil.tools import sleep, TimeOut, YggClass
@@ -371,6 +371,8 @@ class RMQService(ServiceBase):
         self.consumer_tag = self.channel.basic_consume(
             queue=self.queue,
             on_message_callback=self._on_request)
+        cb = functools.partial(self.shutdown, in_callback=True)
+        self.channel.add_on_cancel_callback(cb)
     
     def setup_client(self, *args, **kwargs):
         r"""Set up the machinery for sending requests.
@@ -397,15 +399,19 @@ class RMQService(ServiceBase):
         except self.pika.exceptions.ChannelWrongStateError:
             pass
 
-    def shutdown(self):
+    def shutdown(self, in_callback=False):
         r"""Shutdown the process from the server."""
         if not self.channel:
             return
         if self.for_request:
             queue = self.callback_queue
+            in_callback = False
         else:
             queue = self.queue
-        self.channel.basic_cancel(consumer_tag=self.consumer_tag)
+        if not in_callback:
+            self.channel.basic_cancel(consumer_tag=self.consumer_tag)
+            if not self.for_request:
+                return
         self.channel.queue_delete(queue=queue)
         self.channel.close()
         self.channel = None
@@ -679,8 +685,7 @@ def create_service_manager_class(service_type=_default_service_type):
                     response = {'status': 'stopped'}
                 elif action == 'shutdown':
                     self.stop_integration(None)
-                    tobj = threading.Timer(1, self.shutdown)
-                    tobj.start()
+                    self.shutdown()
                     response = {'status': 'shutting down',
                                 'pid': os.getpid()}
                 elif action == 'status':
