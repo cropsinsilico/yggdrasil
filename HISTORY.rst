@@ -18,9 +18,9 @@ TODO
 ....
 
 * Add tutorial on setting up a service
-* Add method for running a production Flask app
-* Add method for specifying the port to use via the command line
-  
+* Fix return of opp_address for flask so that RESTComms use the correct remote address
+* Finish test using the Heroku app
+* Fix bug on windows where ZMQ error occurs on shudown for service integration
 
 
 1.7.0 (2021-08-26) Support for MPI communicators, MPI execution, and pika >= 1.0.0
